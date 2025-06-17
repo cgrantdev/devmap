@@ -23,12 +23,12 @@
         <input v-model="form.password" type="password" class="w-full border rounded px-3 py-2" :class="{ 'border-red-500': errors.password }" />
         <div v-if="errors.password" class="text-red-500 text-sm mt-1">{{ Array.isArray(errors.password) ? errors.password[0] : errors.password }}</div>
       </div>
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" :disabled="form.processing">
+      <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-900" :disabled="form.processing">
         {{ form.processing ? 'Logging in...' : 'Login' }}
       </button>
     </form>
     <div class="mt-4">
-      <span>Don't have a vendor account?</span>
+      <span>Don't have an account?</span>
       <Link href="/register" class="text-blue-600">Register</Link>
     </div>
     <div class="mt-2">
