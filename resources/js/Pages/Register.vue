@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto max-w-md py-8">
-    <h1 class="text-2xl font-bold mb-6">Register</h1>
+    <h1 class="text-2xl font-bold mb-6">Vendor Registration</h1>
     <form @submit.prevent="submit">
       <div class="mb-4">
         <label class="block mb-1">Name</label>
@@ -24,15 +24,19 @@
       <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Register</button>
     </form>
     <div class="mt-4">
-      <span>Already have an account?</span>
-      <inertia-link href="/login" class="text-blue-600">Login</inertia-link>
+      <span>Already have a vendor account?</span>
+      <Link href="/login" class="text-blue-600">Login</Link>
+    </div>
+    <div class="mt-2">
+      <span>Are you an admin?</span>
+      <Link href="/admin/login" class="text-gray-800">Admin Login</Link>
     </div>
   </div>
 </template>
 
 <script setup>
 import { reactive } from 'vue'
-import { useForm, usePage } from '@inertiajs/vue3'
+import { useForm, usePage, Link } from '@inertiajs/vue3'
 
 const form = useForm({
   name: '',
