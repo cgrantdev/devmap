@@ -17,18 +17,26 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request)
     {
-        $request->authenticate();
+        try {
+            $request->authenticate();
 
-        $request->session()->regenerate();
+            $request->session()->regenerate();
 
-        if ($request->user()->role !== 'vendor') {
-            Auth::logout();
+            if ($request->user()->role !== 'vendor') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'These credentials are for vendor access only.',
+                ])->withInput();
+            }
+
+            return redirect()->intended('/vendor/dashboard');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
             return back()->withErrors([
-                'email' => 'These credentials are for vendor access only.',
-            ]);
+                'email' => 'An error occurred during login. Please try again.',
+            ])->withInput();
         }
-
-        return redirect()->intended('/vendor/dashboard');
     }
 
     public function destroy(Request $request)

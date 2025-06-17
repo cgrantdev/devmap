@@ -41,8 +41,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 // Authentication routes
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/register', [RegisteredUserController::class, 'store']);
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+});
 
 // Admin authentication routes
 Route::post('/admin/login', [AdminAuthenticatedSessionController::class, 'store']);
-Route::post('/admin/logout', [AdminAuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
+Route::middleware('auth')->group(function () {
+    Route::post('/admin/logout', [AdminAuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
+});

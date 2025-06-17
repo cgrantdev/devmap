@@ -40,9 +40,11 @@
 </template>
 
 <script setup>
-import { useForm } from '@inertiajs/vue3'
+import { useForm, usePage } from '@inertiajs/vue3'
 
-const form = useForm()
+const form = useForm({
+  _token: usePage().props.csrf_token
+})
 
 // Mock data - replace with actual data from your backend
 const stats = {

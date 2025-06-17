@@ -3,7 +3,9 @@
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-bold">Vendor Dashboard</h1>
       <form @submit.prevent="logout">
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Logout</button>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" :disabled="form.processing">
+          {{ form.processing ? 'Logging out...' : 'Logout' }}
+        </button>
       </form>
     </div>
     
@@ -40,9 +42,11 @@
 </template>
 
 <script setup>
-import { useForm } from '@inertiajs/vue3'
+import { useForm, usePage } from '@inertiajs/vue3'
 
-const form = useForm()
+const form = useForm({
+  _token: usePage().props.csrf_token
+})
 
 // Mock data - replace with actual data from your backend
 const stats = {
@@ -53,6 +57,10 @@ const stats = {
 const recentOrders = []
 
 function logout() {
-  form.post('/logout')
+  form.post('/logout', {
+    onSuccess: () => {
+      window.location.href = '/login'
+    }
+  })
 }
 </script> 
