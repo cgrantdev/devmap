@@ -28,7 +28,8 @@ import { useForm, usePage, Link } from '@inertiajs/vue3'
 
 const form = useForm({
   email: '',
-  password: ''
+  password: '',
+  _token: usePage().props.csrf_token
 })
 const errors = usePage().props.errors || {}
 

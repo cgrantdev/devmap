@@ -27,13 +27,14 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
 import { useForm, usePage, Link } from '@inertiajs/vue3'
 
 const form = useForm({
   email: '',
-  password: ''
+  password: '',
+  _token: usePage().props.csrf_token
 })
+
 const errors = usePage().props.errors || {}
 
 function submit() {

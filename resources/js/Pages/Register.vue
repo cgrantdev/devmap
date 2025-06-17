@@ -42,7 +42,8 @@ const form = useForm({
   name: '',
   email: '',
   password: '',
-  password_confirmation: ''
+  password_confirmation: '',
+  _token: usePage().props.csrf_token
 })
 const errors = usePage().props.errors || {}
 
