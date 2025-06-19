@@ -54,4 +54,9 @@ class User extends Authenticatable
     {
         return $this->role === 'vendor';
     }
+
+    public function vendorSetting()
+    {
+        return $this->hasOne(VendorSetting::class);
+    }
 }

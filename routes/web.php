@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\AdminAuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\Vendor\VendorSettingsController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -29,6 +30,11 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->group(function () 
     Route::get('/dashboard', function () {
         return Inertia::render('Vendor/Dashboard');
     })->name('vendor.dashboard');
+    Route::get('/profile', function () {
+        return Inertia::render('Vendor/Profile');
+    })->name('vendor.profile');
+    Route::get('/settings', [VendorSettingsController::class, 'show'])->name('vendor.settings');
+    Route::post('/settings', [VendorSettingsController::class, 'update'])->name('vendor.settings.update');
 });
 
 // Admin routes
