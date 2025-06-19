@@ -10,6 +10,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\Vendor\VendorSettingsController;
+use App\Http\Controllers\Vendor\PublicVendorController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -56,3 +57,5 @@ Route::post('/admin/login', [AdminAuthenticatedSessionController::class, 'store'
 Route::middleware('auth')->group(function () {
     Route::post('/admin/logout', [AdminAuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
 });
+
+Route::get('/vendor/{vendor_name}', [PublicVendorController::class, 'show'])->name('vendor.public');
