@@ -43,15 +43,16 @@ const form = useForm({
   _token: usePage().props.csrf_token
 })
 
-const errors = usePage().props.errors || {}
+var errors = {}
 
 function submit() {
   form.post('/admin/login', {
     onSuccess: () => {
       window.location.href = '/admin/dashboard'
     },
-    onError: (errors) => {
-      console.log('Login failed:', errors)
+    onError: (errs) => {
+      console.log('Login failed:', errs)
+      errors = errs
     }
   })
 }
