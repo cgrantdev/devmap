@@ -1,6 +1,6 @@
 <template>
   <Layout>
-    <div>
+    <div class="bg-white p-8">
     <h1 class="text-2xl font-bold mb-6">Settings</h1>
     <form class="max-w-lg space-y-6" @submit.prevent="submit">
       <div>
@@ -49,7 +49,7 @@
 <script setup>
 import Layout from './Layout.vue'
 import { usePage, router } from '@inertiajs/vue3'
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref } from 'vue'
 
 const props = defineProps({
   settings: Object
@@ -68,8 +68,14 @@ const form = reactive({
   logo: null
 })
 
-const bannerPreview = ref(props.settings?.banner ? `/storage/${props.settings.banner}` : null)
-const logoPreview = ref(props.settings?.logo ? `/storage/${props.settings.logo}` : null)
+function getImageUrl(path) {
+  if (!path) return null
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('/')) return path
+  return `/storage/${path}`
+}
+
+const bannerPreview = ref(getImageUrl(props.settings?.banner))
+const logoPreview = ref(getImageUrl(props.settings?.logo))
 
 function onBannerChange(e) {
   const file = e.target.files[0]
@@ -79,7 +85,7 @@ function onBannerChange(e) {
     reader.onload = e => bannerPreview.value = e.target.result
     reader.readAsDataURL(file)
   } else {
-    bannerPreview.value = props.settings?.banner ? `/storage/${props.settings.banner}` : null
+    bannerPreview.value = getImageUrl(props.settings?.banner)
   }
 }
 
@@ -91,7 +97,7 @@ function onLogoChange(e) {
     reader.onload = e => logoPreview.value = e.target.result
     reader.readAsDataURL(file)
   } else {
-    logoPreview.value = props.settings?.logo ? `/storage/${props.settings.logo}` : null
+    logoPreview.value = getImageUrl(props.settings?.logo)
   }
 }
 

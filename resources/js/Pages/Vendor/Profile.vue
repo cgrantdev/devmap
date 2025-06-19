@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <Layout>
+    <div class="bg-white p-8">
     <h1 class="text-2xl font-bold mb-6">Profile</h1>
     <div class="max-w-md space-y-4">
       <div>
@@ -12,9 +13,11 @@
       </div>
     </div>
   </div>
+  </Layout>
 </template>
 
 <script setup>
+import Layout from './Layout.vue'
 import { usePage } from '@inertiajs/vue3'
 const user = usePage().props.auth.user || {}
 const profile = {
