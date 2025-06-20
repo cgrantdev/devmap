@@ -1,6 +1,7 @@
 <template>
-  <div class="container mx-auto max-w-md py-8">
-    <h1 class="text-2xl font-bold mb-6">Vendor Login</h1>
+  <div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+      <h1 class="text-2xl font-bold mb-6 text-center">Vendor Login</h1>
 
     <!-- General Error Message -->
     <div v-if="Object.keys(errors).length > 0" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -12,28 +13,43 @@
       </ul>
     </div>
 
-    <form @submit.prevent="submit">
-      <div class="mb-4">
-        <label class="block mb-1">Email</label>
-        <input v-model="form.email" type="email" class="w-full border rounded px-3 py-2" :class="{ 'border-red-500': errors.email }" />
-        <div v-if="errors.email" class="text-red-500 text-sm mt-1">{{ Array.isArray(errors.email) ? errors.email[0] : errors.email }}</div>
+      <form @submit.prevent="submit">
+        <div class="mb-4">
+          <label class="block mb-1">Email</label>
+          <input v-model="form.email" type="email" class="w-full border rounded px-3 py-2" :class="{ 'border-red-500': errors.email }" />
+          <div v-if="errors.email" class="text-red-500 text-sm mt-1">
+            <template v-if="Array.isArray(errors.email)">
+              <span v-for="(msg, idx) in errors.email" :key="idx">{{ msg }}</span>
+            </template>
+            <template v-else>
+              {{ errors.email }}
+            </template>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block mb-1">Password</label>
+          <input v-model="form.password" type="password" class="w-full border rounded px-3 py-2" :class="{ 'border-red-500': errors.password }" />
+          <div v-if="errors.password" class="text-red-500 text-sm mt-1">
+            <template v-if="Array.isArray(errors.password)">
+              <span v-for="(msg, idx) in errors.password" :key="idx">{{ msg }}</span>
+            </template>
+            <template v-else>
+              {{ errors.password }}
+            </template>
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-900" :disabled="form.processing">
+          {{ form.processing ? 'Logging in...' : 'Login' }}
+        </button>
+      </form>
+      <div class="mt-4 text-center">
+        <span>Don't have an account?</span>
+        <Link href="/register" class="text-blue-600 ml-1">Register</Link>
       </div>
-      <div class="mb-4">
-        <label class="block mb-1">Password</label>
-        <input v-model="form.password" type="password" class="w-full border rounded px-3 py-2" :class="{ 'border-red-500': errors.password }" />
-        <div v-if="errors.password" class="text-red-500 text-sm mt-1">{{ Array.isArray(errors.password) ? errors.password[0] : errors.password }}</div>
+      <div class="mt-2">
+        <span>Are you an admin?</span>
+        <Link href="/admin/login" class="text-gray-800">Admin Login</Link>
       </div>
-      <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-900" :disabled="form.processing">
-        {{ form.processing ? 'Logging in...' : 'Login' }}
-      </button>
-    </form>
-    <div class="mt-4">
-      <span>Don't have an account?</span>
-      <Link href="/register" class="text-blue-600">Register</Link>
-    </div>
-    <div class="mt-2">
-      <span>Are you an admin?</span>
-      <Link href="/admin/login" class="text-gray-800">Admin Login</Link>
     </div>
   </div>
 </template>
