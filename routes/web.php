@@ -13,6 +13,7 @@ use App\Http\Controllers\Vendor\VendorSettingsController;
 use App\Http\Controllers\Vendor\PublicVendorController;
 use App\Http\Controllers\Admin\VendorsController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Vendor\ImportController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -33,6 +34,10 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->group(function () 
     Route::get('/dashboard', function () {
         return Inertia::render('Vendor/Dashboard');
     })->name('vendor.dashboard');
+    Route::get('/import', [ImportController::class, 'index'])->name('vendor.import');
+    Route::post('/import/file', [ImportController::class, 'importFromFile'])->name('vendor.import.file');
+    Route::post('/import/url', [ImportController::class, 'importFromUrl'])->name('vendor.import.url');
+    Route::delete('/products/{product}', [ImportController::class, 'deleteProduct'])->name('vendor.products.delete');
     Route::get('/profile', function () {
         return Inertia::render('Vendor/Profile');
     })->name('vendor.profile');

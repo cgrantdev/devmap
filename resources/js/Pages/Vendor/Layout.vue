@@ -5,6 +5,7 @@
       <div class="p-6 text-2xl font-bold border-b">Vendor Panel</div>
       <nav class="flex-1 p-4 space-y-2">
         <Link href="/vendor/dashboard" class="block px-4 py-2 rounded hover:bg-gray-200" :class="{ 'bg-gray-200 font-semibold': $page.url === '/vendor/dashboard' }">Dashboard</Link>
+        <Link href="/vendor/import" class="block px-4 py-2 rounded hover:bg-gray-200" :class="{ 'bg-gray-200 font-semibold': $page.url === '/vendor/import' }">Import</Link>
         <Link href="/vendor/settings" class="block px-4 py-2 rounded hover:bg-gray-200" :class="{ 'bg-gray-200 font-semibold': $page.url === '/vendor/settings' }">Settings</Link>
         <Link href="/vendor/profile" class="block px-4 py-2 rounded hover:bg-gray-200" :class="{ 'bg-gray-200 font-semibold': $page.url === '/vendor/profile' }">Profile</Link>
       </nav>
