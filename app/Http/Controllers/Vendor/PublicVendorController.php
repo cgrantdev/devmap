@@ -6,20 +6,30 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\VendorSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class PublicVendorController extends Controller
 {
     public function show($vendor_name)
     {
-        // Convert URL-friendly name back to company name
-        $company_name = str_replace('-', ' ', $vendor_name);
+        // Convert URL-friendly name back to vendor name
+        $name = str_replace('-', ' ', $vendor_name);
         
-        $vendorSetting = VendorSetting::where('company_name', 'LIKE', $company_name)
-            ->where('status', 1) // Only show active vendors
+        $user = User::where('name', 'LIKE', $name)
+            ->where('role', 'vendor')
             ->firstOrFail();
             
-        $user = $vendorSetting->user;
+        $vendorSetting = $user->vendorSetting;
+        
+        // Check if current user is admin
+        $currentUser = Auth::user();
+        $isAdmin = $currentUser && $currentUser->role === 'admin';
+        
+        // Only show if vendor has active status, unless user is admin
+        if (!$vendorSetting || ($vendorSetting->status !== 1 && !$isAdmin)) {
+            abort(404);
+        }
         
         // Dummy items
         $items = [
@@ -47,6 +57,7 @@ class PublicVendorController extends Controller
             'settings' => $vendorSetting,
             'vendor' => $user,
             'items' => $items,
+            'isAdmin' => $isAdmin,
         ]);
     }
 } 

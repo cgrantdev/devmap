@@ -58,8 +58,8 @@
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <Link v-if="vendor.settings?.company_name" :href="`/vendor/${vendor.settings.company_name.toLowerCase().replace(/\s+/g, '-')}`" class="text-indigo-600 hover:text-indigo-900 mr-4">
-                  View Public Page
+                <Link :href="`/vendor/${vendor.name.toLowerCase().replace(/\s+/g, '-')}`" target="_blank" class="text-indigo-600 hover:text-indigo-900 mr-4">
+                  {{ vendor.settings?.status === 1 ? 'View Public Page' : 'Preview Public Page (Inactive)' }}
                 </Link>
                 <button @click="toggleStatus(vendor)" class="text-gray-600 hover:text-gray-900">
                   {{ vendor.settings?.status === 1 ? 'Deactivate' : 'Activate' }}
