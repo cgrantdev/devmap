@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\VendorSetting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,8 +12,15 @@ class PublicVendorController extends Controller
 {
     public function show($vendor_name)
     {
-        $user = User::where('name', $vendor_name)->where('role', 'vendor')->firstOrFail();
-        $settings = $user->vendorSetting;
+        // Convert URL-friendly name back to company name
+        $company_name = str_replace('-', ' ', $vendor_name);
+        
+        $vendorSetting = VendorSetting::where('company_name', 'LIKE', $company_name)
+            ->where('status', 1) // Only show active vendors
+            ->firstOrFail();
+            
+        $user = $vendorSetting->user;
+        
         // Dummy items
         $items = [
             [
@@ -34,8 +42,9 @@ class PublicVendorController extends Controller
                 'image' => 'https://via.placeholder.com/150',
             ],
         ];
+        
         return Inertia::render('Vendor/Public', [
-            'settings' => $settings,
+            'settings' => $vendorSetting,
             'vendor' => $user,
             'items' => $items,
         ]);

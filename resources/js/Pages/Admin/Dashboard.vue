@@ -1,10 +1,8 @@
 <template>
-  <div class="container mx-auto max-w-6xl py-8">
-    <div class="flex justify-between items-center mb-8">
+  <AdminLayout>
+    <div class="mb-8">
       <h1 class="text-3xl font-bold">Admin Dashboard</h1>
-      <form @submit.prevent="logout">
-        <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded">Logout</button>
-      </form>
+      <p class="text-gray-600 mt-2">Welcome to the admin panel</p>
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -14,6 +12,7 @@
         <div class="space-y-2">
           <p>Total Vendors: {{ stats.totalVendors }}</p>
           <p>Active Vendors: {{ stats.activeVendors }}</p>
+          <p>Inactive Vendors: {{ stats.inactiveVendors }}</p>
         </div>
       </div>
 
@@ -31,30 +30,28 @@
       <div class="bg-white p-6 rounded-lg shadow">
         <h2 class="text-xl font-semibold mb-4">Quick Actions</h2>
         <div class="space-y-2">
-          <button class="w-full bg-gray-800 text-white px-4 py-2 rounded">Manage Vendors</button>
-          <button class="w-full bg-gray-800 text-white px-4 py-2 rounded">View Reports</button>
+          <Link href="/admin/vendors" class="block w-full bg-gray-800 text-white px-4 py-2 rounded text-center hover:bg-gray-700">Manage Vendors</Link>
+          <button class="w-full bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Reports</button>
         </div>
       </div>
     </div>
-  </div>
+  </AdminLayout>
 </template>
 
 <script setup>
-import { useForm, usePage } from '@inertiajs/vue3'
+import { Link } from '@inertiajs/vue3'
+import AdminLayout from './Layout.vue'
 
-const form = useForm({
-  _token: usePage().props.csrf_token
+const props = defineProps({
+  stats: {
+    type: Object,
+    default: () => ({
+      totalVendors: 0,
+      activeVendors: 0,
+      inactiveVendors: 0
+    })
+  }
 })
 
-// Mock data - replace with actual data from your backend
-const stats = {
-  totalVendors: 0,
-  activeVendors: 0
-}
-
 const recentActivity = []
-
-function logout() {
-  form.post('/admin/logout')
-}
 </script> 

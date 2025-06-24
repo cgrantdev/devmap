@@ -11,6 +11,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use App\Http\Controllers\Vendor\VendorSettingsController;
 use App\Http\Controllers\Vendor\PublicVendorController;
+use App\Http\Controllers\Admin\VendorsController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -40,9 +42,9 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->group(function () 
 
 // Admin routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->name('admin.dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/vendors', [VendorsController::class, 'index'])->name('admin.vendors');
+    Route::post('/vendors/{id}/toggle-status', [VendorsController::class, 'toggleStatus'])->name('admin.vendors.toggle-status');
 });
 
 // Authentication routes

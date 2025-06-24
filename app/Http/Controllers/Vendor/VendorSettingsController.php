@@ -52,6 +52,12 @@ class VendorSettingsController extends Controller
         $settings->contact_email = $validated['contact_email'] ?? $settings->contact_email;
         $settings->phone_number = $validated['phone_number'] ?? $settings->phone_number;
         $settings->user_id = $user->id;
+        
+        // Set status to active if this is a new settings record
+        if (!$settings->exists) {
+            $settings->status = 1;
+        }
+        
         $settings->save();
 
         return redirect()->back()->with('message', 'Settings updated successfully!');
