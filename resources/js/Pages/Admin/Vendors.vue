@@ -58,9 +58,9 @@
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <Link :href="`/vendor/${vendor.name.toLowerCase().replace(/\s+/g, '-')}`" target="_blank" class="text-indigo-600 hover:text-indigo-900 mr-4">
+                <a :href="`/vendor/${vendor.name.toLowerCase().replace(/\s+/g, '-')}`" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-900 mr-4">
                   {{ vendor.settings?.status === 1 ? 'View Public Page' : 'Preview Public Page (Inactive)' }}
-                </Link>
+                </a>
                 <button @click="toggleStatus(vendor)" class="text-gray-600 hover:text-gray-900">
                   {{ vendor.settings?.status === 1 ? 'Deactivate' : 'Activate' }}
                 </button>
