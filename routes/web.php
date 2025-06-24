@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\VendorsController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Vendor\ImportController;
 use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -30,8 +31,18 @@ Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AdminAuthenticatedSessionController::class, 'create'])->name('admin.login');
 });
 
+// Email verification routes (require authentication but not email verification)
+Route::middleware('auth')->group(function () {
+    Route::get('/email/verify', [EmailVerificationController::class, 'show'])->name('verification.notice');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])->name('verification.send');
+});
+
+// Email verification link (no auth required as it's clicked from email)
+// This route handles both signed URLs and route parameters
+Route::get('/email/verify/{id?}/{hash?}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
+
 // Vendor routes
-Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->group(function () {
+Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->group(function () {
     Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('vendor.dashboard');
     Route::get('/import', [ImportController::class, 'index'])->name('vendor.import');
     Route::post('/import/file', [ImportController::class, 'importFromFile'])->name('vendor.import.file');
@@ -45,7 +56,7 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->group(function () 
 });
 
 // Admin routes
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/vendors', [VendorsController::class, 'index'])->name('admin.vendors');
     Route::post('/vendors/{id}/toggle-status', [VendorsController::class, 'toggleStatus'])->name('admin.vendors.toggle-status');

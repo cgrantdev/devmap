@@ -29,6 +29,10 @@ class AuthenticatedSessionController extends Controller
                 ])->withInput();
             }
 
+            if (!$request->user()->hasVerifiedEmail()) {
+                return redirect('/email/verify')->with('info', 'Please verify your email address before accessing the dashboard.');
+            }
+
             return redirect()->intended('/vendor/dashboard');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();

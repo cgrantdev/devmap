@@ -59,9 +59,6 @@ var errors = {}
 
 function submit() {
   form.post('/register', {
-    onSuccess: () => {
-      window.location.href = '/vendor/dashboard'
-    },
     onError: (errs) => {
       console.log('Register failed:', errs)
       errors = errs

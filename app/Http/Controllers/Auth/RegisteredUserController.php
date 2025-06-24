@@ -26,23 +26,29 @@ class RegisteredUserController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
+                'role' => 'sometimes|string|in:vendor,admin',
             ]);
 
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role' => 'vendor',
+                'role' => $validated['role'] ?? 'vendor',
             ]);
 
             event(new Registered($user));
 
+            // Send verification email
+            $user->sendEmailVerificationNotification();
+
+            // Log the user in
             Auth::login($user);
 
-            return redirect()->intended('/vendor/dashboard');
+            return redirect('/email/verify')->with('success', 'Registration successful! Please check your email to verify your account.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
+            \Log::error('Registration error: ' . $e->getMessage());
             return back()->withErrors([
                 'email' => 'An error occurred during registration. Please try again.',
             ])->withInput();

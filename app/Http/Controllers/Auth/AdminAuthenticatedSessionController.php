@@ -28,6 +28,11 @@ class AdminAuthenticatedSessionController extends Controller
             ]);
         }
 
+        // Check if email is verified
+        if (!$request->user()->hasVerifiedEmail()) {
+            return redirect('/email/verify')->with('info', 'Please verify your email address before accessing the admin dashboard.');
+        }
+
         return redirect()->intended('/admin/dashboard');
     }
 

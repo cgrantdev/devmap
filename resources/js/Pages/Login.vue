@@ -3,15 +3,25 @@
     <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
       <h1 class="text-2xl font-bold mb-6 text-center">Vendor Login</h1>
 
-    <!-- General Error Message -->
-    <div v-if="Object.keys(errors).length > 0" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-      <p class="font-bold">Please fix the following errors:</p>
-      <ul class="list-disc list-inside">
-        <li v-for="(error, field) in errors" :key="field" class="text-sm">
-          {{ Array.isArray(error) ? error[0] : error }}
-        </li>
-      </ul>
-    </div>
+      <!-- Success Message -->
+      <div v-if="$page.props.flash.success" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+        {{ $page.props.flash.success }}
+      </div>
+
+      <!-- Info Message -->
+      <div v-if="$page.props.flash.info" class="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
+        {{ $page.props.flash.info }}
+      </div>
+
+      <!-- General Error Message -->
+      <div v-if="Object.keys(errors).length > 0" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+        <p class="font-bold">Please fix the following errors:</p>
+        <ul class="list-disc list-inside">
+          <li v-for="(error, field) in errors" :key="field" class="text-sm">
+            {{ Array.isArray(error) ? error[0] : error }}
+          </li>
+        </ul>
+      </div>
 
       <form @submit.prevent="submit">
         <div class="mb-4">
