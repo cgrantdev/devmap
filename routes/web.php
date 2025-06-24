@@ -14,6 +14,7 @@ use App\Http\Controllers\Vendor\PublicVendorController;
 use App\Http\Controllers\Admin\VendorsController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Vendor\ImportController;
+use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -31,9 +32,7 @@ Route::middleware('guest')->group(function () {
 
 // Vendor routes
 Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Vendor/Dashboard');
-    })->name('vendor.dashboard');
+    Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('vendor.dashboard');
     Route::get('/import', [ImportController::class, 'index'])->name('vendor.import');
     Route::post('/import/file', [ImportController::class, 'importFromFile'])->name('vendor.import.file');
     Route::post('/import/url', [ImportController::class, 'importFromUrl'])->name('vendor.import.url');
