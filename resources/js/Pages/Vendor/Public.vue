@@ -25,7 +25,7 @@
     <div v-else class="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center text-gray-400 text-2xl">No Banner</div>
 
     <!-- Company Info Row -->
-    <div class="flex flex-col md:flex-row items-center justify-between bg-white shadow p-6 -mt-12 mx-4 rounded-lg relative z-10">
+    <div class="flex flex-col md:flex-row items-center justify-between bg-white shadow p-6 -mt-12 mx-4 rounded-lg relative z-10 max-w-6xl mx-auto">
       <!-- Logo -->
       <div class="flex-shrink-0 mb-4 md:mb-0">
         <img v-if="settings?.logo" :src="getImageUrl(settings.logo)" alt="Logo" class="h-24 w-24 object-contain rounded border bg-white" />
@@ -45,7 +45,7 @@
     </div>
 
     <!-- Main Content: Filters & Items -->
-    <div class="flex flex-col md:flex-row gap-6 mt-8 px-4 max-w-6xl mx-auto">
+    <div class="flex flex-col md:flex-row gap-6 mt-8 max-w-6xl mx-auto">
       <!-- Filters (dummy) -->
       <aside class="w-full md:w-64 bg-white rounded-lg shadow p-4 mb-4 md:mb-0">
         <h2 class="text-lg font-semibold mb-2">Filters</h2>
@@ -58,10 +58,13 @@
       <!-- Items (dummy) -->
       <section class="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <div v-for="item in items" :key="item.id" class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
-          <img :src="item.image" alt="Item Image" class="h-32 w-32 object-cover rounded mb-2" />
-          <h3 class="font-semibold text-lg mb-1">{{ item.name }}</h3>
+          <img :src="getImageUrl(item.image_url)" alt="Item Image" class="h-32 w-32 object-cover rounded mb-2" />
+          <h3 class="font-semibold text-lg mb-1">
+            <a v-if="item.product_url" :href="item.product_url" target="_blank" class="hover:underline text-blue-700">{{ item.name }}</a>
+            <span v-else>{{ item.name }}</span>
+          </h3>
           <div class="text-blue-600 font-bold mb-2">${{ item.price }}</div>
-          <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">View</button>
+          <div v-if="item.description" class="text-gray-600 text-sm mb-2">{{ item.description }}</div>
         </div>
       </section>
     </div>

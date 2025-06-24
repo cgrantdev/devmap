@@ -32,27 +32,8 @@ class PublicVendorController extends Controller
             abort(404);
         }
         
-        // Dummy items
-        $items = [
-            [
-                'id' => 1,
-                'name' => 'Sample Item 1',
-                'price' => 19.99,
-                'image' => 'https://via.placeholder.com/150',
-            ],
-            [
-                'id' => 2,
-                'name' => 'Sample Item 2',
-                'price' => 29.99,
-                'image' => 'https://via.placeholder.com/150',
-            ],
-            [
-                'id' => 3,
-                'name' => 'Sample Item 3',
-                'price' => 39.99,
-                'image' => 'https://via.placeholder.com/150',
-            ],
-        ];
+        // Get real products for this vendor
+        $items = $user->products()->latest()->get(['id', 'name', 'price', 'image_url', 'product_url', 'description']);
         
         return Inertia::render('Vendor/Public', [
             'settings' => $vendorSetting,
