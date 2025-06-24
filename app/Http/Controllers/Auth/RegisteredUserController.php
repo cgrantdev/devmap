@@ -23,7 +23,17 @@ class RegisteredUserController extends Controller
     {
         try {
             $validated = $request->validate([
-                'name' => 'required|string|max:255',
+                'name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    function ($attribute, $value, $fail) use ($request) {
+                        $role = $request->input('role', 'vendor');
+                        if ($role === 'vendor' && \App\Models\User::where('name', $value)->where('role', 'vendor')->exists()) {
+                            $fail('The vendor name has already been taken.');
+                        }
+                    },
+                ],
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
                 'role' => 'sometimes|string|in:vendor,admin',
