@@ -136,6 +136,6 @@ function resendVerification() {
 }
 
 function logout() {
-  form.delete('/logout')
+  form.post('/logout')
 }
 </script> 
