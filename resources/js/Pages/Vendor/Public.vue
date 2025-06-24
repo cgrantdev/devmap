@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Admin Warning Banner for Inactive Vendors -->
-    <div v-if="isAdmin && settings?.status === 0" class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
+    <div v-if="(isAdmin || isOwnPage) && settings?.status === 0" class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
       <div class="flex">
         <div class="flex-shrink-0">
           <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -10,7 +10,9 @@
         </div>
         <div class="ml-3">
           <p class="text-sm">
-            <strong>Admin Preview:</strong> This vendor is currently inactive and not visible to the public.
+            <strong v-if="isAdmin">Admin Preview:</strong>
+            <strong v-else>Your Page Preview:</strong>
+            This vendor is currently inactive and not visible to the public.
           </p>
         </div>
       </div>
@@ -72,6 +74,10 @@ const props = defineProps({
   vendor: Object,
   items: Array,
   isAdmin: {
+    type: Boolean,
+    default: false
+  },
+  isOwnPage: {
     type: Boolean,
     default: false
   }

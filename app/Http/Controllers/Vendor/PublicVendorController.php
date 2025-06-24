@@ -22,12 +22,13 @@ class PublicVendorController extends Controller
             
         $vendorSetting = $user->vendorSetting;
         
-        // Check if current user is admin
+        // Check if current user is admin or the vendor themselves
         $currentUser = Auth::user();
         $isAdmin = $currentUser && $currentUser->role === 'admin';
+        $isOwnPage = $currentUser && $currentUser->id === $user->id;
         
-        // Only show if vendor has active status, unless user is admin
-        if (!$vendorSetting || ($vendorSetting->status !== 1 && !$isAdmin)) {
+        // Only show if vendor has active status, unless user is admin or the vendor themselves
+        if (!$vendorSetting || ($vendorSetting->status !== 1 && !$isAdmin && !$isOwnPage)) {
             abort(404);
         }
         
@@ -58,6 +59,7 @@ class PublicVendorController extends Controller
             'vendor' => $user,
             'items' => $items,
             'isAdmin' => $isAdmin,
+            'isOwnPage' => $isOwnPage,
         ]);
     }
 } 

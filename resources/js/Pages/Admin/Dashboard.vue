@@ -31,7 +31,7 @@
         <h2 class="text-xl font-semibold mb-4">Quick Actions</h2>
         <div class="space-y-2">
           <Link href="/admin/vendors" class="block w-full bg-gray-800 text-white px-4 py-2 rounded text-center hover:bg-gray-700">Manage Vendors</Link>
-          <button class="w-full bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Reports</button>
+          <!-- <button class="w-full bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">View Reports</button> -->
         </div>
       </div>
     </div>
