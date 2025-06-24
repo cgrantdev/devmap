@@ -40,18 +40,15 @@ class VendorsController extends Controller
         $vendorSetting = VendorSetting::where('user_id', $id)->first();
         
         if ($vendorSetting) {
+            $oldStatus = $vendorSetting->status;
             $vendorSetting->status = $vendorSetting->status === 1 ? 0 : 1;
             $vendorSetting->save();
             
-            return response()->json([
-                'success' => true,
-                'status' => $vendorSetting->status
-            ]);
+            $statusText = $vendorSetting->status === 1 ? 'activated' : 'deactivated';
+            
+            return redirect()->back()->with('success', "Vendor has been {$statusText} successfully.");
         }
         
-        return response()->json([
-            'success' => false,
-            'message' => 'Vendor settings not found'
-        ], 404);
+        return redirect()->back()->with('error', 'Vendor settings not found.');
     }
 } 

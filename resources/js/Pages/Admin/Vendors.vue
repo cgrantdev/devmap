@@ -5,6 +5,16 @@
       <p class="text-gray-600 mt-2">Manage all registered vendors</p>
     </div>
     
+    <!-- Success Message -->
+    <div v-if="$page.props.flash.success" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+      {{ $page.props.flash.success }}
+    </div>
+    
+    <!-- Error Message -->
+    <div v-if="$page.props.flash.error" class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      {{ $page.props.flash.error }}
+    </div>
+    
     <div class="bg-white rounded-lg shadow">
       <div class="p-6 border-b">
         <h2 class="text-xl font-semibold">All Vendors</h2>
@@ -61,8 +71,8 @@
                 <a :href="`/vendor/${vendor.name.toLowerCase().replace(/\s+/g, '-')}`" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-900 mr-4">
                   {{ vendor.settings?.status === 1 ? 'View Public Page' : 'Preview Public Page (Inactive)' }}
                 </a>
-                <button @click="toggleStatus(vendor)" class="text-gray-600 hover:text-gray-900">
-                  {{ vendor.settings?.status === 1 ? 'Deactivate' : 'Activate' }}
+                <button @click="toggleStatus(vendor)" :disabled="form.processing" class="text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed">
+                  {{ form.processing ? 'Updating...' : (vendor.settings?.status === 1 ? 'Deactivate' : 'Activate') }}
                 </button>
               </td>
             </tr>
@@ -78,7 +88,7 @@
 </template>
 
 <script setup>
-import { Link, useForm } from '@inertiajs/vue3'
+import { Link, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 
 const props = defineProps({
@@ -88,7 +98,9 @@ const props = defineProps({
   }
 })
 
-const form = useForm({})
+const form = useForm({
+  _token: usePage().props.csrf_token
+})
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString()
@@ -97,8 +109,11 @@ function formatDate(dateString) {
 function toggleStatus(vendor) {
   form.post(`/admin/vendors/${vendor.id}/toggle-status`, {
     onSuccess: () => {
-      // Refresh the page to show updated data
-      window.location.reload()
+      // The page will be refreshed with updated data from the server
+      console.log('Status updated successfully')
+    },
+    onError: (errors) => {
+      console.error('Error updating status:', errors)
     }
   })
 }
