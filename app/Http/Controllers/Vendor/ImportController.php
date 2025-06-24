@@ -44,22 +44,36 @@ class ImportController extends Controller
             $xml = new SimpleXMLElement($xmlContent);
             
             $importedCount = 0;
+            $skippedCount = 0;
             
             if (isset($xml->product)) {
                 foreach ($xml->product as $productData) {
+                    $productUrl = (string) $productData->url;
+                    
+                    // Skip if product with same URL already exists for this user
+                    if ($productUrl && $user->products()->where('product_url', $productUrl)->exists()) {
+                        $skippedCount++;
+                        continue;
+                    }
+                    
                     $product = Product::create([
                         'user_id' => $user->id,
                         'name' => (string) $productData->name,
                         'price' => $this->extractPrice((string) $productData->price),
                         'image_url' => (string) $productData->image,
-                        'product_url' => (string) $productData->url,
+                        'product_url' => $productUrl,
                     ]);
                     
                     $importedCount++;
                 }
             }
             
-            return redirect()->back()->with('success', "Successfully imported {$importedCount} products.");
+            $message = "Successfully imported {$importedCount} products.";
+            if ($skippedCount > 0) {
+                $message .= " Skipped {$skippedCount} duplicate products.";
+            }
+            
+            return redirect()->back()->with('success', $message);
             
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error parsing XML file: ' . $e->getMessage());
@@ -85,22 +99,36 @@ class ImportController extends Controller
             $xml = new SimpleXMLElement($xmlContent);
             
             $importedCount = 0;
+            $skippedCount = 0;
             
             if (isset($xml->product)) {
                 foreach ($xml->product as $productData) {
+                    $productUrl = (string) $productData->url;
+                    
+                    // Skip if product with same URL already exists for this user
+                    if ($productUrl && $user->products()->where('product_url', $productUrl)->exists()) {
+                        $skippedCount++;
+                        continue;
+                    }
+                    
                     $product = Product::create([
                         'user_id' => $user->id,
                         'name' => (string) $productData->name,
                         'price' => $this->extractPrice((string) $productData->price),
                         'image_url' => (string) $productData->image,
-                        'product_url' => (string) $productData->url,
+                        'product_url' => $productUrl,
                     ]);
                     
                     $importedCount++;
                 }
             }
             
-            return redirect()->back()->with('success', "Successfully imported {$importedCount} products from URL.");
+            $message = "Successfully imported {$importedCount} products from URL.";
+            if ($skippedCount > 0) {
+                $message .= " Skipped {$skippedCount} duplicate products.";
+            }
+            
+            return redirect()->back()->with('success', $message);
             
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error importing from URL: ' . $e->getMessage());
