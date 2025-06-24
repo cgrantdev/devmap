@@ -45,9 +45,9 @@
     </div>
 
     <!-- Main Content: Filters & Items -->
-    <div class="flex flex-col md:flex-row gap-6 mt-8 max-w-6xl mx-auto">
+    <div class="flex flex-col md:flex-row gap-6 mt-8 max-w-6xl mx-auto px-4">
       <!-- Filters (dummy) -->
-      <aside class="w-full md:w-64 bg-white rounded-lg shadow p-4 mb-4 md:mb-0">
+      <aside class="w-full md:w-64 bg-white rounded-lg shadow p-4 mb-4 md:mb-0 self-start">
         <h2 class="text-lg font-semibold mb-2">Search</h2>
         <form @submit.prevent="onSearch" class="mb-4">
           <input
