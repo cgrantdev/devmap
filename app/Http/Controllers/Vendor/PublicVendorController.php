@@ -11,7 +11,7 @@ use Inertia\Inertia;
 
 class PublicVendorController extends Controller
 {
-    public function show($vendor_name)
+    public function show(Request $request, $vendor_name)
     {
         // Convert URL-friendly name back to vendor name
         $name = str_replace('-', ' ', $vendor_name);
@@ -31,16 +31,61 @@ class PublicVendorController extends Controller
         if (!$vendorSetting || ($vendorSetting->status !== 1 && !$isAdmin && !$isOwnPage)) {
             abort(404);
         }
-        
-        // Get real products for this vendor
-        $items = $user->products()->latest()->get(['id', 'name', 'price', 'image_url', 'product_url', 'description']);
-        
+
+        // Define price ranges (add 'all')
+        $ranges = [
+            'all' => [null, null],
+            '0-50' => [0, 50],
+            '50-100' => [50, 100],
+            '100-150' => [100, 150],
+            '150-200' => [150, 200],
+            '200+' => [200, null],
+        ];
+
+        // Get counts for each range
+        $counts = [];
+        // All products count
+        $counts['all'] = $user->products()->count();
+        foreach ($ranges as $key => [$min, $max]) {
+            if ($key === 'all') continue;
+            $query = $user->products();
+            if ($max === null) {
+                $query->where('price', '>=', $min);
+            } else {
+                $query->where('price', '>=', $min)->where('price', '<', $max);
+            }
+            $counts[$key] = $query->count();
+        }
+
+        // Get search query
+        $search = $request->query('search', '');
+        // Get selected cost filter
+        $selected = $request->query('cost', 'all');
+        $selectedRange = $ranges[$selected] ?? $ranges['all'];
+
+        // Build products query
+        $productsQuery = $user->products()->latest();
+        if ($selected !== 'all') {
+            if ($selectedRange[1] === null) {
+                $productsQuery->where('price', '>=', $selectedRange[0]);
+            } else {
+                $productsQuery->where('price', '>=', $selectedRange[0])->where('price', '<', $selectedRange[1]);
+            }
+        }
+        if ($search) {
+            $productsQuery->where('name', 'like', '%' . $search . '%');
+        }
+        $items = $productsQuery->get(['id', 'name', 'price', 'image_url', 'product_url', 'description']);
+
         return Inertia::render('Vendor/Public', [
             'settings' => $vendorSetting,
             'vendor' => $user,
             'items' => $items,
             'isAdmin' => $isAdmin,
             'isOwnPage' => $isOwnPage,
+            'costCounts' => $counts,
+            'selectedCost' => $selected,
+            'search' => $search,
         ]);
     }
 } 

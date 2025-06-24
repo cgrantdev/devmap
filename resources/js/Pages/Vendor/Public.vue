@@ -48,11 +48,40 @@
     <div class="flex flex-col md:flex-row gap-6 mt-8 max-w-6xl mx-auto">
       <!-- Filters (dummy) -->
       <aside class="w-full md:w-64 bg-white rounded-lg shadow p-4 mb-4 md:mb-0">
-        <h2 class="text-lg font-semibold mb-2">Filters</h2>
+        <h2 class="text-lg font-semibold mb-2">Search</h2>
+        <form @submit.prevent="onSearch" class="mb-4">
+          <input
+            v-model="searchInput"
+            type="text"
+            placeholder="Search by title..."
+            class="w-full border rounded px-2 py-1"
+          />
+          <button type="submit" class="hidden">Search</button>
+        </form>
+        <h2 class="text-lg font-semibold mb-2">Filter by Cost</h2>
         <div class="space-y-2">
-          <div><input type="checkbox" id="filter1" /> <label for="filter1">Filter 1</label></div>
-          <div><input type="checkbox" id="filter2" /> <label for="filter2">Filter 2</label></div>
-          <div><input type="checkbox" id="filter3" /> <label for="filter3">Filter 3</label></div>
+          <div v-for="(count, key) in costCounts" :key="key">
+            <label :for="'cost-' + key" class="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                :id="'cost-' + key"
+                name="cost"
+                :value="key"
+                :checked="selectedCost === key"
+                @change="applyCostFilter(key)"
+                class="mr-2"
+              />
+              <span>
+                <span v-if="key === 'all'">All</span>
+                <span v-else-if="key === '0-50'">$0 - $50</span>
+                <span v-else-if="key === '50-100'">$50 - $100</span>
+                <span v-else-if="key === '100-150'">$100 - $150</span>
+                <span v-else-if="key === '150-200'">$150 - $200</span>
+                <span v-else>$200+</span>
+                <span class="ml-2 text-gray-500">({{ count }})</span>
+              </span>
+            </label>
+          </div>
         </div>
       </aside>
       <!-- Items (dummy) -->
@@ -72,6 +101,9 @@
 </template>
 
 <script setup>
+import { router } from '@inertiajs/vue3'
+import { ref, watch } from 'vue'
+
 const props = defineProps({
   settings: Object,
   vendor: Object,
@@ -83,12 +115,33 @@ const props = defineProps({
   isOwnPage: {
     type: Boolean,
     default: false
-  }
+  },
+  costCounts: Object,
+  selectedCost: String,
+  search: String,
 })
+
+const searchInput = ref(props.search || '')
 
 function getImageUrl(path) {
   if (!path) return null
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('/')) return path
   return `/storage/${path}`
 }
+
+function onSearch() {
+  router.get(window.location.pathname, { cost: props.selectedCost, search: searchInput.value }, { preserveScroll: true })
+}
+
+function applyCostFilter(key) {
+  router.get(window.location.pathname, { cost: key, search: searchInput.value }, { preserveScroll: true })
+}
+
+watch(searchInput, (val, oldVal) => {
+  if (val.length >= 2) {
+    onSearch()
+  } else if (val === '') {
+    onSearch()
+  }
+})
 </script> 
