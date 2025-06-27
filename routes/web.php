@@ -59,7 +59,15 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
 Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/vendors', [VendorsController::class, 'index'])->name('admin.vendors');
+    Route::get('/vendors/create', [VendorsController::class, 'create'])->name('admin.vendors.create');
+    Route::post('/vendors', [VendorsController::class, 'store'])->name('admin.vendors.store');
+    Route::get('/vendors/{id}/edit', [VendorsController::class, 'edit'])->name('admin.vendors.edit');
+    Route::put('/vendors/{id}', [VendorsController::class, 'update'])->name('admin.vendors.update');
+    Route::delete('/vendors/{id}', [VendorsController::class, 'destroy'])->name('admin.vendors.destroy');
     Route::post('/vendors/{id}/toggle-status', [VendorsController::class, 'toggleStatus'])->name('admin.vendors.toggle-status');
+    Route::get('/vendors/{id}/products', [VendorsController::class, 'products'])->name('admin.vendors.products');
+    Route::post('/vendors/{id}/products/import', [VendorsController::class, 'importProductsFromFile'])->name('admin.vendors.products.import');
+    Route::delete('/vendors/{vendorId}/products/{productId}', [VendorsController::class, 'deleteProduct'])->name('admin.vendors.products.delete');
 });
 
 // Authentication routes
