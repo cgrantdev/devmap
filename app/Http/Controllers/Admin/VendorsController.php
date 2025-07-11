@@ -14,6 +14,7 @@ class VendorsController extends Controller
     {
         $vendors = User::where('role', 'vendor')
             ->with('vendorSetting')
+            ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($vendor) {
                 return [
