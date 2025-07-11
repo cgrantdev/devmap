@@ -102,7 +102,7 @@ class VendorsController extends Controller
         $settings->url = $validated['url'] ?? null;
         $settings->contact_email = $validated['contact_email'] ?? null;
         $settings->phone_number = $validated['phone_number'] ?? null;
-        $settings->status = 1;
+        $settings->status = 0;
         $settings->save();
         return redirect()->route('admin.vendors')->with('success', 'Vendor created successfully.');
     }

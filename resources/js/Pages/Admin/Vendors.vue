@@ -5,7 +5,7 @@
         <h1 class="text-3xl font-bold">Vendor Management</h1>
         <p class="text-gray-600 mt-2">Manage all registered vendors</p>
       </div>
-      <button @click="showCreateModal = true" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold shadow">
+      <button @click="openCreateModal" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold shadow">
         + New Vendor
       </button>
     </div>
@@ -26,6 +26,15 @@
         <button @click="showCreateModal = false" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
         <h2 class="text-2xl font-bold mb-4">Register New Vendor</h2>
         <form @submit.prevent="submitCreateVendor">
+          <!-- Error Message -->
+          <div v-if="Object.keys(createForm.errors).length > 0" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            <p class="font-bold">Please fix the following errors:</p>
+            <ul class="list-disc list-inside">
+              <li v-for="(error, field) in createForm.errors" :key="field" class="text-sm">
+                {{ Array.isArray(error) ? error[0] : error }}
+              </li>
+            </ul>
+          </div>
           <input type="hidden" :value="createForm._token" name="_token" />
           <div class="mb-4 flex gap-4">
             <div class="w-1/2">
@@ -235,5 +244,13 @@ function submitCreateVendor() {
       logoPreview.value = null
     }
   })
+}
+
+function openCreateModal() {
+  showCreateModal.value = true
+  createForm.reset()
+  createForm.clearErrors()
+  bannerPreview.value = null
+  logoPreview.value = null
 }
 </script> 
