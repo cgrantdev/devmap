@@ -4,7 +4,6 @@
     <div class="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center relative">
       <img v-if="vendor.banner_url" :src="vendor.banner_url" alt="Shop Banner" class="absolute inset-0 w-full h-full object-cover" />
       <div v-else class="w-full h-full flex items-center justify-center text-gray-400 text-2xl font-bold">No Banner</div>
-      <div class="absolute inset-0 bg-black bg-opacity-20"></div>
     </div>
     <div class="w-full max-w-5xl mx-auto px-2 md:px-0 -mt-16 md:-mt-24 relative z-10">
       <div class="flex flex-col md:flex-row gap-8 bg-white rounded-lg shadow-lg p-8 relative">
