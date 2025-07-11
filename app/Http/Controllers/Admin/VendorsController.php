@@ -110,9 +110,36 @@ class VendorsController extends Controller
 
     public function edit($id)
     {
-        $vendor = User::where('role', 'vendor')->with('vendorSetting')->findOrFail($id);
+        $vendor = User::where('role', 'vendor')
+            ->with('vendorSetting')
+            ->findOrFail($id);
+
+        // Fetch products for this vendor
+        $products = $vendor->products()
+            ->latest()
+            ->get(['id', 'name', 'price', 'image_url']);
+
+        // Prepare vendor data
+        $vendorData = [
+            'id' => $vendor->id,
+            'name' => $vendor->name,
+            'email' => $vendor->email,
+            'settings' => $vendor->vendorSetting ? [
+                'company_name' => $vendor->vendorSetting->company_name,
+                'company_detail' => $vendor->vendorSetting->company_detail,
+                'url' => $vendor->vendorSetting->url,
+                'contact_email' => $vendor->vendorSetting->contact_email,
+                'phone_number' => $vendor->vendorSetting->phone_number,
+                'banner' => $vendor->vendorSetting->banner,
+                'logo' => $vendor->vendorSetting->logo,
+                'banner_url' => $vendor->vendorSetting->banner ? asset('storage/' . $vendor->vendorSetting->banner) : null,
+                'logo_url' => $vendor->vendorSetting->logo ? asset('storage/' . $vendor->vendorSetting->logo) : null,
+            ] : null,
+        ];
+
         return Inertia::render('Admin/VendorEdit', [
-            'vendor' => $vendor
+            'vendor' => $vendorData,
+            'products' => $products,
         ]);
     }
 

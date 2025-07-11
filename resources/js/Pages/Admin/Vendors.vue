@@ -149,11 +149,12 @@
             <a :href="`/vendor/${item.name.toLowerCase().replace(/\s+/g, '-')}`" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-900 mr-4">
               {{ item.settings?.status === 1 ? 'View Public Page' : 'Preview Public Page (Inactive)' }}
             </a>
-            <button @click="toggleStatus(item)" :disabled="form.processing" 
+            <Link :href="`/admin/vendors/${item.id}/edit`" class="text-yellow-600 hover:text-yellow-900 mr-4 font-semibold">Edit</Link>
+            <button @click="toggleStatus(item)" :disabled="form.processing"
               :class="[
                 'px-4 py-2 rounded font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
-                item.settings?.status === 1 
-                  ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2' 
+                item.settings?.status === 1
+                  ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                   : 'bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
               ]">
               {{ form.processing ? 'Updating...' : (item.settings?.status === 1 ? 'Deactivate' : 'Activate') }}
