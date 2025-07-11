@@ -146,7 +146,7 @@
             </span>
           </template>
           <template #item-actions="item">
-            <a :href="`/vendor/${item.name.toLowerCase().replace(/\s+/g, '-')}`" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-900 mr-4">
+            <a :href="`/shop/${item.name.toLowerCase().replace(/\s+/g, '-')}`" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-900 mr-4">
               {{ item.settings?.status === 1 ? 'View Public Page' : 'Preview Public Page (Inactive)' }}
             </a>
             <Link :href="`/admin/vendors/${item.id}/edit`" class="text-yellow-600 hover:text-yellow-900 mr-4 font-semibold">Edit</Link>

@@ -303,4 +303,24 @@ class VendorsController extends Controller
         $product->delete();
         return redirect()->back()->with('success', 'Product deleted successfully.');
     }
+
+    public function adminProducts(Request $request)
+    {
+        $products = \App\Models\Product::with('user')
+            ->latest()
+            ->paginate(20)
+            ->through(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => \Str::slug($product->name),
+                    'price' => $product->price,
+                    'image_url' => $product->image_url,
+                    'vendor_name' => $product->user ? $product->user->name : '-',
+                ];
+            });
+        return \Inertia\Inertia::render('Admin/Products', [
+            'products' => $products
+        ]);
+    }
 } 

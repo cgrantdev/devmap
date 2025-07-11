@@ -40,7 +40,7 @@ const user = usePage().props.auth?.user
 let publicPageUrl = ''
 if (user && user.name) {
   // Use the same transformation as in the controller
-  publicPageUrl = `/vendor/${encodeURIComponent(user.name.replace(/\s+/g, '-'))}`
+  publicPageUrl = `/shop/${encodeURIComponent(user.name.replace(/\s+/g, '-'))}`
 }
 
 // Mock data - replace with actual data from your backend

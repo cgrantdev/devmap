@@ -69,6 +69,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/vendors/{id}/products/import', [VendorsController::class, 'importProductsFromFile'])->name('admin.vendors.products.import');
     Route::post('/vendors/{id}/products/import-url', [VendorsController::class, 'importProductsFromUrl'])->name('admin.vendors.products.import-url');
     Route::delete('/vendors/{vendorId}/products/{productId}', [VendorsController::class, 'deleteProduct'])->name('admin.vendors.products.delete');
+    Route::get('/products', [VendorsController::class, 'adminProducts'])->name('admin.products');
 });
 
 // Authentication routes
@@ -84,4 +85,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/logout', [AdminAuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
 });
 
-Route::get('/vendor/{vendor_name}', [PublicVendorController::class, 'show'])->name('vendor.public');
+Route::get('/shop/{vendor_name}', [PublicVendorController::class, 'show'])->name('shop.public');
+Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('product.public');

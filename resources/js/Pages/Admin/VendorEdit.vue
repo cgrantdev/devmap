@@ -160,9 +160,6 @@ const props = defineProps({
   }
 })
 
-console.log('Vendor props:', props.vendor);
-console.log('Products props:', props.products);
-
 const bannerPreview = ref(null)
 const logoPreview = ref(null)
 const cacheBuster = ref(Date.now())
@@ -213,11 +210,6 @@ watch(() => props.vendor, (newVendor) => {
   }
 }, { deep: true })
 
-// Watch for products changes
-watch(() => props.products, (newProducts) => {
-  console.log('Products data changed:', newProducts);
-}, { deep: true })
-
 function handleFileChange(event, field) {
   const file = event.target.files[0]
   if (file) {
@@ -243,10 +235,8 @@ function submitEditVendor() {
       // Clear file inputs
       const fileInputs = document.querySelectorAll('input[type="file"]')
       fileInputs.forEach(input => input.value = '')
-      console.log('Form submitted successfully, cache buster updated to:', cacheBuster.value)
     },
     onError: () => {
-      console.log('Form submission failed')
     },
     data: { _method: 'put' }
   })
@@ -277,8 +267,6 @@ function importFromFile() {
       // Clear file input
       const fileInput = document.querySelector('input[accept=".xml"]')
       if (fileInput) fileInput.value = ''
-      console.log('File import successful, reloading page...')
-      // Reload the page to get updated products
       router.reload()
     },
     onError: () => {
@@ -291,8 +279,6 @@ function importFromUrl() {
   importUrlForm.post(`/admin/vendors/${props.vendor.id}/products/import-url`, {
     onSuccess: () => {
       importUrlForm.url = ''
-      console.log('URL import successful, reloading page...')
-      // Reload the page to get updated products
       router.reload()
     },
     onError: () => {
@@ -306,8 +292,6 @@ function deleteProduct(productId) {
     const deleteForm = useForm({ _token: usePage().props.csrf_token })
     deleteForm.delete(`/admin/vendors/${props.vendor.id}/products/${productId}`, {
       onSuccess: () => {
-        console.log('Product deleted successfully, reloading page...')
-        // Reload the page to get updated products
         router.reload()
       },
       onError: () => {
