@@ -146,23 +146,54 @@ class VendorsController extends Controller
     public function update(Request $request, $id)
     {
         $vendor = User::where('role', 'vendor')->findOrFail($id);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $vendor->id,
             'phone_number' => 'nullable|string|max:50',
+            'banner' => 'nullable|image|max:2048',
+            'logo' => 'nullable|image|max:1024',
         ]);
+
         $vendor->update($validated);
         if ($request->filled('password')) {
             $vendor->update(['password' => bcrypt($request->input('password'))]);
         }
+
         $settings = $vendor->vendorSetting ?: new VendorSetting(['user_id' => $vendor->id]);
+
+        // Handle banner upload
+        if ($request->hasFile('banner')) {
+            // Optionally delete old file
+            if ($settings->banner) {
+                \Storage::disk('public')->delete($settings->banner);
+            }
+            $bannerPath = $request->file('banner')->store('vendor_banners', 'public');
+            $settings->banner = $bannerPath;
+        }
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Optionally delete old file
+            if ($settings->logo) {
+                \Storage::disk('public')->delete($settings->logo);
+            }
+            $logoPath = $request->file('logo')->store('vendor_logos', 'public');
+            $settings->logo = $logoPath;
+        }
+
         $settings->company_name = $request->input('company_name', $settings->company_name);
         $settings->company_detail = $request->input('company_detail', $settings->company_detail);
         $settings->url = $request->input('url', $settings->url);
         $settings->contact_email = $request->input('contact_email', $settings->contact_email);
         $settings->phone_number = $request->input('phone_number', $settings->phone_number);
         $settings->save();
-        return redirect()->route('admin.vendors')->with('success', 'Vendor updated successfully.');
+
+        // Refresh the vendor data to get updated URLs
+        $vendor->refresh();
+        $settings->refresh();
+
+        return redirect()->route('admin.vendors.edit', $vendor->id)->with('success', 'Vendor updated successfully.');
     }
 
     public function destroy($id)
@@ -217,6 +248,51 @@ class VendorsController extends Controller
             return redirect()->back()->with('success', $message);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error parsing XML file: ' . $e->getMessage());
+        }
+    }
+
+    public function importProductsFromUrl(Request $request, $id)
+    {
+        $request->validate([
+            'url' => 'required|url',
+        ]);
+        
+        $vendor = User::where('role', 'vendor')->findOrFail($id);
+        
+        try {
+            $xmlContent = file_get_contents($request->input('url'));
+            if ($xmlContent === false) {
+                return redirect()->back()->with('error', 'Could not fetch XML from the provided URL.');
+            }
+            
+            $xml = new \SimpleXMLElement($xmlContent);
+            $importedCount = 0;
+            $skippedCount = 0;
+            
+            if (isset($xml->product)) {
+                foreach ($xml->product as $productData) {
+                    $productUrl = (string) $productData->url;
+                    if ($productUrl && $vendor->products()->where('product_url', $productUrl)->exists()) {
+                        $skippedCount++;
+                        continue;
+                    }
+                    $vendor->products()->create([
+                        'name' => (string) $productData->name,
+                        'price' => preg_replace('/[^0-9.]/', '', (string) $productData->price) ?: '0.00',
+                        'image_url' => (string) $productData->image,
+                        'product_url' => $productUrl,
+                    ]);
+                    $importedCount++;
+                }
+            }
+            
+            $message = "Successfully imported {$importedCount} products from URL.";
+            if ($skippedCount > 0) {
+                $message .= " Skipped {$skippedCount} duplicate products.";
+            }
+            return redirect()->back()->with('success', $message);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error parsing XML from URL: ' . $e->getMessage());
         }
     }
 

@@ -62,11 +62,12 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::get('/vendors/create', [VendorsController::class, 'create'])->name('admin.vendors.create');
     Route::post('/vendors', [VendorsController::class, 'store'])->name('admin.vendors.store');
     Route::get('/vendors/{id}/edit', [VendorsController::class, 'edit'])->name('admin.vendors.edit');
-    Route::put('/vendors/{id}', [VendorsController::class, 'update'])->name('admin.vendors.update');
+    Route::post('/vendors/{id}', [VendorsController::class, 'update'])->name('admin.vendors.update');
     Route::delete('/vendors/{id}', [VendorsController::class, 'destroy'])->name('admin.vendors.destroy');
     Route::post('/vendors/{id}/toggle-status', [VendorsController::class, 'toggleStatus'])->name('admin.vendors.toggle-status');
     Route::get('/vendors/{id}/products', [VendorsController::class, 'products'])->name('admin.vendors.products');
     Route::post('/vendors/{id}/products/import', [VendorsController::class, 'importProductsFromFile'])->name('admin.vendors.products.import');
+    Route::post('/vendors/{id}/products/import-url', [VendorsController::class, 'importProductsFromUrl'])->name('admin.vendors.products.import-url');
     Route::delete('/vendors/{vendorId}/products/{productId}', [VendorsController::class, 'deleteProduct'])->name('admin.vendors.products.delete');
 });
 
