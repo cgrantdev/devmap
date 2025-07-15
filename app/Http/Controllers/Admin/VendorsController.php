@@ -408,7 +408,12 @@ class VendorsController extends Controller
      */
     private function scrapeWooCommerceShop($shopUrl)
     {
-        $client = new Client(['timeout' => 60]); // Increased timeout for slow shops
+        $client = new Client([
+            'timeout' => 60,
+            'headers' => [
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+            ]
+        ]);
         $products = [];
         $page = 1;
         $maxPages = 50; // safety limit
@@ -435,7 +440,19 @@ class VendorsController extends Controller
                     $price = preg_replace('/[^0-9.]/', '', $priceText);
                 }
                 // --- End price extraction ---
-                $image_url = $node->filter('img.attachment-woocommerce_thumbnail')->count() ? $node->filter('img.attachment-woocommerce_thumbnail')->first()->attr('src') : null;
+                $image_url = null;
+                if ($node->filter('img.attachment-woocommerce_thumbnail')->count()) {
+                    $imgNode = $node->filter('img.attachment-woocommerce_thumbnail')->first();
+                    $src = $imgNode->attr('src');
+                    if ($src && strpos($src, 'data:image') === 0) {
+                        // Lazy load: try data-src or data-lzl-src
+                        $dataSrc = $imgNode->attr('data-src');
+                        $dataLzlSrc = $imgNode->attr('data-lzl-src');
+                        $image_url = $dataSrc ?: ($dataLzlSrc ?: null);
+                    } else {
+                        $image_url = $src;
+                    }
+                }
                 $product_url = $node->filter('a')->count() ? $node->filter('a')->attr('href') : null;
                 if ($name && $product_url) {
                     $products[] = [
