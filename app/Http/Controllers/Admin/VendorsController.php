@@ -199,6 +199,25 @@ class VendorsController extends Controller
     public function destroy($id)
     {
         $vendor = User::where('role', 'vendor')->findOrFail($id);
+        // Delete vendor settings and files
+        $settings = $vendor->vendorSetting;
+        if ($settings) {
+            // Delete banner file
+            if ($settings->banner) {
+                \Storage::disk('public')->delete($settings->banner);
+            }
+            // Delete logo file
+            if ($settings->logo) {
+                \Storage::disk('public')->delete($settings->logo);
+            }
+            $settings->delete();
+        }
+        // Delete all products for this vendor
+        if ($vendor->products) {
+            foreach ($vendor->products as $product) {
+                $product->delete();
+            }
+        }
         $vendor->delete();
         return redirect()->route('admin.vendors')->with('success', 'Vendor deleted successfully.');
     }

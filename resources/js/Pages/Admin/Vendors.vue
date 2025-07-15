@@ -159,6 +159,9 @@
               ]">
               {{ form.processing ? 'Updating...' : (item.settings?.status === 1 ? 'Deactivate' : 'Activate') }}
             </button>
+            <button @click="deleteVendor(item)" :disabled="form.processing" class="ml-2 px-4 py-2 rounded bg-red-500 text-white hover:bg-red-700 font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+              Delete
+            </button>
           </template>
         </EasyDataTable>        
       </div>
@@ -265,5 +268,19 @@ function openCreateModal() {
   createForm.clearErrors()
   bannerPreview.value = null
   logoPreview.value = null
+}
+
+function deleteVendor(vendor) {
+  if (confirm(`Are you sure you want to delete vendor '${vendor.name}'? This cannot be undone.`)) {
+    form.delete(`/admin/vendors/${vendor.id}`, {
+      onSuccess: () => {
+        // Success message will be shown via flash
+      },
+      onError: (errors) => {
+        alert('Failed to delete vendor.');
+        console.error(errors);
+      }
+    })
+  }
 }
 </script> 
