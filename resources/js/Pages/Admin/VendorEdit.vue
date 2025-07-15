@@ -58,6 +58,10 @@
             <label class="block mb-1 font-medium text-gray-700">URL</label>
             <input v-model="editForm.url" type="url" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
           </div>
+          <div>
+            <label class="block mb-1 font-medium text-gray-700">Shop URL</label>
+            <input v-model="editForm.shop_url" type="url" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+          </div>
           <div class="flex gap-4 items-end">
             <div class="w-1/2">
               <label class="block mb-1 font-medium text-gray-700">Banner</label>
@@ -90,6 +94,15 @@
       <!-- XML Import Card -->
       <div class="bg-white rounded-lg shadow p-8 mb-8">
         <h2 class="text-xl font-semibold mb-4">Import Products (XML)</h2>
+        <!-- Import from Shop URL Button -->
+        <div class="mb-4">
+          <button @click="importFromShopUrl" :disabled="importShopUrlProcessing" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50">
+            {{ importShopUrlProcessing ? 'Importing...' : 'Import Products from Shop URL' }}
+          </button>
+          <div v-if="importShopUrlMessage" :class="['mt-2', importShopUrlSuccess ? 'text-green-600' : 'text-red-600']">
+            {{ importShopUrlMessage }}
+          </div>
+        </div>
         <!-- Import Success/Error Messages -->
         <div v-if="$page.props.flash.success && $page.props.flash.success.includes('imported')" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
           {{ $page.props.flash.success }}
@@ -187,6 +200,7 @@ const editForm = useForm({
   url: props.vendor.settings?.url || '',
   contact_email: props.vendor.settings?.contact_email || '',
   phone_number: props.vendor.settings?.phone_number || '',
+  shop_url: props.vendor.settings?.shop_url || '',
   banner: null,
   logo: null,
   banner_url: props.vendor.settings?.banner_url || '',
@@ -205,6 +219,7 @@ watch(() => props.vendor, (newVendor) => {
     editForm.url = newVendor.settings?.url || ''
     editForm.contact_email = newVendor.settings?.contact_email || ''
     editForm.phone_number = newVendor.settings?.phone_number || ''
+    editForm.shop_url = newVendor.settings?.shop_url || ''
     editForm.banner_url = newVendor.settings?.banner_url || ''
     editForm.logo_url = newVendor.settings?.logo_url || ''
   }
@@ -285,6 +300,33 @@ function importFromUrl() {
       console.log('URL import failed')
     }
   })
+}
+
+const importShopUrlProcessing = ref(false)
+const importShopUrlMessage = ref('')
+const importShopUrlSuccess = ref(false)
+
+function importFromShopUrl() {
+  importShopUrlProcessing.value = true
+  importShopUrlMessage.value = ''
+  importShopUrlSuccess.value = false
+  router.post(
+    `/admin/vendors/${props.vendor.id}/import-shop-url`,
+    { _token: usePage().props.csrf_token },
+    {
+      forceFormData: true,
+      onSuccess: () => {
+        importShopUrlProcessing.value = false
+        importShopUrlSuccess.value = true
+        importShopUrlMessage.value = 'Import started (TODO: not implemented yet)'
+      },
+      onError: (err) => {
+        importShopUrlProcessing.value = false
+        importShopUrlSuccess.value = false
+        importShopUrlMessage.value = 'Import failed (TODO: not implemented yet)'
+      }
+    }
+  )
 }
 
 function deleteProduct(productId) {

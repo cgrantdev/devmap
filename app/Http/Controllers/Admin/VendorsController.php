@@ -187,6 +187,7 @@ class VendorsController extends Controller
         $settings->url = $request->input('url', $settings->url);
         $settings->contact_email = $request->input('contact_email', $settings->contact_email);
         $settings->phone_number = $request->input('phone_number', $settings->phone_number);
+        $settings->shop_url = $request->input('shop_url', $settings->shop_url);
         $settings->save();
 
         // Refresh the vendor data to get updated URLs
@@ -341,5 +342,14 @@ class VendorsController extends Controller
         return \Inertia\Inertia::render('Admin/Products', [
             'products' => $products
         ]);
+    }
+
+    /**
+     * Import products from the vendor's shop_url (TODO: implement logic)
+     */
+    public function importFromShopUrl(Request $request, $id)
+    {
+        // TODO: Implement product import from shop_url
+        return response()->json(['message' => 'Import from shop_url not implemented yet.'], 501);
     }
 } 

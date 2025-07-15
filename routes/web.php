@@ -68,6 +68,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::get('/vendors/{id}/products', [VendorsController::class, 'products'])->name('admin.vendors.products');
     Route::post('/vendors/{id}/products/import', [VendorsController::class, 'importProductsFromFile'])->name('admin.vendors.products.import');
     Route::post('/vendors/{id}/products/import-url', [VendorsController::class, 'importProductsFromUrl'])->name('admin.vendors.products.import-url');
+    Route::post('/vendors/{id}/import-shop-url', [VendorsController::class, 'importFromShopUrl'])->name('admin.vendors.import-shop-url');
     Route::delete('/vendors/{vendorId}/products/{productId}', [VendorsController::class, 'deleteProduct'])->name('admin.vendors.products.delete');
     Route::get('/products', [VendorsController::class, 'adminProducts'])->name('admin.products');
 });
