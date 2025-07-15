@@ -14,6 +14,8 @@ class Product extends Model
         'name',
         'description',
         'price',
+        'discount_price',
+        'second_price',
         'brand_id',
         'location_id',
         'verified',

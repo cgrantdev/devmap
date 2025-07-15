@@ -119,7 +119,7 @@ class VendorsController extends Controller
         // Fetch products for this vendor
         $products = $vendor->products()
             ->latest()
-            ->get(['id', 'name', 'price', 'image_url', 'product_url']);
+            ->get(['id', 'name', 'price', 'image_url', 'product_url', 'discount_price', 'second_price']);
 
         // Prepare vendor data
         $vendorData = [
@@ -366,13 +366,19 @@ class VendorsController extends Controller
             foreach ($products as $product) {
                 $existing = $vendor->products()->where('product_url', $product['product_url'])->first();
                 if ($existing) {
-                    // if ($existing->price == $product['price']) {
+                    // if (
+                    //     $existing->price == $product['price'] &&
+                    //     $existing->discount_price == $product['discount_price'] &&
+                    //     $existing->image_url == $product['image_url']
+                    // ) {
                     //     $skippedCount++;
                     //     continue;
                     // } else {
-                        // Update price and other details
+                        // Update price, discount_price, image_url, and name
                         $existing->update([
                             'price' => $product['price'],
+                            'discount_price' => $product['discount_price'],
+                            'second_price' => $product['second_price'],
                             'name' => $product['name'],
                             'image_url' => $product['image_url'],
                         ]);
@@ -383,6 +389,8 @@ class VendorsController extends Controller
                 $vendor->products()->create([
                     'name' => $product['name'],
                     'price' => $product['price'],
+                    'discount_price' => $product['discount_price'],
+                    'second_price' => $product['second_price'],
                     'image_url' => $product['image_url'],
                     'product_url' => $product['product_url'],
                 ]);
@@ -427,25 +435,37 @@ class VendorsController extends Controller
                 $name = $node->filter('.woocommerce-loop-product__title')->count() ? $node->filter('.woocommerce-loop-product__title')->text() : null;
                 // --- General price extraction logic ---
                 $price = '0.00';
-                if ($node->filter('.price ins .woocommerce-Price-amount')->count()) {
-                    // Discounted/current price
-                    $priceText = $node->filter('.price ins .woocommerce-Price-amount')->first()->text();
-                } elseif ($node->filter('.price .woocommerce-Price-amount')->count()) {
-                    // Regular price
-                    $priceText = $node->filter('.price .woocommerce-Price-amount')->first()->text();
-                } else {
-                    $priceText = null;
-                }
-                if ($priceText) {
+                $discount_price = null;
+                $second_price = null;
+                $amounts = $node->filter('.price .woocommerce-Price-amount');
+                if ($amounts->count() > 1 && $node->filter('.price ins')->count() == 0 && $node->filter('.price del')->count() == 0) {
+                    // Price range (variable product, no discount)
+                    $priceText = $amounts->eq(0)->text();
+                    $secondText = $amounts->eq(1)->text();
                     $price = preg_replace('/[^0-9.]/', '', $priceText);
+                    $second_price = preg_replace('/[^0-9.]/', '', $secondText);
+                    $discount_price = null;
+                } elseif ($node->filter('.price ins .woocommerce-Price-amount')->count() && $node->filter('.price del .woocommerce-Price-amount')->count()) {
+                    // Both regular and discounted price
+                    $discountText = $node->filter('.price ins .woocommerce-Price-amount')->first()->text();
+                    $regularText = $node->filter('.price del .woocommerce-Price-amount')->first()->text();
+                    $discount_price = preg_replace('/[^0-9.]/', '', $discountText);
+                    $price = preg_replace('/[^0-9.]/', '', $regularText);
+                    $second_price = null;
+                } elseif ($amounts->count() > 0) {
+                    // Only one price (regular)
+                    $priceText = $amounts->first()->text();
+                    $price = preg_replace('/[^0-9.]/', '', $priceText);
+                    $discount_price = null;
+                    $second_price = null;
                 }
                 // --- End price extraction ---
+                // Improved image extraction for lazy load
                 $image_url = null;
                 if ($node->filter('img.attachment-woocommerce_thumbnail')->count()) {
                     $imgNode = $node->filter('img.attachment-woocommerce_thumbnail')->first();
                     $src = $imgNode->attr('src');
                     if ($src && strpos($src, 'data:image') === 0) {
-                        // Lazy load: try data-src or data-lzl-src
                         $dataSrc = $imgNode->attr('data-src');
                         $dataLzlSrc = $imgNode->attr('data-lzl-src');
                         $image_url = $dataSrc ?: ($dataLzlSrc ?: null);
@@ -458,6 +478,8 @@ class VendorsController extends Controller
                     $products[] = [
                         'name' => $name,
                         'price' => $price,
+                        'discount_price' => $discount_price,
+                        'second_price' => $second_price,
                         'image_url' => $image_url,
                         'product_url' => $product_url,
                     ];

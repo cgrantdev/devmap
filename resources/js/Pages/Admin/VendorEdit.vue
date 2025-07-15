@@ -135,6 +135,8 @@
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount Price</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Second Price</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product URL</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -146,7 +148,9 @@
                   <span v-else class="text-gray-400 text-xs">No Image</span>
                 </td>
                 <td class="px-4 py-2">{{ product.name }}</td>
-                <td class="px-4 py-2">{{ product.price }}</td>
+                <td class="px-4 py-2">{{ product.price ?? '-' }}</td>
+                <td class="px-4 py-2">{{ product.discount_price ?? '-' }}</td>
+                <td class="px-4 py-2">{{ product.second_price ?? '-' }}</td>
                 <td class="px-4 py-2">
                   <a v-if="product.product_url" :href="product.product_url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">External</a>
                 </td>
