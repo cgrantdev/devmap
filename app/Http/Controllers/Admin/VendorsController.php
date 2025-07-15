@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\VendorSetting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use GuzzleHttp\Client;
+use Symfony\Component\DomCrawler\Crawler;
 
 class VendorsController extends Controller
 {
@@ -117,7 +119,7 @@ class VendorsController extends Controller
         // Fetch products for this vendor
         $products = $vendor->products()
             ->latest()
-            ->get(['id', 'name', 'price', 'image_url']);
+            ->get(['id', 'name', 'price', 'image_url', 'product_url']);
 
         // Prepare vendor data
         $vendorData = [
@@ -346,11 +348,109 @@ class VendorsController extends Controller
     }
 
     /**
-     * Import products from the vendor's shop_url (TODO: implement logic)
+     * Import products from the vendor's shop_url (WooCommerce shop page scraping)
      */
     public function importFromShopUrl(Request $request, $id)
     {
-        // TODO: Implement product import from shop_url
-        return response()->json(['message' => 'Import from shop_url not implemented yet.'], 501);
+        $vendor = User::where('role', 'vendor')->findOrFail($id);
+        $settings = $vendor->vendorSetting;
+        $shopUrl = $settings ? $settings->shop_url : null;
+        if (!$shopUrl) {
+            return redirect()->back()->with('error', 'Shop URL is not set for this vendor.');
+        }
+        try {
+            $products = $this->scrapeWooCommerceShop($shopUrl);
+            $importedCount = 0;
+            $skippedCount = 0;
+            $updatedCount = 0;
+            foreach ($products as $product) {
+                $existing = $vendor->products()->where('product_url', $product['product_url'])->first();
+                if ($existing) {
+                    // if ($existing->price == $product['price']) {
+                    //     $skippedCount++;
+                    //     continue;
+                    // } else {
+                        // Update price and other details
+                        $existing->update([
+                            'price' => $product['price'],
+                            'name' => $product['name'],
+                            'image_url' => $product['image_url'],
+                        ]);
+                        $updatedCount++;
+                        continue;
+                    // }
+                }
+                $vendor->products()->create([
+                    'name' => $product['name'],
+                    'price' => $product['price'],
+                    'image_url' => $product['image_url'],
+                    'product_url' => $product['product_url'],
+                ]);
+                $importedCount++;
+            }
+            $message = "Imported {$importedCount} new products from shop URL.";
+            if ($updatedCount > 0) {
+                $message .= " Updated {$updatedCount} products with new price.";
+            }
+            if ($skippedCount > 0) {
+                $message .= " Skipped {$skippedCount} unchanged products.";
+            }
+            return redirect()->back()->with('success', $message);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error scraping shop URL: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Scrape all products from a WooCommerce shop page (with pagination support)
+     * @param string $shopUrl
+     * @return array
+     */
+    private function scrapeWooCommerceShop($shopUrl)
+    {
+        $client = new Client(['timeout' => 60]); // Increased timeout for slow shops
+        $products = [];
+        $page = 1;
+        $maxPages = 50; // safety limit
+        $nextPageUrl = $shopUrl;
+        do {
+            $response = $client->get($nextPageUrl);
+            $html = (string) $response->getBody();
+            $crawler = new Crawler($html);
+            // Find product cards (standard WooCommerce class)
+            $crawler->filter('.products .product')->each(function (Crawler $node) use (&$products, $shopUrl) {
+                $name = $node->filter('.woocommerce-loop-product__title')->count() ? $node->filter('.woocommerce-loop-product__title')->text() : null;
+                // --- General price extraction logic ---
+                $price = '0.00';
+                if ($node->filter('.price ins .woocommerce-Price-amount')->count()) {
+                    // Discounted/current price
+                    $priceText = $node->filter('.price ins .woocommerce-Price-amount')->first()->text();
+                } elseif ($node->filter('.price .woocommerce-Price-amount')->count()) {
+                    // Regular price
+                    $priceText = $node->filter('.price .woocommerce-Price-amount')->first()->text();
+                } else {
+                    $priceText = null;
+                }
+                if ($priceText) {
+                    $price = preg_replace('/[^0-9.]/', '', $priceText);
+                }
+                // --- End price extraction ---
+                $image_url = $node->filter('img.attachment-woocommerce_thumbnail')->count() ? $node->filter('img.attachment-woocommerce_thumbnail')->first()->attr('src') : null;
+                $product_url = $node->filter('a')->count() ? $node->filter('a')->attr('href') : null;
+                if ($name && $product_url) {
+                    $products[] = [
+                        'name' => $name,
+                        'price' => $price,
+                        'image_url' => $image_url,
+                        'product_url' => $product_url,
+                    ];
+                }
+            });
+            // Find next page link (standard WooCommerce pagination)
+            $nextLink = $crawler->filter('.woocommerce-pagination .next')->count() ? $crawler->filter('.woocommerce-pagination .next')->attr('href') : null;
+            $page++;
+            $nextPageUrl = $nextLink;
+        } while ($nextPageUrl && $page <= $maxPages);
+        return $products;
     }
 } 

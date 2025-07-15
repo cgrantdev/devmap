@@ -135,6 +135,7 @@
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product URL</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -147,6 +148,10 @@
                 <td class="px-4 py-2">{{ product.name }}</td>
                 <td class="px-4 py-2">{{ product.price }}</td>
                 <td class="px-4 py-2">
+                  <a v-if="product.product_url" :href="product.product_url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">External</a>
+                </td>
+                <td class="px-4 py-2">
+                  <a :href="`/product/${product.id}/${slugify(product.name)}`" target="_blank" class="text-green-600 hover:underline mr-2">Internal</a>
                   <button @click="deleteProduct(product.id)" class="text-red-600 hover:text-red-900">Delete</button>
                 </td>
               </tr>
@@ -318,12 +323,12 @@ function importFromShopUrl() {
       onSuccess: () => {
         importShopUrlProcessing.value = false
         importShopUrlSuccess.value = true
-        importShopUrlMessage.value = 'Import started (TODO: not implemented yet)'
+        importShopUrlMessage.value = 'Import Completed'
       },
       onError: (err) => {
         importShopUrlProcessing.value = false
         importShopUrlSuccess.value = false
-        importShopUrlMessage.value = 'Import failed (TODO: not implemented yet)'
+        importShopUrlMessage.value = 'Import failed'
       }
     }
   )
@@ -341,5 +346,16 @@ function deleteProduct(productId) {
       }
     })
   }
+}
+
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-')           // Replace spaces with -
+    .replace(/[^\w\-]+/g, '')      // Remove all non-word chars
+    .replace(/\-\-+/g, '-')        // Replace multiple - with single -
+    .replace(/^-+/, '')              // Trim - from start of text
+    .replace(/-+$/, '');             // Trim - from end of text
 }
 </script> 
