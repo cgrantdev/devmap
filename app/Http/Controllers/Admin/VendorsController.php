@@ -130,6 +130,7 @@ class VendorsController extends Controller
                 'url' => $vendor->vendorSetting->url,
                 'contact_email' => $vendor->vendorSetting->contact_email,
                 'phone_number' => $vendor->vendorSetting->phone_number,
+                'shop_url' => $vendor->vendorSetting->shop_url,
                 'banner' => $vendor->vendorSetting->banner,
                 'logo' => $vendor->vendorSetting->logo,
                 'banner_url' => $vendor->vendorSetting->banner ? asset('storage/' . $vendor->vendorSetting->banner) : null,
