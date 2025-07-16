@@ -359,9 +359,11 @@ class VendorsController extends Controller
             return redirect()->back()->with('error', 'Shop URL is not set for this vendor.');
         }
         try {
-            // Use Python scraper for simplepeptide.com/shop, otherwise use PHP scraper
+            // Use Python scraper for simplepeptide.com/shop
             if (strpos($shopUrl, 'simplepeptide.com/shop') !== false) {
                 $products = $this->runPythonScraper($shopUrl);
+            } elseif (strpos($shopUrl, 'peptidology.co/products/') !== false) {
+                $products = $this->scrapePeptidologyShop($shopUrl);
             } else {
                 $products = $this->scrapeWooCommerceShop($shopUrl);
             }
@@ -516,5 +518,59 @@ class VendorsController extends Controller
             return [];
         }
         return $data['products'];
+    }
+
+    /**
+     * Scrape all products from peptidology.co/products/ (custom HTML structure)
+     * @param string $shopUrl
+     * @return array
+     */
+    private function scrapePeptidologyShop($shopUrl)
+    {
+        $client = new \GuzzleHttp\Client(['timeout' => 30, 'headers' => [
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+        ]]);
+        $products = [];
+        $response = $client->get($shopUrl);
+        $html = (string) $response->getBody();
+        $crawler = new \Symfony\Component\DomCrawler\Crawler($html);
+        $crawler->filter('div.product')->each(function ($node) use (&$products) {
+            // Product URL
+            $a = $node->filter('a.woocommerce-LoopProduct-link')->first();
+            $product_url = $a->count() ? $a->attr('href') : null;
+            // Name
+            $name = $node->filter('h3.custom-product-title')->count() ? $node->filter('h3.custom-product-title')->text() : null;
+            // Price (from Add to Cart button or .woocommerce-Price-amount)
+            $price = null;
+            $discount_price = null;
+            $second_price = null;
+            $priceNode = $node->filter('.woocommerce-Price-amount');
+            if ($priceNode->count() > 1) {
+                $price = preg_replace('/[^0-9.]/', '', $priceNode->eq(0)->text());
+                $second_price = preg_replace('/[^0-9.]/', '', $priceNode->eq(1)->text());
+            } elseif ($priceNode->count() == 1) {
+                $price = preg_replace('/[^0-9.]/', '', $priceNode->first()->text());
+            }
+            // Discount price (if present)
+            $onsale = $node->filter('.onsale')->count();
+            if ($onsale && $priceNode->count() > 1) {
+                $discount_price = $second_price;
+                $second_price = null;
+            }
+            // Image
+            $img = $node->filter('img')->first();
+            $image_url = $img->count() ? $img->attr('src') : null;
+            if ($name && $product_url) {
+                $products[] = [
+                    'name' => $name,
+                    'price' => $price,
+                    'discount_price' => $discount_price,
+                    'second_price' => $second_price,
+                    'image_url' => $image_url,
+                    'product_url' => $product_url,
+                ];
+            }
+        });
+        return $products;
     }
 } 
