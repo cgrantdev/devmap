@@ -368,6 +368,8 @@ class VendorsController extends Controller
                 $products = $this->runPythonScraper($shopUrl, 'script2.py');
             } elseif (strpos($shopUrl, 'purehealthpeptides.com/shop') !== false) {
                 $products = $this->scrapePureHealthPeptidesShop($shopUrl);
+            } elseif (strpos($shopUrl, 'evolvepeptides.com/product-category/peptides') !== false) {
+                $products = $this->scrapeEvolvePeptidesShop($shopUrl);
             } else {
                 $products = $this->scrapeWooCommerceShop($shopUrl);
             }
@@ -664,6 +666,71 @@ class VendorsController extends Controller
             $nextLink = $crawler->filter('.woocommerce-pagination .next')->count() ? $crawler->filter('.woocommerce-pagination .next')->attr('href') : null;
             $page++;
             $nextPageUrl = $nextLink;
+        } while ($nextPageUrl && $page <= $maxPages);
+        return $products;
+    }
+
+    /**
+     * Scrape all products from evolvepeptides.com/product-category/peptides/ (custom HTML structure)
+     * @param string $shopUrl
+     * @return array
+     */
+    private function scrapeEvolvePeptidesShop($shopUrl)
+    {
+        $client = new \GuzzleHttp\Client(['timeout' => 30, 'headers' => [
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+        ]]);
+        $products = [];
+        $nextPageUrl = $shopUrl;
+        $maxPages = 20; // safety limit
+        $page = 1;
+        do {
+            $response = $client->get($nextPageUrl);
+            $html = (string) $response->getBody();
+            $crawler = new \Symfony\Component\DomCrawler\Crawler($html);
+            $crawler->filter('li.product')->each(function ($node) use (&$products) {
+                $a = $node->filter('a.woocommerce-LoopProduct-link')->first();
+                $product_url = $a->count() ? $a->attr('href') : null;
+                $name = null;
+                if ($node->filter('.woocommerce-loop-product__title')->count()) {
+                    $name = $node->filter('.woocommerce-loop-product__title')->text();
+                } elseif ($a->count()) {
+                    $name = trim($a->text());
+                }
+                $img = $node->filter('img.attachment-woocommerce_thumbnail')->first();
+                $image_url = $img->count() ? $img->attr('src') : null;
+                $price = null;
+                $discount_price = null;
+                $second_price = null;
+                $priceNode = $node->filter('.price .woocommerce-Price-amount');
+                if ($priceNode->count() > 1) {
+                    $price = preg_replace('/[^0-9.]/', '', $priceNode->eq(0)->text());
+                    $second_price = preg_replace('/[^0-9.]/', '', $priceNode->eq(1)->text());
+                } elseif ($priceNode->count() == 1) {
+                    $price = preg_replace('/[^0-9.]/', '', $priceNode->first()->text());
+                }
+                if ($node->filter('del .woocommerce-Price-amount')->count() && $node->filter('ins .woocommerce-Price-amount')->count()) {
+                    $price = preg_replace('/[^0-9.]/', '', $node->filter('del .woocommerce-Price-amount')->first()->text());
+                    $discount_price = preg_replace('/[^0-9.]/', '', $node->filter('ins .woocommerce-Price-amount')->first()->text());
+                    $second_price = null;
+                }
+                if ($name && $product_url) {
+                    $products[] = [
+                        'name' => $name,
+                        'price' => $price,
+                        'discount_price' => $discount_price,
+                        'second_price' => $second_price,
+                        'image_url' => $image_url,
+                        'product_url' => $product_url,
+                    ];
+                }
+            });
+            // Find next page link
+            $nextLink = $crawler->filter('nav.rey-ajaxLoadMore a.rey-ajaxLoadMore-btn')->count()
+                ? $crawler->filter('nav.rey-ajaxLoadMore a.rey-ajaxLoadMore-btn')->attr('href')
+                : null;
+            $nextPageUrl = $nextLink;
+            $page++;
         } while ($nextPageUrl && $page <= $maxPages);
         return $products;
     }
