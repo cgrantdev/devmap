@@ -359,7 +359,12 @@ class VendorsController extends Controller
             return redirect()->back()->with('error', 'Shop URL is not set for this vendor.');
         }
         try {
-            $products = $this->scrapeWooCommerceShop($shopUrl);
+            // Use Python scraper for simplepeptide.com/shop, otherwise use PHP scraper
+            if (strpos($shopUrl, 'simplepeptide.com/shop') !== false) {
+                $products = $this->runPythonScraper($shopUrl);
+            } else {
+                $products = $this->scrapeWooCommerceShop($shopUrl);
+            }
             $importedCount = 0;
             $skippedCount = 0;
             $updatedCount = 0;
@@ -398,7 +403,7 @@ class VendorsController extends Controller
             }
             $message = "Imported {$importedCount} new products from shop URL.";
             if ($updatedCount > 0) {
-                $message .= " Updated {$updatedCount} products with new price.";
+                $message .= " Updated {$updatedCount} products.";
             }
             if ($skippedCount > 0) {
                 $message .= " Skipped {$skippedCount} unchanged products.";
@@ -491,5 +496,25 @@ class VendorsController extends Controller
             $nextPageUrl = $nextLink;
         } while ($nextPageUrl && $page <= $maxPages);
         return $products;
+    }
+
+    public function runPythonScraper($shopUrl)
+    {        
+
+        $pythonBin = dirname(base_path()) . '/venv/bin/python3.12';
+        // $pythonScript = dirname(base_path()) . '/pyscripts/test.py';
+
+        $pythonScript = base_path() . '/pyscripts/script.py';
+
+        $escapedUrl = escapeshellarg($shopUrl);
+
+        $command = $pythonBin . ' ' . escapeshellarg($pythonScript) . ' ' . $escapedUrl . ' 2>&1';
+
+        $output = shell_exec($command);
+        $data = json_decode($output, true);
+        if (isset($data['error'])) {
+            return [];
+        }
+        return $data['products'];
     }
 } 
