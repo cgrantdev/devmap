@@ -88,4 +88,31 @@ class PublicVendorController extends Controller
             'search' => $search,
         ]);
     }
+
+    public function list()
+    {
+        $vendors = User::where('role', 'vendor')
+            ->whereHas('vendorSetting', function ($q) {
+                $q->where('status', 1);
+            })
+            ->with(['vendorSetting' => function ($q) {
+                $q->select('user_id', 'company_name', 'banner', 'logo');
+            }])
+            ->get(['id', 'name']);
+
+        $vendors = $vendors->map(function ($vendor) {
+            return [
+                'id' => $vendor->id,
+                'name' => $vendor->name,
+                'company_name' => $vendor->vendorSetting->company_name ?? $vendor->name,
+                'banner' => $vendor->vendorSetting->banner ? asset('storage/' . $vendor->vendorSetting->banner) : null,
+                'logo' => $vendor->vendorSetting->logo ? asset('storage/' . $vendor->vendorSetting->logo) : null,
+                'slug' => str_replace(' ', '-', strtolower($vendor->name)),
+            ];
+        });
+
+        return Inertia::render('Vendor/Vendors', [
+            'vendors' => $vendors
+        ]);
+    }
 } 

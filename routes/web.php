@@ -86,5 +86,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/logout', [AdminAuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
 });
 
+Route::get('/vendors', [PublicVendorController::class, 'list'])->name('vendors.public');
 Route::get('/shop/{vendor_name}', [PublicVendorController::class, 'show'])->name('shop.public');
 Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('product.public');
