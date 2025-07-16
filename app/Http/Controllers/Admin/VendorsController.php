@@ -361,9 +361,11 @@ class VendorsController extends Controller
         try {
             // Use Python scraper for simplepeptide.com/shop
             if (strpos($shopUrl, 'simplepeptide.com/shop') !== false) {
-                $products = $this->runPythonScraper($shopUrl);
+                $products = $this->runPythonScraper($shopUrl, 'script.py');
             } elseif (strpos($shopUrl, 'peptidology.co/products/') !== false) {
                 $products = $this->scrapePeptidologyShop($shopUrl);
+            } elseif (strpos($shopUrl, 'trueaminos.com/category/peptides') !== false) {
+                $products = $this->runPythonScraper($shopUrl, 'script2.py');
             } else {
                 $products = $this->scrapeWooCommerceShop($shopUrl);
             }
@@ -417,7 +419,7 @@ class VendorsController extends Controller
     }
 
     /**
-     * Scrape all products from a WooCommerce shop page (with pagination support)
+     * Scrape all products from WooCommerce shop page (with pagination support)
      * @param string $shopUrl
      * @return array
      */
@@ -500,13 +502,13 @@ class VendorsController extends Controller
         return $products;
     }
 
-    public function runPythonScraper($shopUrl)
+    public function runPythonScraper($shopUrl, $file_name)
     {        
 
         $pythonBin = dirname(base_path()) . '/venv/bin/python3.12';
         // $pythonScript = dirname(base_path()) . '/pyscripts/test.py';
 
-        $pythonScript = base_path() . '/pyscripts/script.py';
+        $pythonScript = base_path() . '/pyscripts/' . $file_name;
 
         $escapedUrl = escapeshellarg($shopUrl);
 
