@@ -370,6 +370,8 @@ class VendorsController extends Controller
                 $products = $this->scrapePureHealthPeptidesShop($shopUrl);
             } elseif (strpos($shopUrl, 'evolvepeptides.com/product-category/peptides') !== false) {
                 $products = $this->scrapeEvolvePeptidesShop($shopUrl);
+            } elseif (strpos($shopUrl, 'aminousa.com/collections/peptides') !== false) {
+                $products = $this->scrapeAminoUsaShop($shopUrl);
             } else {
                 $products = $this->scrapeWooCommerceShop($shopUrl);
             }
@@ -732,6 +734,62 @@ class VendorsController extends Controller
             $nextPageUrl = $nextLink;
             $page++;
         } while ($nextPageUrl && $page <= $maxPages);
+        return $products;
+    }
+
+    /**
+     * Scrape all products from aminousa.com/collections/peptides using their WooCommerce REST API.
+     * @param string $shopUrl
+     * @return array
+     */
+    private function scrapeAminoUsaShop($shopUrl)
+    {
+        $client = new \GuzzleHttp\Client(['timeout' => 30, 'headers' => [
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+        ]]);
+        $products = [];
+        $page = 1;
+        $perPage = 100;
+        do {
+            $apiUrl = "https://aminousa.com/wp-json/wc/store/v1/products?per_page=$perPage&page=$page";
+            $response = $client->get($apiUrl);
+            $data = json_decode((string)$response->getBody(), true);
+            if (!is_array($data) || empty($data)) {
+                break;
+            }
+            foreach ($data as $item) {
+                // Filter: only include products with a category slug 'peptides'
+                $hasPeptidesCategory = false;
+                if (isset($item['categories']) && is_array($item['categories'])) {
+                    foreach ($item['categories'] as $cat) {
+                        if (isset($cat['slug']) && $cat['slug'] === 'peptides') {
+                            $hasPeptidesCategory = true;
+                            break;
+                        }
+                    }
+                }
+                if (!$hasPeptidesCategory) {
+                    continue;
+                }
+                $price = isset($item['prices']['regular_price']) ? ((float)$item['prices']['regular_price'] / 100) : null;
+                $discount_price = (isset($item['on_sale']) && $item['on_sale'] && isset($item['prices']['sale_price']))
+                    ? ((float)$item['prices']['sale_price'] / 100)
+                    : null;
+                $image_url = null;
+                if (!empty($item['images']) && isset($item['images'][0]['src'])) {
+                    $image_url = $item['images'][0]['src'];
+                }
+                $products[] = [
+                    'name' => $item['name'] ?? null,
+                    'price' => $price,
+                    'discount_price' => $discount_price,
+                    'second_price' => null,
+                    'image_url' => $image_url,
+                    'product_url' => $item['permalink'] ?? null,
+                ];
+            }
+            $page++;
+        } while (count($data) === $perPage && $page <= 10); // safety limit
         return $products;
     }
 } 
