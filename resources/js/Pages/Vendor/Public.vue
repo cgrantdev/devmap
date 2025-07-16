@@ -1,4 +1,5 @@
 <template>
+  <Header />
   <div class="min-h-screen bg-gray-50">
     <!-- Admin Warning Banner for Inactive Vendors -->
     <div v-if="(isAdmin || isOwnPage) && settings?.status === 0" class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
@@ -17,13 +18,11 @@
         </div>
       </div>
     </div>
-
     <!-- Banner -->
     <div v-if="settings?.banner" class="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
       <img :src="getImageUrl(settings.banner)" alt="Banner" class="object-cover w-full h-full" />
     </div>
     <div v-else class="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center text-gray-400 text-2xl">No Banner</div>
-
     <!-- Company Info Row -->
     <div class="flex flex-col md:flex-row items-center justify-between bg-white shadow p-6 -mt-12 mx-4 rounded-lg relative z-10 max-w-6xl mx-auto">
       <!-- Logo -->
@@ -43,7 +42,6 @@
         <div v-if="settings?.phone_number"><span class="font-semibold">Phone:</span> {{ settings.phone_number }}</div>
       </div>
     </div>
-
     <!-- Main Content: Filters & Items -->
     <div class="flex flex-col md:flex-row gap-6 mt-8 max-w-6xl mx-auto px-4">
       <!-- Filters (dummy) -->
@@ -101,6 +99,7 @@
 </template>
 
 <script setup>
+import Header from '../Header.vue'
 import { router } from '@inertiajs/vue3'
 import { ref, watch } from 'vue'
 
