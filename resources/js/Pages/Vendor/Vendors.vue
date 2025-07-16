@@ -1,4 +1,5 @@
 <template>
+  <Header />
   <div class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-10">
     <div class="max-w-7xl mx-auto px-4">
       <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-10 drop-shadow">Our Trusted Vendors</h1>
@@ -38,6 +39,7 @@
 </template>
 
 <script setup>
+import Header from '../Header.vue'
 import { defineProps } from 'vue'
 
 const props = defineProps({
