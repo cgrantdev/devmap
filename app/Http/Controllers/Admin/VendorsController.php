@@ -366,6 +366,8 @@ class VendorsController extends Controller
                 $products = $this->scrapePeptidologyShop($shopUrl);
             } elseif (strpos($shopUrl, 'trueaminos.com/category/peptides') !== false) {
                 $products = $this->runPythonScraper($shopUrl, 'script2.py');
+            } elseif (strpos($shopUrl, 'purehealthpeptides.com/shop') !== false) {
+                $products = $this->scrapePureHealthPeptidesShop($shopUrl);
             } else {
                 $products = $this->scrapeWooCommerceShop($shopUrl);
             }
@@ -573,6 +575,96 @@ class VendorsController extends Controller
                 ];
             }
         });
+        return $products;
+    }
+
+    /**
+     * Scrape all products from purehealthpeptides.com/shop (custom HTML structure)
+     * @param string $shopUrl
+     * @return array
+     */
+    private function scrapePureHealthPeptidesShop($shopUrl)
+    {
+        $client = new Client([
+            'timeout' => 60,
+            'headers' => [
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+            ]
+        ]);
+        $products = [];
+        $page = 1;
+        $maxPages = 50; // safety limit
+        $nextPageUrl = $shopUrl;
+        do {
+            $response = $client->get($nextPageUrl);
+            $html = (string) $response->getBody();
+            $crawler = new Crawler($html);
+            // Find product cards (standard WooCommerce class)
+            $crawler->filter('.woocommerce .product')->each(function (Crawler $node) use (&$products, $shopUrl) {
+                
+                $name = '';
+                $form = $node->filter('form.variations_form')->first();
+                if ($form->count()) {
+                    $data = $form->attr('data-product_variations');
+                    if ($data) {
+                        $variations = json_decode(html_entity_decode($data), true);
+                        if (is_array($variations) && count($variations) > 0) {
+                            $name = isset($variations[0]['display_name']) ? $variations[0]['display_name'] : '';
+                            // If there are multiple variations, you could extract second_price, etc.
+                        }
+                    }
+                }    
+                // --- General price extraction logic ---
+                $price = '0.00';
+                $discount_price = null;
+                $second_price = null;
+                $amounts = $node->filter('.woocommerce-Price-amount');
+                if ($amounts->count() > 1 && $node->filter('.price ins')->count() == 0 && $node->filter('.price del')->count() == 0) {
+                    // Price range (variable product, no discount)
+                    $priceText = $amounts->eq(0)->text();
+                    $secondText = $amounts->eq(1)->text();
+                    $price = preg_replace('/[^0-9.]/', '', $priceText);
+                    $second_price = preg_replace('/[^0-9.]/', '', $secondText);
+                    $discount_price = null;
+                } elseif ($node->filter('.price ins .woocommerce-Price-amount')->count() && $node->filter('.price del .woocommerce-Price-amount')->count()) {
+                    // Both regular and discounted price
+                    $discountText = $node->filter('.price ins .woocommerce-Price-amount')->first()->text();
+                    $regularText = $node->filter('.price del .woocommerce-Price-amount')->first()->text();
+                    $discount_price = preg_replace('/[^0-9.]/', '', $discountText);
+                    $price = preg_replace('/[^0-9.]/', '', $regularText);
+                    $second_price = null;
+                } elseif ($amounts->count() > 0) {
+                    // Only one price (regular)
+                    $priceText = $amounts->first()->text();
+                    $price = preg_replace('/[^0-9.]/', '', $priceText);
+                    $discount_price = null;
+                    $second_price = null;
+                }
+                // --- End price extraction ---
+                // Improved image extraction for lazy load
+                $image_url = null;
+                if ($node->filter('img.main-image')->count()) {
+                    $imgNode = $node->filter('img.main-image')->first();
+                    $src = $imgNode->attr('src');                    
+                    $image_url = $src;
+                }
+                $product_url = $node->filter('a')->count() ? $node->filter('a')->attr('href') : null;
+                if ($name && $product_url) {
+                    $products[] = [
+                        'name' => $name,
+                        'price' => $price,
+                        'discount_price' => $discount_price,
+                        'second_price' => $second_price,
+                        'image_url' => $image_url,
+                        'product_url' => $product_url,
+                    ];
+                }
+            });
+            // Find next page link (standard WooCommerce pagination)
+            $nextLink = $crawler->filter('.woocommerce-pagination .next')->count() ? $crawler->filter('.woocommerce-pagination .next')->attr('href') : null;
+            $page++;
+            $nextPageUrl = $nextLink;
+        } while ($nextPageUrl && $page <= $maxPages);
         return $products;
     }
 } 
