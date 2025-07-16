@@ -75,7 +75,7 @@ class PublicVendorController extends Controller
         if ($search) {
             $productsQuery->where('name', 'like', '%' . $search . '%');
         }
-        $items = $productsQuery->get(['id', 'name', 'price', 'image_url', 'product_url', 'description']);
+        $items = $productsQuery->get(['id', 'name', 'price', 'discount_price', 'second_price', 'image_url', 'product_url', 'description']);
 
         return Inertia::render('Vendor/Public', [
             'settings' => $vendorSetting,

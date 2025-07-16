@@ -82,7 +82,7 @@
           </div>
         </div>
       </aside>
-      <!-- Items (dummy) -->
+      <!-- Items -->
       <section class="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <div v-for="item in items" :key="item.id" class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
           <img :src="getImageUrl(item.image_url)" alt="Item Image" class="h-32 w-32 object-cover rounded mb-2" />
@@ -90,7 +90,27 @@
             <a v-if="item.product_url" :href="item.product_url" target="_blank" class="hover:underline text-blue-700">{{ item.name }}</a>
             <span v-else>{{ item.name }}</span>
           </h3>
-          <div class="text-blue-600 font-bold mb-2">${{ item.price }}</div>
+          <div class="mb-2 flex flex-col items-center">
+            <!-- Out of Stock logic -->
+            <template v-if="!item.price && item.price !== 0">
+              <span class="text-red-600 font-bold text-lg">Out of Stock</span>
+            </template>
+            <template v-else-if="item.second_price">
+              <span class="text-blue-700 font-bold text-lg">
+                ${{ formatPrice(item.price) }} - ${{ formatPrice(item.second_price) }}
+              </span>
+              <span v-if="item.discount_price" class="text-sm text-green-600 font-semibold mt-1">
+                Discount: ${{ formatPrice(item.discount_price) }}
+              </span>
+            </template>
+            <template v-else-if="item.discount_price">
+              <span class="text-gray-500 line-through text-base">${{ formatPrice(item.price) }}</span>
+              <span class="text-green-600 font-bold text-lg ml-2">${{ formatPrice(item.discount_price) }}</span>
+            </template>
+            <template v-else>
+              <span class="text-blue-700 font-bold text-lg">${{ formatPrice(item.price) }}</span>
+            </template>
+          </div>
           <div v-if="item.description" class="text-gray-600 text-sm mb-2">{{ item.description }}</div>
         </div>
       </section>
@@ -126,6 +146,11 @@ function getImageUrl(path) {
   if (!path) return null
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('/')) return path
   return `/storage/${path}`
+}
+
+function formatPrice(val) {
+  if (val === null || val === undefined || val === '') return '-'
+  return Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 function onSearch() {
