@@ -518,7 +518,7 @@ class VendorsController extends Controller
 
         $escapedUrl = escapeshellarg($shopUrl);
 
-        $command = $pythonBin . ' ' . escapeshellarg($pythonScript) . ' ' . $escapedUrl . ' 2>&1';
+        $command = 'sudo -u devuser ' . $pythonBin . ' ' . escapeshellarg($pythonScript) . ' ' . $escapedUrl . ' 2>&1';
 
         \Log::info($command);
 
