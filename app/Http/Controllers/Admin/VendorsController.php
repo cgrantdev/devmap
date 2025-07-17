@@ -521,8 +521,9 @@ class VendorsController extends Controller
         $command = $pythonBin . ' ' . escapeshellarg($pythonScript) . ' ' . $escapedUrl . ' 2>&1';
 
         \Log::info($command);
-        
+
         $output = shell_exec($command);
+        \Log::info($output);
         $data = json_decode($output, true);
         if (isset($data['error'])) {
             return [];
