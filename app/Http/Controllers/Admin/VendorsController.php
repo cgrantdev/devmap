@@ -523,7 +523,7 @@ class VendorsController extends Controller
         \Log::info($command);
 
         $output = shell_exec($command);
-        \Log::info($output);
+        // \Log::info($output);
         $data = json_decode($output, true);
         if (isset($data['error'])) {
             return [];
