@@ -1,3 +1,9 @@
+import os
+
+# ✅ Force webdriver_manager to use a local cache writable by www-data
+os.environ['WDM_LOCAL'] = '1'
+os.environ['WDM_CACHE'] = '/var/www/.cache/selenium'
+
 import json
 import sys
 from selenium import webdriver
