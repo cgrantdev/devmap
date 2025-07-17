@@ -10,6 +10,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+import tempfile
 
 def scrape_trueaminos(url):
     options = Options()
@@ -23,6 +24,10 @@ def scrape_trueaminos(url):
     options.add_argument("--disable-gpu")
     options.add_argument("--remote-debugging-port=9222")
     options.add_argument("--disable-software-rasterizer")
+
+# ✅ Create a temporary, unique user data dir for each session
+    tmp_profile = tempfile.mkdtemp(prefix="chrome-profile-")
+    options.add_argument(f"--user-data-dir={tmp_profile}")
 
     driver = webdriver.Chrome(options=options)
     driver.get(url)

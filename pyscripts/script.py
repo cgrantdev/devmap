@@ -16,6 +16,7 @@ import time
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from webdriver_manager.firefox import GeckoDriverManager
+import tempfile
 
 if len(sys.argv) < 2:
     print(json.dumps({'error': 'No URL provided'}))
@@ -45,6 +46,10 @@ def get_driver():
     chrome_options.add_argument("--disable-software-rasterizer")
     # Explicitly set binary if needed
     #chrome_options.binary_location = "/usr/bin/chromium-browser"  # or /usr/bin/google-chrome
+
+    # ✅ Create a temporary, unique user data dir for each session
+    tmp_profile = tempfile.mkdtemp(prefix="chrome-profile-")
+    chrome_options.add_argument(f"--user-data-dir={tmp_profile}")
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     return driver
