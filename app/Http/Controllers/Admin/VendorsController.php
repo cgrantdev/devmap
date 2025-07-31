@@ -355,51 +355,36 @@ class VendorsController extends Controller
         $vendor = User::where('role', 'vendor')->findOrFail($id);
         $settings = $vendor->vendorSetting;
         $shopUrl = $settings ? $settings->shop_url : null;
+        $settings_id = $settings ? $settings->id : null;
         if (!$shopUrl) {
             return redirect()->back()->with('error', 'Shop URL is not set for this vendor.');
         }
-        try {
-            // Use Python scraper for simplepeptide.com/shop
-            if (strpos($shopUrl, 'simplepeptide.com/shop') !== false) {
-                $products = $this->runPythonScraper($shopUrl, 'script.py');
-            } elseif (strpos($shopUrl, 'peptidology.co/products/') !== false) {
-                $products = $this->scrapePeptidologyShop($shopUrl);
-            } elseif (strpos($shopUrl, 'trueaminos.com/category/peptides') !== false) {
+        // try {
+            if (strpos($shopUrl, 'trueaminos.com/category/peptides') !== false) {
                 $products = $this->runPythonScraper($shopUrl, 'script2.py');
-            } elseif (strpos($shopUrl, 'purehealthpeptides.com/shop') !== false) {
-                $products = $this->scrapePureHealthPeptidesShop($shopUrl);
-            } elseif (strpos($shopUrl, 'evolvepeptides.com/product-category/peptides') !== false) {
-                $products = $this->scrapeEvolvePeptidesShop($shopUrl);
-            } elseif (strpos($shopUrl, 'aminousa.com/collections/peptides') !== false) {
-                $products = $this->scrapeAminoUsaShop($shopUrl);
+                $api_route = 'python';
             } else {
-                $products = $this->scrapeWooCommerceShop($shopUrl);
+                $data = $this->fetchProducts($shopUrl);
+                $products = $data['products'];
+                $api_route = $data['api_route'];
             }
+            
             $importedCount = 0;
             $skippedCount = 0;
             $updatedCount = 0;
             foreach ($products as $product) {
                 $existing = $vendor->products()->where('product_url', $product['product_url'])->first();
-                if ($existing) {
-                    // if (
-                    //     $existing->price == $product['price'] &&
-                    //     $existing->discount_price == $product['discount_price'] &&
-                    //     $existing->image_url == $product['image_url']
-                    // ) {
-                    //     $skippedCount++;
-                    //     continue;
-                    // } else {
-                        // Update price, discount_price, image_url, and name
-                        $existing->update([
-                            'price' => $product['price'],
-                            'discount_price' => $product['discount_price'],
-                            'second_price' => $product['second_price'],
-                            'name' => $product['name'],
-                            'image_url' => $product['image_url'],
-                        ]);
-                        $updatedCount++;
-                        continue;
-                    // }
+                if ($existing) {                   
+                    // Update price, discount_price, image_url, and name
+                    $existing->update([
+                        'price' => $product['price'],
+                        'discount_price' => $product['discount_price'],
+                        'second_price' => $product['second_price'],
+                        'name' => $product['name'],
+                        'image_url' => $product['image_url'],
+                    ]);
+                    $updatedCount++;
+                    continue;
                 }
                 $vendor->products()->create([
                     'name' => $product['name'],
@@ -418,95 +403,109 @@ class VendorsController extends Controller
             if ($skippedCount > 0) {
                 $message .= " Skipped {$skippedCount} unchanged products.";
             }
+            VendorSetting::where('id', $settings_id)->update(['api_route' => $api_route]);
             return redirect()->back()->with('success', $message);
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error scraping shop URL: ' . $e->getMessage());
-        }
+        // } catch (\Exception $e) {
+        //     return redirect()->back()->with('error', 'Error scraping shop URL: ' . $e->getMessage());
+        // }
     }
 
-    /**
-     * Scrape all products from WooCommerce shop page (with pagination support)
-     * @param string $shopUrl
-     * @return array
-     */
-    private function scrapeWooCommerceShop($shopUrl)
+    private function fetchProducts($shopUrl)
     {
-        $client = new Client([
-            'timeout' => 60,
-            'headers' => [
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
-            ]
-        ]);
+        $client = new \GuzzleHttp\Client(['timeout' => 30, 'headers' => [
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+        ]]);
         $products = [];
         $page = 1;
-        $maxPages = 50; // safety limit
-        $nextPageUrl = $shopUrl;
+        $perPage = 100;
+        $data = [];
         do {
-            $response = $client->get($nextPageUrl);
-            $html = (string) $response->getBody();
-            $crawler = new Crawler($html);
-            // Find product cards (standard WooCommerce class)
-            $crawler->filter('.products .product')->each(function (Crawler $node) use (&$products, $shopUrl) {
-                $name = $node->filter('.woocommerce-loop-product__title')->count() ? $node->filter('.woocommerce-loop-product__title')->text() : null;
-                // --- General price extraction logic ---
-                $price = '0.00';
-                $discount_price = null;
-                $second_price = null;
-                $amounts = $node->filter('.price .woocommerce-Price-amount');
-                if ($amounts->count() > 1 && $node->filter('.price ins')->count() == 0 && $node->filter('.price del')->count() == 0) {
-                    // Price range (variable product, no discount)
-                    $priceText = $amounts->eq(0)->text();
-                    $secondText = $amounts->eq(1)->text();
-                    $price = preg_replace('/[^0-9.]/', '', $priceText);
-                    $second_price = preg_replace('/[^0-9.]/', '', $secondText);
-                    $discount_price = null;
-                } elseif ($node->filter('.price ins .woocommerce-Price-amount')->count() && $node->filter('.price del .woocommerce-Price-amount')->count()) {
-                    // Both regular and discounted price
-                    $discountText = $node->filter('.price ins .woocommerce-Price-amount')->first()->text();
-                    $regularText = $node->filter('.price del .woocommerce-Price-amount')->first()->text();
-                    $discount_price = preg_replace('/[^0-9.]/', '', $discountText);
-                    $price = preg_replace('/[^0-9.]/', '', $regularText);
-                    $second_price = null;
-                } elseif ($amounts->count() > 0) {
-                    // Only one price (regular)
-                    $priceText = $amounts->first()->text();
-                    $price = preg_replace('/[^0-9.]/', '', $priceText);
-                    $discount_price = null;
-                    $second_price = null;
-                }
-                // --- End price extraction ---
-                // Improved image extraction for lazy load
-                $image_url = null;
-                if ($node->filter('img.attachment-woocommerce_thumbnail')->count()) {
-                    $imgNode = $node->filter('img.attachment-woocommerce_thumbnail')->first();
-                    $src = $imgNode->attr('src');
-                    if ($src && strpos($src, 'data:image') === 0) {
-                        $dataSrc = $imgNode->attr('data-src');
-                        $dataLzlSrc = $imgNode->attr('data-lzl-src');
-                        $image_url = $dataSrc ?: ($dataLzlSrc ?: null);
-                    } else {
-                        $image_url = $src;
+            $shopUrl = rtrim($shopUrl, '/');
+            $api_route = 'normal';
+            $apiUrl = "$shopUrl/wp-json/wc/store/v1/products?per_page=$perPage&page=$page";
+            $response = null;
+            
+            try {
+                $response = $client->get($apiUrl);
+            } catch (\Exception $e) {
+                \Log::info("API Request Failed: " . $e->getMessage());
+                $statusCode = $e->getCode();
+                \Log::info('statuscode_'.$statusCode);
+
+                if ($statusCode == 403) {
+                    \Log::info('403 Forbidden - Using proxy');
+                    $proxytoken = 'e3980c24459441efbc4ca2d232d91e7663bfa3d6897';
+                    $encodedUrl = urlencode($apiUrl);
+                    $url = "https://api.scrape.do/?token=$proxytoken&url=$encodedUrl";
+                    \Log::info($url);
+                    try {
+                        $response = $client->get($url);
+                        $api_route = 'proxy';
+                    } catch (\Exception $e) {
+                        $statusCode = $e->getCode();
+                        \Log::info('proxystatuscode_'.$statusCode);
+                        \Log::info("Proxy request also failed: " . $e->getMessage());
                     }
                 }
-                $product_url = $node->filter('a')->count() ? $node->filter('a')->attr('href') : null;
-                if ($name && $product_url) {
-                    $products[] = [
-                        'name' => $name,
-                        'price' => $price,
-                        'discount_price' => $discount_price,
-                        'second_price' => $second_price,
-                        'image_url' => $image_url,
-                        'product_url' => $product_url,
-                    ];
+            }
+
+            if(!$response) {
+                return [
+                    'products' => [],
+                    'api_route' => 'nothing',
+                ];
+            }
+          
+            $data = json_decode((string)$response->getBody(), true);
+            if (!is_array($data) || empty($data)) {
+                break;
+            }
+            
+            foreach ($data as $item) {
+                // Filter: only include products with a category slug 'peptides'
+                // $hasPeptidesCategory = false;
+                // if (empty($item['categories'])) {
+                //     $hasPeptidesCategory = true;
+                // }
+                // if (isset($item['categories']) && is_array($item['categories'])) {
+                //     foreach ($item['categories'] as $cat) {
+                //         if (isset($cat['slug']) && strpos($cat['slug'], 'peptide') !== false) {
+                //             $hasPeptidesCategory = true;
+                //             break;
+                //         }
+                //     }
+                // }
+                // if (!$hasPeptidesCategory) {
+                //     continue;
+                // }
+                $price = isset($item['prices']['regular_price']) ? ((float)$item['prices']['regular_price'] / 100) : null;
+                $discount_price = (isset($item['on_sale']) && $item['on_sale'] && isset($item['prices']['sale_price']))
+                    ? ((float)$item['prices']['sale_price'] / 100)
+                    : null;
+                $image_urls = [];
+                if (!empty($item['images'])) {
+                    foreach ($item['images'] as $image) {
+                        $image_urls[] = $image['src'];
+                    }
                 }
-            });
-            // Find next page link (standard WooCommerce pagination)
-            $nextLink = $crawler->filter('.woocommerce-pagination .next')->count() ? $crawler->filter('.woocommerce-pagination .next')->attr('href') : null;
+                $products[] = [
+                    'name' => $item['name'] ?? null,
+                    'price' => $price,
+                    'discount_price' => $discount_price,
+                    'second_price' => null,
+                    'image_url' => isset($image_urls[0])?$image_urls[0]:null,
+                    'product_url' => $item['permalink'] ?? null,
+                ];
+            }
             $page++;
-            $nextPageUrl = $nextLink;
-        } while ($nextPageUrl && $page <= $maxPages);
-        return $products;
+        } while (count($data) === $perPage && $page <= 10); // safety limit
+        \Log::info(count($products));
+        return [
+            'products' => $products,
+            'api_route' => $api_route,
+        ];
     }
+
 
     public function runPythonScraper($shopUrl, $file_name)
     {        
@@ -529,270 +528,5 @@ class VendorsController extends Controller
             return [];
         }
         return $data['products'];
-    }
-
-    /**
-     * Scrape all products from peptidology.co/products/ (custom HTML structure)
-     * @param string $shopUrl
-     * @return array
-     */
-    private function scrapePeptidologyShop($shopUrl)
-    {
-        $client = new \GuzzleHttp\Client(['timeout' => 30, 'headers' => [
-            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
-        ]]);
-        $products = [];
-        $response = $client->get($shopUrl);
-        $html = (string) $response->getBody();
-        $crawler = new \Symfony\Component\DomCrawler\Crawler($html);
-        $crawler->filter('div.product')->each(function ($node) use (&$products) {
-            // Product URL
-            $a = $node->filter('a.woocommerce-LoopProduct-link')->first();
-            $product_url = $a->count() ? $a->attr('href') : null;
-            // Name
-            $name = $node->filter('h3.custom-product-title')->count() ? $node->filter('h3.custom-product-title')->text() : null;
-            // Price (from Add to Cart button or .woocommerce-Price-amount)
-            $price = null;
-            $discount_price = null;
-            $second_price = null;
-            $priceNode = $node->filter('.woocommerce-Price-amount');
-            if ($priceNode->count() > 1) {
-                $price = preg_replace('/[^0-9.]/', '', $priceNode->eq(0)->text());
-                $second_price = preg_replace('/[^0-9.]/', '', $priceNode->eq(1)->text());
-            } elseif ($priceNode->count() == 1) {
-                $price = preg_replace('/[^0-9.]/', '', $priceNode->first()->text());
-            }
-            // Discount price (if present)
-            $onsale = $node->filter('.onsale')->count();
-            if ($onsale && $priceNode->count() > 1) {
-                $discount_price = $second_price;
-                $second_price = null;
-            }
-            // Image
-            $img = $node->filter('img')->first();
-            $image_url = $img->count() ? $img->attr('src') : null;
-            if ($name && $product_url) {
-                $products[] = [
-                    'name' => $name,
-                    'price' => $price,
-                    'discount_price' => $discount_price,
-                    'second_price' => $second_price,
-                    'image_url' => $image_url,
-                    'product_url' => $product_url,
-                ];
-            }
-        });
-        return $products;
-    }
-
-    /**
-     * Scrape all products from purehealthpeptides.com/shop (custom HTML structure)
-     * @param string $shopUrl
-     * @return array
-     */
-    private function scrapePureHealthPeptidesShop($shopUrl)
-    {
-        $client = new Client([
-            'timeout' => 60,
-            'headers' => [
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
-            ]
-        ]);
-        $products = [];
-        $page = 1;
-        $maxPages = 50; // safety limit
-        $nextPageUrl = $shopUrl;
-        do {
-            $response = $client->get($nextPageUrl);
-            $html = (string) $response->getBody();
-            $crawler = new Crawler($html);
-            // Find product cards (standard WooCommerce class)
-            $crawler->filter('.woocommerce .product')->each(function (Crawler $node) use (&$products, $shopUrl) {
-                
-                $name = '';
-                $form = $node->filter('form.variations_form')->first();
-                if ($form->count()) {
-                    $data = $form->attr('data-product_variations');
-                    if ($data) {
-                        $variations = json_decode(html_entity_decode($data), true);
-                        if (is_array($variations) && count($variations) > 0) {
-                            $name = isset($variations[0]['display_name']) ? $variations[0]['display_name'] : '';
-                            // If there are multiple variations, you could extract second_price, etc.
-                        }
-                    }
-                }    
-                // --- General price extraction logic ---
-                $price = '0.00';
-                $discount_price = null;
-                $second_price = null;
-                $amounts = $node->filter('.woocommerce-Price-amount');
-                if ($amounts->count() > 1 && $node->filter('.price ins')->count() == 0 && $node->filter('.price del')->count() == 0) {
-                    // Price range (variable product, no discount)
-                    $priceText = $amounts->eq(0)->text();
-                    $secondText = $amounts->eq(1)->text();
-                    $price = preg_replace('/[^0-9.]/', '', $priceText);
-                    $second_price = preg_replace('/[^0-9.]/', '', $secondText);
-                    $discount_price = null;
-                } elseif ($node->filter('.price ins .woocommerce-Price-amount')->count() && $node->filter('.price del .woocommerce-Price-amount')->count()) {
-                    // Both regular and discounted price
-                    $discountText = $node->filter('.price ins .woocommerce-Price-amount')->first()->text();
-                    $regularText = $node->filter('.price del .woocommerce-Price-amount')->first()->text();
-                    $discount_price = preg_replace('/[^0-9.]/', '', $discountText);
-                    $price = preg_replace('/[^0-9.]/', '', $regularText);
-                    $second_price = null;
-                } elseif ($amounts->count() > 0) {
-                    // Only one price (regular)
-                    $priceText = $amounts->first()->text();
-                    $price = preg_replace('/[^0-9.]/', '', $priceText);
-                    $discount_price = null;
-                    $second_price = null;
-                }
-                // --- End price extraction ---
-                // Improved image extraction for lazy load
-                $image_url = null;
-                if ($node->filter('img.main-image')->count()) {
-                    $imgNode = $node->filter('img.main-image')->first();
-                    $src = $imgNode->attr('src');                    
-                    $image_url = $src;
-                }
-                $product_url = $node->filter('a')->count() ? $node->filter('a')->attr('href') : null;
-                if ($name && $product_url) {
-                    $products[] = [
-                        'name' => $name,
-                        'price' => $price,
-                        'discount_price' => $discount_price,
-                        'second_price' => $second_price,
-                        'image_url' => $image_url,
-                        'product_url' => $product_url,
-                    ];
-                }
-            });
-            // Find next page link (standard WooCommerce pagination)
-            $nextLink = $crawler->filter('.woocommerce-pagination .next')->count() ? $crawler->filter('.woocommerce-pagination .next')->attr('href') : null;
-            $page++;
-            $nextPageUrl = $nextLink;
-        } while ($nextPageUrl && $page <= $maxPages);
-        return $products;
-    }
-
-    /**
-     * Scrape all products from evolvepeptides.com/product-category/peptides/ (custom HTML structure)
-     * @param string $shopUrl
-     * @return array
-     */
-    private function scrapeEvolvePeptidesShop($shopUrl)
-    {
-        $client = new \GuzzleHttp\Client(['timeout' => 30, 'headers' => [
-            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
-        ]]);
-        $products = [];
-        $nextPageUrl = $shopUrl;
-        $maxPages = 20; // safety limit
-        $page = 1;
-        do {
-            $response = $client->get($nextPageUrl);
-            $html = (string) $response->getBody();
-            $crawler = new \Symfony\Component\DomCrawler\Crawler($html);
-            $crawler->filter('li.product')->each(function ($node) use (&$products) {
-                $a = $node->filter('a.woocommerce-LoopProduct-link')->first();
-                $product_url = $a->count() ? $a->attr('href') : null;
-                $name = null;
-                if ($node->filter('.woocommerce-loop-product__title')->count()) {
-                    $name = $node->filter('.woocommerce-loop-product__title')->text();
-                } elseif ($a->count()) {
-                    $name = trim($a->text());
-                }
-                $img = $node->filter('img.attachment-woocommerce_thumbnail')->first();
-                $image_url = $img->count() ? $img->attr('src') : null;
-                $price = null;
-                $discount_price = null;
-                $second_price = null;
-                $priceNode = $node->filter('.price .woocommerce-Price-amount');
-                if ($priceNode->count() > 1) {
-                    $price = preg_replace('/[^0-9.]/', '', $priceNode->eq(0)->text());
-                    $second_price = preg_replace('/[^0-9.]/', '', $priceNode->eq(1)->text());
-                } elseif ($priceNode->count() == 1) {
-                    $price = preg_replace('/[^0-9.]/', '', $priceNode->first()->text());
-                }
-                if ($node->filter('del .woocommerce-Price-amount')->count() && $node->filter('ins .woocommerce-Price-amount')->count()) {
-                    $price = preg_replace('/[^0-9.]/', '', $node->filter('del .woocommerce-Price-amount')->first()->text());
-                    $discount_price = preg_replace('/[^0-9.]/', '', $node->filter('ins .woocommerce-Price-amount')->first()->text());
-                    $second_price = null;
-                }
-                if ($name && $product_url) {
-                    $products[] = [
-                        'name' => $name,
-                        'price' => $price,
-                        'discount_price' => $discount_price,
-                        'second_price' => $second_price,
-                        'image_url' => $image_url,
-                        'product_url' => $product_url,
-                    ];
-                }
-            });
-            // Find next page link
-            $nextLink = $crawler->filter('nav.rey-ajaxLoadMore a.rey-ajaxLoadMore-btn')->count()
-                ? $crawler->filter('nav.rey-ajaxLoadMore a.rey-ajaxLoadMore-btn')->attr('href')
-                : null;
-            $nextPageUrl = $nextLink;
-            $page++;
-        } while ($nextPageUrl && $page <= $maxPages);
-        return $products;
-    }
-
-    /**
-     * Scrape all products from aminousa.com/collections/peptides using their WooCommerce REST API.
-     * @param string $shopUrl
-     * @return array
-     */
-    private function scrapeAminoUsaShop($shopUrl)
-    {
-        $client = new \GuzzleHttp\Client(['timeout' => 30, 'headers' => [
-            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
-        ]]);
-        $products = [];
-        $page = 1;
-        $perPage = 100;
-        do {
-            $apiUrl = "https://aminousa.com/wp-json/wc/store/v1/products?per_page=$perPage&page=$page";
-            $response = $client->get($apiUrl);
-            $data = json_decode((string)$response->getBody(), true);
-            if (!is_array($data) || empty($data)) {
-                break;
-            }
-            foreach ($data as $item) {
-                // Filter: only include products with a category slug 'peptides'
-                $hasPeptidesCategory = false;
-                if (isset($item['categories']) && is_array($item['categories'])) {
-                    foreach ($item['categories'] as $cat) {
-                        if (isset($cat['slug']) && $cat['slug'] === 'peptides') {
-                            $hasPeptidesCategory = true;
-                            break;
-                        }
-                    }
-                }
-                if (!$hasPeptidesCategory) {
-                    continue;
-                }
-                $price = isset($item['prices']['regular_price']) ? ((float)$item['prices']['regular_price'] / 100) : null;
-                $discount_price = (isset($item['on_sale']) && $item['on_sale'] && isset($item['prices']['sale_price']))
-                    ? ((float)$item['prices']['sale_price'] / 100)
-                    : null;
-                $image_url = null;
-                if (!empty($item['images']) && isset($item['images'][0]['src'])) {
-                    $image_url = $item['images'][0]['src'];
-                }
-                $products[] = [
-                    'name' => $item['name'] ?? null,
-                    'price' => $price,
-                    'discount_price' => $discount_price,
-                    'second_price' => null,
-                    'image_url' => $image_url,
-                    'product_url' => $item['permalink'] ?? null,
-                ];
-            }
-            $page++;
-        } while (count($data) === $perPage && $page <= 10); // safety limit
-        return $products;
-    }
+    } 
 } 

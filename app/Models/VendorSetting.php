@@ -19,6 +19,7 @@ class VendorSetting extends Model
         'contact_email',
         'phone_number',
         'status',
+        'api_route'
     ];
 
     public function user()
