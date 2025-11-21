@@ -9,3 +9,83 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* Header Styles */
+.header-container {
+    height: 132px;
+}
+
+.header-padding {
+    padding: 40px;
+}
+
+.logo {
+    font-family: 'HV Muse';
+    /* Note: Design uses 'HV Muse' - replace if font file is available */
+    font-weight: 400;
+    font-size: 36px;
+    line-height: 120%;
+    letter-spacing: 0%;
+    color: #1F2937;
+    height: 43px;
+}
+
+.menu-link {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: #374151;
+    /* gray/700 - active color */
+}
+
+.menu-link-inactive {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: #6B7280;
+    /* gray/500 - inactive color */
+}
+
+.search-input {
+    width: 320px;
+    height: 52px;
+    border-radius: 500px;
+    padding: 10px 16px 10px 42px;
+    background-color: #F8FAFC;
+    border: 1px solid rgba(216, 207, 198, 0.1);
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: #374151;
+}
+
+.search-input::placeholder {
+    color: #374151;
+    opacity: 1;
+}
+
+.search-icon {
+    width: 20px;
+    height: 20px;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.signup-button {
+    height: 52px;
+    border-radius: 500px;
+    padding: 10px 24px;
+    background-color: #1F2937;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 100%;
+    letter-spacing: 0%;
+}

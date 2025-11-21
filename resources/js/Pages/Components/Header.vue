@@ -1,57 +1,87 @@
 <template>
-  <header class="sticky top-0 z-50 bg-white shadow-sm">
-    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between py-4">
+  <header class="sticky top-0 z-50 bg-white shadow-sm header-container">
+    <div class="max-w-[1440px] mx-auto h-full header-padding">
+      <div class="flex items-center justify-between h-full">
         <!-- Logo -->
         <Link href="/" class="flex items-center">
-          <span class="text-2xl font-bold text-gray-800">PeptideSync</span>
+          <span class="logo">PeptideSync</span>
         </Link>
 
         <!-- Navigation Menu -->
-        <nav class="hidden md:flex items-center gap-6">
-          <Link href="/products" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Products</Link>
-          <Link href="/brands" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Brands</Link>
-          <Link href="/about" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">About</Link>
-          <Link href="/education" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Education</Link>
-          <Link href="/calculator" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Calculator</Link>
-          <Link href="/contact" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Contact</Link>
+        <nav class="hidden md:flex items-center gap-[22px]">
+          <Link 
+            href="/products" 
+            :class="isActive('/products') ? 'menu-link' : 'menu-link-inactive'"
+            class="transition-colors hover:opacity-80"
+          >
+            Products
+          </Link>
+          <Link 
+            href="/brands" 
+            :class="isActive('/brands') ? 'menu-link' : 'menu-link-inactive'"
+            class="transition-colors hover:opacity-80"
+          >
+            Brands
+          </Link>
+          <Link 
+            href="/about" 
+            :class="isActive('/about') ? 'menu-link' : 'menu-link-inactive'"
+            class="transition-colors hover:opacity-80"
+          >
+            About
+          </Link>
+          <Link 
+            href="/education" 
+            :class="isActive('/education') ? 'menu-link' : 'menu-link-inactive'"
+            class="transition-colors hover:opacity-80"
+          >
+            Education
+          </Link>
+          <Link 
+            href="/calculator" 
+            :class="isActive('/calculator') ? 'menu-link' : 'menu-link-inactive'"
+            class="transition-colors hover:opacity-80"
+          >
+            Calculator
+          </Link>
+          <Link 
+            href="/contact" 
+            :class="isActive('/contact') ? 'menu-link' : 'menu-link-inactive'"
+            class="transition-colors hover:opacity-80"
+          >
+            Contact
+          </Link>
         </nav>
 
         <!-- Search Bar and Auth Buttons -->
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-[34px]">
           <!-- Search Bar -->
           <div class="hidden sm:flex items-center relative">
+            <svg 
+              class="absolute pointer-events-none search-icon"
+              width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13.6666 13.6667L17.4166 17.4167" stroke="#374151" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M15.75 8.25C15.75 4.10786 12.3921 0.75 8.25 0.75C4.10786 0.75 0.75 4.10786 0.75 8.25C0.75 12.3921 4.10786 15.75 8.25 15.75C12.3921 15.75 15.75 12.3921 15.75 8.25Z" stroke="#374151" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+
             <input
               type="text"
               placeholder="Type here..."
-              class="pl-10 pr-4 py-2 w-64 bg-gray-100 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="search-input focus:outline-none"
             />
-            <svg
-              class="absolute left-3 w-4 h-4 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
           </div>
 
           <!-- Auth Buttons -->
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-6">
             <Link
               href="/login"
-              class="px-4 py-2 text-gray-700 font-medium hover:text-blue-600 transition-colors"
+              class="menu-link-inactive transition-colors hover:opacity-80"
             >
               Login
             </Link>
             <Link
               href="/register"
-              class="px-6 py-2 bg-blue-700 text-white font-medium rounded-lg hover:bg-blue-800 transition-colors"
+              class="signup-button text-white transition-colors hover:opacity-90 inline-flex items-center justify-center"
             >
               Signup
             </Link>
@@ -60,7 +90,7 @@
           <!-- Mobile Menu Button -->
           <button
             @click="mobileMenuOpen = !mobileMenuOpen"
-            class="md:hidden p-2 text-gray-700 hover:text-blue-600"
+            class="md:hidden p-2 text-gray-700"
           >
             <svg
               v-if="!mobileMenuOpen"
@@ -87,21 +117,59 @@
       <!-- Mobile Menu -->
       <div
         v-if="mobileMenuOpen"
-        class="md:hidden pb-4 border-t border-gray-200 mt-4"
+        class="md:hidden pb-4 border-t border-gray-200 pt-4"
       >
-        <nav class="flex flex-col gap-4 pt-4">
-          <Link href="/products" class="text-gray-700 hover:text-blue-600 font-medium">Products</Link>
-          <Link href="/brands" class="text-gray-700 hover:text-blue-600 font-medium">Brands</Link>
-          <Link href="/about" class="text-gray-700 hover:text-blue-600 font-medium">About</Link>
-          <Link href="/education" class="text-gray-700 hover:text-blue-600 font-medium">Education</Link>
-          <Link href="/calculator" class="text-gray-700 hover:text-blue-600 font-medium">Calculator</Link>
-          <Link href="/contact" class="text-gray-700 hover:text-blue-600 font-medium">Contact</Link>
+        <nav class="flex flex-col gap-4">
+          <Link 
+            href="/products" 
+            :class="isActive('/products') ? 'menu-link' : 'menu-link-inactive'"
+          >
+            Products
+          </Link>
+          <Link 
+            href="/brands" 
+            :class="isActive('/brands') ? 'menu-link' : 'menu-link-inactive'"
+          >
+            Brands
+          </Link>
+          <Link 
+            href="/about" 
+            :class="isActive('/about') ? 'menu-link' : 'menu-link-inactive'"
+          >
+            About
+          </Link>
+          <Link 
+            href="/education" 
+            :class="isActive('/education') ? 'menu-link' : 'menu-link-inactive'"
+          >
+            Education
+          </Link>
+          <Link 
+            href="/calculator" 
+            :class="isActive('/calculator') ? 'menu-link' : 'menu-link-inactive'"
+          >
+            Calculator
+          </Link>
+          <Link 
+            href="/contact" 
+            :class="isActive('/contact') ? 'menu-link' : 'menu-link-inactive'"
+          >
+            Contact
+          </Link>
           <div class="pt-4 border-t border-gray-200">
-            <input
-              type="text"
-              placeholder="Type here..."
-              class="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            <div class="relative">
+              <svg 
+                class="absolute pointer-events-none search-icon"
+                width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13.6666 13.6667L17.4166 17.4167" stroke="#374151" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M15.75 8.25C15.75 4.10786 12.3921 0.75 8.25 0.75C4.10786 0.75 0.75 4.10786 0.75 8.25C0.75 12.3921 4.10786 15.75 8.25 15.75C12.3921 15.75 15.75 12.3921 15.75 8.25Z" stroke="#374151" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+              <input
+                type="text"
+                placeholder="Type here..."
+                class="w-full search-input focus:outline-none"
+              />
+            </div>
           </div>
         </nav>
       </div>
@@ -111,8 +179,22 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Link } from '@inertiajs/vue3'
+import { Link, usePage } from '@inertiajs/vue3'
 
 const mobileMenuOpen = ref(false)
+const page = usePage()
+
+const isActive = (path) => {
+  const currentPath = page.url
+  
+  // Handle root path - only active if exactly "/"
+  if (path === '/') {
+    return currentPath === '/'
+  }
+  
+  // For other paths, check if current path starts with the link path
+  // Use strict matching to avoid partial matches (e.g., "/about" matching "/about-us")
+  return currentPath === path || currentPath.startsWith(path + '/')
+}
 </script>
 
