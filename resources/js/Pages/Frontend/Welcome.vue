@@ -65,27 +65,49 @@
       <section class="py-16 bg-white">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <h2 class="top-vendors-title">Top Vendors</h2>
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-x-[20px] gap-y-[80px] mb-8">
             <div
               v-for="vendor in topVendors"
               :key="vendor.id"
-              class="bg-white border border-gray-200 rounded-lg p-6 text-center hover:shadow-lg transition-shadow"
+              class="vendor-card"
             >
-              <div class="relative mb-4">
-                <div class="w-20 h-20 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-3 relative">
-                  <span class="text-blue-700 font-semibold text-sm">{{ vendor.initials }}</span>
-                  <span
-                    v-if="vendor.badge"
-                    class="absolute -top-1 -right-1 text-xl"
-                  >{{ vendor.badge }}</span>
+              <!-- Logo Area -->
+              <div class="vendor-logo-area">
+                <img 
+                  :src="`/images/vendors/${vendor.logo}`" 
+                  :alt="vendor.name + ' logo'"
+                  class="vendor-logo-image"
+                  @error="handleLogoError($event, vendor.id)"
+                />
+                <div v-if="logoErrors.has(vendor.id)" class="vendor-logo-placeholder">
+                  <span class="vendor-logo-initials">{{ vendor.initials }}</span>
                 </div>
               </div>
-              <p class="text-gray-500 text-xs mb-1">{{ vendor.location }}</p>
-              <h3 class="font-semibold text-gray-800 mb-2">{{ vendor.name }}</h3>
-              <div class="flex items-center justify-center gap-1 mb-1">
-                <span class="text-yellow-400">★★★★★</span>
+              
+              <!-- Location -->
+              <div class="vendor-location">
+                <svg class="location-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 8.5C9.10457 8.5 10 7.60457 10 6.5C10 5.39543 9.10457 4.5 8 4.5C6.89543 4.5 6 5.39543 6 6.5C6 7.60457 6.89543 8.5 8 8.5Z" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8 13.5C8 13.5 13.5 10.5 13.5 6.5C13.5 4.01472 11.4853 2 9 2C6.51472 2 5 4.01472 5 6.5C5 10.5 8 13.5 8 13.5Z" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="location-text">{{ vendor.location }}</span>
               </div>
-              <p class="text-gray-600 text-sm">{{ vendor.rating }} ({{ vendor.reviews }})</p>
+              
+              <!-- Vendor Name -->
+              <h3 class="vendor-name">{{ vendor.name }}</h3>
+              
+              <!-- Rating -->
+              <div class="vendor-rating">
+                <div class="rating-stars">
+                  <svg v-for="i in 5" :key="i" class="star-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 0L9.79611 5.52786H15.6085L10.9062 8.94427L12.7023 14.4721L8 11.0557L3.29772 14.4721L5.09383 8.94427L0.391548 5.52786H6.20389L8 0Z" fill="#FBBF24"/>
+                  </svg>
+                </div>
+                <div class="rating-text">
+                  <span class="rating-value">{{ vendor.rating }}</span>
+                  <span class="reviews-count">({{ vendor.reviews }})</span>
+                </div>
+              </div>
             </div>
           </div>
           <div class="text-center">
@@ -303,6 +325,16 @@ const handleCtaClick = (url) => {
   }
 }
 
+const logoErrors = ref(new Set())
+
+const handleLogoError = (event, vendorId) => {
+  const img = event.target
+  if (vendorId) {
+    logoErrors.value.add(vendorId)
+  }
+  img.style.display = 'none'
+}
+
 onMounted(() => {
   if (emblaApi.value) {
     emblaApi.value.on('select', onSelect)
@@ -319,16 +351,16 @@ onUnmounted(() => {
 })
 
 const topVendors = ref([
-  { id: 1, name: 'Behemoth Labz', location: 'Beach Valley, California', initials: 'BL', rating: '5.00', reviews: 345, badge: '🍃' },
-  { id: 2, name: 'Peptide Sciences', location: 'San Diego, California', initials: 'PS', rating: '5.00', reviews: 289, badge: '🔥' },
-  { id: 3, name: 'Bella Corner', location: 'Los Angeles, California', initials: 'BC', rating: '5.00', reviews: 412 },
-  { id: 4, name: 'Chemyo', location: 'Austin, Texas', initials: 'CH', rating: '5.00', reviews: 356 },
-  { id: 5, name: 'Organic Food', location: 'Seattle, Washington', initials: 'OF', rating: '5.00', reviews: 298 },
-  { id: 6, name: 'Core Peptides', location: 'Miami, Florida', initials: 'CP', rating: '5.00', reviews: 324 },
-  { id: 7, name: 'AA Health', location: 'Chicago, Illinois', initials: 'AA', rating: '5.00', reviews: 267 },
-  { id: 8, name: 'Wholeness in Health', location: 'Denver, Colorado', initials: 'WH', rating: '5.00', reviews: 389 },
-  { id: 9, name: 'Health Net', location: 'Boston, Massachusetts', initials: 'HN', rating: '5.00', reviews: 445 },
-  { id: 10, name: 'Dental Plus', location: 'Portland, Oregon', initials: 'DP', rating: '5.00', reviews: 312 },
+  { id: 1, name: 'Behemoth Labz', location: 'Beach Valley, California', initials: 'BL', rating: '5.00', reviews: 345, badge: '🍃' , logo: 'behemoth-labz.png'},
+  { id: 2, name: 'Peptide Sciences', location: 'San Diego, California', initials: 'PS', rating: '5.00', reviews: 289, badge: '🔥' , logo: 'peptide-sciences.png'},
+  { id: 3, name: 'Bella Corner', location: 'Los Angeles, California', initials: 'BC', rating: '5.00', reviews: 412 , logo: 'bella-corner.png'},
+  { id: 4, name: 'Chemyo', location: 'Austin, Texas', initials: 'CH', rating: '5.00', reviews: 356 , logo: 'chemyo.png'},
+  { id: 5, name: 'Organic Food', location: 'Seattle, Washington', initials: 'OF', rating: '5.00', reviews: 298 , logo: 'organic-food.png'},
+  { id: 6, name: 'Core Peptides', location: 'Miami, Florida', initials: 'CP', rating: '5.00', reviews: 324 , logo: 'core-peptides.png'},
+  { id: 7, name: 'AA Health', location: 'Chicago, Illinois', initials: 'AA', rating: '5.00', reviews: 267 , logo: 'aa-health.png'},
+  { id: 8, name: 'Wholeness in Health', location: 'Denver, Colorado', initials: 'WH', rating: '5.00', reviews: 389 , logo: 'wholeness-in-health.png'},
+  { id: 9, name: 'Health Net', location: 'Boston, Massachusetts', initials: 'HN', rating: '5.00', reviews: 445 , logo: 'health-net.png'},
+  { id: 10, name: 'Dental Plus', location: 'Portland, Oregon', initials: 'DP', rating: '5.00', reviews: 312 , logo: 'dental-plus.png'},
 ])
 
 const peptideArticles = ref([
