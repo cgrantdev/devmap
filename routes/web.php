@@ -18,8 +18,41 @@ use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController
 use App\Http\Controllers\Auth\EmailVerificationController;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    return Inertia::render('Frontend/Welcome');
 });
+
+// Frontend pages
+Route::get('/products', function () {
+    return Inertia::render('Frontend/Products');
+})->name('products');
+
+Route::get('/brands', function () {
+    return Inertia::render('Frontend/Brands');
+})->name('brands');
+
+Route::get('/about', function () {
+    return Inertia::render('Frontend/About');
+})->name('about');
+
+Route::get('/education', function () {
+    return Inertia::render('Frontend/Education');
+})->name('education');
+
+Route::get('/calculator', function () {
+    return Inertia::render('Frontend/Calculator');
+})->name('calculator');
+
+Route::get('/contact', function () {
+    return Inertia::render('Frontend/Contact');
+})->name('contact');
+
+Route::get('/disclaimer', function () {
+    return Inertia::render('Frontend/Disclaimer');
+})->name('disclaimer');
+
+Route::get('/privacy', function () {
+    return Inertia::render('Frontend/Privacy');
+})->name('privacy');
 
 // Guest routes
 Route::middleware('guest')->group(function () {

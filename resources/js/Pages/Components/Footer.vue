@@ -4,9 +4,9 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <!-- Logo and Sign Up -->
         <div class="md:col-span-1">
-          <a href="/" class="inline-block mb-4">
+          <Link href="/" class="inline-block mb-4">
             <span class="text-2xl font-bold text-gray-800">PeptideSync</span>
-          </a>
+          </Link>
           <Link
             href="/register"
             class="inline-block px-6 py-2 bg-blue-700 text-white font-medium rounded-lg hover:bg-blue-800 transition-colors"
@@ -20,16 +20,16 @@
           <h3 class="text-gray-800 font-semibold mb-4">Legal</h3>
           <ul class="space-y-2">
             <li>
-              <a href="/disclaimer" class="text-gray-600 hover:text-blue-600 transition-colors">Disclaimer</a>
+              <Link href="/disclaimer" class="text-gray-600 hover:text-blue-600 transition-colors">Disclaimer</Link>
             </li>
             <li>
-              <a href="/privacy" class="text-gray-600 hover:text-blue-600 transition-colors">Privacy Policy</a>
+              <Link href="/privacy" class="text-gray-600 hover:text-blue-600 transition-colors">Privacy Policy</Link>
             </li>
             <li>
-              <a href="/brands" class="text-gray-600 hover:text-blue-600 transition-colors">Brands</a>
+              <Link href="/brands" class="text-gray-600 hover:text-blue-600 transition-colors">Brands</Link>
             </li>
             <li>
-              <a href="/calculator" class="text-gray-600 hover:text-blue-600 transition-colors">Calculator</a>
+              <Link href="/calculator" class="text-gray-600 hover:text-blue-600 transition-colors">Calculator</Link>
             </li>
           </ul>
         </div>
@@ -39,16 +39,16 @@
           <h3 class="text-gray-800 font-semibold mb-4">Resources</h3>
           <ul class="space-y-2">
             <li>
-              <a href="/contact" class="text-gray-600 hover:text-blue-600 transition-colors">Contact</a>
+              <Link href="/contact" class="text-gray-600 hover:text-blue-600 transition-colors">Contact</Link>
             </li>
             <li>
-              <a href="/about" class="text-gray-600 hover:text-blue-600 transition-colors">About</a>
+              <Link href="/about" class="text-gray-600 hover:text-blue-600 transition-colors">About</Link>
             </li>
             <li>
-              <a href="/brands" class="text-gray-600 hover:text-blue-600 transition-colors">Brands</a>
+              <Link href="/brands" class="text-gray-600 hover:text-blue-600 transition-colors">Brands</Link>
             </li>
             <li>
-              <a href="/products" class="text-gray-600 hover:text-blue-600 transition-colors">Products</a>
+              <Link href="/products" class="text-gray-600 hover:text-blue-600 transition-colors">Products</Link>
             </li>
           </ul>
         </div>
@@ -58,13 +58,13 @@
           <h3 class="text-gray-800 font-semibold mb-4">Resources</h3>
           <ul class="space-y-2">
             <li>
-              <a href="/calculator" class="text-gray-600 hover:text-blue-600 transition-colors">Calculator</a>
+              <Link href="/calculator" class="text-gray-600 hover:text-blue-600 transition-colors">Calculator</Link>
             </li>
             <li>
-              <a href="/education" class="text-gray-600 hover:text-blue-600 transition-colors">Education</a>
+              <Link href="/education" class="text-gray-600 hover:text-blue-600 transition-colors">Education</Link>
             </li>
             <li>
-              <a href="/disclaimer" class="text-gray-600 hover:text-blue-600 transition-colors">Disclaimer</a>
+              <Link href="/disclaimer" class="text-gray-600 hover:text-blue-600 transition-colors">Disclaimer</Link>
             </li>
           </ul>
         </div>

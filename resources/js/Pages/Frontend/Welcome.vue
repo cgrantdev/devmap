@@ -1,7 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white flex flex-col">
-    <Header />
-    <main class="flex-1">
+  <FrontLayout>
       <!-- Hero Section -->
       <section class="relative w-full h-[600px] overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-blue-800/60">
@@ -178,16 +176,13 @@
           </div>
         </div>
       </section>
-    </main>
-    <Footer />
-  </div>
+  </FrontLayout>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
-import Header from './Header.vue'
-import Footer from './Footer.vue'
+import FrontLayout from '../Layouts/FrontLayout.vue'
 
 const topVendors = ref([
   { id: 1, name: 'Behemoth Labz', location: 'Beach Valley, California', initials: 'BL', rating: '5.00', reviews: 345, badge: '🍃' },
@@ -288,3 +283,4 @@ const researchInsights = ref([
   },
 ])
 </script>
+

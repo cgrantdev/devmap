@@ -3,18 +3,18 @@
     <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between py-4">
         <!-- Logo -->
-        <a href="/" class="flex items-center">
+        <Link href="/" class="flex items-center">
           <span class="text-2xl font-bold text-gray-800">PeptideSync</span>
-        </a>
+        </Link>
 
         <!-- Navigation Menu -->
         <nav class="hidden md:flex items-center gap-6">
-          <a href="/products" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Products</a>
-          <a href="/brands" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Brands</a>
-          <a href="/about" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">About</a>
-          <a href="/education" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Education</a>
-          <a href="/calculator" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Calculator</a>
-          <a href="/contact" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Contact</a>
+          <Link href="/products" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Products</Link>
+          <Link href="/brands" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Brands</Link>
+          <Link href="/about" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">About</Link>
+          <Link href="/education" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Education</Link>
+          <Link href="/calculator" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Calculator</Link>
+          <Link href="/contact" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Contact</Link>
         </nav>
 
         <!-- Search Bar and Auth Buttons -->
@@ -90,12 +90,12 @@
         class="md:hidden pb-4 border-t border-gray-200 mt-4"
       >
         <nav class="flex flex-col gap-4 pt-4">
-          <a href="/products" class="text-gray-700 hover:text-blue-600 font-medium">Products</a>
-          <a href="/brands" class="text-gray-700 hover:text-blue-600 font-medium">Brands</a>
-          <a href="/about" class="text-gray-700 hover:text-blue-600 font-medium">About</a>
-          <a href="/education" class="text-gray-700 hover:text-blue-600 font-medium">Education</a>
-          <a href="/calculator" class="text-gray-700 hover:text-blue-600 font-medium">Calculator</a>
-          <a href="/contact" class="text-gray-700 hover:text-blue-600 font-medium">Contact</a>
+          <Link href="/products" class="text-gray-700 hover:text-blue-600 font-medium">Products</Link>
+          <Link href="/brands" class="text-gray-700 hover:text-blue-600 font-medium">Brands</Link>
+          <Link href="/about" class="text-gray-700 hover:text-blue-600 font-medium">About</Link>
+          <Link href="/education" class="text-gray-700 hover:text-blue-600 font-medium">Education</Link>
+          <Link href="/calculator" class="text-gray-700 hover:text-blue-600 font-medium">Calculator</Link>
+          <Link href="/contact" class="text-gray-700 hover:text-blue-600 font-medium">Contact</Link>
           <div class="pt-4 border-t border-gray-200">
             <input
               type="text"
@@ -114,4 +114,5 @@ import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
 
 const mobileMenuOpen = ref(false)
-</script> 
+</script>
+
