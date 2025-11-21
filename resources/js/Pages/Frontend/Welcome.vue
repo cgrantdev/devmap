@@ -113,7 +113,7 @@
           <div class="text-center">
             <Link
               href="/vendors"
-              class="inline-block px-8 py-3 bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-800 transition-colors"
+              class="main-btn inline-block text-white"
             >
               View All Vendors
             </Link>
@@ -122,7 +122,7 @@
       </section>
 
       <!-- Discover & Research Section -->
-      <section class="py-16 bg-white">
+      <section class="py-8 bg-white">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div class="discover-research-banner">
             <div 
@@ -131,12 +131,14 @@
             >
               <div class="discover-research-overlay"></div>
             </div>
-            <div class="discover-research-content">
-              <h2 class="discover-research-heading">Discover & Research with Confidence</h2>
-              <p class="discover-research-subtitle">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
-              <button class="discover-research-button">
-                Read Details
-              </button>
+            <div class="discover-research-content gap-8 lg:left-[99px]">
+              <div class="discover-research-text-container gap-6">
+                  <h2 class="discover-research-heading">Discover & Research with Confidence</h2>
+                  <p class="discover-research-subtitle">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
+                </div>
+                <button class="discover-research-button">
+                  Read Details
+                </button>
             </div>
           </div>
         </div>
@@ -171,7 +173,7 @@
           <div class="text-center">
             <Link
               href="/education"
-              class="inline-block px-8 py-3 bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-800 transition-colors"
+              class="main-btn inline-block text-white"
             >
               View All Articles
             </Link>
