@@ -10,6 +10,155 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+/* Design System Variables */
+:root {
+    /* Font Families */
+    --font-hv-muse: 'HV Muse', serif;
+    --font-roboto: 'Roboto', sans-serif;
+
+    /* Gray Scale */
+    --color-gray-100: #F3F4F6;
+    --color-gray-200: #E5E7EB;
+    --color-gray-300: #D1D5DB;
+    --color-gray-400: #9CA3AF;
+    --color-gray-500: #6B7280;
+    --color-gray-700: #374151;
+    --color-gray-800: #1F2937;
+
+    /* Slate Scale */
+    --color-slate-50: #F8FAFC;
+
+    /* White/Black */
+    --color-white: #FFFFFF;
+    --color-black: #000000;
+
+    /* Yellow for stars */
+    --color-yellow-500: #FBBF24;
+}
+
+/* Font Family Classes */
+.font-hv-muse {
+    font-family: var(--font-hv-muse);
+}
+
+.font-roboto {
+    font-family: var(--font-roboto);
+}
+
+/* Font Size Classes */
+.text-xs {
+    font-size: 14px;
+}
+
+.text-sm {
+    font-size: 16px;
+}
+
+.text-base {
+    font-size: 17px;
+}
+
+.text-lg {
+    font-size: 18px;
+}
+
+.text-xl {
+    font-size: 22px;
+}
+
+.text-2xl {
+    font-size: 24px;
+}
+
+.text-3xl {
+    font-size: 36px;
+}
+
+.text-4xl {
+    font-size: 48px;
+}
+
+.text-5xl {
+    font-size: 60px;
+}
+
+.text-6xl {
+    font-size: 72px;
+}
+
+.text-7xl {
+    font-size: 120px;
+}
+
+/* Color Classes */
+.text-gray-100 {
+    color: var(--color-gray-100);
+}
+
+.text-gray-200 {
+    color: var(--color-gray-200);
+}
+
+.text-gray-300 {
+    color: var(--color-gray-300);
+}
+
+.text-gray-400 {
+    color: var(--color-gray-400);
+}
+
+.text-gray-500 {
+    color: var(--color-gray-500);
+}
+
+.text-gray-700 {
+    color: var(--color-gray-700);
+}
+
+.text-gray-800 {
+    color: var(--color-gray-800);
+}
+
+.text-white {
+    color: var(--color-white);
+}
+
+.bg-gray-100 {
+    background-color: var(--color-gray-100);
+}
+
+.bg-gray-200 {
+    background-color: var(--color-gray-200);
+}
+
+.bg-gray-300 {
+    background-color: var(--color-gray-300);
+}
+
+.bg-gray-400 {
+    background-color: var(--color-gray-400);
+}
+
+.bg-gray-500 {
+    background-color: var(--color-gray-500);
+}
+
+.bg-gray-700 {
+    background-color: var(--color-gray-700);
+}
+
+.bg-gray-800 {
+    background-color: var(--color-gray-800);
+}
+
+.bg-white {
+    background-color: var(--color-white);
+}
+
+.bg-slate-50 {
+    background-color: var(--color-slate-50);
+}
+
 /* Header Styles */
 .header-container {
     height: 132px;
@@ -20,34 +169,31 @@
 }
 
 .logo {
-    font-family: 'HV Muse';
-    /* Note: Design uses 'HV Muse' - replace if font file is available */
+    font-family: var(--font-hv-muse, 'HV Muse'), serif;
     font-weight: 400;
     font-size: 36px;
     line-height: 120%;
     letter-spacing: 0%;
-    color: #1F2937;
+    color: var(--color-gray-800);
     height: 43px;
 }
 
 .menu-link {
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 500;
     font-size: 17px;
     line-height: 100%;
     letter-spacing: 0%;
-    color: #374151;
-    /* gray/700 - active color */
+    color: var(--color-gray-700);
 }
 
 .menu-link-inactive {
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 400;
     font-size: 17px;
     line-height: 100%;
     letter-spacing: 0%;
-    color: #6B7280;
-    /* gray/500 - inactive color */
+    color: var(--color-gray-500);
 }
 
 .search-input {
@@ -55,18 +201,18 @@
     height: 52px;
     border-radius: 500px;
     padding: 10px 16px 10px 42px;
-    background-color: #F8FAFC;
+    background-color: var(--color-slate-50);
     border: 1px solid rgba(216, 207, 198, 0.1);
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 400;
     font-size: 16px;
     line-height: 100%;
     letter-spacing: 0%;
-    color: #374151;
+    color: var(--color-gray-700);
 }
 
 .search-input::placeholder {
-    color: #374151;
+    color: var(--color-gray-700);
     opacity: 1;
 }
 
@@ -82,8 +228,8 @@
     height: 52px;
     border-radius: 500px;
     padding: 10px 24px;
-    background-color: #1F2937;
-    font-family: 'Roboto', sans-serif;
+    background-color: var(--color-gray-800);
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 500;
     font-size: 17px;
     line-height: 100%;
@@ -181,23 +327,18 @@
     width: 80px;
     height: 14px;
     border-radius: 200px;
-    /* Pill/oval shape */
-    background-color: #374151;
-    /* gray/700 - dark gray */
+    background-color: var(--color-gray-700);
 }
 
 .carousel-dot-inactive {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    /* Perfect circle */
-    background-color: #D1D5DB;
-    /* white/50 */
+    background-color: var(--color-gray-300);
 }
 
 .carousel-dot-inactive:hover {
     background-color: rgba(255, 255, 255, 0.75);
-    /* white/75 on hover */
 }
 
 /* Hero Text Styles */
@@ -212,32 +353,31 @@
 }
 
 .hero-heading {
-    font-family: 'HV Muse', serif;
+    font-family: var(--font-hv-muse, 'HV Muse'), serif;
     font-weight: 400;
     font-style: normal;
     font-size: 120px;
     line-height: 100%;
     letter-spacing: 0%;
-    color: #FFFFFF;
+    color: var(--color-white);
     margin: 0;
 }
 
 .hero-subtitle {
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 400;
     font-style: normal;
     font-size: 24px;
     line-height: 130%;
     letter-spacing: 0%;
-    color: #FFFFFF;
+    color: var(--color-white);
     margin: 0;
 }
 
 .hero-cta-button {
-    background-color: #FFFFFF;
-    color: #1F2937;
-    /* gray/800 */
-    font-family: 'Roboto', sans-serif;
+    background-color: var(--color-white);
+    color: var(--color-gray-800);
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 500;
     font-style: medium;
     font-size: 22px;
@@ -255,37 +395,29 @@
 }
 
 .hero-cta-button:hover {
-    background-color: #F3F4F6;
-    /* gray/100 */
+    background-color: var(--color-gray-100);
 }
 
 /* Top Vendors Title */
 .top-vendors-title {
-    font-family: 'HV Muse', serif;
+    font-family: var(--font-hv-muse, 'HV Muse'), serif;
     font-weight: 400;
     font-style: normal;
     font-size: 60px;
     line-height: 130%;
     letter-spacing: 0%;
-    color: #1F2937;
-    /* gray/800 */
+    color: var(--color-gray-800);
     text-align: center;
     margin-bottom: 48px;
-    /* mb-12 = 48px */
     width: 100%;
     max-width: 360px;
-    /* Optional: match design width if needed */
     margin-left: auto;
     margin-right: auto;
 }
 
 /* Vendor Card Styles */
 .vendor-card {
-    background-color: #FFFFFF;
-    /* border: 1px solid #E5E7EB; */
-    /* gray/200 */
-    /* border-radius: 8px; */
-    /* padding: 16px; */
+    background-color: var(--color-white);
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -293,16 +425,11 @@
     align-items: center;
 }
 
-/* .vendor-card:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-} */
-
 /* Vendor Logo Area */
 .vendor-logo-area {
     width: 100%;
     aspect-ratio: 1;
-    background-color: #F3F4F6;
-    /* gray/100 */
+    background-color: var(--color-gray-100);
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -327,11 +454,10 @@
 }
 
 .vendor-logo-initials {
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 600;
     font-size: 24px;
-    color: #6B7280;
-    /* gray/500 */
+    color: var(--color-gray-500);
 }
 
 /* Vendor Location */
@@ -347,22 +473,20 @@
 }
 
 .location-text {
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 400;
     font-size: 16px;
     line-height: 140%;
-    color: #6B7280;
-    /* gray/500 */
+    color: var(--color-gray-500);
 }
 
 /* Vendor Name */
 .vendor-name {
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 400;
     font-size: 24px;
     line-height: 100%;
-    color: #1F2937;
-    /* gray/800 */
+    color: var(--color-gray-800);
     margin: 0;
     margin-bottom: 4px;
 }
@@ -390,31 +514,29 @@
 }
 
 .rating-value {
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 400;
     font-size: 14px;
     line-height: 140%;
-    color: #1F2937;
-    /* gray/800 */
+    color: var(--color-gray-800);
 }
 
 .reviews-count {
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 400;
     font-size: 14px;
     line-height: 140%;
-    color: #9CA3AF;
-    /* gray/400 */
+    color: var(--color-gray-400);
 }
 
 .main-btn {
-    background: var(--gray-800, #1F2937);
+    background: var(--color-gray-800);
     padding-top: 10px;
     padding-right: 80px;
     padding-bottom: 10px;
     padding-left: 80px;
     border-radius: 500px;
-    font-family: Roboto;
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 500;
     font-size: 22px;
     opacity: 1;
@@ -457,23 +579,23 @@
 }
 
 .discover-research-heading {
-    font-family: HV Muse;
+    font-family: var(--font-hv-muse, 'HV Muse'), serif;
     font-weight: 400;
     font-style: Regular;
     font-size: 72px;
     line-height: 110.00000000000001%;
     letter-spacing: 0%;
-    color: #FFFFFF;
+    color: var(--color-white);
 }
 
 .discover-research-subtitle {
-    font-family: Roboto;
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 400;
     font-style: Regular;
     font-size: 18px;
     line-height: 150%;
     letter-spacing: 0%;
-    color: #FFFFFF;
+    color: var(--color-white);
 }
 
 .discover-research-button {
@@ -484,16 +606,15 @@
     padding-left: 80px;
     opacity: 1;
     border-radius: 500px;
-    background: var(--slate-50, #F8FAFC);
-    font-family: Roboto;
+    background: var(--color-slate-50);
+    font-family: var(--font-roboto, 'Roboto'), sans-serif;
     font-weight: 500;
     font-style: Medium;
     font-size: 22px;
     letter-spacing: 0%;
-    color: #374151
+    color: var(--color-gray-700);
 }
 
 .discover-research-button:hover {
-    background-color: #F3F4F6;
-    /* gray-100 */
+    background-color: var(--color-gray-100);
 }
