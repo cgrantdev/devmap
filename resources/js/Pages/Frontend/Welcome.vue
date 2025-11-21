@@ -1,32 +1,65 @@
 <template>
   <FrontLayout>
-      <!-- Hero Section -->
-      <section class="relative w-full h-[600px] overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-blue-800/60">
-          <!-- Placeholder for hero image - replace with actual image -->
-          <div class="absolute inset-0 bg-blue-900"></div>
-        </div>
-        <div class="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
-          <div class="text-white max-w-2xl">
-            <h1 class="text-5xl md:text-6xl font-bold mb-4">Hello Hero</h1>
-            <p class="text-xl mb-8 text-blue-100">Want your brand to stand out? Advertise with us right here!</p>
-            <button class="bg-white text-blue-700 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
-              Contact Us to Advertise
-            </button>
+      <!-- Hero Section Carousel -->
+      <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <section class="relative w-full h-[663px] overflow-visible">
+          <div 
+            class="embla hero-carousel"
+            @mouseenter="stopAutoplay"
+            @mouseleave="startAutoplay"
+          >
+            <div class="embla__viewport" ref="emblaRef">
+              <div class="embla__container">
+                <div
+                  v-for="(slide, index) in heroSlides"
+                  :key="index"
+                  class="embla__slide"
+                  :class="{ 'slide-active': currentSlide === index }"
+                >
+                  <div class="carousel-slide">
+                    <!-- Background Image -->
+                    <div 
+                      class="absolute inset-0 bg-cover bg-center rounded-[24px] overflow-hidden"
+                      :style="{ backgroundImage: slide.image ? `url(${slide.image})` : 'none' }"
+                    >
+                      <div class="absolute inset-0 hero-overlay1"></div>
+                      <div class="absolute inset-0 hero-overlay2"></div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="relative max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
+                      <div class="text-white max-w-2xl">
+                        <h1 class="text-5xl md:text-6xl font-bold mb-4">{{ slide.title }}</h1>
+                        <p class="text-xl mb-8 text-blue-100">{{ slide.subtitle }}</p>
+                        <button 
+                          @click.stop="handleCtaClick(slide.ctaUrl)"
+                          class="bg-white text-blue-700 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                        >
+                          {{ slide.ctaText }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Custom Carousel Indicators -->
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex gap-2">
+              <button
+                v-for="(slide, index) in heroSlides"
+                :key="index"
+                @click="goToSlide(index)"
+                :class="[
+                  'rounded-full transition-all cursor-pointer',
+                  currentSlide === index ? 'bg-blue-700 w-3 h-2' : 'bg-white/50 w-2 h-2 hover:bg-white/75'
+                ]"
+                :aria-label="`Go to slide ${index + 1}`"
+              ></button>
+            </div>
           </div>
-        </div>
-        <!-- Carousel Indicators -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
-          <div
-            v-for="(_, index) in 5"
-            :key="index"
-            :class="[
-              'w-2 h-2 rounded-full transition-all',
-              index === 0 ? 'bg-blue-700 w-3' : 'bg-gray-600'
-            ]"
-          ></div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <!-- Top Vendors Section -->
       <section class="py-16 bg-white">
@@ -180,9 +213,110 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Link } from '@inertiajs/vue3'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { Link, router } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
+import useEmblaCarousel from 'embla-carousel-vue'
+import Autoplay from 'embla-carousel-autoplay'
+
+// Hero Carousel
+const currentSlide = ref(0)
+const autoplayPluginInstance = Autoplay({
+  delay: 5000,
+  stopOnInteraction: true,
+  stopOnMouseEnter: true,
+})
+
+const [emblaRef, emblaApi] = useEmblaCarousel(
+  {
+    align: 'center',
+    loop: true,
+    skipSnaps: false,
+    dragFree: false,
+    slidesToScroll: 1,
+    containScroll: 'trimSnaps',
+  },
+  [autoplayPluginInstance]
+)
+
+// Hero slides data
+// Images should be placed in: public/images/hero/
+// Access them via: /images/hero/image-name.jpg
+const heroSlides = ref([
+  {
+    title: 'Hello Hero',
+    subtitle: 'Want your brand to stand out? Advertise with us right here!',
+    ctaText: 'Contact Us to Advertise',
+    ctaUrl: '/contact',
+    image: '/images/hero/hero1.jpg' // Place your image in public/images/hero/hero-1.jpg
+  },
+  {
+    title: 'Discover Research Peptides',
+    subtitle: 'Explore our comprehensive collection of high-quality research peptides.',
+    ctaText: 'Browse Products',
+    ctaUrl: '/products',
+    image: '/images/hero/hero2.jpg' // Place your image in public/images/hero/hero-2.jpg
+  },
+  {
+    title: 'Trusted Vendors',
+    subtitle: 'Connect with verified vendors in the peptide research community.',
+    ctaText: 'View Vendors',
+    ctaUrl: '/vendors',
+    image: '/images/hero/hero3.jpg' // Place your image in public/images/hero/hero-3.jpg
+  },
+  {
+    title: 'Research Education',
+    subtitle: 'Learn about peptides, research protocols, and best practices.',
+    ctaText: 'Learn More',
+    ctaUrl: '/education',
+    image: '/images/hero/hero4.jpg' // Place your image in public/images/hero/hero-4.jpg
+  }
+])
+
+const goToSlide = (index) => {
+  if (emblaApi.value) {
+    emblaApi.value.scrollTo(index)
+  }
+}
+
+const onSelect = () => {
+  if (emblaApi.value) {
+    currentSlide.value = emblaApi.value.selectedScrollSnap()
+  }
+}
+
+const stopAutoplay = () => {
+  if (autoplayPluginInstance) {
+    autoplayPluginInstance.stop()
+  }
+}
+
+const startAutoplay = () => {
+  if (autoplayPluginInstance) {
+    autoplayPluginInstance.play()
+  }
+}
+
+const handleCtaClick = (url) => {
+  if (url) {
+    router.visit(url)
+  }
+}
+
+onMounted(() => {
+  if (emblaApi.value) {
+    emblaApi.value.on('select', onSelect)
+    emblaApi.value.on('reInit', onSelect)
+    onSelect() // Set initial slide
+  }
+})
+
+onUnmounted(() => {
+  if (emblaApi.value) {
+    emblaApi.value.off('select', onSelect)
+    emblaApi.value.off('reInit', onSelect)
+  }
+})
 
 const topVendors = ref([
   { id: 1, name: 'Behemoth Labz', location: 'Beach Valley, California', initials: 'BL', rating: '5.00', reviews: 345, badge: '🍃' },
