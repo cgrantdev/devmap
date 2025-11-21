@@ -65,7 +65,7 @@
       <section class="py-16 bg-white">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <h2 class="top-vendors-title">Top Vendors</h2>
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-x-[20px] gap-y-[80px] mb-8">
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-x-[20px] gap-y-[80px] mb-20">
             <div
               v-for="vendor in topVendors"
               :key="vendor.id"
@@ -122,18 +122,22 @@
       </section>
 
       <!-- Discover & Research Section -->
-      <section class="relative w-full h-[500px] overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-gray-800/60">
-          <!-- Placeholder for background image -->
-          <div class="absolute inset-0 bg-gray-900"></div>
-        </div>
-        <div class="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
-          <div class="text-white max-w-2xl">
-            <h2 class="text-5xl md:text-6xl font-bold mb-4">Discover & Research with Confidence</h2>
-            <p class="text-xl mb-8 text-gray-200">Behind the scenes, we're enabling custom creations of RUC peptides for advanced lab applications.</p>
-            <button class="bg-white text-blue-700 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
-              Read Details
-            </button>
+      <section class="py-16 bg-white">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="discover-research-banner">
+            <div 
+              class="discover-research-background"
+              :style="{ backgroundImage: `url(/images/banners/1.jpg)` }"
+            >
+              <div class="discover-research-overlay"></div>
+            </div>
+            <div class="discover-research-content">
+              <h2 class="discover-research-heading">Discover & Research with Confidence</h2>
+              <p class="discover-research-subtitle">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
+              <button class="discover-research-button">
+                Read Details
+              </button>
+            </div>
           </div>
         </div>
       </section>
