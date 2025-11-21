@@ -1,7 +1,7 @@
 <template>
   <FrontLayout>
       <!-- Hero Section Carousel -->
-      <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mb-10">
         <section class="relative w-full h-[663px] overflow-visible">
           <div 
             class="embla hero-carousel"
@@ -45,14 +45,14 @@
             </div>
 
             <!-- Custom Carousel Indicators -->
-            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex gap-2">
+            <div class="carousel-indicators">
               <button
                 v-for="(slide, index) in heroSlides"
                 :key="index"
                 @click="goToSlide(index)"
                 :class="[
-                  'rounded-full transition-all cursor-pointer',
-                  currentSlide === index ? 'bg-blue-700 w-3 h-2' : 'bg-white/50 w-2 h-2 hover:bg-white/75'
+                  'carousel-dot',
+                  currentSlide === index ? 'carousel-dot-active' : 'carousel-dot-inactive'
                 ]"
                 :aria-label="`Go to slide ${index + 1}`"
               ></button>
@@ -64,7 +64,7 @@
       <!-- Top Vendors Section -->
       <section class="py-16 bg-white">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">Top Vendors</h2>
+          <h2 class="top-vendors-title">Top Vendors</h2>
           <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
             <div
               v-for="vendor in topVendors"

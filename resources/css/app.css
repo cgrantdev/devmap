@@ -156,3 +156,66 @@
 .hero-overlay2 {
     background: #255F791A;
 }
+
+/* Carousel Indicators */
+.carousel-indicators {
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.carousel-dot {
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.carousel-dot-active {
+    width: 80px;
+    height: 14px;
+    border-radius: 200px;
+    /* Pill/oval shape */
+    background-color: #374151;
+    /* gray/700 - dark gray */
+}
+
+.carousel-dot-inactive {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    /* Perfect circle */
+    background-color: #D1D5DB;
+    /* white/50 */
+}
+
+.carousel-dot-inactive:hover {
+    background-color: rgba(255, 255, 255, 0.75);
+    /* white/75 on hover */
+}
+
+/* Top Vendors Title */
+.top-vendors-title {
+    font-family: 'HV Muse', serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 60px;
+    line-height: 130%;
+    letter-spacing: 0%;
+    color: #1F2937;
+    /* gray/800 */
+    text-align: center;
+    margin-bottom: 48px;
+    /* mb-12 = 48px */
+    width: 100%;
+    max-width: 360px;
+    /* Optional: match design width if needed */
+    margin-left: auto;
+    margin-right: auto;
+}
