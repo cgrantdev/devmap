@@ -27,18 +27,18 @@
                     </div>
                     
                     <!-- Content -->
-                    <div class="relative max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
-                      <div class="text-white max-w-2xl">
-                        <h1 class="text-5xl md:text-6xl font-bold mb-4">{{ slide.title }}</h1>
-                        <p class="text-xl mb-8 text-blue-100">{{ slide.subtitle }}</p>
+                      <div class="hero-text-container">
+                        <div class="hero-text-content">
+                          <h1 class="hero-heading">{{ slide.title }}</h1>
+                          <p class="hero-subtitle">{{ slide.subtitle }}</p>
+                        </div>
                         <button 
                           @click.stop="handleCtaClick(slide.ctaUrl)"
-                          class="bg-white text-blue-700 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                          class="hero-cta-button"
                         >
                           {{ slide.ctaText }}
                         </button>
                       </div>
-                    </div>
                   </div>
                 </div>
               </div>

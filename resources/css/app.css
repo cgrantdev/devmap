@@ -200,6 +200,65 @@
     /* white/75 on hover */
 }
 
+/* Hero Text Styles */
+.hero-text-container {
+    display: flex;
+    flex-direction: column;
+    gap: 52px;
+    color: white;
+    position: absolute;
+    left: 85px;
+    bottom: 100px;
+}
+
+.hero-heading {
+    font-family: 'HV Muse', serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 120px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: #FFFFFF;
+    margin: 0;
+}
+
+.hero-subtitle {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 130%;
+    letter-spacing: 0%;
+    color: #FFFFFF;
+    margin: 0;
+}
+
+.hero-cta-button {
+    background-color: #FFFFFF;
+    color: #1F2937;
+    /* gray/800 */
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-style: medium;
+    font-size: 22px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    padding: 10px 80px;
+    border-radius: 500px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-cta-button:hover {
+    background-color: #F3F4F6;
+    /* gray/100 */
+}
+
 /* Top Vendors Title */
 .top-vendors-title {
     font-family: 'HV Muse', serif;
