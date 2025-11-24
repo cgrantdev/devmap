@@ -1,7 +1,7 @@
 <template>
   <FrontLayout>
     <!-- Hero Section -->
-    <section class="py-16 bg-white">
+    <section class="pt-0 pb-16 bg-white">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="w-full max-w-[1360px] h-[574px] rounded-[24px] overflow-hidden relative mx-auto">
           <!-- Background Image -->
@@ -20,12 +20,12 @@
           <!-- Content -->
           <div class="relative p-10 h-full flex flex-col justify-center max-w-[800px] gap-6">
             <div class="flex flex-col gap-6">
-              <h1 class="font-hv-muse font-normal text-[72px] leading-[110%] tracking-normal text-white m-0">The Science Behind Peptides</h1>
-              <p class="font-roboto font-normal text-lg leading-[150%] tracking-normal text-white m-0">Everything You Need to Know About Peptides</p>
+              <h1 class="font-hv-muse font-normal text-6xl leading-tight tracking-normal text-white m-0">The Science Behind Peptides</h1>
+              <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white m-0">Everything You Need to Know About Peptides</p>
             </div>
             <button 
               @click="handleCtaClick('/education')"
-              class="w-fit py-[10px] px-20 rounded-[500px] bg-white font-roboto font-medium text-xl leading-none tracking-normal text-gray-800 border-none cursor-pointer transition-colors duration-300 flex items-center justify-center hover:bg-gray-100"
+              class="w-fit py-2.5 px-20 rounded-[500px] bg-white font-roboto font-medium text-xl leading-none tracking-normal text-gray-800 border-none cursor-pointer transition-colors duration-300 flex items-center justify-center hover:bg-gray-100"
             >
               Read Details
             </button>
@@ -71,7 +71,7 @@
         <div v-if="hasMoreProducts" class="text-center">
           <button 
             @click="loadMore"
-            class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-gray-700"
+            class="py-2.5 px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-gray-700"
           >
             Load More
           </button>

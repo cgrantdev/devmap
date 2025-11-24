@@ -112,97 +112,9 @@ html {
     font-size: 120px;
 }
 
-/* Color Classes */
-.text-gray-100 {
-    color: var(--color-gray-100);
-}
+/* Note: Color classes (text-gray-*, bg-gray-*, text-white, bg-white) are standard Tailwind and removed */
 
-.text-gray-200 {
-    color: var(--color-gray-200);
-}
-
-.text-gray-300 {
-    color: var(--color-gray-300);
-}
-
-.text-gray-400 {
-    color: var(--color-gray-400);
-}
-
-.text-gray-500 {
-    color: var(--color-gray-500);
-}
-
-.text-gray-700 {
-    color: var(--color-gray-700);
-}
-
-.text-gray-800 {
-    color: var(--color-gray-800);
-}
-
-.text-white {
-    color: var(--color-white);
-}
-
-.bg-gray-100 {
-    background-color: var(--color-gray-100);
-}
-
-.bg-gray-200 {
-    background-color: var(--color-gray-200);
-}
-
-.bg-gray-300 {
-    background-color: var(--color-gray-300);
-}
-
-.bg-gray-400 {
-    background-color: var(--color-gray-400);
-}
-
-.bg-gray-500 {
-    background-color: var(--color-gray-500);
-}
-
-.bg-gray-700 {
-    background-color: var(--color-gray-700);
-}
-
-.bg-gray-800 {
-    background-color: var(--color-gray-800);
-}
-
-.bg-white {
-    background-color: var(--color-white);
-}
-
-.bg-slate-50 {
-    background-color: var(--color-slate-50);
-}
-
-/* Font Weight Classes */
-.font-normal {
-    font-weight: 400;
-}
-
-.font-medium {
-    font-weight: 500;
-}
-
-.font-semibold {
-    font-weight: 600;
-}
-
-.font-bold {
-    font-weight: 700;
-}
-
-/* Line Height Classes */
-.leading-none {
-    line-height: 100%;
-}
-
+/* Line Height Classes - Custom values different from Tailwind defaults */
 .leading-tight {
     line-height: 120%;
 }
@@ -217,11 +129,6 @@ html {
 
 .leading-loose {
     line-height: 150%;
-}
-
-/* Letter Spacing Classes */
-.tracking-normal {
-    letter-spacing: 0%;
 }
 
 /* Header Styles */
