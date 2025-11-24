@@ -176,6 +176,49 @@
     background-color: var(--color-slate-50);
 }
 
+/* Font Weight Classes */
+.font-normal {
+    font-weight: 400;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+/* Line Height Classes */
+.leading-none {
+    line-height: 100%;
+}
+
+.leading-tight {
+    line-height: 120%;
+}
+
+.leading-normal {
+    line-height: 130%;
+}
+
+.leading-relaxed {
+    line-height: 140%;
+}
+
+.leading-loose {
+    line-height: 150%;
+}
+
+/* Letter Spacing Classes */
+.tracking-normal {
+    letter-spacing: 0%;
+}
+
 /* Header Styles */
 .header-container {
     height: 132px;
@@ -186,6 +229,7 @@
 }
 
 .logo {
+    /* Keep for mail templates - can be replaced with: font-hv-muse font-normal text-3xl leading-tight tracking-normal text-gray-800 h-[43px] */
     font-family: var(--font-hv-muse, 'HV Muse'), serif;
     font-weight: 400;
     font-size: 36px;
@@ -195,43 +239,6 @@
     height: 43px;
 }
 
-.menu-link {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 500;
-    font-size: 17px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    color: var(--color-gray-700);
-}
-
-.menu-link-inactive {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 17px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    color: var(--color-gray-500);
-}
-
-.search-input {
-    width: 320px;
-    height: 52px;
-    border-radius: 500px;
-    padding: 10px 16px 10px 42px;
-    background-color: var(--color-slate-50);
-    border: 1px solid rgba(216, 207, 198, 0.1);
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    color: var(--color-gray-700);
-}
-
-.search-input::placeholder {
-    color: var(--color-gray-700);
-    opacity: 1;
-}
 
 .search-icon {
     width: 20px;
@@ -241,17 +248,6 @@
     transform: translateY(-50%);
 }
 
-.signup-button {
-    height: 52px;
-    border-radius: 500px;
-    padding: 10px 24px;
-    background-color: var(--color-gray-800);
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 500;
-    font-size: 17px;
-    line-height: 100%;
-    letter-spacing: 0%;
-}
 
 /* Hero Carousel Styles - Embla */
 .embla {
@@ -261,7 +257,7 @@
 }
 
 .embla__viewport {
-    overflow: visible;
+    overflow: hidden;
     width: 100%;
     height: 100%;
 }
@@ -415,149 +411,6 @@
     background-color: var(--color-gray-100);
 }
 
-/* Top Vendors Title */
-.top-vendors-title {
-    font-family: var(--font-hv-muse, 'HV Muse'), serif;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 60px;
-    line-height: 130%;
-    letter-spacing: 0%;
-    color: var(--color-gray-800);
-    text-align: center;
-    margin-bottom: 48px;
-    width: 100%;
-    max-width: 360px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Vendor Card Styles */
-.vendor-card {
-    background-color: var(--color-white);
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    transition: box-shadow 0.3s ease;
-    align-items: center;
-}
-
-/* Vendor Logo Area */
-.vendor-logo-area {
-    width: 100%;
-    aspect-ratio: 1;
-    background-color: var(--color-gray-100);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    margin-bottom: 4px;
-}
-
-.vendor-logo-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 12px;
-}
-
-.vendor-logo-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.vendor-logo-initials {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 600;
-    font-size: 24px;
-    color: var(--color-gray-500);
-}
-
-/* Vendor Location */
-.vendor-location {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-bottom: 4px;
-}
-
-.location-icon {
-    flex-shrink: 0;
-}
-
-.location-text {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 140%;
-    color: var(--color-gray-500);
-}
-
-/* Vendor Name */
-.vendor-name {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 24px;
-    line-height: 100%;
-    color: var(--color-gray-800);
-    margin: 0;
-    margin-bottom: 4px;
-}
-
-/* Vendor Rating */
-.vendor-rating {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
-}
-
-.rating-stars {
-    display: flex;
-    gap: 2px;
-}
-
-.star-icon {
-    flex-shrink: 0;
-}
-
-.rating-text {
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-}
-
-.rating-value {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 140%;
-    color: var(--color-gray-800);
-}
-
-.reviews-count {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 140%;
-    color: var(--color-gray-400);
-}
-
-.main-btn {
-    background: var(--color-gray-800);
-    padding-top: 10px;
-    padding-right: 80px;
-    padding-bottom: 10px;
-    padding-left: 80px;
-    border-radius: 500px;
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 500;
-    font-size: 22px;
-    opacity: 1;
-}
 
 /* Discover & Research Banner */
 .discover-research-banner {
@@ -595,150 +448,6 @@
     max-width: 800px;
 }
 
-.discover-research-heading {
-    font-family: var(--font-hv-muse, 'HV Muse'), serif;
-    font-weight: 400;
-    font-style: Regular;
-    font-size: 72px;
-    line-height: 110.00000000000001%;
-    letter-spacing: 0%;
-    color: var(--color-white);
-}
-
-.discover-research-subtitle {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-style: Regular;
-    font-size: 18px;
-    line-height: 150%;
-    letter-spacing: 0%;
-    color: var(--color-white);
-}
-
-.discover-research-button {
-    width: fit-content;
-    padding-top: 10px;
-    padding-right: 80px;
-    padding-bottom: 10px;
-    padding-left: 80px;
-    opacity: 1;
-    border-radius: 500px;
-    background: var(--color-slate-50);
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 500;
-    font-style: Medium;
-    font-size: 22px;
-    letter-spacing: 0%;
-    color: var(--color-gray-700);
-}
-
-.discover-research-button:hover {
-    background-color: var(--color-gray-100);
-}
-
-/* Learn About Peptides Title */
-.learn-about-peptides-title {
-    font-family: var(--font-hv-muse, 'HV Muse'), serif;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 60px;
-    line-height: 130%;
-    letter-spacing: 0%;
-    color: var(--color-gray-800);
-    text-align: center;
-    margin-bottom: 48px;
-    padding: 0;
-    width: 100%;
-}
-
-/* Peptide Article Card */
-.peptide-article-card {
-    background-color: var(--color-white);
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: box-shadow 0.3s ease;
-}
-
-.peptide-article-card:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* Peptide Article Image Container */
-.peptide-article-image {
-    width: 100%;
-    aspect-ratio: 1;
-    background-color: var(--color-gray-100);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    overflow: hidden;
-}
-
-.peptide-bottle-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-}
-
-/* Peptide Article Content */
-.peptide-article-content {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    flex: 1;
-}
-
-.peptide-article-title {
-    text-align: center;
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 140%;
-    color: var(--color-gray-800);
-    margin: 0;
-}
-
-.peptide-article-description {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 16px;
-    color: var(--color-gray-500);
-    margin: 0;
-    flex: 1;
-    line-height: 140%;
-    text-align: center;
-}
-
-.peptide-article-button {
-    gap: 10px;
-    opacity: 1;
-    padding-top: 12px;
-    padding-right: 44px;
-    padding-bottom: 12px;
-    padding-left: 44px;
-    border-radius: 500px;
-    width: 100%;
-    padding: 12px 24px;
-    background-color: var(--color-gray-200);
-    border: none;
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 100%;
-    color: var(--color-gray-800);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: auto;
-}
-
-.peptide-article-button:hover {
-    background-color: var(--color-gray-300);
-}
 
 /* Advance Your Research Banner */
 .advance-research-banner {
@@ -780,220 +489,6 @@
     gap: 24px;
 }
 
-.advance-research-heading {
-    font-style: normal;
-    color: var(--color-white);
-    margin: 0;
-    font-family: var(--font-hv-muse, 'HV Muse'), serif;
-    font-weight: 400;
-    font-size: 72px;
-    line-height: 110.00000000000001%;
-    letter-spacing: 0%;
-    text-align: center;
-
-}
-
-.advance-research-subtitle {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 18px;
-    line-height: 150%;
-    letter-spacing: 0%;
-    color: var(--color-white);
-    margin: 0;
-}
-
-.advance-research-button {
-    width: fit-content;
-    padding-top: 10px;
-    padding-right: 80px;
-    padding-bottom: 10px;
-    padding-left: 80px;
-    opacity: 1;
-    border-radius: 500px;
-    background: var(--color-white);
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 500;
-    font-style: normal;
-    font-size: 22px;
-    letter-spacing: 0%;
-    color: var(--color-gray-800);
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.advance-research-button:hover {
-    background-color: var(--color-gray-100);
-}
-
-/* Research Insights Title */
-.research-insights-title {
-    font-family: var(--font-hv-muse, 'HV Muse'), serif;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 60px;
-    line-height: 130%;
-    letter-spacing: 0%;
-    color: var(--color-gray-800);
-    text-align: center;
-    margin-bottom: 48px;
-    padding: 0;
-    width: 100%;
-}
-
-.research-insights-grid {
-    gap: 24px;
-}
-
-/* Research Insights Card */
-.research-insight-card {
-    background-color: var(--color-white);
-    border: 1px solid var(--color-gray-200);
-    border-radius: 8px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: box-shadow 0.3s ease;
-    height: 100%;
-}
-
-.research-insight-card:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* Research Insight Image Container */
-.research-insight-image {
-    width: 100%;
-    aspect-ratio: 325 / 404;
-    overflow: hidden;
-    background-color: var(--color-gray-100);
-    border-radius: 8px 8px 0 0;
-}
-
-.research-insight-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-}
-
-.research-insight-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 140%;
-    color: var(--color-gray-500);
-    background-color: var(--color-white);
-}
-
-.research-insight-read-time {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.research-insight-clock-icon {
-    flex-shrink: 0;
-    color: var(--color-gray-500);
-    width: 16px;
-    height: 16px;
-}
-
-.research-insight-date {
-    color: var(--color-gray-500);
-}
-
-/* Research Insight Content */
-.research-insight-content {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    flex: 1;
-}
-
-.research-insight-title {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 140%;
-    color: var(--color-gray-800);
-    margin: 0;
-    margin-bottom: 4px;
-}
-
-.research-insight-description {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 150%;
-    color: var(--color-gray-500);
-    margin: 0;
-    flex: 1;
-    margin-bottom: 8px;
-}
-
-.research-insight-button {
-    width: 100%;
-    padding: 12px 24px;
-    background-color: var(--color-gray-200);
-    border: none;
-    border-radius: 8px;
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 100%;
-    color: var(--color-gray-800);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: auto;
-    text-align: center;
-}
-
-.research-insight-button:hover {
-    background-color: var(--color-gray-300);
-}
-
-/* Footer More Details Button */
-.footer-more-details-btn {
-    padding: 10px 80px;
-    background-color: var(--color-gray-800);
-    color: var(--color-white);
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 500;
-    font-size: 22px;
-    line-height: 100%;
-    border-radius: 500px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.footer-more-details-btn:hover {
-    background-color: var(--color-gray-700);
-}
-
-/* Footer Container */
-.footer-container {
-    background-color: var(--color-white);
-    border-top: 1px solid var(--color-gray-200);
-    padding: 48px 0;
-}
-
-.footer-more-details-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 48px;
-}
 
 .footer-main-content {
     display: grid;
@@ -1010,69 +505,6 @@
     }
 }
 
-/* Footer Left Section */
-.footer-left-section {
-    display: flex;
-    flex-direction: column;
-    padding-right: 48px;
-}
-
-.footer-logo-group {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    margin-bottom: 32px;
-}
-
-.footer-logo {
-    display: inline-block;
-    margin-bottom: 0;
-}
-
-.footer-logo-text {
-    font-family: var(--font-hv-muse, 'HV Muse'), serif;
-    font-weight: 400;
-    font-size: 36px;
-    line-height: 120%;
-    color: var(--color-gray-800);
-}
-
-.footer-signup-btn {
-    display: inline-block;
-    padding: 10px 24px;
-    background-color: var(--color-gray-800);
-    color: var(--color-white);
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 500;
-    font-size: 17px;
-    line-height: 100%;
-    border-radius: 500px;
-    text-align: center;
-    transition: background-color 0.3s ease;
-    width: fit-content;
-}
-
-.footer-signup-btn:hover {
-    background-color: var(--color-gray-700);
-}
-
-.footer-left-links {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 32px;
-    margin-bottom: 32px;
-}
-
-@media (min-width: 640px) {
-    .footer-left-links {
-        grid-template-columns: 1fr 1fr;
-        gap: 48px;
-    }
-}
-
-.footer-links-section {
-    margin-top: 0;
-}
 
 /* Footer Right Section with Background */
 .footer-right-section {
@@ -1103,68 +535,4 @@
     flex-direction: column;
     flex: 1;
     min-height: 100%;
-}
-
-/* Footer Section Title */
-.footer-section-title {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 140%;
-    color: var(--color-gray-800);
-    margin-bottom: 16px;
-}
-
-/* Footer Links List */
-.footer-links-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.footer-link {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 140%;
-    color: var(--color-gray-500);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.footer-link:hover {
-    color: var(--color-gray-800);
-}
-
-/* Footer Copyright */
-.footer-copyright-left {
-    padding-top: 24px;
-    border-top: 1px solid var(--color-gray-200);
-    margin-top: auto;
-    padding-bottom: 0;
-}
-
-.footer-copyright-text {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 140%;
-    color: var(--color-gray-400);
-    margin: 0;
-}
-
-.footer-copyright-right {
-    font-family: var(--font-roboto, 'Roboto'), sans-serif;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 140%;
-    color: var(--color-gray-400);
-    margin: 0;
-    margin-top: auto;
-    padding-top: 24px;
-    text-align: right;
-    align-self: flex-end;
 }

@@ -1,7 +1,7 @@
 <template>
   <FrontLayout>
       <!-- Hero Section Carousel -->
-      <div class="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+      <div class="w-full mb-10">
         <section class="relative w-full h-[663px] overflow-visible">
           <div 
             class="embla hero-carousel"
@@ -64,48 +64,48 @@
       <!-- Top Vendors Section -->
       <section class="py-16 bg-white">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 class="top-vendors-title">Top Vendors</h2>
+          <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 w-full max-w-[360px] mx-auto">Top Vendors</h2>
           <div class="grid grid-cols-2 md:grid-cols-5 gap-x-[20px] gap-y-[80px] mb-20">
             <div
               v-for="vendor in topVendors"
               :key="vendor.id"
-              class="vendor-card"
+              class="bg-white flex flex-col gap-[5px] transition-shadow duration-300 items-center hover:shadow-md"
             >
               <!-- Logo Area -->
-              <div class="vendor-logo-area">
+              <div class="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden mb-1">
                 <img 
                   :src="`/images/vendors/${vendor.logo}`" 
                   :alt="vendor.name + ' logo'"
-                  class="vendor-logo-image"
+                  class="w-full h-full object-contain p-3"
                   @error="handleLogoError($event, vendor.id)"
                 />
-                <div v-if="logoErrors.has(vendor.id)" class="vendor-logo-placeholder">
-                  <span class="vendor-logo-initials">{{ vendor.initials }}</span>
+                <div v-if="logoErrors.has(vendor.id)" class="w-full h-full flex items-center justify-center">
+                  <span class="font-roboto font-semibold text-2xl text-gray-500">{{ vendor.initials }}</span>
                 </div>
               </div>
               
               <!-- Location -->
-              <div class="vendor-location">
-                <svg class="location-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <div class="flex items-center gap-1 mb-1">
+                <svg class="flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M8 8.5C9.10457 8.5 10 7.60457 10 6.5C10 5.39543 9.10457 4.5 8 4.5C6.89543 4.5 6 5.39543 6 6.5C6 7.60457 6.89543 8.5 8 8.5Z" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M8 13.5C8 13.5 13.5 10.5 13.5 6.5C13.5 4.01472 11.4853 2 9 2C6.51472 2 5 4.01472 5 6.5C5 10.5 8 13.5 8 13.5Z" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <span class="location-text">{{ vendor.location }}</span>
+                <span class="font-roboto font-normal text-sm leading-relaxed text-gray-500">{{ vendor.location }}</span>
               </div>
               
               <!-- Vendor Name -->
-              <h3 class="vendor-name">{{ vendor.name }}</h3>
+              <h3 class="font-roboto font-normal text-2xl leading-none tracking-normal text-gray-800 m-0 mb-1">{{ vendor.name }}</h3>
               
               <!-- Rating -->
-              <div class="vendor-rating">
-                <div class="rating-stars">
-                  <svg v-for="i in 5" :key="i" class="star-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <div class="flex flex-row gap-2">
+                <div class="flex gap-0.5">
+                  <svg v-for="i in 5" :key="i" class="flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M8 0L9.79611 5.52786H15.6085L10.9062 8.94427L12.7023 14.4721L8 11.0557L3.29772 14.4721L5.09383 8.94427L0.391548 5.52786H6.20389L8 0Z" fill="#FBBF24"/>
                   </svg>
                 </div>
-                <div class="rating-text">
-                  <span class="rating-value">{{ vendor.rating }}</span>
-                  <span class="reviews-count">({{ vendor.reviews }})</span>
+                <div class="flex items-baseline gap-1">
+                  <span class="font-roboto font-normal text-xs leading-relaxed text-gray-800">{{ vendor.rating }}</span>
+                  <span class="font-roboto font-normal text-xs leading-relaxed text-gray-400">({{ vendor.reviews }})</span>
                 </div>
               </div>
             </div>
@@ -113,7 +113,7 @@
           <div class="text-center">
             <Link
               href="/vendors"
-              class="main-btn inline-block text-white"
+              class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white inline-block opacity-100"
             >
               View All Vendors
             </Link>
@@ -132,11 +132,11 @@
               <div class="discover-research-overlay"></div>
             </div>
             <div class="discover-research-content gap-8 lg:left-[99px]">
-              <div class="discover-research-text-container gap-6">
-                  <h2 class="discover-research-heading">Discover & Research with Confidence</h2>
-                  <p class="discover-research-subtitle">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
+              <div class="flex flex-col gap-6">
+                  <h2 class="font-hv-muse font-normal text-6xl leading-[110%] tracking-normal text-white">Discover & Research with Confidence</h2>
+                  <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
                 </div>
-                <button class="discover-research-button">
+                <button class="w-fit py-[10px] px-20 rounded-[500px] bg-slate-50 font-roboto font-medium text-xl leading-none tracking-normal text-gray-700 opacity-100 hover:bg-gray-100 transition-colors">
                   Read Details
                 </button>
             </div>
@@ -147,24 +147,24 @@
       <!-- Learn About Peptides Section -->
       <section class="py-16 bg-white">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 class="learn-about-peptides-title">Learn About Peptides</h2>
+          <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 p-0 w-full">Learn About Peptides</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 gap-x-[20px] gap-y-[80px]">
             <div
               v-for="article in peptideArticles"
               :key="article.id"
-              class="peptide-article-card"
+              class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg"
             >
-              <div class="peptide-article-image">
+              <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden">
                 <img 
                   :src="`/images/peptides/${article.image}`" 
                   :alt="article.title"
-                  class="peptide-bottle-image"
+                  class="w-full h-full object-contain object-center"
                 />
               </div>
-              <div class="peptide-article-content">
-                <h3 class="peptide-article-title">{{ article.title }}</h3>
-                <p class="peptide-article-description">{{ article.description }}</p>
-                <button class="peptide-article-button">
+              <div class="p-6 flex flex-col gap-4 flex-1">
+                <h3 class="text-center font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0">{{ article.title }}</h3>
+                <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 text-center m-0 flex-1">{{ article.description }}</p>
+                <button class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300">
                   Read Details
                 </button>
               </div>
@@ -173,7 +173,7 @@
           <div class="text-center">
             <Link
               href="/education"
-              class="main-btn inline-block text-white"
+              class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white inline-block opacity-100"
             >
               View All Vendors
             </Link>
@@ -192,9 +192,9 @@
               <div class="advance-research-overlay"></div>
             </div>
             <div class="advance-research-content">
-              <h2 class="advance-research-heading">Advance Your<br>Research with Trusted<br>Peptides</h2>
-              <p class="advance-research-subtitle">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
-              <button class="advance-research-button">
+              <h2 class="font-hv-muse font-normal text-6xl leading-[110%] tracking-normal text-white text-center m-0">Advance Your<br>Research with Trusted<br>Peptides</h2>
+              <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white m-0">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
+              <button class="w-fit py-[10px] px-20 rounded-[500px] bg-white font-roboto font-medium text-xl leading-none tracking-normal text-gray-800 border-none cursor-pointer transition-colors duration-300 shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-gray-100">
                 Start Research
               </button>
             </div>
@@ -205,41 +205,41 @@
       <!-- Research Insights Section -->
       <section class="py-16 bg-white">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 class="research-insights-title">Research Insights</h2>
+          <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 p-0 w-full">Research Insights</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 research-insights-grid">
             <div
               v-for="insight in researchInsights"
               :key="insight.id"
-              class="research-insight-card"
+              class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 h-full hover:shadow-lg"
             >
-              <div class="research-insight-image">
+              <div class="w-full aspect-[325/404] overflow-hidden bg-gray-100 rounded-t-lg">
                 <img 
                   :src="`/images/blogs/${insight.image}`" 
                   :alt="insight.title"
-                  class="research-insight-img"
+                  class="w-full h-full object-cover object-center block"
                 />
               </div>
-              <div class="research-insight-meta">
-                <span class="research-insight-read-time">
-                  <svg class="research-insight-clock-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <div class="flex justify-between items-center py-3 px-4 font-roboto font-normal text-xs leading-relaxed text-gray-500 bg-white">
+                <span class="flex items-center gap-1.5">
+                  <svg class="flex-shrink-0 text-gray-500 w-4 h-4" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                   {{ insight.readTime }}
                 </span>
-                <span class="research-insight-date">{{ insight.date }}</span>
+                <span class="text-gray-500">{{ insight.date }}</span>
               </div>
-              <div class="research-insight-content">
-                <h3 class="research-insight-title">{{ insight.title }}</h3>
-                <p class="research-insight-description">{{ insight.description }}</p>
-                <button class="research-insight-button">
+              <div class="p-5 flex flex-col gap-3 flex-1">
+                <h3 class="font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0 mb-1 text-center">{{ insight.title }}</h3>
+                <p class="font-roboto font-normal text-sm leading-loose text-gray-500 m-0 flex-1 mb-2 text-center">{{ insight.description }}</p>
+                <button class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300">
                   Read Details
                 </button>
               </div>
             </div>
           </div>
           <div class="text-center">
-            <button class="footer-more-details-btn">
+            <button class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-gray-700">
               More Details
             </button>
           </div>

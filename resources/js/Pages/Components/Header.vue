@@ -4,49 +4,49 @@
       <div class="flex items-center justify-between h-full">
         <!-- Logo -->
         <Link href="/" class="flex items-center">
-          <span class="logo">PeptideSync</span>
+          <span class="font-hv-muse font-normal text-3xl leading-tight tracking-normal text-gray-800 h-[43px]">PeptideSync</span>
         </Link>
 
         <!-- Navigation Menu -->
         <nav class="hidden md:flex items-center gap-[22px]">
           <Link 
             href="/products" 
-            :class="isActive('/products') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/products') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
             class="transition-colors hover:opacity-80"
           >
             Products
           </Link>
           <Link 
             href="/brands" 
-            :class="isActive('/brands') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/brands') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
             class="transition-colors hover:opacity-80"
           >
             Brands
           </Link>
           <Link 
             href="/about" 
-            :class="isActive('/about') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/about') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
             class="transition-colors hover:opacity-80"
           >
             About
           </Link>
           <Link 
             href="/education" 
-            :class="isActive('/education') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/education') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
             class="transition-colors hover:opacity-80"
           >
             Education
           </Link>
           <Link 
             href="/calculator" 
-            :class="isActive('/calculator') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/calculator') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
             class="transition-colors hover:opacity-80"
           >
             Calculator
           </Link>
           <Link 
             href="/contact" 
-            :class="isActive('/contact') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/contact') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
             class="transition-colors hover:opacity-80"
           >
             Contact
@@ -67,7 +67,7 @@
             <input
               type="text"
               placeholder="Type here..."
-              class="search-input focus:outline-none"
+              class="w-[320px] h-[52px] rounded-[500px] py-[10px] pl-[42px] pr-4 bg-slate-50 border border-[rgba(216,207,198,0.1)] font-roboto font-normal text-sm leading-none tracking-normal text-gray-700 focus:outline-none placeholder:text-gray-700 placeholder:opacity-100"
             />
           </div>
 
@@ -75,13 +75,13 @@
           <div class="flex items-center gap-6">
             <Link
               href="/login"
-              class="menu-link-inactive transition-colors hover:opacity-80"
+              class="font-roboto font-normal text-base leading-none tracking-normal text-gray-500 transition-colors hover:opacity-80"
             >
               Login
             </Link>
             <Link
               href="/register"
-              class="signup-button text-white transition-colors hover:opacity-90 inline-flex items-center justify-center"
+              class="h-[52px] rounded-[500px] px-6 py-[10px] bg-gray-800 font-roboto font-medium text-base leading-none tracking-normal text-white transition-colors hover:opacity-90 inline-flex items-center justify-center"
             >
               Signup
             </Link>
@@ -122,37 +122,37 @@
         <nav class="flex flex-col gap-4">
           <Link 
             href="/products" 
-            :class="isActive('/products') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/products') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
           >
             Products
           </Link>
           <Link 
             href="/brands" 
-            :class="isActive('/brands') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/brands') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
           >
             Brands
           </Link>
           <Link 
             href="/about" 
-            :class="isActive('/about') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/about') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
           >
             About
           </Link>
           <Link 
             href="/education" 
-            :class="isActive('/education') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/education') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
           >
             Education
           </Link>
           <Link 
             href="/calculator" 
-            :class="isActive('/calculator') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/calculator') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
           >
             Calculator
           </Link>
           <Link 
             href="/contact" 
-            :class="isActive('/contact') ? 'menu-link' : 'menu-link-inactive'"
+            :class="isActive('/contact') ? 'font-roboto font-medium text-base leading-none tracking-normal text-gray-700' : 'font-roboto font-normal text-base leading-none tracking-normal text-gray-500'"
           >
             Contact
           </Link>
@@ -167,7 +167,7 @@
               <input
                 type="text"
                 placeholder="Type here..."
-                class="w-full search-input focus:outline-none"
+                class="w-full h-[52px] rounded-[500px] py-[10px] pl-[42px] pr-4 bg-slate-50 border border-[rgba(216,207,198,0.1)] font-roboto font-normal text-sm leading-none tracking-normal text-gray-700 focus:outline-none placeholder:text-gray-700 placeholder:opacity-100"
               />
             </div>
           </div>
