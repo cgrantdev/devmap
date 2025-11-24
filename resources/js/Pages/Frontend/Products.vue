@@ -200,8 +200,8 @@ const handleCtaClick = (url) => {
 }
 
 const handleShopClick = (product) => {
-  // Navigate to products page with filter/search for this product name
-  router.visit(`/products?search=${encodeURIComponent(product.name)}`)
+  // Navigate to product listing page using slug
+  router.visit(`/product/${product.slug}`)
 }
 
 const handleImageError = (event) => {
