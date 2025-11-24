@@ -113,27 +113,27 @@
                 :key="filter.key"
                 @click="toggleQuickFilter(filter.key)"
                 :class="[
-                  'py-2 px-4 rounded-lg font-roboto font-medium text-sm leading-none tracking-normal cursor-pointer transition-colors',
+                  'py-2 px-4 rounded-[500px] font-roboto font-medium text-sm leading-none tracking-normal cursor-pointer transition-colors',
                   activeFilters[filter.key] 
                     ? 'bg-gray-800 text-white hover:bg-gray-700' 
                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                 ]"
               >
                 {{ filter.label }}
-                <span v-if="getFilterCount(filter.key) > 0" class="ml-1 bg-orange-500 text-white rounded-[500px] px-2 py-0.5 text-xs">
+                <span v-if="getFilterCount(filter.key) > 0" class="ml-1 bg-orange-500 text-white px-2 py-0.5 text-xs">
                   {{ getFilterCount(filter.key) }}
                 </span>
               </button>
             </div>
 
             <!-- Product Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-8">
               <div
                 v-for="product in products.data"
                 :key="product.id"
                 class="bg-white rounded-[500px] overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg"
               >
-                <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden">
+                <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden rounded-lg">
                   <img 
                     :src="product.image_url || '/images/peptides/default.png'" 
                     :alt="product.name"
