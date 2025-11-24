@@ -1,85 +1,96 @@
 <template>
-  <footer class="bg-white border-t border-gray-200">
-    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        <!-- Logo and Sign Up -->
-        <div class="md:col-span-1">
-          <Link href="/" class="inline-block mb-4">
-            <span class="text-2xl font-bold text-gray-800">PeptideSync</span>
-          </Link>
-          <Link
-            href="/register"
-            class="inline-block px-6 py-2 bg-blue-700 text-white font-medium rounded-lg hover:bg-blue-800 transition-colors"
-          >
-            Sign Up
-          </Link>
+  <footer class="pt-12 relative">
+    <div 
+            class="max-w-[701px] w-full h-full absolute top-0 right-0 z-0"
+            :style="{ backgroundImage: `url(/images/footer/1.png)` }"
+          ></div>
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">   
+      
+      <!-- Footer Content Grid -->
+      <div class="footer-main-content">
+        <!-- Left Section -->
+        <div class="flex gap-30 z-1">
+          <!-- Logo and Sign Up -->
+          <div class="footer-logo-group">
+            <Link href="/" class="footer-logo">
+              <span class="footer-logo-text">PeptideSync</span>
+            </Link>
+            <Link href="/register" class="footer-signup-btn">
+              Sign Up
+            </Link>
+          </div>
+          
+          <!-- Legal and Resources Sections -->
+          <div class="flex gap-40">
+            <!-- Legal Links -->
+            <div class="footer-links-section">
+              <h3 class="footer-section-title">Legal</h3>
+              <ul class="footer-links-list">
+                <li>
+                  <Link href="/disclaimer" class="footer-link">Disclaimer</Link>
+                </li>
+                <li>
+                  <Link href="/privacy" class="footer-link">Privacy Policy</Link>
+                </li>
+                <li>
+                  <Link href="/brands" class="footer-link">Brands</Link>
+                </li>
+                <li>
+                  <Link href="/calculator" class="footer-link">Calculator</Link>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Resources Section 1 -->
+            <div class="footer-links-section">
+              <h3 class="footer-section-title">Ressources</h3>
+              <ul class="footer-links-list">
+                <li>
+                  <Link href="/contact" class="footer-link">Contact</Link>
+                </li>
+                <li>
+                  <Link href="/about" class="footer-link">About</Link>
+                </li>
+                <li>
+                  <Link href="/brands" class="footer-link">Brands</Link>
+                </li>
+                <li>
+                  <Link href="/products" class="footer-link">Products</Link>
+                </li>
+              </ul>
+            </div>
+
+          <div class="footer-links-section">
+            <h3 class="footer-section-title">Ressources</h3>
+            <ul class="footer-links-list">
+              <li>
+                <Link href="/calculator" class="footer-link">Calculator</Link>
+              </li>
+              <li>
+                <Link href="/education" class="footer-link">Education</Link>
+              </li>
+              <li>
+                <Link href="/disclaimer" class="footer-link">Disclaimer</Link>
+              </li>
+            </ul>
+          </div>
+
+            
+          </div>
+
         </div>
 
-        <!-- Legal Links -->
-        <div>
-          <h3 class="text-gray-800 font-semibold mb-4">Legal</h3>
-          <ul class="space-y-2">
-            <li>
-              <Link href="/disclaimer" class="text-gray-600 hover:text-blue-600 transition-colors">Disclaimer</Link>
-            </li>
-            <li>
-              <Link href="/privacy" class="text-gray-600 hover:text-blue-600 transition-colors">Privacy Policy</Link>
-            </li>
-            <li>
-              <Link href="/brands" class="text-gray-600 hover:text-blue-600 transition-colors">Brands</Link>
-            </li>
-            <li>
-              <Link href="/calculator" class="text-gray-600 hover:text-blue-600 transition-colors">Calculator</Link>
-            </li>
-          </ul>
+        <div class="footer-right-section z-[-1]"></div>
+
+        <!-- Copyright Left -->
+        <div class="footer-copyright-left">
+          <p class="footer-copyright-text">© 2024 PeptideSync All Rights Reserved.</p>
+        </div>
+        <!-- Copyright Right -->
+        <div class="footer-copyright-right">
+          <p class="footer-copyright-right-text">PeptideSync All Rights Reserved</p>
         </div>
 
-        <!-- Resources -->
-        <div>
-          <h3 class="text-gray-800 font-semibold mb-4">Resources</h3>
-          <ul class="space-y-2">
-            <li>
-              <Link href="/contact" class="text-gray-600 hover:text-blue-600 transition-colors">Contact</Link>
-            </li>
-            <li>
-              <Link href="/about" class="text-gray-600 hover:text-blue-600 transition-colors">About</Link>
-            </li>
-            <li>
-              <Link href="/brands" class="text-gray-600 hover:text-blue-600 transition-colors">Brands</Link>
-            </li>
-            <li>
-              <Link href="/products" class="text-gray-600 hover:text-blue-600 transition-colors">Products</Link>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Additional Resources -->
-        <div>
-          <h3 class="text-gray-800 font-semibold mb-4">Resources</h3>
-          <ul class="space-y-2">
-            <li>
-              <Link href="/calculator" class="text-gray-600 hover:text-blue-600 transition-colors">Calculator</Link>
-            </li>
-            <li>
-              <Link href="/education" class="text-gray-600 hover:text-blue-600 transition-colors">Education</Link>
-            </li>
-            <li>
-              <Link href="/disclaimer" class="text-gray-600 hover:text-blue-600 transition-colors">Disclaimer</Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Copyright -->
-      <div class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-200 relative">
-        <p class="text-gray-600 text-sm">© 2024 PeptideSync. All Rights Reserved.</p>
-        
-        <!-- Decorative Elements -->
-        <div class="hidden md:block absolute right-0 top-0 bottom-0 w-48 overflow-hidden pointer-events-none">
-          <div class="absolute right-0 top-0 w-32 h-32 bg-blue-100 rounded-full opacity-20 blur-2xl"></div>
-          <div class="absolute right-8 top-8 w-24 h-24 bg-blue-200 rounded-full opacity-30 blur-xl"></div>
-          <div class="absolute right-16 top-16 w-16 h-16 bg-blue-300 rounded-full opacity-40 blur-lg"></div>
-        </div>
       </div>
     </div>
   </footer>

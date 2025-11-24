@@ -147,24 +147,24 @@
       <!-- Learn About Peptides Section -->
       <section class="py-16 bg-white">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">Learn About Peptides</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <h2 class="learn-about-peptides-title">Learn About Peptides</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 gap-x-[20px] gap-y-[80px]">
             <div
               v-for="article in peptideArticles"
               :key="article.id"
-              class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              class="peptide-article-card"
             >
-              <div class="h-48 bg-amber-100 flex items-center justify-center">
-                <!-- Placeholder for bottle image -->
-                <div class="text-center">
-                  <div class="w-16 h-20 mx-auto bg-amber-300 rounded-t-lg rounded-b-2xl border-2 border-amber-400 mb-2"></div>
-                  <p class="text-xs text-amber-800 font-semibold">{{ article.title.split(' ')[0] }}</p>
-                </div>
+              <div class="peptide-article-image">
+                <img 
+                  :src="`/images/peptides/${article.image}`" 
+                  :alt="article.title"
+                  class="peptide-bottle-image"
+                />
               </div>
-              <div class="p-6">
-                <h3 class="font-bold text-gray-800 mb-3">{{ article.title }}</h3>
-                <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ article.description }}</p>
-                <button class="w-full bg-white border border-blue-700 text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+              <div class="peptide-article-content">
+                <h3 class="peptide-article-title">{{ article.title }}</h3>
+                <p class="peptide-article-description">{{ article.description }}</p>
+                <button class="peptide-article-button">
                   Read Details
                 </button>
               </div>
@@ -175,25 +175,29 @@
               href="/education"
               class="main-btn inline-block text-white"
             >
-              View All Articles
+              View All Vendors
             </Link>
           </div>
         </div>
       </section>
 
       <!-- Advance Your Research Section -->
-      <section class="relative w-full h-[500px] overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-l from-gray-900/80 to-gray-800/60">
-          <!-- Placeholder for background image -->
-          <div class="absolute inset-0 bg-gray-900"></div>
-        </div>
-        <div class="relative max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-end">
-          <div class="text-white max-w-2xl text-right">
-            <h2 class="text-5xl md:text-6xl font-bold mb-4">Advance Your Research with Trusted Peptides</h2>
-            <p class="text-xl mb-8 text-gray-200">Behind the scenes, we're enabling custom combinations of RUC peptides for advanced lab applications.</p>
-            <button class="bg-white text-blue-700 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
-              Start Research
-            </button>
+      <section class="py-8 bg-white">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="advance-research-banner">
+            <div 
+              class="advance-research-background"
+              :style="{ backgroundImage: `url(/images/banners/2.jpg)` }"
+            >
+              <div class="advance-research-overlay"></div>
+            </div>
+            <div class="advance-research-content">
+              <h2 class="advance-research-heading">Advance Your<br>Research with Trusted<br>Peptides</h2>
+              <p class="advance-research-subtitle">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
+              <button class="advance-research-button">
+                Start Research
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -201,37 +205,41 @@
       <!-- Research Insights Section -->
       <section class="py-16 bg-white">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">Research Insights</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <h2 class="research-insights-title">Research Insights</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 research-insights-grid">
             <div
               v-for="insight in researchInsights"
               :key="insight.id"
-              class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              class="research-insight-card"
             >
-              <div class="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center relative">
-                <!-- Placeholder for research image -->
-                <div class="text-center text-gray-600">
-                  <svg class="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                  </svg>
-                </div>
-                <div class="absolute bottom-2 left-2 flex gap-3 text-xs text-gray-600">
-                  <span>19 Min Read</span>
-                  <span>22 Aug 2005</span>
-                </div>
+              <div class="research-insight-image">
+                <img 
+                  :src="`/images/blogs/${insight.image}`" 
+                  :alt="insight.title"
+                  class="research-insight-img"
+                />
               </div>
-              <div class="p-6">
-                <h3 class="font-bold text-gray-800 mb-3">{{ insight.title }}</h3>
-                <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ insight.description }}</p>
-                <button class="w-full bg-white border border-blue-700 text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+              <div class="research-insight-meta">
+                <span class="research-insight-read-time">
+                  <svg class="research-insight-clock-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  {{ insight.readTime }}
+                </span>
+                <span class="research-insight-date">{{ insight.date }}</span>
+              </div>
+              <div class="research-insight-content">
+                <h3 class="research-insight-title">{{ insight.title }}</h3>
+                <p class="research-insight-description">{{ insight.description }}</p>
+                <button class="research-insight-button">
                   Read Details
                 </button>
               </div>
             </div>
           </div>
           <div class="text-center">
-            <button class="inline-block px-8 py-3 bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-800 transition-colors">
+            <button class="footer-more-details-btn">
               More Details
             </button>
           </div>
@@ -373,42 +381,50 @@ const peptideArticles = ref([
   {
     id: 1,
     title: 'What is BPC-157?',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: 'bpc-157.png'
   },
   {
     id: 2,
     title: 'Safe Handling',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: 'bpc-157.png'
   },
   {
     id: 3,
     title: 'Stacking with Others',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: 'bpc-157.png'
   },
   {
     id: 4,
     title: 'Dosage Guidelines',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: 'bpc-157.png'
   },
   {
     id: 5,
     title: 'Storage Methods',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: 'bpc-157.png'
   },
   {
     id: 6,
     title: 'Research Applications',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: 'bpc-157.png'
   },
   {
     id: 7,
     title: 'Safety Protocols',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: 'bpc-157.png'
   },
   {
     id: 8,
     title: 'Quality Standards',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: 'bpc-157.png'
   },
 ])
 
@@ -416,42 +432,66 @@ const researchInsights = ref([
   {
     id: 1,
     title: 'Safe Handling',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: '1.jpg',
+    readTime: '19 Min Read',
+    date: '22 Aug 2025'
   },
   {
     id: 2,
     title: 'Research Guidelines',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: '1.jpg',
+    readTime: '19 Min Read',
+    date: '22 Aug 2025'
   },
   {
     id: 3,
     title: 'Benefits of BPC-157',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: '1.jpg',
+    readTime: '19 Min Read',
+    date: '22 Aug 2025'
   },
   {
     id: 4,
     title: 'BPC-157 in Sport Medicine',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: '1.jpg',
+    readTime: '19 Min Read',
+    date: '22 Aug 2025'
   },
   {
     id: 5,
     title: 'Safety and Usage',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: '1.jpg',
+    readTime: '19 Min Read',
+    date: '22 Aug 2025'
   },
   {
     id: 6,
     title: 'Laboratory Protocols',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: '1.jpg',
+    readTime: '19 Min Read',
+    date: '22 Aug 2025'
   },
   {
     id: 7,
     title: 'Advanced Applications',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: '1.jpg',
+    readTime: '19 Min Read',
+    date: '22 Aug 2025'
   },
   {
     id: 8,
     title: 'Research Methodologies',
-    description: 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation...'
+    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
+    image: '1.jpg',
+    readTime: '19 Min Read',
+    date: '22 Aug 2025'
   },
 ])
 </script>
