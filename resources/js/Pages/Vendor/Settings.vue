@@ -7,14 +7,14 @@
         <label class="block mb-1 font-semibold">Banner Image</label>
         <input type="file" accept="image/*" @change="onBannerChange" />
         <div v-if="bannerPreview" class="mt-2">
-          <img :src="bannerPreview" alt="Banner Preview" class="w-full max-h-40 object-cover rounded border" />
+          <img :src="bannerPreview" alt="Banner Preview" class="w-full max-h-40 object-cover rounded border" loading="lazy" />
         </div>
       </div>
       <div>
         <label class="block mb-1 font-semibold">Logo Image</label>
         <input type="file" accept="image/*" @change="onLogoChange" />
         <div v-if="logoPreview" class="mt-2">
-          <img :src="logoPreview" alt="Logo Preview" class="h-20 w-20 object-contain rounded border" />
+          <img :src="logoPreview" alt="Logo Preview" class="h-20 w-20 object-contain rounded border" loading="lazy" />
         </div>
       </div>
       <div>

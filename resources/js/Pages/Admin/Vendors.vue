@@ -77,14 +77,14 @@
               <label class="block mb-1 font-medium">Banner</label>
               <input @change="e => handleFileChange(e, 'banner')" type="file" accept="image/*" class="w-full" />
               <div v-if="bannerPreview" class="mt-2">
-                <img :src="bannerPreview" alt="Banner Preview" class="h-16 rounded object-cover w-full" />
+                <img :src="bannerPreview" alt="Banner Preview" class="h-16 rounded object-cover w-full" loading="lazy" />
               </div>
             </div>
             <div class="w-1/2">
               <label class="block mb-1 font-medium">Logo</label>
               <input @change="e => handleFileChange(e, 'logo')" type="file" accept="image/*" class="w-full" />
               <div v-if="logoPreview" class="mt-2">
-                <img :src="logoPreview" alt="Logo Preview" class="h-16 w-16 rounded-full object-cover mx-auto" />
+                <img :src="logoPreview" alt="Logo Preview" class="h-16 w-16 rounded-full object-cover mx-auto" loading="lazy" />
               </div>
             </div>
           </div>
