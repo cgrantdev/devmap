@@ -1,5 +1,5 @@
 <template>
-  <header class="sticky top-0 z-50 bg-white shadow-sm header-container">
+  <header class="sticky top-0 z-50 bg-white header-container">
     <div class="max-w-[1440px] mx-auto h-full header-padding">
       <div class="flex items-center justify-between h-full">
         <!-- Logo -->
@@ -67,7 +67,7 @@
             <input
               type="text"
               placeholder="Type here..."
-              class="w-[320px] h-[52px] rounded-[500px] py-[10px] pl-[42px] pr-4 bg-slate-50 border border-[rgba(216,207,198,0.1)] font-roboto font-normal text-sm leading-none tracking-normal text-gray-700 focus:outline-none placeholder:text-gray-700 placeholder:opacity-100"
+              class="w-[320px] h-[52px] rounded-[500px] py-[10px] pl-[42px] pr-4 border-0 border-[rgba(216,207,198,0.1)] font-roboto font-normal text-sm leading-none tracking-normal text-gray-700 focus:outline-none placeholder:text-gray-700 placeholder:opacity-100 bg-[#D8CFC61A]"
             />
           </div>
 

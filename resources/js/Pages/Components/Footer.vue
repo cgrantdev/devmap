@@ -9,7 +9,7 @@
       <!-- Footer Content Grid -->
       <div class="footer-main-content">
         <!-- Left Section -->
-        <div class="flex gap-8 z-10">
+        <div class="flex gap-30 z-10">
           <!-- Logo and Sign Up -->
           <div class="flex flex-col gap-4 mb-8">
             <Link href="/" class="inline-block mb-0">
@@ -21,7 +21,7 @@
           </div>
           
           <!-- Legal and Resources Sections -->
-          <div class="flex gap-12">
+          <div class="flex gap-40">
             <!-- Legal Links -->
             <div class="mt-0">
               <h3 class="font-roboto font-semibold text-lg leading-relaxed text-gray-800 mb-4">Legal</h3>

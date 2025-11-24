@@ -27,6 +27,11 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+/* Prevent Layout Shift on Scrollbar */
+html {
+    scrollbar-gutter: stable;
+}
+
 /* Design System Variables */
 :root {
     /* Font Families */
