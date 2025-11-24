@@ -1,5 +1,5 @@
 <template>
-  <Header />
+  <FrontLayout>
   <div class="min-h-screen bg-gray-50">
     <!-- Admin Warning Banner for Inactive Vendors -->
     <div v-if="(isAdmin || isOwnPage) && settings?.status === 0" class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
@@ -20,14 +20,14 @@
     </div>
     <!-- Banner -->
     <div v-if="settings?.banner" class="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
-      <img :src="getImageUrl(settings.banner)" alt="Banner" class="object-cover w-full h-full" />
+      <img :src="getImageUrl(settings.banner)" alt="Banner" class="object-cover w-full h-full" loading="lazy" />
     </div>
     <div v-else class="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center text-gray-400 text-2xl">No Banner</div>
     <!-- Company Info Row -->
     <div class="flex flex-col md:flex-row items-center justify-between bg-white shadow p-6 -mt-12 mx-4 rounded-lg relative z-10 max-w-6xl mx-auto">
       <!-- Logo -->
       <div class="flex-shrink-0 mb-4 md:mb-0">
-        <img v-if="settings?.logo" :src="getImageUrl(settings.logo)" alt="Logo" class="h-24 w-24 object-contain rounded border bg-white" />
+        <img v-if="settings?.logo" :src="getImageUrl(settings.logo)" alt="Logo" class="h-24 w-24 object-contain rounded border bg-white" loading="lazy" />
         <div v-else class="h-24 w-24 flex items-center justify-center bg-gray-100 rounded border text-gray-400">No Logo</div>
       </div>
       <!-- Center: Name & Description -->
@@ -85,7 +85,7 @@
       <!-- Items -->
       <section class="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <div v-for="item in items" :key="item.id" class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
-          <img :src="getImageUrl(item.image_url)" alt="Item Image" class="h-32 w-32 object-cover rounded mb-2" />
+          <img :src="getImageUrl(item.image_url)" alt="Item Image" class="h-32 w-32 object-cover rounded mb-2" loading="lazy" />
           <h3 class="font-semibold text-lg mb-1">
             <a v-if="item.product_url" :href="item.product_url" target="_blank" class="hover:underline text-blue-700">{{ item.name }}</a>
             <span v-else>{{ item.name }}</span>
@@ -116,12 +116,13 @@
       </section>
     </div>
   </div>
+  </FrontLayout>
 </template>
 
 <script setup>
-import Header from '../Header.vue'
 import { router } from '@inertiajs/vue3'
 import { ref, watch } from 'vue'
+import FrontLayout from '../Layouts/FrontLayout.vue'
 
 const props = defineProps({
   settings: Object,

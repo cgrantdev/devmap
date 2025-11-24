@@ -123,7 +123,7 @@
         <div v-if="recentProducts.length > 0" class="space-y-4">
           <div v-for="product in recentProducts" :key="product.id" class="flex items-center space-x-4 p-4 border rounded-lg">
             <div class="flex-shrink-0">
-              <img v-if="product.image_url" :src="product.image_url" alt="Product" class="h-12 w-12 object-cover rounded">
+              <img v-if="product.image_url" :src="product.image_url" alt="Product" class="h-12 w-12 object-cover rounded" loading="lazy">
               <div v-else class="h-12 w-12 bg-gray-200 rounded flex items-center justify-center">
                 <span class="text-gray-400 text-xs">No Image</span>
               </div>

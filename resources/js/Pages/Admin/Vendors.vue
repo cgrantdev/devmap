@@ -120,7 +120,7 @@
           <template #item-name="{ name, settings, created_at }">
             <div class="flex items-center px-6 py-4 whitespace-nowrap">
                 <div class="flex-shrink-0 h-10 w-10">
-                  <img v-if="settings?.logo" :src="settings.logo" alt="Logo" class="h-10 w-10 rounded-full object-cover">
+                  <img v-if="settings?.logo" :src="settings.logo" alt="Logo" class="h-10 w-10 rounded-full object-cover" loading="lazy">
                   <div v-else class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
                     <span class="text-gray-600 font-semibold">{{ name.charAt(0).toUpperCase() }}</span>
                   </div>

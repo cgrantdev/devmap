@@ -1,8 +1,10 @@
 <template>
   <footer class="pt-12 relative">
     <div 
+            ref="footerBgRef"
             class="max-w-[701px] w-full h-full absolute top-0 right-0 z-0"
-            :style="{ backgroundImage: `url(/images/footer/1.png)` }"
+            data-bg-image="/images/footer/1.png"
+            :style="{ backgroundImage: footerBgLoaded ? `url(/images/footer/1.png)` : 'none' }"
           ></div>
     <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">   
       
@@ -97,6 +99,36 @@
 </template>
 
 <script setup>
+import { ref, onMounted, nextTick } from 'vue'
 import { Link } from '@inertiajs/vue3'
+
+const footerBgRef = ref(null)
+const footerBgLoaded = ref(false)
+
+// Lazy load footer background image
+onMounted(() => {
+  nextTick(() => {
+    if (footerBgRef.value) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const bgImage = entry.target.getAttribute('data-bg-image')
+            if (bgImage) {
+              const img = new Image()
+              img.onload = () => {
+                footerBgLoaded.value = true
+              }
+              img.src = bgImage
+            }
+            observer.unobserve(entry.target)
+          }
+        })
+      }, {
+        rootMargin: '50px'
+      })
+      observer.observe(footerBgRef.value)
+    }
+  })
+})
 </script>
 

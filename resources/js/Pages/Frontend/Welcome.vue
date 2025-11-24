@@ -19,8 +19,10 @@
                   <div class="carousel-slide">
                     <!-- Background Image -->
                     <div 
+                      :ref="el => { if (el) heroImageRefs[index] = el }"
                       class="absolute inset-0 bg-cover bg-center rounded-[24px] overflow-hidden"
-                      :style="{ backgroundImage: slide.image ? `url(${slide.image})` : 'none' }"
+                      :data-bg-image="slide.image || ''"
+                      :style="{ backgroundImage: slide.image && heroImagesLoaded.has(slide.image) ? `url(${slide.image})` : 'none' }"
                     >
                       <div class="absolute inset-0 hero-overlay1"></div>
                       <div class="absolute inset-0 hero-overlay2"></div>
@@ -77,6 +79,7 @@
                   :src="`/images/vendors/${vendor.logo}`" 
                   :alt="vendor.name + ' logo'"
                   class="w-full h-full object-contain p-3"
+                  loading="lazy"
                   @error="handleLogoError($event, vendor.id)"
                 />
                 <div v-if="logoErrors.has(vendor.id)" class="w-full h-full flex items-center justify-center">
@@ -126,8 +129,10 @@
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div class="discover-research-banner">
             <div 
+              ref="discoverBannerRef"
               class="discover-research-background"
-              :style="{ backgroundImage: `url(/images/banners/1.jpg)` }"
+              data-bg-image="/images/banners/1.jpg"
+              :style="{ backgroundImage: discoverBannerLoaded ? `url(/images/banners/1.jpg)` : 'none' }"
             >
               <div class="discover-research-overlay"></div>
             </div>
@@ -159,6 +164,7 @@
                   :src="`/images/peptides/${article.image}`" 
                   :alt="article.title"
                   class="w-full h-full object-contain object-center"
+                  loading="lazy"
                 />
               </div>
               <div class="p-6 flex flex-col gap-4 flex-1">
@@ -186,8 +192,10 @@
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div class="advance-research-banner">
             <div 
+              ref="advanceBannerRef"
               class="advance-research-background"
-              :style="{ backgroundImage: `url(/images/banners/2.jpg)` }"
+              data-bg-image="/images/banners/2.jpg"
+              :style="{ backgroundImage: advanceBannerLoaded ? `url(/images/banners/2.jpg)` : 'none' }"
             >
               <div class="advance-research-overlay"></div>
             </div>
@@ -217,6 +225,7 @@
                   :src="`/images/blogs/${insight.image}`" 
                   :alt="insight.title"
                   class="w-full h-full object-cover object-center block"
+                  loading="lazy"
                 />
               </div>
               <div class="flex justify-between items-center py-3 px-4 font-roboto font-normal text-xs leading-relaxed text-gray-500 bg-white">
@@ -249,11 +258,76 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import useEmblaCarousel from 'embla-carousel-vue'
 import Autoplay from 'embla-carousel-autoplay'
+
+// Lazy loading for background images
+const heroImagesLoaded = ref(new Set())
+const discoverBannerLoaded = ref(false)
+const advanceBannerLoaded = ref(false)
+const heroImageRefs = ref({})
+const discoverBannerRef = ref(null)
+const advanceBannerRef = ref(null)
+
+// Intersection Observer for lazy loading background images
+const setupLazyBackgroundImages = () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const bgImage = entry.target.getAttribute('data-bg-image')
+        if (bgImage) {
+          // Preload the image
+          const img = new Image()
+          img.onload = () => {
+            // Check if it's a hero slide by checking if the ref exists in heroImageRefs
+            const isHeroSlide = Object.values(heroImageRefs.value).includes(entry.target)
+            if (isHeroSlide) {
+              heroImagesLoaded.value.add(bgImage)
+            } else if (entry.target === discoverBannerRef.value) {
+              discoverBannerLoaded.value = true
+            } else if (entry.target === advanceBannerRef.value) {
+              advanceBannerLoaded.value = true
+            }
+          }
+          img.src = bgImage
+        }
+        observer.unobserve(entry.target)
+      }
+    })
+  }, {
+    rootMargin: '50px' // Start loading 50px before entering viewport
+  })
+
+  // Observe hero images - load first slide immediately, others lazily
+  const heroRefsArray = Object.values(heroImageRefs.value).filter(ref => ref)
+  if (heroRefsArray.length > 0) {
+    // Load first slide immediately (it's visible)
+    const firstRef = heroRefsArray[0]
+    const firstBgImage = firstRef.getAttribute('data-bg-image')
+    if (firstBgImage) {
+      const img = new Image()
+      img.onload = () => {
+        heroImagesLoaded.value.add(firstBgImage)
+      }
+      img.src = firstBgImage
+    }
+    // Observe others for lazy loading
+    heroRefsArray.slice(1).forEach(ref => {
+      if (ref) observer.observe(ref)
+    })
+  }
+
+  // Observe banner images
+  if (discoverBannerRef.value) {
+    observer.observe(discoverBannerRef.value)
+  }
+  if (advanceBannerRef.value) {
+    observer.observe(advanceBannerRef.value)
+  }
+}
 
 // Hero Carousel
 const currentSlide = ref(0)
@@ -355,6 +429,11 @@ onMounted(() => {
     emblaApi.value.on('reInit', onSelect)
     onSelect() // Set initial slide
   }
+  
+  // Setup lazy loading for background images
+  nextTick(() => {
+    setupLazyBackgroundImages()
+  })
 })
 
 onUnmounted(() => {

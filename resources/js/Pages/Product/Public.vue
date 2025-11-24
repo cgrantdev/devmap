@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-white">
     <!-- Banner/Header -->
     <div class="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center relative">
-      <img v-if="vendor.banner_url" :src="vendor.banner_url" alt="Shop Banner" class="absolute inset-0 w-full h-full object-cover" />
+      <img v-if="vendor.banner_url" :src="vendor.banner_url" alt="Shop Banner" class="absolute inset-0 w-full h-full object-cover" loading="lazy" />
       <div v-else class="w-full h-full flex items-center justify-center text-gray-400 text-2xl font-bold">No Banner</div>
     </div>
     <div class="w-full max-w-5xl mx-auto px-2 md:px-0 -mt-16 md:-mt-24 relative z-10">
@@ -24,6 +24,7 @@
             :src="product.image_url"
             :alt="product.name"
             class="rounded shadow-lg max-w-full max-h-[420px] object-contain bg-gray-50"
+            loading="lazy"
           />
           <div v-else class="w-96 h-96 flex items-center justify-center bg-gray-200 rounded text-gray-400">No Image</div>
         </div>

@@ -144,7 +144,7 @@
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-for="product in currentProducts" :key="product.id" class="hover:bg-gray-50">
                 <td class="px-4 py-2">
-                  <img v-if="product.image_url" :src="product.image_url" alt="Product" class="h-12 w-12 object-cover rounded" />
+                  <img v-if="product.image_url" :src="product.image_url" alt="Product" class="h-12 w-12 object-cover rounded" loading="lazy" />
                   <span v-else class="text-gray-400 text-xs">No Image</span>
                 </td>
                 <td class="px-4 py-2">{{ product.name }}</td>

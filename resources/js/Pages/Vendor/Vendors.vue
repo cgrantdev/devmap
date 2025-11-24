@@ -1,5 +1,5 @@
 <template>
-  <Header />
+  <FrontLayout>
   <div class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-10">
     <div class="max-w-7xl mx-auto px-4">
       <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-10 drop-shadow">Our Trusted Vendors</h1>
@@ -10,12 +10,12 @@
           class="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 relative border border-gray-100"
         >
           <div class="h-32 w-full bg-gray-200 flex items-center justify-center overflow-hidden">
-            <img v-if="vendor.banner" :src="vendor.banner" alt="Banner" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" />
+            <img v-if="vendor.banner" :src="vendor.banner" alt="Banner" class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300" loading="lazy" />
             <div v-else class="w-full h-full flex items-center justify-center text-gray-300 text-2xl">No Banner</div>
           </div>
           <div class="flex flex-col items-center -mt-10 pb-6 px-4">
             <div class="h-20 w-20 rounded-full border-4 border-white bg-white shadow -mb-2 flex items-center justify-center overflow-hidden">
-              <img v-if="vendor.logo" :src="vendor.logo" alt="Logo" class="object-contain h-16 w-16" />
+              <img v-if="vendor.logo" :src="vendor.logo" alt="Logo" class="object-contain h-16 w-16" loading="lazy" />
               <div v-else class="h-16 w-16 flex items-center justify-center text-gray-400 text-3xl font-bold">{{ vendor.company_name.charAt(0) }}</div>
             </div>
             <div class="mt-4 text-center">
@@ -36,11 +36,12 @@
       </div>
     </div>
   </div>
+  </FrontLayout>
 </template>
 
 <script setup>
-import Header from '../Header.vue'
 import { defineProps } from 'vue'
+import FrontLayout from '../Layouts/FrontLayout.vue';
 
 const props = defineProps({
   vendors: Array

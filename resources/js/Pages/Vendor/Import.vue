@@ -86,7 +86,7 @@
             <tr v-for="product in products" :key="product.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex-shrink-0 h-16 w-16">
-                  <img v-if="product.image_url" :src="product.image_url" alt="Product" class="h-16 w-16 object-cover rounded">
+                  <img v-if="product.image_url" :src="product.image_url" alt="Product" class="h-16 w-16 object-cover rounded" loading="lazy">
                   <div v-else class="h-16 w-16 bg-gray-200 rounded flex items-center justify-center">
                     <span class="text-gray-400 text-xs">No Image</span>
                   </div>
