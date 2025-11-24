@@ -24,6 +24,7 @@ Route::get('/', function () {
 
 // Frontend pages
 Route::get('/products', [ProductsController::class, 'index'])->name('products');
+Route::get('/product/{slug}', [ProductsController::class, 'show'])->name('product.show');
 
 Route::get('/brands', function () {
     return Inertia::render('Frontend/Brands');
