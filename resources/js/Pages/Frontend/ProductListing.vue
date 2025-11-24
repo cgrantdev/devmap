@@ -3,7 +3,7 @@
     <!-- Hero Section -->
     <section class="pt-0 pb-16 bg-white">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-[1360px] h-[574px] rounded-[24px] overflow-hidden relative mx-auto">
+        <div class="w-full max-w-[1360px] h-[334px] rounded-[24px] overflow-hidden relative mx-auto">
           <!-- Background Image -->
           <div 
             ref="heroBgRef"
@@ -18,9 +18,9 @@
           </div>
           
           <!-- Content -->
-          <div class="relative p-10 h-full flex flex-col justify-center max-w-[800px] gap-6">
-            <div class="flex flex-col gap-6">
-              <h1 class="font-hv-muse font-normal text-6xl leading-tight tracking-normal text-white m-0">Harmony Through Discovery</h1>
+          <div class="relative p-6 h-full flex flex-col justify-center max-w-[800px] gap-4">
+            <div class="flex flex-col gap-3">
+              <h1 class="font-hv-muse font-normal text-[52px] leading-loose tracking-normal text-white m-0">Harmony Through Discovery</h1>
               <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white m-0">Everything You Need to Know About Peptides</p>
             </div>
             <button 
@@ -51,7 +51,7 @@
                   @keyup.enter="applySearch"
                   type="text"
                   placeholder="Search Peptide..."
-                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
                 <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -64,39 +64,40 @@
                 <div class="relative">
                   <button 
                     @click="showSortDropdown = !showSortDropdown"
-                    class="flex items-center gap-2 py-2 px-4 rounded-lg bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer hover:bg-gray-300"
+                    class="flex items-center gap-2 py-2 px-4 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer hover:bg-gray-300"
                   >
                     Sort Items
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    <svg v-if="props.sortDir === 'asc'" width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <svg v-else width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <g transform="translate(0,18) scale(1,-1)">
+                        <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </g>
                     </svg>
                   </button>
                   <div 
                     v-if="showSortDropdown"
-                    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10 border border-gray-200"
+                    class="absolute right-0 mt-2 w-48 bg-white rounded-[500px] shadow-lg z-10 border border-gray-200"
                   >
                     <button 
-                      @click="applySort('name', 'asc')"
-                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
-                    >
-                      Name (A-Z)
-                    </button>
-                    <button 
-                      @click="applySort('name', 'desc')"
-                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
-                    >
-                      Name (Z-A)
-                    </button>
-                    <button 
                       @click="applySort('price', 'asc')"
-                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
+                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
                     >
+                      <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
+                        <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
                       Price (Low to High)
                     </button>
                     <button 
                       @click="applySort('price', 'desc')"
-                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
+                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
                     >
+                      <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
+                        <g transform="translate(0,18) scale(1,-1)">
+                          <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </g>
+                      </svg>
                       Price (High to Low)
                     </button>
                   </div>
@@ -119,7 +120,7 @@
                 ]"
               >
                 {{ filter.label }}
-                <span v-if="getFilterCount(filter.key) > 0" class="ml-1 bg-orange-500 text-white rounded-full px-2 py-0.5 text-xs">
+                <span v-if="getFilterCount(filter.key) > 0" class="ml-1 bg-orange-500 text-white rounded-[500px] px-2 py-0.5 text-xs">
                   {{ getFilterCount(filter.key) }}
                 </span>
               </button>
@@ -130,7 +131,7 @@
               <div
                 v-for="product in products.data"
                 :key="product.id"
-                class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg"
+                class="bg-white rounded-[500px] overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg"
               >
                 <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden">
                   <img 
@@ -146,7 +147,7 @@
                   <p class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800 m-0 text-center">${{ product.price }}</p>
                   <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 m-0 text-center">
                     From Seller 
-                    <span class="text-blue-600">{{ product.user?.name || 'Unknown' }}</span>
+                    <span class="inline-block bg-[#E0F2FE] text-gray-800 rounded-lg py-[3px] px-2">{{ product.user?.name || 'Unknown' }}</span>
                   </p>
                   <div class="flex items-center justify-center gap-1">
                     <div class="flex items-center">
@@ -170,53 +171,57 @@
             </div>
 
             <!-- Pagination -->
-            <div class="flex items-center justify-between">
-              <div class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-600">
-                Items {{ products.from }} to {{ products.to }} of {{ products.total }}
-              </div>
-              <div class="flex items-center gap-2">
+            <div class="flex items-center justify-center mt-8">
+              <div class="flex items-center gap-2 bg-gray-200 rounded-[100px] px-4 py-2">
                 <Link
                   v-if="products.prev_page_url"
                   :href="products.prev_page_url"
-                  class="px-4 py-2 rounded-lg bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 hover:bg-gray-300"
+                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 hover:bg-gray-300 transition-colors"
                 >
-                  ←
+                  <svg width="15" height="12" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.84853 11.6485C6.3799 12.1172 5.6201 12.1172 5.15147 11.6485L0.351472 6.84853C-0.117157 6.3799 -0.117157 5.6201 0.351472 5.15147L5.15147 0.351472C5.6201 -0.117157 6.3799 -0.117157 6.84853 0.351472C7.31716 0.820101 7.31716 1.5799 6.84853 2.04853L4.09706 4.8L13.2 4.8C13.8627 4.8 14.4 5.33726 14.4 6C14.4 6.66274 13.8627 7.2 13.2 7.2H4.09706L6.84853 9.95147C7.31716 10.4201 7.31716 11.1799 6.84853 11.6485Z" fill="#475569"/>
+                  </svg>
                 </Link>
+                <span
+                  v-else
+                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 cursor-not-allowed"
+                >
+                  <svg width="15" height="12" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.84853 11.6485C6.3799 12.1172 5.6201 12.1172 5.15147 11.6485L0.351472 6.84853C-0.117157 6.3799 -0.117157 5.6201 0.351472 5.15147L5.15147 0.351472C5.6201 -0.117157 6.3799 -0.117157 6.84853 0.351472C7.31716 0.820101 7.31716 1.5799 6.84853 2.04853L4.09706 4.8L13.2 4.8C13.8627 4.8 14.4 5.33726 14.4 6C14.4 6.66274 13.8627 7.2 13.2 7.2H4.09706L6.84853 9.95147C7.31716 10.4201 7.31716 11.1799 6.84853 11.6485Z" fill="#94A3B8"/>
+                  </svg>
+                </span>
                 <template v-for="page in visiblePages" :key="page">
                   <Link
                     v-if="page !== '...'"
                     :href="getPageUrl(page)"
                     :class="[
-                      'px-4 py-2 rounded-lg font-roboto font-medium text-sm leading-none tracking-normal',
+                      'flex items-center justify-center min-w-[32px] h-8 px-2 rounded-[500px] font-roboto font-medium text-sm leading-none tracking-normal transition-colors',
                       page === products.current_page
-                        ? 'bg-gray-800 text-white'
-                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                        ? 'bg-white text-gray-800'
+                        : 'text-gray-800 hover:text-gray-600'
                     ]"
                   >
                     {{ page }}
                   </Link>
-                  <span v-else class="px-4 py-2 text-gray-500">...</span>
+                  <span v-else class="flex items-center justify-center min-w-[32px] h-8 px-2 text-gray-800">...</span>
                 </template>
                 <Link
                   v-if="products.next_page_url"
                   :href="products.next_page_url"
-                  class="px-4 py-2 rounded-lg bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 hover:bg-gray-300"
+                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 hover:bg-gray-300 transition-colors"
                 >
-                  →
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12.3513 6.35147C12.8199 5.88284 13.5797 5.88284 14.0483 6.35147L18.8483 11.1515C19.317 11.6201 19.317 12.3799 18.8483 12.8485L14.0483 17.6485C13.5797 18.1172 12.8199 18.1172 12.3513 17.6485C11.8826 17.1799 11.8826 16.4201 12.3513 15.9515L15.1028 13.2L5.99981 13.2C5.33706 13.2 4.7998 12.6627 4.7998 12C4.7998 11.3373 5.33706 10.8 5.99981 10.8H15.1028L12.3513 8.04853C11.8826 7.5799 11.8826 6.8201 12.3513 6.35147Z" fill="#475569"/>
+                  </svg>
                 </Link>
-              </div>
-              <div class="flex items-center gap-2">
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-600">Show</span>
-                <select 
-                  v-model="perPage"
-                  @change="applyPerPage"
-                  class="px-3 py-2 border border-gray-300 rounded-lg font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                <span
+                  v-else
+                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 cursor-not-allowed"
                 >
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12.3513 6.35147C12.8199 5.88284 13.5797 5.88284 14.0483 6.35147L18.8483 11.1515C19.317 11.6201 19.317 12.3799 18.8483 12.8485L14.0483 17.6485C13.5797 18.1172 12.8199 18.1172 12.3513 17.6485C11.8826 17.1799 11.8826 16.4201 12.3513 15.9515L15.1028 13.2L5.99981 13.2C5.33706 13.2 4.7998 12.6627 4.7998 12C4.7998 11.3373 5.33706 10.8 5.99981 10.8H15.1028L12.3513 8.04853C11.8826 7.5799 11.8826 6.8201 12.3513 6.35147Z" fill="#94A3B8"/>
+                  </svg>
+                </span>
               </div>
             </div>
           </div>
@@ -326,7 +331,7 @@
                   v-model.number="selectedFilters.cost_min"
                   @change="applyFilters"
                   placeholder="Min"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
                 />
                 <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-600">to</span>
                 <input 
@@ -334,7 +339,7 @@
                   v-model.number="selectedFilters.cost_max"
                   @change="applyFilters"
                   placeholder="Max"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
                 />
               </div>
             </div>
@@ -448,7 +453,7 @@
         <div class="p-6 border-t border-gray-200 flex gap-4">
           <button 
             @click="clearFilters"
-            class="flex-1 py-2 px-4 rounded-lg bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 hover:bg-gray-300 flex items-center justify-center gap-2"
+            class="flex-1 py-2 px-4 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 hover:bg-gray-300 flex items-center justify-center gap-2"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -457,7 +462,7 @@
           </button>
           <button 
             @click="applyFilters"
-            class="flex-1 py-2 px-4 rounded-lg bg-teal-700 font-roboto font-medium text-sm leading-none tracking-normal text-white hover:bg-teal-800 flex items-center justify-center gap-2"
+            class="flex-1 py-2 px-4 rounded-[500px] bg-teal-700 font-roboto font-medium text-sm leading-none tracking-normal text-white hover:bg-teal-800 flex items-center justify-center gap-2"
           >
             Show ({{ products.total }})
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
