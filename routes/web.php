@@ -16,15 +16,14 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Vendor\ImportController;
 use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
 use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Frontend\ProductsController;
 
 Route::get('/', function () {
     return Inertia::render('Frontend/Welcome');
 });
 
 // Frontend pages
-Route::get('/products', function () {
-    return Inertia::render('Frontend/Products');
-})->name('products');
+Route::get('/products', [ProductsController::class, 'index'])->name('products');
 
 Route::get('/brands', function () {
     return Inertia::render('Frontend/Brands');
