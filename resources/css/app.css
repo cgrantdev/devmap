@@ -1,19 +1,19 @@
 /* HV Muse Font Face Declarations */
 @font-face {
     font-family: 'HV Muse';
-    src: url('../fonts/hv muse/HV Muse Regular.otf') format('opentype');
+    src: url('../fonts/hv muse/HVMuse-Regular.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
 }
 
-@font-face {
+/* @font-face {
     font-family: 'HV Muse';
     src: url('../fonts/hv muse/HV Muse Italic.otf') format('opentype');
     font-weight: normal;
     font-style: italic;
     font-display: swap;
-}
+} */
 
 @import 'tailwindcss';
 

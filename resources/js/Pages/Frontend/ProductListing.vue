@@ -38,7 +38,7 @@
     <section class="py-16 bg-white">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Product Name Title -->
-        <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 m-0 mb-6">{{ productName }}</h2>
+        <h2 class="font-hv-muse font-normal text-center text-5xl leading-normal tracking-normal text-gray-800 m-0 mb-6">{{ productName }}</h2>
 
         <!-- Main Content Area (Full Width) -->
         <div class="w-full">
@@ -64,7 +64,7 @@
                 <div class="relative">
                   <button 
                     @click="showSortDropdown = !showSortDropdown"
-                    class="flex items-center gap-2 py-2 px-4 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer hover:bg-gray-300"
+                    class="flex items-center gap-2 py-2 px-4 rounded-lg bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer hover:bg-gray-300"
                   >
                     Sort Items
                     <svg v-if="props.sortDir === 'asc'" width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -78,7 +78,7 @@
                   </button>
                   <div 
                     v-if="showSortDropdown"
-                    class="absolute right-0 mt-2 w-48 bg-white rounded-[500px] shadow-lg z-10 border border-gray-200"
+                    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10 border border-gray-200"
                   >
                     <button 
                       @click="applySort('price', 'asc')"
@@ -87,7 +87,7 @@
                       <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
                         <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
-                      Price (Low to High)
+                      Low to High
                     </button>
                     <button 
                       @click="applySort('price', 'desc')"
@@ -98,7 +98,7 @@
                           <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </g>
                       </svg>
-                      Price (High to Low)
+                      High to Low
                     </button>
                   </div>
                 </div>
@@ -131,7 +131,7 @@
               <div
                 v-for="product in products.data"
                 :key="product.id"
-                class="bg-white rounded-[500px] overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg"
+                class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg"
               >
                 <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden rounded-lg">
                   <img 
