@@ -132,4 +132,111 @@ class ProductsController extends Controller
             'sortDir' => $sortDir,
         ]);
     }
+
+    public function byBrand(Request $request, $brandId)
+    {
+        $brand = Brand::findOrFail($brandId);
+
+        // Build query for all products of this brand
+        $query = Product::with(['user', 'brand', 'location', 'types', 'puses'])
+            ->where('brand_id', $brandId);
+
+        // Apply filters
+        if ($request->has('use') && $request->use) {
+            $query->whereHas('puses', function ($q) use ($request) {
+                $q->where('puses.id', $request->use);
+            });
+        }
+
+        if ($request->has('type') && $request->type) {
+            $query->whereHas('types', function ($q) use ($request) {
+                $q->where('types.id', $request->type);
+            });
+        }
+
+        if ($request->has('location') && $request->location) {
+            $query->where('location_id', $request->location);
+        }
+
+        if ($request->has('verification') && $request->verification !== '') {
+            $query->where('verified', $request->verification === '1' || $request->verification === 'true');
+        }
+
+        if ($request->has('cost_min') && $request->cost_min) {
+            $query->where('price', '>=', $request->cost_min);
+        }
+
+        if ($request->has('cost_max') && $request->cost_max) {
+            $query->where('price', '<=', $request->cost_max);
+        }
+
+        // Apply sorting
+        $sortBy = $request->get('sort', 'name');
+        $sortDir = $request->get('sort_dir', 'asc');
+        $query->orderBy($sortBy, $sortDir);
+
+        // Paginate
+        $perPage = $request->get('per_page', 20);
+        $products = $query->paginate($perPage)->withQueryString();
+
+        // Get filter options for this brand
+        $baseQuery = Product::where('brand_id', $brandId);
+
+        $filterOptions = [
+            'uses' => Puse::whereHas('products', function ($q) use ($brandId) {
+                $q->where('brand_id', $brandId);
+            })->get(['id', 'name']),
+            'types' => Type::whereHas('products', function ($q) use ($brandId) {
+                $q->where('brand_id', $brandId);
+            })->get(['id', 'name']),
+            'brands' => Brand::where('id', $brandId)->get(['id', 'name']),
+            'locations' => Location::whereHas('products', function ($q) use ($brandId) {
+                $q->where('brand_id', $brandId);
+            })->get(['id', 'name']),
+        ];
+
+        // Get price range
+        $priceRange = $baseQuery->selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
+
+        // Get brand details with vendor settings and aggregated data
+        $brand->load(['vendorSetting', 'user']);
+        
+        // Calculate average rating and total reviews
+        $ratingData = Product::where('brand_id', $brandId)
+            ->selectRaw('AVG(rating_average) as avg_rating, SUM(rating_count) as total_reviews')
+            ->first();
+        
+        $avgRating = $ratingData->avg_rating ?? 0;
+        $totalReviews = $ratingData->total_reviews ?? 0;
+        
+        // Get initials for logo
+        $words = explode(' ', $brand->name);
+        $initials = count($words) >= 2 
+            ? strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1))
+            : strtoupper(substr($brand->name, 0, 2));
+
+        return Inertia::render('Frontend/BrandProducts', [
+            'brand' => [
+                'id' => $brand->id,
+                'name' => $brand->name,
+                'initials' => $initials,
+                'rating' => number_format($avgRating, 2, '.', ''),
+                'reviews' => (int) $totalReviews,
+                'description' => $brand->vendorSetting->company_detail ?? 'Premium quality peptides for research purposes.',
+                'url' => $brand->vendorSetting->url ?? null,
+                'contact_email' => $brand->vendorSetting->contact_email ?? null,
+                'phone_number' => $brand->vendorSetting->phone_number ?? null,
+                'logo' => $brand->vendorSetting && $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
+            ],
+            'products' => $products,
+            'filterOptions' => $filterOptions,
+            'priceRange' => [
+                'min' => $priceRange->min_price ?? 0,
+                'max' => $priceRange->max_price ?? 1000,
+            ],
+            'filters' => $request->only(['use', 'type', 'location', 'verification', 'cost_min', 'cost_max']),
+            'sort' => $sortBy,
+            'sortDir' => $sortDir,
+        ]);
+    }
 }

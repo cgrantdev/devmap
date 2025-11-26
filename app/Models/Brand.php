@@ -11,10 +11,22 @@ class Brand extends Model
 
     protected $fillable = [
         'name',
+        'user_id',
+        'vendor_setting_id',
     ];
 
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function vendorSetting()
+    {
+        return $this->belongsTo(VendorSetting::class);
     }
 }

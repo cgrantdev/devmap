@@ -17,6 +17,7 @@ use App\Http\Controllers\Vendor\ImportController;
 use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Frontend\ProductsController;
+use App\Http\Controllers\Frontend\BrandsController;
 
 Route::get('/', function () {
     return Inertia::render('Frontend/Welcome');
@@ -25,10 +26,8 @@ Route::get('/', function () {
 // Frontend pages
 Route::get('/products', [ProductsController::class, 'index'])->name('products');
 Route::get('/product/{slug}', [ProductsController::class, 'show'])->name('product.show');
-
-Route::get('/brands', function () {
-    return Inertia::render('Frontend/Brands');
-})->name('brands');
+Route::get('/brand/{id}/products', [ProductsController::class, 'byBrand'])->name('brand.products');
+Route::get('/brands', [BrandsController::class, 'index'])->name('brands');
 
 Route::get('/about', function () {
     return Inertia::render('Frontend/About');
