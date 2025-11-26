@@ -39,8 +39,8 @@
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white rounded-lg shadow-lg p-8 flex flex-col md:flex-row gap-8">
           <!-- Left: Brand Logo -->
-          <div class="flex-shrink-0 w-full md:w-64 flex items-center justify-center">
-            <div class="w-full max-w-[200px] aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+          <div class="flex-shrink-0 w-full md:w-[400px] flex items-center justify-center">
+            <div class="w-[400px] h-[400px] rounded-[24px] flex items-center justify-center overflow-hidden" style="background-color: #F3F3F3;">
               <img 
                 v-if="brand.logo" 
                 :src="brand.logo" 
@@ -48,83 +48,110 @@
                 class="w-full h-full object-contain p-4"
                 loading="lazy"
               />
-              <span v-else class="font-roboto font-semibold text-4xl text-gray-500">{{ brand.initials }}</span>
+              <div v-else class="w-full h-full flex items-center justify-center relative">
+                <!-- Background oval shape -->
+                <div class="absolute w-[200px] h-[280px] rounded-full" style="background-color: #D8CFC6; opacity: 0.05;"></div>
+                <!-- Initials -->
+                <span class="relative z-10 font-roboto font-semibold text-6xl text-gray-700">{{ brand.initials }}</span>
+              </div>
             </div>
           </div>
 
-          <!-- Middle: Brand Info -->
+          <!-- Right: Brand Info (2 columns layout) -->
           <div class="flex-1 flex flex-col gap-4">
-            <div>
-              <h2 class="font-hv-muse font-normal text-4xl leading-normal tracking-normal text-gray-800 m-0 mb-2">{{ brand.name }}</h2>
-              <!-- Rating -->
-              <div class="flex flex-row gap-2 items-center mb-3">
-                <div class="flex gap-0.5">
-                  <svg v-for="i in 5" :key="i" class="flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 0L9.79611 5.52786H15.6085L10.9062 8.94427L12.7023 14.4721L8 11.0557L3.29772 14.4721L5.09383 8.94427L0.391548 5.52786H6.20389L8 0Z" fill="#FBBF24"/>
-                  </svg>
+            <!-- First Row: Title and Shop Now Button -->
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1">
+                <h2 class="font-hv-muse font-normal text-4xl leading-normal tracking-normal text-gray-800 m-0 mb-2">{{ brand.name }}</h2>
+                <!-- Rating -->
+                <div class="flex flex-row gap-2 items-center">
+                  <div class="flex gap-0.5">
+                    <svg v-for="i in 5" :key="i" class="flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 0L9.79611 5.52786H15.6085L10.9062 8.94427L12.7023 14.4721L8 11.0557L3.29772 14.4721L5.09383 8.94427L0.391548 5.52786H6.20389L8 0Z" fill="#FBBF24"/>
+                    </svg>
+                  </div>
+                  <div class="flex items-baseline gap-1">
+                    <span class="font-roboto font-normal text-sm leading-relaxed text-gray-800">{{ brand.rating || '0.00' }}</span>
+                    <span class="font-roboto font-normal text-sm leading-relaxed text-gray-400">({{ brand.reviews || 0 }})</span>
+                  </div>
                 </div>
-                <div class="flex items-baseline gap-1">
-                  <span class="font-roboto font-normal text-sm leading-relaxed text-gray-800">{{ brand.rating || '0.00' }}</span>
-                  <span class="font-roboto font-normal text-sm leading-relaxed text-gray-400">({{ brand.reviews || 0 }})</span>
-                </div>
               </div>
-              <p class="font-roboto font-normal text-base leading-relaxed text-gray-600 m-0 mb-4">
-                {{ brand.description }}
-              </p>
+              <!-- Shop Now Button -->
+              <a
+                :href="brand.url || '#'"
+                :target="brand.url ? '_blank' : '_self'"
+                :rel="brand.url ? 'noopener noreferrer' : ''"
+                class="flex-shrink-0 py-[10px] px-[80px] rounded-[500px] text-white font-roboto font-medium text-base leading-none tracking-normal text-center hover:opacity-90 transition-colors flex items-center justify-center gap-[10px]"
+                style="background-color: #1F2937;"
+              >
+                Shop Now
+                <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 1L19 8M19 8L12 15M19 8L1 8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
             </div>
-            <!-- Promotional Banner -->
-            <div class="bg-orange-600 rounded-lg px-6 py-3 flex items-center gap-4 mb-4">
-              <div class="flex items-center gap-2 text-white">
-                <span class="font-roboto font-medium text-sm">WITH <strong>PEPSYNC30</strong> CODE</span>
-              </div>
-              <div class="text-white">
-                <span class="font-roboto font-medium text-sm">New Customers - </span>
-                <span class="font-roboto font-bold text-lg">30% OFF</span>
-              </div>
-            </div>
-          </div>
 
-          <!-- Right: Shop Now & Contact -->
-          <div class="flex-shrink-0 w-full md:w-80 flex flex-col gap-4">
-            <!-- Shop Now Button -->
-            <a
-              v-if="brand.url"
-              :href="brand.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="w-full py-3 px-6 rounded-lg bg-blue-700 text-white font-roboto font-medium text-base leading-none tracking-normal text-center hover:bg-blue-800 transition-colors flex items-center justify-center gap-2"
-            >
-              Shop Now
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
             
-            <!-- Contact Information -->
-            <div class="bg-gray-100 rounded-lg p-4 space-y-3">
-              <div v-if="brand.url" class="flex items-center gap-2 text-sm">
-                <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-                <a :href="brand.url" target="_blank" class="text-blue-600 hover:underline font-roboto font-normal">{{ brand.url }}</a>
+
+            <!-- Second Row: Description and Social Links -->
+            <div class="flex flex-col md:flex-row gap-6 items-start">
+              <!-- Description -->
+              <div class="flex-1">
+
+                <p class="font-roboto font-normal text-base leading-relaxed text-gray-600 m-0">
+                  {{ brand.description }}
+                </p>
+
+                <!-- Promotional Banner -->
+                <div class="relative rounded-[50px] h-[91px] flex items-center justify-between mb-4 overflow-hidden" style="padding-left: 23px; padding-right: 36px; max-width: 489px; background-image: url('/images/promo.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+                  <!-- Gradient Overlay -->
+                  <div class="absolute inset-0 rounded-[50px] overflow-hidden" style="background: linear-gradient(135deg, rgba(254, 193, 133, 0.8) 0%, rgba(232, 154, 90, 0.8) 100%);"></div>
+                  
+                  <!-- Content - Horizontal Layout -->
+                  <div class="flex flex-col items-end relative w-full z-10">
+                    <!-- Left Side: WITH PEPSYNC30 CODE -->
+                    <div class="flex items-center gap-2">
+                      <span class="font-roboto font-medium text-sm text-white">WITH</span>
+                      <span class="bg-blue-400 px-2 py-0.5 rounded font-roboto font-bold text-sm text-white">PEPSYNC30</span>
+                      <span class="font-roboto font-medium text-sm text-white">CODE</span>
+                    </div>
+                    <!-- Right Side: New Customers - 30% OFF -->
+                    <div class="flex items-center gap-1">
+                      <span class="font-roboto font-medium text-xs text-white">New Customers</span>
+                      <span class="font-roboto font-bold text-sm text-white">-</span>
+                      <span class="font-roboto font-bold text-lg" style="color: #AF5858;">30% OFF</span>
+                    </div>
+                  </div>
+                </div>
+
               </div>
-              <div v-if="brand.contact_email" class="flex items-center gap-2 text-sm">
-                <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <a :href="`mailto:${brand.contact_email}`" class="text-blue-600 hover:underline font-roboto font-normal">{{ brand.contact_email }}</a>
-              </div>
-              <div v-if="brand.phone_number" class="flex items-center gap-2 text-sm">
-                <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                <a :href="`tel:${brand.phone_number}`" class="text-blue-600 hover:underline font-roboto font-normal">{{ brand.phone_number }}</a>
-              </div>
-              <div class="flex items-center gap-2 text-sm">
-                <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                </svg>
-                <span class="font-roboto font-normal text-gray-700">Free Shipping Over $200</span>
+              
+              <!-- Contact Information -->
+              <div class="flex-shrink-0 rounded-lg space-y-[10px] min-w-[250px]" style="background-color: #F8FAFC; padding: 50px 20px; border-radius: 7px;">
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                  <a href="https://www.peptidexyz.com" target="_blank" class="text-blue-600 hover:underline font-roboto font-normal">www.peptidexyz.com</a>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <a href="mailto:info@peptidexyz.com" class="text-blue-600 hover:underline font-roboto font-normal">info@peptidexyz.com</a>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <a href="tel:222-222-2222" class="text-blue-600 hover:underline font-roboto font-normal">222-222-2222</a>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                  </svg>
+                  <span class="font-roboto font-normal text-gray-700">Free Shipping Over $200</span>
+                </div>
               </div>
             </div>
           </div>
