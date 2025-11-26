@@ -1,0 +1,770 @@
+<template>
+  <FrontLayout>
+    <!-- Hero Section -->
+    <section class="pt-0 pb-16 bg-white">
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full max-w-[1360px] h-[334px] rounded-[24px] overflow-hidden relative mx-auto">
+          <!-- Background Image -->
+          <div 
+            ref="heroBgRef"
+            class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            data-bg-image="/images/hero/hero1.jpg"
+            :style="{ backgroundImage: heroBgLoaded ? `url(/images/hero/hero1.jpg)` : 'none' }"
+          >
+            <div 
+              class="absolute inset-0 pointer-events-none"
+              :style="{ background: 'linear-gradient(260deg, rgba(0, 0, 0, 0.4) 45.49%, rgba(0, 0, 0, 0.81) 79.33%)' }"
+            ></div>
+          </div>
+          
+          <!-- Content -->
+          <div class="relative p-6 h-full flex flex-col justify-center max-w-[800px] gap-4">
+            <div class="flex flex-col gap-3">
+              <h1 class="font-hv-muse font-normal text-[52px] leading-loose tracking-normal text-white m-0">Harmony Through Discovery</h1>
+              <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white m-0">Everything You Need to Know About Peptides</p>
+            </div>
+            <button 
+              @click="handleCtaClick('/education')"
+              class="w-fit py-2.5 px-20 rounded-[500px] bg-white font-roboto font-medium text-xl leading-none tracking-normal text-gray-800 border-none cursor-pointer transition-colors duration-300 flex items-center justify-center hover:bg-gray-100"
+            >
+              Read Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Brand Detail Section -->
+    <section class="py-8 bg-white">
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-lg p-8 flex flex-col md:flex-row gap-8">
+          <!-- Left: Brand Logo -->
+          <div class="flex-shrink-0 w-full md:w-64 flex items-center justify-center">
+            <div class="w-full max-w-[200px] aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+              <img 
+                v-if="brand.logo" 
+                :src="brand.logo" 
+                :alt="brand.name + ' logo'"
+                class="w-full h-full object-contain p-4"
+                loading="lazy"
+              />
+              <span v-else class="font-roboto font-semibold text-4xl text-gray-500">{{ brand.initials }}</span>
+            </div>
+          </div>
+
+          <!-- Middle: Brand Info -->
+          <div class="flex-1 flex flex-col gap-4">
+            <div>
+              <h2 class="font-hv-muse font-normal text-4xl leading-normal tracking-normal text-gray-800 m-0 mb-2">{{ brand.name }}</h2>
+              <!-- Rating -->
+              <div class="flex flex-row gap-2 items-center mb-3">
+                <div class="flex gap-0.5">
+                  <svg v-for="i in 5" :key="i" class="flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 0L9.79611 5.52786H15.6085L10.9062 8.94427L12.7023 14.4721L8 11.0557L3.29772 14.4721L5.09383 8.94427L0.391548 5.52786H6.20389L8 0Z" fill="#FBBF24"/>
+                  </svg>
+                </div>
+                <div class="flex items-baseline gap-1">
+                  <span class="font-roboto font-normal text-sm leading-relaxed text-gray-800">{{ brand.rating || '0.00' }}</span>
+                  <span class="font-roboto font-normal text-sm leading-relaxed text-gray-400">({{ brand.reviews || 0 }})</span>
+                </div>
+              </div>
+              <p class="font-roboto font-normal text-base leading-relaxed text-gray-600 m-0 mb-4">
+                {{ brand.description }}
+              </p>
+            </div>
+            <!-- Promotional Banner -->
+            <div class="bg-orange-600 rounded-lg px-6 py-3 flex items-center gap-4 mb-4">
+              <div class="flex items-center gap-2 text-white">
+                <span class="font-roboto font-medium text-sm">WITH <strong>PEPSYNC30</strong> CODE</span>
+              </div>
+              <div class="text-white">
+                <span class="font-roboto font-medium text-sm">New Customers - </span>
+                <span class="font-roboto font-bold text-lg">30% OFF</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Shop Now & Contact -->
+          <div class="flex-shrink-0 w-full md:w-80 flex flex-col gap-4">
+            <!-- Shop Now Button -->
+            <a
+              v-if="brand.url"
+              :href="brand.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-full py-3 px-6 rounded-lg bg-blue-700 text-white font-roboto font-medium text-base leading-none tracking-normal text-center hover:bg-blue-800 transition-colors flex items-center justify-center gap-2"
+            >
+              Shop Now
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+            
+            <!-- Contact Information -->
+            <div class="bg-gray-100 rounded-lg p-4 space-y-3">
+              <div v-if="brand.url" class="flex items-center gap-2 text-sm">
+                <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                <a :href="brand.url" target="_blank" class="text-blue-600 hover:underline font-roboto font-normal">{{ brand.url }}</a>
+              </div>
+              <div v-if="brand.contact_email" class="flex items-center gap-2 text-sm">
+                <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <a :href="`mailto:${brand.contact_email}`" class="text-blue-600 hover:underline font-roboto font-normal">{{ brand.contact_email }}</a>
+              </div>
+              <div v-if="brand.phone_number" class="flex items-center gap-2 text-sm">
+                <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <a :href="`tel:${brand.phone_number}`" class="text-blue-600 hover:underline font-roboto font-normal">{{ brand.phone_number }}</a>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+                <span class="font-roboto font-normal text-gray-700">Free Shipping Over $200</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Listing Section -->
+    <section class="py-16 bg-white">
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Brand Name Title -->
+        <h2 class="font-hv-muse font-normal text-center text-5xl leading-normal tracking-normal text-gray-800 m-0 mb-6">{{ brand.name }} Offers</h2>
+
+        <!-- Main Content Area (Full Width) -->
+        <div class="w-full">
+            <!-- Search Bar, Item Count, and Sort (First Row) -->
+            <div class="mb-4 flex items-center gap-4">
+              <!-- Search Bar -->
+              <div class="relative flex-1 min-w-[200px] max-w-md">
+                <input
+                  v-model="searchQuery"
+                  @keyup.enter="applySearch"
+                  type="text"
+                  placeholder="Search Peptide..."
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                />
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+
+              <!-- Item Count and Sort (on the right) -->
+              <div class="flex items-center gap-4 ml-auto">
+                <span class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800">{{ products.total }} Items</span>
+                <div class="relative">
+                  <button 
+                    @click="showSortDropdown = !showSortDropdown"
+                    class="flex items-center gap-2 py-2 px-4 rounded-lg bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer hover:bg-gray-300"
+                  >
+                    Sort Items
+                    <svg v-if="props.sortDir === 'asc'" width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <svg v-else width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <g transform="translate(0,18) scale(1,-1)">
+                        <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </g>
+                    </svg>
+                  </button>
+                  <div 
+                    v-if="showSortDropdown"
+                    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10 border border-gray-200"
+                  >
+                    <button 
+                      @click="applySort('price', 'asc')"
+                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
+                    >
+                      <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
+                        <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      Low to High
+                    </button>
+                    <button 
+                      @click="applySort('price', 'desc')"
+                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
+                    >
+                      <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
+                        <g transform="translate(0,18) scale(1,-1)">
+                          <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </g>
+                      </svg>
+                      High to Low
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filter By Label and Filter Buttons (Second Row) -->
+            <div class="mb-6 flex items-center gap-2 flex-wrap">
+              <span class="font-roboto font-medium text-sm leading-none tracking-normal text-gray-800">Filter By</span>
+              <button 
+                v-for="filter in quickFilters"
+                :key="filter.key"
+                @click="toggleQuickFilter(filter.key)"
+                :class="[
+                  'py-2 px-4 rounded-[500px] font-roboto font-medium text-sm leading-none tracking-normal cursor-pointer transition-colors',
+                  activeFilters[filter.key] 
+                    ? 'bg-gray-800 text-white hover:bg-gray-700' 
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                ]"
+              >
+                {{ filter.label }}
+                <span v-if="getFilterCount(filter.key) > 0" class="ml-1 bg-orange-500 text-white px-2 py-0.5 text-xs">
+                  {{ getFilterCount(filter.key) }}
+                </span>
+              </button>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-8">
+              <div
+                v-for="product in products.data"
+                :key="product.id"
+                class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg"
+              >
+                <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden rounded-lg">
+                  <img 
+                    :src="product.image_url || '/images/peptides/default.png'" 
+                    :alt="product.name"
+                    class="w-full h-full object-contain object-center"
+                    loading="lazy"
+                    @error="handleImageError($event)"
+                  />
+                </div>
+                <div class="p-4 flex flex-col gap-2 flex-1">
+                  <h3 class="font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0 text-center">{{ product.name }}</h3>
+                  <p class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800 m-0 text-center">${{ product.price }}</p>
+                  <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 m-0 text-center">
+                    From Seller 
+                    <span class="inline-block bg-[#E0F2FE] text-gray-800 rounded-lg py-[3px] px-2">{{ product.user?.name || 'Unknown' }}</span>
+                  </p>
+                  <div class="flex items-center justify-center gap-1">
+                    <div class="flex items-center">
+                      <svg 
+                        v-for="i in 5" 
+                        :key="i"
+                        class="w-4 h-4"
+                        :class="i <= Math.round(product.rating_average || 0) ? 'text-yellow-500' : 'text-gray-300'"
+                        fill="currentColor" 
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </div>
+                    <span class="font-roboto font-normal text-xs leading-normal tracking-normal text-gray-500">
+                      ({{ product.rating_count || 0 }} reviews)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex items-center justify-center mt-8">
+              <div class="flex items-center gap-2 bg-gray-200 rounded-[100px] px-4 py-2">
+                <Link
+                  v-if="products.prev_page_url"
+                  :href="products.prev_page_url"
+                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 hover:bg-gray-300 transition-colors"
+                >
+                  <svg width="15" height="12" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.84853 11.6485C6.3799 12.1172 5.6201 12.1172 5.15147 11.6485L0.351472 6.84853C-0.117157 6.3799 -0.117157 5.6201 0.351472 5.15147L5.15147 0.351472C5.6201 -0.117157 6.3799 -0.117157 6.84853 0.351472C7.31716 0.820101 7.31716 1.5799 6.84853 2.04853L4.09706 4.8L13.2 4.8C13.8627 4.8 14.4 5.33726 14.4 6C14.4 6.66274 13.8627 7.2 13.2 7.2H4.09706L6.84853 9.95147C7.31716 10.4201 7.31716 11.1799 6.84853 11.6485Z" fill="#475569"/>
+                  </svg>
+                </Link>
+                <span
+                  v-else
+                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 cursor-not-allowed"
+                >
+                  <svg width="15" height="12" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.84853 11.6485C6.3799 12.1172 5.6201 12.1172 5.15147 11.6485L0.351472 6.84853C-0.117157 6.3799 -0.117157 5.6201 0.351472 5.15147L5.15147 0.351472C5.6201 -0.117157 6.3799 -0.117157 6.84853 0.351472C7.31716 0.820101 7.31716 1.5799 6.84853 2.04853L4.09706 4.8L13.2 4.8C13.8627 4.8 14.4 5.33726 14.4 6C14.4 6.66274 13.8627 7.2 13.2 7.2H4.09706L6.84853 9.95147C7.31716 10.4201 7.31716 11.1799 6.84853 11.6485Z" fill="#94A3B8"/>
+                  </svg>
+                </span>
+                <template v-for="page in visiblePages" :key="page">
+                  <Link
+                    v-if="page !== '...'"
+                    :href="getPageUrl(page)"
+                    :class="[
+                      'flex items-center justify-center min-w-[32px] h-8 px-2 rounded-[500px] font-roboto font-medium text-sm leading-none tracking-normal transition-colors',
+                      page === products.current_page
+                        ? 'bg-white text-gray-800'
+                        : 'text-gray-800 hover:text-gray-600'
+                    ]"
+                  >
+                    {{ page }}
+                  </Link>
+                  <span v-else class="flex items-center justify-center min-w-[32px] h-8 px-2 text-gray-800">...</span>
+                </template>
+                <Link
+                  v-if="products.next_page_url"
+                  :href="products.next_page_url"
+                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 hover:bg-gray-300 transition-colors"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12.3513 6.35147C12.8199 5.88284 13.5797 5.88284 14.0483 6.35147L18.8483 11.1515C19.317 11.6201 19.317 12.3799 18.8483 12.8485L14.0483 17.6485C13.5797 18.1172 12.8199 18.1172 12.3513 17.6485C11.8826 17.1799 11.8826 16.4201 12.3513 15.9515L15.1028 13.2L5.99981 13.2C5.33706 13.2 4.7998 12.6627 4.7998 12C4.7998 11.3373 5.33706 10.8 5.99981 10.8H15.1028L12.3513 8.04853C11.8826 7.5799 11.8826 6.8201 12.3513 6.35147Z" fill="#475569"/>
+                  </svg>
+                </Link>
+                <span
+                  v-else
+                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 cursor-not-allowed"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12.3513 6.35147C12.8199 5.88284 13.5797 5.88284 14.0483 6.35147L18.8483 11.1515C19.317 11.6201 19.317 12.3799 18.8483 12.8485L14.0483 17.6485C13.5797 18.1172 12.8199 18.1172 12.3513 17.6485C11.8826 17.1799 11.8826 16.4201 12.3513 15.9515L15.1028 13.2L5.99981 13.2C5.33706 13.2 4.7998 12.6627 4.7998 12C4.7998 11.3373 5.33706 10.8 5.99981 10.8H15.1028L12.3513 8.04853C11.8826 7.5799 11.8826 6.8201 12.3513 6.35147Z" fill="#94A3B8"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
+
+    <!-- Filter Sidebar Modal Overlay -->
+    <div 
+      v-if="showSidebar"
+      class="fixed inset-0 z-50 flex"
+      @click="showSidebar = false"
+    >
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-black/50"></div>
+      
+      <!-- Sidebar -->
+      <div class="w-full sm:w-96 bg-white shadow-xl overflow-y-auto ml-auto relative z-10" @click.stop>
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h3 class="font-hv-muse font-normal text-2xl leading-normal tracking-normal text-teal-700 m-0">Filter Products</h3>
+            <button 
+              @click="showSidebar = false"
+              class="text-gray-500 hover:text-gray-700"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="p-6 space-y-4">
+          <!-- Use Filter -->
+          <div>
+            <button 
+              @click="expandedFilters.use = !expandedFilters.use"
+              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
+            >
+              <span>Use</span>
+              <svg class="w-5 h-5" :class="expandedFilters.use ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div v-if="expandedFilters.use" class="mt-2 space-y-2">
+              <label 
+                v-for="use in filterOptions.uses"
+                :key="use.id"
+                class="flex items-center gap-2 cursor-pointer"
+              >
+                <input 
+                  type="radio"
+                  :value="use.id"
+                  v-model="selectedFilters.use"
+                  @change="applyFilters"
+                  class="rounded border-gray-300"
+                  name="use-filter"
+                />
+                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">{{ use.name }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Type Filter -->
+          <div>
+            <button 
+              @click="expandedFilters.type = !expandedFilters.type"
+              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
+            >
+              <span>Type</span>
+              <svg class="w-5 h-5" :class="expandedFilters.type ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div v-if="expandedFilters.type" class="mt-2 space-y-2">
+              <label 
+                v-for="type in filterOptions.types"
+                :key="type.id"
+                class="flex items-center gap-2 cursor-pointer"
+              >
+                <input 
+                  type="radio"
+                  :value="type.id"
+                  v-model="selectedFilters.type"
+                  @change="applyFilters"
+                  class="rounded border-gray-300"
+                  name="type-filter"
+                />
+                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">{{ type.name }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Cost Filter -->
+          <div>
+            <button 
+              @click="expandedFilters.cost = !expandedFilters.cost"
+              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
+            >
+              <span>Cost</span>
+              <svg class="w-5 h-5" :class="expandedFilters.cost ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div v-if="expandedFilters.cost" class="mt-2 space-y-2">
+              <div class="flex items-center gap-2">
+                <input 
+                  type="number"
+                  v-model.number="selectedFilters.cost_min"
+                  @change="applyFilters"
+                  placeholder="Min"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
+                />
+                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-600">to</span>
+                <input 
+                  type="number"
+                  v-model.number="selectedFilters.cost_max"
+                  @change="applyFilters"
+                  placeholder="Max"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Location Filter -->
+          <div>
+            <button 
+              @click="expandedFilters.location = !expandedFilters.location"
+              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
+            >
+              <span>Location</span>
+              <svg class="w-5 h-5" :class="expandedFilters.location ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div v-if="expandedFilters.location" class="mt-2 space-y-2">
+              <label 
+                v-for="location in filterOptions.locations"
+                :key="location.id"
+                class="flex items-center gap-2 cursor-pointer"
+              >
+                <input 
+                  type="radio"
+                  :value="location.id"
+                  v-model="selectedFilters.location"
+                  @change="applyFilters"
+                  class="rounded border-gray-300"
+                  name="location-filter"
+                />
+                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">{{ location.name }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Verification Filter -->
+          <div>
+            <button 
+              @click="expandedFilters.verification = !expandedFilters.verification"
+              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
+            >
+              <span>Verification</span>
+              <svg class="w-5 h-5" :class="expandedFilters.verification ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div v-if="expandedFilters.verification" class="mt-2 space-y-2">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="radio"
+                  value=""
+                  v-model="selectedFilters.verification"
+                  @change="applyFilters"
+                  class="rounded border-gray-300"
+                />
+                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">All</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="radio"
+                  value="1"
+                  v-model="selectedFilters.verification"
+                  @change="applyFilters"
+                  class="rounded border-gray-300"
+                />
+                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">Verified</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="radio"
+                  value="0"
+                  v-model="selectedFilters.verification"
+                  @change="applyFilters"
+                  class="rounded border-gray-300"
+                />
+                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">Not Verified</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="p-6 border-t border-gray-200 flex gap-4">
+          <button 
+            @click="clearFilters"
+            class="flex-1 py-2 px-4 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 hover:bg-gray-300 flex items-center justify-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Clear Filters
+          </button>
+          <button 
+            @click="applyFilters"
+            class="flex-1 py-2 px-4 rounded-[500px] bg-teal-700 font-roboto font-medium text-sm leading-none tracking-normal text-white hover:bg-teal-800 flex items-center justify-center gap-2"
+          >
+            Show ({{ products.total }})
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </FrontLayout>
+</template>
+
+<script setup>
+import { ref, computed, onMounted, nextTick } from 'vue'
+import { Link, router } from '@inertiajs/vue3'
+import FrontLayout from '../Layouts/FrontLayout.vue'
+
+const props = defineProps({
+  brand: Object,
+  products: Object,
+  filterOptions: Object,
+  priceRange: Object,
+  filters: Object,
+  sort: String,
+  sortDir: String,
+})
+
+// Hero background lazy loading
+const heroBgRef = ref(null)
+const heroBgLoaded = ref(false)
+
+// Sort dropdown
+const showSortDropdown = ref(false)
+// Filter sidebar
+const showSidebar = ref(false)
+const searchQuery = ref('')
+const perPage = ref(props.products.per_page || 20)
+
+// Expanded filters
+const expandedFilters = ref({
+  use: false,
+  type: false,
+  cost: false,
+  location: props.filters?.location ? true : false,
+  verification: false,
+})
+
+// Selected filters (no brand filter since we're already filtering by brand)
+const selectedFilters = ref({
+  use: props.filters?.use ? parseInt(props.filters.use) : null,
+  type: props.filters?.type ? parseInt(props.filters.type) : null,
+  location: props.filters?.location ? parseInt(props.filters.location) : null,
+  verification: props.filters?.verification || '',
+  cost_min: props.filters?.cost_min || '',
+  cost_max: props.filters?.cost_max || '',
+})
+
+// Quick filters (no brand filter)
+const quickFilters = [
+  { key: 'use', label: 'Use' },
+  { key: 'type', label: 'Type' },
+  { key: 'cost', label: 'Cost' },
+  { key: 'location', label: 'Location' },
+  { key: 'verification', label: 'Verification' },
+]
+
+// Active filters for quick filter buttons
+const activeFilters = computed(() => {
+  return {
+    use: selectedFilters.value.use !== null,
+    type: selectedFilters.value.type !== null,
+    cost: selectedFilters.value.cost_min || selectedFilters.value.cost_max,
+    location: selectedFilters.value.location !== null,
+    verification: selectedFilters.value.verification !== '',
+  }
+})
+
+const getFilterCount = (key) => {
+  if (key === 'use') return selectedFilters.value.use !== null ? 1 : 0
+  if (key === 'type') return selectedFilters.value.type !== null ? 1 : 0
+  if (key === 'location') return selectedFilters.value.location !== null ? 1 : 0
+  if (key === 'verification') return selectedFilters.value.verification !== '' ? 1 : 0
+  if (key === 'cost') return (selectedFilters.value.cost_min || selectedFilters.value.cost_max) ? 1 : 0
+  return 0
+}
+
+const toggleQuickFilter = (key) => {
+  showSidebar.value = true
+  if (key === 'use' || key === 'type' || key === 'location' || key === 'verification' || key === 'cost') {
+    expandedFilters.value[key] = true
+  }
+}
+
+const applyFilters = () => {
+  const params = new URLSearchParams()
+  
+  if (selectedFilters.value.use !== null) {
+    params.set('use', selectedFilters.value.use)
+  }
+  if (selectedFilters.value.type !== null) {
+    params.set('type', selectedFilters.value.type)
+  }
+  if (selectedFilters.value.location !== null) {
+    params.set('location', selectedFilters.value.location)
+  }
+  if (selectedFilters.value.verification) {
+    params.set('verification', selectedFilters.value.verification)
+  }
+  if (selectedFilters.value.cost_min) {
+    params.set('cost_min', selectedFilters.value.cost_min)
+  }
+  if (selectedFilters.value.cost_max) {
+    params.set('cost_max', selectedFilters.value.cost_max)
+  }
+  if (props.sort) {
+    params.set('sort', props.sort)
+  }
+  if (props.sortDir) {
+    params.set('sort_dir', props.sortDir)
+  }
+  if (perPage.value) {
+    params.set('per_page', perPage.value)
+  }
+
+  router.visit(`/brand/${props.brand.id}/products?${params.toString()}`, {
+    preserveState: true,
+    preserveScroll: true,
+  })
+}
+
+const clearFilters = () => {
+  selectedFilters.value = {
+    use: null,
+    type: null,
+    location: null,
+    verification: '',
+    cost_min: '',
+    cost_max: '',
+  }
+  applyFilters()
+}
+
+const applySort = (sort, dir) => {
+  showSortDropdown.value = false
+  const params = new URLSearchParams(window.location.search)
+  params.set('sort', sort)
+  params.set('sort_dir', dir)
+  router.visit(`/brand/${props.brand.id}/products?${params.toString()}`, {
+    preserveState: true,
+    preserveScroll: true,
+  })
+}
+
+const applySearch = () => {
+  // Search functionality can be implemented here
+}
+
+const getPageUrl = (page) => {
+  const params = new URLSearchParams(window.location.search)
+  params.set('page', page)
+  return `/brand/${props.brand.id}/products?${params.toString()}`
+}
+
+const visiblePages = computed(() => {
+  const current = props.products.current_page
+  const last = props.products.last_page
+  const pages = []
+  
+  if (last <= 7) {
+    for (let i = 1; i <= last; i++) {
+      pages.push(i)
+    }
+  } else {
+    if (current <= 3) {
+      for (let i = 1; i <= 4; i++) pages.push(i)
+      pages.push('...')
+      pages.push(last)
+    } else if (current >= last - 2) {
+      pages.push(1)
+      pages.push('...')
+      for (let i = last - 3; i <= last; i++) pages.push(i)
+    } else {
+      pages.push(1)
+      pages.push('...')
+      for (let i = current - 1; i <= current + 1; i++) pages.push(i)
+      pages.push('...')
+      pages.push(last)
+    }
+  }
+  
+  return pages
+})
+
+const handleCtaClick = (url) => {
+  router.visit(url)
+}
+
+const handleImageError = (event) => {
+  event.target.src = '/images/peptides/default.png'
+}
+
+// Setup lazy loading for hero background
+onMounted(() => {
+  nextTick(() => {
+    if (heroBgRef.value) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const bgImage = entry.target.getAttribute('data-bg-image')
+            if (bgImage) {
+              const img = new Image()
+              img.onload = () => {
+                heroBgLoaded.value = true
+              }
+              img.src = bgImage
+            }
+            observer.unobserve(entry.target)
+          }
+        })
+      }, {
+        rootMargin: '50px'
+      })
+      observer.observe(heroBgRef.value)
+    }
+  })
+})
+
+// Close dropdowns when clicking outside
+onMounted(() => {
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.relative')) {
+      showSortDropdown.value = false
+    }
+  })
+})
+</script>
+
