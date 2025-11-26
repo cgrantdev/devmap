@@ -128,29 +128,41 @@
               
               <!-- Contact Information -->
               <div class="flex-shrink-0 rounded-lg space-y-[10px] min-w-[250px]" style="background-color: #F8FAFC; padding: 50px 20px; border-radius: 7px;">
-                <div class="flex items-center gap-2 text-sm">
-                  <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
-                  <a href="https://www.peptidexyz.com" target="_blank" class="text-blue-600 hover:underline font-roboto font-normal">www.peptidexyz.com</a>
+                <!-- Website Link -->
+                <div class="flex items-center gap-[10px]">
+                  <div class="w-[38px] h-[38px] rounded-full flex items-center justify-center flex-shrink-0" style="background-color: rgba(7, 89, 133, 0.44);">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                  </div>
+                  <a :href="brand.url || '#'" :target="brand.url ? '_blank' : '_self'" class="text-gray-800 hover:underline font-roboto font-normal text-sm underline">{{ brand.url ? brand.url.replace(/^https?:\/\//, '') : 'www.peptidexyz.com' }}</a>
                 </div>
-                <div class="flex items-center gap-2 text-sm">
-                  <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <a href="mailto:info@peptidexyz.com" class="text-blue-600 hover:underline font-roboto font-normal">info@peptidexyz.com</a>
+                <!-- Email -->
+                <div class="flex items-center gap-[10px]">
+                  <div class="w-[38px] h-[38px] rounded-full flex items-center justify-center flex-shrink-0" style="background-color: rgba(7, 89, 133, 0.44);">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <a :href="`mailto:${brand.contact_email || 'info@peptidexyz.com'}`" class="text-gray-800 hover:underline font-roboto font-normal text-sm underline">{{ brand.contact_email || 'info@peptidexyz.com' }}</a>
                 </div>
-                <div class="flex items-center gap-2 text-sm">
-                  <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                  <a href="tel:222-222-2222" class="text-blue-600 hover:underline font-roboto font-normal">222-222-2222</a>
+                <!-- Phone -->
+                <div class="flex items-center gap-[10px]">
+                  <div class="w-[38px] h-[38px] rounded-full flex items-center justify-center flex-shrink-0" style="background-color: rgba(7, 89, 133, 0.44);">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <a :href="`tel:${brand.phone_number || '222-222-2222'}`" class="text-gray-800 hover:underline font-roboto font-normal text-sm underline">{{ brand.phone_number || '222-222-2222' }}</a>
                 </div>
-                <div class="flex items-center gap-2 text-sm">
-                  <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                  </svg>
-                  <span class="font-roboto font-normal text-gray-700">Free Shipping Over $200</span>
+                <!-- Shipping -->
+                <div class="flex items-center gap-[10px]">
+                  <div class="w-[38px] h-[38px] rounded-full flex items-center justify-center flex-shrink-0" style="background-color: rgba(7, 89, 133, 0.44);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13 16V6C13 5.44772 12.5523 5 12 5H4C3.44772 5 3 5.44772 3 6V16C3 16.5523 3.44772 17 4 17H5M13 16C13 16.5523 12.5523 17 12 17H9M13 16L13 8C13 7.44772 13.4477 7 14 7H16.5858C16.851 7 17.1054 7.10536 17.2929 7.29289L20.7071 10.7071C20.8946 10.8946 21 11.149 21 11.4142V16C21 16.5523 20.5523 17 20 17H19M13 16C13 16.5523 13.4477 17 14 17H15M5 17C5 18.1046 5.89543 19 7 19C8.10457 19 9 18.1046 9 17M5 17C5 15.8954 5.89543 15 7 15C8.10457 15 9 15.8954 9 17M15 17C15 18.1046 15.8954 19 17 19C18.1046 19 19 18.1046 19 17M15 17C15 15.8954 15.8954 15 17 15C18.1046 15 19 15.8954 19 17" stroke="white" stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <span class="text-gray-800 font-roboto font-normal text-sm underline">Free Shipping Over $200</span>
                 </div>
               </div>
             </div>
