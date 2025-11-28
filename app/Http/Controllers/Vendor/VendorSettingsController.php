@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\VendorSetting;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use App\Helpers\ImageHelper;
 
 class VendorSettingsController extends Controller
 {
@@ -35,15 +36,23 @@ class VendorSettingsController extends Controller
 
         $settings = $user->vendorSetting ?: new VendorSetting(['user_id' => $user->id]);
 
-        // Handle banner upload
+        // Handle banner upload and convert to WebP
         if ($request->hasFile('banner')) {
-            $bannerPath = $request->file('banner')->store('vendor_banners', 'public');
-            $settings->banner = $bannerPath;
+            // Delete old banner if exists
+            if ($settings->banner) {
+                ImageHelper::deleteImage(basename($settings->banner), 'vendor_banners');
+            }
+            $bannerFilename = ImageHelper::convertToWebP($request->file('banner'), 'vendor_banners');
+            $settings->banner = 'vendor_banners/' . $bannerFilename;
         }
-        // Handle logo upload
+        // Handle logo upload and convert to WebP
         if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('vendor_logos', 'public');
-            $settings->logo = $logoPath;
+            // Delete old logo if exists
+            if ($settings->logo) {
+                ImageHelper::deleteImage(basename($settings->logo), 'vendor_logos');
+            }
+            $logoFilename = ImageHelper::convertToWebP($request->file('logo'), 'vendor_logos');
+            $settings->logo = 'vendor_logos/' . $logoFilename;
         }
 
         $settings->company_name = $validated['company_name'] ?? $settings->company_name;

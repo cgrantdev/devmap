@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use App\Helpers\ImageHelper;
 
 class BlogManagementController extends Controller
 {
@@ -66,10 +67,9 @@ class BlogManagementController extends Controller
             $validated['published_at'] = null;
         }
 
-        // Handle image upload
+        // Handle image upload and convert to WebP
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('blogs', 'public');
-            $validated['image'] = basename($imagePath);
+            $validated['image'] = ImageHelper::convertToWebP($request->file('image'), 'blogs');
         } else {
             unset($validated['image']);
         }
@@ -131,14 +131,13 @@ class BlogManagementController extends Controller
             unset($validated['published_at']);
         }
 
-        // Handle image upload
+        // Handle image upload and convert to WebP
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($blog->image) {
-                Storage::disk('public')->delete('blogs/' . $blog->image);
+                ImageHelper::deleteImage($blog->image, 'blogs');
             }
-            $imagePath = $request->file('image')->store('blogs', 'public');
-            $validated['image'] = basename($imagePath);
+            $validated['image'] = ImageHelper::convertToWebP($request->file('image'), 'blogs');
         } else {
             unset($validated['image']);
         }

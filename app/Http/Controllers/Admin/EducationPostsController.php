@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use App\Helpers\ImageHelper;
 
 class EducationPostsController extends Controller
 {
@@ -73,10 +74,9 @@ class EducationPostsController extends Controller
             $validated['published_at'] = null;
         }
 
-        // Handle image upload
+        // Handle image upload and convert to WebP
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('education_posts', 'public');
-            $validated['image'] = basename($imagePath);
+            $validated['image'] = ImageHelper::convertToWebP($request->file('image'), 'education_posts');
         } else {
             unset($validated['image']);
         }
@@ -149,14 +149,13 @@ class EducationPostsController extends Controller
             unset($validated['published_at']);
         }
 
-        // Handle image upload
+        // Handle image upload and convert to WebP
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($post->image) {
-                Storage::disk('public')->delete('education_posts/' . $post->image);
+                ImageHelper::deleteImage($post->image, 'education_posts');
             }
-            $imagePath = $request->file('image')->store('education_posts', 'public');
-            $validated['image'] = basename($imagePath);
+            $validated['image'] = ImageHelper::convertToWebP($request->file('image'), 'education_posts');
         } else {
             unset($validated['image']);
         }
