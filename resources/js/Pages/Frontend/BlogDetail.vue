@@ -46,10 +46,10 @@
         </div>
 
         <!-- Blog Content -->
-        <div class="prose prose-lg max-w-none mb-12">
+        <div class="blog-content mb-12">
           <div 
             v-if="blog.content"
-            class="font-roboto font-normal text-base leading-relaxed text-gray-700"
+            class="blog-content-html"
             v-html="blog.content"
           ></div>
           <div v-else class="font-roboto font-normal text-base leading-relaxed text-gray-700">
@@ -131,4 +131,158 @@ const handleImageError = (event) => {
   }
 }
 </script>
+
+<style scoped>
+.blog-content-html {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.blog-content-html :deep(p) {
+  margin: 0 0 1em 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.blog-content-html :deep(h1),
+.blog-content-html :deep(h2),
+.blog-content-html :deep(h3),
+.blog-content-html :deep(h4),
+.blog-content-html :deep(h5),
+.blog-content-html :deep(h6) {
+  font-family: 'HV Muse', serif;
+  font-weight: normal;
+  margin: 1.5em 0 0.75em 0;
+  color: #1F2937;
+  line-height: 1.3;
+}
+
+.blog-content-html :deep(h1) {
+  font-size: 36px;
+}
+
+.blog-content-html :deep(h2) {
+  font-size: 30px;
+}
+
+.blog-content-html :deep(h3) {
+  font-size: 24px;
+}
+
+.blog-content-html :deep(h4) {
+  font-size: 20px;
+}
+
+.blog-content-html :deep(h5) {
+  font-size: 18px;
+}
+
+.blog-content-html :deep(h6) {
+  font-size: 17px;
+}
+
+.blog-content-html :deep(ul),
+.blog-content-html :deep(ol) {
+  margin: 1em 0;
+  padding-left: 2em;
+}
+
+.blog-content-html :deep(li) {
+  margin: 0.5em 0;
+  line-height: 1.6;
+}
+
+.blog-content-html :deep(strong),
+.blog-content-html :deep(b) {
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.blog-content-html :deep(em),
+.blog-content-html :deep(i) {
+  font-style: italic;
+}
+
+.blog-content-html :deep(u) {
+  text-decoration: underline;
+}
+
+.blog-content-html :deep(s),
+.blog-content-html :deep(strike) {
+  text-decoration: line-through;
+}
+
+.blog-content-html :deep(a) {
+  color: #2563eb;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.blog-content-html :deep(a:hover) {
+  color: #1d4ed8;
+}
+
+.blog-content-html :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.5em 0;
+}
+
+.blog-content-html :deep(blockquote) {
+  border-left: 4px solid #E5E7EB;
+  padding-left: 1.5em;
+  margin: 1.5em 0;
+  font-style: italic;
+  color: #6B7280;
+}
+
+.blog-content-html :deep(code) {
+  background-color: #F3F4F6;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.blog-content-html :deep(pre) {
+  background-color: #F3F4F6;
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1.5em 0;
+}
+
+.blog-content-html :deep(pre code) {
+  background-color: transparent;
+  padding: 0;
+}
+
+.blog-content-html :deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+}
+
+.blog-content-html :deep(table th),
+.blog-content-html :deep(table td) {
+  border: 1px solid #E5E7EB;
+  padding: 0.75em;
+  text-align: left;
+}
+
+.blog-content-html :deep(table th) {
+  background-color: #F9FAFB;
+  font-weight: 600;
+}
+
+.blog-content-html :deep(hr) {
+  border: none;
+  border-top: 1px solid #E5E7EB;
+  margin: 2em 0;
+}
+</style>
 

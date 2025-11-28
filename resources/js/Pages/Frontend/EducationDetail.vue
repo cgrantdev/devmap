@@ -56,8 +56,8 @@
             </div>
 
             <!-- Overview -->
-            <div v-if="post.overview || post.description">
-              <p class="font-roboto font-normal text-base leading-relaxed text-gray-700 m-0" v-html="post.overview || post.description"></p>
+            <div v-if="post.overview || post.description" class="education-content-html">
+              <div v-html="post.overview || post.description"></div>
             </div>
 
             <!-- Key Effects -->
@@ -137,7 +137,7 @@
               class="p-6 bg-white"
             >
               <div 
-                class="font-roboto font-normal text-base leading-relaxed text-gray-700 prose max-w-none"
+                class="education-content-html"
                 v-html="section.content"
               ></div>
             </div>
@@ -183,4 +183,162 @@ const handleImageError = (event) => {
   }
 }
 </script>
+
+<style scoped>
+.education-content-html {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.education-content-html :deep(p) {
+  margin: 0 0 1em 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.education-content-html :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.education-content-html :deep(h1),
+.education-content-html :deep(h2),
+.education-content-html :deep(h3),
+.education-content-html :deep(h4),
+.education-content-html :deep(h5),
+.education-content-html :deep(h6) {
+  font-family: 'HV Muse', serif;
+  font-weight: normal;
+  margin: 1.5em 0 0.75em 0;
+  color: #1F2937;
+  line-height: 1.3;
+}
+
+.education-content-html :deep(h1) {
+  font-size: 36px;
+}
+
+.education-content-html :deep(h2) {
+  font-size: 30px;
+}
+
+.education-content-html :deep(h3) {
+  font-size: 24px;
+}
+
+.education-content-html :deep(h4) {
+  font-size: 20px;
+}
+
+.education-content-html :deep(h5) {
+  font-size: 18px;
+}
+
+.education-content-html :deep(h6) {
+  font-size: 17px;
+}
+
+.education-content-html :deep(ul),
+.education-content-html :deep(ol) {
+  margin: 1em 0;
+  padding-left: 2em;
+}
+
+.education-content-html :deep(li) {
+  margin: 0.5em 0;
+  line-height: 1.6;
+}
+
+.education-content-html :deep(strong),
+.education-content-html :deep(b) {
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.education-content-html :deep(em),
+.education-content-html :deep(i) {
+  font-style: italic;
+}
+
+.education-content-html :deep(u) {
+  text-decoration: underline;
+}
+
+.education-content-html :deep(s),
+.education-content-html :deep(strike) {
+  text-decoration: line-through;
+}
+
+.education-content-html :deep(a) {
+  color: #2563eb;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.education-content-html :deep(a:hover) {
+  color: #1d4ed8;
+}
+
+.education-content-html :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.5em 0;
+}
+
+.education-content-html :deep(blockquote) {
+  border-left: 4px solid #E5E7EB;
+  padding-left: 1.5em;
+  margin: 1.5em 0;
+  font-style: italic;
+  color: #6B7280;
+}
+
+.education-content-html :deep(code) {
+  background-color: #F3F4F6;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.education-content-html :deep(pre) {
+  background-color: #F3F4F6;
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 1.5em 0;
+}
+
+.education-content-html :deep(pre code) {
+  background-color: transparent;
+  padding: 0;
+}
+
+.education-content-html :deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+}
+
+.education-content-html :deep(table th),
+.education-content-html :deep(table td) {
+  border: 1px solid #E5E7EB;
+  padding: 0.75em;
+  text-align: left;
+}
+
+.education-content-html :deep(table th) {
+  background-color: #F9FAFB;
+  font-weight: 600;
+}
+
+.education-content-html :deep(hr) {
+  border: none;
+  border-top: 1px solid #E5E7EB;
+  margin: 2em 0;
+}
+</style>
 
