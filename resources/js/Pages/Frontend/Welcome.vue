@@ -219,7 +219,8 @@
             <div
               v-for="insight in researchInsights"
               :key="insight.id"
-              class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 h-full hover:shadow-lg"
+              class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 h-full hover:shadow-lg cursor-pointer"
+              @click="router.visit('/blogs')"
             >
               <div class="w-full aspect-[325/404] overflow-hidden bg-gray-100 rounded-t-lg">
                 <img 
@@ -243,14 +244,20 @@
               <div class="p-5 flex flex-col gap-3 flex-1">
                 <h3 class="font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0 mb-1 text-center">{{ insight.title }}</h3>
                 <p class="font-roboto font-normal text-sm leading-loose text-gray-500 m-0 flex-1 mb-2 text-center">{{ insight.description }}</p>
-                <button class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300">
+                <button 
+                  @click="router.visit('/blogs')"
+                  class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300"
+                >
                   Read Details
                 </button>
               </div>
             </div>
           </div>
           <div class="text-center">
-            <button class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-gray-700">
+            <button 
+              @click="router.visit('/blogs')"
+              class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-gray-700"
+            >
               More Details
             </button>
           </div>
