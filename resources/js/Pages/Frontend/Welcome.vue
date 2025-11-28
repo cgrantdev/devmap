@@ -157,7 +157,8 @@
             <div
               v-for="article in peptideArticles"
               :key="article.id"
-              class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg"
+              class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg cursor-pointer"
+              @click="router.visit('/education')"
             >
               <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden">
                 <img 
@@ -171,19 +172,22 @@
               <div class="p-6 flex flex-col gap-4 flex-1">
                 <h3 class="text-center font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0">{{ article.title }}</h3>
                 <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 text-center m-0 flex-1">{{ article.description }}</p>
-                <button class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300">
+                <button 
+                  @click.stop="router.visit('/education')"
+                  class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300"
+                >
                   Read Details
                 </button>
               </div>
             </div>
           </div>
           <div class="text-center">
-            <Link
-              href="/education"
-              class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white inline-block opacity-100"
+            <button 
+              @click="router.visit('/education')"
+              class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 hover:bg-gray-700"
             >
-              View All Vendors
-            </Link>
+              View All Education
+            </button>
           </div>
         </div>
       </section>

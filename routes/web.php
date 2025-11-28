@@ -19,6 +19,7 @@ use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Frontend\ProductsController;
 use App\Http\Controllers\Frontend\BrandsController;
 use App\Http\Controllers\Frontend\BlogsController;
+use App\Http\Controllers\Frontend\EducationController;
 
 Route::get('/', function () {
     return Inertia::render('Frontend/Welcome');
@@ -31,14 +32,13 @@ Route::get('/brand/{id}/products', [ProductsController::class, 'byBrand'])->name
 Route::get('/brands', [BrandsController::class, 'index'])->name('brands');
 Route::get('/blogs', [BlogsController::class, 'index'])->name('blogs');
 Route::get('/blog/{slug}', [BlogsController::class, 'show'])->name('blog.show');
+Route::get('/education', [EducationController::class, 'index'])->name('education');
+Route::get('/education/{slug}', [EducationController::class, 'show'])->name('education.show');
 
 Route::get('/about', function () {
     return Inertia::render('Frontend/About');
 })->name('about');
 
-Route::get('/education', function () {
-    return Inertia::render('Frontend/Education');
-})->name('education');
 
 Route::get('/calculator', function () {
     return Inertia::render('Frontend/Calculator');
