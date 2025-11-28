@@ -19,6 +19,7 @@ class Blog extends Model
         'read_time',
         'published_at',
         'is_featured',
+        'status',
     ];
 
     protected $casts = [

@@ -7,6 +7,8 @@
         <Link href="/admin/dashboard" class="block px-4 py-2 rounded hover:bg-gray-200" :class="{ 'bg-gray-200 font-semibold': $page.url === '/admin/dashboard' }">Dashboard</Link>
         <Link href="/admin/vendors" class="block px-4 py-2 rounded hover:bg-gray-200" :class="{ 'bg-gray-200 font-semibold': $page.url === '/admin/vendors' }">Vendors</Link>
         <Link href="/admin/products" class="block px-4 py-2 rounded hover:bg-gray-200" :class="{ 'bg-gray-200 font-semibold': $page.url === '/admin/products' }">Products</Link>
+        <Link href="/admin/blogs" class="block px-4 py-2 rounded hover:bg-gray-200" :class="{ 'bg-gray-200 font-semibold': $page.url.startsWith('/admin/blogs') }">Blogs</Link>
+        <Link href="/admin/education-posts" class="block px-4 py-2 rounded hover:bg-gray-200" :class="{ 'bg-gray-200 font-semibold': $page.url.startsWith('/admin/education-posts') }">Education Posts</Link>
       </nav>
       <form @submit.prevent="logout" class="p-4 border-t">
         <button type="submit" class="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Logout</button>

@@ -13,6 +13,8 @@ use App\Http\Controllers\Vendor\VendorSettingsController;
 use App\Http\Controllers\Vendor\PublicVendorController;
 use App\Http\Controllers\Admin\VendorsController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\BlogManagementController;
+use App\Http\Controllers\Admin\EducationPostsController;
 use App\Http\Controllers\Vendor\ImportController;
 use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
 use App\Http\Controllers\Auth\EmailVerificationController;
@@ -106,6 +108,23 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/vendors/{id}/import-shop-url', [VendorsController::class, 'importFromShopUrl'])->name('admin.vendors.import-shop-url');
     Route::delete('/vendors/{vendorId}/products/{productId}', [VendorsController::class, 'deleteProduct'])->name('admin.vendors.products.delete');
     Route::get('/products', [VendorsController::class, 'adminProducts'])->name('admin.products');
+    
+    // Blogs
+    Route::get('/blogs', [BlogManagementController::class, 'index'])->name('admin.blogs.index');
+    Route::get('/blogs/create', [BlogManagementController::class, 'create'])->name('admin.blogs.create');
+    Route::post('/blogs', [BlogManagementController::class, 'store'])->name('admin.blogs.store');
+    Route::get('/blogs/{id}/edit', [BlogManagementController::class, 'edit'])->name('admin.blogs.edit');
+    Route::post('/blogs/{id}', [BlogManagementController::class, 'update'])->name('admin.blogs.update');
+    Route::patch('/blogs/{id}/quick-update', [BlogManagementController::class, 'quickUpdate'])->name('admin.blogs.quick-update');
+    Route::delete('/blogs/{id}', [BlogManagementController::class, 'destroy'])->name('admin.blogs.destroy');
+    
+    // Education Posts
+    Route::get('/education-posts', [EducationPostsController::class, 'index'])->name('admin.education-posts.index');
+    Route::get('/education-posts/create', [EducationPostsController::class, 'create'])->name('admin.education-posts.create');
+    Route::post('/education-posts', [EducationPostsController::class, 'store'])->name('admin.education-posts.store');
+    Route::get('/education-posts/{id}/edit', [EducationPostsController::class, 'edit'])->name('admin.education-posts.edit');
+    Route::post('/education-posts/{id}', [EducationPostsController::class, 'update'])->name('admin.education-posts.update');
+    Route::delete('/education-posts/{id}', [EducationPostsController::class, 'destroy'])->name('admin.education-posts.destroy');
 });
 
 // Authentication routes

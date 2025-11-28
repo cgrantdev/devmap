@@ -18,8 +18,10 @@
         "@inertiajs/inertia-vue3": "^0.6.0",
         "@inertiajs/vue3": "^2.0.12",
         "@vitejs/plugin-vue": "^5.2.4",
+        "@vueup/vue-quill": "^1.2.0",
         "embla-carousel-autoplay": "^8.6.0",
         "embla-carousel-vue": "^8.6.0",
+        "quill": "^2.0.3",
         "vue": "^3.5.16",
         "vue3-easy-data-table": "^1.5.47"
     }

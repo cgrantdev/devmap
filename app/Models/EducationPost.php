@@ -23,6 +23,7 @@ class EducationPost extends Model
         'accordion_sections',
         'shop_url',
         'published_at',
+        'status',
     ];
 
     protected $casts = [
