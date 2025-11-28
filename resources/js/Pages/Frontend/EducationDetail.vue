@@ -2,7 +2,7 @@
   <FrontLayout>
     <!-- Education Post Detail Section -->
     <section class="py-16 bg-white">
-      <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Back Button -->
         <button 
           @click="router.visit('/education')"
@@ -56,15 +56,14 @@
             </div>
 
             <!-- Overview -->
-            <div>
-              <h2 class="font-roboto font-bold text-lg text-gray-800 mb-3">Overview</h2>
+            <div v-if="post.overview || post.description">
               <p class="font-roboto font-normal text-base leading-relaxed text-gray-700 m-0" v-html="post.overview || post.description"></p>
             </div>
 
             <!-- Key Effects -->
             <div v-if="post.key_effects && post.key_effects.length > 0">
-              <h2 class="font-roboto font-bold text-lg text-gray-800 mb-3">Key Effects</h2>
-              <ul class="space-y-3">
+              <p class="font-roboto font-normal text-base leading-relaxed text-gray-700 mb-4">Researchers have investigated {{ post.title }} for its effects on:</p>
+              <ul class="space-y-3 mb-6">
                 <li 
                   v-for="(effect, index) in post.key_effects" 
                   :key="index"
@@ -93,31 +92,38 @@
             </button>
           </div>
         </div>
-
+      </div> 
+    </section>
+    <section class="py-16 bg-white">
         <!-- General Disclaimer Section -->
-        <div class="mb-12 p-6 bg-gray-50 rounded-lg">
-          <p class="font-roboto font-normal text-sm leading-relaxed text-gray-600 m-0 mb-3">
-            The reported effects mentioned above are based on user reviews and research findings. This information is not intended as medical advice. Please consult with a qualified healthcare professional before using any peptide products.
-          </p>
+      <div class="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-12">
           <p class="font-roboto font-normal text-sm leading-relaxed text-gray-600 m-0">
-            This content is for informational purposes only. Products shown are based on site activity and user engagement. Individual results may vary.
+            Reported effects are generated from user reviews and are not intended as medical advice. Please consult your physician before changing any medical treatment. Description and grow content is for informational purposes only. We show products that we think you'll be interested in based on your site activity.
           </p>
         </div>
 
         <!-- Accordion Sections -->
-        <div class="space-y-4">
+        <div class="space-y-0">
           <div
             v-for="(section, index) in post.accordion_sections"
             :key="index"
-            class="border border-gray-200 rounded-lg overflow-hidden"
+            class="overflow-hidden mb-5"
           >
             <button
               @click="toggleAccordion(index)"
-              class="w-full flex items-center justify-between p-6 bg-white hover:bg-gray-50 transition-colors text-left"
+              class="w-full flex items-center justify-between text-left transition-colors"
+              :style="{
+                backgroundColor: '#F1F5F9',
+                borderRadius: '50px',
+                padding: '20px 50px',
+                borderBottom: index < post.accordion_sections.length - 1 ? '1px solid #E2E8F0' : 'none',
+                gap: '12px'
+              }"
             >
               <h3 class="font-roboto font-bold text-lg text-gray-800 m-0">{{ section.title }}</h3>
               <svg 
-                class="w-6 h-6 text-gray-600 transition-transform"
+                class="w-6 h-6 text-gray-600 transition-transform flex-shrink-0"
                 :class="{ 'rotate-180': expandedSections.has(index) }"
                 fill="none" 
                 stroke="currentColor" 
@@ -128,7 +134,7 @@
             </button>
             <div
               v-show="expandedSections.has(index)"
-              class="p-6 bg-white border-t border-gray-200"
+              class="p-6 bg-white"
             >
               <div 
                 class="font-roboto font-normal text-base leading-relaxed text-gray-700 prose max-w-none"
@@ -138,39 +144,6 @@
           </div>
         </div>
 
-        <!-- Related Posts -->
-        <div v-if="related && related.length > 0" class="mt-16">
-          <h2 class="font-hv-muse font-normal text-3xl leading-normal tracking-normal text-gray-800 mb-8">Related Topics</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div
-              v-for="item in related"
-              :key="item.id"
-              class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg cursor-pointer"
-              @click="router.visit(`/education/${item.slug}`)"
-            >
-              <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden">
-                <img 
-                  v-if="item.image"
-                  :src="`/images/peptides/${item.image}`" 
-                  :alt="item.title"
-                  class="w-full h-full object-contain object-center"
-                  loading="lazy"
-                  @error="handleImageError($event)"
-                />
-                <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-                  <span class="text-sm">No Image</span>
-                </div>
-              </div>
-              <div class="p-6 flex flex-col gap-4 flex-1">
-                <h3 class="text-center font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0">{{ item.title }}</h3>
-                <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 text-center m-0 flex-1">{{ item.description }}</p>
-                <button class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300">
-                  Read Details
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   </FrontLayout>
