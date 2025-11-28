@@ -20,14 +20,14 @@
     </div>
     <!-- Banner -->
     <div v-if="settings?.banner" class="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
-      <img :src="getImageUrl(settings.banner)" alt="Banner" class="object-cover w-full h-full" loading="lazy" />
+      <img :src="getImageUrl(settings.banner)" alt="Banner" class="object-cover w-full h-full" loading="lazy" @error="handleImageError($event)" />
     </div>
     <div v-else class="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center text-gray-400 text-2xl">No Banner</div>
     <!-- Company Info Row -->
     <div class="flex flex-col md:flex-row items-center justify-between bg-white shadow p-6 -mt-12 mx-4 rounded-lg relative z-10 max-w-6xl mx-auto">
       <!-- Logo -->
       <div class="flex-shrink-0 mb-4 md:mb-0">
-        <img v-if="settings?.logo" :src="getImageUrl(settings.logo)" alt="Logo" class="h-24 w-24 object-contain rounded border bg-white" loading="lazy" />
+        <img v-if="settings?.logo" :src="getImageUrl(settings.logo)" alt="Logo" class="h-24 w-24 object-contain rounded border bg-white" loading="lazy" @error="handleImageError($event)" />
         <div v-else class="h-24 w-24 flex items-center justify-center bg-gray-100 rounded border text-gray-400">No Logo</div>
       </div>
       <!-- Center: Name & Description -->
@@ -85,7 +85,7 @@
       <!-- Items -->
       <section class="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         <div v-for="item in items" :key="item.id" class="bg-white rounded-lg shadow p-4 flex flex-col items-center">
-          <img :src="getImageUrl(item.image_url)" alt="Item Image" class="h-32 w-32 object-cover rounded mb-2" loading="lazy" />
+          <img :src="getImageUrl(item.image_url)" alt="Item Image" class="h-32 w-32 object-cover rounded mb-2" loading="lazy" @error="handleImageError($event)" />
           <h3 class="font-semibold text-lg mb-1">
             <a v-if="item.product_url" :href="item.product_url" target="_blank" class="hover:underline text-blue-700">{{ item.name }}</a>
             <span v-else>{{ item.name }}</span>
@@ -160,6 +160,17 @@ function onSearch() {
 
 function applyCostFilter(key) {
   router.get(window.location.pathname, { cost: key, search: searchInput.value }, { preserveScroll: true })
+}
+
+const handleImageError = (event) => {
+  // Prevent infinite loop - stop trying to load images if we've already failed
+  if (event.target.dataset.failed) {
+    return
+  }
+  // Mark as failed to prevent retry
+  event.target.dataset.failed = 'true'
+  // Hide the broken image
+  event.target.style.display = 'none'
 }
 
 watch(searchInput, (val, oldVal) => {

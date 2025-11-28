@@ -135,12 +135,16 @@
               >
                 <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden rounded-lg">
                   <img 
-                    :src="product.image_url || '/images/peptides/default.png'" 
+                    v-if="product.image_url"
+                    :src="product.image_url" 
                     :alt="product.name"
                     class="w-full h-full object-contain object-center"
                     loading="lazy"
                     @error="handleImageError($event)"
                   />
+                  <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
+                    <span class="text-sm">No Image</span>
+                  </div>
                 </div>
                 <div class="p-4 flex flex-col gap-2 flex-1">
                   <h3 class="font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0 text-center">{{ product.name }}</h3>
@@ -677,7 +681,20 @@ const handleCtaClick = (url) => {
 }
 
 const handleImageError = (event) => {
-  event.target.src = '/images/peptides/default.png'
+  // Prevent infinite loop - stop trying to load images if we've already failed
+  if (event.target.dataset.failed) {
+    return
+  }
+  // Mark as failed to prevent retry
+  event.target.dataset.failed = 'true'
+  // Hide the broken image and show placeholder
+  event.target.style.display = 'none'
+  if (event.target.parentElement) {
+    const placeholder = document.createElement('div')
+    placeholder.className = 'w-full h-full flex items-center justify-center text-gray-400'
+    placeholder.innerHTML = '<span class="text-sm">No Image</span>'
+    event.target.parentElement.appendChild(placeholder)
+  }
 }
 
 // Setup lazy loading for hero background

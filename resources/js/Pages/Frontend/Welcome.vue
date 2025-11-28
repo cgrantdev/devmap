@@ -165,6 +165,7 @@
                   :alt="article.title"
                   class="w-full h-full object-contain object-center"
                   loading="lazy"
+                  @error="handleImageError($event)"
                 />
               </div>
               <div class="p-6 flex flex-col gap-4 flex-1">
@@ -226,6 +227,7 @@
                   :alt="insight.title"
                   class="w-full h-full object-cover object-center block"
                   loading="lazy"
+                  @error="handleImageError($event)"
                 />
               </div>
               <div class="flex justify-between items-center py-3 px-4 font-roboto font-normal text-xs leading-relaxed text-gray-500 bg-white">
@@ -421,6 +423,23 @@ const handleLogoError = (event, vendorId) => {
     logoErrors.value.add(vendorId)
   }
   img.style.display = 'none'
+}
+
+const handleImageError = (event) => {
+  // Prevent infinite loop - stop trying to load images if we've already failed
+  if (event.target.dataset.failed) {
+    return
+  }
+  // Mark as failed to prevent retry
+  event.target.dataset.failed = 'true'
+  // Hide the broken image and show placeholder
+  event.target.style.display = 'none'
+  if (event.target.parentElement) {
+    const placeholder = document.createElement('div')
+    placeholder.className = 'w-full h-full flex items-center justify-center text-gray-400'
+    placeholder.innerHTML = '<span class="text-sm">No Image</span>'
+    event.target.parentElement.appendChild(placeholder)
+  }
 }
 
 onMounted(() => {

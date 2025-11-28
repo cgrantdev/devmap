@@ -25,6 +25,7 @@
             :alt="product.name"
             class="rounded shadow-lg max-w-full max-h-[420px] object-contain bg-gray-50"
             loading="lazy"
+            @error="handleImageError($event)"
           />
           <div v-else class="w-96 h-96 flex items-center justify-center bg-gray-200 rounded text-gray-400">No Image</div>
         </div>
@@ -57,4 +58,15 @@ const props = defineProps({
   product: Object,
   vendor: Object
 })
+
+const handleImageError = (event) => {
+  // Prevent infinite loop - stop trying to load images if we've already failed
+  if (event.target.dataset.failed) {
+    return
+  }
+  // Mark as failed to prevent retry
+  event.target.dataset.failed = 'true'
+  // Hide the broken image - the v-else div will show "No Image"
+  event.target.style.display = 'none'
+}
 </script> 
