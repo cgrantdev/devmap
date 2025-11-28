@@ -25,47 +25,47 @@
           <div class="flex gap-4">
             <div class="w-1/2">
               <label class="block mb-1 font-medium text-gray-700">Name</label>
-              <input v-model="editForm.name" type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required />
+              <input v-model="editForm.name" type="text" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required />
             </div>
             <div class="w-1/2">
               <label class="block mb-1 font-medium text-gray-700">Email Address</label>
-              <input v-model="editForm.email" type="email" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required />
+              <input v-model="editForm.email" type="email" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required />
             </div>
           </div>
           <div>
             <label class="block mb-1 font-medium text-gray-700">Password <span class="text-xs text-gray-500">(leave blank to keep current)</span></label>
-            <input v-model="editForm.password" type="password" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+            <input v-model="editForm.password" type="password" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
           </div>
           <div>
             <label class="block mb-1 font-medium text-gray-700">Company Name</label>
-            <input v-model="editForm.company_name" type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+            <input v-model="editForm.company_name" type="text" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
           </div>
           <div>
             <label class="block mb-1 font-medium text-gray-700">Company Detail</label>
-            <textarea v-model="editForm.company_detail" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" rows="2"></textarea>
+            <textarea v-model="editForm.company_detail" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" rows="2"></textarea>
           </div>
           <div class="flex gap-4">
             <div class="w-1/2">
               <label class="block mb-1 font-medium text-gray-700">Contact Email</label>
-              <input v-model="editForm.contact_email" type="email" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+              <input v-model="editForm.contact_email" type="email" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
             </div>
             <div class="w-1/2">
               <label class="block mb-1 font-medium text-gray-700">Phone Number</label>
-              <input v-model="editForm.phone_number" type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+              <input v-model="editForm.phone_number" type="text" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
             </div>
           </div>
           <div>
             <label class="block mb-1 font-medium text-gray-700">URL</label>
-            <input v-model="editForm.url" type="url" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+            <input v-model="editForm.url" type="url" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
           </div>
           <div>
             <label class="block mb-1 font-medium text-gray-700">Shop URL</label>
-            <input v-model="editForm.shop_url" type="url" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+            <input v-model="editForm.shop_url" type="url" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
           </div>
           <div class="flex gap-4 items-end">
             <div class="w-1/2">
               <label class="block mb-1 font-medium text-gray-700">Banner</label>
-              <input @change="e => handleFileChange(e, 'banner')" type="file" accept="image/*" class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+              <input @change="e => handleFileChange(e, 'banner')" type="file" accept="image/*" class="w-full border border-slate-100 rounded-lg px-3 py-2" />
               <div v-if="bannerPreview" class="mt-2">
                 <img :src="bannerPreview" alt="Banner Preview" class="h-16 rounded object-cover w-full" loading="lazy" />
               </div>
@@ -75,7 +75,7 @@
             </div>
             <div class="w-1/2">
               <label class="block mb-1 font-medium text-gray-700">Logo</label>
-              <input @change="e => handleFileChange(e, 'logo')" type="file" accept="image/*" class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+              <input @change="e => handleFileChange(e, 'logo')" type="file" accept="image/*" class="w-full border border-slate-100 rounded-lg px-3 py-2" />
               <div v-if="logoPreview" class="mt-2">
                 <img :src="logoPreview" alt="Logo Preview" class="h-16 w-16 rounded-full object-cover mx-auto" loading="lazy" />
               </div>
@@ -113,14 +113,14 @@
         <form @submit.prevent="importFromFile" class="mb-6 flex gap-2 items-end">
           <div class="flex-1">
             <label class="block mb-2 font-medium text-gray-700">Import from File</label>
-            <input type="file" @change="handleImportFileSelect" accept=".xml" class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+            <input type="file" @change="handleImportFileSelect" accept=".xml" class="w-full border border-slate-100 rounded-lg px-3 py-2" />
           </div>
           <button type="submit" :disabled="importFileForm.processing || !importFileForm.file" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50">Import from File</button>
         </form>
         <form @submit.prevent="importFromUrl" class="flex gap-2 items-end">
           <div class="flex-1">
             <label class="block mb-2 font-medium text-gray-700">Import from URL</label>
-            <input v-model="importUrlForm.url" type="url" placeholder="https://example.com/products.xml" class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+            <input v-model="importUrlForm.url" type="url" placeholder="https://example.com/products.xml" class="w-full border border-slate-100 rounded-lg px-3 py-2" />
           </div>
           <button type="submit" :disabled="importUrlForm.processing || !importUrlForm.url" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50">Import from URL</button>
         </form>
