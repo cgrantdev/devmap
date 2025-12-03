@@ -39,8 +39,16 @@
             @click="navigateToBrand(brand)"
           >
             <!-- Logo Area -->
-            <div class="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden mb-1">
-              <div class="w-full h-full flex items-center justify-center">
+            <div class="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden mb-1 p-4">
+              <div v-if="brand.logo" class="w-full h-full flex items-center justify-center p-4">
+                <img 
+                  :src="brand.logo" 
+                  :alt="brand.name"
+                  class="w-full h-full object-contain"
+                  @error="handleImageError"
+                />
+              </div>
+              <div v-else class="w-full h-full flex items-center justify-center">
                 <span class="font-roboto font-semibold text-2xl text-gray-500">{{ brand.initials }}</span>
               </div>
             </div>
@@ -94,7 +102,20 @@ const props = defineProps({
 
 const navigateToBrand = (brand) => {
   // Navigate to products page filtered by brand
-  router.visit(`/brand/${brand.id}/products`)
+  router.visit(`/brand/${brand.slug}/products`)
+}
+
+const handleImageError = (event) => {
+  // Hide broken image and show initials fallback
+  const img = event.target
+  const container = img.closest('.aspect-square')
+  if (container) {
+    img.style.display = 'none'
+    const fallback = container.querySelector('span')
+    if (fallback) {
+      fallback.style.display = 'block'
+    }
+  }
 }
 </script>
 

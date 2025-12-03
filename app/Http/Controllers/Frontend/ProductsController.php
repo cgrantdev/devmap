@@ -133,9 +133,10 @@ class ProductsController extends Controller
         ]);
     }
 
-    public function byBrand(Request $request, $brandId)
+    public function byBrand(Request $request, $slug)
     {
-        $brand = Brand::findOrFail($brandId);
+        $brand = Brand::where('slug', $slug)->where('is_active', true)->firstOrFail();
+        $brandId = $brand->id;
 
         // Build query for all products of this brand
         $query = Product::with(['user', 'brand', 'location', 'types', 'puses'])
@@ -210,6 +211,7 @@ class ProductsController extends Controller
         return Inertia::render('Frontend/BrandProducts', [
             'brand' => [
                 'id' => $brand->id,
+                'slug' => $brand->slug,
                 'name' => $brand->name,
                 'initials' => $initials,
                 'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
@@ -219,6 +221,7 @@ class ProductsController extends Controller
                 'contact_email' => $brand->vendorSetting->contact_email ?? null,
                 'phone_number' => $brand->vendorSetting->phone_number ?? null,
                 'logo' => $brand->vendorSetting && $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
+                'banner' => $brand->vendorSetting && $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
             ],
             'reviews' => $brand->approvedReviews->map(function ($review) {
                 return [

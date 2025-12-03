@@ -13,9 +13,10 @@ class BrandsController extends Controller
 {
     public function index()
     {
-        // Get brands that have products, with product counts and aggregated data
-        $brands = Brand::withCount('products')
-            ->having('products_count', '>', 0)
+        // Get active brands with product counts and aggregated data
+        $brands = Brand::where('is_active', true)
+            ->with('vendorSetting')
+            ->withCount('products')
             ->orderBy('name')
             ->get()
             ->map(function ($brand) {
@@ -48,12 +49,19 @@ class BrandsController extends Controller
                 
                 $location = $locationId ? Location::find($locationId) : null;
                 
+                // Get logo URL from vendor settings
+                $logoUrl = null;
+                if ($brand->vendorSetting && $brand->vendorSetting->logo) {
+                    $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
+                }
+                
                 return [
                     'id' => $brand->id,
                     'name' => $brand->name,
                     'product_count' => $brand->products_count,
-                    'slug' => Str::slug($brand->name),
-                    'initials' => $this->getInitials($brand->name),
+                    'slug' => $brand->slug ?? Str::slug($brand->name),
+                    'initials' => self::getInitials($brand->name),
+                    'logo' => $logoUrl,
                     'location' => $location ? $location->name : null,
                     'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
                     'reviews' => (int) ($brand->rating_count ?? 0),
@@ -68,7 +76,7 @@ class BrandsController extends Controller
     /**
      * Get initials from brand name
      */
-    private function getInitials($name)
+    private static function getInitials($name)
     {
         $words = explode(' ', $name);
         if (count($words) >= 2) {

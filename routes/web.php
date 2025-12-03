@@ -31,7 +31,7 @@ Route::get('/', function () {
 // Frontend pages
 Route::get('/products', [ProductsController::class, 'index'])->name('products');
 Route::get('/product/{slug}', [ProductsController::class, 'show'])->name('product.show');
-Route::get('/brand/{id}/products', [ProductsController::class, 'byBrand'])->name('brand.products');
+Route::get('/brand/{slug}/products', [ProductsController::class, 'byBrand'])->name('brand.products');
 Route::get('/brands', [BrandsController::class, 'index'])->name('brands');
 Route::get('/blogs', [BlogsController::class, 'index'])->name('blogs');
 Route::get('/blog/{slug}', [BlogsController::class, 'show'])->name('blog.show');

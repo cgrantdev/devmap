@@ -8,8 +8,8 @@
           <div 
             ref="heroBgRef"
             class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            data-bg-image="/images/hero/hero1.jpg"
-            :style="{ backgroundImage: heroBgLoaded ? `url(/images/hero/hero1.jpg)` : 'none' }"
+            :data-bg-image="brand.banner || '/images/hero/hero1.jpg'"
+            :style="{ backgroundImage: heroBgLoaded ? `url(${brand.banner || '/images/hero/hero1.jpg'})` : 'none' }"
           >
             <div 
               class="absolute inset-0 pointer-events-none"
@@ -78,9 +78,9 @@
               </div>
               <!-- Shop Now Button -->
               <a
-                :href="brand.url || '#'"
-                :target="brand.url ? '_blank' : '_self'"
-                :rel="brand.url ? 'noopener noreferrer' : ''"
+                :href="brand.shop_url || '#'"
+                :target="brand.shop_url ? '_blank' : '_self'"
+                :rel="brand.shop_url ? 'noopener noreferrer' : ''"
                 class="flex-shrink-0 py-[10px] px-[80px] rounded-[500px] text-white font-roboto font-medium text-base leading-none tracking-normal text-center hover:opacity-90 transition-colors flex items-center justify-center gap-[10px]"
                 style="background-color: #1F2937;"
               >
@@ -135,7 +135,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
                   </div>
-                  <a :href="brand.url || '#'" :target="brand.url ? '_blank' : '_self'" class="text-gray-800 hover:underline font-roboto font-normal text-sm underline">{{ brand.url ? brand.url.replace(/^https?:\/\//, '') : 'www.peptidexyz.com' }}</a>
+                  <a :href="brand.shop_url || '#'" :target="brand.shop_url ? '_blank' : '_self'" class="text-gray-800 hover:underline font-roboto font-normal text-sm underline">{{ brand.shop_url ? brand.shop_url.replace(/^https?:\/\//, '') : 'www.peptidexyz.com' }}</a>
                 </div>
                 <!-- Email -->
                 <div class="flex items-center gap-[10px]">
@@ -698,7 +698,7 @@ const applyFilters = () => {
     params.set('per_page', perPage.value)
   }
 
-  router.visit(`/brand/${props.brand.id}/products?${params.toString()}`, {
+  router.visit(`/brand/${props.brand.slug}/products?${params.toString()}`, {
     preserveState: true,
     preserveScroll: true,
   })
@@ -721,7 +721,7 @@ const applySort = (sort, dir) => {
   const params = new URLSearchParams(window.location.search)
   params.set('sort', sort)
   params.set('sort_dir', dir)
-  router.visit(`/brand/${props.brand.id}/products?${params.toString()}`, {
+  router.visit(`/brand/${props.brand.slug}/products?${params.toString()}`, {
     preserveState: true,
     preserveScroll: true,
   })
@@ -734,7 +734,7 @@ const applySearch = () => {
 const getPageUrl = (page) => {
   const params = new URLSearchParams(window.location.search)
   params.set('page', page)
-  return `/brand/${props.brand.id}/products?${params.toString()}`
+  return `/brand/${props.brand.slug}/products?${params.toString()}`
 }
 
 const visiblePages = computed(() => {
