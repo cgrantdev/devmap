@@ -17,7 +17,7 @@ class DashboardController extends Controller
         $stats = [
             'totalProducts' => $user->products()->count(),
             'publicPageStatus' => $vendorSettings ? ($vendorSettings->status === 1 ? 'Active' : 'Inactive') : 'Not Configured',
-            'hasCompanyName' => $vendorSettings && $vendorSettings->company_name ? true : false,
+            'hasDescription' => $vendorSettings && $vendorSettings->description ? true : false,
             'hasLogo' => $vendorSettings && $vendorSettings->logo ? true : false,
             'hasBanner' => $vendorSettings && $vendorSettings->banner ? true : false,
         ];

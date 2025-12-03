@@ -16,10 +16,10 @@
           <div class="flex flex-col items-center -mt-10 pb-6 px-4">
             <div class="h-20 w-20 rounded-full border-4 border-white bg-white shadow -mb-2 flex items-center justify-center overflow-hidden">
               <img v-if="vendor.logo" :src="vendor.logo" alt="Logo" class="object-contain h-16 w-16" loading="lazy" />
-              <div v-else class="h-16 w-16 flex items-center justify-center text-gray-400 text-3xl font-bold">{{ vendor.company_name.charAt(0) }}</div>
+              <div v-else class="h-16 w-16 flex items-center justify-center text-gray-400 text-3xl font-bold">{{ vendor.name.charAt(0) }}</div>
             </div>
             <div class="mt-4 text-center">
-              <h2 class="text-xl font-semibold text-gray-800 group-hover:text-blue-700 transition-colors">{{ vendor.company_name }}</h2>
+              <h2 class="text-xl font-semibold text-gray-800 group-hover:text-blue-700 transition-colors">{{ vendor.name }}</h2>
               <p class="text-gray-500 text-sm mt-1">@{{ vendor.name }}</p>
             </div>
             <a

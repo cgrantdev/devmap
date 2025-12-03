@@ -18,16 +18,12 @@
         </div>
       </div>
       <div>
-        <label class="block mb-1 font-semibold">Company Name</label>
-        <input type="text" class="w-full border rounded px-3 py-2" v-model="form.company_name" />
+        <label class="block mb-1 font-semibold">Description</label>
+        <textarea class="w-full border rounded px-3 py-2" v-model="form.description" rows="3"></textarea>
       </div>
       <div>
-        <label class="block mb-1 font-semibold">Company Detail</label>
-        <textarea class="w-full border rounded px-3 py-2" v-model="form.company_detail" rows="3"></textarea>
-      </div>
-      <div>
-        <label class="block mb-1 font-semibold">URL</label>
-        <input type="text" class="w-full border rounded px-3 py-2" v-model="form.url" />
+        <label class="block mb-1 font-semibold">Shop URL</label>
+        <input type="url" class="w-full border rounded px-3 py-2" v-model="form.shop_url" />
       </div>
       <div>
         <label class="block mb-1 font-semibold">Contact Email</label>
@@ -59,9 +55,8 @@ const user = usePage().props.auth.user || {}
 const csrf_token = usePage().props.csrf_token
 
 const form = reactive({
-  company_name: props.settings?.company_name || '',
-  company_detail: props.settings?.company_detail || '',
-  url: props.settings?.url || '',
+  description: props.settings?.description || '',
+  shop_url: props.settings?.shop_url || '',
   contact_email: props.settings?.contact_email || user.email || '',
   phone_number: props.settings?.phone_number || '',
   banner: null,

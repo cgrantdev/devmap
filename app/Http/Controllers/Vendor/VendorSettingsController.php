@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Vendor;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Brand;
 use App\Models\VendorSetting;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -14,16 +15,21 @@ class VendorSettingsController extends Controller
 {
     public function show()
     {
-        $user = Auth::user();
-        $settings = $user->vendorSetting;
+        // Note: This controller may not be needed if vendors don't have user accounts
+        // For now, we'll need to identify the brand another way (e.g., session, token, etc.)
+        // This is a placeholder - you may need to implement a different authentication method
         return Inertia::render('Vendor/Settings', [
-            'settings' => $settings,
+            'settings' => null,
         ]);
     }
 
     public function update(Request $request)
     {
-        $user = Auth::user();
+        // Note: This controller may not be needed if vendors don't have user accounts
+        // For now, this is a placeholder
+        // You may need to implement a different authentication method for vendors
+        return redirect()->back()->with('error', 'Vendor authentication not implemented yet.');
+        
         $validated = $request->validate([
             'company_name' => 'nullable|string|max:255',
             'company_detail' => 'nullable|string|max:1000',
@@ -34,7 +40,7 @@ class VendorSettingsController extends Controller
             'logo' => 'nullable|image|max:1024',
         ]);
 
-        $settings = $user->vendorSetting ?: new VendorSetting(['user_id' => $user->id]);
+        $settings = $brand->vendorSetting ?: new VendorSetting(['brand_id' => $brand->id]);
 
         // Handle banner upload and convert to WebP
         if ($request->hasFile('banner')) {
@@ -60,7 +66,6 @@ class VendorSettingsController extends Controller
         $settings->url = $validated['url'] ?? $settings->url;
         $settings->contact_email = $validated['contact_email'] ?? $settings->contact_email;
         $settings->phone_number = $validated['phone_number'] ?? $settings->phone_number;
-        $settings->user_id = $user->id;
         
         // Set status to active if this is a new settings record
         if (!$settings->exists) {

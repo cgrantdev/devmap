@@ -2,97 +2,90 @@
   <AdminLayout>
     <div class="mx-auto">
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Edit Vendor</h1>
-        <Link href="/admin/vendors" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold">Back</Link>
-      </div>
-      <!-- Profile Edit Card -->
-      <div class="bg-white rounded-lg shadow p-8 mb-8">
-        <h2 class="text-xl font-semibold mb-4">Profile Details</h2>
-        <!-- Success Message -->
-        <div v-if="$page.props.flash.success" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-          {{ $page.props.flash.success }}
+        <div>
+          <h1 class="text-3xl font-normal text-slate-700">{{ vendor ? 'Edit Vendor' : 'Create New Vendor' }}</h1>
+          <p class="text-slate-500 mt-2">{{ vendor ? 'Update vendor details' : 'Add a new vendor' }}</p>
         </div>
+        <Link href="/admin/vendors" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors">Back</Link>
+      </div>
+      <!-- Success Message -->
+      <div v-if="$page.props.flash.success" class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl">
+        {{ $page.props.flash.success }}
+      </div>
+      
+      <!-- Error Message -->
+      <div v-if="$page.props.flash.error" class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
+        {{ $page.props.flash.error }}
+      </div>
+      
+      <!-- Profile Edit Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
+        <h2 class="text-xl font-semibold text-slate-800 mb-6">Vendor Details</h2>
         <!-- Error Message -->
-        <div v-if="Object.keys(editForm.errors).length > 0" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-          <p class="font-bold">Please fix the following errors:</p>
-          <ul class="list-disc list-inside">
+        <div v-if="Object.keys(editForm.errors).length > 0" class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl">
+          <p class="font-medium">Please fix the following errors:</p>
+          <ul class="list-disc list-inside mt-2">
             <li v-for="(error, field) in editForm.errors" :key="field" class="text-sm">
               {{ Array.isArray(error) ? error[0] : error }}
             </li>
           </ul>
         </div>
-        <form @submit.prevent="submitEditVendor" class="space-y-4">
+        <form @submit.prevent="submitEditVendor" class="space-y-6">
           <div class="flex gap-4">
             <div class="w-1/2">
-              <label class="block mb-1 font-medium text-gray-700">Name</label>
-              <input v-model="editForm.name" type="text" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required />
+              <label class="block mb-1.5 font-semibold text-slate-800">Name *</label>
+              <input v-model="editForm.name" type="text" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" required />
             </div>
             <div class="w-1/2">
-              <label class="block mb-1 font-medium text-gray-700">Email Address</label>
-              <input v-model="editForm.email" type="email" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required />
+              <label class="block mb-1.5 font-semibold text-slate-800">Contact Email</label>
+              <input v-model="editForm.contact_email" type="email" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" />
             </div>
           </div>
           <div>
-            <label class="block mb-1 font-medium text-gray-700">Password <span class="text-xs text-gray-500">(leave blank to keep current)</span></label>
-            <input v-model="editForm.password" type="password" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
-          </div>
-          <div>
-            <label class="block mb-1 font-medium text-gray-700">Company Name</label>
-            <input v-model="editForm.company_name" type="text" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
-          </div>
-          <div>
-            <label class="block mb-1 font-medium text-gray-700">Company Detail</label>
-            <textarea v-model="editForm.company_detail" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" rows="2"></textarea>
+            <label class="block mb-1.5 font-semibold text-slate-800">Description</label>
+            <textarea v-model="editForm.description" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" rows="3"></textarea>
           </div>
           <div class="flex gap-4">
             <div class="w-1/2">
-              <label class="block mb-1 font-medium text-gray-700">Contact Email</label>
-              <input v-model="editForm.contact_email" type="email" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+              <label class="block mb-1.5 font-semibold text-slate-800">Phone Number</label>
+              <input v-model="editForm.phone_number" type="text" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" />
             </div>
             <div class="w-1/2">
-              <label class="block mb-1 font-medium text-gray-700">Phone Number</label>
-              <input v-model="editForm.phone_number" type="text" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
+              <label class="block mb-1.5 font-semibold text-slate-800">Shop URL</label>
+              <input v-model="editForm.shop_url" type="url" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" />
             </div>
-          </div>
-          <div>
-            <label class="block mb-1 font-medium text-gray-700">URL</label>
-            <input v-model="editForm.url" type="url" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
-          </div>
-          <div>
-            <label class="block mb-1 font-medium text-gray-700">Shop URL</label>
-            <input v-model="editForm.shop_url" type="url" class="w-full border border-slate-100 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" />
           </div>
           <div class="flex gap-4 items-end">
             <div class="w-1/2">
-              <label class="block mb-1 font-medium text-gray-700">Banner</label>
-              <input @change="e => handleFileChange(e, 'banner')" type="file" accept="image/*" class="w-full border border-slate-100 rounded-lg px-3 py-2" />
+              <label class="block mb-1.5 font-semibold text-slate-800">Banner</label>
+              <input @change="e => handleFileChange(e, 'banner')" type="file" accept="image/*" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
               <div v-if="bannerPreview" class="mt-2">
-                <img :src="bannerPreview" alt="Banner Preview" class="h-16 rounded object-cover w-full" loading="lazy" />
+                <img :src="bannerPreview" alt="Banner Preview" class="h-24 rounded-xl object-cover w-full" loading="lazy" />
               </div>
               <div v-else-if="currentBannerUrl" class="mt-2">
-                <img :src="currentBannerUrl + '?t=' + cacheBuster" alt="Current Banner" class="h-16 rounded object-cover w-full" loading="lazy" />
+                <img :src="currentBannerUrl + '?t=' + cacheBuster" alt="Current Banner" class="h-24 rounded-xl object-cover w-full" loading="lazy" />
               </div>
             </div>
             <div class="w-1/2">
-              <label class="block mb-1 font-medium text-gray-700">Logo</label>
-              <input @change="e => handleFileChange(e, 'logo')" type="file" accept="image/*" class="w-full border border-slate-100 rounded-lg px-3 py-2" />
+              <label class="block mb-1.5 font-semibold text-slate-800">Logo</label>
+              <input @change="e => handleFileChange(e, 'logo')" type="file" accept="image/*" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
               <div v-if="logoPreview" class="mt-2">
-                <img :src="logoPreview" alt="Logo Preview" class="h-16 w-16 rounded-full object-cover mx-auto" loading="lazy" />
+                <img :src="logoPreview" alt="Logo Preview" class="h-24 w-24 rounded-full object-cover mx-auto" loading="lazy" />
               </div>
               <div v-else-if="currentLogoUrl" class="mt-2">
-                <img :src="currentLogoUrl + '?t=' + cacheBuster" alt="Current Logo" class="h-16 w-16 rounded-full object-cover mx-auto" loading="lazy" />
+                <img :src="currentLogoUrl + '?t=' + cacheBuster" alt="Current Logo" class="h-24 w-24 rounded-full object-cover mx-auto" loading="lazy" />
               </div>
             </div>
           </div>
-          <div class="flex justify-end">
-            <button type="submit" :disabled="editForm.processing" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 font-semibold">
-              {{ editForm.processing ? 'Saving...' : 'Save Changes' }}
+          <div class="flex justify-end pt-4 border-t border-slate-100">
+            <button type="submit" :disabled="editForm.processing" class="px-6 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-medium transition-colors disabled:opacity-50">
+              {{ editForm.processing ? 'Saving...' : (vendor ? 'Update Vendor' : 'Create Vendor') }}
             </button>
           </div>
         </form>
       </div>
-      <!-- XML Import Card -->
-      <div class="bg-white rounded-lg shadow p-8 mb-8">
+      <!-- XML Import Card (only show when editing) -->
+      <div v-if="vendor" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
         <h2 class="text-xl font-semibold mb-4">Import Products (XML)</h2>
         <!-- Import from Shop URL Button -->
         <div class="mb-4">
@@ -125,8 +118,8 @@
           <button type="submit" :disabled="importUrlForm.processing || !importUrlForm.url" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50">Import from URL</button>
         </form>
       </div>
-      <!-- Imported Products Card -->
-      <div class="bg-white rounded-lg shadow p-8">
+      <!-- Imported Products Card (only show when editing) -->
+      <div v-if="vendor" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         <h2 class="text-xl font-semibold mb-4">Imported Products</h2>
         <div class="overflow-x-auto">
           <table class="w-full">
@@ -210,19 +203,15 @@ const currentProducts = computed(() => {
 })
 
 const editForm = useForm({
-  name: props.vendor.name || '',
-  email: props.vendor.email || '',
-  password: '',
-  company_name: props.vendor.settings?.company_name || '',
-  company_detail: props.vendor.settings?.company_detail || '',
-  url: props.vendor.settings?.url || '',
-  contact_email: props.vendor.settings?.contact_email || '',
-  phone_number: props.vendor.settings?.phone_number || '',
-  shop_url: props.vendor.settings?.shop_url || '',
+  name: props.vendor?.name || '',
+  email: props.vendor?.email || '',
+  description: props.vendor?.settings?.description || '',
+  contact_email: props.vendor?.settings?.contact_email || '',
+  phone_number: props.vendor?.settings?.phone_number || '',
+  shop_url: props.vendor?.settings?.shop_url || '',
   banner: null,
   logo: null,
-  banner_url: props.vendor.settings?.banner_url || '',
-  logo_url: props.vendor.settings?.logo_url || '',
+  is_active: props.vendor?.is_active ?? false,
   _token: usePage().props.csrf_token
 })
 
@@ -232,9 +221,7 @@ watch(() => props.vendor, (newVendor) => {
   if (newVendor) {
     editForm.name = newVendor.name || ''
     editForm.email = newVendor.email || ''
-    editForm.company_name = newVendor.settings?.company_name || ''
-    editForm.company_detail = newVendor.settings?.company_detail || ''
-    editForm.url = newVendor.settings?.url || ''
+    editForm.description = newVendor.settings?.description || ''
     editForm.contact_email = newVendor.settings?.contact_email || ''
     editForm.phone_number = newVendor.settings?.phone_number || ''
     editForm.shop_url = newVendor.settings?.shop_url || ''
@@ -257,22 +244,35 @@ function handleFileChange(event, field) {
 }
 
 function submitEditVendor() {
-  editForm.post(`/admin/vendors/${props.vendor.id}`, {
-    forceFormData: true,
-    preserveState: true,
-    preserveScroll: true,
-    onSuccess: () => {
-      bannerPreview.value = null
-      logoPreview.value = null
-      cacheBuster.value = Date.now()
-      // Clear file inputs
-      const fileInputs = document.querySelectorAll('input[type="file"]')
-      fileInputs.forEach(input => input.value = '')
-    },
-    onError: () => {
-    },
-    data: { _method: 'put' }
-  })
+  if (props.vendor) {
+    // Update existing vendor
+    editForm.post(`/admin/vendors/${props.vendor.id}`, {
+      forceFormData: true,
+      preserveState: true,
+      preserveScroll: true,
+      onSuccess: () => {
+        bannerPreview.value = null
+        logoPreview.value = null
+        cacheBuster.value = Date.now()
+        // Clear file inputs
+        const fileInputs = document.querySelectorAll('input[type="file"]')
+        fileInputs.forEach(input => input.value = '')
+      },
+      onError: () => {
+      },
+      data: { _method: 'put' }
+    })
+  } else {
+    // Create new vendor
+    editForm.post('/admin/vendors', {
+      forceFormData: true,
+      onSuccess: () => {
+        router.visit('/admin/vendors')
+      },
+      onError: () => {
+      }
+    })
+  }
 }
 
 // XML Import logic

@@ -48,14 +48,6 @@ class BrandsController extends Controller
                 
                 $location = $locationId ? Location::find($locationId) : null;
                 
-                // Calculate average rating and total reviews
-                $ratingData = Product::where('brand_id', $brand->id)
-                    ->selectRaw('AVG(rating_average) as avg_rating, SUM(rating_count) as total_reviews')
-                    ->first();
-                
-                $avgRating = $ratingData->avg_rating ?? 0;
-                $totalReviews = $ratingData->total_reviews ?? 0;
-                
                 return [
                     'id' => $brand->id,
                     'name' => $brand->name,
@@ -63,8 +55,8 @@ class BrandsController extends Controller
                     'slug' => Str::slug($brand->name),
                     'initials' => $this->getInitials($brand->name),
                     'location' => $location ? $location->name : null,
-                    'rating' => number_format($avgRating, 2, '.', ''),
-                    'reviews' => (int) $totalReviews,
+                    'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
+                    'reviews' => (int) ($brand->rating_count ?? 0),
                 ];
             });
         

@@ -96,7 +96,7 @@ class PublicVendorController extends Controller
                 $q->where('status', 1);
             })
             ->with(['vendorSetting' => function ($q) {
-                $q->select('user_id', 'company_name', 'banner', 'logo');
+                $q->select('brand_id', 'description', 'banner', 'logo');
             }])
             ->get(['id', 'name']);
 
@@ -104,7 +104,7 @@ class PublicVendorController extends Controller
             return [
                 'id' => $vendor->id,
                 'name' => $vendor->name,
-                'company_name' => $vendor->vendorSetting->company_name ?? $vendor->name,
+                'description' => $vendor->vendorSetting->description ?? null,
                 'banner' => $vendor->vendorSetting->banner ? asset('storage/' . $vendor->vendorSetting->banner) : null,
                 'logo' => $vendor->vendorSetting->logo ? asset('storage/' . $vendor->vendorSetting->logo) : null,
                 'slug' => str_replace(' ', '-', strtolower($vendor->name)),

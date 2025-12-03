@@ -32,12 +32,12 @@
       </div>
       <!-- Center: Name & Description -->
       <div class="flex-1 text-center md:text-left px-4">
-        <h1 class="text-3xl font-bold mb-2">{{ settings?.company_name || vendor.name }}</h1>
-        <p class="text-gray-600">{{ settings?.company_detail || 'No description provided.' }}</p>
+        <h1 class="text-3xl font-bold mb-2">{{ vendor.name }}</h1>
+        <p class="text-gray-600">{{ settings?.description || 'No description provided.' }}</p>
       </div>
       <!-- Right: Contact Info -->
       <div class="flex flex-col items-end space-y-1 text-sm">
-        <div v-if="settings?.url"><span class="font-semibold">URL:</span> <a :href="settings.url" class="text-blue-600 hover:underline" target="_blank">{{ settings.url }}</a></div>
+        <div v-if="settings?.shop_url"><span class="font-semibold">Shop URL:</span> <a :href="settings.shop_url" class="text-blue-600 hover:underline" target="_blank">{{ settings.shop_url }}</a></div>
         <div v-if="settings?.contact_email"><span class="font-semibold">Email:</span> <a :href="`mailto:${settings.contact_email}`" class="text-blue-600 hover:underline">{{ settings.contact_email }}</a></div>
         <div v-if="settings?.phone_number"><span class="font-semibold">Phone:</span> {{ settings.phone_number }}</div>
       </div>

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Brand extends Model
 {
@@ -11,9 +12,54 @@ class Brand extends Model
 
     protected $fillable = [
         'name',
+        'slug',
         'user_id',
-        'vendor_setting_id',
+        'is_active',
+        'rating_average',
+        'rating_count',
     ];
+
+    protected $casts = [
+        'rating_average' => 'decimal:2',
+        'rating_count' => 'integer',
+    ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($brand) {
+            if (empty($brand->slug)) {
+                $baseSlug = Str::slug($brand->name);
+                $slug = $baseSlug;
+                $counter = 1;
+                
+                // Ensure unique slug
+                while (static::where('slug', $slug)->exists()) {
+                    $slug = $baseSlug . '-' . $counter;
+                    $counter++;
+                }
+                
+                $brand->slug = $slug;
+            }
+        });
+
+        static::updating(function ($brand) {
+            if ($brand->isDirty('name') && empty($brand->slug)) {
+                $baseSlug = Str::slug($brand->name);
+                $slug = $baseSlug;
+                $counter = 1;
+                
+                // Ensure unique slug
+                while (static::where('slug', $slug)->where('id', '!=', $brand->id)->exists()) {
+                    $slug = $baseSlug . '-' . $counter;
+                    $counter++;
+                }
+                
+                $brand->slug = $slug;
+            }
+        });
+    }
 
     public function products()
     {
@@ -27,6 +73,16 @@ class Brand extends Model
 
     public function vendorSetting()
     {
-        return $this->belongsTo(VendorSetting::class);
+        return $this->hasOne(VendorSetting::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(VendorReview::class);
+    }
+
+    public function approvedReviews()
+    {
+        return $this->hasMany(VendorReview::class)->where('is_approved', true);
     }
 }

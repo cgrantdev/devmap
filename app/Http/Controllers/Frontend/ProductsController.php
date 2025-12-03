@@ -198,16 +198,8 @@ class ProductsController extends Controller
         // Get price range
         $priceRange = $baseQuery->selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
 
-        // Get brand details with vendor settings and aggregated data
-        $brand->load(['vendorSetting', 'user']);
-        
-        // Calculate average rating and total reviews
-        $ratingData = Product::where('brand_id', $brandId)
-            ->selectRaw('AVG(rating_average) as avg_rating, SUM(rating_count) as total_reviews')
-            ->first();
-        
-        $avgRating = $ratingData->avg_rating ?? 0;
-        $totalReviews = $ratingData->total_reviews ?? 0;
+        // Get brand details with vendor settings and reviews
+        $brand->load(['vendorSetting', 'approvedReviews.user']);
         
         // Get initials for logo
         $words = explode(' ', $brand->name);
@@ -220,14 +212,23 @@ class ProductsController extends Controller
                 'id' => $brand->id,
                 'name' => $brand->name,
                 'initials' => $initials,
-                'rating' => number_format($avgRating, 2, '.', ''),
-                'reviews' => (int) $totalReviews,
-                'description' => $brand->vendorSetting->company_detail ?? 'Premium quality peptides for research purposes.',
-                'url' => $brand->vendorSetting->url ?? null,
+                'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
+                'reviews' => (int) ($brand->rating_count ?? 0),
+                'description' => $brand->vendorSetting->description ?? 'Premium quality peptides for research purposes.',
+                'shop_url' => $brand->vendorSetting->shop_url ?? null,
                 'contact_email' => $brand->vendorSetting->contact_email ?? null,
                 'phone_number' => $brand->vendorSetting->phone_number ?? null,
                 'logo' => $brand->vendorSetting && $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
             ],
+            'reviews' => $brand->approvedReviews->map(function ($review) {
+                return [
+                    'id' => $review->id,
+                    'rating' => $review->rating,
+                    'review' => $review->review,
+                    'user_name' => $review->user ? $review->user->name : $review->user_name,
+                    'created_at' => $review->created_at->format('M d, Y'),
+                ];
+            }),
             'products' => $products,
             'filterOptions' => $filterOptions,
             'priceRange' => [

@@ -10,25 +10,19 @@ class VendorSetting extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'brand_id',
         'banner',
         'logo',
-        'company_name',
-        'company_detail',
-        'url',
+        'description',
         'contact_email',
         'phone_number',
         'status',
-        'api_route'
+        'api_route',
+        'shop_url'
     ];
 
-    public function user()
+    public function brand()
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function brands()
-    {
-        return $this->hasMany(Brand::class);
+        return $this->belongsTo(Brand::class);
     }
 }
