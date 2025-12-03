@@ -23,8 +23,9 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
-        // $this->call([
-        //     BlogSeeder::class,
-        // ]);
+        $this->call([
+            BlogSeeder::class,
+            EducationPostSeeder::class,
+        ]);
     }
 }
