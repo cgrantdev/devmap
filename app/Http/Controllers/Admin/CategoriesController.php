@@ -137,6 +137,31 @@ class CategoriesController extends Controller
             ->with('success', 'Category updated successfully.');
     }
 
+    public function destroy($id)
+    {
+        $category = ProductCategory::withCount('products')->findOrFail($id);
+        $categoryName = $category->name;
+        $productsCount = $category->products_count;
+        
+        DB::beginTransaction();
+        try {
+            // Delete all products associated with this category
+            Product::where('product_category_id', $category->id)->delete();
+            
+            // Delete the category
+            $category->delete();
+            
+            DB::commit();
+            
+            $message = "Category '{$categoryName}' and {$productsCount} associated product(s) deleted successfully.";
+            return redirect()->route('admin.categories.index')
+                ->with('success', $message);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error deleting category: ' . $e->getMessage());
+        }
+    }
+
     public function search(Request $request, $id)
     {
         $currentCategory = ProductCategory::findOrFail($id);

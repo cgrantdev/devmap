@@ -47,6 +47,7 @@
           :server-options="serverOptions"
           @update:server-options="handleServerOptionsChange"
           @update:search-value="handleSearchChange"
+          :loading="loading"
           server
           table-class-name="customize-table"
           header-text-direction="left"
@@ -74,8 +75,15 @@
           <template #item-products_count="{ products_count }">
             <div class="text-sm text-slate-800">{{ products_count || 0 }}</div>
           </template>
-          <template #item-actions="{ id }">
+          <template #item-actions="{ id, name }">
             <Link :href="`/admin/categories/${id}/edit`" class="text-blue-500 hover:text-blue-600 mr-4 transition-colors duration-150">Edit</Link>
+            <button
+              @click="deleteCategory(id, name)"
+              :disabled="deleteForm.processing"
+              class="text-red-500 hover:text-red-600 transition-colors duration-150 disabled:opacity-50"
+            >
+              Delete
+            </button>
           </template>
         </EasyDataTable>
       </div>
@@ -97,6 +105,7 @@ const props = defineProps({
 const searchValue = ref('')
 const searchField = ['name', 'slug']
 const loading = ref(false)
+const isUserAction = ref(false) // Flag to prevent watch from interfering with user actions
 
 const serverOptions = ref({
   page: props.categories?.current_page || 1,
@@ -118,15 +127,19 @@ const headers = [
 
 const selectedCategories = ref([])
 
-// Sync serverOptions with props when they change
-watch(() => props.categories, (categories) => {
-  if (categories) {
-    serverOptions.value.page = categories.current_page || 1
-    serverOptions.value.rowsPerPage = categories.per_page || 20
-    // Clear selections when data changes (pagination, search, etc.)
-    selectedCategories.value = []
+// Sync serverOptions with props when they change (only on initial load or external updates)
+watch(() => [props.categories?.current_page, props.categories?.per_page], ([currentPage, perPage]) => {
+  if (currentPage && perPage && !isUserAction.value) {
+    // Only update if values actually changed to prevent loops
+    if (serverOptions.value.page !== currentPage || serverOptions.value.rowsPerPage !== perPage) {
+      serverOptions.value.page = currentPage
+      serverOptions.value.rowsPerPage = perPage
+      // Clear selections when data changes (pagination, search, etc.)
+      selectedCategories.value = []
+    }
   }
-}, { immediate: true, deep: true })
+  isUserAction.value = false // Reset flag after sync
+}, { immediate: true })
 
 let searchTimeout = null
 
@@ -141,6 +154,7 @@ function handleSearchInput() {
 
 function fetchData() {
   loading.value = true
+  isUserAction.value = true // Mark as user action to prevent watch interference
   router.get('/admin/categories', {
     page: serverOptions.value.page,
     per_page: serverOptions.value.rowsPerPage,
@@ -152,25 +166,61 @@ function fetchData() {
     preserveScroll: true,
     onFinish: () => {
       loading.value = false
+      // Sync after data is loaded
+      if (props.categories) {
+        serverOptions.value.page = props.categories.current_page || 1
+        serverOptions.value.rowsPerPage = props.categories.per_page || 20
+      }
     }
   })
 }
 
 function handleServerOptionsChange(options) {
-  serverOptions.value = options
+  isUserAction.value = true // Mark as user action
+  serverOptions.value = { ...options } // Create new object to trigger reactivity
   fetchData()
 }
 
 function handleSearchChange(value) {
-  searchValue.value = value
-  serverOptions.value.page = 1
-  fetchData()
+  // This is called by EasyDataTable's built-in search
+  // We're using our own search input, so we can ignore this or sync it
+  if (searchValue.value !== value) {
+    searchValue.value = value
+    serverOptions.value.page = 1
+    isUserAction.value = true
+    fetchData()
+  }
 }
 
 const bulkMergeForm = useForm({
   category_ids: [],
   _token: usePage().props.csrf_token
 })
+
+const deleteForm = useForm({
+  _token: usePage().props.csrf_token
+})
+
+function deleteCategory(id, name) {
+  if (confirm(`Are you sure you want to delete category "${name}"? This will also delete all products in this category. This action cannot be undone.`)) {
+    deleteForm.delete(`/admin/categories/${id}`, {
+      preserveScroll: true,
+      onSuccess: () => {
+        // Remove from selected categories if it was selected
+        const index = selectedCategories.value.indexOf(id)
+        if (index > -1) {
+          selectedCategories.value.splice(index, 1)
+        }
+        // Refresh data
+        fetchData()
+      },
+      onError: (errors) => {
+        console.error('Delete error:', errors)
+        alert('Failed to delete category. Please try again.')
+      }
+    })
+  }
+}
 
 function bulkMerge() {
   if (selectedCategories.value.length < 2) {
