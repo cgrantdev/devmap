@@ -781,6 +781,14 @@ class VendorsController extends Controller
         $name = preg_replace('/\s+Water\s*/i', ' ', $name);
         $name = preg_replace('/\s+Water\s*$/i', '', $name);
         
+        // Remove "Blend" word (case insensitive) - e.g., "sermorelin ghrp-6 blend" -> "sermorelin ghrp-6"
+        // Note: We already removed "Blend:" prefix, but need to remove standalone "blend" anywhere
+        $name = preg_replace('/\s+Blend\s*/i', ' ', $name);
+        $name = preg_replace('/\s+Blend\s*$/i', '', $name);
+
+        $name = preg_replace('/\s+Tablets\s*/i', ' ', $name);
+        $name = preg_replace('/\s+Tablets\s*$/i', '', $name);
+
         // Replace "+" with space (e.g., "BAM-15 + SLU-PP-332" -> "BAM-15 SLU-PP-332")
         $name = preg_replace('/\s*\+\s*/', ' ', $name);
         
