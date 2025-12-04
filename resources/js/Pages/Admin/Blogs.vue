@@ -20,7 +20,17 @@
       {{ $page.props.flash.error }}
     </div>
     
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-6">
+        <h2 class="text-xl font-semibold">All Blogs</h2>
+      </div>
+
+      <div class="flex items-center gap-4 mb-4 px-6">
+        <span>search value: </span>
+        <input type="text" v-model="searchValue" @input="handleSearchInput" class="border rounded px-3 py-2">
+      </div>
+
+      <div class="overflow-x-auto px-6 pb-6">
       <EasyDataTable
         :headers="headers"
         :items="blogs.data || []"
@@ -28,13 +38,13 @@
         :search-value="searchValue"
         :server-items-length="blogs.total || 0"
         :server-options="serverOptions"
-        @update:server-options="handleServerOptionsChange"
-        @update:search-value="handleSearchChange"
-        server
-        table-class-name="customize-table"
-        header-text-direction="left"
-        body-text-direction="left"
-      >
+          @update:server-options="handleServerOptionsChange"
+          @update:search-value="handleSearchChange"
+          server
+          table-class-name="customize-table"
+          header-text-direction="left"
+          body-text-direction="left"
+        >
         <template #item-image="{ image }">
           <div v-if="image" class="w-16 h-16 rounded-xl overflow-hidden border border-slate-100 shadow-sm">
             <img :src="image" alt="Blog" class="w-full h-full object-cover" />
@@ -84,6 +94,7 @@
           </button>
         </template>
       </EasyDataTable>
+      </div>
       
       <!-- Quick Edit Modal -->
       <div v-if="selectedBlogId && expandedRows.includes(selectedBlogId)" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/75" @click.self="toggleQuickEdit(selectedBlogId)">
@@ -196,6 +207,17 @@ function fetchData() {
 function handleServerOptionsChange(options) {
   serverOptions.value = options
   fetchData()
+}
+
+let searchTimeout = null
+
+function handleSearchInput() {
+  // Debounce search to avoid too many requests
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    serverOptions.value.page = 1 // Reset to first page on search
+    fetchData()
+  }, 500) // Wait 500ms after user stops typing
 }
 
 function handleSearchChange(value) {

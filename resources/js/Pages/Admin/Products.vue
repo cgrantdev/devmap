@@ -5,32 +5,17 @@
         <h1 class="text-2xl font-bold">All Products</h1>
       </div>
       
-      <!-- Search Bar -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-6">
-        <div class="flex items-center gap-4">
-          <div class="flex-1 relative">
-            <input
-              v-model="searchValue"
-              @input="handleSearchInput"
-              type="text"
-              placeholder="Search products by name or vendor..."
-              class="w-full border border-slate-100 rounded-xl px-4 py-2.5 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base"
-            />
-            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <button
-            v-if="searchValue"
-            @click="clearSearch"
-            class="px-4 py-2.5 text-sm rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all duration-200 font-medium"
-          >
-            Clear
-          </button>
+      <div class="bg-white rounded-lg shadow">
+        <div class="p-6">
+          <h2 class="text-xl font-semibold">All Products</h2>
         </div>
-      </div>
-      
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+
+        <div class="flex items-center gap-4 mb-4 px-6">
+          <span>search value: </span>
+          <input type="text" v-model="searchValue" @input="handleSearchInput" class="border rounded px-3 py-2">
+        </div>
+
+        <div class="overflow-x-auto px-6 pb-6">
         <EasyDataTable
           :headers="headers"
           :items="tableItems"
@@ -45,7 +30,6 @@
           table-class-name="customize-table"
           header-text-direction="left"
           body-text-direction="left"
-          :hide-search="true"
         >
           <template #item-image_url="{ image_url }">
             <img v-if="image_url" :src="image_url" alt="Product" class="h-12 w-12 object-cover rounded" loading="lazy" />
@@ -58,6 +42,7 @@
             <a :href="`/product/${id}/${slug}`" target="_blank" class="text-blue-600 hover:underline">View</a>
           </template>
         </EasyDataTable>
+        </div>
       </div>
     </div>
   </AdminLayout>
@@ -141,12 +126,6 @@ function handleSearchInput() {
 function handleSearchChange(value) {
   searchValue.value = value
   serverOptions.value.page = 1 // Reset to first page on search
-  fetchData()
-}
-
-function clearSearch() {
-  searchValue.value = ''
-  serverOptions.value.page = 1
   fetchData()
 }
 </script> 

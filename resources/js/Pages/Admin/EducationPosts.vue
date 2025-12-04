@@ -20,7 +20,17 @@
       {{ $page.props.flash.error }}
     </div>
     
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-6">
+        <h2 class="text-xl font-semibold">All Education Posts</h2>
+      </div>
+
+      <div class="flex items-center gap-4 mb-4 px-6">
+        <span>search value: </span>
+        <input type="text" v-model="searchValue" @input="handleSearchInput" class="border rounded px-3 py-2">
+      </div>
+
+      <div class="overflow-x-auto px-6 pb-6">
       <EasyDataTable
         :headers="headers"
         :items="posts.data || []"
@@ -28,13 +38,13 @@
         :search-value="searchValue"
         :server-items-length="posts.total || 0"
         :server-options="serverOptions"
-        @update:server-options="handleServerOptionsChange"
-        @update:search-value="handleSearchChange"
-        server
-        table-class-name="customize-table"
-        header-text-direction="left"
-        body-text-direction="left"
-      >
+          @update:server-options="handleServerOptionsChange"
+          @update:search-value="handleSearchChange"
+          server
+          table-class-name="customize-table"
+          header-text-direction="left"
+          body-text-direction="left"
+        >
         <template #item-title="{ title, slug }">
           <div class="text-sm font-medium text-slate-800">{{ title }}</div>
           <div class="text-sm text-slate-500">{{ slug }}</div>
@@ -125,6 +135,17 @@ function fetchData() {
 function handleServerOptionsChange(options) {
   serverOptions.value = options
   fetchData()
+}
+
+let searchTimeout = null
+
+function handleSearchInput() {
+  // Debounce search to avoid too many requests
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    serverOptions.value.page = 1 // Reset to first page on search
+    fetchData()
+  }, 500) // Wait 500ms after user stops typing
 }
 
 function handleSearchChange(value) {
