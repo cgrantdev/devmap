@@ -344,7 +344,7 @@ class VendorsController extends Controller
 
     public function adminProducts(Request $request)
     {
-        $products = \App\Models\Product::with('user')
+        $products = \App\Models\Product::with('brand')
             ->latest()
             ->paginate(20)
             ->through(function ($product) {
@@ -354,7 +354,7 @@ class VendorsController extends Controller
                     'slug' => \Str::slug($product->name),
                     'price' => $product->price,
                     'image_url' => $product->image_url,
-                    'vendor_name' => $product->user ? $product->user->name : '-',
+                    'vendor_name' => $product->brand ? $product->brand->name : '-',
                 ];
             });
         return \Inertia\Inertia::render('Admin/Products', [
@@ -512,6 +512,25 @@ class VendorsController extends Controller
             }
             
             foreach ($data as $item) {
+                // Check categories - if not empty, only include if category contains "peptide" or "peptides"
+                $categories = $item['categories'] ?? [];
+                if (!empty($categories) && is_array($categories)) {
+                    $hasPeptideCategory = false;
+                    foreach ($categories as $cat) {
+                        $catName = strtolower($cat['name'] ?? '');
+                        $catSlug = strtolower($cat['slug'] ?? '');
+                        // Check if category name or slug contains "peptide" or "peptides"
+                        if (strpos($catName, 'peptide') !== false || strpos($catSlug, 'peptide') !== false) {
+                            $hasPeptideCategory = true;
+                            break;
+                        }
+                    }
+                    // Skip this product if it doesn't have a peptide category
+                    if (!$hasPeptideCategory) {
+                        continue;
+                    }
+                }
+                
                 // Extract category name from product name
                 // Example: "P21 Peptide 10MG (P021)" -> "P21 Peptide"
                 $categoryName = $this->extractCategoryFromProductName($item['name'] ?? '');

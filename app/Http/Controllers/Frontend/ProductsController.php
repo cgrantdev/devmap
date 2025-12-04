@@ -92,8 +92,8 @@ class ProductsController extends Controller
             $query->where('price', '<=', $request->cost_max);
         }
 
-        // Apply sorting
-        $sortBy = $request->get('sort', 'name');
+        // Apply sorting - default to price ascending
+        $sortBy = $request->get('sort', 'price');
         $sortDir = $request->get('sort_dir', 'asc');
         $query->orderBy($sortBy, $sortDir);
 
@@ -149,8 +149,9 @@ class ProductsController extends Controller
         $brandId = $brand->id;
 
         // Build query for all products of this brand
-        $query = Product::with(['user', 'brand', 'location', 'types', 'puses'])
-            ->where('brand_id', $brandId);
+        $query = Product::with(['brand', 'location', 'types', 'puses', 'category'])
+            ->where('brand_id', $brandId)
+            ->where('status', 'active');
 
         // Apply filters
         if ($request->has('use') && $request->use) {
@@ -181,8 +182,8 @@ class ProductsController extends Controller
             $query->where('price', '<=', $request->cost_max);
         }
 
-        // Apply sorting
-        $sortBy = $request->get('sort', 'name');
+        // Apply sorting - default to price ascending
+        $sortBy = $request->get('sort', 'price');
         $sortDir = $request->get('sort_dir', 'asc');
         $query->orderBy($sortBy, $sortDir);
 
