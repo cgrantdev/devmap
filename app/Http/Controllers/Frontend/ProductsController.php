@@ -59,6 +59,15 @@ class ProductsController extends Controller
             ->where('product_category_id', $category->id)
             ->where('status', 'active');
 
+        // Apply search
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+                //   ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         // Apply filters
         if ($request->has('use') && $request->use) {
             $query->whereHas('puses', function ($q) use ($request) {
@@ -148,6 +157,7 @@ class ProductsController extends Controller
             'filters' => $request->only(['use', 'type', 'location', 'verification', 'brand', 'cost_min', 'cost_max']),
             'sort' => $sortBy,
             'sortDir' => $sortDir,
+            'search' => $request->get('search', ''),
         ]);
     }
 
@@ -160,6 +170,15 @@ class ProductsController extends Controller
         $query = Product::with(['brand', 'location', 'types', 'puses', 'category'])
             ->where('brand_id', $brandId)
             ->where('status', 'active');
+
+        // Apply search
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+                //   ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
 
         // Apply filters
         if ($request->has('use') && $request->use) {
@@ -268,6 +287,7 @@ class ProductsController extends Controller
             'filters' => $request->only(['use', 'type', 'location', 'verification', 'cost_min', 'cost_max']),
             'sort' => $sortBy,
             'sortDir' => $sortDir,
+            'search' => $request->get('search', ''),
         ]);
     }
 }

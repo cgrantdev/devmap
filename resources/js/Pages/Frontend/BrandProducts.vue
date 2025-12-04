@@ -185,7 +185,7 @@
               <div class="relative flex-1 min-w-[200px] max-w-md">
                 <input
                   v-model="searchQuery"
-                  @keyup.enter="applySearch"
+                  @input="handleSearchInput"
                   type="text"
                   placeholder="Search Peptide..."
                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
@@ -602,6 +602,7 @@ const props = defineProps({
   filters: Object,
   sort: String,
   sortDir: String,
+  search: String,
 })
 
 // Hero background lazy loading
@@ -612,7 +613,8 @@ const heroBgLoaded = ref(false)
 const showSortDropdown = ref(false)
 // Filter sidebar
 const showSidebar = ref(false)
-const searchQuery = ref('')
+// Initialize searchQuery from URL parameters or props
+const searchQuery = ref(props.search || '')
 const perPage = ref(props.products.per_page || 20)
 
 // Expanded filters
@@ -673,6 +675,11 @@ const toggleQuickFilter = (key) => {
 const applyFilters = () => {
   const params = new URLSearchParams()
   
+  // Preserve search query
+  if (searchQuery.value) {
+    params.set('search', searchQuery.value)
+  }
+  
   if (selectedFilters.value.use !== null) {
     params.set('use', selectedFilters.value.use)
   }
@@ -722,6 +729,12 @@ const clearFilters = () => {
 const applySort = (sort, dir) => {
   showSortDropdown.value = false
   const params = new URLSearchParams(window.location.search)
+  
+  // Preserve search query
+  if (searchQuery.value) {
+    params.set('search', searchQuery.value)
+  }
+  
   params.set('sort', sort)
   params.set('sort_dir', dir)
   router.visit(`/brand/${props.brand.slug}/products?${params.toString()}`, {
@@ -730,8 +743,62 @@ const applySort = (sort, dir) => {
   })
 }
 
+let searchTimeout = null
+
+const handleSearchInput = () => {
+  // Debounce search to avoid too many requests
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    applySearch()
+  }, 500) // Wait 500ms after user stops typing
+}
+
 const applySearch = () => {
-  // Search functionality can be implemented here
+  const params = new URLSearchParams(window.location.search)
+  
+  // Update search parameter
+  if (searchQuery.value) {
+    params.set('search', searchQuery.value)
+  } else {
+    params.delete('search')
+  }
+  
+  // Reset to first page when searching
+  params.set('page', '1')
+  
+  // Preserve other filters
+  if (selectedFilters.value.use !== null) {
+    params.set('use', selectedFilters.value.use)
+  }
+  if (selectedFilters.value.type !== null) {
+    params.set('type', selectedFilters.value.type)
+  }
+  if (selectedFilters.value.location !== null) {
+    params.set('location', selectedFilters.value.location)
+  }
+  if (selectedFilters.value.verification) {
+    params.set('verification', selectedFilters.value.verification)
+  }
+  if (selectedFilters.value.cost_min) {
+    params.set('cost_min', selectedFilters.value.cost_min)
+  }
+  if (selectedFilters.value.cost_max) {
+    params.set('cost_max', selectedFilters.value.cost_max)
+  }
+  if (props.sort) {
+    params.set('sort', props.sort)
+  }
+  if (props.sortDir) {
+    params.set('sort_dir', props.sortDir)
+  }
+  if (perPage.value) {
+    params.set('per_page', perPage.value)
+  }
+  
+  router.visit(`/brand/${props.brand.slug}/products?${params.toString()}`, {
+    preserveState: true,
+    preserveScroll: true,
+  })
 }
 
 const getPageUrl = (page) => {
