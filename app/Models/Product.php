@@ -10,7 +10,6 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
         'name',
         'description',
         'price',
@@ -18,17 +17,16 @@ class Product extends Model
         'second_price',
         'brand_id',
         'location_id',
+        'product_category_id',
+        'size_mg',
+        'availability',
+        'status',
         'verified',
         'rating_average',
         'rating_count',
         'image_url',
         'product_url',
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
     public function brand()
     {
@@ -48,5 +46,10 @@ class Product extends Model
     public function puses()
     {
         return $this->belongsToMany(Puse::class, 'product_uses');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
 }

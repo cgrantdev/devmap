@@ -36,16 +36,8 @@ class BrandsController extends Controller
                         ->value('location_id');
                 }
                 
-                // If still no location, try to get from brand's user's products
-                if (!$locationId && $brand->user_id) {
-                    $locationId = Product::where('user_id', $brand->user_id)
-                        ->whereNotNull('location_id')
-                        ->selectRaw('location_id, COUNT(*) as count')
-                        ->groupBy('location_id')
-                        ->orderByDesc('count')
-                        ->first()
-                        ?->location_id;
-                }
+                // Location should be found from brand's products above
+                // If not found, locationId will remain null
                 
                 $location = $locationId ? Location::find($locationId) : null;
                 

@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
+class ProductCategory extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'image_url',
+        'meta_title',
+        'meta_description',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($category) {
+            if (empty($category->slug)) {
+                $baseSlug = Str::slug($category->name);
+                $slug = $baseSlug;
+                $counter = 1;
+                
+                // Ensure unique slug
+                while (static::where('slug', $slug)->exists()) {
+                    $slug = $baseSlug . '-' . $counter;
+                    $counter++;
+                }
+                
+                $category->slug = $slug;
+            }
+        });
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+}
+

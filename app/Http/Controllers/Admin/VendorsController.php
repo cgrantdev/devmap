@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Brand;
 use App\Models\VendorSetting;
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use GuzzleHttp\Client;
 use Symfony\Component\DomCrawler\Crawler;
 use App\Helpers\ImageHelper;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class VendorsController extends Controller
 {
@@ -371,7 +374,7 @@ class VendorsController extends Controller
         if (!$shopUrl) {
             return redirect()->back()->with('error', 'Shop URL is not set for this vendor.');
         }
-        // try {
+        try {
             if (strpos($shopUrl, 'trueaminos.com/category/peptides') !== false) {
                 $products = $this->runPythonScraper($shopUrl, 'script2.py');
                 $api_route = 'python';
@@ -384,30 +387,60 @@ class VendorsController extends Controller
             $importedCount = 0;
             $skippedCount = 0;
             $updatedCount = 0;
-            foreach ($products as $product) {
-                $existing = $brand->products()->where('product_url', $product['product_url'])->first();
-                if ($existing) {                   
-                    // Update price, discount_price, image_url, and name
-                    $existing->update([
-                        'price' => $product['price'],
-                        'discount_price' => $product['discount_price'],
-                        'second_price' => $product['second_price'],
-                        'name' => $product['name'],
-                        'image_url' => $product['image_url'],
-                    ]);
-                    $updatedCount++;
-                    continue;
+
+            DB::beginTransaction();
+            foreach ($products as $productData) {
+                $existing = $brand->products()->where('product_url', $productData['product_url'])->first();
+                
+                // Find or create category
+                $category = null;
+                if (!empty($productData['category_name'])) {
+                    $category = ProductCategory::firstOrCreate(
+                        ['slug' => Str::slug($productData['category_name'])],
+                        [
+                            'name' => $productData['category_name'],
+                            'is_active' => true,
+                        ]
+                    );
                 }
-                $brand->products()->create([
-                    'name' => $product['name'],
-                    'price' => $product['price'],
-                    'discount_price' => $product['discount_price'],
-                    'second_price' => $product['second_price'],
-                    'image_url' => $product['image_url'],
-                    'product_url' => $product['product_url'],
+                
+                // Map stock availability
+                $availability = 'in_stock';
+                if (isset($productData['is_in_stock']) && !$productData['is_in_stock']) {
+                    $availability = 'out_of_stock';
+                } elseif (isset($productData['is_on_backorder']) && $productData['is_on_backorder']) {
+                    $availability = 'pre_order';
+                }
+                
+                $productFields = [
+                    'name' => $productData['name'],
+                    'description' => $productData['description'] ?? null,
+                    'price' => $productData['price'],
+                    'discount_price' => $productData['discount_price'],
+                    'second_price' => $productData['second_price'],
+                    'size_mg' => $productData['size_mg'] ?? null,
+                    'availability' => $availability,
+                    'status' => 'active',
+                    'product_url' => $productData['product_url'],
                     'brand_id' => $brand->id,
-                ]);
-                $importedCount++;
+                ];
+                
+                if ($category) {
+                    $productFields['product_category_id'] = $category->id;
+                }
+                
+                // Use original image URL
+                if (!empty($productData['image_url'])) {
+                    $productFields['image_url'] = $productData['image_url'];
+                }
+                
+                if ($existing) {
+                    $existing->update($productFields);
+                    $updatedCount++;
+                } else {
+                    $brand->products()->create($productFields);
+                    $importedCount++;
+                }
             }
             $message = "Imported {$importedCount} new products from shop URL.";
             if ($updatedCount > 0) {
@@ -417,10 +450,14 @@ class VendorsController extends Controller
                 $message .= " Skipped {$skippedCount} unchanged products.";
             }
             VendorSetting::where('id', $settings_id)->update(['api_route' => $api_route]);
+            DB::commit();
             return redirect()->back()->with('success', $message);
-        // } catch (\Exception $e) {
-        //     return redirect()->back()->with('error', 'Error scraping shop URL: ' . $e->getMessage());
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Product import error: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->back()->with('error', 'Error importing products: ' . $e->getMessage());
+        }
     }
 
     private function fetchProducts($shopUrl)
@@ -475,39 +512,41 @@ class VendorsController extends Controller
             }
             
             foreach ($data as $item) {
-                // Filter: only include products with a category slug 'peptides'
-                // $hasPeptidesCategory = false;
-                // if (empty($item['categories'])) {
-                //     $hasPeptidesCategory = true;
-                // }
-                // if (isset($item['categories']) && is_array($item['categories'])) {
-                //     foreach ($item['categories'] as $cat) {
-                //         if (isset($cat['slug']) && strpos($cat['slug'], 'peptide') !== false) {
-                //             $hasPeptidesCategory = true;
-                //             break;
-                //         }
-                //     }
-                // }
-                // if (!$hasPeptidesCategory) {
-                //     continue;
-                // }
+                // Extract category name from product name
+                // Example: "P21 Peptide 10MG (P021)" -> "P21 Peptide"
+                $categoryName = $this->extractCategoryFromProductName($item['name'] ?? '');
+                
+                // Extract size from name or attributes
+                $sizeMg = $this->extractSizeFromProduct($item);
+                
+                // Price conversion (cents to dollars)
                 $price = isset($item['prices']['regular_price']) ? ((float)$item['prices']['regular_price'] / 100) : null;
                 $discount_price = (isset($item['on_sale']) && $item['on_sale'] && isset($item['prices']['sale_price']))
                     ? ((float)$item['prices']['sale_price'] / 100)
                     : null;
-                $image_urls = [];
-                if (!empty($item['images'])) {
-                    foreach ($item['images'] as $image) {
-                        $image_urls[] = $image['src'];
-                    }
+                
+                // Get first image URL
+                $imageUrl = null;
+                if (!empty($item['images']) && is_array($item['images'])) {
+                    $imageUrl = $item['images'][0]['src'] ?? null;
                 }
+                
+                // Get description (prefer short_description, fallback to description)
+                $description = !empty($item['short_description']) ? $item['short_description'] : ($item['description'] ?? null);
+                
                 $products[] = [
                     'name' => $item['name'] ?? null,
+                    'category_name' => $categoryName,
+                    'description' => $description,
                     'price' => $price,
                     'discount_price' => $discount_price,
                     'second_price' => null,
-                    'image_url' => isset($image_urls[0])?$image_urls[0]:null,
+                    'size_mg' => $sizeMg,
+                    'image_url' => $imageUrl,
                     'product_url' => $item['permalink'] ?? null,
+                    'is_in_stock' => $item['is_in_stock'] ?? false,
+                    'is_on_backorder' => $item['is_on_backorder'] ?? false,
+                    'stock_availability' => $item['stock_availability'] ?? null,
                 ];
             }
             $page++;
@@ -541,5 +580,118 @@ class VendorsController extends Controller
             return [];
         }
         return $data['products'];
-    } 
+    }
+
+    /**
+     * Extract category name from product name
+     * Examples:
+     * "Blend: BPC-157 TB-500 Peptide (20MG)" -> "bpc-157 tb-500"
+     * "Blend KPV GHK-Cu BPC-157 TB-500" -> "kpv ghk-cu bpc-157 tb-500"
+     * "P21 Peptide 10MG (P021)" -> "p21"
+     * "BPC-157 Peptide (10MG) (Copy)" -> "bpc-157"
+     * "Pack: Epitalon + Thymalin" -> "epitalon + thymalin"
+     * "FOXO4-DRI Peptide (10MG)" -> "foxo4-dri"
+     * "FOXO4-DRI Peptide 10MG" -> "foxo4-dri"
+     * 
+     * @param string $productName
+     * @return string
+     */
+    private function extractCategoryFromProductName($productName)
+    {
+        if (empty($productName)) {
+            return 'uncategorized';
+        }
+        
+        $name = $productName;
+        
+        // Remove prefixes like "Blend:", "Blend ", "Pack:", "Pack ", "Powder:", "Powder " (with or without colon)
+        $name = preg_replace('/^(Blend|Pack|Powder)[:\s]+/i', '', $name);
+        
+        // Remove size patterns (e.g., "10MG", "20MG", "30MG", "400MG/ML") - can be in parentheses or standalone
+        $name = preg_replace('/\s*\(?\s*\d+(?:\.\d+)?\s*MG(?:\/ML)?\s*\)?\s*/i', ' ', $name);
+        
+        // Handle parenthetical content
+        // Remove codes like "(P021)" and indicators like "(Copy)"
+        $name = preg_replace('/\s*\(P\d+\)\s*/i', ' ', $name); // Remove codes like (P021)
+        $name = preg_replace('/\s*\(Copy\)\s*/i', ' ', $name); // Remove (Copy)
+        $name = preg_replace('/\s*\(\d+MG\)\s*/i', ' ', $name); // Remove size in parentheses like (10MG)
+        
+        // Extract descriptive content from parentheses (e.g., "(No DAC)" -> "No DAC")
+        $name = preg_replace_callback('/\s*\(([^)]+)\)\s*/', function($matches) {
+            $content = trim($matches[1]);
+            // Only keep if it looks like descriptive text (not just numbers or codes)
+            if (preg_match('/[a-zA-Z]/', $content) && !preg_match('/^\d+MG$/i', $content)) {
+                return ' ' . $content . ' ';
+            }
+            return ' ';
+        }, $name);
+        
+        // Remove "Peptide" word (case insensitive)
+        $name = preg_replace('/\s+Peptide\s*/i', ' ', $name);
+        $name = preg_replace('/\s+Peptide\s*$/i', '', $name);
+        
+        // Replace "+" with space (e.g., "BAM-15 + SLU-PP-332" -> "BAM-15 SLU-PP-332")
+        $name = preg_replace('/\s*\+\s*/', ' ', $name);
+        
+        // Clean up whitespace
+        $name = trim($name);
+        
+        // If empty after cleaning, return uncategorized
+        if (empty($name)) {
+            return 'uncategorized';
+        }
+        
+        // Convert to lowercase as requested
+        $name = strtolower($name);
+        
+        return $name;
+    }
+
+    /**
+     * Extract size in MG from product data
+     * 
+     * @param array $item Product data from API
+     * @return float|null
+     */
+    private function extractSizeFromProduct($item)
+    {
+        // First, try to get from attributes (Weight attribute)
+        if (isset($item['attributes']) && is_array($item['attributes'])) {
+            foreach ($item['attributes'] as $attribute) {
+                if (isset($attribute['name']) && 
+                    (stripos($attribute['name'], 'weight') !== false || 
+                     stripos($attribute['name'], 'size') !== false)) {
+                    if (isset($attribute['terms']) && is_array($attribute['terms']) && !empty($attribute['terms'])) {
+                        $term = $attribute['terms'][0]['name'] ?? null;
+                        if ($term) {
+                            // Extract number from "20MG" or "20 MG"
+                            if (preg_match('/(\d+(?:\.\d+)?)\s*MG/i', $term, $matches)) {
+                                return (float) $matches[1];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Second, try to extract from product name
+        // Example: "P21 Peptide 10MG (P021)" -> 10
+        if (isset($item['name'])) {
+            if (preg_match('/(\d+(?:\.\d+)?)\s*MG/i', $item['name'], $matches)) {
+                return (float) $matches[1];
+            }
+        }
+        
+        // Third, check short_description for weight info
+        if (isset($item['short_description'])) {
+            if (preg_match('/WEIGHT[^>]*>([^<]+)/i', $item['short_description'], $matches)) {
+                $weightText = trim(strip_tags($matches[1]));
+                if (preg_match('/(\d+(?:\.\d+)?)\s*MG/i', $weightText, $sizeMatches)) {
+                    return (float) $sizeMatches[1];
+                }
+            }
+        }
+        
+        return null;
+    }
 } 

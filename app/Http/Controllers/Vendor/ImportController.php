@@ -139,8 +139,10 @@ class ImportController extends Controller
     {
         $user = Auth::user();
         
-        // Check if the product belongs to the user
-        if ($product->user_id !== $user->id) {
+        // Check if the product belongs to the user's brand
+        // Get user's brand (vendors are associated with brands)
+        $brand = $user->brands()->first();
+        if (!$brand || $product->brand_id !== $brand->id) {
             return redirect()->back()->with('error', 'Product not found.');
         }
         
