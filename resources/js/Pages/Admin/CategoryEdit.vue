@@ -79,7 +79,43 @@
             <h2 class="text-xl font-semibold text-slate-800 mb-4">Merge Category</h2>
             <p class="text-sm text-slate-600 mb-4">This category has <strong>{{ category.products_count }}</strong> products.</p>
             
-            <div v-if="similarCategories.length > 0" class="mb-4">
+            <!-- Search Box -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-slate-700 mb-2">Search Category to Merge:</label>
+              <div class="relative">
+                <input
+                  v-model="mergeSearchQuery"
+                  @input="searchCategories"
+                  type="text"
+                  placeholder="Type to search categories..."
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base"
+                />
+                <svg v-if="searching" class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+            </div>
+            
+            <!-- Search Results -->
+            <div v-if="mergeSearchResults.length > 0" class="mb-4">
+              <p class="text-sm font-medium text-slate-700 mb-2">Search Results:</p>
+              <div class="space-y-2 max-h-64 overflow-y-auto">
+                <div v-for="result in mergeSearchResults" :key="result.id" class="p-3 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div class="font-medium text-slate-800">{{ result.name }}</div>
+                  <div class="text-sm text-slate-500">ID: {{ result.id }} | {{ result.products_count }} products</div>
+                  <button
+                    @click="mergeCategory(result.id)"
+                    :disabled="mergeForm.processing"
+                    class="mt-2 w-full px-4 py-2 rounded-xl bg-orange-600 text-white hover:bg-orange-700 font-medium transition-colors disabled:opacity-50 text-sm"
+                  >
+                    {{ mergeForm.processing ? 'Merging...' : 'Merge' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Similar Categories (fallback) -->
+            <div v-else-if="similarCategories.length > 0 && !mergeSearchQuery" class="mb-4">
               <p class="text-sm font-medium text-slate-700 mb-2">Similar Categories:</p>
               <div class="space-y-2">
                 <div v-for="similar in similarCategories" :key="similar.id" class="p-3 border border-slate-100 rounded-xl">
@@ -90,15 +126,50 @@
                     :disabled="mergeForm.processing"
                     class="mt-2 w-full px-4 py-2 rounded-xl bg-orange-600 text-white hover:bg-orange-700 font-medium transition-colors disabled:opacity-50 text-sm"
                   >
-                    {{ mergeForm.processing ? 'Merging...' : 'Merge into this' }}
+                    {{ mergeForm.processing ? 'Merging...' : 'Merge' }}
                   </button>
                 </div>
               </div>
             </div>
-            <div v-else class="text-sm text-slate-500">
-              No similar categories found.
+            <div v-else-if="!mergeSearchQuery" class="text-sm text-slate-500">
+              No similar categories found. Use search to find categories to merge.
+            </div>
+            <div v-else-if="mergeSearchQuery && !searching && mergeSearchResults.length === 0" class="text-sm text-slate-500">
+              No categories found matching "{{ mergeSearchQuery }}".
             </div>
           </div>
+        </div>
+      </div>
+      
+      <!-- Products Section -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mt-6">
+        <h2 class="text-xl font-semibold text-slate-800 mb-4">Products in this Category ({{ products.length }})</h2>
+        <div class="overflow-x-auto">
+          <EasyDataTable
+            :headers="productHeaders"
+            :items="products"
+            table-class-name="customize-table"
+            header-text-direction="left"
+            body-text-direction="left"
+          >
+            <template #item-image_url="{ image_url }">
+              <img v-if="image_url" :src="image_url" alt="Product" class="h-12 w-12 object-cover rounded" loading="lazy" />
+              <span v-else class="text-gray-400 text-xs">No Image</span>
+            </template>
+            <template #item-price="{ price }">
+              {{ price ? '$' + price : '-' }}
+            </template>
+            <template #item-discount_price="{ discount_price }">
+              {{ discount_price ? '$' + discount_price : '-' }}
+            </template>
+            <template #item-product_url="{ product_url }">
+              <a v-if="product_url" :href="product_url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">External</a>
+              <span v-else class="text-gray-400">-</span>
+            </template>
+          </EasyDataTable>
+        </div>
+        <div v-if="products.length === 0" class="p-6 text-center text-slate-500">
+          No products in this category.
         </div>
       </div>
     </div>
@@ -106,16 +177,32 @@
 </template>
 
 <script setup>
-import { useForm, usePage, Link } from '@inertiajs/vue3'
+import { useForm, usePage, Link, router } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
+import { ref } from 'vue'
+import EasyDataTable from 'vue3-easy-data-table'
+import 'vue3-easy-data-table/dist/style.css'
 
 const props = defineProps({
   category: Object,
   similarCategories: {
     type: Array,
     default: () => []
+  },
+  products: {
+    type: Array,
+    default: () => []
   }
 })
+
+const productHeaders = [
+  { text: 'Image', value: 'image_url', sortable: false },
+  { text: 'Name', value: 'name', sortable: true },
+  { text: 'Price', value: 'price', sortable: true },
+  { text: 'Discount Price', value: 'discount_price', sortable: true },
+  { text: 'Brand', value: 'brand_name', sortable: true },
+  { text: 'Product URL', value: 'product_url', sortable: false }
+]
 
 const editForm = useForm({
   name: props.category?.name || '',
@@ -129,9 +216,43 @@ const editForm = useForm({
 })
 
 const mergeForm = useForm({
-  target_category_id: null,
+  source_category_id: null,
   _token: usePage().props.csrf_token
 })
+
+const mergeSearchQuery = ref('')
+const mergeSearchResults = ref([])
+const searching = ref(false)
+let searchTimeout = null
+
+function searchCategories() {
+  if (!mergeSearchQuery.value || mergeSearchQuery.value.length < 2) {
+    mergeSearchResults.value = []
+    return
+  }
+  
+  clearTimeout(searchTimeout)
+  searching.value = true
+  
+  searchTimeout = setTimeout(async () => {
+    try {
+      const response = await fetch(`/admin/categories/${props.category.id}/search?query=${encodeURIComponent(mergeSearchQuery.value)}`, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json',
+        },
+        credentials: 'same-origin'
+      })
+      const data = await response.json()
+      mergeSearchResults.value = data.results || []
+    } catch (error) {
+      console.error('Search error:', error)
+      mergeSearchResults.value = []
+    } finally {
+      searching.value = false
+    }
+  }, 300)
+}
 
 function submitEdit() {
   editForm.put(`/admin/categories/${props.category.id}`, {
@@ -140,9 +261,9 @@ function submitEdit() {
   })
 }
 
-function mergeCategory(targetCategoryId) {
-  if (confirm('Are you sure you want to merge this category? All products will be moved to the target category and this category will be deleted. This action cannot be undone.')) {
-    mergeForm.target_category_id = targetCategoryId
+function mergeCategory(sourceCategoryId) {
+  if (confirm('Are you sure you want to merge the selected category into this category? All products from the selected category will be moved to this category and the selected category will be deleted. This action cannot be undone.')) {
+    mergeForm.source_category_id = sourceCategoryId
     mergeForm.post(`/admin/categories/${props.category.id}/merge`, {
       onSuccess: () => {
         // Redirect will be handled by the controller

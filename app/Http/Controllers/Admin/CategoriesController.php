@@ -71,6 +71,23 @@ class CategoriesController extends Controller
         // Find similar categories (by name similarity)
         $similarCategories = $this->findSimilarCategories($category);
         
+        // Get products for this category
+        $products = $category->products()
+            ->with('brand')
+            ->latest()
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'discount_price' => $product->discount_price,
+                    'image_url' => $product->image_url,
+                    'brand_name' => $product->brand ? $product->brand->name : '-',
+                    'product_url' => $product->product_url,
+                ];
+            });
+        
         return Inertia::render('Admin/CategoryEdit', [
             'category' => [
                 'id' => $category->id,
@@ -84,6 +101,7 @@ class CategoriesController extends Controller
                 'products_count' => $category->products_count,
             ],
             'similarCategories' => $similarCategories,
+            'products' => $products,
         ]);
     }
 
@@ -119,14 +137,44 @@ class CategoriesController extends Controller
             ->with('success', 'Category updated successfully.');
     }
 
+    public function search(Request $request, $id)
+    {
+        $currentCategory = ProductCategory::findOrFail($id);
+        $query = $request->get('query', '');
+        
+        if (empty($query) || strlen($query) < 2) {
+            return response()->json(['results' => []]);
+        }
+        
+        $results = ProductCategory::where('id', '!=', $currentCategory->id)
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('slug', 'like', "%{$query}%");
+            })
+            ->withCount('products')
+            ->orderBy('name')
+            ->limit(10)
+            ->get()
+            ->map(function ($cat) {
+                return [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                    'slug' => $cat->slug,
+                    'products_count' => $cat->products_count,
+                ];
+            });
+        
+        return response()->json(['results' => $results]);
+    }
+
     public function merge(Request $request, $id)
     {
         $request->validate([
-            'target_category_id' => 'required|exists:product_categories,id',
+            'source_category_id' => 'required|exists:product_categories,id',
         ]);
         
-        $sourceCategory = ProductCategory::findOrFail($id);
-        $targetCategory = ProductCategory::findOrFail($request->target_category_id);
+        $targetCategory = ProductCategory::findOrFail($id); // Current category (where products will be moved to)
+        $sourceCategory = ProductCategory::findOrFail($request->source_category_id); // Category to be merged (will be deleted)
         
         if ($sourceCategory->id === $targetCategory->id) {
             return redirect()->back()->with('error', 'Cannot merge category with itself.');
@@ -134,7 +182,7 @@ class CategoriesController extends Controller
         
         DB::beginTransaction();
         try {
-            // Update all products to use the target category
+            // Update all products from source category to use the target category
             Product::where('product_category_id', $sourceCategory->id)
                 ->update(['product_category_id' => $targetCategory->id]);
             

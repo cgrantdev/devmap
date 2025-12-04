@@ -88,6 +88,7 @@ const serverOptions = ref({
 })
 
 const headers = [
+  { text: 'ID', value: 'id', sortable: true },
   { text: 'Name', value: 'name', sortable: true },
   { text: 'Slug', value: 'slug', sortable: true },
   { text: 'Status', value: 'is_active', sortable: true },
