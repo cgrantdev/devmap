@@ -199,6 +199,60 @@ class CategoriesController extends Controller
         }
     }
 
+    public function bulkMerge(Request $request)
+    {
+        $request->validate([
+            'category_ids' => 'required|array|min:2',
+            'category_ids.*' => 'exists:product_categories,id',
+        ]);
+        
+        $categoryIds = $request->category_ids;
+        
+        // First category is the main category (target)
+        $mainCategoryId = $categoryIds[0];
+        $mainCategory = ProductCategory::findOrFail($mainCategoryId);
+        
+        // Other categories will be merged into the main category
+        $categoriesToMerge = array_slice($categoryIds, 1);
+        
+        // Validate that main category is not in the merge list
+        if (in_array($mainCategoryId, $categoriesToMerge)) {
+            return redirect()->back()->with('error', 'Main category cannot be in the merge list.');
+        }
+        
+        DB::beginTransaction();
+        try {
+            $mergedCount = 0;
+            $mergedNames = [];
+            
+            foreach ($categoriesToMerge as $categoryId) {
+                $categoryToMerge = ProductCategory::findOrFail($categoryId);
+                
+                // Skip if trying to merge main category with itself
+                if ($categoryToMerge->id === $mainCategory->id) {
+                    continue;
+                }
+                
+                // Update all products from category to merge to use the main category
+                Product::where('product_category_id', $categoryToMerge->id)
+                    ->update(['product_category_id' => $mainCategory->id]);
+                
+                $mergedNames[] = $categoryToMerge->name;
+                $categoryToMerge->delete();
+                $mergedCount++;
+            }
+            
+            DB::commit();
+            
+            $message = "Successfully merged {$mergedCount} category/categories into '{$mainCategory->name}': " . implode(', ', $mergedNames);
+            return redirect()->route('admin.categories.index')
+                ->with('success', $message);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error merging categories: ' . $e->getMessage());
+        }
+    }
+
     private function findSimilarCategories(ProductCategory $category)
     {
         // Find categories with similar names (case-insensitive, partial match)

@@ -25,6 +25,16 @@
       <div class="flex items-center gap-4 mb-4 px-6">
         <span>search value: </span>
         <input type="text" v-model="searchValue" @input="handleSearchInput" class="border rounded px-3 py-2">
+        
+        <!-- Bulk Merge Button -->
+        <button
+          v-if="selectedCategories.length > 1"
+          @click="bulkMerge"
+          :disabled="bulkMergeForm.processing"
+          class="ml-auto px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 font-medium transition-colors disabled:opacity-50"
+        >
+          {{ bulkMergeForm.processing ? 'Merging...' : `Bulk Merge (${selectedCategories.length} selected)` }}
+        </button>
       </div>
 
       <div class="overflow-x-auto px-6 pb-6">
@@ -42,6 +52,14 @@
           header-text-direction="left"
           body-text-direction="left"
         >
+          <template #item-checkbox="{ id }">
+            <input
+              type="checkbox"
+              :value="id"
+              v-model="selectedCategories"
+              class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+            />
+          </template>
           <template #item-name="{ name }">
             <div class="text-sm font-medium text-slate-800">{{ name }}</div>
           </template>
@@ -66,7 +84,7 @@
 </template>
 
 <script setup>
-import { Link, router } from '@inertiajs/vue3'
+import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import { ref, watch } from 'vue'
 import EasyDataTable from 'vue3-easy-data-table'
@@ -88,6 +106,7 @@ const serverOptions = ref({
 })
 
 const headers = [
+  { text: '', value: 'checkbox', sortable: false, width: 50 },
   { text: 'ID', value: 'id', sortable: true },
   { text: 'Name', value: 'name', sortable: true },
   { text: 'Slug', value: 'slug', sortable: true },
@@ -97,11 +116,15 @@ const headers = [
   { text: 'Actions', value: 'actions', sortable: false }
 ]
 
+const selectedCategories = ref([])
+
 // Sync serverOptions with props when they change
 watch(() => props.categories, (categories) => {
   if (categories) {
     serverOptions.value.page = categories.current_page || 1
     serverOptions.value.rowsPerPage = categories.per_page || 20
+    // Clear selections when data changes (pagination, search, etc.)
+    selectedCategories.value = []
   }
 }, { immediate: true, deep: true })
 
@@ -142,6 +165,35 @@ function handleSearchChange(value) {
   searchValue.value = value
   serverOptions.value.page = 1
   fetchData()
+}
+
+const bulkMergeForm = useForm({
+  category_ids: [],
+  _token: usePage().props.csrf_token
+})
+
+function bulkMerge() {
+  if (selectedCategories.value.length < 2) {
+    alert('Please select at least 2 categories to merge.')
+    return
+  }
+  
+  const mainCategory = selectedCategories.value[0] // First selected is the main category
+  const categoriesToMerge = selectedCategories.value.slice(1) // Others will be merged into main
+  
+  if (confirm(`Are you sure you want to merge ${categoriesToMerge.length} category/categories into "${props.categories.data.find(c => c.id === mainCategory)?.name}"? All products from merged categories will be moved to the main category and merged categories will be deleted. This action cannot be undone.`)) {
+    bulkMergeForm.category_ids = selectedCategories.value
+    bulkMergeForm.post('/admin/categories/bulk-merge', {
+      onSuccess: () => {
+        selectedCategories.value = []
+        fetchData()
+      },
+      onError: (errors) => {
+        console.error('Bulk merge error:', errors)
+        alert('Failed to merge categories. Please try again.')
+      }
+    })
+  }
 }
 </script>
 

@@ -121,6 +121,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::get('/categories/{id}/search', [CategoriesController::class, 'search'])->name('admin.categories.search');
     Route::put('/categories/{id}', [CategoriesController::class, 'update'])->name('admin.categories.update');
     Route::post('/categories/{id}/merge', [CategoriesController::class, 'merge'])->name('admin.categories.merge');
+    Route::post('/categories/bulk-merge', [CategoriesController::class, 'bulkMerge'])->name('admin.categories.bulk-merge');
     
     // Blogs
     Route::get('/blogs', [BlogManagementController::class, 'index'])->name('admin.blogs.index');
