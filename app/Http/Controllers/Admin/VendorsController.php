@@ -726,14 +726,14 @@ class VendorsController extends Controller
         // Remove prefixes like "Blend:", "Blend ", "Pack:", "Pack ", "Powder:", "Powder " (with or without colon)
         $name = preg_replace('/^(Blend|Pack|Powder)[:\s]+/i', '', $name);
         
-        // Remove size patterns (e.g., "10MG", "20MG", "30MG", "400MG/ML", "250mcg") - can be in parentheses or standalone
-        $name = preg_replace('/\s*\(?\s*\d+(?:\.\d+)?\s*(?:MG|mcg)(?:\/ML)?\s*\)?\s*/i', ' ', $name);
+        // Remove size patterns (e.g., "10MG", "20MG", "30MG", "400MG/ML", "250mcg", "10ml", "10 ml") - can be in parentheses or standalone
+        $name = preg_replace('/\s*\(?\s*\d+(?:\.\d+)?\s*(?:MG|mcg|ML|ml)(?:\/ML)?\s*\)?\s*/i', ' ', $name);
         
         // Handle parenthetical content
         // Remove codes like "(P021)" and indicators like "(Copy)"
         $name = preg_replace('/\s*\(P\d+\)\s*/i', ' ', $name); // Remove codes like (P021)
         $name = preg_replace('/\s*\(Copy\)\s*/i', ' ', $name); // Remove (Copy)
-        $name = preg_replace('/\s*\(\d+(?:\.\d+)?\s*(?:MG|mcg)\)\s*/i', ' ', $name); // Remove size in parentheses like (10MG)
+        $name = preg_replace('/\s*\(\d+(?:\.\d+)?\s*(?:MG|mcg|ML|ml)\)\s*/i', ' ', $name); // Remove size in parentheses like (10MG) or (10ml)
         $name = preg_replace('/\s*\(\d+\s*ct\)\s*/i', ' ', $name); // Remove count patterns like (100 ct)
         
         // Remove standalone count patterns like "100 ct" (not in parentheses)
@@ -743,7 +743,7 @@ class VendorsController extends Controller
         $name = preg_replace_callback('/\s*\(([^)]+)\)\s*/', function($matches) {
             $content = trim($matches[1]);
             // Only keep if it looks like descriptive text (not just numbers or codes)
-            if (preg_match('/[a-zA-Z]/', $content) && !preg_match('/^\d+MG$/i', $content)) {
+            if (preg_match('/[a-zA-Z]/', $content) && !preg_match('/^\d+(?:MG|ML|ml)$/i', $content)) {
                 return ' ' . $content . ' ';
             }
             return ' ';
@@ -756,6 +756,10 @@ class VendorsController extends Controller
         // Remove "Capsules" and similar words (case insensitive)
         $name = preg_replace('/\s+Capsules?\s*/i', ' ', $name);
         $name = preg_replace('/\s+Capsules?\s*$/i', '', $name);
+        
+        // Remove "Water" word (case insensitive) - e.g., "bacteriostatic water 10 ml" -> "bacteriostatic"
+        $name = preg_replace('/\s+Water\s*/i', ' ', $name);
+        $name = preg_replace('/\s+Water\s*$/i', '', $name);
         
         // Replace "+" with space (e.g., "BAM-15 + SLU-PP-332" -> "BAM-15 SLU-PP-332")
         $name = preg_replace('/\s*\+\s*/', ' ', $name);
