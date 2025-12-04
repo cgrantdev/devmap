@@ -504,27 +504,26 @@ class VendorsController extends Controller
             $api_route = 'normal';
             $apiUrl = "$shopUrl/wp-json/wc/store/v1/products?per_page=$perPage&page=$page";
             $response = null;
-            \Log::info('normal====' . $apiUrl);
+            \Log::info('Fetching products from API', ['url' => $apiUrl, 'route' => 'normal']);
             try {
                 $response = $client->get($apiUrl);
             } catch (\Exception $e) {
-                \Log::info("API Request Failed: " . $e->getMessage());
+                \Log::info('API Request Failed', ['message' => $e->getMessage(), 'url' => $apiUrl]);
                 $statusCode = $e->getCode();
-                \Log::info('statuscode_'.$statusCode);
+                \Log::info('API Request Status Code', ['status_code' => $statusCode]);
 
                 if ($statusCode == 403) {
-                    \Log::info('403 Forbidden - Using proxy');
+                    \Log::info('403 Forbidden - Using proxy', ['url' => $apiUrl]);
                     $proxytoken = 'e3980c24459441efbc4ca2d232d91e7663bfa3d6897';
                     $encodedUrl = urlencode($apiUrl);
                     $url = "https://api.scrape.do/?token=$proxytoken&url=$encodedUrl";
-                    \Log::info('proxy=====' . $url);
+                    \Log::info('Using proxy URL', ['proxy_url' => $url]);
                     try {
                         $response = $client->get($url);
                         $api_route = 'proxy';
                     } catch (\Exception $e) {
                         $statusCode = $e->getCode();
-                        \Log::info('proxystatuscode_'.$statusCode);
-                        \Log::info("Proxy request also failed: " . $e->getMessage());
+                        \Log::info('Proxy request failed', ['status_code' => $statusCode, 'message' => $e->getMessage()]);
                     }
                 }
             }
@@ -638,7 +637,7 @@ class VendorsController extends Controller
             }
             $page++;
         } while (count($data) === $perPage && $page <= 10); // safety limit
-        \Log::info(count($products));
+        \Log::info('Products fetched', ['count' => count($products)]);
         return [
             'products' => $products,
             'api_route' => $api_route,
@@ -658,7 +657,7 @@ class VendorsController extends Controller
 
         $command = 'sudo -u devuser ' . $pythonBin . ' ' . escapeshellarg($pythonScript) . ' ' . $escapedUrl . ' 2>&1';
 
-        \Log::info($command);
+        \Log::info('Running Python scraper', ['command' => $command, 'url' => $shopUrl]);
 
         $output = shell_exec($command);
         // \Log::info($output);
