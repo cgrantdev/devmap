@@ -71,6 +71,7 @@
           </button>
         </template>
       </EasyDataTable>
+      </div>
     </div>
   </AdminLayout>
 </template>
