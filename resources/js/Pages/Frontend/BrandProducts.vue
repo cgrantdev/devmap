@@ -288,7 +288,7 @@
                   <p class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800 m-0 text-center">${{ product.price }}</p>
                   <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 m-0 text-center">
                     From Seller 
-                    <span class="inline-block bg-[#E0F2FE] text-gray-800 rounded-lg py-[3px] px-2">{{ product.user?.name || 'Unknown' }}</span>
+                    <span class="inline-block bg-[#E0F2FE] text-gray-800 rounded-lg py-[3px] px-2">{{ product.brand?.name || 'Unknown' }}</span>
                   </p>
                   <div class="flex items-center justify-center gap-1">
                     <div class="flex items-center">

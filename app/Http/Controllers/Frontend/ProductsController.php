@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\Type;
 use App\Models\Puse;
 use App\Models\Brand;
@@ -16,44 +17,47 @@ class ProductsController extends Controller
 {
     public function index()
     {
-        // Group products by name and count items
-        $productGroups = Product::select('name')
-            ->selectRaw('count(*) as total_items')
-            ->selectRaw('MIN(image_url) as image_url')
-            ->groupBy('name')
+        // Get all active product categories with product counts
+        $categories = ProductCategory::where('is_active', true)
+            ->withCount('products')
             ->orderBy('name')
             ->get()
-            ->map(function ($group) {
+            ->map(function ($category) {
+                // Get a sample product image for this category
+                $sampleProduct = Product::where('product_category_id', $category->id)
+                    ->whereNotNull('image_url')
+                    ->first();
+                
                 return [
-                    'name' => $group->name,
-                    'total_items' => $group->total_items,
-                    'image' => $group->image_url ?: '/images/peptides/default.png',
-                    'slug' => Str::slug($group->name),
+                    'id' => $category->id,
+                    'name' => strtoupper($category->name),
+                    'slug' => $category->slug,
+                    'total_items' => $category->products_count,
+                    'image' => $sampleProduct ? $sampleProduct->image_url : ($category->image_url ?: '/images/peptides/default.png'),
+                    'description' => $category->description,
                 ];
             });
         
         return Inertia::render('Frontend/Products', [
-            'productGroups' => $productGroups,
+            'productGroups' => $categories,
         ]);
     }
 
     public function show(Request $request, $slug)
     {
-        // Find product name by slug - get distinct product names and find matching slug
-        $productName = Product::select('name')
-            ->distinct()
-            ->get()
-            ->first(function ($product) use ($slug) {
-                return Str::slug($product->name) === $slug;
-            })?->name;
+        // Find category by slug
+        $category = ProductCategory::where('slug', $slug)
+            ->where('is_active', true)
+            ->first();
 
-        if (!$productName) {
-            abort(404, 'Product not found');
+        if (!$category) {
+            abort(404, 'Category not found');
         }
 
-        // Start building query
-        $query = Product::with(['user', 'brand', 'location', 'types', 'puses'])
-            ->where('name', $productName);
+        // Start building query for products in this category
+        $query = Product::with(['brand', 'location', 'types', 'puses', 'category'])
+            ->where('product_category_id', $category->id)
+            ->where('status', 'active');
 
         // Apply filters
         if ($request->has('use') && $request->use) {
@@ -97,21 +101,21 @@ class ProductsController extends Controller
         $perPage = $request->get('per_page', 20);
         $products = $query->paginate($perPage)->withQueryString();
 
-        // Get filter options for this product name
-        $baseQuery = Product::where('name', $productName);
+        // Get filter options for this category
+        $baseQuery = Product::where('product_category_id', $category->id);
 
         $filterOptions = [
-            'uses' => Puse::whereHas('products', function ($q) use ($productName) {
-                $q->where('name', $productName);
+            'uses' => Puse::whereHas('products', function ($q) use ($category) {
+                $q->where('product_category_id', $category->id);
             })->get(['id', 'name']),
-            'types' => Type::whereHas('products', function ($q) use ($productName) {
-                $q->where('name', $productName);
+            'types' => Type::whereHas('products', function ($q) use ($category) {
+                $q->where('product_category_id', $category->id);
             })->get(['id', 'name']),
-            'brands' => Brand::whereHas('products', function ($q) use ($productName) {
-                $q->where('name', $productName);
+            'brands' => Brand::whereHas('products', function ($q) use ($category) {
+                $q->where('product_category_id', $category->id);
             })->get(['id', 'name']),
-            'locations' => Location::whereHas('products', function ($q) use ($productName) {
-                $q->where('name', $productName);
+            'locations' => Location::whereHas('products', function ($q) use ($category) {
+                $q->where('product_category_id', $category->id);
             })->get(['id', 'name']),
         ];
 
@@ -119,7 +123,13 @@ class ProductsController extends Controller
         $priceRange = $baseQuery->selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
 
         return Inertia::render('Frontend/ProductListing', [
-            'productName' => $productName,
+            'category' => [
+                'id' => $category->id,
+                'name' => strtoupper($category->name),
+                'slug' => $category->slug,
+                'description' => $category->description,
+            ],
+            'productName' => strtoupper($category->name), // Keep for backward compatibility
             'slug' => $slug,
             'products' => $products,
             'filterOptions' => $filterOptions,
