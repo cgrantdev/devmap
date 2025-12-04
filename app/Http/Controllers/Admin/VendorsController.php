@@ -485,16 +485,36 @@ class VendorsController extends Controller
                     $existing->update($productFields);
                     $updatedCount++;
                 } else {
-                    // Find or create category
+                    // Find similar category or create new one
                     $category = null;
                     if (!empty($productData['category_name'])) {
-                        $category = ProductCategory::firstOrCreate(
-                            ['slug' => Str::slug($productData['category_name'])],
-                            [
-                                'name' => $productData['category_name'],
+                        // First, try to find a similar category
+                        $categoryName = $productData['category_name'];
+                        $categoryNameLower = strtolower($categoryName);
+                        
+                        // Search for similar categories (case-insensitive, partial match)
+                        $similarCategory = ProductCategory::where(function ($query) use ($categoryNameLower) {
+                            // Exact match (case-insensitive)
+                            $query->whereRaw('LOWER(name) = ?', [$categoryNameLower])
+                                // Contains the category name
+                                ->orWhereRaw('LOWER(name) LIKE ?', ['%' . $categoryNameLower . '%'])
+                                // Category name contains the other name
+                                ->orWhereRaw('? LIKE CONCAT("%", LOWER(name), "%")', [$categoryNameLower]);
+                        })
+                        ->orderBy('name')
+                        ->first();
+                        
+                        if ($similarCategory) {
+                            // Use the similar category found
+                            $category = $similarCategory;
+                        } else {
+                            // No similar category found, create a new one
+                            $category = ProductCategory::create([
+                                'name' => $categoryName,
+                                'slug' => Str::slug($categoryName),
                                 'is_active' => true,
-                            ]
-                        );
+                            ]);
+                        }
                     }                   
 
                     if ($category) {

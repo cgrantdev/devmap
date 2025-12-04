@@ -29,6 +29,12 @@
         <!-- Bulk Action Buttons -->
         <div v-if="selectedCategories.length > 0" class="ml-auto flex gap-2">
           <button
+            @click="deselectAll"
+            class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 font-medium transition-colors"
+          >
+            Deselect All
+          </button>
+          <button
             v-if="selectedCategories.length > 1"
             @click="bulkMerge"
             :disabled="bulkMergeForm.processing || bulkDeleteForm.processing"
@@ -70,8 +76,10 @@
               class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
             />
           </template>
-          <template #item-name="{ name }">
-            <div class="text-sm font-medium text-slate-800">{{ name }}</div>
+          <template #item-name="{ name, slug }">
+            <a :href="`/product/${slug}`" target="_blank" class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-150">
+              {{ name }}
+            </a>
           </template>
           <template #item-is_active="{ is_active }">
             <span v-if="is_active" class="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-green-500 text-white">
@@ -284,6 +292,10 @@ function bulkDelete() {
       }
     })
   }
+}
+
+function deselectAll() {
+  selectedCategories.value = []
 }
 </script>
 

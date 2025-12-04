@@ -52,4 +52,15 @@ class Product extends Model
     {
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
+
+    /**
+     * Get the decoded product name (HTML entities decoded)
+     */
+    public function getNameAttribute($value)
+    {
+        if (empty($value)) {
+            return $value;
+        }
+        return html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
 }
