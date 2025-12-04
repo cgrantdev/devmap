@@ -10,10 +10,10 @@ class ProductController extends Controller
 {
     public function show($id, $slug = null)
     {
-        $product = Product::with(['user.vendorSetting'])->findOrFail($id);
-        $vendor = $product->user;
-        $banner_url = $vendor && $vendor->vendorSetting && $vendor->vendorSetting->banner
-            ? asset('storage/' . $vendor->vendorSetting->banner)
+        $product = Product::with(['brand.vendorSetting'])->findOrFail($id);
+        $brand = $product->brand;
+        $banner_url = $brand && $brand->vendorSetting && $brand->vendorSetting->banner
+            ? asset('storage/' . $brand->vendorSetting->banner)
             : null;
         return Inertia::render('Product/Public', [
             'product' => [
@@ -26,7 +26,7 @@ class ProductController extends Controller
                 'product_url' => $product->product_url,
             ],
             'vendor' => [
-                'name' => $vendor ? $vendor->name : '-',
+                'name' => $brand ? $brand->name : '-',
                 'banner_url' => $banner_url,
             ]
         ]);
