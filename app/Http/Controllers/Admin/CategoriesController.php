@@ -191,7 +191,7 @@ class CategoriesController extends Controller
             
             DB::commit();
             
-            return redirect()->route('admin.categories.index')
+            return redirect()->route('admin.categories.edit', $targetCategory->id)
                 ->with('success', "Category '{$sourceCategory->name}' merged into '{$targetCategory->name}' successfully.");
         } catch (\Exception $e) {
             DB::rollBack();
