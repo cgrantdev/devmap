@@ -91,7 +91,7 @@ class VendorsController extends Controller
             'contact_email' => 'nullable|email|max:255',
             'phone_number' => 'nullable|string|max:50',
             'banner' => 'nullable|image|max:2048',
-            'logo' => 'nullable|image|max:1024',
+            'logo' => 'nullable|mimes:jpeg,jpg,png,gif,webp,svg|max:1024',
         ]);
 
         // Create Brand (vendor) - no user account
@@ -109,10 +109,19 @@ class VendorsController extends Controller
             $settings->banner = 'vendor_banners/' . $bannerFilename;
         }
         
-        // Handle logo upload and convert to WebP
+        // Handle logo upload - convert to WebP if not SVG, otherwise save as-is
         if ($request->hasFile('logo')) {
-            $logoFilename = ImageHelper::convertToWebP($request->file('logo'), 'vendor_logos');
-            $settings->logo = 'vendor_logos/' . $logoFilename;
+            $logoFile = $request->file('logo');
+            if (strtolower($logoFile->getClientOriginalExtension()) === 'svg') {
+                // Save SVG as-is
+                $logoFilename = Str::random(40) . '.svg';
+                $logoFile->storeAs('vendor_logos', $logoFilename, 'public');
+                $settings->logo = 'vendor_logos/' . $logoFilename;
+            } else {
+                // Convert other formats to WebP
+                $logoFilename = ImageHelper::convertToWebP($logoFile, 'vendor_logos');
+                $settings->logo = 'vendor_logos/' . $logoFilename;
+            }
         }
         
         $settings->description = $validated['description'] ?? null;
@@ -169,7 +178,7 @@ class VendorsController extends Controller
             'email' => 'nullable|email|max:255',
             'phone_number' => 'nullable|string|max:50',
             'banner' => 'nullable|image|max:2048',
-            'logo' => 'nullable|image|max:1024',
+            'logo' => 'nullable|mimes:jpeg,jpg,png,gif,webp,svg|max:1024',
             'is_active' => 'nullable|boolean',
         ]);
 
@@ -191,14 +200,23 @@ class VendorsController extends Controller
             $settings->banner = 'vendor_banners/' . $bannerFilename;
         }
 
-        // Handle logo upload and convert to WebP
+        // Handle logo upload - convert to WebP if not SVG, otherwise save as-is
         if ($request->hasFile('logo')) {
             // Delete old logo if exists
             if ($settings->logo) {
                 ImageHelper::deleteImage(basename($settings->logo), 'vendor_logos');
             }
-            $logoFilename = ImageHelper::convertToWebP($request->file('logo'), 'vendor_logos');
-            $settings->logo = 'vendor_logos/' . $logoFilename;
+            $logoFile = $request->file('logo');
+            if (strtolower($logoFile->getClientOriginalExtension()) === 'svg') {
+                // Save SVG as-is
+                $logoFilename = Str::random(40) . '.svg';
+                $logoFile->storeAs('vendor_logos', $logoFilename, 'public');
+                $settings->logo = 'vendor_logos/' . $logoFilename;
+            } else {
+                // Convert other formats to WebP
+                $logoFilename = ImageHelper::convertToWebP($logoFile, 'vendor_logos');
+                $settings->logo = 'vendor_logos/' . $logoFilename;
+            }
         }
 
         $settings->description = $request->input('description', $settings->description);
@@ -389,6 +407,10 @@ class VendorsController extends Controller
             $updatedCount = 0;
 
             DB::beginTransaction();
+
+            // dd($products);
+            // return;
+
             foreach ($products as $productData) {
                 $existing = $brand->products()->where('product_url', $productData['product_url'])->first();
                 
@@ -520,9 +542,22 @@ class VendorsController extends Controller
                         $catName = strtolower($cat['name'] ?? '');
                         $catSlug = strtolower($cat['slug'] ?? '');
                         // Check if category name or slug contains "peptide" or "peptides"
-                        if (strpos($catName, 'peptide') !== false || strpos($catSlug, 'peptide') !== false) {
-                            $hasPeptideCategory = true;
-                            break;
+                        // allow category names
+                        //peptide, regeneration, all-other
+
+                        $allowCategorieNames = [
+                            'peptide',
+                            'peptides',
+                            'regeneration',
+                            'all-other',
+                            'cognitive-neuro'
+                        ];
+
+                        foreach ($allowCategorieNames as $allowCategoryName) {
+                            if (strpos($catName, $allowCategoryName) !== false || strpos($catSlug, $allowCategoryName) !== false) {
+                                $hasPeptideCategory = true;
+                                break;
+                            }
                         }
                     }
                     // Skip this product if it doesn't have a peptide category
@@ -626,14 +661,18 @@ class VendorsController extends Controller
         // Remove prefixes like "Blend:", "Blend ", "Pack:", "Pack ", "Powder:", "Powder " (with or without colon)
         $name = preg_replace('/^(Blend|Pack|Powder)[:\s]+/i', '', $name);
         
-        // Remove size patterns (e.g., "10MG", "20MG", "30MG", "400MG/ML") - can be in parentheses or standalone
-        $name = preg_replace('/\s*\(?\s*\d+(?:\.\d+)?\s*MG(?:\/ML)?\s*\)?\s*/i', ' ', $name);
+        // Remove size patterns (e.g., "10MG", "20MG", "30MG", "400MG/ML", "250mcg") - can be in parentheses or standalone
+        $name = preg_replace('/\s*\(?\s*\d+(?:\.\d+)?\s*(?:MG|mcg)(?:\/ML)?\s*\)?\s*/i', ' ', $name);
         
         // Handle parenthetical content
         // Remove codes like "(P021)" and indicators like "(Copy)"
         $name = preg_replace('/\s*\(P\d+\)\s*/i', ' ', $name); // Remove codes like (P021)
         $name = preg_replace('/\s*\(Copy\)\s*/i', ' ', $name); // Remove (Copy)
-        $name = preg_replace('/\s*\(\d+MG\)\s*/i', ' ', $name); // Remove size in parentheses like (10MG)
+        $name = preg_replace('/\s*\(\d+(?:\.\d+)?\s*(?:MG|mcg)\)\s*/i', ' ', $name); // Remove size in parentheses like (10MG)
+        $name = preg_replace('/\s*\(\d+\s*ct\)\s*/i', ' ', $name); // Remove count patterns like (100 ct)
+        
+        // Remove standalone count patterns like "100 ct" (not in parentheses)
+        $name = preg_replace('/\s*\d+\s*ct\s*/i', ' ', $name);
         
         // Extract descriptive content from parentheses (e.g., "(No DAC)" -> "No DAC")
         $name = preg_replace_callback('/\s*\(([^)]+)\)\s*/', function($matches) {
@@ -648,6 +687,10 @@ class VendorsController extends Controller
         // Remove "Peptide" word (case insensitive)
         $name = preg_replace('/\s+Peptide\s*/i', ' ', $name);
         $name = preg_replace('/\s+Peptide\s*$/i', '', $name);
+        
+        // Remove "Capsules" and similar words (case insensitive)
+        $name = preg_replace('/\s+Capsules?\s*/i', ' ', $name);
+        $name = preg_replace('/\s+Capsules?\s*$/i', '', $name);
         
         // Replace "+" with space (e.g., "BAM-15 + SLU-PP-332" -> "BAM-15 SLU-PP-332")
         $name = preg_replace('/\s*\+\s*/', ' ', $name);

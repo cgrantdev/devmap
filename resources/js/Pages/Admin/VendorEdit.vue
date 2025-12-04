@@ -68,7 +68,7 @@
             </div>
             <div class="w-1/2">
               <label class="block mb-1.5 font-semibold text-slate-800">Logo</label>
-              <input @change="e => handleFileChange(e, 'logo')" type="file" accept="image/*" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
+              <input @change="e => handleFileChange(e, 'logo')" type="file" accept="image/*,.svg" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
               <div v-if="logoPreview" class="mt-2">
                 <img :src="logoPreview" alt="Logo Preview" class="h-24 w-24 rounded-full object-cover mx-auto" loading="lazy" />
               </div>
