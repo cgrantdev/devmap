@@ -26,15 +26,24 @@
         <span>search value: </span>
         <input type="text" v-model="searchValue" @input="handleSearchInput" class="border rounded px-3 py-2">
         
-        <!-- Bulk Merge Button -->
-        <button
-          v-if="selectedCategories.length > 1"
-          @click="bulkMerge"
-          :disabled="bulkMergeForm.processing"
-          class="ml-auto px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 font-medium transition-colors disabled:opacity-50"
-        >
-          {{ bulkMergeForm.processing ? 'Merging...' : `Bulk Merge (${selectedCategories.length} selected)` }}
-        </button>
+        <!-- Bulk Action Buttons -->
+        <div v-if="selectedCategories.length > 0" class="ml-auto flex gap-2">
+          <button
+            v-if="selectedCategories.length > 1"
+            @click="bulkMerge"
+            :disabled="bulkMergeForm.processing || bulkDeleteForm.processing"
+            class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 font-medium transition-colors disabled:opacity-50"
+          >
+            {{ bulkMergeForm.processing ? 'Merging...' : `Bulk Merge (${selectedCategories.length} selected)` }}
+          </button>
+          <button
+            @click="bulkDelete"
+            :disabled="bulkMergeForm.processing || bulkDeleteForm.processing"
+            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium transition-colors disabled:opacity-50"
+          >
+            {{ bulkDeleteForm.processing ? 'Deleting...' : `Bulk Delete (${selectedCategories.length} selected)` }}
+          </button>
+        </div>
       </div>
 
       <div class="overflow-x-auto px-6 pb-6">
@@ -197,6 +206,11 @@ const bulkMergeForm = useForm({
   _token: usePage().props.csrf_token
 })
 
+const bulkDeleteForm = useForm({
+  category_ids: [],
+  _token: usePage().props.csrf_token
+})
+
 const deleteForm = useForm({
   _token: usePage().props.csrf_token
 })
@@ -241,6 +255,32 @@ function bulkMerge() {
       onError: (errors) => {
         console.error('Bulk merge error:', errors)
         alert('Failed to merge categories. Please try again.')
+      }
+    })
+  }
+}
+
+function bulkDelete() {
+  if (selectedCategories.value.length === 0) {
+    alert('Please select at least one category to delete.')
+    return
+  }
+  
+  const selectedNames = selectedCategories.value.map(id => {
+    const category = props.categories.data.find(c => c.id === id)
+    return category ? category.name : `ID: ${id}`
+  }).join(', ')
+  
+  if (confirm(`Are you sure you want to delete ${selectedCategories.value.length} category/categories? This will also delete all products in these categories. This action cannot be undone.\n\nCategories: ${selectedNames}`)) {
+    bulkDeleteForm.category_ids = selectedCategories.value
+    bulkDeleteForm.post('/admin/categories/bulk-delete', {
+      onSuccess: () => {
+        selectedCategories.value = []
+        fetchData()
+      },
+      onError: (errors) => {
+        console.error('Bulk delete error:', errors)
+        alert('Failed to delete categories. Please try again.')
       }
     })
   }

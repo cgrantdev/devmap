@@ -224,6 +224,51 @@ class CategoriesController extends Controller
         }
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'category_ids' => 'required|array|min:1',
+            'category_ids.*' => 'exists:product_categories,id',
+        ]);
+        
+        $categoryIds = $request->category_ids;
+        
+        DB::beginTransaction();
+        try {
+            $deletedCount = 0;
+            $productsDeletedCount = 0;
+            $deletedNames = [];
+            
+            foreach ($categoryIds as $categoryId) {
+                $category = ProductCategory::withCount('products')->findOrFail($categoryId);
+                
+                // Count products before deletion
+                $productsCount = $category->products_count;
+                
+                // Delete all products associated with this category
+                Product::where('product_category_id', $category->id)->delete();
+                
+                $deletedNames[] = $category->name;
+                $productsDeletedCount += $productsCount;
+                $category->delete();
+                $deletedCount++;
+            }
+            
+            DB::commit();
+            
+            $message = "Successfully deleted {$deletedCount} category/categories and {$productsDeletedCount} associated product(s).";
+            if ($deletedCount <= 5) {
+                $message .= " Deleted: " . implode(', ', $deletedNames);
+            }
+            
+            return redirect()->route('admin.categories.index')
+                ->with('success', $message);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error deleting categories: ' . $e->getMessage());
+        }
+    }
+
     public function bulkMerge(Request $request)
     {
         $request->validate([
