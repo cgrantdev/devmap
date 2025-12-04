@@ -59,15 +59,41 @@ const props = defineProps({
   products: Object
 })
 
+// Initialize searchValue from URL parameters
+const getSearchFromUrl = () => {
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('search') || ''
+  }
+  return ''
+}
+
 const loading = ref(false)
-const searchValue = ref('')
+const searchValue = ref(getSearchFromUrl())
 const searchField = ['name', 'vendor_name']
+
+// Initialize serverOptions from URL parameters or props
+const getSortByFromUrl = () => {
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('sort_by') || 'id'
+  }
+  return 'id'
+}
+
+const getSortTypeFromUrl = () => {
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('sort_type') || 'desc'
+  }
+  return 'desc'
+}
 
 const serverOptions = ref({
   page: props.products?.current_page || 1,
   rowsPerPage: props.products?.per_page || 20,
-  sortBy: 'id',
-  sortType: 'desc'
+  sortBy: getSortByFromUrl(),
+  sortType: getSortTypeFromUrl()
 })
 
 const headers = [

@@ -158,15 +158,42 @@ const deleteForm = useForm({})
 const expandedRows = ref([])
 const quickEditForms = reactive({})
 const selectedBlogId = ref(null)
-const searchValue = ref('')
+
+// Initialize searchValue from URL parameters
+const getSearchFromUrl = () => {
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('search') || ''
+  }
+  return ''
+}
+
+const searchValue = ref(getSearchFromUrl())
 const searchField = ['title', 'slug']
 const loading = ref(false)
+
+// Initialize serverOptions from URL parameters or props
+const getSortByFromUrl = () => {
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('sort_by') || 'created_at'
+  }
+  return 'created_at'
+}
+
+const getSortTypeFromUrl = () => {
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('sort_type') || 'desc'
+  }
+  return 'desc'
+}
 
 const serverOptions = ref({
   page: props.blogs?.current_page || 1,
   rowsPerPage: props.blogs?.per_page || 20,
-  sortBy: 'created_at',
-  sortType: 'desc'
+  sortBy: getSortByFromUrl(),
+  sortType: getSortTypeFromUrl()
 })
 
 const headers = [

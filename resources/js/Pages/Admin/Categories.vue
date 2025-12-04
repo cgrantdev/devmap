@@ -111,7 +111,7 @@
 <script setup>
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 
@@ -119,16 +119,42 @@ const props = defineProps({
   categories: Object
 })
 
-const searchValue = ref('')
+// Initialize searchValue from URL parameters
+const getSearchFromUrl = () => {
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('search') || ''
+  }
+  return ''
+}
+
+const searchValue = ref(getSearchFromUrl())
 const searchField = ['name', 'slug']
 const loading = ref(false)
 const isUserAction = ref(false) // Flag to prevent watch from interfering with user actions
 
+// Initialize serverOptions from URL parameters or props
+const getSortByFromUrl = () => {
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('sort_by') || 'name'
+  }
+  return 'name'
+}
+
+const getSortTypeFromUrl = () => {
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('sort_type') || 'asc'
+  }
+  return 'asc'
+}
+
 const serverOptions = ref({
   page: props.categories?.current_page || 1,
   rowsPerPage: props.categories?.per_page || 20,
-  sortBy: 'name',
-  sortType: 'asc'
+  sortBy: getSortByFromUrl(),
+  sortType: getSortTypeFromUrl()
 })
 
 const headers = [

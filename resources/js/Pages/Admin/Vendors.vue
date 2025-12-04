@@ -111,8 +111,17 @@ const headers = [
   { text: 'Actions', value: 'actions' }
 ]
 
+// Initialize searchValue from URL parameters
+const getSearchFromUrl = () => {
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('search') || ''
+  }
+  return ''
+}
+
 const searchField = ["name", "email"];
-const searchValue = ref("");
+const searchValue = ref(getSearchFromUrl());
 
 const form = useForm({
   _token: usePage().props.csrf_token
