@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\VendorsController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\BlogManagementController;
 use App\Http\Controllers\Admin\EducationPostsController;
+use App\Http\Controllers\Admin\CategoriesController;
 use App\Http\Controllers\Vendor\ImportController;
 use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
 use App\Http\Controllers\Auth\EmailVerificationController;
@@ -113,6 +114,12 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/vendors/{id}/import-shop-url', [VendorsController::class, 'importFromShopUrl'])->name('admin.vendors.import-shop-url');
     Route::delete('/vendors/{vendorId}/products/{productId}', [VendorsController::class, 'deleteProduct'])->name('admin.vendors.products.delete');
     Route::get('/products', [VendorsController::class, 'adminProducts'])->name('admin.products');
+    
+    // Categories
+    Route::get('/categories', [CategoriesController::class, 'index'])->name('admin.categories.index');
+    Route::get('/categories/{id}/edit', [CategoriesController::class, 'edit'])->name('admin.categories.edit');
+    Route::put('/categories/{id}', [CategoriesController::class, 'update'])->name('admin.categories.update');
+    Route::post('/categories/{id}/merge', [CategoriesController::class, 'merge'])->name('admin.categories.merge');
     
     // Blogs
     Route::get('/blogs', [BlogManagementController::class, 'index'])->name('admin.blogs.index');
