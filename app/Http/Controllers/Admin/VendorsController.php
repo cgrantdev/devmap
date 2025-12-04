@@ -453,19 +453,7 @@ class VendorsController extends Controller
             // return;
 
             foreach ($products as $productData) {
-                $existing = $brand->products()->where('product_url', $productData['product_url'])->first();
-                
-                // Find or create category
-                $category = null;
-                if (!empty($productData['category_name'])) {
-                    $category = ProductCategory::firstOrCreate(
-                        ['slug' => Str::slug($productData['category_name'])],
-                        [
-                            'name' => $productData['category_name'],
-                            'is_active' => true,
-                        ]
-                    );
-                }
+                $existing = $brand->products()->where('product_url', $productData['product_url'])->first();                
                 
                 // Map stock availability
                 $availability = 'in_stock';
@@ -474,7 +462,7 @@ class VendorsController extends Controller
                 } elseif (isset($productData['is_on_backorder']) && $productData['is_on_backorder']) {
                     $availability = 'pre_order';
                 }
-                
+               
                 $productFields = [
                     'name' => $productData['name'],
                     'description' => $productData['description'] ?? null,
@@ -488,10 +476,6 @@ class VendorsController extends Controller
                     'brand_id' => $brand->id,
                 ];
                 
-                if ($category) {
-                    $productFields['product_category_id'] = $category->id;
-                }
-                
                 // Use original image URL
                 if (!empty($productData['image_url'])) {
                     $productFields['image_url'] = $productData['image_url'];
@@ -501,6 +485,22 @@ class VendorsController extends Controller
                     $existing->update($productFields);
                     $updatedCount++;
                 } else {
+                    // Find or create category
+                    $category = null;
+                    if (!empty($productData['category_name'])) {
+                        $category = ProductCategory::firstOrCreate(
+                            ['slug' => Str::slug($productData['category_name'])],
+                            [
+                                'name' => $productData['category_name'],
+                                'is_active' => true,
+                            ]
+                        );
+                    }                   
+
+                    if ($category) {
+                        $productFields['product_category_id'] = $category->id;
+                    }
+
                     $brand->products()->create($productFields);
                     $importedCount++;
                 }
