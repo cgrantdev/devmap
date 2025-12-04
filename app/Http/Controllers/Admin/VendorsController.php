@@ -27,8 +27,9 @@ class VendorsController extends Controller
                     'id' => $brand->id,
                     'brand_id' => $brand->id,
                     'name' => $brand->name,
+                    'slug' => $brand->slug,
                     'email' => $brand->vendorSetting->contact_email ?? null,
-                    'created_at' => $brand->created_at->format('Y-m-d'),
+                    'created_at' => $brand->created_at->format('n/j/Y'), // Format: 12/3/2025
                     'is_active' => $brand->is_active,
                     'settings' => $brand->vendorSetting ? [
                         'status' => $brand->vendorSetting->status,
@@ -46,22 +47,19 @@ class VendorsController extends Controller
     {
         $brand = Brand::findOrFail($id);
         
+        // Toggle brand is_active status
+        $brand->is_active = !$brand->is_active;
+        $brand->save();
+        
+        // Also update vendor setting status if it exists
         if ($brand->vendorSetting) {
-            $vendorSetting = $brand->vendorSetting;
-            $oldStatus = $vendorSetting->status;
-            $vendorSetting->status = $vendorSetting->status === 1 ? 0 : 1;
-            $vendorSetting->save();
-            
-            // Also update brand is_active
-            $brand->is_active = $vendorSetting->status === 1;
-            $brand->save();
-            
-            $statusText = $vendorSetting->status === 1 ? 'activated' : 'deactivated';
-            
-            return redirect()->back()->with('success', "Vendor has been {$statusText} successfully.");
+            $brand->vendorSetting->status = $brand->is_active ? 1 : 0;
+            $brand->vendorSetting->save();
         }
         
-        return redirect()->back()->with('error', 'Vendor settings not found.');
+        $statusText = $brand->is_active ? 'activated' : 'deactivated';
+        
+        return redirect()->back()->with('success', "Vendor has been {$statusText} successfully.");
     }
 
     public function create()
@@ -370,9 +368,44 @@ class VendorsController extends Controller
 
     public function adminProducts(Request $request)
     {
-        $products = \App\Models\Product::with('brand')
-            ->latest()
-            ->paginate(20)
+        $query = \App\Models\Product::with('brand');
+        
+        // Search functionality
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhereHas('brand', function ($brandQuery) use ($search) {
+                      $brandQuery->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+        
+        // Sorting
+        $sortBy = $request->get('sort_by', '');
+        $sortType = $request->get('sort_type', 'desc');
+        
+        // Validate sortType
+        $sortType = strtolower($sortType) === 'asc' ? 'asc' : 'desc';
+        
+        // Handle vendor_name sorting (requires join)
+        if ($sortBy === 'vendor_name') {
+            $query->join('brands', 'products.brand_id', '=', 'brands.id')
+                  ->orderBy('brands.name', $sortType)
+                  ->select('products.*')
+                  ->distinct(); // Prevent duplicate counting
+        } else {
+            // Validate sortBy - if empty or invalid, default to 'id'
+            $allowedSortColumns = ['id', 'name', 'price', 'created_at', 'updated_at'];
+            if (empty($sortBy) || !in_array($sortBy, $allowedSortColumns)) {
+                $sortBy = 'id';
+            }
+            $query->orderBy($sortBy, $sortType);
+        }
+        
+        // Pagination
+        $perPage = $request->get('per_page', 20);
+        $products = $query->paginate($perPage)
             ->through(function ($product) {
                 return [
                     'id' => $product->id,

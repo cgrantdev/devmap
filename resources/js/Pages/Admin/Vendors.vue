@@ -30,7 +30,7 @@
         <input type="text" v-model="searchValue" class="border rounded px-3 py-2">
       </div>
 
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto px-6">
         <EasyDataTable
           :headers="headers"
           :items="vendors"
@@ -57,30 +57,28 @@
             <div class="text-sm text-gray-900 px-6 py-4 whitespace-nowrap">{{ email }}</div>
           </template>
           <template #item-status="item">
-            <span v-if="item.settings?.status === 1" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+            <span v-if="item.is_active" class="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-green-500 text-white">
               Active
             </span>
-            <span v-else class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+            <span v-else class="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-gray-300 text-gray-700">
               Inactive
             </span>
           </template>
           <template #item-actions="item">
-            <a :href="`/shop/${item.name.toLowerCase().replace(/\s+/g, '-')}`" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-900 mr-4">
-              {{ item.settings?.status === 1 ? 'View Public Page' : 'Preview Public Page (Inactive)' }}
-            </a>
-            <Link :href="`/admin/vendors/${item.id}/edit`" class="text-yellow-600 hover:text-yellow-900 mr-4 font-semibold">Edit</Link>
-            <button @click="toggleStatus(item)" :disabled="form.processing"
-              :class="[
-                'px-4 py-2 rounded font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
-                item.settings?.status === 1
-                  ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
-                  : 'bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2'
-              ]">
-              {{ form.processing ? 'Updating...' : (item.settings?.status === 1 ? 'Deactivate' : 'Activate') }}
-            </button>
-            <button @click="deleteVendor(item)" :disabled="form.processing" class="ml-2 px-4 py-2 rounded bg-red-500 text-white hover:bg-red-700 font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-              Delete
-            </button>
+            <div class="flex items-center gap-3 px-6 py-4">
+              <a :href="`/brand/${item.slug}/products`" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 font-medium">
+                View Public Page
+              </a>
+              <Link :href="`/admin/vendors/${item.id}/edit`" class="text-orange-600 hover:text-orange-800 font-medium">Edit</Link>
+              <button @click="toggleStatus(item)" :disabled="form.processing"
+                class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                {{ form.processing ? 'Updating...' : (item.is_active ? 'Deactivate' : 'Activate') }}
+              </button>
+              <button @click="deleteVendor(item)" :disabled="form.processing" 
+                class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                Delete
+              </button>
+            </div>
           </template>
         </EasyDataTable>        
       </div>
@@ -121,7 +119,12 @@ const form = useForm({
 })
 
 function formatDate(dateString) {
-  return new Date(dateString).toLocaleDateString()
+  // Format: 12/3/2025 (M/D/YYYY)
+  const date = new Date(dateString)
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const year = date.getFullYear()
+  return `${month}/${day}/${year}`
 }
 
 function toggleStatus(vendor) {

@@ -121,41 +121,37 @@
       <!-- Imported Products Card (only show when editing) -->
       <div v-if="vendor" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         <h2 class="text-xl font-semibold mb-4">Imported Products</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount Price</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Second Price</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product URL</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="product in currentProducts" :key="product.id" class="hover:bg-gray-50">
-                <td class="px-4 py-2">
-                  <img v-if="product.image_url" :src="product.image_url" alt="Product" class="h-12 w-12 object-cover rounded" loading="lazy" />
-                  <span v-else class="text-gray-400 text-xs">No Image</span>
-                </td>
-                <td class="px-4 py-2">{{ product.name }}</td>
-                <td class="px-4 py-2">{{ product.price ?? '-' }}</td>
-                <td class="px-4 py-2">{{ product.discount_price ?? '-' }}</td>
-                <td class="px-4 py-2">{{ product.second_price ?? '-' }}</td>
-                <td class="px-4 py-2">
-                  <a v-if="product.product_url" :href="product.product_url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">External</a>
-                </td>
-                <td class="px-4 py-2">
-                  <a :href="`/product/${product.id}/${slugify(product.name)}`" target="_blank" class="text-green-600 hover:underline mr-2">Internal</a>
-                  <button @click="deleteProduct(product.id)" class="text-red-600 hover:text-red-900">Delete</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div v-if="currentProducts.length === 0" class="p-4 text-center text-gray-500">No products imported yet.</div>
-        </div>
+        <EasyDataTable
+          :headers="productHeaders"
+          :items="currentProducts"
+          :search-field="productSearchField"
+          :search-value="productSearchValue"
+          table-class-name="customize-table"
+          header-text-direction="left"
+          body-text-direction="left"
+        >
+          <template #item-image_url="{ image_url }">
+            <img v-if="image_url" :src="image_url" alt="Product" class="h-12 w-12 object-cover rounded" loading="lazy" />
+            <span v-else class="text-gray-400 text-xs">No Image</span>
+          </template>
+          <template #item-price="{ price }">
+            {{ price ? '$' + price : '-' }}
+          </template>
+          <template #item-discount_price="{ discount_price }">
+            {{ discount_price ? '$' + discount_price : '-' }}
+          </template>
+          <template #item-second_price="{ second_price }">
+            {{ second_price ? '$' + second_price : '-' }}
+          </template>
+          <template #item-product_url="{ product_url }">
+            <a v-if="product_url" :href="product_url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">External</a>
+            <span v-else class="text-gray-400">-</span>
+          </template>
+          <template #item-actions="{ id, name }">
+            <a :href="`/product/${id}/${slugify(name)}`" target="_blank" class="text-green-600 hover:underline mr-2">Internal</a>
+            <button @click="deleteProduct(id)" class="text-red-600 hover:text-red-900">Delete</button>
+          </template>
+        </EasyDataTable>
       </div>
     </div>
   </AdminLayout>
@@ -175,6 +171,8 @@ import { ref, computed, watch } from 'vue'
 import { useForm, usePage, Link } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import { router } from '@inertiajs/vue3'
+import EasyDataTable from 'vue3-easy-data-table'
+import 'vue3-easy-data-table/dist/style.css'
 
 const props = defineProps({
   vendor: Object,
@@ -201,6 +199,19 @@ const currentLogoUrl = computed(() => {
 const currentProducts = computed(() => {
   return props.products || []
 })
+
+const productSearchValue = ref('')
+const productSearchField = ['name']
+
+const productHeaders = [
+  { text: 'Image', value: 'image_url', sortable: false },
+  { text: 'Name', value: 'name', sortable: true },
+  { text: 'Price', value: 'price', sortable: true },
+  { text: 'Discount Price', value: 'discount_price', sortable: true },
+  { text: 'Second Price', value: 'second_price', sortable: true },
+  { text: 'Product URL', value: 'product_url', sortable: false },
+  { text: 'Actions', value: 'actions', sortable: false }
+]
 
 const editForm = useForm({
   name: props.vendor?.name || '',
