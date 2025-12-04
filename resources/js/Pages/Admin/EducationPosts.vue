@@ -20,142 +20,123 @@
       {{ $page.props.flash.error }}
     </div>
     
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Published</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="post in posts.data" :key="post.id" class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ post.title }}</div>
-              <div class="text-sm text-gray-500">{{ post.slug }}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span v-if="post.status === 'published'" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                Published
-              </span>
-              <span v-else class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                Draft
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">{{ post.rating }} ({{ post.rating_count }} reviews)</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span v-if="post.published_at" class="text-sm text-gray-900">{{ post.published_at }}</span>
-              <span v-else class="text-sm text-gray-400">Draft</span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              {{ post.created_at }}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <Link :href="`/admin/education-posts/${post.id}/edit`" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</Link>
-              <button @click="deletePost(post)" :disabled="deleteForm.processing" class="text-red-600 hover:text-red-900">
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <!-- Pagination -->
-      <div v-if="posts.last_page > 1" class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-        <div class="flex-1 flex justify-between sm:hidden">
-          <Link v-if="posts.current_page > 1" :href="posts.prev_page_url" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-            Previous
-          </Link>
-          <Link v-if="posts.current_page < posts.last_page" :href="posts.next_page_url" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-            Next
-          </Link>
-        </div>
-        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-          <div>
-            <p class="text-sm text-gray-700">
-              Showing <span class="font-medium">{{ posts.from }}</span> to <span class="font-medium">{{ posts.to }}</span> of <span class="font-medium">{{ posts.total }}</span> results
-            </p>
-          </div>
-          <div>
-            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-              <Link v-for="page in pages" :key="page" :href="getPageUrl(page)" :class="[
-                'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                page === posts.current_page
-                  ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
-                page === '...' ? 'cursor-default' : ''
-              ]">
-                {{ page }}
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </div>
-      
-      <div v-if="posts.data.length === 0" class="p-6 text-center text-gray-500">
-        No education posts found. <Link href="/admin/education-posts/create" class="text-blue-600 hover:text-blue-800">Create your first education post</Link>
-      </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+      <EasyDataTable
+        :headers="headers"
+        :items="posts.data || []"
+        :search-field="searchField"
+        :search-value="searchValue"
+        :server-items-length="posts.total || 0"
+        :server-options="serverOptions"
+        @update:server-options="handleServerOptionsChange"
+        @update:search-value="handleSearchChange"
+        server
+        table-class-name="customize-table"
+        header-text-direction="left"
+        body-text-direction="left"
+      >
+        <template #item-title="{ title, slug }">
+          <div class="text-sm font-medium text-slate-800">{{ title }}</div>
+          <div class="text-sm text-slate-500">{{ slug }}</div>
+        </template>
+        <template #item-status="{ status }">
+          <span v-if="status === 'published'" class="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-green-50 text-green-700 border border-green-200">
+            Published
+          </span>
+          <span v-else class="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-600 border border-slate-100">
+            Draft
+          </span>
+        </template>
+        <template #item-rating="{ rating, rating_count }">
+          <div class="text-sm text-slate-800">{{ rating }} ({{ rating_count }} reviews)</div>
+        </template>
+        <template #item-published_at="{ published_at }">
+          <span v-if="published_at" class="text-sm text-slate-700">{{ published_at }}</span>
+          <span v-else class="text-sm text-slate-400">Draft</span>
+        </template>
+        <template #item-actions="{ id }">
+          <Link :href="`/admin/education-posts/${id}/edit`" class="text-blue-500 hover:text-blue-600 mr-4 transition-colors duration-150">Edit</Link>
+          <button @click="deletePostById(id)" :disabled="deleteForm.processing" class="text-red-500 hover:text-red-600 transition-colors duration-150">
+            Delete
+          </button>
+        </template>
+      </EasyDataTable>
     </div>
   </AdminLayout>
 </template>
 
 <script setup>
-import { Link, useForm } from '@inertiajs/vue3'
+import { Link, useForm, router } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
-import { computed } from 'vue'
+import { ref, watch } from 'vue'
+import EasyDataTable from 'vue3-easy-data-table'
+import 'vue3-easy-data-table/dist/style.css'
 
 const props = defineProps({
   posts: Object,
 })
 
 const deleteForm = useForm({})
+const searchValue = ref('')
+const searchField = ['title', 'slug']
+const loading = ref(false)
 
-const pages = computed(() => {
-  const current = props.posts.current_page
-  const last = props.posts.last_page
-  const pages = []
-  
-  if (last <= 7) {
-    for (let i = 1; i <= last; i++) {
-      pages.push(i)
-    }
-  } else {
-    if (current <= 3) {
-      for (let i = 1; i <= 4; i++) pages.push(i)
-      pages.push('...')
-      pages.push(last)
-    } else if (current >= last - 2) {
-      pages.push(1)
-      pages.push('...')
-      for (let i = last - 3; i <= last; i++) pages.push(i)
-    } else {
-      pages.push(1)
-      pages.push('...')
-      for (let i = current - 1; i <= current + 1; i++) pages.push(i)
-      pages.push('...')
-      pages.push(last)
-    }
-  }
-  
-  return pages
+const serverOptions = ref({
+  page: props.posts?.current_page || 1,
+  rowsPerPage: props.posts?.per_page || 20,
+  sortBy: 'created_at',
+  sortType: 'desc'
 })
 
-const getPageUrl = (page) => {
-  if (page === '...' || page === props.posts.current_page) return '#'
-  const url = new URL(window.location.href)
-  url.searchParams.set('page', page)
-  return url.pathname + url.search
+const headers = [
+  { text: 'Title', value: 'title', sortable: true },
+  { text: 'Status', value: 'status', sortable: true },
+  { text: 'Rating', value: 'rating', sortable: true },
+  { text: 'Published', value: 'published_at', sortable: true },
+  { text: 'Created', value: 'created_at', sortable: true },
+  { text: 'Actions', value: 'actions', sortable: false }
+]
+
+// Sync serverOptions with props when they change
+watch(() => props.posts, (posts) => {
+  if (posts) {
+    serverOptions.value.page = posts.current_page || 1
+    serverOptions.value.rowsPerPage = posts.per_page || 20
+  }
+}, { immediate: true, deep: true })
+
+function fetchData() {
+  loading.value = true
+  router.get('/admin/education-posts', {
+    page: serverOptions.value.page,
+    per_page: serverOptions.value.rowsPerPage,
+    sort_by: serverOptions.value.sortBy,
+    sort_type: serverOptions.value.sortType,
+    search: searchValue.value
+  }, {
+    preserveState: true,
+    preserveScroll: true,
+    onFinish: () => {
+      loading.value = false
+    }
+  })
 }
 
-const deletePost = (post) => {
-  if (confirm(`Are you sure you want to delete "${post.title}"?`)) {
-    deleteForm.delete(`/admin/education-posts/${post.id}`, {
+function handleServerOptionsChange(options) {
+  serverOptions.value = options
+  fetchData()
+}
+
+function handleSearchChange(value) {
+  searchValue.value = value
+  serverOptions.value.page = 1
+  fetchData()
+}
+
+const deletePostById = (id) => {
+  const post = props.posts.data.find(p => p.id === id)
+  if (post && confirm(`Are you sure you want to delete "${post.title}"?`)) {
+    deleteForm.delete(`/admin/education-posts/${id}`, {
       preserveScroll: true,
     })
   }

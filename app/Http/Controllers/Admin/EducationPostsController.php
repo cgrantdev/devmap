@@ -13,10 +13,37 @@ use App\Helpers\ImageHelper;
 
 class EducationPostsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = EducationPost::orderBy('created_at', 'desc')
-            ->paginate(20)
+        $query = EducationPost::query();
+        
+        // Search functionality
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
+        
+        // Sorting
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortType = $request->get('sort_type', 'desc');
+        
+        // Validate sortBy
+        $allowedSortColumns = ['id', 'title', 'status', 'rating', 'published_at', 'created_at'];
+        if (!in_array($sortBy, $allowedSortColumns)) {
+            $sortBy = 'created_at';
+        }
+        
+        // Validate sortType
+        $sortType = strtolower($sortType) === 'asc' ? 'asc' : 'desc';
+        
+        $query->orderBy($sortBy, $sortType);
+        
+        // Pagination
+        $perPage = $request->get('per_page', 20);
+        $posts = $query->paginate($perPage)
             ->through(function ($post) {
                 return [
                     'id' => $post->id,
