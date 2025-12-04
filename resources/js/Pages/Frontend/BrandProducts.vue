@@ -285,7 +285,10 @@
                 </div>
                 <div class="p-4 flex flex-col gap-2 flex-1">
                   <h3 class="font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0 text-center">{{ product.name }}</h3>
-                  <p class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800 m-0 text-center">${{ product.price }}</p>
+                  <div class="flex items-center justify-center gap-2">
+                    <p v-if="product.discount_price" class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-400 m-0 line-through">${{ product.price }}</p>
+                    <p class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800 m-0">${{ product.discount_price || product.price }}</p>
+                  </div>
                   <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 m-0 text-center">
                     From Seller 
                     <span class="inline-block bg-[#E0F2FE] text-gray-800 rounded-lg py-[3px] px-2">{{ product.brand?.name || 'Unknown' }}</span>

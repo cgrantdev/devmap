@@ -36,6 +36,11 @@ class ImageHelper
         
         $mimeType = $imageInfo['mime'];
         
+        // Don't process SVG files - they should be handled separately
+        if ($mimeType === 'image/svg+xml') {
+            throw new \Exception('SVG files should be saved as-is, not converted to WebP.');
+        }
+        
         // Create image resource based on MIME type
         switch ($mimeType) {
             case 'image/jpeg':
@@ -46,9 +51,28 @@ class ImageHelper
                 // Preserve transparency for PNG
                 imagealphablending($image, false);
                 imagesavealpha($image, true);
+                
+                // Convert palette images to true color to support WebP
+                if (imageistruecolor($image) === false) {
+                    $trueColorImage = imagecreatetruecolor(imagesx($image), imagesy($image));
+                    imagealphablending($trueColorImage, false);
+                    imagesavealpha($trueColorImage, true);
+                    imagecopy($trueColorImage, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
+                    imagedestroy($image);
+                    $image = $trueColorImage;
+                }
                 break;
             case 'image/gif':
                 $image = imagecreatefromgif($uploadedFile->getRealPath());
+                // Convert palette images to true color to support WebP
+                if (imageistruecolor($image) === false) {
+                    $trueColorImage = imagecreatetruecolor(imagesx($image), imagesy($image));
+                    imagealphablending($trueColorImage, false);
+                    imagesavealpha($trueColorImage, true);
+                    imagecopy($trueColorImage, $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
+                    imagedestroy($image);
+                    $image = $trueColorImage;
+                }
                 break;
             case 'image/webp':
                 // Already WebP, just copy it

@@ -93,9 +93,17 @@ class ProductsController extends Controller
         }
 
         // Apply sorting - default to price ascending
+        // When sorting by price, use discount_price if available, otherwise use price
         $sortBy = $request->get('sort', 'price');
-        $sortDir = $request->get('sort_dir', 'asc');
-        $query->orderBy($sortBy, $sortDir);
+        $sortDir = in_array(strtolower($request->get('sort_dir', 'asc')), ['asc', 'desc']) 
+            ? strtolower($request->get('sort_dir', 'asc')) 
+            : 'asc';
+        
+        if ($sortBy === 'price') {
+            $query->orderByRaw('COALESCE(discount_price, price) ' . $sortDir);
+        } else {
+            $query->orderBy($sortBy, $sortDir);
+        }
 
         // Paginate
         $perPage = $request->get('per_page', 20);
@@ -183,9 +191,17 @@ class ProductsController extends Controller
         }
 
         // Apply sorting - default to price ascending
+        // When sorting by price, use discount_price if available, otherwise use price
         $sortBy = $request->get('sort', 'price');
-        $sortDir = $request->get('sort_dir', 'asc');
-        $query->orderBy($sortBy, $sortDir);
+        $sortDir = in_array(strtolower($request->get('sort_dir', 'asc')), ['asc', 'desc']) 
+            ? strtolower($request->get('sort_dir', 'asc')) 
+            : 'asc';
+        
+        if ($sortBy === 'price') {
+            $query->orderByRaw('COALESCE(discount_price, price) ' . $sortDir);
+        } else {
+            $query->orderBy($sortBy, $sortDir);
+        }
 
         // Paginate
         $perPage = $request->get('per_page', 20);

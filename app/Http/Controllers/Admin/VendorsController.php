@@ -112,7 +112,11 @@ class VendorsController extends Controller
         // Handle logo upload - convert to WebP if not SVG, otherwise save as-is
         if ($request->hasFile('logo')) {
             $logoFile = $request->file('logo');
-            if (strtolower($logoFile->getClientOriginalExtension()) === 'svg') {
+            $extension = strtolower($logoFile->getClientOriginalExtension());
+            $mimeType = $logoFile->getMimeType();
+            
+            // Check if it's SVG by extension or MIME type
+            if ($extension === 'svg' || $mimeType === 'image/svg+xml') {
                 // Save SVG as-is
                 $logoFilename = Str::random(40) . '.svg';
                 $logoFile->storeAs('vendor_logos', $logoFilename, 'public');
@@ -207,7 +211,11 @@ class VendorsController extends Controller
                 ImageHelper::deleteImage(basename($settings->logo), 'vendor_logos');
             }
             $logoFile = $request->file('logo');
-            if (strtolower($logoFile->getClientOriginalExtension()) === 'svg') {
+            $extension = strtolower($logoFile->getClientOriginalExtension());
+            $mimeType = $logoFile->getMimeType();
+            
+            // Check if it's SVG by extension or MIME type
+            if ($extension === 'svg' || $mimeType === 'image/svg+xml') {
                 // Save SVG as-is
                 $logoFilename = Str::random(40) . '.svg';
                 $logoFile->storeAs('vendor_logos', $logoFilename, 'public');
@@ -496,7 +504,7 @@ class VendorsController extends Controller
             $api_route = 'normal';
             $apiUrl = "$shopUrl/wp-json/wc/store/v1/products?per_page=$perPage&page=$page";
             $response = null;
-            
+            \Log::info('normal====' . $apiUrl);
             try {
                 $response = $client->get($apiUrl);
             } catch (\Exception $e) {
@@ -509,7 +517,7 @@ class VendorsController extends Controller
                     $proxytoken = 'e3980c24459441efbc4ca2d232d91e7663bfa3d6897';
                     $encodedUrl = urlencode($apiUrl);
                     $url = "https://api.scrape.do/?token=$proxytoken&url=$encodedUrl";
-                    \Log::info($url);
+                    \Log::info('proxy=====' . $url);
                     try {
                         $response = $client->get($url);
                         $api_route = 'proxy';
@@ -534,35 +542,60 @@ class VendorsController extends Controller
             }
             
             foreach ($data as $item) {
-                // Check categories - if not empty, only include if category contains "peptide" or "peptides"
+                // Check categories - if product has "peptide" category, always include it
+                // Otherwise, skip if it has disallowed categories
                 $categories = $item['categories'] ?? [];
                 if (!empty($categories) && is_array($categories)) {
+                    // First, check if product has a peptide category - if yes, always include it
                     $hasPeptideCategory = false;
                     foreach ($categories as $cat) {
                         $catName = strtolower($cat['name'] ?? '');
                         $catSlug = strtolower($cat['slug'] ?? '');
-                        // Check if category name or slug contains "peptide" or "peptides"
-                        // allow category names
-                        //peptide, regeneration, all-other
-
-                        $allowCategorieNames = [
-                            'peptide',
-                            'peptides',
-                            'regeneration',
-                            'all-other',
-                            'cognitive-neuro'
-                        ];
-
-                        foreach ($allowCategorieNames as $allowCategoryName) {
-                            if (strpos($catName, $allowCategoryName) !== false || strpos($catSlug, $allowCategoryName) !== false) {
-                                $hasPeptideCategory = true;
-                                break;
-                            }
+                        if (strpos($catName, 'peptide') !== false || strpos($catSlug, 'peptide') !== false) {
+                            $hasPeptideCategory = true;
+                            break;
                         }
                     }
-                    // Skip this product if it doesn't have a peptide category
+                    
+                    // If it has a peptide category, include it (don't check disallowed)
                     if (!$hasPeptideCategory) {
-                        continue;
+                        // If no peptide category, check for disallowed categories
+                        $hasDisallowedCategory = false;
+                        $disallowCategorieNames = [
+                            'ebook',
+                            'e-book',
+                            'book',
+                            'guide',
+                            'manual',
+                            'document',
+                            'powder', // for pureawz
+                            'capsules', // for pureawz
+                            'research-caps', //for pureawz
+                            'research-powders',
+                            'stack-tablets',
+                            'discounted',
+                            'merchandise',
+                            'supplementary',
+                            'injectables',
+                            'additions',
+                        ];
+
+                        foreach ($categories as $cat) {
+                            $catName = strtolower($cat['name'] ?? '');
+                            $catSlug = strtolower($cat['slug'] ?? '');
+                            
+                            // Check if category name or slug contains any disallowed name
+                            foreach ($disallowCategorieNames as $disallowCategoryName) {
+                                if (strpos($catName, $disallowCategoryName) !== false || strpos($catSlug, $disallowCategoryName) !== false) {
+                                    $hasDisallowedCategory = true;
+                                    break 2; // Break out of both loops
+                                }
+                            }
+                        }
+                        // Skip this product if it has a disallowed category (and no peptide category)
+                        if ($hasDisallowedCategory) {
+                            continue;
+                        }
                     }
                 }
                 
