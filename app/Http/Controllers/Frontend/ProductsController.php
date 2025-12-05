@@ -23,17 +23,24 @@ class ProductsController extends Controller
             ->orderBy('name')
             ->get()
             ->map(function ($category) {
-                // Get a sample product image for this category
-                $sampleProduct = Product::where('product_category_id', $category->id)
-                    ->whereNotNull('image_url')
-                    ->first();
+                // Use category image if available, otherwise get a sample product image
+                $image = null;
+                if ($category->image_url) {
+                    $image = \Illuminate\Support\Facades\Storage::url('categories/' . $category->image_url);
+                } else {
+                    // Get a sample product image for this category
+                    $sampleProduct = Product::where('product_category_id', $category->id)
+                        ->whereNotNull('image_url')
+                        ->first();
+                    $image = $sampleProduct ? $sampleProduct->image_url : '/images/peptides/default.png';
+                }
                 
                 return [
                     'id' => $category->id,
                     'name' => strtoupper($category->name),
                     'slug' => $category->slug,
                     'total_items' => $category->products_count,
-                    'image' => $sampleProduct ? $sampleProduct->image_url : ($category->image_url ?: '/images/peptides/default.png'),
+                    'image' => $image,
                     'description' => $category->description,
                 ];
             });

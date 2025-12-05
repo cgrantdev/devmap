@@ -79,6 +79,10 @@
               class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
             />
           </template>
+          <template #item-image_url="{ image_url }">
+            <img v-if="image_url" :src="image_url" alt="Category" class="h-12 w-12 object-cover rounded" loading="lazy" />
+            <span v-else class="text-gray-400 text-xs">No Image</span>
+          </template>
           <template #item-name="{ name, slug }">
             <a :href="`/product/${slug}`" target="_blank" class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-150">
               {{ name }}
@@ -163,6 +167,7 @@ const serverOptions = ref({
 const headers = [
   { text: '', value: 'checkbox', sortable: false, width: 50 },
   { text: 'ID', value: 'id', sortable: true },
+  { text: 'Image', value: 'image_url', sortable: false },
   { text: 'Name', value: 'name', sortable: true },
   { text: 'Slug', value: 'slug', sortable: true },
   { text: 'Status', value: 'is_active', sortable: true },

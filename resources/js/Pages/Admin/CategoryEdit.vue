@@ -47,8 +47,23 @@
                 <textarea v-model="editForm.description" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" rows="4"></textarea>
               </div>
               <div>
-                <label class="block mb-1.5 font-semibold text-slate-800">Image URL</label>
-                <input v-model="editForm.image_url" type="url" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" />
+                <label class="block mb-1.5 font-semibold text-slate-800">Category Image</label>
+                <div v-if="imagePreview" class="mb-4">
+                  <img :src="imagePreview" alt="Preview" class="w-full h-48 object-cover rounded-xl border border-slate-100 shadow-sm" />
+                </div>
+                <div v-else-if="category?.image_url" class="mb-4">
+                  <img :src="category.image_url" alt="Current" class="w-full h-48 object-cover rounded-xl border border-slate-100 shadow-sm" />
+                </div>
+                <div v-else class="mb-4 w-full h-48 bg-slate-100 rounded-xl border border-slate-100 flex items-center justify-center text-slate-400">
+                  <span>No Image</span>
+                </div>
+                <input
+                  @change="handleImageChange"
+                  type="file"
+                  accept="image/*"
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                />
+                <p class="text-sm text-slate-500 mt-1">Upload category image (will be converted to WebP)</p>
               </div>
               <div>
                 <label class="block mb-1.5 font-semibold text-slate-800">Meta Title</label>
@@ -208,12 +223,26 @@ const editForm = useForm({
   name: props.category?.name || '',
   slug: props.category?.slug || '',
   description: props.category?.description || '',
-  image_url: props.category?.image_url || '',
+  image: null,
   meta_title: props.category?.meta_title || '',
   meta_description: props.category?.meta_description || '',
   is_active: props.category?.is_active ?? true,
   _token: usePage().props.csrf_token
 })
+
+const imagePreview = ref(null)
+
+function handleImageChange(event) {
+  const file = event.target.files[0]
+  if (file) {
+    editForm.image = file
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      imagePreview.value = e.target.result
+    }
+    reader.readAsDataURL(file)
+  }
+}
 
 const mergeForm = useForm({
   source_category_id: null,
@@ -255,17 +284,23 @@ function searchCategories() {
 }
 
 function submitEdit() {
+  // Update CSRF token before submission
+  editForm._token = usePage().props.csrf_token
+  
   if (props.category) {
     // Update existing category
-    editForm.put(`/admin/categories/${props.category.id}`, {
+    editForm.post(`/admin/categories/${props.category.id}`, {
       preserveState: true,
-      preserveScroll: true
+      preserveScroll: true,
+      forceFormData: true,
+      _method: 'PUT',
     })
   } else {
     // Create new category
     editForm.post('/admin/categories', {
       preserveState: true,
-      preserveScroll: true
+      preserveScroll: true,
+      forceFormData: true,
     })
   }
 }

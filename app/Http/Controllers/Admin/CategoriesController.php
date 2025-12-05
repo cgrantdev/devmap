@@ -8,7 +8,9 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use App\Helpers\ImageHelper;
 
 class CategoriesController extends Controller
 {
@@ -38,6 +40,12 @@ class CategoriesController extends Controller
         // Validate sortType
         $sortType = strtolower($sortType) === 'desc' ? 'desc' : 'asc';
         
+        // Priority: Active categories first (unless explicitly sorting by is_active)
+        if ($sortBy !== 'is_active') {
+            $query->orderBy('is_active', 'desc');
+        }
+        
+        // Apply user's chosen sort
         if ($sortBy === 'products_count') {
             $query->orderBy('products_count', $sortType);
         } else {
@@ -53,6 +61,7 @@ class CategoriesController extends Controller
                     'name' => $category->name,
                     'slug' => $category->slug,
                     'description' => $category->description,
+                    'image_url' => $category->image_url ? Storage::url('categories/' . $category->image_url) : null,
                     'is_active' => $category->is_active,
                     'products_count' => $category->products_count,
                     'created_at' => $category->created_at->format('Y-m-d H:i'),
@@ -79,7 +88,7 @@ class CategoriesController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:product_categories,slug',
             'description' => 'nullable|string',
-            'image_url' => 'nullable|string|max:255',
+            'image' => 'nullable|image|max:2048',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'is_active' => 'boolean',
@@ -95,6 +104,13 @@ class CategoriesController extends Controller
                 $validated['slug'] = $baseSlug . '-' . $counter;
                 $counter++;
             }
+        }
+        
+        // Handle image upload and convert to WebP
+        if ($request->hasFile('image')) {
+            $validated['image_url'] = ImageHelper::convertToWebP($request->file('image'), 'categories');
+        } else {
+            unset($validated['image']);
         }
         
         ProductCategory::create($validated);
@@ -133,7 +149,7 @@ class CategoriesController extends Controller
                 'name' => $category->name,
                 'slug' => $category->slug,
                 'description' => $category->description,
-                'image_url' => $category->image_url,
+                'image_url' => $category->image_url ? Storage::url('categories/' . $category->image_url) : null,
                 'meta_title' => $category->meta_title,
                 'meta_description' => $category->meta_description,
                 'is_active' => $category->is_active,
@@ -152,7 +168,7 @@ class CategoriesController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:product_categories,slug,' . $id,
             'description' => 'nullable|string',
-            'image_url' => 'nullable|string|max:255',
+            'image' => 'nullable|image|max:2048',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'is_active' => 'boolean',
@@ -168,6 +184,17 @@ class CategoriesController extends Controller
                 $validated['slug'] = $baseSlug . '-' . $counter;
                 $counter++;
             }
+        }
+        
+        // Handle image upload and convert to WebP
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($category->image_url) {
+                ImageHelper::deleteImage($category->image_url, 'categories');
+            }
+            $validated['image_url'] = ImageHelper::convertToWebP($request->file('image'), 'categories');
+        } else {
+            unset($validated['image']);
         }
         
         $category->update($validated);
