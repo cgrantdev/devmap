@@ -39,6 +39,7 @@
             ${{ price || '0.00' }}
           </template>
           <template #item-actions="{ id, slug }">
+            <Link :href="`/admin/products/${id}/edit`" class="text-blue-500 hover:text-blue-600 mr-4 transition-colors duration-150">Edit</Link>
             <a :href="`/product/${id}/${slug}`" target="_blank" class="text-blue-600 hover:underline">View</a>
           </template>
         </EasyDataTable>
@@ -50,7 +51,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { usePage, router } from '@inertiajs/vue3'
+import { usePage, router, Link } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
@@ -100,6 +101,7 @@ const headers = [
   { text: 'Image', value: 'image_url', sortable: false },
   { text: 'Name', value: 'name', sortable: true },
   { text: 'Price', value: 'price', sortable: true },
+  { text: 'Category', value: 'category_name', sortable: true },
   { text: 'Vendor', value: 'vendor_name', sortable: true },
   { text: 'Actions', value: 'actions', sortable: false }
 ]

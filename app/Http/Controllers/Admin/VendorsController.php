@@ -368,7 +368,7 @@ class VendorsController extends Controller
 
     public function adminProducts(Request $request)
     {
-        $query = \App\Models\Product::with('brand');
+        $query = \App\Models\Product::with(['brand', 'category']);
         
         // Search functionality
         if ($request->has('search') && $request->search) {
@@ -414,6 +414,7 @@ class VendorsController extends Controller
                     'price' => $product->price,
                     'image_url' => $product->image_url,
                     'vendor_name' => $product->brand ? $product->brand->name : '-',
+                    'category_name' => $product->category ? $product->category->name : '-',
                 ];
             });
         return \Inertia\Inertia::render('Admin/Products', [

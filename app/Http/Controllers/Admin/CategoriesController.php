@@ -64,6 +64,45 @@ class CategoriesController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return Inertia::render('Admin/CategoryEdit', [
+            'category' => null,
+            'similarCategories' => [],
+            'products' => [],
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:product_categories,slug',
+            'description' => 'nullable|string',
+            'image_url' => 'nullable|string|max:255',
+            'meta_title' => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'is_active' => 'boolean',
+        ]);
+        
+        // Auto-generate slug if not provided
+        if (empty($validated['slug'])) {
+            $validated['slug'] = Str::slug($validated['name']);
+            // Ensure unique slug
+            $baseSlug = $validated['slug'];
+            $counter = 1;
+            while (ProductCategory::where('slug', $validated['slug'])->exists()) {
+                $validated['slug'] = $baseSlug . '-' . $counter;
+                $counter++;
+            }
+        }
+        
+        ProductCategory::create($validated);
+        
+        return redirect()->route('admin.categories.index')
+            ->with('success', 'Category created successfully.');
+    }
+
     public function edit($id)
     {
         $category = ProductCategory::withCount('products')->findOrFail($id);

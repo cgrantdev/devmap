@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\BlogManagementController;
 use App\Http\Controllers\Admin\EducationPostsController;
 use App\Http\Controllers\Admin\CategoriesController;
+use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Vendor\ImportController;
 use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
 use App\Http\Controllers\Auth\EmailVerificationController;
@@ -114,9 +115,13 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/vendors/{id}/import-shop-url', [VendorsController::class, 'importFromShopUrl'])->name('admin.vendors.import-shop-url');
     Route::delete('/vendors/{vendorId}/products/{productId}', [VendorsController::class, 'deleteProduct'])->name('admin.vendors.products.delete');
     Route::get('/products', [VendorsController::class, 'adminProducts'])->name('admin.products');
+    Route::get('/products/{id}/edit', [AdminProductsController::class, 'edit'])->name('admin.products.edit');
+    Route::put('/products/{id}', [AdminProductsController::class, 'update'])->name('admin.products.update');
     
     // Categories
     Route::get('/categories', [CategoriesController::class, 'index'])->name('admin.categories.index');
+    Route::get('/categories/create', [CategoriesController::class, 'create'])->name('admin.categories.create');
+    Route::post('/categories', [CategoriesController::class, 'store'])->name('admin.categories.store');
     Route::get('/categories/{id}/edit', [CategoriesController::class, 'edit'])->name('admin.categories.edit');
     Route::get('/categories/{id}/search', [CategoriesController::class, 'search'])->name('admin.categories.search');
     Route::put('/categories/{id}', [CategoriesController::class, 'update'])->name('admin.categories.update');
