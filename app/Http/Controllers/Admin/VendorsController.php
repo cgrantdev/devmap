@@ -483,6 +483,8 @@ class VendorsController extends Controller
                 }
                 
                 if ($existing) {
+                    // Don't update the name for existing products
+                    unset($productFields['name']);
                     $existing->update($productFields);
                     $updatedCount++;
                 } else {
@@ -493,28 +495,37 @@ class VendorsController extends Controller
                         $categoryName = $productData['category_name'];
                         $categoryNameLower = strtolower($categoryName);
                         
-                        // Search for similar categories (case-insensitive, partial match)
-                        $similarCategory = ProductCategory::where(function ($query) use ($categoryNameLower) {
-                            // Exact match (case-insensitive)
-                            $query->whereRaw('LOWER(name) = ?', [$categoryNameLower])
-                                // Contains the category name
-                                ->orWhereRaw('LOWER(name) LIKE ?', ['%' . $categoryNameLower . '%'])
-                                // Category name contains the other name
-                                ->orWhereRaw('? LIKE CONCAT("%", LOWER(name), "%")', [$categoryNameLower]);
-                        })
-                        ->orderBy('name')
-                        ->first();
+                        // First, check if a category with this exact slug already exists (check ALL categories, not just active)
+                        $baseSlug = Str::slug($categoryName);
+                        $existingCategory = ProductCategory::where('slug', $baseSlug)->first();
                         
-                        if ($similarCategory) {
-                            // Use the similar category found
-                            $category = $similarCategory;
+                        if ($existingCategory) {
+                            // Use the existing category
+                            $category = $existingCategory;
                         } else {
-                            // No similar category found, create a new one
-                            $category = ProductCategory::create([
-                                'name' => $categoryName,
-                                'slug' => Str::slug($categoryName),
-                                'is_active' => true,
-                            ]);
+                            // Search for similar categories by name (case-insensitive, partial match)
+                            $similarCategory = ProductCategory::where(function ($query) use ($categoryNameLower) {
+                                // Exact match (case-insensitive)
+                                $query->whereRaw('LOWER(name) = ?', [$categoryNameLower])
+                                    // Contains the category name
+                                    ->orWhereRaw('LOWER(name) LIKE ?', ['%' . $categoryNameLower . '%'])
+                                    // Category name contains the other name
+                                    ->orWhereRaw('? LIKE CONCAT("%", LOWER(name), "%")', [$categoryNameLower]);
+                            })
+                            ->orderBy('name')
+                            ->first();
+                            
+                            if ($similarCategory) {
+                                // Use the similar category found
+                                $category = $similarCategory;
+                            } else {
+                                // No similar category found, create a new one
+                                // Let the model's boot method handle unique slug generation
+                                $category = ProductCategory::create([
+                                    'name' => $categoryName,
+                                    'is_active' => true,
+                                ]);
+                            }
                         }
                     }                   
 
