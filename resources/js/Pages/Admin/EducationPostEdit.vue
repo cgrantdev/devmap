@@ -126,6 +126,22 @@
         <!-- Sidebar Content -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-6">
           <div>
+            <label class="block mb-2 font-semibold text-slate-800">Category *</label>
+            <select v-model="form.product_category_id" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" required>
+              <option :value="null">-- Select Category --</option>
+              <option 
+                v-for="category in availableCategories" 
+                :key="category.id" 
+                :value="category.id"
+                :disabled="category.has_education_post"
+              >
+                {{ category.name }}{{ category.has_education_post ? ' (Already has education post)' : '' }}
+              </option>
+            </select>
+            <p class="text-sm text-slate-500 mt-1">Each category can only have one education post</p>
+          </div>
+          
+          <div>
             <label class="block mb-2 font-semibold text-slate-800">Status *</label>
             <select v-model="form.status" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" required>
               <option value="draft">Draft</option>
@@ -181,10 +197,14 @@ import { Link, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   post: Object,
+  categories: {
+    type: Array,
+    default: () => []
+  }
 })
 
 const page = usePage()
@@ -215,7 +235,13 @@ const form = useForm({
   accordion_sections: props.post?.accordion_sections || [],
   shop_url: props.post?.shop_url || '',
   status: props.post?.status || 'draft',
+  product_category_id: props.post?.product_category_id || null,
   _token: page.props.csrf_token,
+})
+
+// Computed property to filter available categories
+const availableCategories = computed(() => {
+  return props.categories || []
 })
 
 const handleImageChange = (event) => {

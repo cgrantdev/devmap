@@ -28,10 +28,10 @@ class ProductsController extends Controller
                 if ($category->image_url) {
                     $image = \Illuminate\Support\Facades\Storage::url('categories/' . $category->image_url);
                 } else {
-                    // Get a sample product image for this category
-                    $sampleProduct = Product::where('product_category_id', $category->id)
-                        ->whereNotNull('image_url')
-                        ->first();
+                // Get a sample product image for this category
+                $sampleProduct = Product::where('product_category_id', $category->id)
+                    ->whereNotNull('image_url')
+                    ->first();
                     $image = $sampleProduct ? $sampleProduct->image_url : '/images/peptides/default.png';
                 }
                 

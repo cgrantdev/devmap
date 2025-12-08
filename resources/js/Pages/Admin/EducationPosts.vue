@@ -127,6 +127,7 @@ const serverOptions = ref({
 
 const headers = [
   { text: 'Title', value: 'title', sortable: true },
+  { text: 'Category', value: 'category_name', sortable: true },
   { text: 'Status', value: 'status', sortable: true },
   { text: 'Rating', value: 'rating', sortable: true },
   { text: 'Published', value: 'published_at', sortable: true },

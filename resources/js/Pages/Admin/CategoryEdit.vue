@@ -298,10 +298,10 @@ function submitEdit() {
   } else {
     // Create new category
     editForm.post('/admin/categories', {
-      preserveState: true,
+    preserveState: true,
       preserveScroll: true,
       forceFormData: true,
-    })
+  })
   }
 }
 

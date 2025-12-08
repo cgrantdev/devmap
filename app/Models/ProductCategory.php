@@ -50,6 +50,11 @@ class ProductCategory extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function educationPost()
+    {
+        return $this->hasOne(EducationPost::class, 'product_category_id');
+    }
+
     /**
      * Get the decoded category name (HTML entities decoded)
      */

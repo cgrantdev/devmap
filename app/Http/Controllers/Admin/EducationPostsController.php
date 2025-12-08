@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\EducationPost;
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -43,7 +44,7 @@ class EducationPostsController extends Controller
         
         // Pagination
         $perPage = $request->get('per_page', 20);
-        $posts = $query->paginate($perPage)
+        $posts = $query->with('category')->paginate($perPage)
             ->through(function ($post) {
                 return [
                     'id' => $post->id,
@@ -51,11 +52,12 @@ class EducationPostsController extends Controller
                     'slug' => $post->slug,
                     'description' => $post->description,
                     'image' => $post->image ? (Storage::disk('public')->exists('education_posts/' . $post->image) ? asset('storage/education_posts/' . $post->image) : (file_exists(public_path('images/peptides/' . $post->image)) ? '/images/peptides/' . $post->image : null)) : null,
-                    'rating' => $post->rating,
+                    'rating' => number_format($post->rating, 2, '.', ''),
                     'rating_count' => $post->rating_count,
                     'published_at' => $post->published_at ? $post->published_at->format('Y-m-d') : null,
                     'status' => $post->status,
                     'created_at' => $post->created_at->format('Y-m-d H:i'),
+                    'category_name' => $post->category ? $post->category->name : '-',
                 ];
             });
 
@@ -66,8 +68,33 @@ class EducationPostsController extends Controller
 
     public function create()
     {
+        // Get all categories, excluding those that already have education posts
+        $categories = ProductCategory::where('is_active', true)
+            ->whereDoesntHave('educationPost')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                ];
+            });
+        
+        // Also include categories that have education posts (for editing existing posts)
+        $allCategories = ProductCategory::where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'has_education_post' => $category->educationPost ? true : false,
+                ];
+            });
+
         return Inertia::render('Admin/EducationPostEdit', [
             'post' => null,
+            'categories' => $allCategories,
         ]);
     }
 
@@ -89,6 +116,7 @@ class EducationPostsController extends Controller
             'accordion_sections.*.content' => 'required|string',
             'shop_url' => 'nullable|url|max:255',
             'status' => 'required|in:draft,published',
+            'product_category_id' => 'nullable|exists:product_categories,id|unique:education_posts,product_category_id',
         ]);
 
         // Auto-generate slug from title
@@ -116,7 +144,19 @@ class EducationPostsController extends Controller
 
     public function edit($id)
     {
-        $post = EducationPost::findOrFail($id);
+        $post = EducationPost::with('category')->findOrFail($id);
+        
+        // Get all categories
+        $allCategories = ProductCategory::where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->map(function ($category) use ($post) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'has_education_post' => $category->educationPost && $category->educationPost->id !== $post->id ? true : false,
+                ];
+            });
 
         return Inertia::render('Admin/EducationPostEdit', [
             'post' => [
@@ -126,7 +166,7 @@ class EducationPostsController extends Controller
                 'description' => $post->description,
                 'overview' => $post->overview,
                 'content' => $post->content,
-                'image' => $post->image,
+                'image' => $post->image ? Storage::url('education_posts/' . $post->image) : null,
                 'rating' => $post->rating,
                 'rating_count' => $post->rating_count,
                 'key_effects' => $post->key_effects ?? [],
@@ -134,7 +174,9 @@ class EducationPostsController extends Controller
                 'shop_url' => $post->shop_url,
                 'published_at' => $post->published_at ? $post->published_at->format('Y-m-d') : null,
                 'status' => $post->status,
+                'product_category_id' => $post->product_category_id,
             ],
+            'categories' => $allCategories,
         ]);
     }
 
@@ -158,6 +200,7 @@ class EducationPostsController extends Controller
             'accordion_sections.*.content' => 'required|string',
             'shop_url' => 'nullable|url|max:255',
             'status' => 'required|in:draft,published',
+            'product_category_id' => 'nullable|exists:product_categories,id|unique:education_posts,product_category_id,' . $id,
         ]);
 
         // Auto-generate slug from title

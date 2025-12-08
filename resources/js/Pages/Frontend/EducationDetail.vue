@@ -85,10 +85,10 @@
             <!-- Shop Now Button -->
             <button 
               v-if="post.shop_url"
-              @click="window.open(post.shop_url, '_blank')"
-              class="w-full md:w-auto py-3 px-8 rounded-[500px] bg-blue-600 font-roboto font-medium text-base leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 hover:bg-blue-700"
+              @click="router.visit(post.shop_url)"
+              class="h-[52px] rounded-[500px] px-6 py-[10px] bg-gray-800 font-roboto font-medium text-base leading-none tracking-normal text-white transition-colors hover:opacity-90 inline-flex items-center justify-center"
             >
-              Shop {{ post.title }} Now
+              Shop {{ category.name }} Now
             </button>
           </div>
         </div>
@@ -156,6 +156,7 @@ import FrontLayout from '../Layouts/FrontLayout.vue'
 
 const props = defineProps({
   post: Object,
+  category: Object,
   related: Array,
 })
 

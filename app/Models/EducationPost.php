@@ -24,6 +24,7 @@ class EducationPost extends Model
         'shop_url',
         'published_at',
         'status',
+        'product_category_id',
     ];
 
     protected $casts = [
@@ -42,5 +43,10 @@ class EducationPost extends Model
                 $post->slug = Str::slug($post->title);
             }
         });
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
 }
