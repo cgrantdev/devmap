@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Models\ProductCategory;
+use App\Models\Brand;
+use App\Models\Product;
+use App\Models\Location;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -57,10 +61,66 @@ class HomeController extends Controller
                 ];
             });
 
+        // Top brands (vendors) limited list for homepage
+        $topBrands = Brand::where('is_active', true)
+            ->with('vendorSetting')
+            ->withCount('products')
+            ->orderByDesc('products_count')
+            ->take(5)
+            ->get()
+            ->map(function ($brand) {
+                // Get most common location from products
+                $locationId = Product::where('brand_id', $brand->id)
+                    ->whereNotNull('location_id')
+                    ->selectRaw('location_id, COUNT(*) as count')
+                    ->groupBy('location_id')
+                    ->orderByDesc('count')
+                    ->first()
+                    ?->location_id;
+
+                if (!$locationId) {
+                    $locationId = Product::where('brand_id', $brand->id)
+                        ->whereNotNull('location_id')
+                        ->value('location_id');
+                }
+
+                $location = $locationId ? Location::find($locationId) : null;
+
+                $logoUrl = null;
+                if ($brand->vendorSetting && $brand->vendorSetting->logo) {
+                    $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
+                }
+
+                return [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                    'product_count' => $brand->products_count,
+                    'slug' => $brand->slug ?? Str::slug($brand->name),
+                    'initials' => $this->getInitials($brand->name),
+                    'logo' => $logoUrl,
+                    'location' => $location ? $location->name : null,
+                    'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
+                    'reviews' => (int) ($brand->rating_count ?? 0),
+                ];
+            });
+
         return Inertia::render('Frontend/Welcome', [
             'heroSlides' => $heroSlides,
             'productGroups' => $categories,
+            'topBrands' => $topBrands,
         ]);
+    }
+
+    /**
+     * Get initials from brand name
+     */
+    private function getInitials($name)
+    {
+        $words = explode(' ', $name);
+        if (count($words) >= 2) {
+            return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+        }
+        return strtoupper(substr($name, 0, 2));
     }
 }
 

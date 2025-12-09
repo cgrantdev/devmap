@@ -71,18 +71,20 @@
             <div
               v-for="vendor in topVendors"
               :key="vendor.id"
-              class="bg-white flex flex-col gap-[5px] transition-shadow duration-300 items-center hover:shadow-md"
+              class="bg-white flex flex-col gap-[5px] transition-shadow duration-300 items-center hover:shadow-md cursor-pointer"
+              @click="router.visit(`/brand/${vendor.slug}/products`)"
             >
               <!-- Logo Area -->
               <div class="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden mb-1">
                 <img 
-                  :src="`/images/vendors/${vendor.logo}`" 
+                  v-if="vendor.logo"
+                  :src="vendor.logo" 
                   :alt="vendor.name + ' logo'"
                   class="w-full h-full object-contain p-3"
                   loading="lazy"
                   @error="handleLogoError($event, vendor.id)"
                 />
-                <div v-if="logoErrors.has(vendor.id)" class="w-full h-full flex items-center justify-center">
+                <div v-if="logoErrors.has(vendor.id) || !vendor.logo" class="w-full h-full flex items-center justify-center">
                   <span class="font-roboto font-semibold text-2xl text-gray-500">{{ vendor.initials }}</span>
                 </div>
               </div>
@@ -101,11 +103,6 @@
               
               <!-- Rating -->
               <div class="flex flex-row gap-2">
-                <div class="flex gap-0.5">
-                  <svg v-for="i in 5" :key="i" class="flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 0L9.79611 5.52786H15.6085L10.9062 8.94427L12.7023 14.4721L8 11.0557L3.29772 14.4721L5.09383 8.94427L0.391548 5.52786H6.20389L8 0Z" fill="#FBBF24"/>
-                  </svg>
-                </div>
                 <div class="flex items-baseline gap-1">
                   <span class="font-roboto font-normal text-xs leading-relaxed text-gray-800">{{ vendor.rating }}</span>
                   <span class="font-roboto font-normal text-xs leading-relaxed text-gray-400">({{ vendor.reviews }})</span>
@@ -115,7 +112,7 @@
           </div>
           <div class="text-center">
             <Link
-              href="/vendors"
+            href="/brands"
               class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white inline-block opacity-100"
             >
               View All Vendors
@@ -378,6 +375,10 @@ const props = defineProps({
   productGroups: {
     type: Array,
     default: () => []
+  },
+  topBrands: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -513,18 +514,7 @@ onUnmounted(() => {
   }
 })
 
-const topVendors = ref([
-  { id: 1, name: 'Behemoth Labz', location: 'Beach Valley, California', initials: 'BL', rating: '5.00', reviews: 345, badge: '🍃' , logo: 'behemoth-labz.png'},
-  { id: 2, name: 'Peptide Sciences', location: 'San Diego, California', initials: 'PS', rating: '5.00', reviews: 289, badge: '🔥' , logo: 'peptide-sciences.png'},
-  { id: 3, name: 'Bella Corner', location: 'Los Angeles, California', initials: 'BC', rating: '5.00', reviews: 412 , logo: 'bella-corner.png'},
-  { id: 4, name: 'Chemyo', location: 'Austin, Texas', initials: 'CH', rating: '5.00', reviews: 356 , logo: 'chemyo.png'},
-  { id: 5, name: 'Organic Food', location: 'Seattle, Washington', initials: 'OF', rating: '5.00', reviews: 298 , logo: 'organic-food.png'},
-  { id: 6, name: 'Core Peptides', location: 'Miami, Florida', initials: 'CP', rating: '5.00', reviews: 324 , logo: 'core-peptides.png'},
-  { id: 7, name: 'AA Health', location: 'Chicago, Illinois', initials: 'AA', rating: '5.00', reviews: 267 , logo: 'aa-health.png'},
-  { id: 8, name: 'Wholeness in Health', location: 'Denver, Colorado', initials: 'WH', rating: '5.00', reviews: 389 , logo: 'wholeness-in-health.png'},
-  { id: 9, name: 'Health Net', location: 'Boston, Massachusetts', initials: 'HN', rating: '5.00', reviews: 445 , logo: 'health-net.png'},
-  { id: 10, name: 'Dental Plus', location: 'Portland, Oregon', initials: 'DP', rating: '5.00', reviews: 312 , logo: 'dental-plus.png'},
-])
+const topVendors = computed(() => props.topBrands || [])
 
 // Education categories (from server) - show first 8, link to full page
 const displayedProducts = computed(() => {
