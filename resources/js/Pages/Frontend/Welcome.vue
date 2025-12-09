@@ -138,10 +138,8 @@
                   <h2 class="font-hv-muse font-normal text-6xl leading-[110%] tracking-normal text-white">Discover & Research with Confidence</h2>
                   <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
                 </div>
-                <MainButton 
-                  text="Read Details"
+                <SecondButton 
                   to="/blogs"
-                  bg-color="slate-50"
                 />
             </div>
           </div>
@@ -177,12 +175,8 @@
               <div class="p-6 flex flex-col gap-4 flex-1">
                 <h3 class="text-center font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0">{{ product.name }}</h3>
                 <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 text-center m-0">Total items {{ product.total_items }}</p>
-                <MainButton 
-                  text="Learn More"
+                <SecondButton 
                   :to="`/education/${product.slug}`"
-                  bg-color="gray-200"
-                  size="sm"
-                  :full-width="true"
                 />
               </div>
             </div>
@@ -228,7 +222,7 @@
       <section class="py-16 bg-white">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 p-0 w-full">Research Insights</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 research-insights-grid">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20 research-insights-grid">
             <div
               v-for="insight in researchInsights"
               :key="insight.id"
@@ -257,12 +251,8 @@
               <div class="p-5 flex flex-col gap-3 flex-1">
                 <h3 class="font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0 mb-1 text-center">{{ insight.title }}</h3>
                 <p class="font-roboto font-normal text-sm leading-loose text-gray-500 m-0 flex-1 mb-2 text-center">{{ insight.description }}</p>
-                <MainButton 
-                  text="Read Details"
+                <SecondButton 
                   :to="`/blog/${insight.slug}`"
-                  bg-color="gray-200"
-                  size="sm"
-                  :full-width="true"
                 />
               </div>
             </div>
@@ -286,6 +276,7 @@ import FrontLayout from '../Layouts/FrontLayout.vue'
 import useEmblaCarousel from 'embla-carousel-vue'
 import Autoplay from 'embla-carousel-autoplay'
 import MainButton from '@/components/MainButton.vue'
+import SecondButton from '@/components/SecondButton.vue'
 
 // Lazy loading for background images
 const heroImagesLoaded = ref(new Set())

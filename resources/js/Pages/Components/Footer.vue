@@ -17,9 +17,11 @@
             <Link href="/" class="inline-block mb-0">
               <span class="font-hv-muse font-normal text-3xl leading-tight tracking-normal text-gray-800">PeptideSync</span>
             </Link>
-            <Link href="/register" class="inline-block py-[10px] px-6 rounded-[500px] bg-gray-800 font-roboto font-medium text-base leading-none tracking-normal text-white text-center transition-colors duration-300 w-fit hover:bg-gray-700">
-              Sign Up
-            </Link>
+            <SecondButton 
+              text="Sign Up"
+              to="/register"
+              bg-color="gray-800"
+            />
           </div>
           
           <!-- Legal and Resources Sections -->
@@ -101,6 +103,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
 import { Link } from '@inertiajs/vue3'
+import SecondButton from '@/components/SecondButton.vue'
 
 const footerBgRef = ref(null)
 const footerBgLoaded = ref(false)
