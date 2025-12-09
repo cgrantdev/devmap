@@ -10,6 +10,8 @@
         <Link href="/admin/categories" class="block px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-all duration-200" :class="{ 'bg-slate-100 text-slate-800 font-medium': $page.url.startsWith('/admin/categories') }">Categories</Link>
         <Link href="/admin/blogs" class="block px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-all duration-200" :class="{ 'bg-slate-100 text-slate-800 font-medium': $page.url.startsWith('/admin/blogs') }">Blogs</Link>
         <Link href="/admin/education-posts" class="block px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-all duration-200" :class="{ 'bg-slate-100 text-slate-800 font-medium': $page.url.startsWith('/admin/education-posts') }">Education Posts</Link>
+        <Link href="/admin/pages" class="block px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-all duration-200" :class="{ 'bg-slate-100 text-slate-800 font-medium': $page.url.startsWith('/admin/pages') }">Pages</Link>
+        <Link href="/admin/settings" class="block px-4 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-all duration-200" :class="{ 'bg-slate-100 text-slate-800 font-medium': $page.url.startsWith('/admin/settings') }">Settings</Link>
       </nav>
       <form @submit.prevent="logout" class="p-4 border-t border-slate-100">
         <button type="submit" class="w-full bg-red-50 text-red-600 px-4 py-2.5 rounded-xl hover:bg-red-100 transition-all duration-200 font-medium">Logout</button>

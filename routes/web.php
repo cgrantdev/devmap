@@ -17,6 +17,8 @@ use App\Http\Controllers\Admin\BlogManagementController;
 use App\Http\Controllers\Admin\EducationPostsController;
 use App\Http\Controllers\Admin\CategoriesController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
+use App\Http\Controllers\Admin\PagesController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Vendor\ImportController;
 use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
 use App\Http\Controllers\Auth\EmailVerificationController;
@@ -25,9 +27,41 @@ use App\Http\Controllers\Frontend\BrandsController;
 use App\Http\Controllers\Frontend\BlogsController;
 use App\Http\Controllers\Frontend\EducationController;
 use App\Http\Controllers\Frontend\VendorReviewsController;
+use App\Http\Controllers\Frontend\PagesController as FrontendPagesController;
 
 Route::get('/', function () {
-    return Inertia::render('Frontend/Welcome');
+    $heroSlidesSetting = \App\Models\Setting::where('key', 'hero_slides')->first();
+    $heroSlides = [];
+    
+    if ($heroSlidesSetting && $heroSlidesSetting->value) {
+        $slides = json_decode($heroSlidesSetting->value, true) ?? [];
+        // Filter active slides and sort by order
+        $activeSlides = array_filter($slides, function($slide) {
+            return isset($slide['is_active']) && $slide['is_active'];
+        });
+        
+        // Sort by order
+        usort($activeSlides, function($a, $b) {
+            return ($a['order'] ?? 0) <=> ($b['order'] ?? 0);
+        });
+        
+        // Format for frontend
+        foreach ($activeSlides as $slide) {
+            $heroSlides[] = [
+                'title' => $slide['title'] ?? '',
+                'subtitle' => $slide['subtitle'] ?? '',
+                'ctaText' => $slide['cta_text'] ?? '',
+                'ctaUrl' => $slide['cta_url'] ?? '',
+                'image' => isset($slide['image']) && $slide['image'] 
+                    ? \Illuminate\Support\Facades\Storage::url('hero_slides/' . $slide['image']) 
+                    : null,
+            ];
+        }
+    }
+    
+    return Inertia::render('Frontend/Welcome', [
+        'heroSlides' => $heroSlides,
+    ]);
 });
 
 // Frontend pages
@@ -44,26 +78,9 @@ Route::get('/education/{slug}', [EducationController::class, 'show'])->name('edu
 Route::post('/brands/{brandId}/reviews', [VendorReviewsController::class, 'store'])->name('vendor.reviews.store');
 Route::get('/brands/{brandId}/reviews', [VendorReviewsController::class, 'index'])->name('vendor.reviews.index');
 
-Route::get('/about', function () {
-    return Inertia::render('Frontend/About');
-})->name('about');
-
-
-Route::get('/calculator', function () {
-    return Inertia::render('Frontend/Calculator');
-})->name('calculator');
-
-Route::get('/contact', function () {
-    return Inertia::render('Frontend/Contact');
-})->name('contact');
-
-Route::get('/disclaimer', function () {
-    return Inertia::render('Frontend/Disclaimer');
-})->name('disclaimer');
-
-Route::get('/privacy', function () {
-    return Inertia::render('Frontend/Privacy');
-})->name('privacy');
+// Catch-all route for any other page slugs (must be last to avoid conflicts with other routes)
+// This allows creating new pages dynamically without adding routes
+Route::get('/{slug}', [FrontendPagesController::class, 'show'])->name('page.show')->where('slug', '[a-z0-9-]+');
 
 // Guest routes
 Route::middleware('guest')->group(function () {
@@ -146,6 +163,18 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::get('/education-posts/{id}/edit', [EducationPostsController::class, 'edit'])->name('admin.education-posts.edit');
     Route::post('/education-posts/{id}', [EducationPostsController::class, 'update'])->name('admin.education-posts.update');
     Route::delete('/education-posts/{id}', [EducationPostsController::class, 'destroy'])->name('admin.education-posts.destroy');
+    
+    // Pages
+    Route::get('/pages', [PagesController::class, 'index'])->name('admin.pages.index');
+    Route::get('/pages/create', [PagesController::class, 'create'])->name('admin.pages.create');
+    Route::post('/pages', [PagesController::class, 'store'])->name('admin.pages.store');
+    Route::get('/pages/{id}/edit', [PagesController::class, 'edit'])->name('admin.pages.edit');
+    Route::put('/pages/{id}', [PagesController::class, 'update'])->name('admin.pages.update');
+    Route::delete('/pages/{id}', [PagesController::class, 'destroy'])->name('admin.pages.destroy');
+    
+    // Settings
+    Route::get('/settings', [SettingsController::class, 'index'])->name('admin.settings');
+    Route::post('/settings/hero-slides', [SettingsController::class, 'updateHeroSlides'])->name('admin.settings.hero-slides.update');
 });
 
 // Authentication routes

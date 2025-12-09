@@ -14,7 +14,7 @@
                   v-for="(slide, index) in heroSlides"
                   :key="index"
                   class="embla__slide"
-                  :class="{ 'slide-active': currentSlide === index }"
+                  :class="{ 'slide-active': isSlideActive(index) }"
                 >
                   <div class="carousel-slide">
                     <!-- Background Image -->
@@ -49,7 +49,7 @@
             <!-- Custom Carousel Indicators -->
             <div class="carousel-indicators">
               <button
-                v-for="(slide, index) in heroSlides"
+                v-for="(slide, index) in props.heroSlides"
                 :key="index"
                 @click="goToSlide(index)"
                 :class="[
@@ -362,49 +362,78 @@ const [emblaRef, emblaApi] = useEmblaCarousel(
   [autoplayPluginInstance]
 )
 
-// Hero slides data
-// Images should be placed in: public/images/hero/
-// Access them via: /images/hero/image-name.jpg
-const heroSlides = ref([
-  {
-    title: 'Hello Hero',
-    subtitle: 'Want your brand to stand out? Advertise with us right here!',
-    ctaText: 'Contact Us to Advertise',
-    ctaUrl: '/contact',
-    image: '/images/hero/hero1.jpg' // Place your image in public/images/hero/hero-1.jpg
-  },
-  {
-    title: 'Discover Research Peptides',
-    subtitle: 'Explore our comprehensive collection of high-quality research peptides.',
-    ctaText: 'Browse Products',
-    ctaUrl: '/products',
-    image: '/images/hero/hero2.jpg' // Place your image in public/images/hero/hero-2.jpg
-  },
-  {
-    title: 'Trusted Vendors',
-    subtitle: 'Connect with verified vendors in the peptide research community.',
-    ctaText: 'View Vendors',
-    ctaUrl: '/vendors',
-    image: '/images/hero/hero3.jpg' // Place your image in public/images/hero/hero-3.jpg
-  },
-  {
-    title: 'Research Education',
-    subtitle: 'Learn about peptides, research protocols, and best practices.',
-    ctaText: 'Learn More',
-    ctaUrl: '/education',
-    image: '/images/hero/hero4.jpg' // Place your image in public/images/hero/hero-4.jpg
+// Hero slides data from database
+const props = defineProps({
+  heroSlides: {
+    type: Array,
+    default: () => []
   }
-])
+})
+
+// Process slides and duplicate if needed to ensure looping works with 1-2 slides
+const processSlides = (slides) => {
+  const processed = slides.map(slide => ({
+    title: slide.title,
+    subtitle: slide.subtitle,
+    ctaText: slide.ctaText,
+    ctaUrl: slide.ctaUrl,
+    image: slide.image
+  }))
+  
+  // If we have fewer than 3 slides, duplicate them to ensure looping works
+  if (processed.length > 0 && processed.length < 3) {
+    // Duplicate slides until we have at least 3
+    const needed = 3 - processed.length
+    for (let i = 0; i < needed; i++) {
+      processed.push({ ...processed[i % processed.length] })
+    }
+  }
+  
+  return processed
+}
+
+const heroSlides = ref(processSlides(props.heroSlides))
 
 const goToSlide = (index) => {
   if (emblaApi.value) {
-    emblaApi.value.scrollTo(index)
+    // Get the original slide count (before duplication)
+    const originalCount = props.heroSlides.length
+    // If we have fewer than 3 original slides, map the index to the correct position
+    // Since slides are duplicated, we can scroll to any duplicate of the target slide
+    if (originalCount > 0 && originalCount < 3) {
+      // Find the first occurrence of this slide in the duplicated array
+      const targetIndex = index % originalCount
+      // Scroll to the first occurrence
+      emblaApi.value.scrollTo(targetIndex)
+    } else {
+      emblaApi.value.scrollTo(index)
+    }
   }
 }
 
 const onSelect = () => {
   if (emblaApi.value) {
-    currentSlide.value = emblaApi.value.selectedScrollSnap()
+    const selectedIndex = emblaApi.value.selectedScrollSnap()
+    // Get the original slide count (before duplication)
+    const originalCount = props.heroSlides.length
+    // If we have fewer than 3 original slides, map to the original index
+    if (originalCount > 0 && originalCount < 3) {
+      currentSlide.value = selectedIndex % originalCount
+    } else {
+      currentSlide.value = selectedIndex
+    }
+  }
+}
+
+// Check if a slide (by its index in the duplicated array) should be active
+const isSlideActive = (index) => {
+  const originalCount = props.heroSlides.length
+  if (originalCount > 0 && originalCount < 3) {
+    // For duplicated slides, check if this index maps to the current slide
+    return (index % originalCount) === currentSlide.value
+  } else {
+    // For normal slides, direct comparison
+    return currentSlide.value === index
   }
 }
 
