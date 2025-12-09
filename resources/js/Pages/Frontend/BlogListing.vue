@@ -37,7 +37,7 @@
             <div class="flex-1">
               <img 
                 v-if="featured.image"
-                :src="`/images/blogs/${featured.image}`" 
+                :src="featured.image" 
                 :alt="featured.title"
                 class="w-full h-full object-cover"
                 loading="lazy"
@@ -61,7 +61,7 @@
             <div class="w-full aspect-[325/404] overflow-hidden bg-gray-100 rounded-t-lg">
               <img 
                 v-if="blog.image"
-                :src="`/images/blogs/${blog.image}`" 
+                :src="blog.image" 
                 :alt="blog.title"
                 class="w-full h-full object-cover object-center block"
                 loading="lazy"
