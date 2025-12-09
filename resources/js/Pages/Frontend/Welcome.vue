@@ -138,8 +138,10 @@
                   <h2 class="font-hv-muse font-normal text-6xl leading-[110%] tracking-normal text-white">Discover & Research with Confidence</h2>
                   <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
                 </div>
-                <SecondButton 
+                <MainButton 
+                  text="Read Details"
                   to="/blogs"
+                  bg-color="slate-50"
                 />
             </div>
           </div>
