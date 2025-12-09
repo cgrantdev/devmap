@@ -228,11 +228,11 @@
               v-for="insight in researchInsights"
               :key="insight.id"
               class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 h-full hover:shadow-lg cursor-pointer"
-              @click="router.visit('/blogs')"
+              @click="router.visit(`/blog/${insight.slug}`)"
             >
               <div class="w-full aspect-[325/404] overflow-hidden bg-gray-100 rounded-t-lg">
                 <img 
-                  :src="`/images/blogs/${insight.image}`" 
+                  :src="insight.image || '/images/blogs/placeholder.jpg'" 
                   :alt="insight.title"
                   class="w-full h-full object-cover object-center block"
                   loading="lazy"
@@ -253,7 +253,7 @@
                 <h3 class="font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0 mb-1 text-center">{{ insight.title }}</h3>
                 <p class="font-roboto font-normal text-sm leading-loose text-gray-500 m-0 flex-1 mb-2 text-center">{{ insight.description }}</p>
                 <button 
-                  @click="router.visit('/blogs')"
+                  @click="router.visit(`/blog/${insight.slug}`)"
                   class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300"
                 >
                   Read Details
@@ -377,6 +377,10 @@ const props = defineProps({
     default: () => []
   },
   topBrands: {
+    type: Array,
+    default: () => []
+  },
+  topBlogs: {
     type: Array,
     default: () => []
   }
@@ -521,71 +525,6 @@ const displayedProducts = computed(() => {
   return props.productGroups.slice(0, 8)
 })
 
-const researchInsights = ref([
-  {
-    id: 1,
-    title: 'Safe Handling',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: '1.jpg',
-    readTime: '19 Min Read',
-    date: '22 Aug 2025'
-  },
-  {
-    id: 2,
-    title: 'Research Guidelines',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: '1.jpg',
-    readTime: '19 Min Read',
-    date: '22 Aug 2025'
-  },
-  {
-    id: 3,
-    title: 'Benefits of BPC-157',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: '1.jpg',
-    readTime: '19 Min Read',
-    date: '22 Aug 2025'
-  },
-  {
-    id: 4,
-    title: 'BPC-157 in Sport Medicine',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: '1.jpg',
-    readTime: '19 Min Read',
-    date: '22 Aug 2025'
-  },
-  {
-    id: 5,
-    title: 'Safety and Usage',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: '1.jpg',
-    readTime: '19 Min Read',
-    date: '22 Aug 2025'
-  },
-  {
-    id: 6,
-    title: 'Laboratory Protocols',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: '1.jpg',
-    readTime: '19 Min Read',
-    date: '22 Aug 2025'
-  },
-  {
-    id: 7,
-    title: 'Advanced Applications',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: '1.jpg',
-    readTime: '19 Min Read',
-    date: '22 Aug 2025'
-  },
-  {
-    id: 8,
-    title: 'Research Methodologies',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: '1.jpg',
-    readTime: '19 Min Read',
-    date: '22 Aug 2025'
-  },
-])
+const researchInsights = computed(() => props.topBlogs || [])
 </script>
 

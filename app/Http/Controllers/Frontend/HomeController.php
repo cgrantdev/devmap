@@ -8,6 +8,7 @@ use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\Location;
+use App\Models\Blog;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -61,6 +62,25 @@ class HomeController extends Controller
                 ];
             });
 
+        // Top blogs / research insights
+        $topBlogs = Blog::where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->orderBy('published_at', 'desc')
+            ->take(4)
+            ->get()
+            ->map(function ($blog) {
+                return [
+                    'id' => $blog->id,
+                    'title' => $blog->title,
+                    'slug' => $blog->slug,
+                    'description' => $blog->description,
+                    'image' => $blog->image ? Storage::url('blogs/' . $blog->image) : null,
+                    'date' => $blog->published_at ? $blog->published_at->format('M d, Y') : null,
+                    'readTime' => $blog->read_time ?? '5 min read',
+                ];
+            });
+
         // Top brands (vendors) limited list for homepage
         $topBrands = Brand::where('is_active', true)
             ->with('vendorSetting')
@@ -108,6 +128,7 @@ class HomeController extends Controller
             'heroSlides' => $heroSlides,
             'productGroups' => $categories,
             'topBrands' => $topBrands,
+            'topBlogs' => $topBlogs,
         ]);
     }
 
