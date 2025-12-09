@@ -27,42 +27,10 @@ use App\Http\Controllers\Frontend\BrandsController;
 use App\Http\Controllers\Frontend\BlogsController;
 use App\Http\Controllers\Frontend\EducationController;
 use App\Http\Controllers\Frontend\VendorReviewsController;
+use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\PagesController as FrontendPagesController;
 
-Route::get('/', function () {
-    $heroSlidesSetting = \App\Models\Setting::where('key', 'hero_slides')->first();
-    $heroSlides = [];
-    
-    if ($heroSlidesSetting && $heroSlidesSetting->value) {
-        $slides = json_decode($heroSlidesSetting->value, true) ?? [];
-        // Filter active slides and sort by order
-        $activeSlides = array_filter($slides, function($slide) {
-            return isset($slide['is_active']) && $slide['is_active'];
-        });
-        
-        // Sort by order
-        usort($activeSlides, function($a, $b) {
-            return ($a['order'] ?? 0) <=> ($b['order'] ?? 0);
-        });
-        
-        // Format for frontend
-        foreach ($activeSlides as $slide) {
-            $heroSlides[] = [
-                'title' => $slide['title'] ?? '',
-                'subtitle' => $slide['subtitle'] ?? '',
-                'ctaText' => $slide['cta_text'] ?? '',
-                'ctaUrl' => $slide['cta_url'] ?? '',
-                'image' => isset($slide['image']) && $slide['image'] 
-                    ? \Illuminate\Support\Facades\Storage::url('hero_slides/' . $slide['image']) 
-                    : null,
-            ];
-        }
-    }
-    
-    return Inertia::render('Frontend/Welcome', [
-        'heroSlides' => $heroSlides,
-    ]);
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Frontend pages
 Route::get('/products', [ProductsController::class, 'index'])->name('products');

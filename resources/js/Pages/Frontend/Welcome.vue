@@ -149,42 +149,49 @@
         </div>
       </section>
 
-      <!-- Learn About Peptides Section -->
+      <!-- Learn About Peptides Section (education categories) -->
       <section class="py-16 bg-white">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 p-0 w-full">Learn About Peptides</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 gap-x-[20px] gap-y-[80px]">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
             <div
-              v-for="article in peptideArticles"
-              :key="article.id"
+              v-for="product in displayedProducts"
+              :key="product.slug"
               class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg cursor-pointer"
-              @click="router.visit('/education')"
             >
               <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden">
                 <img 
-                  :src="`/images/peptides/${article.image}`" 
-                  :alt="article.title"
+                  v-if="product.image"
+                  :src="product.image" 
+                  :alt="product.name"
                   class="w-full h-full object-contain object-center"
                   loading="lazy"
                   @error="handleImageError($event)"
                 />
+                <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
+                  <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
               </div>
               <div class="p-6 flex flex-col gap-4 flex-1">
-                <h3 class="text-center font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0">{{ article.title }}</h3>
-                <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 text-center m-0 flex-1">{{ article.description }}</p>
+                <h3 class="text-center font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0">{{ product.name }}</h3>
+                <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 text-center m-0">Total items {{ product.total_items }}</p>
                 <button 
-                  @click.stop="router.visit('/education')"
+                  @click="handleLearnClick(product)"
                   class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300"
                 >
-                  Read Details
+                  Learn More
                 </button>
               </div>
             </div>
           </div>
+
           <div class="text-center">
             <button 
               @click="router.visit('/education')"
-              class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 hover:bg-gray-700"
+              class="py-2.5 px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-gray-700"
             >
               View All Education
             </button>
@@ -271,7 +278,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import useEmblaCarousel from 'embla-carousel-vue'
@@ -365,6 +372,10 @@ const [emblaRef, emblaApi] = useEmblaCarousel(
 // Hero slides data from database
 const props = defineProps({
   heroSlides: {
+    type: Array,
+    default: () => []
+  },
+  productGroups: {
     type: Array,
     default: () => []
   }
@@ -515,56 +526,10 @@ const topVendors = ref([
   { id: 10, name: 'Dental Plus', location: 'Portland, Oregon', initials: 'DP', rating: '5.00', reviews: 312 , logo: 'dental-plus.png'},
 ])
 
-const peptideArticles = ref([
-  {
-    id: 1,
-    title: 'What is BPC-157?',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: 'bpc-157.png'
-  },
-  {
-    id: 2,
-    title: 'Safe Handling',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: 'bpc-157.png'
-  },
-  {
-    id: 3,
-    title: 'Stacking with Others',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: 'bpc-157.png'
-  },
-  {
-    id: 4,
-    title: 'Dosage Guidelines',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: 'bpc-157.png'
-  },
-  {
-    id: 5,
-    title: 'Storage Methods',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: 'bpc-157.png'
-  },
-  {
-    id: 6,
-    title: 'Research Applications',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: 'bpc-157.png'
-  },
-  {
-    id: 7,
-    title: 'Safety Protocols',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: 'bpc-157.png'
-  },
-  {
-    id: 8,
-    title: 'Quality Standards',
-    description: 'BPC-157 is a lab-made peptide studied for its healing propertie. It may support tissue repair, reduce inflammation...',
-    image: 'bpc-157.png'
-  },
-])
+// Education categories (from server) - show first 8, link to full page
+const displayedProducts = computed(() => {
+  return props.productGroups.slice(0, 8)
+})
 
 const researchInsights = ref([
   {
