@@ -14,6 +14,16 @@
     <div v-if="$page.props.flash.error" class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
       {{ $page.props.flash.error }}
     </div>
+    
+    <!-- Validation Errors Summary -->
+    <div v-if="Object.keys($page.props.errors || {}).length > 0" class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
+      <p class="font-semibold mb-2">Please fix the following errors:</p>
+      <ul class="list-disc list-inside space-y-1">
+        <li v-for="(error, field) in $page.props.errors" :key="field" class="text-sm">
+          <strong>{{ field }}:</strong> {{ Array.isArray(error) ? error[0] : error }}
+        </li>
+      </ul>
+    </div>
 
     <!-- Hero Slides -->
     <div class="space-y-6">
@@ -47,16 +57,22 @@
                 v-model="slide.title" 
                 type="text" 
                 required
-                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.title`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']"
               />
+              <div v-if="$page.props.errors[`hero_slides.${index}.title`]" class="text-red-500 text-sm mt-1">
+                {{ $page.props.errors[`hero_slides.${index}.title`] }}
+              </div>
             </div>
             <div>
               <label class="block mb-1.5 font-semibold text-slate-800">Subtitle</label>
               <input 
                 v-model="slide.subtitle" 
                 type="text"
-                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.subtitle`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']"
               />
+              <div v-if="$page.props.errors[`hero_slides.${index}.subtitle`]" class="text-red-500 text-sm mt-1">
+                {{ $page.props.errors[`hero_slides.${index}.subtitle`] }}
+              </div>
             </div>
           </div>
           
@@ -86,14 +102,22 @@
                 @change="handleSlideImageChange(index, $event)"
                 type="file" 
                 accept="image/*"
-                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.image`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']"
               />
-              <img 
-                v-if="slide.image_url || slide.imagePreview" 
-                :src="slide.image_url || slide.imagePreview" 
-                alt="Preview" 
-                class="mt-2 w-full h-48 object-cover rounded-xl" 
-              />
+              <p class="text-xs text-slate-500 mt-1">
+                Maximum file size: <span class="font-semibold text-slate-700">{{ maxFileSize }}</span>
+              </p>
+              <div v-if="$page.props.errors[`hero_slides.${index}.image`]" class="text-red-500 text-sm mt-1">
+                {{ $page.props.errors[`hero_slides.${index}.image`] }}
+              </div>
+              <div v-if="slide.image_url || slide.imagePreview" class="mt-2">
+                <img 
+                  :src="slide.imagePreview || slide.image_url" 
+                  alt="Preview" 
+                  class="w-full h-48 object-cover rounded-xl border border-slate-200" 
+                />
+                <p v-if="slide.imagePreview" class="text-xs text-slate-500 mt-1">New image preview</p>
+              </div>
             </div>
             <div>
               <label class="block mb-1.5 font-semibold text-slate-800">Order</label>
@@ -101,8 +125,11 @@
                 v-model.number="slide.order" 
                 type="number" 
                 min="0"
-                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.order`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']"
               />
+              <div v-if="$page.props.errors[`hero_slides.${index}.order`]" class="text-red-500 text-sm mt-1">
+                {{ $page.props.errors[`hero_slides.${index}.order`] }}
+              </div>
               <div class="mt-2">
                 <label class="flex items-center gap-2">
                   <input 
@@ -135,12 +162,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
+import { useAdminLoading } from '../../composables/useAdminLoading'
+
+const { setLoading } = useAdminLoading()
 
 const props = defineProps({
   heroSlides: Array,
+  maxFileSize: String,
 })
 
 // Initialize hero slides
@@ -179,17 +210,33 @@ const removeHeroSlide = (index) => {
 const handleSlideImageChange = (index, event) => {
   const file = event.target.files[0]
   if (file) {
+    // Set the new file
     heroSlides.value[index].image = file
+    // Clear the old image_url so preview takes precedence
+    heroSlides.value[index].image_url = null
+    // Clear any existing preview first
+    heroSlides.value[index].imagePreview = null
+    
     const reader = new FileReader()
     reader.onload = (e) => {
       heroSlides.value[index].imagePreview = e.target.result
     }
+    reader.onerror = () => {
+      console.error('Failed to read file')
+      heroSlides.value[index].imagePreview = null
+    }
     reader.readAsDataURL(file)
+  } else {
+    // If no file selected, clear preview
+    heroSlides.value[index].imagePreview = null
   }
 }
 
 const saveHeroSlides = () => {
   const page = usePage()
+  
+  // Show loading overlay
+  setLoading(true, 'Saving hero slides, please wait...')
   
   // Prepare form data
   const formData = new FormData()
@@ -221,10 +268,28 @@ const saveHeroSlides = () => {
   // Use router to post form data
   router.post('/admin/settings/hero-slides', formData, {
     preserveScroll: true,
+    preserveState: true,
     forceFormData: true,
+    onStart: () => {
+      // Ensure loading is shown when request starts
+      setLoading(true, 'Saving hero slides, please wait...')
+    },
     onSuccess: () => {
       // Reload to get updated data
-      router.reload({ only: ['heroSlides'] })
+      router.reload({ 
+        only: ['heroSlides'],
+        onFinish: () => {
+          setLoading(false)
+        }
+      })
+    },
+    onError: (errors) => {
+      // Hide loading overlay on error
+      setLoading(false)
+    },
+    onFinish: () => {
+      // Ensure loading overlay is hidden when request finishes
+      setLoading(false)
     }
   })
 }

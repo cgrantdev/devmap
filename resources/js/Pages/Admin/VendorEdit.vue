@@ -89,8 +89,8 @@
         <h2 class="text-xl font-semibold mb-4">Import Products (XML)</h2>
         <!-- Import from Shop URL Button -->
         <div class="mb-4">
-          <button @click="importFromShopUrl" :disabled="importShopUrlProcessing" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50">
-            {{ importShopUrlProcessing ? 'Importing...' : 'Import Products from Shop URL' }}
+          <button @click="importFromShopUrl" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50">
+            Import Products from Shop URL
           </button>
           <div v-if="importShopUrlMessage" :class="['mt-2', importShopUrlSuccess ? 'text-green-600' : 'text-red-600']">
             {{ importShopUrlMessage }}
@@ -155,15 +155,6 @@
       </div>
     </div>
   </AdminLayout>
-  <div v-if="importShopUrlProcessing" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/75">
-    <div class="flex flex-col items-center">
-      <svg class="animate-spin h-12 w-12 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-      </svg>
-      <span class="text-white text-lg font-semibold">Importing products, please wait...</span>
-    </div>
-  </div>
 </template>
 
 <script setup>
@@ -173,6 +164,7 @@ import AdminLayout from './Layout.vue'
 import { router } from '@inertiajs/vue3'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
+import { useAdminLoading } from '../../composables/useAdminLoading'
 
 const props = defineProps({
   vendor: Object,
@@ -331,12 +323,12 @@ function importFromUrl() {
   })
 }
 
-const importShopUrlProcessing = ref(false)
+const { setLoading } = useAdminLoading()
 const importShopUrlMessage = ref('')
 const importShopUrlSuccess = ref(false)
 
 function importFromShopUrl() {
-  importShopUrlProcessing.value = true
+  setLoading(true, 'Importing products, please wait...')
   importShopUrlMessage.value = ''
   importShopUrlSuccess.value = false
   router.post(
@@ -345,14 +337,17 @@ function importFromShopUrl() {
     {
       forceFormData: true,
       onSuccess: () => {
-        importShopUrlProcessing.value = false
+        setLoading(false)
         importShopUrlSuccess.value = true
         importShopUrlMessage.value = 'Import Completed'
       },
       onError: (err) => {
-        importShopUrlProcessing.value = false
+        setLoading(false)
         importShopUrlSuccess.value = false
         importShopUrlMessage.value = 'Import failed'
+      },
+      onFinish: () => {
+        setLoading(false)
       }
     }
   )

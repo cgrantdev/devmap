@@ -21,11 +21,25 @@
     <main class="flex-1 p-8 overflow-y-auto h-screen">
       <slot />
     </main>
+
+    <!-- Global Loading Overlay -->
+    <div v-if="isLoading" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/75">
+      <div class="flex flex-col items-center">
+        <svg class="animate-spin h-12 w-12 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+        <span class="text-white text-lg font-semibold">{{ loadingMessage }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { useForm, usePage, Link } from '@inertiajs/vue3'
+import { useAdminLoading } from '../../composables/useAdminLoading'
+
+const { isLoading, loadingMessage } = useAdminLoading()
 
 const form = useForm({
   _token: usePage().props.csrf_token
