@@ -34,12 +34,13 @@
                           <h1 class="hero-heading">{{ slide.title }}</h1>
                           <p class="hero-subtitle">{{ slide.subtitle }}</p>
                         </div>
-                        <button 
-                          @click.stop="handleCtaClick(slide.ctaUrl)"
-                          class="hero-cta-button"
-                        >
-                          {{ slide.ctaText }}
-                        </button>
+                        <MainButton 
+                          :text="slide.ctaText"
+                          :to="slide.ctaUrl"
+                          bg-color="white"
+                          class="self-start"
+                          @click.stop
+                        />
                       </div>
                   </div>
                 </div>
@@ -110,13 +111,12 @@
               </div>
             </div>
           </div>
-          <div class="text-center">
-            <Link
-            href="/brands"
-              class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white inline-block opacity-100"
-            >
-              View All Vendors
-            </Link>
+          <div class="flex justify-center">
+            <MainButton 
+              text="View All Vendors"
+              to="/brands"
+              bg-color="gray-800"
+            />
           </div>
         </div>
       </section>
@@ -138,9 +138,11 @@
                   <h2 class="font-hv-muse font-normal text-6xl leading-[110%] tracking-normal text-white">Discover & Research with Confidence</h2>
                   <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
                 </div>
-                <button class="w-fit py-[10px] px-20 rounded-[500px] bg-slate-50 font-roboto font-medium text-xl leading-none tracking-normal text-gray-700 opacity-100 hover:bg-gray-100 transition-colors">
-                  Read Details
-                </button>
+                <MainButton 
+                  text="Read Details"
+                  to="/blogs"
+                  bg-color="slate-50"
+                />
             </div>
           </div>
         </div>
@@ -175,23 +177,23 @@
               <div class="p-6 flex flex-col gap-4 flex-1">
                 <h3 class="text-center font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0">{{ product.name }}</h3>
                 <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 text-center m-0">Total items {{ product.total_items }}</p>
-                <button 
-                  @click="handleLearnClick(product)"
-                  class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300"
-                >
-                  Learn More
-                </button>
+                <MainButton 
+                  text="Learn More"
+                  :to="`/education/${product.slug}`"
+                  bg-color="gray-200"
+                  size="sm"
+                  :full-width="true"
+                />
               </div>
             </div>
           </div>
 
-          <div class="text-center">
-            <button 
-              @click="router.visit('/education')"
-              class="py-2.5 px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-gray-700"
-            >
-              View All Education
-            </button>
+          <div class="flex justify-center">
+            <MainButton 
+              text="View All Education"
+              to="/education"
+              bg-color="gray-800"
+            />
           </div>
         </div>
       </section>
@@ -211,9 +213,12 @@
             <div class="advance-research-content">
               <h2 class="font-hv-muse font-normal text-6xl leading-[110%] tracking-normal text-white text-center m-0">Advance Your<br>Research with Trusted<br>Peptides</h2>
               <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white m-0">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
-              <button class="w-fit py-[10px] px-20 rounded-[500px] bg-white font-roboto font-medium text-xl leading-none tracking-normal text-gray-800 border-none cursor-pointer transition-colors duration-300 shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-gray-100">
-                Start Research
-              </button>
+              <MainButton 
+                text="Start Research"
+                to="/products"
+                bg-color="white"
+                class="mx-auto"
+              />
             </div>
           </div>
         </div>
@@ -252,22 +257,22 @@
               <div class="p-5 flex flex-col gap-3 flex-1">
                 <h3 class="font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0 mb-1 text-center">{{ insight.title }}</h3>
                 <p class="font-roboto font-normal text-sm leading-loose text-gray-500 m-0 flex-1 mb-2 text-center">{{ insight.description }}</p>
-                <button 
-                  @click="router.visit(`/blog/${insight.slug}`)"
-                  class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300"
-                >
-                  Read Details
-                </button>
+                <MainButton 
+                  text="Read Details"
+                  :to="`/blog/${insight.slug}`"
+                  bg-color="gray-200"
+                  size="sm"
+                  :full-width="true"
+                />
               </div>
             </div>
           </div>
-          <div class="text-center">
-            <button 
-              @click="router.visit('/blogs')"
-              class="py-[10px] px-20 rounded-[500px] bg-gray-800 font-roboto font-medium text-xl leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 shadow-[0_2px_4px_rgba(0,0,0,0.1)] hover:bg-gray-700"
-            >
-              More Details
-            </button>
+          <div class="flex justify-center">
+            <MainButton 
+              text="More Details"
+              to="/blogs"
+              bg-color="gray-800"
+            />
           </div>
         </div>
       </section>
@@ -280,6 +285,7 @@ import { Link, router } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import useEmblaCarousel from 'embla-carousel-vue'
 import Autoplay from 'embla-carousel-autoplay'
+import MainButton from '@/components/MainButton.vue'
 
 // Lazy loading for background images
 const heroImagesLoaded = ref(new Set())
@@ -363,7 +369,7 @@ const [emblaRef, emblaApi] = useEmblaCarousel(
     slidesToScroll: 1,
     containScroll: 'trimSnaps',
   },
-  [autoplayPluginInstance]
+  // [autoplayPluginInstance]
 )
 
 // Hero slides data from database
@@ -465,11 +471,6 @@ const startAutoplay = () => {
   }
 }
 
-const handleCtaClick = (url) => {
-  if (url) {
-    router.visit(url)
-  }
-}
 
 const logoErrors = ref(new Set())
 
