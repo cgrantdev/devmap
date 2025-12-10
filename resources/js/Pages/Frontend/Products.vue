@@ -23,12 +23,11 @@
               <h1 class="font-hv-muse font-normal text-6xl leading-tight tracking-normal text-white m-0">The Science Behind Peptides</h1>
               <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white m-0">Everything You Need to Know About Peptides</p>
             </div>
-            <button 
-              @click="handleCtaClick('/education')"
-              class="w-fit py-2.5 px-20 rounded-[500px] bg-white font-roboto font-medium text-xl leading-none tracking-normal text-gray-800 border-none cursor-pointer transition-colors duration-300 flex items-center justify-center hover:bg-gray-100"
-            >
-              Read Details
-            </button>
+            <MainButton
+              text="Read Details"
+              to="/education"
+              bg-color="white"
+            />
           </div>
         </div>
       </div>
@@ -40,35 +39,14 @@
         <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 p-0 w-full">Discover Peptides</h2>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
-          <div
+          <CategoryCard
             v-for="product in displayedProducts"
-            :key="product.name"
-            class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg"
-          >
-            <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden">
-              <img 
-                v-if="product.image"
-                :src="product.image" 
-                :alt="product.name"
-                class="w-full h-full object-contain object-center"
-                loading="lazy"
-                @error="handleImageError($event)"
-              />
-              <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-                <span class="text-sm">No Image</span>
-              </div>
-            </div>
-            <div class="p-6 flex flex-col gap-4 flex-1">
-              <h3 class="text-center font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0">{{ product.name }}</h3>
-              <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 text-center m-0">Total items {{ product.total_items }}</p>
-              <button 
-                @click="handleShopClick(product)"
-                class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300"
-              >
-                Shop Now
-              </button>
-            </div>
-          </div>
+            :key="product.slug || product.name"
+            :name="product.name"
+            :image="product.image"
+            :total-items="product.total_items"
+            :to="`/product/${product.slug}`"
+          />
         </div>
 
         <!-- Load More Button -->
@@ -134,6 +112,9 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
+import CategoryCard from '@/components/CategoryCard.vue'
+import BlogPostCard from '@/components/BlogPostCard.vue'
+import MainButton from '@/components/MainButton.vue'
 
 const props = defineProps({
   productGroups: {

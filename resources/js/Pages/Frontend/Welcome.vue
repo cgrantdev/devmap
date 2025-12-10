@@ -232,6 +232,7 @@ import MainButton from '@/components/MainButton.vue'
 import SecondButton from '@/components/SecondButton.vue'
 import VendorCard from '@/components/VendorCard.vue'
 import EducationPostCard from '@/components/EducationPostCard.vue'
+import BlogPostCard from '@/components/BlogPostCard.vue'
 
 // Lazy loading for background images
 const heroImagesLoaded = ref(new Set())
