@@ -4,7 +4,10 @@
     :class="[buttonClasses, $attrs.class]"
     @click="handleClick"
   >
-    {{ text }}
+    <span>{{ text }}</span>
+    <span v-if="svg" class="inline-flex items-center">
+      <component :is="svg" class="w-5 h-5" />
+    </span>
   </a>
 </template>
 
@@ -38,11 +41,15 @@ const props = defineProps({
   fullWidth: {
     type: Boolean,
     default: false
+  },
+  svg: {
+    type: [Object, Function, String],
+    default: null
   }
 })
 
 const buttonClasses = computed(() => {
-  const baseClasses = 'font-roboto font-medium leading-none tracking-normal border-none cursor-pointer transition-colors duration-300 rounded-[500px] flex items-center justify-center'
+  const baseClasses = 'font-roboto font-medium leading-none tracking-normal border-none cursor-pointer transition-colors duration-300 rounded-[500px] flex items-center justify-center gap-2'
   
   const sizeClasses = {
     sm: 'py-3 px-11 text-sm',

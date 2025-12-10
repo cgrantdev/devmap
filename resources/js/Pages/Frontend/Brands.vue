@@ -20,6 +20,11 @@
             <div class="flex flex-col gap-6">
               <h1 class="font-hv-muse font-normal text-6xl leading-tight tracking-normal text-white m-0">Trusted Brands</h1>
               <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white m-0">Explore verified brands in the peptide research community.</p>
+              <MainButton
+                text="View All Vendors"
+                to="/brands"
+                bg-color="white"
+              />
             </div>
           </div>
         </div>
@@ -29,7 +34,7 @@
     <!-- Brands Section -->
     <section class="py-16 bg-white">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 w-full max-w-[360px] mx-auto">All Brands</h2>
+        <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 w-full max-w-[360px] mx-auto">Tob Vendors</h2>
         
         <div v-if="brands.length > 0" class="grid grid-cols-2 md:grid-cols-5 gap-x-[20px] gap-y-[80px] mb-20">
           <VendorCard
@@ -57,6 +62,7 @@
 <script setup>
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import VendorCard from '@/components/VendorCard.vue'
+import MainButton from '@/components/MainButton.vue'
 
 const props = defineProps({
   brands: {

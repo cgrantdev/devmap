@@ -23,12 +23,11 @@
               <h1 class="font-hv-muse font-normal text-[52px] leading-loose tracking-normal text-white m-0">Harmony Through Discovery</h1>
               <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white m-0">Everything You Need to Know About Peptides</p>
             </div>
-            <button 
-              @click="handleCtaClick('/education')"
-              class="w-fit py-2.5 px-20 rounded-[500px] bg-white font-roboto font-medium text-xl leading-none tracking-normal text-gray-800 border-none cursor-pointer transition-colors duration-300 flex items-center justify-center hover:bg-gray-100"
-            >
-              Read Details
-            </button>
+            <MainButton
+              text="Read Details"
+              to="/education"
+              bg-color="white"
+            />
           </div>
         </div>
       </div>
@@ -77,18 +76,12 @@
                 </div>
               </div>
               <!-- Shop Now Button -->
-              <a
-                :href="brand.shop_url || '#'"
-                :target="brand.shop_url ? '_blank' : '_self'"
-                :rel="brand.shop_url ? 'noopener noreferrer' : ''"
-                class="flex-shrink-0 py-[10px] px-[80px] rounded-[500px] text-white font-roboto font-medium text-base leading-none tracking-normal text-center hover:opacity-90 transition-colors flex items-center justify-center gap-[10px]"
-                style="background-color: #1F2937;"
-              >
-                Shop Now
-                <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 1L19 8M19 8L12 15M19 8L1 8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </a>
+              <MainButton
+                text="Shop Now"
+                to="/education"
+                bg-color="gray-800"
+                :svg="ArrowRightIcon"
+              />
             </div>
 
             
@@ -590,9 +583,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, h, defineComponent } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
+import MainButton from '@/components/MainButton.vue'
 
 const props = defineProps({
   brand: Object,
@@ -603,6 +597,33 @@ const props = defineProps({
   sort: String,
   sortDir: String,
   search: String,
+})
+
+const ArrowRightIcon = defineComponent({
+  name: 'ArrowRightIcon',
+  setup() {
+    return () =>
+      h(
+        'svg',
+        {
+          width: 20,
+          height: 16,
+          viewBox: '0 0 20 16',
+          fill: 'none',
+          xmlns: 'http://www.w3.org/2000/svg',
+          class: 'w-5 h-4',
+        },
+        [
+          h('path', {
+            d: 'M12 1L19 8M19 8L12 15M19 8L1 8',
+            stroke: 'currentColor',
+            'stroke-width': 2,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          }),
+        ],
+      )
+  },
 })
 
 // Hero background lazy loading
