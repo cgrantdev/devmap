@@ -69,47 +69,18 @@
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 w-full max-w-[360px] mx-auto">Top Vendors</h2>
           <div class="grid grid-cols-2 md:grid-cols-5 gap-x-[20px] gap-y-[80px] mb-20">
-            <div
+            <VendorCard
               v-for="vendor in topVendors"
               :key="vendor.id"
-              class="bg-white flex flex-col gap-[5px] transition-shadow duration-300 items-center hover:shadow-md cursor-pointer"
-              @click="router.visit(`/brand/${vendor.slug}/products`)"
-            >
-              <!-- Logo Area -->
-              <div class="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden mb-1">
-                <img 
-                  v-if="vendor.logo"
-                  :src="vendor.logo" 
-                  :alt="vendor.name + ' logo'"
-                  class="w-full h-full object-contain p-3"
-                  loading="lazy"
-                  @error="handleLogoError($event, vendor.id)"
-                />
-                <div v-if="logoErrors.has(vendor.id) || !vendor.logo" class="w-full h-full flex items-center justify-center">
-                  <span class="font-roboto font-semibold text-2xl text-gray-500">{{ vendor.initials }}</span>
-                </div>
-              </div>
-              
-              <!-- Location -->
-              <div class="flex items-center gap-1 mb-1">
-                <svg class="flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 8.5C9.10457 8.5 10 7.60457 10 6.5C10 5.39543 9.10457 4.5 8 4.5C6.89543 4.5 6 5.39543 6 6.5C6 7.60457 6.89543 8.5 8 8.5Z" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M8 13.5C8 13.5 13.5 10.5 13.5 6.5C13.5 4.01472 11.4853 2 9 2C6.51472 2 5 4.01472 5 6.5C5 10.5 8 13.5 8 13.5Z" stroke="#6B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span class="font-roboto font-normal text-sm leading-relaxed text-gray-500">{{ vendor.location }}</span>
-              </div>
-              
-              <!-- Vendor Name -->
-              <h3 class="font-roboto font-normal text-2xl leading-none tracking-normal text-gray-800 m-0 mb-1">{{ vendor.name }}</h3>
-              
-              <!-- Rating -->
-              <div class="flex flex-row gap-2">
-                <div class="flex items-baseline gap-1">
-                  <span class="font-roboto font-normal text-xs leading-relaxed text-gray-800">{{ vendor.rating }}</span>
-                  <span class="font-roboto font-normal text-xs leading-relaxed text-gray-400">({{ vendor.reviews }})</span>
-                </div>
-              </div>
-            </div>
+              :id="vendor.id"
+              :name="vendor.name"
+              :slug="vendor.slug"
+              :logo="vendor.logo"
+              :initials="vendor.initials"
+              :location="vendor.location"
+              :rating="vendor.rating"
+              :reviews="vendor.reviews"
+            />
           </div>
           <div class="flex justify-center">
             <MainButton 
@@ -279,6 +250,7 @@ import useEmblaCarousel from 'embla-carousel-vue'
 import Autoplay from 'embla-carousel-autoplay'
 import MainButton from '@/components/MainButton.vue'
 import SecondButton from '@/components/SecondButton.vue'
+import VendorCard from '@/components/VendorCard.vue'
 
 // Lazy loading for background images
 const heroImagesLoaded = ref(new Set())
