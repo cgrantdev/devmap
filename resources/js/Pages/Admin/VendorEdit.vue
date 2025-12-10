@@ -51,6 +51,17 @@
               <input v-model="editForm.phone_number" type="text" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" />
             </div>
             <div class="w-1/2">
+              <label class="block mb-1.5 font-semibold text-slate-800">Location</label>
+              <select v-model="editForm.location_id" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base">
+                <option :value="null">Select Location</option>
+                <option v-for="location in locations" :key="location.id" :value="location.id">
+                  {{ location.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="w-full">
               <label class="block mb-1.5 font-semibold text-slate-800">Shop URL</label>
               <input v-model="editForm.shop_url" type="url" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" />
             </div>
@@ -171,6 +182,10 @@ const props = defineProps({
   products: {
     type: Array,
     default: () => []
+  },
+  locations: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -211,6 +226,7 @@ const editForm = useForm({
   description: props.vendor?.settings?.description || '',
   contact_email: props.vendor?.settings?.contact_email || '',
   phone_number: props.vendor?.settings?.phone_number || '',
+  location_id: props.vendor?.settings?.location_id || null,
   shop_url: props.vendor?.settings?.shop_url || '',
   banner: null,
   logo: null,
@@ -227,6 +243,7 @@ watch(() => props.vendor, (newVendor) => {
     editForm.description = newVendor.settings?.description || ''
     editForm.contact_email = newVendor.settings?.contact_email || ''
     editForm.phone_number = newVendor.settings?.phone_number || ''
+    editForm.location_id = newVendor.settings?.location_id || null
     editForm.shop_url = newVendor.settings?.shop_url || ''
     editForm.banner_url = newVendor.settings?.banner_url || ''
     editForm.logo_url = newVendor.settings?.logo_url || ''

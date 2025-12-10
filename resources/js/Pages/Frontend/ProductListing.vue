@@ -365,6 +365,19 @@
             </button>
             <div v-if="expandedFilters.location" class="mt-2 space-y-2">
               <label 
+                class="flex items-center gap-2 cursor-pointer"
+              >
+                <input 
+                  type="radio"
+                  :value="null"
+                  v-model="selectedFilters.location"
+                  @change="applyFilters"
+                  class="rounded border-gray-300"
+                  name="location-filter"
+                />
+                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">All Locations</span>
+              </label>
+              <label 
                 v-for="location in filterOptions.locations"
                 :key="location.id"
                 class="flex items-center gap-2 cursor-pointer"
@@ -588,6 +601,8 @@ const applyFilters = () => {
   }
   if (selectedFilters.value.location !== null) {
     params.set('location', selectedFilters.value.location)
+  } else {
+    params.delete('location')
   }
   if (selectedFilters.value.verification) {
     params.set('verification', selectedFilters.value.verification)
@@ -679,6 +694,8 @@ const applySearch = () => {
   }
   if (selectedFilters.value.location !== null) {
     params.set('location', selectedFilters.value.location)
+  } else {
+    params.delete('location')
   }
   if (selectedFilters.value.verification) {
     params.set('verification', selectedFilters.value.verification)

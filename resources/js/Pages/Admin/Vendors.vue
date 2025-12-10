@@ -54,7 +54,10 @@
               </div>
           </template>
           <template #item-email="{ email }">
-            <div class="text-sm text-gray-900 px-6 py-4 whitespace-nowrap">{{ email }}</div>
+            <div class="text-sm text-gray-900 px-6 py-4 whitespace-nowrap">{{ email || '-' }}</div>
+          </template>
+          <template #item-location="{ location }">
+            <div class="text-sm text-gray-900 px-6 py-4 whitespace-nowrap">{{ location || '-' }}</div>
           </template>
           <template #item-status="item">
             <span v-if="item.is_active" class="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-green-500 text-white">
@@ -107,6 +110,7 @@ const props = defineProps({
 const headers = [
   { text: 'Vendor', value: 'name' },
   { text: 'Email', value: 'email' },
+  { text: 'Location', value: 'location' },
   { text: 'Status', value: 'status' },
   { text: 'Actions', value: 'actions' }
 ]
@@ -120,7 +124,7 @@ const getSearchFromUrl = () => {
   return ''
 }
 
-const searchField = ["name", "email"];
+const searchField = ["name", "email", "location"];
 const searchValue = ref(getSearchFromUrl());
 
 const form = useForm({
