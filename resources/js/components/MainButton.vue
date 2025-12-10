@@ -1,10 +1,11 @@
 <template>
-  <button
+  <a
+    :href="to"
     :class="[buttonClasses, $attrs.class]"
     @click="handleClick"
   >
     {{ text }}
-  </button>
+  </a>
 </template>
 
 <script setup>
@@ -68,11 +69,22 @@ const buttonClasses = computed(() => {
 })
 
 const handleClick = (event) => {
+  // Allow default behavior for new-tab / new-window / middle-click
+  if (
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey ||
+    event.button !== 0
+  ) {
+    return
+  }
+
+  // In-page navigation via Inertia
+  event.preventDefault()
   if (props.to) {
     router.visit(props.to)
   }
-  // Emit the click event so parent can handle stop propagation if needed
-  // The @click.stop modifier on the component will work automatically
 }
 </script>
 

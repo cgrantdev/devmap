@@ -1,10 +1,11 @@
 <template>
-  <button
+  <a
+    :href="to"
     :class="buttonClasses"
     @click="handleClick"
   >
     {{ text }}
-  </button>
+  </a>
 </template>
 
 <script setup>
@@ -59,7 +60,19 @@ const buttonClasses = computed(() => {
   ].join(' ')
 })
 
-const handleClick = () => {
+const handleClick = (event) => {
+  // Allow ctrl/cmd/shift/middle-click to open in new tab/window
+  if (
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey ||
+    event.button !== 0
+  ) {
+    return
+  }
+
+  event.preventDefault()
   if (props.to) {
     router.visit(props.to)
   }
