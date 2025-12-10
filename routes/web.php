@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\BlogManagementController;
 use App\Http\Controllers\Admin\EducationPostsController;
 use App\Http\Controllers\Admin\CategoriesController;
+use App\Http\Controllers\Admin\LocationsController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\PagesController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -114,6 +115,14 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/categories/{id}/merge', [CategoriesController::class, 'merge'])->name('admin.categories.merge');
     Route::post('/categories/bulk-merge', [CategoriesController::class, 'bulkMerge'])->name('admin.categories.bulk-merge');
     Route::post('/categories/bulk-delete', [CategoriesController::class, 'bulkDelete'])->name('admin.categories.bulk-delete');
+    
+    // Locations
+    Route::get('/locations', [LocationsController::class, 'index'])->name('admin.locations.index');
+    Route::get('/locations/create', [LocationsController::class, 'create'])->name('admin.locations.create');
+    Route::post('/locations', [LocationsController::class, 'store'])->name('admin.locations.store');
+    Route::get('/locations/{id}/edit', [LocationsController::class, 'edit'])->name('admin.locations.edit');
+    Route::put('/locations/{id}', [LocationsController::class, 'update'])->name('admin.locations.update');
+    Route::delete('/locations/{id}', [LocationsController::class, 'destroy'])->name('admin.locations.destroy');
     
     // Blogs
     Route::get('/blogs', [BlogManagementController::class, 'index'])->name('admin.blogs.index');

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Brand;
 use App\Models\VendorSetting;
 use App\Models\ProductCategory;
+use App\Models\Location;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use GuzzleHttp\Client;
@@ -19,7 +20,7 @@ class VendorsController extends Controller
 {
     public function index()
     {
-        $vendors = Brand::with('vendorSetting')
+        $vendors = Brand::with(['vendorSetting.location'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($brand) {
@@ -29,6 +30,7 @@ class VendorsController extends Controller
                     'name' => $brand->name,
                     'slug' => $brand->slug,
                     'email' => $brand->vendorSetting->contact_email ?? null,
+                    'location' => $brand->vendorSetting && $brand->vendorSetting->location ? $brand->vendorSetting->location->name : null,
                     'created_at' => $brand->created_at->format('n/j/Y'), // Format: 12/3/2025
                     'is_active' => $brand->is_active,
                     'settings' => $brand->vendorSetting ? [
@@ -64,9 +66,12 @@ class VendorsController extends Controller
 
     public function create()
     {
+        $locations = Location::orderBy('name')->get();
+
         return Inertia::render('Admin/VendorEdit', [
             'vendor' => null,
             'products' => [],
+            'locations' => $locations,
         ]);
     }
 
@@ -88,6 +93,7 @@ class VendorsController extends Controller
             'shop_url' => 'nullable|url|max:255',
             'contact_email' => 'nullable|email|max:255',
             'phone_number' => 'nullable|string|max:50',
+            'location_id' => 'nullable|exists:locations,id',
             'banner' => 'nullable|image|max:2048',
             'logo' => 'nullable|mimes:jpeg,jpg,png,gif,webp,svg|max:1024',
         ]);
@@ -130,6 +136,7 @@ class VendorsController extends Controller
         $settings->shop_url = $validated['shop_url'] ?? null;
         $settings->contact_email = $validated['contact_email'] ?? null;
         $settings->phone_number = $validated['phone_number'] ?? null;
+        $settings->location_id = $validated['location_id'] ?? null;
         $settings->status = 0;
         $settings->save();
 
@@ -157,6 +164,7 @@ class VendorsController extends Controller
                 'shop_url' => $brand->vendorSetting->shop_url,
                 'contact_email' => $brand->vendorSetting->contact_email,
                 'phone_number' => $brand->vendorSetting->phone_number,
+                'location_id' => $brand->vendorSetting->location_id,
                 'shop_url' => $brand->vendorSetting->shop_url,
                 'banner' => $brand->vendorSetting->banner,
                 'logo' => $brand->vendorSetting->logo,
@@ -165,9 +173,12 @@ class VendorsController extends Controller
             ] : null,
         ];
 
+        $locations = Location::orderBy('name')->get();
+
         return Inertia::render('Admin/VendorEdit', [
             'vendor' => $vendorData,
             'products' => $products,
+            'locations' => $locations,
         ]);
     }
 
@@ -179,6 +190,7 @@ class VendorsController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone_number' => 'nullable|string|max:50',
+            'location_id' => 'nullable|exists:locations,id',
             'banner' => 'nullable|image|max:2048',
             'logo' => 'nullable|mimes:jpeg,jpg,png,gif,webp,svg|max:1024',
             'is_active' => 'nullable|boolean',
@@ -229,6 +241,7 @@ class VendorsController extends Controller
         $settings->shop_url = $request->input('shop_url', $settings->shop_url);
         $settings->contact_email = $request->input('contact_email', $settings->contact_email);
         $settings->phone_number = $request->input('phone_number', $settings->phone_number);
+        $settings->location_id = $validated['location_id'] ?? $settings->location_id;
         $settings->shop_url = $request->input('shop_url', $settings->shop_url);
         $settings->contact_email = $validated['email'] ?? $settings->contact_email;
         $settings->save();

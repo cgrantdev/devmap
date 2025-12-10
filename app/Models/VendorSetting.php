@@ -11,6 +11,7 @@ class VendorSetting extends Model
 
     protected $fillable = [
         'brand_id',
+        'location_id',
         'banner',
         'logo',
         'description',
@@ -24,5 +25,10 @@ class VendorSetting extends Model
     public function brand()
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
     }
 }

@@ -17,4 +17,9 @@ class Location extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function vendorSettings()
+    {
+        return $this->hasMany(VendorSetting::class);
+    }
 }

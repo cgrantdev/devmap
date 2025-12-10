@@ -89,7 +89,13 @@ class ProductsController extends Controller
         }
 
         if ($request->has('location') && $request->location) {
-            $query->where('location_id', $request->location);
+            // Match products by their own location or by the vendor's location (via brand vendor settings)
+            $query->where(function ($q) use ($request) {
+                $q->where('location_id', $request->location)
+                  ->orWhereHas('brand.vendorSetting', function ($vendorSettingQuery) use ($request) {
+                      $vendorSettingQuery->where('location_id', $request->location);
+                  });
+            });
         }
 
         if ($request->has('verification') && $request->verification !== '') {
@@ -138,9 +144,8 @@ class ProductsController extends Controller
             'brands' => Brand::whereHas('products', function ($q) use ($category) {
                 $q->where('product_category_id', $category->id);
             })->get(['id', 'name']),
-            'locations' => Location::whereHas('products', function ($q) use ($category) {
-                $q->where('product_category_id', $category->id);
-            })->get(['id', 'name']),
+            // Provide all locations from the locations table so the filter always shows full list
+            'locations' => Location::orderBy('name')->get(['id', 'name']),
         ];
 
         // Get price range
@@ -201,7 +206,13 @@ class ProductsController extends Controller
         }
 
         if ($request->has('location') && $request->location) {
-            $query->where('location_id', $request->location);
+            // Match products by their own location or by the vendor's location (via brand vendor settings)
+            $query->where(function ($q) use ($request) {
+                $q->where('location_id', $request->location)
+                  ->orWhereHas('brand.vendorSetting', function ($vendorSettingQuery) use ($request) {
+                      $vendorSettingQuery->where('location_id', $request->location);
+                  });
+            });
         }
 
         if ($request->has('verification') && $request->verification !== '') {
@@ -244,9 +255,8 @@ class ProductsController extends Controller
                 $q->where('brand_id', $brandId);
             })->get(['id', 'name']),
             'brands' => Brand::where('id', $brandId)->get(['id', 'name']),
-            'locations' => Location::whereHas('products', function ($q) use ($brandId) {
-                $q->where('brand_id', $brandId);
-            })->get(['id', 'name']),
+            // Provide all locations from the locations table so the filter always shows full list
+            'locations' => Location::orderBy('name')->get(['id', 'name']),
         ];
 
         // Get price range
