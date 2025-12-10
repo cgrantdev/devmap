@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 h-full hover:shadow-lg cursor-pointer"
+    class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 h-full cursor-pointer"
     @click="handleClick"
   >
     <div class="w-full aspect-[325/404] overflow-hidden bg-gray-100 rounded-t-lg">

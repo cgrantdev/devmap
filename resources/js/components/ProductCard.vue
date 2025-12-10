@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 hover:shadow-lg cursor-pointer"
+    class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 cursor-pointer"
     @click="handleClick"
   >
     <div class="w-full aspect-square bg-gray-100 flex items-center justify-center p-6 overflow-hidden rounded-lg">

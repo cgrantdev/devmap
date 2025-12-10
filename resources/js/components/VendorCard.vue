@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white flex flex-col gap-5 transition-shadow duration-300 items-center hover:shadow-md cursor-pointer rounded-lg"
+    class="bg-white flex flex-col gap-5 transition-shadow duration-300 items-center cursor-pointer rounded-lg"
     @click="handleClick"
   >
     <!-- Logo -->
@@ -19,7 +19,7 @@
       </template>
     </div>
 
-    <div class="flex flex-col items-center min-w-0 w-full">
+    <div class="flex flex-col items-center min-w-0 w-full justify-between gap-[5px] flex-1">
         <!-- Location -->
         <div class="flex items-center gap-1 mb-1">
             <svg width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -29,21 +29,18 @@
             </svg>
 
             <span class="font-roboto font-normal text-sm leading-relaxed text-gray-500">{{ location || 'Location not available' }}</span>
-            </div>
+          </div>
 
-            <!-- Name -->
-            <div class="w-full min-w-0 px-2">
-              <h3
-                class="font-roboto font-normal text-2xl leading-tight tracking-normal text-gray-700
-                      m-0 mb-1 text-center truncate w-full"
-                :title="name"
-              >
-                {{ name }}
-              </h3>
-            </div>
+          <!-- Name -->
+            <h3
+              class="font-roboto font-normal text-2xl leading-tight tracking-normal text-gray-700
+                    m-0 mb-1 text-center w-full"
+            >
+              {{ name }}
+            </h3>
 
-            <!-- Rating -->
-            <RatingDisplay :rating="rating" :reviews="reviews" />
+          <!-- Rating -->
+          <RatingDisplay :rating="rating" :reviews="reviews" />
     </div>
     
   </div>
