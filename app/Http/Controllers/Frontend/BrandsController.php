@@ -15,31 +15,32 @@ class BrandsController extends Controller
     {
         // Get active brands with product counts and aggregated data
         $brands = Brand::where('is_active', true)
-            ->with('vendorSetting')
+            ->with(['vendorSetting', 'vendorSetting.location'])
             ->withCount('products')
             ->orderBy('name')
             ->get()
             ->map(function ($brand) {
-                // Get most common location from products
-                $locationId = Product::where('brand_id', $brand->id)
-                    ->whereNotNull('location_id')
-                    ->selectRaw('location_id, COUNT(*) as count')
-                    ->groupBy('location_id')
-                    ->orderByDesc('count')
-                    ->first()
-                    ?->location_id;
-                
-                // If no location from grouping, try to get any location from products
-                if (!$locationId) {
+                // Prefer vendor setting location if set; otherwise derive from products
+                $location = null;
+                if ($brand->vendorSetting && $brand->vendorSetting->location) {
+                    $location = $brand->vendorSetting->location;
+                } else {
                     $locationId = Product::where('brand_id', $brand->id)
                         ->whereNotNull('location_id')
-                        ->value('location_id');
+                        ->selectRaw('location_id, COUNT(*) as count')
+                        ->groupBy('location_id')
+                        ->orderByDesc('count')
+                        ->first()
+                        ?->location_id;
+                    
+                    if (!$locationId) {
+                        $locationId = Product::where('brand_id', $brand->id)
+                            ->whereNotNull('location_id')
+                            ->value('location_id');
+                    }
+                    
+                    $location = $locationId ? Location::find($locationId) : null;
                 }
-                
-                // Location should be found from brand's products above
-                // If not found, locationId will remain null
-                
-                $location = $locationId ? Location::find($locationId) : null;
                 
                 // Get logo URL from vendor settings
                 $logoUrl = null;

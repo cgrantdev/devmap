@@ -83,7 +83,7 @@ class HomeController extends Controller
 
         // Top brands (vendors) limited list for homepage
         $topBrands = Brand::where('is_active', true)
-            ->with('vendorSetting')
+            ->with(['vendorSetting', 'vendorSetting.location'])
             ->withCount('products')
             ->orderByDesc('products_count')
             ->take(5)
@@ -104,7 +104,13 @@ class HomeController extends Controller
                         ->value('location_id');
                 }
 
-                $location = $locationId ? Location::find($locationId) : null;
+                // Prefer vendor setting location if set; otherwise fall back to product-derived location
+                $location = null;
+                if ($brand->vendorSetting && $brand->vendorSetting->location) {
+                    $location = $brand->vendorSetting->location;
+                } elseif ($locationId) {
+                    $location = Location::find($locationId);
+                }
 
                 $logoUrl = null;
                 if ($brand->vendorSetting && $brand->vendorSetting->logo) {
