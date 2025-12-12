@@ -64,43 +64,16 @@
         <div v-if="related && related.length > 0" class="mt-16">
           <h2 class="font-hv-muse font-normal text-3xl leading-normal tracking-normal text-gray-800 mb-8">Related Articles</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div
+            <BlogPostCard
               v-for="item in related"
               :key="item.id"
-              class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 h-full hover:shadow-lg cursor-pointer"
-              @click="router.visit(`/blog/${item.slug}`)"
-            >
-              <div class="w-full aspect-[325/404] overflow-hidden bg-gray-100 rounded-t-lg">
-                <img 
-                  v-if="item.image"
-                  :src="item.image" 
-                  :alt="item.title"
-                  class="w-full h-full object-cover object-center block"
-                  loading="lazy"
-                  @error="handleImageError($event)"
-                />
-                <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-                  <span class="text-sm">No Image</span>
-                </div>
-              </div>
-              <div class="flex justify-between items-center py-3 px-4 font-roboto font-normal text-xs leading-relaxed text-gray-500 bg-white">
-                <span class="flex items-center gap-1.5">
-                  <svg class="flex-shrink-0 text-gray-500 w-4 h-4" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  {{ item.readTime }}
-                </span>
-                <span class="text-gray-500">{{ item.date }}</span>
-              </div>
-              <div class="p-5 flex flex-col gap-3 flex-1">
-                <h3 class="font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0 mb-1 text-center">{{ item.title }}</h3>
-                <p class="font-roboto font-normal text-sm leading-loose text-gray-500 m-0 flex-1 mb-2 text-center">{{ item.description }}</p>
-                <button class="w-full py-3 px-11 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer transition-colors duration-300 mt-auto hover:bg-gray-300">
-                  Read Details
-                </button>
-              </div>
-            </div>
+              :title="item.title"
+              :description="item.description"
+              :image="item.image"
+              :read-time="item.readTime"
+              :date="item.date"
+              :to="`/blog/${item.slug}`"
+            />
           </div>
         </div>
       </div>
@@ -111,25 +84,13 @@
 <script setup>
 import { router } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
+import BlogPostCard from '@/components/BlogPostCard.vue'
 
 const props = defineProps({
   blog: Object,
   related: Array,
 })
 
-const handleImageError = (event) => {
-  if (event.target.dataset.failed) {
-    return
-  }
-  event.target.dataset.failed = 'true'
-  event.target.style.display = 'none'
-  if (event.target.parentElement) {
-    const placeholder = document.createElement('div')
-    placeholder.className = 'w-full h-full flex items-center justify-center text-gray-400'
-    placeholder.innerHTML = '<span class="text-sm">No Image</span>'
-    event.target.parentElement.appendChild(placeholder)
-  }
-}
 </script>
 
 <style scoped>

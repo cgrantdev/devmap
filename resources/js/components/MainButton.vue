@@ -1,6 +1,7 @@
 <template>
-  <a
-    :href="to"
+  <component
+    :is="to ? 'a' : 'button'"
+    :href="to || undefined"
     :class="[buttonClasses, $attrs.class]"
     @click="handleClick"
   >
@@ -8,7 +9,7 @@
     <span v-if="svg" class="inline-flex items-center">
       <component :is="svg" class="w-5 h-5" />
     </span>
-  </a>
+  </component>
 </template>
 
 <script setup>
@@ -22,7 +23,7 @@ const props = defineProps({
   },
   to: {
     type: String,
-    required: true
+    default: null
   },
   bgColor: {
     type: String,
@@ -75,7 +76,15 @@ const buttonClasses = computed(() => {
   ].join(' ')
 })
 
+const emit = defineEmits(['click'])
+
 const handleClick = (event) => {
+  // If no 'to' prop, emit click event for parent to handle
+  if (!props.to) {
+    emit('click', event)
+    return
+  }
+
   // Allow default behavior for new-tab / new-window / middle-click
   if (
     event.metaKey ||
@@ -89,9 +98,7 @@ const handleClick = (event) => {
 
   // In-page navigation via Inertia
   event.preventDefault()
-  if (props.to) {
-    router.visit(props.to)
-  }
+  router.visit(props.to)
 }
 </script>
 

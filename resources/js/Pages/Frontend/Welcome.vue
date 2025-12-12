@@ -176,39 +176,16 @@
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 p-0 w-full">Research Insights</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20 research-insights-grid">
-            <div
+            <BlogPostCard
               v-for="insight in researchInsights"
               :key="insight.id"
-              class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 h-full hover:shadow-lg cursor-pointer"
-              @click="router.visit(`/blog/${insight.slug}`)"
-            >
-              <div class="w-full aspect-[325/404] overflow-hidden bg-gray-100 rounded-t-lg">
-                <img 
-                  :src="insight.image || '/images/blogs/placeholder.jpg'" 
-                  :alt="insight.title"
-                  class="w-full h-full object-cover object-center block"
-                  loading="lazy"
-                  @error="handleImageError($event)"
-                />
-              </div>
-              <div class="flex justify-between items-center py-3 px-4 font-roboto font-normal text-xs leading-relaxed text-gray-500 bg-white">
-                <span class="flex items-center gap-1.5">
-                  <svg class="flex-shrink-0 text-gray-500 w-4 h-4" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  {{ insight.readTime }}
-                </span>
-                <span class="text-gray-500">{{ insight.date }}</span>
-              </div>
-              <div class="p-5 flex flex-col gap-3 flex-1">
-                <h3 class="font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0 mb-1 text-center">{{ insight.title }}</h3>
-                <p class="font-roboto font-normal text-sm leading-loose text-gray-500 m-0 flex-1 mb-2 text-center">{{ insight.description }}</p>
-                <SecondButton 
-                  :to="`/blog/${insight.slug}`"
-                />
-              </div>
-            </div>
+              :title="insight.title"
+              :description="insight.description"
+              :image="insight.image"
+              :read-time="insight.readTime"
+              :date="insight.date"
+              :to="`/blog/${insight.slug}`"
+            />
           </div>
           <div class="flex justify-center">
             <MainButton 
@@ -429,22 +406,6 @@ const handleLogoError = (event, vendorId) => {
   img.style.display = 'none'
 }
 
-const handleImageError = (event) => {
-  // Prevent infinite loop - stop trying to load images if we've already failed
-  if (event.target.dataset.failed) {
-    return
-  }
-  // Mark as failed to prevent retry
-  event.target.dataset.failed = 'true'
-  // Hide the broken image and show placeholder
-  event.target.style.display = 'none'
-  if (event.target.parentElement) {
-    const placeholder = document.createElement('div')
-    placeholder.className = 'w-full h-full flex items-center justify-center text-gray-400'
-    placeholder.innerHTML = '<span class="text-sm">No Image</span>'
-    event.target.parentElement.appendChild(placeholder)
-  }
-}
 
 onMounted(() => {
   if (emblaApi.value) {
