@@ -36,7 +36,7 @@
     <!-- Brand Detail Section -->
     <section class="py-8 bg-white">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-lg shadow-lg p-8 flex flex-col md:flex-row gap-8">
+        <div class="bg-white rounded-lg flex flex-col md:flex-row gap-8">
           <!-- Left: Brand Logo -->
           <div class="flex-shrink-0 w-full md:w-[400px] flex items-center justify-center">
             <div class="w-[400px] h-[400px] rounded-[24px] flex items-center justify-center overflow-hidden" style="background-color: #F3F3F3;">
@@ -63,17 +63,7 @@
               <div class="flex-1">
                 <h2 class="font-hv-muse font-normal text-4xl leading-normal tracking-normal text-gray-800 m-0 mb-2">{{ brand.name }}</h2>
                 <!-- Rating -->
-                <div class="flex flex-row gap-2 items-center">
-                  <div class="flex gap-0.5">
-                    <svg v-for="i in 5" :key="i" class="flex-shrink-0" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M8 0L9.79611 5.52786H15.6085L10.9062 8.94427L12.7023 14.4721L8 11.0557L3.29772 14.4721L5.09383 8.94427L0.391548 5.52786H6.20389L8 0Z" fill="#FBBF24"/>
-                    </svg>
-                  </div>
-                  <div class="flex items-baseline gap-1">
-                    <span class="font-roboto font-normal text-sm leading-relaxed text-gray-800">{{ brand.rating || '0.00' }}</span>
-                    <span class="font-roboto font-normal text-sm leading-relaxed text-gray-400">({{ brand.reviews || 0 }})</span>
-                  </div>
-                </div>
+                <RatingDisplay :rating="brand.rating || '0.00'" :reviews="brand.reviews || 0" />
               </div>
               <!-- Shop Now Button -->
               <MainButton
@@ -553,6 +543,7 @@ import { Link, router } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import MainButton from '@/components/MainButton.vue'
 import ProductCard from '@/components/ProductCard.vue'
+import RatingDisplay from '@/components/RatingDisplay.vue'
 
 const props = defineProps({
   brand: Object,
