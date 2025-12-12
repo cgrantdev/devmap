@@ -63,7 +63,7 @@
               <div class="flex-1">
                 <h2 class="font-hv-muse font-normal text-4xl leading-normal tracking-normal text-gray-800 m-0 mb-2">{{ brand.name }}</h2>
                 <!-- Rating -->
-                <RatingDisplay :rating="brand.rating || '0.00'" :reviews="brand.reviews || 0" />
+                <RatingDisplay :rating="brand.rating || 0" :reviews="brand.reviews || 0" />
               </div>
               <!-- Shop Now Button -->
               <MainButton
@@ -263,57 +263,86 @@
             </div>
 
             <!-- Pagination -->
-            <div class="flex items-center justify-center mt-8">
-              <div class="flex items-center gap-2 bg-gray-200 rounded-[100px] px-4 py-2">
-                <Link
-                  v-if="products.prev_page_url"
-                  :href="products.prev_page_url"
-                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 hover:bg-gray-300 transition-colors"
+            <Pagination
+              :pagination="products"
+              :get-page-url="getPageUrl"
+            />
+
+            <!-- Vendor Grading -->
+            <div class="mt-12">
+              <VendorGrading
+                :shipping-time="brand.shipping_time || 0"
+                :customer-service="brand.customer_service || 0"
+                :quality="brand.quality || 0"
+                :cost="brand.cost || 0"
+                :packaging="brand.packaging || 0"
+                :is-loading="isSubmittingReview"
+                @submit="handleGradingSubmit"
+              />
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div
+              v-if="reviewMessage"
+              :class="[
+                'fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg max-w-md',
+                reviewMessageType === 'success' 
+                  ? 'bg-green-50 border border-green-200 text-green-800' 
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              ]"
+            >
+              <div class="flex items-start gap-3">
+                <svg
+                  v-if="reviewMessageType === 'success'"
+                  class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg width="15" height="12" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.84853 11.6485C6.3799 12.1172 5.6201 12.1172 5.15147 11.6485L0.351472 6.84853C-0.117157 6.3799 -0.117157 5.6201 0.351472 5.15147L5.15147 0.351472C5.6201 -0.117157 6.3799 -0.117157 6.84853 0.351472C7.31716 0.820101 7.31716 1.5799 6.84853 2.04853L4.09706 4.8L13.2 4.8C13.8627 4.8 14.4 5.33726 14.4 6C14.4 6.66274 13.8627 7.2 13.2 7.2H4.09706L6.84853 9.95147C7.31716 10.4201 7.31716 11.1799 6.84853 11.6485Z" fill="#475569"/>
-                  </svg>
-                </Link>
-                <span
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <svg
                   v-else
-                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 cursor-not-allowed"
+                  class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg width="15" height="12" viewBox="0 0 15 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.84853 11.6485C6.3799 12.1172 5.6201 12.1172 5.15147 11.6485L0.351472 6.84853C-0.117157 6.3799 -0.117157 5.6201 0.351472 5.15147L5.15147 0.351472C5.6201 -0.117157 6.3799 -0.117157 6.84853 0.351472C7.31716 0.820101 7.31716 1.5799 6.84853 2.04853L4.09706 4.8L13.2 4.8C13.8627 4.8 14.4 5.33726 14.4 6C14.4 6.66274 13.8627 7.2 13.2 7.2H4.09706L6.84853 9.95147C7.31716 10.4201 7.31716 11.1799 6.84853 11.6485Z" fill="#94A3B8"/>
-                  </svg>
-                </span>
-                <template v-for="page in visiblePages" :key="page">
-                  <Link
-                    v-if="page !== '...'"
-                    :href="getPageUrl(page)"
-                    :class="[
-                      'flex items-center justify-center min-w-[32px] h-8 px-2 rounded-[500px] font-roboto font-medium text-sm leading-none tracking-normal transition-colors',
-                      page === products.current_page
-                        ? 'bg-white text-gray-800'
-                        : 'text-gray-800 hover:text-gray-600'
-                    ]"
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div class="flex-1">
+                  <p class="font-roboto font-medium text-sm leading-relaxed">
+                    {{ reviewMessage }}
+                  </p>
+                </div>
+                <button
+                  @click="reviewMessage = null"
+                  class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    {{ page }}
-                  </Link>
-                  <span v-else class="flex items-center justify-center min-w-[32px] h-8 px-2 text-gray-800">...</span>
-                </template>
-                <Link
-                  v-if="products.next_page_url"
-                  :href="products.next_page_url"
-                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 hover:bg-gray-300 transition-colors"
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12.3513 6.35147C12.8199 5.88284 13.5797 5.88284 14.0483 6.35147L18.8483 11.1515C19.317 11.6201 19.317 12.3799 18.8483 12.8485L14.0483 17.6485C13.5797 18.1172 12.8199 18.1172 12.3513 17.6485C11.8826 17.1799 11.8826 16.4201 12.3513 15.9515L15.1028 13.2L5.99981 13.2C5.33706 13.2 4.7998 12.6627 4.7998 12C4.7998 11.3373 5.33706 10.8 5.99981 10.8H15.1028L12.3513 8.04853C11.8826 7.5799 11.8826 6.8201 12.3513 6.35147Z" fill="#475569"/>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
-                </Link>
-                <span
-                  v-else
-                  class="flex items-center justify-center w-8 h-8 rounded-[500px] bg-gray-200 cursor-not-allowed"
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12.3513 6.35147C12.8199 5.88284 13.5797 5.88284 14.0483 6.35147L18.8483 11.1515C19.317 11.6201 19.317 12.3799 18.8483 12.8485L14.0483 17.6485C13.5797 18.1172 12.8199 18.1172 12.3513 17.6485C11.8826 17.1799 11.8826 16.4201 12.3513 15.9515L15.1028 13.2L5.99981 13.2C5.33706 13.2 4.7998 12.6627 4.7998 12C4.7998 11.3373 5.33706 10.8 5.99981 10.8H15.1028L12.3513 8.04853C11.8826 7.5799 11.8826 6.8201 12.3513 6.35147Z" fill="#94A3B8"/>
-                  </svg>
-                </span>
+                </button>
               </div>
             </div>
           </div>
@@ -539,11 +568,13 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, h, defineComponent } from 'vue'
-import { Link, router } from '@inertiajs/vue3'
+import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import MainButton from '@/components/MainButton.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import RatingDisplay from '@/components/RatingDisplay.vue'
+import VendorGrading from '@/components/VendorGrading.vue'
+import Pagination from '@/components/Pagination.vue'
 
 const props = defineProps({
   brand: Object,
@@ -785,38 +816,94 @@ const getPageUrl = (page) => {
   return `/brand/${props.brand.slug}/products?${params.toString()}`
 }
 
-const visiblePages = computed(() => {
-  const current = props.products.current_page
-  const last = props.products.last_page
-  const pages = []
-  
-  if (last <= 7) {
-    for (let i = 1; i <= last; i++) {
-      pages.push(i)
-    }
-  } else {
-    if (current <= 3) {
-      for (let i = 1; i <= 4; i++) pages.push(i)
-      pages.push('...')
-      pages.push(last)
-    } else if (current >= last - 2) {
-      pages.push(1)
-      pages.push('...')
-      for (let i = last - 3; i <= last; i++) pages.push(i)
-    } else {
-      pages.push(1)
-      pages.push('...')
-      for (let i = current - 1; i <= current + 1; i++) pages.push(i)
-      pages.push('...')
-      pages.push(last)
-    }
-  }
-  
-  return pages
-})
-
 const handleCtaClick = (url) => {
   router.visit(url)
+}
+
+const page = usePage()
+
+// Review submission state
+const isSubmittingReview = ref(false)
+const reviewMessage = ref(null)
+const reviewMessageType = ref('success') // 'success' or 'error'
+
+const handleGradingSubmit = (gradingData) => {
+  isSubmittingReview.value = true
+  reviewMessage.value = null
+
+  const form = useForm({
+    shipping_time: gradingData.shipping_time,
+    customer_service: gradingData.customer_service,
+    quality: gradingData.quality,
+    cost: gradingData.cost,
+    packaging: gradingData.packaging,
+    user_name: gradingData.user_name,
+    user_email: gradingData.user_email,
+    review: gradingData.review || null,
+    _token: page.props.csrf_token,
+  })
+
+  form.post(`/brands/${props.brand.id}/reviews`, {
+    preserveScroll: true,
+    onSuccess: () => {
+      isSubmittingReview.value = false
+      reviewMessageType.value = 'success'
+      reviewMessage.value = 'Thank you for your review! Your rating has been submitted successfully.'
+      
+      // Auto-hide success message after 5 seconds
+      setTimeout(() => {
+        reviewMessage.value = null
+      }, 5000)
+
+      // Refresh the page to show updated ratings
+      router.reload({ only: ['brand'] })
+    },
+    onError: (errors) => {
+      isSubmittingReview.value = false
+      reviewMessageType.value = 'error'
+      
+      // Helper function to get error message (handles both array and string formats)
+      const getErrorMessage = (error) => {
+        if (Array.isArray(error)) {
+          return error[0]
+        }
+        if (typeof error === 'string') {
+          return error
+        }
+        return null
+      }
+      
+      // Build error message from validation errors
+      let errorText = 'Failed to submit review. '
+      
+      if (errors.user_name) {
+        errorText = getErrorMessage(errors.user_name) || 'Please enter your name.'
+      } else if (errors.user_email) {
+        errorText = getErrorMessage(errors.user_email) || 'Please enter a valid email address.'
+      } else if (errors.shipping_time || errors.customer_service || errors.quality || errors.cost || errors.packaging) {
+        errorText = 'Please rate all categories before submitting.'
+      } else if (errors.message) {
+        errorText = getErrorMessage(errors.message) || errors.message
+      } else if (errors.rating) {
+        errorText = getErrorMessage(errors.rating) || 'Please provide a rating.'
+      } else {
+        // Check for any other error fields
+        const firstError = Object.values(errors)[0]
+        if (firstError) {
+          errorText = getErrorMessage(firstError) || 'Please check your information and try again.'
+        } else {
+          errorText = 'Please check your information and try again.'
+        }
+      }
+      
+      reviewMessage.value = errorText
+      
+      // Auto-hide error message after 7 seconds
+      setTimeout(() => {
+        reviewMessage.value = null
+      }, 7000)
+    }
+  })
 }
 
 
