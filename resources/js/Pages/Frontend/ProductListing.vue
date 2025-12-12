@@ -145,6 +145,8 @@
             <Pagination
               :pagination="products"
               :get-page-url="getPageUrl"
+              :per-page-options="[10, 20, 50, 100]"
+              :on-per-page-change="handlePerPageChange"
             />
           </div>
         </div>
@@ -645,6 +647,17 @@ const applySearch = () => {
 
 const applyPerPage = () => {
   applyFilters()
+}
+
+const handlePerPageChange = (newPerPage) => {
+  perPage.value = newPerPage
+  const params = new URLSearchParams(window.location.search)
+  params.set('per_page', newPerPage)
+  params.set('page', 1) // Reset to first page when changing per page
+  router.visit(`/product/${props.slug}?${params.toString()}`, {
+    preserveState: true,
+    preserveScroll: false,
+  })
 }
 
 const getPageUrl = (page) => {

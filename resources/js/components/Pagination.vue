@@ -1,5 +1,11 @@
 <template>
-  <div class="flex items-center justify-center mt-8">
+  <div class="flex items-center justify-between mt-8">
+    <!-- Items Count -->
+    <div class="font-roboto font-normal text-sm leading-relaxed text-gray-800">
+      Items {{ itemsFrom }} to {{ itemsTo }} of {{ pagination.total || 0 }}
+    </div>
+
+    <!-- Pagination Controls -->
     <div class="flex items-center gap-2 bg-gray-200 rounded-[100px] px-4 py-2">
       <!-- Previous Button -->
       <Link
@@ -56,6 +62,41 @@
         </svg>
       </span>
     </div>
+
+    <!-- Items Per Page Selector -->
+    <div class="flex items-center gap-2">
+      <span class="font-roboto font-normal text-sm leading-relaxed text-gray-800">Show</span>
+      <div class="relative">
+        <select
+          :value="currentPerPage"
+          @change="handlePerPageChange"
+          class="appearance-none bg-white border border-gray-300 rounded-lg px-3 py-1.5 pr-8 font-roboto font-normal text-sm leading-relaxed text-gray-800 cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent"
+        >
+          <option
+            v-for="option in perPageOptions"
+            :key="option"
+            :value="option"
+          >
+            {{ option }}
+          </option>
+        </select>
+        <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+          <svg
+            class="w-4 h-4 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -74,8 +115,35 @@ const props = defineProps({
   getPageUrl: {
     type: Function,
     required: true
+  },
+  perPageOptions: {
+    type: Array,
+    default: () => [10, 20, 50, 100]
+  },
+  onPerPageChange: {
+    type: Function,
+    default: null
   }
 })
+
+const itemsFrom = computed(() => {
+  return props.pagination.from || 0
+})
+
+const itemsTo = computed(() => {
+  return props.pagination.to || 0
+})
+
+const currentPerPage = computed(() => {
+  return props.pagination.per_page || props.perPageOptions[0]
+})
+
+const handlePerPageChange = (event) => {
+  const newPerPage = parseInt(event.target.value)
+  if (props.onPerPageChange) {
+    props.onPerPageChange(newPerPage)
+  }
+}
 
 const visiblePages = computed(() => {
   const current = props.pagination.current_page

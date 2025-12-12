@@ -59,19 +59,21 @@
           <!-- Right: Brand Info (2 columns layout) -->
           <div class="flex-1 flex flex-col gap-4">
             <!-- First Row: Title and Shop Now Button -->
-            <div class="flex items-start justify-between gap-4">
-              <div class="flex-1">
+            <div class="flex flex-col md:flex-row items-start md:items-start justify-between gap-4">
+              <div class="flex-1 w-full md:w-auto">
                 <h2 class="font-hv-muse font-normal text-4xl leading-normal tracking-normal text-gray-800 m-0 mb-2">{{ brand.name }}</h2>
                 <!-- Rating -->
                 <RatingDisplay :rating="brand.rating || 0" :reviews="brand.reviews || 0" />
               </div>
               <!-- Shop Now Button -->
-              <MainButton
-                text="Shop Now"
-                to="/education"
-                bg-color="gray-800"
-                :svg="ArrowRightIcon"
-              />
+              <div class="w-full md:w-auto">
+                <MainButton
+                  text="Shop Now"
+                  to="/education"
+                  bg-color="gray-800"
+                  :svg="ArrowRightIcon"
+                />
+              </div>
             </div>
 
             
@@ -266,6 +268,8 @@
             <Pagination
               :pagination="products"
               :get-page-url="getPageUrl"
+              :per-page-options="[10, 20, 50, 100]"
+              :on-per-page-change="handlePerPageChange"
             />
 
             <!-- Vendor Grading -->
@@ -814,6 +818,16 @@ const getPageUrl = (page) => {
   const params = new URLSearchParams(window.location.search)
   params.set('page', page)
   return `/brand/${props.brand.slug}/products?${params.toString()}`
+}
+
+const handlePerPageChange = (perPage) => {
+  const params = new URLSearchParams(window.location.search)
+  params.set('per_page', perPage)
+  params.set('page', 1) // Reset to first page when changing per page
+  router.visit(`/brand/${props.brand.slug}/products?${params.toString()}`, {
+    preserveState: true,
+    preserveScroll: false,
+  })
 }
 
 const handleCtaClick = (url) => {
