@@ -16,52 +16,62 @@ class VendorReviewsController extends Controller
     public function store(Request $request, $brandId)
     {
         $validated = $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
+            'rating' => 'nullable|integer|min:1|max:5',
             'review' => 'nullable|string|max:2000',
-            'user_name' => 'nullable|string|max:255',
-            'user_email' => 'nullable|email|max:255',
+            'user_name' => 'required|string|max:255',
+            'user_email' => 'required|email|max:255',
+            'shipping_time' => 'required|integer|min:1|max:5',
+            'customer_service' => 'required|integer|min:1|max:5',
+            'quality' => 'required|integer|min:1|max:5',
+            'cost' => 'required|integer|min:1|max:5',
+            'packaging' => 'required|integer|min:1|max:5',
         ]);
+
+        // Calculate overall rating from the 5 categories
+        $overallRating = round(
+            ($validated['shipping_time'] + 
+             $validated['customer_service'] + 
+             $validated['quality'] + 
+             $validated['cost'] + 
+             $validated['packaging']) / 5
+        );
 
         $brand = Brand::findOrFail($brandId);
 
-        // Check if user is authenticated
+        // Get user ID if authenticated (optional)
         $userId = Auth::id();
+
+        // Check if this email has already reviewed this vendor (prevent duplicate reviews)
+        $existingReview = VendorReview::where('brand_id', $brandId)
+            ->where('user_email', $validated['user_email'])
+            ->first();
         
-        // If not authenticated, require name and email
-        if (!$userId) {
-            if (empty($validated['user_name']) || empty($validated['user_email'])) {
-                return back()->withErrors([
-                    'user_name' => 'Name and email are required for guest reviews.',
-                    'user_email' => 'Name and email are required for guest reviews.',
-                ])->withInput();
-            }
+        if ($existingReview) {
+            return back()->withErrors([
+                'user_email' => 'You have already submitted a review for this vendor with this email address.',
+            ])->withInput();
         }
 
-        // Check if user already reviewed this vendor
-        if ($userId) {
-            $existingReview = VendorReview::where('brand_id', $brandId)
-                ->where('user_id', $userId)
-                ->first();
-            
-            if ($existingReview) {
-                return back()->withErrors([
-                    'rating' => 'You have already reviewed this vendor.',
-                ])->withInput();
-            }
-        }
-
-        // Create review (pending approval by default)
+        // Create review (auto-approved so rating updates immediately)
         $review = VendorReview::create([
             'brand_id' => $brandId,
-            'user_id' => $userId,
-            'user_name' => $validated['user_name'] ?? Auth::user()->name ?? null,
-            'user_email' => $validated['user_email'] ?? Auth::user()->email ?? null,
-            'rating' => $validated['rating'],
+            'user_id' => $userId, // null for guest reviews
+            'user_name' => $validated['user_name'],
+            'user_email' => $validated['user_email'],
+            'rating' => $overallRating,
             'review' => $validated['review'] ?? null,
-            'is_approved' => false, // Require admin approval
+            'is_approved' => true, // Auto-approve so rating updates immediately
+            'shipping_time' => $validated['shipping_time'],
+            'customer_service' => $validated['customer_service'],
+            'quality' => $validated['quality'],
+            'cost' => $validated['cost'],
+            'packaging' => $validated['packaging'],
         ]);
 
-        return back()->with('success', 'Thank you for your review! It will be published after admin approval.');
+        // The updateBrandRating will be triggered automatically via the model's boot method
+        // since is_approved is true
+
+        return back()->with('success', 'Thank you for your review!');
     }
 
     /**

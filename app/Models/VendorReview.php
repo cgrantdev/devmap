@@ -17,6 +17,11 @@ class VendorReview extends Model
         'rating',
         'review',
         'is_approved',
+        'shipping_time',
+        'customer_service',
+        'quality',
+        'cost',
+        'packaging',
     ];
 
     protected $casts = [
@@ -71,9 +76,31 @@ class VendorReview extends Model
             ? $approvedReviews->avg('rating') 
             : 0;
 
+        // Calculate averages for each grading category
+        $shippingTime = $ratingCount > 0 && $approvedReviews->whereNotNull('shipping_time')->count() > 0
+            ? round($approvedReviews->whereNotNull('shipping_time')->avg('shipping_time'), 1)
+            : 0;
+        $customerService = $ratingCount > 0 && $approvedReviews->whereNotNull('customer_service')->count() > 0
+            ? round($approvedReviews->whereNotNull('customer_service')->avg('customer_service'), 1)
+            : 0;
+        $quality = $ratingCount > 0 && $approvedReviews->whereNotNull('quality')->count() > 0
+            ? round($approvedReviews->whereNotNull('quality')->avg('quality'), 1)
+            : 0;
+        $cost = $ratingCount > 0 && $approvedReviews->whereNotNull('cost')->count() > 0
+            ? round($approvedReviews->whereNotNull('cost')->avg('cost'), 1)
+            : 0;
+        $packaging = $ratingCount > 0 && $approvedReviews->whereNotNull('packaging')->count() > 0
+            ? round($approvedReviews->whereNotNull('packaging')->avg('packaging'), 1)
+            : 0;
+
         $brand->update([
             'rating_average' => round($ratingAverage, 2),
             'rating_count' => $ratingCount,
+            'shipping_time' => $shippingTime,
+            'customer_service' => $customerService,
+            'quality' => $quality,
+            'cost' => $cost,
+            'packaging' => $packaging,
         ]);
     }
 }

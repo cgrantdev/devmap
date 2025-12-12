@@ -17,6 +17,11 @@ class Brand extends Model
         'is_active',
         'rating_average',
         'rating_count',
+        'shipping_time',
+        'customer_service',
+        'quality',
+        'cost',
+        'packaging',
     ];
 
     protected $casts = [

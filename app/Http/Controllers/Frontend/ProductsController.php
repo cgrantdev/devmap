@@ -271,13 +271,21 @@ class ProductsController extends Controller
             ? strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1))
             : strtoupper(substr($brand->name, 0, 2));
 
+        // Calculate grading averages from reviews if available
+        $approvedReviews = $brand->approvedReviews;
+        $shippingTime = $approvedReviews->whereNotNull('shipping_time')->avg('shipping_time') ?? 0;
+        $customerService = $approvedReviews->whereNotNull('customer_service')->avg('customer_service') ?? 0;
+        $quality = $approvedReviews->whereNotNull('quality')->avg('quality') ?? 0;
+        $cost = $approvedReviews->whereNotNull('cost')->avg('cost') ?? 0;
+        $packaging = $approvedReviews->whereNotNull('packaging')->avg('packaging') ?? 0;
+
         return Inertia::render('Frontend/BrandProducts', [
             'brand' => [
                 'id' => $brand->id,
                 'slug' => $brand->slug,
                 'name' => $brand->name,
                 'initials' => $initials,
-                'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
+                'rating' => (float) ($brand->rating_average ?? 0),
                 'reviews' => (int) ($brand->rating_count ?? 0),
                 'description' => $brand->vendorSetting->description ?? 'Premium quality peptides for research purposes.',
                 'shop_url' => $brand->vendorSetting->shop_url ?? null,
@@ -285,6 +293,11 @@ class ProductsController extends Controller
                 'phone_number' => $brand->vendorSetting->phone_number ?? null,
                 'logo' => $brand->vendorSetting && $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
                 'banner' => $brand->vendorSetting && $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
+                'shipping_time' => round($shippingTime, 1),
+                'customer_service' => round($customerService, 1),
+                'quality' => round($quality, 1),
+                'cost' => round($cost, 1),
+                'packaging' => round($packaging, 1),
             ],
             'reviews' => $brand->approvedReviews->map(function ($review) {
                 return [
