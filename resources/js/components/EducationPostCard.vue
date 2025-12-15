@@ -33,8 +33,10 @@
       <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 text-center m-0">
         Total items {{ totalItems }}
       </p>
-      <SecondButton
+      <MainButton
         :to="to"
+        size="second"
+        bg-color="gray-200"
         @click.stop
       />
     </div>
@@ -44,7 +46,7 @@
 <script setup>
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import SecondButton from '@/components/SecondButton.vue'
+import MainButton from '@/components/MainButton.vue'
 
 const props = defineProps({
   name: { type: String, required: true },

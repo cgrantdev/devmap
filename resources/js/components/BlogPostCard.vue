@@ -25,8 +25,10 @@
     <div class="p-5 flex flex-col gap-3 flex-1">
       <h3 class="font-roboto font-bold text-lg leading-relaxed text-gray-800 m-0 mb-1 text-center">{{ title }}</h3>
       <p class="font-roboto font-normal text-sm leading-loose text-gray-500 m-0 flex-1 mb-2 text-center">{{ description }}</p>
-      <SecondButton
+      <MainButton
         :to="to"
+        size="second"
+        bg-color="gray-200"
         @click.stop
       />
     </div>
@@ -36,7 +38,7 @@
 <script setup>
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import SecondButton from '@/components/SecondButton.vue'
+import MainButton from '@/components/MainButton.vue'
 
 const props = defineProps({
   title: { type: String, required: true },

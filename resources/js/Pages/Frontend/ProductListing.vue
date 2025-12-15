@@ -18,6 +18,7 @@
           </div>
           
           <!-- Content -->
+          <!-- Content -->
           <div class="relative p-6 h-full flex flex-col justify-center max-w-[800px] gap-4">
             <div class="flex flex-col gap-3">
               <h1 class="font-hv-muse font-normal text-[52px] leading-loose tracking-normal text-white m-0">Harmony Through Discovery</h1>
@@ -26,6 +27,7 @@
             <MainButton
               text="Read Details"
               to="/education"
+              size="custom"
               bg-color="white"
             />
           </div>
@@ -50,9 +52,9 @@
                   @input="handleSearchInput"
                   type="text"
                   placeholder="Search Peptide..."
-                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  class="w-full pl-12 pr-5 py-3 border border-black rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -61,20 +63,13 @@
               <div class="flex items-center gap-4 ml-auto">
                 <span class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800">{{ products.total }} Items</span>
                 <div class="relative">
-                  <button 
+                  <MainButton
+                    text="Sort Items"
+                    size="custom-small"
+                    bg-color="gray-200"
+                    :svg="sortIcon"
                     @click="showSortDropdown = !showSortDropdown"
-                    class="flex items-center gap-2 py-2 px-4 rounded-lg bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 cursor-pointer hover:bg-gray-300"
-                  >
-                    Sort Items
-                    <svg v-if="props.sortDir === 'asc'" width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <svg v-else width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <g transform="translate(0,18) scale(1,-1)">
-                        <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </g>
-                    </svg>
-                  </button>
+                  />
                   <div 
                     v-if="showSortDropdown"
                     class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10 border border-gray-200"
@@ -107,22 +102,15 @@
             <!-- Filter By Label and Filter Buttons (Second Row) -->
             <div class="mb-6 flex items-center gap-2 flex-wrap">
               <span class="font-roboto font-medium text-sm leading-none tracking-normal text-gray-800">Filter By</span>
-              <button 
+              <MainButton
                 v-for="filter in quickFilters"
                 :key="filter.key"
+                :text="filter.label"
+                :badge="getFilterCount(filter.key) > 0 ? getFilterCount(filter.key) : null"
+                size="custom-small"
+                :bg-color="activeFilters[filter.key] ? 'gray-800' : 'gray-200'"
                 @click="toggleQuickFilter(filter.key)"
-                :class="[
-                  'py-2 px-4 rounded-[500px] font-roboto font-medium text-sm leading-none tracking-normal cursor-pointer transition-colors',
-                  activeFilters[filter.key] 
-                    ? 'bg-gray-800 text-white hover:bg-gray-700' 
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                ]"
-              >
-                {{ filter.label }}
-                <span v-if="getFilterCount(filter.key) > 0" class="ml-1 bg-orange-500 text-white px-2 py-0.5 text-xs">
-                  {{ getFilterCount(filter.key) }}
-                </span>
-              </button>
+              />
             </div>
 
             <!-- Product Grid -->
@@ -413,7 +401,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, nextTick, watch, h } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import ProductCard from '@/components/ProductCard.vue'
@@ -443,6 +431,47 @@ const showSidebar = ref(false)
 // Initialize searchQuery from props or URL
 const searchQuery = ref(props.search || '')
 const perPage = ref(props.products.per_page || 20)
+
+// Sort icon component
+const sortIcon = computed(() => {
+  if (props.sortDir === 'asc') {
+    return h('svg', {
+      width: '20',
+      height: '18',
+      viewBox: '0 0 20 18',
+      fill: 'none',
+      xmlns: 'http://www.w3.org/2000/svg'
+    }, [
+      h('path', {
+        d: 'M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13',
+        stroke: '#1F2937',
+        'stroke-width': '2',
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round'
+      })
+    ])
+  } else {
+    return h('svg', {
+      width: '20',
+      height: '18',
+      viewBox: '0 0 20 18',
+      fill: 'none',
+      xmlns: 'http://www.w3.org/2000/svg'
+    }, [
+      h('g', {
+        transform: 'translate(0,18) scale(1,-1)'
+      }, [
+        h('path', {
+          d: 'M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13',
+          stroke: '#1F2937',
+          'stroke-width': '2',
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round'
+        })
+      ])
+    ])
+  }
+})
 
 // Expanded filters - expand location if it has an active filter
 const expandedFilters = ref({

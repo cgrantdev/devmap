@@ -17,9 +17,10 @@
             <Link href="/" class="inline-block mb-0">
               <span class="font-hv-muse font-normal text-3xl leading-tight tracking-normal text-gray-800">PeptideSync</span>
             </Link>
-            <SecondButton 
+            <MainButton 
               text="Sign Up"
               to="/register"
+              size="second"
               bg-color="gray-800"
             />
           </div>
@@ -103,7 +104,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
 import { Link } from '@inertiajs/vue3'
-import SecondButton from '@/components/SecondButton.vue'
+import MainButton from '@/components/MainButton.vue'
 
 const footerBgRef = ref(null)
 const footerBgLoaded = ref(false)
