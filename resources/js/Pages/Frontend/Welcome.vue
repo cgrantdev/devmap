@@ -292,7 +292,7 @@ const [emblaRef, emblaApi] = useEmblaCarousel(
     slidesToScroll: 1,
     containScroll: 'trimSnaps',
   },
-  // [autoplayPluginInstance]
+  [autoplayPluginInstance]
 )
 
 // Hero slides data from database
