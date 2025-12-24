@@ -202,9 +202,11 @@
 import { ref, reactive } from 'vue'
 import { router, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
-import { useToast } from '../../composables/useToast'
+import { useToast as useVueToastification } from 'vue-toastification'
 
-const { success, error } = useToast()
+// Only use toast for manual error messages
+// Success messages are handled automatically by Layout component via flash messages
+const toast = useVueToastification()
 
 const props = defineProps({
   banners: {
@@ -266,7 +268,7 @@ function saveBanner() {
     ? `/admin/banners/${editingBanner.value.id}`
     : '/admin/banners'
   
-  bannerForm.value = useForm({
+  const formDataToSubmit = {
     image: formData.image,
     image_url: formData.image_url,
     position: formData.position,
@@ -276,49 +278,37 @@ function saveBanner() {
     title: formData.title,
     description: formData.description,
     _token: page.props.csrf_token,
-  })
+  }
+
+  // Add _method for PUT requests (Laravel method spoofing)
+  if (editingBanner.value) {
+    formDataToSubmit._method = 'put'
+  }
+
+  bannerForm.value = useForm(formDataToSubmit)
 
   // Update CSRF token before submission
   bannerForm.value._token = page.props.csrf_token
 
-  if (editingBanner.value) {
-    bannerForm.value.post(url, {
-      preserveScroll: true,
-      forceFormData: true,
-      data: { _method: 'put' },
-      onSuccess: () => {
-        showModal.value = false
-        resetForm()
-        // Toast will be shown automatically from Laravel flash message
-      },
-      onError: (errors) => {
-        console.error('Banner save errors:', errors)
-        // Show toast for first error
-        const firstError = Object.values(errors)[0]
-        if (firstError) {
-          error(Array.isArray(firstError) ? firstError[0] : firstError)
-        }
+  bannerForm.value.post(url, {
+    preserveScroll: true,
+    forceFormData: true,
+    onSuccess: () => {
+      showModal.value = false
+      resetForm()
+      // Toast will be shown automatically from Laravel flash message
+    },
+    onError: (errors) => {
+      console.error('Banner save errors:', errors)
+      // Show toast for first error
+      const firstError = Object.values(errors)[0]
+      if (firstError) {
+        toast.error(Array.isArray(firstError) ? firstError[0] : firstError, {
+          timeout: 4000,
+        })
       }
-    })
-  } else {
-    bannerForm.value.post(url, {
-      preserveScroll: true,
-      forceFormData: true,
-      onSuccess: () => {
-        showModal.value = false
-        resetForm()
-        // Toast will be shown automatically from Laravel flash message
-      },
-      onError: (errors) => {
-        console.error('Banner save errors:', errors)
-        // Show toast for first error
-        const firstError = Object.values(errors)[0]
-        if (firstError) {
-          error(Array.isArray(firstError) ? firstError[0] : firstError)
-        }
-      }
-    })
-  }
+    }
+  })
 }
 
 function toggleActive(bannerId) {
@@ -328,9 +318,22 @@ function toggleActive(bannerId) {
 }
 
 function deleteBanner(bannerId) {
-  if (confirm('Delete this banner?')) {
-    router.delete(`/admin/banners/${bannerId}`, {
-      preserveScroll: true
+  if (confirm('Are you sure you want to delete this banner?')) {
+    const deleteForm = useForm({
+      _token: usePage().props.csrf_token
+    })
+    
+    deleteForm.delete(`/admin/banners/${bannerId}`, {
+      preserveScroll: true,
+      onSuccess: () => {
+        // Success toast will be shown automatically from flash message
+      },
+      onError: (errors) => {
+        toast.error('Failed to delete banner. Please try again.', {
+          timeout: 4000,
+        })
+        console.error(errors)
+      }
     })
   }
 }
