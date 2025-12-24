@@ -154,7 +154,7 @@
 import { Link, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import { ref, computed } from 'vue'
-import { useToast } from '../../composables/useToast'
+import { useToast as useVueToastification } from 'vue-toastification'
 
 const props = defineProps({
   vendors: {
@@ -163,7 +163,10 @@ const props = defineProps({
   }
 })
 
-const { error: toastError } = useToast()
+// Only use toast for manual error messages
+// Success messages are handled automatically by Layout component via flash messages
+const toast = useVueToastification()
+const toastError = (message) => toast.error(message, { timeout: 4000 })
 
 const searchTerm = ref('')
 

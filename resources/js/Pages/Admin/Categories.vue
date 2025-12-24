@@ -113,9 +113,13 @@ import AdminLayout from './Layout.vue'
 import { ref, watch, onMounted } from 'vue'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
-import { useToast } from '../../composables/useToast'
+import { useToast as useVueToastification } from 'vue-toastification'
 
-const { error: toastError, warning: toastWarning } = useToast()
+// Only use toast for manual error messages
+// Success messages are handled automatically by Layout component via flash messages
+const toast = useVueToastification()
+const toastError = (message) => toast.error(message, { timeout: 4000 })
+const toastWarning = (message) => toast.warning(message, { timeout: 3000 })
 
 const props = defineProps({
   categories: Object

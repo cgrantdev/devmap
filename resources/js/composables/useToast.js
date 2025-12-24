@@ -11,31 +11,35 @@ export function useToast() {
   const toast = useVueToastification()
 
   // Watch for flash messages and show toasts
+  // Only watch for changes, not immediate (to avoid duplicate toasts on page load)
   watch(
     () => page.props.flash,
-    (flash) => {
-      if (flash?.success) {
+    (flash, oldFlash) => {
+      // Only show toast if flash message actually changed
+      if (!flash || flash === oldFlash) return
+      
+      if (flash?.success && flash.success !== oldFlash?.success) {
         toast.success(flash.success, {
           timeout: 3000,
         })
       }
-      if (flash?.error) {
+      if (flash?.error && flash.error !== oldFlash?.error) {
         toast.error(flash.error, {
           timeout: 4000,
         })
       }
-      if (flash?.info) {
+      if (flash?.info && flash.info !== oldFlash?.info) {
         toast.info(flash.info, {
           timeout: 3000,
         })
       }
-      if (flash?.warning) {
+      if (flash?.warning && flash.warning !== oldFlash?.warning) {
         toast.warning(flash.warning, {
           timeout: 3000,
         })
       }
     },
-    { deep: true, immediate: true }
+    { deep: true }
   )
 
   return {

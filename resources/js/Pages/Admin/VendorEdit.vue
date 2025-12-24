@@ -281,9 +281,12 @@ import { router } from '@inertiajs/vue3'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import { useAdminLoading } from '../../composables/useAdminLoading'
-import { useToast } from '../../composables/useToast'
+import { useToast as useVueToastification } from 'vue-toastification'
 
-const { success: toastSuccess, error: toastError } = useToast()
+// Only use toast for manual error messages
+// Success messages are handled automatically by Layout component via flash messages
+const toast = useVueToastification()
+const toastError = (message) => toast.error(message, { timeout: 4000 })
 
 const props = defineProps({
   vendor: Object,
