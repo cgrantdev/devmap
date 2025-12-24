@@ -48,5 +48,13 @@ class ProductsController extends Controller
         return redirect()->route('admin.products')
             ->with('success', 'Product updated successfully.');
     }
+
+    public function destroy($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return redirect()->back()->with('success', 'Product deleted successfully.');
+    }
 }
 

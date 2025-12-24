@@ -1,107 +1,173 @@
 <template>
   <AdminLayout>
-    <div class="mb-8 flex items-center justify-between">
-      <div>
-        <h1 class="text-3xl font-bold">Category Management</h1>
-        <p class="text-gray-600 mt-2">Manage all product categories</p>
-      </div>
-      <Link href="/admin/categories/create" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium transition-colors">
-        Create New Category
-      </Link>
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl text-slate-900 mb-2">Category Management</h1>
+      <p class="text-slate-600">Manage all product categories</p>
     </div>
-    
-    <!-- Flash messages are now handled by toast notifications -->
-    
-    <div class="bg-white rounded-lg shadow">
-      <div class="p-6">
-        <h2 class="text-xl font-semibold">All Categories</h2>
-      </div>
 
-      <div class="flex items-center gap-4 mb-4 px-6">
-        <span>search value: </span>
-        <input type="text" v-model="searchValue" @input="handleSearchInput" class="border rounded px-3 py-2">
-        
-        <!-- Bulk Action Buttons -->
-        <div v-if="selectedCategories.length > 0" class="ml-auto flex gap-2">
-          <button
-            @click="deselectAll"
-            class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 font-medium transition-colors"
-          >
-            Deselect All
-          </button>
-          <button
-            v-if="selectedCategories.length > 1"
-            @click="bulkMerge"
-            :disabled="bulkMergeForm.processing || bulkDeleteForm.processing"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium transition-colors disabled:opacity-50"
-          >
-            {{ bulkMergeForm.processing ? 'Merging...' : `Bulk Merge (${selectedCategories.length} selected)` }}
-          </button>
-          <button
-            @click="bulkDelete"
-            :disabled="bulkMergeForm.processing || bulkDeleteForm.processing"
-            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium transition-colors disabled:opacity-50"
-          >
-            {{ bulkDeleteForm.processing ? 'Deleting...' : `Bulk Delete (${selectedCategories.length} selected)` }}
-          </button>
+    <!-- Actions Bar -->
+    <div class="bg-white rounded-lg border border-slate-200 p-4 mb-6">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex-1 relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search categories..."
+            v-model="searchValue"
+            @input="handleSearchInput"
+            class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div class="flex items-center gap-2">
+          <div v-if="selectedCategories.length > 0" class="flex gap-2">
+            <button
+              @click="deselectAll"
+              class="px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors"
+            >
+              Deselect All
+            </button>
+            <button
+              v-if="selectedCategories.length > 1"
+              @click="bulkMerge"
+              :disabled="bulkMergeForm.processing || bulkDeleteForm.processing"
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {{ bulkMergeForm.processing ? 'Merging...' : `Merge (${selectedCategories.length})` }}
+            </button>
+            <button
+              @click="bulkDelete"
+              :disabled="bulkMergeForm.processing || bulkDeleteForm.processing"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+            >
+              {{ bulkDeleteForm.processing ? 'Deleting...' : `Delete (${selectedCategories.length})` }}
+            </button>
+          </div>
+          <Link href="/admin/categories/create" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Category
+          </Link>
         </div>
       </div>
+    </div>
 
-      <div class="overflow-x-auto px-6 pb-6">
-        <EasyDataTable
-          :headers="headers"
-          :items="categories.data || []"
-          :search-field="searchField"
-          :search-value="searchValue"
-          :server-items-length="categories.total || 0"
-          :server-options="serverOptions"
-          @update:server-options="handleServerOptionsChange"
-          @update:search-value="handleSearchChange"
-          :loading="loading"
-          server
-          table-class-name="customize-table"
-          header-text-direction="left"
-          body-text-direction="left"
+    <!-- Categories Table -->
+    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider w-12">
+                <input
+                  type="checkbox"
+                  @change="toggleSelectAll"
+                  :checked="selectedCategories.length === (categories.data || []).length && (categories.data || []).length > 0"
+                  class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
+              </th>
+              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Category</th>
+              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Slug</th>
+              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Products</th>
+              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Created</th>
+              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            <tr v-for="category in categories.data || []" :key="category.id" class="hover:bg-slate-50">
+              <td class="px-6 py-4">
+                <input
+                  type="checkbox"
+                  :value="category.id"
+                  v-model="selectedCategories"
+                  class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div v-if="category.image_url" class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+                    <img :src="category.image_url" :alt="category.name" class="w-10 h-10 object-cover" />
+                  </div>
+                  <div v-else class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+                    {{ category.name.substring(0, 2).toUpperCase() }}
+                  </div>
+                  <div>
+                    <a :href="`/product/${category.slug}`" target="_blank" class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline">
+                      {{ category.name }}
+                    </a>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <span class="text-sm text-slate-600">{{ category.slug }}</span>
+              </td>
+              <td class="px-6 py-4">
+                <span v-if="category.is_active" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+                  Active
+                </span>
+                <span v-else class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs">
+                  Inactive
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <span class="text-sm text-slate-900">{{ category.products_count || 0 }}</span>
+              </td>
+              <td class="px-6 py-4">
+                <span class="text-sm text-slate-600">{{ category.created_at }}</span>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <Link :href="`/admin/categories/${category.id}/edit`" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </Link>
+                  <button
+                    @click="deleteCategory(category.id, category.name)"
+                    :disabled="deleteForm.processing"
+                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                    title="Delete"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div v-if="!categories.data || categories.data.length === 0" class="bg-white rounded-lg border border-slate-200 p-6 text-center text-slate-500">
+      No categories found.
+    </div>
+
+    <!-- Pagination -->
+    <div v-if="categories.last_page > 1" class="mt-6 flex items-center justify-between bg-white rounded-lg border border-slate-200 p-4">
+      <div class="text-sm text-slate-600">
+        Showing {{ categories.from || 0 }} to {{ categories.to || 0 }} of {{ categories.total || 0 }} categories
+      </div>
+      <div class="flex gap-2">
+        <button
+          @click="goToPage(categories.current_page - 1)"
+          :disabled="categories.current_page === 1"
+          class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <template #item-checkbox="{ id }">
-            <input
-              type="checkbox"
-              :value="id"
-              v-model="selectedCategories"
-              class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-            />
-          </template>
-          <template #item-image_url="{ image_url }">
-            <img v-if="image_url" :src="image_url" alt="Category" class="h-12 w-12 object-cover rounded" loading="lazy" />
-            <span v-else class="text-gray-400 text-xs">No Image</span>
-          </template>
-          <template #item-name="{ name, slug }">
-            <a :href="`/product/${slug}`" target="_blank" class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-150">
-              {{ name }}
-            </a>
-          </template>
-          <template #item-is_active="{ is_active }">
-            <span v-if="is_active" class="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-green-500 text-white">
-              Active
-            </span>
-            <span v-else class="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-gray-300 text-gray-700">
-              Inactive
-            </span>
-          </template>
-          <template #item-products_count="{ products_count }">
-            <div class="text-sm text-slate-800">{{ products_count || 0 }}</div>
-          </template>
-          <template #item-actions="{ id, name }">
-            <Link :href="`/admin/categories/${id}/edit`" class="text-blue-500 hover:text-blue-600 mr-4 transition-colors duration-150">Edit</Link>
-            <button
-              @click="deleteCategory(id, name)"
-              :disabled="deleteForm.processing"
-              class="text-red-500 hover:text-red-600 transition-colors duration-150 disabled:opacity-50"
-            >
-              Delete
-            </button>
-          </template>
-        </EasyDataTable>
+          Previous
+        </button>
+        <button
+          @click="goToPage(categories.current_page + 1)"
+          :disabled="categories.current_page === categories.last_page"
+          class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
       </div>
     </div>
   </AdminLayout>
@@ -110,9 +176,7 @@
 <script setup>
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
-import { ref, watch, onMounted } from 'vue'
-import EasyDataTable from 'vue3-easy-data-table'
-import 'vue3-easy-data-table/dist/style.css'
+import { ref, watch } from 'vue'
 import { useToast as useVueToastification } from 'vue-toastification'
 
 // Only use toast for manual error messages
@@ -125,120 +189,40 @@ const props = defineProps({
   categories: Object
 })
 
-// Initialize searchValue from URL parameters
-const getSearchFromUrl = () => {
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    return urlParams.get('search') || ''
-  }
-  return ''
-}
-
-const searchValue = ref(getSearchFromUrl())
-const searchField = ['name', 'slug']
-const loading = ref(false)
-const isUserAction = ref(false) // Flag to prevent watch from interfering with user actions
-
-// Initialize serverOptions from URL parameters or props
-const getSortByFromUrl = () => {
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    return urlParams.get('sort_by') || 'name'
-  }
-  return 'name'
-}
-
-const getSortTypeFromUrl = () => {
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    return urlParams.get('sort_type') || 'asc'
-  }
-  return 'asc'
-}
-
-const serverOptions = ref({
-  page: props.categories?.current_page || 1,
-  rowsPerPage: props.categories?.per_page || 20,
-  sortBy: getSortByFromUrl(),
-  sortType: getSortTypeFromUrl()
-})
-
-const headers = [
-  { text: '', value: 'checkbox', sortable: false, width: 50 },
-  { text: 'ID', value: 'id', sortable: true },
-  { text: 'Image', value: 'image_url', sortable: false },
-  { text: 'Name', value: 'name', sortable: true },
-  { text: 'Slug', value: 'slug', sortable: true },
-  { text: 'Status', value: 'is_active', sortable: true },
-  { text: 'Products Count', value: 'products_count', sortable: true },
-  { text: 'Created', value: 'created_at', sortable: true },
-  { text: 'Actions', value: 'actions', sortable: false }
-]
-
+const searchValue = ref('')
 const selectedCategories = ref([])
-
-// Sync serverOptions with props when they change (only on initial load or external updates)
-watch(() => [props.categories?.current_page, props.categories?.per_page], ([currentPage, perPage]) => {
-  if (currentPage && perPage && !isUserAction.value) {
-    // Only update if values actually changed to prevent loops
-    if (serverOptions.value.page !== currentPage || serverOptions.value.rowsPerPage !== perPage) {
-      serverOptions.value.page = currentPage
-      serverOptions.value.rowsPerPage = perPage
-      // Clear selections when data changes (pagination, search, etc.)
-      selectedCategories.value = []
-    }
-  }
-  isUserAction.value = false // Reset flag after sync
-}, { immediate: true })
 
 let searchTimeout = null
 
 function handleSearchInput() {
-  // Debounce search to avoid too many requests
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
-    serverOptions.value.page = 1 // Reset to first page on search
-    fetchData()
-  }, 500) // Wait 500ms after user stops typing
+    fetchData(1)
+  }, 500)
 }
 
-function fetchData() {
-  loading.value = true
-  isUserAction.value = true // Mark as user action to prevent watch interference
+function fetchData(page = props.categories?.current_page || 1) {
   router.get('/admin/categories', {
-    page: serverOptions.value.page,
-    per_page: serverOptions.value.rowsPerPage,
-    sort_by: serverOptions.value.sortBy,
-    sort_type: serverOptions.value.sortType,
+    page,
+    per_page: props.categories?.per_page || 20,
     search: searchValue.value
   }, {
     preserveState: true,
-    preserveScroll: true,
-    onFinish: () => {
-      loading.value = false
-      // Sync after data is loaded
-      if (props.categories) {
-        serverOptions.value.page = props.categories.current_page || 1
-        serverOptions.value.rowsPerPage = props.categories.per_page || 20
-      }
-    }
+    preserveScroll: true
   })
 }
 
-function handleServerOptionsChange(options) {
-  isUserAction.value = true // Mark as user action
-  serverOptions.value = { ...options } // Create new object to trigger reactivity
-  fetchData()
+function goToPage(page) {
+  if (page >= 1 && page <= props.categories.last_page) {
+    fetchData(page)
+  }
 }
 
-function handleSearchChange(value) {
-  // This is called by EasyDataTable's built-in search
-  // We're using our own search input, so we can ignore this or sync it
-  if (searchValue.value !== value) {
-    searchValue.value = value
-    serverOptions.value.page = 1
-    isUserAction.value = true
-    fetchData()
+function toggleSelectAll(event) {
+  if (event.target.checked) {
+    selectedCategories.value = (props.categories.data || []).map(c => c.id)
+  } else {
+    selectedCategories.value = []
   }
 }
 
@@ -261,18 +245,15 @@ function deleteCategory(id, name) {
     deleteForm.delete(`/admin/categories/${id}`, {
       preserveScroll: true,
       onSuccess: () => {
-        // Remove from selected categories if it was selected
         const index = selectedCategories.value.indexOf(id)
         if (index > -1) {
           selectedCategories.value.splice(index, 1)
         }
-        // Success toast will be shown automatically from flash message
-        // Refresh data
         fetchData()
       },
       onError: (errors) => {
         console.error('Delete error:', errors)
-        alert('Failed to delete category. Please try again.')
+        toastError('Failed to delete category. Please try again.')
       }
     })
   }
@@ -284,8 +265,8 @@ function bulkMerge() {
     return
   }
   
-  const mainCategory = selectedCategories.value[0] // First selected is the main category
-  const categoriesToMerge = selectedCategories.value.slice(1) // Others will be merged into main
+  const mainCategory = selectedCategories.value[0]
+  const categoriesToMerge = selectedCategories.value.slice(1)
   
   if (confirm(`Are you sure you want to merge ${categoriesToMerge.length} category/categories into "${props.categories.data.find(c => c.id === mainCategory)?.name}"? All products from merged categories will be moved to the main category and merged categories will be deleted. This action cannot be undone.`)) {
     bulkMergeForm.category_ids = selectedCategories.value
@@ -332,4 +313,3 @@ function deselectAll() {
   selectedCategories.value = []
 }
 </script>
-

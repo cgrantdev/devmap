@@ -434,13 +434,27 @@ class VendorsController extends Controller
     {
         $query = \App\Models\Product::with(['brand', 'category']);
         
+        // Filter by brand
+        if ($request->has('brand') && $request->brand && $request->brand !== 'all') {
+            $query->where('brand_id', $request->brand);
+        }
+        
+        // Filter by category
+        if ($request->has('category') && $request->category && $request->category !== 'all') {
+            $query->where('product_category_id', $request->category);
+        }
+        
         // Search functionality
         if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('dosage', 'like', "%{$search}%")
                   ->orWhereHas('brand', function ($brandQuery) use ($search) {
                       $brandQuery->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('category', function ($categoryQuery) use ($search) {
+                      $categoryQuery->where('name', 'like', "%{$search}%");
                   });
             });
         }
@@ -475,14 +489,44 @@ class VendorsController extends Controller
                     'id' => $product->id,
                     'name' => $product->name,
                     'slug' => \Str::slug($product->name),
+                    'dosage' => $product->dosage ?? null,
                     'price' => $product->price,
+                    'original_price' => $product->original_price ?? null,
                     'image_url' => $product->image_url,
+                    'brand_id' => $product->brand_id,
+                    'vendor_id' => $product->brand_id,
                     'vendor_name' => $product->brand ? $product->brand->name : '-',
+                    'brand_name' => $product->brand ? $product->brand->name : '-',
+                    'product_category_id' => $product->product_category_id,
+                    'category_id' => $product->product_category_id,
                     'category_name' => $product->category ? $product->category->name : '-',
+                    'rating' => round($product->rating_average ?? 0, 1),
+                    'review_count' => $product->rating_count ?? 0,
                 ];
             });
+        // Get brands and categories for filters
+        $brands = Brand::orderBy('name')
+            ->get()
+            ->map(function ($brand) {
+                return [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                ];
+            });
+
+        $categories = \App\Models\ProductCategory::orderBy('name')
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                ];
+            });
+
         return \Inertia\Inertia::render('Admin/Products', [
-            'products' => $products
+            'products' => $products,
+            'brands' => $brands,
+            'categories' => $categories
         ]);
     }
 
