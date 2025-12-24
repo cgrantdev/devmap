@@ -514,7 +514,8 @@ class VendorsController extends Controller
                 ];
             });
 
-        $categories = \App\Models\ProductCategory::orderBy('name')
+        $categories = \App\Models\ProductCategory::where('is_active', true)
+            ->orderBy('name')
             ->get()
             ->map(function ($category) {
                 return [
