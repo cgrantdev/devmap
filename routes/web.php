@@ -151,6 +151,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('admin.settings');
+    Route::post('/settings/general', [SettingsController::class, 'updateGeneral'])->name('admin.settings.general.update');
     Route::post('/settings/hero-slides', [SettingsController::class, 'updateHeroSlides'])->name('admin.settings.hero-slides.update');
     
     // Reviews
