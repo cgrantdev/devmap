@@ -6,7 +6,7 @@
         <p class="text-slate-600">Manage coupon codes and special offers</p>
       </div>
       <button
-        @click="showModal = true; editingDeal = null"
+        @click="showModal = true; editingDeal = null; resetForm()"
         class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,14 +85,28 @@
         </div>
 
         <form @submit.prevent="saveDeal" class="p-6 space-y-6">
+          <!-- Error Messages -->
+          <div v-if="dealForm && Object.keys(dealForm.errors).length > 0" class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+            <p class="font-medium mb-2">Please fix the following errors:</p>
+            <ul class="list-disc list-inside text-sm">
+              <li v-for="(error, field) in dealForm.errors" :key="field">
+                {{ Array.isArray(error) ? error[0] : error }}
+              </li>
+            </ul>
+          </div>
+
           <div>
             <label class="block text-sm text-slate-700 mb-2">Coupon Code *</label>
             <input
               type="text"
               v-model="formData.code"
               required
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              :class="[
+                'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                dealForm?.errors?.code ? 'border-red-300' : 'border-slate-300'
+              ]"
             />
+            <p v-if="dealForm?.errors?.code" class="text-xs text-red-600 mt-1">{{ dealForm.errors.code }}</p>
           </div>
 
           <div>
@@ -101,8 +115,12 @@
               v-model="formData.description"
               required
               rows="3"
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              :class="[
+                'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                dealForm?.errors?.description ? 'border-red-300' : 'border-slate-300'
+              ]"
             ></textarea>
+            <p v-if="dealForm?.errors?.description" class="text-xs text-red-600 mt-1">{{ dealForm.errors.description }}</p>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
@@ -114,8 +132,12 @@
                 required
                 min="1"
                 max="100"
-                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :class="[
+                  'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  dealForm?.errors?.discount ? 'border-red-300' : 'border-slate-300'
+                ]"
               />
+              <p v-if="dealForm?.errors?.discount" class="text-xs text-red-600 mt-1">{{ dealForm.errors.discount }}</p>
             </div>
             <div>
               <label class="block text-sm text-slate-700 mb-2">Expiry Date *</label>
@@ -123,8 +145,12 @@
                 type="date"
                 v-model="formData.expiry_date"
                 required
-                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                :class="[
+                  'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                  dealForm?.errors?.expiry_date ? 'border-red-300' : 'border-slate-300'
+                ]"
               />
+              <p v-if="dealForm?.errors?.expiry_date" class="text-xs text-red-600 mt-1">{{ dealForm.errors.expiry_date }}</p>
             </div>
           </div>
 
@@ -132,14 +158,18 @@
             <label class="block text-sm text-slate-700 mb-2">Brand/Vendor (Optional)</label>
             <select
               v-model="formData.brand_id"
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              :class="[
+                'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                dealForm?.errors?.brand_id ? 'border-red-300' : 'border-slate-300'
+              ]"
             >
               <option :value="null">All Vendors (Site-wide)</option>
               <option v-for="brand in brands" :key="brand.id" :value="brand.id">
                 {{ brand.name }}
               </option>
             </select>
-            <p class="text-xs text-slate-500 mt-1">Leave blank for site-wide deals</p>
+            <p v-if="dealForm?.errors?.brand_id" class="text-xs text-red-600 mt-1">{{ dealForm.errors.brand_id }}</p>
+            <p v-else class="text-xs text-slate-500 mt-1">Leave blank for site-wide deals</p>
           </div>
 
           <div>
@@ -175,8 +205,13 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
+import { useToast as useVueToastification } from 'vue-toastification'
+
+// Only use toast for manual error messages
+// Success messages are handled automatically by Layout component via flash messages
+const toast = useVueToastification()
 
 const props = defineProps({
   deals: {
@@ -191,6 +226,7 @@ const props = defineProps({
 
 const showModal = ref(false)
 const editingDeal = ref(null)
+const dealForm = ref(null)
 
 const formData = reactive({
   code: '',
@@ -213,25 +249,68 @@ function editDeal(deal) {
 }
 
 function saveDeal() {
+  const page = usePage()
   const url = editingDeal.value
     ? `/admin/deals/${editingDeal.value.id}`
     : '/admin/deals'
   
-  const method = editingDeal.value ? 'put' : 'post'
+  const formDataToSubmit = {
+    code: formData.code,
+    description: formData.description,
+    discount: formData.discount,
+    expiry_date: formData.expiry_date,
+    active: formData.active,
+    brand_id: formData.brand_id,
+    _token: page.props.csrf_token,
+  }
 
-  router[method](url, formData, {
+  // Add _method for PUT requests (Laravel method spoofing)
+  if (editingDeal.value) {
+    formDataToSubmit._method = 'put'
+  }
+
+  dealForm.value = useForm(formDataToSubmit)
+
+  // Update CSRF token before submission
+  dealForm.value._token = page.props.csrf_token
+
+  dealForm.value.post(url, {
     preserveScroll: true,
     onSuccess: () => {
       showModal.value = false
       resetForm()
+      // Toast will be shown automatically from Laravel flash message
+    },
+    onError: (errors) => {
+      console.error('Deal save errors:', errors)
+      // Show toast for first error
+      const firstError = Object.values(errors)[0]
+      if (firstError) {
+        toast.error(Array.isArray(firstError) ? firstError[0] : firstError, {
+          timeout: 4000,
+        })
+      }
     }
   })
 }
 
 function deleteDeal(dealId) {
-  if (confirm('Delete this deal?')) {
-    router.delete(`/admin/deals/${dealId}`, {
-      preserveScroll: true
+  if (confirm('Are you sure you want to delete this deal?')) {
+    const deleteForm = useForm({
+      _token: usePage().props.csrf_token
+    })
+    
+    deleteForm.delete(`/admin/deals/${dealId}`, {
+      preserveScroll: true,
+      onSuccess: () => {
+        // Success toast will be shown automatically from flash message
+      },
+      onError: (errors) => {
+        toast.error('Failed to delete deal. Please try again.', {
+          timeout: 4000,
+        })
+        console.error(errors)
+      }
     })
   }
 }
@@ -244,6 +323,7 @@ function resetForm() {
   formData.active = true
   formData.brand_id = null
   editingDeal.value = null
+  dealForm.value = null
 }
 </script>
 
