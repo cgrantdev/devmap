@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Deal;
-use App\Models\User;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +16,7 @@ class DealsController extends Controller
         if (!Schema::hasTable('deals')) {
             $deals = [];
         } else {
-            $deals = Deal::with('vendor')
+            $deals = Deal::with('brand')
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->map(function ($deal) {
@@ -27,24 +27,24 @@ class DealsController extends Controller
                         'discount' => $deal->discount,
                         'expiry_date' => $deal->expiry_date?->format('Y-m-d'),
                         'active' => $deal->active,
-                        'vendor_id' => $deal->vendor_id,
-                        'vendor_name' => $deal->vendor?->name,
+                        'brand_id' => $deal->brand_id,
+                        'vendor_name' => $deal->brand?->name,
                     ];
                 });
         }
 
-        $vendors = User::where('role', 'vendor')
+        $brands = Brand::orderBy('name')
             ->get()
-            ->map(function ($vendor) {
+            ->map(function ($brand) {
                 return [
-                    'id' => $vendor->id,
-                    'name' => $vendor->name,
+                    'id' => $brand->id,
+                    'name' => $brand->name,
                 ];
             });
 
         return Inertia::render('Admin/Deals', [
             'deals' => $deals,
-            'vendors' => $vendors
+            'brands' => $brands
         ]);
     }
 
@@ -60,7 +60,7 @@ class DealsController extends Controller
             'discount' => 'required|integer|min:1|max:100',
             'expiry_date' => 'nullable|date',
             'active' => 'boolean',
-            'vendor_id' => 'nullable|exists:users,id',
+            'brand_id' => 'nullable|exists:brands,id',
             'usage_limit' => 'nullable|integer|min:1',
             'minimum_purchase' => 'nullable|numeric|min:0',
         ]);
@@ -84,7 +84,7 @@ class DealsController extends Controller
             'discount' => 'required|integer|min:1|max:100',
             'expiry_date' => 'nullable|date',
             'active' => 'boolean',
-            'vendor_id' => 'nullable|exists:users,id',
+            'brand_id' => 'nullable|exists:brands,id',
             'usage_limit' => 'nullable|integer|min:1',
             'minimum_purchase' => 'nullable|numeric|min:0',
         ]);

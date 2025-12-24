@@ -13,7 +13,7 @@ class Deal extends Model
         'discount',
         'expiry_date',
         'active',
-        'vendor_id',
+        'brand_id',
         'usage_limit',
         'used_count',
         'minimum_purchase',
@@ -28,9 +28,9 @@ class Deal extends Model
         'minimum_purchase' => 'decimal:2',
     ];
 
-    public function vendor(): BelongsTo
+    public function brand(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'vendor_id');
+        return $this->belongsTo(Brand::class, 'brand_id');
     }
 
     public function isExpired(): bool

@@ -6,7 +6,7 @@
         <p class="text-slate-600">Manage homepage carousel banners</p>
       </div>
       <button
-        @click="showModal = true; editingBanner = null"
+        @click="showModal = true; editingBanner = null; resetForm()"
         class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,15 +87,51 @@
           </h2>
         </div>
 
-        <form @submit.prevent="saveBanner" class="p-6 space-y-6">
+        <form @submit.prevent="saveBanner" class="p-6 space-y-6" enctype="multipart/form-data">
+          <!-- Error Messages -->
+          <div v-if="bannerForm && Object.keys(bannerForm.errors).length > 0" class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+            <p class="font-medium mb-2">Please fix the following errors:</p>
+            <ul class="list-disc list-inside text-sm">
+              <li v-for="(error, field) in bannerForm.errors" :key="field">
+                {{ Array.isArray(error) ? error[0] : error }}
+              </li>
+            </ul>
+          </div>
+
           <div>
-            <label class="block text-sm text-slate-700 mb-2">Image URL *</label>
+            <label class="block text-sm text-slate-700 mb-2">Upload Image</label>
+            <input
+              type="file"
+              @change="handleImageChange"
+              accept="image/*"
+              :class="[
+                'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                bannerForm?.errors?.image ? 'border-red-300' : 'border-slate-300'
+              ]"
+            />
+            <p v-if="bannerForm?.errors?.image" class="text-xs text-red-600 mt-1">{{ bannerForm.errors.image }}</p>
+            <p v-else class="text-xs text-slate-500 mt-1">Or use Image URL below</p>
+            <div v-if="imagePreview" class="mt-2">
+              <img :src="imagePreview" alt="Preview" class="w-full h-48 object-cover rounded-lg border border-slate-200" />
+            </div>
+            <div v-else-if="formData.existing_image_url" class="mt-2">
+              <img :src="formData.existing_image_url" alt="Current" class="w-full h-48 object-cover rounded-lg border border-slate-200" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm text-slate-700 mb-2">Image URL (Alternative)</label>
             <input
               type="url"
               v-model="formData.image_url"
-              required
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              :class="[
+                'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500',
+                bannerForm?.errors?.image_url ? 'border-red-300' : 'border-slate-300'
+              ]"
+              placeholder="https://example.com/image.jpg"
             />
+            <p v-if="bannerForm?.errors?.image_url" class="text-xs text-red-600 mt-1">{{ bannerForm.errors.image_url }}</p>
+            <p v-else class="text-xs text-slate-500 mt-1">Use this if you don't upload a file</p>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
@@ -119,12 +155,16 @@
           </div>
 
           <div>
-            <label class="block text-sm text-slate-700 mb-2">Vendor Name (Optional)</label>
-            <input
-              type="text"
-              v-model="formData.vendor_name"
+            <label class="block text-sm text-slate-700 mb-2">Brand/Vendor (Optional)</label>
+            <select
+              v-model="formData.brand_id"
               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            >
+              <option :value="null">Select Brand (Optional)</option>
+              <option v-for="brand in brands" :key="brand.id" :value="brand.id">
+                {{ brand.name }}
+              </option>
+            </select>
           </div>
 
           <div>
@@ -160,11 +200,18 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
+import { useToast } from '../../composables/useToast'
+
+const { success, error } = useToast()
 
 const props = defineProps({
   banners: {
+    type: Array,
+    default: () => []
+  },
+  brands: {
     type: Array,
     default: () => []
   }
@@ -172,39 +219,106 @@ const props = defineProps({
 
 const showModal = ref(false)
 const editingBanner = ref(null)
+const imagePreview = ref(null)
+const bannerForm = ref(null)
 
 const formData = reactive({
+  image: null,
   image_url: '',
+  existing_image_url: '',
   position: 1,
   link: '',
-  vendor_name: '',
-  active: true
+  brand_id: null,
+  active: true,
+  title: '',
+  description: ''
 })
+
+function handleImageChange(event) {
+  const file = event.target.files[0]
+  if (file) {
+    formData.image = file
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      imagePreview.value = e.target.result
+    }
+    reader.readAsDataURL(file)
+  }
+}
 
 function editBanner(banner) {
   editingBanner.value = banner
   formData.image_url = banner.image_url || ''
+  formData.existing_image_url = banner.image_url || ''
   formData.position = banner.position || 1
   formData.link = banner.link || ''
-  formData.vendor_name = banner.vendor_name || ''
+  formData.brand_id = banner.brand_id || null
   formData.active = banner.active !== false
+  formData.title = banner.title || ''
+  formData.description = banner.description || ''
+  imagePreview.value = null
   showModal.value = true
 }
 
 function saveBanner() {
+  const page = usePage()
   const url = editingBanner.value
     ? `/admin/banners/${editingBanner.value.id}`
     : '/admin/banners'
   
-  const method = editingBanner.value ? 'put' : 'post'
-
-  router[method](url, formData, {
-    preserveScroll: true,
-    onSuccess: () => {
-      showModal.value = false
-      resetForm()
-    }
+  bannerForm.value = useForm({
+    image: formData.image,
+    image_url: formData.image_url,
+    position: formData.position,
+    link: formData.link,
+    brand_id: formData.brand_id,
+    active: formData.active,
+    title: formData.title,
+    description: formData.description,
+    _token: page.props.csrf_token,
   })
+
+  // Update CSRF token before submission
+  bannerForm.value._token = page.props.csrf_token
+
+  if (editingBanner.value) {
+    bannerForm.value.post(url, {
+      preserveScroll: true,
+      forceFormData: true,
+      data: { _method: 'put' },
+      onSuccess: () => {
+        showModal.value = false
+        resetForm()
+        // Toast will be shown automatically from Laravel flash message
+      },
+      onError: (errors) => {
+        console.error('Banner save errors:', errors)
+        // Show toast for first error
+        const firstError = Object.values(errors)[0]
+        if (firstError) {
+          error(Array.isArray(firstError) ? firstError[0] : firstError)
+        }
+      }
+    })
+  } else {
+    bannerForm.value.post(url, {
+      preserveScroll: true,
+      forceFormData: true,
+      onSuccess: () => {
+        showModal.value = false
+        resetForm()
+        // Toast will be shown automatically from Laravel flash message
+      },
+      onError: (errors) => {
+        console.error('Banner save errors:', errors)
+        // Show toast for first error
+        const firstError = Object.values(errors)[0]
+        if (firstError) {
+          error(Array.isArray(firstError) ? firstError[0] : firstError)
+        }
+      }
+    })
+  }
 }
 
 function toggleActive(bannerId) {
@@ -222,12 +336,18 @@ function deleteBanner(bannerId) {
 }
 
 function resetForm() {
+  formData.image = null
   formData.image_url = ''
+  formData.existing_image_url = ''
   formData.position = 1
   formData.link = ''
-  formData.vendor_name = ''
+  formData.brand_id = null
   formData.active = true
+  formData.title = ''
+  formData.description = ''
+  imagePreview.value = null
   editingBanner.value = null
+  bannerForm.value = null
 }
 </script>
 

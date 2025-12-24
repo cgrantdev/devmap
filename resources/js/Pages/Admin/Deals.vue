@@ -129,6 +129,20 @@
           </div>
 
           <div>
+            <label class="block text-sm text-slate-700 mb-2">Brand/Vendor (Optional)</label>
+            <select
+              v-model="formData.brand_id"
+              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option :value="null">All Vendors (Site-wide)</option>
+              <option v-for="brand in brands" :key="brand.id" :value="brand.id">
+                {{ brand.name }}
+              </option>
+            </select>
+            <p class="text-xs text-slate-500 mt-1">Leave blank for site-wide deals</p>
+          </div>
+
+          <div>
             <label class="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -169,7 +183,7 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
-  vendors: {
+  brands: {
     type: Array,
     default: () => []
   }
@@ -184,7 +198,7 @@ const formData = reactive({
   discount: 0,
   expiry_date: '',
   active: true,
-  vendor_id: null
+  brand_id: null
 })
 
 function editDeal(deal) {
@@ -194,7 +208,7 @@ function editDeal(deal) {
   formData.discount = deal.discount
   formData.expiry_date = deal.expiry_date
   formData.active = deal.active
-  formData.vendor_id = deal.vendor_id
+  formData.brand_id = deal.brand_id || null
   showModal.value = true
 }
 
@@ -228,7 +242,7 @@ function resetForm() {
   formData.discount = 0
   formData.expiry_date = ''
   formData.active = true
-  formData.vendor_id = null
+  formData.brand_id = null
   editingDeal.value = null
 }
 </script>

@@ -9,11 +9,12 @@ class Banner extends Model
 {
     protected $fillable = [
         'title',
+        'image',
         'image_url',
         'link',
         'position',
         'active',
-        'vendor_id',
+        'brand_id',
         'description',
         'start_date',
         'end_date',
@@ -26,9 +27,9 @@ class Banner extends Model
         'end_date' => 'date',
     ];
 
-    public function vendor(): BelongsTo
+    public function brand(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'vendor_id');
+        return $this->belongsTo(Brand::class, 'brand_id');
     }
 
     public function isActive(): bool
