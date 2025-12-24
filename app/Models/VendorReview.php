@@ -17,6 +17,8 @@ class VendorReview extends Model
         'rating',
         'review',
         'is_approved',
+        'status',
+        'verified',
         'shipping_time',
         'customer_service',
         'quality',
@@ -27,6 +29,7 @@ class VendorReview extends Model
     protected $casts = [
         'rating' => 'integer',
         'is_approved' => 'boolean',
+        'verified' => 'boolean',
     ];
 
     public function brand()

@@ -33,9 +33,15 @@ class VendorsController extends Controller
                     'location' => $brand->vendorSetting && $brand->vendorSetting->location ? $brand->vendorSetting->location->name : null,
                     'created_at' => $brand->created_at->format('n/j/Y'), // Format: 12/3/2025
                     'is_active' => $brand->is_active,
+                    'rating_average' => $brand->rating_average ?? 0,
+                    'rating_count' => $brand->rating_count ?? 0,
                     'settings' => $brand->vendorSetting ? [
                         'status' => $brand->vendorSetting->status,
                         'logo' => $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
+                        'shop_url' => $brand->vendorSetting->shop_url ?? null, // shop_url is the website
+                        'top_vendor' => $brand->vendorSetting->top_vendor ?? false,
+                        'featured' => $brand->vendorSetting->featured ?? false,
+                        'is_partner' => $brand->vendorSetting->is_partner ?? false,
                     ] : null
                 ];
             });
@@ -88,12 +94,21 @@ class VendorsController extends Controller
                     }
                 },
             ],
+            'shop_url' => 'required|url|max:255',
             'email' => 'nullable|email|max:255',
             'description' => 'nullable|string|max:1000',
-            'shop_url' => 'nullable|url|max:255',
             'contact_email' => 'nullable|email|max:255',
             'phone_number' => 'nullable|string|max:50',
-            'location_id' => 'nullable|exists:locations,id',
+            'location_id' => 'required|exists:locations,id',
+            'founded_year' => 'nullable|integer|min:1800|max:' . date('Y'),
+            'coupon_code' => 'nullable|string|max:50',
+            'shipping_info' => 'nullable|string|max:2000',
+            'return_policy' => 'nullable|string|max:2000',
+            'business_hours' => 'nullable|string|max:255',
+            'banner_image_url' => 'nullable|url|max:500',
+            'top_vendor' => 'nullable|boolean',
+            'featured' => 'nullable|boolean',
+            'is_partner' => 'nullable|boolean',
             'banner' => 'nullable|image|max:2048',
             'logo' => 'nullable|mimes:jpeg,jpg,png,gif,webp,svg|max:1024',
         ]);
@@ -133,10 +148,19 @@ class VendorsController extends Controller
         }
         
         $settings->description = $validated['description'] ?? null;
-        $settings->shop_url = $validated['shop_url'] ?? null;
+        $settings->shop_url = $validated['shop_url'] ?? null; // shop_url is the website
         $settings->contact_email = $validated['contact_email'] ?? null;
         $settings->phone_number = $validated['phone_number'] ?? null;
         $settings->location_id = $validated['location_id'] ?? null;
+        $settings->founded_year = $validated['founded_year'] ?? null;
+        $settings->coupon_code = $validated['coupon_code'] ?? null;
+        $settings->shipping_info = $validated['shipping_info'] ?? null;
+        $settings->return_policy = $validated['return_policy'] ?? null;
+        $settings->business_hours = $validated['business_hours'] ?? null;
+        $settings->banner_image_url = $validated['banner_image_url'] ?? null;
+        $settings->top_vendor = $validated['top_vendor'] ?? false;
+        $settings->featured = $validated['featured'] ?? false;
+        $settings->is_partner = $validated['is_partner'] ?? false;
         $settings->status = 0;
         $settings->save();
 
@@ -161,11 +185,19 @@ class VendorsController extends Controller
             'is_active' => $brand->is_active,
             'settings' => $brand->vendorSetting ? [
                 'description' => $brand->vendorSetting->description,
-                'shop_url' => $brand->vendorSetting->shop_url,
+                'shop_url' => $brand->vendorSetting->shop_url, // shop_url is the website
                 'contact_email' => $brand->vendorSetting->contact_email,
                 'phone_number' => $brand->vendorSetting->phone_number,
                 'location_id' => $brand->vendorSetting->location_id,
-                'shop_url' => $brand->vendorSetting->shop_url,
+                'founded_year' => $brand->vendorSetting->founded_year,
+                'coupon_code' => $brand->vendorSetting->coupon_code,
+                'shipping_info' => $brand->vendorSetting->shipping_info,
+                'return_policy' => $brand->vendorSetting->return_policy,
+                'business_hours' => $brand->vendorSetting->business_hours,
+                'banner_image_url' => $brand->vendorSetting->banner_image_url,
+                'top_vendor' => $brand->vendorSetting->top_vendor ?? false,
+                'featured' => $brand->vendorSetting->featured ?? false,
+                'is_partner' => $brand->vendorSetting->is_partner ?? false,
                 'banner' => $brand->vendorSetting->banner,
                 'logo' => $brand->vendorSetting->logo,
                 'banner_url' => $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
@@ -188,9 +220,21 @@ class VendorsController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'shop_url' => 'nullable|url|max:255', // shop_url is the website
             'email' => 'nullable|email|max:255',
+            'description' => 'nullable|string|max:1000',
+            'contact_email' => 'nullable|email|max:255',
             'phone_number' => 'nullable|string|max:50',
             'location_id' => 'nullable|exists:locations,id',
+            'founded_year' => 'nullable|integer|min:1800|max:' . date('Y'),
+            'coupon_code' => 'nullable|string|max:50',
+            'shipping_info' => 'nullable|string|max:2000',
+            'return_policy' => 'nullable|string|max:2000',
+            'business_hours' => 'nullable|string|max:255',
+            'banner_image_url' => 'nullable|url|max:500',
+            'top_vendor' => 'nullable|boolean',
+            'featured' => 'nullable|boolean',
+            'is_partner' => 'nullable|boolean',
             'banner' => 'nullable|image|max:2048',
             'logo' => 'nullable|mimes:jpeg,jpg,png,gif,webp,svg|max:1024',
             'is_active' => 'nullable|boolean',
@@ -237,13 +281,20 @@ class VendorsController extends Controller
             }
         }
 
-        $settings->description = $request->input('description', $settings->description);
-        $settings->shop_url = $request->input('shop_url', $settings->shop_url);
-        $settings->contact_email = $request->input('contact_email', $settings->contact_email);
-        $settings->phone_number = $request->input('phone_number', $settings->phone_number);
+        $settings->description = $validated['description'] ?? $settings->description;
+        $settings->shop_url = $validated['shop_url'] ?? $settings->shop_url; // shop_url is the website
+        $settings->contact_email = $validated['contact_email'] ?? $settings->contact_email;
+        $settings->phone_number = $validated['phone_number'] ?? $settings->phone_number;
         $settings->location_id = $validated['location_id'] ?? $settings->location_id;
-        $settings->shop_url = $request->input('shop_url', $settings->shop_url);
-        $settings->contact_email = $validated['email'] ?? $settings->contact_email;
+        $settings->founded_year = $validated['founded_year'] ?? $settings->founded_year;
+        $settings->coupon_code = $validated['coupon_code'] ?? $settings->coupon_code;
+        $settings->shipping_info = $validated['shipping_info'] ?? $settings->shipping_info;
+        $settings->return_policy = $validated['return_policy'] ?? $settings->return_policy;
+        $settings->business_hours = $validated['business_hours'] ?? $settings->business_hours;
+        $settings->banner_image_url = $validated['banner_image_url'] ?? $settings->banner_image_url;
+        $settings->top_vendor = $validated['top_vendor'] ?? $settings->top_vendor ?? false;
+        $settings->featured = $validated['featured'] ?? $settings->featured ?? false;
+        $settings->is_partner = $validated['is_partner'] ?? $settings->is_partner ?? false;
         $settings->save();
 
         return redirect()->route('admin.vendors.edit', $brand->id)->with('success', 'Vendor updated successfully.');

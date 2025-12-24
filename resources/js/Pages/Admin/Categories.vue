@@ -10,15 +10,7 @@
       </Link>
     </div>
     
-    <!-- Success Message -->
-    <div v-if="$page.props.flash.success" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-      {{ $page.props.flash.success }}
-    </div>
-    
-    <!-- Error Message -->
-    <div v-if="$page.props.flash.error" class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-      {{ $page.props.flash.error }}
-    </div>
+    <!-- Flash messages are now handled by toast notifications -->
     
     <div class="bg-white rounded-lg shadow">
       <div class="p-6">
@@ -121,6 +113,9 @@ import AdminLayout from './Layout.vue'
 import { ref, watch, onMounted } from 'vue'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
+import { useToast } from '../../composables/useToast'
+
+const { error: toastError, warning: toastWarning } = useToast()
 
 const props = defineProps({
   categories: Object
@@ -267,6 +262,7 @@ function deleteCategory(id, name) {
         if (index > -1) {
           selectedCategories.value.splice(index, 1)
         }
+        // Success toast will be shown automatically from flash message
         // Refresh data
         fetchData()
       },
@@ -280,7 +276,7 @@ function deleteCategory(id, name) {
 
 function bulkMerge() {
   if (selectedCategories.value.length < 2) {
-    alert('Please select at least 2 categories to merge.')
+    toastWarning('Please select at least 2 categories to merge.')
     return
   }
   
@@ -296,7 +292,7 @@ function bulkMerge() {
       },
       onError: (errors) => {
         console.error('Bulk merge error:', errors)
-        alert('Failed to merge categories. Please try again.')
+        toastError('Failed to merge categories. Please try again.')
       }
     })
   }
@@ -304,7 +300,7 @@ function bulkMerge() {
 
 function bulkDelete() {
   if (selectedCategories.value.length === 0) {
-    alert('Please select at least one category to delete.')
+    toastWarning('Please select at least one category to delete.')
     return
   }
   
@@ -322,7 +318,7 @@ function bulkDelete() {
       },
       onError: (errors) => {
         console.error('Bulk delete error:', errors)
-        alert('Failed to delete categories. Please try again.')
+        toastError('Failed to delete categories. Please try again.')
       }
     })
   }

@@ -8,10 +8,7 @@
         </Link>
       </div>
 
-      <!-- Success Message -->
-      <div v-if="$page.props.flash.success" class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl">
-        {{ $page.props.flash.success }}
-      </div>
+      <!-- Flash messages are now handled by toast notifications -->
 
       <div class="bg-white rounded-2xl shadow-sm border border-slate-100">
         <div class="flex items-center gap-4 mb-4 px-6 pt-6">

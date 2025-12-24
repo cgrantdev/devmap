@@ -10,15 +10,7 @@
       </Link>
     </div>
     
-    <!-- Success Message -->
-    <div v-if="$page.props.flash.success" class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl">
-      {{ $page.props.flash.success }}
-    </div>
-    
-    <!-- Error Message -->
-    <div v-if="$page.props.flash.error" class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-      {{ $page.props.flash.error }}
-    </div>
+    <!-- Flash messages are now handled by toast notifications -->
     
     <div class="bg-white rounded-lg shadow">
       <div class="p-6">

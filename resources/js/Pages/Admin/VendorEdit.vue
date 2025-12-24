@@ -8,15 +8,7 @@
         </div>
         <Link href="/admin/vendors" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors">Back</Link>
       </div>
-      <!-- Success Message -->
-      <div v-if="$page.props.flash.success" class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl">
-        {{ $page.props.flash.success }}
-      </div>
-      
-      <!-- Error Message -->
-      <div v-if="$page.props.flash.error" class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
-        {{ $page.props.flash.error }}
-      </div>
+      <!-- Flash messages are now handled by toast notifications -->
       
       <!-- Profile Edit Card -->
       <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
@@ -31,55 +23,142 @@
           </ul>
         </div>
         <form @submit.prevent="submitEditVendor" class="space-y-6">
-          <div class="flex gap-4">
-            <div class="w-1/2">
-              <label class="block mb-1.5 font-semibold text-slate-800">Name *</label>
-              <input v-model="editForm.name" type="text" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" required />
+          <!-- Basic Info -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">Vendor Name *</label>
+              <input
+                v-model="editForm.name"
+                type="text"
+                required
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
-            <div class="w-1/2">
-              <label class="block mb-1.5 font-semibold text-slate-800">Contact Email</label>
-              <input v-model="editForm.contact_email" type="email" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" />
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">Website *</label>
+              <input
+                v-model="editForm.shop_url"
+                type="url"
+                required
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
           </div>
-          <div>
-            <label class="block mb-1.5 font-semibold text-slate-800">Description</label>
-            <textarea v-model="editForm.description" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" rows="3"></textarea>
-          </div>
-          <div class="flex gap-4">
-            <div class="w-1/2">
-              <label class="block mb-1.5 font-semibold text-slate-800">Phone Number</label>
-              <input v-model="editForm.phone_number" type="text" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" />
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">Email</label>
+              <input
+                v-model="editForm.contact_email"
+                type="email"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
-            <div class="w-1/2">
-              <label class="block mb-1.5 font-semibold text-slate-800">Location</label>
-              <select v-model="editForm.location_id" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base">
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">Phone</label>
+              <input
+                v-model="editForm.phone_number"
+                type="tel"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">Location *</label>
+              <select
+                v-model="editForm.location_id"
+                required
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
                 <option :value="null">Select Location</option>
                 <option v-for="location in locations" :key="location.id" :value="location.id">
                   {{ location.name }}
                 </option>
               </select>
             </div>
-          </div>
-          <div class="flex gap-4">
-            <div class="w-full">
-              <label class="block mb-1.5 font-semibold text-slate-800">Shop URL</label>
-              <input v-model="editForm.shop_url" type="url" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" />
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">Founded Year</label>
+              <input
+                v-model.number="editForm.founded_year"
+                type="number"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
           </div>
-          <div class="flex gap-4 items-end">
-            <div class="w-1/2">
-              <label class="block mb-1.5 font-semibold text-slate-800">Banner</label>
-              <input @change="e => handleFileChange(e, 'banner')" type="file" accept="image/*" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
+
+          <div>
+            <label class="block text-sm text-slate-700 mb-2">Description</label>
+            <textarea
+              v-model="editForm.description"
+              rows="3"
+              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">Coupon Code</label>
+              <input
+                v-model="editForm.coupon_code"
+                type="text"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">Banner Image URL</label>
+              <input
+                v-model="editForm.banner_image_url"
+                type="url"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm text-slate-700 mb-2">Shipping Information</label>
+            <textarea
+              v-model="editForm.shipping_info"
+              rows="2"
+              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm text-slate-700 mb-2">Return Policy</label>
+            <textarea
+              v-model="editForm.return_policy"
+              rows="2"
+              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm text-slate-700 mb-2">Business Hours</label>
+            <input
+              v-model="editForm.business_hours"
+              type="text"
+              placeholder="e.g., Mon-Fri: 9AM-6PM EST"
+              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <!-- File Uploads -->
+          <div class="grid grid-cols-2 gap-4 items-end">
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">Banner (File Upload)</label>
+              <input @change="e => handleFileChange(e, 'banner')" type="file" accept="image/*" class="w-full border border-slate-300 rounded-lg px-3 py-2" />
               <div v-if="bannerPreview" class="mt-2">
-                <img :src="bannerPreview" alt="Banner Preview" class="h-24 rounded-xl object-cover w-full" loading="lazy" />
+                <img :src="bannerPreview" alt="Banner Preview" class="h-24 rounded-lg object-cover w-full" loading="lazy" />
               </div>
               <div v-else-if="currentBannerUrl" class="mt-2">
-                <img :src="currentBannerUrl + '?t=' + cacheBuster" alt="Current Banner" class="h-24 rounded-xl object-cover w-full" loading="lazy" />
+                <img :src="currentBannerUrl + '?t=' + cacheBuster" alt="Current Banner" class="h-24 rounded-lg object-cover w-full" loading="lazy" />
               </div>
             </div>
-            <div class="w-1/2">
-              <label class="block mb-1.5 font-semibold text-slate-800">Logo</label>
-              <input @change="e => handleFileChange(e, 'logo')" type="file" accept="image/*,.svg" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">Logo (File Upload)</label>
+              <input @change="e => handleFileChange(e, 'logo')" type="file" accept="image/*,.svg" class="w-full border border-slate-300 rounded-lg px-3 py-2" />
               <div v-if="logoPreview" class="mt-2">
                 <img :src="logoPreview" alt="Logo Preview" class="h-24 w-24 rounded-full object-cover mx-auto" loading="lazy" />
               </div>
@@ -88,9 +167,41 @@
               </div>
             </div>
           </div>
-          <div class="flex justify-end pt-4 border-t border-slate-100">
-            <button type="submit" :disabled="editForm.processing" class="px-6 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-medium transition-colors disabled:opacity-50">
-              {{ editForm.processing ? 'Saving...' : (vendor ? 'Update Vendor' : 'Create Vendor') }}
+
+          <!-- Checkboxes -->
+          <div class="flex gap-6">
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                v-model="editForm.top_vendor"
+                class="w-4 h-4 text-blue-600"
+              />
+              <span class="text-sm text-slate-700">Top Vendor</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                v-model="editForm.featured"
+                class="w-4 h-4 text-blue-600"
+              />
+              <span class="text-sm text-slate-700">Featured</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                v-model="editForm.is_partner"
+                class="w-4 h-4 text-blue-600"
+              />
+              <span class="text-sm text-slate-700">Partner</span>
+            </label>
+          </div>
+
+          <div class="flex justify-end pt-4 border-t border-slate-200 gap-3">
+            <Link href="/admin/vendors" class="px-6 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+              Cancel
+            </Link>
+            <button type="submit" :disabled="editForm.processing" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50">
+              {{ editForm.processing ? 'Saving...' : (vendor ? 'Save Changes' : 'Add Vendor') }}
             </button>
           </div>
         </form>
@@ -107,13 +218,7 @@
             {{ importShopUrlMessage }}
           </div>
         </div>
-        <!-- Import Success/Error Messages -->
-        <div v-if="$page.props.flash.success && $page.props.flash.success.includes('imported')" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-          {{ $page.props.flash.success }}
-        </div>
-        <div v-if="$page.props.flash.error" class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {{ $page.props.flash.error }}
-        </div>
+        <!-- Import messages are now handled by toast notifications -->
         <form @submit.prevent="importFromFile" class="mb-6 flex gap-2 items-end">
           <div class="flex-1">
             <label class="block mb-2 font-medium text-gray-700">Import from File</label>
@@ -176,6 +281,9 @@ import { router } from '@inertiajs/vue3'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import { useAdminLoading } from '../../composables/useAdminLoading'
+import { useToast } from '../../composables/useToast'
+
+const { success: toastSuccess, error: toastError } = useToast()
 
 const props = defineProps({
   vendor: Object,
@@ -228,6 +336,15 @@ const editForm = useForm({
   phone_number: props.vendor?.settings?.phone_number || '',
   location_id: props.vendor?.settings?.location_id || null,
   shop_url: props.vendor?.settings?.shop_url || '',
+  founded_year: props.vendor?.settings?.founded_year || null,
+  coupon_code: props.vendor?.settings?.coupon_code || '',
+  shipping_info: props.vendor?.settings?.shipping_info || '',
+  return_policy: props.vendor?.settings?.return_policy || '',
+  business_hours: props.vendor?.settings?.business_hours || '',
+  banner_image_url: props.vendor?.settings?.banner_image_url || '',
+  top_vendor: props.vendor?.settings?.top_vendor || false,
+  featured: props.vendor?.settings?.featured || false,
+  is_partner: props.vendor?.settings?.is_partner || false,
   banner: null,
   logo: null,
   is_active: props.vendor?.is_active ?? false,
@@ -245,6 +362,15 @@ watch(() => props.vendor, (newVendor) => {
     editForm.phone_number = newVendor.settings?.phone_number || ''
     editForm.location_id = newVendor.settings?.location_id || null
     editForm.shop_url = newVendor.settings?.shop_url || ''
+    editForm.founded_year = newVendor.settings?.founded_year || null
+    editForm.coupon_code = newVendor.settings?.coupon_code || ''
+    editForm.shipping_info = newVendor.settings?.shipping_info || ''
+    editForm.return_policy = newVendor.settings?.return_policy || ''
+    editForm.business_hours = newVendor.settings?.business_hours || ''
+    editForm.banner_image_url = newVendor.settings?.banner_image_url || ''
+    editForm.top_vendor = newVendor.settings?.top_vendor || false
+    editForm.featured = newVendor.settings?.featured || false
+    editForm.is_partner = newVendor.settings?.is_partner || false
     editForm.banner_url = newVendor.settings?.banner_url || ''
     editForm.logo_url = newVendor.settings?.logo_url || ''
   }
@@ -277,8 +403,12 @@ function submitEditVendor() {
         // Clear file inputs
         const fileInputs = document.querySelectorAll('input[type="file"]')
         fileInputs.forEach(input => input.value = '')
+        // Toast will be shown automatically from flash message
       },
-      onError: () => {
+      onError: (errors) => {
+        if (errors && Object.keys(errors).length > 0) {
+          toastError('Please fix the errors and try again.')
+        }
       },
       data: { _method: 'put' }
     })
@@ -287,9 +417,13 @@ function submitEditVendor() {
     editForm.post('/admin/vendors', {
       forceFormData: true,
       onSuccess: () => {
+        // Toast will be shown automatically from flash message
         router.visit('/admin/vendors')
       },
-      onError: () => {
+      onError: (errors) => {
+        if (errors && Object.keys(errors).length > 0) {
+          toastError('Please fix the errors and try again.')
+        }
       }
     })
   }
@@ -375,10 +509,11 @@ function deleteProduct(productId) {
     const deleteForm = useForm({ _token: usePage().props.csrf_token })
     deleteForm.delete(`/admin/vendors/${props.vendor.id}/products/${productId}`, {
       onSuccess: () => {
+        // Toast will be shown automatically from flash message
         router.reload()
       },
       onError: () => {
-        console.log('Product deletion failed')
+        toastError('Failed to delete product. Please try again.')
       }
     })
   }

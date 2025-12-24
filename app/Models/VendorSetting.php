@@ -19,7 +19,25 @@ class VendorSetting extends Model
         'phone_number',
         'status',
         'api_route',
-        'shop_url'
+        'shop_url',
+        'website',
+        'founded_year',
+        'coupon_code',
+        'shipping_info',
+        'return_policy',
+        'business_hours',
+        'banner_image_url',
+        'top_vendor',
+        'featured',
+        'is_partner',
+    ];
+
+    protected $casts = [
+        'founded_year' => 'integer',
+        'top_vendor' => 'boolean',
+        'featured' => 'boolean',
+        'is_partner' => 'boolean',
+        'status' => 'integer',
     ];
 
     public function brand()

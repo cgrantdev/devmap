@@ -152,6 +152,40 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('admin.settings');
     Route::post('/settings/hero-slides', [SettingsController::class, 'updateHeroSlides'])->name('admin.settings.hero-slides.update');
+    
+    // Reviews
+    Route::get('/reviews', [\App\Http\Controllers\Admin\ReviewsController::class, 'index'])->name('admin.reviews.index');
+    Route::post('/reviews/{id}/approve', [\App\Http\Controllers\Admin\ReviewsController::class, 'approve'])->name('admin.reviews.approve');
+    Route::post('/reviews/{id}/reject', [\App\Http\Controllers\Admin\ReviewsController::class, 'reject'])->name('admin.reviews.reject');
+    Route::delete('/reviews/{id}', [\App\Http\Controllers\Admin\ReviewsController::class, 'destroy'])->name('admin.reviews.destroy');
+    
+    // Deals
+    Route::get('/deals', [\App\Http\Controllers\Admin\DealsController::class, 'index'])->name('admin.deals.index');
+    Route::post('/deals', [\App\Http\Controllers\Admin\DealsController::class, 'store'])->name('admin.deals.store');
+    Route::put('/deals/{id}', [\App\Http\Controllers\Admin\DealsController::class, 'update'])->name('admin.deals.update');
+    Route::delete('/deals/{id}', [\App\Http\Controllers\Admin\DealsController::class, 'destroy'])->name('admin.deals.destroy');
+    
+    // Banners
+    Route::get('/banners', [\App\Http\Controllers\Admin\BannersController::class, 'index'])->name('admin.banners.index');
+    Route::post('/banners', [\App\Http\Controllers\Admin\BannersController::class, 'store'])->name('admin.banners.store');
+    Route::put('/banners/{id}', [\App\Http\Controllers\Admin\BannersController::class, 'update'])->name('admin.banners.update');
+    Route::post('/banners/{id}/toggle', [\App\Http\Controllers\Admin\BannersController::class, 'toggle'])->name('admin.banners.toggle');
+    Route::delete('/banners/{id}', [\App\Http\Controllers\Admin\BannersController::class, 'destroy'])->name('admin.banners.destroy');
+    
+    // Analytics
+    Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('admin.analytics.index');
+    
+    // Users
+    Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('admin.users.index');
+    
+    // Content
+    Route::get('/content', [\App\Http\Controllers\Admin\ContentController::class, 'index'])->name('admin.content.index');
+    
+    // Product Scraping
+    Route::get('/product-scraping', [\App\Http\Controllers\Admin\ProductScrapingController::class, 'index'])->name('admin.product-scraping.index');
+    Route::post('/product-scraping/{id}/toggle', [\App\Http\Controllers\Admin\ProductScrapingController::class, 'toggle'])->name('admin.product-scraping.toggle');
+    Route::post('/product-scraping/{id}/scrape', [\App\Http\Controllers\Admin\ProductScrapingController::class, 'scrape'])->name('admin.product-scraping.scrape');
+    Route::post('/product-scraping/products/{id}/toggle-override', [\App\Http\Controllers\Admin\ProductScrapingController::class, 'toggleOverride'])->name('admin.product-scraping.toggle-override');
 });
 
 // Authentication routes
