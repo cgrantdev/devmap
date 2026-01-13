@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Jobs\RunPythonScraperJob;
 use App\Models\ScrapingConfig;
+use App\Models\ScrapedProduct;
 use App\Models\Product;
 use App\Models\Brand;
 use App\Models\User;
@@ -124,7 +125,7 @@ class ProductScrapingController extends Controller
             return redirect()->back()->with('error', 'Scraped products table does not exist. Please run migrations.');
         }
         
-        $product = Product::findOrFail($id);
+        $product = ScrapedProduct::findOrFail($id);
         $product->manual_override = !$product->manual_override;
         $product->save();
 
