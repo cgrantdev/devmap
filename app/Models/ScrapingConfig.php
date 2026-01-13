@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ScrapingConfig extends Model
 {
@@ -11,6 +12,7 @@ class ScrapingConfig extends Model
         'vendor_id',
         'vendor_name',
         'products_url',
+        'product_category_id',
         'enabled',
         'frequency',
         'last_run_at',
@@ -32,7 +34,12 @@ class ScrapingConfig extends Model
 
     public function vendor(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'vendor_id');
+        return $this->belongsTo(Brand::class, 'vendor_id');
+    }
+
+    public function scrapedProducts(): HasMany
+    {
+        return $this->hasMany(ScrapedProduct::class);
     }
 
     public function calculateNextRunAt(): void
