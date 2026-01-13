@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\RunPythonScraperJob;
 use App\Models\ScrapingConfig;
+use App\Models\ScrapedProduct;
 use App\Models\Product;
+use App\Models\Brand;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Schema;
@@ -45,6 +49,7 @@ class ProductScrapingController extends Controller
         
         if ($hasAutoScrapedColumn) {
             $products = Product::where('auto_scraped', true)
+                ->with('brand')
                 ->orderBy('last_scraped_at', 'desc')
                 ->get()
                 ->map(function ($product) {
@@ -56,6 +61,7 @@ class ProductScrapingController extends Controller
                         'vendor_name' => $product->brand?->name ?? 'Unknown',
                         'stock_status' => $product->stock_status ?? 'in-stock',
                         'image_url' => $product->image_url,
+                        'source_url' => $product->source_url ?? $product->product_url ?? null,
                         'last_scraped_at' => $product->last_scraped_at?->toIso8601String(),
                         'auto_scraped' => $product->auto_scraped,
                         'manual_override' => $product->manual_override ?? false,
@@ -65,9 +71,11 @@ class ProductScrapingController extends Controller
             $products = [];
         }
 
+        $vendors = Brand::all();
         return Inertia::render('Admin/ProductScraping', [
             'scrapingConfigs' => $scrapingConfigs,
-            'products' => $products
+            'products' => $products,
+            'vendors' => $vendors,
         ]);
     }
 
@@ -94,21 +102,30 @@ class ProductScrapingController extends Controller
         
         // TODO: Dispatch scraping job here
         // Example: dispatch(new ScrapeProductsJob($config));
+        RunPythonScraperJob::dispatch($config);
         
         $config->last_run_at = now();
         $config->calculateNextRunAt();
         $config->save();
 
-        return redirect()->back()->with('success', 'Scraping job queued.');
+        return redirect()->back()->with('success', 'Python scraping job queued.');
+    }
+
+    public function edit($id)
+    {
+        $config = ScrapingConfig::findOrFail($id);
+        return Inertia::render('Admin/ProductScrapingEdit', [
+            'config' => $config
+        ]);
     }
 
     public function toggleOverride($id)
     {
-        if (!Schema::hasColumn('products', 'manual_override')) {
-            return redirect()->back()->with('error', 'Manual override column does not exist. Please run migrations.');
+        if (!Schema::hasTable('scraped_products')) {
+            return redirect()->back()->with('error', 'Scraped products table does not exist. Please run migrations.');
         }
         
-        $product = Product::findOrFail($id);
+        $product = ScrapedProduct::findOrFail($id);
         $product->manual_override = !$product->manual_override;
         $product->save();
 
