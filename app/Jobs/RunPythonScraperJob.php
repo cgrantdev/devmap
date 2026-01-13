@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Models\ScrapingConfig;
-use App\Models\ScrapedProduct;
 use App\Models\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

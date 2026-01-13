@@ -582,7 +582,7 @@ const activeTab = ref('configs')
 const showConfigModal = ref(false)
 
 // Log props values
-console.log('Props:', props)
+// console.log('Props:', props)
 
 // Filter states
 const selectedVendor = ref('')
