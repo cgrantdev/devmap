@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\CategoriesController;
 use App\Http\Controllers\Admin\LocationsController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
 use App\Http\Controllers\Admin\PagesController;
+use App\Http\Controllers\Admin\ScrapingConfigController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Vendor\ImportController;
 use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
@@ -35,6 +36,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Frontend pages
 Route::get('/products', [ProductsController::class, 'index'])->name('products');
+Route::get('/product/{slug}/{id}', [ProductsController::class, 'showProduct'])->name('product.detail');
 Route::get('/product/{slug}', [ProductsController::class, 'show'])->name('product.show');
 Route::get('/brand/{slug}/products', [ProductsController::class, 'byBrand'])->name('brand.products');
 Route::get('/brands', [BrandsController::class, 'index'])->name('brands');
@@ -187,7 +189,10 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::get('/product-scraping', [\App\Http\Controllers\Admin\ProductScrapingController::class, 'index'])->name('admin.product-scraping.index');
     Route::post('/product-scraping/{id}/toggle', [\App\Http\Controllers\Admin\ProductScrapingController::class, 'toggle'])->name('admin.product-scraping.toggle');
     Route::post('/product-scraping/{id}/scrape', [\App\Http\Controllers\Admin\ProductScrapingController::class, 'scrape'])->name('admin.product-scraping.scrape');
+    Route::post('/product-scraping/{id}/edit', [\App\Http\Controllers\Admin\ProductScrapingController::class, 'edit'])->name('admin.product-scraping.edit');
     Route::post('/product-scraping/products/{id}/toggle-override', [\App\Http\Controllers\Admin\ProductScrapingController::class, 'toggleOverride'])->name('admin.product-scraping.toggle-override');
+    Route::post('/product-scraping/configs', [ScrapingConfigController::class, 'store']);
+    Route::put('/product-scraping/configs/{id}', [ScrapingConfigController::class, 'update'])->name('admin.product-scraping.update');
 });
 
 // Authentication routes

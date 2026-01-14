@@ -26,6 +26,8 @@ class Product extends Model
         'rating_count',
         'image_url',
         'product_url',
+        'auto_scraped',
+        'last_scraped_at',
     ];
 
     public function brand()
@@ -52,6 +54,10 @@ class Product extends Model
     {
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
+
+    protected $casts = [
+        'last_scraped_at' => 'datetime',
+    ];
 
     /**
      * Get the decoded product name (HTML entities decoded)

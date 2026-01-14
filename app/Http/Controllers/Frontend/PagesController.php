@@ -16,6 +16,11 @@ class PagesController extends Controller
             $slug = $request->route('slug');
         }
         
+        // Special handling for calculator page
+        if ($slug === 'calculator') {
+            return Inertia::render('Frontend/Calculator');
+        }
+        
         // Find page by slug
         $page = Page::where('slug', $slug)->first();
         

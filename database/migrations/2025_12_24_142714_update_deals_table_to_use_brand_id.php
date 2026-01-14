@@ -17,8 +17,8 @@ return new class extends Migration
 
         Schema::table('deals', function (Blueprint $table) {
             // Drop old foreign key and column
-            $table->dropForeign(['vendor_id']);
-            $table->dropColumn('vendor_id');
+            // $table->dropForeign(['vendor_id']);
+            // $table->dropColumn('vendor_id');
             
             // Add new brand_id column
             $table->foreignId('brand_id')->nullable()->after('active')->constrained('brands')->onDelete('set null');
