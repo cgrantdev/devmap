@@ -36,6 +36,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Frontend pages
 Route::get('/products', [ProductsController::class, 'index'])->name('products');
+Route::get('/product/{slug}/{id}', [ProductsController::class, 'showProduct'])->name('product.detail');
 Route::get('/product/{slug}', [ProductsController::class, 'show'])->name('product.show');
 Route::get('/brand/{slug}/products', [ProductsController::class, 'byBrand'])->name('brand.products');
 Route::get('/brands', [BrandsController::class, 'index'])->name('brands');

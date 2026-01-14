@@ -50,6 +50,97 @@ class ProductsController extends Controller
         ]);
     }
 
+    public function showProduct(Request $request, $slug, $id)
+    {
+        // Find product by id and slug
+        $product = Product::with(['brand', 'location', 'types', 'puses', 'category', 'brand.vendorSetting'])
+            ->where('id', $id)
+            ->where('slug', $slug)
+            ->where('status', 'active')
+            ->first();
+
+        if (!$product) {
+            abort(404, 'Product not found');
+        }
+
+        // Get related products (same category, different product)
+        $relatedProducts = Product::with(['brand'])
+            ->where('product_category_id', $product->product_category_id)
+            ->where('id', '!=', $product->id)
+            ->where('status', 'active')
+            ->get()
+            ->map(function ($p) {
+                return [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'slug' => $p->slug,
+                    'image_url' => $p->image_url,
+                    'price' => $p->price,
+                    'discount_price' => $p->discount_price,
+                    'brand' => $p->brand ? ['name' => $p->brand->name] : null,
+                ];
+            });
+
+        // Get brand initials
+        $brand = $product->brand;
+        $initials = 'PS';
+        if ($brand && !empty($brand->name)) {
+            // Split by spaces and filter out empty strings
+            $words = array_filter(explode(' ', trim($brand->name)));
+            $words = array_values($words); // Re-index array
+            
+            if (count($words) >= 2) {
+                // Take first letter of first two words
+                $initials = strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+            } elseif (count($words) == 1) {
+                // If only one word, take first two characters
+                $word = $words[0];
+                $initials = strtoupper(substr($word, 0, 2));
+                // If word is only one character, pad with first character
+                if (strlen($initials) < 2) {
+                    $initials = strtoupper($word[0] . $word[0]);
+                }
+            } else {
+                // Fallback
+                $initials = strtoupper(substr($brand->name, 0, 2));
+            }
+        }
+
+        return Inertia::render('Frontend/ProductDetail', [
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'description' => $product->description,
+                'price' => $product->price,
+                'discount_price' => $product->discount_price,
+                'size_mg' => $product->size_mg,
+                'availability' => $product->availability,
+                'verified' => $product->verified,
+                'rating_average' => (float) ($product->rating_average ?? 0),
+                'rating_count' => (int) ($product->rating_count ?? 0),
+                'image_url' => $product->image_url,
+                'product_url' => $product->product_url,
+                'category' => $product->category ? [
+                    'id' => $product->category->id,
+                    'name' => $product->category->name,
+                    'slug' => $product->category->slug,
+                ] : null,
+            ],
+            'brand' => $brand ? [
+                'id' => $brand->id,
+                'name' => $brand->name,
+                'slug' => $brand->slug,
+                'initials' => $initials,
+                'logo' => $brand->vendorSetting && $brand->vendorSetting->logo 
+                    ? asset('storage/' . $brand->vendorSetting->logo) 
+                    : null,
+                'shop_url' => $brand->vendorSetting->shop_url ?? null,
+            ] : null,
+            'relatedProducts' => $relatedProducts,
+        ]);
+    }
+
     public function show(Request $request, $slug)
     {
         // Find category by slug
