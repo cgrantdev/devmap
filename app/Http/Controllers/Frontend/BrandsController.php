@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Location;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class BrandsController extends Controller
 {
@@ -45,7 +46,10 @@ class BrandsController extends Controller
                 // Get logo URL from vendor settings
                 $logoUrl = null;
                 if ($brand->vendorSetting && $brand->vendorSetting->logo) {
-                    $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
+                    // Check if the file actually exists in storage
+                    if (Storage::disk('public')->exists($brand->vendorSetting->logo)) {
+                        $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
+                    }
                 }
                 
                 return [

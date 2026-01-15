@@ -27,7 +27,7 @@ class RunPythonScraperJob implements ShouldQueue
         Log::info('Scraper payload', [ 'payload' => $payload ]);
         
         $process = new Process([
-            'python3',
+            'python3.10',
             base_path('pyscripts/script.py'),
             $payload
         ]);
@@ -82,11 +82,13 @@ class RunPythonScraperJob implements ShouldQueue
             Log::info('Product saved', [
                 'id' => $product->id,
                 'name' => $product->name,
+                'product_category_id' => $product->product_category_id,
                 'price' => $product->price
             ]);
         }
         $this->config->last_run_at = now();
         $this->config->success_count++;
+        $this->config->calculateNextRunAt();
         $this->config->save();
     }
 }

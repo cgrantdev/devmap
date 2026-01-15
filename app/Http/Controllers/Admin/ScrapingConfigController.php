@@ -22,15 +22,17 @@ class ScrapingConfigController extends Controller
         // Save to database (example)
         $brand = Brand::findOrFail($request->vendor_id);
 
-        ScrapingConfig::create([
+        $config = ScrapingConfig::create([
             'vendor_id'   => $brand->id,
             'vendor_name' => $brand->name,
             'products_url' => $request->products_url,
             'frequency'   => $request->frequency,
             'selectors'   => $request->selectors,
         ]);
-
-        // $config = \App\Models\ScrapingConfig::create($data);
+        
+        // Calculate next run time for new config
+        $config->calculateNextRunAt();
+        $config->save();
 
         return redirect()->back()->with('success', 'Scraping config added.');
     }
@@ -46,6 +48,8 @@ class ScrapingConfigController extends Controller
         $config = ScrapingConfig::findOrFail($id);
         $brand = Brand::findOrFail($request->vendor_id);
         
+        $frequencyChanged = $config->frequency !== $request->frequency;
+        
         $config->update([
             'vendor_id'   => $brand->id,
             'vendor_name' => $brand->name,   // <-- IMPORTANT
@@ -53,6 +57,12 @@ class ScrapingConfigController extends Controller
             'frequency'   => $request->frequency,
             'selectors'   => $request->selectors,
         ]);
+        
+        // Recalculate next run time if frequency changed or if next_run_at is null
+        if ($frequencyChanged || $config->next_run_at === null) {
+            $config->calculateNextRunAt();
+            $config->save();
+        }
 
         return redirect()->back()->with('success', 'Scraping config updated.');
     }

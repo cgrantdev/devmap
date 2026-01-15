@@ -168,8 +168,17 @@
             body-text-direction="left"
           >
             <template #item-image_url="{ image_url }">
-              <img v-if="image_url" :src="image_url" alt="Product" class="h-12 w-12 object-cover rounded" loading="lazy" />
-              <span v-else class="text-gray-400 text-xs">No Image</span>
+              <div class="flex items-center justify-center h-12 w-12">
+                <img 
+                  v-if="image_url" 
+                  :src="image_url" 
+                  alt="Product" 
+                  class="h-12 w-12 object-cover rounded border border-slate-200" 
+                  loading="lazy"
+                  @error="handleImageError"
+                />
+                <span v-else class="text-gray-400 text-xs">No Image</span>
+              </div>
             </template>
             <template #item-price="{ price }">
               {{ price ? '$' + price : '-' }}
@@ -320,6 +329,22 @@ function mergeCategory(sourceCategoryId) {
         console.error('Merge error:', errors)
       }
     })
+  }
+}
+
+function handleImageError(event) {
+  // Replace broken image with placeholder
+  const img = event.target
+  const parent = img.parentNode
+  if (parent) {
+    img.style.display = 'none'
+    // Check if placeholder already exists
+    if (!parent.querySelector('.image-error-placeholder')) {
+      const placeholder = document.createElement('span')
+      placeholder.className = 'image-error-placeholder text-gray-400 text-xs'
+      placeholder.textContent = 'No Image'
+      parent.appendChild(placeholder)
+    }
   }
 }
 </script>

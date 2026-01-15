@@ -8,6 +8,7 @@ use App\Models\Brand;
 use App\Models\VendorSetting;
 use App\Models\Product;
 use App\Models\VendorReview;
+use App\Models\Activity;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -42,10 +43,22 @@ class DashboardController extends Controller
         ];
 
         // Recent activity (last 10 activities)
-        $recentActivity = [
-            // This would be populated from an activity log in a real implementation
-            // For now, we'll return empty array
-        ];
+        $recentActivity = [];
+        if (Schema::hasTable('activities')) {
+            $recentActivity = Activity::orderBy('created_at', 'desc')
+                ->limit(10)
+                ->get()
+                ->map(function ($activity) {
+                    return [
+                        'id' => $activity->id,
+                        'description' => $activity->description,
+                        'vendor' => $activity->entity_name,
+                        'time' => $activity->created_at->diffForHumans(),
+                        'created_at' => $activity->created_at->toIso8601String(),
+                    ];
+                })
+                ->toArray();
+        }
 
         return Inertia::render('Admin/Dashboard', [
             'stats' => $stats,
