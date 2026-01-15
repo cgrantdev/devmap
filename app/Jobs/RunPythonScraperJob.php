@@ -27,7 +27,7 @@ class RunPythonScraperJob implements ShouldQueue
         Log::info('Scraper payload', [ 'payload' => $payload ]);
         
         $process = new Process([
-            'python3.10',
+            'python3.12',
             base_path('pyscripts/script.py'),
             $payload
         ]);
