@@ -37,6 +37,7 @@
             <div v-if="brand" class="flex items-center gap-2">
               <span class="text-gray-600">by</span>
               <Link
+                v-if="brand.slug && brand.is_active"
                 :href="`/brand/${brand.slug}/products`"
                 class="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
               >
@@ -45,6 +46,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </Link>
+              <span v-else class="text-blue-600 font-medium">{{ brand.name }}</span>
             </div>
 
             <!-- Rating -->
@@ -126,9 +128,9 @@
             </div>
 
             <!-- Purchase Button -->
-            <div v-if="brand && brand.shop_url">
+            <div v-if="product.product_url">
               <a
-                :href="brand.shop_url"
+                :href="product.product_url"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="block w-full bg-blue-700 hover:bg-blue-800 text-white font-medium py-3 px-6 rounded-lg text-center flex items-center justify-center gap-2 transition-colors"
@@ -158,15 +160,27 @@
                 </div>
                 <div>
                   <p class="text-sm text-gray-600 mb-1">Sold by</p>
+                  <a
+                    v-if="brand.shop_url"
+                    :href="brand.shop_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    {{ brand.name }}
+                  </a>
                   <Link
+                    v-else-if="brand.slug && brand.is_active"
                     :href="`/brand/${brand.slug}/products`"
                     class="text-blue-600 hover:text-blue-800 font-medium"
                   >
                     {{ brand.name }}
                   </Link>
+                  <span v-else class="text-blue-600 font-medium">{{ brand.name }}</span>
                 </div>
               </div>
               <Link
+                v-if="brand.slug && brand.is_active"
                 :href="`/brand/${brand.slug}/products`"
                 class="text-blue-600 hover:text-blue-800 text-sm font-medium"
               >

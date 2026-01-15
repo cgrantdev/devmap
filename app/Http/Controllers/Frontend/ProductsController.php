@@ -131,6 +131,7 @@ class ProductsController extends Controller
                 'id' => $brand->id,
                 'name' => $brand->name,
                 'slug' => $brand->slug,
+                'is_active' => $brand->is_active,
                 'initials' => $initials,
                 'logo' => $brand->vendorSetting && $brand->vendorSetting->logo 
                     ? asset('storage/' . $brand->vendorSetting->logo) 
