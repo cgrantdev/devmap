@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Deal;
 use App\Models\Brand;
+use App\Helpers\ActivityLogger;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Schema;
@@ -65,7 +66,13 @@ class DealsController extends Controller
             'minimum_purchase' => 'nullable|numeric|min:0',
         ]);
 
-        Deal::create($validated);
+        $deal = Deal::create($validated);
+        
+        // Log activity
+        $brand = $deal->brand;
+        if ($brand) {
+            ActivityLogger::dealCreated($brand->name, $deal->id);
+        }
 
         return redirect()->back()->with('success', 'Deal created successfully.');
     }

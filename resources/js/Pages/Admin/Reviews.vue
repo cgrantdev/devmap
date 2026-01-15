@@ -124,7 +124,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 
 const props = defineProps({
@@ -134,6 +134,7 @@ const props = defineProps({
   }
 })
 
+const csrf = usePage().props.csrf_token
 const searchTerm = ref('')
 const filterStatus = ref('all')
 
@@ -156,14 +157,18 @@ function formatDate(dateString) {
 }
 
 function approveReview(reviewId) {
-  router.post(`/admin/reviews/${reviewId}/approve`, {}, {
+  router.post(`/admin/reviews/${reviewId}/approve`, {
+    _token: csrf
+  }, {
     preserveScroll: true
   })
 }
 
 function rejectReview(reviewId) {
   if (confirm('Are you sure you want to reject this review?')) {
-    router.post(`/admin/reviews/${reviewId}/reject`, {}, {
+    router.post(`/admin/reviews/${reviewId}/reject`, {
+      _token: csrf
+    }, {
       preserveScroll: true
     })
   }
@@ -171,7 +176,11 @@ function rejectReview(reviewId) {
 
 function deleteReview(reviewId) {
   if (confirm('Are you sure you want to delete this review?')) {
-    router.delete(`/admin/reviews/${reviewId}`, {
+    const deleteForm = useForm({
+      _token: usePage().props.csrf_token
+    })
+    
+    deleteForm.delete(`/admin/reviews/${reviewId}`, {
       preserveScroll: true
     })
   }

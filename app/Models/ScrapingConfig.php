@@ -47,13 +47,13 @@ class ScrapingConfig extends Model
         $now = now();
         switch ($this->frequency) {
             case 'hourly':
-                $this->next_run_at = $now->addHour();
+                $this->next_run_at = $now->copy()->addHour();
                 break;
             case 'daily':
-                $this->next_run_at = $now->addDay();
+                $this->next_run_at = $now->copy()->addDay();
                 break;
             case 'weekly':
-                $this->next_run_at = $now->addWeek();
+                $this->next_run_at = $now->copy()->addWeek();
                 break;
         }
     }

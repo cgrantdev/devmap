@@ -13,6 +13,7 @@ use Inertia\Inertia;
 use GuzzleHttp\Client;
 use Symfony\Component\DomCrawler\Crawler;
 use App\Helpers\ImageHelper;
+use App\Helpers\ActivityLogger;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
@@ -448,8 +449,7 @@ class VendorsController extends Controller
         if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('dosage', 'like', "%{$search}%")
+                $q->where('name', 'like', "%{$search}%")                  
                   ->orWhereHas('brand', function ($brandQuery) use ($search) {
                       $brandQuery->where('name', 'like', "%{$search}%");
                   })
@@ -489,7 +489,6 @@ class VendorsController extends Controller
                     'id' => $product->id,
                     'name' => $product->name,
                     'slug' => \Str::slug($product->name),
-                    'dosage' => $product->dosage ?? null,
                     'price' => $product->price,
                     'original_price' => $product->original_price ?? null,
                     'image_url' => $product->image_url,
@@ -642,8 +641,13 @@ class VendorsController extends Controller
                         $productFields['product_category_id'] = $category->id;
                     }
 
-                    $brand->products()->create($productFields);
+                    $product = $brand->products()->create($productFields);
                     $importedCount++;
+                    
+                    // Log activity for first product imported (to avoid spam)
+                    if ($importedCount === 1) {
+                        ActivityLogger::productAdded($product->name, $brand->name, $product->id);
+                    }
                 }
             }
             $message = "Imported {$importedCount} new products from shop URL.";

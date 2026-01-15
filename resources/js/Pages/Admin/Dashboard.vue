@@ -71,12 +71,12 @@
         <h2 class="text-lg text-slate-900 mb-4">Recent Activity</h2>
         <div class="space-y-4">
           <div v-for="activity in recentActivity" :key="activity.id" class="flex items-start gap-3 pb-4 border-b border-slate-100 last:border-0">
-            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-            <div class="flex-1">
-              <p class="text-sm text-slate-900">{{ activity.description }}</p>
-              <p class="text-xs text-slate-500">{{ activity.vendor }}</p>
+            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-slate-900 font-medium">{{ activity.description }}</p>
+              <p class="text-xs text-slate-500 mt-0.5">{{ activity.vendor }}</p>
             </div>
-            <span class="text-xs text-slate-500">{{ activity.time }}</span>
+            <span class="text-xs text-slate-500 whitespace-nowrap ml-2">{{ activity.time }}</span>
           </div>
           <div v-if="recentActivity.length === 0" class="text-sm text-slate-500 text-center py-4">
             No recent activity

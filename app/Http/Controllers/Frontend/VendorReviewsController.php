@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\VendorReview;
+use App\Helpers\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -70,6 +71,9 @@ class VendorReviewsController extends Controller
 
         // The updateBrandRating will be triggered automatically via the model's boot method
         // since is_approved is true
+
+        // Log activity
+        ActivityLogger::reviewSubmitted($brand->name, $review->id);
 
         return back()->with('success', 'Thank you for your review!');
     }

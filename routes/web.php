@@ -155,7 +155,6 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('admin.settings');
     Route::post('/settings/general', [SettingsController::class, 'updateGeneral'])->name('admin.settings.general.update');
-    Route::post('/settings/hero-slides', [SettingsController::class, 'updateHeroSlides'])->name('admin.settings.hero-slides.update');
     
     // Reviews
     Route::get('/reviews', [\App\Http\Controllers\Admin\ReviewsController::class, 'index'])->name('admin.reviews.index');
@@ -175,6 +174,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::put('/banners/{id}', [\App\Http\Controllers\Admin\BannersController::class, 'update'])->name('admin.banners.update');
     Route::post('/banners/{id}/toggle', [\App\Http\Controllers\Admin\BannersController::class, 'toggle'])->name('admin.banners.toggle');
     Route::delete('/banners/{id}', [\App\Http\Controllers\Admin\BannersController::class, 'destroy'])->name('admin.banners.destroy');
+    Route::post('/banners/hero-slides', [\App\Http\Controllers\Admin\BannersController::class, 'updateHeroSlides'])->name('admin.banners.hero-slides.update');
     
     // Analytics
     Route::get('/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('admin.analytics.index');

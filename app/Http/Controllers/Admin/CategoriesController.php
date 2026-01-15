@@ -132,12 +132,34 @@ class CategoriesController extends Controller
             ->latest()
             ->get()
             ->map(function ($product) {
+                // Process image URL - ensure it's a valid absolute URL
+                $imageUrl = $product->image_url;
+                if ($imageUrl) {
+                    // Trim whitespace
+                    $imageUrl = trim($imageUrl);
+                    
+                    // If it's already a full URL (starts with http:// or https://), use it as-is
+                    if (preg_match('/^https?:\/\//', $imageUrl)) {
+                        // Valid absolute URL, use as-is
+                        $imageUrl = $imageUrl;
+                    } elseif (!empty($imageUrl)) {
+                        // If it's a relative path starting with /, make it absolute using the app URL
+                        if (strpos($imageUrl, '/') === 0) {
+                            $imageUrl = url($imageUrl);
+                        } else {
+                            // For other relative paths, try to construct a full URL
+                            // Most product image_urls should be external URLs, so this is a fallback
+                            $imageUrl = $imageUrl;
+                        }
+                    }
+                }
+                
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
                     'price' => $product->price,
                     'discount_price' => $product->discount_price,
-                    'image_url' => $product->image_url,
+                    'image_url' => $imageUrl ?: null, // Ensure null instead of empty string
                     'brand_name' => $product->brand ? $product->brand->name : '-',
                     'product_url' => $product->product_url,
                 ];
