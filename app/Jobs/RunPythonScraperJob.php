@@ -7,7 +7,6 @@ use App\Models\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Symfony\Component\Process\Process;
 use Illuminate\Support\Facades\Log;
 
 class RunPythonScraperJob implements ShouldQueue
@@ -26,27 +25,37 @@ class RunPythonScraperJob implements ShouldQueue
         ]);
         Log::info('Scraper payload', [ 'payload' => $payload ]);
         
-        $process = new Process([
-            'python3.12',
-            base_path('pyscripts/script.py'),
-            $payload
-        ]);
-
-        $process->setTimeout(120); // avoid hanging forever
-        $process->run();
-        Log::info('Python stdout', [ 'stdout' => $process->getOutput() ]);
-
-        Log::info('Python stderr', [ 'stderr' => $process->getErrorOutput() ]);
-
-        if (! $process->isSuccessful()) {
+        // Use the same pattern as the working VendorsController::runPythonScraper method
+        $pythonBin = dirname(base_path()) . '/venv/bin/python3.12';
+        $pythonScript = base_path() . '/pyscripts/script.py';
+        
+        $escapedPayload = escapeshellarg($payload);
+        
+        $command = 'sudo -u devuser ' . $pythonBin . ' ' . escapeshellarg($pythonScript) . ' ' . $escapedPayload . ' 2>&1';
+        
+        Log::info('Running Python scraper', ['command' => $command, 'url' => $this->config->products_url]);
+        
+        $output = shell_exec($command);
+        
+        Log::info('Python stdout', [ 'stdout' => $output ]);
+        
+        if (empty($output)) {
+            Log::error('Python scraper returned empty output');
             $this->config->error_count++;
-            $this->config->last_error = $process->getErrorOutput();
+            $this->config->last_error = 'Python scraper returned empty output';
             $this->config->save();
             return;
         }
-
-        $output = $process->getOutput();
+        
         $data = json_decode($output, true);
+        
+        if (isset($data['error'])) {
+            Log::error('Python scraper error', ['error' => $data['error']]);
+            $this->config->error_count++;
+            $this->config->last_error = $data['error'];
+            $this->config->save();
+            return;
+        }
 
         // safety check
         if (! isset($data['products']) || ! is_array($data['products'])) {
