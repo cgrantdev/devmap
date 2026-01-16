@@ -27,7 +27,8 @@ class RunPythonScraperJob implements ShouldQueue
         
         // Use the same pattern as the working VendorsController::runPythonScraper method
         $pythonBin = dirname(base_path()) . '/venv/bin/python3.12';
-        $pythonScript = base_path() . '/pyscripts/script.py';
+        // $pythonBin = '/usr/bin/python3';
+        $pythonScript = base_path() . '/pyscripts/script.py';        
         
         $escapedPayload = escapeshellarg($payload);
         
