@@ -6,34 +6,34 @@ from urllib.parse import quote
 import sys
 
 
-if len(sys.argv) < 2:
-    print(json.dumps({'error': 'No URL provided'}))
-    sys.exit(1)
+# if len(sys.argv) < 2:
+#     print(json.dumps({'error': 'No URL provided'}))
+#     sys.exit(1)
 
-raw_payload = sys.argv[1]           # JSON string from PHP
-payload = json.loads(raw_payload)   # decode JSON
+# raw_payload = sys.argv[1]           # JSON string from PHP
+# payload = json.loads(raw_payload)   # decode JSON
 
-BASE_URL = payload["products_url"]
-selectors = payload["selectors"]
+# BASE_URL = payload["products_url"]
+# selectors = payload["selectors"]
 
-product_container_selector = selectors["product_container"]
-name_selector = selectors["name"]
-price_selector = selectors["price"]
-image_selector = selectors["image"]
-link_selector = selectors["link"]
+# product_container_selector = selectors["product_container"]
+# name_selector = selectors["name"]
+# price_selector = selectors["price"]
+# image_selector = selectors["image"]
+# link_selector = selectors["link"]
 # BASE_URL = "https://www.peptidesciences.com/all-peptides"
-# BASE_URL = "https://verifiedpeptides.com/peptides/"
+BASE_URL = "https://verifiedpeptides.com/peptides/"
 # product_container_selector = "li.c-product-card"
 # name_selector = "h1.s-pdp__title"
 # image_selector = "img.gallery-placeholder__image"
 # price_selector = "span.price"
 # link_selector = "a.c-product-card__body"
 
-# product_container_selector = "div.product-small"
-# name_selector = "h1.product-title"
-# image_selector = "img.wp-post-image"
-# price_selector = "bdi"
-# link_selector = "a"
+product_container_selector = "div.product-small"
+name_selector = "h1.product-title"
+image_selector = "img.wp-post-image"
+price_selector = "bdi"
+link_selector = "a"
 
 SCRAPEDO_API_KEY = "233d356d97884d8d881b6e24b81e44d3356aa0922d1"   # <<< paste your API key here
 
