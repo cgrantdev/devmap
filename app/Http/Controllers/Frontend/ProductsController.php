@@ -206,6 +206,20 @@ class ProductsController extends Controller
             $query->where('price', '<=', $request->cost_max);
         }
 
+        if ($request->has('in_stock') && $request->in_stock === '1') {
+            $query->where('availability', 'in_stock');
+        }
+
+        if ($request->has('min_purity') && $request->min_purity) {
+            $minPurity = (float) $request->min_purity;
+            // Extract purity from product name (looks for patterns like "99.2%", "99%", etc.)
+            // Using REGEXP_SUBSTR to extract the number before the % sign, then remove % and convert to decimal
+            $query->whereRaw(
+                "CAST(REPLACE(REGEXP_SUBSTR(name, '[0-9]+(\\.[0-9]+)?\\s*%'), '%', '') AS DECIMAL(5,2)) >= ?",
+                [$minPurity]
+            );
+        }
+
         // Apply sorting - default to price ascending
         // When sorting by price, use discount_price if available, otherwise use price
         $sortBy = $request->get('sort', 'price');
@@ -215,6 +229,12 @@ class ProductsController extends Controller
         
         if ($sortBy === 'price') {
             $query->orderByRaw('COALESCE(discount_price, price) ' . $sortDir);
+        } elseif ($sortBy === 'popular') {
+            // Sort by review count (rating_count) in descending order
+            $query->orderBy('rating_count', 'desc');
+        } elseif ($sortBy === 'rating') {
+            // Sort by rating average (rating_average) in the specified direction
+            $query->orderBy('rating_average', $sortDir);
         } else {
             $query->orderBy($sortBy, $sortDir);
         }
@@ -319,6 +339,20 @@ class ProductsController extends Controller
             $query->where('price', '<=', $request->cost_max);
         }
 
+        if ($request->has('in_stock') && $request->in_stock === '1') {
+            $query->where('availability', 'in_stock');
+        }
+
+        if ($request->has('min_purity') && $request->min_purity) {
+            $minPurity = (float) $request->min_purity;
+            // Extract purity from product name (looks for patterns like "99.2%", "99%", etc.)
+            // Using REGEXP_SUBSTR to extract the number before the % sign, then remove % and convert to decimal
+            $query->whereRaw(
+                "CAST(REPLACE(REGEXP_SUBSTR(name, '[0-9]+(\\.[0-9]+)?\\s*%'), '%', '') AS DECIMAL(5,2)) >= ?",
+                [$minPurity]
+            );
+        }
+
         // Apply sorting - default to price ascending
         // When sorting by price, use discount_price if available, otherwise use price
         $sortBy = $request->get('sort', 'price');
@@ -328,6 +362,12 @@ class ProductsController extends Controller
         
         if ($sortBy === 'price') {
             $query->orderByRaw('COALESCE(discount_price, price) ' . $sortDir);
+        } elseif ($sortBy === 'popular') {
+            // Sort by review count (rating_count) in descending order
+            $query->orderBy('rating_count', 'desc');
+        } elseif ($sortBy === 'rating') {
+            // Sort by rating average (rating_average) in the specified direction
+            $query->orderBy('rating_average', $sortDir);
         } else {
             $query->orderBy($sortBy, $sortDir);
         }

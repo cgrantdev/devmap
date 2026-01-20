@@ -36,7 +36,23 @@
     <!-- Discover Peptides Section -->
     <section class="py-16 bg-white">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 p-0 w-full">Discover Peptides</h2>
+        <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-4 p-0 w-full">Peptides Categories</h2>
+        <p class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800 text-center mb-8">Browse by category to find the perfect peptides for your needs</p>
+        
+        <!-- Search Bar -->
+        <div class="mb-8 flex justify-center">
+          <div class="relative w-full max-w-2xl">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search categories..."
+              class="w-full pl-12 pr-5 py-3 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white"
+            />
+            <svg class="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
           <CategoryCard
@@ -107,16 +123,29 @@ const props = defineProps({
 const heroBgRef = ref(null)
 const heroBgLoaded = ref(false)
 
+// Search functionality
+const searchQuery = ref('')
+
 // Products display
 const itemsPerPage = 8
 const displayedCount = ref(itemsPerPage)
 
+const filteredProducts = computed(() => {
+  if (!searchQuery.value.trim()) {
+    return props.productGroups
+  }
+  const query = searchQuery.value.toLowerCase().trim()
+  return props.productGroups.filter(product => 
+    product.name.toLowerCase().includes(query)
+  )
+})
+
 const displayedProducts = computed(() => {
-  return props.productGroups.slice(0, displayedCount.value)
+  return filteredProducts.value.slice(0, displayedCount.value)
 })
 
 const hasMoreProducts = computed(() => {
-  return displayedCount.value < props.productGroups.length
+  return displayedCount.value < filteredProducts.value.length
 })
 
 const loadMore = () => {

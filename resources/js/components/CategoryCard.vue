@@ -24,16 +24,16 @@
         {{ name }}
       </h3>
       <p class="font-roboto font-normal text-sm leading-relaxed text-gray-500 text-center m-0">
-        Total items {{ totalItems }}
+        {{ totalItems }} products
       </p>
-      <MainButton
+      <!-- <MainButton
         :to="to"
         text="Shop Now"
         size="second"
         bg-color="gray-200"
         @click.stop
         class="mt-auto"
-      />
+      /> -->
     </div>
   </div>
 </template>
@@ -41,7 +41,7 @@
 <script setup>
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import MainButton from '@/components/MainButton.vue'
+// import MainButton from '@/components/MainButton.vue'
 
 const props = defineProps({
   name: { type: String, required: true },
