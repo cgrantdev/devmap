@@ -247,6 +247,9 @@
                 :brand-name="product.brand?.name"
                 :rating-average="product.rating_average"
                 :rating-count="product.rating_count"
+                :category-name="product.category?.name || ''"
+                :size-mg="product.size_mg"
+                :availability="product.availability"
                 :to="`/product/${product.slug}/${product.id}`"
               />
             </div>

@@ -32,7 +32,7 @@ const props = defineProps({
     type: String,
     default: 'gray-800',
     validator: (value) => {
-      return ['gray-800', 'white', 'slate-50', 'gray-200', 'gray-700'].includes(value)
+      return ['gray-800', 'white', 'slate-50', 'gray-200', 'gray-700', 'blue-600'].includes(value)
     }
   },
   size: {
@@ -82,7 +82,8 @@ const buttonClasses = computed(() => {
     'white': 'bg-white text-gray-800 hover:bg-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.1)]',
     'slate-50': 'bg-slate-50 text-gray-700 hover:bg-gray-100',
     'gray-200': 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-    'gray-700': 'bg-gray-700 text-white hover:bg-gray-600'
+    'gray-700': 'bg-gray-700 text-white hover:bg-gray-600',
+    'blue-600': 'bg-blue-600 text-white hover:bg-blue-700'
   }
   
   const widthClass = props.fullWidth ? 'w-full' : 'w-fit' 

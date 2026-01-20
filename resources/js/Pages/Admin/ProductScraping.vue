@@ -703,7 +703,9 @@ function updateConfig() {
 }
 
 function toggleOverride(productId) {
-  router.post(`/admin/product-scraping/products/${productId}/toggle-override`, {}, {
+  router.post(`/admin/product-scraping/products/${productId}/toggle-override`, {
+    _token: csrf
+  }, {
     preserveScroll: true
   })
 }

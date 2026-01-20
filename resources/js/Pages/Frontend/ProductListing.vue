@@ -39,11 +39,12 @@
     <section class="py-16 bg-white">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Product Name Title -->
-        <h2 class="font-hv-muse font-normal text-center text-5xl leading-normal tracking-normal text-gray-800 m-0 mb-6">{{ productName }}</h2>
+        <h2 class="font-hv-muse font-normal text-center text-5xl leading-normal tracking-normal text-gray-800 m-0 mb-2">{{ productName }}</h2>
+        <p class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800 text-center mb-6">Compare prices, check availability, and read verified reviews.</p>
 
         <!-- Main Content Area (Full Width) -->
         <div class="w-full">
-            <!-- Search Bar, Item Count, and Sort (First Row) -->
+            <!-- Search Bar, Sort, and Filters (First Row) -->
             <div class="mb-4 flex items-center gap-4">
               <!-- Search Bar -->
               <div class="relative flex-1 min-w-[200px] max-w-md">
@@ -51,7 +52,7 @@
                   v-model="searchQuery"
                   @input="handleSearchInput"
                   type="text"
-                  placeholder="Search Peptide..."
+                  placeholder="Search products, brands, or categories..."
                   class="w-full pl-12 pr-5 py-3 border border-black rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
                 <svg class="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,58 +60,232 @@
                 </svg>
               </div>
 
-              <!-- Item Count and Sort (on the right) -->
+              <!-- Sort and Filters (on the right) -->
               <div class="flex items-center gap-4 ml-auto">
-                <span class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800">{{ products.total }} Items</span>
                 <div class="relative">
                   <MainButton
-                    text="Sort Items"
+                    :text="currentSortLabel"
                     size="custom-small"
-                    bg-color="gray-200"
-                    :svg="sortIcon"
+                    bg-color="gray-200"                    
                     @click="showSortDropdown = !showSortDropdown"
                   />
                   <div 
                     v-if="showSortDropdown"
-                    class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10 border border-gray-200"
+                    class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-10 border border-gray-200"
                   >
+                    <button 
+                      @click="applySort('popular', 'desc')"
+                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
+                      :class="{ 'bg-gray-100': props.sort === 'popular' }"
+                    >
+                      Most Popular
+                    </button>
+                    <button 
+                      @click="applySort('rating', 'desc')"
+                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
+                      :class="{ 'bg-gray-100': props.sort === 'rating' }"
+                    >
+                      Highest Rated
+                    </button>
                     <button 
                       @click="applySort('price', 'asc')"
                       class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
-                    >
-                      <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
-                        <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      Low to High
+                      :class="{ 'bg-gray-100': props.sort === 'price' && props.sortDir === 'asc' }"
+                    >                      
+                      Price: Low to High
                     </button>
                     <button 
                       @click="applySort('price', 'desc')"
                       class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
+                      :class="{ 'bg-gray-100': props.sort === 'price' && props.sortDir === 'desc' }"
                     >
-                      <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0">
-                        <g transform="translate(0,18) scale(1,-1)">
-                          <path d="M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13" stroke="#1F2937" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </g>
-                      </svg>
-                      High to Low
+                      Price: High to Low
                     </button>
                   </div>
                 </div>
+                <MainButton
+                  text="Filters"
+                  :bg-color="showFilterPanel ? 'blue-600' : 'gray-200'"
+                  size="custom-small"
+                  :svg="filterIcon"
+                  @click="showFilterPanel = !showFilterPanel"
+                />
               </div>
             </div>
 
-            <!-- Filter By Label and Filter Buttons (Second Row) -->
-            <div class="mb-6 flex items-center gap-2 flex-wrap">
-              <span class="font-roboto font-medium text-sm leading-none tracking-normal text-gray-800">Filter By</span>
-              <MainButton
-                v-for="filter in quickFilters"
-                :key="filter.key"
-                :text="filter.label"
-                :badge="getFilterCount(filter.key) > 0 ? getFilterCount(filter.key) : null"
-                size="custom-small"
-                :bg-color="activeFilters[filter.key] ? 'gray-800' : 'gray-200'"
-                @click="toggleQuickFilter(filter.key)"
-              />
+            <!-- Filter Panel -->
+            <div v-if="showFilterPanel" class="mb-6 bg-white border border-gray-200 rounded-lg p-6">
+              <!-- Checkboxes -->
+              <div class="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    v-model="selectedFilters.inStock"
+                    @change="applyFilters"
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800">In Stock Only</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    v-model="selectedFilters.onSale"
+                    @change="applyFilters"
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800">On Sale</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    v-model="selectedFilters.labTested"
+                    @change="applyFilters"
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800">Lab Tested</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    v-model="selectedFilters.firstTimerDeals"
+                    @change="applyFilters"
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800">First-Timer Deals</span>
+                </label>
+              </div>
+
+              <!-- Min Purity Slider and Price Range (Side by Side) -->
+              <div class="mb-6 flex flex-col sm:flex-row gap-6">
+                <!-- Min Purity Slider -->
+                <div class="flex-[2]">
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800">Min Purity: {{ selectedFilters.minPurity }}%</label>
+                  </div>
+                  <div class="relative">
+                    <div 
+                      class="absolute inset-0 h-2 bg-gray-200 rounded-lg pointer-events-none"
+                      :style="{ background: `linear-gradient(to right, #2563eb ${selectedFilters.minPurity}%, #e5e7eb ${selectedFilters.minPurity}%)` }"
+                    ></div>
+                    <input 
+                      type="range"
+                      v-model.number="selectedFilters.minPurity"
+                      @input="applyFilters"
+                      min="0"
+                      max="100"
+                      step="1"
+                      class="w-full h-2 rounded-lg appearance-none cursor-pointer relative z-10 bg-transparent"
+                      style="accent-color: #2563eb;"
+                    />
+                  </div>
+                </div>
+
+                <!-- Price Range -->
+                <div class="flex-1">
+                  <label class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 mb-2 block">Price Range: ${{ selectedFilters.cost_min || 0 }} - ${{ selectedFilters.cost_max || 200 }}</label>
+                  <div class="flex items-center gap-2">
+                    <input 
+                      type="number"
+                      v-model.number="selectedFilters.cost_min"
+                      @change="applyFilters"
+                      placeholder="0"
+                      min="0"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-600">-</span>
+                    <input 
+                      type="number"
+                      v-model.number="selectedFilters.cost_max"
+                      @change="applyFilters"
+                      placeholder="200"
+                      min="0"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Active Filters -->
+              <div v-if="hasActiveFilters" class="flex items-center gap-2 flex-wrap">
+                <span class="font-roboto font-medium text-sm leading-normal tracking-normal text-gray-800">Active filters:</span>
+                <span
+                  v-if="selectedFilters.minPurity > 0"
+                  class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-roboto font-normal text-sm leading-normal tracking-normal"
+                >
+                  {{ selectedFilters.minPurity }}% Purity
+                  <button @click="removePurityFilter" class="hover:text-blue-900">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </span>
+                <span
+                  v-if="selectedFilters.inStock"
+                  class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-roboto font-normal text-sm leading-normal tracking-normal"
+                >
+                  In Stock Only
+                  <button @click="selectedFilters.inStock = false; applyFilters()" class="hover:text-blue-900">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </span>
+                <span
+                  v-if="selectedFilters.onSale"
+                  class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-roboto font-normal text-sm leading-normal tracking-normal"
+                >
+                  On Sale
+                  <button @click="selectedFilters.onSale = false; applyFilters()" class="hover:text-blue-900">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </span>
+                <span
+                  v-if="selectedFilters.labTested"
+                  class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-roboto font-normal text-sm leading-normal tracking-normal"
+                >
+                  Lab Tested
+                  <button @click="selectedFilters.labTested = false; applyFilters()" class="hover:text-blue-900">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </span>
+                <span
+                  v-if="selectedFilters.firstTimerDeals"
+                  class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-roboto font-normal text-sm leading-normal tracking-normal"
+                >
+                  First-Timer Deals
+                  <button @click="selectedFilters.firstTimerDeals = false; applyFilters()" class="hover:text-blue-900">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </span>
+                <span
+                  v-if="selectedFilters.cost_min || selectedFilters.cost_max"
+                  class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-roboto font-normal text-sm leading-normal tracking-normal"
+                >
+                  Price Range
+                  <button @click="selectedFilters.cost_min = ''; selectedFilters.cost_max = ''; applyFilters()" class="hover:text-blue-900">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </span>
+                <button 
+                  @click="clearFilters"
+                  class="text-blue-600 hover:text-blue-800 font-roboto font-normal text-sm leading-normal tracking-normal underline"
+                >
+                  Clear all
+                </button>
+              </div>
+            </div>
+
+            <!-- Products Found (moved to bottom left) -->
+            <div class="mb-4">
+              <span class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800">{{ products.total }} products found</span>
             </div>
 
             <!-- Product Grid -->
@@ -125,278 +300,15 @@
                 :brand-name="product.brand?.name"
                 :rating-average="product.rating_average"
                 :rating-count="product.rating_count"
+                :category-name="product.category?.name || ''"
+                :size-mg="product.size_mg"
+                :availability="product.availability"
                 :to="`/product/${product.slug}/${product.id}`"
               />
             </div>
-
-            <!-- Pagination -->
-            <Pagination
-              :pagination="products"
-              :get-page-url="getPageUrl"
-              :per-page-options="[10, 20, 50, 100]"
-              :on-per-page-change="handlePerPageChange"
-            />
           </div>
         </div>
     </section>
-
-    <!-- Filter Sidebar Modal Overlay -->
-    <div 
-      v-if="showSidebar"
-      class="fixed inset-0 z-50 flex"
-      @click="showSidebar = false"
-    >
-      <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/50"></div>
-      
-      <!-- Sidebar -->
-      <div class="w-full sm:w-96 bg-white shadow-xl overflow-y-auto ml-auto relative z-10" @click.stop>
-        <div class="p-6 border-b border-gray-200">
-          <div class="flex items-center justify-between">
-            <h3 class="font-hv-muse font-normal text-2xl leading-normal tracking-normal text-teal-700 m-0">Filter Peptides</h3>
-            <button 
-              @click="showSidebar = false"
-              class="text-gray-500 hover:text-gray-700"
-            >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="p-6 space-y-4">
-          <!-- Use Filter -->
-          <div>
-            <button 
-              @click="expandedFilters.use = !expandedFilters.use"
-              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
-            >
-              <span>Use</span>
-              <svg class="w-5 h-5" :class="expandedFilters.use ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div v-if="expandedFilters.use" class="mt-2 space-y-2">
-              <label 
-                v-for="use in filterOptions.uses"
-                :key="use.id"
-                class="flex items-center gap-2 cursor-pointer"
-              >
-                <input 
-                  type="radio"
-                  :value="use.id"
-                  v-model="selectedFilters.use"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                  name="use-filter"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">{{ use.name }}</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Type Filter -->
-          <div>
-            <button 
-              @click="expandedFilters.type = !expandedFilters.type"
-              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
-            >
-              <span>Type</span>
-              <svg class="w-5 h-5" :class="expandedFilters.type ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div v-if="expandedFilters.type" class="mt-2 space-y-2">
-              <label 
-                v-for="type in filterOptions.types"
-                :key="type.id"
-                class="flex items-center gap-2 cursor-pointer"
-              >
-                <input 
-                  type="radio"
-                  :value="type.id"
-                  v-model="selectedFilters.type"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                  name="type-filter"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">{{ type.name }}</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Cost Filter -->
-          <div>
-            <button 
-              @click="expandedFilters.cost = !expandedFilters.cost"
-              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
-            >
-              <span>Cost</span>
-              <svg class="w-5 h-5" :class="expandedFilters.cost ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div v-if="expandedFilters.cost" class="mt-2 space-y-2">
-              <div class="flex items-center gap-2">
-                <input 
-                  type="number"
-                  v-model.number="selectedFilters.cost_min"
-                  @change="applyFilters"
-                  placeholder="Min"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-600">to</span>
-                <input 
-                  type="number"
-                  v-model.number="selectedFilters.cost_max"
-                  @change="applyFilters"
-                  placeholder="Max"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Location Filter -->
-          <div>
-            <button 
-              @click="expandedFilters.location = !expandedFilters.location"
-              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
-            >
-              <span>Location</span>
-              <svg class="w-5 h-5" :class="expandedFilters.location ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div v-if="expandedFilters.location" class="mt-2 space-y-2">
-              <label 
-                class="flex items-center gap-2 cursor-pointer"
-              >
-                <input 
-                  type="radio"
-                  :value="null"
-                  v-model="selectedFilters.location"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                  name="location-filter"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">All Locations</span>
-              </label>
-              <label 
-                v-for="location in filterOptions.locations"
-                :key="location.id"
-                class="flex items-center gap-2 cursor-pointer"
-              >
-                <input 
-                  type="radio"
-                  :value="location.id"
-                  v-model="selectedFilters.location"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                  name="location-filter"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">{{ location.name }}</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Verification Filter -->
-          <div>
-            <button 
-              @click="expandedFilters.verification = !expandedFilters.verification"
-              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
-            >
-              <span>Verification</span>
-              <svg class="w-5 h-5" :class="expandedFilters.verification ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div v-if="expandedFilters.verification" class="mt-2 space-y-2">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="radio"
-                  value=""
-                  v-model="selectedFilters.verification"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">All</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="radio"
-                  value="1"
-                  v-model="selectedFilters.verification"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">Verified</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="radio"
-                  value="0"
-                  v-model="selectedFilters.verification"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">Not Verified</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Brand Filter -->
-          <div>
-            <button 
-              @click="expandedFilters.brand = !expandedFilters.brand"
-              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
-            >
-              <span>Brand</span>
-              <svg class="w-5 h-5" :class="expandedFilters.brand ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div v-if="expandedFilters.brand" class="mt-2 space-y-2">
-              <label 
-                v-for="brand in filterOptions.brands"
-                :key="brand.id"
-                class="flex items-center gap-2 cursor-pointer"
-              >
-                <input 
-                  type="radio"
-                  :value="brand.id"
-                  v-model="selectedFilters.brand"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                  name="brand-filter"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">{{ brand.name }}</span>
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class="p-6 border-t border-gray-200 flex gap-4">
-          <button 
-            @click="clearFilters"
-            class="flex-1 py-2 px-4 rounded-[500px] bg-gray-200 font-roboto font-medium text-sm leading-none tracking-normal text-gray-800 hover:bg-gray-300 flex items-center justify-center gap-2"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-            Clear Filters
-          </button>
-          <button 
-            @click="applyFilters"
-            class="flex-1 py-2 px-4 rounded-[500px] bg-teal-700 font-roboto font-medium text-sm leading-none tracking-normal text-white hover:bg-teal-800 flex items-center justify-center gap-2"
-          >
-            Show ({{ products.total }})
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
   </FrontLayout>
 </template>
 
@@ -406,7 +318,6 @@ import { Link, router, usePage } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import MainButton from '@/components/MainButton.vue'
-import Pagination from '@/components/Pagination.vue'
 
 const props = defineProps({
   productName: String,
@@ -426,62 +337,27 @@ const heroBgLoaded = ref(false)
 
 // Sort dropdown
 const showSortDropdown = ref(false)
-// Filter sidebar
-const showSidebar = ref(false)
+// Filter panel
+const showFilterPanel = ref(false)
 // Initialize searchQuery from props or URL
 const searchQuery = ref(props.search || '')
-const perPage = ref(props.products.per_page || 20)
 
-// Sort icon component
-const sortIcon = computed(() => {
-  if (props.sortDir === 'asc') {
-    return h('svg', {
-      width: '20',
-      height: '18',
-      viewBox: '0 0 20 18',
-      fill: 'none',
-      xmlns: 'http://www.w3.org/2000/svg'
-    }, [
-      h('path', {
-        d: 'M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13',
-        stroke: '#1F2937',
-        'stroke-width': '2',
-        'stroke-linecap': 'round',
-        'stroke-linejoin': 'round'
-      })
-    ])
-  } else {
-    return h('svg', {
-      width: '20',
-      height: '18',
-      viewBox: '0 0 20 18',
-      fill: 'none',
-      xmlns: 'http://www.w3.org/2000/svg'
-    }, [
-      h('g', {
-        transform: 'translate(0,18) scale(1,-1)'
-      }, [
-        h('path', {
-          d: 'M1 1H14M1 5H10M1 9H10M15 5V17M15 17L11 13M15 17L19 13',
-          stroke: '#1F2937',
-          'stroke-width': '2',
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round'
-        })
-      ])
-    ])
-  }
-})
-
-// Expanded filters - expand location if it has an active filter
-const expandedFilters = ref({
-  use: false,
-  type: false,
-  cost: false,
-  location: props.filters?.location ? true : false,
-  verification: false,
-  brand: false,
-})
+// Filter icon component
+const filterIcon = h('svg', {
+  width: '20',
+  height: '20',
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  xmlns: 'http://www.w3.org/2000/svg'
+}, [
+  h('path', {
+    d: 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z',
+    'stroke-width': '2',
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round'
+  })
+])
 
 // Selected filters
 const selectedFilters = ref({
@@ -492,46 +368,43 @@ const selectedFilters = ref({
   brand: props.filters?.brand ? parseInt(props.filters.brand) : null,
   cost_min: props.filters?.cost_min || '',
   cost_max: props.filters?.cost_max || '',
+  inStock: props.filters?.in_stock === '1' || false,
+  onSale: props.filters?.on_sale === '1' || false,
+  labTested: props.filters?.lab_tested === '1' || false,
+  firstTimerDeals: props.filters?.first_timer_deals === '1' || false,
+  minPurity: props.filters?.min_purity ? parseInt(props.filters.min_purity) : 0,
 })
 
-// Quick filters
-const quickFilters = [
-  { key: 'use', label: 'Use' },
-  { key: 'type', label: 'Type' },
-  { key: 'cost', label: 'Cost' },
-  { key: 'location', label: 'Location' },
-  { key: 'verification', label: 'Verification' },
-  { key: 'brand', label: 'Brand' },
-]
-
-// Active filters for quick filter buttons
-const activeFilters = computed(() => {
-  return {
-    use: selectedFilters.value.use !== null,
-    type: selectedFilters.value.type !== null,
-    cost: selectedFilters.value.cost_min || selectedFilters.value.cost_max,
-    location: selectedFilters.value.location !== null,
-    verification: selectedFilters.value.verification !== '',
-    brand: selectedFilters.value.brand !== null,
-  }
+// Current sort label
+const currentSortLabel = computed(() => {
+  if (props.sort === 'popular') return 'Most Popular'
+  if (props.sort === 'rating') return 'Highest Rated'
+  if (props.sort === 'price' && props.sortDir === 'asc') return 'Price: Low to High'
+  if (props.sort === 'price' && props.sortDir === 'desc') return 'Price: High to Low'
+  return 'Most Popular'
 })
 
-const getFilterCount = (key) => {
-  if (key === 'use') return selectedFilters.value.use !== null ? 1 : 0
-  if (key === 'type') return selectedFilters.value.type !== null ? 1 : 0
-  if (key === 'location') return selectedFilters.value.location !== null ? 1 : 0
-  if (key === 'brand') return selectedFilters.value.brand !== null ? 1 : 0
-  if (key === 'verification') return selectedFilters.value.verification !== '' ? 1 : 0
-  if (key === 'cost') return (selectedFilters.value.cost_min || selectedFilters.value.cost_max) ? 1 : 0
-  return 0
-}
 
-const toggleQuickFilter = (key) => {
-  // Show sidebar and expand the filter section when clicking quick filter button
-  showSidebar.value = true
-  if (key === 'use' || key === 'type' || key === 'location' || key === 'brand' || key === 'verification' || key === 'cost') {
-    expandedFilters.value[key] = true
-  }
+// Check if there are active filters
+const hasActiveFilters = computed(() => {
+  return selectedFilters.value.minPurity > 0 ||
+    selectedFilters.value.inStock ||
+    selectedFilters.value.onSale ||
+    selectedFilters.value.labTested ||
+    selectedFilters.value.firstTimerDeals ||
+    selectedFilters.value.cost_min ||
+    selectedFilters.value.cost_max ||
+    selectedFilters.value.use !== null ||
+    selectedFilters.value.type !== null ||
+    selectedFilters.value.location !== null ||
+    selectedFilters.value.verification !== '' ||
+    selectedFilters.value.brand !== null
+})
+
+// Remove purity filter
+const removePurityFilter = () => {
+  selectedFilters.value.minPurity = 0
+  applyFilters()
 }
 
 const applyFilters = () => {
@@ -565,14 +438,26 @@ const applyFilters = () => {
   if (selectedFilters.value.cost_max) {
     params.set('cost_max', selectedFilters.value.cost_max)
   }
+  if (selectedFilters.value.inStock) {
+    params.set('in_stock', '1')
+  }
+  if (selectedFilters.value.onSale) {
+    params.set('on_sale', '1')
+  }
+  if (selectedFilters.value.labTested) {
+    params.set('lab_tested', '1')
+  }
+  if (selectedFilters.value.firstTimerDeals) {
+    params.set('first_timer_deals', '1')
+  }
+  if (selectedFilters.value.minPurity > 0) {
+    params.set('min_purity', selectedFilters.value.minPurity)
+  }
   if (props.sort) {
     params.set('sort', props.sort)
   }
   if (props.sortDir) {
     params.set('sort_dir', props.sortDir)
-  }
-  if (perPage.value) {
-    params.set('per_page', perPage.value)
   }
 
   router.visit(`/product/${props.slug}?${params.toString()}`, {
@@ -590,6 +475,11 @@ const clearFilters = () => {
     brand: null,
     cost_min: '',
     cost_max: '',
+    inStock: false,
+    onSale: false,
+    labTested: false,
+    firstTimerDeals: false,
+    minPurity: 0,
   }
   applyFilters()
 }
@@ -631,9 +521,6 @@ const applySearch = () => {
     params.delete('search')
   }
   
-  // Reset to first page when searching
-  params.set('page', '1')
-  
   // Preserve other filters
   if (selectedFilters.value.use !== null) {
     params.set('use', selectedFilters.value.use)
@@ -658,14 +545,26 @@ const applySearch = () => {
   if (selectedFilters.value.cost_max) {
     params.set('cost_max', selectedFilters.value.cost_max)
   }
+  if (selectedFilters.value.inStock) {
+    params.set('in_stock', '1')
+  }
+  if (selectedFilters.value.onSale) {
+    params.set('on_sale', '1')
+  }
+  if (selectedFilters.value.labTested) {
+    params.set('lab_tested', '1')
+  }
+  if (selectedFilters.value.firstTimerDeals) {
+    params.set('first_timer_deals', '1')
+  }
+  if (selectedFilters.value.minPurity > 0) {
+    params.set('min_purity', selectedFilters.value.minPurity)
+  }
   if (props.sort) {
     params.set('sort', props.sort)
   }
   if (props.sortDir) {
     params.set('sort_dir', props.sortDir)
-  }
-  if (perPage.value) {
-    params.set('per_page', perPage.value)
   }
   
   router.visit(`/product/${props.slug}?${params.toString()}`, {
@@ -674,26 +573,6 @@ const applySearch = () => {
   })
 }
 
-const applyPerPage = () => {
-  applyFilters()
-}
-
-const handlePerPageChange = (newPerPage) => {
-  perPage.value = newPerPage
-  const params = new URLSearchParams(window.location.search)
-  params.set('per_page', newPerPage)
-  params.set('page', 1) // Reset to first page when changing per page
-  router.visit(`/product/${props.slug}?${params.toString()}`, {
-    preserveState: true,
-    preserveScroll: false,
-  })
-}
-
-const getPageUrl = (page) => {
-  const params = new URLSearchParams(window.location.search)
-  params.set('page', page)
-  return `/product/${props.slug}?${params.toString()}`
-}
 
 const handleCtaClick = (url) => {
   router.visit(url)
@@ -752,3 +631,43 @@ onMounted(() => {
 })
 </script>
 
+<style scoped>
+/* Make range input track transparent so background shows through */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+input[type="range"]::-webkit-slider-track {
+  background: transparent;
+  height: 8px;
+}
+
+input[type="range"]::-moz-range-track {
+  background: transparent;
+  height: 8px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #2563eb;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #2563eb;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+</style>

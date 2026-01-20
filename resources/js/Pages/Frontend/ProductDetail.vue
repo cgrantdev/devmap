@@ -279,8 +279,11 @@
               :price="relatedProduct.price"
               :discount-price="relatedProduct.discount_price"
               :brand-name="relatedProduct.brand?.name"
-              :rating-average="0"
-              :rating-count="0"
+              :rating-average="relatedProduct.rating_average || 0"
+              :rating-count="relatedProduct.rating_count || 0"
+              :category-name="relatedProduct.category?.name || ''"
+              :size-mg="relatedProduct.size_mg"
+              :availability="relatedProduct.availability"
               :to="`/product/${relatedProduct.slug}/${relatedProduct.id}`"
             />
           </div>
