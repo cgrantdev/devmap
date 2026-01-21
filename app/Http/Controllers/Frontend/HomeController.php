@@ -41,7 +41,11 @@ class HomeController extends Controller
 
         // Education categories (align with education page)
         $categories = ProductCategory::where('is_active', true)
-            ->withCount('products')
+            ->withCount([
+                'products as products_count' => function ($q) {
+                    $q->visible()->where('status', 'active');
+                }
+            ])
             ->with('educationPost')
             ->orderBy('name')
             ->get()
@@ -84,13 +88,19 @@ class HomeController extends Controller
         // Top brands (vendors) limited list for homepage
         $topBrands = Brand::where('is_active', true)
             ->with(['vendorSetting', 'vendorSetting.location'])
-            ->withCount('products')
+            ->withCount([
+                'products as products_count' => function ($q) {
+                    $q->visible()->where('status', 'active');
+                }
+            ])
             ->orderByDesc('products_count')
             ->take(5)
             ->get()
             ->map(function ($brand) {
                 // Get most common location from products
-                $locationId = Product::where('brand_id', $brand->id)
+                $locationId = Product::visible()
+                    ->where('status', 'active')
+                    ->where('brand_id', $brand->id)
                     ->whereNotNull('location_id')
                     ->selectRaw('location_id, COUNT(*) as count')
                     ->groupBy('location_id')
@@ -99,7 +109,9 @@ class HomeController extends Controller
                     ?->location_id;
 
                 if (!$locationId) {
-                    $locationId = Product::where('brand_id', $brand->id)
+                    $locationId = Product::visible()
+                        ->where('status', 'active')
+                        ->where('brand_id', $brand->id)
                         ->whereNotNull('location_id')
                         ->value('location_id');
                 }

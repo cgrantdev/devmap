@@ -44,6 +44,13 @@
             </select>
             <p class="text-sm text-slate-500 mt-1">Select a category for this product</p>
           </div>
+          <div class="flex items-center justify-between rounded-xl border border-slate-100 p-4">
+            <div>
+              <div class="font-semibold text-slate-800">Hidden</div>
+              <div class="text-sm text-slate-500">If checked, this product will not show up on the frontend listings.</div>
+            </div>
+            <input v-model="editForm.hidden" type="checkbox" class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+          </div>
           <div class="flex justify-end pt-4 border-t border-slate-100">
             <button type="submit" :disabled="editForm.processing" class="px-6 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-medium transition-colors disabled:opacity-50">
               {{ editForm.processing ? 'Saving...' : 'Update Product' }}
@@ -70,6 +77,7 @@ const props = defineProps({
 const editForm = useForm({
   name: props.product?.name || '',
   product_category_id: props.product?.product_category_id || null,
+  hidden: !!props.product?.hidden,
   _token: usePage().props.csrf_token
 })
 

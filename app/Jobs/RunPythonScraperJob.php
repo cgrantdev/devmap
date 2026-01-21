@@ -26,13 +26,13 @@ class RunPythonScraperJob implements ShouldQueue
         Log::info('Scraper payload', [ 'payload' => $payload ]);
         
         // Use the same pattern as the working VendorsController::runPythonScraper method
-        $pythonBin = dirname(base_path()) . '/venv/bin/python3.12';
-        // $pythonBin = '/usr/bin/python3';
+        // $pythonBin = dirname(base_path()) . '/venv/bin/python3.12';
+        $pythonBin = '/usr/bin/python3';
         $pythonScript = base_path() . '/pyscripts/script.py';        
         
         $escapedPayload = escapeshellarg($payload);
         
-        $command = 'sudo -u devuser ' . $pythonBin . ' ' . escapeshellarg($pythonScript) . ' ' . $escapedPayload . ' 2>&1';
+        $command = 'sudo ' . $pythonBin . ' ' . escapeshellarg($pythonScript) . ' ' . $escapedPayload . ' 2>&1';
         
         Log::info('Running Python scraper', ['command' => $command, 'url' => $this->config->products_url]);
         

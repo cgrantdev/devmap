@@ -55,6 +55,7 @@
               <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Category</th>
               <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Price</th>
               <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Rating</th>
+              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Hidden</th>
               <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Status</th>
               <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -99,6 +100,14 @@
                   <span class="text-sm text-slate-900">{{ product.rating || '0.0' }}</span>
                   <span v-if="product.review_count" class="text-xs text-slate-500">({{ product.review_count }})</span>
                 </div>
+              </td>
+              <td class="px-6 py-4">
+                <input
+                  type="checkbox"
+                  :checked="!!product.hidden"
+                  @change="toggleHidden(product, $event)"
+                  class="h-5 w-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
               </td>
               <td class="px-6 py-4">
                 <span v-if="product.original_price && product.original_price > product.price" class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs flex items-center gap-1 w-fit">
@@ -243,6 +252,26 @@ function goToPage(page) {
 const deleteForm = useForm({
   _token: usePage().props.csrf_token
 })
+
+const visibilityForm = useForm({
+  hidden: false,
+  _token: usePage().props.csrf_token
+})
+
+function toggleHidden(product, event) {
+  const hidden = !!event?.target?.checked
+  visibilityForm.hidden = hidden
+  visibilityForm.patch(`/admin/products/${product.id}/hidden`, {
+    preserveScroll: true,
+    onSuccess: () => {
+      fetchData()
+    },
+    onError: () => {
+      toastError('Failed to update visibility. Please try again.')
+      fetchData()
+    }
+  })
+}
 
 function deleteProduct(id) {
   if (confirm('Are you sure you want to delete this product?')) {

@@ -5,11 +5,14 @@
     :class="[buttonClasses, $attrs.class]"
     @click="handleClick"
   >
+    <span v-if="svg && iconPosition === 'left'" class="inline-flex items-center">
+      <component :is="svg" class="w-5 h-5" />
+    </span>
     <span>{{ text }}</span>
     <span v-if="badge" class="ml-1 bg-orange-500 text-white px-2 py-0.5 text-xs rounded">
       {{ badge }}
     </span>
-    <span v-if="svg" class="inline-flex items-center">
+    <span v-if="svg && iconPosition !== 'left'" class="inline-flex items-center">
       <component :is="svg" class="w-5 h-5" />
     </span>
   </component>
@@ -53,6 +56,13 @@ const props = defineProps({
   badge: {
     type: [String, Number],
     default: null
+  },
+  iconPosition: {
+    type: String,
+    default: 'right',
+    validator: (value) => {
+      return ['left', 'right'].includes(value)
+    }
   }
 })
 

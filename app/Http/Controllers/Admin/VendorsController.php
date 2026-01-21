@@ -492,6 +492,7 @@ class VendorsController extends Controller
                     'price' => $product->price,
                     'original_price' => $product->original_price ?? null,
                     'image_url' => $product->image_url,
+                    'hidden' => (bool) ($product->hidden ?? false),
                     'brand_id' => $product->brand_id,
                     'vendor_id' => $product->brand_id,
                     'vendor_name' => $product->brand ? $product->brand->name : '-',
