@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 shadow-sm hover:shadow-md"
+    class="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer group relative border-2 border-slate-300 shadow-md flex flex-col"
   >
     <!-- Top Section: Product Image -->
     <div class="w-full h-48 bg-[#F0F4F8] flex items-center justify-center p-6 relative overflow-hidden">
@@ -48,13 +48,13 @@
     <div class="p-4 flex flex-col gap-3 flex-1">
       <!-- Category Tag -->
       <div class="flex items-start justify-between">
-        <span class="inline-block bg-gray-200 text-gray-700 rounded px-2 py-1 font-roboto font-normal text-xs leading-normal">
+        <span class="inline-block text-gray-700 rounded px-2 py-1 font-roboto font-normal text-xs leading-normal">
           {{ categoryName }}
         </span>
       </div>
 
       <!-- Product Title -->
-      <h3 class="font-roboto font-bold text-lg leading-tight text-gray-800 m-0">
+      <h3 class="font-roboto font-normal text-lg leading-tight text-gray-800 group-hover:text-blue-600 transition-colors duration-200 m-0">
         {{ name }}
       </h3>
 
@@ -65,10 +65,10 @@
 
       <!-- Specification Tags -->
       <div class="flex items-center gap-2 flex-wrap">
-        <span v-if="purity" class="inline-block bg-green-600 text-white rounded px-2 py-1 font-roboto font-normal text-xs leading-normal">
+        <span v-if="purity" class="inline-block text-green-600 rounded px-2 py-1 font-roboto font-normal text-xs leading-normal">
           {{ purity }}% Pure
         </span>
-        <span v-if="sizeDisplay" class="inline-block bg-gray-200 text-gray-700 rounded px-2 py-1 font-roboto font-normal text-xs leading-normal">
+        <span v-if="sizeDisplay" class="inline-block text-gray-700 rounded px-2 py-1 font-roboto font-normal text-xs leading-normal">
           {{ sizeDisplay }}
         </span>
       </div>
@@ -90,14 +90,19 @@
       </div>
 
       <!-- Stock Status -->
-      <div class="flex items-center gap-1.5">
-        <div 
-          class="w-2 h-2 rounded-full"
-          :class="isInStock ? 'bg-green-500' : 'bg-red-500'"
-        ></div>
-        <span class="font-roboto font-normal text-sm leading-normal text-gray-800">
-          {{ stockStatus }}
-        </span>
+      <div class="inline-flex items-center gap-1.5 px-2.5 py-1">
+        <div
+          class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 border"
+          :class="isInStock ? 'border-green-300 text-green-700' : 'border-red-300 text-red-700'"
+        >
+          <div 
+            class="w-2 h-2 rounded-full"
+            :class="isInStock ? 'bg-green-500' : 'bg-red-500'"
+          ></div>
+          <span class="font-roboto font-normal text-sm leading-normal">
+            {{ stockStatus }}
+          </span>
+        </div>
       </div>
 
       <!-- Price -->

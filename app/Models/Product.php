@@ -21,6 +21,7 @@ class Product extends Model
         'size_mg',
         'availability',
         'status',
+        'hidden',
         'verified',
         'rating_average',
         'rating_count',
@@ -57,7 +58,13 @@ class Product extends Model
 
     protected $casts = [
         'last_scraped_at' => 'datetime',
+        'hidden' => 'boolean',
     ];
+
+    public function scopeVisible($query)
+    {
+        return $query->where('hidden', false);
+    }
 
     /**
      * Get the decoded product name (HTML entities decoded)

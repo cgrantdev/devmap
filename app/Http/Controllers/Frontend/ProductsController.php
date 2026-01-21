@@ -19,7 +19,11 @@ class ProductsController extends Controller
     {
         // Get all active product categories with product counts
         $categories = ProductCategory::where('is_active', true)
-            ->withCount('products')
+            ->withCount([
+                'products as products_count' => function ($q) {
+                    $q->visible()->where('status', 'active');
+                }
+            ])
             ->orderBy('name')
             ->get()
             ->map(function ($category) {
@@ -29,7 +33,9 @@ class ProductsController extends Controller
                     $image = \Illuminate\Support\Facades\Storage::url('categories/' . $category->image_url);
                 } else {
                 // Get a sample product image for this category
-                $sampleProduct = Product::where('product_category_id', $category->id)
+                $sampleProduct = Product::visible()
+                    ->where('status', 'active')
+                    ->where('product_category_id', $category->id)
                     ->whereNotNull('image_url')
                     ->first();
                     $image = $sampleProduct ? $sampleProduct->image_url : '/images/peptides/default.png';
@@ -54,6 +60,7 @@ class ProductsController extends Controller
     {
         // Find product by id and slug
         $product = Product::with(['brand', 'location', 'types', 'puses', 'category', 'brand.vendorSetting'])
+            ->visible()
             ->where('id', $id)
             ->where('slug', $slug)
             ->where('status', 'active')
@@ -65,6 +72,7 @@ class ProductsController extends Controller
 
         // Get related products (same category, different product)
         $relatedProducts = Product::with(['brand'])
+            ->visible()
             ->where('product_category_id', $product->product_category_id)
             ->where('id', '!=', $product->id)
             ->where('status', 'active')
@@ -155,6 +163,7 @@ class ProductsController extends Controller
 
         // Start building query for products in this category
         $query = Product::with(['brand', 'location', 'types', 'puses', 'category'])
+            ->visible()
             ->where('product_category_id', $category->id)
             ->where('status', 'active');
 
@@ -244,17 +253,25 @@ class ProductsController extends Controller
         $products = $query->paginate($perPage)->withQueryString();
 
         // Get filter options for this category
-        $baseQuery = Product::where('product_category_id', $category->id);
+        $baseQuery = Product::visible()
+            ->where('status', 'active')
+            ->where('product_category_id', $category->id);
 
         $filterOptions = [
             'uses' => Puse::whereHas('products', function ($q) use ($category) {
-                $q->where('product_category_id', $category->id);
+                $q->visible()
+                  ->where('status', 'active')
+                  ->where('product_category_id', $category->id);
             })->get(['id', 'name']),
             'types' => Type::whereHas('products', function ($q) use ($category) {
-                $q->where('product_category_id', $category->id);
+                $q->visible()
+                  ->where('status', 'active')
+                  ->where('product_category_id', $category->id);
             })->get(['id', 'name']),
             'brands' => Brand::whereHas('products', function ($q) use ($category) {
-                $q->where('product_category_id', $category->id);
+                $q->visible()
+                  ->where('status', 'active')
+                  ->where('product_category_id', $category->id);
             })->get(['id', 'name']),
             // Provide all locations from the locations table so the filter always shows full list
             'locations' => Location::orderBy('name')->get(['id', 'name']),
@@ -292,6 +309,7 @@ class ProductsController extends Controller
 
         // Build query for all products of this brand
         $query = Product::with(['brand', 'location', 'types', 'puses', 'category'])
+            ->visible()
             ->where('brand_id', $brandId)
             ->where('status', 'active');
 
@@ -377,14 +395,20 @@ class ProductsController extends Controller
         $products = $query->paginate($perPage)->withQueryString();
 
         // Get filter options for this brand
-        $baseQuery = Product::where('brand_id', $brandId);
+        $baseQuery = Product::visible()
+            ->where('status', 'active')
+            ->where('brand_id', $brandId);
 
         $filterOptions = [
             'uses' => Puse::whereHas('products', function ($q) use ($brandId) {
-                $q->where('brand_id', $brandId);
+                $q->visible()
+                  ->where('status', 'active')
+                  ->where('brand_id', $brandId);
             })->get(['id', 'name']),
             'types' => Type::whereHas('products', function ($q) use ($brandId) {
-                $q->where('brand_id', $brandId);
+                $q->visible()
+                  ->where('status', 'active')
+                  ->where('brand_id', $brandId);
             })->get(['id', 'name']),
             'brands' => Brand::where('id', $brandId)->get(['id', 'name']),
             // Provide all locations from the locations table so the filter always shows full list

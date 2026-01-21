@@ -29,6 +29,7 @@ class ProductsController extends Controller
                 'id' => $product->id,
                 'name' => $product->name,
                 'product_category_id' => $product->product_category_id,
+                'hidden' => (bool) $product->hidden,
             ],
             'categories' => $categories,
         ]);
@@ -41,12 +42,28 @@ class ProductsController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'product_category_id' => 'nullable|exists:product_categories,id',
+            'hidden' => 'sometimes|boolean',
         ]);
         
         $product->update($validated);
         
         return redirect()->route('admin.products')
             ->with('success', 'Product updated successfully.');
+    }
+
+    public function setHidden(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+            'hidden' => 'required|boolean',
+        ]);
+
+        $product->update([
+            'hidden' => $validated['hidden'],
+        ]);
+
+        return redirect()->back()->with('success', 'Product visibility updated.');
     }
 
     public function destroy($id)

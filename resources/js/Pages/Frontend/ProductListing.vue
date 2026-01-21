@@ -47,13 +47,13 @@
             <!-- Search Bar, Sort, and Filters (First Row) -->
             <div class="mb-4 flex items-center gap-4">
               <!-- Search Bar -->
-              <div class="relative flex-1 min-w-[200px] max-w-md">
+              <div class="relative flex-1 min-w-[200px]">
                 <input
                   v-model="searchQuery"
                   @input="handleSearchInput"
                   type="text"
                   placeholder="Search products, brands, or categories..."
-                  class="w-full pl-12 pr-5 py-3 border border-black rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  class="w-full h-[52px] pl-12 pr-5 py-0 border border-black rounded-md font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
                 <svg class="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -63,51 +63,29 @@
               <!-- Sort and Filters (on the right) -->
               <div class="flex items-center gap-4 ml-auto">
                 <div class="relative">
-                  <MainButton
-                    :text="currentSortLabel"
-                    size="custom-small"
-                    bg-color="gray-200"                    
-                    @click="showSortDropdown = !showSortDropdown"
-                  />
-                  <div 
-                    v-if="showSortDropdown"
-                    class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-10 border border-gray-200"
+                  <select
+                    class="h-[52px] px-4 pr-10 rounded-md border border-solid border-gray-800 bg-transparent hover:bg-gray-50 shadow-none font-roboto font-medium text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    :value="sortValue"
+                    @change="handleSortChange"
                   >
-                    <button 
-                      @click="applySort('popular', 'desc')"
-                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
-                      :class="{ 'bg-gray-100': props.sort === 'popular' }"
-                    >
-                      Most Popular
-                    </button>
-                    <button 
-                      @click="applySort('rating', 'desc')"
-                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
-                      :class="{ 'bg-gray-100': props.sort === 'rating' }"
-                    >
-                      Highest Rated
-                    </button>
-                    <button 
-                      @click="applySort('price', 'asc')"
-                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
-                      :class="{ 'bg-gray-100': props.sort === 'price' && props.sortDir === 'asc' }"
-                    >                      
-                      Price: Low to High
-                    </button>
-                    <button 
-                      @click="applySort('price', 'desc')"
-                      class="w-full text-left px-4 py-2 hover:bg-gray-100 font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 flex items-center gap-2"
-                      :class="{ 'bg-gray-100': props.sort === 'price' && props.sortDir === 'desc' }"
-                    >
-                      Price: High to Low
-                    </button>
-                  </div>
+                    <option value="popular|desc">Most Popular</option>
+                    <option value="rating|desc">Highest Rated</option>
+                    <option value="price|asc">Price: Low to High</option>
+                    <option value="price|desc">Price: High to Low</option>
+                  </select>
                 </div>
                 <MainButton
                   text="Filters"
-                  :bg-color="showFilterPanel ? 'blue-600' : 'gray-200'"
+                  bg-color="white"
+                  :class="[
+                    'rounded-md !border !border-solid !shadow-none',
+                    showFilterPanel
+                      ? '!border-blue-600 !bg-blue-600 !text-white hover:!bg-blue-700'
+                      : '!border-gray-800 !bg-transparent !text-gray-800 hover:bg-gray-50'
+                  ]"
                   size="custom-small"
                   :svg="filterIcon"
+                  icon-position="left"
                   @click="showFilterPanel = !showFilterPanel"
                 />
               </div>
@@ -335,8 +313,13 @@ const props = defineProps({
 const heroBgRef = ref(null)
 const heroBgLoaded = ref(false)
 
-// Sort dropdown
-const showSortDropdown = ref(false)
+const sortValue = computed(() => `${props.sort || 'popular'}|${props.sortDir || 'desc'}`)
+
+const handleSortChange = (event) => {
+  const value = event?.target?.value || 'popular|desc'
+  const [sort, dir] = value.split('|')
+  applySort(sort, dir)
+}
 // Filter panel
 const showFilterPanel = ref(false)
 // Initialize searchQuery from props or URL
@@ -344,19 +327,26 @@ const searchQuery = ref(props.search || '')
 
 // Filter icon component
 const filterIcon = h('svg', {
-  width: '20',
-  height: '20',
+  xmlns: 'http://www.w3.org/2000/svg',
+  width: '24',
+  height: '24',
   viewBox: '0 0 24 24',
   fill: 'none',
   stroke: 'currentColor',
-  xmlns: 'http://www.w3.org/2000/svg'
+  'stroke-width': '2',
+  'stroke-linecap': 'round',
+  'stroke-linejoin': 'round',
+  class: 'lucide lucide-sliders-horizontal'
 }, [
-  h('path', {
-    d: 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z',
-    'stroke-width': '2',
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round'
-  })
+  h('path', { d: 'M10 5H3' }),
+  h('path', { d: 'M12 19H3' }),
+  h('path', { d: 'M14 3v4' }),
+  h('path', { d: 'M16 17v4' }),
+  h('path', { d: 'M21 12h-9' }),
+  h('path', { d: 'M21 19h-5' }),
+  h('path', { d: 'M21 5h-7' }),
+  h('path', { d: 'M8 10v4' }),
+  h('path', { d: 'M8 12H3' })
 ])
 
 // Selected filters
@@ -485,7 +475,6 @@ const clearFilters = () => {
 }
 
 const applySort = (sort, dir) => {
-  showSortDropdown.value = false
   const params = new URLSearchParams(window.location.search)
   
   // Preserve search query

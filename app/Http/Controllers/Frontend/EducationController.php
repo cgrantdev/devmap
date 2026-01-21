@@ -15,7 +15,11 @@ class EducationController extends Controller
     {
         // Get all active product categories (display all, not just ones with education posts)
         $categories = ProductCategory::where('is_active', true)
-            ->withCount('products')
+            ->withCount([
+                'products as products_count' => function ($q) {
+                    $q->visible()->where('status', 'active');
+                }
+            ])
             ->with('educationPost')
             ->orderBy('name')
             ->get()

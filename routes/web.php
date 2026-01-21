@@ -105,6 +105,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::get('/products', [VendorsController::class, 'adminProducts'])->name('admin.products');
     Route::get('/products/{id}/edit', [AdminProductsController::class, 'edit'])->name('admin.products.edit');
     Route::put('/products/{id}', [AdminProductsController::class, 'update'])->name('admin.products.update');
+    Route::patch('/products/{id}/hidden', [AdminProductsController::class, 'setHidden'])->name('admin.products.hidden');
     Route::delete('/products/{id}', [AdminProductsController::class, 'destroy'])->name('admin.products.destroy');
     
     // Categories
