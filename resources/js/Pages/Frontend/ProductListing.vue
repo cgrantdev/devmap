@@ -36,114 +36,115 @@
     </section>
 
     <!-- Product Listing Section -->
-    <section class="py-16 bg-white">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Product Name Title -->
-        <h2 class="font-hv-muse font-normal text-center text-5xl leading-normal tracking-normal text-gray-800 m-0 mb-2">{{ productName }}</h2>
-        <p class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800 text-center mb-6">Compare prices, check availability, and read verified reviews.</p>
-
-        <!-- Main Content Area (Full Width) -->
-        <div class="w-full">
-            <!-- Search Bar, Sort, and Filters (First Row) -->
-            <div class="mb-4 flex items-center gap-4">
-              <!-- Search Bar -->
-              <div class="relative flex-1 min-w-[200px]">
-                <input
-                  v-model="searchQuery"
-                  @input="handleSearchInput"
-                  type="text"
-                  placeholder="Search products, brands, or categories..."
-                  class="w-full h-[52px] pl-12 pr-5 py-0 border border-black rounded-md font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                />
-                <svg class="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-
-              <!-- Sort and Filters (on the right) -->
-              <div class="flex items-center gap-4 ml-auto">
-                <div class="relative">
-                  <select
-                    class="h-[52px] px-4 pr-10 rounded-md border border-solid border-gray-800 bg-transparent hover:bg-gray-50 shadow-none font-roboto font-medium text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                    :value="sortValue"
-                    @change="handleSortChange"
-                  >
-                    <option value="popular|desc">Most Popular</option>
-                    <option value="rating|desc">Highest Rated</option>
-                    <option value="price|asc">Price: Low to High</option>
-                    <option value="price|desc">Price: High to Low</option>
-                  </select>
-                </div>
-                <MainButton
-                  text="Filters"
-                  bg-color="white"
-                  :class="[
-                    'rounded-md !border !border-solid !shadow-none',
-                    showFilterPanel
-                      ? '!border-blue-600 !bg-blue-600 !text-white hover:!bg-blue-700'
-                      : '!border-gray-800 !bg-transparent !text-gray-800 hover:bg-gray-50'
-                  ]"
-                  size="custom-small"
-                  :svg="filterIcon"
-                  icon-position="left"
-                  @click="showFilterPanel = !showFilterPanel"
-                />
-              </div>
+    <section class="bg-white">
+      <div class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <h1 class="text-4xl text-gray-900 mb-4">{{ productName }}</h1>
+          <p class="text-xl text-gray-600">Compare prices, check availability, and read verified reviews</p>
+        </div>
+      </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-8">
+          <div class="flex gap-4">
+            <!-- Search Bar -->
+            <div class="flex-1 relative">
+              <input
+                v-model="searchQuery"
+                @input="handleSearchInput"
+                type="text"
+                placeholder="Search products, brands, or categories..."
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true">
+                <path d="m21 21-4.34-4.34"></path>
+                <circle cx="11" cy="11" r="8"></circle>
+              </svg>
             </div>
 
-            <!-- Filter Panel -->
-            <div v-if="showFilterPanel" class="mb-6 bg-white border border-gray-200 rounded-lg p-6">
-              <!-- Checkboxes -->
-              <div class="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <!-- Sort Selector -->
+            <select
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              :value="sortValue"
+              @change="handleSortChange"
+            >
+              <option value="popular|desc">Most Popular</option>
+              <option value="rating|desc">Highest Rated</option>
+              <option value="price|asc">Price: Low to High</option>
+              <option value="price|desc">Price: High to Low</option>
+            </select>
+
+            <!-- Filter Button -->
+            <button
+              :class="[
+                'px-4 py-2 border rounded-lg flex items-center gap-2 transition-colors',
+                showFilterPanel
+                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              ]"
+              @click="showFilterPanel = !showFilterPanel"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sliders-horizontal w-4 h-4">
+                <path d="M10 5H3"></path>
+                <path d="M12 19H3"></path>
+                <path d="M14 3v4"></path>
+                <path d="M16 17v4"></path>
+                <path d="M21 12h-9"></path>
+                <path d="M21 19h-5"></path>
+                <path d="M21 5h-7"></path>
+                <path d="M8 10v4"></path>
+                <path d="M8 12H3"></path>
+              </svg>
+              Filters
+            </button>
+          </div>
+
+          <!-- Filter Panel -->
+          <div v-if="showFilterPanel" class="mt-4 pt-4 border-t border-gray-200">
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input 
                     type="checkbox"
                     v-model="selectedFilters.inStock"
                     @change="applyFilters"
-                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
-                  <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800">In Stock Only</span>
+                  <span class="text-sm text-gray-700">In Stock Only</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input 
                     type="checkbox"
                     v-model="selectedFilters.onSale"
                     @change="applyFilters"
-                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
-                  <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800">On Sale</span>
+                  <span class="text-sm text-gray-700">On Sale</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input 
                     type="checkbox"
                     v-model="selectedFilters.labTested"
                     @change="applyFilters"
-                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
-                  <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800">Lab Tested</span>
+                  <span class="text-sm text-gray-700">Lab Tested</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input 
                     type="checkbox"
                     v-model="selectedFilters.firstTimerDeals"
                     @change="applyFilters"
-                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
-                  <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800">First-Timer Deals</span>
+                  <span class="text-sm text-gray-700">First-Timer Deals</span>
                 </label>
-              </div>
-
-              <!-- Min Purity Slider and Price Range (Side by Side) -->
-              <div class="mb-6 flex flex-col sm:flex-row gap-6">
-                <!-- Min Purity Slider -->
-                <div class="flex-[2]">
-                  <div class="flex items-center justify-between mb-2">
-                    <label class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800">Min Purity: {{ selectedFilters.minPurity }}%</label>
-                  </div>
+                <div class="md:col-span-2">
+                  <label class="text-sm text-gray-700 mb-2 block">
+                    Min Purity: {{ selectedFilters.minPurity }}%
+                  </label>
                   <div class="relative">
                     <div 
-                      class="absolute inset-0 h-2 bg-gray-200 rounded-lg pointer-events-none"
-                      :style="{ background: `linear-gradient(to right, #2563eb ${selectedFilters.minPurity}%, #e5e7eb ${selectedFilters.minPurity}%)` }"
+                      class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-2 border border-gray-300 rounded-lg pointer-events-none"
+                      :style="{ background: `linear-gradient(to right, #2563eb ${selectedFilters.minPurity}%, transparent ${selectedFilters.minPurity}%)` }"
                     ></div>
                     <input 
                       type="range"
@@ -153,31 +154,30 @@
                       max="100"
                       step="1"
                       class="w-full h-2 rounded-lg appearance-none cursor-pointer relative z-10 bg-transparent"
-                      style="accent-color: #2563eb;"
                     />
                   </div>
                 </div>
-
-                <!-- Price Range -->
-                <div class="flex-1">
-                  <label class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 mb-2 block">Price Range: ${{ selectedFilters.cost_min || 0 }} - ${{ selectedFilters.cost_max || 200 }}</label>
-                  <div class="flex items-center gap-2">
+                <div class="md:col-span-2">
+                  <label class="text-sm text-gray-700 mb-2 block">
+                    Price Range: ${{ selectedFilters.cost_min || 0 }} - ${{ selectedFilters.cost_max || 200 }}
+                  </label>
+                  <div class="flex gap-2">
                     <input 
                       type="number"
                       v-model.number="selectedFilters.cost_min"
                       @change="applyFilters"
-                      placeholder="0"
-                      min="0"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      class="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                      placeholder="Min"
+                      value="0"
                     />
-                    <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-600">-</span>
+                    <span class="text-gray-500">-</span>
                     <input 
                       type="number"
                       v-model.number="selectedFilters.cost_max"
                       @change="applyFilters"
-                      placeholder="200"
-                      min="0"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-lg font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      class="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                      placeholder="Max"
+                      value="200"
                     />
                   </div>
                 </div>
@@ -259,8 +259,11 @@
                   Clear all
                 </button>
               </div>
-            </div>
+          </div>
+        </div>
 
+        <!-- Main Content Area (Full Width) -->
+        <div class="w-full">
             <!-- Products Found (moved to bottom left) -->
             <div class="mb-4">
               <span class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800">{{ products.total }} products found</span>

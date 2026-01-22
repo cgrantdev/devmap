@@ -34,43 +34,39 @@
     </section>
 
     <!-- Discover Peptides Section -->
-    <section class="py-16 bg-white">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-4 p-0 w-full">Peptides Categories</h2>
-        <p class="font-roboto font-normal text-base leading-normal tracking-normal text-gray-800 text-center mb-8">Browse by category to find the perfect peptides for your needs</p>
+    <section class="min-h-screen bg-gray-50">
+      <div class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <h1 class="text-4xl text-gray-900 mb-4">Peptide Categories</h1>
+          <p class="text-xl text-gray-600">Browse by category to find the perfect peptides for your needs</p>
+        </div>
+      </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
         <!-- Search Bar -->
-        <div class="mb-8 flex justify-center">
-          <div class="relative w-full max-w-2xl">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+          <div class="relative">
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search categories..."
-              class="w-full pl-12 pr-5 py-3 border border-gray-300 rounded-[500px] font-roboto font-normal text-sm leading-normal tracking-normal text-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white"
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <svg class="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true">
+              <path d="m21 21-4.34-4.34"></path>
+              <circle cx="11" cy="11" r="8"></circle>
             </svg>
           </div>
         </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
           <CategoryCard
-            v-for="product in displayedProducts"
+            v-for="product in filteredProducts"
             :key="product.slug || product.name"
             :name="product.name"
             :image="product.image"
             :total-items="product.total_items"
             :to="`/product/${product.slug}`"
-          />
-        </div>
-
-        <!-- Load More Button -->
-        <div v-if="hasMoreProducts" class="justify-center flex">
-          <MainButton
-            text="Load More"
-            bg-color="gray-800"
-            @click="loadMore"
           />
         </div>
       </div>
@@ -126,10 +122,6 @@ const heroBgLoaded = ref(false)
 // Search functionality
 const searchQuery = ref('')
 
-// Products display
-const itemsPerPage = 8
-const displayedCount = ref(itemsPerPage)
-
 const filteredProducts = computed(() => {
   if (!searchQuery.value.trim()) {
     return props.productGroups
@@ -139,18 +131,6 @@ const filteredProducts = computed(() => {
     product.name.toLowerCase().includes(query)
   )
 })
-
-const displayedProducts = computed(() => {
-  return filteredProducts.value.slice(0, displayedCount.value)
-})
-
-const hasMoreProducts = computed(() => {
-  return displayedCount.value < filteredProducts.value.length
-})
-
-const loadMore = () => {
-  displayedCount.value += itemsPerPage
-}
 
 // Research Insights (same as Welcome page)
 const researchInsights = ref([

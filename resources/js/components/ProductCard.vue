@@ -1,46 +1,48 @@
 <template>
   <div
-    class="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer group relative border-2 border-slate-300 shadow-md flex flex-col"
+    class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group relative flex flex-col"
   >
     <!-- Top Section: Product Image -->
-    <div class="w-full h-48 bg-[#F0F4F8] flex items-center justify-center p-6 relative overflow-hidden">
-      <img
-        v-if="imageUrl && !hasError"
-        :src="imageUrl"
-        :alt="name"
-        class="w-full h-full object-contain object-center"
-        loading="lazy"
-        @error="onError"
-      />
-      <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-        <svg
-          class="w-32 h-40"
-          viewBox="0 0 80 120"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <!-- Vial Body -->
-          <rect x="20" y="20" width="40" height="80" rx="2" fill="white" stroke="#9CA3AF" stroke-width="1.5"/>
-          
-          <!-- Vial Cap -->
-          <rect x="18" y="15" width="44" height="8" rx="1" fill="#4B5563"/>
-          
-          <!-- Liquid (fills ~2/3) -->
-          <rect x="22" y="60" width="36" height="36" rx="1" fill="#93C5FD"/>
-          
-          <!-- Label on vial -->
-          <rect x="26" y="70" width="28" height="16" rx="1" fill="white" opacity="0.9"/>
-          <line x1="28" y1="74" x2="52" y2="74" stroke="#9CA3AF" stroke-width="0.5"/>
-          <line x1="28" y1="78" x2="52" y2="78" stroke="#9CA3AF" stroke-width="0.5"/>
-          <line x1="28" y1="82" x2="52" y2="82" stroke="#9CA3AF" stroke-width="0.5"/>
-          
-          <!-- Volume tick marks on right side -->
-          <line x1="62" y1="30" x2="65" y2="30" stroke="#4B5563" stroke-width="1"/>
-          <line x1="62" y1="45" x2="65" y2="45" stroke="#4B5563" stroke-width="1"/>
-          <line x1="62" y1="60" x2="65" y2="60" stroke="#4B5563" stroke-width="1"/>
-          <line x1="62" y1="75" x2="65" y2="75" stroke="#4B5563" stroke-width="1"/>
-          <line x1="62" y1="90" x2="65" y2="90" stroke="#4B5563" stroke-width="1"/>
-        </svg>
+    <div class="aspect-square bg-gradient-to-br from-blue-50 to-purple-50 p-6 border-b border-gray-200 flex items-center justify-center"> 
+      <div class="w-full h-48 bg-[#F0F4F8] flex items-center justify-center p-6 relative overflow-hidden">
+        <img
+          v-if="imageUrl && !hasError"
+          :src="imageUrl"
+          :alt="name"
+          class="w-full h-full object-contain object-center"
+          loading="lazy"
+          @error="onError"
+        />
+        <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
+          <svg
+            class="w-32 h-40"
+            viewBox="0 0 80 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <!-- Vial Body -->
+            <rect x="20" y="20" width="40" height="80" rx="2" fill="white" stroke="#9CA3AF" stroke-width="1.5"/>
+            
+            <!-- Vial Cap -->
+            <rect x="18" y="15" width="44" height="8" rx="1" fill="#4B5563"/>
+            
+            <!-- Liquid (fills ~2/3) -->
+            <rect x="22" y="60" width="36" height="36" rx="1" fill="#93C5FD"/>
+            
+            <!-- Label on vial -->
+            <rect x="26" y="70" width="28" height="16" rx="1" fill="white" opacity="0.9"/>
+            <line x1="28" y1="74" x2="52" y2="74" stroke="#9CA3AF" stroke-width="0.5"/>
+            <line x1="28" y1="78" x2="52" y2="78" stroke="#9CA3AF" stroke-width="0.5"/>
+            <line x1="28" y1="82" x2="52" y2="82" stroke="#9CA3AF" stroke-width="0.5"/>
+            
+            <!-- Volume tick marks on right side -->
+            <line x1="62" y1="30" x2="65" y2="30" stroke="#4B5563" stroke-width="1"/>
+            <line x1="62" y1="45" x2="65" y2="45" stroke="#4B5563" stroke-width="1"/>
+            <line x1="62" y1="60" x2="65" y2="60" stroke="#4B5563" stroke-width="1"/>
+            <line x1="62" y1="75" x2="65" y2="75" stroke="#4B5563" stroke-width="1"/>
+            <line x1="62" y1="90" x2="65" y2="90" stroke="#4B5563" stroke-width="1"/>
+          </svg>
+        </div>
       </div>
     </div>
 
@@ -48,27 +50,27 @@
     <div class="p-4 flex flex-col gap-3 flex-1">
       <!-- Category Tag -->
       <div class="flex items-start justify-between">
-        <span class="inline-block text-gray-700 rounded px-2 py-1 font-roboto font-normal text-xs leading-normal">
+        <span class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mb-2">
           {{ categoryName }}
         </span>
       </div>
 
       <!-- Product Title -->
-      <h3 class="font-roboto font-normal text-lg leading-tight text-gray-800 group-hover:text-blue-600 transition-colors duration-200 m-0">
+      <h3 class="text-sm text-gray-900 mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
         {{ name }}
       </h3>
 
       <!-- Brand Name -->
-      <p class="font-roboto font-normal text-sm leading-normal text-gray-500 m-0">
+      <p class="text-xs text-gray-500 mb-2">
         {{ brandName || 'Unknown Brand' }}
       </p>
 
       <!-- Specification Tags -->
       <div class="flex items-center gap-2 flex-wrap">
-        <span v-if="purity" class="inline-block text-green-600 rounded px-2 py-1 font-roboto font-normal text-xs leading-normal">
+        <span v-if="purity" class="bg-green-50 text-green-700 px-2 py-0.5 rounded">
           {{ purity }}% Pure
         </span>
-        <span v-if="sizeDisplay" class="inline-block text-gray-700 rounded px-2 py-1 font-roboto font-normal text-xs leading-normal">
+        <span v-if="sizeDisplay" class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded">
           {{ sizeDisplay }}
         </span>
       </div>
@@ -99,14 +101,14 @@
             class="w-2 h-2 rounded-full"
             :class="isInStock ? 'bg-green-500' : 'bg-red-500'"
           ></div>
-          <span class="font-roboto font-normal text-sm leading-normal">
+          <span class="font-medium">
             {{ stockStatus }}
           </span>
         </div>
       </div>
 
       <!-- Price -->
-      <p class="font-roboto font-bold text-2xl leading-normal text-gray-800 m-0">
+      <p class="font-roboto font-semibold text-2xl leading-normal text-gray-900 m-0 mb-3">
         ${{ displayPrice }}
       </p>
 
