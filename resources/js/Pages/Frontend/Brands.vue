@@ -1,37 +1,5 @@
 <template>
   <FrontLayout>
-    <!-- Hero Section -->
-    <section class="pt-0 pb-16 bg-white">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-[1360px] h-[334px] rounded-[24px] overflow-hidden relative mx-auto">
-          <!-- Background Image -->
-          <div 
-            class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style="background-image: url('/images/hero/hero1.jpg')"
-          >
-            <div 
-              class="absolute inset-0 pointer-events-none"
-              style="background: linear-gradient(260deg, rgba(0, 0, 0, 0.4) 45.49%, rgba(0, 0, 0, 0.81) 79.33%)"
-            ></div>
-          </div>
-          
-          <!-- Content -->
-          <div class="relative p-10 h-full flex flex-col justify-center max-w-[800px] gap-6">
-            <div class="flex flex-col gap-6">
-              <h1 class="font-hv-muse font-normal text-[52px] leading-tight tracking-normal text-white m-0">Trusted Brands</h1>
-              <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white m-0">Explore verified brands in the peptide research community.</p>
-              <MainButton
-                text="View All Vendors"
-                to="/brands"
-                size="custom"
-                bg-color="white"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- Brands Section -->
     <section class="min-h-screen bg-gray-50">
       <div class="bg-white border-b border-gray-200">

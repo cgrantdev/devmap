@@ -28,8 +28,13 @@ use App\Http\Controllers\Frontend\ProductsController;
 use App\Http\Controllers\Frontend\BrandsController;
 use App\Http\Controllers\Frontend\BlogsController;
 use App\Http\Controllers\Frontend\EducationController;
+use App\Http\Controllers\Frontend\EncyclopediaController;
+use App\Http\Controllers\Frontend\CompareController;
+use App\Http\Controllers\Frontend\KnowledgeCenterController;
 use App\Http\Controllers\Frontend\VendorReviewsController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\BecomeVendorController;
+use App\Http\Controllers\Frontend\DealsController;
 use App\Http\Controllers\Frontend\PagesController as FrontendPagesController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -44,6 +49,11 @@ Route::get('/blogs', [BlogsController::class, 'index'])->name('blogs');
 Route::get('/blog/{slug}', [BlogsController::class, 'show'])->name('blog.show');
 Route::get('/education', [EducationController::class, 'index'])->name('education');
 Route::get('/education/{slug}', [EducationController::class, 'show'])->name('education.show');
+Route::get('/encyclopedia', [EncyclopediaController::class, 'index'])->name('encyclopedia');
+Route::get('/compare', [CompareController::class, 'index'])->name('compare');
+Route::get('/news', [KnowledgeCenterController::class, 'index'])->name('news');
+Route::get('/deals', [DealsController::class, 'index'])->name('deals');
+Route::get('/become-a-vendor', [BecomeVendorController::class, 'index'])->name('become-a-vendor');
 
 // Vendor Reviews
 Route::post('/brands/{brandId}/reviews', [VendorReviewsController::class, 'store'])->name('vendor.reviews.store');
