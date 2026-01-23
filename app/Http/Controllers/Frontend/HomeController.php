@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\Product;
 use App\Models\Location;
 use App\Models\Blog;
+use App\Models\Deal;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -66,7 +67,7 @@ class HomeController extends Controller
                 ];
             });
 
-        // Top blogs / research insights
+        // Top blogs / research insights (4 for Research Insights section)
         $topBlogs = Blog::where('status', 'published')
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
@@ -82,6 +83,24 @@ class HomeController extends Controller
                     'image' => $blog->image ? Storage::url('blogs/' . $blog->image) : null,
                     'date' => $blog->published_at ? $blog->published_at->format('M d, Y') : null,
                     'readTime' => $blog->read_time ?? '5 min read',
+                ];
+            });
+
+        // Latest blogs (8 for Latest from Our Blog section)
+        $latestBlogs = Blog::where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->orderBy('published_at', 'desc')
+            ->take(8)
+            ->get()
+            ->map(function ($blog) {
+                return [
+                    'id' => $blog->id,
+                    'title' => $blog->title,
+                    'slug' => $blog->slug,
+                    'description' => $blog->description,
+                    'image' => $blog->image ? Storage::url('blogs/' . $blog->image) : null,
+                    'date' => $blog->published_at ? $blog->published_at->format('M d, Y') : null,
                 ];
             });
 
@@ -142,11 +161,124 @@ class HomeController extends Controller
                 ];
             });
 
+        // Limited Time Discounts - Get active deals with vendor info
+        $discountDeals = Deal::where('active', true)
+            ->where(function ($query) {
+                $query->whereNull('expiry_date')
+                    ->orWhere('expiry_date', '>=', now());
+            })
+            ->where(function ($query) {
+                $query->whereNull('usage_limit')
+                    ->orWhereRaw('used_count < usage_limit');
+            })
+            ->with(['brand.vendorSetting'])
+            ->orderByDesc('discount')
+            ->take(8)
+            ->get()
+            ->map(function ($deal) {
+                $brand = $deal->brand;
+                if (!$brand || !$brand->is_active) {
+                    return null;
+                }
+
+                $logoUrl = null;
+                if ($brand->vendorSetting && $brand->vendorSetting->logo) {
+                    $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
+                }
+
+                return [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                    'slug' => $brand->slug ?? Str::slug($brand->name),
+                    'initials' => $this->getInitials($brand->name),
+                    'logo' => $logoUrl,
+                    'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
+                    'reviews' => (int) ($brand->rating_count ?? 0),
+                    'discount' => $deal->discount,
+                    'code' => $deal->code,
+                ];
+            })
+            ->filter() // Remove null entries
+            ->values();
+
+        // If we don't have enough deals, supplement with top brands that have coupon codes
+        if ($discountDeals->count() < 8) {
+            $brandsWithCoupons = Brand::where('is_active', true)
+                ->whereHas('vendorSetting', function ($q) {
+                    $q->whereNotNull('coupon_code')
+                      ->where('coupon_code', '!=', '');
+                })
+                ->with(['vendorSetting'])
+                ->withCount([
+                    'products as products_count' => function ($q) {
+                        $q->visible()->where('status', 'active');
+                    }
+                ])
+                ->whereNotIn('id', $discountDeals->pluck('id'))
+                ->orderByDesc('products_count')
+                ->take(8 - $discountDeals->count())
+                ->get()
+                ->map(function ($brand) {
+                    $logoUrl = null;
+                    if ($brand->vendorSetting && $brand->vendorSetting->logo) {
+                        $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
+                    }
+
+                    return [
+                        'id' => $brand->id,
+                        'name' => $brand->name,
+                        'slug' => $brand->slug ?? Str::slug($brand->name),
+                        'initials' => $this->getInitials($brand->name),
+                        'logo' => $logoUrl,
+                        'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
+                        'reviews' => (int) ($brand->rating_count ?? 0),
+                        'discount' => 15, // Default discount for coupon codes
+                        'code' => $brand->vendorSetting->coupon_code ?? 'PMAP',
+                    ];
+                });
+
+            $discountDeals = $discountDeals->merge($brandsWithCoupons)->take(8);
+        }
+
+        // If still no deals, use top brands as fallback with default discount
+        if ($discountDeals->count() === 0) {
+            $discountDeals = Brand::where('is_active', true)
+                ->with(['vendorSetting'])
+                ->withCount([
+                    'products as products_count' => function ($q) {
+                        $q->visible()->where('status', 'active');
+                    }
+                ])
+                ->orderByDesc('products_count')
+                ->take(8)
+                ->get()
+                ->map(function ($brand) {
+                    $logoUrl = null;
+                    if ($brand->vendorSetting && $brand->vendorSetting->logo) {
+                        $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
+                    }
+
+                    return [
+                        'id' => $brand->id,
+                        'name' => $brand->name,
+                        'slug' => $brand->slug ?? Str::slug($brand->name),
+                        'initials' => $this->getInitials($brand->name),
+                        'logo' => $logoUrl,
+                        'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
+                        'reviews' => (int) ($brand->rating_count ?? 0),
+                        'discount' => 10, // Default discount
+                        'code' => $brand->vendorSetting->coupon_code ?? 'PMAP',
+                    ];
+                });
+        }
+
         return Inertia::render('Frontend/Welcome', [
             'heroSlides' => $heroSlides,
             'productGroups' => $categories,
             'topBrands' => $topBrands,
             'topBlogs' => $topBlogs,
+            'latestBlogs' => $latestBlogs,
+            'discountDeals' => $discountDeals,
         ]);
     }
 

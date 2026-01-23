@@ -11,6 +11,7 @@ use App\Models\Brand;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProductsController extends Controller
@@ -419,13 +420,39 @@ class ProductsController extends Controller
         $priceRange = $baseQuery->selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
 
         // Get brand details with vendor settings and reviews
-        $brand->load(['vendorSetting', 'approvedReviews.user']);
+        $brand->load(['vendorSetting.location', 'approvedReviews.user']);
         
         // Get initials for logo
         $words = explode(' ', $brand->name);
         $initials = count($words) >= 2 
             ? strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1))
             : strtoupper(substr($brand->name, 0, 2));
+
+        // Get location - prefer vendor setting location if set; otherwise derive from products
+        $location = null;
+        if ($brand->vendorSetting && $brand->vendorSetting->location) {
+            $location = $brand->vendorSetting->location;
+        } else {
+            $locationId = Product::visible()
+                ->where('status', 'active')
+                ->where('brand_id', $brand->id)
+                ->whereNotNull('location_id')
+                ->selectRaw('location_id, COUNT(*) as count')
+                ->groupBy('location_id')
+                ->orderByDesc('count')
+                ->first()
+                ?->location_id;
+            
+            if (!$locationId) {
+                $locationId = Product::visible()
+                    ->where('status', 'active')
+                    ->where('brand_id', $brand->id)
+                    ->whereNotNull('location_id')
+                    ->value('location_id');
+            }
+            
+            $location = $locationId ? Location::find($locationId) : null;
+        }
 
         // Calculate grading averages from reviews if available
         $approvedReviews = $brand->approvedReviews;
@@ -447,8 +474,13 @@ class ProductsController extends Controller
                 'shop_url' => $brand->vendorSetting->shop_url ?? null,
                 'contact_email' => $brand->vendorSetting->contact_email ?? null,
                 'phone_number' => $brand->vendorSetting->phone_number ?? null,
-                'logo' => $brand->vendorSetting && $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
+                'logo' => $this->getBrandLogoUrl($brand),
                 'banner' => $brand->vendorSetting && $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
+                'location' => $location ? $location->name : null,
+                'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
+                'founded_year' => $brand->vendorSetting && $brand->vendorSetting->founded_year ? $brand->vendorSetting->founded_year : null,
+                'shipping_info' => $brand->vendorSetting && $brand->vendorSetting->shipping_info ? $brand->vendorSetting->shipping_info : null,
+                'return_policy' => $brand->vendorSetting && $brand->vendorSetting->return_policy ? $brand->vendorSetting->return_policy : null,
                 'shipping_time' => round($shippingTime, 1),
                 'customer_service' => round($customerService, 1),
                 'quality' => round($quality, 1),
@@ -475,5 +507,19 @@ class ProductsController extends Controller
             'sortDir' => $sortDir,
             'search' => $request->get('search', ''),
         ]);
+    }
+
+    /**
+     * Get brand logo URL if file exists in storage
+     */
+    private function getBrandLogoUrl($brand)
+    {
+        if ($brand->vendorSetting && $brand->vendorSetting->logo) {
+            // Check if the file actually exists in storage
+            if (Storage::disk('public')->exists($brand->vendorSetting->logo)) {
+                return asset('storage/' . $brand->vendorSetting->logo);
+            }
+        }
+        return null;
     }
 }

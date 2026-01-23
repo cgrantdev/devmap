@@ -1,299 +1,347 @@
 <template>
   <FrontLayout>
       <!-- Hero Section Carousel -->
-      <div class="w-full mb-10">
-        <section class="relative w-full h-[663px] overflow-visible">
-          <div 
-            class="embla hero-carousel"
-            @mouseenter="stopAutoplay"
-            @mouseleave="startAutoplay"
-          >
-            <div class="embla__viewport" ref="emblaRef">
-              <div class="embla__container">
-                <div
-                  v-for="(slide, index) in heroSlides"
-                  :key="index"
-                  class="embla__slide"
-                  :class="{ 'slide-active': isSlideActive(index) }"
-                >
-                  <div class="carousel-slide">
-                    <!-- Background Image -->
-                    <div 
-                      :ref="el => { if (el) heroImageRefs[index] = el }"
-                      class="absolute inset-0 bg-cover bg-center rounded-[24px] overflow-hidden"
-                      :data-bg-image="slide.image || ''"
-                      :style="{ backgroundImage: slide.image && heroImagesLoaded.has(slide.image) ? `url(${slide.image})` : 'none' }"
-                    >
-                      <div class="absolute inset-0 hero-overlay1"></div>
-                      <div class="absolute inset-0 hero-overlay2"></div>
-                    </div>
-                    
-                    <!-- Content -->
-                      <div class="hero-text-container">
-                        <div class="hero-text-content">
-                          <h1 class="hero-heading">{{ slide.title }}</h1>
-                          <p class="hero-subtitle">{{ slide.subtitle }}</p>
-                        </div>
-                        <MainButton 
-                          :text="slide.ctaText"
-                          :to="slide.ctaUrl"
-                          bg-color="white"
-                          class="self-start"
-                          @click.stop
-                        />
+      <section class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="rounded-xl overflow-hidden shadow-lg">
+            <div
+              class="relative h-96"
+              @mouseenter="stopAutoplay"
+              @mouseleave="startAutoplay"
+            >
+              <div
+                v-for="(slide, index) in heroSlides"
+                :key="index"
+                class="absolute inset-0 transition-opacity duration-700 opacity-100"
+                :class="currentSlide === index ? 'opacity-100 z-10' : 'opacity-0 z-0'"
+              >
+                <!-- Background Image -->
+                <img
+                  :src="slide.image"
+                  :alt="slide.title || 'Hero image'"
+                  class="absolute inset-0 w-full h-full object-cover"
+                  @load="onImageLoad(slide.image)"
+                />
+                <div class="absolute inset-0 bg-black/60"></div>
+
+                <!-- Content -->
+                <div class="relative z-10 h-full flex items-center">
+                  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                    <div class="max-w-2xl">
+                      <p class="text-white/90 uppercase text-sm font-semibold tracking-wider mb-3">
+                        {{ slide.heading || 'PREMIUM RESEARCH PEPTIDES' }}
+                      </p>
+
+                      <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4">
+                        {{ slide.title || 'Peptide Sciences' }}
+                      </h1>
+
+                      <p class="text-white/90 text-lg md:text-xl mb-8 leading-relaxed">
+                        {{ slide.subtitle || '99%+ purity guaranteed. Third-party tested with COAs available for every batch.' }}
+                      </p>
+
+                      <div class="flex flex-col sm:flex-row gap-4">
+                        <button class="px-6 py-3 bg-transparent border-2 border-white/80 text-white rounded-lg font-medium hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                            <line x1="7" x2="7.01" y1="7" y2="7"></line>
+                          </svg>
+                          <span>Use code: {{ slide.promoCode || 'PMAP' }}</span>
+                        </button>
+
+                        <Link
+                          :to="slide.ctaUrl || '#'"
+                          class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors text-center"
+                        >
+                          {{ slide.ctaText || 'Shop Now' }}
+                        </Link>
                       </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Custom Carousel Indicators -->
-            <div class="carousel-indicators">
-              <button
-                v-for="(slide, index) in props.heroSlides"
-                :key="index"
-                @click="goToSlide(index)"
-                :class="[
-                  'carousel-dot',
-                  currentSlide === index ? 'carousel-dot-active' : 'carousel-dot-inactive'
-                ]"
-                :aria-label="`Go to slide ${index + 1}`"
-              ></button>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <!-- Top Vendors Section -->
-      <section class="py-16 bg-white">
-        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 w-full max-w-[360px] mx-auto">Top Vendors</h2>
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-x-[20px] gap-y-[80px] mb-20">
-            <VendorCard
-              v-for="vendor in topVendors"
-              :key="vendor.id"
-              :id="vendor.id"
-              :name="vendor.name"
-              :slug="vendor.slug"
-              :logo="vendor.logo"
-              :initials="vendor.initials"
-              :location="vendor.location"
-              :rating="vendor.rating"
-              :reviews="vendor.reviews"
-            />
-          </div>
-          <div class="flex justify-center">
-            <MainButton 
-              text="View All Vendors"
-              to="/brands"
-              bg-color="gray-800"
-            />
-          </div>
-        </div>
-      </section>
-
-      <!-- Discover & Research Section -->
-      <section class="py-8 bg-white">
-        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="discover-research-banner">
-            <div 
-              ref="discoverBannerRef"
-              class="discover-research-background"
-              data-bg-image="/images/banners/1.jpg"
-              :style="{ backgroundImage: discoverBannerLoaded ? `url(/images/banners/1.jpg)` : 'none' }"
-            >
-              <div class="discover-research-overlay"></div>
-            </div>
-            <div class="discover-research-content gap-8 lg:left-[99px]">
-              <div class="flex flex-col gap-6">
-                  <h2 class="font-hv-muse font-normal text-6xl leading-[110%] tracking-normal text-white">Discover & Research with Confidence</h2>
-                  <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
-                </div>
-                <MainButton 
-                  text="Read Details"
-                  to="/blogs"
-                  bg-color="slate-50"
+              <!-- Dots -->
+              <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                <button
+                  v-for="(slide, index) in heroSlides"
+                  :key="index"
+                  @click="goToSlide(index)"
+                  :class="[
+                    'h-2 rounded-full transition-all',
+                    currentSlide === index ? 'bg-white w-4' : 'bg-white/50 w-2'
+                  ]"
                 />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Learn About Peptides Section (education categories) -->
-      <section class="py-16 bg-white">
-        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 p-0 w-full">Learn About Peptides</h2>
-          
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
-            <EducationPostCard
-              v-for="product in displayedProducts"
-              :key="product.slug"
-              :name="product.name"
-              :image="product.image"
-              :total-items="product.total_items"
-              :to="`/education/${product.slug}`"
-            />
-          </div>
+      
+      <!-- Top Rated Vendors Section -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="mb-8">
+          <h2 class="text-3xl text-gray-900 mb-1">Top Rated Vendors</h2>
+          <p class="text-gray-600">Browse the most trusted peptide suppliers.</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <TopRatedVendorCard
+            v-for="vendor in topVendors"
+            :key="vendor.id"
+            :id="vendor.id"
+            :name="vendor.name"
+            :slug="vendor.slug"
+            :logo="vendor.logo"
+            :initials="vendor.initials"
+            :location="vendor.location"
+            :rating="vendor.rating"
+            :reviews="vendor.reviews"
+          />
+        </div>          
+      </section>
 
-          <div class="flex justify-center">
-            <MainButton 
-              text="View All Education"
-              to="/education"
-              bg-color="gray-800"
-            />
+      <!-- Your Brand Section -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-gradient-to-r from-slate-700 to-slate-600 rounded-lg p-8 text-center text-white relative overflow-hidden">
+          <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-32 -translate-y-32"></div>
+            <div class="absolute bottom-0 right-0 w-64 h-64 bg-white rounded-full translate-x-32 translate-y-32"></div>
+          </div>
+          <div class="relative z-10">
+            <div class="text-sm uppercase tracking-wider mb-2 opacity-90">Sponsored</div>
+            <h3 class="text-2xl mb-2">Advertise Your Brand Here</h3>
+            <p class="text-slate-100 mb-4">Reach thousands of peptide researchers and customers</p>
+            <button class="bg-white text-slate-700 px-6 py-2 rounded-lg hover:bg-slate-50 transition-colors">Learn More</button>
           </div>
         </div>
       </section>
 
-      <!-- Advance Your Research Section -->
-      <section class="py-8 bg-white">
-        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="advance-research-banner">
-            <div 
-              ref="advanceBannerRef"
-              class="advance-research-background"
-              data-bg-image="/images/banners/2.jpg"
-              :style="{ backgroundImage: advanceBannerLoaded ? `url(/images/banners/2.jpg)` : 'none' }"
+      <!-- Peptide Encyclopedia Section -->
+      <section class="bg-gradient-to-b from-slate-50 to-slate-100 border-y border-slate-200 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Header -->
+          <div class="text-center mb-12">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-700 rounded-full mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-8 h-8 text-white">
+                <path d="M12 7v14"></path>
+                <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
+              </svg>
+            </div>
+            <h2 class="text-4xl text-gray-900 mb-3">Peptide Encyclopedia</h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+              Comprehensive information on popular research peptides with detailed profiles, research data, and vendor comparisons.
+            </p>
+          </div>
+
+          <!-- Peptide Cards Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <PeptideEncyclopediaCard
+              v-for="peptide in displayedEncyclopediaPeptides"
+              :key="peptide.id"
+              :id="peptide.id"
+              :name="peptide.name"
+              :description="peptide.description"
+              :image="peptide.image"
+              :slug="peptide.slug"
+              :category-tag="peptide.categoryTag"
+            />
+          </div>
+
+          <!-- Footer Button -->
+          <div class="text-center mt-10">
+            <Link
+              to="/products"
+              class="bg-slate-700 hover:bg-slate-800 text-white px-10 py-4 rounded-lg transition-colors inline-flex items-center gap-2 shadow-lg"
             >
-              <div class="advance-research-overlay"></div>
-            </div>
-            <div class="advance-research-content">
-              <h2 class="font-hv-muse font-normal text-6xl leading-[110%] tracking-normal text-white text-center m-0">Advance Your<br>Research with Trusted<br>Peptides</h2>
-              <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white m-0">Behind the scenes, we're enabling custom combinations of RUO peptides for advanced lab applications.</p>
-              <MainButton 
-                text="Start Research"
-                to="/products"
-                bg-color="white"
-                class="mx-auto"
-              />
-            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-5 h-5" aria-hidden="true">
+              <path d="M12 7v14"></path>
+              <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
+            </svg>
+            View Full Encyclopedia
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-5 h-5" aria-hidden="true">
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+            </Link>
           </div>
         </div>
       </section>
 
-      <!-- Research Insights Section -->
-      <section class="py-16 bg-white">
-        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 p-0 w-full">Research Insights</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20 research-insights-grid">
-            <BlogPostCard
-              v-for="insight in researchInsights"
-              :key="insight.id"
-              :title="insight.title"
-              :description="insight.description"
-              :image="insight.image"
-              :read-time="insight.readTime"
-              :date="insight.date"
-              :to="`/blog/${insight.slug}`"
-            />
+      <!-- Premium Vendor Section -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-gradient-to-r from-slate-700 to-slate-600 rounded-lg p-8 text-center text-white relative overflow-hidden">
+          <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white rounded-full translate-x-32 -translate-y-32"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full -translate-x-32 translate-y-32"></div>
           </div>
-          <div class="flex justify-center">
-            <MainButton 
-              text="More Details"
-              to="/blogs"
-              bg-color="gray-800"
+          <div class="relative z-10">
+            <div class="text-sm uppercase tracking-wider mb-2 opacity-90">FEATURED SPOT</div>
+            <h3 class="text-2xl mb-2">Premium Vendor Placement Available</h3>
+            <p class="text-slate-100 mb-4">Showcase your products to our growing community</p>
+            <button class="bg-white text-slate-700 px-6 py-2 rounded-lg hover:bg-slate-50 transition-colors">Get Started</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Limited Time Discounts Section -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h2 class="text-3xl text-gray-900 mb-1">Limited Time Discounts</h2>
+            <p class="text-gray-600">Save up to 25% with verified discount codes</p>
+          </div>
+          <Link
+            href="/deals"
+            class="text-slate-700 hover:text-slate-900 flex items-center gap-1"
+          >
+            View All Deals
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4" aria-hidden="true">
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+          </Link>
+        </div>
+
+        <!-- Discount Cards Grid -->
+        <div v-if="discountDeals.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <LimitedTimeDiscountCard
+            v-for="deal in discountDeals"
+            :key="deal.id"
+            :id="deal.id"
+            :name="deal.name"
+            :slug="deal.slug"
+            :logo="deal.logo"
+            :initials="deal.initials"
+            :rating="deal.rating"
+            :reviews="deal.reviews"
+            :discount="deal.discount"
+            :code="deal.code"
+          />
+        </div>
+        <div v-else class="text-center py-12">
+          <p class="text-gray-500">No discount deals available at the moment.</p>
+        </div>
+      </section>
+
+      <!-- Resources & Tools Section -->
+      <section class="bg-white border-t border-gray-200 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Header -->
+          <div class="text-center mb-12">
+            <h2 class="text-3xl text-gray-900 mb-2">Resources & Tools</h2>
+            <p class="text-gray-600">
+              Everything you need to make informed decisions
+            </p>
+          </div>
+
+          <!-- Cards Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <ResourcesToolsCard
+              title="Education Hub"
+              description="Learn about different peptides and research information"
+              to="/education"
+              cta-text="Explore"
+              icon="book"
+            />
+            <ResourcesToolsCard
+              title="Product Comparison"
+              description="Compare products side-by-side to find the best option for your research"
+              to="/products"
+              cta-text="Compare"
+              icon="graph"
+            />
+            <ResourcesToolsCard
+              title="Price Comparison"
+              description="Compare prices across vendors to find the best deals on peptides"
+              to="/products"
+              cta-text="Compare"
+              icon="ribbon"
             />
           </div>
         </div>
       </section>
+
+      <!-- Latest from Our Blog Section -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <!-- Header -->
+        <div class="text-center mb-12">
+          <h2 class="text-3xl text-gray-900 mb-2">Latest from Our Blog</h2>
+          <p class="text-gray-600">
+            Stay updated with the latest peptide news and research.
+          </p>
+        </div>
+
+        <!-- Blog Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <LatestBlogCard
+            v-for="blog in latestBlogs"
+            :key="blog.id"
+            :title="blog.title"
+            :description="blog.description"
+            :image="blog.image"
+            :date="blog.date"
+            :to="`/blog/${blog.slug}`"
+          />
+        </div>
+      </section>  
+      
+      <section class="bg-gradient-to-b from-slate-50 to-white border-y border-gray-200 py-16">
+        <!-- Cards Grid -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <ResourcesToolsSimpleCard
+              title="Top Peptides"
+              description="Discover the most popular research peptides"
+              icon="graph"
+            />
+            <ResourcesToolsSimpleCard
+              title="Best Deals"
+              description="Find the best prices on peptides"
+              icon="ribbon"
+            />
+            <ResourcesToolsSimpleCard
+              title="Educational Resources"
+              description="Access comprehensive peptide information"
+              icon="book"
+            />
+          </div>
+        </div>
+      </section>
+
+     
   </FrontLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { Link, router } from '@inertiajs/vue3'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { Link } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
-import useEmblaCarousel from 'embla-carousel-vue'
-import Autoplay from 'embla-carousel-autoplay'
 import MainButton from '@/components/MainButton.vue'
-import VendorCard from '@/components/VendorCard.vue'
+import TopRatedVendorCard from '@/components/TopRatedVendorCard.vue'
 import EducationPostCard from '@/components/EducationPostCard.vue'
 import BlogPostCard from '@/components/BlogPostCard.vue'
+import PeptideEncyclopediaCard from '@/components/PeptideEncyclopediaCard.vue'
+import LimitedTimeDiscountCard from '@/components/LimitedTimeDiscountCard.vue'
+import ResourcesToolsCard from '@/components/ResourcesToolsCard.vue'
+import ResourcesToolsSimpleCard from '@/components/ResourcesToolsSimpleCard.vue'
+import LatestBlogCard from '@/components/LatestBlogCard.vue'
+
+// Carousel images
+const carouselImages = [
+  'https://images.unsplash.com/photo-1606206605628-0a09580d44a1?w=1600&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1600&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1600&h=600&fit=crop'
+]
 
 // Lazy loading for background images
-const heroImagesLoaded = ref(new Set())
 const discoverBannerLoaded = ref(false)
 const advanceBannerLoaded = ref(false)
-const heroImageRefs = ref({})
 const discoverBannerRef = ref(null)
 const advanceBannerRef = ref(null)
 
-// Intersection Observer for lazy loading background images
-const setupLazyBackgroundImages = () => {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const bgImage = entry.target.getAttribute('data-bg-image')
-        if (bgImage) {
-          // Preload the image
-          const img = new Image()
-          img.onload = () => {
-            // Check if it's a hero slide by checking if the ref exists in heroImageRefs
-            const isHeroSlide = Object.values(heroImageRefs.value).includes(entry.target)
-            if (isHeroSlide) {
-              heroImagesLoaded.value.add(bgImage)
-            } else if (entry.target === discoverBannerRef.value) {
-              discoverBannerLoaded.value = true
-            } else if (entry.target === advanceBannerRef.value) {
-              advanceBannerLoaded.value = true
-            }
-          }
-          img.src = bgImage
-        }
-        observer.unobserve(entry.target)
-      }
-    })
-  }, {
-    rootMargin: '50px' // Start loading 50px before entering viewport
-  })
-
-  // Observe hero images - load first slide immediately, others lazily
-  const heroRefsArray = Object.values(heroImageRefs.value).filter(ref => ref)
-  if (heroRefsArray.length > 0) {
-    // Load first slide immediately (it's visible)
-    const firstRef = heroRefsArray[0]
-    const firstBgImage = firstRef.getAttribute('data-bg-image')
-    if (firstBgImage) {
-      const img = new Image()
-      img.onload = () => {
-        heroImagesLoaded.value.add(firstBgImage)
-      }
-      img.src = firstBgImage
-    }
-    // Observe others for lazy loading
-    heroRefsArray.slice(1).forEach(ref => {
-      if (ref) observer.observe(ref)
-    })
-  }
-
-  // Observe banner images
-  if (discoverBannerRef.value) {
-    observer.observe(discoverBannerRef.value)
-  }
-  if (advanceBannerRef.value) {
-    observer.observe(advanceBannerRef.value)
-  }
-}
-
-// Hero Carousel
+// Hero Carousel - Fade type (no sliding)
 const currentSlide = ref(0)
-const autoplayPluginInstance = Autoplay({
-  delay: 5000,
-  stopOnInteraction: true,
-  stopOnMouseEnter: true,
-})
-
-const [emblaRef, emblaApi] = useEmblaCarousel(
-  {
-    align: 'center',
-    loop: true,
-    skipSnaps: false,
-    dragFree: false,
-    slidesToScroll: 1,
-    containScroll: 'trimSnaps',
-  },
-  [autoplayPluginInstance]
-)
+let interval = null
 
 // Hero slides data from database
 const props = defineProps({
@@ -312,85 +360,99 @@ const props = defineProps({
   topBlogs: {
     type: Array,
     default: () => []
+  },
+  discountDeals: {
+    type: Array,
+    default: () => []
+  },
+  latestBlogs: {
+    type: Array,
+    default: () => []
   }
 })
 
-// Process slides and duplicate if needed to ensure looping works with 1-2 slides
+// Process slides
 const processSlides = (slides) => {
-  const processed = slides.map(slide => ({
-    title: slide.title,
-    subtitle: slide.subtitle,
-    ctaText: slide.ctaText,
-    ctaUrl: slide.ctaUrl,
-    image: slide.image
-  }))
-  
-  // If we have fewer than 3 slides, duplicate them to ensure looping works
-  if (processed.length > 0 && processed.length < 3) {
-    // Duplicate slides until we have at least 3
-    const needed = 3 - processed.length
-    for (let i = 0; i < needed; i++) {
-      processed.push({ ...processed[i % processed.length] })
-    }
+  if (!slides.length) {
+    return carouselImages.map(image => ({
+      title: 'Peptide Sciences',
+      subtitle: '99%+ purity guaranteed. Third-party tested with COAs available for every batch.',
+      heading: 'PREMIUM RESEARCH PEPTIDES',
+      ctaText: 'Shop Now',
+      ctaUrl: '#',
+      promoCode: 'PMAP',
+      image
+    }))
   }
-  
-  return processed
-}
 
+  return slides.map((slide, index) => ({
+    ...slide,
+    image: slide.image || carouselImages[index % carouselImages.length]
+  }))
+}
 const heroSlides = ref(processSlides(props.heroSlides))
 
+// Preload all carousel images
+const onImageLoad = (imageUrl) => {
+  // Image loaded successfully
+}
+
+// Navigate to specific slide
 const goToSlide = (index) => {
-  if (emblaApi.value) {
-    // Get the original slide count (before duplication)
-    const originalCount = props.heroSlides.length
-    // If we have fewer than 3 original slides, map the index to the correct position
-    // Since slides are duplicated, we can scroll to any duplicate of the target slide
-    if (originalCount > 0 && originalCount < 3) {
-      // Find the first occurrence of this slide in the duplicated array
-      const targetIndex = index % originalCount
-      // Scroll to the first occurrence
-      emblaApi.value.scrollTo(targetIndex)
-    } else {
-      emblaApi.value.scrollTo(index)
-    }
-  }
+  currentSlide.value = index
+  // Reset autoplay
+  stopAutoplay()
+  startAutoplay()
 }
 
-const onSelect = () => {
-  if (emblaApi.value) {
-    const selectedIndex = emblaApi.value.selectedScrollSnap()
-    // Get the original slide count (before duplication)
-    const originalCount = props.heroSlides.length
-    // If we have fewer than 3 original slides, map to the original index
-    if (originalCount > 0 && originalCount < 3) {
-      currentSlide.value = selectedIndex % originalCount
-    } else {
-      currentSlide.value = selectedIndex
-    }
-  }
-}
-
-// Check if a slide (by its index in the duplicated array) should be active
-const isSlideActive = (index) => {
-  const originalCount = props.heroSlides.length
-  if (originalCount > 0 && originalCount < 3) {
-    // For duplicated slides, check if this index maps to the current slide
-    return (index % originalCount) === currentSlide.value
-  } else {
-    // For normal slides, direct comparison
-    return currentSlide.value === index
-  }
+// Next slide
+const nextSlide = () => {
+  currentSlide.value = (currentSlide.value + 1) % heroSlides.value.length
 }
 
 const stopAutoplay = () => {
-  if (autoplayPluginInstance) {
-    autoplayPluginInstance.stop()
+  if (interval) {
+    clearInterval(interval)
+    interval = null
   }
 }
 
 const startAutoplay = () => {
-  if (autoplayPluginInstance) {
-    autoplayPluginInstance.play()
+  stopAutoplay()
+  interval = setInterval(nextSlide, 5000)
+}
+
+// Intersection Observer for lazy loading background images
+const setupLazyBackgroundImages = () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const bgImage = entry.target.getAttribute('data-bg-image')
+        if (bgImage) {
+          // Preload the image
+          const img = new Image()
+          img.onload = () => {
+            if (entry.target === discoverBannerRef.value) {
+              discoverBannerLoaded.value = true
+            } else if (entry.target === advanceBannerRef.value) {
+              advanceBannerLoaded.value = true
+            }
+          }
+          img.src = bgImage
+        }
+        observer.unobserve(entry.target)
+      }
+    })
+  }, {
+    rootMargin: '50px' // Start loading 50px before entering viewport
+  })
+
+  // Observe banner images
+  if (discoverBannerRef.value) {
+    observer.observe(discoverBannerRef.value)
+  }
+  if (advanceBannerRef.value) {
+    observer.observe(advanceBannerRef.value)
   }
 }
 
@@ -407,23 +469,20 @@ const handleLogoError = (event, vendorId) => {
 
 
 onMounted(() => {
-  if (emblaApi.value) {
-    emblaApi.value.on('select', onSelect)
-    emblaApi.value.on('reInit', onSelect)
-    onSelect() // Set initial slide
-  }
-  
-  // Setup lazy loading for background images
-  nextTick(() => {
-    setupLazyBackgroundImages()
+  // Preload all carousel images
+  heroSlides.value.forEach(slide => {
+    if (slide.image) {
+      const img = new Image()
+      img.src = slide.image
+    }
   })
+  
+  startAutoplay()
+  setupLazyBackgroundImages()
 })
 
 onUnmounted(() => {
-  if (emblaApi.value) {
-    emblaApi.value.off('select', onSelect)
-    emblaApi.value.off('reInit', onSelect)
-  }
+  stopAutoplay()
 })
 
 const topVendors = computed(() => props.topBrands || [])
@@ -433,6 +492,55 @@ const displayedProducts = computed(() => {
   return props.productGroups.slice(0, 8)
 })
 
+// Peptide Encyclopedia - show first 8 categories with category tags
+const displayedEncyclopediaPeptides = computed(() => {
+  return props.productGroups.slice(0, 8).map(category => {
+    // Determine category tag based on name/description
+    const categoryTag = getCategoryTag(category.name, category.description)
+    
+    return {
+      ...category,
+      categoryTag
+    }
+  })
+})
+
+// Helper function to determine category tag
+const getCategoryTag = (name, description) => {
+  const nameLower = (name || '').toLowerCase()
+  const descLower = (description || '').toLowerCase()
+  const combined = `${nameLower} ${descLower}`
+  
+  // Healing & Recovery
+  if (combined.includes('bpc') || combined.includes('tb-500') || combined.includes('healing') || combined.includes('recovery')) {
+    return 'Healing & Recovery'
+  }
+  
+  // Growth & Recovery
+  if (combined.includes('cjc') || combined.includes('ipamorelin') || combined.includes('ghrp') || combined.includes('growth')) {
+    return 'Growth & Recovery'
+  }
+  
+  // Weight Management
+  if (combined.includes('semaglutide') || combined.includes('tirzepatide') || combined.includes('weight') || combined.includes('glp')) {
+    return 'Weight Management'
+  }
+  
+  // Cosmetic
+  if (combined.includes('melanotan') || combined.includes('tanning') || combined.includes('cosmetic')) {
+    return 'Cosmetic'
+  }
+  
+  // Default fallback
+  return 'Research Peptide'
+}
+
 const researchInsights = computed(() => props.topBlogs || [])
+
+// Limited Time Discounts
+const discountDeals = computed(() => props.discountDeals || [])
+
+// Latest from Our Blog
+const latestBlogs = computed(() => props.latestBlogs || [])
 </script>
 

@@ -1,0 +1,397 @@
+<template>
+  <FrontLayout>
+    <!-- Header Section with Gradient -->
+    <section class="bg-gradient-to-br from-blue-600 to-purple-700 text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <!-- Title and Tagline -->
+        <h1 class="text-5xl mb-4">Peptide Knowledge Center</h1>
+        <p class="text-xl text-blue-100 mb-8">
+          Latest research, industry news, and expert guides from the peptide community
+        </p>
+
+        <!-- Search Bar -->
+        <div class="relative max-w-2xl">
+          <input
+            v-model="searchQuery"
+            @input="handleSearch"
+            type="text"
+            placeholder="Search articles, research, and guides..."
+            class="w-full pl-12 pr-4 py-4 bg-white rounded-lg text-gray-900 border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+          />
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" aria-hidden="true">
+            <path d="m21 21-4.34-4.34"></path>
+            <circle cx="11" cy="11" r="8"></circle>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- Primary Navigation -->
+    <section class="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="flex gap-8">
+          <button
+            v-for="nav in primaryNavs"
+            :key="nav.value"
+            @click="selectPrimaryNav(nav.value)"
+            :class="[
+              'py-4 border-b-2 transition-colors flex items-center gap-2',
+              primaryNav === nav.value
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            ]"
+          >
+            <component :is="nav.icon" class="w-5 h-5" />
+            <span>{{ nav.label }}</span>
+          </button>
+        </nav>
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Research Library Section -->
+      <div v-if="primaryNav === 'research'">
+        <!-- Research Library Header -->
+        <div class="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div class="flex items-center gap-3 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-6 h-6 text-blue-600" aria-hidden="true">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <h2 class="text-2xl font-bold text-gray-900">Research Library</h2>
+          </div>
+          <p class="text-sm text-gray-700">
+            Curated collection of clinical studies and research papers on peptide therapies. All studies are linked to their original sources on PubMed.
+          </p>
+        </div>
+
+        <!-- Research Papers -->
+        <div v-if="filteredResearchPapers.length > 0" class="space-y-6">
+          <ResearchLibraryCard
+            v-for="paper in filteredResearchPapers"
+            :key="paper.id"
+            :id="paper.id"
+            :peptide="paper.peptide"
+            :evidence-level="paper.evidenceLevel"
+            :title="paper.title"
+            :description="paper.description"
+            :source="paper.source"
+            :date="paper.date"
+            :tags="paper.tags"
+            :pubmed-url="paper.pubmedUrl"
+          />
+        </div>
+
+        <div v-else class="text-center py-20">
+          <p class="text-gray-500 text-lg">No research papers found. Try a different search.</p>
+        </div>
+      </div>
+
+      <!-- Educational Guides Section -->
+      <div v-else-if="primaryNav === 'guides'">
+        <!-- Educational Guides Header -->
+        <div class="mb-8 bg-purple-50 border border-purple-200 rounded-lg p-6">
+          <div class="flex items-center gap-3 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-6 h-6 text-purple-600" aria-hidden="true">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <h2 class="text-2xl font-bold text-gray-900">Educational Guides</h2>
+          </div>
+          <p class="text-sm text-gray-700">
+            Comprehensive guides written by experts to help you understand peptides, create effective protocols, and use them safely.
+          </p>
+        </div>
+
+        <!-- Educational Guides Grid -->
+        <div v-if="filteredEducationalGuides.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <EducationalGuideCard
+            v-for="guide in filteredEducationalGuides"
+            :key="guide.id"
+            :id="guide.id"
+            :tag="guide.tag"
+            :reading-time="guide.readingTime"
+            :title="guide.title"
+            :description="guide.description"
+            :peptides="guide.peptides"
+            :guide-url="guide.guideUrl"
+          />
+        </div>
+
+        <div v-else class="text-center py-20">
+          <p class="text-gray-500 text-lg">No educational guides found. Try a different search.</p>
+        </div>
+      </div>
+
+      <!-- News & Articles Section -->
+      <div v-else>
+        <!-- Secondary Navigation/Filters -->
+        <div class="flex gap-2 mb-8 overflow-x-auto pb-2">
+          <div class="flex flex-wrap items-center gap-3">
+            <button
+              v-for="filter in filters"
+              :key="filter.value"
+              @click="selectFilter(filter.value)"
+              :class="[
+                'px-4 py-2 rounded-lg whitespace-nowrap transition-colors border flex items-center gap-2',
+                currentFilter === filter.value
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              ]"
+            >
+              <component :is="filter.icon" class="w-4 h-4" />
+              <span>{{ filter.label }}</span>
+            </button>
+          </div>
+        </div>
+
+        
+        <!-- Featured Stories -->
+        <div v-if="featuredBlogs.length > 0" class="mb-12">
+          <h2 class="text-2xl text-gray-900 mb-6 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up w-6 h-6 text-blue-600" aria-hidden="true">
+              <path d="M16 7h6v6"></path>
+              <path d="m22 7-8.5 8.5-5-5L2 17"></path>
+            </svg>
+            Featured Stories
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <KnowledgeCenterCard
+              v-for="blog in featuredBlogs"
+              :key="blog.id"
+              :id="blog.id"
+              :title="blog.title"
+              :description="blog.description"
+              :image="blog.image"
+              :date="blog.date"
+              :read-time="blog.readTime"
+              :category-tag="blog.categoryTag"
+              :tags="blog.tags"
+              :author="blog.author"
+              :slug="blog.slug"
+            />
+          </div>
+        </div>
+
+      <!-- Latest Articles -->
+      <div v-if="filteredLatestBlogs.length > 0">
+        <h2 class="text-2xl text-gray-900 mb-6">Latest Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <KnowledgeCenterCard
+            v-for="blog in filteredLatestBlogs"
+            :key="blog.id"
+            :id="blog.id"
+            :title="blog.title"
+            :description="blog.description"
+            :image="blog.image"
+            :date="blog.date"
+            :read-time="blog.readTime"
+            :category-tag="blog.categoryTag"
+            :tags="blog.tags"
+            :author="blog.author"
+            :slug="blog.slug"
+          />
+        </div>
+      </div>
+
+        <div v-if="featuredBlogs.length === 0 && filteredLatestBlogs.length === 0" class="text-center py-20">
+          <p class="text-gray-500 text-lg">No articles found. Try a different search or filter.</p>
+        </div>
+      </div>
+    </section>
+  </FrontLayout>
+</template>
+
+<script setup>
+import { ref, computed, h } from 'vue'
+import { router } from '@inertiajs/vue3'
+import FrontLayout from '../Layouts/FrontLayout.vue'
+import KnowledgeCenterCard from '@/components/KnowledgeCenterCard.vue'
+import ResearchLibraryCard from '@/components/ResearchLibraryCard.vue'
+import EducationalGuideCard from '@/components/EducationalGuideCard.vue'
+
+const props = defineProps({
+  featuredBlogs: {
+    type: Array,
+    default: () => []
+  },
+  latestBlogs: {
+    type: Array,
+    default: () => []
+  },
+  researchPapers: {
+    type: Array,
+    default: () => []
+  },
+  educationalGuides: {
+    type: Array,
+    default: () => []
+  },
+  search: {
+    type: String,
+    default: ''
+  },
+  primaryNav: {
+    type: String,
+    default: 'news'
+  },
+  filter: {
+    type: String,
+    default: 'all'
+  }
+})
+
+const searchQuery = ref(props.search || '')
+const currentFilter = ref(props.filter || 'all')
+const primaryNav = ref(props.primaryNav || 'news')
+
+// Primary navigation items
+const primaryNavs = [
+  {
+    label: 'News & Articles',
+    value: 'news',
+    icon: () => h('svg', {
+      xmlns: 'http://www.w3.org/2000/svg',
+      width: '20',
+      height: '20',
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke: 'currentColor',
+      strokeWidth: '2',
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round'
+    }, [
+      h('path', { d: 'M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2' }),
+      h('path', { d: 'M18 14h-8' }),
+      h('path', { d: 'M15 18h-5' }),
+      h('path', { d: 'M10 6h8' }),
+      h('path', { d: 'M10 10h8' })
+    ])
+  },
+  {
+    label: 'Research Library',
+    value: 'research',
+    icon: () => h('svg', {
+      xmlns: 'http://www.w3.org/2000/svg',
+      width: '20',
+      height: '20',
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke: 'currentColor',
+      strokeWidth: '2',
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round'
+    }, [
+      h('path', { d: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20' }),
+      h('path', { d: 'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' })
+    ])
+  },
+  {
+    label: 'Educational Guides',
+    value: 'guides',
+    icon: () => h('svg', {
+      xmlns: 'http://www.w3.org/2000/svg',
+      width: '20',
+      height: '20',
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke: 'currentColor',
+      strokeWidth: '2',
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round'
+    }, [
+      h('path', { d: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20' }),
+      h('path', { d: 'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' }),
+      h('path', { d: 'M12 7v14' })
+    ])
+  }
+]
+
+// Filter buttons
+const filters = [
+  { label: 'All News', value: 'all', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('circle', { cx: '12', cy: '12', r: '10' }), h('line', { x1: '12', y1: '2', x2: '12', y2: '6' }), h('line', { x1: '12', y1: '18', x2: '12', y2: '22' }), h('line', { x1: '4.93', y1: '4.93', x2: '7.76', y2: '7.76' }), h('line', { x1: '16.24', y1: '16.24', x2: '19.07', y2: '19.07' }), h('line', { x1: '2', y1: '12', x2: '6', y2: '12' }), h('line', { x1: '18', y1: '12', x2: '22', y2: '12' }), h('line', { x1: '4.93', y1: '19.07', x2: '7.76', y2: '16.24' }), h('line', { x1: '16.24', y1: '7.76', x2: '19.07', y2: '4.93' })]) },
+  { label: 'Research', value: 'research', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('path', { d: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20' }), h('path', { d: 'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' })]) },
+  { label: 'Industry', value: 'industry', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('path', { d: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' }), h('circle', { cx: '9', cy: '7', r: '4' }), h('path', { d: 'M22 21v-2a4 4 0 0 0-3-3.87' }), h('path', { d: 'M16 3.13a4 4 0 0 1 0 7.75' })]) },
+  { label: 'Regulation', value: 'regulation', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('path', { d: 'M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z' }), h('circle', { cx: '7.5', cy: '7.5', r: '.5', fill: 'currentColor' })]) },
+  { label: 'Guides', value: 'guides', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('path', { d: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20' }), h('path', { d: 'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' }), h('path', { d: 'M12 7v14' })]) },
+  { label: 'Community', value: 'community', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('path', { d: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2' }), h('circle', { cx: '9', cy: '7', r: '4' }), h('path', { d: 'M23 21v-2a4 4 0 0 0-3-3.87' }), h('path', { d: 'M16 3.13a4 4 0 0 1 0 7.75' })]) }
+]
+
+// Filter latest blogs by current filter
+const filteredLatestBlogs = computed(() => {
+  let result = props.latestBlogs || []
+  
+  if (currentFilter.value !== 'all') {
+    result = result.filter(blog => blog.categoryTag === currentFilter.value)
+  }
+  
+  return result
+})
+
+// Filter research papers by search
+const filteredResearchPapers = computed(() => {
+  let result = props.researchPapers || []
+  
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim()
+    result = result.filter(paper => 
+      paper.title.toLowerCase().includes(query) ||
+      paper.description.toLowerCase().includes(query) ||
+      (paper.peptide && paper.peptide.toLowerCase().includes(query))
+    )
+  }
+  
+  return result
+})
+
+// Filter educational guides by search
+const filteredEducationalGuides = computed(() => {
+  let result = props.educationalGuides || []
+  
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim()
+    result = result.filter(guide => 
+      guide.title.toLowerCase().includes(query) ||
+      guide.description.toLowerCase().includes(query) ||
+      (guide.tag && guide.tag.toLowerCase().includes(query)) ||
+      (guide.peptides && guide.peptides.some(p => p.toLowerCase().includes(query)))
+    )
+  }
+  
+  return result
+})
+
+const selectPrimaryNav = (value) => {
+  primaryNav.value = value
+  updateURL()
+}
+
+const selectFilter = (value) => {
+  currentFilter.value = value
+  updateURL()
+}
+
+const handleSearch = () => {
+  updateURL()
+}
+
+const updateURL = () => {
+  const params = new URLSearchParams()
+  if (searchQuery.value.trim()) {
+    params.set('search', searchQuery.value.trim())
+  }
+  if (primaryNav.value !== 'news') {
+    params.set('nav', primaryNav.value)
+  }
+  if (currentFilter.value !== 'all') {
+    params.set('filter', currentFilter.value)
+  }
+  
+  const queryString = params.toString()
+  router.visit(`/news${queryString ? '?' + queryString : ''}`, {
+    preserveState: true,
+    preserveScroll: true,
+    replace: true
+  })
+}
+</script>

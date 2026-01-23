@@ -1,38 +1,5 @@
 <template>
   <FrontLayout>
-    <!-- Hero Section -->
-    <section class="pt-0 pb-16 bg-white">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-[1360px] h-[574px] rounded-[24px] overflow-hidden relative mx-auto">
-          <!-- Background Image -->
-          <div 
-            ref="heroBgRef"
-            class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            data-bg-image="/images/hero/hero1.jpg"
-            :style="{ backgroundImage: heroBgLoaded ? `url(/images/hero/hero1.jpg)` : 'none' }"
-          >
-            <div 
-              class="absolute inset-0 pointer-events-none"
-              :style="{ background: 'linear-gradient(260deg, rgba(0, 0, 0, 0.4) 45.49%, rgba(0, 0, 0, 0.81) 79.33%)' }"
-            ></div>
-          </div>
-          
-          <!-- Content -->
-          <div class="relative p-10 h-full flex flex-col justify-center max-w-[800px] gap-6">
-            <div class="flex flex-col gap-6">
-              <h1 class="font-hv-muse font-normal text-6xl leading-tight tracking-normal text-white m-0">The Science Behind Peptides</h1>
-              <p class="font-roboto font-normal text-lg leading-loose tracking-normal text-white m-0">Everything You Need to Know About Peptides</p>
-            </div>
-            <MainButton
-              text="Read Details"
-              to="/education"
-              bg-color="white"
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- Discover Peptides Section -->
     <section class="min-h-screen bg-gray-50">
       <div class="bg-white border-b border-gray-200">
@@ -70,33 +37,7 @@
           />
         </div>
       </div>
-    </section>
-
-    <!-- Research Insights Section -->
-    <section class="py-16 bg-white">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 p-0 w-full">Research Insights</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <BlogPostCard
-            v-for="insight in researchInsights"
-            :key="insight.id"
-            :title="insight.title"
-            :description="insight.description"
-            :image="insight.image ? `/images/blogs/${insight.image}` : null"
-            :read-time="insight.readTime"
-            :date="insight.date"
-            :to="`/blog/${insight.slug || insight.id}`"
-          />
-        </div>
-        <div class="justify-center flex">
-          <MainButton
-            text="More Details"
-            to="/blogs"
-            bg-color="gray-800"
-          />
-        </div>
-      </div>
-    </section>
+    </section>   
   </FrontLayout>
 </template>
 
