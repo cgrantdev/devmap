@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white border-2 border-slate-200 rounded-lg overflow-hidden hover:shadow-xl hover:border-slate-400 transition-all cursor-pointer group"
+    class="bg-white border-2 border-slate-200 rounded-lg overflow-hidden hover:shadow-xl hover:border-slate-400 transition-all cursor-pointer group flex flex-col"
     @click="handleClick"
   >
     <!-- Vial/Image Section -->
@@ -40,10 +40,10 @@
     </div>
 
     <!-- Content Section -->
-    <div class="p-6">
+    <div class="p-6 flex flex-col flex-grow">
       <!-- Name and ID -->
       <div class="flex items-start justify-between mb-2 gap-2">
-        <h3 class="text-lg text-gray-900 group-hover:text-slate-700 transition-colors line-clamp-1 flex-1">
+        <h3 class="text-lg text-gray-900 group-hover:text-slate-700 transition-colors flex-1">
           {{ name }}
         </h3>
         <div class="text-xs text-slate-600 bg-slate-100 px-2 py-1 rounded flex-shrink-0">
@@ -51,17 +51,22 @@
         </div>
       </div>
 
-      <!-- Description -->
-      <p class="text-sm text-gray-600 mb-3 line-clamp-1">
+      <!-- Spacer to push description, tag, and button to consistent positions -->
+      <div class="flex-grow"></div>
+
+      <!-- Description (Fixed height) -->
+      <p class="text-sm text-gray-600 mb-3 line-clamp-2 min-h-[2.5rem]">
         {{ description || 'Research peptide information' }}
       </p>
 
-      <!-- Category Tag -->
-      <span class="inline-block bg-slate-700 text-white text-xs px-3 py-1 rounded-full mb-4">
-        {{ categoryTag }}
-      </span>
+      <!-- Category Tag (Fixed height) -->
+      <div class="mb-4">
+        <span class="inline bg-slate-700 text-white text-xs px-3 py-1 rounded-full">
+          {{ categoryTag }}
+        </span>
+      </div>
 
-      <!-- Learn More Link -->
+      <!-- Learn More Link (Fixed position at bottom) -->
       <div class="pt-3 border-t border-gray-200 flex items-center justify-between">
         <span class="text-slate-700 text-sm group-hover:underline">Learn More</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-colors" aria-hidden="true">

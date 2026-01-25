@@ -4,55 +4,51 @@
   >
     <!-- Top Section: Product Image -->
     <div class="aspect-square bg-gradient-to-br from-blue-50 to-purple-50 p-6 border-b border-gray-200 flex items-center justify-center"> 
-      <div class="w-full h-48 bg-[#F0F4F8] flex items-center justify-center p-6 relative overflow-hidden">
-        <img
-          v-if="imageUrl && !hasError"
-          :src="imageUrl"
-          :alt="name"
-          class="w-full h-full object-contain object-center"
-          loading="lazy"
-          @error="onError"
-        />
-        <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-          <svg
-            class="w-32 h-40"
-            viewBox="0 0 80 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <!-- Vial Body -->
-            <rect x="20" y="20" width="40" height="80" rx="2" fill="white" stroke="#9CA3AF" stroke-width="1.5"/>
-            
-            <!-- Vial Cap -->
-            <rect x="18" y="15" width="44" height="8" rx="1" fill="#4B5563"/>
-            
-            <!-- Liquid (fills ~2/3) -->
-            <rect x="22" y="60" width="36" height="36" rx="1" fill="#93C5FD"/>
-            
-            <!-- Label on vial -->
-            <rect x="26" y="70" width="28" height="16" rx="1" fill="white" opacity="0.9"/>
-            <line x1="28" y1="74" x2="52" y2="74" stroke="#9CA3AF" stroke-width="0.5"/>
-            <line x1="28" y1="78" x2="52" y2="78" stroke="#9CA3AF" stroke-width="0.5"/>
-            <line x1="28" y1="82" x2="52" y2="82" stroke="#9CA3AF" stroke-width="0.5"/>
-            
-            <!-- Volume tick marks on right side -->
-            <line x1="62" y1="30" x2="65" y2="30" stroke="#4B5563" stroke-width="1"/>
-            <line x1="62" y1="45" x2="65" y2="45" stroke="#4B5563" stroke-width="1"/>
-            <line x1="62" y1="60" x2="65" y2="60" stroke="#4B5563" stroke-width="1"/>
-            <line x1="62" y1="75" x2="65" y2="75" stroke="#4B5563" stroke-width="1"/>
-            <line x1="62" y1="90" x2="65" y2="90" stroke="#4B5563" stroke-width="1"/>
-          </svg>
-        </div>
+      <img
+        v-if="imageUrl && !hasError"
+        :src="imageUrl"
+        :alt="name"
+        class="w-full h-full"
+        loading="lazy"
+        @error="onError"
+      />
+      <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
+        <svg
+          class="w-32 h-40"
+          viewBox="0 0 80 120"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <!-- Vial Body -->
+          <rect x="20" y="20" width="40" height="80" rx="2" fill="white" stroke="#9CA3AF" stroke-width="1.5"/>
+          
+          <!-- Vial Cap -->
+          <rect x="18" y="15" width="44" height="8" rx="1" fill="#4B5563"/>
+          
+          <!-- Liquid (fills ~2/3) -->
+          <rect x="22" y="60" width="36" height="36" rx="1" fill="#93C5FD"/>
+          
+          <!-- Label on vial -->
+          <rect x="26" y="70" width="28" height="16" rx="1" fill="white" opacity="0.9"/>
+          <line x1="28" y1="74" x2="52" y2="74" stroke="#9CA3AF" stroke-width="0.5"/>
+          <line x1="28" y1="78" x2="52" y2="78" stroke="#9CA3AF" stroke-width="0.5"/>
+          <line x1="28" y1="82" x2="52" y2="82" stroke="#9CA3AF" stroke-width="0.5"/>
+          
+          <!-- Volume tick marks on right side -->
+          <line x1="62" y1="30" x2="65" y2="30" stroke="#4B5563" stroke-width="1"/>
+          <line x1="62" y1="45" x2="65" y2="45" stroke="#4B5563" stroke-width="1"/>
+          <line x1="62" y1="60" x2="65" y2="60" stroke="#4B5563" stroke-width="1"/>
+          <line x1="62" y1="75" x2="65" y2="75" stroke="#4B5563" stroke-width="1"/>
+          <line x1="62" y1="90" x2="65" y2="90" stroke="#4B5563" stroke-width="1"/>
+        </svg>
       </div>
     </div>
 
     <!-- Bottom Section: Product Information -->
-    <div class="p-4 flex flex-col gap-3 flex-1">
+    <div class="p-4">
       <!-- Category Tag -->
-      <div class="flex items-start justify-between">
-        <span class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mb-2">
-          {{ categoryName }}
-        </span>
+      <div class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mb-2">
+        {{ categoryName }}
       </div>
 
       <!-- Product Title -->
@@ -66,7 +62,7 @@
       </p>
 
       <!-- Specification Tags -->
-      <div class="flex items-center gap-2 flex-wrap">
+      <div class="flex items-center gap-2 mb-2 text-xs text-gray-600">
         <span v-if="purity" class="bg-green-50 text-green-700 px-2 py-0.5 rounded">
           {{ purity }}% Pure
         </span>
@@ -76,29 +72,26 @@
       </div>
 
       <!-- Rating -->
-      <div class="flex items-center gap-1.5">
-        <svg
-          class="w-4 h-4 text-yellow-500"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-        >
-          <path
-            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-          />
+      <div class="flex items-center gap-1 mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-3 h-3 fill-yellow-400 text-yellow-400" aria-hidden="true">
+          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
         </svg>
-        <span class="font-roboto font-normal text-sm leading-normal text-gray-800">
-          {{ formattedRating }} ({{ ratingCount || 0 }})
+        <span class="text-xs text-gray-900">
+          {{ formattedRating }}
+        </span>
+        <span class="text-xs text-gray-500">
+          ({{ ratingCount || 0 }})
         </span>
       </div>
 
       <!-- Stock Status -->
-      <div class="inline-flex items-center gap-1.5 px-2.5 py-1">
+      <div class="mb-3">
         <div
-          class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 border"
-          :class="isInStock ? 'border-green-300 text-green-700' : 'border-red-300 text-red-700'"
+          class="inline-flex items-center gap-1.5 bg-green-50 text-green-700 border-green-200 border rounded-full text-xs px-2 py-1"
+          :class="isInStock ? 'border-green-200 text-green-700' : 'border-red-200 text-red-700'"
         >
           <div 
-            class="w-2 h-2 rounded-full"
+            class="bg-green-500 w-1.5 h-1.5 rounded-full animate-pulse"
             :class="isInStock ? 'bg-green-500' : 'bg-red-500'"
           ></div>
           <span class="font-medium">
@@ -108,30 +101,24 @@
       </div>
 
       <!-- Price -->
-      <p class="font-roboto font-semibold text-2xl leading-normal text-gray-900 m-0 mb-3">
+      <div class="text-lg text-gray-900 font-semibold mb-3">
         ${{ displayPrice }}
-      </p>
+      </div>
 
       <!-- View Details Button -->
-      <button
-        @click="handleClick"
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2.5 px-4 font-roboto font-medium text-sm leading-normal flex items-center justify-center gap-2 transition-colors duration-200"
-      >
-        <svg
-          class="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      <div class="flex gap-2">
+        <button
+          @click="handleClick"
+          class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm flex items-center justify-center gap-2 transition-colors"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-        View Details
-      </button>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart w-4 h-4" aria-hidden="true">
+            <circle cx="8" cy="21" r="1"></circle>
+            <circle cx="19" cy="21" r="1"></circle>
+            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+          </svg>
+          View Details
+        </button>
+      </div>
     </div>
   </div>
 </template>
