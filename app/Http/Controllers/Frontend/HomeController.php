@@ -31,8 +31,10 @@ class HomeController extends Controller
                 $heroSlides[] = [
                     'title' => $slide['title'] ?? '',
                     'subtitle' => $slide['subtitle'] ?? '',
+                    'heading' => $slide['heading'] ?? '',
                     'ctaText' => $slide['cta_text'] ?? '',
                     'ctaUrl' => $slide['cta_url'] ?? '',
+                    'promoCode' => $slide['promo_code'] ?? '',
                     'image' => isset($slide['image']) && $slide['image']
                         ? Storage::url('hero_slides/' . $slide['image'])
                         : null,
@@ -113,7 +115,6 @@ class HomeController extends Controller
                 }
             ])
             ->orderByDesc('products_count')
-            ->take(5)
             ->get()
             ->map(function ($brand) {
                 // Get most common location from products

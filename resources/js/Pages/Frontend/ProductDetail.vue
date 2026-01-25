@@ -367,5 +367,5 @@ const copyDiscountCode = () => {
     alert('Failed to copy discount code')
   })
 }
-console.log(props)
+// console.log(props)
 </script>

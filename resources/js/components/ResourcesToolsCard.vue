@@ -1,6 +1,7 @@
 <template>
-  <div
-    class="bg-white border border-gray-200 rounded-lg p-8 hover:shadow-lg transition-all cursor-pointer group"
+  <Link
+    :href="href"
+    class="bg-white border border-gray-200 rounded-lg p-8 hover:shadow-lg transition-all cursor-pointer group block"
   >
     <!-- Icon Area -->
     <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mb-4">
@@ -18,17 +19,14 @@
     </p>
 
     <!-- Call-to-Action Link -->
-    <Link
-      :to="to"
-      class="text-slate-700 text-sm group-hover:underline"
-    >
+    <div class="text-slate-700 text-sm group-hover:underline flex items-center gap-1">
       <span>{{ ctaText }}</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-1">
         <path d="M5 12h14"></path>
         <path d="M12 5l7 7-7 7"></path>
       </svg>
-    </Link>
-  </div>
+    </div>
+  </Link>
 </template>
 
 <script setup>
@@ -44,7 +42,7 @@ const props = defineProps({
     type: String,
     required: true
   },
-  to: {
+  href: {
     type: String,
     required: true
   },
