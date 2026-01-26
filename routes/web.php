@@ -39,6 +39,9 @@ use App\Http\Controllers\Frontend\PagesController as FrontendPagesController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Search
+Route::get('/search', [\App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('search');
+
 // Frontend pages
 Route::get('/products', [ProductsController::class, 'index'])->name('products');
 Route::get('/product/{slug}/{id}', [ProductsController::class, 'showProduct'])->name('product.detail');

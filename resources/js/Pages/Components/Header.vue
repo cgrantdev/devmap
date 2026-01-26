@@ -16,9 +16,9 @@
             <span class="text-blue-600 font-semibold">maps</span>
           </div>
         </Link>
-        <form class="hidden lg:flex items-center flex-1 max-w-2xl">
+        <form @submit.prevent="handleSearch" class="hidden lg:flex items-center flex-1 max-w-2xl">
           <div class="relative flex-1">
-            <input type="text" placeholder="Search brands, products, peptides..." class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-sm border-r-0" value>
+            <input v-model="searchQuery" type="text" placeholder="Search brands, products, peptides..." class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-sm border-r-0">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" aria-hidden="true">
               <path d="m21 21-4.34-4.34"></path>
               <circle cx="11" cy="11" r="8"></circle>
@@ -62,8 +62,10 @@
       <!-- Mobile Search and Location (Always Visible) -->
       <div class="lg:hidden space-y-3 py-3 border-t border-slate-200">
         <!-- Search Bar -->
+        <form @submit.prevent="handleSearch">
         <div class="relative">
           <input
+              v-model="searchQuery"
             type="text"
             placeholder="Search brands, products, peptides..."
             class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -73,6 +75,7 @@
             <circle cx="11" cy="11" r="8"></circle>
           </svg>
         </div>
+        </form>
 
         <!-- Location Filter -->
         <div class="relative">
@@ -223,8 +226,10 @@
         <!-- Search and Location Filters -->
         <div class="px-4 py-4 space-y-3 border-b border-gray-200">
           <!-- Search Bar -->
+          <form @submit.prevent="handleSearch">
           <div class="relative">
             <input
+                v-model="searchQuery"
               type="text"
               placeholder="Search brands, products, peptides..."
               class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -234,6 +239,7 @@
               <circle cx="11" cy="11" r="8"></circle>
             </svg>
           </div>
+          </form>
 
           <!-- Location Filter -->
           <div class="relative">
@@ -367,10 +373,11 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Link, usePage } from '@inertiajs/vue3'
+import { Link, router, usePage } from '@inertiajs/vue3'
 
 const mobileMenuOpen = ref(false)
 const page = usePage()
+const searchQuery = ref('')
 
 const isActive = (path) => {
   const currentPath = page.url
@@ -383,6 +390,12 @@ const isActive = (path) => {
   // For other paths, check if current path starts with the link path
   // Use strict matching to avoid partial matches (e.g., "/about" matching "/about-us")
   return currentPath === path || currentPath.startsWith(path + '/')
+}
+
+const handleSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.visit(`/search?q=${encodeURIComponent(searchQuery.value.trim())}`)
+  }
 }
 </script>
 
