@@ -437,6 +437,86 @@ class KnowledgeCenterController extends Controller
             });
         }
 
-        return array_values($guides);
+        // Update guide URLs to use proper routes
+        $guides = array_map(function ($guide) {
+            $guide['guideUrl'] = route('guide.show', ['id' => $guide['id']]);
+            return $guide;
+        }, array_values($guides));
+
+        return $guides;
+    }
+
+    /**
+     * Show education guide detail page
+     */
+    public function showGuide($id)
+    {
+        // Get the guide data (for now using mock data, can be replaced with database query later)
+        $allGuides = [
+            1 => [
+                'id' => 1,
+                'tag' => 'Beginner',
+                'readingTime' => '15 min',
+                'title' => "Beginner's Guide to Peptides",
+                'description' => 'Everything you need to know about peptides, from basics to first purchase.',
+                'peptides' => ['BPC-157', 'TB-500', 'Ipamorelin'],
+            ],
+            2 => [
+                'id' => 2,
+                'tag' => 'Stacking',
+                'readingTime' => '12 min',
+                'title' => 'The Complete BPC-157 + TB-500 Healing Stack',
+                'description' => 'Detailed protocol for combining BPC-157 and TB-500 for optimal healing results.',
+                'peptides' => ['BPC-157', 'TB-500'],
+            ],
+            3 => [
+                'id' => 3,
+                'tag' => 'Dosage',
+                'readingTime' => '10 min',
+                'title' => 'Peptide Dosage Calculator & Safety Guidelines',
+                'description' => 'Learn how to calculate proper dosages and follow safety protocols.',
+                'peptides' => [],
+            ],
+            4 => [
+                'id' => 4,
+                'tag' => 'Advanced',
+                'readingTime' => '20 min',
+                'title' => 'Advanced: Growth Hormone Stack for Anti-Aging',
+                'description' => 'Comprehensive guide to combining multiple GH secretagogues for anti-aging benefits.',
+                'peptides' => ['Ipamorelin', 'CJC-1295', 'GHRP-6'],
+            ],
+            5 => [
+                'id' => 5,
+                'tag' => 'Beginner',
+                'readingTime' => '8 min',
+                'title' => 'Understanding Peptide Purity and COA',
+                'description' => 'Learn how to read Certificate of Analysis and verify peptide quality.',
+                'peptides' => [],
+            ],
+            6 => [
+                'id' => 6,
+                'tag' => 'Stacking',
+                'readingTime' => '18 min',
+                'title' => 'Weight Loss Peptide Stack Guide',
+                'description' => 'Complete guide to combining GLP-1 agonists and other peptides for weight management.',
+                'peptides' => ['Semaglutide', 'Tirzepatide'],
+            ],
+        ];
+
+        if (!isset($allGuides[$id])) {
+            abort(404, 'Guide not found');
+        }
+
+        $guide = $allGuides[$id];
+
+        return Inertia::render('Frontend/EducationGuideDetail', [
+            'id' => $guide['id'],
+            'tag' => $guide['tag'],
+            'readingTime' => $guide['readingTime'],
+            'title' => $guide['title'],
+            'description' => $guide['description'],
+            'peptides' => $guide['peptides'],
+            'guideUrl' => route('guide.show', ['id' => $guide['id']]),
+        ]);
     }
 }

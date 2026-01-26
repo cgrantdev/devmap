@@ -1,7 +1,7 @@
 <template>
   <FrontLayout>
     <!-- Brand Detail Section -->
-    <section class="py-8 bg-white">
+    <div class="min-h-screen bg-gray-50">
       <div class="relative overflow-hidden bg-white">
         <div class="absolute inset-0">
           <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1600&h=400&fit=crop" class="w-full h-full object-cover">
@@ -10,63 +10,66 @@
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-6">
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 flex">
-              <div v-if="brand.is_partner" class="absolute top-0 right-0">
-                <div class="px-4 py-2 rounded-bl-xl rounded-tr-xl text-sm shadow-sm bg-slate-100 text-slate-700">Partner</div>
-              </div>
-              <div class="flex flex-col md:flex-row gap-6">
-                <div class="flex-shrink-0">
-                  <div class="relative">
-                    <img 
-                      v-if="brand.logo" 
-                      :src="brand.logo" 
-                      :alt="brand.name + ' logo'"                      
-                      loading="lazy"
-                    />
-                    <div v-else class="w-full h-full flex items-center justify-center relative">
-                      <!-- Background oval shape -->
-                      <div class="absolute w-[200px] h-[280px] rounded-full" style="background-color: #D8CFC6; opacity: 0.05;"></div>
-                      <!-- Initials -->
-                      <span class="relative z-10 font-roboto font-semibold text-6xl text-gray-700">{{ brand.initials }}</span>
-                    </div>
-                  </div>
+              <div class="rounded-2xl shadow-lg p-10 w-full relative bg-white">
+                <div v-if="brand.is_partner" class="absolute top-0 right-0">
+                  <div class="px-4 py-2 rounded-bl-xl rounded-tr-xl text-sm shadow-sm bg-slate-100 text-slate-700">Partner</div>
                 </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex flex-wrap items-center gap-3 mb-3">
-                    <h1 class="text-3xl text-slate-800">{{ brand.name }}</h1>
-                  </div>
-                  <div class="flex flex-wrap items-center gap-4 mb-4">
-                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-50">
-                      <!-- Rating -->
-                      <RatingDisplay :rating="brand.rating || 0" :reviews="brand.reviews || 0" />
-                    </div>
-                    <div class="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full text-gray-600 bg-gray-50">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucid lucid-map-pin w-4 h-4" aria-hidden="true">
-                        <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                      </svg>
-                      {{ brand.location }}
+                <div class="flex flex-col md:flex-row gap-6">
+                  <div class="flex-shrink-0">
+                    <div class="relative">
+                      <img 
+                        v-if="brand.logo" 
+                        :src="brand.logo" 
+                        :alt="brand.name + ' logo'"                      
+                        loading="lazy"
+                      />
+                      <div v-else class="w-24 h-24 text-2xl bg-blue-600 rounded-lg flex items-center justify-center text-white select-none">
+                        <span>{{ brand.initials }}</span>
+                      </div>
                     </div>
                   </div>
-                  <p class="text-gray-600 mb-5 line-clamp-3">
-                    {{ brand.description }}
-                  </p>
-                  <div class="flex flex-wrap gap-3">
-                    <a href="brand.shop_url || '#'" :target="brand.shop_url ? '_blank' : '_self'" target="_blank" rel="noopener noreferrer" class="px-6 py-3 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg bg-slate-700 hover:bg-slate-600 text-white">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-4 h-4" aria-hidden="true">
-                        <path d="M15 3h6v6"></path>
-                        <path d="M10 14 21 3"></path>
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                      </svg>
-                      Visit Website
-                    </a>
-                    <button class="px-6 py-3 rounded-lg flex items-center gap-3 transition-all border-[3px] border-dashed border-green-600 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 group">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag w-5 h-5" aria-hidden="true">
-                        <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path>
-                        <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                      </svg>
-                      <span class="text-sm font-semibold">Use Code:</span>
-                      <span class="font-mono tracking-wider font-bold">PMAP</span>
-                    </button>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex flex-wrap items-center gap-3 mb-3">
+                      <h1 class="text-3xl text-slate-800">{{ brand.name }}</h1>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-4 mb-4">
+                      <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-50">
+                        <!-- Rating -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-4 h-4 fill-yellow-400 text-yellow-400" aria-hidden="true">
+                          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
+                        </svg>
+                        <span class="text-gray-900">{{ brand.rating || 0 }}</span>
+                        <span class="text-gray-500 text-sm">{{ brand.reviews || 0 }}</span>
+                      </div>
+                      <div class="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full text-gray-600 bg-gray-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucid lucid-map-pin w-4 h-4" aria-hidden="true">
+                          <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
+                          <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        {{ brand.location }}
+                      </div>
+                    </div>
+                    <p class="text-gray-600 mb-5 line-clamp-3">
+                      {{ brand.description }}
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                      <a href="brand.shop_url || '#'" :target="brand.shop_url ? '_blank' : '_self'" target="_blank" rel="noopener noreferrer" class="px-6 py-3 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg bg-slate-700 hover:bg-slate-600 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-4 h-4" aria-hidden="true">
+                          <path d="M15 3h6v6"></path>
+                          <path d="M10 14 21 3"></path>
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        </svg>
+                        Visit Website
+                      </a>
+                      <button class="px-6 py-3 rounded-lg flex items-center gap-3 transition-all border-[3px] border-dashed border-green-600 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 group">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag w-5 h-5" aria-hidden="true">
+                          <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path>
+                          <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
+                        </svg>
+                        <span class="text-sm font-semibold">Use Code:</span>
+                        <span class="font-mono tracking-wider font-bold">PMAP</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -118,210 +121,223 @@
           </div>
         </div> 
       </div>
-    </section>
 
-    <!-- Product Listing Section -->
-    <section class="py-8 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Product Listing Section -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <!-- Left Main Content Area (2/3) -->
-          <div class="lg:col-span-2">
-            <!-- Products Section Header -->
-            <div class="flex items-center gap-2 mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-gray-700">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-              </svg>
-              <h2 class="text-xl font-semibold text-gray-900">Products ({{ products.total }})</h2>
-            </div>
+          <div class="lg:col-span-3 space-y-8">
+            <section>
+              <!-- Products Section Header -->
+              <div class="flex items-center gap-3 mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package w-6 h-6 text-gray-900" aria-hidden="true">
+                  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path>
+                  <path d="M12 22V12"></path>
+                  <polyline points="3.29 7 12 12 20.71 7"></polyline>
+                  <path d="m7.5 4.27 9 5.15"></path>
+                </svg>
+                <h2 class="text-2xl text-gray-900">Products </h2>
+                <span class="text-gray-500">({{ products.total }})</span>
+              </div>
+              <div class="mb-6 space-y-4">
+                <div class="relative">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" aria-hidden="true">
+                    <path d="m21 21-4.34-4.34"></path>
+                    <circle cx="11" cy="11" r="8"></circle>
+                  </svg>
 
-            <!-- Search Bar -->
-            <div class="relative mb-6">
-              <input
-                v-model="searchQuery"
-                @input="handleSearchInput"
-                type="text"
-                placeholder="Search products..."
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-
-            <!-- Sort by Options -->
-            <div class="flex items-center gap-2 mb-6 flex-wrap">
-              <span class="text-sm text-gray-600">Sort by:</span>
-              <button
-                @click="applySort('featured', 'desc')"
-                :class="[
-                  'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-                  currentSort === 'featured' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                ]"
-              >
-                Featured
-              </button>
-              <button
-                @click="applySort('price', 'asc')"
-                :class="[
-                  'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-                  currentSort === 'price' && currentSortDir === 'asc' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                ]"
-              >
-                Price: Low to High
-              </button>
-              <button
-                @click="applySort('price', 'desc')"
-                :class="[
-                  'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-                  currentSort === 'price' && currentSortDir === 'desc' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                ]"
-              >
-                Price: High to Low
-              </button>
-              <button
-                @click="applySort('rating', 'desc')"
-                :class="[
-                  'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-                  currentSort === 'rating' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                ]"
-              >
-                Highest Rated
-              </button>
-              <button
-                @click="applySort('reviews', 'desc')"
-                :class="[
-                  'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-                  currentSort === 'reviews' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                ]"
-              >
-                Most Reviews
-              </button>
-              <button
-                @click="applySort('name', 'asc')"
-                :class="[
-                  'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-                  currentSort === 'name' ? 'bg-blue-700 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                ]"
-              >
-                Name A-Z
-              </button>
-            </div>
-
-            <!-- Product Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-              <ProductCard
-                v-for="product in products.data"
-                :key="product.id"
-                :name="product.name"
-                :image-url="product.image_url"
-                :price="product.price"
-                :discount-price="product.discount_price"
-                :brand-name="product.brand?.name"
-                :rating-average="product.rating_average"
-                :rating-count="product.rating_count"
-                :category-name="product.category?.name || ''"
-                :size-mg="product.size_mg"
-                :availability="product.availability"
-                :to="`/product/${product.slug}/${product.id}`"
-              />
-            </div>
-
-            <!-- Pagination -->
-            <Pagination
-              :pagination="products"
-              :get-page-url="getPageUrl"
-              :per-page-options="[10, 20, 50, 100]"
-              :on-per-page-change="handlePerPageChange"
-            />
-
-            <!-- Customer Reviews Section -->
-            <div class="mt-12 bg-white rounded-lg border border-gray-200 p-6">
-              <h3 class="text-xl font-semibold text-gray-900 mb-6">Customer Reviews</h3>
-              
-              <!-- Overall Rating -->
-              <div class="flex items-start gap-8 mb-6">
-                <div class="text-center">
-                  <div class="text-5xl font-bold text-gray-900 mb-2">{{ formattedOverallRating }}</div>
-                  <div class="flex items-center justify-center gap-1 mb-2">
-                    <svg v-for="i in 5" :key="i" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :class="i <= Math.floor(props.brand.rating) ? 'text-yellow-400 fill-yellow-400' : i === Math.ceil(props.brand.rating) && props.brand.rating % 1 !== 0 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
-                  </div>
-                  <p class="text-sm text-gray-600">{{ props.brand.reviews || 0 }} reviews</p>
+                  <input
+                    v-model="searchQuery"
+                    @input="handleSearchInput"
+                    type="text"
+                    placeholder="Search products..."
+                    class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                  />                  
                 </div>
-                
-                <!-- Star Breakdown -->
-                <div class="flex-1 space-y-2">
-                  <div v-for="star in 5" :key="star" class="flex items-center gap-3">
-                    <span class="text-sm text-gray-700 w-12">{{ 6 - star }} stars</span>
-                    <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div class="h-full bg-gray-300" style="width: 0%"></div>
-                    </div>
-                    <span class="text-sm text-gray-500 w-8 text-right">0</span>
+                <div class="flex items-center gap-2">
+                  <!-- Sort by Options -->
+                  <span class="text-sm text-gray-600">Sort by:</span>
+                  <div class="flex gap-2 flex-wrap">
+                    <button
+                      @click="applySort('featured', 'desc')"
+                      :class="[
+                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
+                        currentSort === 'featured' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                      ]"
+                    >
+                      Featured
+                    </button>
+                    <button
+                      @click="applySort('price', 'asc')"
+                      :class="[
+                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
+                        currentSort === 'price' && currentSortDir === 'asc' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                      ]"
+                    >
+                      Price: Low to High
+                    </button>
+                    <button
+                      @click="applySort('price', 'desc')"
+                      :class="[
+                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
+                        currentSort === 'price' && currentSortDir === 'desc' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                      ]"
+                    >
+                      Price: High to Low
+                    </button>
+                    <button
+                      @click="applySort('rating', 'desc')"
+                      :class="[
+                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
+                        currentSort === 'rating' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                      ]"
+                    >
+                      Highest Rated
+                    </button>
+                    <button
+                      @click="applySort('reviews', 'desc')"
+                      :class="[
+                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
+                        currentSort === 'reviews' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                      ]"
+                    >
+                      Most Reviews
+                    </button>
+                    <button
+                      @click="applySort('name', 'asc')"
+                      :class="[
+                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
+                        currentSort === 'name' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                      ]"
+                    >
+                      Name A-Z
+                    </button>
                   </div>
+                </div>
+              </div>
+
+              <!-- Product Grid -->
+              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <ProductSimpleCard
+                  v-for="product in products.data"
+                  :key="product.id"
+                  :name="product.name"
+                  :image-url="product.image_url"
+                  :price="product.price"
+                  :discount-price="product.discount_price"
+                  :rating-average="product.rating_average"
+                  :rating-count="product.rating_count"
+                  :to="`/product/${product.slug}/${product.id}`"
+                />
+              </div>
+            </section>
+            <section>
+              <h2 class="text-2xl text-gray-900 mb-6">Customer Reviews</h2>
+              <!-- Customer Reviews Section -->
+              <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                
+                <!-- Overall Rating -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div class="text-center">
+                    <div class="text-5xl text-gray-900 mb-2">{{ formattedOverallRating }}</div>
+                    <div class="flex items-center justify-center gap-1 mb-2">
+                      <svg v-for="i in 5" :key="i" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :class="i <= Math.floor(props.brand.rating) ? 'text-yellow-400 fill-yellow-400' : i === Math.ceil(props.brand.rating) && props.brand.rating % 1 !== 0 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'">
+                        <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
+                      </svg>
+                    </div>
+                    <div class="text-gray-600">{{ props.brand.reviews || 0 }} reviews</div>
+                  </div>
+                  
+                  <!-- Star Breakdown -->
+                  <div class="space-y-2">
+                    <div v-for="star in 5" :key="star" class="flex items-center gap-3">
+                      <span class="text-sm text-gray-600 w-12">{{ 6 - star }} stars</span>
+                      <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div class="h-full bg-yellow-400" style="width: 0%"></div>
+                      </div>
+                      <span class="text-sm text-gray-600 w-8">0</span>
+                    </div>
+                  </div>
+                </div>  
+              </div>
+              <div class="space-y-4">
+                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                  <div class="flex items-start justify-between mb-4">
+                    <div>
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="text-gray-900">John D.</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Verified Purchase</span>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <svg v-for="i in 5" :key="i" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-4 h-4 fill-yellow-400 text-yellow-400">
+                          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <span class="text-sm text-gray-500">2024-12-10</span>
+                  </div>
+                  <p class="text-gray-700 mb-2">Excellent product! Noticed significant improvement in joint pain after 2 weeks. Lab results match advertised purity.</p>
+                  <p class="text-sm text-gray-500">Product: BPC-157 5mg</p>
                 </div>
               </div>
 
               <!-- No Reviews Message -->
-              <div class="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+              <!-- <div class="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
                 <p class="text-gray-500">No reviews yet</p>
-              </div>
-            </div>
+              </div> -->
+            </section> 
           </div>
 
           <!-- Right Sidebar (1/3) -->
-          <div class="lg:col-span-1">
-            <div class="space-y-6">
+          <aside class="lg:col-span-1">
+            <div class="space-y-6 sticky top-24">
               <!-- Business Details Panel -->
-              <div class="bg-gray-100 rounded-lg p-6">
-                <div class="flex items-center gap-2 mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-gray-700">
-                    <rect width="20" height="14" x="2" y="7" rx="2" ry="2"></rect>
-                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                  </svg>
-                  <h3 class="text-lg font-semibold text-gray-900">Business Details</h3>
-                </div>
+              <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg text-gray-900 mb-4">Business Details</h3>                
                 <div class="space-y-3">
-                  <div class="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-500">
-                      <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
-                      <line x1="16" y1="2" x2="16" y2="6"></line>
-                      <line x1="8" y1="2" x2="8" y2="6"></line>
-                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                  <div class="flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-4 h-4 text-gray-500 mt-0.5" aria-hidden="true">
+                      <path d="M8 2v4"></path>
+                      <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                      <path d="M16 2v4"></path>
+                      <path d="M3 10h18"></path>
                     </svg>
-                    <span class="text-sm text-gray-700">Established: {{ brand.founded_year || '2013' }}</span>
+                    <div>
+                      <div class="text-xs text-gray-500">Established</div>
+                      <div class="text-sm text-gray-900">{{ brand.founded_year || '2013' }}</div>
+                    </div>
                   </div>
-                  <div class="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-500">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  <div class="flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-4 h-4 text-gray-500 mt-0.5" aria-hidden="true">
+                      <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
                     </svg>
-                    <span class="text-sm text-gray-700">Rating: {{ formattedOverallRating }} / 5.0 ({{ props.brand.reviews || 0 }} reviews)</span>
+                    <div>
+                      <div class="text-xs text-gray-500">Rating</div>
+                      <div class="text-sm text-gray-900">{{ formattedOverallRating }} / 5.0 ({{ props.brand.reviews || 0 }} reviews)</div>
+                    </div>
                   </div>
-                  <div class="flex items-center gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-500">
-                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                      <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                      <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  <div class="flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package w-4 h-4 text-gray-500 mt-0.5" aria-hidden="true">
+                      <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path>
+                      <polyline points="3.29 7 12 12 20.71 7"></polyline>
+                      <path d="m7.5 4.27 9 5.15"></path>
                     </svg>
-                    <span class="text-sm text-gray-700">{{ products.total }} listed</span>
+                    <div>
+                      <div class="text-xs text-gray-500">Produts</div>
+                      <div class="text-sm text-gray-900">{{ products.total }} listed</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <!-- Certifications Panel -->
-              <div class="bg-gray-100 rounded-lg p-6">
+              <div class="bg-white border border-gray-200 rounded-lg p-6">
                 <div class="flex items-center gap-2 mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-gray-700">
-                    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
-                    <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
-                    <path d="M10 9H8"></path>
-                    <path d="M16 13H8"></path>
-                    <path d="M16 17H8"></path>
-                    <path d="M10 5H8"></path>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award w-5 h-5 text-gray-900" aria-hidden="true">
+                    <path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"></path>
+                    <circle cx="12" cy="8" r="6"></circle>
                   </svg>
-                  <h3 class="text-lg font-semibold text-gray-900">Certifications</h3>
+                  <h3 class="text-lg text-gray-900">Certifications</h3>
                 </div>
                 <ul class="space-y-2">
                   <li v-for="cert in certifications" :key="cert" class="flex items-center gap-2">
@@ -332,67 +348,62 @@
               </div>
 
               <!-- Policies Panel -->
-              <div class="bg-gray-100 rounded-lg p-6">
-                <div class="flex items-center gap-2 mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-gray-700">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <path d="M14 2v6h6"></path>
-                    <path d="M16 13H8"></path>
-                    <path d="M16 17H8"></path>
-                    <path d="M10 9H8"></path>
-                  </svg>
-                  <h3 class="text-lg font-semibold text-gray-900">Policies</h3>
-                </div>
+              <div class="bg-white border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg text-gray-900 mb-4">Policies</h3>                
                 <div class="space-y-4">
-                  <div class="flex items-start gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-500 mt-0.5">
-                      <path d="M5 18H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"></path>
-                      <path d="M19 18h2a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
-                      <rect width="14" height="10" x="5" y="6" rx="2"></rect>
-                    </svg>
-                    <span class="text-sm text-gray-700">{{ props.brand.shipping_info || 'Free 2-day shipping on orders over $200.' }}</span>
-                  </div>
-                  <div class="flex items-start gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-500 mt-0.5">
-                      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-                      <path d="M21 3v5h-5"></path>
-                      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-                      <path d="M3 21v-5h5"></path>
-                    </svg>
-                    <span class="text-sm text-gray-700">{{ props.brand.return_policy || '60-day satisfaction guarantee.' }}</span>
+                  <div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-truck w-4 h-4 text-blue-600" aria-hidden="true">
+                        <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
+                        <path d="M15 18H9"></path>
+                        <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"></path>
+                        <circle cx="17" cy="18" r="2"></circle>
+                        <circle cx="7" cy="18" r="2"></circle>
+                      </svg>
+                      <div class="text-sm text-gray-900">Shipping</div>
+                    </div>
+                    <p class="text-sm text-gray-600 pl-6">{{ props.brand.shipping_info || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
                   </div>
                   <div>
                     <div class="flex items-center gap-2 mb-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-ccw w-4 h-4 text-green-600" aria-hidden="true">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                      </svg>
+                      <div class="text-sm text-gray-900">Returns</div>
+                    </div>
+                    <p class="text-sm text-gray-600 pl-6">{{ props.brand.return_policy || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2 mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card w-4 h-4 text-purple-600" aria-hidden="true">
                         <rect width="20" height="14" x="2" y="5" rx="2"></rect>
                         <line x1="2" y1="10" x2="22" y2="10"></line>
                       </svg>
-                      <span class="text-sm font-medium text-gray-700">Payment Methods:</span>
+                      <div class="text-sm text-gray-900">Payment Methods</div>
                     </div>
-                    <div class="flex flex-wrap gap-2">
-                      <span v-for="method in paymentMethods" :key="method" class="px-3 py-1 bg-white rounded-full text-xs text-gray-700 border border-gray-300">{{ method }}</span>
+                    <div class="flex flex-wrap gap-2 pl-6">
+                      <span v-for="method in paymentMethods" :key="method" class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">{{ method }}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <!-- Why Choose Panel -->
-              <div class="bg-gray-100 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Why Choose {{ props.brand.name }}?</h3>
-                <ul class="space-y-3">
+              <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg text-gray-900 mb-4">Why Choose {{ props.brand.name || 'Peptide Sciences' }}?</h3>
+                <ul class="space-y-2 text-sm text-gray-700">
                   <li v-for="benefit in whyChooseBenefits" :key="benefit" class="flex items-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5">
-                      <path d="M20 6 9 17l-5-5"></path>
-                    </svg>
-                    <span class="text-sm text-gray-700">{{ benefit }}</span>
+                    <span class="text-gray-900 mt-0.5">✓</span>
+                    <span>{{ benefit }}</span>
                   </li>
                 </ul>
               </div>
             </div>
-          </div>
+          </aside>
         </div>
       </div>
-    </section>
+    </div>
 
     <!-- Success/Error Messages -->
     <div
@@ -681,7 +692,7 @@ import { ref, computed, onMounted, nextTick, h, defineComponent } from 'vue'
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import MainButton from '@/components/MainButton.vue'
-import ProductCard from '@/components/ProductCard.vue'
+import ProductSimpleCard from '@/components/ProductSimpleCard.vue'
 import RatingDisplay from '@/components/RatingDisplay.vue'
 import VendorGrading from '@/components/VendorGrading.vue'
 import Pagination from '@/components/Pagination.vue'
