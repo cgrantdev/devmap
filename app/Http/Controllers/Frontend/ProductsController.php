@@ -223,9 +223,16 @@ class ProductsController extends Controller
         if ($request->has('min_purity') && $request->min_purity) {
             $minPurity = (float) $request->min_purity;
             // Extract purity from product name (looks for patterns like "99.2%", "99%", etc.)
-            // Using REGEXP_SUBSTR to extract the number before the % sign, then remove % and convert to decimal
+            // Match ProductCard.vue behavior: extract purity or default to 99.0%
+            // Handle both NULL and empty string results from REGEXP_SUBSTR
             $query->whereRaw(
-                "CAST(REPLACE(REGEXP_SUBSTR(name, '[0-9]+(\\.[0-9]+)?\\s*%'), '%', '') AS DECIMAL(5,2)) >= ?",
+                "COALESCE(
+                    NULLIF(
+                        CAST(REPLACE(NULLIF(REGEXP_SUBSTR(name, '[0-9]+(\\.[0-9]+)?\\s*%'), ''), '%', '') AS DECIMAL(5,2)),
+                        0
+                    ),
+                    99.0
+                ) >= ?",
                 [$minPurity]
             );
         }
@@ -365,9 +372,16 @@ class ProductsController extends Controller
         if ($request->has('min_purity') && $request->min_purity) {
             $minPurity = (float) $request->min_purity;
             // Extract purity from product name (looks for patterns like "99.2%", "99%", etc.)
-            // Using REGEXP_SUBSTR to extract the number before the % sign, then remove % and convert to decimal
+            // Match ProductCard.vue behavior: extract purity or default to 99.0%
+            // Handle both NULL and empty string results from REGEXP_SUBSTR
             $query->whereRaw(
-                "CAST(REPLACE(REGEXP_SUBSTR(name, '[0-9]+(\\.[0-9]+)?\\s*%'), '%', '') AS DECIMAL(5,2)) >= ?",
+                "COALESCE(
+                    NULLIF(
+                        CAST(REPLACE(NULLIF(REGEXP_SUBSTR(name, '[0-9]+(\\.[0-9]+)?\\s*%'), ''), '%', '') AS DECIMAL(5,2)),
+                        0
+                    ),
+                    99.0
+                ) >= ?",
                 [$minPurity]
             );
         }
