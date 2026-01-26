@@ -198,4 +198,304 @@ class EncyclopediaController extends Controller
             'Multiple potential benefits'
         ];
     }
+
+    /**
+     * Show encyclopedia detail page
+     */
+    public function show($slug)
+    {
+        $category = ProductCategory::where('slug', $slug)
+            ->where('is_active', true)
+            ->with('educationPost')
+            ->firstOrFail();
+
+        $educationPost = $category->educationPost;
+        
+        // Get image - prioritize education post image, fallback to category image
+        $image = null;
+        if ($educationPost && $educationPost->image) {
+            $image = Storage::url('education_posts/' . $educationPost->image);
+        } elseif ($category->image_url) {
+            $image = Storage::url('categories/' . $category->image_url);
+        }
+
+        // Get products for this category
+        $products = Product::visible()
+            ->where('status', 'active')
+            ->where('product_category_id', $category->id)
+            ->with(['brand', 'category'])
+            ->orderBy('price', 'asc')
+            ->limit(5)
+            ->get()
+            ->map(function ($product) use ($category) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'image_url' => $product->image_url,
+                    'price' => $product->price,
+                    'discount_price' => $product->discount_price,
+                    'size_mg' => $product->size_mg,
+                    'availability' => $product->availability,
+                    'rating_average' => (float) ($product->rating_average ?? 0),
+                    'rating_count' => (int) ($product->rating_count ?? 0),
+                    'brand' => $product->brand ? [
+                        'name' => $product->brand->name,
+                    ] : null,
+                    'category' => $product->category ? [
+                        'name' => $product->category->name,
+                    ] : [
+                        'name' => $category->name,
+                    ],
+                ];
+            });
+
+        // Determine category tag
+        $categoryTag = $this->getCategoryTag($category->name, $category->description);
+
+        // Get comprehensive data
+        $peptideData = [
+            'id' => $category->id,
+            'name' => $category->name,
+            'slug' => $category->slug,
+            'subtitle' => $this->getSubtitle($category->name),
+            'description' => $educationPost ? $educationPost->description : $category->description,
+            'image' => $image,
+            'categoryTag' => $categoryTag,
+            'keyBenefits' => $this->getKeyBenefits($category->name),
+            'quickFacts' => $this->getQuickFacts($category->name),
+            'commonUseCases' => $this->getCommonUseCases($category->name),
+            'howItWorks' => $this->getHowItWorks($category->name),
+            'dosage' => $this->getDosage($category->name),
+            'safetyInfo' => $this->getSafetyInfo($category->name),
+            'stackingRecommendations' => $this->getStackingRecommendations($category->name),
+            'faqs' => $this->getFAQs($category->name),
+            'userExperiences' => $this->getUserExperiences($category->name),
+            'products' => $products,
+            'researchStudies' => rand(30, 60),
+        ];
+
+        return Inertia::render('Frontend/EncyclopediaDetail', $peptideData);
+    }
+
+    /**
+     * Get key benefits for peptide
+     */
+    private function getKeyBenefits($name)
+    {
+        $nameLower = strtolower($name ?? '');
+        
+        if (stripos($nameLower, 'bpc-157') !== false) {
+            return [
+                'Accelerates tendon and ligament healing',
+                'Promotes gut health and repairs intestinal damage',
+                'May improve joint health',
+                'Neuroprotective properties',
+                'Reduces inflammation',
+                'Protects and heals muscle tissue',
+                'Supports blood vessel formation',
+            ];
+        }
+
+        // Default benefits
+        return [
+            'Supports research applications',
+            'Well-documented in scientific literature',
+            'Multiple potential benefits',
+        ];
+    }
+
+    /**
+     * Get quick facts
+     */
+    private function getQuickFacts($name)
+    {
+        $nameLower = strtolower($name ?? '');
+        
+        if (stripos($nameLower, 'bpc-157') !== false) {
+            return [
+                'halfLife' => '~4 hours',
+                'bioavailability' => 'High via injection, lower oral',
+                'storage' => 'Refrigerate at 2-8°C, freeze for long-term storage',
+                'researchLevel' => 'Moderate Research',
+            ];
+        }
+
+        return [
+            'halfLife' => 'Varies',
+            'bioavailability' => 'Varies by administration method',
+            'storage' => 'Refrigerate at 2-8°C',
+            'researchLevel' => 'Moderate Research',
+        ];
+    }
+
+    /**
+     * Get common use cases
+     */
+    private function getCommonUseCases($name)
+    {
+        $nameLower = strtolower($name ?? '');
+        
+        if (stripos($nameLower, 'bpc-157') !== false) {
+            return [
+                'Sports injuries (tendonitis, sprains, strains)',
+                'Post-surgical recovery',
+                'Chronic joint pain',
+                'Inflammatory bowel disease (IBD)',
+                'Leaky gut syndrome',
+                'Muscle tears and damage',
+                'General tissue repair',
+            ];
+        }
+
+        return [
+            'Research applications',
+            'General use cases',
+        ];
+    }
+
+    /**
+     * Get how it works information
+     */
+    private function getHowItWorks($name)
+    {
+        $nameLower = strtolower($name ?? '');
+        
+        if (stripos($nameLower, 'bpc-157') !== false) {
+            return [
+                'Promotes angiogenesis (formation of new blood vessels)',
+                'Modulates growth factors including VEGF and FGF',
+                'Activates the FAK-paxillin pathway',
+                'Enhances cell migration and proliferation',
+            ];
+        }
+
+        return [
+            'Mechanism of action varies by peptide type',
+            'Research continues to uncover specific pathways',
+        ];
+    }
+
+    /**
+     * Get dosage information
+     */
+    private function getDosage($name)
+    {
+        $nameLower = strtolower($name ?? '');
+        
+        if (stripos($nameLower, 'bpc-157') !== false) {
+            return [
+                'typicalDosage' => '250-500 mcg',
+                'frequency' => 'Once or twice daily',
+                'administration' => [
+                    'Subcutaneous injection',
+                    'Intramuscular injection',
+                    'Oral - less effective',
+                ],
+                'cycleDuration' => '4-6 weeks, can be extended',
+            ];
+        }
+
+        return [
+            'typicalDosage' => 'Varies',
+            'frequency' => 'Varies',
+            'administration' => ['Subcutaneous injection'],
+            'cycleDuration' => '4-6 weeks',
+        ];
+    }
+
+    /**
+     * Get safety information
+     */
+    private function getSafetyInfo($name)
+    {
+        return [
+            'sideEffects' => [
+                'Generally well-tolerated',
+                'Mild headache (rare)',
+                'Dizziness (rare)',
+                'Nausea (rare)',
+                'Injection site redness',
+            ],
+            'contraindications' => [
+                'Pregnancy and breastfeeding',
+                'Active cancer (theoretical concern)',
+                'Consult doctor if on blood thinners',
+            ],
+        ];
+    }
+
+    /**
+     * Get stacking recommendations
+     */
+    private function getStackingRecommendations($name)
+    {
+        $nameLower = strtolower($name ?? '');
+        
+        if (stripos($nameLower, 'bpc-157') !== false) {
+            return [
+                [
+                    'name' => 'TB-500',
+                    'subtitle' => 'Thymosin Beta-4',
+                    'description' => 'Stacking BPC-157 with TB-500 can enhance healing effects',
+                    'slug' => 'tb-500',
+                ],
+            ];
+        }
+
+        return [];
+    }
+
+    /**
+     * Get FAQs
+     */
+    private function getFAQs($name)
+    {
+        $nameLower = strtolower($name ?? '');
+        
+        if (stripos($nameLower, 'bpc-157') !== false) {
+            return [
+                [
+                    'question' => 'How long does it take to see results from BPC-157?',
+                    'answer' => 'Most users report noticeable improvements within 2-4 weeks of consistent use. Full benefits may take 6-8 weeks or longer depending on the severity of the condition.',
+                ],
+                [
+                    'question' => 'Should I inject BPC-157 near the injury site?',
+                    'answer' => 'While systemic administration is effective, some users prefer to inject near the injury site for potentially faster localized effects. Both methods are valid.',
+                ],
+                [
+                    'question' => 'Can I take BPC-157 orally?',
+                    'answer' => 'Yes, BPC-157 can be taken orally, though bioavailability is lower than injection. Oral administration is more convenient but may require higher doses.',
+                ],
+            ];
+        }
+
+        return [
+            [
+                'question' => 'What is the recommended dosage?',
+                'answer' => 'Dosage varies by individual and condition. Consult with a healthcare professional for personalized recommendations.',
+            ],
+        ];
+    }
+
+    /**
+     * Get user experiences (mock data)
+     */
+    private function getUserExperiences($name)
+    {
+        return [
+            [
+                'rating' => 5,
+                'review' => 'Excellent product! Helped with my tendonitis significantly. Shipping was fast and product quality is top-notch.',
+                'verified' => true,
+                'author' => 'John D.',
+            ],
+            [
+                'rating' => 5,
+                'review' => 'Great results after 3 weeks of use. Highly recommend for anyone dealing with joint issues.',
+                'verified' => true,
+                'author' => 'Sarah M.',
+            ],
+        ];
+    }
 }

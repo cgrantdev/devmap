@@ -45,35 +45,35 @@
     </div>
 
     <!-- Bottom Section: Product Information -->
-    <div class="p-4">
+    <div class="p-4 flex flex-col flex-grow">
       <!-- Category Tag -->
-      <div class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mb-2">
-        {{ categoryName }}
+      <div class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mb-2 h-6 flex items-center">
+        <span class="truncate">{{ categoryName }}</span>
       </div>
 
       <!-- Product Title -->
-      <h3 class="text-sm text-gray-900 mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
+      <h3 class="text-sm text-gray-900 mb-1 line-clamp-2 min-h-[2.5rem] group-hover:text-blue-600 transition-colors">
         {{ name }}
       </h3>
 
       <!-- Brand Name -->
-      <p class="text-xs text-gray-500 mb-2">
-        {{ brandName || 'Unknown Brand' }}
+      <p class="text-xs text-gray-500 mb-2 h-4 flex items-center">
+        <span class="truncate">{{ brandName || 'Unknown Brand' }}</span>
       </p>
 
       <!-- Specification Tags -->
-      <div class="flex items-center gap-2 mb-2 text-xs text-gray-600">
-        <span v-if="purity" class="bg-green-50 text-green-700 px-2 py-0.5 rounded">
+      <div class="flex items-center gap-2 mb-2 text-xs text-gray-600 min-h-[1.5rem]">
+        <span v-if="purity" class="bg-green-50 text-green-700 px-2 py-0.5 rounded whitespace-nowrap">
           {{ purity }}% Pure
         </span>
-        <span v-if="sizeDisplay" class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded">
+        <span v-if="sizeDisplay" class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded whitespace-nowrap">
           {{ sizeDisplay }}
         </span>
       </div>
 
       <!-- Rating -->
-      <div class="flex items-center gap-1 mb-3">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-3 h-3 fill-yellow-400 text-yellow-400" aria-hidden="true">
+      <div class="flex items-center gap-1 mb-3 h-5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-3 h-3 fill-yellow-400 text-yellow-400 flex-shrink-0" aria-hidden="true">
           <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
         </svg>
         <span class="text-xs text-gray-900">
@@ -85,13 +85,13 @@
       </div>
 
       <!-- Stock Status -->
-      <div class="mb-3">
+      <div class="mb-3 h-6 flex items-center">
         <div
-          class="inline-flex items-center gap-1.5 bg-green-50 text-green-700 border-green-200 border rounded-full text-xs px-2 py-1"
+          class="inline-flex items-center gap-1.5 bg-green-50 text-green-700 border-green-200 border rounded-full text-xs px-2 py-1 whitespace-nowrap"
           :class="isInStock ? 'border-green-200 text-green-700' : 'border-red-200 text-red-700'"
         >
           <div 
-            class="bg-green-500 w-1.5 h-1.5 rounded-full animate-pulse"
+            class="bg-green-500 w-1.5 h-1.5 rounded-full animate-pulse flex-shrink-0"
             :class="isInStock ? 'bg-green-500' : 'bg-red-500'"
           ></div>
           <span class="font-medium">
@@ -101,17 +101,20 @@
       </div>
 
       <!-- Price -->
-      <div class="text-lg text-gray-900 font-semibold mb-3">
+      <div class="text-lg text-gray-900 font-semibold mb-3 h-7 flex items-center">
         ${{ displayPrice }}
       </div>
 
+      <!-- Spacer to push button to bottom -->
+      <div class="flex-grow"></div>
+
       <!-- View Details Button -->
-      <div class="flex gap-2">
+      <div class="flex gap-2 mt-auto">
         <button
           @click="handleClick"
-          class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm flex items-center justify-center gap-2 transition-colors"
+          class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm flex items-center justify-center gap-2 transition-colors h-10"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart w-4 h-4" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart w-4 h-4 flex-shrink-0" aria-hidden="true">
             <circle cx="8" cy="21" r="1"></circle>
             <circle cx="19" cy="21" r="1"></circle>
             <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>

@@ -16,14 +16,15 @@
                 </div>
                 <div class="flex flex-col md:flex-row gap-6">
                   <div class="flex-shrink-0">
-                    <div class="relative">
+                    <div class="relative w-24 h-24 bg-white rounded-lg flex items-center justify-center overflow-hidden">
                       <img 
                         v-if="brand.logo" 
                         :src="brand.logo" 
-                        :alt="brand.name + ' logo'"                      
+                        :alt="brand.name + ' logo'"
+                        class="w-full h-full object-contain p-2"
                         loading="lazy"
                       />
-                      <div v-else class="w-24 h-24 text-2xl bg-blue-600 rounded-lg flex items-center justify-center text-white select-none">
+                      <div v-else class="w-full h-full text-2xl bg-blue-600 rounded-lg flex items-center justify-center text-white select-none">
                         <span>{{ brand.initials }}</span>
                       </div>
                     </div>
@@ -53,7 +54,7 @@
                       {{ brand.description }}
                     </p>
                     <div class="flex flex-wrap gap-3">
-                      <a href="brand.shop_url || '#'" :target="brand.shop_url ? '_blank' : '_self'" target="_blank" rel="noopener noreferrer" class="px-6 py-3 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg bg-slate-700 hover:bg-slate-600 text-white">
+                      <a :href="brand.shop_url || '#'" :target="brand.shop_url ? '_blank' : '_self'" rel="noopener noreferrer" class="px-6 py-3 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg bg-slate-700 hover:bg-slate-600 text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-4 h-4" aria-hidden="true">
                           <path d="M15 3h6v6"></path>
                           <path d="M10 14 21 3"></path>
