@@ -129,6 +129,6 @@ const props = defineProps({
 })
 
 const handleClick = () => {
-  router.visit(`/education/${props.slug}`)
+  router.visit(`/encyclopedia/${props.slug}`)
 }
 </script>
