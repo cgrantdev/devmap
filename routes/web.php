@@ -55,6 +55,7 @@ Route::get('/education/{slug}', [EducationController::class, 'show'])->name('edu
 Route::get('/encyclopedia', [EncyclopediaController::class, 'index'])->name('encyclopedia');
 Route::get('/compare', [CompareController::class, 'index'])->name('compare');
 Route::get('/news', [KnowledgeCenterController::class, 'index'])->name('news');
+Route::get('/guide/{id}', [KnowledgeCenterController::class, 'showGuide'])->name('guide.show');
 Route::get('/deals', [DealsController::class, 'index'])->name('deals');
 Route::get('/become-a-vendor', [BecomeVendorController::class, 'index'])->name('become-a-vendor');
 

@@ -41,7 +41,7 @@
                 : 'border-transparent text-gray-600 hover:text-gray-900'
             ]"
           >
-            <component :is="nav.icon" class="w-5 h-5" />
+            <component :is="nav.icon" />
             <span>{{ nav.label }}</span>
           </button>
         </nav>
@@ -53,20 +53,20 @@
       <div v-if="primaryNav === 'research'">
         <!-- Research Library Header -->
         <div class="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <div class="flex items-center gap-3 mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-6 h-6 text-blue-600" aria-hidden="true">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          <h3 class="text-lg text-blue-900 mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="llucide lucide-award w-5 h-5" aria-hidden="true">
+              <path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"></path>
+              <circle cx="12" cy="8" r="6"></circle>
             </svg>
-            <h2 class="text-2xl font-bold text-gray-900">Research Library</h2>
-          </div>
-          <p class="text-sm text-gray-700">
+            Research Library
+          </h3>
+          <p class="text-blue-800">
             Curated collection of clinical studies and research papers on peptide therapies. All studies are linked to their original sources on PubMed.
           </p>
         </div>
 
         <!-- Research Papers -->
-        <div v-if="filteredResearchPapers.length > 0" class="space-y-6">
+        <div v-if="filteredResearchPapers.length > 0" class="grid grid-cols-1 gap-4">
           <ResearchLibraryCard
             v-for="paper in filteredResearchPapers"
             :key="paper.id"
@@ -91,16 +91,16 @@
       <div v-else-if="primaryNav === 'guides'">
         <!-- Educational Guides Header -->
         <div class="mb-8 bg-purple-50 border border-purple-200 rounded-lg p-6">
-          <div class="flex items-center gap-3 mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-6 h-6 text-purple-600" aria-hidden="true">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          <h3 class="text-lg text-purple-900 mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-5 h-5" aria-hidden="true">
+              <path d="M12 7v14"></path>
+              <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
             </svg>
-            <h2 class="text-2xl font-bold text-gray-900">Educational Guides</h2>
-          </div>
-          <p class="text-sm text-gray-700">
+            Educational Guides
+          </h3>
+          <p class="text-purple-800">
             Comprehensive guides written by experts to help you understand peptides, create effective protocols, and use them safely.
-          </p>
+          </p>          
         </div>
 
         <!-- Educational Guides Grid -->
@@ -139,7 +139,7 @@
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
               ]"
             >
-              <component :is="filter.icon" class="w-4 h-4" />
+              <component :is="filter.icon" />
               <span>{{ filter.label }}</span>
             </button>
           </div>
@@ -250,71 +250,28 @@ const primaryNavs = [
   {
     label: 'News & Articles',
     value: 'news',
-    icon: () => h('svg', {
-      xmlns: 'http://www.w3.org/2000/svg',
-      width: '20',
-      height: '20',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      stroke: 'currentColor',
-      strokeWidth: '2',
-      strokeLinecap: 'round',
-      strokeLinejoin: 'round'
-    }, [
-      h('path', { d: 'M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2' }),
-      h('path', { d: 'M18 14h-8' }),
-      h('path', { d: 'M15 18h-5' }),
-      h('path', { d: 'M10 6h8' }),
-      h('path', { d: 'M10 10h8' })
-    ])
+    icon: () => h('span', { class: 'text-lg' }, '📰')
   },
   {
     label: 'Research Library',
     value: 'research',
-    icon: () => h('svg', {
-      xmlns: 'http://www.w3.org/2000/svg',
-      width: '20',
-      height: '20',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      stroke: 'currentColor',
-      strokeWidth: '2',
-      strokeLinecap: 'round',
-      strokeLinejoin: 'round'
-    }, [
-      h('path', { d: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20' }),
-      h('path', { d: 'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' })
-    ])
+    icon: () => h('span', { class: 'text-lg' }, '🔬')
   },
   {
     label: 'Educational Guides',
     value: 'guides',
-    icon: () => h('svg', {
-      xmlns: 'http://www.w3.org/2000/svg',
-      width: '20',
-      height: '20',
-      viewBox: '0 0 24 24',
-      fill: 'none',
-      stroke: 'currentColor',
-      strokeWidth: '2',
-      strokeLinecap: 'round',
-      strokeLinejoin: 'round'
-    }, [
-      h('path', { d: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20' }),
-      h('path', { d: 'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' }),
-      h('path', { d: 'M12 7v14' })
-    ])
+    icon: () => h('span', { class: 'text-lg' }, '📚')
   }
 ]
 
 // Filter buttons
 const filters = [
-  { label: 'All News', value: 'all', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('circle', { cx: '12', cy: '12', r: '10' }), h('line', { x1: '12', y1: '2', x2: '12', y2: '6' }), h('line', { x1: '12', y1: '18', x2: '12', y2: '22' }), h('line', { x1: '4.93', y1: '4.93', x2: '7.76', y2: '7.76' }), h('line', { x1: '16.24', y1: '16.24', x2: '19.07', y2: '19.07' }), h('line', { x1: '2', y1: '12', x2: '6', y2: '12' }), h('line', { x1: '18', y1: '12', x2: '22', y2: '12' }), h('line', { x1: '4.93', y1: '19.07', x2: '7.76', y2: '16.24' }), h('line', { x1: '16.24', y1: '7.76', x2: '19.07', y2: '4.93' })]) },
-  { label: 'Research', value: 'research', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('path', { d: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20' }), h('path', { d: 'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' })]) },
-  { label: 'Industry', value: 'industry', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('path', { d: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' }), h('circle', { cx: '9', cy: '7', r: '4' }), h('path', { d: 'M22 21v-2a4 4 0 0 0-3-3.87' }), h('path', { d: 'M16 3.13a4 4 0 0 1 0 7.75' })]) },
-  { label: 'Regulation', value: 'regulation', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('path', { d: 'M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z' }), h('circle', { cx: '7.5', cy: '7.5', r: '.5', fill: 'currentColor' })]) },
-  { label: 'Guides', value: 'guides', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('path', { d: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20' }), h('path', { d: 'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' }), h('path', { d: 'M12 7v14' })]) },
-  { label: 'Community', value: 'community', icon: () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '16', height: '16', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' }, [h('path', { d: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2' }), h('circle', { cx: '9', cy: '7', r: '4' }), h('path', { d: 'M23 21v-2a4 4 0 0 0-3-3.87' }), h('path', { d: 'M16 3.13a4 4 0 0 1 0 7.75' })]) }
+  { label: 'All News', value: 'all', icon: () => h('span', { class: 'text-base' }, '📰') },
+  { label: 'Research', value: 'research', icon: () => h('span', { class: 'text-base' }, '🔬') },
+  { label: 'Industry', value: 'industry', icon: () => h('span', { class: 'text-base' }, '📊') },
+  { label: 'Regulation', value: 'regulation', icon: () => h('span', { class: 'text-base' }, '⚖️') },
+  { label: 'Guides', value: 'guides', icon: () => h('span', { class: 'text-base' }, '📚') },
+  { label: 'Community', value: 'community', icon: () => h('span', { class: 'text-base' }, '💬') }
 ]
 
 // Filter latest blogs by current filter

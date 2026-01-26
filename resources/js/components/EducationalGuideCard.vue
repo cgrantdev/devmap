@@ -1,64 +1,66 @@
 <template>
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow flex flex-col">
+  <div class="bg-white border-2 rounded-lg p-6 hover:shadow-xl transition-all cursor-pointer group border-purple-300 bg-purple-50/30">
     <!-- Top Row: Tag and Reading Time -->
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex items-start justify-between mb-3">
       <!-- Tag -->
       <span
         v-if="tag"
         :class="[
-          'px-3 py-1 rounded-full text-xs font-medium',
+          'text-xs px-2 py-1 rounded bg-green-100 text-green-800',
           getTagClasses(tag)
         ]"
       >
         {{ tag }}
       </span>
-      <span v-else></span>
-      
-      <!-- Reading Time -->
-      <div class="flex items-center gap-1 text-sm text-gray-500">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock" aria-hidden="true">
+      <span class="text-xs text-gray-500 flex items-center gap-1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-3 h-3" aria-hidden="true">
           <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
+          <path d="M12 6v6l4 2"></path>
         </svg>
-        <span>{{ readingTime }}</span>
-      </div>
-    </div>
+        {{ readingTime }}
+      </span>    
+    </div>     
 
     <!-- Title -->
-    <h3 class="text-lg font-bold text-gray-900 mb-2">
+    <h3 class="text-xl text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
       {{ title }}
     </h3>
 
     <!-- Description -->
-    <p class="text-sm text-gray-600 mb-4 flex-grow">
+    <p class="text-sm text-gray-600 mb-4">
       {{ description }}
     </p>
 
     <!-- Peptide Tags -->
-    <div v-if="peptides && peptides.length > 0" class="flex flex-wrap gap-2 mb-4">
-      <span
-        v-for="peptide in peptides"
-        :key="peptide"
-        class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700 font-medium"
-      >
-        {{ peptide }}
-      </span>
+    <div v-if="peptides && peptides.length > 0" class="mb-4">
+      <p class="text-xs text-gray-500 mb-2">Covers:</p>
+      <div class="flex flex-wrap gap-1">
+        <span
+          v-for="peptide in peptides"
+          :key="peptide"
+          class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-200"
+        >
+          {{ peptide }}
+        </span>
+      </div>
     </div>
 
     <!-- Read Guide Button -->
-    <a
-      :href="guideUrl"
-      class="mt-auto px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+    <button
+      @click="router.visit(guideUrl)"
+      class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded flex items-center justify-center gap-2 transition-colors"
     >
       Read Guide
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4" aria-hidden="true">
         <path d="m9 18 6-6-6-6"></path>
       </svg>
-    </a>
+    </button>
   </div>
 </template>
 
 <script setup>
+import { router } from '@inertiajs/vue3'
+
 defineProps({
   id: {
     type: [Number, String],

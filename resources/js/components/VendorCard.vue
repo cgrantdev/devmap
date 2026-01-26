@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer group relative border-2 border-slate-300 shadow-md"
+    class="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer group relative border-2 border-slate-300 shadow-md flex flex-col"
   >
     <!-- Partner Badge (Top Right Corner) -->
     <div class="absolute top-0 right-0 z-10">
@@ -34,11 +34,11 @@
     </div>
 
     <!-- Content Section -->
-    <div class="px-5 pb-5">
+    <div class="px-5 pb-5 flex flex-col h-full">
       <!-- Brand Name with Featured Dot -->
-      <div class="mb-3 text-center"> 
-        <div class="flex items-center justify-center gap-1.5 mb-1">
-          <h3 class="text-base text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+      <div class="mb-2 text-center min-h-[3rem] flex items-center justify-center">
+        <div class="flex items-center justify-center gap-1.5">
+          <h3 class="text-base text-gray-900 group-hover:text-blue-600 transition-colors">
             {{ name }}
           </h3>
           <!-- Featured Indicator (Blue Circle) -->
@@ -48,16 +48,19 @@
             title="Featured Partner"
           ></div>
         </div>
-        
-        <!-- Location -->
-        <div class="flex items-center justify-center gap-1 text-xs text-gray-500">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-3 h-3 flex-shrink-0" aria-hidden="true">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-          <span class="truncate">{{ location || 'Location not available' }}</span>
-        </div>
       </div>
+      
+      <!-- Location (Fixed height for alignment) -->
+      <div class="flex items-center justify-center gap-1 text-xs text-gray-500 mb-3 min-h-[1.5rem]">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-3 h-3 flex-shrink-0" aria-hidden="true">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        <span class="truncate">{{ location || 'Location not available' }}</span>
+      </div>
+
+      <!-- Spacer to push rating and button to bottom -->
+      <div class="flex-grow"></div>
 
       <!-- Rating and Reviews (Side by Side) -->
       <div class="grid grid-cols-2 gap-2 mb-3">
