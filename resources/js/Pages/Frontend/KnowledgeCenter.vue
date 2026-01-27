@@ -147,7 +147,7 @@
 
         
         <!-- Featured Stories -->
-        <div v-if="featuredBlogs.length > 0" class="mb-12">
+        <div v-if="filteredFeaturedBlogs.length > 0" class="mb-12">
           <h2 class="text-2xl text-gray-900 mb-6 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up w-6 h-6 text-blue-600" aria-hidden="true">
               <path d="M16 7h6v6"></path>
@@ -157,7 +157,7 @@
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <KnowledgeCenterCard
-              v-for="blog in featuredBlogs"
+              v-for="blog in filteredFeaturedBlogs"
               :key="blog.id"
               :id="blog.id"
               :title="blog.title"
@@ -274,14 +274,39 @@ const filters = [
   { label: 'Community', value: 'community', icon: () => h('span', { class: 'text-base' }, '💬') }
 ]
 
-// Filter latest blogs by current filter
+// Map filter values to categoryTag values used on blogs
+const filterToCategoryTag = {
+  research: 'Research',
+  industry: 'Industry',
+  regulation: 'Regulation',
+  guides: 'Guides',
+  community: 'Community'
+}
+
+const currentCategoryTag = computed(() => {
+  if (currentFilter.value === 'all') return null
+  return filterToCategoryTag[currentFilter.value] || null
+})
+
+// Filter latest blogs by current filter (categoryTag)
 const filteredLatestBlogs = computed(() => {
   let result = props.latestBlogs || []
   
-  if (currentFilter.value !== 'all') {
-    result = result.filter(blog => blog.categoryTag === currentFilter.value)
+  if (currentCategoryTag.value) {
+    result = result.filter(blog => blog.categoryTag === currentCategoryTag.value)
   }
   
+  return result
+})
+
+// Filter featured blogs by current filter (categoryTag)
+const filteredFeaturedBlogs = computed(() => {
+  let result = props.featuredBlogs || []
+
+  if (currentCategoryTag.value) {
+    result = result.filter(blog => blog.categoryTag === currentCategoryTag.value)
+  }
+
   return result
 })
 

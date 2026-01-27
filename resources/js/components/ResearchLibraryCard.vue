@@ -1,5 +1,8 @@
 <template>
-  <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer group">
+  <div 
+    class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer group"
+    @click="handleClick"
+  >
     <div class="flex items-start gap-4">
       <div class="flex-1">
         <!-- Left: Tags -->
@@ -55,6 +58,7 @@
         :href="pubmedUrl"
         target="_blank"
         rel="noopener noreferrer"
+        @click.stop
         class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm whitespace-nowrap transition-colors"
       >
         View on PubMed
@@ -64,7 +68,9 @@
 </template>
 
 <script setup>
-defineProps({
+import { router } from '@inertiajs/vue3'
+
+const props = defineProps({
   id: {
     type: [Number, String],
     required: true
@@ -102,4 +108,8 @@ defineProps({
     default: '#'
   }
 })
+
+const handleClick = () => {
+  router.visit(`/research/${props.id}`)
+}
 </script>

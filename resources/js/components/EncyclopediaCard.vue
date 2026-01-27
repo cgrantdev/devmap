@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-xl hover:border-blue-500 transition-all text-left group"
+    class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-xl hover:border-blue-500 transition-all text-left group flex flex-col h-full"
     @click="handleClick"
   >
     <!-- Tags Row -->
@@ -25,16 +25,20 @@
     </div>
     
     <!-- Title and Subtitle -->
-    <h3 class="text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">{{ name }}</h3>
+    <h3 class="text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors min-h-[3.5rem] flex items-center">
+      <span class="line-clamp-2">{{ name }}</span>
+    </h3>
     <p class="text-sm text-gray-600 mb-3">{{ subtitle || name }}</p>
 
-    <!-- Description -->
-    <p class="text-sm text-gray-700 mb-4 line-clamp-3">
+    <!-- Description - grows to fill space -->
+    <div class="flex-grow mb-4">
+      <p class="text-sm text-gray-700 line-clamp-3">
       {{ description || 'Research peptide information' }}
     </p>
+    </div>
 
-    <!-- Metrics -->
-    <div class="flex items-center justify-between text-xs text-gray-500 mb-4">
+    <!-- Metrics - fixed height -->
+    <div class="flex items-center justify-between text-xs text-gray-500 mb-4 h-5">
       <span class="flex items-center gap-1">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up w-3 h-3" aria-hidden="true">
           <path d="M16 7h6v6" />
@@ -51,8 +55,8 @@
       </span>
     </div>
 
-    <!-- Top Benefits -->
-    <div class="border-t border-gray-200 pt-3">
+    <!-- Top Benefits - fixed height -->
+    <div class="border-t border-gray-200 pt-3 min-h-[80px]">
       <p class="text-xs text-gray-500 mb-2">Top Benefits:</p>
       <ul class="space-y-1">
         <li 
@@ -60,14 +64,14 @@
           :key="index"
           class="flex items-start gap-2 text-xs text-gray-700"
         >
-          <div class="w-1 h-1 rounded-full bg-green-500 flex-shrink-0 mt-1.5">•</div>
+          <div class="w-1 h-1 rounded-full bg-green-500 flex-shrink-0 mt-1.5"></div>
           <span class="line-clamp-1">{{ benefit }}</span>
         </li>
       </ul>
     </div>
 
-    <!-- Research Studies -->
-    <div class="mt-3 pt-3 border-t border-gray-200">
+    <!-- Research Studies - fixed height -->
+    <div class="mt-3 pt-3 border-t border-gray-200 h-8">
       <div class="text-xs text-blue-600">{{ researchStudies }}+ research studies</div>
     </div>
   </div>

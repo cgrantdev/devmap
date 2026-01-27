@@ -1,10 +1,10 @@
 <template>
   <div
-    class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group ring-2 ring-blue-500"
+    class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group ring-2 ring-blue-500 flex flex-col h-full"
     @click="handleClick"
   >
     <!-- Image -->
-    <div class="aspect-video overflow-hidden">
+    <div class="aspect-video overflow-hidden flex-shrink-0">
       <img
         v-if="image && !hasError"
         :src="image"
@@ -22,12 +22,12 @@
     </div>
 
     <!-- Content -->
-    <div class="p-6">
+    <div class="p-6 flex flex-col flex-1 min-h-0">
       <!-- Category Tag and Date -->
-      <div class="flex items-center gap-2 mb-3">
+      <div class="flex items-center gap-2 mb-3 h-6 flex-shrink-0">
         <span
           :class="[
-            'text-xs px-2 py-1 rounded-full bg-red-100 text-red-800',
+            'text-xs px-2 py-1 rounded-full',
             getCategoryTagClass(categoryTag)
           ]"
         >
@@ -52,28 +52,30 @@
       </div>
 
       <!-- Title -->
-      <h3 class="text-lg text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
-        {{ title }}
+      <h3 class="text-lg text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2 h-14 flex items-center flex-shrink-0">
+        <span class="line-clamp-2">{{ title }}</span>
       </h3>
 
       <!-- Description -->
-      <p class="text-sm text-gray-600 mb-4 line-clamp-3">
-        {{ description }}
-      </p>
+      <div class="flex-grow mb-4">
+        <p class="text-sm text-gray-600 line-clamp-3">
+          {{ description }}
+        </p>
+      </div>
 
       <!-- Author -->
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between h-6 mb-3 flex-shrink-0">
         <div class="text-xs text-gray-500">
-        By Dr. {{ author }}
+          By {{ author }}
           <span class="ml-1">• Regulatory Expert</span>
         </div>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0" aria-hidden="true">
           <path d="m9 18 6-6-6-6"></path>
         </svg>
       </div>
 
       <!-- Tags -->
-      <div class="flex flex-wrap gap-1 mb-3">
+      <div class="flex flex-wrap gap-1 min-h-[1.5rem] flex-shrink-0">
         <span
           v-for="tag in tags"
           :key="tag"
@@ -139,13 +141,13 @@ const hasError = ref(false)
 
 const getCategoryTagClass = (category) => {
   const classes = {
-    'Regulation': 'bg-red-100 text-red-700',
-    'Research': 'bg-blue-100 text-blue-700',
-    'Industry': 'bg-green-100 text-green-700',
-    'Guides': 'bg-purple-100 text-purple-700',
-    'Community': 'bg-yellow-100 text-yellow-700',
+    'Regulation': 'bg-red-100 text-red-800',
+    'Research': 'bg-blue-100 text-blue-800',
+    'Industry': 'bg-green-100 text-green-800',
+    'Guides': 'bg-purple-100 text-purple-800',
+    'Community': 'bg-yellow-100 text-yellow-800',
   }
-  return classes[category] || 'bg-gray-100 text-gray-700'
+  return classes[category] || 'bg-gray-100 text-gray-800'
 }
 
 const handleClick = () => {

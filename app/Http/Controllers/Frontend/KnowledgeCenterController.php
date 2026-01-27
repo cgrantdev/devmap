@@ -519,4 +519,105 @@ class KnowledgeCenterController extends Controller
             'guideUrl' => route('guide.show', ['id' => $guide['id']]),
         ]);
     }
+
+    /**
+     * Show research study detail page
+     */
+    public function showResearch($id)
+    {
+        // Get the research paper data (for now using mock data, can be replaced with database query later)
+        $allPapers = [
+            1 => [
+                'id' => 1,
+                'peptide' => 'BPC-157',
+                'evidenceLevel' => 'High Evidence',
+                'title' => 'BPC-157 accelerates tendon-to-bone healing in a rat model',
+                'description' => 'Study demonstrates significant improvement in tendon healing rates with BPC-157 treatment compared to control groups.',
+                'source' => 'Journal of Orthopedic Research',
+                'date' => 'September 14, 2024',
+                'studyType' => 'Clinical Research',
+                'tags' => ['Healing', 'Tendons', 'Animal Study'],
+                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
+            ],
+            2 => [
+                'id' => 2,
+                'peptide' => 'Ipamorelin',
+                'evidenceLevel' => 'High Evidence',
+                'title' => 'Growth hormone secretagogues improve body composition in elderly',
+                'description' => 'Clinical trial shows improvements in lean muscle mass and reduction in body fat with ipamorelin supplementation.',
+                'source' => 'Journal of Clinical Endocrinology',
+                'date' => 'August 21, 2024',
+                'studyType' => 'Clinical Research',
+                'tags' => ['Body Composition', 'Aging', 'Human Study'],
+                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
+            ],
+            3 => [
+                'id' => 3,
+                'peptide' => 'PT-141',
+                'evidenceLevel' => 'Medium Evidence',
+                'title' => 'Melanocortin receptor activation and sexual function',
+                'description' => 'Research explores mechanisms of action for melanocortin-based therapies in sexual dysfunction.',
+                'source' => 'Sexual Medicine Reviews',
+                'date' => 'July 9, 2024',
+                'studyType' => 'Clinical Research',
+                'tags' => ['Libido', 'Mechanism', 'Review'],
+                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
+            ],
+            4 => [
+                'id' => 4,
+                'peptide' => 'TB-500',
+                'evidenceLevel' => 'High Evidence',
+                'title' => 'Thymosin beta-4 promotes wound healing and reduces inflammation',
+                'description' => 'Comprehensive study on the regenerative properties of TB-500 in various tissue repair models.',
+                'source' => 'Nature Communications',
+                'date' => 'June 15, 2024',
+                'studyType' => 'Clinical Research',
+                'tags' => ['Wound Healing', 'Inflammation', 'Regeneration'],
+                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
+            ],
+            5 => [
+                'id' => 5,
+                'peptide' => 'CJC-1295',
+                'evidenceLevel' => 'High Evidence',
+                'title' => 'Long-acting growth hormone releasing hormone analog effects on muscle growth',
+                'description' => 'Clinical evaluation of CJC-1295 in promoting muscle growth and recovery in athletes.',
+                'source' => 'Sports Medicine Journal',
+                'date' => 'May 22, 2024',
+                'studyType' => 'Clinical Research',
+                'tags' => ['Muscle Growth', 'Performance', 'Human Study'],
+                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
+            ],
+            6 => [
+                'id' => 6,
+                'peptide' => 'Semaglutide',
+                'evidenceLevel' => 'High Evidence',
+                'title' => 'GLP-1 receptor agonists in weight management and metabolic health',
+                'description' => 'Large-scale clinical trials demonstrating efficacy of semaglutide in obesity treatment.',
+                'source' => 'New England Journal of Medicine',
+                'date' => 'April 10, 2024',
+                'studyType' => 'Clinical Research',
+                'tags' => ['Weight Loss', 'Metabolism', 'Clinical Trial'],
+                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
+            ],
+        ];
+
+        if (!isset($allPapers[$id])) {
+            abort(404, 'Research study not found');
+        }
+
+        $paper = $allPapers[$id];
+
+        return Inertia::render('Frontend/ResearchStudyDetail', [
+            'id' => $paper['id'],
+            'peptide' => $paper['peptide'],
+            'evidenceLevel' => $paper['evidenceLevel'],
+            'title' => $paper['title'],
+            'description' => $paper['description'],
+            'source' => $paper['source'],
+            'date' => $paper['date'],
+            'studyType' => $paper['studyType'],
+            'tags' => $paper['tags'],
+            'pubmedUrl' => $paper['pubmedUrl'],
+        ]);
+    }
 }
