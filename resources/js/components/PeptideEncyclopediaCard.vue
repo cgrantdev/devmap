@@ -1,10 +1,10 @@
 <template>
   <div
-    class="bg-white border-2 border-slate-200 rounded-lg overflow-hidden hover:shadow-xl hover:border-slate-400 transition-all cursor-pointer group flex flex-col"
+    class="bg-white border-2 border-slate-200 rounded-lg overflow-hidden hover:shadow-xl hover:border-slate-400 transition-all cursor-pointer group flex flex-col h-full"
     @click="handleClick"
   >
     <!-- Vial/Image Section -->
-    <div class="w-full h-48 bg-gray-50 border-b border-slate-200 flex items-center justify-center p-6">
+    <div class="w-full h-48 bg-gray-50 border-b border-slate-200 flex items-center justify-center p-6 flex-shrink-0">
       <img
         v-if="hasImage"
         :src="image"
@@ -40,11 +40,11 @@
     </div>
 
     <!-- Content Section -->
-    <div class="p-6 flex flex-col flex-grow">
+    <div class="p-6 flex flex-col flex-1 min-h-0">
       <!-- Name and ID -->
-      <div class="flex items-start justify-between mb-2 gap-2">
-        <h3 class="text-lg text-gray-900 group-hover:text-slate-700 transition-colors flex-1">
-          {{ name }}
+      <div class="flex items-center justify-between mb-2 gap-2 h-14">
+        <h3 class="text-lg text-gray-900 group-hover:text-slate-700 transition-colors flex-1 flex items-center">
+          <span class="line-clamp-2">{{ name }}</span>
         </h3>
         <div class="text-xs text-slate-600 bg-slate-100 px-2 py-1 rounded flex-shrink-0">
           #{{ id }}
@@ -55,19 +55,19 @@
       <div class="flex-grow"></div>
 
       <!-- Description (Fixed height) -->
-      <p class="text-sm text-gray-600 mb-3 line-clamp-2 min-h-[2.5rem]">
+      <p class="text-sm text-gray-600 mb-3 line-clamp-2 h-10">
         {{ description || 'Research peptide information' }}
       </p>
 
       <!-- Category Tag (Fixed height) -->
-      <div class="mb-4">
+      <div class="mb-4 h-6 flex items-center">
         <span class="inline bg-slate-700 text-white text-xs px-3 py-1 rounded-full">
           {{ categoryTag }}
         </span>
       </div>
 
       <!-- Learn More Link (Fixed position at bottom) -->
-      <div class="pt-3 border-t border-gray-200 flex items-center justify-between">
+      <div class="pt-3 border-t border-gray-200 flex items-center justify-between h-10 flex-shrink-0">
         <span class="text-slate-700 text-sm group-hover:underline">Learn More</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-colors" aria-hidden="true">
           <path d="m9 18 6-6-6-6"></path>

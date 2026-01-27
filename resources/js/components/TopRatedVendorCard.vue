@@ -1,10 +1,10 @@
 <template>
   <div
-    class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer flex flex-col"
+    class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
     @click="handleClick"
   >
     <!-- Logo (Square with colored background) -->
-    <div class="bg-gray-50 p-6 flex items-center justify-center border-b border-gray-200">
+    <div class="bg-gray-50 p-6 flex items-center justify-center border-b border-gray-200 flex-shrink-0">
       <div 
         class="w-20 h-20 text-xl bg-blue-600 rounded-lg flex items-center justify-center text-white select-none"
         :class="logo && !hasError ? '' : getInitialsColorClass(initials)"
@@ -27,12 +27,12 @@
     <!-- Content Section -->
     <div class="p-4 flex flex-col h-full">
       <!-- Brand Name -->
-      <h3 class="text-lg text-gray-900 mb-2 text-center min-h-[3rem] flex items-center justify-center">
-        {{ name }}
+      <h3 class="text-lg text-gray-900 mb-2 text-center h-12 flex items-center justify-center">
+        <span class="line-clamp-2">{{ name }}</span>
       </h3>
       
       <!-- Location (Fixed height) -->
-      <div class="flex items-center justify-center gap-1 text-gray-600 text-sm mb-3 min-h-[1.5rem]">         
+      <div class="flex items-center justify-center gap-1 text-gray-600 text-sm mb-3 h-6 flex-shrink-0">         
         <!-- Location -->
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-3 h-3 flex-shrink-0" aria-hidden="true">
           <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
