@@ -44,7 +44,7 @@ class ProductsController extends Controller
                 
                 return [
                     'id' => $category->id,
-                    'name' => strtoupper($category->name),
+                    'name' => $category->name,
                     'slug' => $category->slug,
                     'total_items' => $category->products_count,
                     'image' => $image,
@@ -249,6 +249,9 @@ class ProductsController extends Controller
         } elseif ($sortBy === 'popular') {
             // Sort by review count (rating_count) in descending order
             $query->orderBy('rating_count', 'desc');
+        } elseif ($sortBy === 'reviews') {
+            // Sort by review count (rating_count) in the specified direction
+            $query->orderBy('rating_count', $sortDir);
         } elseif ($sortBy === 'rating') {
             // Sort by rating average (rating_average) in the specified direction
             $query->orderBy('rating_average', $sortDir);
@@ -312,7 +315,7 @@ class ProductsController extends Controller
 
     public function byBrand(Request $request, $slug)
     {
-        $brand = Brand::where('slug', $slug)->where('is_active', true)->firstOrFail();
+        $brand = Brand::with(['approvedReviews.user'])->where('slug', $slug)->where('is_active', true)->firstOrFail();
         $brandId = $brand->id;
 
         // Build query for all products of this brand
@@ -398,6 +401,9 @@ class ProductsController extends Controller
         } elseif ($sortBy === 'popular') {
             // Sort by review count (rating_count) in descending order
             $query->orderBy('rating_count', 'desc');
+        } elseif ($sortBy === 'reviews') {
+            // Sort by review count (rating_count) in the specified direction
+            $query->orderBy('rating_count', $sortDir);
         } elseif ($sortBy === 'rating') {
             // Sort by rating average (rating_average) in the specified direction
             $query->orderBy('rating_average', $sortDir);
@@ -476,6 +482,24 @@ class ProductsController extends Controller
         $cost = $approvedReviews->whereNotNull('cost')->avg('cost') ?? 0;
         $packaging = $approvedReviews->whereNotNull('packaging')->avg('packaging') ?? 0;
 
+        // Map reviews with all fields including review comment
+        $mappedReviews = $approvedReviews->map(function ($review) {
+            return [
+                'id' => $review->id,
+                'rating' => $review->rating,
+                'review' => $review->review ?? '', // Ensure review field is included
+                'user_name' => $review->user ? $review->user->name : $review->user_name,
+                'user_email' => $review->user_email,
+                'user_id' => $review->user_id,
+                'created_at' => $review->created_at->format('Y-m-d'),
+                'shipping_time' => $review->shipping_time,
+                'customer_service' => $review->customer_service,
+                'quality' => $review->quality,
+                'cost' => $review->cost,
+                'packaging' => $review->packaging,
+            ];
+        });
+
         return Inertia::render('Frontend/BrandProducts', [
             'brand' => [
                 'id' => $brand->id,
@@ -501,15 +525,7 @@ class ProductsController extends Controller
                 'cost' => round($cost, 1),
                 'packaging' => round($packaging, 1),
             ],
-            'reviews' => $brand->approvedReviews->map(function ($review) {
-                return [
-                    'id' => $review->id,
-                    'rating' => $review->rating,
-                    'review' => $review->review,
-                    'user_name' => $review->user ? $review->user->name : $review->user_name,
-                    'created_at' => $review->created_at->format('M d, Y'),
-                ];
-            }),
+            'reviews' => $mappedReviews,
             'products' => $products,
             'filterOptions' => $filterOptions,
             'priceRange' => [

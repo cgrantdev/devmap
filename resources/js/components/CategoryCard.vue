@@ -3,7 +3,7 @@
     class="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-lg transition-all text-left group cursor-pointer flex flex-col overflow-hidden relative h-full"
     @click="handleClick"
   >
-    <div class="bg-gray-500 w-16 h-16 rounded-lg flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform flex-shrink-0">
+    <div class="w-16 h-16 rounded-lg flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform flex-shrink-0">
       <img
         v-if="image && !hasError"
         :src="image"
@@ -12,16 +12,16 @@
         loading="lazy"
         @error="onError"
       />
-      <div v-else class="flex items-center justify-center text-white">
+      <div v-else class="flex items-center justify-center text-gray-400">
         <span class="text-sm">No Image</span>
       </div>
     </div>
     <div class="flex flex-col flex-1 min-w-0">
       <h3
-        class="text-xl text-gray-900 mb-4 group-hover:text-blue-600 transition-colors w-full min-h-[3.5rem] flex items-center"
+        class="text-xl text-gray-900 mb-4 group-hover:text-blue-600 transition-colors w-full min-h-[3.5rem] flex items-center normal-case"
         :title="name"
       >
-        <span class="line-clamp-2">{{ name }}</span>
+        <span class="line-clamp-2 normal-case">{{ name }}</span>
       </h3>
       <p class="text-sm text-gray-600 flex-shrink-0">
         {{ totalItems }} products

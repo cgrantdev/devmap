@@ -40,7 +40,7 @@
                           <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
                         </svg>
                         <span class="text-gray-900">{{ brand.rating || 0 }}</span>
-                        <span class="text-gray-500 text-sm">{{ brand.reviews || 0 }}</span>
+                        <span class="text-gray-500 text-sm">({{ brand.reviews || totalReviews }})</span>
                       </div>
                       <div class="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full text-gray-600 bg-gray-50">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucid lucid-map-pin w-4 h-4" aria-hidden="true">
@@ -242,11 +242,24 @@
                   <div class="text-center">
                     <div class="text-5xl text-gray-900 mb-2">{{ formattedOverallRating }}</div>
                     <div class="flex items-center justify-center gap-1 mb-2">
-                      <svg v-for="i in 5" :key="i" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :class="i <= Math.floor(props.brand.rating) ? 'text-yellow-400 fill-yellow-400' : i === Math.ceil(props.brand.rating) && props.brand.rating % 1 !== 0 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'">
+                      <svg 
+                        v-for="i in 5" 
+                        :key="i" 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="24" 
+                        height="24" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        stroke-width="2" 
+                        stroke-linecap="round" 
+                        stroke-linejoin="round" 
+                        :class="i <= Math.round(props.brand.rating || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'"
+                      >
                         <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
                       </svg>
                     </div>
-                    <div class="text-gray-600">{{ props.brand.reviews || 0 }} reviews</div>
+                    <div class="text-gray-600">{{ totalReviews }} {{ totalReviews === 1 ? 'review' : 'reviews' }}</div>
                   </div>
                   
                   <!-- Star Breakdown -->
@@ -254,38 +267,61 @@
                     <div v-for="star in 5" :key="star" class="flex items-center gap-3">
                       <span class="text-sm text-gray-600 w-12">{{ 6 - star }} stars</span>
                       <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div class="h-full bg-yellow-400" style="width: 0%"></div>
+                        <div 
+                          class="h-full bg-yellow-400 transition-all" 
+                          :style="{ width: starBreakdown[6 - star] ? `${(starBreakdown[6 - star] / totalReviews) * 100}%` : '0%' }"
+                        ></div>
                       </div>
-                      <span class="text-sm text-gray-600 w-8">0</span>
+                      <span class="text-sm text-gray-600 w-8">{{ starBreakdown[6 - star] || 0 }}</span>
                     </div>
                   </div>
                 </div>  
               </div>
-              <div class="space-y-4">
-                <div class="bg-white border border-gray-200 rounded-lg p-6">
+              <div v-if="reviews && reviews.length > 0" class="space-y-4">
+                <div 
+                  v-for="review in reviews" 
+                  :key="review.id"
+                  class="bg-white border border-gray-200 rounded-lg p-6"
+                >
                   <div class="flex items-start justify-between mb-4">
                     <div>
                       <div class="flex items-center gap-2 mb-2">
-                        <span class="text-gray-900">John D.</span>
-                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Verified Purchase</span>
+                        <span class="text-gray-900 font-medium">{{ review.user_name }}</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                          Verified Purchase
+                        </span>
                       </div>
                       <div class="flex items-center gap-1">
-                        <svg v-for="i in 5" :key="i" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-4 h-4 fill-yellow-400 text-yellow-400">
+                        <svg 
+                          v-for="i in 5" 
+                          :key="i" 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="24" 
+                          height="24" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          stroke-width="2" 
+                          stroke-linecap="round" 
+                          stroke-linejoin="round" 
+                          :class="i <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'"
+                          class="lucide lucide-star w-4 h-4"
+                        >
                           <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
                         </svg>
                       </div>
                     </div>
-                    <span class="text-sm text-gray-500">2024-12-10</span>
+                    <span class="text-sm text-gray-500">{{ review.created_at }}</span>
                   </div>
-                  <p class="text-gray-700 mb-2">Excellent product! Noticed significant improvement in joint pain after 2 weeks. Lab results match advertised purity.</p>
+                  <p class="text-gray-700 mb-2">{{ review.review }}</p>
                   <p class="text-sm text-gray-500">Product: BPC-157 5mg</p>
                 </div>
               </div>
 
               <!-- No Reviews Message -->
-              <!-- <div class="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+              <div v-else class="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
                 <p class="text-gray-500">No reviews yet</p>
-              </div> -->
+              </div>
             </section> 
           </div>
 
@@ -314,7 +350,7 @@
                     </svg>
                     <div>
                       <div class="text-xs text-gray-500">Rating</div>
-                      <div class="text-sm text-gray-900">{{ formattedOverallRating }} / 5.0 ({{ props.brand.reviews || 0 }} reviews)</div>
+                      <div class="text-sm text-gray-900">{{ formattedOverallRating }} / 5.0 ({{ props.brand.reviews || totalReviews }} {{ (props.brand.reviews || totalReviews) === 1 ? 'review' : 'reviews' }})</div>
                     </div>
                   </div>
                   <div class="flex items-start gap-3">
@@ -707,6 +743,10 @@ const props = defineProps({
   sort: String,
   sortDir: String,
   search: String,
+  reviews: {
+    type: Array,
+    default: () => []
+  },
 })
 
 const ArrowRightIcon = defineComponent({
@@ -768,6 +808,25 @@ const whyChooseBenefits = ref([
 // Formatted overall rating
 const formattedOverallRating = computed(() => {
   return (props.brand.rating || 0).toFixed(1)
+})
+
+// Calculate total reviews count
+const totalReviews = computed(() => {
+  return props.reviews?.length || 0
+})
+
+// Calculate star breakdown
+const starBreakdown = computed(() => {
+  const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+  if (props.reviews && props.reviews.length > 0) {
+    props.reviews.forEach(review => {
+      const rating = Math.round(review.rating)
+      if (rating >= 1 && rating <= 5) {
+        breakdown[rating] = (breakdown[rating] || 0) + 1
+      }
+    })
+  }
+  return breakdown
 })
 
 // Sort icon component
@@ -1126,6 +1185,15 @@ const handleGradingSubmit = (gradingData) => {
   })
 }
 
+
+// Debug: Log reviews data to check structure
+// onMounted(() => {
+//   if (props.reviews && props.reviews.length > 0) {
+//     console.log('Reviews data:', props.reviews)
+//     console.log('First review:', props.reviews[0])
+//     console.log('First review.review field:', props.reviews[0]?.review)
+//   }
+// })
 
 // Setup lazy loading for hero background
 onMounted(() => {

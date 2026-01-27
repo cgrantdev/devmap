@@ -111,6 +111,10 @@ class BlogsController extends Controller
             });
 
         $imageUrl = $blog->image ? Storage::url('blogs/' . $blog->image) : null;
+        
+        // Determine category tag from content
+        $categoryTag = $this->getCategoryTag($blog->title, $blog->description, $blog->content);
+        
         return Inertia::render('Frontend/BlogDetail', [
             'blog' => [
                 'id' => $blog->id,
@@ -121,8 +125,47 @@ class BlogsController extends Controller
                 'image' => $imageUrl,
                 'readTime' => $blog->read_time ?? '19 Min Read',
                 'date' => $blog->published_at ? $blog->published_at->format('d M Y') : null,
+                'is_featured' => $blog->is_featured ?? false,
+                'categoryTag' => $categoryTag,
             ],
             'related' => $related,
         ]);
+    }
+
+    /**
+     * Get category tag based on content
+     */
+    private function getCategoryTag($title, $description, $content = '')
+    {
+        $combined = strtolower($title . ' ' . $description . ' ' . $content);
+
+        if (stripos($combined, 'fda') !== false || stripos($combined, 'regulation') !== false || 
+            stripos($combined, 'regulatory') !== false || stripos($combined, 'compounding') !== false) {
+            return 'Regulation';
+        }
+
+        if (stripos($combined, 'study') !== false || stripos($combined, 'research') !== false || 
+            stripos($combined, 'clinical') !== false || stripos($combined, 'trial') !== false) {
+            return 'Research';
+        }
+
+        if (stripos($combined, 'market') !== false || stripos($combined, 'industry') !== false || 
+            stripos($combined, 'price') !== false || stripos($combined, 'pricing') !== false) {
+            return 'Industry';
+        }
+
+        if (stripos($combined, 'guide') !== false || stripos($combined, 'how to') !== false || 
+            stripos($combined, 'tutorial') !== false || stripos($combined, 'education') !== false ||
+            stripos($combined, 'coa') !== false || stripos($combined, 'purity') !== false) {
+            return 'Guides';
+        }
+
+        if (stripos($combined, 'success') !== false || stripos($combined, 'story') !== false || 
+            stripos($combined, 'experience') !== false || stripos($combined, 'user') !== false ||
+            stripos($combined, 'community') !== false) {
+            return 'Community';
+        }
+
+        return 'Research'; // Default
     }
 }

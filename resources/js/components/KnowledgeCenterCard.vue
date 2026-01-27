@@ -59,8 +59,8 @@
       <!-- Description -->
       <div class="flex-grow mb-4">
         <p class="text-sm text-gray-600 line-clamp-3">
-          {{ description }}
-        </p>
+        {{ description }}
+      </p>
       </div>
 
       <!-- Author -->

@@ -43,8 +43,8 @@
     <div class="p-6 flex flex-col flex-1 min-h-0">
       <!-- Name and ID -->
       <div class="flex items-center justify-between mb-2 gap-2 h-14">
-        <h3 class="text-lg text-gray-900 group-hover:text-slate-700 transition-colors flex-1 flex items-center">
-          <span class="line-clamp-2">{{ name }}</span>
+        <h3 class="text-lg text-gray-900 group-hover:text-slate-700 transition-colors flex-1 flex items-center" style="text-transform: none !important;">
+          <span class="line-clamp-2" style="text-transform: none !important;">{{ name }}</span>
         </h3>
         <div class="text-xs text-slate-600 bg-slate-100 px-2 py-1 rounded flex-shrink-0">
           #{{ id }}
@@ -116,7 +116,7 @@ const hasImage = computed(() => {
 })
 
 const handleClick = () => {
-  router.visit(`/products?category=${props.slug}`)
+  router.visit(`/encyclopedia/${props.slug}`)
 }
 
 const onError = (event) => {
