@@ -16,8 +16,24 @@
             Back to Knowledge Center
           </button>
           <div class="flex items-center gap-2 mb-4">
-            <span class="text-xs px-3 py-1 rounded-full bg-red-100 text-red-800">Regulation</span>
-            <span class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">⭐ Featured</span>
+            <span 
+              v-if="blog.categoryTag"
+              :class="[
+                'text-xs px-3 py-1 rounded-full',
+                getCategoryTagClass(blog.categoryTag)
+              ]"
+            >
+              {{ blog.categoryTag }}
+            </span>
+            <span 
+              v-if="blog.is_featured"
+              class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 flex items-center gap-1.5"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#facc15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5" aria-hidden="true">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>  
+              Featured
+            </span>
           </div>
           <h1 class="text-4xl text-gray-900 mb-4">{{ blog.title }}</h1>
           <div class="flex items-center gap-6 text-gray-600 mb-6">
@@ -155,6 +171,17 @@ const props = defineProps({
   blog: Object,
   related: Array,
 })
+
+const getCategoryTagClass = (category) => {
+  const classes = {
+    'Regulation': 'bg-red-100 text-red-800',
+    'Research': 'bg-blue-100 text-blue-800',
+    'Industry': 'bg-green-100 text-green-800',
+    'Guides': 'bg-purple-100 text-purple-800',
+    'Community': 'bg-yellow-100 text-yellow-800',
+  }
+  return classes[category] || 'bg-gray-100 text-gray-800'
+}
 
 </script>
 

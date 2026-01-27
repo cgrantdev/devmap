@@ -61,7 +61,7 @@ class HomeController extends Controller
 
                 return [
                     'id' => $category->id,
-                    'name' => strtoupper($category->name),
+                    'name' => $category->name,
                     'slug' => $category->slug,
                     'total_items' => $category->products_count,
                     'image' => $image,

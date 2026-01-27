@@ -52,7 +52,7 @@
                       :href="slide.ctaUrl || '#'"
                       class="bg-slate-700 hover:bg-slate-800 text-white px-8 py-3 rounded-lg transition-colors"
                     >
-                      {{ slide.ctaText || 'Shop Now' }}
+                      Shop Now
                     </Link>
                   </div>
                 </div>

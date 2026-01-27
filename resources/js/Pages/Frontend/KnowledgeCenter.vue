@@ -306,7 +306,7 @@ const filteredFeaturedBlogs = computed(() => {
   if (currentCategoryTag.value) {
     result = result.filter(blog => blog.categoryTag === currentCategoryTag.value)
   }
-
+  
   return result
 })
 

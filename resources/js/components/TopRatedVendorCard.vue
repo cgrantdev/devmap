@@ -3,25 +3,22 @@
     class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer flex flex-col h-full"
     @click="handleClick"
   >
-    <!-- Logo (Square with colored background) -->
-    <div class="bg-gray-50 p-6 flex items-center justify-center border-b border-gray-200 flex-shrink-0">
-      <div 
-        class="w-20 h-20 text-xl bg-blue-600 rounded-lg flex items-center justify-center text-white select-none"
-        :class="logo && !hasError ? '' : getInitialsColorClass(initials)"
-      >
-        <template v-if="logo && !hasError">
-          <img
-            :src="logo"
-            :alt="name + ' logo'"
-            class="w-full h-full object-contain rounded-lg"
-            loading="lazy"
-            @error="onError"
-          />
-        </template>
-        <template v-else>
-          <span class="font-roboto font-semibold text-3xl text-white">{{ initials }}</span>
-        </template>
-      </div>
+    <!-- Logo (Full Top Area) -->
+    <div class="w-full h-48 flex items-center justify-center bg-white border-b border-gray-200 flex-shrink-0">
+      <template v-if="logo && !hasError">
+        <img
+          :src="logo"
+          :alt="name + ' logo'"
+          class="w-full h-full object-contain p-4"
+          loading="lazy"
+          @error="onError"
+        />
+      </template>
+      <template v-else>
+        <div class="w-full h-full flex items-center justify-center">
+          <span class="font-roboto font-semibold text-4xl text-gray-400">{{ initials }}</span>
+        </div>
+      </template>
     </div>
 
     <!-- Content Section -->
@@ -89,20 +86,6 @@ const formattedRating = computed(() => {
 
 const onError = () => {
   hasError.value = true
-}
-
-// Generate color class based on initials for variety
-const getInitialsColorClass = (initials) => {
-  const colors = [
-    'bg-blue-600',
-    'bg-purple-600',
-    'bg-blue-600',
-    'bg-orange-600',
-    'bg-red-600',
-  ]
-  // Use a simple hash of initials to pick a color
-  const hash = initials.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-  return colors[hash % colors.length]
 }
 
 const handleClick = () => {

@@ -12,25 +12,22 @@
       </div>
     </div>
 
-    <!-- Logo (80x80) -->
-    <div class="p-8 pb-5 flex justify-center">
-      <div 
-        class="w-20 h-20 text-xl bg-blue-600 rounded-lg flex items-center justify-center text-white select-none"
-        :class="logo && !hasError ? '' : 'bg-blue-600 p-4'"
-      >
-        <template v-if="logo && !hasError">
-          <img
-            :src="logo"
-            :alt="name + ' logo'"
-            class="w-full h-full object-contain"
-            loading="lazy"
-            @error="onError"
-          />
-        </template>
-        <template v-else>
-          <span class="font-roboto font-semibold text-3xl text-white">{{ initials }}</span>
-        </template>
-      </div>
+    <!-- Logo (Full Top Area) -->
+    <div class="w-full h-48 flex items-center justify-center bg-white flex-shrink-0">
+      <template v-if="logo && !hasError">
+        <img
+          :src="logo"
+          :alt="name + ' logo'"
+          class="w-full h-full object-contain p-4"
+          loading="lazy"
+          @error="onError"
+        />
+      </template>
+      <template v-else>
+        <div class="w-full h-full flex items-center justify-center">
+          <span class="font-roboto font-semibold text-4xl text-gray-400">{{ initials }}</span>
+        </div>
+      </template>
     </div>
 
     <!-- Content Section -->

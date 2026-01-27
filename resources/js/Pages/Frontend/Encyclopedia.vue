@@ -143,7 +143,7 @@ const filteredPeptides = computed(() => {
   // Apply category filter
   if (selectedFilter.value !== 'all') {
     result = result.filter(p => p.categoryTag === selectedFilter.value)
-    console.log(result)
+    console.log(props.peptides)
   }
 
   // Apply search filter
