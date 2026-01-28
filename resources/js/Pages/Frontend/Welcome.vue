@@ -450,6 +450,7 @@ const displayedEncyclopediaPeptides = computed(() => {
   return props.productGroups.slice(0, 8).map(category => {
     // Determine category tag based on name/description
     const categoryTag = getCategoryTag(category.name, category.description)
+    console.log(category)
     
     return {
       ...category,
