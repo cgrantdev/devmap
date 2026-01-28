@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer group relative border-2 border-slate-300 shadow-md flex flex-col"
+    class="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer group relative border-2 border-slate-300 shadow-md"
   >
     <!-- Partner Badge (Top Right Corner) -->
     <div class="absolute top-0 right-0 z-10">
@@ -13,59 +13,61 @@
     </div>
 
     <!-- Logo (Full Top Area) -->
-    <div class="w-full h-48 flex items-center justify-center bg-white flex-shrink-0">
+    <div class="p-8 pb-5 flex justify-center">
       <template v-if="logo && !hasError">
         <img
           :src="logo"
           :alt="name + ' logo'"
-          class="w-full h-full object-contain p-4"
+          class="w-full h-20 object-contain flex items-center justify-center select-none"
           loading="lazy"
           @error="onError"
         />
       </template>
       <template v-else>
-        <div class="w-full h-full flex items-center justify-center">
-          <span class="font-roboto font-semibold text-4xl text-gray-400">{{ initials }}</span>
+        <div class="w-20 h-20 text-xl bg-blue-600 rounded-lg flex items-center justify-center text-white select-none">
+          <span>{{ initials }}</span>
         </div>
       </template>
     </div>
 
     <!-- Content Section -->
-    <div class="px-5 pb-5 flex flex-col h-full">
+    <div class="px-5 pb-5">
       <!-- Brand Name with Featured Dot -->
-      <div class="mb-2 text-center min-h-[3rem] flex items-center justify-center">
-        <div class="flex items-center justify-center gap-1.5">
-          <h3 class="text-base text-gray-900 group-hover:text-blue-600 transition-colors">
+      <div class="mb-3 text-center">
+        <div class="flex items-center justify-center gap-1.5 mb-1">
+          <h3 class="text-base text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
             {{ name }}
           </h3>
           <!-- Featured Indicator (Blue Circle) -->
           <div
             v-if="featured"
-            class="w-4 h-4 bg-blue-600 rounded-full flex-shrink-0"
+            class="flex-shrink-0"
             title="Featured Partner"
-          ></div>
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-big w-5 h-5 text-white fill-blue-600 drop-shadow-sm" aria-hidden="true">
+              <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
+              <path d="m9 11 3 3L22 4"></path>
+            </svg>
+          </div>
+        </div>
+        <!-- Location (Fixed height for alignment) -->
+        <div class="flex items-center justify-center gap-1 text-xs text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-3 h-3" aria-hidden="true">
+            <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span class="truncate">{{ location || 'Location not available' }}</span>
         </div>
       </div>
       
-      <!-- Location (Fixed height for alignment) -->
-      <div class="flex items-center justify-center gap-1 text-xs text-gray-500 mb-3 min-h-[1.5rem]">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-3 h-3 flex-shrink-0" aria-hidden="true">
-          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-          <circle cx="12" cy="10" r="3"></circle>
-        </svg>
-        <span class="truncate">{{ location || 'Location not available' }}</span>
-      </div>
-
-      <!-- Spacer to push rating and button to bottom -->
-      <div class="flex-grow"></div>
 
       <!-- Rating and Reviews (Side by Side) -->
       <div class="grid grid-cols-2 gap-2 mb-3">
         <!-- Rating Section -->
         <div class="bg-gray-50 rounded-lg p-2 text-center">
           <div class="flex items-center justify-center gap-1 mb-0.5">
-            <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-3 h-3 fill-yellow-400 text-yellow-400" aria-hidden="true">
+              <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
             </svg>
             <span class="text-base text-gray-900">{{ formattedRating }}</span>
           </div>

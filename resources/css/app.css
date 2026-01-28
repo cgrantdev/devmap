@@ -69,11 +69,11 @@ html {
 
 /* Font Size Classes */
 .text-xs {
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .text-sm {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .text-base {
@@ -85,7 +85,7 @@ html {
 }
 
 .text-xl {
-    font-size: 22px;
+    font-size: 20px;
 }
 
 .text-2xl {
@@ -93,15 +93,15 @@ html {
 }
 
 .text-3xl {
-    font-size: 36px;
+    font-size: 30px;
 }
 
 .text-4xl {
-    font-size: 48px;
+    font-size: 36px;
 }
 
 .text-5xl {
-    font-size: 60px;
+    font-size: 48px;
 }
 
 .text-6xl {
