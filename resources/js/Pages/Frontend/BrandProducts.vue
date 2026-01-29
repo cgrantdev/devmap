@@ -102,7 +102,6 @@
                     <div class="bg-slate-100 p-2 rounded-lg group-hover:bg-slate-700 transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-4 h-4 text-slate-700 group-hover:text-white" aria-hidden="true">
                         <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"></path>
-                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                       </svg>
                     </div>
                     <span class="text-sm text-slate-600 group-hover:text-slate-700">{{ brand.phone_number || '222-222-2222' }}</span>
@@ -162,8 +161,8 @@
                     <button
                       @click="applySort('featured', 'desc')"
                       :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
-                        currentSort === 'featured' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                        'px-4 py-2 rounded-lg text-sm transition-all',
+                        currentSort === 'featured' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
                       ]"
                     >
                       Featured
@@ -171,8 +170,8 @@
                     <button
                       @click="applySort('price', 'asc')"
                       :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
-                        currentSort === 'price' && currentSortDir === 'asc' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                        'px-4 py-2 rounded-lg text-sm transition-all',
+                        currentSort === 'price' && currentSortDir === 'asc' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
                       ]"
                     >
                       Price: Low to High
@@ -180,8 +179,8 @@
                     <button
                       @click="applySort('price', 'desc')"
                       :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
-                        currentSort === 'price' && currentSortDir === 'desc' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                        'px-4 py-2 rounded-lg text-sm transition-all',
+                        currentSort === 'price' && currentSortDir === 'desc' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
                       ]"
                     >
                       Price: High to Low
@@ -189,8 +188,8 @@
                     <button
                       @click="applySort('rating', 'desc')"
                       :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
-                        currentSort === 'rating' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                        'px-4 py-2 rounded-lg text-sm transition-all',
+                        currentSort === 'rating' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
                       ]"
                     >
                       Highest Rated
@@ -198,8 +197,8 @@
                     <button
                       @click="applySort('reviews', 'desc')"
                       :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
-                        currentSort === 'reviews' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                        'px-4 py-2 rounded-lg text-sm transition-all',
+                        currentSort === 'reviews' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
                       ]"
                     >
                       Most Reviews
@@ -207,8 +206,8 @@
                     <button
                       @click="applySort('name', 'asc')"
                       :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all bg-slate-100 text-gray-600',
-                        currentSort === 'name' ? 'bg-slate-700 text-white' : 'bg-slate-100 text-gray-600 hover:bg-gray-200'
+                        'px-4 py-2 rounded-lg text-sm transition-all',
+                        currentSort === 'name' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
                       ]"
                     >
                       Name A-Z

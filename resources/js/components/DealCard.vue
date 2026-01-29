@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer group relative border border-gray-200"
+    class="bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group relative border border-gray-200"
     @click="handleClick"
   >
     <!-- Discount Badge -->
@@ -16,23 +16,23 @@
 
     <!-- Logo/Icon Area -->
     <div class="aspect-square bg-gray-50 p-8 border-b border-gray-200 flex items-center justify-center">
-      <div 
-        class="w-20 h-20 text-xl rounded-lg flex items-center justify-center text-white select-none"
-        :class="getInitialsColorClass(initials)"
-      >
-        <template v-if="logo && !hasError">
-          <img
-            :src="logo"
-            :alt="name + ' logo'"
-            class="w-full h-full object-contain rounded-lg"
-            loading="lazy"
-            @error="onError"
+      <template v-if="logo && !hasError">
+        <img
+          :src="logo"
+          :alt="name + ' logo'"
+          class="w-full h-full object-contain flex items-center justify-center rounded-lg select-none"
+          loading="lazy"
+          @error="onError"
           />
         </template>
         <template v-else>
-          {{ initials }}
+          <div 
+            class="w-20 h-20 text-xl bg-blue-600 rounded-lg flex items-center justify-center text-white select-none"
+            :class="getInitialsColorClass(initials)"
+          >
+              {{ initials }}
+            </div>
         </template>
-      </div>
     </div>
 
     <!-- Content Section -->
