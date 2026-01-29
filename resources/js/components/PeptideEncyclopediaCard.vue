@@ -4,7 +4,7 @@
     @click="handleClick"
   >
     <!-- Vial/Image Section -->
-    <div class="bg-gray-50 p-6 border-b border-slate-200 flex items-center justify-center">
+    <div class="aspect-square bg-gray-50 p-6 border-b border-slate-200 flex items-center justify-center">
       <img
         v-if="hasImage"
         :src="image"
