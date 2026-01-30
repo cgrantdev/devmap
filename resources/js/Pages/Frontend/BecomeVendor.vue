@@ -188,7 +188,7 @@
                   <input
                     id="year_established"
                     v-model="formData.yearEstablished"
-                    type="number"
+                    type="text"
                     min="1800"
                     :max="new Date().getFullYear()"
                     placeholder="2020"
@@ -738,7 +738,7 @@ const props = defineProps({
 const formData = ref({
   companyName: '',
   website: '',
-  yearEstablished: '2020',
+  yearEstablished: '',
   country: '',
   fullName: '',
   email: '',
