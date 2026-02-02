@@ -60,6 +60,14 @@ class EncyclopediaController extends Controller
                 ->where('product_category_id', $category->id)
                 ->first();
 
+            // Get key effects from education post if available, otherwise use fallback method
+            $keyEffects = [];
+            if ($educationPost && !empty($educationPost->key_effects) && is_array($educationPost->key_effects)) {
+                $keyEffects = $educationPost->key_effects;
+            } else {
+                $keyEffects = $this->getKeyBenefits($category->name);
+            }
+
             return [
                 'id' => $category->id,
                 'name' => $category->name,
@@ -71,7 +79,7 @@ class EncyclopediaController extends Controller
                 'safetyTag' => 'High Safety', // Default, can be enhanced later
                 'popularity' => min(95, 70 + ($category->products_count * 2)), // Mock popularity
                 'rating' => '4.7', // Mock rating, can be calculated from reviews
-                'benefits' => $this->getBenefits($category->name, $category->description),
+                'benefits' => $keyEffects,
                 'researchStudies' => rand(30, 60), // Mock research studies count
                 'products_count' => $category->products_count,
             ];
@@ -253,6 +261,14 @@ class EncyclopediaController extends Controller
         // Determine category tag
         $categoryTag = $this->getCategoryTag($category->name, $category->description);
 
+        // Get key effects from education post if available, otherwise use fallback method
+        $keyBenefits = [];
+        if ($educationPost && !empty($educationPost->key_effects) && is_array($educationPost->key_effects)) {
+            $keyBenefits = $educationPost->key_effects;
+        } else {
+            $keyBenefits = $this->getKeyBenefits($category->name);
+        }
+
         // Get comprehensive data
         $peptideData = [
             'id' => $category->id,
@@ -262,7 +278,7 @@ class EncyclopediaController extends Controller
             'description' => $educationPost ? $educationPost->description : $category->description,
             'image' => $image,
             'categoryTag' => $categoryTag,
-            'keyBenefits' => $this->getKeyBenefits($category->name),
+            'keyBenefits' => $keyBenefits,
             'quickFacts' => $this->getQuickFacts($category->name),
             'commonUseCases' => $this->getCommonUseCases($category->name),
             'howItWorks' => $this->getHowItWorks($category->name),

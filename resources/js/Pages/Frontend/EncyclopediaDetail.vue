@@ -26,7 +26,8 @@
 
               <!-- Title and Subtitle -->
               <h1 class="text-5xl text-gray-900 mb-3">{{ name }}</h1>
-              <p class="text-xl text-slate-600 mb-6">{{ subtitle }}</p>
+              <!-- <p class="text-xl text-slate-600 mb-6">{{ subtitle }}</p> -->
+              <p class="text-xl text-slate-600 mb-6">Peptide Full Name</p>
 
               <!-- Description -->
               <p class="text-lg text-gray-700 leading-relaxed">
@@ -64,7 +65,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap w-6 h-6 text-blue-600" aria-hidden="true">
                   <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path>
                 </svg>
-                Key Benefits
+                Research Applications
               </h2>
               <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <li 

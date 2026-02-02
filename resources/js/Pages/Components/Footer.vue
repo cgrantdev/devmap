@@ -13,12 +13,12 @@
           </div>
           <!-- Right Buttons -->
           <div class="flex flex-col sm:flex-row gap-4">
-            <button class="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap">
+            <Link href="/become-a-vendor" class="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap">
               List Your Brand
-            </button>
-            <button class="bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white/20 transition-colors whitespace-nowrap">
+            </Link>
+            <Link href="/become-a-vendor" class="bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white/20 transition-colors whitespace-nowrap">
               Learn More
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -150,4 +150,5 @@
 
 <script setup>
 import { Link } from '@inertiajs/vue3'
+
 </script>

@@ -1,308 +1,351 @@
 <template>
   <FrontLayout>
-    <section class="py-8 bg-gray-50">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <!-- Left: Product Image -->
-          <div class="bg-white rounded-lg p-8 flex items-center justify-center">
-            <div class="w-full max-w-md">
-              <img
-                v-if="product.image_url"
-                :src="product.image_url"
-                :alt="product.name"
-                class="w-full h-auto object-contain"
-              />
-              <div v-else class="w-full aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-                <!-- Vial illustration placeholder -->
-                <svg class="w-64 h-64 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right: Product Details -->
-          <div class="space-y-6">
-            <!-- Product Identifier Tag -->
-            <div v-if="product.category" class="inline-block">
-              <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm font-medium">
-                {{ product.category.name }}
-              </span>
-            </div>
-
-            <!-- Product Title -->
-            <h1 class="text-4xl font-bold text-gray-800">{{ product.name }}</h1>
-
-            <!-- Brand/Seller -->
-            <div v-if="brand" class="flex items-center gap-2">
-              <span class="text-gray-600">by</span>
-              <Link
-                v-if="brand.slug && brand.is_active"
-                :href="`/brand/${brand.slug}/products`"
-                class="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
-              >
-                {{ brand.name }}
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </Link>
-              <span v-else class="text-blue-600 font-medium">{{ brand.name }}</span>
-            </div>
-
-            <!-- Rating -->
-            <div class="flex items-center gap-2">
-              <div class="flex items-center">
-                <svg
-                  v-for="i in 5"
-                  :key="i"
-                  class="w-5 h-5"
-                  :class="i <= Math.round(product.rating_average) ? 'text-yellow-500' : 'text-gray-300'"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              </div>
-              <span class="text-gray-700 font-medium">{{ product.rating_average }}</span>
-              <span class="text-gray-500">({{ product.rating_count }} reviews)</span>
-            </div>
-
-            <!-- Stock Status -->
+    <div class="min-h-screen bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex items-center gap-2 text-sm text-gray-600 mb-6">
+          <button 
+            @click="handleClick1"
+            class="hover:text-gray-900">Products
+          </button>
+          <span>/</span>
+          <button 
+            @click="handleClick2"
+            class="hover:text-gray-900">{{ product.category?.name || 'N/A' }}
+          </button>
+          <span>/</span>
+          <span class="text-gray-900">{{ product.name || 'N/A' }}</span>
+        </div>
+        <div class="bg-white rounded-lg border border-gray-200 mb-8">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
+            <!-- Left: Product Image -->
             <div>
-              <span
-                :class="product.availability === 'in_stock' ? 'text-green-600' : 'text-red-600'"
-                class="font-semibold"
-              >
-                {{ product.availability === 'in_stock' ? 'In Stock' : 'Out of Stock' }}
-              </span>
-            </div>
-
-            <!-- Price -->
-            <div>
-              <p class="text-4xl font-bold text-gray-800">
-                ${{ product.discount_price || product.price }}
-              </p>
-              <p v-if="product.discount_price" class="text-lg text-gray-500 line-through">
-                ${{ product.price }}
-              </p>
-            </div>
-
-            <!-- Product Features -->
-            <div class="space-y-2">
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span class="text-gray-700">Third-party lab tested</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span class="text-gray-700">Certificate of Analysis available</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span class="text-gray-700">Research grade quality</span>
-              </div>
-            </div>
-
-            <!-- Discount Code -->
-            <div v-if="brand && brand.shop_url" class="border-2 border-dashed border-green-500 rounded-lg p-4 bg-green-50">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              <div class="aspect-square bg-gray-50 rounded-lg p-12 sticky top-24">
+                <img
+                  v-if="product.image_url"
+                  :src="product.image_url"
+                  :alt="product.name"
+                  class="w-full h-full object-contain flex items-center justify-center rounded-lg select-none"
+                />
+                <div v-else class="w-full aspect-square bg-gray-50 rounded-lg flex items-center justify-center">
+                  <!-- Vial illustration placeholder -->
+                  <svg class="w-64 h-64 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                   </svg>
-                  <span class="text-gray-700 font-medium">Use Code: PMAP</span>
-                </div>
-                <button
-                  @click="copyDiscountCode"
-                  class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                >
-                  Click to Copy
-                </button>
-              </div>
-            </div>
-
-            <!-- Purchase Button -->
-            <div v-if="product.product_url">
-              <a
-                :href="product.product_url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="block w-full bg-blue-700 hover:bg-blue-800 text-white font-medium py-3 px-6 rounded-lg text-center flex items-center justify-center gap-2 transition-colors"
-              >
-                Visit {{ brand.name }} to Purchase
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
-            </div>
-
-            <!-- Seller Information -->
-            <div v-if="brand" class="border-t border-gray-200 pt-6">
-              <div class="flex items-center gap-4 mb-4">
-                <!--<div
-                  v-if="brand.logo"
-                  class="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center"
-                  :style="{ backgroundColor: '#3b82f6' }"
-                >
-                  <img :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain" />
-                </div> -->
-                <div
-                  class="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold"
-                  style="background-color: #3b82f6;"
-                >
-                  {{ brandInitials }}
-                </div>
-                <div>
-                  <p class="text-sm text-gray-600 mb-1">Sold by</p>
-                  <a
-                    v-if="brand.shop_url"
-                    :href="brand.shop_url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    {{ brand.name }}
-                  </a>
-                  <Link
-                    v-else-if="brand.slug && brand.is_active"
-                    :href="`/brand/${brand.slug}/products`"
-                    class="text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    {{ brand.name }}
-                  </Link>
-                  <span v-else class="text-blue-600 font-medium">{{ brand.name }}</span>
                 </div>
               </div>
-              <Link
-                v-if="brand.slug && brand.is_active"
+            </div>
+  
+            <!-- Right: Product Details -->
+            <div>
+              <!-- Product Identifier Tag -->
+              <div v-if="product.category" class="inline-block bg-slate-100 text-slate-700 px-3 py-1.5 rounded text-sm mb-3">
+                {{ product.category.name }}
+              </div>
+  
+              <!-- Product Title -->
+              <h1 class="text-3xl text-gray-900 mb-3">{{ product.name }}</h1>
+  
+              <!-- Brand/Seller -->
+              <Link                
                 :href="`/brand/${brand.slug}/products`"
-                class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                class="text-blue-600 hover:text-blue-700 mb-4 flex items-center gap-2"
               >
-                View All Products from {{ brand.name }}
-              </Link>
-            </div>
-
-            <!-- Disclaimer -->
-            <div class="bg-yellow-50 border border-yellow-400 rounded-lg p-4">
-              <div class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                by {{ brand.name }}
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-4 h-4" aria-hidden="true">
+                  <path d="M15 3h6v6"></path>
+                  <path d="M10 14 21 3"></path>
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 </svg>
-                <p class="text-sm text-gray-800">
-                  Research purposes only. Not intended for human consumption.
-                </p>
+              </Link>
+  
+              <!-- Rating -->
+              <div class="flex items-center justify-between pb-4 mb-4 border-b border-gray-200">
+                <div class="flex items-center gap-3">
+                  <div class="flex items-center gap-1">
+                    <svg
+                      v-for="i in 5"
+                      :key="i"
+                      class="lucide lucide-star w-5 h-5"
+                      :class="i <= Math.round(product.rating_average) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+                    </svg>
+                  </div>
+                  <span class="text-gray-900">{{ product.rating_average }}</span>
+                  <span class="text-gray-500">({{ product.rating_count }} reviews)</span>
+                </div>
+                <!-- Stock Status -->
+                <span
+                  :class="product.availability === 'in_stock' ? 'text-green-600' : 'text-red-600'"
+                  class="text-sm"
+                >
+                  {{ product.availability === 'in_stock' ? 'In Stock' : 'Out of Stock' }}
+                </span>
+              </div>              
+  
+              <!-- Price -->
+              <div class="mb-6">
+                <!-- <p class="text-4xl text-gray-900 mb-1">
+                  ${{ product.discount_price || product.price }}
+                </p> -->
+                <div class="text-4xl text-gray-900 mb-1">
+                  ${{ product.price }}
+                </div>
+              </div>
+  
+              <!-- Product Features -->
+              <div class="space-y-2 mb-6">
+                <div class="flex items-center gap-2 text-sm text-gray-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-big w-4 h-4 text-green-600" aria-hidden="true">
+                    <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
+                    <path d="m9 11 3 3L22 4"></path>
+                  </svg>
+                  <span>Third-party lab tested</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm text-gray-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-big w-4 h-4 text-green-600" aria-hidden="true">
+                    <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
+                    <path d="m9 11 3 3L22 4"></path>
+                  </svg>
+                  <span>Certificate of Analysis available</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm text-gray-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-big w-4 h-4 text-green-600" aria-hidden="true">
+                    <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
+                    <path d="m9 11 3 3L22 4"></path>
+                  </svg>
+                  <span>Research grade quality</span>
+                </div>
+              </div>
+  
+              <!-- Discount Code -->
+              <button
+                @click="copyDiscountCode"
+                class="w-full mb-6 px-6 py-4 rounded-lg flex items-center justify-between transition-all border-[3px] border-dashed border-green-600 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 group cursor-pointer"
+              >
+                <div class="flex items-center gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag w-5 h-5" aria-hidden="true">
+                    <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path>
+                    <circle cx="7.5" cy="7.5" r=".5" fill="currentColr"></circle>
+                  </svg>
+                  <span class="text-sm font-semibold">Use Code:</span>
+                  <span class="font-mono tracking-wider font-bold">PMAP</span>
+                </div>                
+                <span class="text-xs opacity-75">Click to Copy</span>
+              </button>              
+  
+              <!-- Purchase Button -->
+              <div v-if="product.product_url">
+                <a
+                  :href="product.product_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg transition-colors flex items-center justify-center gap-2 mb-6"
+                >
+                  Visit {{ brand.name }} to Purchase
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5" aria-hidden="true">
+                    <path d="M15 3h6v6"></path>
+                    <path d="M10 14 21 3"></path>
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  </svg>
+                </a>
+              </div>
+  
+              <!-- Seller Information -->
+              <div v-if="brand" class="border-t border-gray-200 pt-6 mb-6">
+                <div class="flex items-center gap-3 mb-3">
+                  <div v-if="brand.logo">
+                    <img :src="brand.logo" :alt="brand.name" class="w-12 h-full object-cover" />
+                  </div>
+                  <div v-else class="w-12 h-12 rounded-lg object-cover">
+                    {{ brandInitials }}
+                  </div>
+                  <div>
+                    <div class="text-sm text-gray-600">Sold by</div>
+                    <a
+                      v-if="brand.shop_url"
+                      :href="`/brand/${brand.slug}/products`"
+                      rel="noopener noreferrer"
+                      class="text-blue-600 hover:text-blue-700"
+                    >
+                      {{ brand.name }}
+                    </a>                    
+                  </div>
+                </div>
+                <a                  
+                  :href="`/brand/${brand.slug}/products`"
+                  class="block w-full text-center border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors text-sm"
+                >
+                  View All Products from {{ brand.name }}
+                </a>
+              </div>
+  
+              <!-- Disclaimer -->
+              <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <div class="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" x2="12" y1="8" y2="12"></line>
+                    <line x1="12" x2="12.01" y1="16" y2="16"></line>
+                  </svg>
+                  <div class="text-xs text-yellow-800">
+                    <p>
+                      Research purposes only. Not intended for human consumption.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Tabs Section -->
-        <div class="bg-white rounded-lg shadow-md mb-8">
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-8">
           <!-- Tabs -->
           <div class="border-b border-gray-200">
             <div class="flex">
               <button
                 @click="activeTab = 'description'"
-                :class="activeTab === 'description' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 hover:text-gray-800'"
-                class="px-6 py-4 font-medium text-sm transition-colors"
+                :class="activeTab === 'description' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'"
+                class="px-6 py-4 text-sm transition-colors relative"
               >
                 Description
+                <div v-if="activeTab === 'description'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
               </button>
               <button
                 @click="activeTab = 'reviews'"
-                :class="activeTab === 'reviews' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 hover:text-gray-800'"
-                class="px-6 py-4 font-medium text-sm transition-colors"
+                :class="activeTab === 'reviews' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'"
+                class="px-6 py-4 text-sm transition-colors relative"
               >
                 Reviews ({{ product.rating_count }})
+                <div v-if="activeTab === 'reviews'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
               </button>
             </div>
           </div>
 
           <!-- Tab Content -->
-          <div class="p-6">
+          <div class="p-8">
             <!-- Description Tab -->
-            <div v-if="activeTab === 'description'">
-              <p class="text-gray-700 mb-4">
+            <div v-if="activeTab === 'description'" class="text-gray-700 space-y-4 max-w-4xl">
+              <p>
                 {{ product.name }} from {{ brand?.name || 'our store' }} is a research peptide designed for scientific and research purposes only.
               </p>
-              <p class="text-gray-700">
+              <p>
                 This product undergoes third-party testing to ensure quality. Each batch comes with a certificate of analysis (COA) available upon request.
               </p>
+              <div class="bg-slate-50 rounded-lg p-6 mt-6">
+                <h3 class="text-lg text-gray-900 mb-4">Product Information</h3>
+                <div class="space-y-3">
+                  <div class="flex justify-between py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Category:</span>
+                    <span class="text-gray-900">{{ product.category?.name || 'N/A' }}</span>
+                  </div>
+                  <div class="flex justify-between py-2 border-b border-gray-200">
+                    <span class="text-gray-600">Brand:</span>
+                    <span class="text-gray-900">{{ brand?.name || 'N/A' }}</span>
+                  </div>
+                  <div class="flex justify-between py-2">
+                    <span class="text-gray-600">Stock Status:</span>
+                    <span
+                      :class="product.availability === 'in_stock' ? 'text-green-600' : 'text-red-600'"
+                      class="font-medium"
+                    >
+                      {{ product.availability === 'in_stock' ? 'In Stock' : 'Out of Stock' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Reviews Tab -->
-            <div v-if="activeTab === 'reviews'">
-              <p class="text-gray-500">No reviews yet. Be the first to review this product!</p>
+            <div v-if="activeTab === 'reviews'" class="max-w-4xl">
+              <!-- Reviews List -->
+              <div v-if="reviews && reviews.length > 0" class="space-y-6">
+                <div 
+                  v-for="review in reviews" 
+                  :key="review.id"
+                  class="bg-white border border-gray-200 rounded-lg p-6"
+                >
+                  <div class="flex items-start justify-between mb-4">
+                    <div>
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="text-gray-900 font-medium">{{ review.user_name }}</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                          Verified Purchase
+                        </span>
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <svg 
+                          v-for="i in 5" 
+                          :key="i" 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="24" 
+                          height="24" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          stroke-width="2" 
+                          stroke-linecap="round" 
+                          stroke-linejoin="round" 
+                          :class="i <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'"
+                          class="lucide lucide-star w-4 h-4"
+                        >
+                          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <span class="text-sm text-gray-500">{{ review.created_at }}</span>
+                  </div>
+                  <p v-if="review.review" class="text-gray-700">{{ review.review }}</p>
+                </div>
+              </div>
+              
+              <!-- No Reviews Message -->
+              <div v-else class="text-center py-12">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-12 h-12 text-gray-300 mx-auto mb-4" aria-hidden="true">
+                  <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
+                </svg>
+                <p class="text-gray-500 mb-2">No reviews yet</p>
+                <p class="text-sm text-gray-400">Be the first to review this product!</p>
+              </div>
             </div>
           </div>
-        </div>
-
-        <!-- Product Information Table -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">Product Information</h2>
-          <div class="space-y-3">
-            <div class="flex">
-              <span class="w-32 text-gray-600 font-medium">Category:</span>
-              <span class="text-gray-800">{{ product.category?.name || 'N/A' }}</span>
-            </div>
-            <div class="flex">
-              <span class="w-32 text-gray-600 font-medium">Brand:</span>
-              <span class="text-gray-800">{{ brand?.name || 'N/A' }}</span>
-            </div>
-            <div class="flex">
-              <span class="w-32 text-gray-600 font-medium">Stock Status:</span>
-              <span
-                :class="product.availability === 'in_stock' ? 'text-green-600' : 'text-red-600'"
-                class="font-medium"
-              >
-                {{ product.availability === 'in_stock' ? 'In Stock' : 'Out of Stock' }}
-              </span>
-            </div>
-          </div>
-        </div>
+        </div>        
 
         <!-- Related Products -->
-        <div v-if="relatedProducts && relatedProducts.length > 0" class="mb-8">
-          <h2 class="text-2xl font-semibold text-gray-800 mb-6">Related Products</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            <ProductCard
+        <div v-if="relatedProducts && relatedProducts.length > 0" class="bg-white rounded-lg border border-gray-200 p-8">
+          <h2 class="text-2xl text-gray-900 mb-6">Related Products</h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <ProductSimpleDetailCard
               v-for="relatedProduct in relatedProducts"
               :key="relatedProduct.id"
               :name="relatedProduct.name"
               :image-url="relatedProduct.image_url"
               :price="relatedProduct.price"
               :discount-price="relatedProduct.discount_price"
-              :brand-name="relatedProduct.brand?.name"
-              :rating-average="relatedProduct.rating_average || 0"
-              :rating-count="relatedProduct.rating_count || 0"
-              :category-name="relatedProduct.category?.name || ''"
-              :size-mg="relatedProduct.size_mg"
-              :availability="relatedProduct.availability"
+              :brand-name="relatedProduct.brand?.name"              
               :to="`/product/${relatedProduct.slug}/${relatedProduct.id}`"
             />
           </div>
         </div>
       </div>
-    </section>
+    </div>
   </FrontLayout>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
-import ProductCard from '@/components/ProductCard.vue'
+import ProductSimpleDetailCard from '@/components/ProductSimpleDetailCard.vue'
 
 const props = defineProps({
   product: Object,
   brand: Object,
   relatedProducts: Array,
+  reviews: Array,
 })
 
 const activeTab = ref('description')
@@ -367,5 +410,14 @@ const copyDiscountCode = () => {
     alert('Failed to copy discount code')
   })
 }
-// console.log(props)
+
+const handleClick1 = () => {
+  router.visit('/products')
+}
+
+const handleClick2 = () => {
+  if (props.product?.category?.slug) {
+    router.visit(`/product/${props.product.category.slug}`)
+  }
+}
 </script>
