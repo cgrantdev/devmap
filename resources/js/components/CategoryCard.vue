@@ -3,7 +3,7 @@
     class="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-lg transition-all text-left group cursor-pointer flex flex-col overflow-hidden relative h-full"
     @click="handleClick"
   >
-    <div class="w-16 h-16 rounded-lg flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform flex-shrink-0">
+    <div class="w-24 h-24 rounded-lg flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform flex-shrink-0">
       <img
         v-if="image && !hasError"
         :src="image"
@@ -23,17 +23,10 @@
       >
         <span class="line-clamp-2 normal-case">{{ name }}</span>
       </h3>
-      <p class="text-sm text-gray-600 flex-shrink-0">
+      <!-- <p class="text-sm text-gray-600 flex-shrink-0">
         {{ totalItems }} products
-      </p>
-      <!-- <MainButton
-        :to="to"
-        text="Shop Now"
-        size="second"
-        bg-color="gray-200"
-        @click.stop
-        class="mt-auto"
-      /> -->
+      </p> -->
+      <span class="text-gray-600 text-sm flex-shrink-0 group-hover:underline">View All</span>
     </div>
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down w-5 h-5 text-gray-400 group-hover:text-blue-600 rotate-[-90deg] transition-colors absolute bottom-4 right-4 flex-shrink-0" aria-hidden="true">
       <path d="m6 9 6 6 6-6"></path>

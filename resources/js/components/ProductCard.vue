@@ -1,5 +1,6 @@
 <template>
   <div
+    @click="handleClick"
     class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group relative"
   >
     <!-- Top Section: Product Image -->

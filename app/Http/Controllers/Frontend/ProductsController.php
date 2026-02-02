@@ -115,6 +115,32 @@ class ProductsController extends Controller
             }
         }
 
+        // Get brand reviews if brand exists
+        $reviews = [];
+        if ($brand) {
+            $approvedReviews = $brand->approvedReviews()
+                ->with('user')
+                ->orderBy('created_at', 'desc')
+                ->get();
+            
+            $reviews = $approvedReviews->map(function ($review) {
+                return [
+                    'id' => $review->id,
+                    'rating' => $review->rating,
+                    'review' => $review->review ?? '',
+                    'user_name' => $review->user ? $review->user->name : $review->user_name,
+                    'user_email' => $review->user_email,
+                    'user_id' => $review->user_id,
+                    'created_at' => $review->created_at->format('Y-m-d'),
+                    'shipping_time' => $review->shipping_time,
+                    'customer_service' => $review->customer_service,
+                    'quality' => $review->quality,
+                    'cost' => $review->cost,
+                    'packaging' => $review->packaging,
+                ];
+            })->toArray();
+        }
+
         return Inertia::render('Frontend/ProductDetail', [
             'product' => [
                 'id' => $product->id,
@@ -148,6 +174,7 @@ class ProductsController extends Controller
                 'shop_url' => $brand->vendorSetting->shop_url ?? null,
             ] : null,
             'relatedProducts' => $relatedProducts,
+            'reviews' => $reviews,
         ]);
     }
 

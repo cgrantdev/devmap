@@ -1,5 +1,6 @@
 <template>
   <div
+    @click.stop="handleClick"
     class="bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer group relative border-2 border-slate-300 shadow-md"
   >
     <!-- Partner Badge (Top Right Corner) -->
