@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-xl hover:border-blue-500 transition-all text-left group flex flex-col h-full"
+    class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-xl hover:border-blue-500 transition-all text-left group"
     @click="handleClick"
   >
     <!-- Tags Row -->
@@ -25,41 +25,43 @@
     </div>
     
     <!-- Title and Subtitle -->
-    <h3 class="text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors min-h-[3.5rem] border-b border-slate-200 flex items-center">
-      <span class="line-clamp-2">{{ name }}</span>
+    <h3 class="text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors border-b border-slate-200">
+      {{ name }}
     </h3>
     <!-- Vial/Image Section -->
     <div class="aspect-square bg-gray-50 p-6 border-b border-slate-200 flex items-center justify-center">
-      <img
-        v-if="hasImage"
-        :src="image"
-        :alt="name"
-        class="w-full h-full object-contain flex items-center justtify-center select-none"
-        loading="lazy"
-        @error="onError"
-      />
-      <div v-else class="w-full h-full flex items-center justtify-center">
-        <!-- Vial Illustration -->
-        <svg
-          class="w-full h-full"
-          viewBox="0 0 200 200"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect x="70" y="30" width="60" height="15" fill="#687280" stroke="#374151" stroke-width="2"></rect>
-          <rect x="75" y="45" width="50" height="10" fill="#9CA3AF" stroke="#374151" stroke-width="2"></rect>
-          <rect x="60" y="55" width="80" height="110" rx="8" fill= "#E5E7EB" stroke="#374151" stroke-width="2"></rect>
-          <rect x="65" y="100" width="70" height="60" rx="6" fill="#3B82F6" fill-opacity="0.3"></rect>
-          <rect x="70" y="80" width="60" height="30" fill="white" stroke="#9CA3AF" stroke-width="1"></rect>
-          <line x1="75" y1="88" x2="125" y2="88" stroke="#D1D5DB" stroke-width="2"></line>
-          <line x1="75" y1="95" x2="115" y2="95" stroke="#D1D5DB" stroke-width="2"></line>
-          <line x1="75" y1="102" x2="120" y2="102" stroke="#D1D5DB" stroke-width="2"></line> 
-          <line x1="145" y1="70" x2="150" y2="70" stroke="#9CA3AF" stroke-width="1"></line>
-          <line x1="145" y1="90" x2="150" y2="90" stroke="#9CA3AF" stroke-width="1"></line>
-          <line x1="145" y1="110" x2= "150" y2="110" stroke="#9CA3AF" stroke-width="1"></line>
-          <line x1="145" y1="130" x2= "150" y2="130" stroke="#9CA3AF" stroke-width="1"></line>
-          <line x1="145" y1="150" x2= "150" y2="150" stroke="#9CA3AF" stroke-width="1"></line>
-        </svg>
+      <div class="w-full h-full flex items-center justify-center">
+        <img
+          v-if="hasImage"
+          :src="image"
+          :alt="name"
+          class="w-full h-full object-contain select-none"
+          loading="lazy"
+          @error="onError"
+        />
+        <div v-else class="w-full h-full flex items-center justify-center">
+          <!-- Vial Illustration -->
+          <svg
+            class="w-full h-full"
+            viewBox="0 0 200 200"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect x="70" y="30" width="60" height="15" fill="#687280" stroke="#374151" stroke-width="2"></rect>
+            <rect x="75" y="45" width="50" height="10" fill="#9CA3AF" stroke="#374151" stroke-width="2"></rect>
+            <rect x="60" y="55" width="80" height="110" rx="8" fill= "#E5E7EB" stroke="#374151" stroke-width="2"></rect>
+            <rect x="65" y="100" width="70" height="60" rx="6" fill="#3B82F6" fill-opacity="0.3"></rect>
+            <rect x="70" y="80" width="60" height="30" fill="white" stroke="#9CA3AF" stroke-width="1"></rect>
+            <line x1="75" y1="88" x2="125" y2="88" stroke="#D1D5DB" stroke-width="2"></line>
+            <line x1="75" y1="95" x2="115" y2="95" stroke="#D1D5DB" stroke-width="2"></line>
+            <line x1="75" y1="102" x2="120" y2="102" stroke="#D1D5DB" stroke-width="2"></line> 
+            <line x1="145" y1="70" x2="150" y2="70" stroke="#9CA3AF" stroke-width="1"></line>
+            <line x1="145" y1="90" x2="150" y2="90" stroke="#9CA3AF" stroke-width="1"></line>
+            <line x1="145" y1="110" x2= "150" y2="110" stroke="#9CA3AF" stroke-width="1"></line>
+            <line x1="145" y1="130" x2= "150" y2="130" stroke="#9CA3AF" stroke-width="1"></line>
+            <line x1="145" y1="150" x2= "150" y2="150" stroke="#9CA3AF" stroke-width="1"></line>
+          </svg>
+        </div>
       </div>
     </div>
     <!-- <p class="text-sm text-gray-600 mb-3">{{ subtitle || name }}</p> -->
