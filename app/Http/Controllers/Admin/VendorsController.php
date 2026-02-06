@@ -30,7 +30,7 @@ class VendorsController extends Controller
                     'brand_id' => $brand->id,
                     'name' => $brand->name,
                     'slug' => $brand->slug,
-                    'email' => $brand->vendorSetting->contact_email ?? null,
+                    'email' => $brand->vendorSetting?->contact_email ?? null,
                     'location' => $brand->vendorSetting && $brand->vendorSetting->location ? $brand->vendorSetting->location->name : null,
                     'created_at' => $brand->created_at->format('n/j/Y'), // Format: 12/3/2025
                     'is_active' => $brand->is_active,
@@ -39,7 +39,19 @@ class VendorsController extends Controller
                     'settings' => $brand->vendorSetting ? [
                         'status' => $brand->vendorSetting->status,
                         'logo' => $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
+                        'logo_url' => $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
+                        'banner_url' => $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
                         'shop_url' => $brand->vendorSetting->shop_url ?? null, // shop_url is the website
+                        'location_id' => $brand->vendorSetting->location_id ?? null,
+                        'description' => $brand->vendorSetting->description ?? null,
+                        'contact_email' => $brand->vendorSetting->contact_email ?? null,
+                        'phone_number' => $brand->vendorSetting->phone_number ?? null,
+                        'founded_year' => $brand->vendorSetting->founded_year ?? null,
+                        'coupon_code' => $brand->vendorSetting->coupon_code ?? null,
+                        'shipping_info' => $brand->vendorSetting->shipping_info ?? null,
+                        'return_policy' => $brand->vendorSetting->return_policy ?? null,
+                        'business_hours' => $brand->vendorSetting->business_hours ?? null,
+                        'banner_image_url' => $brand->vendorSetting->banner_image_url ?? null,
                         'top_vendor' => $brand->vendorSetting->top_vendor ?? false,
                         'featured' => $brand->vendorSetting->featured ?? false,
                         'is_partner' => $brand->vendorSetting->is_partner ?? false,
@@ -47,8 +59,11 @@ class VendorsController extends Controller
                 ];
             });
 
+        $locations = Location::orderBy('name')->get();
+
         return Inertia::render('Admin/Vendors', [
-            'vendors' => $vendors
+            'vendors' => $vendors,
+            'locations' => $locations
         ]);
     }
 
@@ -100,7 +115,7 @@ class VendorsController extends Controller
             'description' => 'nullable|string|max:1000',
             'contact_email' => 'nullable|email|max:255',
             'phone_number' => 'nullable|string|max:50',
-            'location_id' => 'required|exists:locations,id',
+            'location' => 'required|string|max:255',
             'founded_year' => 'nullable|integer|min:1800|max:' . date('Y'),
             'coupon_code' => 'nullable|string|max:50',
             'shipping_info' => 'nullable|string|max:2000',
@@ -117,7 +132,7 @@ class VendorsController extends Controller
         // Create Brand (vendor) - no user account
         $brand = Brand::create([
             'name' => $validated['name'],
-            'is_active' => false, // Inactive by default
+            'is_active' => true, // Active by default
         ]);
 
         // Create VendorSetting
@@ -150,9 +165,18 @@ class VendorsController extends Controller
         
         $settings->description = $validated['description'] ?? null;
         $settings->shop_url = $validated['shop_url'] ?? null; // shop_url is the website
-        $settings->contact_email = $validated['contact_email'] ?? null;
+        // Save email to contact_email field
+        $settings->contact_email = $validated['email'] ?? $validated['contact_email'] ?? null;
         $settings->phone_number = $validated['phone_number'] ?? null;
-        $settings->location_id = $validated['location_id'] ?? null;
+        
+        // Find or create location by name
+        $locationName = trim($validated['location']);
+        $location = Location::firstOrCreate(
+            ['name' => $locationName],
+            ['name' => $locationName]
+        );
+        $settings->location_id = $location->id;
+        
         $settings->founded_year = $validated['founded_year'] ?? null;
         $settings->coupon_code = $validated['coupon_code'] ?? null;
         $settings->shipping_info = $validated['shipping_info'] ?? null;
@@ -162,7 +186,7 @@ class VendorsController extends Controller
         $settings->top_vendor = $validated['top_vendor'] ?? false;
         $settings->featured = $validated['featured'] ?? false;
         $settings->is_partner = $validated['is_partner'] ?? false;
-        $settings->status = 0;
+        $settings->status = 1; // Active by default
         $settings->save();
 
         return redirect()->route('admin.vendors')->with('success', 'Vendor created successfully.');
@@ -226,7 +250,7 @@ class VendorsController extends Controller
             'description' => 'nullable|string|max:1000',
             'contact_email' => 'nullable|email|max:255',
             'phone_number' => 'nullable|string|max:50',
-            'location_id' => 'nullable|exists:locations,id',
+            'location' => 'nullable|string|max:255',
             'founded_year' => 'nullable|integer|min:1800|max:' . date('Y'),
             'coupon_code' => 'nullable|string|max:50',
             'shipping_info' => 'nullable|string|max:2000',
@@ -284,9 +308,24 @@ class VendorsController extends Controller
 
         $settings->description = $validated['description'] ?? $settings->description;
         $settings->shop_url = $validated['shop_url'] ?? $settings->shop_url; // shop_url is the website
-        $settings->contact_email = $validated['contact_email'] ?? $settings->contact_email;
+        // Save email to contact_email field (use email if provided, otherwise contact_email, otherwise keep existing)
+        if (isset($validated['email'])) {
+            $settings->contact_email = $validated['email'];
+        } elseif (isset($validated['contact_email'])) {
+            $settings->contact_email = $validated['contact_email'];
+        }
         $settings->phone_number = $validated['phone_number'] ?? $settings->phone_number;
-        $settings->location_id = $validated['location_id'] ?? $settings->location_id;
+        
+        // Find or create location by name if provided
+        if (!empty($validated['location'])) {
+            $locationName = trim($validated['location']);
+            $location = Location::firstOrCreate(
+                ['name' => $locationName],
+                ['name' => $locationName]
+            );
+            $settings->location_id = $location->id;
+        }
+        
         $settings->founded_year = $validated['founded_year'] ?? $settings->founded_year;
         $settings->coupon_code = $validated['coupon_code'] ?? $settings->coupon_code;
         $settings->shipping_info = $validated['shipping_info'] ?? $settings->shipping_info;
@@ -298,7 +337,7 @@ class VendorsController extends Controller
         $settings->is_partner = $validated['is_partner'] ?? $settings->is_partner ?? false;
         $settings->save();
 
-        return redirect()->route('admin.vendors.edit', $brand->id)->with('success', 'Vendor updated successfully.');
+        return redirect()->route('admin.vendors')->with('success', 'Vendor updated successfully.');
     }
 
     public function destroy($id)
@@ -485,14 +524,23 @@ class VendorsController extends Controller
         $perPage = $request->get('per_page', 20);
         $products = $query->paginate($perPage)
             ->through(function ($product) {
+                // If discount_price exists, price is original and discount_price is sale price
+                // Frontend expects: price = sale price, original_price = original price
+                $salePrice = $product->discount_price ? $product->discount_price : $product->price;
+                $originalPrice = $product->discount_price ? $product->price : null;
+                
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
                     'slug' => \Str::slug($product->name),
-                    'price' => $product->price,
-                    'original_price' => $product->original_price ?? null,
+                    'price' => $salePrice,
+                    'original_price' => $originalPrice,
                     'image_url' => $product->image_url,
                     'hidden' => (bool) ($product->hidden ?? false),
+                    'featured' => (bool) ($product->featured ?? false),
+                    'lab_tested' => (bool) ($product->lab_tested ?? false),
+                    'first_timer_deals' => (bool) ($product->first_timer_deals ?? false),
+                    'purity' => $product->purity,
                     'brand_id' => $product->brand_id,
                     'vendor_id' => $product->brand_id,
                     'vendor_name' => $product->brand ? $product->brand->name : '-',
@@ -502,6 +550,8 @@ class VendorsController extends Controller
                     'category_name' => $product->category ? $product->category->name : '-',
                     'rating' => round($product->rating_average ?? 0, 1),
                     'review_count' => $product->rating_count ?? 0,
+                    'size_mg' => $product->size_mg,
+                    'dosage' => $product->size_mg,
                 ];
             });
         // Get brands and categories for filters

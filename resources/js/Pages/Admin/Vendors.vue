@@ -2,8 +2,8 @@
   <AdminLayout>
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-3xl text-slate-900 mb-2">Vendor Management</h1>
-      <p class="text-slate-600">Manage all vendors and their information</p>
+      <h1 class="text-3xl text-gray-900 mb-2">Vendor Management</h1>
+      <p class="text-gray-600">Manage all vendors and their information</p>
     </div>
 
     <!-- Success Message -->
@@ -17,54 +17,58 @@
     </div>
 
     <!-- Actions Bar -->
-    <div class="bg-white rounded-lg border border-slate-200 p-4 mb-6">
+    <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
       <div class="flex items-center justify-between gap-4">
         <div class="flex-1 relative">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" aria-hidden="true">
+            <path d="m21 21-4.34-4.34" />
+            <circle cx="11" cy="11" r="8"></circle>
           </svg>
           <input
             type="text"
             placeholder="Search vendors..."
             v-model="searchTerm"
-            class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <Link href="/admin/vendors/create" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+        <button 
+          @click="openAddModal"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+        >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
           Add Vendor
-        </Link>
+        </button>
       </div>
     </div>
 
     <!-- Vendors Table -->
-    <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-slate-50 border-b border-slate-200">
+          <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Vendor</th>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Location</th>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Rating</th>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Reviews</th>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Actions</th>
+              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Vendor</th>
+              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Location</th>
+              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Rating</th>
+              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Reviews</th>
+              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-200">
-            <tr v-for="vendor in filteredVendors" :key="vendor.id" class="hover:bg-slate-50">
+          <tbody class="divide-y divide-gray-200">
+            <tr v-for="vendor in filteredVendors" :key="vendor.id" class="hover:bg-gray-50">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
-                  <div v-if="vendor.settings?.logo" class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                    <img :src="vendor.settings.logo" :alt="vendor.name" class="w-10 h-10 object-cover" />
+                  <div v-if="vendor.settings?.logo">
+                    <img :src="vendor.settings.logo" :alt="vendor.name" class="w-10 h-full object-cotain rounded-lg flex items-center justify-center text-white select-none" />
                   </div>
-                  <div v-else class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+                  <div v-else class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white">
                     {{ vendor.name.substring(0, 2).toUpperCase() }}
                   </div>
                   <div>
-                    <div class="text-sm text-slate-900">{{ vendor.name }}</div>
+                    <div class="text-sm text-gray-900">{{ vendor.name }}</div>
                     <a
                       v-if="vendor.settings?.shop_url"
                       :href="vendor.settings.shop_url"
@@ -73,15 +77,17 @@
                       class="text-xs text-blue-600 hover:underline flex items-center gap-1"
                     >
                       {{ (vendor.settings.shop_url || '').replace('https://', '').replace('http://', '') }}
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-3 h-3" aria-hidden="true">
+                        <path d="M15 3h6v6" />
+                        <path d="M10 14 21 3" />
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                       </svg>
                     </a>
                   </div>
                 </div>
               </td>
               <td class="px-6 py-4">
-                <div class="flex items-center gap-1 text-sm text-slate-600">
+                <div class="flex items-center gap-1 text-sm text-gray-600">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -91,21 +97,21 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center gap-1">
-                  <svg class="w-4 h-4 fill-yellow-400 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  <svg class="lucide lucide-star w-4 h-4 fill-yellow-400 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
                   </svg>
-                  <span class="text-sm text-slate-900">{{ vendor.rating_average || vendor.rating || '0.0' }}</span>
+                  <span class="text-sm text-gray-900">{{ vendor.rating_average || vendor.rating || '0.0' }}</span>
                 </div>
               </td>
               <td class="px-6 py-4">
-                <span class="text-sm text-slate-900">{{ vendor.rating_count || vendor.reviewCount || 0 }}</span>
+                <span class="text-sm text-gray-900">{{ vendor.rating_count || vendor.reviewCount || 0 }}</span>
               </td>
               <td class="px-6 py-4">
-                <div class="flex gap-2 flex-wrap">
+                <div class="flex gap-2">
                   <span v-if="vendor.is_active" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
                     Active
                   </span>
-                  <span v-else class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs">
+                  <span v-else class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
                     Inactive
                   </span>
                   <span v-if="vendor.settings?.top_vendor" class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
@@ -121,11 +127,15 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
-                  <Link :href="`/admin/vendors/${vendor.id}/edit`" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                  <button
+                    @click="openEditModal(vendor)"
+                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="Edit"
+                  >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                  </Link>
+                  </button>
                   <button
                     @click="deleteVendor(vendor)"
                     :disabled="form.processing"
@@ -144,20 +154,213 @@
       </div>
     </div>
 
-    <div v-if="filteredVendors.length === 0" class="bg-white rounded-lg border border-slate-200 p-6 text-center text-slate-500">
+    <div v-if="filteredVendors.length === 0" class="bg-white rounded-lg border border-gray-200 p-6 text-center text-gray-500">
       No vendors found.
+    </div>
+
+    <!-- Edit Vendor Modal -->
+    <div
+      v-if="showEditModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      @click.self="closeEditModal"
+    >
+      <div class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-2xl text-gray-900">{{ isEditMode ? 'Edit Vendor' : 'Add Vendor' }}</h2>
+        </div>
+
+        <form @submit.prevent="submitVendor" class="p-6 space-y-6">
+          <!-- Error Messages -->
+          <div v-if="Object.keys(editForm.errors).length > 0" class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+            <p class="font-medium mb-2">Please fix the following errors:</p>
+            <ul class="list-disc list-inside text-sm">
+              <li v-for="(error, field) in editForm.errors" :key="field">
+                {{ Array.isArray(error) ? error[0] : error }}
+              </li>
+            </ul>
+          </div>
+
+          <!-- Basic Info -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">Vendor Name *</label>
+              <input
+                v-model="editForm.name"
+                type="text"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">Website *</label>
+              <input
+                v-model="editForm.shop_url"
+                type="url"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">Email</label>
+              <input
+                v-model="editForm.email"
+                type="email"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">Phone</label>
+              <input
+                v-model="editForm.phone_number"
+                type="tel"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>            
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">Location *</label>
+              <input
+                v-model="editForm.location"
+                type="text"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">Founded Year</label>
+              <input
+                v-model.number="editForm.founded_year"
+                type="number"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+
+          <div>
+            <label class="block text-sm text-gray-700 mb-2">Description</label>
+            <textarea
+              v-model="editForm.description"
+              rows="3"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">Coupon Code</label>
+              <input
+                v-model="editForm.coupon_code"
+                type="text"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">Banner Image URL</label>
+              <input
+                v-model="editForm.banner_image_url"
+                type="url"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-700 mb-2">Shipping Information</label>
+            <textarea
+              v-model="editForm.shipping_info"
+              rows="2"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-700 mb-2">Return Policy</label>
+            <textarea
+              v-model="editForm.return_policy"
+              rows="2"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm text-gray-700 mb-2">Business Hours</label>
+            <input
+              v-model="editForm.business_hours"
+              type="text"
+              placeholder="e.g., Mon-Fri: 9AM-6PM EST"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <!-- Checkboxes -->
+          <div class="flex gap-6">
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                v-model="editForm.top_vendor"
+                class="w-4 h-4 text-blue-600"
+              />
+              <span class="text-sm text-gray-700">Top Vendor</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                v-model="editForm.featured"
+                class="w-4 h-4 text-blue-600"
+              />
+              <span class="text-sm text-gray-700">Featured</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                v-model="editForm.is_partner"
+                class="w-4 h-4 text-blue-600"
+              />
+              <span class="text-sm text-gray-700">Partner</span>
+            </label>            
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="p-6 border-t border-gray-200 flex justify-end gap-3">
+            <button
+              type="button"
+              @click="closeEditModal"
+              class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              :disabled="editForm.processing"
+              class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            >
+              {{ editForm.processing ? (isEditMode ? 'Saving...' : 'Adding...') : (isEditMode ? 'Save Changes' : 'Add Vendor') }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </AdminLayout>
 </template>
 
 <script setup>
-import { Link, useForm, usePage } from '@inertiajs/vue3'
+import { Link, useForm, usePage, router } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useToast as useVueToastification } from 'vue-toastification'
 
 const props = defineProps({
   vendors: {
+    type: Array,
+    default: () => []
+  },
+  locations: {
     type: Array,
     default: () => []
   }
@@ -169,6 +372,42 @@ const toast = useVueToastification()
 const toastError = (message) => toast.error(message, { timeout: 4000 })
 
 const searchTerm = ref('')
+const showEditModal = ref(false)
+const editingVendor = ref(null)
+const isEditMode = computed(() => editingVendor.value !== null)
+
+const bannerPreview = ref(null)
+const logoPreview = ref(null)
+const cacheBuster = ref(Date.now())
+
+const currentBannerUrl = computed(() => {
+  return editingVendor.value?.settings?.banner_url || editingVendor.value?.settings?.banner || ''
+})
+
+const currentLogoUrl = computed(() => {
+  return editingVendor.value?.settings?.logo_url || editingVendor.value?.settings?.logo || ''
+})
+
+const editForm = useForm({
+  name: '',
+  email: '',
+  description: '',
+  phone_number: '',
+  location: '',
+  shop_url: '',
+  founded_year: '2026',
+  coupon_code: '',
+  shipping_info: '',
+  return_policy: '',
+  business_hours: '',
+  banner_image_url: '',
+  top_vendor: false,
+  featured: false,
+  is_partner: false,
+  banner: null,
+  logo: null,
+  _token: usePage().props.csrf_token
+})
 
 const filteredVendors = computed(() => {
   if (!searchTerm.value) {
@@ -186,6 +425,104 @@ const filteredVendors = computed(() => {
 const form = useForm({
   _token: usePage().props.csrf_token
 })
+
+function openAddModal() {
+  editingVendor.value = null
+  editForm.reset()
+  editForm.clearErrors()
+  bannerPreview.value = null
+  logoPreview.value = null
+  showEditModal.value = true
+}
+
+function openEditModal(vendor) {
+  editingVendor.value = vendor
+  editForm.name = vendor.name || ''
+  editForm.email = vendor.email || vendor.settings?.contact_email || ''
+  editForm.description = vendor.settings?.description || ''
+  editForm.phone_number = vendor.settings?.phone_number || ''
+  editForm.location = vendor.location || ''
+  editForm.shop_url = vendor.settings?.shop_url || ''
+  editForm.founded_year = vendor.settings?.founded_year || null
+  editForm.coupon_code = vendor.settings?.coupon_code || ''
+  editForm.shipping_info = vendor.settings?.shipping_info || ''
+  editForm.return_policy = vendor.settings?.return_policy || ''
+  editForm.business_hours = vendor.settings?.business_hours || ''
+  editForm.banner_image_url = vendor.settings?.banner_image_url || ''
+  editForm.top_vendor = vendor.settings?.top_vendor || false
+  editForm.featured = vendor.settings?.featured || false
+  editForm.is_partner = vendor.settings?.is_partner || false
+  editForm.banner = null
+  editForm.logo = null
+  bannerPreview.value = null
+  logoPreview.value = null
+  cacheBuster.value = Date.now()
+  showEditModal.value = true
+}
+
+function closeEditModal() {
+  showEditModal.value = false
+  editingVendor.value = null
+  editForm.reset()
+  editForm.clearErrors()
+  bannerPreview.value = null
+  logoPreview.value = null
+}
+
+function handleFileChange(event, field) {
+  const file = event.target.files[0]
+  if (file) {
+    editForm[field] = file
+    const reader = new FileReader()
+    reader.onload = e => {
+      if (field === 'banner') bannerPreview.value = e.target.result
+      if (field === 'logo') logoPreview.value = e.target.result
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+function submitVendor() {
+  if (isEditMode.value) {
+    // Update existing vendor
+    editForm.post(`/admin/vendors/${editingVendor.value.id}`, {
+      forceFormData: true,
+      preserveState: true,
+      preserveScroll: true,
+      data: { _method: 'put' },
+      onSuccess: () => {
+        bannerPreview.value = null
+        logoPreview.value = null
+        cacheBuster.value = Date.now()
+        const fileInputs = document.querySelectorAll('input[type="file"]')
+        fileInputs.forEach(input => input.value = '')
+        closeEditModal()
+        router.reload({ only: ['vendors'] })
+      },
+      onError: (errors) => {
+        if (errors && Object.keys(errors).length > 0) {
+          toastError('Please fix the errors and try again.')
+        }
+      }
+    })
+  } else {
+    // Create new vendor
+    editForm.post('/admin/vendors', {
+      forceFormData: true,
+      preserveState: true,
+      preserveScroll: true,
+      onSuccess: () => {
+        closeEditModal()
+        router.reload({ only: ['vendors'] })
+      },
+      onError: (errors) => {
+        if (errors && Object.keys(errors).length > 0) {
+          toastError('Please fix the errors and try again.')
+        }
+      }
+    })
+  }
+}
 
 function deleteVendor(vendor) {
   if (confirm('Are you sure you want to delete this vendor?')) {

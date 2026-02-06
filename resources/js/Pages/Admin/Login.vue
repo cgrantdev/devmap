@@ -53,15 +53,21 @@
 <script setup>
 import { useForm, usePage, Link } from '@inertiajs/vue3'
 
+const page = usePage()
+const csrfToken = page.props.csrf_token || ''
+
 const form = useForm({
   email: '',
   password: '',
-  _token: usePage().props.csrf_token
+  _token: csrfToken
 })
 
 var errors = {}
 
 function submit() {
+  // Ensure CSRF token is up to date before submission
+  form._token = page.props.csrf_token || csrfToken
+  
   form.post('/admin/login', {
     onSuccess: () => {
       window.location.href = '/admin/dashboard'
