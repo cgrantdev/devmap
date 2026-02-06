@@ -20,9 +20,13 @@ class Product extends Model
         'location_id',
         'product_category_id',
         'size_mg',
+        'purity',
         'availability',
         'status',
         'hidden',
+        'featured',
+        'lab_tested',
+        'first_timer_deals',
         'verified',
         'rating_average',
         'rating_count',
@@ -60,6 +64,9 @@ class Product extends Model
     protected $casts = [
         'last_scraped_at' => 'datetime',
         'hidden' => 'boolean',
+        'featured' => 'boolean',
+        'lab_tested' => 'boolean',
+        'first_timer_deals' => 'boolean',
     ];
 
     public function scopeVisible($query)
@@ -76,5 +83,17 @@ class Product extends Model
             return $value;
         }
         return html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+
+    /**
+     * Get the original price (before discount)
+     * When discount_price exists, price is the original and discount_price is the sale price
+     */
+    public function getOriginalPriceAttribute()
+    {
+        if ($this->discount_price && $this->discount_price < $this->price) {
+            return $this->price; // price is original, discount_price is sale
+        }
+        return null;
     }
 }
