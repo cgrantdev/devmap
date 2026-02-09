@@ -18,9 +18,9 @@
           ]"
         >
           <div class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-4 h-4" aria-hidden="true">
+              <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+              <circle cx="12" cy="12" r="3"></circle>
             </svg>
             Scraping Configs
           </div>
@@ -33,8 +33,11 @@
           ]"
         >
           <div class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw w-4 h-4" aria-hidden="true">
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+              <path d="M21 3v5h-5" />
+              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+              <path d="M8 16H3v5" />
             </svg>
             Scraped Products
           </div>
@@ -45,7 +48,7 @@
     <!-- Scraping Configs Tab -->
     <div v-if="activeTab === 'configs'" class="space-y-4">
       <!-- Add Scraping Config Modal -->
-      <div v-if="showConfigModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div v-if="showConfigModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-lg w-full max-w-2xl p-6">
           <h2 class="text-xl font-semibold mb-4">Add Scraping Config</h2>
           <form @submit.prevent="submitConfig">
@@ -112,7 +115,7 @@
       </div>
 
       <!-- Edit Scraping Config Modal -->
-      <div v-if="showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div v-if="showEditModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-lg w-full max-w-2xl p-6">
           <h2 class="text-xl font-semibold mb-4">Edit Scraping Config</h2>
 
@@ -196,9 +199,9 @@
           @click="showConfigModal = true"
           class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-4 h-4" aria-hidden="true">
+            <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+            <circle cx="12" cy="12" r="3"></circle>
           </svg>
           Add Scraping Config
         </button>
@@ -241,9 +244,10 @@
                   config.enabled ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 ]"
                 :title="config.enabled ? 'Disable scraping' : 'Enable scraping'"
-              >
-                <svg v-if="config.enabled" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              >                
+                <svg v-if="config.enabled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pause w-4 h-4" aria-hidden="true">
+                  <rect x="14" y="3" width="5" height="18" rx="1"></rect>
+                  <rect x="5" y="3" width="5" height="18" rx="1"></rect>                  
                 </svg>
                 <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -255,8 +259,11 @@
                 class="p-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
                 title="Scrape now"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw w-4 h-4" aria-hidden="true">
+                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                  <path d="M21 3v5h-5" />
+                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                  <path d="M8 16H3v5" />
                 </svg>
               </button>
               <button
@@ -264,13 +271,8 @@
                 class="p-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
                 title="Edit config"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M11 4h6a1 1 0 011 1v6m-7 7H4a1 1 0 01-1-1v-7l11-11 7 7-11 11z"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen w-4 h-4" aria-hidden="true">
+                  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />                  
                 </svg>
               </button>
 
@@ -313,32 +315,67 @@
 
           <!-- View CSS Selectors -->
           <!-- Toggle title -->
-          <button
-            class="text-sm text-gray-700 mt-3 flex items-center"
-            @click="toggleSelectors(config.id)"
-          >
-            <span class="mr-1">
-              {{ openSelectors[config.id] ? '▾' : '▸' }}
-            </span>
-            View CSS Selectors
-          </button>
+          <details class="mt-4">
+            <summary
+              class="text-sm text-slate-600 cursor-pointer hover:text-slate-800 flex items-center gap-2"
+              @click="toggleSelectors(config.id)"
+            >
+              <svg 
+                v-if="openSelectors[config.id]"
+                class="w-5 h-5" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+              <svg 
+                v-else
+                class="w-5 h-5" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>              
+              View CSS Selectors
+            </summary>
 
-          <!-- Collapsible content -->
-          <div
-            v-if="openSelectors[config.id]"
-            class="mt-2 bg-gray-50 p-3"
-          >
-            <pre class="text-xs text-slate-600">
-          product_container: {{ config.selectors?.product_container }}
-          name: {{ config.selectors?.name }}
-          price: {{ config.selectors?.price }}
-          dosage: {{ config.selectors?.dosage }}
-          image: {{ config.selectors?.image }}
-          link: {{ config.selectors?.link }}
-          stock: {{ config.selectors?.stock }}
-            </pre>
-          </div>
-
+            <!-- Collapsible content -->
+            <div
+              v-if="openSelectors[config.id]"
+              class="mt-2 bg-slate-50 rounded-lg p-3 font-mono text-xs text-slate-700"
+            >
+              <div class="mb-1">
+                <span class="text-slate-500">product_container:</span>
+                {{ config.selectors?.product_container }}
+              </div>
+              <div class="mb-1">
+                <span class="text-slate-500">name:</span>
+                {{ config.selectors?.name }}
+              </div>
+              <div class="mb-1">
+                <span class="text-slate-500">price:</span>
+                {{ config.selectors?.price }}
+              </div>
+              <div class="mb-1">
+                <span class="text-slate-500">dosage:</span>
+                {{ config.selectors?.dosage }}
+              </div>
+              <div class="mb-1">
+                <span class="text-slate-500">image:</span>
+                {{ config.selectors?.image }}
+              </div>
+              <div class="mb-1">
+                <span class="text-slate-500">link:</span>
+                {{ config.selectors?.link }}
+              </div>
+              <div class="mb-1">
+                <span class="text-slate-500">stock:</span>
+                {{ config.selectors?.stock }}
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -349,11 +386,11 @@
         <div class="text-sm text-slate-600">
           {{ filteredProducts.length }} product{{ filteredProducts.length !== 1 ? 's' : '' }} found
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex gap-2">
           <!-- Vendor Filter -->
           <select
             v-model="selectedVendor"
-            class="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+            class="px-4 py-2 border border-slate-300 rounded-lg text-sm"
           >
             <option value="">All Vendors</option>
             <option v-for="vendor in uniqueVendors" :key="vendor" :value="vendor">
@@ -363,7 +400,7 @@
           <!-- Status Filter -->
           <select
             v-model="selectedStatus"
-            class="px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+            class="px-4 py-2 border border-slate-300 rounded-lg text-sm"
           >
             <option value="">All Status</option>
             <option value="auto">Auto</option>
@@ -392,133 +429,355 @@
 
       <!-- Products Table -->
       <div v-else class="bg-white border border-slate-200 rounded-lg overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">Product</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">Vendor</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">Price</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">Stock</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">Last Scraped</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">Status</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-slate-700 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-200">
-              <tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-slate-50 transition-colors">
-                <td class="px-4 py-3">
-                  <div class="flex items-center gap-3">
-                    <div class="flex-shrink-0 w-12 h-12 bg-slate-100 rounded flex items-center justify-center border border-slate-200">
-                      <img
-                        v-if="product.image_url && !imageErrors[product.id]"
-                        :src="product.image_url"
-                        :alt="product.name || 'Product image'"
-                        class="w-12 h-12 rounded object-cover"
-                        @error="handleImageError(product.id)"
-                      />
-                      <svg v-else class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
+        <table class="w-full">
+          <thead class="bg-slate-50 border-b border-slate-200">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs text-slate-700">Product</th>
+              <th class="px-4 py-3 text-left text-xs text-slate-700">Vendor</th>
+              <th class="px-4 py-3 text-left text-xs text-slate-700">Price</th>
+              <th class="px-4 py-3 text-left text-xs text-slate-700">Stock</th>
+              <th class="px-4 py-3 text-left text-xs text-slate-700">Last Scraped</th>
+              <th class="px-4 py-3 text-left text-xs text-slate-700">Status</th>
+              <th class="px-4 py-3 text-left text-xs text-slate-700">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            <tr v-for="product in filteredProducts" :key="product.id" class="hover:bg-slate-50">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="flex-shrink-0 w-12 h-12 bg-slate-100 rounded flex items-center justify-center border border-slate-200">
+                    <img
+                      v-if="product.image_url && !imageErrors[product.id]"
+                      :src="product.image_url"
+                      :alt="product.name || 'Product image'"
+                      class="w-12 h-12 rounded object-cover"
+                      @error="handleImageError(product.id)"
+                    />
+                    <svg v-else class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-sm text-slate-800">
+                      {{ product.name || 'Unnamed Product' }}
                     </div>
-                    <div class="min-w-0 flex-1">
-                      <div class="text-sm font-medium text-slate-800 truncate">
-                        {{ product.name || 'Unnamed Product' }}
-                      </div>
-                      <div v-if="product.dosage" class="text-xs text-slate-600 mt-0.5">
-                        {{ product.dosage }}
-                      </div>
+                    <div v-if="product.dosage" class="text-xs text-slate-600">
+                      {{ product.dosage }}
                     </div>
                   </div>
-                </td>
-                <td class="px-4 py-3 text-sm text-slate-700">
-                  {{ product.vendor_name || 'Unknown' }}
-                </td>
-                <td class="px-4 py-3 text-sm font-medium text-slate-800">
-                  <span v-if="product.price">${{ formatPrice(product.price) }}</span>
-                  <span v-else class="text-slate-400">N/A</span>
-                </td>
-                <td class="px-4 py-3">
-                  <span :class="[
-                    'px-2 py-1 rounded text-xs font-medium',
-                    product.stock_status === 'in-stock' ? 'bg-green-100 text-green-800' :
-                    product.stock_status === 'low-stock' ? 'bg-yellow-100 text-yellow-800' :
-                    product.stock_status === 'out-of-stock' ? 'bg-red-100 text-red-800' :
-                    'bg-slate-100 text-slate-800'
-                  ]">
-                    {{ product.stock_status || 'unknown' }}
+                </div>
+              </td>
+              <td class="px-4 py-3 text-sm text-slate-700">
+                {{ product.vendor_name || 'Unknown' }}
+              </td>
+              <td class="px-4 py-3 text-sm text-slate-800">
+                ${{ formatPrice(product.price) }}                
+              </td>
+              <td class="px-4 py-3">
+                <span :class="[
+                  'px-2 py-1 rounded text-xs',
+                  product.stock_status === 'in-stock' ? 'bg-green-100 text-green-800' :
+                  product.stock_status === 'low-stock' ? 'bg-yellow-100 text-yellow-800' :
+                  product.stock_status === 'out-of-stock' ? 'bg-red-100 text-red-800' :
+                  'bg-slate-100 text-slate-800'
+                ]">
+                  {{ product.stock_status || 'unknown' }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-xs text-slate-600">
+                {{ product.last_scraped_at ? formatDate(product.last_scraped_at) : 'Never' }}
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <span v-if="product.auto_scraped" class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                    Auto
                   </span>
-                </td>
-                <td class="px-4 py-3 text-xs text-slate-600">
-                  {{ product.last_scraped_at ? formatDate(product.last_scraped_at) : 'Never' }}
-                </td>
-                <td class="px-4 py-3">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span v-if="product.auto_scraped" class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 font-medium">
-                      Auto
-                    </span>
-                    <span v-if="product.manual_override" class="px-2 py-1 rounded text-xs bg-purple-100 text-purple-800 flex items-center gap-1 font-medium">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      Override
-                    </span>
-                  </div>
-                </td>
-                <td class="px-4 py-3">
-                  <div class="flex items-center gap-2">
-                    <!-- Lock/Override Button -->
-                    <button
-                      @click="toggleOverride(product.id)"
-                      :class="[
-                        'p-1.5 rounded transition-colors',
-                        product.manual_override ? 'bg-purple-100 text-purple-700 hover:bg-purple-200' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                      ]"
-                      :title="product.manual_override ? 'Remove override protection' : 'Protect from auto-updates'"
-                    >
-                      <svg v-if="product.manual_override" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
-                      </svg>
-                    </button>
-                    <!-- Edit Button -->
-                    <button
-                      @click="editProduct(product)"
-                      class="p-1.5 bg-slate-100 text-slate-700 rounded hover:bg-slate-200 transition-colors"
-                      title="Edit product"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                    <!-- External Link Button -->
-                    <a
-                      v-if="product.source_url"
-                      :href="product.source_url"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="p-1.5 bg-slate-100 text-slate-700 rounded hover:bg-slate-200 transition-colors"
-                      title="View source page"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  <span v-if="product.manual_override" class="px-2 py-1 rounded text-xs bg-purple-100 text-purple-800 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock w-3 h-3" aria-hidden="true">
+                      <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />                  
+                    </svg>
+                    Override
+                  </span>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <!-- Lock/Override Button -->
+                  <button
+                    @click="toggleOverride(product.id)"
+                    :class="[
+                      'p-1.5 rounded transition-colors',
+                      product.manual_override ? 'bg-purple-100 text-purple-700 hover:bg-purple-200' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    ]"
+                    :title="product.manual_override ? 'Remove override protection' : 'Protect from auto-updates'"
+                  >                    
+                    <svg v-if="product.manual_override" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock w-4 h-4" aria-hidden="true">
+                      <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />                  
+                    </svg>                    
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-open w-4 h-4" aria-hidden="true">
+                      <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 9.9-1" />                  
+                    </svg>
+                  </button>
+                  <!-- Edit Button -->
+                  <button
+                    @click="editProduct(product)"
+                    class="p-1.5 bg-slate-100 text-slate-700 rounded hover:bg-slate-200 transition-colors"
+                    title="Edit product"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pen w-4 h-4" aria-hidden="true">
+                      <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />                  
+                    </svg>
+                  </button>
+                  <!-- External Link Button -->
+                  <a
+                    v-if="product.source_url"
+                    :href="product.source_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="p-1.5 bg-slate-100 text-slate-700 rounded hover:bg-slate-200 transition-colors"
+                    title="View on vendor site"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-4 h-4" aria-hidden="true">
+                      <path d="M15 3h6v6" />                  
+                      <path d="M10 14 21 3" />                  
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />                  
+                    </svg>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div
+      v-if="showProductEditModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      @click.self="closeProductEditModal"
+    >
+      <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-2xl text-gray-900">Edit Product</h2>
         </div>
+
+        <form @submit.prevent="submitProductEdit" class="p-6 space-y-6">
+            <!-- Product Name -->
+            <div>
+              <label class="block text-sm text-gray-700 mb-2">
+                Product Name *
+              </label>
+              <input
+                v-model="productEditForm.name"
+                type="text"
+                required
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <!-- Brand -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-gray-700 mb-2">
+                  Brand *
+                </label>
+                <select
+                  v-model="productEditForm.brand_id"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Brand</option>
+                  <option v-for="brand in brands" :key="brand.id" :value="brand.id">
+                    {{ brand.name }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Category -->
+              <div>
+                <label class="block text-sm text-gray-700 mb-2">
+                  Category *
+                </label>
+                <select
+                  v-model="productEditForm.product_category_id"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Category</option>
+                  <option v-for="category in categories" :key="category.id" :value="category.id">
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-gray-700 mb-2">
+                  Price *
+                </label>
+                <input
+                  v-model="productEditForm.price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <!-- Dosage -->
+              <div>
+                <label class="block text-sm text-gray-700 mb-2">
+                  Dosage *
+                </label>
+                <input
+                  v-model="productEditForm.size_mg"
+                  type="text"
+                  required
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <!-- On Sale -->
+            <div class="border-t border-gray-200 pt-4">
+              <label for="on_sale" class="flex items-center gap-2 mb-4">
+                <input
+                  v-model="productEditForm.on_sale"
+                  type="checkbox"
+                  id="on_sale"
+                  class="h-4 w-4 text-blue-600"
+                />
+                <span class="text-sm text-gray-700">On Sale</span>
+              </label>
+              <div v-if="productEditForm.on_sale" class="grid grid-cols-2 gap-4">
+                <!-- Original Price (shown when On Sale is checked) -->
+                <div>
+                  <label class="block text-sm text-gray-700 mb-2">
+                    Original Price
+                  </label>
+                  <input
+                    v-model="productEditForm.original_price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+    
+                <!-- Discount % (shown when On Sale is checked) -->
+                <div>
+                  <label class="block text-sm text-gray-700 mb-2">
+                    Discount %
+                  </label>
+                  <input
+                    v-model="productEditForm.discount_percent"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="100"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    @input="calculateProductDiscount"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Purity -->
+            <div class="border-t border-gray-200 pt-4">
+              <label class="block text-sm text-gray-700 mb-2">
+                Purity (%)
+              </label>
+              <input
+                v-model="productEditForm.purity"
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., 99.2"
+              />
+            </div>
+
+            <!-- Checkboxes Section -->
+            <div class="border-t border-gray-200 pt-4">
+              <div class="grid grid-cols-2 gap-4">
+                <label class="flex items-center gap-2">
+                  <input
+                    v-model="productEditForm.featured"
+                    type="checkbox"
+                    class="h-4 w-4 text-blue-600"
+                  />
+                  <span class="text-sm text-gray-700">Featured</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    v-model="productEditForm.hidden"
+                    type="checkbox"
+                    class="h-4 w-4 text-blue-600"
+                  />
+                  <span class="text-sm text-gray-700">Hidden</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    v-model="productEditForm.lab_tested"
+                    type="checkbox"
+                    class="h-4 w-4 text-blue-600"
+                  />
+                  <span class="text-sm text-gray-700">Lab Tested</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    v-model="productEditForm.first_timer_deals"
+                    type="checkbox"
+                    class="h-4 w-4 text-blue-600"
+                  />
+                  <span class="text-sm text-gray-700">First-Timer Deals</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Error Messages -->
+            <div v-if="Object.keys(productEditForm.errors).length > 0" class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+              <p class="font-medium mb-2">Please fix the following errors:</p>
+              <ul class="list-disc list-inside text-sm">
+                <li v-for="(error, field) in productEditForm.errors" :key="field">
+                  {{ Array.isArray(error) ? error[0] : error }}
+                </li>
+              </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+              <button
+                type="button"
+                @click="closeProductEditModal"
+                class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                :disabled="productEditForm.processing"
+                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
+              >
+                {{ productEditForm.processing ? 'Saving...' : 'Save Changes' }}
+              </button>
+            </div>
+        </form>
       </div>
     </div>
   </AdminLayout>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { router, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import { Inertia } from '@inertiajs/inertia'
@@ -541,6 +800,8 @@ const form = useForm({
 
 const showEditModal = ref(false)
 const editingConfig = ref(null)
+const showProductEditModal = ref(false)
+const editingProduct = ref(null)
 
 const editForm = useForm({
   id: null,
@@ -571,6 +832,14 @@ const props = defineProps({
   vendors: {
     type: Array,
     default: () => []
+  },
+  brands: {
+    type: Array,
+    default: () => []
+  },
+  categories: {
+    type: Array,
+    default: () => []
   }
 })
 
@@ -590,6 +859,24 @@ const selectedStatus = ref('')
 
 const openSelectors = ref({})
 const imageErrors = ref({})
+
+// Product Edit Form
+const productEditForm = useForm({
+  name: '',
+  brand_id: null,
+  product_category_id: null,
+  price: '',
+  size_mg: '',
+  on_sale: false,
+  original_price: '',
+  discount_percent: '',
+  purity: '',
+  featured: false,
+  hidden: false,
+  lab_tested: false,
+  first_timer_deals: false,
+  _token: usePage().props.csrf_token
+})
 
 // Get unique vendor names from products
 const uniqueVendors = computed(() => {
@@ -711,8 +998,110 @@ function toggleOverride(productId) {
 }
 
 function editProduct(product) {
-  // Navigate to product edit page
-  router.visit(`/admin/products/${product.id}/edit`)
+  editingProduct.value = product
+  
+  // Populate form with product data
+  productEditForm.name = product.name || ''
+  productEditForm.brand_id = product.brand_id || null
+  productEditForm.product_category_id = product.product_category_id || null
+  productEditForm.price = product.price || ''
+  productEditForm.size_mg = product.size_mg || product.dosage || ''
+  productEditForm.purity = product.purity || ''
+  productEditForm.featured = !!product.featured
+  productEditForm.hidden = !!product.hidden
+  productEditForm.lab_tested = !!product.lab_tested
+  productEditForm.first_timer_deals = !!product.first_timer_deals
+  
+  // Determine if product is on sale
+  // If discount_price exists, that means price is original and discount_price is sale price
+  const hasDiscount = product.discount_price && product.price && product.discount_price < product.price
+  productEditForm.on_sale = hasDiscount
+  
+  if (hasDiscount) {
+    // price is original, discount_price is sale price
+    productEditForm.original_price = product.price
+    productEditForm.price = product.discount_price
+    productEditForm.discount_percent = Math.round(((product.price - product.discount_price) / product.price) * 100)
+  } else {
+    productEditForm.original_price = ''
+    productEditForm.discount_percent = ''
+  }
+  
+  showProductEditModal.value = true
+}
+
+function closeProductEditModal() {
+  showProductEditModal.value = false
+  editingProduct.value = null
+  productEditForm.reset()
+  productEditForm.clearErrors()
+}
+
+function calculateProductDiscount() {
+  if (productEditForm.original_price && productEditForm.discount_percent) {
+    const discount = (parseFloat(productEditForm.original_price) * parseFloat(productEditForm.discount_percent)) / 100
+    productEditForm.price = (parseFloat(productEditForm.original_price) - discount).toFixed(2)
+  }
+}
+
+// Watch for changes in original_price or discount_percent when on_sale is true
+watch([() => productEditForm.original_price, () => productEditForm.discount_percent], () => {
+  if (productEditForm.on_sale && productEditForm.original_price && productEditForm.discount_percent) {
+    calculateProductDiscount()
+  }
+})
+
+// Watch for on_sale changes - clear sale fields when unchecked
+watch(() => productEditForm.on_sale, (isOnSale) => {
+  if (!isOnSale) {
+    productEditForm.original_price = ''
+    productEditForm.discount_percent = ''
+  }
+})
+
+function submitProductEdit() {
+  // Prepare data for submission
+  const formData = {
+    name: productEditForm.name,
+    brand_id: productEditForm.brand_id,
+    product_category_id: productEditForm.product_category_id,
+    price: parseFloat(productEditForm.price),
+    size_mg: productEditForm.size_mg,
+    purity: productEditForm.purity ? parseFloat(productEditForm.purity) : null,
+    featured: productEditForm.featured,
+    hidden: productEditForm.hidden,
+    lab_tested: productEditForm.lab_tested,
+    first_timer_deals: productEditForm.first_timer_deals,
+    _token: productEditForm._token
+  }
+  
+  // If on sale, set original_price or calculate from discount
+  if (productEditForm.on_sale) {
+    if (productEditForm.original_price) {
+      formData.original_price = parseFloat(productEditForm.original_price)
+    } else if (productEditForm.discount_percent && productEditForm.price) {
+      // Calculate original price from discount percent
+      const price = parseFloat(productEditForm.price)
+      const discountPercent = parseFloat(productEditForm.discount_percent)
+      formData.original_price = (price / (1 - discountPercent / 100)).toFixed(2)
+    }
+  } else {
+    // If not on sale, clear original_price
+    formData.original_price = null
+  }
+  
+  // Update product
+  productEditForm.transform(() => formData).put(`/admin/products/${editingProduct.value.id}`, {
+    preserveScroll: true,
+    onSuccess: () => {
+      closeProductEditModal()
+      // Refresh the page to get updated product data
+      router.reload({ only: ['products'] })
+    },
+    onError: (errors) => {
+      console.error('Update error:', errors)
+    }
+  })
 }
 
 function handleImageError(productId) {
