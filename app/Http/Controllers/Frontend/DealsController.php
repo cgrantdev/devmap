@@ -57,7 +57,8 @@ class DealsController extends Controller
                 ];
             })
             ->filter()
-            ->values();
+            ->values()
+            ->toBase();
 
         // If we don't have enough deals, supplement with top brands that have coupon codes
         if ($deals->count() < 8) {
@@ -89,9 +90,11 @@ class DealsController extends Controller
                         'code' => $brand->vendorSetting->coupon_code ?? 'PMAP',
                         'description' => $brand->vendorSetting->description ?? 'Premium peptides and nootropics with exceptional quality control and customer service.',
                     ];
-                });
+                })
+                ->values()
+                ->toBase();
 
-            $deals = $deals->merge($brandsWithCoupons)->take(8);
+            $deals = $deals->merge($brandsWithCoupons)->take(8)->values()->toBase();
         }
 
         // If still no deals, use top brands as fallback with default discount
@@ -119,7 +122,9 @@ class DealsController extends Controller
                         'code' => 'PMAP',
                         'description' => $brand->vendorSetting->description ?? 'Premium peptides and nootropics with exceptional quality control and customer service.',
                     ];
-                });
+                })
+                ->values()
+                ->toBase();
         }
 
         // Apply sorting

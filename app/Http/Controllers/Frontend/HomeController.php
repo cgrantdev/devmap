@@ -200,7 +200,8 @@ class HomeController extends Controller
                 ];
             })
             ->filter() // Remove null entries
-            ->values();
+            ->values()
+            ->toBase();
 
         // If we don't have enough deals, supplement with top brands that have coupon codes
         if ($discountDeals->count() < 8) {
@@ -236,9 +237,10 @@ class HomeController extends Controller
                         'discount' => 15, // Default discount for coupon codes
                         'code' => $brand->vendorSetting->coupon_code ?? 'PMAP',
                     ];
-                });
+                })
+                ->toBase();
 
-            $discountDeals = $discountDeals->merge($brandsWithCoupons)->take(8);
+            $discountDeals = $discountDeals->merge($brandsWithCoupons)->take(8)->values();
         }
 
         // If still no deals, use top brands as fallback with default discount
