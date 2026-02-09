@@ -8,6 +8,7 @@ use App\Models\ScrapingConfig;
 use App\Models\ScrapedProduct;
 use App\Models\Product;
 use App\Models\Brand;
+use App\Models\ProductCategory;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -57,7 +58,11 @@ class ProductScrapingController extends Controller
                         'id' => $product->id,
                         'name' => $product->name,
                         'dosage' => $product->dosage ?? '',
+                        'size_mg' => $product->size_mg ?? '',
                         'price' => $product->price,
+                        'discount_price' => $product->discount_price,
+                        'brand_id' => $product->brand_id,
+                        'product_category_id' => $product->product_category_id,
                         'vendor_name' => $product->brand?->name ?? 'Unknown',
                         'stock_status' => $product->stock_status ?? 'in-stock',
                         'image_url' => $product->image_url,
@@ -65,6 +70,11 @@ class ProductScrapingController extends Controller
                         'last_scraped_at' => $product->last_scraped_at?->toIso8601String(),
                         'auto_scraped' => $product->auto_scraped,
                         'manual_override' => $product->manual_override ?? false,
+                        'purity' => $product->purity,
+                        'featured' => $product->featured ?? false,
+                        'hidden' => $product->hidden ?? false,
+                        'lab_tested' => $product->lab_tested ?? false,
+                        'first_timer_deals' => $product->first_timer_deals ?? false,
                     ];
                 });
         } else {
@@ -72,10 +82,33 @@ class ProductScrapingController extends Controller
         }
 
         $vendors = Brand::all();
+        
+        // Get brands and categories for product edit modal
+        $brands = Brand::orderBy('name')
+            ->get()
+            ->map(function ($brand) {
+                return [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                ];
+            });
+
+        $categories = ProductCategory::where('is_active', true)
+            ->orderBy('name')
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                ];
+            });
+        
         return Inertia::render('Admin/ProductScraping', [
             'scrapingConfigs' => $scrapingConfigs,
             'products' => $products,
             'vendors' => $vendors,
+            'brands' => $brands,
+            'categories' => $categories,
         ]);
     }
 
