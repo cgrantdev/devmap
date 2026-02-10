@@ -26,6 +26,7 @@
         </div>
         <select
           v-model="filterBrand"
+          @change="handleBrandChange"
           class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">All Brands</option>
@@ -35,6 +36,7 @@
         </select>
         <select
           v-model="filterCategory"
+          @change="handleCategoryChange"
           class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">All Categories</option>
@@ -486,27 +488,9 @@ const searchValue = ref('')
 const filterBrand = ref('all')
 const filterCategory = ref('all')
 
+// Use products directly from props since filtering is done on backend
 const filteredProducts = computed(() => {
-  let products = props.products?.data || []
-  
-  if (filterBrand.value !== 'all') {
-    products = products.filter(p => p.brand_id === filterBrand.value || p.vendor_id === filterBrand.value)
-  }
-  
-  if (filterCategory.value !== 'all') {
-    products = products.filter(p => p.product_category_id === filterCategory.value || p.category_id === filterCategory.value)
-  }
-  
-  if (searchValue.value) {
-    const term = searchValue.value.toLowerCase()
-    products = products.filter(p => 
-      (p.name && p.name.toLowerCase().includes(term)) ||
-      (p.vendor_name && p.vendor_name.toLowerCase().includes(term)) ||
-      (p.category_name && p.category_name.toLowerCase().includes(term))
-    )
-  }
-  
-  return products
+  return props.products?.data || []
 })
 
 let searchTimeout = null
@@ -516,6 +500,14 @@ function handleSearchInput() {
   searchTimeout = setTimeout(() => {
     fetchData(1)
   }, 500)
+}
+
+function handleBrandChange() {
+  fetchData(1)
+}
+
+function handleCategoryChange() {
+  fetchData(1)
 }
 
 function fetchData(page = props.products?.current_page || 1) {

@@ -645,10 +645,10 @@ class VendorsController extends Controller
                 if ($existing) {
                     // Only update if auto_update is enabled
                     if ($existing->auto_update) {
-                        // Don't update the name for existing products
-                        unset($productFields['name']);
-                        $existing->update($productFields);
-                        $updatedCount++;
+                    // Don't update the name for existing products
+                    unset($productFields['name']);
+                    $existing->update($productFields);
+                    $updatedCount++;
                     } else {
                         // Skip updating this product because auto_update is false
                         $skippedCount++;

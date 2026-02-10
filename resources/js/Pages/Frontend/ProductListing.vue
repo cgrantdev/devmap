@@ -249,6 +249,7 @@
                 :category-name="product.category?.name || ''"
                 :size-mg="product.size_mg"
                 :availability="product.availability"
+                :purity="product.purity"
                 :to="`/product/${product.slug}/${product.id}`"
               />
             </div>

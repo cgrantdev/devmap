@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasTable('activities')) {
-            Schema::create('activities', function (Blueprint $table) {
+        Schema::create('activities', function (Blueprint $table) {
             $table->id();
             $table->string('type'); // e.g., 'vendor_registered', 'product_added', 'review_submitted', 'deal_created', 'banner_activated'
             $table->string('description'); // e.g., 'New vendor registered', 'Product added'
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->index('type');
             $table->index('created_at');
             $table->index(['entity_type', 'entity_id']);
-            });
+        });
         }
     }
 

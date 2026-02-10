@@ -164,11 +164,11 @@ class RunPythonScraperJob implements ShouldQueue
                 // Create new product
                 $product = Product::create($productData);
                 Log::info('Product created', [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'product_category_id' => $product->product_category_id,
-                    'price' => $product->price
-                ]);
+                'id' => $product->id,
+                'name' => $product->name,
+                'product_category_id' => $product->product_category_id,
+                'price' => $product->price
+            ]);
             }
         }
         $this->config->last_run_at = now();
