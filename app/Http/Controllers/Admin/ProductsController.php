@@ -49,6 +49,7 @@ class ProductsController extends Controller
             'hidden' => 'sometimes|boolean',
             'lab_tested' => 'sometimes|boolean',
             'first_timer_deals' => 'sometimes|boolean',
+            'auto_update' => 'sometimes|boolean',
         ]);
         
         // Handle pricing logic:
@@ -95,6 +96,7 @@ class ProductsController extends Controller
             'hidden' => 'sometimes|boolean',
             'lab_tested' => 'sometimes|boolean',
             'first_timer_deals' => 'sometimes|boolean',
+            'auto_update' => 'sometimes|boolean',
         ]);
         
         // Handle pricing logic:
@@ -133,6 +135,21 @@ class ProductsController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Product visibility updated.');
+    }
+
+    public function setAutoUpdate(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+            'auto_update' => 'required|boolean',
+        ]);
+
+        $product->update([
+            'auto_update' => $validated['auto_update'],
+        ]);
+
+        return redirect()->back()->with('success', 'Product auto-update setting updated.');
     }
 
     public function destroy($id)

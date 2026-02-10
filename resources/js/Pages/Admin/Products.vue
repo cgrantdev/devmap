@@ -69,6 +69,7 @@
               <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Price</th>
               <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Rating</th>
               <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Hidden</th>
+              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Update</th>
               <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Status</th>
               <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -119,6 +120,14 @@
                   type="checkbox"
                   :checked="!!product.hidden"
                   @change="toggleHidden(product, $event)"
+                  class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+              </td>
+              <td class="px-6 py-4">
+                <input
+                  type="checkbox"
+                  :checked="!!product.auto_update"
+                  @change="toggleAutoUpdate(product, $event)"
                   class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
               </td>
@@ -384,6 +393,14 @@
                   />
                   <span class="text-sm text-gray-700">First-Timer Deals</span>
                 </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    v-model="editForm.auto_update"
+                    type="checkbox"
+                    class="h-4 w-4 text-blue-600"
+                  />
+                  <span class="text-sm text-gray-700">Auto Update from Source</span>
+                </label>
               </div>
             </div>
 
@@ -449,6 +466,7 @@ const editForm = useForm({
   hidden: false,
   lab_tested: false,
   first_timer_deals: false,
+  auto_update: false,
   _token: usePage().props.csrf_token
 })
 
@@ -528,6 +546,11 @@ const visibilityForm = useForm({
   _token: usePage().props.csrf_token
 })
 
+const autoUpdateForm = useForm({
+  auto_update: false,
+  _token: usePage().props.csrf_token
+})
+
 function toggleHidden(product, event) {
   const hidden = !!event?.target?.checked
   visibilityForm.hidden = hidden
@@ -538,6 +561,21 @@ function toggleHidden(product, event) {
     },
     onError: () => {
       toastError('Failed to update visibility. Please try again.')
+      fetchData()
+    }
+  })
+}
+
+function toggleAutoUpdate(product, event) {
+  const autoUpdate = !!event?.target?.checked
+  autoUpdateForm.auto_update = autoUpdate
+  autoUpdateForm.patch(`/admin/products/${product.id}/auto-update`, {
+    preserveScroll: true,
+    onSuccess: () => {
+      fetchData()
+    },
+    onError: () => {
+      toastError('Failed to update auto-update setting. Please try again.')
       fetchData()
     }
   })
@@ -577,6 +615,7 @@ function openEditModal(product) {
   editForm.hidden = !!product.hidden
   editForm.lab_tested = !!product.lab_tested
   editForm.first_timer_deals = !!product.first_timer_deals
+  editForm.auto_update = !!product.auto_update
   
   // Determine if product is on sale
   const hasOriginalPrice = product.original_price && product.original_price > product.price
@@ -635,6 +674,7 @@ function submitEdit() {
     hidden: editForm.hidden,
     lab_tested: editForm.lab_tested,
     first_timer_deals: editForm.first_timer_deals,
+    auto_update: editForm.auto_update,
     _token: editForm._token
   }
   

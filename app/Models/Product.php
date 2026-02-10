@@ -27,6 +27,7 @@ class Product extends Model
         'featured',
         'lab_tested',
         'first_timer_deals',
+        'auto_update',
         'verified',
         'rating_average',
         'rating_count',
@@ -67,6 +68,7 @@ class Product extends Model
         'featured' => 'boolean',
         'lab_tested' => 'boolean',
         'first_timer_deals' => 'boolean',
+        'auto_update' => 'boolean',
     ];
 
     public function scopeVisible($query)

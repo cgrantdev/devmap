@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('scraped_products', function (Blueprint $table) {
+        if (!Schema::hasTable('scraped_products')) {
+            Schema::create('scraped_products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('scraping_config_id')->constrained('scraping_configs')->onDelete('cascade');
             $table->string('name');
@@ -29,7 +30,8 @@ return new class extends Migration
             $table->index('scraping_config_id');
             $table->index('last_scraped_at');
             $table->index('name');
-        });
+            });
+        }
     }
 
     /**

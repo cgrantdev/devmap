@@ -141,17 +141,35 @@ class RunPythonScraperJob implements ShouldQueue
                 $productData['discount_price'] = $p['discount_price'];
             }
             
-            $product = Product::updateOrCreate(
-                ['name' => $productName],
-                $productData
-            );
-            
-            Log::info('Product saved', [
-                'id' => $product->id,
-                'name' => $product->name,
-                'product_category_id' => $product->product_category_id,
-                'price' => $product->price
-            ]);
+            // Check if product exists and if auto_update is enabled
+            if ($existingProduct) {
+                // If product exists, only update if auto_update is true
+                if ($existingProduct->auto_update) {
+                    $existingProduct->update($productData);
+                    $product = $existingProduct->fresh();
+                    Log::info('Product updated', [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'product_category_id' => $product->product_category_id,
+                        'price' => $product->price
+                    ]);
+                } else {
+                    Log::info('Product skipped (auto_update is false)', [
+                        'id' => $existingProduct->id,
+                        'name' => $existingProduct->name
+                    ]);
+                    continue;
+                }
+            } else {
+                // Create new product
+                $product = Product::create($productData);
+                Log::info('Product created', [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'product_category_id' => $product->product_category_id,
+                    'price' => $product->price
+                ]);
+            }
         }
         $this->config->last_run_at = now();
         $this->config->success_count++;

@@ -102,9 +102,9 @@
               <li>
                 <Link href="/education" class="hover:text-white transition-colors">Education Hub</Link>
               </li>
-              <li>
+              <!-- <li>
                 <Link href="/developers" class="hover:text-white transition-colors">Developers Guide</Link>
-              </li>
+              </li> -->
               <li>
                 <Link href="/about" class="hover:text-white transition-colors">About Us</Link>
               </li>
@@ -127,9 +127,9 @@
               <li>
                 <Link href="/advertise" class="hover:text-white transition-colors">Advertise</Link>
               </li>
-              <li>
+              <!-- <li>
                 <Link href="/admin/login" class="hover:text-white transition-colors">Admin Login</Link>
-              </li>
+              </li> -->
             </ul>
           </div>
         </div>

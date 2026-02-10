@@ -21,8 +21,10 @@
       <!-- General Settings -->
       <div class="bg-white rounded-lg border border-gray-200 p-6">
         <div class="flex items-center gap-3 mb-6">
-          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg class="lucide lucide-globe w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle stroke-linecap="round" stroke-linejoin="round" stroke-width="2" cx="12" cy="12" r="10"></circle>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12h20" />
           </svg>
           <h2 class="text-xl text-gray-900">General Settings</h2>
         </div>
@@ -33,6 +35,7 @@
             <input
               v-model="settingsForm.site_name"
               type="text"
+              value="Peptidemaps"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -43,7 +46,7 @@
               v-model="settingsForm.site_description"
               rows="3"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            ></textarea>
+            >Compare peptide brands, prices, and reviews</textarea>
           </div>
 
           <div>
@@ -51,6 +54,7 @@
             <input
               v-model="settingsForm.contact_email"
               type="email"
+              value="contact@peptidemaps.com"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -60,8 +64,9 @@
       <!-- Email Notifications -->
       <div class="bg-white rounded-lg border border-gray-200 p-6">
         <div class="flex items-center gap-3 mb-6">
-          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          <svg class="lucide lucide-mail w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" />
+            <rect stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="20" height="16" x="2" y="4" rx="2"></rect>
           </svg>
           <h2 class="text-xl text-gray-900">Email Notifications</h2>
         </div>
@@ -99,8 +104,8 @@
       <!-- Security -->
       <div class="bg-white rounded-lg border border-gray-200 p-6">
         <div class="flex items-center gap-3 mb-6">
-          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          <svg class="lucide lucide-shield w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
           </svg>
           <h2 class="text-xl text-gray-900">Security</h2>
         </div>
@@ -127,7 +132,7 @@
       </div>
 
       <!-- Platform Settings -->
-      <div class="bg-white rounded-lg border border-gray-200 p-6">
+      <!-- <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-xl text-gray-900 mb-6">Platform Settings</h2>
         
         <div class="space-y-4">
@@ -167,10 +172,10 @@
             />
           </label>
         </div>
-      </div>
+      </div> -->
 
       <!-- Vendor Settings -->
-      <div class="bg-white rounded-lg border border-gray-200 p-6">
+      <!-- <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-xl text-gray-900 mb-6">Vendor Settings</h2>
         
         <div class="space-y-4">
@@ -192,18 +197,15 @@
             />
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Save Settings Button -->
-      <div class="flex justify-end mt-6">
+      <div class="flex justify-end">
         <button 
           @click="saveSettings"
           :disabled="settingsForm.processing"
-          class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg transition-colors disabled:opacity-50"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
+          class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg transition-colors"
+        >          
           {{ settingsForm.processing ? 'Saving...' : 'Save Settings' }}
         </button>
       </div>
