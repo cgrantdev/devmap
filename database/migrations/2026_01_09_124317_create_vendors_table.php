@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('vendors')) {
         Schema::create('vendors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->timestamps();
         });
+        }
     }
 
     /**

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Header -->
-    <Header />
+    <!-- <Header /> -->
     
     <main>
       <div class="min-h-screen bg-gray-100 flex">
@@ -135,7 +135,7 @@
     </main>
 
     <!-- Footer -->
-    <Footer />
+    <!-- <Footer /> -->
 
     <!-- Global Loading Overlay -->
     <div v-if="isLoading" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/75">

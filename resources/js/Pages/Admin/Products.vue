@@ -26,6 +26,7 @@
         </div>
         <select
           v-model="filterBrand"
+          @change="handleBrandChange"
           class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">All Brands</option>
@@ -35,6 +36,7 @@
         </select>
         <select
           v-model="filterCategory"
+          @change="handleCategoryChange"
           class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="all">All Categories</option>
@@ -69,6 +71,7 @@
               <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Price</th>
               <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Rating</th>
               <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Hidden</th>
+              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Update</th>
               <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Status</th>
               <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -119,6 +122,14 @@
                   type="checkbox"
                   :checked="!!product.hidden"
                   @change="toggleHidden(product, $event)"
+                  class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+              </td>
+              <td class="px-6 py-4">
+                <input
+                  type="checkbox"
+                  :checked="!!product.auto_update"
+                  @change="toggleAutoUpdate(product, $event)"
                   class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
               </td>
@@ -384,6 +395,14 @@
                   />
                   <span class="text-sm text-gray-700">First-Timer Deals</span>
                 </label>
+                <label class="flex items-center gap-2">
+                  <input
+                    v-model="editForm.auto_update"
+                    type="checkbox"
+                    class="h-4 w-4 text-blue-600"
+                  />
+                  <span class="text-sm text-gray-700">Auto Update from Source</span>
+                </label>
               </div>
             </div>
 
@@ -449,6 +468,7 @@ const editForm = useForm({
   hidden: false,
   lab_tested: false,
   first_timer_deals: false,
+  auto_update: false,
   _token: usePage().props.csrf_token
 })
 
@@ -468,27 +488,9 @@ const searchValue = ref('')
 const filterBrand = ref('all')
 const filterCategory = ref('all')
 
+// Use products directly from props since filtering is done on backend
 const filteredProducts = computed(() => {
-  let products = props.products?.data || []
-  
-  if (filterBrand.value !== 'all') {
-    products = products.filter(p => p.brand_id === filterBrand.value || p.vendor_id === filterBrand.value)
-  }
-  
-  if (filterCategory.value !== 'all') {
-    products = products.filter(p => p.product_category_id === filterCategory.value || p.category_id === filterCategory.value)
-  }
-  
-  if (searchValue.value) {
-    const term = searchValue.value.toLowerCase()
-    products = products.filter(p => 
-      (p.name && p.name.toLowerCase().includes(term)) ||
-      (p.vendor_name && p.vendor_name.toLowerCase().includes(term)) ||
-      (p.category_name && p.category_name.toLowerCase().includes(term))
-    )
-  }
-  
-  return products
+  return props.products?.data || []
 })
 
 let searchTimeout = null
@@ -498,6 +500,14 @@ function handleSearchInput() {
   searchTimeout = setTimeout(() => {
     fetchData(1)
   }, 500)
+}
+
+function handleBrandChange() {
+  fetchData(1)
+}
+
+function handleCategoryChange() {
+  fetchData(1)
 }
 
 function fetchData(page = props.products?.current_page || 1) {
@@ -528,6 +538,11 @@ const visibilityForm = useForm({
   _token: usePage().props.csrf_token
 })
 
+const autoUpdateForm = useForm({
+  auto_update: false,
+  _token: usePage().props.csrf_token
+})
+
 function toggleHidden(product, event) {
   const hidden = !!event?.target?.checked
   visibilityForm.hidden = hidden
@@ -538,6 +553,21 @@ function toggleHidden(product, event) {
     },
     onError: () => {
       toastError('Failed to update visibility. Please try again.')
+      fetchData()
+    }
+  })
+}
+
+function toggleAutoUpdate(product, event) {
+  const autoUpdate = !!event?.target?.checked
+  autoUpdateForm.auto_update = autoUpdate
+  autoUpdateForm.patch(`/admin/products/${product.id}/auto-update`, {
+    preserveScroll: true,
+    onSuccess: () => {
+      fetchData()
+    },
+    onError: () => {
+      toastError('Failed to update auto-update setting. Please try again.')
       fetchData()
     }
   })
@@ -577,6 +607,7 @@ function openEditModal(product) {
   editForm.hidden = !!product.hidden
   editForm.lab_tested = !!product.lab_tested
   editForm.first_timer_deals = !!product.first_timer_deals
+  editForm.auto_update = !!product.auto_update
   
   // Determine if product is on sale
   const hasOriginalPrice = product.original_price && product.original_price > product.price
@@ -635,6 +666,7 @@ function submitEdit() {
     hidden: editForm.hidden,
     lab_tested: editForm.lab_tested,
     first_timer_deals: editForm.first_timer_deals,
+    auto_update: editForm.auto_update,
     _token: editForm._token
   }
   

@@ -123,6 +123,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::get('/products/{id}/edit', [AdminProductsController::class, 'edit'])->name('admin.products.edit');
     Route::put('/products/{id}', [AdminProductsController::class, 'update'])->name('admin.products.update');
     Route::patch('/products/{id}/hidden', [AdminProductsController::class, 'setHidden'])->name('admin.products.hidden');
+    Route::patch('/products/{id}/auto-update', [AdminProductsController::class, 'setAutoUpdate'])->name('admin.products.auto-update');
     Route::delete('/products/{id}', [AdminProductsController::class, 'destroy'])->name('admin.products.destroy');
     
     // Categories

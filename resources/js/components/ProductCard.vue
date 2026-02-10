@@ -140,6 +140,7 @@ const props = defineProps({
   categoryName: { type: String, default: '' },
   sizeMg: { type: [String, Number], default: null },
   availability: { type: String, default: 'in_stock' },
+  purity: { type: [String, Number], default: null },
 })
 
 const hasError = ref(false)
@@ -176,16 +177,22 @@ const sizeDisplay = computed(() => {
   return null
 })
 
-// Extract purity from name or use default
+// Use real purity from database, or extract from name, or use default
 const purity = computed(() => {
+  // First, use the purity prop if provided (from database)
+  if (props.purity !== null && props.purity !== undefined && props.purity !== '') {
+    return parseFloat(props.purity).toFixed(1)
+  }
+  
+  // Otherwise, try to extract from name
   const name = props.name || ''
-  // Look for patterns like "99.2%", "99%", etc.
   const match = name.match(/(\d+(?:\.\d+)?)\s*%/i)
   if (match) {
     return parseFloat(match[1]).toFixed(1)
   }
+  
   // Default purity if not found
-  return '99.0'
+  return null
 })
 
 

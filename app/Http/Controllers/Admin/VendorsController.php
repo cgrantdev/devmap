@@ -540,6 +540,7 @@ class VendorsController extends Controller
                     'featured' => (bool) ($product->featured ?? false),
                     'lab_tested' => (bool) ($product->lab_tested ?? false),
                     'first_timer_deals' => (bool) ($product->first_timer_deals ?? false),
+                    'auto_update' => (bool) ($product->auto_update ?? false),
                     'purity' => $product->purity,
                     'brand_id' => $product->brand_id,
                     'vendor_id' => $product->brand_id,
@@ -642,10 +643,17 @@ class VendorsController extends Controller
                 }
                 
                 if ($existing) {
+                    // Only update if auto_update is enabled
+                    if ($existing->auto_update) {
                     // Don't update the name for existing products
                     unset($productFields['name']);
                     $existing->update($productFields);
                     $updatedCount++;
+                    } else {
+                        // Skip updating this product because auto_update is false
+                        $skippedCount++;
+                        continue;
+                    }
                 } else {
                     // Find similar category or create new one
                     $category = null;

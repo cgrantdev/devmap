@@ -247,21 +247,26 @@ class ProductsController extends Controller
             $query->where('availability', 'in_stock');
         }
 
+        // On Sale filter - product has a discount price
+        if ($request->has('on_sale') && $request->on_sale === '1') {
+            $query->whereNotNull('discount_price');
+        }
+
+        // Lab Tested filter
+        if ($request->has('lab_tested') && $request->lab_tested === '1') {
+            $query->where('lab_tested', true);
+        }
+
+        // First-Timer Deals filter
+        if ($request->has('first_timer_deals') && $request->first_timer_deals === '1') {
+            $query->where('first_timer_deals', true);
+        }
+
         if ($request->has('min_purity') && $request->min_purity) {
             $minPurity = (float) $request->min_purity;
-            // Extract purity from product name (looks for patterns like "99.2%", "99%", etc.)
-            // Match ProductCard.vue behavior: extract purity or default to 99.0%
-            // Handle both NULL and empty string results from REGEXP_SUBSTR
-            $query->whereRaw(
-                "COALESCE(
-                    NULLIF(
-                        CAST(REPLACE(NULLIF(REGEXP_SUBSTR(name, '[0-9]+(\\.[0-9]+)?\\s*%'), ''), '%', '') AS DECIMAL(5,2)),
-                        0
-                    ),
-                    99.0
-                ) >= ?",
-                [$minPurity]
-            );
+            // Use real purity column from database
+            $query->whereNotNull('purity')
+                  ->where('purity', '>=', $minPurity);
         }
 
         // Apply sorting - default to price ascending
@@ -401,19 +406,9 @@ class ProductsController extends Controller
 
         if ($request->has('min_purity') && $request->min_purity) {
             $minPurity = (float) $request->min_purity;
-            // Extract purity from product name (looks for patterns like "99.2%", "99%", etc.)
-            // Match ProductCard.vue behavior: extract purity or default to 99.0%
-            // Handle both NULL and empty string results from REGEXP_SUBSTR
-            $query->whereRaw(
-                "COALESCE(
-                    NULLIF(
-                        CAST(REPLACE(NULLIF(REGEXP_SUBSTR(name, '[0-9]+(\\.[0-9]+)?\\s*%'), ''), '%', '') AS DECIMAL(5,2)),
-                        0
-                    ),
-                    99.0
-                ) >= ?",
-                [$minPurity]
-            );
+            // Use real purity column from database
+            $query->whereNotNull('purity')
+                  ->where('purity', '>=', $minPurity);
         }
 
         // Apply sorting - default to price ascending
