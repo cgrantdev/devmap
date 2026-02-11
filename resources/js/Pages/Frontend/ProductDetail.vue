@@ -128,10 +128,10 @@
                 <div class="flex items-center gap-3">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag w-5 h-5" aria-hidden="true">
                     <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path>
-                    <circle cx="7.5" cy="7.5" r=".5" fill="currentColr"></circle>
+                    <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
                   </svg>
                   <span class="text-sm font-semibold">Use Code:</span>
-                  <span class="font-mono tracking-wider font-bold">PMAP</span>
+                  <span class="font-mono tracking-wider font-bold">{{ brand?.discount_code || 'PMAP' }}</span>
                 </div>                
                 <span class="text-xs opacity-75">Click to Copy</span>
               </button>              
@@ -403,12 +403,47 @@ const brandInitials = computed(() => {
   }
 })
 
-const copyDiscountCode = () => {
-  navigator.clipboard.writeText('PMAP').then(() => {
+const copyDiscountCode = async () => {
+  const code = props.brand?.discount_code || 'PMAP'
+  
+  // Try modern Clipboard API first (requires secure context)
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await navigator.clipboard.writeText(code)
     alert('Discount code copied to clipboard!')
-  }).catch(() => {
-    alert('Failed to copy discount code')
-  })
+      return
+    } catch (err) {
+      console.warn('Clipboard API failed, trying fallback:', err)
+    }
+  }
+  
+  // Fallback method for non-secure contexts or older browsers
+  try {
+    // Create a temporary textarea element
+    const textarea = document.createElement('textarea')
+    textarea.value = code
+    textarea.style.position = 'fixed'
+    textarea.style.left = '-999999px'
+    textarea.style.top = '-999999px'
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+    
+    // Try to copy using execCommand (deprecated but widely supported)
+    const successful = document.execCommand('copy')
+    document.body.removeChild(textarea)
+    
+    if (successful) {
+      alert('Discount code copied to clipboard!')
+    } else {
+      // Last resort: show the code and ask user to copy manually
+      prompt('Please copy this discount code:', code)
+    }
+  } catch (err) {
+    console.error('Fallback copy method failed:', err)
+    // Last resort: show the code and ask user to copy manually
+    prompt('Please copy this discount code:', code)
+  }
 }
 
 const handleClick1 = () => {

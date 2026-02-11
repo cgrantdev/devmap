@@ -9,8 +9,10 @@ use App\Models\Type;
 use App\Models\Puse;
 use App\Models\Brand;
 use App\Models\Location;
+use App\Models\Deal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -141,6 +143,32 @@ class ProductsController extends Controller
             })->toArray();
         }
 
+        // Get discount code: check for active deal first, then vendorSetting coupon_code, then default to PMAP
+        $discountCode = 'PMAP';
+        if ($brand) {
+            if (Schema::hasTable('deals')) {
+                $activeDeal = Deal::where('brand_id', $brand->id)
+                    ->where('active', true)
+                    ->where(function ($query) {
+                        $query->whereNull('expiry_date')
+                            ->orWhere('expiry_date', '>=', now());
+                    })
+                    ->where(function ($query) {
+                        $query->whereNull('usage_limit')
+                            ->orWhereRaw('used_count < usage_limit');
+                    })
+                    ->first();
+                
+                if ($activeDeal) {
+                    $discountCode = $activeDeal->code;
+                } elseif ($brand->vendorSetting && $brand->vendorSetting->coupon_code) {
+                    $discountCode = $brand->vendorSetting->coupon_code;
+                }
+            } elseif ($brand->vendorSetting && $brand->vendorSetting->coupon_code) {
+                $discountCode = $brand->vendorSetting->coupon_code;
+            }
+        }
+
         return Inertia::render('Frontend/ProductDetail', [
             'product' => [
                 'id' => $product->id,
@@ -172,6 +200,7 @@ class ProductsController extends Controller
                     ? asset('storage/' . $brand->vendorSetting->logo) 
                     : null,
                 'shop_url' => $brand->vendorSetting->shop_url ?? null,
+                'discount_code' => $discountCode,
             ] : null,
             'relatedProducts' => $relatedProducts,
             'reviews' => $reviews,
@@ -522,6 +551,30 @@ class ProductsController extends Controller
             ];
         });
 
+        // Get discount code: check for active deal first, then vendorSetting coupon_code, then default to PMAP
+        $discountCode = 'PMAP';
+        if (Schema::hasTable('deals')) {
+            $activeDeal = Deal::where('brand_id', $brand->id)
+                ->where('active', true)
+                ->where(function ($query) {
+                    $query->whereNull('expiry_date')
+                        ->orWhere('expiry_date', '>=', now());
+                })
+                ->where(function ($query) {
+                    $query->whereNull('usage_limit')
+                        ->orWhereRaw('used_count < usage_limit');
+                })
+                ->first();
+            
+            if ($activeDeal) {
+                $discountCode = $activeDeal->code;
+            } elseif ($brand->vendorSetting && $brand->vendorSetting->coupon_code) {
+                $discountCode = $brand->vendorSetting->coupon_code;
+            }
+        } elseif ($brand->vendorSetting && $brand->vendorSetting->coupon_code) {
+            $discountCode = $brand->vendorSetting->coupon_code;
+        }
+
         return Inertia::render('Frontend/BrandProducts', [
             'brand' => [
                 'id' => $brand->id,
@@ -541,6 +594,7 @@ class ProductsController extends Controller
                 'founded_year' => $brand->vendorSetting && $brand->vendorSetting->founded_year ? $brand->vendorSetting->founded_year : null,
                 'shipping_info' => $brand->vendorSetting && $brand->vendorSetting->shipping_info ? $brand->vendorSetting->shipping_info : null,
                 'return_policy' => $brand->vendorSetting && $brand->vendorSetting->return_policy ? $brand->vendorSetting->return_policy : null,
+                'discount_code' => $discountCode,
                 'shipping_time' => round($shippingTime, 1),
                 'customer_service' => round($customerService, 1),
                 'quality' => round($quality, 1),
