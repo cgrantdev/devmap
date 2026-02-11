@@ -67,14 +67,13 @@ class EducationController extends Controller
                     'title' => $category->name,
                     'slug' => $category->slug,
                     'description' => $category->description,
-                    'overview' => $category->description,
-                    'content' => null,
+                    'overview' => $category->description, // Keep for backward compatibility with frontend
                     'image' => $category->image_url ? \Illuminate\Support\Facades\Storage::url('categories/' . $category->image_url) : null,
                     'rating' => '0.00',
                     'rating_count' => 0,
                     'key_effects' => [],
-                    'accordion_sections' => [],
-                    'shop_url' => '/product/' . $category->slug,
+                    'accordion_sections' => [], // Keep for backward compatibility with frontend
+                    'shop_url' => '/product/' . $category->slug, // Keep for backward compatibility with frontend
                 ],
                 'category' => [
                     'id' => $category->id,
@@ -110,14 +109,29 @@ class EducationController extends Controller
                 'title' => $post->title,
                 'slug' => $category->slug,
                 'description' => $post->description,
-                'overview' => $post->overview,
-                'content' => $post->content,
+                'overview' => $post->description, // Use description as overview for backward compatibility
                 'image' => $post->image ? \Illuminate\Support\Facades\Storage::url('education_posts/' . $post->image) : null,
                 'rating' => number_format($post->rating, 2, '.', ''),
                 'rating_count' => $post->rating_count,
                 'key_effects' => $post->key_effects ?? [],
-                'accordion_sections' => $post->accordion_sections ?? [],
+                'accordion_sections' => [], // Empty array for backward compatibility
                 'shop_url' => '/product/' . $category->slug, // Link to product category page
+                // New fields
+                'education_tag' => $post->education_tag,
+                'peptide_full_name' => $post->peptide_full_name,
+                'half_life' => $post->half_life,
+                'bioavailability' => $post->bioavailability,
+                'storage' => $post->storage,
+                'common_use_cases' => $post->common_use_cases ?? [],
+                'how_it_works' => $post->how_it_works,
+                'typical_dosage' => $post->typical_dosage,
+                'frequency' => $post->frequency,
+                'administration' => $post->administration,
+                'cycle_duration' => $post->cycle_duration,
+                'possible_side_effects' => $post->possible_side_effects ?? [],
+                'contraindications' => $post->contraindications ?? [],
+                'stacking_recommendations' => $post->stacking_recommendations ?? [],
+                'faqs' => $post->faqs ?? [],
             ],
             'category' => [
                 'id' => $category->id,

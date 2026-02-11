@@ -26,8 +26,7 @@
 
               <!-- Title and Subtitle -->
               <h1 class="text-5xl text-gray-900 mb-3">{{ name }}</h1>
-              <!-- <p class="text-xl text-slate-600 mb-6">{{ subtitle }}</p> -->
-              <p class="text-xl text-slate-600 mb-6">Peptide Full Name</p>
+              <p v-if="subtitle" class="text-xl text-slate-600 mb-6">{{ subtitle }}</p>
 
               <!-- Description -->
               <p class="text-lg text-gray-700 leading-relaxed">
@@ -65,7 +64,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap w-6 h-6 text-blue-600" aria-hidden="true">
                   <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path>
                 </svg>
-                Research Applications
+                Key Benefits
               </h2>
               <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <li 
@@ -103,7 +102,7 @@
 
 
             <!-- How It Works -->
-            <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <section v-if="howItWorks" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 class="text-2xl text-gray-900 mb-4 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award w-6 h-6 text-blue-600" aria-hidden="true">
                   <path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"></path>
@@ -111,15 +110,9 @@
                 </svg>
                 How It Works
               </h2>
-              <ul class="space-y-2 text-gray-700">
-                <li 
-                  v-for="(point, index) in howItWorks" 
-                  :key="index"
-                  class="flex items-start gap-2"
-                >
-                  <span>{{ point }}</span>
-                </li>
-              </ul>
+              <div class="text-gray-700 whitespace-pre-line leading-relaxed">
+                {{ howItWorks }}
+              </div>
               <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div class="flex items-center gap-2 text-blue-900">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield w-5 h-5" aria-hidden="true">
@@ -154,9 +147,7 @@
                 </div>
                 <div class="bg-gray-50 rounded-lg p-4">
                   <div class="text-sm text-gray-600 mb-1">Administration:</div>
-                  <div v-for="(method, index) in dosage.administration" :key="index" class="text-sm text-gray-900">
-                    {{ method }}
-                  </div>
+                  <div class="text-lg text-gray-900">{{ dosage.administration }}</div>
                 </div>
                 <div class="bg-gray-50 rounded-lg p-4">
                   <div class="text-sm text-gray-600 mb-1">Cycle Duration:</div>
@@ -225,6 +216,7 @@
                   <p class="text-sm text-gray-600 mb-2">{{ stack.subtitle }}</p>
                   <!-- <p class="text-sm text-gray-700 mb-3">{{ stack.description }}</p> -->
                   <a class="flex items-center text-purple-600 text-sm">
+                    Learn more
                     <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" aria-hidden="true">
                       <path d="m9 18 6-6-6-6"></path>
                     </svg>
@@ -437,15 +429,15 @@ defineProps({
     default: () => []
   },
   howItWorks: {
-    type: Array,
-    default: () => []
+    type: String,
+    default: ''
   },
   dosage: {
     type: Object,
     default: () => ({
       typicalDosage: '',
       frequency: '',
-      administration: [],
+      administration: '',
       cycleDuration: ''
     })
   },

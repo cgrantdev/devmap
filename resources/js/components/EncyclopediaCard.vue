@@ -93,7 +93,7 @@
 
     <!-- Key Effects - fixed height -->
     <div class="border-t border-gray-200 pt-3 min-h-[80px]">
-      <p class="text-xs text-gray-900 mb-2">Research Applications:</p>
+      <p class="text-xs text-gray-900 mb-2">Top Benefits:</p>
       <ul class="space-y-1">
         <li 
           v-for="(benefit, index) in limitedBenefits" 

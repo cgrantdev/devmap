@@ -62,13 +62,17 @@
                         </svg>
                         Visit Website
                       </a>
-                      <button class="px-6 py-3 rounded-lg flex items-center gap-3 transition-all border-[3px] border-dashed border-green-600 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 group">
+                      <button 
+                        @click="copyDiscountCode"
+                        class="px-6 py-3 rounded-lg flex items-center gap-3 transition-all border-[3px] border-dashed border-green-600 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 group cursor-pointer"
+                      >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag w-5 h-5" aria-hidden="true">
                           <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path>
                           <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
                         </svg>
                         <span class="text-sm font-semibold">Use Code:</span>
-                        <span class="font-mono tracking-wider font-bold">PMAP</span>
+                        <span class="font-mono tracking-wider font-bold">{{ brand.discount_code || 'PMAP' }}</span>
+                        <!-- <span class="text-xs opacity-75 ml-auto">Click to Copy</span> -->
                       </button>
                     </div>
                   </div>
@@ -795,13 +799,26 @@ const certifications = ref(['ISO 9001', 'cGMP Compliant', 'FDA Registered'])
 // Payment Methods
 const paymentMethods = ref(['Credit Card', 'PayPal', 'Cryptocurrency', 'Bank Transfer'])
 
+// Calculate years in business from founded year
+const yearsInBusiness = computed(() => {
+  if (props.brand?.founded_year) {
+    const currentYear = new Date().getFullYear()
+    const foundedYear = parseInt(props.brand.founded_year)
+    if (!isNaN(foundedYear) && foundedYear > 0) {
+      const years = currentYear - foundedYear
+      return years > 0 ? `${years}+` : '1+'
+    }
+  }
+  return '13+' // Default fallback
+})
+
 // Why Choose Benefits
-const whyChooseBenefits = ref([
+const whyChooseBenefits = computed(() => [
   'Third-party lab tested products',
   'Fast & reliable shipping',
   'Responsive customer service',
   'Verified customer reviews',
-  '13+ years in business'
+  `${yearsInBusiness.value} years in business`
 ])
 
 // Formatted overall rating
@@ -1096,6 +1113,49 @@ const handlePerPageChange = (perPage) => {
 
 const handleCtaClick = (url) => {
   router.visit(url)
+}
+
+const copyDiscountCode = async () => {
+  const code = props.brand?.discount_code || 'PMAP'
+  
+  // Try modern Clipboard API first (requires secure context)
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await navigator.clipboard.writeText(code)
+      alert('Discount code copied to clipboard!')
+      return
+    } catch (err) {
+      console.warn('Clipboard API failed, trying fallback:', err)
+    }
+  }
+  
+  // Fallback method for non-secure contexts or older browsers
+  try {
+    // Create a temporary textarea element
+    const textarea = document.createElement('textarea')
+    textarea.value = code
+    textarea.style.position = 'fixed'
+    textarea.style.left = '-999999px'
+    textarea.style.top = '-999999px'
+    document.body.appendChild(textarea)
+    textarea.focus()
+    textarea.select()
+    
+    // Try to copy using execCommand (deprecated but widely supported)
+    const successful = document.execCommand('copy')
+    document.body.removeChild(textarea)
+    
+    if (successful) {
+      alert('Discount code copied to clipboard!')
+    } else {
+      // Last resort: show the code and ask user to copy manually
+      prompt('Please copy this discount code:', code)
+    }
+  } catch (err) {
+    console.error('Fallback copy method failed:', err)
+    // Last resort: show the code and ask user to copy manually
+    prompt('Please copy this discount code:', code)
+  }
 }
 
 const page = usePage()

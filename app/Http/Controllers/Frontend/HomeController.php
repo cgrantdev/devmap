@@ -54,9 +54,18 @@ class HomeController extends Controller
             ->get()
             ->map(function ($category) {
                 $educationPost = $category->educationPost;
+                // Use category image if available, otherwise get a sample product image
                 $image = null;
                 if ($category->image_url) {
                     $image = Storage::url('categories/' . $category->image_url);
+                } else {
+                    // Get a sample product image for this category
+                    $sampleProduct = Product::visible()
+                        ->where('status', 'active')
+                        ->where('product_category_id', $category->id)
+                        ->whereNotNull('image_url')
+                        ->first();
+                    $image = $sampleProduct ? $sampleProduct->image_url : '/images/peptides/default.png';
                 }
 
                 return [

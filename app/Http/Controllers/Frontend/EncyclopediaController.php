@@ -45,14 +45,34 @@ class EncyclopediaController extends Controller
         $categories = $query->orderBy('name')->get()->map(function ($category) {
             $educationPost = $category->educationPost;
             
-            // Get category image
+            // Get category image - use category image if available, otherwise get a sample product image
             $image = null;
             if ($category->image_url) {
                 $image = Storage::url('categories/' . $category->image_url);
+            } else {
+                // Get a sample product image for this category
+                $sampleProduct = Product::visible()
+                    ->where('status', 'active')
+                    ->where('product_category_id', $category->id)
+                    ->whereNotNull('image_url')
+                    ->first();
+                $image = $sampleProduct ? $sampleProduct->image_url : '/images/peptides/default.png';
             }
 
-            // Determine category tag
-            $categoryTag = $this->getCategoryTag($category->name, $category->description);
+            // Determine category tag - use education_tag from database, fallback to computed
+            $categoryTag = $educationPost && $educationPost->education_tag 
+                ? $educationPost->education_tag 
+                : $this->getCategoryTag($category->name, $category->description);
+
+            // Get title - use education post title if available, fallback to category name
+            $title = $educationPost && $educationPost->title 
+                ? $educationPost->title 
+                : $category->name;
+
+            // Get peptide full name - use from database, fallback to computed
+            $peptideFullName = $educationPost && $educationPost->peptide_full_name 
+                ? $educationPost->peptide_full_name 
+                : $this->getSubtitle($category->name);
 
             // Get sample product for additional data
             $sampleProduct = Product::visible()
@@ -70,9 +90,9 @@ class EncyclopediaController extends Controller
 
             return [
                 'id' => $category->id,
-                'name' => $category->name,
+                'name' => $title,
                 'slug' => $category->slug,
-                'subtitle' => $this->getSubtitle($category->name),
+                'subtitle' => $peptideFullName,
                 'description' => $educationPost ? $educationPost->description : $category->description,
                 'image' => $image,
                 'categoryTag' => $categoryTag,
@@ -258,8 +278,10 @@ class EncyclopediaController extends Controller
                 ];
             });
 
-        // Determine category tag
-        $categoryTag = $this->getCategoryTag($category->name, $category->description);
+        // Determine category tag - use education_tag from database, fallback to computed
+        $categoryTag = $educationPost && $educationPost->education_tag 
+            ? $educationPost->education_tag 
+            : $this->getCategoryTag($category->name, $category->description);
 
         // Get key effects from education post if available, otherwise use fallback method
         $keyBenefits = [];
@@ -269,26 +291,116 @@ class EncyclopediaController extends Controller
             $keyBenefits = $this->getKeyBenefits($category->name);
         }
 
+        // Get peptide full name - use from database, fallback to computed
+        $peptideFullName = $educationPost && $educationPost->peptide_full_name 
+            ? $educationPost->peptide_full_name 
+            : $this->getSubtitle($category->name);
+
+        // Get quick facts from database
+        $quickFacts = [
+            'halfLife' => $educationPost && $educationPost->half_life ? $educationPost->half_life : 'Varies',
+            'bioavailability' => $educationPost && $educationPost->bioavailability ? $educationPost->bioavailability : 'Varies by administration method',
+            'storage' => $educationPost && $educationPost->storage ? $educationPost->storage : 'Refrigerate at 2-8°C',
+            'researchLevel' => 'Moderate Research', // Can be enhanced later
+        ];
+
+        // Get common use cases from database
+        $commonUseCases = [];
+        if ($educationPost && !empty($educationPost->common_use_cases) && is_array($educationPost->common_use_cases)) {
+            $commonUseCases = $educationPost->common_use_cases;
+        } else {
+            $commonUseCases = $this->getCommonUseCases($category->name);
+        }
+
+        // Get how it works from database (text field)
+        $howItWorks = $educationPost && $educationPost->how_it_works 
+            ? $educationPost->how_it_works 
+            : 'Mechanism of action varies by peptide type. Research continues to uncover specific pathways.';
+
+        // Get dosage information from database
+        $dosage = [
+            'typicalDosage' => $educationPost && $educationPost->typical_dosage ? $educationPost->typical_dosage : 'Varies',
+            'frequency' => $educationPost && $educationPost->frequency ? $educationPost->frequency : 'Varies',
+            'administration' => $educationPost && $educationPost->administration ? $educationPost->administration : 'Subcutaneous injection',
+            'cycleDuration' => $educationPost && $educationPost->cycle_duration ? $educationPost->cycle_duration : '4-6 weeks',
+        ];
+
+        // Get safety information from database
+        $safetyInfo = [
+            'sideEffects' => $educationPost && !empty($educationPost->possible_side_effects) && is_array($educationPost->possible_side_effects)
+                ? $educationPost->possible_side_effects
+                : ['Generally well-tolerated'],
+            'contraindications' => $educationPost && !empty($educationPost->contraindications) && is_array($educationPost->contraindications)
+                ? $educationPost->contraindications
+                : ['Consult doctor before use'],
+        ];
+
+        // Get stacking recommendations from database (array of category IDs)
+        $stackingRecommendations = [];
+        $hasStackingData = false;
+        
+        if ($educationPost && !empty($educationPost->stacking_recommendations) && is_array($educationPost->stacking_recommendations)) {
+            $hasStackingData = true; // We have data from database (even if it's just [null])
+            
+            // Filter out null values
+            $stackingCategoryIds = array_filter($educationPost->stacking_recommendations, function($id) {
+                return $id !== null;
+            });
+            
+            if (!empty($stackingCategoryIds)) {
+                $stackingCategories = ProductCategory::whereIn('id', $stackingCategoryIds)
+                    ->where('is_active', true)
+                    ->get();
+                
+                $stackingRecommendations = $stackingCategories->map(function ($cat) {
+                    return [
+                        'name' => $cat->name,
+                        'subtitle' => $cat->description ? substr($cat->description, 0, 100) : '',
+                        'slug' => $cat->slug,
+                    ];
+                })->toArray();
+            }
+            // If $stackingCategoryIds is empty, it means "None" was selected, so $stackingRecommendations stays empty
+        }
+
+        // Only use fallback if we don't have any stacking data from database
+        if (!$hasStackingData && empty($stackingRecommendations)) {
+            $stackingRecommendations = $this->getStackingRecommendations($category->name);
+        }
+
+        // Get FAQs from database
+        $faqs = [];
+        if ($educationPost && !empty($educationPost->faqs) && is_array($educationPost->faqs)) {
+            $faqs = $educationPost->faqs;
+        } else {
+            $faqs = $this->getFAQs($category->name);
+        }
+
+        // Get title - use education post title if available, fallback to category name
+        $title = $educationPost && $educationPost->title 
+            ? $educationPost->title 
+            : $category->name;
+
         // Get comprehensive data
         $peptideData = [
             'id' => $category->id,
-            'name' => $category->name,
+            'name' => $title,
             'slug' => $category->slug,
-            'subtitle' => $this->getSubtitle($category->name),
+            'subtitle' => $peptideFullName,
             'description' => $educationPost ? $educationPost->description : $category->description,
             'image' => $image,
             'categoryTag' => $categoryTag,
             'keyBenefits' => $keyBenefits,
-            'quickFacts' => $this->getQuickFacts($category->name),
-            'commonUseCases' => $this->getCommonUseCases($category->name),
-            'howItWorks' => $this->getHowItWorks($category->name),
-            'dosage' => $this->getDosage($category->name),
-            'safetyInfo' => $this->getSafetyInfo($category->name),
-            'stackingRecommendations' => $this->getStackingRecommendations($category->name),
-            'faqs' => $this->getFAQs($category->name),
-            'userExperiences' => $this->getUserExperiences($category->name),
+            'quickFacts' => $quickFacts,
+            'commonUseCases' => $commonUseCases,
+            'howItWorks' => $howItWorks,
+            'dosage' => $dosage,
+            'safetyInfo' => $safetyInfo,
+            'stackingRecommendations' => $stackingRecommendations,
+            'faqs' => $faqs,
+            'userExperiences' => $this->getUserExperiences($category->name), // Keep mock data for now
             'products' => $products,
-            'researchStudies' => rand(30, 60),
+            'researchStudies' => rand(30, 60), // Mock data
         ];
 
         return Inertia::render('Frontend/EncyclopediaDetail', $peptideData);

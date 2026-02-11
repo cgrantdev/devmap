@@ -69,7 +69,7 @@
 </template>
 
 <script setup>
-import { Link, useForm, router } from '@inertiajs/vue3'
+import { Link, useForm, router, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import { ref, watch } from 'vue'
 import EasyDataTable from 'vue3-easy-data-table'
@@ -88,7 +88,9 @@ const getSearchFromUrl = () => {
   return ''
 }
 
-const deleteForm = useForm({})
+const deleteForm = useForm({
+  _token: usePage().props.csrf_token
+})
 const searchValue = ref(getSearchFromUrl())
 const searchField = ['title', 'slug']
 const loading = ref(false)
@@ -177,8 +179,14 @@ function handleSearchChange(value) {
 const deletePostById = (id) => {
   const post = props.posts.data.find(p => p.id === id)
   if (post && confirm(`Are you sure you want to delete "${post.title}"?`)) {
+    // Update CSRF token before deletion
+    deleteForm._token = usePage().props.csrf_token
     deleteForm.delete(`/admin/education-posts/${id}`, {
       preserveScroll: true,
+      onSuccess: () => {
+        // Refresh the data after successful deletion
+        fetchData()
+      }
     })
   }
 }
