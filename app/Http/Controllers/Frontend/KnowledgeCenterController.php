@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Research;
+use App\Models\EducationalGuide;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -293,83 +294,36 @@ class KnowledgeCenterController extends Controller
      */
     private function getEducationalGuides($request)
     {
-        // For now, return mock data. This can be replaced with actual database queries later
-        $guides = [
-            [
-                'id' => 1,
-                'tag' => 'Beginner',
-                'readingTime' => '15 min',
-                'title' => "Beginner's Guide to Peptides",
-                'description' => 'Everything you need to know about peptides, from basics to first purchase.',
-                'peptides' => ['BPC-157', 'TB-500', 'Ipamorelin'],
-                'guideUrl' => '#',
-            ],
-            [
-                'id' => 2,
-                'tag' => 'Stacking',
-                'readingTime' => '12 min',
-                'title' => 'The Complete BPC-157 + TB-500 Healing Stack',
-                'description' => 'Detailed protocol for combining BPC-157 and TB-500 for optimal healing results.',
-                'peptides' => ['BPC-157', 'TB-500'],
-                'guideUrl' => '#',
-            ],
-            [
-                'id' => 3,
-                'tag' => 'Dosage',
-                'readingTime' => '10 min',
-                'title' => 'Peptide Dosage Calculator & Safety Guidelines',
-                'description' => 'Learn how to calculate proper dosages and follow safety protocols.',
-                'peptides' => [],
-                'guideUrl' => '#',
-            ],
-            [
-                'id' => 4,
-                'tag' => 'Advanced',
-                'readingTime' => '20 min',
-                'title' => 'Advanced: Growth Hormone Stack for Anti-Aging',
-                'description' => 'Comprehensive guide to combining multiple GH secretagogues for anti-aging benefits.',
-                'peptides' => ['Ipamorelin', 'CJC-1295', 'GHRP-6'],
-                'guideUrl' => '#',
-            ],
-            [
-                'id' => 5,
-                'tag' => 'Beginner',
-                'readingTime' => '8 min',
-                'title' => 'Understanding Peptide Purity and COA',
-                'description' => 'Learn how to read Certificate of Analysis and verify peptide quality.',
-                'peptides' => [],
-                'guideUrl' => '#',
-            ],
-            [
-                'id' => 6,
-                'tag' => 'Stacking',
-                'readingTime' => '18 min',
-                'title' => 'Weight Loss Peptide Stack Guide',
-                'description' => 'Complete guide to combining GLP-1 agonists and other peptides for weight management.',
-                'peptides' => ['Semaglutide', 'Tirzepatide'],
-                'guideUrl' => '#',
-            ],
-        ];
+        $query = EducationalGuide::where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
 
         // Apply search filter if provided
         if ($request->has('search') && $request->search) {
-            $search = strtolower($request->search);
-            $guides = array_filter($guides, function ($guide) use ($search) {
-                return stripos(strtolower($guide['title']), $search) !== false ||
-                       stripos(strtolower($guide['description']), $search) !== false ||
-                       stripos(strtolower($guide['tag']), $search) !== false ||
-                       (is_array($guide['peptides']) && 
-                        array_filter($guide['peptides'], function ($peptide) use ($search) {
-                            return stripos(strtolower($peptide), $search) !== false;
-                        }));
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('outline', 'like', "%{$search}%")
+                  ->orWhere('tag', 'like', "%{$search}%")
+                  ->orWhere('guide_type', 'like', "%{$search}%");
             });
         }
 
-        // Update guide URLs to use proper routes
-        $guides = array_map(function ($guide) {
-            $guide['guideUrl'] = route('guide.show', ['id' => $guide['id']]);
-            return $guide;
-        }, array_values($guides));
+        $guides = $query->orderBy('published_at', 'desc')
+            ->get()
+            ->map(function ($guide) {
+                return [
+                    'id' => $guide->id,
+                    'tag' => $guide->tag ?: $guide->guide_type,
+                    'readingTime' => $guide->reading_time ?: 'N/A',
+                    'title' => $guide->title,
+                    'description' => $guide->description ?: $guide->outline,
+                    'peptides' => $guide->peptides ?? [],
+                    'guideUrl' => route('guide.show', ['id' => $guide->id]),
+                ];
+            })
+            ->toArray();
 
         return $guides;
     }
@@ -379,72 +333,35 @@ class KnowledgeCenterController extends Controller
      */
     public function showGuide($id)
     {
-        // Get the guide data (for now using mock data, can be replaced with database query later)
-        $allGuides = [
-            1 => [
-                'id' => 1,
-                'tag' => 'Beginner',
-                'readingTime' => '15 min',
-                'title' => "Beginner's Guide to Peptides",
-                'description' => 'Everything you need to know about peptides, from basics to first purchase.',
-                'peptides' => ['BPC-157', 'TB-500', 'Ipamorelin'],
-            ],
-            2 => [
-                'id' => 2,
-                'tag' => 'Stacking',
-                'readingTime' => '12 min',
-                'title' => 'The Complete BPC-157 + TB-500 Healing Stack',
-                'description' => 'Detailed protocol for combining BPC-157 and TB-500 for optimal healing results.',
-                'peptides' => ['BPC-157', 'TB-500'],
-            ],
-            3 => [
-                'id' => 3,
-                'tag' => 'Dosage',
-                'readingTime' => '10 min',
-                'title' => 'Peptide Dosage Calculator & Safety Guidelines',
-                'description' => 'Learn how to calculate proper dosages and follow safety protocols.',
-                'peptides' => [],
-            ],
-            4 => [
-                'id' => 4,
-                'tag' => 'Advanced',
-                'readingTime' => '20 min',
-                'title' => 'Advanced: Growth Hormone Stack for Anti-Aging',
-                'description' => 'Comprehensive guide to combining multiple GH secretagogues for anti-aging benefits.',
-                'peptides' => ['Ipamorelin', 'CJC-1295', 'GHRP-6'],
-            ],
-            5 => [
-                'id' => 5,
-                'tag' => 'Beginner',
-                'readingTime' => '8 min',
-                'title' => 'Understanding Peptide Purity and COA',
-                'description' => 'Learn how to read Certificate of Analysis and verify peptide quality.',
-                'peptides' => [],
-            ],
-            6 => [
-                'id' => 6,
-                'tag' => 'Stacking',
-                'readingTime' => '18 min',
-                'title' => 'Weight Loss Peptide Stack Guide',
-                'description' => 'Complete guide to combining GLP-1 agonists and other peptides for weight management.',
-                'peptides' => ['Semaglutide', 'Tirzepatide'],
-            ],
-        ];
-
-        if (!isset($allGuides[$id])) {
-            abort(404, 'Guide not found');
-        }
-
-        $guide = $allGuides[$id];
+        $guide = EducationalGuide::where('id', $id)
+            ->where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->firstOrFail();
 
         return Inertia::render('Frontend/EducationGuideDetail', [
-            'id' => $guide['id'],
-            'tag' => $guide['tag'],
-            'readingTime' => $guide['readingTime'],
-            'title' => $guide['title'],
-            'description' => $guide['description'],
-            'peptides' => $guide['peptides'],
-            'guideUrl' => route('guide.show', ['id' => $guide['id']]),
+            'id' => $guide->id,
+            'tag' => $guide->tag ?: $guide->guide_type,
+            'readingTime' => $guide->reading_time ?: 'N/A',
+            'title' => $guide->title,
+            'description' => $guide->description ?: $guide->outline,
+            'peptides' => $guide->peptides ?? [],
+            'isFeatured' => $guide->is_featured,
+            'guideUrl' => route('guide.show', ['id' => $guide->id]),
+            'introduction' => $guide->introduction,
+            'outline' => $guide->outline,
+            'overviewBenefits' => $guide->overview_benefits ?? [],
+            'usageGuidelinesImportantNote' => $guide->usage_guidelines_important_note,
+            'dosageRecommendation' => $guide->dosage_recommendation ?? [],
+            'administrationMethods' => $guide->administration_methods ?? [],
+            'timingFrequency' => $guide->timing_frequency,
+            'safetyFirst' => $guide->safety_first,
+            'commonSideEffects' => $guide->common_side_effects ?? [],
+            'contraindications' => $guide->contraindications ?? [],
+            'storageHandling' => $guide->storage_handling ?? [],
+            'dos' => $guide->dos ?? [],
+            'donts' => $guide->donts ?? [],
+            'conclusion' => $guide->conclusion,
         ]);
     }
 
