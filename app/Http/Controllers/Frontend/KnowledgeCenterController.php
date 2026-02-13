@@ -34,27 +34,27 @@ class KnowledgeCenterController extends Controller
             });
         }
 
-        // Get featured blogs (3 for Featured Stories)
-        $featuredBlogs = (clone $query)
+        // Apply filter to base query if needed
+        $filteredQuery = (clone $query);
+        if ($filter !== 'all') {
+            $filteredQuery->where(function ($q) use ($filter) {
+                $this->applyCategoryFilter($q, $filter);
+            });
+        }
+
+        // Get featured blogs (3 for Featured Stories) - with filter applied
+        $featuredBlogs = (clone $filteredQuery)
             ->where('is_featured', true)
-            ->orderBy('published_at', 'desc')
-            ->take(3)
+            ->orderBy('published_at', 'desc')            
             ->get()
             ->map(function ($blog) {
                 return $this->formatBlog($blog);
             });
 
-        // Get latest blogs (excluding featured, for Latest Articles)
-        $latestQuery = (clone $query);
+        // Get latest blogs (excluding featured, for Latest Articles) - with filter applied
+        $latestQuery = (clone $filteredQuery);
         if ($featuredBlogs->isNotEmpty()) {
             $latestQuery->whereNotIn('id', $featuredBlogs->pluck('id'));
-        }
-
-        // Apply filter
-        if ($filter !== 'all') {
-            $latestQuery->where(function ($q) use ($filter) {
-                $this->applyCategoryFilter($q, $filter);
-            });
         }
 
         $latestBlogs = $latestQuery
@@ -117,6 +117,7 @@ class KnowledgeCenterController extends Controller
             'date' => $blog->published_at ? $blog->published_at->format('m/d/Y') : null,
             'readTime' => $blog->read_time ?? '5 min',
             'categoryTag' => $categoryTag,
+            'blogType' => $blog->blog_type,
             'tags' => $tags,
             'author' => $author,
             'authorJob' => $authorJob,
@@ -233,45 +234,17 @@ class KnowledgeCenterController extends Controller
     {
         $filterLower = strtolower($filter);
         
-        if ($filterLower === 'research') {
-            $query->where(function ($q) {
-                $q->where('title', 'like', '%research%')
-                  ->orWhere('title', 'like', '%study%')
-                  ->orWhere('title', 'like', '%clinical%')
-                  ->orWhere('description', 'like', '%research%')
-                  ->orWhere('description', 'like', '%study%');
-            });
-        } elseif ($filterLower === 'industry') {
-            $query->where(function ($q) {
-                $q->where('title', 'like', '%market%')
-                  ->orWhere('title', 'like', '%industry%')
-                  ->orWhere('title', 'like', '%price%')
-                  ->orWhere('description', 'like', '%market%')
-                  ->orWhere('description', 'like', '%industry%');
-            });
-        } elseif ($filterLower === 'regulation') {
-            $query->where(function ($q) {
-                $q->where('title', 'like', '%fda%')
-                  ->orWhere('title', 'like', '%regulation%')
-                  ->orWhere('title', 'like', '%regulatory%')
-                  ->orWhere('description', 'like', '%fda%')
-                  ->orWhere('description', 'like', '%regulation%');
-            });
-        } elseif ($filterLower === 'guides') {
-            $query->where(function ($q) {
-                $q->where('title', 'like', '%guide%')
-                  ->orWhere('title', 'like', '%how to%')
-                  ->orWhere('title', 'like', '%tutorial%')
-                  ->orWhere('description', 'like', '%guide%');
-            });
-        } elseif ($filterLower === 'community') {
-            $query->where(function ($q) {
-                $q->where('title', 'like', '%success%')
-                  ->orWhere('title', 'like', '%story%')
-                  ->orWhere('title', 'like', '%experience%')
-                  ->orWhere('description', 'like', '%success%')
-                  ->orWhere('description', 'like', '%story%');
-            });
+        // Map filter values to blog_type values
+        $filterToBlogType = [
+            'research' => 'Research',
+            'industry' => 'Industry',
+            'regulation' => 'Regulation',
+            'guides' => 'Guides',
+            'community' => 'Community'
+        ];
+        
+        if (isset($filterToBlogType[$filterLower])) {
+            $query->where('blog_type', $filterToBlogType[$filterLower]);
         }
     }
 

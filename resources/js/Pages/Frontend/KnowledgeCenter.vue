@@ -276,8 +276,8 @@ const filters = [
   { label: 'Community', value: 'community', icon: () => h('span', { class: 'text-base' }, '💬') }
 ]
 
-// Map filter values to categoryTag values used on blogs
-const filterToCategoryTag = {
+// Map filter values to blogType values used on blogs
+const filterToBlogType = {
   research: 'Research',
   industry: 'Industry',
   regulation: 'Regulation',
@@ -285,28 +285,28 @@ const filterToCategoryTag = {
   community: 'Community'
 }
 
-const currentCategoryTag = computed(() => {
+const currentBlogType = computed(() => {
   if (currentFilter.value === 'all') return null
-  return filterToCategoryTag[currentFilter.value] || null
+  return filterToBlogType[currentFilter.value] || null
 })
 
-// Filter latest blogs by current filter (categoryTag)
+// Filter latest blogs by current filter (blogType)
 const filteredLatestBlogs = computed(() => {
   let result = props.latestBlogs || []
   
-  if (currentCategoryTag.value) {
-    result = result.filter(blog => blog.categoryTag === currentCategoryTag.value)
+  if (currentBlogType.value) {
+    result = result.filter(blog => blog.blogType === currentBlogType.value)
   }
   
   return result
 })
 
-// Filter featured blogs by current filter (categoryTag)
+// Filter featured blogs by current filter (blogType)
 const filteredFeaturedBlogs = computed(() => {
   let result = props.featuredBlogs || []
 
-  if (currentCategoryTag.value) {
-    result = result.filter(blog => blog.categoryTag === currentCategoryTag.value)
+  if (currentBlogType.value) {
+    result = result.filter(blog => blog.blogType === currentBlogType.value)
   }
   
   return result
