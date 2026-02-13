@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
+use App\Models\Research;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -100,23 +101,25 @@ class KnowledgeCenterController extends Controller
         // Determine category tag from content
         $categoryTag = $this->getCategoryTag($blog->title, $blog->description, $blog->content);
         
-        // Extract tags from content or generate default
-        $tags = $this->extractTags($blog->title, $blog->description);
+        // Use blog's tags if available, otherwise extract from content
+        $tags = !empty($blog->tags) ? $blog->tags : $this->extractTags($blog->title, $blog->description);
         
-        // Generate author (can be enhanced with actual author field later)
-        $author = $this->getAuthor($blog->title, $categoryTag);
+        // Use real author data if available, otherwise generate based on category
+        $author = $blog->author_name ?: $this->getAuthor($blog->title, $categoryTag);
+        $authorJob = $blog->author_job;
 
         return [
             'id' => $blog->id,
             'title' => $blog->title,
             'slug' => $blog->slug,
-            'description' => $blog->description,
+            'description' => $blog->outline ?: $blog->description,
             'image' => $imageUrl,
             'date' => $blog->published_at ? $blog->published_at->format('m/d/Y') : null,
             'readTime' => $blog->read_time ?? '5 min',
             'categoryTag' => $categoryTag,
             'tags' => $tags,
             'author' => $author,
+            'authorJob' => $authorJob,
         ];
     }
 
@@ -204,20 +207,20 @@ class KnowledgeCenterController extends Controller
             $tags[] = 'Success Story';
         }
 
-        return array_slice(array_unique($tags), 0, 3); // Limit to 3 tags
+        return array_values(array_unique($tags)); // Return all unique tags
     }
 
     /**
-     * Get author based on category
+     * Get author based on category (returns just the name, job title is handled separately)
      */
     private function getAuthor($title, $categoryTag)
     {
         $authors = [
-            'Regulation' => 'Dr. Sarah Chen • Regulatory Expert',
-            'Research' => 'Dr. Michael Thompson • Research Scientist',
-            'Industry' => 'James Rodriguez • Market Analyst',
+            'Regulation' => 'Dr. Sarah Chen',
+            'Research' => 'Dr. Michael Thompson',
+            'Industry' => 'James Rodriguez',
             'Guides' => 'PeptideMap Editorial',
-            'Community' => 'John M. • Community Member',
+            'Community' => 'John M.',
         ];
 
         return $authors[$categoryTag] ?? 'PeptideMap Editorial';
@@ -277,87 +280,39 @@ class KnowledgeCenterController extends Controller
      */
     private function getResearchPapers($request)
     {
-        // For now, return mock data. This can be replaced with actual database queries later
-        $papers = [
-            [
-                'id' => 1,
-                'peptide' => 'BPC-157',
-                'evidenceLevel' => 'High Evidence',
-                'title' => 'BPC-157 accelerates tendon-to-bone healing in a rat model',
-                'description' => 'Study demonstrates significant improvement in tendon healing rates with BPC-157 treatment compared to control groups.',
-                'source' => 'Journal of Orthopedic Research',
-                'date' => '9/14/2024',
-                'tags' => ['Healing', 'Tendons', 'Animal Study'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-            [
-                'id' => 2,
-                'peptide' => 'Ipamorelin',
-                'evidenceLevel' => 'High Evidence',
-                'title' => 'Growth hormone secretagogues improve body composition in elderly',
-                'description' => 'Clinical trial shows improvements in lean muscle mass and reduction in body fat with ipamorelin supplementation.',
-                'source' => 'Journal of Clinical Endocrinology',
-                'date' => '8/21/2024',
-                'tags' => ['Body Composition', 'Aging', 'Human Study'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-            [
-                'id' => 3,
-                'peptide' => 'PT-141',
-                'evidenceLevel' => 'Medium Evidence',
-                'title' => 'Melanocortin receptor activation and sexual function',
-                'description' => 'Research explores mechanisms of action for melanocortin-based therapies in sexual dysfunction.',
-                'source' => 'Sexual Medicine Reviews',
-                'date' => '7/9/2024',
-                'tags' => ['Libido', 'Mechanism', 'Review'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-            [
-                'id' => 4,
-                'peptide' => 'TB-500',
-                'evidenceLevel' => 'High Evidence',
-                'title' => 'Thymosin beta-4 promotes wound healing and reduces inflammation',
-                'description' => 'Comprehensive study on the regenerative properties of TB-500 in various tissue repair models.',
-                'source' => 'Nature Communications',
-                'date' => '6/15/2024',
-                'tags' => ['Wound Healing', 'Inflammation', 'Regeneration'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-            [
-                'id' => 5,
-                'peptide' => 'CJC-1295',
-                'evidenceLevel' => 'High Evidence',
-                'title' => 'Long-acting growth hormone releasing hormone analog effects on muscle growth',
-                'description' => 'Clinical evaluation of CJC-1295 in promoting muscle growth and recovery in athletes.',
-                'source' => 'Sports Medicine Journal',
-                'date' => '5/22/2024',
-                'tags' => ['Muscle Growth', 'Performance', 'Human Study'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-            [
-                'id' => 6,
-                'peptide' => 'Semaglutide',
-                'evidenceLevel' => 'High Evidence',
-                'title' => 'GLP-1 receptor agonists in weight management and metabolic health',
-                'description' => 'Large-scale clinical trials demonstrating efficacy of semaglutide in obesity treatment.',
-                'source' => 'New England Journal of Medicine',
-                'date' => '4/10/2024',
-                'tags' => ['Weight Loss', 'Metabolism', 'Clinical Trial'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-        ];
+        $query = Research::where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->orderBy('published_at', 'desc');
 
         // Apply search filter if provided
         if ($request->has('search') && $request->search) {
-            $search = strtolower($request->search);
-            $papers = array_filter($papers, function ($paper) use ($search) {
-                return stripos(strtolower($paper['title']), $search) !== false ||
-                       stripos(strtolower($paper['description']), $search) !== false ||
-                       stripos(strtolower($paper['peptide']), $search) !== false;
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('study_summary', 'like', "%{$search}%")
+                  ->orWhere('peptide', 'like', "%{$search}%");
             });
         }
 
-        return array_values($papers);
+        $papers = $query->get()->map(function ($research) {
+            // Format evidence level
+            $evidenceLevel = $research->evidence_level ? $research->evidence_level . ' Evidence' : null;
+
+            return [
+                'id' => $research->id,
+                'peptide' => $research->peptide,
+                'evidenceLevel' => $evidenceLevel,
+                'title' => $research->title,
+                'description' => $research->study_summary ?: 'No summary available.',
+                'source' => $research->journal_type ?: 'Not specified',
+                'date' => $research->published_at ? $research->published_at->format('n/j/Y') : null,
+                'tags' => $research->tags ?? [],
+                'pubmedUrl' => $research->pubmed_url ?: '#',
+            ];
+        })->toArray();
+
+        return $papers;
     }
 
     /**
@@ -525,99 +480,31 @@ class KnowledgeCenterController extends Controller
      */
     public function showResearch($id)
     {
-        // Get the research paper data (for now using mock data, can be replaced with database query later)
-        $allPapers = [
-            1 => [
-                'id' => 1,
-                'peptide' => 'BPC-157',
-                'evidenceLevel' => 'High Evidence',
-                'title' => 'BPC-157 accelerates tendon-to-bone healing in a rat model',
-                'description' => 'Study demonstrates significant improvement in tendon healing rates with BPC-157 treatment compared to control groups.',
-                'source' => 'Journal of Orthopedic Research',
-                'date' => 'September 14, 2024',
-                'studyType' => 'Clinical Research',
-                'tags' => ['Healing', 'Tendons', 'Animal Study'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-            2 => [
-                'id' => 2,
-                'peptide' => 'Ipamorelin',
-                'evidenceLevel' => 'High Evidence',
-                'title' => 'Growth hormone secretagogues improve body composition in elderly',
-                'description' => 'Clinical trial shows improvements in lean muscle mass and reduction in body fat with ipamorelin supplementation.',
-                'source' => 'Journal of Clinical Endocrinology',
-                'date' => 'August 21, 2024',
-                'studyType' => 'Clinical Research',
-                'tags' => ['Body Composition', 'Aging', 'Human Study'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-            3 => [
-                'id' => 3,
-                'peptide' => 'PT-141',
-                'evidenceLevel' => 'Medium Evidence',
-                'title' => 'Melanocortin receptor activation and sexual function',
-                'description' => 'Research explores mechanisms of action for melanocortin-based therapies in sexual dysfunction.',
-                'source' => 'Sexual Medicine Reviews',
-                'date' => 'July 9, 2024',
-                'studyType' => 'Clinical Research',
-                'tags' => ['Libido', 'Mechanism', 'Review'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-            4 => [
-                'id' => 4,
-                'peptide' => 'TB-500',
-                'evidenceLevel' => 'High Evidence',
-                'title' => 'Thymosin beta-4 promotes wound healing and reduces inflammation',
-                'description' => 'Comprehensive study on the regenerative properties of TB-500 in various tissue repair models.',
-                'source' => 'Nature Communications',
-                'date' => 'June 15, 2024',
-                'studyType' => 'Clinical Research',
-                'tags' => ['Wound Healing', 'Inflammation', 'Regeneration'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-            5 => [
-                'id' => 5,
-                'peptide' => 'CJC-1295',
-                'evidenceLevel' => 'High Evidence',
-                'title' => 'Long-acting growth hormone releasing hormone analog effects on muscle growth',
-                'description' => 'Clinical evaluation of CJC-1295 in promoting muscle growth and recovery in athletes.',
-                'source' => 'Sports Medicine Journal',
-                'date' => 'May 22, 2024',
-                'studyType' => 'Clinical Research',
-                'tags' => ['Muscle Growth', 'Performance', 'Human Study'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-            6 => [
-                'id' => 6,
-                'peptide' => 'Semaglutide',
-                'evidenceLevel' => 'High Evidence',
-                'title' => 'GLP-1 receptor agonists in weight management and metabolic health',
-                'description' => 'Large-scale clinical trials demonstrating efficacy of semaglutide in obesity treatment.',
-                'source' => 'New England Journal of Medicine',
-                'date' => 'April 10, 2024',
-                'studyType' => 'Clinical Research',
-                'tags' => ['Weight Loss', 'Metabolism', 'Clinical Trial'],
-                'pubmedUrl' => 'https://pubmed.ncbi.nlm.nih.gov/',
-            ],
-        ];
+        $research = Research::where('id', $id)
+            ->where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->firstOrFail();
 
-        if (!isset($allPapers[$id])) {
-            abort(404, 'Research study not found');
-        }
-
-        $paper = $allPapers[$id];
+        // Format evidence level
+        $evidenceLevel = $research->evidence_level ? $research->evidence_level . ' Evidence' : null;
 
         return Inertia::render('Frontend/ResearchStudyDetail', [
-            'id' => $paper['id'],
-            'peptide' => $paper['peptide'],
-            'evidenceLevel' => $paper['evidenceLevel'],
-            'title' => $paper['title'],
-            'description' => $paper['description'],
-            'source' => $paper['source'],
-            'date' => $paper['date'],
-            'studyType' => $paper['studyType'],
-            'tags' => $paper['tags'],
-            'pubmedUrl' => $paper['pubmedUrl'],
+            'id' => $research->id,
+            'peptide' => $research->peptide,
+            'evidenceLevel' => $evidenceLevel,
+            'title' => $research->title,
+            'studySummary' => $research->study_summary,
+            'journalType' => $research->journal_type,
+            'date' => $research->published_at ? $research->published_at->format('F j, Y') : null,
+            'studyType' => $research->study_type,
+            'background' => $research->background,
+            'keyFindings' => $research->key_findings ?? [],
+            'methodology' => $research->methodology,
+            'clinicalImplications' => $research->clinical_implications,
+            'limitations' => $research->limitations,
+            'tags' => $research->tags ?? [],
+            'pubmedUrl' => $research->pubmed_url ?: '#',
         ]);
     }
 }

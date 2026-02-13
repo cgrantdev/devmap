@@ -6,26 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Blog extends Model
+class EducationalGuide extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'title',
-        'blog_type',
-        'author_name',
-        'author_job',
-        'outline',
         'slug',
+        'tag',
+        'reading_time',
         'description',
-        'introduction',
-        'key_points',
-        'detailed_analysis',
-        'conclusion',
-        'tags',
-        'content',
-        'image',
-        'read_time',
+        'peptides',
+        'guide_url',
         'published_at',
         'is_featured',
         'status',
@@ -34,17 +26,16 @@ class Blog extends Model
     protected $casts = [
         'published_at' => 'date',
         'is_featured' => 'boolean',
-        'key_points' => 'array',
-        'tags' => 'array',
+        'peptides' => 'array',
     ];
 
     public static function boot()
     {
         parent::boot();
 
-        static::creating(function ($blog) {
-            if (empty($blog->slug)) {
-                $blog->slug = Str::slug($blog->title);
+        static::creating(function ($guide) {
+            if (empty($guide->slug)) {
+                $guide->slug = Str::slug($guide->title);
             }
         });
     }

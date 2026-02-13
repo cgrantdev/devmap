@@ -23,8 +23,8 @@
                   <span>{{ featured.date }}</span>
                 </div>
                 <h1 class="font-hv-muse font-normal text-4xl md:text-5xl leading-tight tracking-normal text-gray-800 m-0 mb-6">{{ featured.title }}</h1>
-                <p class="font-roboto font-normal text-base leading-relaxed text-gray-600 m-0 mb-4">{{ featured.description }}</p>
-                <p class="font-roboto font-normal text-base leading-relaxed text-gray-600 m-0">{{ featured.description }}</p>
+                <p class="font-roboto font-normal text-base leading-relaxed text-gray-600 m-0 mb-4">{{ featured.outline || featured.description }}</p>
+                <p class="font-roboto font-normal text-base leading-relaxed text-gray-600 m-0">{{ featured.outline || featured.description }}</p>
               </div>
               <button 
                 @click="router.visit(`/blog/${featured.slug}`)"
@@ -56,7 +56,7 @@
             v-for="blog in blogs.data"
             :key="blog.id"
             :title="blog.title"
-            :description="blog.description"
+            :description="blog.outline || blog.description"
             :image="blog.image"
             :read-time="blog.readTime"
             :date="blog.date"

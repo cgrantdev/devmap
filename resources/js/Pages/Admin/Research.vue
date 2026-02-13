@@ -2,11 +2,11 @@
   <AdminLayout>
     <div class="mb-8 flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-normal text-slate-700">Blog Management</h1>
-        <p class="text-slate-500 mt-2">Manage all blog posts</p>
+        <h1 class="text-3xl font-normal text-slate-700">Research Management</h1>
+        <p class="text-slate-500 mt-2">Manage all research papers</p>
       </div>
-      <Link href="/admin/blogs/create" class="inline-flex items-center px-5 py-2.5 bg-blue-500 text-white rounded-xl hover:bg-blue-600 font-medium shadow-sm hover:shadow transition-all duration-200">
-        + New Blog Post
+      <Link href="/admin/research/create" class="inline-flex items-center px-5 py-2.5 bg-yellow-500 text-white rounded-xl hover:bg-yellow-600 font-medium shadow-sm hover:shadow transition-all duration-200">
+        + New Research Paper
       </Link>
     </div>
     
@@ -14,7 +14,7 @@
     
     <div class="bg-white rounded-lg shadow">
       <div class="p-6">
-        <h2 class="text-xl font-semibold">All Blogs</h2>
+        <h2 class="text-xl font-semibold">All Research Papers</h2>
       </div>
 
       <div class="flex items-center gap-4 mb-4 px-6">
@@ -25,10 +25,10 @@
       <div class="overflow-x-auto px-6 pb-6">
       <EasyDataTable
         :headers="headers"
-        :items="blogs.data || []"
+        :items="research.data || []"
         :search-field="searchField"
         :search-value="searchValue"
-        :server-items-length="blogs.total || 0"
+        :server-items-length="research.total || 0"
         :server-options="serverOptions"
           @update:server-options="handleServerOptionsChange"
           @update:search-value="handleSearchChange"
@@ -37,17 +37,14 @@
           header-text-direction="left"
           body-text-direction="left"
         >
-        <template #item-image="{ image }">
-          <div v-if="image" class="w-16 h-16 rounded-xl overflow-hidden border border-slate-100 shadow-sm">
-            <img :src="image" alt="Blog" class="w-full h-full object-cover" />
-          </div>
-          <div v-else class="w-16 h-16 rounded-xl bg-slate-100 border border-slate-100 flex items-center justify-center">
-            <span class="text-xs text-slate-400">No Image</span>
-          </div>
+        <template #item-category="{ category }">
+          <span v-if="category" class="inline-flex px-3 py-1 text-xs bg-gray-50 text-gray-700">
+            {{ category }}
+          </span>
+          <span v-else class="text-sm text-slate-400">-</span>
         </template>
-        <template #item-title="{ title, slug }">
+        <template #item-title="{ title }">
           <div class="text-sm font-medium text-slate-800">{{ title }}</div>
-          <div class="text-sm text-slate-500">{{ slug }}</div>
         </template>
         <template #item-status="{ status }">
           <span v-if="status === 'published'" class="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-green-50 text-green-700 border border-green-200">
@@ -56,12 +53,6 @@
           <span v-else class="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-slate-100 text-slate-600 border border-slate-100">
             Draft
           </span>
-        </template>
-        <template #item-is_featured="{ is_featured }">
-          <span v-if="is_featured" class="inline-flex px-3 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-            Featured
-          </span>
-          <span v-else class="text-sm text-slate-400">-</span>
         </template>
         <template #item-published_at="{ published_at }">
           <span v-if="published_at" class="text-sm text-slate-700">{{ published_at }}</span>
@@ -80,8 +71,8 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-          <Link :href="`/admin/blogs/${id}/edit`" class="text-blue-500 hover:text-blue-600 mr-4 transition-colors duration-150">Edit</Link>
-          <button @click="deleteBlogById(id)" :disabled="deleteForm.processing" class="text-red-500 hover:text-red-600 transition-colors duration-150">
+          <Link :href="`/admin/research/${id}/edit`" class="text-blue-500 hover:text-blue-600 mr-4 transition-colors duration-150">Edit</Link>
+          <button @click="deleteResearchById(id)" :disabled="deleteForm.processing" class="text-red-500 hover:text-red-600 transition-colors duration-150">
             Delete
           </button>
         </template>
@@ -89,23 +80,23 @@
       </div>
       
       <!-- Quick Edit Modal -->
-      <div v-if="selectedBlogId && expandedRows.includes(selectedBlogId)" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/75" @click.self="toggleQuickEdit(selectedBlogId)">
+      <div v-if="selectedResearchId && expandedRows.includes(selectedResearchId)" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/75" @click.self="toggleQuickEdit(selectedResearchId)">
         <div class="bg-white rounded-xl border border-slate-100 p-6 shadow-lg max-w-2xl w-full mx-4" @click.stop>
           <h3 class="text-lg font-medium text-slate-700 mb-4">Quick Edit</h3>
-          <div v-if="quickEditForms[selectedBlogId]" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div v-if="quickEditForms[selectedResearchId]" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-1.5">Title *</label>
               <input 
-                v-model="quickEditForms[selectedBlogId].title" 
+                v-model="quickEditForms[selectedResearchId].title" 
                 type="text" 
                 class="w-full border border-slate-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                @keyup.enter="saveQuickEdit(selectedBlogId)"
+                @keyup.enter="saveQuickEdit(selectedResearchId)"
               />
             </div>
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-1.5">Status *</label>
               <select 
-                v-model="quickEditForms[selectedBlogId].status" 
+                v-model="quickEditForms[selectedResearchId].status" 
                 class="w-full border border-slate-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               >
                 <option value="draft">Draft</option>
@@ -115,17 +106,17 @@
           </div>
           <div class="mt-4 flex justify-end gap-2">
             <button 
-              @click="toggleQuickEdit(selectedBlogId)" 
+              @click="toggleQuickEdit(selectedResearchId)" 
               class="px-4 py-2 text-sm rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all duration-200 font-medium"
             >
               Cancel
             </button>
             <button 
-              @click="saveQuickEdit(selectedBlogId)" 
-              :disabled="quickEditForms[selectedBlogId]?.processing"
-              class="px-4 py-2 text-sm rounded-xl bg-blue-500 text-white hover:bg-blue-600 font-medium transition-all duration-200 shadow-sm"
+              @click="saveQuickEdit(selectedResearchId)" 
+              :disabled="quickEditForms[selectedResearchId]?.processing"
+              class="px-4 py-2 text-sm rounded-xl bg-yellow-500 text-white hover:bg-yellow-600 font-medium transition-all duration-200 shadow-sm"
             >
-              {{ quickEditForms[selectedBlogId]?.processing ? 'Saving...' : 'Update' }}
+              {{ quickEditForms[selectedResearchId]?.processing ? 'Saving...' : 'Update' }}
             </button>
           </div>
         </div>
@@ -142,7 +133,7 @@ import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 
 const props = defineProps({
-  blogs: Object,
+  research: Object,
 })
 
 const page = usePage()
@@ -151,7 +142,7 @@ const deleteForm = useForm({
 })
 const expandedRows = ref([])
 const quickEditForms = reactive({})
-const selectedBlogId = ref(null)
+const selectedResearchId = ref(null)
 
 // Initialize searchValue from URL parameters
 const getSearchFromUrl = () => {
@@ -163,7 +154,7 @@ const getSearchFromUrl = () => {
 }
 
 const searchValue = ref(getSearchFromUrl())
-const searchField = ['title', 'slug']
+const searchField = ['title', 'peptide']
 const loading = ref(false)
 
 // Initialize serverOptions from URL parameters or props
@@ -184,33 +175,32 @@ const getSortTypeFromUrl = () => {
 }
 
 const serverOptions = ref({
-  page: props.blogs?.current_page || 1,
-  rowsPerPage: props.blogs?.per_page || 20,
+  page: props.research?.current_page || 1,
+  rowsPerPage: props.research?.per_page || 20,
   sortBy: getSortByFromUrl(),
   sortType: getSortTypeFromUrl()
 })
 
 const headers = [
-  { text: 'Image', value: 'image', sortable: false },
+  { text: 'Category', value: 'category', sortable: true },
   { text: 'Title', value: 'title', sortable: true },
   { text: 'Status', value: 'status', sortable: true },
-  { text: 'Featured', value: 'is_featured', sortable: true },
   { text: 'Published', value: 'published_at', sortable: true },
   { text: 'Created', value: 'created_at', sortable: true },
   { text: 'Actions', value: 'actions', sortable: false }
 ]
 
 // Sync serverOptions with props when they change
-watch(() => props.blogs, (blogs) => {
-  if (blogs) {
-    serverOptions.value.page = blogs.current_page || 1
-    serverOptions.value.rowsPerPage = blogs.per_page || 20
+watch(() => props.research, (research) => {
+  if (research) {
+    serverOptions.value.page = research.current_page || 1
+    serverOptions.value.rowsPerPage = research.per_page || 20
   }
 }, { immediate: true, deep: true })
 
 function fetchData() {
   loading.value = true
-  router.get('/admin/blogs', {
+  router.get('/admin/research', {
     page: serverOptions.value.page,
     per_page: serverOptions.value.rowsPerPage,
     sort_by: serverOptions.value.sortBy,
@@ -247,49 +237,49 @@ function handleSearchChange(value) {
   fetchData()
 }
 
-const toggleQuickEdit = (blogId) => {
-  const index = expandedRows.value.indexOf(blogId)
+const toggleQuickEdit = (researchId) => {
+  const index = expandedRows.value.indexOf(researchId)
   if (index > -1) {
     expandedRows.value.splice(index, 1)
-    selectedBlogId.value = null
+    selectedResearchId.value = null
     // Clean up form when closing
-    delete quickEditForms[blogId]
+    delete quickEditForms[researchId]
   } else {
-    expandedRows.value.push(blogId)
-    selectedBlogId.value = blogId
+    expandedRows.value.push(researchId)
+    selectedResearchId.value = researchId
     // Initialize form with current values when opening
-    const blog = props.blogs.data.find(b => b.id === blogId)
-    if (blog && !quickEditForms[blogId]) {
-      quickEditForms[blogId] = useForm({
-        title: blog.title,
-        status: blog.status,
+    const researchItem = props.research.data.find(r => r.id === researchId)
+    if (researchItem && !quickEditForms[researchId]) {
+      quickEditForms[researchId] = useForm({
+        title: researchItem.title,
+        status: researchItem.status,
         _token: page.props.csrf_token,
       })
     }
   }
 }
 
-const saveQuickEdit = (blogId) => {
-  const form = quickEditForms[blogId]
+const saveQuickEdit = (researchId) => {
+  const form = quickEditForms[researchId]
   // Update CSRF token before submission
   form._token = page.props.csrf_token
-  form.patch(`/admin/blogs/${blogId}/quick-update`, {
+  form.patch(`/admin/research/${researchId}/quick-update`, {
     preserveScroll: true,
     onSuccess: () => {
-      // Reload the blogs data to get updated information
-      router.reload({ only: ['blogs'], preserveScroll: true })
+      // Reload the research data to get updated information
+      router.reload({ only: ['research'], preserveScroll: true })
       // Close the quick edit
-      toggleQuickEdit(blogId)
+      toggleQuickEdit(researchId)
     },
   })
 }
 
-const deleteBlogById = (id) => {
-  const blog = props.blogs.data.find(b => b.id === id)
-  if (blog && confirm(`Are you sure you want to delete "${blog.title}"?`)) {
+const deleteResearchById = (id) => {
+  const researchItem = props.research.data.find(r => r.id === id)
+  if (researchItem && confirm(`Are you sure you want to delete "${researchItem.title}"?`)) {
     // Update CSRF token before deletion
     deleteForm._token = page.props.csrf_token
-    deleteForm.delete(`/admin/blogs/${id}`, {
+    deleteForm.delete(`/admin/research/${id}`, {
       preserveScroll: true,
     })
   }

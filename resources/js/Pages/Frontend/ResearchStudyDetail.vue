@@ -1,7 +1,7 @@
 <template>
   <FrontLayout>
-    <div class="min-h-screen flex flex-col">
-      <div class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="min-h-screen bg-gray-50">
+      <div class="bg-white border-b border-gray-200">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <!-- Back Button -->
           <button
@@ -28,12 +28,12 @@
             <span
               v-if="evidenceLevel"
               :class="[
-                'text-sm px-3 py-1 rounded-full border bg-green-100 text-green-800 border-green-200',
+                'text-sm px-3 py-1 rounded-full border',
                 evidenceLevel === 'High Evidence'
-                  ? 'bg-green-100 text-green-800'
+                  ? 'bg-green-100 text-green-800 border-green-200'
                   : evidenceLevel === 'Medium Evidence'
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : 'bg-gray-100 text-gray-800'
+                  ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                  : 'bg-gray-100 text-gray-800 border-gray-200'
               ]"
             >
               {{ evidenceLevel }}
@@ -59,7 +59,7 @@
                 </svg>
                 <span class="text-sm">Journal</span>
               </div>
-              <p class="text-gray-900">{{ source }}</p>
+              <p class="text-gray-900">{{ journalType || 'Not specified' }}</p>
             </div>
     
             <!-- Published -->
@@ -73,7 +73,7 @@
                 </svg>
                 <span class="text-sm">Published</span>
               </div>
-              <p class="text-gray-900">{{ date }}</p>
+              <p class="text-gray-900">{{ date || 'Not published' }}</p>
             </div>
     
             <!-- Study Type -->
@@ -87,7 +87,7 @@
                 </svg>
                   <span class="text-sm">Study Type</span>
               </div>
-              <p class="text-sm font-medium text-gray-900">{{ studyType }}</p>
+              <p class="text-gray-900">{{ studyType || 'Not specified' }}</p>
             </div>
           </div>
     
@@ -120,49 +120,44 @@
             </svg>
             <h2 class="text-2xl text-gray-900">Study Summary</h2>
           </div>
-          <p class="text-lg text-gray-700 leading-relaxed">
-            {{ description }}
+          <p class="text-lg text-gray-700 leading-relaxed" v-if="studySummary">
+            {{ studySummary }}
           </p>
+          <p v-else class="text-lg text-gray-500 italic">No study summary available.</p>
         </div>
 
         <!-- Research Details -->
         <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
           <h2 class="text-2xl text-gray-900 mb-6">Research Details</h2>
           <div class="space-y-6">
-            <div>
+            <div v-if="background">
               <h3 class="text-xl text-gray-900 mb-3">Background</h3>
               <p class="text-gray-700 leading-relaxed">
-                This clinical study investigated the therapeutic effects and mechanisms of BPC-157 in relevant applications. The research was conducted following rigorous scientific protocols and published in Journal of Orthopedic Research, a peer-reviewed academic journal.
+                {{ background }}
               </p>
             </div>
-            <div>
+            <div v-if="keyFindings && keyFindings.length > 0">
               <h3 class="text-xl text-gray-900 mb-3">Key Findings</h3>
               <ul class="list-disc pl-6 space-y-2 text-gray-700">
-                <li>Demonstrated measurable therapeutic effects in clinical trials</li>
-                <li>Established safety profile within recommended dosage ranges</li>
-                <li>Identified potential mechanisms of action at the molecular level</li>
-                <li>Documented patient outcomes and response rates</li>
-                <li>Provided evidence-based recommendations for clinical application</li>
+                <li v-for="(finding, index) in keyFindings" :key="index">{{ finding }}</li>
               </ul>
             </div>
-            <div>
+            <div v-if="methodology">
               <h3 class="text-xl text-gray-900 mb-3">Methodology</h3>
               <p class="text-gray-700 leading-relaxed">
-                The study employed randomized controlled trial methodology with appropriate statistical analysis. Participants were carefully selected based on specific inclusion and exclusion criteria, and outcomes were measured using validated assessment tools and biomarkers.
+                {{ methodology }}
               </p>
             </div>
-            <div>
+            <div v-if="clinicalImplications">
               <h3 class="text-xl text-gray-900 mb-3">Clinical Implications</h3>
               <p class="text-gray-700 leading-relaxed">
-                These findings contribute to the growing body of evidence supporting the therapeutic potential of BPC-157. 
-                Healthcare practitioners can use this research to inform treatment decisions and patient counseling. Further research is recommended to expand our understanding of optimal protocols and long-term outcomes.
+                {{ clinicalImplications }}
               </p>
             </div>
-            <div>
+            <div v-if="limitations">
               <h3 class="text-xl text-gray-900 mb-3">Limitations</h3>
               <p class="text-gray-700 leading-relaxed">
-                As with all clinical research, this study has certain limitations including sample size considerations, follow-up duration, and the need for replication in diverse populations. 
-                The authors acknowledge these limitations and provide recommendations for future research directions.
+                {{ limitations }}
               </p>
             </div>
           </div>
@@ -189,6 +184,9 @@
                   </span>
                   <span v-else-if="evidenceLevel === 'Medium Evidence'">
                     This study provides moderate-quality evidence from clinical research with some methodological considerations.
+                  </span>
+                  <span v-else-if="evidenceLevel === 'Low Evidence'">
+                    This study provides preliminary evidence from clinical research. Please review the methodology and findings carefully.
                   </span>
                   <span v-else>
                     This study provides evidence from clinical research. Please review the methodology and findings carefully.
@@ -256,21 +254,41 @@ const props = defineProps({
     type: String,
     required: true
   },
-  description: {
+  studySummary: {
     type: String,
-    required: true
+    default: null
   },
-  source: {
+  journalType: {
     type: String,
-    required: true
+    default: null
   },
   date: {
     type: String,
-    required: true
+    default: null
   },
   studyType: {
     type: String,
-    required: true
+    default: null
+  },
+  background: {
+    type: String,
+    default: null
+  },
+  keyFindings: {
+    type: Array,
+    default: () => []
+  },
+  methodology: {
+    type: String,
+    default: null
+  },
+  clinicalImplications: {
+    type: String,
+    default: null
+  },
+  limitations: {
+    type: String,
+    default: null
   },
   tags: {
     type: Array,

@@ -46,6 +46,7 @@ class BlogsController extends Controller
                 'title' => $blog->title,
                 'slug' => $blog->slug,
                 'description' => $blog->description,
+                'outline' => $blog->outline,
                 'image' => $imageUrl,
                 'readTime' => $blog->read_time ?? '19 Min Read',
                 'date' => $blog->published_at ? $blog->published_at->format('d M Y') : null,
@@ -60,7 +61,7 @@ class BlogsController extends Controller
                 'title' => $featured->title,
                 'slug' => $featured->slug,
                 'description' => $featured->description,
-                'content' => $featured->content,
+                'outline' => $featured->outline,
                 'image' => $featuredImage,
                 'readTime' => $featured->read_time ?? '19 Min Read',
                 'date' => $featured->published_at ? $featured->published_at->format('d M Y') : null,
@@ -104,6 +105,7 @@ class BlogsController extends Controller
                     'title' => $b->title,
                     'slug' => $b->slug,
                     'description' => $b->description,
+                    'outline' => $b->outline,
                     'image' => $imageUrl,
                     'readTime' => $b->read_time ?? '19 Min Read',
                     'date' => $b->published_at ? $b->published_at->format('d M Y') : null,
@@ -112,8 +114,9 @@ class BlogsController extends Controller
 
         $imageUrl = $blog->image ? Storage::url('blogs/' . $blog->image) : null;
         
-        // Determine category tag from content
-        $categoryTag = $this->getCategoryTag($blog->title, $blog->description, $blog->content);
+        // Use blog_type for category tag, fallback to computed tag if not set
+        $combinedContent = $blog->introduction . ' ' . $blog->detailed_analysis . ' ' . $blog->conclusion;
+        $categoryTag = $blog->blog_type ?: $this->getCategoryTag($blog->title, $blog->description, $combinedContent);
         
         return Inertia::render('Frontend/BlogDetail', [
             'blog' => [
@@ -121,10 +124,18 @@ class BlogsController extends Controller
                 'title' => $blog->title,
                 'slug' => $blog->slug,
                 'description' => $blog->description,
-                'content' => $blog->content,
+                'outline' => $blog->outline,
+                'introduction' => $blog->introduction,
+                'key_points' => $blog->key_points ?? [],
+                'detailed_analysis' => $blog->detailed_analysis,
+                'conclusion' => $blog->conclusion,
+                'tags' => $blog->tags ?? [],
+                'author_name' => $blog->author_name,
+                'author_job' => $blog->author_job,
+                'blog_type' => $blog->blog_type,
                 'image' => $imageUrl,
                 'readTime' => $blog->read_time ?? '19 Min Read',
-                'date' => $blog->published_at ? $blog->published_at->format('d M Y') : null,
+                'date' => $blog->published_at ? $blog->published_at->format('F d, Y') : null,
                 'is_featured' => $blog->is_featured ?? false,
                 'categoryTag' => $categoryTag,
             ],

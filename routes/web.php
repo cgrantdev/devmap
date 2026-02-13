@@ -14,6 +14,8 @@ use App\Http\Controllers\Vendor\PublicVendorController;
 use App\Http\Controllers\Admin\VendorsController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\BlogManagementController;
+use App\Http\Controllers\Admin\ResearchManagementController;
+use App\Http\Controllers\Admin\EducationalGuideManagementController;
 use App\Http\Controllers\Admin\EducationPostsController;
 use App\Http\Controllers\Admin\CategoriesController;
 use App\Http\Controllers\Admin\LocationsController;
@@ -154,6 +156,24 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/blogs/{id}', [BlogManagementController::class, 'update'])->name('admin.blogs.update');
     Route::patch('/blogs/{id}/quick-update', [BlogManagementController::class, 'quickUpdate'])->name('admin.blogs.quick-update');
     Route::delete('/blogs/{id}', [BlogManagementController::class, 'destroy'])->name('admin.blogs.destroy');
+    
+    // Research
+    Route::get('/research', [ResearchManagementController::class, 'index'])->name('admin.research.index');
+    Route::get('/research/create', [ResearchManagementController::class, 'create'])->name('admin.research.create');
+    Route::post('/research', [ResearchManagementController::class, 'store'])->name('admin.research.store');
+    Route::get('/research/{id}/edit', [ResearchManagementController::class, 'edit'])->name('admin.research.edit');
+    Route::post('/research/{id}', [ResearchManagementController::class, 'update'])->name('admin.research.update');
+    Route::patch('/research/{id}/quick-update', [ResearchManagementController::class, 'quickUpdate'])->name('admin.research.quick-update');
+    Route::delete('/research/{id}', [ResearchManagementController::class, 'destroy'])->name('admin.research.destroy');
+    
+    // Educational Guides
+    Route::get('/educational-guides', [EducationalGuideManagementController::class, 'index'])->name('admin.educational-guides.index');
+    Route::get('/educational-guides/create', [EducationalGuideManagementController::class, 'create'])->name('admin.educational-guides.create');
+    Route::post('/educational-guides', [EducationalGuideManagementController::class, 'store'])->name('admin.educational-guides.store');
+    Route::get('/educational-guides/{id}/edit', [EducationalGuideManagementController::class, 'edit'])->name('admin.educational-guides.edit');
+    Route::post('/educational-guides/{id}', [EducationalGuideManagementController::class, 'update'])->name('admin.educational-guides.update');
+    Route::patch('/educational-guides/{id}/quick-update', [EducationalGuideManagementController::class, 'quickUpdate'])->name('admin.educational-guides.quick-update');
+    Route::delete('/educational-guides/{id}', [EducationalGuideManagementController::class, 'destroy'])->name('admin.educational-guides.destroy');
     
     // Education Posts
     Route::get('/education-posts', [EducationPostsController::class, 'index'])->name('admin.education-posts.index');
