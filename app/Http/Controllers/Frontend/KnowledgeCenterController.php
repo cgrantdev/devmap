@@ -98,8 +98,8 @@ class KnowledgeCenterController extends Controller
             $imageUrl = Storage::url('blogs/' . $blog->image);
         }
 
-        // Determine category tag from content
-        $categoryTag = $this->getCategoryTag($blog->title, $blog->description, $blog->content);
+        // Use blog_type from database if available, otherwise determine from content
+        $categoryTag = $blog->blog_type ?: $this->getCategoryTag($blog->title, $blog->description, $blog->content);
         
         // Use blog's tags if available, otherwise extract from content
         $tags = !empty($blog->tags) ? $blog->tags : $this->extractTags($blog->title, $blog->description);
