@@ -37,14 +37,21 @@
           </div>
           <h1 class="text-4xl text-gray-900 mb-4">{{ blog.title }}</h1>
           <div class="flex items-center gap-6 text-gray-600 mb-6">
-            <div class="flex items-center gap-2">
+            <div v-if="blog.author_name" class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-4 h-4" aria-hidden="true">
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
-              <span>Dr. Sarah Chen
-                <span class="text-gray-500"> • Regulatory Expert</span>
+              <span>Dr. {{ blog.author_name }}
+                <span v-if="blog.author_job" class="text-gray-500"> • {{ blog.author_job }}</span>
               </span>
+            </div>
+            <div v-else class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-4 h-4" aria-hidden="true">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>PeptideMap Editorial</span>
             </div>
             <div class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-4 h-4" aria-hidden="true">
@@ -84,46 +91,50 @@
         </div>
       </div>
 
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div v-if="blog.image" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <img 
-          v-if="blog.image"
           :src="blog.image" 
           :alt="blog.title"
           class="w-full h-96 object-cover rounded-lg shadow-lg"
           loading="lazy"
           @error="handleImageError($event)"
         />
-        <div v-else class="w-full h-96 object-cover rounded-lg shadow-lg">
-          <span>No Image</span>
-        </div>
       </div>
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="bg-white rounded-lg shadow-sm p-8">
-          <p class="text-xl text-gray-700 mb-8 pb-8 border-b border-gray-200 italic">
-            {{ blog.description }}
+          <p v-if="blog.outline" class="text-xl text-gray-700 mb-8 pb-8 border-b border-gray-200 italic">
+            {{ blog.outline}}
           </p>
           <div class="prose prose-lg max-w-none">
-            <p class="text-gray-700 mb-4">
-              This is a detailed article about fda issues new guidelines for peptide compounding pharmacies. 
-              In a production environment, this would contain the full article content pulled from your backend database or CMS.
-              This is a detailed article about fda issues new guidelines for peptide compounding pharmacies. 
-              In a production environment, this would contain the full article content pulled from your backend database or CMS.              
-            </p>
-            <h2 class="text-2xl text-gray-900 mt-8 mb-4">Introduction</h2>
-            <p class="text-gray-700 mb-4">The FDA has released updated guidance affecting how compounding pharmacies can manufacture and distribute peptide therapies.  This comprehensive guide will walk you through everything you need to know about this topic, backed by scientific research and expert insights.</p>
-            <h2 class="text-2xl text-gray-900 mt-8 mb-4">Key Points</h2>
-            <ul class="list-disc pl-6 mb-6 text-gray-700 space-y-2">
-              <li>Detailed analysis of the latest research and findings</li>
-              <li>Expert opinions from leading researchers in the field</li>
-              <li>Practical applications and real-world implications</li>
-              <li>Safety considerations and best practices</li>
-              <li>Future directions and ongoing research</li>
-            </ul>
-            <h2 class="text-2xl text-gray-900 mt-8 mb-4">Detailed Analysis</h2>
-            <p class="text-gray-700 mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-            <p class="text-gray-700 mb-4">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-            <h2 class="text-2xl text-gray-900 mt-8 mb-4">Conclusion</h2>
-            <p class="text-gray-700 mb-4">Understanding fda issues new guidelines for peptide compounding pharmacies is crucial for anyone interested in peptide therapy. As research continues to evolve, staying informed about the latest developments will help you make better decisions.</p>
+            <div v-if="blog.description" class="mb-8">
+              <p class="text-gray-700 whitespace-pre-line">{{ blog.description }}</p>
+            </div>
+            
+            <div v-if="blog.introduction" class="mb-8">
+              <h2 class="text-2xl text-gray-900 mt-8 mb-4">Introduction</h2>
+              <p class="text-gray-700 mb-4 whitespace-pre-line">{{ blog.introduction }}</p>
+            </div>
+            
+            <div v-if="blog.key_points && blog.key_points.length > 0" class="mb-8">
+              <h2 class="text-2xl text-gray-900 mt-8 mb-4">Key Points</h2>
+              <ul class="list-disc pl-6 mb-6 text-gray-700 space-y-2">
+                <li v-for="(point, index) in blog.key_points" :key="index">{{ point }}</li>
+              </ul>
+            </div>
+            
+            <div v-if="blog.detailed_analysis" class="mb-8">
+              <h2 class="text-2xl text-gray-900 mt-8 mb-4">Detailed Analysis</h2>
+              <p class="text-gray-700 mb-4 whitespace-pre-line">{{ blog.detailed_analysis }}</p>
+            </div>
+            
+            <div v-if="blog.conclusion" class="mb-8">
+              <h2 class="text-2xl text-gray-900 mt-8 mb-4">Conclusion</h2>
+              <p class="text-gray-700 mb-4 whitespace-pre-line">{{ blog.conclusion }}</p>
+            </div>
+            
+            <!-- Fallback to content if new fields are not available -->
+            <div v-if="!blog.introduction && !blog.detailed_analysis && blog.content" class="blog-content-html" v-html="blog.content"></div>
+            
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
               <p class="text-sm text-blue-900">
                 <strong>Note:</strong>
@@ -132,12 +143,16 @@
             </div>
           </div>
         </div>
-        <div class="mt-8 pt-8 border-t border-gray-200">
+        <div v-if="blog.tags && blog.tags.length > 0" class="mt-8 pt-8 border-t border-gray-200">
           <h3 class="text-sm text-gray-500 mb-3">Tags:</h3>
           <div class="flex flex-wrap gap-2">
-            <span class="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-200 cursor-pointer transition-colors">FDA</span>
-            <span class="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-200 cursor-pointer transition-colors">Regulation</span>
-            <span class="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-200 cursor-pointer transition-colors">Compounding</span>            
+            <span 
+              v-for="(tag, index) in blog.tags" 
+              :key="index"
+              class="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-200 cursor-pointer transition-colors"
+            >
+              {{ tag }}
+            </span>
           </div>
         </div>
         <!-- Related Articles -->
@@ -148,7 +163,7 @@
               v-for="item in related"
               :key="item.id"
               :title="item.title"
-              :description="item.description"
+              :description="item.outline"
               :image="item.image"
               :read-time="item.readTime"
               :date="item.date"
@@ -181,6 +196,10 @@ const getCategoryTagClass = (category) => {
     'Community': 'bg-yellow-100 text-yellow-800',
   }
   return classes[category] || 'bg-gray-100 text-gray-800'
+}
+
+const handleImageError = (event) => {
+  event.target.style.display = 'none'
 }
 
 </script>

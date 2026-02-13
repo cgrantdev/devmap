@@ -168,6 +168,7 @@
               :category-tag="blog.categoryTag"
               :tags="blog.tags"
               :author="blog.author"
+              :author-job="blog.authorJob"
               :slug="blog.slug"
             />
           </div>
@@ -189,6 +190,7 @@
             :category-tag="blog.categoryTag"
             :tags="blog.tags"
             :author="blog.author"
+            :author-job="blog.authorJob"
             :slug="blog.slug"
           />
         </div>
@@ -317,9 +319,10 @@ const filteredResearchPapers = computed(() => {
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase().trim()
     result = result.filter(paper => 
-      paper.title.toLowerCase().includes(query) ||
-      paper.description.toLowerCase().includes(query) ||
-      (paper.peptide && paper.peptide.toLowerCase().includes(query))
+      paper.title?.toLowerCase().includes(query) ||
+      paper.description?.toLowerCase().includes(query) ||
+      (paper.peptide && paper.peptide.toLowerCase().includes(query)) ||
+      (paper.tags && paper.tags.some(tag => tag.toLowerCase().includes(query)))
     )
   }
   

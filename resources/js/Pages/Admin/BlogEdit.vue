@@ -37,19 +37,68 @@
             </div>
             
             <div>
+              <label class="block mb-1.5 font-semibold text-slate-800">Blog Type *</label>
+              <select v-model="form.blog_type" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" required>
+                <option :value="null">-- Select Blog Type --</option>
+                <option value="Regulation">Regulation</option>
+                <option value="Research">Research</option>
+                <option value="Community">Community</option>
+                <option value="Guides">Guides</option>
+                <option value="Industry">Industry</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800">Author Name</label>
+              <input v-model="form.author_name" type="text" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" placeholder="Enter author name" />
+            </div>
+            
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800">Author Job</label>
+              <input v-model="form.author_job" type="text" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" placeholder="Enter author job title" />
+            </div>
+            
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800">Outline</label>
+              <textarea v-model="form.outline" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" rows="3" placeholder="Enter blog outline"></textarea>
+            </div>
+            
+            <div>
               <label class="block mb-1.5 font-semibold text-slate-800">Description</label>
               <textarea v-model="form.description" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" rows="3"></textarea>
             </div>
             
             <div>
-              <label class="block mb-1.5 font-semibold text-slate-800">Content</label>
-              <QuillEditor
-                v-model:content="form.content"
-                contentType="html"
-                theme="snow"
-                :toolbar="toolbarOptions"
-                class="bg-white rounded-xl"
-              />
+              <label class="block mb-1.5 font-semibold text-slate-800">Introduction</label>
+              <textarea v-model="form.introduction" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" rows="5" placeholder="Enter introduction"></textarea>
+            </div>
+            
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800">Key Points</label>
+              <div v-for="(point, index) in form.key_points" :key="index" class="flex gap-2 mb-2">
+                <input v-model="form.key_points[index]" type="text" class="flex-1 border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" placeholder="Enter key point" />
+                <button type="button" @click="removeKeyPoint(index)" class="px-3 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all duration-200 font-medium">Remove</button>
+              </div>
+              <button type="button" @click="addKeyPoint" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-all duration-200 font-medium">+ Add Key Point</button>
+            </div>
+            
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800">Detailed Analysis</label>
+              <textarea v-model="form.detailed_analysis" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" rows="8" placeholder="Enter detailed analysis"></textarea>
+            </div>
+            
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800">Conclusion</label>
+              <textarea v-model="form.conclusion" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" rows="5" placeholder="Enter conclusion"></textarea>
+            </div>
+            
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800">Tags</label>
+              <div v-for="(tag, index) in form.tags" :key="index" class="flex gap-2 mb-2">
+                <input v-model="form.tags[index]" type="text" class="flex-1 border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" placeholder="Enter tag" />
+                <button type="button" @click="removeTag(index)" class="px-3 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all duration-200 font-medium">Remove</button>
+              </div>
+              <button type="button" @click="addTag" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-all duration-200 font-medium">+ Add Tag</button>
             </div>
           </div>
         </form>
@@ -129,8 +178,6 @@
 <script setup>
 import { Link, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
-import { QuillEditor } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.snow.css'
 import { ref } from 'vue'
 
 const props = defineProps({
@@ -140,23 +187,18 @@ const props = defineProps({
 const page = usePage()
 const imagePreview = ref(null)
 
-const toolbarOptions = [
-  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-  ['bold', 'italic', 'underline', 'strike'],
-  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-  [{ 'script': 'sub'}, { 'script': 'super' }],
-  [{ 'indent': '-1'}, { 'indent': '+1' }],
-  [{ 'direction': 'rtl' }],
-  [{ 'color': [] }, { 'background': [] }],
-  [{ 'align': [] }],
-  ['link', 'image', 'video'],
-  ['clean']
-]
-
 const form = useForm({
   title: props.blog?.title || '',
+  blog_type: props.blog?.blog_type || null,
+  author_name: props.blog?.author_name || '',
+  author_job: props.blog?.author_job || '',
+  outline: props.blog?.outline || '',
   description: props.blog?.description || '',
-  content: props.blog?.content || '',
+  introduction: props.blog?.introduction || '',
+  key_points: props.blog?.key_points || [],
+  detailed_analysis: props.blog?.detailed_analysis || '',
+  conclusion: props.blog?.conclusion || '',
+  tags: props.blog?.tags || [],
   image: null,
   read_time: props.blog?.read_time || '',
   status: props.blog?.status || 'draft',
@@ -176,7 +218,29 @@ const handleImageChange = (event) => {
   }
 }
 
+const addKeyPoint = () => {
+  form.key_points.push('')
+}
+
+const removeKeyPoint = (index) => {
+  form.key_points.splice(index, 1)
+}
+
+const addTag = () => {
+  form.tags.push('')
+}
+
+const removeTag = (index) => {
+  form.tags.splice(index, 1)
+}
+
 const submit = () => {
+  // Filter out empty Key Points
+  form.key_points = form.key_points.filter(point => point.trim() !== '')
+  
+  // Filter out empty Tags
+  form.tags = form.tags.filter(tag => tag.trim() !== '')
+  
   // Update CSRF token before submission
   form._token = page.props.csrf_token
   
