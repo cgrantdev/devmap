@@ -133,7 +133,7 @@
         </div>
 
         <!-- Peptide Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           <PeptideEncyclopediaCard
             v-for="peptide in displayedEncyclopediaPeptides"
             :key="peptide.id"
@@ -201,7 +201,7 @@
       </div>
 
       <!-- Discount Cards Grid -->
-      <div v-if="discountDeals.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div v-if="discountDeals.length > 0" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <LimitedTimeDiscountCard
           v-for="deal in discountDeals"
           :key="deal.id"
@@ -235,9 +235,9 @@
         <!-- Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <ResourcesToolsCard
-            title="Education Hub"
+            title="Encyclopedia"
             description="Learn about different peptides and research information"
-            href="/education"
+            href="/encyclopedia"
             cta-text="Explore"
             icon="book"
           />
@@ -270,7 +270,7 @@
       </div>
 
       <!-- Blog Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <LatestBlogCard
           v-for="blog in latestBlogs"
           :key="blog.id"

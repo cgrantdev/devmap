@@ -76,14 +76,14 @@
               </div>
             </div>
             
-            <!-- Key Benefits -->
+            <!-- Research Applications -->
             <div>
-              <label class="block mb-1.5 font-semibold text-slate-800">Key Benefits</label>
+              <label class="block mb-1.5 font-semibold text-slate-800">Research Applications</label>
               <div v-for="(effect, index) in form.key_effects" :key="index" class="flex gap-2 mb-2">
                 <input v-model="form.key_effects[index]" type="text" class="flex-1 border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" placeholder="Enter benefit" />
                 <button type="button" @click="removeKeyEffect(index)" class="px-3 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all duration-200 font-medium">Remove</button>
               </div>
-              <button type="button" @click="addKeyEffect" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-all duration-200 font-medium">+ Add Benefit</button>
+              <button type="button" @click="addKeyEffect" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-all duration-200 font-medium">+ Add Application</button>
             </div>
             
             <!-- Common Use Cases -->
@@ -469,7 +469,7 @@ const removeFAQ = (index) => {
 }
 
 const submit = () => {
-  // Filter out empty Key Benefits
+  // Filter out empty Research Applications
   form.key_effects = form.key_effects.filter(effect => effect.trim() !== '')
   
   // Filter out empty Common Use Cases

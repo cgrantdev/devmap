@@ -51,6 +51,7 @@ class ProductsController extends Controller
                     'total_items' => $category->products_count,
                     'image' => $image,
                     'description' => $category->description,
+                    'research_area' => $category->research_area,
                 ];
             });
         

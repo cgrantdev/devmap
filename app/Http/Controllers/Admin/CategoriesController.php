@@ -65,6 +65,7 @@ class CategoriesController extends Controller
                     'is_active' => $category->is_active,
                     'products_count' => $category->products_count,
                     'created_at' => $category->created_at->format('Y-m-d H:i'),
+                    'research_area' => $category->research_area,
                 ];
             });
 
@@ -92,6 +93,7 @@ class CategoriesController extends Controller
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'is_active' => 'boolean',
+            'research_area' => 'nullable|string|max:255',
         ]);
         
         // Auto-generate slug if not provided
@@ -176,6 +178,7 @@ class CategoriesController extends Controller
                 'meta_description' => $category->meta_description,
                 'is_active' => $category->is_active,
                 'products_count' => $category->products_count,
+                'research_area' => $category->research_area,
             ],
             'similarCategories' => $similarCategories,
             'products' => $products,
@@ -194,6 +197,7 @@ class CategoriesController extends Controller
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'is_active' => 'boolean',
+            'research_area' => 'nullable|string|max:255',
         ]);
         
         // Auto-generate slug if not provided

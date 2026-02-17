@@ -48,9 +48,9 @@
     <!-- Bottom Section: Product Information -->
     <div class="p-4">
       <!-- Category Tag -->
-      <div class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mb-2">
+      <!-- <div class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mb-2">
         {{ categoryName }}
-      </div>
+      </div> -->
 
       <!-- Product Title -->
       <h3 class="text-sm text-gray-900 mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
@@ -63,14 +63,14 @@
       </p>
 
       <!-- Specification Tags -->
-      <div class="flex items-center gap-2 mb-2 text-xs text-gray-600">
+      <!-- <div class="flex items-center gap-2 mb-2 text-xs text-gray-600">
         <span v-if="purity" class="bg-green-50 text-green-700 px-2 py-0.5 rounded">
           {{ purity }}% Pure
         </span>
         <span v-if="sizeDisplay" class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded">
           {{ sizeDisplay }}
         </span>
-      </div>
+      </div> -->
 
       <!-- Rating -->
       <div class="flex items-center gap-1 mb-3">
@@ -86,7 +86,7 @@
       </div>
 
       <!-- Stock Status -->
-      <div class="mb-3">
+      <!-- <div class="mb-3">
         <div
           class="inline-flex items-center gap-1.5 bg-green-50 text-green-700 border-green-200 border rounded-full text-xs px-2 py-1"
           :class="isInStock ? 'border-green-200 text-green-700' : 'border-red-200 text-red-700'"
@@ -99,7 +99,7 @@
             {{ stockStatus }}
           </span>
         </div>
-      </div>
+      </div> -->
 
       <!-- Price -->
       <div class="text-lg text-gray-900 font-semibold mb-3">
@@ -117,7 +117,7 @@
             <circle cx="19" cy="21" r="1"></circle>
             <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
           </svg>
-          View Details
+          View Product
         </button>
       </div>
     </div>
