@@ -45,12 +45,15 @@
               {{ bulkDeleteForm.processing ? 'Deleting...' : `Delete (${selectedCategories.length})` }}
             </button>
           </div>
-          <Link href="/admin/categories/create" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+          <button 
+            @click="openAddModal"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             Add Category
-          </Link>
+          </button>
         </div>
       </div>
     </div>
@@ -121,11 +124,15 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
-                  <Link :href="`/admin/categories/${category.id}/edit`" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                  <button
+                    @click="openEditModal(category)"
+                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="Edit"
+                  >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                  </Link>
+                  </button>
                   <button
                     @click="deleteCategory(category.id, category.name)"
                     :disabled="deleteForm.processing"
@@ -170,13 +177,121 @@
         </button>
       </div>
     </div>
+
+    <!-- Edit Category Modal -->
+    <div
+      v-if="showEditModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      @click.self="closeEditModal"
+    >
+      <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-slate-200">
+          <h2 class="text-2xl text-slate-900">{{ isEditMode ? 'Edit Category' : 'Add Category' }}</h2>
+        </div>
+
+        <form @submit.prevent="submitEdit" class="p-6 space-y-6">
+            <!-- Category Name -->
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">
+                Category Name *
+              </label>
+              <input
+                v-model="editForm.name"
+                type="text"
+                required
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <!-- Slug -->
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">
+                Slug
+              </label>
+              <input
+                v-model="editForm.slug"
+                type="text"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Auto-generated from name if left empty"
+              />
+              <p class="text-xs text-slate-500 mt-1">Leave empty to auto-generate from category name</p>
+            </div>
+
+            <!-- Image URL -->
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">
+                Image URL
+              </label>
+              <input
+                v-model="editForm.image_url"
+                type="url"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+
+            <!-- Research Area -->
+            <div>
+              <label class="block text-sm text-slate-700 mb-2">
+                Research Area
+              </label>
+              <input
+                v-model="editForm.research_area"
+                type="text"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter research area"
+              />
+            </div>
+
+            <!-- Status -->
+            <div class="border-t border-slate-200 pt-4">
+              <label class="flex items-center gap-2">
+                <input
+                  v-model="editForm.is_active"
+                  type="checkbox"
+                  class="h-4 w-4 text-blue-600"
+                />
+                <span class="text-sm text-slate-700">Active</span>
+              </label>
+            </div>
+
+            <!-- Error Messages -->
+            <div v-if="Object.keys(editForm.errors).length > 0" class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+              <p class="font-medium mb-2">Please fix the following errors:</p>
+              <ul class="list-disc list-inside text-sm">
+                <li v-for="(error, field) in editForm.errors" :key="field">
+                  {{ Array.isArray(error) ? error[0] : error }}
+                </li>
+              </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+              <button
+                type="button"
+                @click="closeEditModal"
+                class="px-6 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                :disabled="editForm.processing"
+                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
+              >
+                {{ editForm.processing ? (isEditMode ? 'Saving...' : 'Adding...') : (isEditMode ? 'Save Changes' : 'Add Category') }}
+              </button>
+            </div>
+        </form>
+      </div>
+    </div>
   </AdminLayout>
 </template>
 
 <script setup>
-import { Link, router, useForm, usePage } from '@inertiajs/vue3'
+import { router, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useToast as useVueToastification } from 'vue-toastification'
 
 // Only use toast for manual error messages
@@ -191,6 +306,18 @@ const props = defineProps({
 
 const searchValue = ref('')
 const selectedCategories = ref([])
+const showEditModal = ref(false)
+const editingCategory = ref(null)
+const isEditMode = computed(() => editingCategory.value !== null)
+
+const editForm = useForm({
+  name: '',
+  slug: '',
+  image_url: '',
+  research_area: '',
+  is_active: true,
+  _token: usePage().props.csrf_token
+})
 
 let searchTimeout = null
 
@@ -311,5 +438,71 @@ function bulkDelete() {
 
 function deselectAll() {
   selectedCategories.value = []
+}
+
+function openAddModal() {
+  editingCategory.value = null
+  editForm.reset()
+  editForm.clearErrors()
+  editForm.is_active = true
+  showEditModal.value = true
+}
+
+function openEditModal(category) {
+  editingCategory.value = category
+  editForm.name = category.name || ''
+  editForm.slug = category.slug || ''
+  editForm.image_url = category.image_url || ''
+  editForm.research_area = category.research_area || ''
+  editForm.is_active = !!category.is_active
+  editForm.clearErrors()
+  showEditModal.value = true
+}
+
+function closeEditModal() {
+  showEditModal.value = false
+  editingCategory.value = null
+  editForm.reset()
+  editForm.clearErrors()
+}
+
+function submitEdit() {
+  // Prepare data for submission
+  const formData = {
+    name: editForm.name,
+    slug: editForm.slug || null,
+    image_url: editForm.image_url || null,
+    research_area: editForm.research_area || null,
+    is_active: editForm.is_active,
+    _token: editForm._token
+  }
+  
+  if (isEditMode.value) {
+    // Update existing category
+    editForm.transform(() => formData).put(`/admin/categories/${editingCategory.value.id}`, {
+      preserveScroll: true,
+      onSuccess: () => {
+        closeEditModal()
+        fetchData()
+      },
+      onError: (errors) => {
+        console.error('Update error:', errors)
+        toastError('Failed to update category. Please check the form for errors.')
+      }
+    })
+  } else {
+    // Create new category
+    editForm.transform(() => formData).post('/admin/categories', {
+      preserveScroll: true,
+      onSuccess: () => {
+        closeEditModal()
+        fetchData()
+      },
+      onError: (errors) => {
+        console.error('Create error:', errors)
+        toastError('Failed to create category. Please check the form for errors.')
+      }
+    })
+  }
 }
 </script>

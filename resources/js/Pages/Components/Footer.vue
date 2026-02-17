@@ -100,7 +100,7 @@
             <h3 class="text-white mb-4">Resources</h3>
             <ul class="space-y-3">
               <li>
-                <Link href="/education" class="hover:text-white transition-colors">Education Hub</Link>
+                <Link href="/encyclopedia" class="hover:text-white transition-colors">Encyclopedia</Link>
               </li>
               <!-- <li>
                 <Link href="/developers" class="hover:text-white transition-colors">Developers Guide</Link>

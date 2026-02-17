@@ -78,7 +78,7 @@
 
 
       <!-- Peptide Cards Grid -->
-      <div v-if="filteredPeptides.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-if="filteredPeptides.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <EncyclopediaCard
           v-for="peptide in filteredPeptides"
           :key="peptide.id"

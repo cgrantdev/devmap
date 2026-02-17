@@ -218,10 +218,10 @@
                 </button>
             </div>
 
-            <div class="mt-12">
+            <!-- <div class="mt-12">
                 <h2 class="text-2xl text-gray-900 mb-6">Related Guides</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-            </div>
+            </div> -->
         </div>
       </div>
     </FrontLayout>

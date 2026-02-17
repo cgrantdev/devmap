@@ -3,7 +3,7 @@
     class="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-lg transition-all text-left group cursor-pointer flex flex-col overflow-hidden relative h-full"
     @click="handleClick"
   >
-    <div class="w-24 h-24 rounded-lg flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform flex-shrink-0">
+    <div class="aspect-square bg-gray-50 p-0 flex items-center justify-center mb-6">
       <img
         v-if="image && !hasError"
         :src="image"
@@ -16,21 +16,24 @@
         <span class="text-sm">No Image</span>
       </div>
     </div>
-    <div class="flex flex-col flex-1 min-w-0">
-      <h3
-        class="text-xl text-gray-900 mb-4 group-hover:text-blue-600 transition-colors w-full min-h-[3.5rem] flex items-center normal-case"
-        :title="name"
-      >
-        <span class="line-clamp-2 normal-case">{{ name }}</span>
-      </h3>
-      <!-- <p class="text-sm text-gray-600 flex-shrink-0">
-        {{ totalItems }} products
-      </p> -->
-      <span class="text-gray-600 text-sm flex-shrink-0 group-hover:underline">View All</span>
+    <h3
+      class="pt-6 border-t border-slate-200 text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors"
+      :title="name"
+    >
+      {{ name }}
+    </h3>
+    <!-- Research Area -->
+    <div v-if="researchArea" class="text-slate-600 text-xs italic justify-between mb-6">      
+      {{ researchArea }}
     </div>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down w-5 h-5 text-gray-400 group-hover:text-blue-600 rotate-[-90deg] transition-colors absolute bottom-4 right-4 flex-shrink-0" aria-hidden="true">
-      <path d="m6 9 6 6 6-6"></path>
-    </svg>
+    
+    <!-- Learn More Link (Fixed position at bottom) -->
+    <div class="pt-3 border-t border-slate-200 flex items-center justify-between">
+      <span class="text-gray-900 text-xs italic underline">View All</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-colors" aria-hidden="true">
+        <path d="m9 18 6-6-6-6"></path>
+      </svg>
+    </div>
   </div>
 </template>
 
@@ -44,6 +47,7 @@ const props = defineProps({
   image: { type: String, default: null },
   totalItems: { type: [String, Number], default: 0 },
   to: { type: String, required: true },
+  researchArea: { type: String, default: null },
 })
 
 const hasError = ref(false)

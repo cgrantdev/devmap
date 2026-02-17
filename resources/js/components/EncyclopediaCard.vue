@@ -2,40 +2,15 @@
   <div
     class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-xl hover:border-blue-500 transition-all text-left group"
     @click="handleClick"
-  >
-    <!-- Tags Row -->
-    <div class="flex items-start justify-between mb-3">
-      <!-- Category Tag -->
-      <div class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-        {{ categoryTag }}
-      </div>
-      <!-- Safety Tag -->
-      <!-- <div 
-        :class="[
-          'text-xs px-2 py-1 rounded bg-green-100 text-green-800',
-          safetyTag === 'High Safety' 
-            ? 'bg-green-100 text-green-800'
-            : safetyTag === 'Medium Safety'
-            ? 'bg-yello-100 text-yello-800'
-            : 'bg-red-100 text-red-800'
-        ]"
-      >
-        {{ safetyTag }}
-      </div> -->
-    </div>
-    
-    <!-- Title and Subtitle -->
-    <h3 class="text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors border-b border-slate-200">
-      {{ name }}
-    </h3>
+  >    
     <!-- Vial/Image Section -->
-    <div class="aspect-square bg-gray-50 p-6 border-b border-slate-200 flex items-center justify-center">
-      <div class="w-full h-full flex items-center justify-center">
+    <div class="aspect-square bg-gray-50 p-0 flex items-center justify-center mb-6">
+      <!-- <div class="w-full h-full flex items-center justify-center"> -->
         <img
           v-if="hasImage"
           :src="image"
           :alt="name"
-          class="w-full h-full object-contain select-none"
+          class="w-full h-full object-contain select-none flex items-center justify-center"
           loading="lazy"
           @error="onError"
         />
@@ -62,7 +37,24 @@
             <line x1="145" y1="150" x2= "150" y2="150" stroke="#9CA3AF" stroke-width="1"></line>
           </svg>
         </div>
-      </div>
+      <!-- </div> -->
+    </div>
+
+    <!-- Title and Subtitle -->
+    <h3 class="pt-6 border-t border-slate-200 text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+      {{ name }}
+    </h3>
+    <!-- Category Tag -->
+    <div class="text-slate-600 text-xs italic justify-between mb-6">
+      {{ categoryTag }}
+    </div>
+
+    <!-- Learn More Link (Fixed position at bottom) -->
+    <div class="pt-3 border-t border-slate-200 flex items-center justify-between">
+      <span class="text-gray-900 text-xs italic underline">Learn More</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-colors" aria-hidden="true">
+        <path d="m9 18 6-6-6-6"></path>
+      </svg>
     </div>
     <!-- <p class="text-sm text-gray-600 mb-3">{{ subtitle || name }}</p> -->
 
@@ -92,8 +84,8 @@
     </div> -->
 
     <!-- Key Effects - fixed height -->
-    <div class="border-t border-gray-200 pt-3 min-h-[80px]">
-      <p class="text-xs text-gray-900 mb-2">Top Benefits:</p>
+    <!-- <div class="border-t border-gray-200 pt-3 min-h-[80px]">
+      <p class="text-xs text-gray-900 mb-2">Research Applications:</p>
       <ul class="space-y-1">
         <li 
           v-for="(benefit, index) in limitedBenefits" 
@@ -104,7 +96,7 @@
           <span class="line-clamp-1">{{ benefit }}</span>
         </li>
       </ul>
-    </div>
+    </div> -->
 
     <!-- Research Studies - fixed height -->
     <!-- <div class="mt-3 pt-3 border-t border-gray-200 h-8">

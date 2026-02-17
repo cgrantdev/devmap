@@ -66,7 +66,7 @@
         </div>
 
         <!-- Research Papers -->
-        <div v-if="filteredResearchPapers.length > 0" class="grid grid-cols-1 gap-4">
+        <div v-if="filteredResearchPapers.length > 0" class="grid grid-cols-2 gap-4">
           <ResearchLibraryCard
             v-for="paper in filteredResearchPapers"
             :key="paper.id"
@@ -104,7 +104,7 @@
         </div>
 
         <!-- Educational Guides Grid -->
-        <div v-if="filteredEducationalGuides.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div v-if="filteredEducationalGuides.length > 0" class="grid grid-cols-2 md:grid-cols-2 gap-6">
           <EducationalGuideCard
             v-for="guide in filteredEducationalGuides"
             :key="guide.id"
@@ -155,7 +155,7 @@
             </svg>
             Featured Stories
           </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <KnowledgeCenterCard
               v-for="blog in filteredFeaturedBlogs"
               :key="blog.id"
@@ -177,7 +177,7 @@
       <!-- Latest Articles -->
       <div v-if="filteredLatestBlogs.length > 0">
         <h2 class="text-2xl text-gray-900 mb-6">Latest Articles</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <KnowledgeCenterCard
             v-for="blog in filteredLatestBlogs"
             :key="blog.id"

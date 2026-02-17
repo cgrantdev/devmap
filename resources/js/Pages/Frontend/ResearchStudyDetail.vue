@@ -221,13 +221,13 @@
         </div>
 
         <!-- Related Research -->
-        <div class="mt-12">
+        <!-- <div class="mt-12">
           <h2 class="text-2xl text-gray-900 mb-6">Related Research</h2>
           <div class="grid grid-cols-1 gap-4">
 
 
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </FrontLayout>

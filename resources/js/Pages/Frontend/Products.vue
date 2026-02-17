@@ -26,7 +26,7 @@
           </div>
         </div>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
           <CategoryCard
             v-for="product in filteredProducts"
             :key="product.slug || product.name"
@@ -34,6 +34,7 @@
             :image="product.image"
             :total-items="product.total_items"
             :to="`/product/${product.slug}`"
+            :research-area="product.research_area"
           />
         </div>
       </div>

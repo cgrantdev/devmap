@@ -98,7 +98,7 @@
     <!-- Discount Cards Grid -->
     <section class="bg-gray-50 min-h-screen">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div v-if="deals.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div v-if="deals.length > 0" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <DealCard
             v-for="deal in deals"
             :key="deal.id"
