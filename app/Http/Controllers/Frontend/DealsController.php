@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class DealsController extends Controller
 {
@@ -139,6 +140,14 @@ class DealsController extends Controller
                     return -$deal['discount']; // Negative for descending
             }
         })->values();
+
+        // Generate SEO data
+        $seoData = new SEOData(
+            title: 'Peptide Deals & Discount Codes | PeptideSync',
+            description: 'Find the best deals and discount codes for research peptides. Save money on top-rated peptide vendors with verified coupon codes.',
+            url: url('/deals'),
+        );
+        session(['page_seo_data' => $seoData]);
 
         return Inertia::render('Frontend/Deals', [
             'deals' => $deals,

@@ -10,6 +10,7 @@ use App\Models\Blog;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class SearchController extends Controller
 {
@@ -204,6 +205,18 @@ class SearchController extends Controller
             'encyclopedia' => count($results['encyclopedia']),
             'news' => count($results['news']),
         ];
+
+        // Generate SEO data
+        $searchTitle = !empty($query) ? "Search Results for '{$query}'" : 'Search Peptides, Vendors & More';
+        $searchDescription = !empty($query) 
+            ? "Search results for '{$query}' - Find peptides, vendors, products, and research information."
+            : 'Search for research peptides, vendors, products, encyclopedia entries, and news articles.';
+        $seoData = new SEOData(
+            title: $searchTitle . ' | PeptideSync',
+            description: $searchDescription,
+            url: url('/search', ['q' => $query]),
+        );
+        session(['page_seo_data' => $seoData]);
 
         return Inertia::render('Frontend/SearchResults', [
             'query' => $query,

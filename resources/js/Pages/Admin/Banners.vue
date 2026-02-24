@@ -18,7 +18,7 @@
 
     <div class="space-y-4">
       <div v-for="banner in banners" :key="banner.id" class="bg-white rounded-lg border border-slate-200 overflow-hidden">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div class="md:col-span-1">
             <img 
               :src="banner.image_url || '/images/banners/default.jpg'"

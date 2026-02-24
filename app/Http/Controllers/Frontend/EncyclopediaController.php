@@ -8,6 +8,8 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class EncyclopediaController extends Controller
 {
@@ -111,6 +113,14 @@ class EncyclopediaController extends Controller
                 return $category['categoryTag'] === $selectedCategory;
             })->values();
         }
+
+        // Generate SEO data
+        $seoData = new SEOData(
+            title: 'Peptide Encyclopedia - Comprehensive Research Guide | PeptideSync',
+            description: 'Explore our comprehensive peptide encyclopedia. Detailed information on research peptides including benefits, dosing, safety, and research applications.',
+            url: url('/encyclopedia'),
+        );
+        session(['page_seo_data' => $seoData]);
 
         return Inertia::render('Frontend/Encyclopedia', [
             'peptides' => $categories,
@@ -380,6 +390,15 @@ class EncyclopediaController extends Controller
         $title = $educationPost && $educationPost->title 
             ? $educationPost->title 
             : $category->name;
+
+        // Generate SEO data for encyclopedia detail
+        $seoData = new SEOData(
+            title: $title . ' - Peptide Encyclopedia | PeptideSync',
+            description: ($educationPost ? $educationPost->description : $category->description) ? Str::limit(strip_tags($educationPost ? $educationPost->description : $category->description), 160) : 'Comprehensive guide to ' . $title . ' research peptides.',
+            image: $image,
+            url: url("/encyclopedia/{$slug}"),
+        );
+        session(['page_seo_data' => $seoData]);
 
         // Get comprehensive data
         $peptideData = [

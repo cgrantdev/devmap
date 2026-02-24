@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-lg transition-all text-left group cursor-pointer flex flex-col overflow-hidden relative h-full"
+    class="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-lg transition-all text-left group cursor-pointer"
     @click="handleClick"
   >
     <div class="aspect-square bg-gray-50 p-0 flex items-center justify-center mb-6">
@@ -8,7 +8,7 @@
         v-if="image && !hasError"
         :src="image"
         :alt="name"
-        class="w-full h-full object-contain object-center"
+        class="w-full h-full object-contain select-none flex items-center justify-center"
         loading="lazy"
         @error="onError"
       />

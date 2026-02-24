@@ -16,7 +16,7 @@
       </button>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-2 md:grid-cols-2 gap-6">
       <div v-for="deal in deals" :key="deal.id" class="bg-white rounded-lg border border-gray-200 p-6">
         <div class="flex items-start justify-between mb-4">
           <div class="flex-1">

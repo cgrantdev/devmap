@@ -8,6 +8,8 @@ use App\Models\ProductCategory;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class EducationController extends Controller
 {
@@ -42,6 +44,14 @@ class EducationController extends Controller
                 ];
             });
 
+        // Generate SEO data
+        $seoData = new SEOData(
+            title: 'Peptide Education & Research Guides | PeptideSync',
+            description: 'Comprehensive educational guides on research peptides. Learn about benefits, dosing, safety, and research applications for various peptides.',
+            url: url('/education'),
+        );
+        session(['page_seo_data' => $seoData]);
+
         return Inertia::render('Frontend/Education', [
             'productGroups' => $categories,
         ]);
@@ -60,6 +70,16 @@ class EducationController extends Controller
         // If no education post exists or not published, show a basic page or create one
         // For now, we'll show the category info even if no education post exists
         if (!$post || $post->status !== 'published' || !$post->published_at || $post->published_at->isFuture()) {
+            // Generate SEO data for basic category page
+            $categoryImage = $category->image_url ? \Illuminate\Support\Facades\Storage::url('categories/' . $category->image_url) : null;
+            $seoData = new SEOData(
+                title: $category->name . ' - Education Guide | PeptideSync',
+                description: $category->description ? Str::limit(strip_tags($category->description), 160) : 'Learn about ' . $category->name . ' research peptides.',
+                image: $categoryImage,
+                url: url("/education/{$slug}"),
+            );
+            session(['page_seo_data' => $seoData]);
+            
             // Show a basic education page with category info
             return Inertia::render('Frontend/EducationDetail', [
                 'post' => [
@@ -102,6 +122,16 @@ class EducationController extends Controller
                     'image' => $p->image ? \Illuminate\Support\Facades\Storage::url('education_posts/' . $p->image) : null,
                 ];
             });
+
+        // Generate SEO data for education post
+        $postImage = $post->image ? \Illuminate\Support\Facades\Storage::url('education_posts/' . $post->image) : null;
+        $seoData = new SEOData(
+            title: $post->title . ' - Education Guide | PeptideSync',
+            description: $post->description ? Str::limit(strip_tags($post->description), 160) : 'Learn about ' . $post->title . ' research peptides.',
+            image: $postImage,
+            url: url("/education/{$slug}"),
+        );
+        session(['page_seo_data' => $seoData]);
 
         return Inertia::render('Frontend/EducationDetail', [
             'post' => [

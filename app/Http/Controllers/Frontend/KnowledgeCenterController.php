@@ -9,6 +9,8 @@ use App\Models\EducationalGuide;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class KnowledgeCenterController extends Controller
 {
@@ -77,6 +79,20 @@ class KnowledgeCenterController extends Controller
         if ($primaryNav === 'guides') {
             $educationalGuides = $this->getEducationalGuides($request);
         }
+
+        // Generate SEO data
+        $navTitles = [
+            'news' => 'Peptide News & Industry Updates',
+            'research' => 'Peptide Research Library',
+            'guides' => 'Educational Guides',
+        ];
+        $title = $navTitles[$primaryNav] ?? 'Knowledge Center';
+        $seoData = new SEOData(
+            title: $title . ' | PeptideSync',
+            description: 'Access comprehensive peptide knowledge including news, research papers, and educational guides. Stay informed about the latest developments in peptide research.',
+            url: url('/news', ['nav' => $primaryNav]),
+        );
+        session(['page_seo_data' => $seoData]);
 
         return Inertia::render('Frontend/KnowledgeCenter', [
             'featuredBlogs' => $featuredBlogs,
@@ -339,6 +355,14 @@ class KnowledgeCenterController extends Controller
             ->where('published_at', '<=', now())
             ->firstOrFail();
 
+        // Generate SEO data for guide
+        $seoData = new SEOData(
+            title: $guide->title . ' - Educational Guide | PeptideSync',
+            description: $guide->description ? Str::limit(strip_tags($guide->description), 160) : 'Educational guide: ' . $guide->title,
+            url: url("/guide/{$guide->id}"),
+        );
+        session(['page_seo_data' => $seoData]);
+
         return Inertia::render('Frontend/EducationGuideDetail', [
             'id' => $guide->id,
             'tag' => $guide->tag ?: $guide->guide_type,
@@ -378,6 +402,14 @@ class KnowledgeCenterController extends Controller
 
         // Format evidence level
         $evidenceLevel = $research->evidence_level ? $research->evidence_level . ' Evidence' : null;
+
+        // Generate SEO data for research
+        $seoData = new SEOData(
+            title: $research->title . ' - Research Study | PeptideSync',
+            description: $research->study_summary ? Str::limit(strip_tags($research->study_summary), 160) : 'Research study: ' . $research->title,
+            url: url("/research/{$research->id}"),
+        );
+        session(['page_seo_data' => $seoData]);
 
         return Inertia::render('Frontend/ResearchStudyDetail', [
             'id' => $research->id,
