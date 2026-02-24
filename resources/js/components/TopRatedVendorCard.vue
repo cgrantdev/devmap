@@ -24,7 +24,7 @@
     <!-- Content Section -->
     <div class="p-4">
       <!-- Brand Name -->
-      <h3 class="text-lg text-gray-900 mb-2 text-center line-clamp-1">
+      <h3 class="text-lg text-gray-900 mb-2 text-center">
         {{ name }}
       </h3>
       

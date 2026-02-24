@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class CompareController extends Controller
 {
@@ -95,6 +96,14 @@ class CompareController extends Controller
                 })
                 ->values();
         }
+
+        // Generate SEO data
+        $seoData = new SEOData(
+            title: 'Compare Peptide Products - Side by Side Comparison | PeptideSync',
+            description: 'Compare research peptides side by side. Compare prices, ratings, purity, and specifications to find the best product for your research needs.',
+            url: url('/compare'),
+        );
+        session(['page_seo_data' => $seoData]);
 
         return Inertia::render('Frontend/Compare', [
             'products' => $products,

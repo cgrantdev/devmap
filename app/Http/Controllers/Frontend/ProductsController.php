@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class ProductsController extends Controller
 {
@@ -55,6 +56,14 @@ class ProductsController extends Controller
                 ];
             });
         
+        // Generate SEO data
+        $seoData = new SEOData(
+            title: 'Research Peptides - Browse All Products | PeptideSync',
+            description: 'Browse our comprehensive collection of research peptides. Compare products, prices, and vendors to find the best peptides for your research needs.',
+            url: url('/products'),
+        );
+        session(['page_seo_data' => $seoData]);
+
         return Inertia::render('Frontend/Products', [
             'productGroups' => $categories,
         ]);
@@ -169,6 +178,16 @@ class ProductsController extends Controller
                 $discountCode = $brand->vendorSetting->coupon_code;
             }
         }
+
+        // Generate SEO data for product detail
+        $productImage = $product->image_url ? (str_starts_with($product->image_url, 'http') ? $product->image_url : url($product->image_url)) : null;
+        $seoData = new SEOData(
+            title: $product->name . ' - Product Details | PeptideSync',
+            description: $product->description ? Str::limit(strip_tags($product->description), 160) : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.',
+            image: $productImage,
+            url: url("/product/{$product->slug}/{$product->id}"),
+        );
+        session(['page_seo_data' => $seoData]);
 
         return Inertia::render('Frontend/ProductDetail', [
             'product' => [
@@ -352,6 +371,19 @@ class ProductsController extends Controller
 
         // Get price range
         $priceRange = $baseQuery->selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
+
+        // Generate SEO data for category listing
+        $categoryImage = null;
+        if ($category->image_url) {
+            $categoryImage = Storage::url('categories/' . $category->image_url);
+        }
+        $seoData = new SEOData(
+            title: $category->name . ' - Research Peptides | PeptideSync',
+            description: $category->description ? Str::limit(strip_tags($category->description), 160) : 'Browse ' . $category->name . ' research peptides. Compare products, prices, and vendors.',
+            image: $categoryImage,
+            url: url("/product/{$slug}"),
+        );
+        session(['page_seo_data' => $seoData]);
 
         return Inertia::render('Frontend/ProductListing', [
             'category' => [
@@ -575,6 +607,16 @@ class ProductsController extends Controller
         } elseif ($brand->vendorSetting && $brand->vendorSetting->coupon_code) {
             $discountCode = $brand->vendorSetting->coupon_code;
         }
+
+        // Generate SEO data for brand products
+        $brandImage = $this->getBrandLogoUrl($brand);
+        $seoData = new SEOData(
+            title: $brand->name . ' - Products & Reviews | PeptideSync',
+            description: ($brand->vendorSetting->description ?? '') ? Str::limit(strip_tags($brand->vendorSetting->description), 160) : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.',
+            image: $brandImage,
+            url: url("/brand/{$slug}/products"),
+        );
+        session(['page_seo_data' => $seoData]);
 
         return Inertia::render('Frontend/BrandProducts', [
             'brand' => [

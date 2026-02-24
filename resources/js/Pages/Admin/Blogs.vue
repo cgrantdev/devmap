@@ -92,7 +92,7 @@
       <div v-if="selectedBlogId && expandedRows.includes(selectedBlogId)" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/75" @click.self="toggleQuickEdit(selectedBlogId)">
         <div class="bg-white rounded-xl border border-slate-100 p-6 shadow-lg max-w-2xl w-full mx-4" @click.stop>
           <h3 class="text-lg font-medium text-slate-700 mb-4">Quick Edit</h3>
-          <div v-if="quickEditForms[selectedBlogId]" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div v-if="quickEditForms[selectedBlogId]" class="grid grid-cols-2 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-1.5">Title *</label>
               <input 

@@ -7,6 +7,8 @@ use App\Models\Blog;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class BlogsController extends Controller
 {
@@ -68,6 +70,16 @@ class BlogsController extends Controller
             ];
         }
 
+        // Generate SEO data
+        $featuredImage = $formattedFeatured ? $formattedFeatured['image'] : null;
+        $seoData = new SEOData(
+            title: 'Peptide Research Blog & News | PeptideSync',
+            description: 'Stay updated with the latest peptide research, industry news, guides, and educational content. Expert insights and comprehensive information for researchers.',
+            image: $featuredImage,
+            url: url('/blogs'),
+        );
+        session(['page_seo_data' => $seoData]);
+
         return Inertia::render('Frontend/BlogListing', [
             'featured' => $formattedFeatured,
             'blogs' => [
@@ -117,6 +129,15 @@ class BlogsController extends Controller
         // Use blog_type for category tag, fallback to computed tag if not set
         $combinedContent = $blog->introduction . ' ' . $blog->detailed_analysis . ' ' . $blog->conclusion;
         $categoryTag = $blog->blog_type ?: $this->getCategoryTag($blog->title, $blog->description, $combinedContent);
+        
+        // Generate SEO data for blog detail
+        $seoData = new SEOData(
+            title: $blog->title . ' | PeptideSync',
+            description: $blog->description ? Str::limit(strip_tags($blog->description), 160) : 'Read the latest article about ' . $blog->title . ' on PeptideSync.',
+            image: $imageUrl,
+            url: url("/blog/{$blog->slug}"),
+        );
+        session(['page_seo_data' => $seoData]);
         
         return Inertia::render('Frontend/BlogDetail', [
             'blog' => [

@@ -194,6 +194,7 @@ class CategoriesController extends Controller
             'slug' => 'nullable|string|max:255|unique:product_categories,slug,' . $id,
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
+            'image_url' => 'nullable|string|max:500',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'is_active' => 'boolean',
@@ -220,6 +221,25 @@ class CategoriesController extends Controller
             }
             $validated['image_url'] = ImageHelper::convertToWebP($request->file('image'), 'categories');
         } else {
+            // If no new image file uploaded, handle image_url string
+            if (isset($validated['image_url']) && !empty($validated['image_url'])) {
+                $imageUrl = trim($validated['image_url']);
+                
+                // If it's a storage URL (contains /storage/categories/), extract just the filename
+                if (strpos($imageUrl, '/storage/categories/') !== false || strpos($imageUrl, 'storage/categories/') !== false) {
+                    // Extract filename from storage path
+                    $validated['image_url'] = basename($imageUrl);
+                } elseif (preg_match('/^https?:\/\//', $imageUrl)) {
+                    // External URL, keep as-is
+                    $validated['image_url'] = $imageUrl;
+                } else {
+                    // Assume it's already just a filename or relative path, keep as-is
+                    $validated['image_url'] = $imageUrl;
+                }
+            } else {
+                // If image_url is empty/null, keep the existing value from database
+                $validated['image_url'] = $category->image_url;
+            }
             unset($validated['image']);
         }
         

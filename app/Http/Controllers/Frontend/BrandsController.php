@@ -10,6 +10,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class BrandsController extends Controller
 {
@@ -140,6 +141,14 @@ class BrandsController extends Controller
                 ];
             });
         
+        // Generate SEO data
+        $seoData = new SEOData(
+            title: 'Top Rated Peptide Vendors & Brands | PeptideSync',
+            description: 'Browse and compare top-rated peptide vendors and brands. Read reviews, compare prices, and find trusted suppliers for your research needs.',
+            url: url('/brands'),
+        );
+        session(['page_seo_data' => $seoData]);
+
         return Inertia::render('Frontend/Brands', [
             'brands' => $brands,
             'search' => $request->get('search', ''),

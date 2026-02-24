@@ -1,16 +1,16 @@
 <template>
   <AdminLayout>
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-3xl text-slate-900 mb-2">Category Management</h1>
-      <p class="text-slate-600">Manage all product categories</p>
+    <div class="mb-4 sm:mb-8">
+      <h1 class="text-2xl sm:text-3xl text-slate-900 mb-2">Category Management</h1>
+      <p class="text-sm sm:text-base text-slate-600">Manage all product categories</p>
     </div>
 
     <!-- Actions Bar -->
-    <div class="bg-white rounded-lg border border-slate-200 p-4 mb-6">
-      <div class="flex items-center justify-between gap-4">
-        <div class="flex-1 relative">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="bg-white rounded-lg border border-slate-200 p-3 sm:p-4 mb-4 sm:mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div class="flex-1 relative w-full sm:w-auto">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -18,14 +18,14 @@
             placeholder="Search categories..."
             v-model="searchValue"
             @input="handleSearchInput"
-            class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full pl-9 sm:pl-10 pr-4 py-2 text-sm sm:text-base border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <div class="flex items-center gap-2">
-          <div v-if="selectedCategories.length > 0" class="flex gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <div v-if="selectedCategories.length > 0" class="flex flex-wrap gap-2">
             <button
               @click="deselectAll"
-              class="px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors"
+              class="px-3 sm:px-4 py-2 text-sm sm:text-base bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors"
             >
               Deselect All
             </button>
@@ -33,26 +33,27 @@
               v-if="selectedCategories.length > 1"
               @click="bulkMerge"
               :disabled="bulkMergeForm.processing || bulkDeleteForm.processing"
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              class="px-3 sm:px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
               {{ bulkMergeForm.processing ? 'Merging...' : `Merge (${selectedCategories.length})` }}
             </button>
             <button
               @click="bulkDelete"
               :disabled="bulkMergeForm.processing || bulkDeleteForm.processing"
-              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+              class="px-3 sm:px-4 py-2 text-sm sm:text-base bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
             >
               {{ bulkDeleteForm.processing ? 'Deleting...' : `Delete (${selectedCategories.length})` }}
             </button>
           </div>
           <button 
             @click="openAddModal"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors text-sm sm:text-base"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            Add Category
+            <span class="hidden sm:inline">Add Category</span>
+            <span class="sm:hidden">Add</span>
           </button>
         </div>
       </div>
@@ -61,10 +62,10 @@
     <!-- Categories Table -->
     <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full">
+        <table class="w-full min-w-[640px]">
           <thead class="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider w-12">
+              <th class="px-3 sm:px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider w-12">
                 <input
                   type="checkbox"
                   @change="toggleSelectAll"
@@ -72,17 +73,17 @@
                   class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
               </th>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Category</th>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Slug</th>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Products</th>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Created</th>
-              <th class="px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Actions</th>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Category</th>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider hidden md:table-cell">Slug</th>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Status</th>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider hidden sm:table-cell">Products</th>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider hidden lg:table-cell">Created</th>
+              <th class="px-3 sm:px-6 py-3 text-left text-xs text-slate-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200">
             <tr v-for="category in categories.data || []" :key="category.id" class="hover:bg-slate-50">
-              <td class="px-6 py-4">
+              <td class="px-3 sm:px-6 py-4">
                 <input
                   type="checkbox"
                   :value="category.id"
@@ -90,43 +91,43 @@
                   class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
               </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <div v-if="category.image_url" class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                    <img :src="category.image_url" :alt="category.name" class="w-10 h-10 object-cover" />
+              <td class="px-3 sm:px-6 py-4">
+                <div class="flex items-center gap-2 sm:gap-3">
+                  <div v-if="category.image_url" class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg overflow-hidden flex-shrink-0">
+                    <img :src="category.image_url" :alt="category.name" class="w-full h-full object-cover" />
                   </div>
-                  <div v-else class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white flex-shrink-0">
+                  <div v-else class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white flex-shrink-0 text-xs sm:text-sm">
                     {{ category.name.substring(0, 2).toUpperCase() }}
                   </div>
-                  <div>
-                    <a :href="`/product/${category.slug}`" target="_blank" class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline">
+                  <div class="min-w-0 flex-1">
+                    <a :href="`/product/${category.slug}`" target="_blank" class="text-xs sm:text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline block truncate">
                       {{ category.name }}
                     </a>
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4">
-                <span class="text-sm text-slate-600">{{ category.slug }}</span>
+              <td class="px-3 sm:px-6 py-4 hidden md:table-cell">
+                <span class="text-xs sm:text-sm text-slate-600 truncate block max-w-xs">{{ category.slug }}</span>
               </td>
-              <td class="px-6 py-4">
-                <span v-if="category.is_active" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+              <td class="px-3 sm:px-6 py-4">
+                <span v-if="category.is_active" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs whitespace-nowrap">
                   Active
                 </span>
-                <span v-else class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs">
+                <span v-else class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs whitespace-nowrap">
                   Inactive
                 </span>
               </td>
-              <td class="px-6 py-4">
-                <span class="text-sm text-slate-900">{{ category.products_count || 0 }}</span>
+              <td class="px-3 sm:px-6 py-4 hidden sm:table-cell">
+                <span class="text-xs sm:text-sm text-slate-900">{{ category.products_count || 0 }}</span>
               </td>
-              <td class="px-6 py-4">
-                <span class="text-sm text-slate-600">{{ category.created_at }}</span>
+              <td class="px-3 sm:px-6 py-4 hidden lg:table-cell">
+                <span class="text-xs sm:text-sm text-slate-600">{{ category.created_at }}</span>
               </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
+              <td class="px-3 sm:px-6 py-4">
+                <div class="flex items-center gap-1 sm:gap-2">
                   <button
                     @click="openEditModal(category)"
-                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    class="p-1.5 sm:p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     title="Edit"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +137,7 @@
                   <button
                     @click="deleteCategory(category.id, category.name)"
                     :disabled="deleteForm.processing"
-                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                    class="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
                     title="Delete"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,27 +152,27 @@
       </div>
     </div>
 
-    <div v-if="!categories.data || categories.data.length === 0" class="bg-white rounded-lg border border-slate-200 p-6 text-center text-slate-500">
+    <div v-if="!categories.data || categories.data.length === 0" class="bg-white rounded-lg border border-slate-200 p-4 sm:p-6 text-center text-slate-500 text-sm sm:text-base">
       No categories found.
     </div>
 
     <!-- Pagination -->
-    <div v-if="categories.last_page > 1" class="mt-6 flex items-center justify-between bg-white rounded-lg border border-slate-200 p-4">
-      <div class="text-sm text-slate-600">
+    <div v-if="categories.last_page > 1" class="mt-4 sm:mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white rounded-lg border border-slate-200 p-3 sm:p-4">
+      <div class="text-xs sm:text-sm text-slate-600 text-center sm:text-left">
         Showing {{ categories.from || 0 }} to {{ categories.to || 0 }} of {{ categories.total || 0 }} categories
       </div>
-      <div class="flex gap-2">
+      <div class="flex gap-2 justify-center sm:justify-end">
         <button
           @click="goToPage(categories.current_page - 1)"
           :disabled="categories.current_page === 1"
-          class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-3 sm:px-4 py-2 text-sm sm:text-base border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Previous
         </button>
         <button
           @click="goToPage(categories.current_page + 1)"
           :disabled="categories.current_page === categories.last_page"
-          class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-3 sm:px-4 py-2 text-sm sm:text-base border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Next
         </button>
@@ -181,15 +182,15 @@
     <!-- Edit Category Modal -->
     <div
       v-if="showEditModal"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4"
       @click.self="closeEditModal"
     >
-      <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6 border-b border-slate-200">
-          <h2 class="text-2xl text-slate-900">{{ isEditMode ? 'Edit Category' : 'Add Category' }}</h2>
+      <div class="bg-white rounded-lg max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto m-2 sm:m-0">
+        <div class="p-4 sm:p-6 border-b border-slate-200">
+          <h2 class="text-xl sm:text-2xl text-slate-900">{{ isEditMode ? 'Edit Category' : 'Add Category' }}</h2>
         </div>
 
-        <form @submit.prevent="submitEdit" class="p-6 space-y-6">
+        <form @submit.prevent="submitEdit" class="p-4 sm:p-6 space-y-4 sm:space-y-6">
             <!-- Category Name -->
             <div>
               <label class="block text-sm text-slate-700 mb-2">
@@ -224,9 +225,9 @@
               </label>
               <input
                 v-model="editForm.image_url"
-                type="url"
+                type="text"
                 class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="https://example.com/image.jpg"
+                placeholder="https://example.com/image.jpg or /storage/categories/image.webp"
               />
             </div>
 
@@ -266,18 +267,18 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+            <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t border-slate-200">
               <button
                 type="button"
                 @click="closeEditModal"
-                class="px-6 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+                class="w-full sm:w-auto px-4 sm:px-6 py-2 text-sm sm:text-base border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 :disabled="editForm.processing"
-                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                class="w-full sm:w-auto px-4 sm:px-6 py-2 text-sm sm:text-base bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
               >
                 {{ editForm.processing ? (isEditMode ? 'Saving...' : 'Adding...') : (isEditMode ? 'Save Changes' : 'Add Category') }}
               </button>

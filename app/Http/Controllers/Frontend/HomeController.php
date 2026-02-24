@@ -13,6 +13,7 @@ use App\Models\Deal;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class HomeController extends Controller
 {
@@ -284,6 +285,17 @@ class HomeController extends Controller
                 });
         }
 
+        // Generate SEO data for the homepage
+        $seoData = new SEOData(
+            title: 'PeptideSync',
+            description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.',
+            image: $heroSlides[0]['image'] ?? null,
+            url: url('/'),
+        );
+
+        // Store SEO data in session for Blade template access
+        session(['page_seo_data' => $seoData]);
+
         return Inertia::render('Frontend/Welcome', [
             'heroSlides' => $heroSlides,
             'productGroups' => $categories,
@@ -291,6 +303,12 @@ class HomeController extends Controller
             'topBlogs' => $topBlogs,
             'latestBlogs' => $latestBlogs,
             'discountDeals' => $discountDeals,
+            'seo' => [
+                'title' => $seoData->title,
+                'description' => $seoData->description,
+                'image' => $seoData->image,
+                'url' => $seoData->url,
+            ],
         ]);
     }
 

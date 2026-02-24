@@ -6,7 +6,7 @@
     </div>
     
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <div class="bg-white rounded-lg border border-gray-200 p-6">
         <div class="flex items-center justify-between mb-4">
           <div class="bg-blue-500 w-12 h-12 rounded-lg flex items-center justify-center">
@@ -68,7 +68,7 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-2 lg:grid-cols-2 gap-6">
       <!-- Recent Activity -->
       <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-lg text-gray-900 mb-4">Recent Activity</h2>
