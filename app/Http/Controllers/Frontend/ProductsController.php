@@ -19,6 +19,32 @@ use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class ProductsController extends Controller
 {
+    /**
+     * Safely truncate a string to a given length
+     * Works without mbstring extension
+     */
+    private function safeLimit($value, $limit = 100, $end = '...')
+    {
+        if (empty($value)) {
+            return '';
+        }
+
+        $value = strip_tags($value);
+        
+        // If mbstring is available, use it
+        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+            if (mb_strlen($value) <= $limit) {
+                return $value;
+            }
+            return mb_substr($value, 0, $limit) . $end;
+        }
+        
+        // Fallback to regular string functions
+        if (strlen($value) <= $limit) {
+            return $value;
+        }
+        return substr($value, 0, $limit) . $end;
+    }
     public function index()
     {
         // Get all active product categories with product counts
@@ -183,7 +209,7 @@ class ProductsController extends Controller
         $productImage = $product->image_url ? (str_starts_with($product->image_url, 'http') ? $product->image_url : url($product->image_url)) : null;
         $seoData = new SEOData(
             title: $product->name . ' - Product Details | PeptideSync',
-            description: $product->description ? Str::limit(strip_tags($product->description), 160) : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.',
+            description: $product->description ? $this->safeLimit($product->description, 160) : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.',
             image: $productImage,
             url: url("/product/{$product->slug}/{$product->id}"),
         );
@@ -379,7 +405,7 @@ class ProductsController extends Controller
         }
         $seoData = new SEOData(
             title: $category->name . ' - Research Peptides | PeptideSync',
-            description: $category->description ? Str::limit(strip_tags($category->description), 160) : 'Browse ' . $category->name . ' research peptides. Compare products, prices, and vendors.',
+            description: $category->description ? $this->safeLimit($category->description, 160) : 'Browse ' . $category->name . ' research peptides. Compare products, prices, and vendors.',
             image: $categoryImage,
             url: url("/product/{$slug}"),
         );
@@ -612,7 +638,7 @@ class ProductsController extends Controller
         $brandImage = $this->getBrandLogoUrl($brand);
         $seoData = new SEOData(
             title: $brand->name . ' - Products & Reviews | PeptideSync',
-            description: ($brand->vendorSetting->description ?? '') ? Str::limit(strip_tags($brand->vendorSetting->description), 160) : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.',
+            description: ($brand->vendorSetting->description ?? '') ? $this->safeLimit($brand->vendorSetting->description, 160) : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.',
             image: $brandImage,
             url: url("/brand/{$slug}/products"),
         );

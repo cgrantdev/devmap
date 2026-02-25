@@ -11,6 +11,33 @@ use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class PagesController extends Controller
 {
+    /**
+     * Safely truncate a string to a given length
+     * Works without mbstring extension
+     */
+    private function safeLimit($value, $limit = 100, $end = '...')
+    {
+        if (empty($value)) {
+            return '';
+        }
+
+        $value = strip_tags($value);
+        
+        // If mbstring is available, use it
+        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+            if (mb_strlen($value) <= $limit) {
+                return $value;
+            }
+            return mb_substr($value, 0, $limit) . $end;
+        }
+        
+        // Fallback to regular string functions
+        if (strlen($value) <= $limit) {
+            return $value;
+        }
+        return substr($value, 0, $limit) . $end;
+    }
+
     public function show(Request $request, $slug = null)
     {
         // If slug is not provided, try to get from route parameter
@@ -39,7 +66,7 @@ class PagesController extends Controller
         
         // Generate SEO data for dynamic page
         $pageTitle = $page->seo_title ?? $page->title;
-        $pageDescription = $page->seo_description ?? ($page->content ? Str::limit(strip_tags($page->content), 160) : '');
+        $pageDescription = $page->seo_description ?? ($page->content ? $this->safeLimit($page->content, 160) : '');
         $seoData = new SEOData(
             title: $pageTitle . ' | PeptideSync',
             description: $pageDescription ?: 'Learn more about ' . $page->title,

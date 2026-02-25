@@ -13,6 +13,33 @@ use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class EducationController extends Controller
 {
+    /**
+     * Safely truncate a string to a given length
+     * Works without mbstring extension
+     */
+    private function safeLimit($value, $limit = 100, $end = '...')
+    {
+        if (empty($value)) {
+            return '';
+        }
+
+        $value = strip_tags($value);
+        
+        // If mbstring is available, use it
+        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+            if (mb_strlen($value) <= $limit) {
+                return $value;
+            }
+            return mb_substr($value, 0, $limit) . $end;
+        }
+        
+        // Fallback to regular string functions
+        if (strlen($value) <= $limit) {
+            return $value;
+        }
+        return substr($value, 0, $limit) . $end;
+    }
+
     public function index(Request $request)
     {
         // Get all active product categories (display all, not just ones with education posts)
@@ -74,7 +101,7 @@ class EducationController extends Controller
             $categoryImage = $category->image_url ? \Illuminate\Support\Facades\Storage::url('categories/' . $category->image_url) : null;
             $seoData = new SEOData(
                 title: $category->name . ' - Education Guide | PeptideSync',
-                description: $category->description ? Str::limit(strip_tags($category->description), 160) : 'Learn about ' . $category->name . ' research peptides.',
+                description: $category->description ? $this->safeLimit($category->description, 160) : 'Learn about ' . $category->name . ' research peptides.',
                 image: $categoryImage,
                 url: url("/education/{$slug}"),
             );
@@ -127,7 +154,7 @@ class EducationController extends Controller
         $postImage = $post->image ? \Illuminate\Support\Facades\Storage::url('education_posts/' . $post->image) : null;
         $seoData = new SEOData(
             title: $post->title . ' - Education Guide | PeptideSync',
-            description: $post->description ? Str::limit(strip_tags($post->description), 160) : 'Learn about ' . $post->title . ' research peptides.',
+            description: $post->description ? $this->safeLimit($post->description, 160) : 'Learn about ' . $post->title . ' research peptides.',
             image: $postImage,
             url: url("/education/{$slug}"),
         );

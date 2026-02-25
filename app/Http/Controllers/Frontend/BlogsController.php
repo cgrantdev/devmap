@@ -12,6 +12,33 @@ use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class BlogsController extends Controller
 {
+    /**
+     * Safely truncate a string to a given length
+     * Works without mbstring extension
+     */
+    private function safeLimit($value, $limit = 100, $end = '...')
+    {
+        if (empty($value)) {
+            return '';
+        }
+
+        $value = strip_tags($value);
+        
+        // If mbstring is available, use it
+        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+            if (mb_strlen($value) <= $limit) {
+                return $value;
+            }
+            return mb_substr($value, 0, $limit) . $end;
+        }
+        
+        // Fallback to regular string functions
+        if (strlen($value) <= $limit) {
+            return $value;
+        }
+        return substr($value, 0, $limit) . $end;
+    }
+
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 20);
@@ -133,7 +160,7 @@ class BlogsController extends Controller
         // Generate SEO data for blog detail
         $seoData = new SEOData(
             title: $blog->title . ' | PeptideSync',
-            description: $blog->description ? Str::limit(strip_tags($blog->description), 160) : 'Read the latest article about ' . $blog->title . ' on PeptideSync.',
+            description: $blog->description ? $this->safeLimit($blog->description, 160) : 'Read the latest article about ' . $blog->title . ' on PeptideSync.',
             image: $imageUrl,
             url: url("/blog/{$blog->slug}"),
         );
