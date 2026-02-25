@@ -14,6 +14,33 @@ use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class KnowledgeCenterController extends Controller
 {
+    /**
+     * Safely truncate a string to a given length
+     * Works without mbstring extension
+     */
+    private function safeLimit($value, $limit = 100, $end = '...')
+    {
+        if (empty($value)) {
+            return '';
+        }
+
+        $value = strip_tags($value);
+        
+        // If mbstring is available, use it
+        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+            if (mb_strlen($value) <= $limit) {
+                return $value;
+            }
+            return mb_substr($value, 0, $limit) . $end;
+        }
+        
+        // Fallback to regular string functions
+        if (strlen($value) <= $limit) {
+            return $value;
+        }
+        return substr($value, 0, $limit) . $end;
+    }
+
     public function index(Request $request)
     {
         // Get primary navigation selection
@@ -358,7 +385,7 @@ class KnowledgeCenterController extends Controller
         // Generate SEO data for guide
         $seoData = new SEOData(
             title: $guide->title . ' - Educational Guide | PeptideSync',
-            description: $guide->description ? Str::limit(strip_tags($guide->description), 160) : 'Educational guide: ' . $guide->title,
+            description: $guide->description ? $this->safeLimit($guide->description, 160) : 'Educational guide: ' . $guide->title,
             url: url("/guide/{$guide->id}"),
         );
         session(['page_seo_data' => $seoData]);
@@ -406,7 +433,7 @@ class KnowledgeCenterController extends Controller
         // Generate SEO data for research
         $seoData = new SEOData(
             title: $research->title . ' - Research Study | PeptideSync',
-            description: $research->study_summary ? Str::limit(strip_tags($research->study_summary), 160) : 'Research study: ' . $research->title,
+            description: $research->study_summary ? $this->safeLimit($research->study_summary, 160) : 'Research study: ' . $research->title,
             url: url("/research/{$research->id}"),
         );
         session(['page_seo_data' => $seoData]);

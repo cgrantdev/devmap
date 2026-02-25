@@ -13,6 +13,33 @@ use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class EncyclopediaController extends Controller
 {
+    /**
+     * Safely truncate a string to a given length
+     * Works without mbstring extension
+     */
+    private function safeLimit($value, $limit = 100, $end = '...')
+    {
+        if (empty($value)) {
+            return '';
+        }
+
+        $value = strip_tags($value);
+        
+        // If mbstring is available, use it
+        if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+            if (mb_strlen($value) <= $limit) {
+                return $value;
+            }
+            return mb_substr($value, 0, $limit) . $end;
+        }
+        
+        // Fallback to regular string functions
+        if (strlen($value) <= $limit) {
+            return $value;
+        }
+        return substr($value, 0, $limit) . $end;
+    }
+
     public function index(Request $request)
     {
         // Get all active product categories with additional data
@@ -394,7 +421,7 @@ class EncyclopediaController extends Controller
         // Generate SEO data for encyclopedia detail
         $seoData = new SEOData(
             title: $title . ' - Peptide Encyclopedia | PeptideSync',
-            description: ($educationPost ? $educationPost->description : $category->description) ? Str::limit(strip_tags($educationPost ? $educationPost->description : $category->description), 160) : 'Comprehensive guide to ' . $title . ' research peptides.',
+            description: ($educationPost ? $educationPost->description : $category->description) ? $this->safeLimit($educationPost ? $educationPost->description : $category->description, 160) : 'Comprehensive guide to ' . $title . ' research peptides.',
             image: $image,
             url: url("/encyclopedia/{$slug}"),
         );
@@ -423,6 +450,99 @@ class EncyclopediaController extends Controller
         ];
 
         return Inertia::render('Frontend/EncyclopediaDetail', $peptideData);
+    }
+
+    /**
+     * Show encyclopedia article detail page (new format)
+     */
+    public function showArticle($slug)
+    {
+        // Reuse the same logic as show() but render the new article detail page
+        $category = ProductCategory::where('slug', $slug)
+            ->where('is_active', true)
+            ->with('educationPost')
+            ->firstOrFail();
+
+        $educationPost = $category->educationPost;
+        
+        // Get image - prioritize education post image, fallback to category image
+        $image = null;
+        if ($educationPost && $educationPost->image) {
+            $image = Storage::url('education_posts/' . $educationPost->image);
+        } elseif ($category->image_url) {
+            $image = Storage::url('categories/' . $category->image_url);
+        }
+
+        // Get products for this category
+        $products = Product::visible()
+            ->where('status', 'active')
+            ->where('product_category_id', $category->id)
+            ->with(['brand', 'category'])
+            ->orderBy('price', 'asc')
+            ->limit(5)
+            ->get()
+            ->map(function ($product) use ($category) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'image_url' => $product->image_url,
+                    'price' => $product->price,
+                    'discount_price' => $product->discount_price,
+                    'size_mg' => $product->size_mg,
+                    'availability' => $product->availability,
+                    'rating_average' => (float) ($product->rating_average ?? 0),
+                    'rating_count' => (int) ($product->rating_count ?? 0),
+                    'brand' => $product->brand ? [
+                        'name' => $product->brand->name,
+                    ] : null,
+                    'category' => $product->category ? [
+                        'name' => $product->category->name,
+                    ] : [
+                        'name' => $category->name,
+                    ],
+                ];
+            });
+
+        // Determine category tag - use education_tag from database, fallback to computed
+        $categoryTag = $category->education_tag ?? $this->getCategoryTag($category->name, $category->description);
+        
+        // Get title and full name
+        $title = $category->name;
+        $peptideFullName = $educationPost ? $educationPost->title : $category->description;
+
+        // Generate SEO data
+        $seoData = new SEOData(
+            title: $title . ' - Peptide Encyclopedia | PeptideSync',
+            description: ($educationPost ? $educationPost->description : $category->description) ? $this->safeLimit($educationPost ? $educationPost->description : $category->description, 160) : 'Comprehensive guide to ' . $title . ' research peptides.',
+            image: $image,
+            url: url("/encyclopedia/article/{$slug}"),
+        );
+        session(['page_seo_data' => $seoData]);
+
+        // Get comprehensive data for article detail page
+        $peptideData = [
+            'id' => $category->id,
+            'name' => $title,
+            'slug' => $category->slug,
+            'subtitle' => $peptideFullName,
+            'description' => $educationPost ? $educationPost->description : $category->description,
+            'image' => $image,
+            'categoryTag' => $categoryTag,
+            'keyBenefits' => $this->getKeyBenefits($category->name),
+            'quickFacts' => $this->getQuickFacts($category->name),
+            'commonUseCases' => $this->getCommonUseCases($category->name),
+            'howItWorks' => $this->getHowItWorks($category->name),
+            'dosage' => $this->getDosage($category->name),
+            'safetyInfo' => $this->getSafetyInfo($category->name),
+            'stackingRecommendations' => $this->getStackingRecommendations($category->name),
+            'faqs' => $this->getFaqs($category->name),
+            'userExperiences' => $this->getUserExperiences($category->name),
+            'products' => $products,
+            'researchStudies' => rand(30, 60),
+        ];
+
+        return Inertia::render('Frontend/EncyclopediaArticleDetail', $peptideData);
     }
 
     /**
