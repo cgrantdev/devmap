@@ -231,6 +231,8 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     
     // Users
     Route::get('/users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('admin.users.index');
+    Route::get('/users/{id}/edit', [\App\Http\Controllers\Admin\UsersController::class, 'edit'])->name('admin.users.edit');
+    Route::put('/users/{id}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])->name('admin.users.update');
     
     // Content
     Route::get('/content', [\App\Http\Controllers\Admin\ContentController::class, 'index'])->name('admin.content.index');

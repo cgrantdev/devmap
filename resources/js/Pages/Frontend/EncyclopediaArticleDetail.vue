@@ -450,7 +450,7 @@
                         v-for="(item, itemIndex) in subsection.items" 
                         :key="itemIndex"                      
                       >                      
-                        <span v-if="item.item"><strong>{{ item.item }}:</strong></span>
+                        <span v-if="item.item"><strong>{{ item.item }}: </strong></span>
                         <span v-if="item.description" v-html="item.description.replace(/\n/g, '<br>')"></span>
                         <span v-else-if="typeof item === 'string'">{{ item }}</span>
                       </li>
@@ -666,7 +666,10 @@
     
                   <!-- Important Note Warning Box -->
                   <div v-if="regulatoryImportantNote" class="bg-amber-50 border border-amber-200 rounded-lg p-5 mt-6">
-                    <p class="text-amber-900 text-sm leading-relaxed" v-html="regulatoryImportantNote.replace(/\n/g, '<br>')"></p>
+                    <p class="text-amber-900 text-sm leading-relaxed">
+                      <strong>Important Note: </strong>
+                      {{ regulatoryImportantNote }}
+                    </p>
                   </div>
                 </section>
 
@@ -885,37 +888,42 @@
                       class="bg-slate-50 border-l-4 border-slate-600 p-4 hover:bg-slate-100 transition-colors"
                     >
                       <p class="text-slate-700 mb-1">
-                        <strong>{{ index + 1 }}. {{ ref.authors }}, {{ ref.title }}</strong>
+                        <strong v-if="ref.authors && ref.authors.trim()">
+                          {{ index + 1 }}. {{ ref.authors }}, {{ ref.title }}
+                        </strong>
+                        <strong v-else>
+                          {{ index + 1 }}. {{ ref.title }}.
+                        </strong>
                       </p>
                       <p class="text-slate-600 mb-2">{{ ref.description }}</p>
                       <p class="text-xs text-slate-500">{{ ref.citation }}</p>
                       <div v-if="ref.links && ref.links.length > 0" class="flex flex-wrap gap-2 mt-2">
-                        <a 
+                      <a 
                           v-for="(link, linkIndex) in ref.links.filter(l => l.url && l.url.trim())" 
-                          :key="linkIndex"
+                        :key="linkIndex"
                           :href="processReferenceLink(link.url)"
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        target="_blank"
+                        rel="noopener noreferrer"
                           class="text-slate-600 hover:text-slate-900 flex items-center gap-1 transition-colors"
-                        >                      
-                          <svg                         
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="24" 
-                            height="24" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            stroke-width="2" 
-                            stroke-linecap="round" 
-                            stroke-linejoin="round"
-                            class="lucide lucide-external-link w-3 h-3"
-                          >
-                            <path d="M15 3h6v6"></path>
-                            <path d="M10 14 21 3"></path>
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                          </svg>
-                          {{ link.label || link.url }}
-                        </a>
+                      >                      
+                        <svg                         
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="24" 
+                          height="24" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          stroke-width="2" 
+                          stroke-linecap="round" 
+                          stroke-linejoin="round"
+                          class="lucide lucide-external-link w-3 h-3"
+                        >
+                          <path d="M15 3h6v6"></path>
+                          <path d="M10 14 21 3"></path>
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        </svg>
+                        {{ link.label || link.url }}
+                      </a>
                       </div>
                     </div>                  
                   </div>  
