@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
 use App\Models\Product;
+use App\Models\EducationPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -141,6 +142,43 @@ class EncyclopediaController extends Controller
             })->values();
         }
 
+        // Get all published encyclopedia entries (EducationPost)
+        $encyclopediaEntries = EducationPost::where('status', 'published')
+            ->with('category')
+            ->orderBy('title')
+            ->get()
+            ->filter(function ($entry) {
+                // Only include entries that have a category (for proper routing)
+                return $entry->category !== null;
+            })
+            ->map(function ($entry) {
+                $category = $entry->category;
+                
+                // Get tags - use entry tags if available, otherwise use education_tag
+                $tags = [];
+                if ($entry->tags && is_array($entry->tags)) {
+                    $tags = $entry->tags;
+                } elseif ($entry->tags) {
+                    $tags = json_decode($entry->tags, true) ?? [];
+                }
+                $categoryTag = !empty($tags) ? $tags[0] : ($entry->education_tag ?? 'Research Review');
+
+                // Use category slug for the route
+                $slug = $category ? $category->slug : ($entry->slug ?? '');
+
+                return [
+                    'id' => $entry->id,
+                    'title' => $entry->title ?? 'Untitled',
+                    'research_title' => $entry->research_title ?? ($entry->title ?? 'Untitled'),
+                    'research_outline' => $entry->research_outline ?? '',
+                    'slug' => $slug,
+                    'subtitle' => $entry->peptide_full_name ?? '',
+                    'description' => $entry->research_outline ?? $entry->overview ?? $entry->description ?? '',
+                    'categoryTag' => $categoryTag,
+                    'updated_at' => $entry->updated_at ? $entry->updated_at->format('M Y') : null,
+                ];
+            });
+
         // Generate SEO data
         $seoData = new SEOData(
             title: 'Peptide Encyclopedia - Comprehensive Research Guide | PeptideSync',
@@ -151,6 +189,7 @@ class EncyclopediaController extends Controller
 
         return Inertia::render('Frontend/Encyclopedia', [
             'peptides' => $categories,
+            'encyclopediaEntries' => $encyclopediaEntries->values(),
             'search' => $request->get('search', ''),
             'category' => $selectedCategory,
         ]);
@@ -504,42 +543,74 @@ class EncyclopediaController extends Controller
                 ];
             });
 
-        // Determine category tag - use education_tag from database, fallback to computed
-        $categoryTag = $category->education_tag ?? $this->getCategoryTag($category->name, $category->description);
+        // Determine category tag - use tags from education post, fallback to education_tag, then computed
+        $tags = [];
+        if ($educationPost && $educationPost->tags) {
+            $tags = is_array($educationPost->tags) ? $educationPost->tags : json_decode($educationPost->tags, true) ?? [];
+        }
+        $categoryTag = !empty($tags) ? $tags[0] : ($category->education_tag ?? $this->getCategoryTag($category->name, $category->description));
         
         // Get title and full name
-        $title = $category->name;
-        $peptideFullName = $educationPost ? $educationPost->title : $category->description;
+        $title = $educationPost && $educationPost->title ? $educationPost->title : $category->name;
+        $peptideFullName = $educationPost && $educationPost->peptide_full_name ? $educationPost->peptide_full_name : ($category->description ?? '');
 
         // Generate SEO data
         $seoData = new SEOData(
             title: $title . ' - Peptide Encyclopedia | PeptideSync',
-            description: ($educationPost ? $educationPost->description : $category->description) ? $this->safeLimit($educationPost ? $educationPost->description : $category->description, 160) : 'Comprehensive guide to ' . $title . ' research peptides.',
+            description: ($educationPost && $educationPost->overview) ? $this->safeLimit($educationPost->overview, 160) : (($educationPost && $educationPost->description) ? $this->safeLimit($educationPost->description, 160) : 'Comprehensive guide to ' . $title . ' research peptides.'),
             image: $image,
             url: url("/encyclopedia/article/{$slug}"),
         );
         session(['page_seo_data' => $seoData]);
 
-        // Get comprehensive data for article detail page
+        // Get comprehensive data for article detail page from database
         $peptideData = [
             'id' => $category->id,
             'name' => $title,
+            'categoryName' => $category->name,
             'slug' => $category->slug,
             'subtitle' => $peptideFullName,
-            'description' => $educationPost ? $educationPost->description : $category->description,
-            'image' => $image,
-            'categoryTag' => $categoryTag,
-            'keyBenefits' => $this->getKeyBenefits($category->name),
-            'quickFacts' => $this->getQuickFacts($category->name),
-            'commonUseCases' => $this->getCommonUseCases($category->name),
-            'howItWorks' => $this->getHowItWorks($category->name),
-            'dosage' => $this->getDosage($category->name),
-            'safetyInfo' => $this->getSafetyInfo($category->name),
-            'stackingRecommendations' => $this->getStackingRecommendations($category->name),
-            'faqs' => $this->getFaqs($category->name),
-            'userExperiences' => $this->getUserExperiences($category->name),
+            'tags' => $tags,
+            'primaryResearch' => [
+                'institution' => 'University of Zagreb (Croatia)',
+                'url' => $educationPost->research_url ?? '#'
+            ],
+            'molecularInfo' => [
+                'formula' => $educationPost->molecular_formula ?? '',
+                'molecularWeight' => $educationPost->molecular_weight ?? '',
+                'casNumber' => $educationPost->cas_registry_number ?? ''
+            ],
+            'aminoAcidSequence' => [
+                'residueCount' => $educationPost->amino_acid_sequence ? count(explode('-', $educationPost->amino_acid_sequence)) : 0,
+                'sequence' => $educationPost->amino_acid_sequence ?? '',
+                'composition' => [],
+                'properties' => [
+                    'netCharge' => $educationPost->amino_acid_net_charge ?? '',
+                    'hydrophobic' => $educationPost->amino_acid_hydrophobic ?? '',
+                    'stability' => $educationPost->amino_acid_stability ?? '',
+                    'solubility' => $educationPost->amino_acid_solubility ?? ''
+                ]
+            ],
+            'keyPoints' => $educationPost && $educationPost->key_points ? (is_array($educationPost->key_points) ? $educationPost->key_points : json_decode($educationPost->key_points, true) ?? []) : [],
+            'overview' => $educationPost->overview ?? '',
+            'areasOfResearch' => $educationPost && $educationPost->areas_of_research ? (is_array($educationPost->areas_of_research) ? $educationPost->areas_of_research : json_decode($educationPost->areas_of_research, true) ?? []) : [],
+            'areasOfResearchIntro' => $educationPost->areas_of_research_intro ?? '',
+            'background' => $educationPost->background ?? '',
+            'mechanismOfActionIntro' => $educationPost->mechanism_of_action_intro ?? '',
+            'mechanismSubsections' => $educationPost && $educationPost->mechanism_subsections ? (is_array($educationPost->mechanism_subsections) ? $educationPost->mechanism_subsections : json_decode($educationPost->mechanism_subsections, true) ?? []) : [],
+            'preclinicalIntro' => $educationPost->preclinical_intro ?? '',
+            'preclinicalSubsections' => $educationPost && $educationPost->preclinical_subsections ? (is_array($educationPost->preclinical_subsections) ? $educationPost->preclinical_subsections : json_decode($educationPost->preclinical_subsections, true) ?? []) : [],
+            'preclinicalDisclaimer' => $educationPost->preclinical_disclaimer ?? '',
+            'humanUseIntro' => $educationPost->human_use_intro ?? '',
+            'humanUseSubsections' => $educationPost && $educationPost->human_use_subsections ? (is_array($educationPost->human_use_subsections) ? $educationPost->human_use_subsections : json_decode($educationPost->human_use_subsections, true) ?? []) : [],
+            'regulatorySubsections' => $educationPost && $educationPost->regulatory_subsections ? (is_array($educationPost->regulatory_subsections) ? $educationPost->regulatory_subsections : json_decode($educationPost->regulatory_subsections, true) ?? []) : [],
+            'regulatoryImportantNote' => $educationPost->regulatory_important_note ?? '',
+            'potentialApplicationsIntro' => $educationPost->potential_applications_intro ?? '',
+            'potentialApplications' => $educationPost && $educationPost->potential_applications ? (is_array($educationPost->potential_applications) ? $educationPost->potential_applications : json_decode($educationPost->potential_applications, true) ?? []) : [],
+            'potentialApplicationsImportantContext' => $educationPost->potential_applications_important_context ?? '',
+            'conclusion' => $educationPost->conclusion ?? '',
+            'references' => $educationPost && $educationPost->references ? (is_array($educationPost->references) ? $educationPost->references : json_decode($educationPost->references, true) ?? []) : [],
             'products' => $products,
-            'researchStudies' => rand(30, 60),
         ];
 
         return Inertia::render('Frontend/EncyclopediaArticleDetail', $peptideData);

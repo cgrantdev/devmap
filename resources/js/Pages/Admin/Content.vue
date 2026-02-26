@@ -48,6 +48,16 @@
         <h3 class="text-lg text-slate-900 mb-2">Educational Guides</h3>
         <p class="text-sm text-slate-600">Edit educational guides</p>
       </Link>
+
+      <Link href="/admin/encyclopedia-entries" class="bg-white rounded-lg border-2 border-slate-200 hover:border-cyan-500 p-8 text-left transition-colors">
+        <svg class="w-12 h-12 text-cyan-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.453 15h11.094" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.5 2h7" />
+        </svg>
+        <h3 class="text-lg text-slate-900 mb-2">Encyclopedia Entries</h3>
+        <p class="text-sm text-slate-600">Edit encyclopedia entries</p>
+      </Link>
     </div>
   </AdminLayout>
 </template>

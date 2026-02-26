@@ -7,7 +7,7 @@
         {!! seo(session('page_seo_data')) !!}
         @php session()->forget('page_seo_data') @endphp
     @else
-        <title>{{ $title ?? 'PeptideSync' }}</title>
+        <title>PeptideSync</title>
     @endif
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

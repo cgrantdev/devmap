@@ -12,6 +12,9 @@ class EducationPost extends Model
 
     protected $fillable = [
         'title',
+        'research_title',
+        'research_outline',
+        'research_url',
         'slug',
         'description',
         'education_tag',
@@ -36,6 +39,35 @@ class EducationPost extends Model
         'published_at',
         'status',
         'product_category_id',
+        // New encyclopedia entry fields
+        'tags',
+        'molecular_formula',
+        'molecular_weight',
+        'cas_registry_number',
+        'amino_acid_sequence',
+        'amino_acid_net_charge',
+        'amino_acid_hydrophobic',
+        'amino_acid_stability',
+        'amino_acid_solubility',
+        'key_points',
+        'overview',
+        'areas_of_research',
+        'background',
+        'mechanism_of_action_intro',
+        'mechanism_subsections',
+        'preclinical_intro',
+        'preclinical_subsections',
+        'preclinical_disclaimer',
+        'human_use_intro',
+        'human_use_subsections',
+        'regulatory_subsections',
+        'regulatory_important_note',
+        'potential_applications_intro',
+        'potential_applications',
+        'potential_applications_important_context',
+        'conclusion',
+        'references',
+        'areas_of_research_intro',
     ];
 
     protected $casts = [
@@ -47,6 +79,16 @@ class EducationPost extends Model
         'contraindications' => 'array',
         'stacking_recommendations' => 'array',
         'faqs' => 'array',
+        // New encyclopedia entry casts
+        'tags' => 'array',
+        'key_points' => 'array',
+        'areas_of_research' => 'array',
+        'mechanism_subsections' => 'array',
+        'preclinical_subsections' => 'array',
+        'human_use_subsections' => 'array',
+        'regulatory_subsections' => 'array',
+        'potential_applications' => 'array',
+        'references' => 'array',
     ];
 
     public static function boot()
