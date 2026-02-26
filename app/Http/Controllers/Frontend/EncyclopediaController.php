@@ -44,7 +44,17 @@ class EncyclopediaController extends Controller
     public function index(Request $request)
     {
         // Get all active product categories with additional data
+        // Only include categories that have an education_post entry with research articles
         $query = ProductCategory::where('is_active', true)
+            ->whereHas('educationPost', function ($epQuery) {
+                $epQuery->where(function ($subQ) {
+                    $subQ->whereNotNull('research_url')
+                         ->where('research_url', '!=', '');
+                })->orWhere(function ($subQ) {
+                    $subQ->whereNotNull('research_title')
+                         ->where('research_title', '!=', '');
+                });
+            })
             ->withCount([
                 'products as products_count' => function ($q) {
                     $q->visible()->where('status', 'active');
@@ -94,10 +104,8 @@ class EncyclopediaController extends Controller
                 ? $educationPost->education_tag 
                 : $this->getCategoryTag($category->name, $category->description);
 
-            // Get title - use education post title if available, fallback to category name
-            $title = $educationPost && $educationPost->title 
-                ? $educationPost->title 
-                : $category->name;
+            // Get title - always use category name
+            $title = $category->name;
 
             // Get peptide full name - use from database, fallback to computed
             $peptideFullName = $educationPost && $educationPost->peptide_full_name 

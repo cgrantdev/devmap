@@ -91,7 +91,7 @@
                 <span class="text-sm text-slate-600">{{ formatDate(user.created_at) }}</span>
               </td>
               <td class="px-6 py-4">
-                <button class="text-blue-600 hover:text-blue-700 text-sm">
+                <button @click="openEditModal(user)" class="text-blue-600 hover:text-blue-700 text-sm">
                   Manage
                 </button>
               </td>
@@ -104,11 +104,79 @@
     <div v-if="filteredUsers.length === 0" class="bg-white rounded-lg border border-slate-200 p-6 text-center text-slate-500">
       No users found.
     </div>
+
+    <!-- Edit User Modal -->
+    <div
+      v-if="showEditModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      @click.self="closeEditModal"
+    >
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-slate-100">
+          <h2 class="text-2xl font-semibold text-slate-800">Edit User</h2>
+        </div>
+
+        <form @submit.prevent="submitEdit" class="p-6 space-y-6">
+          <div v-if="Object.keys(editForm.errors).length > 0" class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl">
+            <p class="font-medium">Please fix the following errors:</p>
+            <ul class="list-disc list-inside mt-2">
+              <li v-for="(error, field) in editForm.errors" :key="field" class="text-sm">
+                {{ Array.isArray(error) ? error[0] : error }}
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <label class="block mb-1.5 font-semibold text-slate-800">Name *</label>
+            <input v-model="editForm.name" type="text" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" required />
+          </div>
+
+          <div>
+            <label class="block mb-1.5 font-semibold text-slate-800">Email *</label>
+            <input v-model="editForm.email" type="email" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" required />
+          </div>
+
+          <div>
+            <label class="block mb-1.5 font-semibold text-slate-800">Password</label>
+            <input v-model="editForm.password" type="password" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" />
+            <p class="text-sm text-slate-500 mt-1">Leave blank to keep current password</p>
+          </div>
+
+          <div>
+            <label class="block mb-1.5 font-semibold text-slate-800">Role *</label>
+            <select v-model="editForm.role" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" required>
+              <option value="customer">Customer</option>
+              <option value="vendor">Vendor</option>
+              <option value="admin">Admin</option>
+            </select>
+            <p class="text-sm text-slate-500 mt-1">Select a role for this user</p>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            <button
+              type="button"
+              @click="closeEditModal"
+              class="px-6 py-2.5 border border-slate-300 rounded-xl hover:bg-slate-50 text-slate-700 font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              :disabled="editForm.processing"
+              class="px-6 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-medium transition-colors disabled:opacity-50"
+            >
+              {{ editForm.processing ? 'Saving...' : 'Update User' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </AdminLayout>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useForm, usePage, router } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 
 const props = defineProps({
@@ -120,6 +188,16 @@ const props = defineProps({
 
 const searchTerm = ref('')
 const filterRole = ref('all')
+const showEditModal = ref(false)
+const editingUser = ref(null)
+
+const editForm = useForm({
+  name: '',
+  email: '',
+  password: '',
+  role: 'customer',
+  _token: usePage().props.csrf_token
+})
 
 const filteredUsers = computed(() => {
   return props.users.filter(user => {
@@ -134,6 +212,35 @@ function formatDate(dateString) {
   if (!dateString) return ''
   const date = new Date(dateString)
   return date.toLocaleDateString()
+}
+
+function openEditModal(user) {
+  editingUser.value = user
+  editForm.name = user.name || ''
+  editForm.email = user.email || ''
+  editForm.password = ''
+  editForm.role = user.role || 'customer'
+  editForm.clearErrors()
+  showEditModal.value = true
+}
+
+function closeEditModal() {
+  showEditModal.value = false
+  editingUser.value = null
+  editForm.reset()
+  editForm.clearErrors()
+}
+
+function submitEdit() {
+  if (!editingUser.value) return
+
+  editForm.put(`/admin/users/${editingUser.value.id}`, {
+    preserveScroll: true,
+    onSuccess: () => {
+      closeEditModal()
+      router.reload({ only: ['users'] })
+    }
+  })
 }
 </script>
 

@@ -69,20 +69,20 @@ return [
          *
          * For example, if you have a page with the url '/foo/about-me', we'll automatically set the title to 'About me' and append the site suffix.
          */
-        'infer_title_from_url' => true,
+        'infer_title_from_url' => false,
 
         /**
          * Use this setting to provide a suffix that will be added after the title on each page.
          * If you don't want a suffix, you should specify an empty string.
          */
-        'suffix' => ' | PeptideSync',
+        'suffix' => '',
 
         /**
          * Use this setting to provide a custom title for the homepage. We will not use the suffix on the homepage,
          * so you'll need to add the suffix manually if you want that. If set to null, we'll determine the title
          * just like the other pages.
          */
-        'homepage_title' => null,
+        'homepage_title' => 'PeptideSync',
     ],
 
     'description' => [
