@@ -76,7 +76,7 @@
         </p>
       </div>
 
-      <div class="mb-12 bg-white border border-slate-200 rounded-lg p-6">
+      <div v-if="encyclopediaEntries && encyclopediaEntries.length > 0" class="mb-12 bg-white border border-slate-200 rounded-lg p-6">
         <div class="flex items-center gap-3 mb-6">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class= "lucide lucide-book-open w-6 h-6 text-slate-700" aria-hidden="true">
             <path d="M12 7v14"></path>
@@ -86,20 +86,22 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button 
-            @click="router.visit('/encyclopedia/article/bpc-157')"
+            v-for="entry in encyclopediaEntries"
+            :key="entry.id"
+            @click="router.visit(`/encyclopedia/article/${entry.slug}`)"
             class="group bg-slate-50 border border-slate-200 rounded-lg p-5 hover:border-slate-400 hover:shadow-lg transition-all text-left"
           >
             <div class="flex items-start justify-between mb-3">
-              <div class="bg-slate-700 text-white text-xs px-3 py-1 rounded-full">Research Review</div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-4 h-4 text-slate-400 group-hover: text-slate-700 transition-colors" aria-hidden="true">
+              <div class="bg-slate-700 text-white text-xs px-3 py-1 rounded-full">{{ 'Research Review' }}</div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors" aria-hidden="true">
                 <path d="M15 3h6v6"></path>
                 <path d="M10 14 21 3"></path>
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-slate-900 mb-2 group-hover:text-slate-700 transition-colors">BPC-157: A Comprehensive Research Overview</h3>
+            <h3 class="text-lg font-semibold text-slate-900 mb-2 group-hover:text-slate-700 transition-colors">{{ entry.research_title || entry.title }}</h3>
             <p class="text-sm text-slate-600 mb-4 line-clamp-2">
-              An in-depth analysis of Body Protection Compound-157, covering mechanisms of action, preclinical research findings, human evidence, regulatory status, and potential therapeutic applications.
+              {{ entry.research_outline || entry.description || entry.subtitle || 'Read the full research article for comprehensive information.' }}
             </p>
             <div class="flex items-center gap-4 text-xs text-slate-500">
               <span class="flex items-center gap-1">
@@ -109,7 +111,7 @@
                 </svg>
                 Full Article
               </span>
-              <span>Updated Feb 2026</span>
+              <span v-if="entry.updated_at">Updated {{ entry.updated_at }}</span>
             </div>
           </button>
         </div>
@@ -151,6 +153,10 @@ import EncyclopediaCard from '@/components/EncyclopediaCard.vue'
 
 const props = defineProps({
   peptides: {
+    type: Array,
+    default: () => []
+  },
+  encyclopediaEntries: {
     type: Array,
     default: () => []
   },

@@ -27,7 +27,7 @@
                 </svg>
               </div>
               <div>
-                <h1 class="text-5xl font-semibold text-white mb-2">{{ name }}</h1>
+                <h1 class="text-5xl font-semibold text-white mb-2">{{ categoryName || name }}</h1>
                 <p class="text-xl text-slate-200">{{ subtitle }}</p>
               </div>
             </div>
@@ -39,7 +39,8 @@
                 <span 
                   v-for="(tag, index) in tags" 
                   :key="index"
-                  class="px-3 py-1 bg-blue-500/20 text-blue-100 border border-blue-400/30 rounded-full text-sm font-medium backdrop-blur-sm"
+                  :class="getTagColorClass(tag)"
+                  class="px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm"
                 >
                   {{ tag }}
                 </span>
@@ -77,15 +78,15 @@
               <div class="space-y-4">
                 <div>
                   <div class="text-white/60 text-xs mb-1">Formula</div>
-                  <div class="text-white font-mono text-xl">C₆₂H₉₈N₁₆O₂₂</div>
+                  <div class="text-white font-mono text-xl">{{ molecularInfo.formula || '-' }}</div>
                 </div>
                 <div>
                   <div class="text-white/60 text-xs mb-1">Molecular Weight</div>
-                  <div class="text-white font-semibold text-xl">1,419.53 g/mol</div>
+                  <div class="text-white font-semibold text-xl">{{ molecularInfo.molecularWeight || '-' }}</div>
                 </div>
                 <div>
                   <div class="text-white/60 text-xs mb-1">CAS Registry Number</div>
-                  <div class="text-white font-mono text-xl">137525-51-0</div>
+                  <div class="text-white font-mono text-xl">{{ molecularInfo.casNumber || '-' }}</div>
                 </div>
               </div>
             </div>
@@ -104,58 +105,30 @@
                   <path d="m7 18 2.891 2.891"></path>
                   <path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"></path>
                 </svg>
-                Amino Acid Sequence (15 Residues)
+                Amino Acid Sequence{{ aminoAcidSequence.residueCount > 0 ? ` (${aminoAcidSequence.residueCount} Residues)` : '' }}
               </h3>
-              <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+              <div v-if="aminoAcidSequence.sequence" class="bg-white/5 rounded-lg p-4 border border-white/10">
                 <p class="text-white font-mono text-sm leading-relaxed">
-                  <span class="text-slate-200">Gly</span>
-                  -
-                  <span class="text-slate-200">Glu</span>
-                  -
-                  <span class="text-slate-200">Pro</span>
-                  -
-                  <span class="text-slate-200">Pro</span>
-                  -
-                  <span class="text-slate-200">Pro</span>
-                  -
-                  <span class="text-slate-200">Gly</span>
-                  -
-                  <span class="text-slate-200">Lys</span>
-                  -
-                  <span class="text-slate-200">Pro</span>
-                  -
-                  <span class="text-slate-200">Ala</span>
-                  -
-                  <span class="text-slate-200">Asp</span>
-                  -
-                  <span class="text-slate-200">Asp</span>
-                  -
-                  <span class="text-slate-200">Ala</span>
-                  -
-                  <span class="text-slate-200">Gly</span>
-                  -
-                  <span class="text-slate-200">Leu</span>
-                  -
-                  <span class="text-slate-200">Val</span>                  
+                  {{ aminoAcidSequence.sequence }}
                 </p>
               </div>
+              <div v-else class="bg-white/5 rounded-lg p-4 border border-white/10">
+                <p class="text-white/60 text-sm">No sequence data available</p>
+              </div>
               <div class="grid grid-cols-2 gap-4 mt-4">
-                <div>
+                <div v-if="aminoAcidComposition && aminoAcidComposition.length > 0">
                   <div class="text-white/60 text-xs mb-2">Composition</div>
                   <div class="space-y-1 text-xs">
-                    <div class="text-white/80">Glycine (Gly): 3</div>
-                    <div class="text-white/80">Proline (Pro): 4</div>
-                    <div class="text-white/80">Aspartic Acid (Asp): 2</div>
-                    <div class="text-white/80">Alanine (Ala): 2</div>
+                    <div v-for="(comp, index) in aminoAcidComposition" :key="index" class="text-white/80">{{ comp }}</div>
                   </div>
                 </div>
-                <div>
+                <div v-if="aminoAcidSequence.properties && (aminoAcidSequence.properties.netCharge || aminoAcidSequence.properties.hydrophobic || aminoAcidSequence.properties.stability || aminoAcidSequence.properties.solubility)">
                   <div class="text-white/60 text-xs mb-2">Properties</div>
                   <div class="space-y-1 text-xs">
-                    <div class="text-white/80">Net Charge: -2 (at pH 7)</div>
-                    <div class="text-white/80">Hydrophobic: 40%</div>
-                    <div class="text-white/80">Stability: High</div>
-                    <div class="text-white/80">Solubility: Water soluble</div>
+                    <div v-if="aminoAcidSequence.properties.netCharge" class="text-white/80">Net Charge: {{ aminoAcidSequence.properties.netCharge }}</div>
+                    <div v-if="aminoAcidSequence.properties.hydrophobic" class="text-white/80">Hydrophobic: {{ aminoAcidSequence.properties.hydrophobic }}</div>
+                    <div v-if="aminoAcidSequence.properties.stability" class="text-white/80">Stability: {{ aminoAcidSequence.properties.stability }}</div>
+                    <div v-if="aminoAcidSequence.properties.solubility" class="text-white/80">Solubility: {{ aminoAcidSequence.properties.solubility }}</div>
                   </div>
                 </div>
               </div>
@@ -263,7 +236,7 @@
                     :key="index"
                     class="flex items-start gap-3 group"
                   >
-                    <div class="w-2 h-2 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mt-2 flex-shrink-0 group-hover:scale-125 transition-transform"></div>
+                    <div :class="`w-2 h-2 rounded-full bg-gradient-to-br ${getKeyPointColorClass(index)} mt-2 flex-shrink-0 group-hover:scale-125 transition-transform`"></div>
                     <span class="text-slate-700 leading-relaxed">{{ point }}</span>
                   </li>
                 </ul>
@@ -282,7 +255,7 @@
                   <div>
                     <h3 class="font-semibold text-amber-900 mb-1">Research Use Only</h3>
                     <p class="text-sm text-amber-800 leading-relaxed">
-                      BPC-157 is an experimental compound not approved for human use by any regulatory agency. This article is for informational and educational purposes only and does not constitute medical advice. Peptidemaps does not provide recommendations on safety, usage, or dosages.
+                      {{ name }} is an experimental compound not approved for human use by any regulatory agency. This article is for informational and educational purposes only and does not constitute medical advice. Peptidemaps does not provide recommendations on safety, usage, or dosages.
                     </p>
                   </div>
                 </div>
@@ -292,7 +265,7 @@
                 <!-- Overview -->
                 <section id="overview" class="mb-12">
                   <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
-                    <div class="">
+                    <div class="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-stethoscope w-5 h-5 text-white" aria-hidden="true">
                         <path d="M11 2v2"></path>
                         <path d="M5 2v2"></path>
@@ -303,14 +276,8 @@
                     </div>
                     <h2 class="text-2xl font-semibold text-slate-900 m-0">Overview</h2>
                   </div>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    BPC-157 (Body Protection Compound-157) is a synthetic peptide composed of 15 amino acids (a pentadecapeptide) that has garnered significant attention in preclinical research for its potential healing properties. 
-                    The peptide's amino acid sequence (Gly-Glu-Pro-Pro-Pro-Gly-Lys-Pro-Ala-Asp-Asp-Ala-Gly-Leu-Val) does not match any naturally occurring peptide in the gut, yet it was isolated as a stable fragment from human gastric juice.
-                  </p>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    The peptide has demonstrated remarkable stability in harsh environments, remaining intact in gastric acid and water for extended periods. Research shows it can survive over 24 hours in human gastric juice, 
-                    which is unusual for peptides. With a molecular weight of approximately 1,419 Daltons, BPC-157 has been investigated as a potential drug candidate for various injuries and disorders, though it remains in experimental stages.
-                  </p>
+                  <div v-if="overview" class="text-slate-700 leading-relaxed mb-4" v-html="overview.replace(/\n/g, '<br>')"></div>
+                  <p v-else class="text-slate-700 leading-relaxed mb-4">No overview available.</p>
                 </section>
 
                 <!-- Sponsored Advertisement -->
@@ -345,100 +312,30 @@
                     </div>
                     <h2 class="text-2xl font-semibold text-slate-900 m-0">Areas of Research</h2>
                   </div>
-                  <p class="text-slate-700 leading-relaxed mb-6">
-                    BPC-157 has been studied across multiple research domains in preclinical models. The following areas represent the primary focus of scientific investigation:
-                  </p>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <p v-if="areasOfResearchIntro" class="text-slate-700 leading-relaxed mb-6" v-html="areasOfResearchIntro.replace(/\n/g, '<br>')"></p>
+                  <div v-if="areasOfResearch && areasOfResearch.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div 
                       v-for="(area, index) in areasOfResearch" 
                       :key="index"
-                      :class="[
-                        'rounded-lg border p-5 hover:shadow-lg transition-all duration-300 group',
-                        area.color === 'blue' ? 'border-blue-200 bg-blue-50' : '',
-                        area.color === 'emerald' ? 'border-emerald-200 bg-emerald-50' : '',
-                        area.color === 'rose' ? 'border-rose-200 bg-rose-50' : '',
-                        area.color === 'purple' ? 'border-purple-200 bg-purple-50' : '',
-                        area.color === 'amber' ? 'border-amber-200 bg-amber-50' : '',
-                        area.color === 'cyan' ? 'border-cyan-200 bg-cyan-50' : '',
-                        !area.color ? 'border-gray-200 bg-gray-50' : ''
-                      ]"
+                      :class="`rounded-lg border ${getAreaColorClasses(area.name).border} bg-gray-50 p-5 hover:shadow-lg transition-all duration-300 group`"
                     >
                       <div class="flex items-start gap-4">
                         <!-- Icon -->
-                        <div 
-                          :class="[
-                            'p-3 bg-gradient-to-br rounded-lg flex-shrink-0 group-hover:scale-110 transition-transform',
-                            area.color === 'blue' ? 'from-blue-500 to-blue-600' : '',
-                            area.color === 'emerald' ? 'from-emerald-500 to-emerald-600' : '',
-                            area.color === 'rose' ? 'from-rose-500 to-rose-600' : '',
-                            area.color === 'purple' ? 'from-purple-500 to-purple-600' : '',
-                            area.color === 'amber' ? 'from-amber-500 to-amber-600' : '',
-                            area.color === 'cyan' ? 'from-cyan-500 to-cyan-600' : '',
-                            !area.color ? 'from-gray-500 to-gray-600' : ''
-                          ]"
-                        >
-                          <svg 
-                            v-if="area.icon === 'bone'"
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="24" 
-                            height="24" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="white" 
-                            stroke-width="2" 
-                            stroke-linecap="round" 
-                            stroke-linejoin="round"
-                            class="lucide lucide-bone w-6 h-6 text-white"
-                            aria-hidden="true"
-                          >
+                        <div :class="`p-3 bg-gradient-to-br ${getAreaColorClasses(area.name).iconBg} rounded-lg flex-shrink-0 group-hover:scale-110 transition-transform`">
+                          <!-- Bone Icon (Orthopedic) -->
+                          <svg v-if="getAreaIconType(area.name) === 'bone'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bone w-6 h-6 text-white" aria-hidden="true">
                             <path d="M17 10c.7-.7 1.69 0 2.5 0a2.5 2.5 0 1 0 0-5 .5.5 0 0 1-.5-.5 2.5 2.5 0 1 0-5 0c0 .81.7 1.8 0 2.5l-7 7c-.7.7-1.69 0-2.5 0a2.5 2.5 0 0 0 0 5c.28 0 .5.22.5.5a2.5 2.5 0 1 0 5 0c0-.81-.7-1.8 0-2.5Z"></path>
                           </svg>
-                          <svg 
-                            v-else-if="area.icon === 'heartbeat'"
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="24" 
-                            height="24" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="white" 
-                            stroke-width="2" 
-                            stroke-linecap="round" 
-                            stroke-linejoin="round"
-                            class="lucide lucide-activity w-6 h-6 text-white"
-                            aria-hidden="true"
-                          >
+                          <!-- Heartbeat Icon (Wound Healing) -->
+                          <svg v-else-if="getAreaIconType(area.name) === 'heartbeat'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-activity w-6 h-6 text-white" aria-hidden="true">
                             <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path>
                           </svg>
-                          <svg 
-                            v-else-if="area.icon === 'heart'"
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="24" 
-                            height="24" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="white" 
-                            stroke-width="2" 
-                            stroke-linecap="round" 
-                            stroke-linejoin="round"
-                            class="lucide lucide-heart w-6 h-6 text-white"
-                            aria-hidden="true"
-                          >
+                          <!-- Heart Icon (Gastrointestinal) -->
+                          <svg v-else-if="getAreaIconType(area.name) === 'heart'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart w-6 h-6 text-white" aria-hidden="true">
                             <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"></path>
                           </svg>
-                          <svg 
-                            v-else-if="area.icon === 'brain'"
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="24" 
-                            height="24" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="white" 
-                            stroke-width="2" 
-                            stroke-linecap="round" 
-                            stroke-linejoin="round"
-                            class="lucide lucide-brain w-6 h-6 text-white"
-                            aria-hidden="true"
-                          >
+                          <!-- Brain Icon (Neuroprotection) -->
+                          <svg v-else-if="getAreaIconType(area.name) === 'brain'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain w-6 h-6 text-white" aria-hidden="true">
                             <path d="M12 18V5"></path>
                             <path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"></path>
                             <path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"></path>
@@ -448,63 +345,28 @@
                             <path d="M6 18a4 4 0 0 1-2-7.464"></path>
                             <path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"></path>
                           </svg>
-                          <svg 
-                            v-else-if="area.icon === 'shield'"
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="24" 
-                            height="24" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="white" 
-                            stroke-width="2" 
-                            stroke-linecap="round" 
-                            stroke-linejoin="round"
-                            class="lucide lucide-shield w-6 h-6 text-white"
-                            aria-hidden="true"
-                          >
+                          <!-- Shield Icon (Anti-Inflammatory) -->
+                          <svg v-else-if="getAreaIconType(area.name) === 'shield'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield w-6 h-6 text-white" aria-hidden="true">
                             <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>
                           </svg>
-                          <svg 
-                            v-else-if="area.icon === 'zap'"
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="24" 
-                            height="24" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="white" 
-                            stroke-width="2" 
-                            stroke-linecap="round" 
-                            stroke-linejoin="round"
-                            class="lucide lucide-zap w-6 h-6 text-white"
-                            aria-hidden="true"
-                          >
+                          <!-- Zap/Lightning Icon (Angiogenesis) -->
+                          <svg v-else-if="getAreaIconType(area.name) === 'zap'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap w-6 h-6 text-white" aria-hidden="true">
                             <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path>
                           </svg>
-                          <svg 
-                            v-else
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="24" 
-                            height="24" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="white" 
-                            stroke-width="2" 
-                            stroke-linecap="round" 
-                            stroke-linejoin="round"
-                            class="lucide lucide-circle w-6 h-6 text-white"
-                            aria-hidden="true"
-                          >
+                          <!-- Default Circle Icon -->
+                          <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide w-6 h-6 text-white" aria-hidden="true">
                             <circle cx="12" cy="12" r="10"></circle>
                           </svg>
                         </div>
                         <!-- Content -->
                         <div>
-                          <h3 class="font-semibold text-cyan-700 mb-2">Angiogenesis</h3>
-                          <p class="text-sm text-slate-600 leading-relaxed">New blood vessel formation and improved circulation</p>
+                          <h3 v-if="area.name" :class="`font-semibold ${getAreaColorClasses(area.name).text} mb-2`">{{ area.name }}</h3>
+                          <p v-if="area.description" class="text-sm text-slate-600 leading-relaxed" v-html="area.description.replace(/\n/g, '<br>')"></p>
                         </div>
                       </div>
                     </div>
                   </div>
+                  <p v-else class="text-slate-700 leading-relaxed mb-6">No research areas available.</p>
                   <!-- Research Note -->
                   <div class="mt-6 bg-slate-50 border border-slate-200 rounded-lg p-5">
                     <div class="flex items-start gap-3">
@@ -533,20 +395,10 @@
                         <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
                       </svg>
                     </div>
-                    <h2 class="text-2xl font-semibold text-slate-900 m-0">Background: What is BPC-157?</h2>
+                    <h2 class="text-2xl font-semibold text-slate-900 m-0">Background{{ subtitle ? ': ' + subtitle : '' }}</h2>
                   </div>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    BPC-157 was originally discovered in human gastric juice during gastroenterology research. In simple terms, a peptide is a short chain of amino acids – the building blocks of proteins. 
-                    This particular peptide has been nicknamed the "body protection compound" in research circles due to the broad protective effects observed on the body's tissues in laboratory studies.
-                  </p>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    Unlike many peptides that are quickly broken down by digestive enzymes, BPC-157 demonstrates exceptional stability. This characteristic means the peptide could potentially be administered orally and still exert effects, unlike most peptides that must be given by injection. 
-                    In rodent studies, BPC-157 proved effective when administered through various routes including intramuscular and intravenous injection, demonstrating bioavailability and activity in the body.
-                  </p>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    It's important to clarify that BPC-157 is an experimental compound. It is not approved as a medication by regulatory agencies and is officially designated for research use only at present. 
-                    Despite this regulatory status, interest in BPC-157 has grown substantially due to promising early research findings in preclinical models.
-                  </p>
+                  <div v-if="background" class="text-slate-700 leading-relaxed mb-4" v-html="background.replace(/\n/g, '<br>')"></div>
+                  <p v-else class="text-slate-700 leading-relaxed mb-4">No background information available.</p>
                 </section>
 
                 <!-- Mechanism of Action -->
@@ -560,10 +412,7 @@
                     <h2 class="text-2xl font-semibold text-slate-900 m-0">Mechanism of Action</h2>
                   </div>                
                   <!-- Introductory Paragraph -->
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    BPC-157 appears to act on a wide range of biological pathways to protect and heal tissues. In scientific terms, it's often described as having "pleiotropic" effects – meaning it produces many different beneficial actions in the body. 
-                    Key mechanisms identified in preclinical research include promoting blood vessel growth, supporting cell survival, reducing inflammation, and influencing the nervous system.
-                  </p>
+                  <p v-if="mechanismOfActionIntro" class="text-slate-700 leading-relaxed mb-4" v-html="mechanismOfActionIntro.replace(/\n/g, '<br>')"></p>
                     
                   <!-- Subsections -->
                   <div 
@@ -571,54 +420,15 @@
                     :key="index"                  
                   >
                     <!-- Subsection Title -->
-                    <h3 class="text-xl font-semibold text-slate-900 mb-3 mt-6 flex items-center gap-2">
-                      <svg 
-                        v-if="subsection.icon === 'arrow-up'"
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="20" 
-                        height="20" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        stroke-width="2" 
-                        stroke-linecap="round" 
-                        stroke-linejoin="round"
-                        class="lucide lucide-trending-up w-5 h-5 text-emerald-600"
-                        aria-hidden="true"
-                      >
+                    <h3 v-if="subsection.title" class="text-xl font-semibold text-slate-900 mb-3 mt-6 flex items-center gap-2">
+                      <svg v-if="subsection.title=== 'Pro-Healing Pathways'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up w-5 h-5 text-emerald-600" aria-hidden="true">
                         <path d="M16 7h6v6"></path>
                         <path d="m22 7-8.5 8.5-5-5L2 17"></path>
                       </svg>
-                      <svg 
-                        v-else-if="subsection.icon === 'shield'"
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="20" 
-                        height="20" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        stroke-width="2" 
-                        stroke-linecap="round" 
-                        stroke-linejoin="round"
-                        class="lucide lucide-shield w-5 h-5 text-amber-600"
-                        aria-hidden="true"
-                      >
+                      <svg v-else-if="subsection.title === 'Anti-Inflammatory Actions'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield w-5 h-5 text-amber-600" aria-hidden="true">
                         <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>
                       </svg>
-                      <svg 
-                        v-else-if="subsection.icon === 'brain'"
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="20" 
-                        height="20" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        stroke-width="2" 
-                        stroke-linecap="round" 
-                        stroke-linejoin="round"
-                        class="lucide lucide-brain w-5 h-5 text-purple-600"
-                        aria-hidden="true"
-                      >
+                      <svg v-else-if="subsection.title === 'Neuroprotective Properties'" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain w-5 h-5 text-purple-600" aria-hidden="true">
                         <path d="M12 18V5"></path>
                         <path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"></path>
                         <path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"></path>
@@ -628,22 +438,21 @@
                         <path d="M6 18a4 4 0 0 1-2-7.464"></path>
                         <path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"></path>
                       </svg>
-                      Pro-Healing Pathways
+                      {{ subsection.title }}
                     </h3>
   
                     <!-- Subsection Intro -->
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                      Research has shown that BPC-157 increases several growth-related mediators in preclinical models:
-                    </p>
+                    <p v-if="subsection.intro" class="text-slate-700 leading-relaxed mb-4" v-html="subsection.intro.replace(/\n/g, '<br>')"></p>
   
                     <!-- Bullet Points -->
-                    <ul class="list-disc pl-6 mb-4 space-y-2 text-slate-700">
+                    <ul v-if="subsection.items && subsection.items.length > 0" class="list-disc pl-6 mb-4 space-y-2 text-slate-700">
                       <li 
                         v-for="(item, itemIndex) in subsection.items" 
                         :key="itemIndex"                      
                       >                      
-                       <strong>VEGF (Vascular Endothelial Growth Factor):</strong>
-                        Promotes new blood vessel formation (angiogenesis), crucial for delivering nutrients and oxygen to damaged tissues
+                        <span v-if="item.item"><strong>{{ item.item }}:</strong></span>
+                        <span v-if="item.description" v-html="item.description.replace(/\n/g, '<br>')"></span>
+                        <span v-else-if="typeof item === 'string'">{{ item }}</span>
                       </li>
                     </ul>
                   </div>                
@@ -683,9 +492,7 @@
                   </div>
     
                   <!-- Introductory Paragraph -->
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    Although human data are limited, preclinical studies in animals and cell cultures have revealed notable findings across multiple organ systems. Researchers have tested BPC-157 in models of tissue injury, inflammatory diseases, and neurological disorders.
-                  </p>
+                  <p v-if="preclinicalIntro" class="text-slate-700 leading-relaxed mb-6" v-html="preclinicalIntro.replace(/\n/g, '<br>')"></p>
                     
                   <!-- Subsections -->
                   <div 
@@ -695,10 +502,10 @@
                     <!-- Subsection Title -->
                     <h3 class="text-xl font-semibold text-slate-900 mb-3 mt-6 flex items-center gap-2">
                       <svg 
-                        v-if="subsection.icon === 'wrench'"
+                        v-if="getPreclinicalIconType(subsection) === 'bone'"
                         xmlns="http://www.w3.org/2000/svg" 
-                        width="20" 
-                        height="20" 
+                        width="24" 
+                        height="24" 
                         viewBox="0 0 24 24" 
                         fill="none" 
                         stroke="currentColor" 
@@ -711,26 +518,26 @@
                         <path d="M17 10c.7-.7 1.69 0 2.5 0a2.5 2.5 0 1 0 0-5 .5.5 0 0 1-.5-.5 2.5 2.5 0 1 0-5 0c0 .81.7 1.8 0 2.5l-7 7c-.7.7-1.69 0-2.5 0a2.5 2.5 0 0 0 0 5c.28 0 .5.22.5.5a2.5 2.5 0 1 0 5 0c0-.81-.7-1.8 0-2.5Z"></path>
                       </svg>
                       <svg 
-                        v-else-if="subsection.icon === 'heart'"
+                        v-else-if="getPreclinicalIconType(subsection) === 'heart'"
                         xmlns="http://www.w3.org/2000/svg" 
-                        width="20" 
-                        height="20" 
+                        width="24" 
+                        height="24" 
                         viewBox="0 0 24 24" 
                         fill="none" 
                         stroke="currentColor" 
                         stroke-width="2" 
                         stroke-linecap="round" 
                         stroke-linejoin="round"
-                        class="text-pink-600"
+                        class="lucide lucide-heart w-5 h-5 text-rose-600"
                         aria-hidden="true"
                       >
                         <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"></path>
                       </svg>
                       <svg 
-                        v-else-if="subsection.icon === 'brain'"
+                        v-else-if="getPreclinicalIconType(subsection) === 'brain'"
                         xmlns="http://www.w3.org/2000/svg" 
-                        width="20" 
-                        height="20" 
+                        width="24" 
+                        height="24" 
                         viewBox="0 0 24 24" 
                         fill="none" 
                         stroke="currentColor" 
@@ -752,12 +559,8 @@
                       :key="findingIndex"
                       :class="[
                         'rounded-lg border p-5 mb-4',
-                        subsection.color === 'blue' ? 'border-blue-200 bg-blue-50' : '',
-                        subsection.color === 'rose' ? 'border-rose-200 bg-rose-50' : '',
-                        subsection.color === 'emerald' ? 'border-emerald-200 bg-emerald-50' : '',
-                        subsection.color === 'purple' ? 'border-purple-200 bg-purple-50' : '',
-                        subsection.color === 'amber' ? 'border-amber-200 bg-amber-50' : '',
-                        !subsection.color ? 'border-gray-200 bg-gray-50' : ''
+                        getPreclinicalFindingColorClasses(subsection, findingIndex).border,
+                        getPreclinicalFindingColorClasses(subsection, findingIndex).bg
                       ]"
                     >
                       <h4 class="font-semibold text-slate-900 mb-2">{{ finding.title }}</h4>
@@ -773,13 +576,12 @@
     
                   <!-- Disclaimer -->
                   <p class="text-slate-700 leading-relaxed mt-6 mb-4">
-                    Across preclinical studies, BPC-157 has repeatedly demonstrated abilities in animal models that span multiple tissue types. However, 
-                    it's crucial to remember that these are early-stage findings, and positive results in animals do not guarantee the same will occur in humans.
+                    {{ preclinicalDisclaimer }}
                   </p>                
                 </section>
 
                 <!-- Human Use & Evidence -->
-                <section id="human-use-evidence" class="mb-12">
+                <section v-if="humanUseIntro || (humanUseSubsections && humanUseSubsections.length > 0)" id="human-use-evidence" class="mb-12">
                   <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
                     <div class="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users w-5 h-5 text-white" aria-hidden="true">
@@ -793,49 +595,28 @@
                   </div>
     
                   <!-- Introductory Paragraph -->
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    Despite the lack of formal approval, BPC-157 has made its way into experimental use, largely driven by compelling preclinical data. 
-                    It's important to emphasize: there are no large-scale, definitive clinical trials of BPC-157 in humans yet, and any use outside of research is considered off-label and unapproved.
-                  </p>                
+                  <p v-if="humanUseIntro" class="text-slate-700 leading-relaxed mb-4" v-html="humanUseIntro.replace(/\n/g, '<br>')"></p>                
     
                   <!-- Subsections -->
-                  <h3 class="text-xl font-semibold text-slate-900 mb-3 mt-6">Pilot Safety Studies</h3>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    To date, only minimal human testing has been published. A recent pilot study in 2025 administered BPC-157 intravenously to two healthy adult volunteers to assess safety.
-                     The participants received 10 mg on the first day and 20 mg on the second day by slow infusion. The results were encouraging in terms of safety: no adverse effects were observed, and detailed blood tests showed no harmful changes in liver, kidney, heart, or metabolic function after the infusions.
-                  </p>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    While this finding supports the idea that BPC-157 may be safe in the short term, the sample size was only two people – far too small to draw broad conclusions. More rigorous safety trials with larger participant groups are needed to confirm safety in humans.
-                  </p>
-                  <h3 class="text-xl font-semibold text-slate-900 mb-3 mt-6">Anecdotal Clinical Use</h3>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    In the absence of official trials, some healthcare practitioners (particularly in sports medicine or integrative medicine) have experimented with BPC-157 as an off-label therapy. For example:
-                  </p>
-                  <ul class="list-disc pl-6 mb-4 space-y-2 text-slate-700">
-                    <li>
-                      A physician-authored report described 12 patients with knee injuries or osteoarthritis who received BPC-157 injections into the knee joint, with 11 of 12 reporting improvements. However, this was not a controlled study with no placebo group, and outcomes were based on patient self-reports.
-                    </li>
-                    <li>
-                      A small pilot trial at a private clinic treated women suffering from chronic bladder pain by injecting BPC-157 into the bladder wall, noting symptom relief and no immediate side effects. This too lacked a control group and was an open-label observation.
-                    </li>
+                  <template v-for="(subsection, index) in humanUseSubsections" :key="index">
+                    <h3 v-if="subsection.title" class="text-xl font-semibold text-slate-900 mb-3 mt-6">{{ subsection.title }}</h3>
+                    <div v-if="subsection.entries && subsection.entries.length > 0" class="mb-4">
+                      <template v-for="(processedEntry, entryIndex) in processEntries(subsection.entries)" :key="entryIndex">
+                        <!-- Render grouped items as a list -->
+                        <ul v-if="processedEntry.type === 'item-group'" class="list-disc pl-6 mb-4 space-y-2 text-slate-700">
+                          <li v-for="(item, itemIndex) in processedEntry.items" :key="itemIndex" v-html="item.replace(/\n/g, '<br>')"></li>
                   </ul>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    Such reports must be viewed cautiously, as they are not the gold standard evidence required for medical approval. They do, however, suggest interest in exploring BPC-157's potential despite the unknowns.
-                  </p>
-                  <h3 class="text-xl font-semibold text-slate-900 mb-3 mt-6">Unpublished Clinical Trial</h3>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    A formal Phase I clinical trial (code-named PCO-02) was conducted around 2015 on 42 healthy volunteers to evaluate BPC-157's pharmacokinetics and safety. 
-                    However, the results of that trial were never published. The trial was completed, but the data were not reported, which has raised questions in the research community. Without publication, the findings remain unknown.
-                  </p>
-                  <h3 class="text-xl font-semibold text-slate-900 mb-3 mt-6">Current Status</h3>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    Human experience with BPC-157 remains in early, experimental stages. Small studies and individual experiments hint at effects consistent with animal research, but robust clinical evidence to verify efficacy or proper protocols is lacking. 
-                    Experts consistently stress that BPC-157 should not be used in routine medical practice yet. It remains a compound with potential, but until large controlled trials are conducted, any human use is effectively experimental.
-                  </p>
+                        <!-- Render content as paragraph -->
+                        <p v-else-if="processedEntry.type === 'content'" class="text-slate-700 leading-relaxed mb-4" v-html="processedEntry.value.replace(/\n/g, '<br>')"></p>
+                        <!-- Fallback for entries without type -->
+                        <p v-else-if="processedEntry.value" class="text-slate-700 leading-relaxed mb-4" v-html="processedEntry.value.replace(/\n/g, '<br>')"></p>
+                      </template>
+                    </div>
+                  </template>
                 </section>
 
                 <!-- Regulatory Status -->
-                <section id="regulatory-status" class="mb-12">
+                <section v-if="regulatorySubsections && regulatorySubsections.length > 0" id="regulatory-status" class="mb-12">
                   <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
                     <div class="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield w-5 h-5 text-white" aria-hidden="true">
@@ -847,64 +628,50 @@
                     </h2>
                   </div>               
   
-                  <h3 class="text-xl font-semibold text-slate-900 mb-3 mt-6">Current Approval Status</h3>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    As of now, no country has approved BPC-157 as a prescription drug. It's not available through legitimate pharmacies for medical use. The peptide is officially designated for research use only.
-                  </p>
-                  <h3 class="text-xl font-semibold text-slate-900 mb-3 mt-6">United States</h3>
-                  <div class="bg-slate-50 border border-slate-200 rounded-lg p-5 mb-4">
-                    <p class="text-slate-700 text-sm leading-relaxed mb-2">
-                      The U.S. Food and Drug Administration (FDA) has taken action against companies marketing BPC-157 as a dietary supplement, stating it does not meet the definition of a legal supplement ingredient. 
-                      There is also no legal basis for compounding pharmacies to include BPC-157 in medications, though regulatory agencies have found some clinics doing so illegally.
-                    </p>
-                    <p class="text-slate-700 text-sm leading-relaxed">
-                      Any product being sold is unregulated. Many websites sell BPC-157 as a "research chemical" with disclaimers that it's not for human use. 
-                      This grey market means quality control is questionable – products might not contain the stated dose or could have impurities.
-                    </p>
+                  <!-- Subsections -->
+                  <template v-for="(subsection, index) in regulatorySubsections" :key="index">
+                    <!-- Second and third subsections (index 1 and 2) use styled container -->
+                    <h3 v-if="subsection.title" class="text-xl font-semibold text-slate-900 mb-3">{{ subsection.title }}</h3>
+                    <div v-if="index === 1 || index === 2" class="bg-slate-50 border border-slate-200 rounded-lg p-5 mb-4">
+                      <div v-if="subsection.entries && subsection.entries.length > 0">
+                        <template v-for="(processedEntry, entryIndex) in processEntries(subsection.entries)" :key="entryIndex">
+                          <!-- Render grouped items as a list -->
+                          <ul v-if="processedEntry.type === 'item-group'" class="list-disc pl-6 mb-4 space-y-2 text-slate-700">
+                            <li v-for="(item, itemIndex) in processedEntry.items" :key="itemIndex" v-html="item.replace(/\n/g, '<br>')"></li>
+                          </ul>
+                          <!-- Render content as paragraph -->
+                          <p v-else-if="processedEntry.type === 'content'" class="text-slate-700 text-sm leading-relaxed mb-2" v-html="processedEntry.value.replace(/\n/g, '<br>')"></p>
+                          <!-- Fallback for entries without type -->
+                          <p v-else-if="processedEntry.value" class="text-slate-700 text-sm leading-relaxed mb-2" v-html="processedEntry.value.replace(/\n/g, '<br>')"></p>
+                        </template>
                   </div>
-                  <h3 class="text-xl font-semibold text-slate-900 mb-3 mt-6">World Anti-Doping Agency (WADA)</h3>
-                  <div class="bg-slate-50 border border-slate-200 rounded-lg p-5 mb-4">
-                    <p class="text-slate-700 text-sm leading-relaxed mb-2">
-                      WADA has banned BPC-157 for athletes under the class of "S0: Non-approved substances." This means athletes can face sanctions if caught using it in sport. The ban signals that BPC-157 is considered experimental and not recognized as a legitimate medication.
-                    </p>
                   </div>
-                  <h3 class="text-xl font-semibold text-slate-900 mb-3 mt-6">Animal Safety Data</h3>                
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    One attractive feature of BPC-157 in research is its apparently favorable safety profile in animals. Toxicology studies have found no lethal dose even at extremely high amounts:
-                  </p>
-                  <ul class="list-disc pl-6 mb-4 space-y-2 text-slate-700">
-                    <li>
-                      In rats, a single injection of 20 mg per kilogram (a massive dose for a peptide) caused no deaths or obvious toxic effects
-                    </li>
-                    <li>
-                      In dogs, daily injections for a month at doses up to 1 mg/kg showed no significant adverse effects compared to control animals
-                    </li>
-                    <li>
-                      Studies reported no changes in body weight, behavior, or organ health attributable to BPC-157
-                    </li>
+                    <!-- Other subsections use default template -->
+                    <template v-else>
+                      <!-- <h3 v-if="subsection.title" class="text-xl font-semibold text-slate-900 mb-3 mt-6">{{ subsection.title }}</h3> -->
+                      <div v-if="subsection.entries && subsection.entries.length > 0" class="mb-4">
+                        <template v-for="(processedEntry, entryIndex) in processEntries(subsection.entries)" :key="entryIndex">
+                          <!-- Render grouped items as a list -->
+                          <ul v-if="processedEntry.type === 'item-group'" class="list-disc pl-6 mb-4 space-y-2 text-slate-700">
+                            <li v-for="(item, itemIndex) in processedEntry.items" :key="itemIndex" v-html="item.replace(/\n/g, '<br>')"></li>
                   </ul>
-                  <h3 class="text-xl font-semibold text-slate-900 mb-3 mt-6">Theoretical Concerns</h3>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    The most prominent theoretical concern is BPC-157's ability to promote growth factors and blood vessel formation. While beneficial for healing injuries, this raises a question: could BPC-157 unintentionally help existing cancer cells grow or spread? 
-                    Cancerous tumors often exploit the same pathways (like FAK/paxillin and VEGF) to invade tissues and nourish themselves with blood supply.
-                  </p>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    This idea is currently theoretical – no study has shown BPC-157 causes cancer in animals or humans. In fact, one lab test showed BPC-157 inhibited growth of a particular cancer cell line in culture. Nonetheless, experts urge caution until more is known about long-term effects.
-                  </p>
-                  
+                          <!-- Render content as paragraph -->
+                          <p v-else-if="processedEntry.type === 'content'" class="text-slate-700 leading-relaxed mb-4" v-html="processedEntry.value.replace(/\n/g, '<br>')"></p>
+                          <!-- Fallback for entries without type -->
+                          <p v-else-if="processedEntry.value" class="text-slate-700 leading-relaxed mb-4" v-html="processedEntry.value.replace(/\n/g, '<br>')"></p>
+                        </template>
+                      </div>
+                    </template>
+                  </template>
     
                   <!-- Important Note Warning Box -->
-                  <div class="bg-amber-50 border border-amber-200 rounded-lg p-5 mt-6">
-                    <p class="text-amber-900 text-sm leading-relaxed">
-                      <strong>Important Note:</strong>
-                       "Absence of evidence is not evidence of absence" when it comes to safety. 
-                       Because BPC-157 has not been extensively studied in people, there could be side effects that haven't been observed in small samples. Minor side effects like headaches, dizziness, or injection site reactions might not show up in tiny studies but could in larger populations.
-                    </p>
+                  <div v-if="regulatoryImportantNote" class="bg-amber-50 border border-amber-200 rounded-lg p-5 mt-6">
+                    <p class="text-amber-900 text-sm leading-relaxed" v-html="regulatoryImportantNote.replace(/\n/g, '<br>')"></p>
                   </div>
                 </section>
 
                 <!-- Potential Applications -->
-                <section id="potential-applications" class="mb-12">
+                <section v-if="potentialApplicationsIntro || (potentialApplications && potentialApplications.length > 0)" id="potential-applications" class="mb-12">
                   <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
                     <div class="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-stethoscope w-5 h-5 text-white" aria-hidden="true">
@@ -921,44 +688,29 @@
                   </div>
     
                   <!-- Introductory Paragraph -->
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    If ongoing research continues to yield positive results, BPC-157 could be developed in the future for a variety of medical applications. 
-                    Here are some potential uses that researchers envision, based on the peptide's demonstrated effects in preclinical studies:
-                  </p>
+                  <p v-if="potentialApplicationsIntro" class="text-slate-700 leading-relaxed mb-4" v-html="potentialApplicationsIntro.replace(/\n/g, '<br>')"></p>
     
                   <!-- Application Cards -->
-                  <div class="space-y-4">
+                  <div v-if="potentialApplications && potentialApplications.length > 0" class="space-y-4">
                     <div 
                       v-for="(app, index) in potentialApplications" 
                       :key="index"
                       :class="[
                         'rounded-lg border p-5',
-                        app.color === 'blue' ? 'border-blue-200 bg-blue-50' : '',
-                        app.color === 'rose' ? 'border-rose-200 bg-rose-50' : '',
-                        app.color === 'purple' ? 'border-purple-200 bg-purple-50' : '',
-                        app.color === 'emerald' ? 'border-emerald-200 bg-emerald-50' : '',
-                        !app.color ? 'border-gray-200 bg-gray-50' : ''
+                        getApplicationColorClasses(app.title, index).border,
+                        getApplicationColorClasses(app.title, index).bg
                       ]"
                     >
                       <!-- Icon -->
-                      <div 
-                        :class="[
-                          'w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0',
-                          app.color === 'blue' ? 'bg-blue-500' : '',
-                          app.color === 'rose' ? 'bg-rose-500' : '',
-                          app.color === 'purple' ? 'bg-purple-500' : '',
-                          app.color === 'emerald' ? 'bg-emerald-500' : '',
-                          !app.color ? 'bg-gray-500' : ''
-                        ]"
-                      >
+                      <h4 class="font-semibold text-slate-900 mb-2 flex items-center gap-2">                      
                         <svg 
-                          v-if="app.icon === 'bone'"
+                          v-if="getApplicationIconType(app.title) === 'bone'"
                           xmlns="http://www.w3.org/2000/svg" 
                           width="24" 
                           height="24" 
                           viewBox="0 0 24 24" 
                           fill="none" 
-                          stroke="white" 
+                          stroke="currentColor" 
                           stroke-width="2" 
                           stroke-linecap="round" 
                           stroke-linejoin="round"
@@ -968,13 +720,13 @@
                           <path d="M17 10c.7-.7 1.69 0 2.5 0a2.5 2.5 0 1 0 0-5 .5.5 0 0 1-.5-.5 2.5 2.5 0 1 0-5 0c0 .81.7 1.8 0 2.5l-7 7c-.7.7-1.69 0-2.5 0a2.5 2.5 0 0 0 0 5c.28 0 .5.22.5.5a2.5 2.5 0 1 0 5 0c0-.81-.7-1.8 0-2.5Z"></path>
                         </svg>
                         <svg 
-                          v-else-if="app.icon === 'heart'"
+                          v-else-if="getApplicationIconType(app.title) === 'heart'"
                           xmlns="http://www.w3.org/2000/svg" 
                           width="24" 
                           height="24" 
                           viewBox="0 0 24 24" 
                           fill="none" 
-                          stroke="white" 
+                          stroke="currentColor" 
                           stroke-width="2" 
                           stroke-linecap="round" 
                           stroke-linejoin="round"
@@ -984,13 +736,13 @@
                           <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"></path>
                         </svg>
                         <svg 
-                          v-else-if="app.icon === 'brain'"
+                          v-else-if="getApplicationIconType(app.title) === 'brain'"
                           xmlns="http://www.w3.org/2000/svg" 
                           width="24" 
                           height="24" 
                           viewBox="0 0 24 24" 
                           fill="none" 
-                          stroke="white" 
+                          stroke="currentColor" 
                           stroke-width="2" 
                           stroke-linecap="round" 
                           stroke-linejoin="round"
@@ -1007,13 +759,13 @@
                           <path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"></path>
                         </svg>
                         <svg 
-                          v-else-if="app.icon === 'shield'"
+                          v-else-if="getApplicationIconType(app.title) === 'shield'"
                           xmlns="http://www.w3.org/2000/svg" 
                           width="24" 
                           height="24" 
                           viewBox="0 0 24 24" 
                           fill="none" 
-                          stroke="white" 
+                          stroke="currentColor" 
                           stroke-width="2" 
                           stroke-linecap="round" 
                           stroke-linejoin="round"
@@ -1023,39 +775,73 @@
                           <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>
                         </svg>
                         <svg 
+                          v-else-if="getApplicationIconType(app.title) === 'heartbeat'"
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="24" 
+                          height="24" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          stroke-width="2" 
+                          stroke-linecap="round" 
+                          stroke-linejoin="round"
+                          class="lucide lucide-heart-pulse w-5 h-5 text-emerald-600"
+                          aria-hidden="true"
+                        >
+                          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"></path>
+                          <path d="M3.13 14a7.5 7.5 0 0 0 2.239 3.235"></path>
+                          <path d="M6.34 18.12a12 12 0 0 1-.12-2.74"></path>
+                        </svg>
+                        <svg 
+                          v-else-if="getApplicationIconType(app.title) === 'zap'"
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="24" 
+                          height="24" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          stroke-width="2" 
+                          stroke-linecap="round" 
+                          stroke-linejoin="round"
+                          class="lucide lucide-zap w-5 h-5 text-cyan-600"
+                          aria-hidden="true"
+                        >
+                          <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path>
+                        </svg>
+                        <svg 
                           v-else
                           xmlns="http://www.w3.org/2000/svg" 
                           width="24" 
                           height="24" 
                           viewBox="0 0 24 24" 
                           fill="none" 
-                          stroke="white" 
+                          stroke="currentColor" 
                           stroke-width="2" 
                           stroke-linecap="round" 
                           stroke-linejoin="round"
-                          class="lucide lucide-circle"
+                          class="lucide lucide-circle w-5 h-5 text-slate-600"
                           aria-hidden="true"
                         >
                           <circle cx="12" cy="12" r="10"></circle>
                         </svg>
-                      </div>
+                        {{ app.title }}
+                      </h4>                      
                       <!-- Content -->
-                      <h4 class="font-semibold text-slate-900 mb-2 flex items-center gap-2">{{ app.title || app }}</h4>
-                      <p class="text-slate-700 text-sm leading-relaxed">{{ app.description }}</p>
+                      <p class="text-slate-700 text-sm leading-relaxed" v-html="app.description.replace(/\n/g, '<br>')"></p>
                     </div>
                   </div>
     
-                  <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 mt-6">
+                  <!-- Important Context -->
+                  <div v-if="potentialApplicationsImportantContext" class="bg-blue-50 border border-blue-200 rounded-lg p-5 mt-6">
                     <p class="text-blue-900 text-sm leading-relaxed">
                       <strong>Important Context:</strong>
-                       These applications are potential – they represent what could be possible if BPC-157's effects in humans mirror those seen in animals. 
-                       Realizing these uses will require rigorous clinical trials to confirm efficacy and safety for each specific condition. The range of benefits seen in preclinical research has few parallels, which is why BPC-157 is discussed with both excitement and cautious optimism in the medical research community.
+                      {{ potentialApplicationsImportantContext }}
                     </p>
                   </div>
                 </section>
 
                 <!-- Conclusion -->
-                <section class="mb-12">
+                <section v-if="conclusion" class="mb-12">
                   <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
                     <div class="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open w-5 h-5 text-white" aria-hidden="true">
@@ -1068,19 +854,14 @@
                       Conclusion
                     </h2>
                   </div>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    BPC-157 stands out as a compound at the frontier of medical research. From a research perspective, it demonstrates several noteworthy characteristics: it's small and stable, easy to administer in various forms, and has shown remarkable healing capabilities in preclinical models across the board – from mending torn tendons to healing ulcerated gastrointestinal tissues and protecting neural cells.
-                  </p>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    However, a key message is caution. As of now, BPC-157 is not an approved treatment for any condition and remains in the realm of experimental research. The peptide is currently available only as a research tool, and any human use is essentially an off-label experiment. While current findings in the laboratory are inspiring, science demands evidence through well-designed human studies.
-                  </p>
-                  <p class="text-slate-700 leading-relaxed mb-4">
-                    The current state of knowledge presents a paradox: enthusiastic reports and underground usage suggest it may help people recover from injuries, yet solid clinical data to fully back up those claims and ensure long-term safety is lacking. Until comprehensive human studies are completed, experts advise that BPC-157 should be confined to laboratories and carefully controlled trials.
-                  </p>
-                  <p class="text-slate-700 leading-relaxed">
-                    Researchers around the world are actively studying this peptide, as evidenced by increasing publications and even patents, because its multi-faceted actions are unlike anything in current therapeutic arsenals. 
-                    For those learning about BPC-157, the best course is to stay informed but cautious. With time and rigorous research, we will discover whether BPC-157 can safely fulfill its healing reputation and possibly become a mainstream therapeutic agent. Until then, it remains a compelling scientific discovery on the path from laboratory to clinical application.
-                  </p>                
+                  <template v-if="Array.isArray(conclusion)">
+                    <p v-for="(paragraph, index) in conclusion" :key="index" class="text-slate-700 leading-relaxed mb-4" v-html="paragraph.replace(/\n/g, '<br>')"></p>
+                  </template>
+                  <template v-else>
+                    <template v-for="(paragraph, index) in conclusion.split(/\n\n+/)">
+                      <p v-if="paragraph.trim()" :key="index" class="text-slate-700 leading-relaxed mb-4" v-html="paragraph.trim().replace(/\n/g, '<br>')"></p>
+                    </template>
+                  </template>
                 </section>
 
                 <!-- References -->
@@ -1108,33 +889,34 @@
                       </p>
                       <p class="text-slate-600 mb-2">{{ ref.description }}</p>
                       <p class="text-xs text-slate-500">{{ ref.citation }}</p>
-                      <a 
-                        v-if="ref.links && ref.links.length > 0"
-                        v-for="(link, linkIndex) in ref.links" 
-                        :key="linkIndex"
-                        :href="link.url"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-slate-600 hover:text-slate-900 flex items-center gap-1 mt-1"
-                      >                      
-                        <svg                         
-                          xmlns="http://www.w3.org/2000/svg" 
-                          width="24" 
-                          height="24" 
-                          viewBox="0 0 24 24" 
-                          fill="none" 
-                          stroke="currentColor" 
-                          stroke-width="2" 
-                          stroke-linecap="round" 
-                          stroke-linejoin="round"
-                          class="lucide lucide-external-link w-3 h-3"
-                        >
-                          <path d="M15 3h6v6"></path>
-                          <path d="M10 14 21 3"></path>
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        </svg>
-                        {{ link.label || link.url }}
-                      </a>
+                      <div v-if="ref.links && ref.links.length > 0" class="flex flex-wrap gap-2 mt-2">
+                        <a 
+                          v-for="(link, linkIndex) in ref.links.filter(l => l.url && l.url.trim())" 
+                          :key="linkIndex"
+                          :href="processReferenceLink(link.url)"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="text-slate-600 hover:text-slate-900 flex items-center gap-1 transition-colors"
+                        >                      
+                          <svg                         
+                            xmlns="http://www.w3.org/2000/svg" 
+                            width="24" 
+                            height="24" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            stroke-width="2" 
+                            stroke-linecap="round" 
+                            stroke-linejoin="round"
+                            class="lucide lucide-external-link w-3 h-3"
+                          >
+                            <path d="M15 3h6v6"></path>
+                            <path d="M10 14 21 3"></path>
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                          </svg>
+                          {{ link.label || link.url }}
+                        </a>
+                      </div>
                     </div>                  
                   </div>  
                 </section>
@@ -1154,6 +936,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 
@@ -1180,7 +963,506 @@ const formatMechanismItem = (item) => {
   return item
 }
 
-defineProps({
+// Function to get tag color classes based on tag value
+const getTagColorClass = (tag) => {
+  if (!tag) {
+    return 'bg-blue-500/20 text-blue-100 border border-blue-400/30'
+  }
+  
+  const tagLower = tag.toString().toLowerCase().trim()
+  
+  if (tagLower.includes('pentadecapeptide')) {
+    return 'bg-blue-500/20 text-blue-100 border border-blue-400/30'
+  } else if (tagLower.includes('research only') || tagLower === 'research only') {
+    return 'bg-amber-500/20 text-amber-100 border border-amber-400/30'
+  } else if (tagLower.includes('gastric origin') || tagLower === 'gastric origin') {
+    return 'bg-emerald-500/20 text-emerald-100 border border-emerald-400/30'
+  }
+  
+  // Default color (blue) if no match
+  return 'bg-blue-500/20 text-blue-100 border border-blue-400/30'
+}
+
+// Function to get color class for key points based on index
+const getKeyPointColorClass = (index) => {
+  const colors = [
+    'from-blue-500 to-blue-600',      // blue
+    'from-emerald-500 to-emerald-600', // emerald
+    'from-purple-500 to-purple-600',   // purple
+    'from-amber-500 to-amber-600',     // amber
+    'from-rose-500 to-rose-600'        // rose
+  ]
+  return colors[index % colors.length]
+}
+
+// Function to get area icon type based on area name
+const getAreaIconType = (areaName) => {
+  if (!areaName) return 'default'
+  
+  const nameLower = areaName.toLowerCase()
+  
+  // Orthopedic Recovery - bone icon
+  if (nameLower.includes('orthopedic') || nameLower.includes('orthopaedic') || nameLower.includes('bone') || nameLower.includes('tendon') || nameLower.includes('ligament')) {
+    return 'bone'
+  }
+  
+  // Wound Healing - heartbeat/pulse icon
+  if (nameLower.includes('wound') || nameLower.includes('healing') || nameLower.includes('skin') || nameLower.includes('tissue regeneration')) {
+    return 'heartbeat'
+  }
+  
+  // Gastrointestinal Health - heart icon
+  if (nameLower.includes('gastrointestinal') || nameLower.includes('stomach') || nameLower.includes('intestinal') || nameLower.includes('digestive') || nameLower.includes('gut')) {
+    return 'heart'
+  }
+  
+  // Neuroprotection - brain icon
+  if (nameLower.includes('neuro') || nameLower.includes('brain') || nameLower.includes('cognitive') || nameLower.includes('neural')) {
+    return 'brain'
+  }
+  
+  // Anti-Inflammatory - shield icon
+  if (nameLower.includes('anti-inflammatory') || nameLower.includes('inflammatory') || nameLower.includes('inflammation') || nameLower.includes('immune')) {
+    return 'shield'
+  }
+  
+  // Angiogenesis - lightning bolt icon
+  if (nameLower.includes('angiogenesis') || nameLower.includes('blood vessel') || nameLower.includes('circulation') || nameLower.includes('vascular')) {
+    return 'zap'
+  }
+  
+  // Default - circle icon
+  return 'default'
+}
+
+// Function to get area color classes (border and text) based on area name
+const getAreaColorClasses = (areaName) => {
+  if (!areaName) {
+    return {
+      border: 'border-gray-200',
+      text: 'text-slate-900',
+      iconBg: 'from-gray-500 to-gray-600'
+    }
+  }
+  
+  const nameLower = areaName.toLowerCase()
+  
+  // Orthopedic Recovery - blue
+  if (nameLower.includes('orthopedic') || nameLower.includes('orthopaedic') || nameLower.includes('bone') || nameLower.includes('tendon') || nameLower.includes('ligament')) {
+    return {
+      border: 'border-blue-200',
+      text: 'text-blue-900',
+      iconBg: 'from-blue-500 to-blue-600'
+    }
+  }
+  
+  // Wound Healing - green/emerald
+  if (nameLower.includes('wound') || nameLower.includes('healing') || nameLower.includes('skin') || nameLower.includes('tissue regeneration')) {
+    return {
+      border: 'border-emerald-200',
+      text: 'text-emerald-900',
+      iconBg: 'from-emerald-500 to-emerald-600'
+    }
+  }
+  
+  // Gastrointestinal Health - red/rose
+  if (nameLower.includes('gastrointestinal') || nameLower.includes('stomach') || nameLower.includes('intestinal') || nameLower.includes('digestive') || nameLower.includes('gut')) {
+    return {
+      border: 'border-rose-200',
+      text: 'text-rose-900',
+      iconBg: 'from-rose-500 to-rose-600'
+    }
+  }
+  
+  // Neuroprotection - purple
+  if (nameLower.includes('neuro') || nameLower.includes('brain') || nameLower.includes('cognitive') || nameLower.includes('neural')) {
+    return {
+      border: 'border-purple-200',
+      text: 'text-purple-900',
+      iconBg: 'from-purple-500 to-purple-600'
+    }
+  }
+  
+  // Anti-Inflammatory - orange/amber
+  if (nameLower.includes('anti-inflammatory') || nameLower.includes('inflammatory') || nameLower.includes('inflammation') || nameLower.includes('immune')) {
+    return {
+      border: 'border-amber-200',
+      text: 'text-amber-900',
+      iconBg: 'from-amber-500 to-amber-600'
+    }
+  }
+  
+  // Angiogenesis - cyan/sky blue
+  if (nameLower.includes('angiogenesis') || nameLower.includes('blood vessel') || nameLower.includes('circulation') || nameLower.includes('vascular')) {
+    return {
+      border: 'border-cyan-200',
+      text: 'text-cyan-900',
+      iconBg: 'from-cyan-500 to-cyan-600'
+    }
+  }
+  
+  // Default - gray
+  return {
+    border: 'border-gray-200',
+    text: 'text-slate-900',
+    iconBg: 'from-gray-500 to-gray-600'
+  }
+}
+
+// Function to get application icon type based on title
+const getApplicationIconType = (title) => {
+  if (!title) return 'default'
+  
+  const titleLower = title.toLowerCase()
+  
+  // Orthopedic/Bone - bone icon
+  if (titleLower.includes('orthopedic') || titleLower.includes('orthopaedic') || titleLower.includes('bone') || titleLower.includes('tendon') || titleLower.includes('ligament') || titleLower.includes('joint')) {
+    return 'bone'
+  }
+  
+  // Gastrointestinal - heart icon
+  if (titleLower.includes('gastrointestinal') || titleLower.includes('stomach') || titleLower.includes('intestinal') || titleLower.includes('digestive') || titleLower.includes('gut')) {
+    return 'heart'
+  }
+  
+  // Neuroprotection - brain icon
+  if (titleLower.includes('neuro') || titleLower.includes('brain') || titleLower.includes('cognitive') || titleLower.includes('neural')) {
+    return 'brain'
+  }
+  
+  // Anti-Inflammatory/Immune - shield icon
+  if (titleLower.includes('anti-inflammatory') || titleLower.includes('inflammatory') || titleLower.includes('inflammation') || titleLower.includes('organ')) {
+    return 'shield'
+  }
+  
+  // Wound Healing - heartbeat icon
+  if (titleLower.includes('wound') || titleLower.includes('healing') || titleLower.includes('skin') || titleLower.includes('tissue regeneration')) {
+    return 'heartbeat'
+  }
+  
+  // Angiogenesis/Vascular - zap icon
+  if (titleLower.includes('angiogenesis') || titleLower.includes('blood vessel') || titleLower.includes('circulation') || titleLower.includes('vascular')) {
+    return 'zap'
+  }
+  
+  // Default - circle icon
+  return 'default'
+}
+
+// Function to get application color classes based on title
+const getApplicationColorClasses = (title, index) => {
+  if (!title) {
+    // Cycle through colors if no title match
+    const colors = [
+      { border: 'border-blue-200', bg: 'bg-blue-50', iconBg: 'bg-blue-500' },
+      { border: 'border-emerald-200', bg: 'bg-emerald-50', iconBg: 'bg-emerald-500' },
+      { border: 'border-purple-200', bg: 'bg-purple-50', iconBg: 'bg-purple-500' },
+      { border: 'border-amber-200', bg: 'bg-amber-50', iconBg: 'bg-amber-500' },
+      { border: 'border-rose-200', bg: 'bg-rose-50', iconBg: 'bg-rose-500' }
+    ]
+    return colors[index % colors.length]
+  }
+  
+  const titleLower = title.toLowerCase()
+  
+  // Orthopedic/Bone - blue
+  if (titleLower.includes('orthopedic') || titleLower.includes('orthopaedic') || titleLower.includes('bone') || titleLower.includes('tendon') || titleLower.includes('ligament') || titleLower.includes('joint')) {
+    return {
+      border: 'border-blue-200',
+      bg: 'bg-blue-50',
+      iconBg: 'bg-blue-500'
+    }
+  }
+  
+  // Gastrointestinal - rose
+  if (titleLower.includes('gastrointestinal') || titleLower.includes('stomach') || titleLower.includes('intestinal') || titleLower.includes('digestive') || titleLower.includes('gut')) {
+    return {
+      border: 'border-rose-200',
+      bg: 'bg-rose-50',
+      iconBg: 'bg-rose-500'
+    }
+  }
+  
+  // Neuroprotection - purple
+  if (titleLower.includes('neuro') || titleLower.includes('brain') || titleLower.includes('cognitive') || titleLower.includes('neural')) {
+    return {
+      border: 'border-purple-200',
+      bg: 'bg-purple-50',
+      iconBg: 'bg-purple-500'
+    }
+  }
+  
+  // Anti-Inflammatory/Immune - amber
+  if (titleLower.includes('anti-inflammatory') || titleLower.includes('inflammatory') || titleLower.includes('inflammation') || titleLower.includes('immune')) {
+    return {
+      border: 'border-amber-200',
+      bg: 'bg-amber-50',
+      iconBg: 'bg-amber-500'
+    }
+  }
+  
+  // Wound Healing - emerald
+  if (titleLower.includes('organ') || titleLower.includes('healing') || titleLower.includes('skin') || titleLower.includes('tissue regeneration')) {
+    return {
+      border: 'border-emerald-200',
+      bg: 'bg-emerald-50',
+      iconBg: 'bg-emerald-500'
+    }
+  }
+  
+  // Angiogenesis/Vascular - cyan
+  if (titleLower.includes('angiogenesis') || titleLower.includes('blood vessel') || titleLower.includes('circulation') || titleLower.includes('vascular')) {
+    return {
+      border: 'border-cyan-200',
+      bg: 'bg-cyan-50',
+      iconBg: 'bg-cyan-500'
+    }
+  }
+  
+  // Default - cycle through colors
+  const colors = [
+    { border: 'border-blue-200', bg: 'bg-blue-50', iconBg: 'bg-blue-500' },
+    { border: 'border-emerald-200', bg: 'bg-emerald-50', iconBg: 'bg-emerald-500' },
+    { border: 'border-purple-200', bg: 'bg-purple-50', iconBg: 'bg-purple-500' },
+    { border: 'border-amber-200', bg: 'bg-amber-50', iconBg: 'bg-amber-500' },
+    { border: 'border-rose-200', bg: 'bg-rose-50', iconBg: 'bg-rose-500' }
+  ]
+  return colors[index % colors.length]
+}
+
+// Function to get preclinical subsection icon type (determines which SVG icon is displayed)
+const getPreclinicalIconType = (subsection) => {
+  if (!subsection || !subsection.title) return null
+  
+  // Match the exact logic from the template v-if conditions
+  if (subsection.title === 'Musculoskeletal Tissue Research') {
+    return 'bone' // bone icon with text-blue-600
+  }
+  
+  if (subsection.title === 'Gastrointestinal Research') {
+    return 'heart' // heart icon with text-rose-600
+  }
+  
+  if (subsection.title === 'brain') {
+    return 'brain' // brain icon with text-purple-600
+  }
+  
+  return null // no icon displayed
+}
+
+// Function to get preclinical finding color classes based on subsection's SVG icon color
+const getPreclinicalFindingColorClasses = (subsection, findingIndex) => {
+  const iconType = getPreclinicalIconType(subsection)
+  
+  // Map icon type to color classes (matching the icon's text color)
+  if (iconType === 'bone') {
+    // bone icon has text-blue-600
+    return {
+      border: 'border-blue-200',
+      bg: 'bg-blue-50'
+    }
+  }
+  
+  if (iconType === 'heart') {
+    // heart icon has text-rose-600
+    return {
+      border: 'border-rose-200',
+      bg: 'bg-rose-50'
+    }
+  }
+  
+  if (iconType === 'brain') {
+    // brain icon has text-purple-600
+    return {
+      border: 'border-purple-200',
+      bg: 'bg-purple-50'
+    }
+  }
+  
+  // No icon displayed - cycle through colors (amber, purple, emerald)
+  const colors = [
+    { border: 'border-amber-200', bg: 'bg-amber-50' },
+    { border: 'border-purple-200', bg: 'bg-purple-50' },
+    { border: 'border-emerald-200', bg: 'bg-emerald-50' }
+  ]
+  return colors[findingIndex % colors.length]
+}
+
+// Amino acid mapping: code -> { fullName, threeLetter }
+const aminoAcidMap = {
+  'A': { fullName: 'Alanine', threeLetter: 'Ala' },
+  'Ala': { fullName: 'Alanine', threeLetter: 'Ala' },
+  'R': { fullName: 'Arginine', threeLetter: 'Arg' },
+  'Arg': { fullName: 'Arginine', threeLetter: 'Arg' },
+  'N': { fullName: 'Asparagine', threeLetter: 'Asn' },
+  'Asn': { fullName: 'Asparagine', threeLetter: 'Asn' },
+  'D': { fullName: 'Aspartic Acid', threeLetter: 'Asp' },
+  'Asp': { fullName: 'Aspartic Acid', threeLetter: 'Asp' },
+  'C': { fullName: 'Cysteine', threeLetter: 'Cys' },
+  'Cys': { fullName: 'Cysteine', threeLetter: 'Cys' },
+  'Q': { fullName: 'Glutamine', threeLetter: 'Gln' },
+  'Gln': { fullName: 'Glutamine', threeLetter: 'Gln' },
+  'E': { fullName: 'Glutamic Acid', threeLetter: 'Glu' },
+  'Glu': { fullName: 'Glutamic Acid', threeLetter: 'Glu' },
+  'G': { fullName: 'Glycine', threeLetter: 'Gly' },
+  'Gly': { fullName: 'Glycine', threeLetter: 'Gly' },
+  'H': { fullName: 'Histidine', threeLetter: 'His' },
+  'His': { fullName: 'Histidine', threeLetter: 'His' },
+  'I': { fullName: 'Isoleucine', threeLetter: 'Ile' },
+  'Ile': { fullName: 'Isoleucine', threeLetter: 'Ile' },
+  'L': { fullName: 'Leucine', threeLetter: 'Leu' },
+  'Leu': { fullName: 'Leucine', threeLetter: 'Leu' },
+  'K': { fullName: 'Lysine', threeLetter: 'Lys' },
+  'Lys': { fullName: 'Lysine', threeLetter: 'Lys' },
+  'M': { fullName: 'Methionine', threeLetter: 'Met' },
+  'Met': { fullName: 'Methionine', threeLetter: 'Met' },
+  'F': { fullName: 'Phenylalanine', threeLetter: 'Phe' },
+  'Phe': { fullName: 'Phenylalanine', threeLetter: 'Phe' },
+  'P': { fullName: 'Proline', threeLetter: 'Pro' },
+  'Pro': { fullName: 'Proline', threeLetter: 'Pro' },
+  'S': { fullName: 'Serine', threeLetter: 'Ser' },
+  'Ser': { fullName: 'Serine', threeLetter: 'Ser' },
+  'T': { fullName: 'Threonine', threeLetter: 'Thr' },
+  'Thr': { fullName: 'Threonine', threeLetter: 'Thr' },
+  'W': { fullName: 'Tryptophan', threeLetter: 'Trp' },
+  'Trp': { fullName: 'Tryptophan', threeLetter: 'Trp' },
+  'Y': { fullName: 'Tyrosine', threeLetter: 'Tyr' },
+  'Tyr': { fullName: 'Tyrosine', threeLetter: 'Tyr' },
+  'V': { fullName: 'Valine', threeLetter: 'Val' },
+  'Val': { fullName: 'Valine', threeLetter: 'Val' }
+}
+
+// Function to analyze amino acid sequence and return composition
+const analyzeAminoAcidSequence = (sequence) => {
+  if (!sequence || typeof sequence !== 'string') {
+    return []
+  }
+  
+  const trimmedSeq = sequence.trim()
+  if (!trimmedSeq) {
+    return []
+  }
+  
+  let residues = []
+  
+  // First, try splitting by common delimiters: dash, space, comma
+  const delimited = trimmedSeq.split(/[-,\s]+/).filter(res => res.trim().length > 0)
+  
+  // If we got multiple parts, use them
+  if (delimited.length > 1) {
+    residues = delimited
+  } else {
+    // If no delimiters found, check if it's a continuous string of single-letter codes
+    // Single-letter codes are typically 1 character and uppercase
+    const singleLetterMatch = trimmedSeq.match(/^[A-Z]+$/i)
+    if (singleLetterMatch) {
+      // Split into individual characters
+      residues = trimmedSeq.split('').filter(c => c.trim().length > 0)
+    } else {
+      // Try to match three-letter codes (like "GlyProAspAla")
+      const threeLetterMatch = trimmedSeq.match(/([A-Z][a-z]{2})+/g)
+      if (threeLetterMatch) {
+        // Extract three-letter codes
+        residues = trimmedSeq.match(/[A-Z][a-z]{2}/g) || []
+      } else {
+        // Fallback: use the whole string as one residue
+        residues = [trimmedSeq]
+      }
+    }
+  }
+  
+  // Count occurrences of each amino acid
+  const counts = {}
+  
+  residues.forEach(residue => {
+    const trimmed = residue.trim()
+    // Try to find the amino acid in our map (case-insensitive)
+    const key = Object.keys(aminoAcidMap).find(
+      k => k.toLowerCase() === trimmed.toLowerCase()
+    )
+    
+    if (key) {
+      const aminoAcid = aminoAcidMap[key]
+      const fullName = aminoAcid.fullName
+      if (!counts[fullName]) {
+        counts[fullName] = 0
+      }
+      counts[fullName]++
+    }
+  })
+  
+  // Convert to array format: "Glycine (Gly): 3"
+  const composition = Object.keys(counts)
+    .sort() // Sort alphabetically by full name
+    .map(fullName => {
+      const count = counts[fullName]
+      const threeLetter = aminoAcidMap[Object.keys(aminoAcidMap).find(
+        k => aminoAcidMap[k].fullName === fullName
+      )].threeLetter
+      return `${fullName} (${threeLetter}): ${count}`
+    })
+  
+  return composition
+}
+
+// Helper function to process entries and group consecutive items
+const processEntries = (entries) => {
+  if (!entries || !Array.isArray(entries)) return []
+  
+  const processed = []
+  let i = 0
+  
+  while (i < entries.length) {
+    const entry = entries[i]
+    
+    if (entry.type === 'item') {
+      // Collect consecutive items
+      const items = []
+      while (i < entries.length && entries[i].type === 'item') {
+        items.push(entries[i].value)
+        i++
+      }
+      processed.push({ type: 'item-group', items })
+    } else {
+      // Add content or other types as-is
+      processed.push(entry)
+      i++
+    }
+  }
+  
+  return processed
+}
+
+// Helper function to process reference link URLs
+const processReferenceLink = (url) => {
+  if (!url || typeof url !== 'string') return '#'
+  
+  const trimmedUrl = url.trim()
+  
+  // Check if it's already a normal URL
+  if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+    return trimmedUrl
+  }
+  
+  // Check for PubMed format: "PubMed: 40005999" or "PubMed:40005999" (case-insensitive)
+  const pubmedMatch = trimmedUrl.match(/^PubMed:\s*(\d+)$/i)
+  if (pubmedMatch) {
+    return `https://pubmed.ncbi.nlm.nih.gov/${pubmedMatch[1]}/`
+  }
+  
+  // Check for PMC format: "PMC Article: PMC11053547" or "PMC Article:PMC11053547" (case-insensitive)
+  // Also handles variations like "PMC: PMC11053547" or just "PMC11053547" after "PMC Article:"
+  const pmcMatch = trimmedUrl.match(/^PMC\s+Article:\s*(PMC\d+)$/i)
+  if (pmcMatch) {
+    return `https://pmc.ncbi.nlm.nih.gov/articles/${pmcMatch[1]}/`
+  }
+  
+  // Return original URL if no pattern matches
+  return trimmedUrl
+}
+
+// Get props
+const props = defineProps({
   id: {
     type: [Number, String],
     required: true
@@ -1188,6 +1470,10 @@ defineProps({
   name: {
     type: String,
     required: true
+  },
+  categoryName: {
+    type: String,
+    default: ''
   },
   slug: {
     type: String,
@@ -1344,6 +1630,10 @@ defineProps({
     type: String,
     default: ''
   },
+  potentialApplicationsImportantContext: {
+    type: String,
+    default: ''
+  },
   potentialApplicationsAdditional: {
     type: Array,
     default: () => []
@@ -1360,5 +1650,13 @@ defineProps({
     type: [String, Array],
     default: ''
   }
+})
+
+// Computed property for amino acid composition
+const aminoAcidComposition = computed(() => {
+  if (props.aminoAcidSequence && props.aminoAcidSequence.sequence) {
+    return analyzeAminoAcidSequence(props.aminoAcidSequence.sequence)
+  }
+  return []
 })
 </script>

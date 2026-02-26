@@ -1,6 +1,6 @@
 <template>
   <Head>
-    <title>{{ seo?.title || 'PeptideSync - Your Trusted Source for Research Peptides' }}</title>
+    <title>PeptideSync</title>
     <meta name="description" :content="seo?.description || 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'" />
     
     <!-- Open Graph / Facebook -->

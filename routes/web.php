@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\BlogManagementController;
 use App\Http\Controllers\Admin\ResearchManagementController;
 use App\Http\Controllers\Admin\EducationalGuideManagementController;
 use App\Http\Controllers\Admin\EducationPostsController;
+use App\Http\Controllers\Admin\EncyclopediaEntriesManagementController;
 use App\Http\Controllers\Admin\CategoriesController;
 use App\Http\Controllers\Admin\LocationsController;
 use App\Http\Controllers\Admin\ProductsController as AdminProductsController;
@@ -183,6 +184,15 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::get('/education-posts/{id}/edit', [EducationPostsController::class, 'edit'])->name('admin.education-posts.edit');
     Route::post('/education-posts/{id}', [EducationPostsController::class, 'update'])->name('admin.education-posts.update');
     Route::delete('/education-posts/{id}', [EducationPostsController::class, 'destroy'])->name('admin.education-posts.destroy');
+    
+    // Encyclopedia Entries
+    Route::get('/encyclopedia-entries', [EncyclopediaEntriesManagementController::class, 'index'])->name('admin.encyclopedia-entries.index');
+    Route::get('/encyclopedia-entries/create', [EncyclopediaEntriesManagementController::class, 'create'])->name('admin.encyclopedia-entries.create');
+    Route::post('/encyclopedia-entries', [EncyclopediaEntriesManagementController::class, 'store'])->name('admin.encyclopedia-entries.store');
+    Route::get('/encyclopedia-entries/{id}/edit', [EncyclopediaEntriesManagementController::class, 'edit'])->name('admin.encyclopedia-entries.edit');
+    Route::post('/encyclopedia-entries/{id}', [EncyclopediaEntriesManagementController::class, 'update'])->name('admin.encyclopedia-entries.update');
+    Route::patch('/encyclopedia-entries/{id}/quick-update', [EncyclopediaEntriesManagementController::class, 'quickUpdate'])->name('admin.encyclopedia-entries.quick-update');
+    Route::delete('/encyclopedia-entries/{id}', [EncyclopediaEntriesManagementController::class, 'destroy'])->name('admin.encyclopedia-entries.destroy');
     
     // Pages
     Route::get('/pages', [PagesController::class, 'index'])->name('admin.pages.index');
