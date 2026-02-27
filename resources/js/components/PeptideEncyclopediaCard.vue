@@ -42,11 +42,11 @@
     <div class="p-6">
       <!-- Name and ID -->
       <div class="flex items-start justify-between mb-2">
-        <h3 class="text-lg text-gray-900 group-hover:text-slate-700 transition-colors">
-          {{ name }}
-        </h3>
-        <div class="text-xs text-slate-600 bg-slate-100 px-2 py-1 rounded">
-          #{{ id }}
+        <!-- Category Name (2 lines on mobile only) -->
+        <div class="h-14 md:h-auto flex items-end md:items-start justify-start">
+          <h3 class="text-lg text-gray-900 group-hover:text-slate-700 transition-colors leading-tight">
+            {{ name }}
+          </h3>        
         </div>
       </div>      
 

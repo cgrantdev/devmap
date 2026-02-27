@@ -44,16 +44,21 @@ class EncyclopediaController extends Controller
     public function index(Request $request)
     {
         // Get all active product categories with additional data
-        // Only include categories that have an education_post entry with research articles
+        // Only include categories that have an education_post entry with research articles and is published
         $query = ProductCategory::where('is_active', true)
             ->whereHas('educationPost', function ($epQuery) {
-                $epQuery->where(function ($subQ) {
-                    $subQ->whereNotNull('research_url')
-                         ->where('research_url', '!=', '');
-                })->orWhere(function ($subQ) {
-                    $subQ->whereNotNull('research_title')
-                         ->where('research_title', '!=', '');
-                });
+                $epQuery->where('status', 'published')
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now())
+                    ->where(function ($subQ) {
+                        $subQ->where(function ($researchQ) {
+                            $researchQ->whereNotNull('research_url')
+                                 ->where('research_url', '!=', '');
+                        })->orWhere(function ($researchQ) {
+                            $researchQ->whereNotNull('research_title')
+                                 ->where('research_title', '!=', '');
+                        });
+                    });
             })
             ->withCount([
                 'products as products_count' => function ($q) {

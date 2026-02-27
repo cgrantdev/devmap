@@ -36,9 +36,11 @@
       <!-- Brand Name with Featured Dot -->
       <div class="mb-3 text-center">
         <div class="flex items-center justify-center gap-1.5 mb-1">
-          <h3 class="text-base text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
-            {{ name }}
-          </h3>
+          <div class="h-14 flex items-end justify-center">
+            <h3 class="text-base text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+              {{ name }}
+            </h3>            
+          </div>
           <!-- Featured Indicator (Blue Circle) -->
           <div
             v-if="featured"
