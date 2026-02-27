@@ -205,6 +205,8 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('admin.settings');
     Route::post('/settings/general', [SettingsController::class, 'updateGeneral'])->name('admin.settings.general.update');
+    Route::post('/settings/seo-pages', [SettingsController::class, 'upsertSeoPage'])->name('admin.settings.seo-pages.upsert');
+    Route::delete('/settings/seo-pages/{seoPage}', [SettingsController::class, 'destroySeoPage'])->name('admin.settings.seo-pages.destroy');
     
     // Reviews
     Route::get('/reviews', [\App\Http\Controllers\Admin\ReviewsController::class, 'index'])->name('admin.reviews.index');

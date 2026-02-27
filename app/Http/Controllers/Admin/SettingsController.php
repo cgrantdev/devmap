@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use App\Models\SeoPage;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -48,6 +49,7 @@ class SettingsController extends Controller
 
         return Inertia::render('Admin/Settings', [
             'settings' => $settings,
+            'seoPages' => SeoPage::orderBy('key')->get(),
         ]);
     }
 
@@ -79,5 +81,45 @@ class SettingsController extends Controller
 
         return redirect()->route('admin.settings')
             ->with('success', 'Settings updated successfully.');
+    }
+
+    public function upsertSeoPage(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => 'nullable|integer|exists:seo_pages,id',
+            'key' => 'required|string|max:100|regex:/^[a-z0-9_-]+$/|unique:seo_pages,key,' . ($request->input('id') ?? 'NULL') . ',id',
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:2000',
+            'og_title' => 'nullable|string|max:255',
+            'og_description' => 'nullable|string|max:2000',
+            'og_image' => 'nullable|string|max:2048',
+        ]);
+
+        $data = [
+            'key' => $validated['key'],
+            'title' => $validated['title'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'og_title' => $validated['og_title'] ?? null,
+            'og_description' => $validated['og_description'] ?? null,
+            'og_image' => $validated['og_image'] ?? null,
+        ];
+
+        if (!empty($validated['id'])) {
+            $seoPage = SeoPage::findOrFail($validated['id']);
+            $seoPage->update($data);
+        } else {
+            SeoPage::create($data);
+        }
+
+        return redirect()->route('admin.settings')
+            ->with('success', 'SEO settings saved successfully.');
+    }
+
+    public function destroySeoPage(SeoPage $seoPage)
+    {
+        $seoPage->delete();
+
+        return redirect()->route('admin.settings')
+            ->with('success', 'SEO settings deleted successfully.');
     }
 }

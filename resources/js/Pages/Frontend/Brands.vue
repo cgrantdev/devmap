@@ -1,4 +1,24 @@
 <template>
+  <Head :title="title">
+    <meta name="description" :content="description" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" :content="url" />
+    <meta property="og:title" :content="ogTitle" />
+    <meta property="og:description" :content="ogDescription" />
+    <meta v-if="ogImage" property="og:image" :content="ogImage" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" :content="url" />
+    <meta name="twitter:title" :content="ogTitle" />
+    <meta name="twitter:description" :content="ogDescription" />
+    <meta v-if="ogImage" name="twitter:image" :content="ogImage" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" :href="url" />
+  </Head>
   <FrontLayout>
     <!-- Brands Section -->
     <section class="min-h-screen bg-gray-50">
@@ -137,13 +157,25 @@
 </template>
 
 <script setup>
-import { ref, computed, h } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { ref, computed, h, watchEffect } from 'vue'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import VendorCard from '@/components/VendorCard.vue'
 import MainButton from '@/components/MainButton.vue'
 
 const props = defineProps({
+  seo: {
+    type: Object,
+    default: () => ({
+      title: null,
+      description: null,
+      og_title: null,
+      og_description: null,
+      og_image: null,
+      image: null,
+      url: null,
+    })
+  },
   brands: {
     type: Array,
     default: () => []
@@ -152,6 +184,40 @@ const props = defineProps({
   sort: String,
   sortDir: String,
   filters: Object,
+})
+
+const page = usePage()
+
+// Computed values for reactive SEO updates
+const title = computed(() => {
+  const baseTitle = props.seo?.title || 'Top Rated Peptide Vendors & Brands'
+  const siteName = page.props.site_name || 'Peptidemap'
+  return `${baseTitle} - ${siteName}`
+})
+
+const description = computed(() => {
+  return props.seo?.description || 'Browse and compare top-rated peptide vendors and brands. Read reviews, compare prices, and find trusted suppliers for your research needs.'
+})
+
+const url = computed(() => {
+  return props.seo?.url || page.url
+})
+
+const ogTitle = computed(() => {
+  return props.seo?.og_title || title.value
+})
+
+const ogDescription = computed(() => {
+  return props.seo?.og_description || description.value
+})
+
+const ogImage = computed(() => {
+  return props.seo?.og_image || props.seo?.image || null
+})
+
+// Watch for title changes and update document title immediately
+watchEffect(() => {
+  document.title = title.value
 })
 
 // Filter panel
