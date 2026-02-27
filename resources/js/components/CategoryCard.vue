@@ -16,12 +16,14 @@
         <span class="text-sm">No Image</span>
       </div>
     </div>
-    <h3
-      class="pt-6 border-t border-slate-200 text-xl text-gray-900 mb-1 group-hover:text-blue-600 transition-colors"
-      :title="name"
-    >
-      {{ name }}
-    </h3>
+    <div class="h-14 flex items-end mb-1">      
+      <h3
+        class="pt-6 border-t border-slate-200 text-xl text-gray-900 group-hover:text-blue-600 transition-colors leading-tight"
+        :title="name"
+      >
+        {{ name }}
+      </h3>
+    </div>
     <!-- Research Area -->
     <div v-if="researchArea" class="text-slate-600 text-xs italic justify-between mb-6">      
       {{ researchArea }}

@@ -23,10 +23,12 @@
 
     <!-- Content Section -->
     <div class="p-4">
-      <!-- Brand Name -->
-      <h3 class="text-lg text-gray-900 mb-2 text-center">
-        {{ name }}
-      </h3>
+      <!-- Brand Name (Always 2 lines) -->
+      <div class="h-14 flex items-end justify-center mb-2">
+        <h3 class="text-lg text-gray-900 text-center leading-tight">
+          {{ name }}
+        </h3>
+      </div>
       
       <!-- Location (Fixed height) -->
       <div class="flex items-center justify-center gap-1 text-gray-600 text-sm mb-3">         
