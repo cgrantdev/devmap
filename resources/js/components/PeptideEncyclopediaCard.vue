@@ -45,8 +45,8 @@
         <!-- Category Name (2 lines on mobile only) -->
         <div class="h-14 md:h-auto flex items-end md:items-start justify-start">
           <h3 class="text-lg text-gray-900 group-hover:text-slate-700 transition-colors leading-tight">
-            {{ name }}
-          </h3>        
+          {{ name }}
+        </h3>        
         </div>
       </div>      
 

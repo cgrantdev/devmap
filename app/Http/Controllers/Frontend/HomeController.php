@@ -285,10 +285,12 @@ class HomeController extends Controller
                 });
         }
 
-        // Generate SEO data for the homepage
+        // Generate SEO data for the homepage using configurable site settings
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'PeptideSync';
+        $siteDescription = Setting::where('key', 'site_description')->value('value') ?? 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.';
         $seoData = new SEOData(
-            title: 'PeptideSync',
-            description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.',
+            title: $siteName,
+            description: $siteDescription,
             image: $heroSlides[0]['image'] ?? null,
             url: url('/'),
         );
