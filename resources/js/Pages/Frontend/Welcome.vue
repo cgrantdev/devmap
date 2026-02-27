@@ -1,24 +1,27 @@
 <template>
   <Head>
-    <title>PeptideSync</title>
-    <meta name="description" :content="seo?.description || 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'" />
+    <title>{{ seo?.title || $page.props.site_name || 'PeptideSync' }}</title>
+    <meta name="description" :content="seo?.description || $page.props.site_description || 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" :content="seo?.url || $page.url" />
-    <meta property="og:title" :content="seo?.title || 'PeptideSync - Your Trusted Source for Research Peptides'" />
-    <meta property="og:description" :content="seo?.description || 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'" />
+    <meta property="og:title" :content="seo?.title || $page.props.site_name || 'PeptideSync - Your Trusted Source for Research Peptides'" />
+    <meta property="og:description" :content="seo?.description || $page.props.site_description || 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'" />
     <meta property="og:image" :content="seo?.image || ''" />
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" :content="seo?.url || $page.url" />
-    <meta name="twitter:title" :content="seo?.title || 'PeptideSync - Your Trusted Source for Research Peptides'" />
-    <meta name="twitter:description" :content="seo?.description || 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'" />
+    <meta name="twitter:title" :content="seo?.title || $page.props.site_name || 'PeptideSync - Your Trusted Source for Research Peptides'" />
+    <meta name="twitter:description" :content="seo?.description || $page.props.site_description || 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'" />
     <meta name="twitter:image" :content="seo?.image || ''" />
     
     <!-- Canonical URL -->
     <link rel="canonical" :href="seo?.url || $page.url" />
+    
+    <!-- Contact Email for structured data -->
+    <meta v-if="$page.props.contact_email" name="contact" :content="$page.props.contact_email" />
   </Head>
   <FrontLayout>
     <!-- Hero Section Carousel -->

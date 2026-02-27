@@ -26,8 +26,8 @@
       <!-- Brand Name (Always 2 lines) -->
       <div class="h-14 flex items-end justify-center mb-2">
         <h3 class="text-lg text-gray-900 text-center leading-tight">
-          {{ name }}
-        </h3>
+        {{ name }}
+      </h3>
       </div>
       
       <!-- Location (Fixed height) -->
