@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\Location;
+use App\Models\SeoPage;
+use App\Models\Setting;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -141,13 +143,26 @@ class BrandsController extends Controller
                 ];
             });
         
-        // Generate SEO data
-        $seoData = new SEOData(
-            title: 'Top Rated Peptide Vendors & Brands | PeptideSync',
-            description: 'Browse and compare top-rated peptide vendors and brands. Read reviews, compare prices, and find trusted suppliers for your research needs.',
-            url: url('/brands'),
-        );
-        session(['page_seo_data' => $seoData]);
+        // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "brands")
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
+        $defaultTitle = 'Top Rated Peptide Vendors & Brands';
+        $defaultDescription = 'Browse and compare top-rated peptide vendors and brands. Read reviews, compare prices, and find trusted suppliers for your research needs.';
+
+        $seoPage = SeoPage::where('key', 'brands')->first();
+        $seo = [
+            'key' => 'brands',
+            'title' => $seoPage?->title ?: $defaultTitle,
+            'description' => $seoPage?->description ?: $defaultDescription,
+            'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
+            'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
+            'og_image' => $seoPage?->og_image ?: null,
+            // Backward-compatible field used by some pages
+            'image' => $seoPage?->og_image ?: null,
+            'url' => url('/brands'),
+        ];
+
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/Brands', [
             'brands' => $brands,
@@ -159,6 +174,7 @@ class BrandsController extends Controller
                 'min_rating' => $request->get('min_rating', ''),
                 'top_vendors_only' => $request->get('top_vendors_only', '0'),
             ],
+            'seo' => $seo,
         ]);
     }
 

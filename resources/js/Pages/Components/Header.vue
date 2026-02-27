@@ -148,7 +148,7 @@
             </svg>
             <span>Calculator</span>
           </Link>
-          <Link 
+          <!-- <Link 
             href="/compare" 
             class="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors"
           >
@@ -159,7 +159,7 @@
               <path d="M11 18H8a2 2 0 0 1-2-2V9"></path>
             </svg>
             <span>Compare</span>
-          </Link>
+          </Link> -->
           <Link 
             href="/news" 
             class="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors"

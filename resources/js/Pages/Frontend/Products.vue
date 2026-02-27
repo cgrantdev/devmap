@@ -1,4 +1,24 @@
 <template>
+  <Head :title="title">
+    <meta name="description" :content="description" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" :content="url" />
+    <meta property="og:title" :content="ogTitle" />
+    <meta property="og:description" :content="ogDescription" />
+    <meta v-if="ogImage" property="og:image" :content="ogImage" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" :content="url" />
+    <meta name="twitter:title" :content="ogTitle" />
+    <meta name="twitter:description" :content="ogDescription" />
+    <meta v-if="ogImage" name="twitter:image" :content="ogImage" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" :href="url" />
+  </Head>
   <FrontLayout>
     <!-- Discover Peptides Section -->
     <section class="min-h-screen bg-gray-50">
@@ -43,8 +63,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
-import { Link, router } from '@inertiajs/vue3'
+import { ref, computed, onMounted, nextTick, watchEffect } from 'vue'
+import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import CategoryCard from '@/components/CategoryCard.vue'
 import BlogPostCard from '@/components/BlogPostCard.vue'
@@ -54,7 +74,53 @@ const props = defineProps({
   productGroups: {
     type: Array,
     default: () => []
+  },
+  seo: {
+    type: Object,
+    default: () => ({
+      title: null,
+      description: null,
+      og_title: null,
+      og_description: null,
+      og_image: null,
+      image: null,
+      url: null,
+    })
   }
+})
+
+const page = usePage()
+
+// Computed values for reactive SEO updates
+const title = computed(() => {
+  const baseTitle = props.seo?.title || 'Research Peptides - Browse All Products'
+  const siteName = page.props.site_name || 'Peptidemap'
+  return `${baseTitle} - ${siteName}`
+})
+
+const description = computed(() => {
+  return props.seo?.description || 'Browse our comprehensive collection of research peptides. Compare products, prices, and vendors to find the best peptides for your research needs.'
+})
+
+const url = computed(() => {
+  return props.seo?.url || page.url
+})
+
+const ogTitle = computed(() => {
+  return props.seo?.og_title || title.value
+})
+
+const ogDescription = computed(() => {
+  return props.seo?.og_description || description.value
+})
+
+const ogImage = computed(() => {
+  return props.seo?.og_image || props.seo?.image || null
+})
+
+// Watch for title changes and update document title immediately
+watchEffect(() => {
+  document.title = title.value
 })
 
 // Hero background lazy loading

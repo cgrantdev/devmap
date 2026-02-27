@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\SeoPage;
+use App\Models\Setting;
 use App\Models\Type;
 use App\Models\Puse;
 use App\Models\Brand;
@@ -82,16 +84,30 @@ class ProductsController extends Controller
                 ];
             });
         
-        // Generate SEO data
-        $seoData = new SEOData(
-            title: 'Research Peptides - Browse All Products | PeptideSync',
-            description: 'Browse our comprehensive collection of research peptides. Compare products, prices, and vendors to find the best peptides for your research needs.',
-            url: url('/products'),
-        );
-        session(['page_seo_data' => $seoData]);
+        // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "products")
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
+        $defaultTitle = 'Research Peptides - Browse All Products';
+        $defaultDescription = 'Browse our comprehensive collection of research peptides. Compare products, prices, and vendors to find the best peptides for your research needs.';
+
+        $seoPage = SeoPage::where('key', 'products')->first();
+        $seo = [
+            'key' => 'products',
+            'title' => $seoPage?->title ?: $defaultTitle,
+            'description' => $seoPage?->description ?: $defaultDescription,
+            'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
+            'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
+            'og_image' => $seoPage?->og_image ?: null,
+            // Backward-compatible field used by some pages
+            'image' => $seoPage?->og_image ?: null,
+            'url' => url('/products'),
+        ];
+
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/Products', [
             'productGroups' => $categories,
+            'seo' => $seo,
         ]);
     }
 

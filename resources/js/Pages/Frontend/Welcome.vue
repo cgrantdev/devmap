@@ -1,24 +1,23 @@
 <template>
-  <Head>
-    <title>{{ seo?.title || $page.props.site_name || 'PeptideSync' }}</title>
-    <meta name="description" :content="seo?.description || $page.props.site_description || 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'" />
+  <Head :title="title">
+    <meta name="description" :content="description" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" :content="seo?.url || $page.url" />
-    <meta property="og:title" :content="seo?.title || $page.props.site_name || 'PeptideSync - Your Trusted Source for Research Peptides'" />
-    <meta property="og:description" :content="seo?.description || $page.props.site_description || 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'" />
-    <meta property="og:image" :content="seo?.image || ''" />
+    <meta property="og:url" :content="url" />
+    <meta property="og:title" :content="ogTitle" />
+    <meta property="og:description" :content="ogDescription" />
+    <meta v-if="ogImage" property="og:image" :content="ogImage" />
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" :content="seo?.url || $page.url" />
-    <meta name="twitter:title" :content="seo?.title || $page.props.site_name || 'PeptideSync - Your Trusted Source for Research Peptides'" />
-    <meta name="twitter:description" :content="seo?.description || $page.props.site_description || 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'" />
-    <meta name="twitter:image" :content="seo?.image || ''" />
+    <meta name="twitter:url" :content="url" />
+    <meta name="twitter:title" :content="ogTitle" />
+    <meta name="twitter:description" :content="ogDescription" />
+    <meta v-if="ogImage" name="twitter:image" :content="ogImage" />
     
     <!-- Canonical URL -->
-    <link rel="canonical" :href="seo?.url || $page.url" />
+    <link rel="canonical" :href="url" />
     
     <!-- Contact Email for structured data -->
     <meta v-if="$page.props.contact_email" name="contact" :content="$page.props.contact_email" />
@@ -336,8 +335,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Link, Head } from '@inertiajs/vue3'
+import { ref, computed, onMounted, onUnmounted, watchEffect } from 'vue'
+import { Link, Head, usePage } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import MainButton from '@/components/MainButton.vue'
 import TopRatedVendorCard from '@/components/TopRatedVendorCard.vue'
@@ -348,6 +347,8 @@ import LimitedTimeDiscountCard from '@/components/LimitedTimeDiscountCard.vue'
 import ResourcesToolsCard from '@/components/ResourcesToolsCard.vue'
 import ResourcesToolsSimpleCard from '@/components/ResourcesToolsSimpleCard.vue'
 import LatestBlogCard from '@/components/LatestBlogCard.vue'
+
+const page = usePage()
 
 // Lazy loading for background images
 const discoverBannerLoaded = ref(false)
@@ -390,10 +391,48 @@ const props = defineProps({
     default: () => ({
       title: 'PeptideSync - Your Trusted Source for Research Peptides',
       description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.',
+      og_title: null,
+      og_description: null,
+      og_image: null,
       image: null,
       url: null,
     })
   }
+})
+
+// Computed values for reactive SEO updates
+const title = computed(() => {
+  if (props.seo?.title) return props.seo.title
+  return page.props.site_name || 'PeptideSync'
+})
+
+const description = computed(() => {
+  return (
+    props.seo?.description ||
+    page.props.site_description ||
+    'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'
+  )
+})
+
+const url = computed(() => {
+  return props.seo?.url || page.url
+})
+
+const ogTitle = computed(() => {
+  return props.seo?.og_title || title.value
+})
+
+const ogDescription = computed(() => {
+  return props.seo?.og_description || description.value
+})
+
+const ogImage = computed(() => {
+  return props.seo?.og_image || props.seo?.image || null
+})
+
+// Ensure browser tab title updates immediately on client-side navigation
+watchEffect(() => {
+  document.title = title.value
 })
 
 // Process slides - ensure we have valid slides with images

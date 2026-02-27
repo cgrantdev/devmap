@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\SeoPage;
 use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\Product;
@@ -285,18 +286,26 @@ class HomeController extends Controller
                 });
         }
 
-        // Generate SEO data for the homepage using configurable site settings
+        // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "home")
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'PeptideSync';
-        $siteDescription = Setting::where('key', 'site_description')->value('value') ?? 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.';
-        $seoData = new SEOData(
-            title: $siteName,
-            description: $siteDescription,
-            image: $heroSlides[0]['image'] ?? null,
-            url: url('/'),
-        );
+        $defaultDescription = Setting::where('key', 'site_description')->value('value') ?? 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.';
+        $defaultImage = $heroSlides[0]['image'] ?? null;
 
-        // Store SEO data in session for Blade template access
-        session(['page_seo_data' => $seoData]);
+        $seoPage = SeoPage::where('key', 'home')->first();
+        $seo = [
+            'key' => 'home',
+            'title' => $seoPage?->title ?: $siteName,
+            'description' => $seoPage?->description ?: $defaultDescription,
+            'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $siteName),
+            'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
+            'og_image' => $seoPage?->og_image ?: $defaultImage,
+            // Backward-compatible field used by some pages
+            'image' => $seoPage?->og_image ?: $defaultImage,
+            'url' => url('/'),
+        ];
+
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/Welcome', [
             'heroSlides' => $heroSlides,
@@ -305,12 +314,7 @@ class HomeController extends Controller
             'topBlogs' => $topBlogs,
             'latestBlogs' => $latestBlogs,
             'discountDeals' => $discountDeals,
-            'seo' => [
-                'title' => $seoData->title,
-                'description' => $seoData->description,
-                'image' => $seoData->image,
-                'url' => $seoData->url,
-            ],
+            'seo' => $seo,
         ]);
     }
 
