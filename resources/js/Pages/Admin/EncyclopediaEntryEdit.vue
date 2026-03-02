@@ -35,15 +35,15 @@
               <h2 class="text-xl font-semibold text-slate-800 mb-4">Basic Information</h2>
               
               <div class="mb-4">
-                <label class="block mb-1.5 font-semibold text-slate-800">Research Title (Featured Research Article Title)</label>
-                <input v-model="form.research_title" type="text" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all font-sans text-base" placeholder="Enter research article title" />
-                <p class="text-sm text-slate-500 mt-1">This title will be displayed in the Featured Research Articles section</p>
-              </div>
-              
-              <div class="mb-4">
-                <label class="block mb-1.5 font-semibold text-slate-800">Research Outline</label>
-                <textarea v-model="form.research_outline" rows="4" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all font-sans text-base" placeholder="Enter a brief outline or description of the research article. This will be displayed in the Featured Research Articles section."></textarea>
-                <p class="text-sm text-slate-500 mt-1">This description will be displayed in the Featured Research Articles section</p>
+                <label class="block mb-1.5 font-semibold text-slate-800">Encyclopedia Tag *</label>
+                <select v-model="form.education_tag" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all font-sans text-base" required>
+                  <option :value="null">-- Select Tag --</option>
+                  <option value="Healing & Recovery">Healing & Recovery</option>
+                  <option value="Growth & Recovery">Growth & Recovery</option>
+                  <option value="Performance">Performance</option>
+                  <option value="Anti-Aging">Anti-Aging</option>
+                </select>
+                <p class="text-sm text-slate-500 mt-1">Select the category tag for this encyclopedia entry</p>
               </div>
               
               <div class="mb-4">
@@ -542,8 +542,7 @@ const normalizeSubsections = (subsections) => {
 
 const form = useForm({
   title: props.entry?.title || '',
-  research_title: props.entry?.research_title || '',
-  research_outline: props.entry?.research_outline || '',
+  education_tag: props.entry?.education_tag || null,
   research_url: props.entry?.research_url || '',
   peptide_full_name: props.entry?.peptide_full_name || '',
   tags: props.entry?.tags || [],
@@ -767,9 +766,9 @@ const removeReferenceLink = (referenceIndex, linkIndex) => {
 }
 
 const submit = () => {
-  // Auto-generate title from research_title if title is empty
+  // Auto-generate title if title is empty
   if (!form.title || form.title.trim() === '') {
-    form.title = form.research_title || 'Untitled Entry'
+    form.title = 'Untitled Entry'
   }
   
   // Filter out empty arrays and objects

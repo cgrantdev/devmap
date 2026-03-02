@@ -41,8 +41,8 @@
     </div>
 
     <!-- Title and Subtitle -->
-    <div class="h-14 flex items-end justify-start mb-1">             
-      <h3 class="pt-6 border-t border-slate-200 text-xl text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+    <div class="h-14 border-t border-slate-200 flex items-end justify-start mb-1">             
+      <h3 class="pt-6 text-xl text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
         {{ name }}
       </h3>
     </div>

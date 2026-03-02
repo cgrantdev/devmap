@@ -84,6 +84,7 @@ class EncyclopediaEntriesManagementController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'education_tag' => 'required|string|in:Healing & Recovery,Growth & Recovery,Performance,Anti-Aging',
             'research_title' => 'nullable|string|max:255',
             'research_outline' => 'nullable|string',
             'research_url' => 'nullable|url|max:500',
@@ -182,6 +183,7 @@ class EncyclopediaEntriesManagementController extends Controller
             'entry' => [
                 'id' => $entry->id,
                 'title' => $entry->title,
+                'education_tag' => $entry->education_tag ?? null,
                 'research_title' => $entry->research_title ?? '',
                 'research_outline' => $entry->research_outline ?? '',
                 'research_url' => $entry->research_url ?? '',
@@ -229,6 +231,7 @@ class EncyclopediaEntriesManagementController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'education_tag' => 'required|string|in:Healing & Recovery,Growth & Recovery,Performance,Anti-Aging',
             'research_title' => 'nullable|string|max:255',
             'research_outline' => 'nullable|string',
             'research_url' => 'nullable|url|max:500',
