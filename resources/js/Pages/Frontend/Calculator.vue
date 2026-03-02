@@ -269,8 +269,86 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, watchEffect } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
+
+const props = defineProps({
+  seo: {
+    type: Object,
+    default: () => ({
+      title: null,
+      description: null,
+      og_title: null,
+      og_description: null,
+      og_image: null,
+      image: null,
+      url: null,
+    })
+  }
+})
+
+const page = usePage()
+
+// Computed values for reactive SEO updates
+const title = computed(() => {
+  const baseTitle = props.seo?.title || 'Peptide Calculator'
+  const siteName = page.props.site_name || 'Peptidemap'
+  return `${baseTitle} - ${siteName}`
+})
+
+const description = computed(() => {
+  return props.seo?.description || 'Calculate peptide dosages and reconstitution volumes. Easy-to-use calculator for research peptide preparation.'
+})
+
+const url = computed(() => {
+  return props.seo?.url || page.url
+})
+
+const ogTitle = computed(() => {
+  return props.seo?.og_title || title.value
+})
+
+const ogDescription = computed(() => {
+  return props.seo?.og_description || description.value
+})
+
+const ogImage = computed(() => {
+  return props.seo?.og_image || props.seo?.image || null
+})
+
+// Watch for SEO changes and update document title and meta tags immediately
+watchEffect(() => {
+  // Update document title
+  document.title = title.value
+  
+  // Update meta description
+  let metaDescription = document.querySelector('meta[name="description"]')
+  if (!metaDescription) {
+    metaDescription = document.createElement('meta')
+    metaDescription.setAttribute('name', 'description')
+    document.head.appendChild(metaDescription)
+  }
+  metaDescription.setAttribute('content', description.value)
+  
+  // Update Open Graph tags
+  const updateMetaTag = (property, content) => {
+    let meta = document.querySelector(`meta[property="${property}"]`)
+    if (!meta) {
+      meta = document.createElement('meta')
+      meta.setAttribute('property', property)
+      document.head.appendChild(meta)
+    }
+    meta.setAttribute('content', content)
+  }
+  
+  updateMetaTag('og:title', ogTitle.value)
+  updateMetaTag('og:description', ogDescription.value)
+  updateMetaTag('og:url', url.value)
+  if (ogImage.value) {
+    updateMetaTag('og:image', ogImage.value)
+  }
+})
 
 const form = reactive({
   peptideAmount: 5,

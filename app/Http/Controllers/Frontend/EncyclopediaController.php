@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
 use App\Models\Product;
 use App\Models\EducationPost;
+use App\Models\SeoPage;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -192,19 +194,33 @@ class EncyclopediaController extends Controller
                 ];
             });
 
-        // Generate SEO data
-        $seoData = new SEOData(
-            title: 'Peptide Encyclopedia - Comprehensive Research Guide | PeptideSync',
-            description: 'Explore our comprehensive peptide encyclopedia. Detailed information on research peptides including benefits, dosing, safety, and research applications.',
-            url: url('/encyclopedia'),
-        );
-        session(['page_seo_data' => $seoData]);
+        // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "encyclopedia")
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
+        $defaultTitle = 'Peptide Encyclopedia - Comprehensive Research Guide';
+        $defaultDescription = 'Explore our comprehensive peptide encyclopedia. Detailed information on research peptides including benefits, dosing, safety, and research applications.';
+
+        $seoPage = SeoPage::where('key', 'encyclopedia')->first();
+        $seo = [
+            'key' => 'encyclopedia',
+            'title' => $seoPage?->title ?: $defaultTitle,
+            'description' => $seoPage?->description ?: $defaultDescription,
+            'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
+            'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
+            'og_image' => $seoPage?->og_image ?: null,
+            // Backward-compatible field used by some pages
+            'image' => $seoPage?->og_image ?: null,
+            'url' => url('/encyclopedia'),
+        ];
+
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/Encyclopedia', [
             'peptides' => $categories,
             'encyclopediaEntries' => $encyclopediaEntries->values(),
             'search' => $request->get('search', ''),
             'category' => $selectedCategory,
+            'seo' => $seo,
         ]);
     }
 

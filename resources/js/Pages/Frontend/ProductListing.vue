@@ -260,7 +260,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch, h } from 'vue'
+import { ref, computed, onMounted, nextTick, watch, h, watchEffect } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import ProductCard from '@/components/ProductCard.vue'
@@ -276,6 +276,109 @@ const props = defineProps({
   sort: String,
   sortDir: String,
   search: String,
+  category: Object,
+  seo: {
+    type: Object,
+    default: () => ({
+      title: null,
+      description: null,
+      og_title: null,
+      og_description: null,
+      og_image: null,
+      image: null,
+      url: null,
+      canonical: null,
+    })
+  }
+})
+
+const page = usePage()
+
+// Computed values for reactive SEO updates (automatically from category data)
+const title = computed(() => {
+  // Use SEO title if provided, otherwise generate from category name
+  if (props.seo?.title) {
+    return props.seo.title
+  }
+  const siteName = page.props.site_name || 'Peptidemaps'
+  return `${props.productName || props.category?.name || 'Products'} – ${siteName}`
+})
+
+const description = computed(() => {
+  // Use SEO description if provided, otherwise generate from category description
+  if (props.seo?.description) {
+    return props.seo.description
+  }
+  if (props.category?.description) {
+    // Truncate to ~155 chars
+    const desc = props.category.description.replace(/\s+/g, ' ').trim()
+    return desc.length > 155 ? desc.substring(0, 155) + '...' : desc
+  }
+  return 'Browse ' + (props.productName || props.category?.name || 'products') + ' research peptides. Compare products, prices, and vendors.'
+})
+
+const url = computed(() => {
+  return props.seo?.url || page.url
+})
+
+const ogTitle = computed(() => {
+  return props.seo?.og_title || title.value
+})
+
+const ogDescription = computed(() => {
+  return props.seo?.og_description || description.value
+})
+
+const ogImage = computed(() => {
+  // Use SEO og_image if provided, otherwise use category image
+  return props.seo?.og_image || props.seo?.image || null
+})
+
+const canonical = computed(() => {
+  return props.seo?.canonical || url.value
+})
+
+// Watch for SEO changes and update document title and meta tags immediately
+watchEffect(() => {
+  // Update document title
+  document.title = title.value
+  
+  // Update meta description
+  let metaDescription = document.querySelector('meta[name="description"]')
+  if (!metaDescription) {
+    metaDescription = document.createElement('meta')
+    metaDescription.setAttribute('name', 'description')
+    document.head.appendChild(metaDescription)
+  }
+  metaDescription.setAttribute('content', description.value)
+  
+  // Update canonical link
+  let canonicalLink = document.querySelector('link[rel="canonical"]')
+  if (!canonicalLink) {
+    canonicalLink = document.createElement('link')
+    canonicalLink.setAttribute('rel', 'canonical')
+    document.head.appendChild(canonicalLink)
+  }
+  canonicalLink.setAttribute('href', canonical.value)
+  
+  // Update Open Graph tags
+  const updateMetaTag = (property, content) => {
+    if (!content) return // Don't set empty values
+    let meta = document.querySelector(`meta[property="${property}"]`)
+    if (!meta) {
+      meta = document.createElement('meta')
+      meta.setAttribute('property', property)
+      document.head.appendChild(meta)
+    }
+    meta.setAttribute('content', content)
+  }
+  
+  updateMetaTag('og:title', ogTitle.value)
+  updateMetaTag('og:description', ogDescription.value)
+  updateMetaTag('og:url', url.value)
+  if (ogImage.value) {
+    updateMetaTag('og:image', ogImage.value)
+  }
 })
 
 // Hero background lazy loading
