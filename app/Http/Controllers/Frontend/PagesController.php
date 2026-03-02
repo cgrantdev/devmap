@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Page;
+use App\Models\SeoPage;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
@@ -47,13 +49,30 @@ class PagesController extends Controller
         
         // Special handling for calculator page
         if ($slug === 'calculator') {
-            $seoData = new SEOData(
-                title: 'Peptide Calculator | PeptideSync',
-                description: 'Calculate peptide dosages and reconstitution volumes. Easy-to-use calculator for research peptide preparation.',
-                url: url('/calculator'),
-            );
-            session(['page_seo_data' => $seoData]);
-            return Inertia::render('Frontend/Calculator');
+            // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "calculator")
+            $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
+            $defaultTitle = 'Peptide Calculator';
+            $defaultDescription = 'Calculate peptide dosages and reconstitution volumes. Easy-to-use calculator for research peptide preparation.';
+
+            $seoPage = SeoPage::where('key', 'calculator')->first();
+            $seo = [
+                'key' => 'calculator',
+                'title' => $seoPage?->title ?: $defaultTitle,
+                'description' => $seoPage?->description ?: $defaultDescription,
+                'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
+                'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
+                'og_image' => $seoPage?->og_image ?: null,
+                // Backward-compatible field used by some pages
+                'image' => $seoPage?->og_image ?: null,
+                'url' => url('/calculator'),
+            ];
+
+            // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+            session(['page_seo_data' => $seo]);
+            
+            return Inertia::render('Frontend/Calculator', [
+                'seo' => $seo,
+            ]);
         }
         
         // Find page by slug

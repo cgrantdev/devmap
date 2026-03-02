@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Research;
 use App\Models\EducationalGuide;
+use App\Models\SeoPage;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -107,19 +109,26 @@ class KnowledgeCenterController extends Controller
             $educationalGuides = $this->getEducationalGuides($request);
         }
 
-        // Generate SEO data
-        $navTitles = [
-            'news' => 'Peptide News & Industry Updates',
-            'research' => 'Peptide Research Library',
-            'guides' => 'Educational Guides',
+        // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "news")
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
+        $defaultTitle = 'Peptide News & Industry Updates';
+        $defaultDescription = 'Access comprehensive peptide knowledge including news, research papers, and educational guides. Stay informed about the latest developments in peptide research.';
+
+        $seoPage = SeoPage::where('key', 'news')->first();
+        $seo = [
+            'key' => 'news',
+            'title' => $seoPage?->title ?: $defaultTitle,
+            'description' => $seoPage?->description ?: $defaultDescription,
+            'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
+            'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
+            'og_image' => $seoPage?->og_image ?: null,
+            // Backward-compatible field used by some pages
+            'image' => $seoPage?->og_image ?: null,
+            'url' => url('/news', ['nav' => $primaryNav]),
         ];
-        $title = $navTitles[$primaryNav] ?? 'Knowledge Center';
-        $seoData = new SEOData(
-            title: $title . ' | PeptideSync',
-            description: 'Access comprehensive peptide knowledge including news, research papers, and educational guides. Stay informed about the latest developments in peptide research.',
-            url: url('/news', ['nav' => $primaryNav]),
-        );
-        session(['page_seo_data' => $seoData]);
+
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/KnowledgeCenter', [
             'featuredBlogs' => $featuredBlogs,
@@ -129,6 +138,7 @@ class KnowledgeCenterController extends Controller
             'search' => $request->get('search', ''),
             'primaryNav' => $primaryNav,
             'filter' => $filter,
+            'seo' => $seo,
         ]);
     }
 

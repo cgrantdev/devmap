@@ -221,15 +221,44 @@ class ProductsController extends Controller
             }
         }
 
-        // Generate SEO data for product detail
-        $productImage = $product->image_url ? (str_starts_with($product->image_url, 'http') ? $product->image_url : url($product->image_url)) : null;
-        $seoData = new SEOData(
-            title: $product->name . ' - Product Details | PeptideSync',
-            description: $product->description ? $this->safeLimit($product->description, 160) : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.',
-            image: $productImage,
-            url: url("/product/{$product->slug}/{$product->id}"),
-        );
-        session(['page_seo_data' => $seoData]);
+        // Generate SEO data for product detail (automatically from product fields)
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemaps';
+        $productUrl = url("/product/{$product->slug}/{$product->id}");
+        
+        // Build product image URL - handle both absolute URLs and relative paths
+        $productImage = null;
+        if ($product->image_url) {
+            if (str_starts_with($product->image_url, 'http')) {
+                $productImage = $product->image_url;
+            } else {
+                $productImage = url($product->image_url);
+            }
+        }
+        
+        // Build title: {ProductName} – Peptidemaps
+        $seoTitle = $product->name . ' – ' . $siteName;
+        
+        // Build description: first ~150-160 chars of product description
+        $seoDescription = $product->description 
+            ? $this->safeLimit($product->description, 155) 
+            : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.';
+        
+        // Build SEO array (same format as products/brands pages)
+        $seo = [
+            'key' => 'product',
+            'title' => $seoTitle,
+            'description' => $seoDescription,
+            'og_title' => $seoTitle,
+            'og_description' => $seoDescription,
+            'og_image' => $productImage,
+            // Backward-compatible field used by some pages
+            'image' => $productImage,
+            'url' => $productUrl,
+            'canonical' => $productUrl,
+        ];
+        
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/ProductDetail', [
             'product' => [
@@ -266,6 +295,7 @@ class ProductsController extends Controller
             ] : null,
             'relatedProducts' => $relatedProducts,
             'reviews' => $reviews,
+            'seo' => $seo,
         ]);
     }
 
@@ -414,18 +444,40 @@ class ProductsController extends Controller
         // Get price range
         $priceRange = $baseQuery->selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
 
-        // Generate SEO data for category listing
+        // Generate SEO data for category listing (automatically from category fields)
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemaps';
+        $categoryUrl = url("/product/{$slug}");
+        
+        // Build category image URL
         $categoryImage = null;
         if ($category->image_url) {
             $categoryImage = Storage::url('categories/' . $category->image_url);
         }
-        $seoData = new SEOData(
-            title: $category->name . ' - Research Peptides | PeptideSync',
-            description: $category->description ? $this->safeLimit($category->description, 160) : 'Browse ' . $category->name . ' research peptides. Compare products, prices, and vendors.',
-            image: $categoryImage,
-            url: url("/product/{$slug}"),
-        );
-        session(['page_seo_data' => $seoData]);
+        
+        // Build title: {CategoryName} – Peptidemaps
+        $seoTitle = $category->name . ' – ' . $siteName;
+        
+        // Build description: first ~150-160 chars of category description
+        $seoDescription = $category->description 
+            ? $this->safeLimit($category->description, 155) 
+            : 'Browse ' . $category->name . ' research peptides. Compare products, prices, and vendors.';
+        
+        // Build SEO array (same format as other pages)
+        $seo = [
+            'key' => 'product-listing',
+            'title' => $seoTitle,
+            'description' => $seoDescription,
+            'og_title' => $seoTitle,
+            'og_description' => $seoDescription,
+            'og_image' => $categoryImage,
+            // Backward-compatible field used by some pages
+            'image' => $categoryImage,
+            'url' => $categoryUrl,
+            'canonical' => $categoryUrl,
+        ];
+        
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/ProductListing', [
             'category' => [
@@ -446,6 +498,7 @@ class ProductsController extends Controller
             'sort' => $sortBy,
             'sortDir' => $sortDir,
             'search' => $request->get('search', ''),
+            'seo' => $seo,
         ]);
     }
 
