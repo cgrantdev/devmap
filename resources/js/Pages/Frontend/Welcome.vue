@@ -166,6 +166,7 @@
             :image="peptide.image"
             :slug="peptide.slug"
             :category-tag="peptide.categoryTag"
+            :peptide-full-name="peptide.peptide_full_name"
           />
         </div>
 
@@ -516,9 +517,8 @@ const topVendors = computed(() => (props.topBrands || []).slice(0, 10))
 // Peptide Encyclopedia - show first 8 categories with category tags
 const displayedEncyclopediaPeptides = computed(() => {
   return props.productGroups.slice(0, 8).map(category => {
-    // Determine category tag based on name/description
-    const categoryTag = getCategoryTag(category.name, category.description)
-    console.log(category)
+    // Use education_tag from database, fallback to computed tag if not available
+    const categoryTag = category.education_tag
     
     return {
       ...category,
@@ -526,36 +526,6 @@ const displayedEncyclopediaPeptides = computed(() => {
     }
   })
 })
-
-// Helper function to determine category tag
-const getCategoryTag = (name, description) => {
-  const nameLower = (name || '').toLowerCase()
-  const descLower = (description || '').toLowerCase()
-  const combined = `${nameLower} ${descLower}`
-  
-  // Healing & Recovery
-  if (combined.includes('bpc') || combined.includes('tb-500') || combined.includes('healing') || combined.includes('recovery')) {
-    return 'Healing & Recovery'
-  }
-  
-  // Growth & Recovery
-  if (combined.includes('cjc') || combined.includes('ipamorelin') || combined.includes('ghrp') || combined.includes('growth')) {
-    return 'Growth & Recovery'
-  }
-  
-  // Weight Management
-  if (combined.includes('semaglutide') || combined.includes('tirzepatide') || combined.includes('weight') || combined.includes('glp')) {
-    return 'Weight Management'
-  }
-  
-  // Cosmetic
-  if (combined.includes('melanotan') || combined.includes('tanning') || combined.includes('cosmetic')) {
-    return 'Cosmetic'
-  }
-  
-  // Default fallback
-  return 'Research Peptide'
-}
 
 // Limited Time Discounts
 const discountDeals = computed(() => props.discountDeals || [])

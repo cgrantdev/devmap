@@ -44,8 +44,13 @@ class HomeController extends Controller
             }
         }
 
-        // Education categories (align with education page)
+        // Education categories - only show categories with published encyclopedia articles
         $categories = ProductCategory::where('is_active', true)
+            ->whereHas('educationPost', function ($epQuery) {
+                $epQuery->where('status', 'published')
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now());
+            })
             ->withCount([
                 'products as products_count' => function ($q) {
                     $q->visible()->where('status', 'active');
@@ -77,6 +82,8 @@ class HomeController extends Controller
                     'total_items' => $category->products_count,
                     'image' => $image,
                     'description' => $educationPost ? $educationPost->description : $category->description,
+                    'peptide_full_name' => $educationPost ? $educationPost->peptide_full_name : null,
+                    'education_tag' => $educationPost ? $educationPost->education_tag : null,
                 ];
             });
 

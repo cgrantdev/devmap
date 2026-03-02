@@ -50,9 +50,9 @@
         </div>
       </div>      
 
-      <!-- Description (Fixed height) -->
+      <!-- Peptide Full Name (Fixed height) -->
       <p class="text-sm text-gray-600 mb-3">
-        Peptide full name
+        {{ peptideFullName || 'Peptide full name' }}
       </p>
 
       <!-- Category Tag (Fixed height) -->
@@ -100,6 +100,10 @@ const props = defineProps({
   categoryTag: {
     type: String,
     default: ''
+  },
+  peptideFullName: {
+    type: String,
+    default: null
   }
 })
 
@@ -111,7 +115,7 @@ const hasImage = computed(() => {
 })
 
 const handleClick = () => {
-  router.visit(`/encyclopedia/${props.slug}`)
+  router.visit(`/encyclopedia/article/${props.slug}`)
 }
 
 const onError = (event) => {
