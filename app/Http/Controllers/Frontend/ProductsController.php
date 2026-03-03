@@ -468,7 +468,7 @@ class ProductsController extends Controller
         $priceRange = $baseQuery->selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
 
         // Generate SEO data for category listing (automatically from category fields)
-        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemaps';
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
         $categoryUrl = url("/product/{$slug}");
         
         // Build category image URL
@@ -477,7 +477,7 @@ class ProductsController extends Controller
             $categoryImage = Storage::url('categories/' . $category->image_url);
         }
         
-        // Build title: {CategoryName} – Peptidemaps
+        // Build title: {CategoryName} – Peptidemap
         $seoTitle = $category->name . ' – ' . $siteName;
         
         // Build description: first ~150-160 chars of category description

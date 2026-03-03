@@ -93,6 +93,11 @@ class BlogManagementController extends Controller
             'read_time' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published',
             'is_featured' => 'boolean',
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:500',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string|max:500',
+            'seo_og_image' => 'nullable|url|max:500',
         ]);
 
         // Auto-generate slug from title
@@ -143,6 +148,11 @@ class BlogManagementController extends Controller
                 'published_at' => $blog->published_at ? $blog->published_at->format('Y-m-d') : null,
                 'is_featured' => $blog->is_featured,
                 'status' => $blog->status,
+                'seo_page_title' => $blog->seo_page_title,
+                'seo_description' => $blog->seo_description,
+                'seo_og_title' => $blog->seo_og_title,
+                'seo_og_description' => $blog->seo_og_description,
+                'seo_og_image' => $blog->seo_og_image,
             ],
         ]);
     }
@@ -171,6 +181,11 @@ class BlogManagementController extends Controller
             'read_time' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published',
             'is_featured' => 'boolean',
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:500',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string|max:500',
+            'seo_og_image' => 'nullable|url|max:500',
         ]);
 
         // Auto-generate slug from title

@@ -1,4 +1,24 @@
 <template>
+  <Head :title="title">
+    <meta name="description" :content="description" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article" />
+    <meta property="og:url" :content="url" />
+    <meta property="og:title" :content="ogTitle" />
+    <meta property="og:description" :content="ogDescription" />
+    <meta v-if="ogImage" property="og:image" :content="ogImage" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" :content="url" />
+    <meta name="twitter:title" :content="ogTitle" />
+    <meta name="twitter:description" :content="ogDescription" />
+    <meta v-if="ogImage" name="twitter:image" :content="ogImage" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" :href="canonical" />
+  </Head>
   <FrontLayout>
     <!-- Blog Detail Section -->
     <div class="min-h-screen bg-gray-50">
@@ -178,13 +198,107 @@
 </template>
 
 <script setup>
-import { router } from '@inertiajs/vue3'
+import { computed, watchEffect } from 'vue'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import BlogPostCard from '@/components/BlogPostCard.vue'
 
 const props = defineProps({
   blog: Object,
   related: Array,
+  seo: {
+    type: Object,
+    default: () => ({
+      title: null,
+      description: null,
+      og_title: null,
+      og_description: null,
+      og_image: null,
+      image: null,
+      url: null,
+      canonical: null,
+    })
+  }
+})
+
+const page = usePage()
+
+// Computed values for reactive SEO updates
+const title = computed(() => {
+  if (props.seo?.title) {
+    return props.seo.title
+  }
+  const siteName = page.props.site_name || 'Peptidemap'
+  return `${props.blog?.title || 'News'} - ${siteName}`
+})
+
+const description = computed(() => {
+  if (props.seo?.description) {
+    return props.seo.description
+  }
+  if (props.blog?.description) {
+    const desc = props.blog.description.replace(/\s+/g, ' ').trim()
+    return desc.length > 160 ? desc.substring(0, 160) + '...' : desc
+  }
+  return `Read the latest article about ${props.blog?.title || 'this news'} on Peptidemap.`
+})
+
+const url = computed(() => {
+  return props.seo?.url || page.url
+})
+
+const ogTitle = computed(() => {
+  return props.seo?.og_title || title.value
+})
+
+const ogDescription = computed(() => {
+  return props.seo?.og_description || description.value
+})
+
+const ogImage = computed(() => {
+  return props.seo?.og_image || props.seo?.image || props.blog?.image || null
+})
+
+const canonical = computed(() => {
+  return props.seo?.canonical || url.value
+})
+
+// Watch for SEO changes and update document meta tags
+watchEffect(() => {
+  document.title = title.value
+  let metaDescription = document.querySelector('meta[name="description"]')
+  if (!metaDescription) {
+    metaDescription = document.createElement('meta')
+    metaDescription.setAttribute('name', 'description')
+    document.head.appendChild(metaDescription)
+  }
+  metaDescription.setAttribute('content', description.value)
+
+  let canonicalLink = document.querySelector('link[rel="canonical"]')
+  if (!canonicalLink) {
+    canonicalLink = document.createElement('link')
+    canonicalLink.setAttribute('rel', 'canonical')
+    document.head.appendChild(canonicalLink)
+  }
+  canonicalLink.setAttribute('href', canonical.value)
+
+  const updateMetaTag = (property, content) => {
+    if (!content) return
+    let meta = document.querySelector(`meta[property="${property}"]`)
+    if (!meta) {
+      meta = document.createElement('meta')
+      meta.setAttribute('property', property)
+      document.head.appendChild(meta)
+    }
+    meta.setAttribute('content', content)
+  }
+
+  updateMetaTag('og:title', ogTitle.value)
+  updateMetaTag('og:description', ogDescription.value)
+  updateMetaTag('og:url', url.value)
+  if (ogImage.value) {
+    updateMetaTag('og:image', ogImage.value)
+  }
 })
 
 const getCategoryTagClass = (category) => {

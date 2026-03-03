@@ -393,12 +393,52 @@ class KnowledgeCenterController extends Controller
             ->firstOrFail();
 
         // Generate SEO data for guide
-        $seoData = new SEOData(
-            title: $guide->title . ' - Educational Guide | PeptideSync',
-            description: $guide->description ? $this->safeLimit($guide->description, 160) : 'Educational guide: ' . $guide->title,
-            url: url("/guide/{$guide->id}"),
-        );
-        session(['page_seo_data' => $seoData]);
+        // Priority: Use stored SEO data from database, fallback to auto-generated
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
+        $guideUrl = url("/guide/{$guide->id}");
+        
+        // Check if stored SEO data exists
+        $hasStoredSeo = !empty($guide->seo_page_title) || !empty($guide->seo_description);
+        
+        if ($hasStoredSeo) {
+            // Use stored SEO data from database
+            $seoTitle = $guide->seo_page_title ?: ($guide->title . ' - ' . $siteName);
+            $seoDescription = $guide->seo_description 
+                ?: ($guide->description 
+                    ? $this->safeLimit($guide->description, 160) 
+                    : 'Educational guide: ' . $guide->title . ' on ' . $siteName . '.');
+            $seoOgTitle = $guide->seo_og_title ?: $seoTitle;
+            $seoOgDescription = $guide->seo_og_description ?: $seoDescription;
+            $seoOgImage = $guide->seo_og_image 
+                ? (str_starts_with($guide->seo_og_image, 'http') ? $guide->seo_og_image : url($guide->seo_og_image))
+                : null;
+        } else {
+            // Auto-generate SEO from guide fields
+            $seoTitle = $guide->title . ' - ' . $siteName;
+            $seoDescription = $guide->description 
+                ? $this->safeLimit($guide->description, 160) 
+                : 'Educational guide: ' . $guide->title . ' on ' . $siteName . '.';
+            $seoOgTitle = $seoTitle;
+            $seoOgDescription = $seoDescription;
+            $seoOgImage = null;
+        }
+        
+        // Build SEO array (same format as products/brands pages)
+        $seo = [
+            'key' => 'guide',
+            'title' => $seoTitle,
+            'description' => $seoDescription,
+            'og_title' => $seoOgTitle,
+            'og_description' => $seoOgDescription,
+            'og_image' => $seoOgImage,
+            // Backward-compatible field used by some pages
+            'image' => $seoOgImage,
+            'url' => $guideUrl,
+            'canonical' => $guideUrl,
+        ];
+        
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/EducationGuideDetail', [
             'id' => $guide->id,
@@ -423,6 +463,7 @@ class KnowledgeCenterController extends Controller
             'dos' => $guide->dos ?? [],
             'donts' => $guide->donts ?? [],
             'conclusion' => $guide->conclusion,
+            'seo' => $seo,
         ]);
     }
 
@@ -441,12 +482,52 @@ class KnowledgeCenterController extends Controller
         $evidenceLevel = $research->evidence_level ? $research->evidence_level . ' Evidence' : null;
 
         // Generate SEO data for research
-        $seoData = new SEOData(
-            title: $research->title . ' - Research Study | PeptideSync',
-            description: $research->study_summary ? $this->safeLimit($research->study_summary, 160) : 'Research study: ' . $research->title,
-            url: url("/research/{$research->id}"),
-        );
-        session(['page_seo_data' => $seoData]);
+        // Priority: Use stored SEO data from database, fallback to auto-generated
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
+        $researchUrl = url("/research/{$research->id}");
+        
+        // Check if stored SEO data exists
+        $hasStoredSeo = !empty($research->seo_page_title) || !empty($research->seo_description);
+        
+        if ($hasStoredSeo) {
+            // Use stored SEO data from database
+            $seoTitle = $research->seo_page_title ?: ($research->title . ' - ' . $siteName);
+            $seoDescription = $research->seo_description 
+                ?: ($research->study_summary 
+                    ? $this->safeLimit($research->study_summary, 160) 
+                    : 'Research study: ' . $research->title . ' on ' . $siteName . '.');
+            $seoOgTitle = $research->seo_og_title ?: $seoTitle;
+            $seoOgDescription = $research->seo_og_description ?: $seoDescription;
+            $seoOgImage = $research->seo_og_image 
+                ? (str_starts_with($research->seo_og_image, 'http') ? $research->seo_og_image : url($research->seo_og_image))
+                : null;
+        } else {
+            // Auto-generate SEO from research fields
+            $seoTitle = $research->title . ' - ' . $siteName;
+            $seoDescription = $research->study_summary 
+                ? $this->safeLimit($research->study_summary, 160) 
+                : 'Research study: ' . $research->title . ' on ' . $siteName . '.';
+            $seoOgTitle = $seoTitle;
+            $seoOgDescription = $seoDescription;
+            $seoOgImage = null;
+        }
+        
+        // Build SEO array (same format as products/brands pages)
+        $seo = [
+            'key' => 'research',
+            'title' => $seoTitle,
+            'description' => $seoDescription,
+            'og_title' => $seoOgTitle,
+            'og_description' => $seoOgDescription,
+            'og_image' => $seoOgImage,
+            // Backward-compatible field used by some pages
+            'image' => $seoOgImage,
+            'url' => $researchUrl,
+            'canonical' => $researchUrl,
+        ];
+        
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/ResearchStudyDetail', [
             'id' => $research->id,
@@ -464,6 +545,7 @@ class KnowledgeCenterController extends Controller
             'limitations' => $research->limitations,
             'tags' => $research->tags ?? [],
             'pubmedUrl' => $research->pubmed_url ?: '#',
+            'seo' => $seo,
         ]);
     }
 }

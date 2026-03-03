@@ -300,7 +300,7 @@ const title = computed(() => {
   if (props.seo?.title) {
     return props.seo.title
   }
-  const siteName = page.props.site_name || 'Peptidemaps'
+  const siteName = page.props.site_name || 'Peptidemap'
   return `${props.productName || props.category?.name || 'Products'} – ${siteName}`
 })
 
