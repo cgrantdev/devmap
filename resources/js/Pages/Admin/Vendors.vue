@@ -298,8 +298,61 @@
             />
           </div>
 
+          <!-- Payment Methods -->
+          <div>
+            <label class="block text-sm text-gray-700 mb-2">Payment Methods</label>
+            <div class="flex gap-6 flex-wrap">
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  :value="'Credit Card'"
+                  v-model="editForm.payment_methods"
+                  class="w-4 h-4 text-blue-600"
+                />
+                <span class="text-sm text-gray-700">Credit Card</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  :value="'PayPal'"
+                  v-model="editForm.payment_methods"
+                  class="w-4 h-4 text-blue-600"
+                />
+                <span class="text-sm text-gray-700">PayPal</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  :value="'Cryptocurrency'"
+                  v-model="editForm.payment_methods"
+                  class="w-4 h-4 text-blue-600"
+                />
+                <span class="text-sm text-gray-700">Cryptocurrency</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  :value="'Bank Transfer'"
+                  v-model="editForm.payment_methods"
+                  class="w-4 h-4 text-blue-600"
+                />
+                <span class="text-sm text-gray-700">Bank Transfer</span>
+              </label>
+            </div>
+          </div>
+
           <!-- Checkboxes -->
-          <div class="flex gap-6">
+          <div>
+            <label class="block text-sm text-gray-700 mb-2">Status</label> 
+            <div class="flex gap-6 flex-wrap">
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  v-model="editForm.is_active"
+                  class="w-4 h-4 text-blue-600"
+                />
+                <span class="text-sm text-gray-700">Active</span>
+              </label>
             <label class="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -324,6 +377,59 @@
               />
               <span class="text-sm text-gray-700">Partner</span>
             </label>            
+            </div>
+          </div>
+
+          <!-- SEO Data Section -->
+          <div class="border-t border-gray-200 pt-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">SEO Data</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm text-gray-700 mb-2">Page Title</label>
+                <input
+                  v-model="editForm.seo_page_title"
+                  type="text"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter page title for SEO"
+                />
+              </div>
+              <div>
+                <label class="block text-sm text-gray-700 mb-2">Description</label>
+                <textarea
+                  v-model="editForm.seo_description"
+                  rows="3"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter meta description for SEO"
+                ></textarea>
+              </div>
+              <div>
+                <label class="block text-sm text-gray-700 mb-2">OG:Title</label>
+                <input
+                  v-model="editForm.seo_og_title"
+                  type="text"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Open Graph title"
+                />
+              </div>
+              <div>
+                <label class="block text-sm text-gray-700 mb-2">OG:Image</label>
+                <input
+                  v-model="editForm.seo_og_image"
+                  type="url"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Open Graph image URL"
+                />
+              </div>
+              <div>
+                <label class="block text-sm text-gray-700 mb-2">OG:Description</label>
+                <textarea
+                  v-model="editForm.seo_og_description"
+                  rows="3"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Open Graph description"
+                ></textarea>
+              </div>
+            </div>
           </div>
 
           <!-- Action Buttons -->
@@ -401,9 +507,16 @@ const editForm = useForm({
   return_policy: '',
   business_hours: '',
   banner_image_url: '',
+  is_active: false,
   top_vendor: false,
   featured: false,
   is_partner: false,
+  payment_methods: [],
+  seo_page_title: '',
+  seo_description: '',
+  seo_og_title: '',
+  seo_og_image: '',
+  seo_og_description: '',
   banner: null,
   logo: null,
   _token: usePage().props.csrf_token
@@ -449,9 +562,16 @@ function openEditModal(vendor) {
   editForm.return_policy = vendor.settings?.return_policy || ''
   editForm.business_hours = vendor.settings?.business_hours || ''
   editForm.banner_image_url = vendor.settings?.banner_image_url || ''
+  editForm.is_active = vendor.is_active ?? false
   editForm.top_vendor = vendor.settings?.top_vendor || false
   editForm.featured = vendor.settings?.featured || false
   editForm.is_partner = vendor.settings?.is_partner || false
+  editForm.payment_methods = vendor.settings?.payment_methods || []
+  editForm.seo_page_title = vendor.settings?.seo_page_title || ''
+  editForm.seo_description = vendor.settings?.seo_description || ''
+  editForm.seo_og_title = vendor.settings?.seo_og_title || ''
+  editForm.seo_og_image = vendor.settings?.seo_og_image || ''
+  editForm.seo_og_description = vendor.settings?.seo_og_description || ''
   editForm.banner = null
   editForm.logo = null
   bannerPreview.value = null

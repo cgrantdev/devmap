@@ -169,7 +169,15 @@
           </div>
 
           <!-- Checkboxes -->
-          <div class="flex gap-6">
+          <div class="flex gap-6 flex-wrap">
+            <label class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                v-model="editForm.is_active"
+                class="w-4 h-4 text-blue-600"
+              />
+              <span class="text-sm text-slate-700">Active</span>
+            </label>
             <label class="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -194,6 +202,49 @@
               />
               <span class="text-sm text-slate-700">Partner</span>
             </label>
+          </div>
+
+          <!-- Payment Methods -->
+          <div>
+            <label class="block text-sm text-slate-700 mb-3 font-semibold">Payment Methods</label>
+            <div class="flex gap-6 flex-wrap">
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  :value="'Credit Card'"
+                  v-model="editForm.payment_methods"
+                  class="w-4 h-4 text-blue-600"
+                />
+                <span class="text-sm text-slate-700">Credit Card</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  :value="'PayPal'"
+                  v-model="editForm.payment_methods"
+                  class="w-4 h-4 text-blue-600"
+                />
+                <span class="text-sm text-slate-700">PayPal</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  :value="'Cryptocurrency'"
+                  v-model="editForm.payment_methods"
+                  class="w-4 h-4 text-blue-600"
+                />
+                <span class="text-sm text-slate-700">Cryptocurrency</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  :value="'Bank Transfer'"
+                  v-model="editForm.payment_methods"
+                  class="w-4 h-4 text-blue-600"
+                />
+                <span class="text-sm text-slate-700">Bank Transfer</span>
+              </label>
+            </div>
           </div>
 
           <div class="flex justify-end pt-4 border-t border-slate-200 gap-3">
@@ -348,6 +399,7 @@ const editForm = useForm({
   top_vendor: props.vendor?.settings?.top_vendor || false,
   featured: props.vendor?.settings?.featured || false,
   is_partner: props.vendor?.settings?.is_partner || false,
+  payment_methods: props.vendor?.settings?.payment_methods || [],
   banner: null,
   logo: null,
   is_active: props.vendor?.is_active ?? false,
@@ -374,6 +426,8 @@ watch(() => props.vendor, (newVendor) => {
     editForm.top_vendor = newVendor.settings?.top_vendor || false
     editForm.featured = newVendor.settings?.featured || false
     editForm.is_partner = newVendor.settings?.is_partner || false
+    editForm.payment_methods = newVendor.settings?.payment_methods || []
+    editForm.is_active = newVendor.is_active ?? false
     editForm.banner_url = newVendor.settings?.banner_url || ''
     editForm.logo_url = newVendor.settings?.logo_url || ''
   }

@@ -55,6 +55,12 @@ class VendorsController extends Controller
                         'top_vendor' => $brand->vendorSetting->top_vendor ?? false,
                         'featured' => $brand->vendorSetting->featured ?? false,
                         'is_partner' => $brand->vendorSetting->is_partner ?? false,
+                        'payment_methods' => $brand->vendorSetting->payment_methods ?? [],
+                        'seo_page_title' => $brand->vendorSetting->seo_page_title ?? null,
+                        'seo_description' => $brand->vendorSetting->seo_description ?? null,
+                        'seo_og_title' => $brand->vendorSetting->seo_og_title ?? null,
+                        'seo_og_description' => $brand->vendorSetting->seo_og_description ?? null,
+                        'seo_og_image' => $brand->vendorSetting->seo_og_image ?? null,
                     ] : null
                 ];
             });
@@ -125,6 +131,13 @@ class VendorsController extends Controller
             'top_vendor' => 'nullable|boolean',
             'featured' => 'nullable|boolean',
             'is_partner' => 'nullable|boolean',
+            'payment_methods' => 'nullable|array',
+            'payment_methods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:500',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string|max:500',
+            'seo_og_image' => 'nullable|url|max:500',
             'banner' => 'nullable|image|max:2048',
             'logo' => 'nullable|mimes:jpeg,jpg,png,gif,webp,svg|max:1024',
         ]);
@@ -186,6 +199,7 @@ class VendorsController extends Controller
         $settings->top_vendor = $validated['top_vendor'] ?? false;
         $settings->featured = $validated['featured'] ?? false;
         $settings->is_partner = $validated['is_partner'] ?? false;
+        $settings->payment_methods = $validated['payment_methods'] ?? null;
         $settings->status = 1; // Active by default
         $settings->save();
 
@@ -223,6 +237,12 @@ class VendorsController extends Controller
                 'top_vendor' => $brand->vendorSetting->top_vendor ?? false,
                 'featured' => $brand->vendorSetting->featured ?? false,
                 'is_partner' => $brand->vendorSetting->is_partner ?? false,
+                'payment_methods' => $brand->vendorSetting->payment_methods ?? [],
+                'seo_page_title' => $brand->vendorSetting->seo_page_title ?? null,
+                'seo_description' => $brand->vendorSetting->seo_description ?? null,
+                'seo_og_title' => $brand->vendorSetting->seo_og_title ?? null,
+                'seo_og_description' => $brand->vendorSetting->seo_og_description ?? null,
+                'seo_og_image' => $brand->vendorSetting->seo_og_image ?? null,
                 'banner' => $brand->vendorSetting->banner,
                 'logo' => $brand->vendorSetting->logo,
                 'banner_url' => $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
@@ -260,6 +280,13 @@ class VendorsController extends Controller
             'top_vendor' => 'nullable|boolean',
             'featured' => 'nullable|boolean',
             'is_partner' => 'nullable|boolean',
+            'payment_methods' => 'nullable|array',
+            'payment_methods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:500',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string|max:500',
+            'seo_og_image' => 'nullable|url|max:500',
             'banner' => 'nullable|image|max:2048',
             'logo' => 'nullable|mimes:jpeg,jpg,png,gif,webp,svg|max:1024',
             'is_active' => 'nullable|boolean',
@@ -335,6 +362,24 @@ class VendorsController extends Controller
         $settings->top_vendor = $validated['top_vendor'] ?? $settings->top_vendor ?? false;
         $settings->featured = $validated['featured'] ?? $settings->featured ?? false;
         $settings->is_partner = $validated['is_partner'] ?? $settings->is_partner ?? false;
+        if (isset($validated['payment_methods'])) {
+            $settings->payment_methods = $validated['payment_methods'];
+        }
+        if (isset($validated['seo_page_title'])) {
+            $settings->seo_page_title = $validated['seo_page_title'];
+        }
+        if (isset($validated['seo_description'])) {
+            $settings->seo_description = $validated['seo_description'];
+        }
+        if (isset($validated['seo_og_title'])) {
+            $settings->seo_og_title = $validated['seo_og_title'];
+        }
+        if (isset($validated['seo_og_description'])) {
+            $settings->seo_og_description = $validated['seo_og_description'];
+        }
+        if (isset($validated['seo_og_image'])) {
+            $settings->seo_og_image = $validated['seo_og_image'];
+        }
         $settings->save();
 
         return redirect()->route('admin.vendors')->with('success', 'Vendor updated successfully.');
@@ -553,6 +598,11 @@ class VendorsController extends Controller
                     'review_count' => $product->rating_count ?? 0,
                     'size_mg' => $product->size_mg,
                     'dosage' => $product->size_mg,
+                    'seo_page_title' => $product->seo_page_title,
+                    'seo_description' => $product->seo_description,
+                    'seo_og_title' => $product->seo_og_title,
+                    'seo_og_description' => $product->seo_og_description,
+                    'seo_og_image' => $product->seo_og_image,
                 ];
             });
         // Get brands and categories for filters

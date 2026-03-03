@@ -369,8 +369,9 @@ const title = computed(() => {
   if (props.seo?.title) {
     return props.seo.title
   }
-  const siteName = page.props.site_name || 'Peptidemaps'
-  return `${props.product?.name || 'Product'} – ${siteName}`
+  const siteName = page.props.site_name || 'PeptideMap'
+  const vendorName = props.brand?.name || 'our store'
+  return `Buy ${props.product?.name || 'Product'} from ${vendorName} - ${siteName}`
 })
 
 const description = computed(() => {

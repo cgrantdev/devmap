@@ -30,6 +30,12 @@ class VendorSetting extends Model
         'top_vendor',
         'featured',
         'is_partner',
+        'payment_methods',
+        'seo_page_title',
+        'seo_description',
+        'seo_og_title',
+        'seo_og_description',
+        'seo_og_image',
     ];
 
     protected $casts = [
@@ -38,6 +44,7 @@ class VendorSetting extends Model
         'featured' => 'boolean',
         'is_partner' => 'boolean',
         'status' => 'integer',
+        'payment_methods' => 'array',
     ];
 
     public function brand()

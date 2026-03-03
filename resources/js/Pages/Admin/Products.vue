@@ -406,6 +406,58 @@
               </div>
             </div>
 
+            <!-- SEO Data Section -->
+            <div class="border-t border-gray-200 pt-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">SEO Data</h3>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm text-gray-700 mb-2">Page Title</label>
+                  <input
+                    v-model="editForm.seo_page_title"
+                    type="text"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter page title for SEO"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-700 mb-2">Description</label>
+                  <textarea
+                    v-model="editForm.seo_description"
+                    rows="3"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter meta description for SEO"
+                  ></textarea>
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-700 mb-2">OG:Title</label>
+                  <input
+                    v-model="editForm.seo_og_title"
+                    type="text"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter Open Graph title"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-700 mb-2">OG:Image</label>
+                  <input
+                    v-model="editForm.seo_og_image"
+                    type="url"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter Open Graph image URL"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-700 mb-2">OG:Description</label>
+                  <textarea
+                    v-model="editForm.seo_og_description"
+                    rows="3"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter Open Graph description"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
             <!-- Error Messages -->
             <div v-if="Object.keys(editForm.errors).length > 0" class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
               <p class="font-medium mb-2">Please fix the following errors:</p>
@@ -469,6 +521,11 @@ const editForm = useForm({
   lab_tested: false,
   first_timer_deals: false,
   auto_update: false,
+  seo_page_title: '',
+  seo_description: '',
+  seo_og_title: '',
+  seo_og_image: '',
+  seo_og_description: '',
   _token: usePage().props.csrf_token
 })
 
@@ -608,6 +665,11 @@ function openEditModal(product) {
   editForm.lab_tested = !!product.lab_tested
   editForm.first_timer_deals = !!product.first_timer_deals
   editForm.auto_update = !!product.auto_update
+  editForm.seo_page_title = product.seo_page_title ?? ''
+  editForm.seo_description = product.seo_description ?? ''
+  editForm.seo_og_title = product.seo_og_title ?? ''
+  editForm.seo_og_image = product.seo_og_image ?? ''
+  editForm.seo_og_description = product.seo_og_description ?? ''
   
   // Determine if product is on sale
   const hasOriginalPrice = product.original_price && product.original_price > product.price
@@ -667,6 +729,11 @@ function submitEdit() {
     lab_tested: editForm.lab_tested,
     first_timer_deals: editForm.first_timer_deals,
     auto_update: editForm.auto_update,
+    seo_page_title: editForm.seo_page_title || null,
+    seo_description: editForm.seo_description || null,
+    seo_og_title: editForm.seo_og_title || null,
+    seo_og_description: editForm.seo_og_description || null,
+    seo_og_image: editForm.seo_og_image || null,
     _token: editForm._token
   }
   
