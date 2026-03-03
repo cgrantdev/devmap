@@ -221,8 +221,9 @@ class ProductsController extends Controller
             }
         }
 
-        // Generate SEO data for product detail (automatically from product fields)
-        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemaps';
+        // Generate SEO data for product detail
+        // Priority: Use stored SEO data from database, fallback to auto-generated from product fields
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'PeptideMap';
         $productUrl = url("/product/{$product->slug}/{$product->id}");
         
         // Build product image URL - handle both absolute URLs and relative paths
@@ -235,24 +236,46 @@ class ProductsController extends Controller
             }
         }
         
-        // Build title: {ProductName} – Peptidemaps
-        $seoTitle = $product->name . ' – ' . $siteName;
+        // Check if stored SEO data exists
+        $hasStoredSeo = !empty($product->seo_page_title) || !empty($product->seo_description);
         
-        // Build description: first ~150-160 chars of product description
-        $seoDescription = $product->description 
-            ? $this->safeLimit($product->description, 155) 
-            : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.';
+        if ($hasStoredSeo) {
+            // Use stored SEO data from database
+            $seoTitle = $product->seo_page_title ?: ($product->name . ' – ' . $siteName);
+            $seoDescription = $product->seo_description 
+                ?: ($product->description 
+                    ? $this->safeLimit($product->description, 155) 
+                    : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.');
+            $seoOgTitle = $product->seo_og_title ?: $seoTitle;
+            $seoOgDescription = $product->seo_og_description ?: $seoDescription;
+            $seoOgImage = $product->seo_og_image 
+                ? (str_starts_with($product->seo_og_image, 'http') ? $product->seo_og_image : url($product->seo_og_image))
+                : $productImage;
+        } else {
+            // Auto-generate SEO from product fields
+            $vendorName = $brand ? $brand->name : 'our store';
+            $seoTitle = "Buy {$product->name} from {$vendorName} - {$siteName}";
+            
+            // Build description: first ~150-160 chars of product description
+            $seoDescription = $product->description 
+                ? $this->safeLimit($product->description, 155) 
+                : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.';
+            
+            $seoOgTitle = $seoTitle;
+            $seoOgDescription = $seoDescription;
+            $seoOgImage = $productImage;
+        }
         
         // Build SEO array (same format as products/brands pages)
         $seo = [
             'key' => 'product',
             'title' => $seoTitle,
             'description' => $seoDescription,
-            'og_title' => $seoTitle,
-            'og_description' => $seoDescription,
-            'og_image' => $productImage,
+            'og_title' => $seoOgTitle,
+            'og_description' => $seoOgDescription,
+            'og_image' => $seoOgImage,
             // Backward-compatible field used by some pages
-            'image' => $productImage,
+            'image' => $seoOgImage,
             'url' => $productUrl,
             'canonical' => $productUrl,
         ];
@@ -704,12 +727,58 @@ class ProductsController extends Controller
         }
 
         // Generate SEO data for brand products
+        // Priority: Use stored SEO data from database, fallback to auto-generated from vendor fields
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'PeptideMap';
+        $brandUrl = url("/brand/{$slug}/products");
         $brandImage = $this->getBrandLogoUrl($brand);
+        
+        // Check if stored SEO data exists in vendorSetting
+        $vendorSetting = $brand->vendorSetting;
+        $hasStoredSeo = $vendorSetting && (!empty($vendorSetting->seo_page_title) || !empty($vendorSetting->seo_description));
+        
+        if ($hasStoredSeo) {
+            // Use stored SEO data from database
+            $seoTitle = $vendorSetting->seo_page_title ?: ($brand->name . ': Coupon Codes & Reviews - ' . $siteName);
+            $seoDescription = $vendorSetting->seo_description 
+                ?: (($vendorSetting->description ?? '') 
+                    ? $this->safeLimit($vendorSetting->description, 160) 
+                    : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.');
+            $seoOgTitle = $vendorSetting->seo_og_title ?: $seoTitle;
+            $seoOgDescription = $vendorSetting->seo_og_description ?: $seoDescription;
+            $seoOgImage = $vendorSetting->seo_og_image 
+                ? (str_starts_with($vendorSetting->seo_og_image, 'http') ? $vendorSetting->seo_og_image : url($vendorSetting->seo_og_image))
+                : $brandImage;
+        } else {
+            // Auto-generate SEO from vendor fields
+            $seoTitle = $brand->name . ': Coupon Codes & Reviews - ' . $siteName;
+            $seoDescription = ($vendorSetting->description ?? '') 
+                ? $this->safeLimit($vendorSetting->description, 160) 
+                : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.';
+            $seoOgTitle = $seoTitle;
+            $seoOgDescription = $seoDescription;
+            $seoOgImage = $brandImage;
+        }
+        
+        // Build SEO array (same format as other pages)
+        $seo = [
+            'key' => 'brand',
+            'title' => $seoTitle,
+            'description' => $seoDescription,
+            'og_title' => $seoOgTitle,
+            'og_description' => $seoOgDescription,
+            'og_image' => $seoOgImage,
+            // Backward-compatible field used by some pages
+            'image' => $seoOgImage,
+            'url' => $brandUrl,
+            'canonical' => $brandUrl,
+        ];
+        
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         $seoData = new SEOData(
-            title: $brand->name . ' - Products & Reviews | PeptideSync',
-            description: ($brand->vendorSetting->description ?? '') ? $this->safeLimit($brand->vendorSetting->description, 160) : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.',
-            image: $brandImage,
-            url: url("/brand/{$slug}/products"),
+            title: $seoTitle,
+            description: $seoDescription,
+            image: $seoOgImage,
+            url: $brandUrl,
         );
         session(['page_seo_data' => $seoData]);
 
@@ -732,6 +801,7 @@ class ProductsController extends Controller
                 'founded_year' => $brand->vendorSetting && $brand->vendorSetting->founded_year ? $brand->vendorSetting->founded_year : null,
                 'shipping_info' => $brand->vendorSetting && $brand->vendorSetting->shipping_info ? $brand->vendorSetting->shipping_info : null,
                 'return_policy' => $brand->vendorSetting && $brand->vendorSetting->return_policy ? $brand->vendorSetting->return_policy : null,
+                'payment_methods' => $brand->vendorSetting && $brand->vendorSetting->payment_methods ? $brand->vendorSetting->payment_methods : [],
                 'discount_code' => $discountCode,
                 'shipping_time' => round($shippingTime, 1),
                 'customer_service' => round($customerService, 1),
@@ -750,6 +820,7 @@ class ProductsController extends Controller
             'sort' => $sortBy,
             'sortDir' => $sortDir,
             'search' => $request->get('search', ''),
+            'seo' => $seo,
         ]);
     }
 

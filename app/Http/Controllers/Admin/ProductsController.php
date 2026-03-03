@@ -50,6 +50,11 @@ class ProductsController extends Controller
             'lab_tested' => 'sometimes|boolean',
             'first_timer_deals' => 'sometimes|boolean',
             'auto_update' => 'sometimes|boolean',
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:500',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string|max:500',
+            'seo_og_image' => 'nullable|url|max:500',
         ]);
         
         // Handle pricing logic:
@@ -97,6 +102,11 @@ class ProductsController extends Controller
             'lab_tested' => 'sometimes|boolean',
             'first_timer_deals' => 'sometimes|boolean',
             'auto_update' => 'sometimes|boolean',
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:500',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string|max:500',
+            'seo_og_image' => 'nullable|url|max:500',
         ]);
         
         // Handle pricing logic:

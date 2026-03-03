@@ -35,6 +35,11 @@ class Product extends Model
         'product_url',
         'auto_scraped',
         'last_scraped_at',
+        'seo_page_title',
+        'seo_description',
+        'seo_og_title',
+        'seo_og_description',
+        'seo_og_image',
     ];
 
     public function brand()

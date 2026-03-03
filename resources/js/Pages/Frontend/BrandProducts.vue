@@ -422,9 +422,10 @@
                       </svg>
                       <div class="text-sm text-gray-900">Payment Methods</div>
                     </div>
-                    <div class="flex flex-wrap gap-2 pl-6">
+                    <div v-if="paymentMethods.length > 0" class="flex flex-wrap gap-2 pl-6">
                       <span v-for="method in paymentMethods" :key="method" class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">{{ method }}</span>
                     </div>
+                    <p v-else class="text-sm text-gray-600 pl-6">Not specified</p>
                   </div>
                 </div>
               </div>
@@ -728,7 +729,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, h, defineComponent } from 'vue'
+import { ref, computed, onMounted, nextTick, h, defineComponent, watchEffect } from 'vue'
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import FrontLayout from '../Layouts/FrontLayout.vue'
 import MainButton from '@/components/MainButton.vue'
@@ -750,6 +751,19 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  seo: {
+    type: Object,
+    default: () => ({
+      title: null,
+      description: null,
+      og_title: null,
+      og_description: null,
+      og_image: null,
+      image: null,
+      url: null,
+      canonical: null,
+    })
+  }
 })
 
 const ArrowRightIcon = defineComponent({
@@ -779,6 +793,95 @@ const ArrowRightIcon = defineComponent({
   },
 })
 
+const page = usePage()
+
+// Computed values for reactive SEO updates (automatically from vendor data)
+const title = computed(() => {
+  // Use SEO title if provided, otherwise generate from vendor name
+  if (props.seo?.title) {
+    return props.seo.title
+  }
+  const siteName = page.props.site_name || 'PeptideMap'
+  return `${props.brand?.name || 'Vendor'}: Coupon Codes & Reviews - ${siteName}`
+})
+
+const description = computed(() => {
+  // Use SEO description if provided, otherwise generate from vendor description
+  if (props.seo?.description) {
+    return props.seo.description
+  }
+  if (props.brand?.description) {
+    // Truncate to ~155 chars
+    const desc = props.brand.description.replace(/\s+/g, ' ').trim()
+    return desc.length > 155 ? desc.substring(0, 155) + '...' : desc
+  }
+  return 'Browse products from ' + (props.brand?.name || 'this vendor') + '. Read reviews, compare prices, and find the best deals.'
+})
+
+const url = computed(() => {
+  return props.seo?.url || page.url
+})
+
+const ogTitle = computed(() => {
+  return props.seo?.og_title || title.value
+})
+
+const ogDescription = computed(() => {
+  return props.seo?.og_description || description.value
+})
+
+const ogImage = computed(() => {
+  // Use SEO og_image if provided, otherwise use brand logo
+  return props.seo?.og_image || props.seo?.image || props.brand?.logo || null
+})
+
+const canonical = computed(() => {
+  return props.seo?.canonical || url.value
+})
+
+// Watch for SEO changes and update document title and meta tags immediately
+watchEffect(() => {
+  // Update document title
+  document.title = title.value
+  
+  // Update meta description
+  let metaDescription = document.querySelector('meta[name="description"]')
+  if (!metaDescription) {
+    metaDescription = document.createElement('meta')
+    metaDescription.setAttribute('name', 'description')
+    document.head.appendChild(metaDescription)
+  }
+  metaDescription.setAttribute('content', description.value)
+  
+  // Update canonical link
+  let canonicalLink = document.querySelector('link[rel="canonical"]')
+  if (!canonicalLink) {
+    canonicalLink = document.createElement('link')
+    canonicalLink.setAttribute('rel', 'canonical')
+    document.head.appendChild(canonicalLink)
+  }
+  canonicalLink.setAttribute('href', canonical.value)
+  
+  // Update Open Graph tags
+  const updateMetaTag = (property, content) => {
+    if (!content) return // Don't set empty values
+    let meta = document.querySelector(`meta[property="${property}"]`)
+    if (!meta) {
+      meta = document.createElement('meta')
+      meta.setAttribute('property', property)
+      document.head.appendChild(meta)
+    }
+    meta.setAttribute('content', content)
+  }
+  
+  updateMetaTag('og:title', ogTitle.value)
+  updateMetaTag('og:description', ogDescription.value)
+  updateMetaTag('og:url', url.value)
+  if (ogImage.value) {
+    updateMetaTag('og:image', ogImage.value)
+  }
+})
+
 // Hero background lazy loading
 const heroBgRef = ref(null)
 const heroBgLoaded = ref(false)
@@ -796,8 +899,10 @@ const currentSortDir = ref(props.sortDir || 'desc')
 // Certifications (mock data - can be moved to backend)
 const certifications = ref(['ISO 9001', 'cGMP Compliant', 'FDA Registered'])
 
-// Payment Methods
-const paymentMethods = ref(['Credit Card', 'PayPal', 'Cryptocurrency', 'Bank Transfer'])
+// Payment Methods - use from database, fallback to empty array
+const paymentMethods = computed(() => {
+  return props.brand?.payment_methods || []
+})
 
 // Calculate years in business from founded year
 const yearsInBusiness = computed(() => {
@@ -1158,7 +1263,7 @@ const copyDiscountCode = async () => {
   }
 }
 
-const page = usePage()
+// const page = usePage()
 
 // Review submission state
 const isSubmittingReview = ref(false)
