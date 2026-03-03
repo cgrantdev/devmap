@@ -30,6 +30,11 @@ class Research extends Model
         'tags',
         'published_at',
         'status',
+        'seo_page_title',
+        'seo_description',
+        'seo_og_title',
+        'seo_og_description',
+        'seo_og_image',
     ];
 
     protected $casts = [

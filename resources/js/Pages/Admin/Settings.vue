@@ -35,7 +35,7 @@
             <input
               v-model="settingsForm.site_name"
               type="text"
-              value="Peptidemaps"
+              value="Peptidemap"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -371,7 +371,7 @@ const props = defineProps({
   settings: {
     type: Object,
     default: () => ({
-      site_name: 'Peptidemaps',
+      site_name: 'Peptidemap',
       site_description: 'Compare peptide brands, prices, and reviews',
       contact_email: 'contact@peptidemaps.com',
       email_new_vendor_registrations: true,
@@ -395,7 +395,7 @@ const props = defineProps({
 
 // Settings form
 const settingsForm = useForm({
-  site_name: props.settings?.site_name || 'Peptidemaps',
+  site_name: props.settings?.site_name || 'Peptidemap',
   site_description: props.settings?.site_description || 'Compare peptide brands, prices, and reviews',
   contact_email: props.settings?.contact_email || 'contact@peptidemaps.com',
   email_new_vendor_registrations: props.settings?.email_new_vendor_registrations ?? true,

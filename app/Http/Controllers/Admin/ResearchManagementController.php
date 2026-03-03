@@ -106,6 +106,11 @@ class ResearchManagementController extends Controller
             'tags' => 'nullable|array',
             'tags.*' => 'nullable|string',
             'status' => 'required|in:draft,published',
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:500',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string|max:500',
+            'seo_og_image' => 'nullable|url|max:500',
         ]);
 
         // Set published_at when status is published
@@ -153,6 +158,11 @@ class ResearchManagementController extends Controller
                 'tags' => $research->tags ?? [],
                 'published_at' => $research->published_at ? $research->published_at->format('Y-m-d') : null,
                 'status' => $research->status,
+                'seo_page_title' => $research->seo_page_title,
+                'seo_description' => $research->seo_description,
+                'seo_og_title' => $research->seo_og_title,
+                'seo_og_description' => $research->seo_og_description,
+                'seo_og_image' => $research->seo_og_image,
             ],
             'peptides' => $peptides,
         ]);
@@ -179,6 +189,11 @@ class ResearchManagementController extends Controller
             'tags' => 'nullable|array',
             'tags.*' => 'nullable|string',
             'status' => 'required|in:draft,published',
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:500',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string|max:500',
+            'seo_og_image' => 'nullable|url|max:500',
         ]);
 
         // Handle status change and published_at

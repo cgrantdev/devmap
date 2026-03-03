@@ -107,6 +107,11 @@ class EducationalGuideManagementController extends Controller
             'guide_url' => 'nullable|string|max:500',
             'status' => 'required|in:draft,published',
             'is_featured' => 'boolean',
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:500',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string|max:500',
+            'seo_og_image' => 'nullable|url|max:500',
         ]);
 
         // Auto-generate slug from title
@@ -157,6 +162,11 @@ class EducationalGuideManagementController extends Controller
                 'published_at' => $guide->published_at ? $guide->published_at->format('Y-m-d') : null,
                 'is_featured' => $guide->is_featured,
                 'status' => $guide->status,
+                'seo_page_title' => $guide->seo_page_title,
+                'seo_description' => $guide->seo_description,
+                'seo_og_title' => $guide->seo_og_title,
+                'seo_og_description' => $guide->seo_og_description,
+                'seo_og_image' => $guide->seo_og_image,
             ],
         ]);
     }
@@ -200,6 +210,11 @@ class EducationalGuideManagementController extends Controller
             'guide_url' => 'nullable|string|max:500',
             'status' => 'required|in:draft,published',
             'is_featured' => 'boolean',
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string|max:500',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string|max:500',
+            'seo_og_image' => 'nullable|url|max:500',
         ]);
 
         // Auto-generate slug from title

@@ -87,12 +87,9 @@
   
               <!-- Price -->
               <div class="mb-6">
-                <!-- <p class="text-4xl text-gray-900 mb-1">
-                  ${{ product.discount_price || product.price }}
-                </p> -->
                 <div class="text-4xl text-gray-900 mb-1">
-                  ${{ product.price }}
-                </div>
+                  ${{ product.discount_price || product.price }}
+                </div>                
               </div>
   
               <!-- Product Features -->

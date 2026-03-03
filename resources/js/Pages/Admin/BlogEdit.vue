@@ -165,6 +165,58 @@
             <input v-model="form.read_time" type="text" class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base" placeholder="e.g., 19 Min Read" />
           </div>
           
+          <!-- SEO Data Section -->
+          <div class="border-t border-slate-200 pt-6">
+            <h3 class="text-lg font-semibold text-slate-800 mb-4">SEO Data</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm text-slate-700 mb-2">Page Title</label>
+                <input
+                  v-model="form.seo_page_title"
+                  type="text"
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base"
+                  placeholder="Enter page title for SEO"
+                />
+              </div>
+              <div>
+                <label class="block text-sm text-slate-700 mb-2">Description</label>
+                <textarea
+                  v-model="form.seo_description"
+                  rows="3"
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base"
+                  placeholder="Enter meta description for SEO"
+                ></textarea>
+              </div>
+              <div>
+                <label class="block text-sm text-slate-700 mb-2">OG:Title</label>
+                <input
+                  v-model="form.seo_og_title"
+                  type="text"
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base"
+                  placeholder="Enter Open Graph title"
+                />
+              </div>
+              <div>
+                <label class="block text-sm text-slate-700 mb-2">OG:Image</label>
+                <input
+                  v-model="form.seo_og_image"
+                  type="url"
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base"
+                  placeholder="Enter Open Graph image URL"
+                />
+              </div>
+              <div>
+                <label class="block text-sm text-slate-700 mb-2">OG:Description</label>
+                <textarea
+                  v-model="form.seo_og_description"
+                  rows="3"
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-sans text-base"
+                  placeholder="Enter Open Graph description"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          
           <div v-if="blog?.published_at" class="pt-4 border-t border-slate-100">
             <label class="block mb-1 font-medium text-sm text-slate-600">Published Date</label>
             <p class="text-sm text-slate-700">{{ blog.published_at }}</p>
@@ -203,6 +255,11 @@ const form = useForm({
   read_time: props.blog?.read_time || '',
   status: props.blog?.status || 'draft',
   is_featured: props.blog?.is_featured || false,
+  seo_page_title: props.blog?.seo_page_title || '',
+  seo_description: props.blog?.seo_description || '',
+  seo_og_title: props.blog?.seo_og_title || '',
+  seo_og_description: props.blog?.seo_og_description || '',
+  seo_og_image: props.blog?.seo_og_image || '',
   _token: page.props.csrf_token,
 })
 

@@ -1,12 +1,32 @@
 <template>
-    <FrontLayout>
+  <Head :title="seoTitle">
+    <meta name="description" :content="seoDescription" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article" />
+    <meta property="og:url" :content="url" />
+    <meta property="og:title" :content="ogTitle" />
+    <meta property="og:description" :content="ogDescription" />
+    <meta v-if="ogImage" property="og:image" :content="ogImage" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" :content="url" />
+    <meta name="twitter:title" :content="ogTitle" />
+    <meta name="twitter:description" :content="ogDescription" />
+    <meta v-if="ogImage" name="twitter:image" :content="ogImage" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" :href="canonical" />
+  </Head>
+  <FrontLayout>
       <!-- Header Section with Gradient -->
       <div class="min-h-screen bg-gray-50">
         <div class="border-b-4 bg-gradient-to-br from-purple-600 to-blue-600 text-white">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <!-- Back Button -->
                 <button 
-                    @click="router.visit('/news')"
+                    @click="router.visit('/news?nav=guides')"
                     class="flex items-center gap-2 mb-6 transition-colors text-purple-100 hover:text-white"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left w-4 h-4" aria-hidden="true">
@@ -228,10 +248,11 @@
 </template>
   
 <script setup>
-import { router } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'   
+import { computed, watchEffect } from 'vue'
+import { Head, router, usePage } from '@inertiajs/vue3'
+import FrontLayout from '../Layouts/FrontLayout.vue'
 
-defineProps({
+const props = defineProps({
     id: {
         type: [Number, String],
         required: true
@@ -319,6 +340,99 @@ defineProps({
     conclusion: {
         type: String,
         default: null
+    },
+    seo: {
+        type: Object,
+        default: () => ({
+            title: null,
+            description: null,
+            og_title: null,
+            og_description: null,
+            og_image: null,
+            image: null,
+            url: null,
+            canonical: null,
+        })
+    }
+})
+
+const page = usePage()
+
+// Computed values for reactive SEO updates (separate from displayed title/description)
+const seoTitle = computed(() => {
+    if (props.seo?.title) {
+        return props.seo.title
+    }
+    const siteName = page.props.site_name || 'Peptidemap'
+    return `${props.title || 'Educational Guide'} - ${siteName}`
+})
+
+const seoDescription = computed(() => {
+    if (props.seo?.description) {
+        return props.seo.description
+    }
+    if (props.description) {
+        const desc = props.description.replace(/\s+/g, ' ').trim()
+        return desc.length > 160 ? desc.substring(0, 160) + '...' : desc
+    }
+    return `Educational guide: ${props.title || 'this guide'} on Peptidemap.`
+})
+
+const url = computed(() => {
+    return props.seo?.url || page.url
+})
+
+const ogTitle = computed(() => {
+    return props.seo?.og_title || seoTitle.value
+})
+
+const ogDescription = computed(() => {
+    return props.seo?.og_description || seoDescription.value
+})
+
+const ogImage = computed(() => {
+    return props.seo?.og_image || props.seo?.image || null
+})
+
+const canonical = computed(() => {
+    return props.seo?.canonical || url.value
+})
+
+// Watch for SEO changes and update document meta tags
+watchEffect(() => {
+    document.title = seoTitle.value
+    let metaDescription = document.querySelector('meta[name="description"]')
+    if (!metaDescription) {
+        metaDescription = document.createElement('meta')
+        metaDescription.setAttribute('name', 'description')
+        document.head.appendChild(metaDescription)
+    }
+    metaDescription.setAttribute('content', seoDescription.value)
+
+    let canonicalLink = document.querySelector('link[rel="canonical"]')
+    if (!canonicalLink) {
+        canonicalLink = document.createElement('link')
+        canonicalLink.setAttribute('rel', 'canonical')
+        document.head.appendChild(canonicalLink)
+    }
+    canonicalLink.setAttribute('href', canonical.value)
+
+    const updateMetaTag = (property, content) => {
+        if (!content) return
+        let meta = document.querySelector(`meta[property="${property}"]`)
+        if (!meta) {
+            meta = document.createElement('meta')
+            meta.setAttribute('property', property)
+            document.head.appendChild(meta)
+        }
+        meta.setAttribute('content', content)
+    }
+
+    updateMetaTag('og:title', ogTitle.value)
+    updateMetaTag('og:description', ogDescription.value)
+    updateMetaTag('og:url', url.value)
+    if (ogImage.value) {
+        updateMetaTag('og:image', ogImage.value)
     }
 })
 

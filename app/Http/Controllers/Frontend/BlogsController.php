@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
@@ -158,13 +159,62 @@ class BlogsController extends Controller
         $categoryTag = $blog->blog_type ?: $this->getCategoryTag($blog->title, $blog->description, $combinedContent);
         
         // Generate SEO data for blog detail
-        $seoData = new SEOData(
-            title: $blog->title . ' | PeptideSync',
-            description: $blog->description ? $this->safeLimit($blog->description, 160) : 'Read the latest article about ' . $blog->title . ' on PeptideSync.',
-            image: $imageUrl,
-            url: url("/blog/{$blog->slug}"),
-        );
-        session(['page_seo_data' => $seoData]);
+        // Priority: Use stored SEO data from database, fallback to auto-generated
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
+        $blogUrl = url("/blog/{$blog->slug}");
+        
+        // Build blog image URL - handle both absolute URLs and relative paths
+        $blogImage = null;
+        if ($imageUrl) {
+            if (str_starts_with($imageUrl, 'http')) {
+                $blogImage = $imageUrl;
+            } else {
+                $blogImage = url($imageUrl);
+            }
+        }
+        
+        // Check if stored SEO data exists
+        $hasStoredSeo = !empty($blog->seo_page_title) || !empty($blog->seo_description);
+        
+        if ($hasStoredSeo) {
+            // Use stored SEO data from database
+            $seoTitle = $blog->seo_page_title ?: ($blog->title . ' - ' . $siteName);
+            $seoDescription = $blog->seo_description 
+                ?: ($blog->description 
+                    ? $this->safeLimit($blog->description, 160) 
+                    : 'Read the latest article about ' . $blog->title . ' on ' . $siteName . '.');
+            $seoOgTitle = $blog->seo_og_title ?: $seoTitle;
+            $seoOgDescription = $blog->seo_og_description ?: $seoDescription;
+            $seoOgImage = $blog->seo_og_image 
+                ? (str_starts_with($blog->seo_og_image, 'http') ? $blog->seo_og_image : url($blog->seo_og_image))
+                : $blogImage;
+        } else {
+            // Auto-generate SEO from blog fields
+            $seoTitle = $blog->title . ' - ' . $siteName;
+            $seoDescription = $blog->description 
+                ? $this->safeLimit($blog->description, 160) 
+                : 'Read the latest article about ' . $blog->title . ' on ' . $siteName . '.';
+            $seoOgTitle = $seoTitle;
+            $seoOgDescription = $seoDescription;
+            $seoOgImage = $blogImage;
+        }
+        
+        // Build SEO array (same format as products/brands pages)
+        $seo = [
+            'key' => 'blog',
+            'title' => $seoTitle,
+            'description' => $seoDescription,
+            'og_title' => $seoOgTitle,
+            'og_description' => $seoOgDescription,
+            'og_image' => $seoOgImage,
+            // Backward-compatible field used by some pages
+            'image' => $seoOgImage,
+            'url' => $blogUrl,
+            'canonical' => $blogUrl,
+        ];
+        
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
         
         return Inertia::render('Frontend/BlogDetail', [
             'blog' => [
@@ -188,6 +238,7 @@ class BlogsController extends Controller
                 'categoryTag' => $categoryTag,
             ],
             'related' => $related,
+            'seo' => $seo,
         ]);
     }
 

@@ -29,6 +29,11 @@ class Blog extends Model
         'published_at',
         'is_featured',
         'status',
+        'seo_page_title',
+        'seo_description',
+        'seo_og_title',
+        'seo_og_description',
+        'seo_og_image',
     ];
 
     protected $casts = [
