@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AdminAuthenticatedSessionController;
+use App\Http\Controllers\Auth\VendorAuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -78,6 +79,7 @@ Route::middleware('guest')->group(function () {
     // Vendor routes
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::get('/vendor/login', [VendorAuthenticatedSessionController::class, 'create'])->name('vendor.login');
 
     // Admin routes
     Route::get('/admin/login', [AdminAuthenticatedSessionController::class, 'create'])->name('admin.login');
@@ -96,6 +98,9 @@ Route::get('/email/verify/{id?}/{hash?}', [EmailVerificationController::class, '
 // Vendor routes
 Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->group(function () {
     Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('vendor.dashboard');
+    Route::get('/storefront-analytics', [VendorDashboardController::class, 'storefrontAnalytics'])->name('vendor.storefront-analytics');
+    Route::get('/advertisement-analytics', [VendorDashboardController::class, 'advertisementAnalytics'])->name('vendor.advertisement-analytics');
+    Route::get('/reviews', [VendorDashboardController::class, 'reviews'])->name('vendor.reviews');
     Route::get('/import', [ImportController::class, 'index'])->name('vendor.import');
     Route::post('/import/file', [ImportController::class, 'importFromFile'])->name('vendor.import.file');
     Route::post('/import/url', [ImportController::class, 'importFromUrl'])->name('vendor.import.url');
@@ -260,6 +265,12 @@ Route::middleware('auth')->group(function () {
 Route::post('/admin/login', [AdminAuthenticatedSessionController::class, 'store']);
 Route::middleware('auth')->group(function () {
     Route::post('/admin/logout', [AdminAuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
+});
+
+// Vendor authentication routes
+Route::post('/vendor/login', [VendorAuthenticatedSessionController::class, 'store']);
+Route::middleware('auth')->group(function () {
+    Route::post('/vendor/logout', [VendorAuthenticatedSessionController::class, 'destroy'])->name('vendor.logout');
 });
 
 Route::get('/vendors', [PublicVendorController::class, 'list'])->name('vendors.public');

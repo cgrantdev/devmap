@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-slate-50">
     <div class="w-full max-w-md bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-      <h1 class="text-2xl font-normal mb-6 text-center text-slate-700">Admin Login</h1>
+      <h1 class="text-2xl font-normal mb-6 text-center text-slate-700">Vendor Login</h1>
 
     <!-- General Error Message -->
     <div v-if="Object.keys(errors).length > 0" class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl">
@@ -43,8 +43,8 @@
         </button>
       </form>
       <div class="mt-4 text-center">
-        <span>Are you a vendor?</span>
-        <Link href="/vendor/login" class="text-blue-600 ml-1">Vendor Login</Link>
+        <span>Are you an admin?</span>
+        <Link href="/admin/login" class="text-blue-600 ml-1">Admin Login</Link>
       </div>
     </div>
   </div>
@@ -68,9 +68,9 @@ function submit() {
   // Ensure CSRF token is up to date before submission
   form._token = page.props.csrf_token || csrfToken
   
-  form.post('/admin/login', {
+  form.post('/vendor/login', {
     onSuccess: () => {
-      window.location.href = '/admin/dashboard'
+      window.location.href = '/vendor/dashboard'
     },
     onError: (errs) => {
       console.log('Login failed:', errs)
@@ -78,4 +78,4 @@ function submit() {
     }
   })
 }
-</script> 
+</script>

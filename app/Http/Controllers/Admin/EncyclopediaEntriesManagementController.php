@@ -150,6 +150,12 @@ class EncyclopediaEntriesManagementController extends Controller
             'references.*.links.*.label' => 'nullable|string|max:255',
             'product_category_id' => 'nullable|exists:product_categories,id',
             'status' => 'required|in:draft,published',
+            // SEO fields
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string',
+            'seo_og_image' => 'nullable|string|max:500',
         ]);
 
         // Set published_at when status is published
@@ -220,6 +226,12 @@ class EncyclopediaEntriesManagementController extends Controller
                 'product_category_id' => $entry->product_category_id,
                 'published_at' => $entry->published_at ? $entry->published_at->format('Y-m-d') : null,
                 'status' => $entry->status,
+                // SEO fields
+                'seo_page_title' => $entry->seo_page_title ?? '',
+                'seo_description' => $entry->seo_description ?? '',
+                'seo_og_title' => $entry->seo_og_title ?? '',
+                'seo_og_description' => $entry->seo_og_description ?? '',
+                'seo_og_image' => $entry->seo_og_image ?? '',
             ],
             'categories' => $categories,
         ]);
@@ -297,6 +309,12 @@ class EncyclopediaEntriesManagementController extends Controller
             'references.*.links.*.label' => 'nullable|string|max:255',
             'product_category_id' => 'nullable|exists:product_categories,id',
             'status' => 'required|in:draft,published',
+            // SEO fields
+            'seo_page_title' => 'nullable|string|max:255',
+            'seo_description' => 'nullable|string',
+            'seo_og_title' => 'nullable|string|max:255',
+            'seo_og_description' => 'nullable|string',
+            'seo_og_image' => 'nullable|string|max:500',
         ]);
 
         // Handle status change and published_at
