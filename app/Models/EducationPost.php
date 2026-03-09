@@ -68,6 +68,12 @@ class EducationPost extends Model
         'conclusion',
         'references',
         'areas_of_research_intro',
+        // SEO fields
+        'seo_page_title',
+        'seo_description',
+        'seo_og_title',
+        'seo_og_description',
+        'seo_og_image',
     ];
 
     protected $casts = [

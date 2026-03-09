@@ -583,14 +583,57 @@ class EncyclopediaController extends Controller
         $title = $educationPost && $educationPost->title ? $educationPost->title : $category->name;
         $peptideFullName = $educationPost && $educationPost->peptide_full_name ? $educationPost->peptide_full_name : ($category->description ?? '');
 
-        // Generate SEO data
-        $seoData = new SEOData(
-            title: $title . ' - Peptide Encyclopedia | PeptideSync',
-            description: ($educationPost && $educationPost->overview) ? $this->safeLimit($educationPost->overview, 160) : (($educationPost && $educationPost->description) ? $this->safeLimit($educationPost->description, 160) : 'Comprehensive guide to ' . $title . ' research peptides.'),
-            image: $image,
-            url: url("/encyclopedia/article/{$slug}"),
-        );
-        session(['page_seo_data' => $seoData]);
+        // Generate SEO data - prioritize stored SEO data, otherwise auto-generate
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
+        
+        // Check if stored SEO data exists
+        $hasStoredSeo = $educationPost && (!empty($educationPost->seo_page_title) || !empty($educationPost->seo_description));
+        
+        if ($hasStoredSeo) {
+            // Use stored SEO data from database
+            $seoTitle = $educationPost->seo_page_title ?: ("What is {$title}? - Encyclopedia - {$siteName}");
+            $seoDescription = $educationPost->seo_description 
+                ?: ($educationPost->overview 
+                    ? $this->safeLimit($educationPost->overview, 160) 
+                    : ($educationPost->description 
+                        ? $this->safeLimit($educationPost->description, 160) 
+                        : "Comprehensive guide to {$title} research peptides."));
+            $seoOgTitle = $educationPost->seo_og_title ?: $seoTitle;
+            $seoOgDescription = $educationPost->seo_og_description ?: $seoDescription;
+            $seoOgImage = $educationPost->seo_og_image 
+                ? (str_starts_with($educationPost->seo_og_image, 'http') ? $educationPost->seo_og_image : url($educationPost->seo_og_image))
+                : $image;
+        } else {
+            // Auto-generate SEO from encyclopedia entry fields
+            $seoTitle = "What is {$title}? - Encyclopedia - {$siteName}";
+            if ($educationPost && $educationPost->overview) {
+                $seoDescription = $this->safeLimit($educationPost->overview, 160);
+            } elseif ($educationPost && $educationPost->description) {
+                $seoDescription = $this->safeLimit($educationPost->description, 160);
+            } else {
+                $seoDescription = "Comprehensive guide to {$title} research peptides.";
+            }
+            $seoOgTitle = $seoTitle;
+            $seoOgDescription = $seoDescription;
+            $seoOgImage = $image;
+        }
+        
+        // Build SEO array (same format as products/brands pages)
+        $seo = [
+            'key' => 'encyclopedia',
+            'title' => $seoTitle,
+            'description' => $seoDescription,
+            'og_title' => $seoOgTitle,
+            'og_description' => $seoOgDescription,
+            'og_image' => $seoOgImage,
+            // Backward-compatible field used by some pages
+            'image' => $seoOgImage,
+            'url' => url("/encyclopedia/article/{$slug}"),
+            'canonical' => url("/encyclopedia/article/{$slug}"),
+        ];
+        
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
 
         // Get comprehensive data for article detail page from database
         $peptideData = [
@@ -642,7 +685,9 @@ class EncyclopediaController extends Controller
             'products' => $products,
         ];
 
-        return Inertia::render('Frontend/EncyclopediaArticleDetail', $peptideData);
+        return Inertia::render('Frontend/EncyclopediaArticleDetail', array_merge($peptideData, [
+            'seo' => $seo,
+        ]));
     }
 
     /**

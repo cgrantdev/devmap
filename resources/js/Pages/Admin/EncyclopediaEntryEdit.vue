@@ -452,6 +452,58 @@
             <label class="block mb-1 font-medium text-sm text-slate-600">Published Date</label>
             <p class="text-sm text-slate-700">{{ entry.published_at }}</p>
           </div>
+          
+          <!-- SEO Data Section -->
+          <div class="pt-4 border-t border-slate-100">
+            <h3 class="text-lg font-semibold text-slate-800 mb-4">SEO Data</h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm text-slate-700 mb-2">Page Title</label>
+                <input
+                  v-model="form.seo_page_title"
+                  type="text"
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all font-sans text-base"
+                  placeholder="Enter page title for SEO"
+                />
+        </div>
+              <div>
+                <label class="block text-sm text-slate-700 mb-2">Description</label>
+                <textarea
+                  v-model="form.seo_description"
+                  rows="3"
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all font-sans text-base"
+                  placeholder="Enter meta description for SEO"
+                ></textarea>
+              </div>
+              <div>
+                <label class="block text-sm text-slate-700 mb-2">OG:Title</label>
+                <input
+                  v-model="form.seo_og_title"
+                  type="text"
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all font-sans text-base"
+                  placeholder="Enter Open Graph title"
+                />
+              </div>
+              <div>
+                <label class="block text-sm text-slate-700 mb-2">OG:Image</label>
+                <input
+                  v-model="form.seo_og_image"
+                  type="url"
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all font-sans text-base"
+                  placeholder="Enter Open Graph image URL"
+                />
+              </div>
+              <div>
+                <label class="block text-sm text-slate-700 mb-2">OG:Description</label>
+                <textarea
+                  v-model="form.seo_og_description"
+                  rows="3"
+                  class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all font-sans text-base"
+                  placeholder="Enter Open Graph description"
+                ></textarea>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -575,6 +627,12 @@ const form = useForm({
   references: props.entry?.references || [],
   product_category_id: props.entry?.product_category_id || null,
   status: props.entry?.status || 'draft',
+  // SEO fields
+  seo_page_title: props.entry?.seo_page_title || '',
+  seo_description: props.entry?.seo_description || '',
+  seo_og_title: props.entry?.seo_og_title || '',
+  seo_og_description: props.entry?.seo_og_description || '',
+  seo_og_image: props.entry?.seo_og_image || '',
   _token: page.props.csrf_token,
 })
 
@@ -845,6 +903,13 @@ const submit = () => {
       value: entry.value || ''
     }))
   })
+  
+  // Convert empty SEO strings to null
+  form.seo_page_title = form.seo_page_title?.trim() || null
+  form.seo_description = form.seo_description?.trim() || null
+  form.seo_og_title = form.seo_og_title?.trim() || null
+  form.seo_og_description = form.seo_og_description?.trim() || null
+  form.seo_og_image = form.seo_og_image?.trim() || null
   
   // Update CSRF token before submission
   form._token = page.props.csrf_token
