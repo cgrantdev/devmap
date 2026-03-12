@@ -34,9 +34,15 @@ class SearchController extends Controller
         ];
 
         if (!empty($query)) {
-            // Search Vendors (Brands)
+            // Search Vendors (Brands) - only approved vendors
             if ($tab === 'all' || $tab === 'vendors') {
                 $vendorsQuery = Brand::where('is_active', true)
+                    ->where(function ($q) {
+                        $q->whereHas('vendorSetting', function ($subQ) {
+                            $subQ->where('approval_status', 'approved');
+                        })
+                        ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
+                    })
                     ->with(['vendorSetting.location'])
                     ->withCount(['products' => function ($q) {
                         $q->visible()->where('status', 'active');

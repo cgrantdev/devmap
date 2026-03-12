@@ -18,8 +18,14 @@ class BrandsController extends Controller
 {
     public function index(Request $request)
     {
-        // Get active brands with product counts and aggregated data
+        // Get active and approved brands with product counts and aggregated data
         $query = Brand::where('is_active', true)
+            ->where(function ($q) {
+                $q->whereHas('vendorSetting', function ($subQ) {
+                    $subQ->where('approval_status', 'approved');
+                })
+                ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility with vendors without settings
+            })
             ->with(['vendorSetting', 'vendorSetting.location'])
             ->withCount([
                 'products as products_count' => function ($q) {

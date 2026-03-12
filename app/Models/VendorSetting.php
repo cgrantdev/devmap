@@ -18,6 +18,7 @@ class VendorSetting extends Model
         'contact_email',
         'phone_number',
         'status',
+        'approval_status',
         'api_route',
         'shop_url',
         'website',

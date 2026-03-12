@@ -107,8 +107,11 @@
                 <span class="text-sm text-gray-900">{{ vendor.rating_count || vendor.reviewCount || 0 }}</span>
               </td>
               <td class="px-6 py-4">
-                <div class="flex gap-2">
-                  <span v-if="vendor.is_active" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+                <div class="flex gap-2 flex-wrap">
+                  <span v-if="vendor.approval_status === 'pending' || vendor.settings?.approval_status === 'pending'" class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs font-medium">
+                    Pending Approval
+                  </span>
+                  <span v-else-if="vendor.is_active" class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
                     Active
                   </span>
                   <span v-else class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
@@ -127,25 +130,51 @@
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
-                  <button
-                    @click="openEditModal(vendor)"
-                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    title="Edit"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </button>
-                  <button
-                    @click="deleteVendor(vendor)"
-                    :disabled="form.processing"
-                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Delete"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                  <template v-if="vendor.approval_status === 'pending' || vendor.settings?.approval_status === 'pending'">
+                    <button
+                      @click="approveVendor(vendor)"
+                      :disabled="form.processing"
+                      class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors flex items-center gap-1"
+                      title="Approve"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Approve
+                    </button>
+                    <button
+                      @click="rejectVendor(vendor)"
+                      :disabled="form.processing"
+                      class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs rounded-lg transition-colors flex items-center gap-1"
+                      title="Reject"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      Reject
+                    </button>
+                  </template>
+                  <template v-else>
+                    <button
+                      @click="openEditModal(vendor)"
+                      class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="Edit"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                    <button
+                      @click="deleteVendor(vendor)"
+                      :disabled="form.processing"
+                      class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Delete"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </template>
                 </div>
               </td>
             </tr>
@@ -633,7 +662,7 @@ function submitVendor() {
       preserveScroll: true,
       onSuccess: () => {
         closeEditModal()
-        router.reload({ only: ['vendors'] })
+        router.reload({ only: ['vendors', 'pending_vendors_count'] })
       },
       onError: (errors) => {
         if (errors && Object.keys(errors).length > 0) {
@@ -649,9 +678,44 @@ function deleteVendor(vendor) {
     form.delete(`/admin/vendors/${vendor.id}`, {
       onSuccess: () => {
         // Success toast will be shown automatically from flash message
+        router.reload({ only: ['vendors', 'pending_vendors_count'] })
       },
       onError: (errors) => {
         toastError('Failed to delete vendor. Please try again.')
+        console.error(errors)
+      }
+    })
+  }
+}
+
+function approveVendor(vendor) {
+  if (confirm(`Are you sure you want to approve "${vendor.name}"? This will activate the vendor.`)) {
+    form.post(`/admin/vendors/${vendor.id}/approve`, {
+      preserveState: true,
+      preserveScroll: true,
+      onSuccess: () => {
+        // Success toast will be shown automatically from flash message
+        router.reload({ only: ['vendors', 'pending_vendors_count'] })
+      },
+      onError: (errors) => {
+        toastError('Failed to approve vendor. Please try again.')
+        console.error(errors)
+      }
+    })
+  }
+}
+
+function rejectVendor(vendor) {
+  if (confirm(`Are you sure you want to reject "${vendor.name}"? This will permanently delete the vendor from the database.`)) {
+    form.post(`/admin/vendors/${vendor.id}/reject`, {
+      preserveState: true,
+      preserveScroll: true,
+      onSuccess: () => {
+        // Success toast will be shown automatically from flash message
+        router.reload({ only: ['vendors', 'pending_vendors_count'] })
+      },
+      onError: (errors) => {
+        toastError('Failed to reject vendor. Please try again.')
         console.error(errors)
       }
     })

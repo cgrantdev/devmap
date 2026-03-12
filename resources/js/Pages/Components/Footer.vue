@@ -111,6 +111,9 @@
               <li>
                 <Link href="/contact" class="hover:text-white transition-colors">Contact</Link>
               </li>
+              <li>
+                <Link href="/vendor/login" class="hover:text-white transition-colors">Vendor Login</Link>
+              </li>
             </ul>
           </div>
 
