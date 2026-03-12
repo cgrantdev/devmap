@@ -13,6 +13,22 @@
         </div>
       </div>
 
+      <!-- Success Message -->
+      <div v-if="showSuccessMessage || $page.props.flash?.success" class="max-w-4xl mx-auto px-4 py-12">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-8 flex flex-col items-center text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check w-16 h-16 text-green-600 mb-4">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+          <h2 class="text-green-800 font-semibold text-2xl mb-2">
+            {{ $page.props.flash?.success || 'Registration completed successfully.' }}
+          </h2>
+          <p class="text-green-700 text-base mt-2 max-w-2xl">
+            Your registration has been submitted. We will review your application and contact you soon.
+          </p>
+        </div>
+      </div>
+
       <!-- Progress Indicator -->
       <div class="bg-white border-b border-slate-200">
         <div class="max-w-4xl mx-auto px-4 py-6">
@@ -80,14 +96,14 @@
               <div
                 :class="[
                   'w-10 h-10 rounded-full flex items-center justify-center transition-all bg-slate-200 text-slate-400',
-                  step > 3
+                  (step > 3 || showSuccessMessage || $page.props.flash?.success)
                     ? 'bg-slate-700 text-white'
                     : step === 3
                     ? 'bg-slate-700 text-white'
                     : 'bg-slate-200 text-gray-600'
                 ]"
               >
-                <svg v-if="step > 3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check w-5 h-5" aria-hidden="true">
+                <svg v-if="step > 3 || showSuccessMessage || $page.props.flash?.success" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check w-5 h-5" aria-hidden="true">
                   <circle cx="12" cy="12" r="10"></circle>
                   <path d="m9 12 2 2 4-4"></path>
                 </svg>
@@ -96,15 +112,15 @@
               <span class="text-xs text-slate-600 mt-2 hidden sm:block">Business Info</span>
             </div>
 
-            <!-- Connector Line -->
+            <!-- Connector Line
             <div
               :class="[
                 'h-0.5 flex-1 mx-2',
                 step > 3 ? 'bg-slate-700' : 'bg-slate-200'
               ]"
-            ></div>
+            ></div> -->
 
-            <!-- Step 4: Plan & Payment -->
+            <!-- Step 4: Plan & Payment
             <div class="flex flex-col items-center flex-1">
               <div
                 :class="[
@@ -117,13 +133,13 @@
                 4
               </div>
               <span class="text-xs text-slate-600 mt-2 hidden sm:block">Plan & Payment</span>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
 
       <!-- Form Card -->
-      <div class="max-w-2xl mx-auto px-4 py-12">
+      <div v-if="!showSuccessMessage && !$page.props.flash?.success" class="max-w-2xl mx-auto px-4 py-12">
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
           <!-- Step 1: Company Information -->
           <div v-if="step === 1" class="space-y-6">
@@ -301,7 +317,7 @@
               <!-- Phone Number -->
               <div>
                 <label for="phone" class="block text-sm text-slate-700 mb-2">
-                  Phone Number *
+                  Phone Number
                 </label>
                 <div class="relative">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400">
@@ -312,7 +328,6 @@
                     v-model="formData.phone"
                     type="tel"
                     placeholder="+1 (555) 123-4567"
-                    required
                     class="w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
                   />
                 </div>
@@ -446,6 +461,143 @@
                 </div>
               </div>
 
+              <!-- Company Description -->
+              <div>
+                <label for="company_description" class="block text-sm text-slate-700 mb-2">
+                  Company Description
+                </label>
+                <textarea
+                  id="company_description"
+                  v-model="formData.companyDescription"
+                  rows="4"
+                  placeholder="Tell us about your company..."
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                ></textarea>
+              </div>
+
+              <!-- Payment Methods Accepted -->
+              <div>
+                <label class="block text-sm text-slate-700 mb-2">
+                  Payment Methods Accepted
+                </label>
+                <div class="space-y-2">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      value="Credit Card"
+                      v-model="formData.paymentMethods"
+                      class="w-4 h-4 text-slate-700 border-slate-300 rounded focus:ring-slate-400"
+                    />
+                    <span class="text-sm text-slate-700">Credit Card</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      value="PayPal"
+                      v-model="formData.paymentMethods"
+                      class="w-4 h-4 text-slate-700 border-slate-300 rounded focus:ring-slate-400"
+                    />
+                    <span class="text-sm text-slate-700">PayPal</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      value="Cryptocurrency"
+                      v-model="formData.paymentMethods"
+                      class="w-4 h-4 text-slate-700 border-slate-300 rounded focus:ring-slate-400"
+                    />
+                    <span class="text-sm text-slate-700">Cryptocurrency</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      value="Bank Transfer"
+                      v-model="formData.paymentMethods"
+                      class="w-4 h-4 text-slate-700 border-slate-300 rounded focus:ring-slate-400"
+                    />
+                    <span class="text-sm text-slate-700">Bank Transfer</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Shipping Information -->
+              <div>
+                <label for="shipping_information" class="block text-sm text-slate-700 mb-2">
+                  Shipping Information
+                </label>
+                <textarea
+                  id="shipping_information"
+                  v-model="formData.shippingInformation"
+                  rows="4"
+                  placeholder="Describe your shipping policies, methods, and estimated delivery times..."
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                ></textarea>
+              </div>
+
+              <!-- Return Policy -->
+              <div>
+                <label for="return_policy" class="block text-sm text-slate-700 mb-2">
+                  Return Policy
+                </label>
+                <textarea
+                  id="return_policy"
+                  v-model="formData.returnPolicy"
+                  rows="4"
+                  placeholder="Describe your return and refund policies..."
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                ></textarea>
+              </div>
+
+              <!-- Business Hours -->
+              <div>
+                <label for="business_hours" class="block text-sm text-slate-700 mb-2">
+                  Business Hours
+                </label>
+                <textarea
+                  id="business_hours"
+                  v-model="formData.businessHours"
+                  rows="3"
+                  placeholder="e.g., Monday-Friday: 9 AM - 5 PM EST"
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                ></textarea>
+              </div>
+
+              <!-- Unique Selling Points -->
+              <div>
+                <label for="unique_selling_points" class="block text-sm text-slate-700 mb-2">
+                  Unique selling points of your brand?
+                </label>
+                <textarea
+                  id="unique_selling_points"
+                  v-model="formData.uniqueSellingPoints"
+                  rows="4"
+                  placeholder="What makes your brand stand out? List key differentiators..."
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                ></textarea>
+              </div>
+
+              <!-- Logo Upload -->
+              <div>
+                <label for="logo_file" class="block text-sm text-slate-700 mb-2">
+                  Please upload a transparent .png logo file (1000px x 1000px)
+                </label>
+                <div class="mt-2">
+                  <input
+                    id="logo_file"
+                    type="file"
+                    accept="image/png"
+                    @change="handleLogoUpload"
+                    class="block w-full text-sm text-slate-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600 file:cursor-pointer cursor-pointer"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">
+                    Accepted format: PNG only. Recommended size: 1000px x 1000px with transparent background.
+                  </p>
+                  <div v-if="formData.logoFile" class="mt-2 text-sm text-slate-600">
+                    Selected: {{ formData.logoFile.name }}
+                  </div>
+                </div>
+              </div>
+
               <!-- What you'll get Section -->
               <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
                 <h3 class="text-slate-900 text-sm mb-2">What you'll get:</h3>
@@ -486,11 +638,30 @@
                 <button
                   type="button"
                   @click="goToStep(2)"
+                  :disabled="isSubmitting"
                   class="px-6 py-2 text-slate-600 hover:text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Back
                 </button>
                 <button
+                  type="submit"
+                  :disabled="isSubmitting"
+                  :class="[
+                    'flex items-center gap-2 px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors',
+                    isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                  ]"
+                >
+                  <span v-if="isSubmitting">Submitting...</span>
+                  <span v-else>Complete Registration</span>
+                  <svg v-if="!isSubmitting" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check w-4 h-4" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="m9 12 2 2 4-4"></path>
+                  </svg>
+                  <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 w-4 h-4 animate-spin">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                  </svg>
+                </button>
+                <!-- <button
                   type="submit"
                   class="flex items-center gap-2 px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
                 >
@@ -499,12 +670,12 @@
                     <path d="M5 12h14"></path>
                     <path d="m12 5 7 7-7 7"></path>
                   </svg>
-                </button>
+                </button> -->
               </div>
             </form>
           </div>
 
-          <!-- Step 4: Plan & Payment -->
+          <!-- Step 4: Plan & Payment
           <div v-if="step === 4" class="space-y-6">
             <div>
               <h2 class="text-slate-900 mb-2">Choose Your Plan</h2>
@@ -512,9 +683,9 @@
             </div>
 
             <form @submit.prevent="handleStep4Submit" class="space-y-6">
-              <!-- Plan Selection Cards -->
+              // Plan Selection Cards
               <div class="space-y-4">
-                <!-- Basic Plan -->
+                // Basic Plan
                 <div
                   @click="formData.selectedPlan = 'basic'"
                   :class="[
@@ -559,7 +730,7 @@
                   </ul>
                 </div>
 
-                <!-- Professional Plan -->
+                // Professional Plan
                 <div
                   @click="formData.selectedPlan = 'professional'"
                   :class="[
@@ -621,7 +792,7 @@
                   </ul>
                 </div>
 
-                <!-- Enterprise Plan -->
+                // Enterprise Plan
                 <div
                   @click="formData.selectedPlan = 'enterprise'"
                   :class="[
@@ -674,14 +845,14 @@
                 </div>
               </div>
 
-              <!-- Note Section -->
+              // Note Section
               <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
                 <p class="text-sm text-slate-600">
                   <strong>Note:</strong> You can change or cancel your plan at any time. All plans include a 14-day free trial.
                 </p>
               </div>
 
-              <!-- Navigation Buttons -->
+              // Navigation Buttons
               <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-200">
                 <button
                   type="button"
@@ -702,14 +873,14 @@
                 </button>
               </div>
             </form>
-          </div>
+          </div> -->
         </div>
 
         <!-- Footer Link -->
         <div class="mt-8 text-center">
           <p class="text-sm text-slate-500">
             Already have an account?
-            <a href="/login" class="text-slate-700 hover:underline">Sign in</a>
+            <a href="/vendor/login" class="text-slate-700 hover:underline">Sign in</a>
           </p>
         </div>
       </div>
@@ -721,7 +892,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 import FrontLayout from '@/Pages/Layouts/FrontLayout.vue';
 
 const props = defineProps({
@@ -747,6 +918,13 @@ const formData = ref({
   confirmPassword: '',
   salesVolume: '',
   productCount: '',
+  companyDescription: '',
+  paymentMethods: [],
+  shippingInformation: '',
+  returnPolicy: '',
+  businessHours: '',
+  uniqueSellingPoints: '',
+  logoFile: null,
   selectedPlan: 'basic', // Default to Basic plan
 });
 
@@ -789,7 +967,7 @@ const handleStep1Submit = () => {
 
 const handleStep2Submit = () => {
   // Validate form
-  if (!formData.value.fullName || !formData.value.email || !formData.value.phone || 
+  if (!formData.value.fullName || !formData.value.email || 
       !formData.value.password || !formData.value.confirmPassword) {
     return;
   }
@@ -803,9 +981,95 @@ const handleStep2Submit = () => {
   goToStep(3);
 };
 
+const handleLogoUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    // Validate file type
+    if (file.type !== 'image/png') {
+      alert('Please upload a PNG file only.');
+      event.target.value = '';
+      formData.value.logoFile = null;
+      return;
+    }
+    formData.value.logoFile = file;
+  }
+};
+
+const page = usePage();
+const isSubmitting = ref(false);
+const showSuccessMessage = ref(false);
+
 const handleStep3Submit = () => {
-  // Move to next step (fields are optional)
-  goToStep(4);
+  // Validate required fields
+  if (!formData.value.companyName || !formData.value.website || !formData.value.country ||
+      !formData.value.fullName || !formData.value.email || 
+      !formData.value.password || !formData.value.confirmPassword) {
+    return;
+  }
+
+  // Validate password match
+  if (formData.value.password !== formData.value.confirmPassword) {
+    return;
+  }
+
+  isSubmitting.value = true;
+
+  // Create form with Inertia's useForm for proper file handling
+  const submitForm = useForm({
+    // Step 1
+    companyName: formData.value.companyName,
+    website: formData.value.website,
+    yearEstablished: formData.value.yearEstablished || null,
+    country: formData.value.country,
+    
+    // Step 2
+    fullName: formData.value.fullName,
+    email: formData.value.email,
+    phone: formData.value.phone || null,
+    password: formData.value.password,
+    password_confirmation: formData.value.confirmPassword,
+    
+    // Step 3
+    salesVolume: formData.value.salesVolume || null,
+    productCount: formData.value.productCount || null,
+    companyDescription: formData.value.companyDescription || null,
+    paymentMethods: formData.value.paymentMethods || [],
+    shippingInformation: formData.value.shippingInformation || null,
+    returnPolicy: formData.value.returnPolicy || null,
+    businessHours: formData.value.businessHours || null,
+    uniqueSellingPoints: formData.value.uniqueSellingPoints || null,
+    logoFile: formData.value.logoFile || null,
+    _token: page.props.csrf_token,
+  });
+
+  // Ensure CSRF token is up to date before submission
+  const csrfToken = page.props.csrf_token || '';
+  submitForm._token = csrfToken;
+
+  submitForm.post('/become-a-vendor', {
+    preserveScroll: false,
+    forceFormData: true, // Force FormData for file uploads
+    onSuccess: (page) => {
+      isSubmitting.value = false;
+      showSuccessMessage.value = true;
+      // Scroll to top to show success message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Reload shared props to update pending vendors count in admin panel
+      // This ensures the count updates immediately after signup
+      router.reload({ only: ['pending_vendors_count'] });
+    },
+    onError: (errors) => {
+      isSubmitting.value = false;
+      console.error('Registration errors:', errors);
+      // If CSRF token error, refresh the page to get a new token
+      if (errors.message && errors.message.includes('419')) {
+        window.location.reload();
+      }
+    },
+    onFinish: () => {
+      isSubmitting.value = false;
+    },
+  });
 };
 
 const handleStep4Submit = () => {

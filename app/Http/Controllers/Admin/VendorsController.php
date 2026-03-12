@@ -21,7 +21,13 @@ class VendorsController extends Controller
 {
     public function index()
     {
+        // Get all vendors (including pending for admin review)
         $vendors = Brand::with(['vendorSetting.location'])
+            ->whereHas('vendorSetting', function ($query) {
+                // Only show approved vendors in main list, or all if we want to show pending separately
+                // For now, show all but we'll filter in the frontend
+            })
+            ->orWhereDoesntHave('vendorSetting')
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($brand) {
@@ -36,8 +42,10 @@ class VendorsController extends Controller
                     'is_active' => $brand->is_active,
                     'rating_average' => $brand->rating_average ?? 0,
                     'rating_count' => $brand->rating_count ?? 0,
+                    'approval_status' => $brand->vendorSetting?->approval_status ?? 'approved', // Default to approved for backwards compatibility
                     'settings' => $brand->vendorSetting ? [
                         'status' => $brand->vendorSetting->status,
+                        'approval_status' => $brand->vendorSetting->approval_status ?? 'approved',
                         'logo' => $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
                         'logo_url' => $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
                         'banner_url' => $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
@@ -67,9 +75,15 @@ class VendorsController extends Controller
 
         $locations = Location::orderBy('name')->get();
 
+        // Count pending vendors for notification
+        $pendingVendorsCount = Brand::whereHas('vendorSetting', function ($query) {
+            $query->where('approval_status', 'pending');
+        })->count();
+
         return Inertia::render('Admin/Vendors', [
             'vendors' => $vendors,
-            'locations' => $locations
+            'locations' => $locations,
+            'pendingVendorsCount' => $pendingVendorsCount
         ]);
     }
 
@@ -406,10 +420,87 @@ class VendorsController extends Controller
         // Delete all products for this brand
         $brand->products()->delete();
         
+        // Delete user account if exists
+        if ($brand->user_id) {
+            $user = User::find($brand->user_id);
+            if ($user) {
+                $user->delete();
+            }
+        }
+        
         // Delete the brand
         $brand->delete();
         
         return redirect()->route('admin.vendors')->with('success', 'Vendor deleted successfully.');
+    }
+
+    /**
+     * Approve a pending vendor
+     */
+    public function approve($id)
+    {
+        $brand = Brand::findOrFail($id);
+        
+        if (!$brand->vendorSetting) {
+            return redirect()->route('admin.vendors')->with('error', 'Vendor settings not found.');
+        }
+        
+        // Update approval status and activate vendor
+        $brand->vendorSetting->approval_status = 'approved';
+        $brand->vendorSetting->status = 1; // Active
+        $brand->vendorSetting->save();
+        
+        $brand->is_active = true;
+        $brand->save();
+        
+        // Mark user's email as verified to make them active
+        if ($brand->user_id) {
+            $user = User::find($brand->user_id);
+            if ($user && !$user->email_verified_at) {
+                $user->email_verified_at = now();
+                $user->save();
+            }
+        }
+        
+        return redirect()->route('admin.vendors')->with('success', 'Vendor approved successfully.');
+    }
+
+    /**
+     * Reject a pending vendor (deletes from database)
+     */
+    public function reject($id)
+    {
+        $brand = Brand::findOrFail($id);
+        
+        // Delete vendor settings and files
+        if ($brand->vendorSetting) {
+            $settings = $brand->vendorSetting;
+            // Delete banner file
+            if ($settings->banner) {
+                \Storage::disk('public')->delete($settings->banner);
+            }
+            // Delete logo file
+            if ($settings->logo) {
+                \Storage::disk('public')->delete($settings->logo);
+            }
+            $settings->delete();
+        }
+        
+        // Delete all products for this brand
+        $brand->products()->delete();
+        
+        // Delete user account if exists
+        if ($brand->user_id) {
+            $user = User::find($brand->user_id);
+            if ($user) {
+                $user->delete();
+            }
+        }
+        
+        // Delete the brand
+        $brand->delete();
+        
+        return redirect()->route('admin.vendors')->with('success', 'Vendor rejected and removed from database.');
     }
 
     public function products($id)

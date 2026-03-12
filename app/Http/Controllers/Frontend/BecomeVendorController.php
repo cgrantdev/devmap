@@ -4,7 +4,14 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Location;
+use App\Models\Brand;
+use App\Models\User;
+use App\Models\VendorSetting;
+use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
@@ -32,5 +39,122 @@ class BecomeVendorController extends Controller
             'step' => $step,
             'locations' => $locations,
         ]);
+    }
+
+    /**
+     * Store vendor registration data
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            // Step 1: Company Information
+            'companyName' => 'required|string|max:255',
+            'website' => 'required|url|max:255',
+            'yearEstablished' => 'nullable|integer|min:1800|max:' . date('Y'),
+            'country' => 'required|exists:locations,id',
+            
+            // Step 2: Contact Details
+            'fullName' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'phone' => 'nullable|string|max:50',
+            'password' => 'required|string|min:8|confirmed',
+            
+            // Step 3: Business Info
+            'salesVolume' => 'nullable|string|max:50',
+            'productCount' => 'nullable|string|max:50',
+            'companyDescription' => 'nullable|string|max:2000',
+            'paymentMethods' => 'nullable|array',
+            'paymentMethods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
+            'shippingInformation' => 'nullable|string|max:2000',
+            'returnPolicy' => 'nullable|string|max:2000',
+            'businessHours' => 'nullable|string|max:255',
+            'uniqueSellingPoints' => 'nullable|string|max:2000',
+            'logoFile' => 'nullable|mimes:png|max:2048',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Check if brand name already exists
+            if (Brand::where('name', $validated['companyName'])->exists()) {
+                return back()->withErrors(['companyName' => 'This company name is already taken.'])->withInput();
+            }
+
+            // Create User account
+            $user = User::create([
+                'name' => $validated['fullName'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role' => 'vendor',
+            ]);
+
+            // Create Brand
+            $brand = Brand::create([
+                'name' => $validated['companyName'],
+                'user_id' => $user->id,
+                'is_active' => false, // Inactive until admin approves
+            ]);
+
+            // Build description with unique selling points appended
+            $description = $validated['companyDescription'] ?? '';
+            if (!empty($validated['uniqueSellingPoints'])) {
+                if (!empty($description)) {
+                    $description .= "\n\nUnique Selling Points:\n" . $validated['uniqueSellingPoints'];
+                } else {
+                    $description = "Unique Selling Points:\n" . $validated['uniqueSellingPoints'];
+                }
+            }
+
+            // Create VendorSetting
+            $settings = new VendorSetting([
+                'brand_id' => $brand->id,
+                'location_id' => $validated['country'],
+                'description' => $description,
+                'contact_email' => $validated['email'],
+                'phone_number' => $validated['phone'] ?? null,
+                'shop_url' => $validated['website'],
+                'website' => $validated['website'],
+                'founded_year' => !empty($validated['yearEstablished']) ? (int)$validated['yearEstablished'] : null,
+                'shipping_info' => $validated['shippingInformation'] ?? null,
+                'return_policy' => $validated['returnPolicy'] ?? null,
+                'business_hours' => $validated['businessHours'] ?? null,
+                'payment_methods' => $validated['paymentMethods'] ?? null,
+                'status' => 0, // Inactive until approved
+                'approval_status' => 'pending', // Pending approval
+            ]);
+
+            // Handle logo upload
+            if ($request->hasFile('logoFile')) {
+                $logoFile = $request->file('logoFile');
+                $extension = strtolower($logoFile->getClientOriginalExtension());
+                $mimeType = $logoFile->getMimeType();
+                
+                // Check if it's PNG
+                if ($extension === 'png' || $mimeType === 'image/png') {
+                    // Convert PNG to WebP
+                    try {
+                        $logoFilename = ImageHelper::convertToWebP($logoFile, 'vendor_logos');
+                        $settings->logo = 'vendor_logos/' . $logoFilename;
+                    } catch (\Exception $e) {
+                        // If WebP conversion fails, save as PNG
+                        $logoFilename = Str::random(40) . '.png';
+                        $logoFile->storeAs('vendor_logos', $logoFilename, 'public');
+                        $settings->logo = 'vendor_logos/' . $logoFilename;
+                    }
+                }
+            }
+
+            $settings->save();
+
+            DB::commit();
+
+            // Send email verification notification
+            $user->sendEmailVerificationNotification();
+
+            return back()->with('success', 'Registration completed successfully. Please check your email to verify your account.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['error' => 'An error occurred during registration. Please try again.'])->withInput();
+        }
     }
 }

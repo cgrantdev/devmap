@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Schema;
 use App\Models\Brand;
 use App\Models\VendorReview;
 use App\Models\Product;
+use App\Models\VendorSetting;
+use App\Models\Location;
+use App\Helpers\ImageHelper;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -154,5 +158,142 @@ class DashboardController extends Controller
             'stats' => $stats,
             'reviews' => $reviews,
         ]);
+    }
+
+    public function profile()
+    {
+        $user = Auth::user();
+        $brand = Brand::with(['vendorSetting.location', 'user'])->where('user_id', $user->id)->first();
+        
+        if (!$brand) {
+            return Inertia::render('Vendor/Profile', [
+                'vendor' => null,
+            ]);
+        }
+
+        $vendorData = [
+            'id' => $brand->id,
+            'name' => $brand->name,
+            'user' => [
+                'name' => $brand->user->name ?? $user->name,
+                'email' => $brand->user->email ?? $user->email,
+            ],
+            'settings' => null,
+        ];
+
+        if ($brand->vendorSetting) {
+            $settings = $brand->vendorSetting;
+            $vendorData['settings'] = [
+                'website' => $settings->website ?? $settings->shop_url ?? null,
+                'founded_year' => $settings->founded_year ?? null,
+                'location_id' => $settings->location_id ?? null,
+                'location' => $settings->location ? $settings->location->name : null,
+                'description' => $settings->description ?? null,
+                'contact_email' => $settings->contact_email ?? $user->email,
+                'phone_number' => $settings->phone_number ?? null,
+                'shipping_info' => $settings->shipping_info ?? null,
+                'return_policy' => $settings->return_policy ?? null,
+                'business_hours' => $settings->business_hours ?? null,
+                'payment_methods' => $settings->payment_methods ?? [],
+                'logo' => $settings->logo ? asset('storage/' . $settings->logo) : null,
+                'approval_status' => $settings->approval_status ?? 'pending',
+            ];
+        }
+
+        $locations = Location::orderBy('name')->get(['id', 'name']);
+
+        return Inertia::render('Vendor/Profile', [
+            'vendor' => $vendorData,
+            'locations' => $locations,
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+        $brand = Brand::where('user_id', $user->id)->first();
+
+        if (!$brand) {
+            return back()->withErrors(['error' => 'Vendor profile not found.']);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'website' => 'required|url|max:255',
+            'founded_year' => 'nullable|integer|min:1800|max:' . date('Y'),
+            'location_id' => 'required|exists:locations,id',
+            'description' => 'nullable|string|max:2000',
+            'contact_email' => 'required|email|max:255',
+            'phone_number' => 'nullable|string|max:50',
+            'shipping_info' => 'nullable|string|max:2000',
+            'return_policy' => 'nullable|string|max:2000',
+            'business_hours' => 'nullable|string|max:255',
+            'payment_methods' => 'nullable|array',
+            'payment_methods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
+            'logo' => 'nullable|mimes:png|max:2048',
+        ]);
+
+        try {
+            // Update brand name
+            $brand->update([
+                'name' => $validated['name'],
+            ]);
+
+            // Get or create vendor settings
+            $settings = $brand->vendorSetting ?: new VendorSetting(['brand_id' => $brand->id]);
+
+            // Handle logo upload (PNG only)
+            if ($request->hasFile('logo')) {
+                // Delete old logo if exists
+                if ($settings->logo) {
+                    ImageHelper::deleteImage(basename($settings->logo), 'vendor_logos');
+                }
+                
+                $logoFile = $request->file('logo');
+                $extension = strtolower($logoFile->getClientOriginalExtension());
+                $mimeType = $logoFile->getMimeType();
+                
+                // Validate PNG file
+                if ($extension !== 'png' && $mimeType !== 'image/png') {
+                    return back()->withErrors(['logo' => 'Only PNG files are allowed for company logo.'])->withInput();
+                }
+                
+                // Convert PNG to WebP
+                try {
+                    $logoFilename = ImageHelper::convertToWebP($logoFile, 'vendor_logos');
+                    $settings->logo = 'vendor_logos/' . $logoFilename;
+                } catch (\Exception $e) {
+                    // If WebP conversion fails, save as PNG
+                    $logoFilename = \Illuminate\Support\Str::random(40) . '.png';
+                    $logoFile->storeAs('vendor_logos', $logoFilename, 'public');
+                    $settings->logo = 'vendor_logos/' . $logoFilename;
+                }
+            }
+
+            // Update settings
+            $settings->website = $validated['website'];
+            $settings->shop_url = $validated['website'];
+            $settings->founded_year = $validated['founded_year'] ?? null;
+            $settings->location_id = $validated['location_id'];
+            $settings->description = $validated['description'] ?? null;
+            $settings->contact_email = $validated['contact_email'];
+            $settings->phone_number = $validated['phone_number'] ?? null;
+            $settings->shipping_info = $validated['shipping_info'] ?? null;
+            $settings->return_policy = $validated['return_policy'] ?? null;
+            $settings->business_hours = $validated['business_hours'] ?? null;
+            $settings->payment_methods = $validated['payment_methods'] ?? [];
+
+            // Set status if this is a new settings record
+            if (!$settings->exists) {
+                $settings->status = 0;
+                $settings->approval_status = 'pending';
+            }
+
+            $settings->save();
+
+            return redirect()->route('vendor.profile')->with('success', 'Profile updated successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'An error occurred while updating your profile. Please try again.'])->withInput();
+        }
     }
 } 

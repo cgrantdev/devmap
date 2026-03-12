@@ -65,6 +65,7 @@ Route::get('/guide/{id}', [KnowledgeCenterController::class, 'showGuide'])->name
 Route::get('/research/{id}', [KnowledgeCenterController::class, 'showResearch'])->name('research.show');
 Route::get('/deals', [DealsController::class, 'index'])->name('deals');
 Route::get('/become-a-vendor', [BecomeVendorController::class, 'index'])->name('become-a-vendor');
+Route::post('/become-a-vendor', [BecomeVendorController::class, 'store'])->name('become-a-vendor.store');
 
 // Vendor Reviews
 Route::post('/brands/{brandId}/reviews', [VendorReviewsController::class, 'store'])->name('vendor.reviews.store');
@@ -105,9 +106,8 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
     Route::post('/import/file', [ImportController::class, 'importFromFile'])->name('vendor.import.file');
     Route::post('/import/url', [ImportController::class, 'importFromUrl'])->name('vendor.import.url');
     Route::delete('/products/{product}', [ImportController::class, 'deleteProduct'])->name('vendor.products.delete');
-    Route::get('/profile', function () {
-        return Inertia::render('Vendor/Profile');
-    })->name('vendor.profile');
+    Route::get('/profile', [VendorDashboardController::class, 'profile'])->name('vendor.profile');
+    Route::post('/profile', [VendorDashboardController::class, 'updateProfile'])->name('vendor.profile.update');
     Route::get('/settings', [VendorSettingsController::class, 'show'])->name('vendor.settings');
     Route::post('/settings', [VendorSettingsController::class, 'update'])->name('vendor.settings.update');
 });
@@ -122,6 +122,8 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/vendors/{id}', [VendorsController::class, 'update'])->name('admin.vendors.update');
     Route::delete('/vendors/{id}', [VendorsController::class, 'destroy'])->name('admin.vendors.destroy');
     Route::post('/vendors/{id}/toggle-status', [VendorsController::class, 'toggleStatus'])->name('admin.vendors.toggle-status');
+    Route::post('/vendors/{id}/approve', [VendorsController::class, 'approve'])->name('admin.vendors.approve');
+    Route::post('/vendors/{id}/reject', [VendorsController::class, 'reject'])->name('admin.vendors.reject');
     Route::get('/vendors/{id}/products', [VendorsController::class, 'products'])->name('admin.vendors.products');
     Route::post('/vendors/{id}/products/import', [VendorsController::class, 'importProductsFromFile'])->name('admin.vendors.products.import');
     Route::post('/vendors/{id}/products/import-url', [VendorsController::class, 'importProductsFromUrl'])->name('admin.vendors.products.import-url');

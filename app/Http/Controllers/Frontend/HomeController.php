@@ -124,8 +124,14 @@ class HomeController extends Controller
                 ];
             });
 
-        // Top brands (vendors) limited list for homepage
+        // Top brands (vendors) limited list for homepage - only approved vendors
         $topBrands = Brand::where('is_active', true)
+            ->where(function ($q) {
+                $q->whereHas('vendorSetting', function ($subQ) {
+                    $subQ->where('approval_status', 'approved');
+                })
+                ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
+            })
             ->with(['vendorSetting', 'vendorSetting.location'])
             ->withCount([
                 'products as products_count' => function ($q) {
@@ -221,12 +227,16 @@ class HomeController extends Controller
             ->values()
             ->toBase();
 
-        // If we don't have enough deals, supplement with top brands that have coupon codes
+        // If we don't have enough deals, supplement with top brands that have coupon codes - only approved vendors
         if ($discountDeals->count() < 8) {
             $brandsWithCoupons = Brand::where('is_active', true)
-                ->whereHas('vendorSetting', function ($q) {
-                    $q->whereNotNull('coupon_code')
-                      ->where('coupon_code', '!=', '');
+                ->where(function ($q) {
+                    $q->whereHas('vendorSetting', function ($subQ) {
+                        $subQ->where('approval_status', 'approved')
+                            ->whereNotNull('coupon_code')
+                            ->where('coupon_code', '!=', '');
+                    })
+                    ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
                 })
                 ->with(['vendorSetting'])
                 ->withCount([
@@ -261,9 +271,15 @@ class HomeController extends Controller
             $discountDeals = $discountDeals->merge($brandsWithCoupons)->take(8)->values();
         }
 
-        // If still no deals, use top brands as fallback with default discount
+        // If still no deals, use top brands as fallback with default discount - only approved vendors
         if ($discountDeals->count() === 0) {
             $discountDeals = Brand::where('is_active', true)
+                ->where(function ($q) {
+                    $q->whereHas('vendorSetting', function ($subQ) {
+                        $subQ->where('approval_status', 'approved');
+                    })
+                    ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
+                })
                 ->with(['vendorSetting'])
                 ->withCount([
                     'products as products_count' => function ($q) {

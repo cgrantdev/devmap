@@ -64,9 +64,13 @@ class DealsController extends Controller
         // If we don't have enough deals, supplement with top brands that have coupon codes
         if ($deals->count() < 8) {
             $brandsWithCoupons = Brand::where('is_active', true)
-                ->whereHas('vendorSetting', function ($q) {
-                    $q->whereNotNull('coupon_code')
-                      ->where('coupon_code', '!=', '');
+                ->where(function ($q) {
+                    $q->whereHas('vendorSetting', function ($subQ) {
+                        $subQ->where('approval_status', 'approved')
+                            ->whereNotNull('coupon_code')
+                            ->where('coupon_code', '!=', '');
+                    })
+                    ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
                 })
                 ->with(['vendorSetting'])
                 ->whereNotIn('id', $deals->pluck('id'))
@@ -98,9 +102,15 @@ class DealsController extends Controller
             $deals = $deals->merge($brandsWithCoupons)->take(8)->values()->toBase();
         }
 
-        // If still no deals, use top brands as fallback with default discount
+        // If still no deals, use top brands as fallback with default discount - only approved vendors
         if ($deals->count() === 0) {
             $deals = Brand::where('is_active', true)
+                ->where(function ($q) {
+                    $q->whereHas('vendorSetting', function ($subQ) {
+                        $subQ->where('approval_status', 'approved');
+                    })
+                    ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
+                })
                 ->with(['vendorSetting'])
                 ->orderByDesc('rating_average')
                 ->take(8)
