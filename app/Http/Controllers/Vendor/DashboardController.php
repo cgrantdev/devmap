@@ -112,30 +112,38 @@ class DashboardController extends Controller
             ]);
         }
         
-        // Get review statistics
-        $allReviews = VendorReview::where('brand_id', $brand->id)->get();
-        $pendingReviews = VendorReview::where('brand_id', $brand->id)
-            ->where(function ($query) {
-                $query->where('status', 'pending')
-                    ->orWhere(function ($q) {
-                        // Fallback for old schema
-                        if (Schema::hasColumn('vendor_reviews', 'is_approved')) {
-                            $q->where('is_approved', false);
-                        }
-                    });
-            })
+        // Approved review query (vendors should only see approved reviews)
+        $approvedReviewsQuery = VendorReview::where('brand_id', $brand->id);
+        if (Schema::hasColumn('vendor_reviews', 'status')) {
+            $approvedReviewsQuery->where('status', 'approved');
+        } else {
+            $approvedReviewsQuery->where('is_approved', true);
+        }
+
+        // Pending review count (approval pending from admin)
+        $pendingReviewsQuery = VendorReview::where('brand_id', $brand->id);
+        if (Schema::hasColumn('vendor_reviews', 'status')) {
+            $pendingReviewsQuery->where('status', 'pending');
+        } else {
+            $pendingReviewsQuery->where('is_approved', false);
+        }
+
+        $totalApprovedReviews = (clone $approvedReviewsQuery)->count();
+        $averageRating = number_format((clone $approvedReviewsQuery)->avg('rating') ?? 0, 1);
+        $respondedReviews = (clone $approvedReviewsQuery)
+            ->whereNotNull('vendor_replied_at')
             ->count();
-        
+
         $stats = [
-            'totalReviews' => $allReviews->count(),
-            'averageRating' => number_format($allReviews->avg('rating') ?? 0, 1),
-            'pendingReviews' => $pendingReviews,
-            'respondedReviews' => 0, // TODO: Implement response tracking
+            'totalReviews' => $totalApprovedReviews,
+            'averageRating' => $averageRating,
+            'pendingReviews' => (clone $pendingReviewsQuery)->count(),
+            'respondedReviews' => $respondedReviews,
         ];
-        
-        // Get recent reviews
-        $reviews = VendorReview::where('brand_id', $brand->id)
-            ->with('product:id,name')
+
+        // Get recent approved reviews for the list
+        // Note: `vendor_reviews` currently has no `product_id` column, so we cannot eager-load a `product` relationship here.
+        $reviews = (clone $approvedReviewsQuery)
             ->latest()
             ->take(20)
             ->get()
@@ -143,14 +151,20 @@ class DashboardController extends Controller
                 return [
                     'id' => $review->id,
                     'user_name' => $review->user_name,
+                    'user_email' => $review->user_email,
                     'rating' => $review->rating,
                     'review' => $review->review,
                     'status' => $review->status ?? ($review->is_approved ? 'approved' : 'pending'),
                     'created_at' => $review->created_at,
-                    'product' => $review->product ? [
-                        'id' => $review->product->id,
-                        'name' => $review->product->name,
-                    ] : null,
+                    'vendor_reply' => $review->vendor_reply,
+                    'vendor_replied_at' => $review->vendor_replied_at,
+                    'flagged' => $review->flagged ?? false,
+                    'flag_reason' => $review->flag_reason,
+                    'shipping_time' => $review->shipping_time,
+                    'customer_service' => $review->customer_service,
+                    'quality' => $review->quality,
+                    'cost' => $review->cost,
+                    'packaging' => $review->packaging,
                 ];
             });
         
@@ -158,6 +172,74 @@ class DashboardController extends Controller
             'stats' => $stats,
             'reviews' => $reviews,
         ]);
+    }
+
+    public function reply(Request $request, $id)
+    {
+        $user = Auth::user();
+        $brand = Brand::where('user_id', $user->id)->first();
+
+        if (!$brand) {
+            return back()->withErrors(['error' => 'Vendor not found.']);
+        }
+
+        $review = VendorReview::where('id', $id)
+            ->where('brand_id', $brand->id)
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'vendor_reply' => 'required|string|max:2000',
+        ]);
+
+        $review->vendor_reply = $validated['vendor_reply'];
+        $review->vendor_replied_at = now();
+        $review->save();
+
+        return back()->with('success', 'Reply submitted successfully.');
+    }
+
+    public function flag(Request $request, $id)
+    {
+        $user = Auth::user();
+        $brand = Brand::where('user_id', $user->id)->first();
+
+        if (!$brand) {
+            return back()->withErrors(['error' => 'Vendor not found.']);
+        }
+
+        $review = VendorReview::where('id', $id)
+            ->where('brand_id', $brand->id)
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'flag_reason' => 'required|string|max:1000',
+        ]);
+
+        $review->flagged = true;
+        $review->flag_reason = $validated['flag_reason'];
+        $review->save();
+
+        return back()->with('success', 'Review flagged successfully.');
+    }
+
+    public function unflag($id)
+    {
+        $user = Auth::user();
+        $brand = Brand::where('user_id', $user->id)->first();
+
+        if (!$brand) {
+            return back()->withErrors(['error' => 'Vendor not found.']);
+        }
+
+        $review = VendorReview::where('id', $id)
+            ->where('brand_id', $brand->id)
+            ->firstOrFail();
+
+        $review->flagged = false;
+        $review->flag_reason = null;
+        $review->save();
+
+        return back()->with('success', 'Review unflagged successfully.');
     }
 
     public function profile()

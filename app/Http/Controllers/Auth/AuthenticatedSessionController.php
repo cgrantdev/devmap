@@ -12,7 +12,7 @@ class AuthenticatedSessionController extends Controller
 {
     public function create()
     {
-        return Inertia::render('Login');
+        return Inertia::render('Auth/Login');
     }
 
     public function store(LoginRequest $request)
@@ -22,18 +22,29 @@ class AuthenticatedSessionController extends Controller
 
             $request->session()->regenerate();
 
-            if ($request->user()->role !== 'vendor') {
+            // Support both customer + vendor logins here.
+            // Admins should use the admin login page.
+            if ($request->user()->role === 'admin') {
                 Auth::logout();
                 return back()->withErrors([
-                    'email' => 'These credentials are for vendor access only.',
+                    'email' => 'Please use the admin login page for admin access.',
+                ])->withInput();
+            }
+
+            if (!in_array($request->user()->role, ['customer', 'vendor'], true)) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Please use the correct login page for your account type.',
                 ])->withInput();
             }
 
             if (!$request->user()->hasVerifiedEmail()) {
-                return redirect('/email/verify')->with('info', 'Please verify your email address before accessing the dashboard.');
+                return redirect('/email/verify')->with('info', 'Please verify your email address before continuing.');
             }
 
-            return redirect()->intended('/vendor/dashboard');
+            return $request->user()->role === 'vendor'
+                ? redirect()->intended('/vendor/dashboard')
+                : redirect()->intended('/');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {

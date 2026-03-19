@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-50">
     <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-      <h1 class="text-2xl font-bold mb-6 text-center">Vendor Login</h1>
+      <h1 class="text-2xl font-bold mb-6 text-center">Customer Login</h1>
 
       <!-- Success Message -->
       <div v-if="$page.props.flash.success" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
@@ -56,9 +56,13 @@
         <span>Don't have an account?</span>
         <Link href="/register" class="text-blue-600 ml-1">Register</Link>
       </div>
-      <div class="mt-2">
+      <div class="mt-4 text-center">
+        <span>Are you a vendor?</span>
+        <Link href="/vendor/login" class="text-blue-600 ml-1">Vendor Login</Link>
+      </div>
+      <div class="mt-4 text-center">
         <span>Are you an admin?</span>
-        <Link href="/admin/login" class="text-gray-800">Admin Login</Link>
+        <Link href="/admin/login" class="text-blue-600 ml-1">Admin Login</Link>
       </div>
     </div>
   </div>
@@ -77,9 +81,6 @@ var errors = {}
 
 function submit() {
   form.post('/login', {
-    onSuccess: () => {
-      window.location.href = '/vendor/dashboard'
-    },
     onError: (errs) => {
       console.log('Login failed:', errs)
       errors = errs

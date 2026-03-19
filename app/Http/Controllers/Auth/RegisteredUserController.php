@@ -16,7 +16,7 @@ class RegisteredUserController extends Controller
 {
     public function create()
     {
-        return Inertia::render('Register');
+        return Inertia::render('Auth/Register');
     }
 
     public function store(Request $request)
@@ -36,14 +36,15 @@ class RegisteredUserController extends Controller
                 ],
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
-                'role' => 'sometimes|string|in:vendor,admin',
+                'role' => 'sometimes|string|in:customer,vendor,admin',
             ]);
 
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role' => $validated['role'] ?? 'vendor',
+                // Default to customer if not explicitly provided
+                'role' => $validated['role'] ?? 'customer',
             ]);
 
             event(new Registered($user));

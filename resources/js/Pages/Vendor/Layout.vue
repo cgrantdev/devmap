@@ -43,11 +43,16 @@
                 </svg>
                 <span>Advertisement Analytics</span>
               </Link>
-              <Link href="/vendor/reviews" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/vendor/reviews') }">
+              <Link href="/vendor/reviews" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800 relative" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/vendor/reviews') }">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square w-5 h-5" aria-hidden="true">
                   <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path>
                 </svg>
                 <span>Reviews</span>
+                <div v-if="$page.props.approved_reviews_count > 0" class="ml-auto relative flex-shrink-0">
+                  <span class="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] bg-yellow-600 text-white text-[10px] font-bold rounded-full px-1">
+                    {{ $page.props.approved_reviews_count }}
+                  </span>
+                </div>
               </Link>
             </div>
       </nav>
