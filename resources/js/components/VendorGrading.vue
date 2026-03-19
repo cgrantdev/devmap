@@ -86,8 +86,15 @@
       </div>
     </div>
 
-    <!-- Submit Button -->
-    <div class="mt-6 flex justify-end">
+    <!-- Submit/Cancel Buttons -->
+    <div class="mt-6 flex justify-end items-center gap-3">
+      <MainButton
+        v-if="cancelText"
+        :text="cancelText"
+        size="custom-small"
+        bg-color="gray-200"
+        @click="$emit('cancel')"
+      />
       <MainButton
         :text="isLoading ? 'Submitting...' : 'Submit Rating'"
         size="custom-small"
@@ -111,9 +118,10 @@ const props = defineProps({
   cost: { type: [Number, String], default: 0 },
   packaging: { type: [Number, String], default: 0 },
   isLoading: { type: Boolean, default: false },
+  cancelText: { type: String, default: null },
 })
 
-const emit = defineEmits(['submit'])
+const emit = defineEmits(['submit', 'cancel'])
 
 // Editable ratings state
 const selectedRatings = ref({

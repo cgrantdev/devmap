@@ -24,12 +24,18 @@ class VendorReview extends Model
         'quality',
         'cost',
         'packaging',
+        'vendor_reply',
+        'vendor_replied_at',
+        'flagged',
+        'flag_reason',
     ];
 
     protected $casts = [
         'rating' => 'integer',
         'is_approved' => 'boolean',
         'verified' => 'boolean',
+        'flagged' => 'boolean',
+        'vendor_replied_at' => 'datetime',
     ];
 
     public function brand()

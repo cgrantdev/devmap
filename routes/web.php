@@ -71,10 +71,6 @@ Route::post('/become-a-vendor', [BecomeVendorController::class, 'store'])->name(
 Route::post('/brands/{brandId}/reviews', [VendorReviewsController::class, 'store'])->name('vendor.reviews.store');
 Route::get('/brands/{brandId}/reviews', [VendorReviewsController::class, 'index'])->name('vendor.reviews.index');
 
-// Catch-all route for any other page slugs (must be last to avoid conflicts with other routes)
-// This allows creating new pages dynamically without adding routes
-Route::get('/{slug}', [FrontendPagesController::class, 'show'])->name('page.show')->where('slug', '[a-z0-9-]+');
-
 // Guest routes
 Route::middleware('guest')->group(function () {
     // Vendor routes
@@ -102,6 +98,9 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
     Route::get('/storefront-analytics', [VendorDashboardController::class, 'storefrontAnalytics'])->name('vendor.storefront-analytics');
     Route::get('/advertisement-analytics', [VendorDashboardController::class, 'advertisementAnalytics'])->name('vendor.advertisement-analytics');
     Route::get('/reviews', [VendorDashboardController::class, 'reviews'])->name('vendor.reviews');
+    Route::post('/reviews/{id}/reply', [VendorDashboardController::class, 'reply'])->name('vendor.reviews.reply');
+    Route::post('/reviews/{id}/flag', [VendorDashboardController::class, 'flag'])->name('vendor.reviews.flag');
+    Route::post('/reviews/{id}/unflag', [VendorDashboardController::class, 'unflag'])->name('vendor.reviews.unflag');
     Route::get('/import', [ImportController::class, 'index'])->name('vendor.import');
     Route::post('/import/file', [ImportController::class, 'importFromFile'])->name('vendor.import.file');
     Route::post('/import/url', [ImportController::class, 'importFromUrl'])->name('vendor.import.url');
@@ -278,3 +277,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/vendors', [PublicVendorController::class, 'list'])->name('vendors.public');
 Route::get('/shop/{vendor_name}', [PublicVendorController::class, 'show'])->name('shop.public');
 Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('product.public');
+
+// Catch-all route for any other page slugs (must be last to avoid conflicts with other routes)
+// This allows creating new pages dynamically without adding routes
+Route::get('/{slug}', [FrontendPagesController::class, 'show'])->name('page.show')->where('slug', '[a-z0-9-]+');

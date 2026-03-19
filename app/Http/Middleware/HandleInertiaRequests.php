@@ -6,6 +6,8 @@ use App\Models\Setting;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\VendorReview;
+use Illuminate\Support\Facades\Schema;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -56,6 +58,37 @@ class HandleInertiaRequests extends Middleware
                 ? Brand::whereHas('vendorSetting', function ($query) {
                     $query->where('approval_status', 'pending');
                 })->count() 
+                : 0,
+            'pending_reviews_count' => fn () => $request->user() && $request->user()->isAdmin()
+                ? (function () {
+                    if (Schema::hasColumn('vendor_reviews', 'status')) {
+                        return VendorReview::where('status', 'pending')->count();
+                    }
+
+                    // Fallback for old schema
+                    return VendorReview::where('is_approved', false)->count();
+                })()
+                : 0,
+            'approved_reviews_count' => fn () => $request->user() && $request->user()->isVendor()
+                ? (function () use ($request) {
+                    $brand = Brand::where('user_id', $request->user()->id)->first();
+                    if (!$brand) {
+                        return 0;
+                    }
+                    
+                    if (Schema::hasColumn('vendor_reviews', 'status')) {
+                        return VendorReview::where('brand_id', $brand->id)
+                            ->where('status', 'approved')
+                            ->whereNull('vendor_replied_at') // Only count unreplied reviews
+                            ->count();
+                    }
+                    
+                    // Fallback for old schema
+                    return VendorReview::where('brand_id', $brand->id)
+                        ->where('is_approved', true)
+                        ->whereNull('vendor_replied_at')
+                        ->count();
+                })()
                 : 0,
         ]);
     }

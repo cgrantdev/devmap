@@ -173,25 +173,48 @@
             <span>News</span>
           </Link>
         </div>
-        <div class="flex items-center">
-          <Link 
-            href="/deals" 
-            :class="[
-              'flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors',
-              isActive('/deals') 
-                ? 'border-slate-700 bg-slate-700 text-white hover:bg-slate-600' 
-                : 'border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200'
-            ]"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true">
-              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-              <line x1="7" x2="7.01" y1="7" y2="7"></line>
-            </svg>
-            <span>Deals</span>
-          </Link>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center">
+            <Link
+              href="/deals"
+              :class="[
+                'flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors',
+                isActive('/deals')
+                  ? 'border-slate-700 bg-slate-700 text-white hover:bg-slate-600'
+                  : 'border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ]"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                <line x1="7" x2="7.01" y1="7" y2="7"></line>
+              </svg>
+              <span>Deals</span>
+            </Link>
+          </div>
+
+          <!-- Customer auth controls -->
+          <div class="flex items-center">
+            <template v-if="!authUser">
+              <Link
+                href="/login"
+                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+              >
+                Log In
+              </Link>
+            </template>
+
+            <template v-else-if="isCustomer">
+              <button
+                type="button"
+                @click="logout"
+                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+              >
+                Log Out
+              </button>
+            </template>
+          </div>
         </div>
       </nav>
-      <div class=""></div>
       
 
       <!-- Mobile Menu -->
@@ -366,18 +389,49 @@
             Become a Vendor
           </Link>
         </div>
+
+        <!-- Customer auth actions -->
+        <div class="px-4 py-4 border-t border-gray-200">
+          <template v-if="!authUser">
+            <Link
+              href="/login"
+              @click="mobileMenuOpen = false"
+              class="w-full bg-white hover:bg-gray-50 text-slate-700 px-6 py-3 rounded-lg text-sm font-medium transition-colors block text-center border border-gray-200"
+            >
+              Log In
+            </Link>
+          </template>
+          <template v-else-if="isCustomer">
+            <button
+              type="button"
+              @click="() => { logout(); mobileMenuOpen = false }"
+              class="w-full bg-white hover:bg-gray-50 text-slate-700 px-6 py-3 rounded-lg text-sm font-medium transition-colors block text-center border border-gray-200"
+            >
+              Log Out
+            </button>
+          </template>
+        </div>
       </div>
     </div>
   </header>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 
 const mobileMenuOpen = ref(false)
 const page = usePage()
 const searchQuery = ref('')
+
+const authUser = computed(() => page.props.auth?.user ?? null)
+const isCustomer = computed(() => authUser.value?.role === 'customer')
+const csrfToken = computed(() => page.props.csrf_token ?? '')
+
+const logout = () => {
+  // Include CSRF token explicitly to avoid 419 errors.
+  router.post('/logout', { _token: csrfToken.value }, { preserveScroll: true })
+}
 
 const isActive = (path) => {
   const currentPath = page.url
