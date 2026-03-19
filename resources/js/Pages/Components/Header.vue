@@ -174,22 +174,22 @@
           </Link>
         </div>
         <div class="flex items-center gap-3">
-          <div class="flex items-center">
-            <Link
-              href="/deals"
-              :class="[
-                'flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors',
-                isActive('/deals')
-                  ? 'border-slate-700 bg-slate-700 text-white hover:bg-slate-600'
-                  : 'border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200'
-              ]"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true">
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                <line x1="7" x2="7.01" y1="7" y2="7"></line>
-              </svg>
-              <span>Deals</span>
-            </Link>
+        <div class="flex items-center">
+          <Link 
+            href="/deals" 
+            :class="[
+              'flex items-center gap-2 px-4 py-2 border rounded-lg transition-colors',
+              isActive('/deals') 
+                ? 'border-slate-700 bg-slate-700 text-white hover:bg-slate-600' 
+                : 'border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200'
+            ]"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+              <line x1="7" x2="7.01" y1="7" y2="7"></line>
+            </svg>
+            <span>Deals</span>
+          </Link>
           </div>
 
           <!-- Customer auth controls -->
