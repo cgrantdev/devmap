@@ -20,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Some servers don't have the `mbstring` extension enabled, but common dependencies
+        // may still call `mb_*` functions while rendering emails.
+        require_once app_path('Support/mbstring_polyfill.php');
+
         Schema::defaultStringLength(191);
     }
 }

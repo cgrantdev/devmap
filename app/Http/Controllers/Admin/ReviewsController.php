@@ -4,34 +4,58 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\VendorReview;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Schema;
+use Inertia\Inertia;
 
 class ReviewsController extends Controller
 {
     public function index()
     {
         $reviews = VendorReview::with('brand')
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->get()
-            ->map(function ($review) {
+            ->map(function (VendorReview $review) {
+                $status = Schema::hasColumn('vendor_reviews', 'status')
+                    ? ($review->status ?: ($review->is_approved ? 'approved' : 'pending'))
+                    : ($review->is_approved ? 'approved' : 'pending');
+
                 return [
                     'id' => $review->id,
                     'user_name' => $review->user_name,
-                    'comment' => $review->review, // Model uses 'review' field
+                    'user_email' => $review->user_email,
+                    'comment' => $review->review,
                     'rating' => $review->rating,
-                    'status' => $review->status ?? ($review->is_approved ? 'approved' : 'pending'),
-                    'verified' => $review->verified ?? false,
-                    'created_at' => $review->created_at,
+                    'status' => $status,
+                    'verified' => (bool) ($review->verified ?? false),
+                    'flagged' => (bool) ($review->flagged ?? false),
+                    'flag_reason' => $review->flag_reason,
+                    'vendor_reply' => $review->vendor_reply,
+                    'vendor_replied_at' => $review->vendor_replied_at,
+                    'shipping_time' => $review->shipping_time,
+                    'customer_service' => $review->customer_service,
+                    'quality' => $review->quality,
+                    'cost' => $review->cost,
+                    'packaging' => $review->packaging,
+                    'created_at' => optional($review->created_at)->toIso8601String(),
                     'brand' => $review->brand ? [
                         'id' => $review->brand->id,
                         'name' => $review->brand->name,
                     ] : null,
                 ];
-            });
+            })
+            ->values();
+
+        $stats = [
+            'total' => $reviews->count(),
+            'flagged' => $reviews->where('flagged', true)->count(),
+            'pending' => $reviews->where('status', 'pending')->count(),
+            'approved' => $reviews->where('status', 'approved')->count(),
+            'rejected' => $reviews->where('status', 'rejected')->count(),
+        ];
 
         return Inertia::render('Admin/Reviews', [
-            'reviews' => $reviews
+            'reviews' => $reviews,
+            'stats' => $stats,
         ]);
     }
 
@@ -39,30 +63,32 @@ class ReviewsController extends Controller
     {
         $review = VendorReview::findOrFail($id);
         $review->is_approved = true;
-        
-        // Only set status if column exists
+        $review->flagged = false;
+        $review->flag_reason = null;
+
         if (Schema::hasColumn('vendor_reviews', 'status')) {
             $review->status = 'approved';
         }
-        
+
         $review->save();
 
-        return redirect()->back()->with('success', 'Review approved successfully.');
+        return back()->with('success', 'Review approved successfully.');
     }
 
     public function reject($id)
     {
         $review = VendorReview::findOrFail($id);
         $review->is_approved = false;
-        
-        // Only set status if column exists
+        $review->flagged = false;
+        $review->flag_reason = null;
+
         if (Schema::hasColumn('vendor_reviews', 'status')) {
             $review->status = 'rejected';
         }
-        
+
         $review->save();
 
-        return redirect()->back()->with('success', 'Review rejected successfully.');
+        return back()->with('success', 'Review rejected successfully.');
     }
 
     public function destroy($id)
@@ -70,7 +96,6 @@ class ReviewsController extends Controller
         $review = VendorReview::findOrFail($id);
         $review->delete();
 
-        return redirect()->back()->with('success', 'Review deleted successfully.');
+        return back()->with('success', 'Review deleted successfully.');
     }
 }
-

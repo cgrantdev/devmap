@@ -959,7 +959,7 @@ const whyChooseBenefits = computed(() => [
 // Formatted overall rating
 const formattedOverallRating = computed(() => {
   if (!props.reviews || props.reviews.length === 0) {
-    return (props.brand.rating || 0).toFixed(1)
+  return (props.brand.rating || 0).toFixed(1)
   }
 
   const avg =
