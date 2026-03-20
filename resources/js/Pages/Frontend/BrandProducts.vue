@@ -239,7 +239,32 @@
               <h2 class="text-2xl text-gray-900 mb-6">Customer Reviews</h2>
               <!-- Customer Reviews Section -->
               <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-                
+
+                <!-- Leave feedback CTA (customers only) -->
+                <div v-if="isCustomer" class="space-y-3 mb-6">
+                  <button
+                    type="button"
+                    @click="showLeaveFeedback = !showLeaveFeedback"
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium transition-colors"
+                  >
+                    Leave feedback?
+                  </button>
+
+                  <div v-if="showLeaveFeedback" class="mt-2 bg-white rounded-lg">
+                    <VendorGrading
+                      :shipping-time="0"
+                      :customer-service="0"
+                      :quality="0"
+                      :cost="0"
+                      :packaging="0"
+                      :is-loading="isSubmittingReview"
+                      cancel-text="Cancel"
+                      @submit="handleGradingSubmit"
+                      @cancel="showLeaveFeedback = false"
+                    />
+                  </div>
+                </div>
+
                 <!-- Overall Rating -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div class="text-center">
@@ -279,31 +304,6 @@
                     </div>
                   </div>
                 </div>  
-              </div>
-
-              <!-- Leave feedback CTA (customers only) -->
-              <div v-if="isCustomer" class="mt-5 space-y-3">
-                <button
-                  type="button"
-                  @click="showLeaveFeedback = !showLeaveFeedback"
-                  class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium transition-colors"
-                >
-                  Leave feedback?
-                </button>
-
-                <div v-if="showLeaveFeedback" class="mt-2 bg-white rounded-lg">
-                  <VendorGrading
-                    :shipping-time="0"
-                    :customer-service="0"
-                    :quality="0"
-                    :cost="0"
-                    :packaging="0"
-                    :is-loading="isSubmittingReview"
-                    cancel-text="Cancel"
-                    @submit="handleGradingSubmit"
-                    @cancel="showLeaveFeedback = false"
-                  />
-                </div>
               </div>
 
               <div v-if="reviews && reviews.length > 0" class="mt-5 space-y-4">
