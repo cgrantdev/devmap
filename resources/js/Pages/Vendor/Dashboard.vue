@@ -40,6 +40,23 @@
         </div>
       </Link>
 
+      <Link href="/vendor/products" class="bg-white rounded-lg border border-gray-200 p-6 hover:border-blue-500 hover:shadow-lg transition-all">
+        <div class="flex items-center gap-4">
+          <div class="bg-purple-500 w-12 h-12 rounded-lg flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-white">
+              <path d="M6 2l3 6"></path>
+              <path d="M18 2l-3 6"></path>
+              <path d="M3 7h18"></path>
+              <path d="M4 7l1 13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2l1-13"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Products</h3>
+            <p class="text-sm text-gray-600">View and manage your catalog</p>
+          </div>
+        </div>
+      </Link>
+
       <Link href="/vendor/reviews" class="bg-white rounded-lg border border-gray-200 p-6 hover:border-blue-500 hover:shadow-lg transition-all">
         <div class="flex items-center gap-4">
           <div class="bg-yellow-500 w-12 h-12 rounded-lg flex items-center justify-center">
@@ -55,25 +72,129 @@
       </Link>
     </div>
 
-    <!-- Summary Stats
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white rounded-lg border border-gray-200 p-6">
-        <div class="text-2xl text-gray-900 mb-1">{{ stats.totalProducts || 0 }}</div>
-        <div class="text-sm text-gray-600">Total Products</div>
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 mb-8">
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="text-sm text-gray-500">Total Products</div>
+        <div class="mt-2 text-3xl font-bold text-gray-900">{{ stats.totalProducts || 0 }}</div>
       </div>
-      <div class="bg-white rounded-lg border border-gray-200 p-6">
-        <div class="text-2xl text-gray-900 mb-1">{{ stats.totalViews || 0 }}</div>
-        <div class="text-sm text-gray-600">Storefront Views</div>
+
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="text-sm text-gray-500">Active Products</div>
+        <div class="mt-2 text-3xl font-bold text-gray-900">{{ stats.activeProducts || 0 }}</div>
       </div>
-      <div class="bg-white rounded-lg border border-gray-200 p-6">
-        <div class="text-2xl text-gray-900 mb-1">{{ stats.totalReviews || 0 }}</div>
-        <div class="text-sm text-gray-600">Total Reviews</div>
+
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="text-sm text-gray-500">Storefront Views</div>
+        <div class="mt-2 text-3xl font-bold text-gray-900">{{ stats.totalViews || 0 }}</div>
       </div>
-      <div class="bg-white rounded-lg border border-gray-200 p-6">
-        <div class="text-2xl text-gray-900 mb-1">{{ stats.averageRating || '0.0' }}</div>
-        <div class="text-sm text-gray-600">Average Rating</div>
+
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="text-sm text-gray-500">Total Reviews</div>
+        <div class="mt-2 text-3xl font-bold text-gray-900">{{ stats.totalReviews || 0 }}</div>
       </div>
-    </div> -->  
+
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="text-sm text-gray-500">Average Rating</div>
+        <div class="mt-2 text-3xl font-bold text-gray-900">{{ stats.averageRating || '0.0' }}</div>
+      </div>
+    </div>
+
+    <!-- Recent Products -->
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-5 border-b border-gray-200">
+        <div>
+          <h2 class="text-xl font-semibold text-gray-900">Recent Products</h2>
+          <p class="text-sm text-gray-600 mt-1">Quick preview of your latest products</p>
+        </div>
+
+        <Link
+          href="/vendor/products"
+          class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+        >
+          View All Products
+        </Link>
+      </div>
+
+      <div v-if="recentProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6">
+        <div
+          v-for="product in recentProducts"
+          :key="product.id"
+          class="rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition bg-white"
+        >
+          <div class="aspect-[4/3] bg-gray-100">
+            <img
+              v-if="product.image_url"
+              :src="product.image_url"
+              :alt="product.name"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+            <div v-else class="w-full h-full flex items-center justify-center text-sm text-gray-400">
+              No image
+            </div>
+          </div>
+
+          <div class="p-5">
+            <div class="flex items-start justify-between gap-3">
+              <h3 class="text-base font-semibold text-gray-900 line-clamp-2">
+                {{ product.name }}
+              </h3>
+
+              <span
+                class="shrink-0 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
+                :class="product.hidden ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'"
+              >
+                {{ product.hidden ? 'Hidden' : (product.status || 'Active') }}
+              </span>
+            </div>
+
+            <div class="mt-3 flex items-center gap-2">
+              <span class="text-lg font-bold text-gray-900">{{ formatPrice(product.price) }}</span>
+              <span v-if="product.original_price" class="text-sm text-gray-400 line-through">
+                {{ formatPrice(product.original_price) }}
+              </span>
+            </div>
+
+            <div class="mt-3 flex items-center gap-3 text-sm text-gray-600">
+              <span>⭐ {{ product.rating_average || '0.0' }}</span>
+              <span>•</span>
+              <span>{{ product.rating_count || 0 }} reviews</span>
+            </div>
+
+            <div class="mt-5 flex items-center gap-3">
+              <a
+                v-if="product.product_url"
+                :href="product.product_url"
+                target="_blank"
+                class="inline-flex items-center px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                View Product
+              </a>
+
+              <Link
+                href="/vendor/import"
+                class="inline-flex items-center px-3 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-black"
+              >
+                Edit Catalog
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="px-6 py-12 text-center">
+        <div class="text-lg font-semibold text-gray-900">No products yet</div>
+        <p class="mt-2 text-sm text-gray-600">Import or add products so they appear here.</p>
+
+        <Link
+          href="/vendor/import"
+          class="inline-flex items-center mt-5 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
+        >
+          Import Products
+        </Link>
+      </div>
+    </div>
   </Layout>
 </template>
 
@@ -86,10 +207,26 @@ const props = defineProps({
     type: Object,
     default: () => ({
       totalProducts: 0,
+      activeProducts: 0,
       totalViews: 0,
       totalReviews: 0,
-      averageRating: '0.0'
+      averageRating: '0.0',
+      flaggedReviews: 0
     })
+  },
+  recentProducts: {
+    type: Array,
+    default: () => []
   }
 })
+
+function formatPrice(value) {
+  const number = Number(value)
+
+  if (Number.isNaN(number) || number <= 0) {
+    return '$0.00'
+  }
+
+  return `$${number.toFixed(2)}`
+}
 </script> 

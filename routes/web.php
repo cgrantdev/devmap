@@ -104,6 +104,7 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
     Route::get('/import', [ImportController::class, 'index'])->name('vendor.import');
     Route::post('/import/file', [ImportController::class, 'importFromFile'])->name('vendor.import.file');
     Route::post('/import/url', [ImportController::class, 'importFromUrl'])->name('vendor.import.url');
+    Route::get('/products', [VendorDashboardController::class, 'products'])->name('vendor.products');
     Route::delete('/products/{product}', [ImportController::class, 'deleteProduct'])->name('vendor.products.delete');
     Route::get('/profile', [VendorDashboardController::class, 'profile'])->name('vendor.profile');
     Route::post('/profile', [VendorDashboardController::class, 'updateProfile'])->name('vendor.profile.update');

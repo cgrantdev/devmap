@@ -20,17 +20,64 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $brand = Brand::where('user_id', $user->id)->first();
-        
-        // Get statistics
+
+        $productsQuery = $brand
+            ? Product::query()->where('brand_id', $brand->id)
+            : Product::query()->whereRaw('1 = 0');
+
+        $approvedReviewsQuery = $brand
+            ? VendorReview::query()->where('brand_id', $brand->id)
+            : VendorReview::query()->whereRaw('1 = 0');
+
+        if (Schema::hasColumn('vendor_reviews', 'status')) {
+            $approvedReviewsQuery->where('status', 'approved');
+        } else {
+            $approvedReviewsQuery->where('is_approved', true);
+        }
+
+        $flaggedReviewsQuery = $brand
+            ? VendorReview::query()->where('brand_id', $brand->id)->where('flagged', true)
+            : VendorReview::query()->whereRaw('1 = 0');
+
         $stats = [
-            'totalProducts' => $brand ? $brand->products()->count() : 0,
-            'totalViews' => 0, // TODO: Implement view tracking
-            'totalReviews' => $brand ? VendorReview::where('brand_id', $brand->id)->count() : 0,
-            'averageRating' => $brand ? number_format(VendorReview::where('brand_id', $brand->id)->avg('rating') ?? 0, 1) : '0.0',
+            'totalProducts' => (clone $productsQuery)->count(),
+            'activeProducts' => (clone $productsQuery)
+                ->when(Schema::hasColumn('products', 'hidden'), fn ($query) => $query->where('hidden', false))
+                ->count(),
+            'totalViews' => 0,
+            'totalReviews' => (clone $approvedReviewsQuery)->count(),
+            'averageRating' => number_format((clone $approvedReviewsQuery)->avg('rating') ?? 0, 1),
+            'flaggedReviews' => (clone $flaggedReviewsQuery)->count(),
         ];
-        
+
+        $recentProducts = (clone $productsQuery)
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(function ($product) {
+                $salePrice = $product->discount_price && $product->discount_price < $product->price
+                    ? $product->discount_price
+                    : $product->price;
+
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'image_url' => $product->image_url,
+                    'product_url' => $product->product_url,
+                    'price' => $salePrice,
+                    'original_price' => $product->discount_price && $product->discount_price < $product->price
+                        ? $product->price
+                        : null,
+                    'status' => $product->status,
+                    'hidden' => (bool) ($product->hidden ?? false),
+                    'rating_average' => $product->rating_average,
+                    'rating_count' => $product->rating_count,
+                ];
+            });
+
         return Inertia::render('Vendor/Dashboard', [
             'stats' => $stats,
+            'recentProducts' => $recentProducts,
         ]);
     }
 
@@ -171,6 +218,71 @@ class DashboardController extends Controller
         return Inertia::render('Vendor/Reviews', [
             'stats' => $stats,
             'reviews' => $reviews,
+        ]);
+    }
+
+    public function products()
+    {
+        $user = Auth::user();
+        $brand = Brand::where('user_id', $user->id)->first();
+
+        if (!$brand) {
+            return Inertia::render('Vendor/Products', [
+                'stats' => [
+                    'totalProducts' => 0,
+                    'activeProducts' => 0,
+                    'hiddenProducts' => 0,
+                    'averageRating' => '0.0',
+                ],
+                'products' => [],
+            ]);
+        }
+
+        $productsQuery = Product::query()
+            ->where('brand_id', $brand->id)
+            ->latest();
+
+        $stats = [
+            'totalProducts' => (clone $productsQuery)->count(),
+            'activeProducts' => (clone $productsQuery)
+                ->when(Schema::hasColumn('products', 'hidden'), fn ($query) => $query->where('hidden', false))
+                ->count(),
+            'hiddenProducts' => (clone $productsQuery)
+                ->when(Schema::hasColumn('products', 'hidden'), fn ($query) => $query->where('hidden', true))
+                ->count(),
+            'averageRating' => number_format(
+                Product::where('brand_id', $brand->id)->avg('rating_average') ?? 0,
+                1
+            ),
+        ];
+
+        $products = $productsQuery
+            ->get()
+            ->map(function ($product) {
+                $salePrice = $product->discount_price && $product->discount_price < $product->price
+                    ? $product->discount_price
+                    : $product->price;
+
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'image_url' => $product->image_url,
+                    'product_url' => $product->product_url,
+                    'price' => $salePrice,
+                    'original_price' => $product->discount_price && $product->discount_price < $product->price
+                        ? $product->price
+                        : null,
+                    'status' => $product->status,
+                    'hidden' => (bool) ($product->hidden ?? false),
+                    'rating_average' => $product->rating_average,
+                    'rating_count' => $product->rating_count,
+                    'created_at' => optional($product->created_at)?->toDateTimeString(),
+                ];
+            });
+
+        return Inertia::render('Vendor/Products', [
+            'stats' => $stats,
+            'products' => $products,
         ]);
     }
 

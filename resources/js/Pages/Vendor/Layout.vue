@@ -43,6 +43,15 @@
                 </svg>
                 <span>Advertisement Analytics</span>
               </Link>
+              <Link href="/vendor/products" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800 relative" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/vendor/products') }">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                  <path d="M6 2l3 6"></path>
+                  <path d="M18 2l-3 6"></path>
+                  <path d="M3 7h18"></path>
+                  <path d="M4 7l1 13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2l1-13"></path>
+                </svg>
+                <span>Products</span>
+              </Link>
               <Link href="/vendor/reviews" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800 relative" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/vendor/reviews') }">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square w-5 h-5" aria-hidden="true">
                   <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path>
