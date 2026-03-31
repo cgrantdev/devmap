@@ -29,11 +29,7 @@ class DashboardController extends Controller
             ? VendorReview::query()->where('brand_id', $brand->id)
             : VendorReview::query()->whereRaw('1 = 0');
 
-        if (Schema::hasColumn('vendor_reviews', 'status')) {
-            $approvedReviewsQuery->where('status', 'approved');
-        } else {
-            $approvedReviewsQuery->where('is_approved', true);
-        }
+        $approvedReviewsQuery->where('status', 'approved');
 
         $flaggedReviewsQuery = $brand
             ? VendorReview::query()->where('brand_id', $brand->id)->where('flagged', true)
@@ -161,19 +157,11 @@ class DashboardController extends Controller
         
         // Approved review query (vendors should only see approved reviews)
         $approvedReviewsQuery = VendorReview::where('brand_id', $brand->id);
-        if (Schema::hasColumn('vendor_reviews', 'status')) {
-            $approvedReviewsQuery->where('status', 'approved');
-        } else {
-            $approvedReviewsQuery->where('is_approved', true);
-        }
+        $approvedReviewsQuery->where('status', 'approved');
 
         // Pending review count (approval pending from admin)
         $pendingReviewsQuery = VendorReview::where('brand_id', $brand->id);
-        if (Schema::hasColumn('vendor_reviews', 'status')) {
-            $pendingReviewsQuery->where('status', 'pending');
-        } else {
-            $pendingReviewsQuery->where('is_approved', false);
-        }
+        $pendingReviewsQuery->where('status', 'pending');
 
         $totalApprovedReviews = (clone $approvedReviewsQuery)->count();
         $averageRating = number_format((clone $approvedReviewsQuery)->avg('rating') ?? 0, 1);
@@ -201,7 +189,7 @@ class DashboardController extends Controller
                     'user_email' => $review->user_email,
                     'rating' => $review->rating,
                     'review' => $review->review,
-                    'status' => $review->status ?? ($review->is_approved ? 'approved' : 'pending'),
+                    'status' => $review->status,
                     'created_at' => $review->created_at,
                     'vendor_reply' => $review->vendor_reply,
                     'vendor_replied_at' => $review->vendor_replied_at,

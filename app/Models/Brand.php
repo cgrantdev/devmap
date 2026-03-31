@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Schema;
 
 class Brand extends Model
 {
@@ -89,14 +88,7 @@ class Brand extends Model
 
     public function approvedReviews()
     {
-        $query = $this->hasMany(VendorReview::class);
-
-        // Prefer the newer schema which uses `status`.
-        if (Schema::hasColumn('vendor_reviews', 'status')) {
-            return $query->where('status', 'approved');
-        }
-
-        // Fallback for older data/schema.
-        return $query->where('is_approved', true);
+        return $this->hasMany(VendorReview::class)
+            ->where('status', 'approved');
     }
 }

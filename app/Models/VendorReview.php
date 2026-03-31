@@ -56,7 +56,7 @@ class VendorReview extends Model
         parent::boot();
 
         static::saved(function ($review) {
-            if ($review->is_approved) {
+            if ($review->status === 'approved') {
                 static::updateBrandRating($review->brand_id);
             }
         });
@@ -77,7 +77,7 @@ class VendorReview extends Model
         }
 
         $approvedReviews = static::where('brand_id', $brandId)
-            ->where('is_approved', true)
+            ->where('status', 'approved')
             ->get();
 
         $ratingCount = $approvedReviews->count();

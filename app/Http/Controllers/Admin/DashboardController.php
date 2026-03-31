@@ -23,13 +23,7 @@ class DashboardController extends Controller
         $inactiveVendors = Brand::where('is_active', false)->count();
         $totalProducts = Product::count();
         
-        // Check if status column exists, otherwise use is_approved
-        $hasStatusColumn = Schema::hasColumn('vendor_reviews', 'status');
-        if ($hasStatusColumn) {
-            $pendingReviews = VendorReview::where('status', 'pending')->count();
-        } else {
-            $pendingReviews = VendorReview::where('is_approved', false)->count();
-        }
+        $pendingReviews = VendorReview::where('status', 'pending')->count();
         
         $totalUsers = User::where('role', 'customer')->count();
 

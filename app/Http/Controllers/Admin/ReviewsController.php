@@ -15,17 +15,13 @@ class ReviewsController extends Controller
             ->latest()
             ->get()
             ->map(function (VendorReview $review) {
-                $status = Schema::hasColumn('vendor_reviews', 'status')
-                    ? ($review->status ?: ($review->is_approved ? 'approved' : 'pending'))
-                    : ($review->is_approved ? 'approved' : 'pending');
-
                 return [
                     'id' => $review->id,
                     'user_name' => $review->user_name,
                     'user_email' => $review->user_email,
                     'comment' => $review->review,
                     'rating' => $review->rating,
-                    'status' => $status,
+                    'status' => $review->status,
                     'verified' => (bool) ($review->verified ?? false),
                     'flagged' => (bool) ($review->flagged ?? false),
                     'flag_reason' => $review->flag_reason,

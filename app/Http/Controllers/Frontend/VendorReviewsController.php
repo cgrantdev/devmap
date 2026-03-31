@@ -8,6 +8,7 @@ use App\Models\VendorReview;
 use App\Helpers\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class VendorReviewsController extends Controller
 {
@@ -53,7 +54,7 @@ class VendorReviewsController extends Controller
             ])->withInput();
         }
 
-        // Create review (auto-approved so rating updates immediately)
+        // Create review (pending by default; admin must approve)
         $review = VendorReview::create([
             'brand_id' => $brandId,
             'user_id' => $userId, // null for guest reviews
@@ -61,7 +62,10 @@ class VendorReviewsController extends Controller
             'user_email' => $validated['user_email'],
             'rating' => $overallRating,
             'review' => $validated['review'] ?? null,
-            'is_approved' => true, // Auto-approve so rating updates immediately
+            'is_approved' => false,
+            // If the status column exists (newer schema), explicitly set it to pending.
+            // This keeps admin review stats accurate and avoids relying on DB defaults.
+            'status' => Schema::hasColumn('vendor_reviews', 'status') ? 'pending' : null,
             'shipping_time' => $validated['shipping_time'],
             'customer_service' => $validated['customer_service'],
             'quality' => $validated['quality'],
@@ -69,13 +73,12 @@ class VendorReviewsController extends Controller
             'packaging' => $validated['packaging'],
         ]);
 
-        // The updateBrandRating will be triggered automatically via the model's boot method
-        // since is_approved is true
+        // Brand rating will update when the review is approved (see VendorReview::boot()).
 
         // Log activity
         ActivityLogger::reviewSubmitted($brand->name, $review->id);
 
-        return back()->with('success', 'Thank you for your review!');
+        return back()->with('success', 'Thank you for your review! It will appear once approved.');
     }
 
     /**
