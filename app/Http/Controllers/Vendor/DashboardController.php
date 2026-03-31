@@ -155,13 +155,13 @@ class DashboardController extends Controller
             ]);
         }
         
-        // Approved review query (vendors should only see approved reviews)
-        $approvedReviewsQuery = VendorReview::where('brand_id', $brand->id);
-        $approvedReviewsQuery->where('status', 'approved');
+        // Approved reviews (for rating/response stats)
+        $approvedReviewsQuery = VendorReview::where('brand_id', $brand->id)
+            ->where('status', 'approved');
 
-        // Pending review count (approval pending from admin)
-        $pendingReviewsQuery = VendorReview::where('brand_id', $brand->id);
-        $pendingReviewsQuery->where('status', 'pending');
+        // Pending reviews (approval pending from admin)
+        $pendingReviewsQuery = VendorReview::where('brand_id', $brand->id)
+            ->where('status', 'pending');
 
         $totalApprovedReviews = (clone $approvedReviewsQuery)->count();
         $averageRating = number_format((clone $approvedReviewsQuery)->avg('rating') ?? 0, 1);
@@ -176,11 +176,11 @@ class DashboardController extends Controller
             'respondedReviews' => $respondedReviews,
         ];
 
-        // Get recent approved reviews for the list
+        // Get recent reviews for the list (all statuses for vendor triage)
         // Note: `vendor_reviews` currently has no `product_id` column, so we cannot eager-load a `product` relationship here.
-        $reviews = (clone $approvedReviewsQuery)
+        $reviews = VendorReview::where('brand_id', $brand->id)
             ->latest()
-            ->take(20)
+            ->take(50)
             ->get()
             ->map(function ($review) {
                 return [
@@ -195,6 +195,10 @@ class DashboardController extends Controller
                     'vendor_replied_at' => $review->vendor_replied_at,
                     'flagged' => $review->flagged ?? false,
                     'flag_reason' => $review->flag_reason,
+                    'flag_reviewed_by' => $review->flag_reviewed_by,
+                    'flag_reviewed_at' => $review->flag_reviewed_at,
+                    'flag_resolution' => $review->flag_resolution,
+                    'flag_resolution_note' => $review->flag_resolution_note,
                     'shipping_time' => $review->shipping_time,
                     'customer_service' => $review->customer_service,
                     'quality' => $review->quality,

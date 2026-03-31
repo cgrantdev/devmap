@@ -60,12 +60,29 @@
 
     <!-- Reviews List -->
     <div class="bg-white rounded-lg border border-gray-200">
-      <div class="p-6 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900">Approved Reviews</h2>
+      <div class="p-6 border-b border-gray-200 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">Reviews</h2>
+          <p class="text-sm text-gray-500 mt-1">{{ filteredReviews.length }} review(s)</p>
+        </div>
+
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <label class="text-sm text-gray-600">Filter</label>
+          <select
+            v-model="triageFilter"
+            class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All</option>
+            <option value="flagged">Flagged</option>
+            <option value="awaiting_admin">Awaiting admin review</option>
+            <option value="replied">Replied</option>
+            <option value="unreplied">Unreplied</option>
+          </select>
+        </div>
       </div>
       <div class="p-6">
-        <div v-if="reviews.length > 0" class="space-y-6">
-          <div v-for="review in reviews" :key="review.id" class="border border-gray-200 rounded-lg p-6">
+        <div v-if="filteredReviews.length > 0" class="space-y-6">
+          <div v-for="review in filteredReviews" :key="review.id" class="border border-gray-200 rounded-lg p-6">
             <div class="flex items-start justify-between mb-4">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
@@ -75,6 +92,47 @@
                   <p class="text-sm font-medium text-gray-900">{{ review.user_name || 'Anonymous' }}</p>
                   <p class="text-xs text-gray-500">{{ formatDate(review.created_at) }}</p>
                 </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 justify-end">
+                <span
+                  class="px-2 py-1 rounded-full text-xs font-semibold"
+                  :class="statusBadgeClass(review.status)"
+                >
+                  {{ statusLabel(review.status) }}
+                </span>
+                <span v-if="review.flagged" class="px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                  Flagged
+                </span>
+                <span
+                  v-if="review.vendor_replied_at"
+                  class="px-2 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-800"
+                >
+                  Replied
+                </span>
+                <span
+                  v-else
+                  class="px-2 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700"
+                >
+                  Unreplied
+                </span>
+                <span
+                  v-if="review.flag_reviewed_at || review.flag_resolution"
+                  class="px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800"
+                >
+                  Resolved by admin
+                </span>
+                <span
+                  v-if="review.flag_resolution === 'rejected' || review.status === 'rejected'"
+                  class="px-2 py-1 rounded-full text-xs font-semibold bg-gray-900 text-white"
+                >
+                  Review removed
+                </span>
+                <span
+                  v-else-if="review.flag_resolution === 'approved' && review.status === 'approved'"
+                  class="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800"
+                >
+                  Kept approved
+                </span>
               </div>
               <div class="flex items-center gap-1">
                 <svg
@@ -137,6 +195,12 @@
               </div>
               <p class="text-sm text-blue-800">{{ review.vendor_reply }}</p>
             </div>
+
+            <!-- Admin Resolution Note -->
+            <div v-if="review.flag_resolution_note" class="mb-4 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+              <div class="text-sm font-semibold text-slate-900 mb-1">Admin note</div>
+              <p class="text-sm text-slate-700 whitespace-pre-line">{{ review.flag_resolution_note }}</p>
+            </div>
             
             <!-- Flagged Status -->
             <div v-if="review.flagged" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
@@ -153,7 +217,7 @@
             <!-- Action Buttons -->
             <div class="flex items-center gap-3">
               <button
-                v-if="!review.vendor_reply"
+                v-if="review.status === 'approved' && !review.vendor_reply"
                 @click="showReplyForm(review.id)"
                 class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors flex items-center gap-2"
               >
@@ -164,7 +228,7 @@
                 Reply
               </button>
               <button
-                v-else
+                v-else-if="review.status === 'approved'"
                 @click="showReplyForm(review.id)"
                 class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm transition-colors flex items-center gap-2"
               >
@@ -174,6 +238,9 @@
                 </svg>
                 Edit Reply
               </button>
+              <span v-else class="text-xs text-gray-500">
+                Reply available after approval.
+              </span>
               <button
                 v-if="!review.flagged"
                 @click="showFlagForm(review.id)"
@@ -254,7 +321,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square mx-auto mb-4">
             <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path>
           </svg>
-          <p>No approved reviews yet</p>
+          <p>No reviews found</p>
         </div>
       </div>
     </div>
@@ -262,7 +329,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { router, useForm, usePage } from '@inertiajs/vue3'
 import Layout from './Layout.vue'
 
@@ -288,6 +355,37 @@ const activeFlagForm = ref(null)
 const replyTexts = ref({})
 const flagReasons = ref({})
 const isSubmitting = ref(false)
+const triageFilter = ref('all')
+
+const filteredReviews = computed(() => {
+  const list = props.reviews || []
+
+  if (triageFilter.value === 'flagged') {
+    return list.filter(r => !!r.flagged)
+  }
+  if (triageFilter.value === 'awaiting_admin') {
+    return list.filter(r => r.status === 'pending')
+  }
+  if (triageFilter.value === 'replied') {
+    return list.filter(r => !!r.vendor_replied_at)
+  }
+  if (triageFilter.value === 'unreplied') {
+    return list.filter(r => !r.vendor_replied_at)
+  }
+  return list
+})
+
+function statusLabel(status) {
+  if (status === 'approved') return 'Approved'
+  if (status === 'rejected') return 'Rejected'
+  return 'Pending'
+}
+
+function statusBadgeClass(status) {
+  if (status === 'approved') return 'bg-green-100 text-green-800'
+  if (status === 'rejected') return 'bg-red-100 text-red-800'
+  return 'bg-yellow-100 text-yellow-800'
+}
 
 function formatDate(dateString) {
   if (!dateString) return 'N/A'

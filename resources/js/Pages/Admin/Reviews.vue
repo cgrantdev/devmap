@@ -169,6 +169,8 @@ const filteredReviews = computed(() => {
       review.comment,
       review.brand?.name,
       review.flag_reason,
+      review.flag_resolution,
+      review.flag_resolution_note,
       review.vendor_reply,
       review.status,
     ]
@@ -258,6 +260,23 @@ const ReviewCard = defineComponent({
       return 'bg-yellow-100 text-yellow-800'
     })
 
+    const auditBadges = computed(() => {
+      const badges = []
+      const resolvedByAdmin = !!(cardProps.review.flag_resolution || cardProps.review.flag_reviewed_at)
+      if (resolvedByAdmin) {
+        badges.push({ label: 'resolved by admin', class: 'bg-emerald-100 text-emerald-800' })
+      }
+
+      const isRemoved = cardProps.review.status === 'rejected' || cardProps.review.flag_resolution === 'rejected'
+      if (isRemoved) {
+        badges.push({ label: 'review removed', class: 'bg-gray-900 text-white' })
+      } else if (cardProps.review.status === 'approved' && cardProps.review.flag_resolution === 'approved') {
+        badges.push({ label: 'kept approved', class: 'bg-green-100 text-green-800' })
+      }
+
+      return badges
+    })
+
     return () => h('div', { class: 'bg-white rounded-xl border border-slate-200 p-6 shadow-sm' }, [
       h('div', { class: 'flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between' }, [
         h('div', { class: 'flex-1 min-w-0' }, [
@@ -266,6 +285,7 @@ const ReviewCard = defineComponent({
             cardProps.review.verified ? h('span', { class: 'rounded-full bg-emerald-100 px-2.5 py-1 text-xs text-emerald-700' }, 'Verified purchase') : null,
             cardProps.review.flagged ? h('span', { class: 'rounded-full bg-amber-100 px-2.5 py-1 text-xs text-amber-800' }, 'Flagged by vendor') : null,
             h('span', { class: `rounded-full px-2.5 py-1 text-xs ${badgeClass.value}` }, cardProps.review.status),
+            ...auditBadges.value.map(b => h('span', { class: `rounded-full px-2.5 py-1 text-xs ${b.class}` }, b.label)),
           ].filter(Boolean)),
           h('div', { class: 'flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500 mb-3' }, [
             h('span', `Brand: ${cardProps.review.brand?.name || 'N/A'}`),
@@ -297,6 +317,19 @@ const ReviewCard = defineComponent({
             ? h('div', { class: 'mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4' }, [
                 h('div', { class: 'text-sm text-amber-900 mb-1' }, 'Vendor flag reason'),
                 h('p', { class: 'text-sm text-amber-800 whitespace-pre-line' }, cardProps.review.flag_reason || 'No reason provided.'),
+              ])
+            : null,
+          cardProps.review.flag_resolution
+            ? h('div', { class: 'mb-4 rounded-lg border border-slate-200 bg-slate-50 p-4' }, [
+                h('div', { class: 'text-sm text-slate-900 mb-1' }, 'Moderation audit'),
+                h('div', { class: 'text-xs text-slate-600 mb-1' }, [
+                  `Resolution: ${cardProps.review.flag_resolution}`,
+                  cardProps.review.flag_reviewed_at ? ` • ${formatDate(cardProps.review.flag_reviewed_at, true)}` : '',
+                  cardProps.review.flag_reviewed_by ? ` • Admin #${cardProps.review.flag_reviewed_by}` : '',
+                ].join('')),
+                cardProps.review.flag_resolution_note
+                  ? h('p', { class: 'text-sm text-slate-700 whitespace-pre-line mt-2' }, cardProps.review.flag_resolution_note)
+                  : null,
               ])
             : null,
           cardProps.review.vendor_reply

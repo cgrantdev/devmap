@@ -28,6 +28,10 @@ class VendorReview extends Model
         'vendor_replied_at',
         'flagged',
         'flag_reason',
+        'flag_reviewed_by',
+        'flag_reviewed_at',
+        'flag_resolution',
+        'flag_resolution_note',
     ];
 
     protected $casts = [
@@ -36,6 +40,7 @@ class VendorReview extends Model
         'verified' => 'boolean',
         'flagged' => 'boolean',
         'vendor_replied_at' => 'datetime',
+        'flag_reviewed_at' => 'datetime',
     ];
 
     public function brand()

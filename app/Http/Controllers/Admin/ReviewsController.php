@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\VendorReview;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ReviewsController extends Controller
@@ -25,6 +26,10 @@ class ReviewsController extends Controller
                     'verified' => (bool) ($review->verified ?? false),
                     'flagged' => (bool) ($review->flagged ?? false),
                     'flag_reason' => $review->flag_reason,
+                    'flag_reviewed_by' => $review->flag_reviewed_by,
+                    'flag_reviewed_at' => optional($review->flag_reviewed_at)->toIso8601String(),
+                    'flag_resolution' => $review->flag_resolution,
+                    'flag_resolution_note' => $review->flag_resolution_note,
                     'vendor_reply' => $review->vendor_reply,
                     'vendor_replied_at' => $review->vendor_replied_at,
                     'shipping_time' => $review->shipping_time,
@@ -58,9 +63,17 @@ class ReviewsController extends Controller
     public function approve($id)
     {
         $review = VendorReview::findOrFail($id);
+        $isFlagged = (bool) $review->flagged;
+
         $review->is_approved = true;
         $review->flagged = false;
         $review->flag_reason = null;
+        $review->flag_reviewed_by = Auth::id();
+        $review->flag_reviewed_at = now();
+        $review->flag_resolution = 'approved';
+        $review->flag_resolution_note = $isFlagged
+            ? 'Approved by admin during flag moderation.'
+            : 'Approved by admin.';
 
         if (Schema::hasColumn('vendor_reviews', 'status')) {
             $review->status = 'approved';
@@ -74,9 +87,17 @@ class ReviewsController extends Controller
     public function reject($id)
     {
         $review = VendorReview::findOrFail($id);
+        $isFlagged = (bool) $review->flagged;
+
         $review->is_approved = false;
         $review->flagged = false;
         $review->flag_reason = null;
+        $review->flag_reviewed_by = Auth::id();
+        $review->flag_reviewed_at = now();
+        $review->flag_resolution = 'rejected';
+        $review->flag_resolution_note = $isFlagged
+            ? 'Rejected by admin during flag moderation.'
+            : 'Rejected by admin.';
 
         if (Schema::hasColumn('vendor_reviews', 'status')) {
             $review->status = 'rejected';
