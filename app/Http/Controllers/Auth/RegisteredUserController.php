@@ -57,7 +57,7 @@ class RegisteredUserController extends Controller
             // Log the user in
             Auth::login($user);
 
-            return redirect('/email/verify')->with('success', 'Registration successful! Please check your email to verify your account.');
+            return redirect('/email/verify')->with('success', 'Registration successful! Your account is currently under review and should be activated shortly.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {

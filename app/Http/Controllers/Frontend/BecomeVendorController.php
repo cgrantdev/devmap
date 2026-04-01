@@ -151,7 +151,7 @@ class BecomeVendorController extends Controller
             // Send email verification notification
             $user->sendEmailVerificationNotification();
 
-            return back()->with('success', 'Registration completed successfully. Please check your email to verify your account.');
+            return back()->with('success', 'Registration completed successfully. Your account is currently under review and should be activated shortly.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'An error occurred during registration. Please try again.'])->withInput();
