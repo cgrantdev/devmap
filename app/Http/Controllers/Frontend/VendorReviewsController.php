@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Models\Product;
 use App\Models\VendorReview;
 use App\Helpers\ActivityLogger;
 use Illuminate\Http\Request;

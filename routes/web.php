@@ -105,6 +105,8 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
     Route::post('/import/file', [ImportController::class, 'importFromFile'])->name('vendor.import.file');
     Route::post('/import/url', [ImportController::class, 'importFromUrl'])->name('vendor.import.url');
     Route::get('/products', [VendorDashboardController::class, 'products'])->name('vendor.products');
+    Route::patch('/products/{product}/hidden', [VendorDashboardController::class, 'setProductHidden'])->name('vendor.products.hidden');
+    Route::post('/products/bulk-hidden', [VendorDashboardController::class, 'bulkSetProductHidden'])->name('vendor.products.bulk-hidden');
     Route::delete('/products/{product}', [ImportController::class, 'deleteProduct'])->name('vendor.products.delete');
     Route::get('/profile', [VendorDashboardController::class, 'profile'])->name('vendor.profile');
     Route::post('/profile', [VendorDashboardController::class, 'updateProfile'])->name('vendor.profile.update');

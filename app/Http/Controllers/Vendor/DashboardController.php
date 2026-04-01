@@ -13,6 +13,7 @@ use App\Models\Location;
 use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
@@ -213,7 +214,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function products()
+    public function products(Request $request)
     {
         $user = Auth::user();
         $brand = Brand::where('user_id', $user->id)->first();
@@ -226,31 +227,76 @@ class DashboardController extends Controller
                     'hiddenProducts' => 0,
                     'averageRating' => '0.0',
                 ],
-                'products' => [],
+                'products' => [
+                    'data' => [],
+                    'links' => [],
+                    'meta' => [],
+                ],
+                'filters' => [
+                    'q' => '',
+                    'visibility' => 'all',
+                    'status' => 'all',
+                    'sort' => 'newest',
+                ],
             ]);
         }
 
-        $productsQuery = Product::query()
-            ->where('brand_id', $brand->id)
-            ->latest();
+        $validated = $request->validate([
+            'q' => 'nullable|string|max:100',
+            'visibility' => ['nullable', Rule::in(['all', 'visible', 'hidden'])],
+            'status' => 'nullable|string|max:50',
+            'sort' => ['nullable', Rule::in(['newest', 'oldest', 'price_asc', 'price_desc', 'rating_desc', 'reviews_desc'])],
+            'per_page' => 'nullable|integer|min:6|max:60',
+        ]);
+
+        $q = trim((string) ($validated['q'] ?? ''));
+        $visibility = $validated['visibility'] ?? 'all';
+        $status = $validated['status'] ?? 'all';
+        $sort = $validated['sort'] ?? 'newest';
+        $perPage = (int) ($validated['per_page'] ?? 24);
+
+        $productsBaseQuery = Product::query()->where('brand_id', $brand->id);
+
+        $productsQuery = (clone $productsBaseQuery)
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('name', 'like', "%{$q}%")
+                        ->orWhere('product_url', 'like', "%{$q}%");
+                });
+            })
+            ->when($visibility === 'visible', fn ($query) => $query->where('hidden', false))
+            ->when($visibility === 'hidden', fn ($query) => $query->where('hidden', true))
+            ->when($status !== 'all' && $status !== '', fn ($query) => $query->where('status', $status));
+
+        // Sorting
+        if ($sort === 'oldest') {
+            $productsQuery->orderBy('created_at', 'asc');
+        } elseif ($sort === 'price_asc') {
+            $productsQuery->orderByRaw('COALESCE(discount_price, price) asc');
+        } elseif ($sort === 'price_desc') {
+            $productsQuery->orderByRaw('COALESCE(discount_price, price) desc');
+        } elseif ($sort === 'rating_desc') {
+            $productsQuery->orderBy('rating_average', 'desc');
+        } elseif ($sort === 'reviews_desc') {
+            $productsQuery->orderBy('rating_count', 'desc');
+        } else { // newest
+            $productsQuery->orderBy('created_at', 'desc');
+        }
 
         $stats = [
-            'totalProducts' => (clone $productsQuery)->count(),
-            'activeProducts' => (clone $productsQuery)
-                ->when(Schema::hasColumn('products', 'hidden'), fn ($query) => $query->where('hidden', false))
-                ->count(),
-            'hiddenProducts' => (clone $productsQuery)
-                ->when(Schema::hasColumn('products', 'hidden'), fn ($query) => $query->where('hidden', true))
-                ->count(),
+            'totalProducts' => (clone $productsBaseQuery)->count(),
+            'activeProducts' => (clone $productsBaseQuery)->where('hidden', false)->count(),
+            'hiddenProducts' => (clone $productsBaseQuery)->where('hidden', true)->count(),
             'averageRating' => number_format(
-                Product::where('brand_id', $brand->id)->avg('rating_average') ?? 0,
+                (clone $productsBaseQuery)->avg('rating_average') ?? 0,
                 1
             ),
         ];
 
         $products = $productsQuery
-            ->get()
-            ->map(function ($product) {
+            ->paginate($perPage)
+            ->withQueryString()
+            ->through(function ($product) {
                 $salePrice = $product->discount_price && $product->discount_price < $product->price
                     ? $product->discount_price
                     : $product->price;
@@ -269,13 +315,60 @@ class DashboardController extends Controller
                     'rating_average' => $product->rating_average,
                     'rating_count' => $product->rating_count,
                     'created_at' => optional($product->created_at)?->toDateTimeString(),
+                    'auto_scraped' => (bool) ($product->auto_scraped ?? false),
+                    'auto_update' => (bool) ($product->auto_update ?? false),
+                    'last_scraped_at' => optional($product->last_scraped_at)?->toDateTimeString(),
                 ];
             });
 
         return Inertia::render('Vendor/Products', [
             'stats' => $stats,
             'products' => $products,
+            'filters' => [
+                'q' => $q,
+                'visibility' => $visibility,
+                'status' => $status,
+                'sort' => $sort,
+                'per_page' => $perPage,
+            ],
         ]);
+    }
+
+    public function setProductHidden(Request $request, Product $product)
+    {
+        $user = Auth::user();
+        $brand = Brand::where('user_id', $user->id)->firstOrFail();
+
+        abort_unless($product->brand_id === $brand->id, 403);
+
+        $validated = $request->validate([
+            'hidden' => 'required|boolean',
+        ]);
+
+        $product->hidden = (bool) $validated['hidden'];
+        $product->save();
+
+        return back()->with('success', $product->hidden ? 'Product hidden.' : 'Product is now visible.');
+    }
+
+    public function bulkSetProductHidden(Request $request)
+    {
+        $user = Auth::user();
+        $brand = Brand::where('user_id', $user->id)->firstOrFail();
+
+        $validated = $request->validate([
+            'product_ids' => 'required|array|min:1|max:200',
+            'product_ids.*' => 'integer',
+            'hidden' => 'required|boolean',
+        ]);
+
+        $hidden = (bool) $validated['hidden'];
+
+        Product::where('brand_id', $brand->id)
+            ->whereIn('id', $validated['product_ids'])
+            ->update(['hidden' => $hidden]);
+
+        return back()->with('success', $hidden ? 'Selected products hidden.' : 'Selected products set to visible.');
     }
 
     public function reply(Request $request, $id)
