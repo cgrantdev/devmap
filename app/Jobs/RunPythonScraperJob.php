@@ -31,7 +31,9 @@ class RunPythonScraperJob implements ShouldQueue
         $escapedPayload = escapeshellarg($payload);
 
         $scrapedoKey = escapeshellarg(config('services.scrapedo.key', env('SCRAPEDO_API_KEY', '')));
-        $command = 'sudo -u devuser SCRAPEDO_API_KEY=' . $scrapedoKey . ' '
+        // Run directly as the current (forge) user. Previously prefixed with
+        // `sudo -u devuser` from an older dev environment — no such user here.
+        $command = 'SCRAPEDO_API_KEY=' . $scrapedoKey . ' '
             . $pythonBin . ' ' . escapeshellarg($pythonScript) . ' ' . $escapedPayload . ' 2>&1';
 
         Log::info('Running Python scraper', [
