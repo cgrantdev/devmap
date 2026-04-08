@@ -1,3 +1,4 @@
+import os
 import requests
 import json
 import re
@@ -35,7 +36,10 @@ link_selector = selectors["link"]
 # price_selector = "bdi"
 # link_selector = "a"
 
-SCRAPEDO_API_KEY = "233d356d97884d8d881b6e24b81e44d3356aa0922d1"   # <<< paste your API key here
+SCRAPEDO_API_KEY = os.environ.get("SCRAPEDO_API_KEY")
+if not SCRAPEDO_API_KEY:
+    print(json.dumps({"error": "SCRAPEDO_API_KEY not set in environment"}))
+    sys.exit(1)
 
 
 session = requests.Session()
@@ -166,14 +170,10 @@ def scrape_all():
     # print(f"Found {len(product_urls)} product URLs")
 
     results = []
-    k = 0
     for url in product_urls:
         try:
             detail = scrape_product_details(url)
             results.append(detail)
-            k = k + 1
-            if k > 0:
-                break
         except Exception as e:
             print("Error processing", url, str(e))
 

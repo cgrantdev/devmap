@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\VendorReview;
 use App\Models\Product;
 use App\Models\VendorSetting;
+use App\Models\ProductClick;
 use App\Models\Location;
 use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
@@ -82,57 +83,92 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $brand = Brand::where('user_id', $user->id)->first();
-        
-        // Get storefront analytics stats
+
         $stats = [
-            'totalViews' => 0, // TODO: Implement view tracking
-            'uniqueVisitors' => 0, // TODO: Implement visitor tracking
-            'productClicks' => 0, // TODO: Implement click tracking
-            'avgSessionDuration' => '0:00', // TODO: Implement session tracking
+            'totalClicks' => 0,
+            'clicks30d' => 0,
+            'clicks7d' => 0,
+            'uniqueVisitors30d' => 0,
         ];
-        
-        // Get top products by views (placeholder)
         $topProducts = [];
+        $clicksByDay = [];
+
         if ($brand) {
-            $topProducts = $brand->products()
-                ->latest()
+            $baseClicks = ProductClick::humans()->where('brand_id', $brand->id);
+
+            $stats['totalClicks'] = (clone $baseClicks)->count();
+            $stats['clicks30d'] = (clone $baseClicks)->where('created_at', '>=', now()->subDays(30))->count();
+            $stats['clicks7d'] = (clone $baseClicks)->where('created_at', '>=', now()->subDays(7))->count();
+            $stats['uniqueVisitors30d'] = (clone $baseClicks)
+                ->where('created_at', '>=', now()->subDays(30))
+                ->distinct('ip_hash')
+                ->count('ip_hash');
+
+            // Top 5 products by clicks in the last 30 days
+            $topProducts = ProductClick::humans()
+                ->where('brand_id', $brand->id)
+                ->where('created_at', '>=', now()->subDays(30))
+                ->selectRaw('product_id, COUNT(*) as click_count')
+                ->groupBy('product_id')
+                ->orderByDesc('click_count')
                 ->take(5)
-                ->get(['id', 'name'])
-                ->map(function ($product) {
-                    return [
-                        'id' => $product->id,
-                        'name' => $product->name,
-                        'views' => 0, // TODO: Implement view tracking per product
-                    ];
-                });
+                ->with('product:id,name')
+                ->get()
+                ->map(fn ($row) => [
+                    'id' => $row->product_id,
+                    'name' => $row->product?->name ?? 'Unknown product',
+                    'clicks' => (int) $row->click_count,
+                ])
+                ->values();
+
+            // Daily click counts for a 30-day sparkline
+            $clicksByDay = ProductClick::humans()
+                ->where('brand_id', $brand->id)
+                ->where('created_at', '>=', now()->subDays(30))
+                ->selectRaw('DATE(created_at) as day, COUNT(*) as click_count')
+                ->groupBy('day')
+                ->orderBy('day')
+                ->get()
+                ->map(fn ($row) => [
+                    'day' => (string) $row->day,
+                    'clicks' => (int) $row->click_count,
+                ])
+                ->values();
         }
-        
+
         return Inertia::render('Vendor/StorefrontAnalytics', [
             'stats' => $stats,
             'topProducts' => $topProducts,
+            'clicksByDay' => $clicksByDay,
         ]);
     }
 
     public function advertisementAnalytics()
     {
         $user = Auth::user();
-        
-        // Get advertisement analytics stats
+        $brand = Brand::where('user_id', $user->id)->first();
+
+        // Until paid advertisement/impression tracking exists, we surface click metrics
+        // for featured products so the vendor has something real to look at.
         $stats = [
-            'totalImpressions' => 0, // TODO: Implement impression tracking
-            'totalClicks' => 0, // TODO: Implement click tracking
-            'clickThroughRate' => '0.00',
-            'totalSpent' => '0.00', // TODO: Implement spending tracking
+            'totalClicks' => 0,
+            'clicks30d' => 0,
+            'featuredProductClicks30d' => 0,
         ];
-        
-        // Calculate CTR if we have data
-        if ($stats['totalImpressions'] > 0) {
-            $stats['clickThroughRate'] = number_format(($stats['totalClicks'] / $stats['totalImpressions']) * 100, 2);
+        $activeAds = [];
+
+        if ($brand) {
+            $baseClicks = ProductClick::humans()->where('brand_id', $brand->id);
+            $stats['totalClicks'] = (clone $baseClicks)->count();
+            $stats['clicks30d'] = (clone $baseClicks)->where('created_at', '>=', now()->subDays(30))->count();
+
+            $featuredProductIds = $brand->products()->where('featured', true)->pluck('id');
+            $stats['featuredProductClicks30d'] = ProductClick::humans()
+                ->whereIn('product_id', $featuredProductIds)
+                ->where('created_at', '>=', now()->subDays(30))
+                ->count();
         }
-        
-        // Get active advertisements (placeholder)
-        $activeAds = []; // TODO: Implement advertisement management
-        
+
         return Inertia::render('Vendor/AdvertisementAnalytics', [
             'stats' => $stats,
             'activeAds' => $activeAds,

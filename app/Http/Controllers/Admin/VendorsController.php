@@ -236,6 +236,8 @@ class VendorsController extends Controller
             'name' => $brand->name,
             'email' => $brand->vendorSetting->contact_email ?? null,
             'is_active' => $brand->is_active,
+            'affiliate_url_template' => $brand->affiliate_url_template,
+            'affiliate_tag' => $brand->affiliate_tag,
             'settings' => $brand->vendorSetting ? [
                 'description' => $brand->vendorSetting->description,
                 'shop_url' => $brand->vendorSetting->shop_url, // shop_url is the website
@@ -304,12 +306,20 @@ class VendorsController extends Controller
             'banner' => 'nullable|image|max:2048',
             'logo' => 'nullable|mimes:jpeg,jpg,png,gif,webp,svg|max:1024',
             'is_active' => 'nullable|boolean',
+            'affiliate_url_template' => 'nullable|string|max:2048',
+            'affiliate_tag' => 'nullable|string|max:100',
         ]);
 
-        // Update brand name and is_active
+        // Update brand name, is_active, and affiliate fields
         $brand->update([
             'name' => $validated['name'],
             'is_active' => $validated['is_active'] ?? $brand->is_active,
+            'affiliate_url_template' => array_key_exists('affiliate_url_template', $validated)
+                ? $validated['affiliate_url_template']
+                : $brand->affiliate_url_template,
+            'affiliate_tag' => array_key_exists('affiliate_tag', $validated)
+                ? $validated['affiliate_tag']
+                : $brand->affiliate_tag,
         ]);
 
         $settings = $brand->vendorSetting ?: new VendorSetting(['brand_id' => $brand->id]);

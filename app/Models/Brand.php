@@ -22,7 +22,14 @@ class Brand extends Model
         'quality',
         'cost',
         'packaging',
+        'affiliate_url_template',
+        'affiliate_tag',
     ];
+
+    public function clicks()
+    {
+        return $this->hasMany(ProductClick::class);
+    }
 
     protected $casts = [
         'rating_average' => 'decimal:2',

@@ -43,6 +43,11 @@ use App\Http\Controllers\Frontend\PagesController as FrontendPagesController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Affiliate outbound redirect (click tracking)
+Route::get('/go/{product}', [\App\Http\Controllers\OutboundClickController::class, 'redirect'])
+    ->middleware('throttle:60,1')
+    ->name('product.go');
+
 // Search
 Route::get('/search', [\App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('search');
 
@@ -112,6 +117,12 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
     Route::post('/profile', [VendorDashboardController::class, 'updateProfile'])->name('vendor.profile.update');
     Route::get('/settings', [VendorSettingsController::class, 'show'])->name('vendor.settings');
     Route::post('/settings', [VendorSettingsController::class, 'update'])->name('vendor.settings.update');
+
+    // WooCommerce + other vendor integrations
+    Route::get('/integrations', [\App\Http\Controllers\Vendor\IntegrationsController::class, 'show'])->name('vendor.integrations');
+    Route::post('/integrations/woo', [\App\Http\Controllers\Vendor\IntegrationsController::class, 'store'])->name('vendor.integrations.woo.store');
+    Route::post('/integrations/woo/sync', [\App\Http\Controllers\Vendor\IntegrationsController::class, 'sync'])->name('vendor.integrations.woo.sync');
+    Route::delete('/integrations/woo', [\App\Http\Controllers\Vendor\IntegrationsController::class, 'destroy'])->name('vendor.integrations.woo.destroy');
 });
 
 // Admin routes
@@ -248,6 +259,13 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     // Content
     Route::get('/content', [\App\Http\Controllers\Admin\ContentController::class, 'index'])->name('admin.content.index');
     
+    // Staged / scraped products review queue
+    Route::get('/staged-products', [\App\Http\Controllers\Admin\StagedProductsController::class, 'index'])->name('admin.staged-products.index');
+    Route::post('/staged-products/{stagedProduct}/promote', [\App\Http\Controllers\Admin\StagedProductsController::class, 'promote'])->name('admin.staged-products.promote');
+    Route::post('/staged-products/{stagedProduct}/reject', [\App\Http\Controllers\Admin\StagedProductsController::class, 'reject'])->name('admin.staged-products.reject');
+    Route::post('/staged-products/bulk-promote', [\App\Http\Controllers\Admin\StagedProductsController::class, 'bulkPromote'])->name('admin.staged-products.bulk-promote');
+    Route::post('/staged-products/bulk-reject', [\App\Http\Controllers\Admin\StagedProductsController::class, 'bulkReject'])->name('admin.staged-products.bulk-reject');
+
     // Product Scraping
     Route::get('/product-scraping', [\App\Http\Controllers\Admin\ProductScrapingController::class, 'index'])->name('admin.product-scraping.index');
     Route::post('/product-scraping/{id}/toggle', [\App\Http\Controllers\Admin\ProductScrapingController::class, 'toggle'])->name('admin.product-scraping.toggle');

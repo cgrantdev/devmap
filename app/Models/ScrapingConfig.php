@@ -8,10 +8,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ScrapingConfig extends Model
 {
+    public const TYPE_CSS_SCRAPE = 'css_scrape';
+    public const TYPE_WOO_API = 'woo_api';
+    public const TYPE_WP_REST = 'wp_rest';
+    public const TYPE_XML_FEED = 'xml_feed';
+
     protected $fillable = [
         'vendor_id',
         'vendor_name',
+        'type',
         'products_url',
+        'store_url',
+        'auth_credentials',
+        'auto_promote',
         'product_category_id',
         'enabled',
         'frequency',
@@ -25,11 +34,13 @@ class ScrapingConfig extends Model
 
     protected $casts = [
         'enabled' => 'boolean',
+        'auto_promote' => 'boolean',
         'last_run_at' => 'datetime',
         'next_run_at' => 'datetime',
         'success_count' => 'integer',
         'error_count' => 'integer',
         'selectors' => 'array',
+        'auth_credentials' => 'encrypted:array',
     ];
 
     public function vendor(): BelongsTo

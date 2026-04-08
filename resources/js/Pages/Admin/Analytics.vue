@@ -108,9 +108,8 @@
             </div>
             <div class="flex-1">
               <div class="text-sm text-gray-900">{{ vendor.name }}</div>
-              <div class="text-xs text-gray-500">{{ vendor.views }}</div>
+              <div class="text-xs text-gray-500">{{ formatNumber(vendor.clicks) }} clicks (30d)</div>
             </div>
-            <div class="text-sm text-gray-900">{{ vendor.sales }}</div>
           </div>
           <div v-if="topVendors.length === 0" class="text-sm text-gray-500 text-center py-4">
             No vendor data available
@@ -128,7 +127,7 @@
             </div>
             <div class="flex-1">
               <div class="text-sm text-gray-900">{{ product.name }}</div>
-              <div class="text-xs text-gray-500">{{ product.views }} • {{ product.clicks }}</div>
+              <div class="text-xs text-gray-500">{{ formatNumber(product.clicks) }} clicks (30d)</div>
             </div>
           </div>
           <div v-if="topProducts.length === 0" class="text-sm text-gray-500 text-center py-4">
@@ -160,7 +159,13 @@ const props = defineProps({
   topProducts: {
     type: Array,
     default: () => []
+  },
+  clicksByDay: {
+    type: Array,
+    default: () => []
   }
 })
+
+const formatNumber = (n) => new Intl.NumberFormat().format(n ?? 0)
 </script>
 

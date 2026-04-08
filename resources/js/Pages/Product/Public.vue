@@ -10,9 +10,9 @@
         <!-- Shop Button -->
         <a
           v-if="product.product_url"
-          :href="product.product_url"
+          :href="`/go/${product.id}`"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener noreferrer nofollow sponsored"
           class="absolute top-8 right-8 px-5 py-2 bg-gray-900 text-white rounded hover:bg-gray-700 font-semibold shadow"
         >
           Shop {{ product.name }}

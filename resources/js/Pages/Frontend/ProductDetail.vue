@@ -136,9 +136,9 @@
               <!-- Purchase Button -->
               <div v-if="product.product_url">
                 <a
-                  :href="product.product_url"
+                  :href="`/go/${product.id}`"
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer nofollow sponsored"
                   class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg transition-colors flex items-center justify-center gap-2 mb-6"
                 >
                   Visit {{ brand.name }} to Purchase

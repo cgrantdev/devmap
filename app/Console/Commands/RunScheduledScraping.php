@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Jobs\RunPythonScraperJob;
+use App\Jobs\RunWooCommerceIngestJob;
 use App\Models\ScrapingConfig;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -46,14 +47,19 @@ class RunScheduledScraping extends Command
         $this->info("Found {$configsToRun->count()} scraping config(s) due to run.");
 
         foreach ($configsToRun as $config) {
-            $this->info("Dispatching scraping job for config ID: {$config->id} (Vendor: {$config->vendor_name})");
-            Log::info('Auto-scheduling scraping job', [
+            $type = $config->type ?? ScrapingConfig::TYPE_CSS_SCRAPE;
+            $this->info("Dispatching {$type} job for config ID: {$config->id} (Vendor: {$config->vendor_name})");
+            Log::info('Auto-scheduling ingestion job', [
                 'config_id' => $config->id,
+                'type' => $type,
                 'vendor_name' => $config->vendor_name,
                 'next_run_at' => $config->next_run_at?->toIso8601String(),
             ]);
-            
-            RunPythonScraperJob::dispatch($config);
+
+            match ($type) {
+                ScrapingConfig::TYPE_WOO_API => RunWooCommerceIngestJob::dispatch($config),
+                default => RunPythonScraperJob::dispatch($config),
+            };
         }
 
         $this->info('All due scraping jobs have been dispatched.');

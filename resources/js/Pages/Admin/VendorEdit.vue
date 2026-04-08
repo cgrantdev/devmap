@@ -45,6 +45,32 @@
             </div>
           </div>
 
+          <!-- Affiliate tracking -->
+          <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
+            <div>
+              <label class="block text-sm font-semibold text-slate-800 mb-1">Affiliate URL Template</label>
+              <input
+                v-model="editForm.affiliate_url_template"
+                type="text"
+                placeholder="https://vendor.com/product/{slug}?ref=peptidemap"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+              />
+              <p class="text-xs text-slate-600 mt-1">
+                Placeholders: <code>{product_url}</code>, <code>{slug}</code>, <code>{id}</code>, <code>{affiliate_tag}</code>. Leave blank to use the raw product URL.
+              </p>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-800 mb-1">Affiliate Tag</label>
+              <input
+                v-model="editForm.affiliate_tag"
+                type="text"
+                placeholder="peptidemap"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p class="text-xs text-slate-600 mt-1">Used as the <code>{affiliate_tag}</code> placeholder in the template above.</p>
+            </div>
+          </div>
+
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm text-slate-700 mb-2">Email</label>
@@ -403,6 +429,8 @@ const editForm = useForm({
   banner: null,
   logo: null,
   is_active: props.vendor?.is_active ?? false,
+  affiliate_url_template: props.vendor?.affiliate_url_template || '',
+  affiliate_tag: props.vendor?.affiliate_tag || '',
   _token: usePage().props.csrf_token
 })
 
@@ -428,6 +456,8 @@ watch(() => props.vendor, (newVendor) => {
     editForm.is_partner = newVendor.settings?.is_partner || false
     editForm.payment_methods = newVendor.settings?.payment_methods || []
     editForm.is_active = newVendor.is_active ?? false
+    editForm.affiliate_url_template = newVendor.affiliate_url_template || ''
+    editForm.affiliate_tag = newVendor.affiliate_tag || ''
     editForm.banner_url = newVendor.settings?.banner_url || ''
     editForm.logo_url = newVendor.settings?.logo_url || ''
   }

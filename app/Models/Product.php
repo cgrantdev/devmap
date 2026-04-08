@@ -67,6 +67,11 @@ class Product extends Model
         return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
 
+    public function clicks()
+    {
+        return $this->hasMany(ProductClick::class);
+    }
+
     protected $casts = [
         'last_scraped_at' => 'datetime',
         'hidden' => 'boolean',
