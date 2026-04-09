@@ -44,6 +44,7 @@
           >
             <option value="rating|desc">Highest Rated</option>
             <option value="reviews|desc">Most Reviews</option>
+            <option value="products|desc">Most Compounds</option>
             <option value="name|asc">Alphabetical</option>
           </select>
         </div>
@@ -147,44 +148,55 @@
         </a>
       </div>
 
-      <!-- Vendor card grid — equal weight, sortable -->
+      <!-- Vendor card grid — logo prominent, equal weight -->
       <div v-if="filteredBrands.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         <a
           v-for="brand in filteredBrands"
           :key="brand.id"
           :href="`/shop/${brand.slug}`"
-          class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms]"
+          class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
         >
-          <!-- Header: logo + name + rating -->
-          <div class="p-5 pb-4 flex items-start gap-4">
-            <div class="w-12 h-12 flex-shrink-0 border border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] flex items-center justify-center overflow-hidden">
-              <img v-if="brand.logo" :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain p-1" loading="lazy" />
-              <span v-else class="ui-display text-sm font-bold text-[color:var(--color-ink-muted)]">{{ brand.initials }}</span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="ui-display text-[16px] font-semibold text-[color:var(--color-ink)] truncate tracking-tight">{{ brand.name }}</h3>
-              <div class="flex items-center gap-1.5 mt-1 text-xs text-[color:var(--color-ink-muted)]">
-                <svg v-for="n in 5" :key="n" class="w-3 h-3" :class="n <= Math.round(parseFloat(brand.rating)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ parseFloat(brand.rating).toFixed(1) }}</span>
-                <span class="text-[color:var(--color-ink-subtle)]">({{ brand.reviews }})</span>
-              </div>
-            </div>
-            <span v-if="brand.is_partner" class="ui-mono text-[9px] uppercase tracking-[0.1em] px-1.5 py-0.5 bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] font-semibold flex-shrink-0">Partner</span>
+          <!-- Big logo area -->
+          <div class="aspect-[16/9] bg-[color:var(--color-bg)] border-b border-[color:var(--color-hairline)] flex items-center justify-center p-8 relative">
+            <img
+              v-if="brand.logo"
+              :src="brand.logo"
+              :alt="brand.name"
+              class="max-h-full max-w-[75%] object-contain"
+              loading="lazy"
+            />
+            <span v-else class="ui-display text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ brand.initials }}</span>
+            <span v-if="brand.is_partner" class="absolute top-3 right-3 ui-mono text-[9px] uppercase tracking-[0.1em] px-1.5 py-0.5 bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] font-semibold">Partner</span>
           </div>
 
-          <!-- Footer: location + compounds + view -->
-          <div class="px-5 pt-3 pb-4 flex items-center gap-4 text-xs text-[color:var(--color-ink-muted)] mt-auto border-t border-[color:var(--color-hairline-soft)]">
-            <span v-if="brand.location" class="flex items-center gap-1">
-              <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
-              {{ brand.location }}
-            </span>
-            <span class="flex items-center gap-1">
-              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.product_count }}</span> compounds
-            </span>
-            <span class="ml-auto text-[color:var(--color-accent-600)] font-semibold group-hover:translate-x-0.5 transition-transform duration-[180ms] flex items-center gap-0.5">
-              View
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            </span>
+          <!-- Info -->
+          <div class="p-5 flex-1 flex flex-col gap-3">
+            <div>
+              <h3 class="ui-display text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight">{{ brand.name }}</h3>
+              <div v-if="brand.location" class="flex items-center gap-1 mt-1 text-xs text-[color:var(--color-ink-muted)]">
+                <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ brand.location }}
+              </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="flex items-center gap-1.5 text-xs">
+              <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(parseFloat(brand.rating)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ parseFloat(brand.rating).toFixed(1) }}</span>
+              <span class="text-[color:var(--color-ink-subtle)]">({{ brand.reviews }})</span>
+            </div>
+
+            <!-- Stats row -->
+            <div class="mt-auto pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-xs text-[color:var(--color-ink-muted)]">
+              <span class="flex items-center gap-1">
+                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.product_count }}</span> compounds
+              </span>
+              <span class="text-[color:var(--color-accent-600)] font-semibold group-hover:translate-x-0.5 transition-transform duration-[180ms] flex items-center gap-0.5">
+                View
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </span>
+            </div>
+          </div>
           </div>
         </a>
       </div>

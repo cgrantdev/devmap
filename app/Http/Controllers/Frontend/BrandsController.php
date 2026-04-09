@@ -92,6 +92,8 @@ class BrandsController extends Controller
             $query->orderBy('rating_average', $sortDir);
         } elseif ($sortBy === 'reviews') {
             $query->orderBy('rating_count', $sortDir);
+        } elseif ($sortBy === 'products') {
+            $query->orderBy('products_count', $sortDir);
         } elseif ($sortBy === 'name') {
             $query->orderBy('name', $sortDir);
         } else {
