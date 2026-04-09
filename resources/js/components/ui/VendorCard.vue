@@ -4,19 +4,20 @@
     class="ui-focus group relative flex flex-col rounded-[14px] border border-[color:var(--color-hairline)] bg-white overflow-hidden ui-lift"
     :aria-label="vendor.name"
   >
-    <!-- Banner: deterministic gradient + subtle grid + decorative orbs -->
+    <!-- Banner: vendor logo as blurred background fill -->
     <div class="relative aspect-[16/6] overflow-hidden">
+      <!-- Base gradient -->
       <div class="absolute inset-0" :style="{ background: coverGradient }" />
-      <!-- Faint grid texture -->
-      <div
-        class="absolute inset-0 opacity-[0.08] pointer-events-none"
-        :style="{
-          backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)',
-          backgroundSize: '22px 22px',
-        }"
+      <!-- Large blurred logo behind (if logo exists) — creates branded banner effect -->
+      <img
+        v-if="vendor.logo_url"
+        :src="vendor.logo_url"
+        alt=""
+        class="absolute inset-0 w-full h-full object-contain scale-[1.8] blur-[40px] opacity-30 pointer-events-none"
+        loading="lazy"
       />
-      <!-- Glow orb -->
-      <div class="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-white/15 blur-3xl pointer-events-none" />
+      <!-- Subtle overlay for depth -->
+      <div class="absolute inset-0 bg-gradient-to-br from-black/20 to-transparent pointer-events-none" />
 
       <!-- Partner chip (only if actually premium) -->
       <div v-if="vendor.is_partner" class="absolute top-3 right-3 z-10">
@@ -85,11 +86,11 @@
           </div>
         </div>
         <div>
-          <div class="ui-mono text-base font-semibold text-[color:var(--color-ink)] leading-none truncate">
-            {{ vendor.last_tested_label || '—' }}
+          <div class="ui-mono text-base font-semibold leading-none truncate" :class="vendor.rating_average >= 4 ? 'text-[color:var(--color-verified)]' : 'text-[color:var(--color-ink)]'">
+            {{ vendor.rating_average >= 4 ? 'High' : vendor.rating_average >= 3 ? 'Good' : '—' }}
           </div>
           <div class="text-[10px] uppercase tracking-[0.08em] text-[color:var(--color-ink-subtle)] mt-1 font-semibold">
-            Last updated
+            Trust score
           </div>
         </div>
       </div>

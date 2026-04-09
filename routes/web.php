@@ -41,9 +41,11 @@ use App\Http\Controllers\Frontend\BecomeVendorController;
 use App\Http\Controllers\Frontend\DealsController;
 use App\Http\Controllers\Frontend\PagesController as FrontendPagesController;
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
-// Preview of the 2026 homepage redesign (Phase 2). Not linked anywhere yet
-// so it lives alongside the live homepage while we iterate.
+// Modern 2026 homepage is now the default
+Route::get('/', [HomeController::class, 'v2'])->name('home');
+// Legacy homepage (kept for reference, remove when fully migrated)
+Route::get('/home-old', [HomeController::class, 'index'])->name('home.old');
+// Preview route still works as an alias
 Route::get('/home-v2', [HomeController::class, 'v2'])->name('home.v2');
 
 // Affiliate outbound redirect (click tracking)
