@@ -1,6 +1,6 @@
 <template>
-  <FrontLayout>
-  <div class="min-h-screen bg-gray-50">
+  <ModernLayout>
+  <div class="min-h-screen">
     <!-- Admin Warning Banner for Inactive Vendors -->
     <div v-if="(isAdmin || isOwnPage) && settings?.status === 0" class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
       <div class="flex">
@@ -42,6 +42,40 @@
         <div v-if="settings?.phone_number"><span class="font-semibold">Phone:</span> {{ settings.phone_number }}</div>
       </div>
     </div>
+    <!-- Vendor Details Row -->
+    <div v-if="hasVendorDetails" class="max-w-6xl mx-auto px-4 mt-6">
+      <div class="bg-white rounded-lg shadow p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+        <div v-if="settings?.payment_methods && settings.payment_methods.length">
+          <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-gray-500 mb-2">Payment Methods</div>
+          <div class="flex flex-wrap gap-1.5">
+            <span v-for="method in settings.payment_methods" :key="method" class="px-2 py-1 bg-gray-100 rounded text-xs font-medium text-gray-700">{{ method }}</span>
+          </div>
+        </div>
+        <div v-if="settings?.shipping_info">
+          <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-gray-500 mb-2">Shipping Info</div>
+          <p class="text-gray-700 leading-relaxed">{{ settings.shipping_info }}</p>
+        </div>
+        <div v-if="settings?.return_policy">
+          <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-gray-500 mb-2">Return Policy</div>
+          <p class="text-gray-700 leading-relaxed">{{ settings.return_policy }}</p>
+        </div>
+        <div v-if="settings?.coupon_code">
+          <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-gray-500 mb-2">Discount Code</div>
+          <div class="flex items-center gap-2">
+            <span class="ui-mono font-bold text-base text-gray-900 bg-gray-100 px-3 py-1.5 rounded border border-dashed border-gray-300">{{ settings.coupon_code }}</span>
+          </div>
+        </div>
+        <div v-if="settings?.business_hours">
+          <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-gray-500 mb-2">Business Hours</div>
+          <p class="text-gray-700">{{ settings.business_hours }}</p>
+        </div>
+        <div v-if="settings?.location">
+          <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-gray-500 mb-2">Location</div>
+          <p class="text-gray-700">{{ settings.location.name || settings.location }}</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Main Content: Filters & Items -->
     <div class="flex flex-col md:flex-row gap-6 mt-8 max-w-6xl mx-auto px-4">
       <!-- Filters (dummy) -->
@@ -116,13 +150,13 @@
       </section>
     </div>
   </div>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { router } from '@inertiajs/vue3'
-import { ref, watch } from 'vue'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import { ref, computed, watch } from 'vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
 const props = defineProps({
   settings: Object,
@@ -142,6 +176,19 @@ const props = defineProps({
 })
 
 const searchInput = ref(props.search || '')
+
+const hasVendorDetails = computed(() => {
+  const s = props.settings
+  if (!s) return false
+  return !!(
+    (s.payment_methods && s.payment_methods.length) ||
+    s.shipping_info ||
+    s.return_policy ||
+    s.coupon_code ||
+    s.business_hours ||
+    s.location
+  )
+})
 
 function getImageUrl(path) {
   if (!path) return null
