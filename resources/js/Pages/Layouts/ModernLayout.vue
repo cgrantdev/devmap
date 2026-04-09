@@ -4,7 +4,7 @@
     <header
       :class="[
         'fixed top-0 left-0 right-0 z-50 transition-all duration-[200ms] ease-out',
-        scrolled ? 'bg-black/75 backdrop-blur-xl border-b border-white/[0.06]' : 'bg-transparent',
+        scrolled ? 'bg-white/70 backdrop-blur-xl border-b border-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.04)]' : 'bg-transparent',
       ]"
     >
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 h-16 flex items-center gap-8">
@@ -16,7 +16,7 @@
               <path d="M9.5 12.5l2 2 4-4.5"/>
             </svg>
           </div>
-          <span :class="['ui-display text-[17px] font-semibold tracking-tight transition-colors duration-200', scrolled ? 'text-white' : 'text-[color:var(--color-ink)]']">
+          <span class="ui-display text-[17px] font-semibold tracking-tight text-[color:var(--color-ink)]">
             PeptideMap
           </span>
         </a>
@@ -27,12 +27,7 @@
             v-for="link in navLinks"
             :key="link.href"
             :href="link.href"
-            :class="[
-              'ui-focus px-3 py-1.5 rounded-[8px] transition-colors duration-200',
-              scrolled
-                ? 'text-white/60 hover:text-white hover:bg-white/[0.08]'
-                : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)]',
-            ]"
+            class="ui-focus px-3 py-1.5 rounded-[8px] transition-colors duration-200 text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04]"
           >
             {{ link.label }}
           </a>
@@ -41,28 +36,18 @@
         <!-- Right side: search + country + auth -->
         <div class="ml-auto flex items-center gap-3">
           <div class="hidden md:block">
-            <SearchPalette :dark="scrolled" />
+            <SearchPalette />
           </div>
-          <CountrySelector class="hidden sm:block" :dark="scrolled" />
+          <CountrySelector class="hidden sm:block" />
           <a
             href="/login"
-            :class="[
-              'ui-focus px-3 py-1.5 rounded-[8px] text-[13px] font-medium transition-colors duration-200',
-              scrolled
-                ? 'text-white/55 hover:text-white hover:bg-white/[0.08]'
-                : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)]',
-            ]"
+            class="ui-focus px-3 py-1.5 rounded-[8px] text-[13px] font-medium transition-colors duration-200 text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04]"
           >
             Sign in
           </a>
           <a
             href="/become-a-vendor"
-            :class="[
-              'ui-focus hidden lg:inline-flex items-center h-9 px-4 rounded-[9px] text-[13px] font-semibold transition-all duration-200',
-              scrolled
-                ? 'bg-white/[0.08] border border-white/[0.12] text-white/90 hover:bg-white/[0.14]'
-                : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink)] shadow-[0_1px_2px_rgba(10,11,14,0.04)] hover:border-[color:var(--color-ink-subtle)]',
-            ]"
+            class="ui-focus hidden lg:inline-flex items-center h-9 px-4 rounded-[9px] text-[13px] font-semibold transition-all duration-200 bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink)] shadow-[0_1px_2px_rgba(10,11,14,0.04)] hover:border-[color:var(--color-ink-subtle)]"
           >
             For vendors
           </a>
