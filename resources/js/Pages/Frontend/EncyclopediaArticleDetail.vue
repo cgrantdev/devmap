@@ -90,8 +90,10 @@
                 </div>
               </div>
             </div>
-            <!-- Amino acid sequence — collapsed by default, expandable -->
-            <div class="bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-5 lg:col-span-2">
+          </div>
+
+          <!-- Amino acid sequence — standalone collapsible strip below the grid -->
+          <div class="mt-4 bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-4">
               <button
                 type="button"
                 @click="showSequence = !showSequence"
