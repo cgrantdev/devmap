@@ -65,12 +65,12 @@
               </div>
             </div>
 
-            <!-- Small square 3D model -->
-            <div v-if="aminoAcidSequence.sequence" class="flex-shrink-0 w-40 h-40 md:w-48 md:h-48 relative bg-[#0A0B0E] border border-[color:var(--color-hairline)] overflow-hidden">
+            <!-- Small square 3D model — light background -->
+            <div v-if="aminoAcidSequence.sequence" class="flex-shrink-0 w-40 h-40 md:w-48 md:h-48 relative bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] overflow-hidden">
               <div ref="viewer3d" class="w-full h-full"></div>
               <div class="absolute bottom-1.5 left-2 right-2 flex items-center justify-between">
-                <span class="text-[8px] ui-mono text-white/40 uppercase tracking-wider">{{ categoryName || name }}</span>
-                <span class="text-[8px] ui-mono text-white/25">3D · drag to rotate</span>
+                <span class="text-[8px] ui-mono text-[color:var(--color-ink-subtle)] uppercase tracking-wider">{{ categoryName || name }}</span>
+                <span class="text-[8px] ui-mono text-[color:var(--color-ink-subtle)]/50">drag to rotate</span>
               </div>
             </div>
           </div>
@@ -1680,7 +1680,7 @@ onMounted(async () => {
     if (!$3Dmol) return
 
     const v = $3Dmol.createViewer(viewer3d.value, {
-      backgroundColor: '#0A0B0E',
+      backgroundColor: '#FAFAF9',
       antialias: true,
     })
 
@@ -1709,18 +1709,39 @@ onMounted(async () => {
     pdb += 'END\n'
 
     v.addModel(pdb, 'pdb')
+
+    const resColorMap = {
+      GLY: '#6366F1', ALA: '#6366F1', VAL: '#6366F1', LEU: '#6366F1', ILE: '#6366F1', PRO: '#6366F1',
+      PHE: '#6366F1', MET: '#6366F1', TRP: '#6366F1',
+      SER: '#0D9488', THR: '#0D9488', CYS: '#0D9488', TYR: '#0D9488', ASN: '#0D9488', GLN: '#0D9488',
+      LYS: '#3B82F6', ARG: '#3B82F6', HIS: '#3B82F6',
+      ASP: '#E11D48', GLU: '#E11D48',
+    }
+
     v.setStyle({}, {
-      stick: { radius: 0.15, colorscheme: 'whiteCarbon' },
-      sphere: { radius: 0.4, colorscheme: { prop: 'resn', map: {
-        GLY: '#6366F1', ALA: '#6366F1', VAL: '#6366F1', LEU: '#6366F1', ILE: '#6366F1', PRO: '#6366F1',
-        PHE: '#6366F1', MET: '#6366F1', TRP: '#6366F1',
-        SER: '#0D9488', THR: '#0D9488', CYS: '#0D9488', TYR: '#0D9488', ASN: '#0D9488', GLN: '#0D9488',
-        LYS: '#3B82F6', ARG: '#3B82F6', HIS: '#3B82F6',
-        ASP: '#E11D48', GLU: '#E11D48',
-      }}},
+      stick: { radius: 0.12, color: '#A1A1AA' },
+      sphere: { radius: 0.45, colorscheme: { prop: 'resn', map: resColorMap }},
     })
+
+    // Label each residue with its 3-letter code
+    letters.forEach((letter, i) => {
+      const resName = threeLetterCodes[letter] || 'ALA'
+      v.addLabel(resName, {
+        position: { x: parseFloat((4 * Math.cos((i * 100 * Math.PI) / 180)).toFixed(3)), y: parseFloat((4 * Math.sin((i * 100 * Math.PI) / 180)).toFixed(3)), z: i * 1.5 },
+        fontSize: 9,
+        fontColor: '#3f3f46',
+        backgroundColor: 'white',
+        backgroundOpacity: 0.8,
+        borderColor: '#E4E4E7',
+        borderThickness: 1,
+        showBackground: true,
+        alignment: 'center',
+        inFront: true,
+      })
+    })
+
     v.zoomTo()
-    v.spin('y', 0.5)
+    v.spin('y', 0.4)
     v.render()
   } catch (e) {
     // Silently fail — 3D viewer is enhancement, not critical
