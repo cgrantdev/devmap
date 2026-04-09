@@ -16,7 +16,6 @@
           <span class="ui-mono">Use code PMAP at checkout</span>
         </div>
       </div>
-      </div>
     </section>
 
     <!-- Content -->
