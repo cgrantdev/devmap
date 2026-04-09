@@ -117,10 +117,8 @@
           </div>
         </div>
       </div>
-        </div>
-      </div>
 
-      <!-- Main Content — tighter gap to header -->
+      <!-- Main Content -->
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-6">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <!-- Left Column -->
