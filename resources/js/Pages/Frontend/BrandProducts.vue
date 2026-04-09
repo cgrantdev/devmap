@@ -1,34 +1,36 @@
 <template>
   <ModernLayout>
     <!-- Brand Detail Section -->
-    <div class="min-h-screen bg-gray-50">
-      <div class="relative overflow-hidden bg-white">
-        <div class="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1600&h=400&fit=crop" class="w-full h-full object-cover">
-          <div class="absolute inset-0 bg-white/90"></div>
+    <div class="min-h-screen">
+      <!-- Facebook-style cover photo banner -->
+      <div class="relative h-48 md:h-56 overflow-hidden" :style="{ background: coverGradient }">
+        <!-- Grid texture overlay -->
+        <div class="absolute inset-0 opacity-[0.04]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '28px 28px' }" />
+        <!-- Glow orb -->
+        <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+        <!-- Partner chip -->
+        <div v-if="brand.is_partner" class="absolute top-4 right-4 z-10">
+          <span class="ui-mono text-[10px] uppercase tracking-[0.12em] px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white border border-white/20 font-semibold">Partner</span>
         </div>
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-6">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 flex">
-              <div class="rounded-2xl shadow-lg p-10 w-full relative bg-white">
-                <div v-if="brand.is_partner" class="absolute top-0 right-0">
-                  <div class="px-4 py-2 rounded-bl-xl rounded-tr-xl text-sm shadow-sm bg-slate-100 text-slate-700">Partner</div>
-                </div>
-                <div class="flex flex-col md:flex-row gap-6">
-                  <div class="flex-shrink-0">
-                    <div class="relative w-24 h-24 bg-white rounded-lg flex items-center justify-center overflow-hidden">
-                      <img 
-                        v-if="brand.logo" 
-                        :src="brand.logo" 
-                        :alt="brand.name + ' logo'"
-                        class="w-full h-full object-contain p-2"
-                        loading="lazy"
-                      />
-                      <div v-else class="w-full h-full text-2xl bg-blue-600 rounded-lg flex items-center justify-center text-white select-none">
-                        <span>{{ brand.initials }}</span>
-                      </div>
-                    </div>
+      </div>
+
+      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 -mt-16 pb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 flex">
+            <div class="rounded-[16px] shadow-[var(--shadow-md)] p-8 md:p-10 w-full relative bg-white border border-[color:var(--color-hairline)]">
+              <div class="flex flex-col md:flex-row gap-6">
+                <div class="flex-shrink-0 -mt-20 md:-mt-16">
+                  <div class="relative w-24 h-24 bg-white rounded-[14px] border-4 border-white shadow-lg flex items-center justify-center overflow-hidden" :style="{ background: brand.logo ? 'white' : coverGradient }">
+                    <img
+                      v-if="brand.logo"
+                      :src="brand.logo"
+                      :alt="brand.name + ' logo'"
+                      class="w-full h-full object-contain p-2"
+                      loading="lazy"
+                    />
+                    <span v-else class="text-2xl font-bold text-white select-none ui-display">{{ brand.initials }}</span>
                   </div>
+                </div>
                   <div class="flex-1 min-w-0">
                     <div class="flex flex-wrap items-center gap-3 mb-3">
                       <h1 class="text-3xl text-slate-800">{{ brand.name }}</h1>
@@ -790,6 +792,20 @@ const props = defineProps({
       canonical: null,
     })
   }
+})
+
+// Deterministic gradient for the cover photo banner
+const coverGradient = computed(() => {
+  const palette = [
+    ['#1E293B', '#4F46E5'], ['#0F172A', '#6366F1'], ['#1E3A8A', '#3B82F6'],
+    ['#0C4A6E', '#0EA5E9'], ['#134E4A', '#14B8A6'], ['#312E81', '#4F46E5'],
+    ['#111827', '#7C3AED'], ['#164E63', '#06B6D4'],
+  ]
+  const n = (props.brand?.name || '?').trim()
+  let h = 0
+  for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) & 0xffffffff
+  const [a, b] = palette[Math.abs(h) % palette.length]
+  return `linear-gradient(135deg, ${a} 0%, ${b} 100%)`
 })
 
 const ArrowRightIcon = defineComponent({
