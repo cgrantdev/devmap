@@ -712,11 +712,59 @@ class HomeController extends Controller
                 ];
             });
 
+        // Top compound categories for the homepage "What are you researching?" grid.
+        // Uses the same priority list as the Compare page.
+        $topCompoundNames = [
+            'BPC-157', 'GLP1-S (Semaglutide)', 'GLP2-T (Tirzepatide)', 'GLP3-R (Retatrutide)',
+            'TB-500', 'Ipamorelin', 'CJC-1295 / Ipamorelin', 'GLOW', 'KLOW',
+            'Tesamorelin', 'Sermorelin', 'NAD+', 'AOD-9604', 'GHK-Cu',
+            'PT-141', 'MOTS-c', 'CJC-1295', 'BPC-157 / TB-500',
+        ];
+
+        $displayNames = [
+            'GLP3-R (Retatrutide)' => 'Retatrutide',
+            'GLP1-S (Semaglutide)' => 'Semaglutide',
+            'GLP2-T (Tirzepatide)' => 'Tirzepatide',
+            'BPC-157 / TB-500' => 'BPC-157 / TB-500 Blend',
+            'CJC-1295 / Ipamorelin' => 'Ipamorelin / CJC-1295',
+            'GLOW' => 'GLOW Blend',
+            'KLOW' => 'KLOW Blend',
+        ];
+
+        $topCompounds = ProductCategory::where('is_active', true)
+            ->whereIn('name', $topCompoundNames)
+            ->withCount(['products as product_count' => fn ($q) => $q->visible()->where('status', 'active')])
+            ->get()
+            ->map(function ($cat) use ($displayNames) {
+                $vendorCount = Product::visible()
+                    ->where('status', 'active')
+                    ->where('product_category_id', $cat->id)
+                    ->distinct('brand_id')
+                    ->count('brand_id');
+
+                $cheapest = Product::visible()
+                    ->where('status', 'active')
+                    ->where('product_category_id', $cat->id)
+                    ->selectRaw('MIN(COALESCE(discount_price, price)) as min_price')
+                    ->value('min_price');
+
+                return [
+                    'id' => $cat->id,
+                    'name' => $displayNames[$cat->name] ?? $cat->name,
+                    'slug' => $cat->slug,
+                    'vendor_count' => $vendorCount,
+                    'from_price' => $cheapest ? number_format((float) $cheapest, 2, '.', '') : null,
+                ];
+            })
+            ->sortByDesc('vendor_count')
+            ->values()
+            ->take(16);
+
         // SEO
         $seo = [
             'title' => 'PeptideMap — The definitive platform for research peptide vendors',
             'description' => 'Compare verified suppliers, inspect lab testing, and discover research peptides — all in one place.',
-            'url' => url('/home-v2'),
+            'url' => url('/'),
         ];
 
         return Inertia::render('Frontend/WelcomeV2', [
@@ -724,6 +772,7 @@ class HomeController extends Controller
             'heroSlides' => $heroSlides,
             'brandStripVendors' => $brandStripVendors,
             'verifiedVendors' => $verifiedVendors,
+            'topCompounds' => $topCompounds,
             'trendingProducts' => $trendingProducts,
             'limitedDeals' => $limitedDeals,
             'encyclopediaCategories' => $encyclopediaCategories,

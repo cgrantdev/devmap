@@ -16,18 +16,18 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 2. COMPOUNDS — the core value prop                         -->
+    <!-- 2. COMPOUND CATEGORIES — "What are you researching?"       -->
     <!-- ========================================================= -->
     <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-16 lg:py-20">
       <SectionHeader
         eyebrow="Browse compounds"
-        title="Research peptides, compared"
-        description="Prices, vendors, and lab data for every major compound — updated continuously."
+        title="What are you researching?"
+        description="Explore every major peptide category — vendor pricing, lab data, and research articles for each compound."
         accent="accent"
       >
         <template #cta>
-          <Button as="a" href="/compare" variant="secondary">
-            Compare all prices
+          <Button as="a" href="/encyclopedia" variant="secondary">
+            Full encyclopedia
             <template #icon-right>
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M5 12h14M13 5l7 7-7 7"/>
@@ -37,8 +37,26 @@
         </template>
       </SectionHeader>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-        <ProductCard v-for="product in trendingProducts" :key="product.id" :product="product" />
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <a
+          v-for="compound in topCompounds"
+          :key="compound.slug"
+          :href="`/encyclopedia/${compound.slug}`"
+          class="ui-focus group flex flex-col gap-3 p-5 rounded-[14px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms]"
+        >
+          <div class="ui-display text-[16px] font-semibold text-[color:var(--color-ink)] tracking-tight group-hover:text-[color:var(--color-accent-600)] transition-colors leading-tight">
+            {{ compound.name }}
+          </div>
+          <div class="flex items-center gap-3 text-[12px] text-[color:var(--color-ink-muted)]">
+            <span class="flex items-center gap-1">
+              <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ compound.vendor_count }}</span> vendors
+            </span>
+            <span v-if="compound.from_price" class="ui-mono text-[color:var(--color-verified)]">
+              from ${{ compound.from_price }}
+            </span>
+          </div>
+        </a>
       </div>
     </section>
 
@@ -214,17 +232,13 @@ import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
 import HeroCarousel from '@/components/ui/HeroCarousel.vue'
-import ProductCard from '@/components/ui/ProductCard.vue'
 import BlogImage from '@/components/ui/BlogImage.vue'
 
 defineProps({
   stats: { type: Object, default: () => ({}) },
   heroSlides: { type: Array, default: () => [] },
-  brandStripVendors: { type: Array, default: () => [] },
   verifiedVendors: { type: Array, default: () => [] },
-  trendingProducts: { type: Array, default: () => [] },
-  limitedDeals: { type: Array, default: () => [] },
-  encyclopediaCategories: { type: Array, default: () => [] },
+  topCompounds: { type: Array, default: () => [] },
   editorial: { type: Array, default: () => [] },
   seo: { type: Object, default: () => ({}) },
 })
