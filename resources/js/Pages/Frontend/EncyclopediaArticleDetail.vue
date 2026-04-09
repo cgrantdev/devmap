@@ -36,39 +36,39 @@
             Back to Encyclopedia
           </button>
 
-          <!-- Header: title left, molecular infobox right (Wikipedia-style) -->
-          <div class="flex flex-col lg:flex-row gap-6 mb-6">
-            <!-- Left: title + subtitle + tags -->
-            <div class="flex-1 min-w-0">
-              <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
-              <p class="text-lg text-[color:var(--color-ink-muted)] mb-4">{{ subtitle }}</p>
-              <div class="flex flex-wrap items-center gap-3">
-                <span
-                  v-for="(tag, index) in tags"
-                  :key="index"
-                  :class="getTagColorClass(tag)"
-                  class="px-2 py-0.5 text-[11px] font-semibold"
-                >
-                  {{ tag }}
-                </span>
-                <a
-                  v-if="primaryResearch.url"
-                  :href="primaryResearch.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors text-xs font-medium"
-                >
-                  Primary Research
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M7 17L17 7M17 7H7M17 7v10"/>
-                  </svg>
-                </a>
-              </div>
+          <!-- Title + subtitle + tags -->
+          <div class="mb-6">
+            <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
+            <p class="text-lg text-[color:var(--color-ink-muted)] mb-4">{{ subtitle }}</p>
+            <div class="flex flex-wrap items-center gap-3">
+              <span
+                v-for="(tag, index) in tags"
+                :key="index"
+                :class="getTagColorClass(tag)"
+                class="px-2 py-0.5 text-[11px] font-semibold"
+              >
+                {{ tag }}
+              </span>
+              <a
+                v-if="primaryResearch.url"
+                :href="primaryResearch.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors text-xs font-medium"
+              >
+                Primary Research
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 17L17 7M17 7H7M17 7v10"/>
+                </svg>
+              </a>
             </div>
+          </div>
 
-            <!-- Right: compact molecular infobox -->
-            <div class="lg:w-72 flex-shrink-0 bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-5">
-              <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">Quick facts</div>
+          <!-- Two cards side by side: Quick Facts + Amino Acid Chain -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Quick Facts infobox -->
+            <div class="bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-5">
+              <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">Molecular Data</div>
               <div class="space-y-3">
                 <div class="flex items-baseline justify-between gap-3">
                   <span class="text-xs text-[color:var(--color-ink-muted)]">Formula</span>
@@ -81,7 +81,7 @@
                 </div>
                 <div class="border-t border-[color:var(--color-hairline-soft)]"></div>
                 <div class="flex items-baseline justify-between gap-3">
-                  <span class="text-xs text-[color:var(--color-ink-muted)]">CAS Number</span>
+                  <span class="text-xs text-[color:var(--color-ink-muted)]">CAS</span>
                   <span class="ui-mono text-sm font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber || '—' }}</span>
                 </div>
                 <div v-if="aminoAcidSequence.residueCount > 0" class="border-t border-[color:var(--color-hairline-soft)]"></div>
@@ -89,60 +89,65 @@
                   <span class="text-xs text-[color:var(--color-ink-muted)]">Residues</span>
                   <span class="ui-mono text-sm font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.residueCount }}</span>
                 </div>
+                <!-- Properties inline -->
+                <template v-if="aminoAcidSequence.properties">
+                  <div v-if="aminoAcidSequence.properties.netCharge" class="border-t border-[color:var(--color-hairline-soft)]"></div>
+                  <div v-if="aminoAcidSequence.properties.netCharge" class="flex items-baseline justify-between gap-3">
+                    <span class="text-xs text-[color:var(--color-ink-muted)]">Charge</span>
+                    <span class="ui-mono text-sm font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.properties.netCharge }}</span>
+                  </div>
+                  <div v-if="aminoAcidSequence.properties.stability" class="border-t border-[color:var(--color-hairline-soft)]"></div>
+                  <div v-if="aminoAcidSequence.properties.stability" class="flex items-baseline justify-between gap-3">
+                    <span class="text-xs text-[color:var(--color-ink-muted)]">Stability</span>
+                    <span class="text-xs font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.properties.stability }}</span>
+                  </div>
+                </template>
+              </div>
+            </div>
+
+            <!-- Amino Acid Chain visualization + sequence -->
+            <div class="lg:col-span-2 bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-5">
+              <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">Amino Acid Sequence{{ aminoAcidSequence.residueCount > 0 ? ` · ${aminoAcidSequence.residueCount} Residues` : '' }}</div>
+
+              <!-- Chain visualization SVG -->
+              <div v-if="residueLetters.length > 0" class="mb-4 overflow-x-auto pb-2">
+                <svg :width="residueLetters.length * 36 + 20" height="56" class="min-w-full">
+                  <!-- Backbone line -->
+                  <line x1="28" :y1="28" :x2="(residueLetters.length - 1) * 36 + 28" :y2="28" stroke="var(--color-hairline)" stroke-width="2" />
+                  <!-- Residue circles + labels -->
+                  <g v-for="(letter, i) in residueLetters" :key="i">
+                    <circle
+                      :cx="i * 36 + 28"
+                      cy="28"
+                      r="14"
+                      :fill="residueColor(letter)"
+                      stroke="white"
+                      stroke-width="2"
+                    />
+                    <text
+                      :x="i * 36 + 28"
+                      y="32"
+                      text-anchor="middle"
+                      fill="white"
+                      font-size="10"
+                      font-weight="700"
+                      font-family="var(--font-mono)"
+                    >{{ letter }}</text>
+                  </g>
+                </svg>
+              </div>
+
+              <!-- Full sequence text -->
+              <div v-if="aminoAcidSequence.sequence" class="bg-white border border-[color:var(--color-hairline)] p-3">
+                <p class="ui-mono text-xs leading-relaxed text-[color:var(--color-ink)] break-all">{{ aminoAcidSequence.sequence }}</p>
+              </div>
+
+              <!-- Composition -->
+              <div v-if="aminoAcidComposition && aminoAcidComposition.length > 0" class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[color:var(--color-ink-muted)]">
+                <span v-for="(comp, i) in aminoAcidComposition" :key="i">{{ comp }}</span>
               </div>
             </div>
           </div>
-
-          <!-- Amino acid sequence — collapsible strip -->
-          <div class="bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-4">
-              <button
-                type="button"
-                @click="showSequence = !showSequence"
-                class="w-full flex items-center justify-between text-left group"
-              >
-                <h3 class="text-[color:var(--color-ink-muted)] text-xs uppercase tracking-wider flex items-center gap-2">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m10 16 1.5 1.5"/><path d="m14 8-1.5-1.5"/><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"/><path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/>
-                  </svg>
-                  Amino Acid Sequence{{ aminoAcidSequence.residueCount > 0 ? ` (${aminoAcidSequence.residueCount} Residues)` : '' }}
-                </h3>
-                <svg
-                  class="w-4 h-4 text-[color:var(--color-ink-subtle)] transition-transform duration-200"
-                  :class="showSequence ? 'rotate-180' : ''"
-                  fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"
-                >
-                  <path d="m6 9 6 6 6-6"/>
-                </svg>
-              </button>
-
-              <div v-if="showSequence" class="mt-4">
-                <div v-if="aminoAcidSequence.sequence" class="bg-white border border-[color:var(--color-hairline)] p-4">
-                  <p class="text-[color:var(--color-ink)] ui-mono text-xs leading-relaxed break-all">
-                    {{ aminoAcidSequence.sequence }}
-                  </p>
-                </div>
-                <div v-else class="bg-white border border-[color:var(--color-hairline)] p-4">
-                  <p class="text-[color:var(--color-ink-subtle)] text-sm">No sequence data available</p>
-                </div>
-                <div class="grid grid-cols-2 gap-4 mt-4">
-                  <div v-if="aminoAcidComposition && aminoAcidComposition.length > 0">
-                    <div class="text-[color:var(--color-ink-subtle)] text-xs mb-2">Composition</div>
-                    <div class="space-y-1 text-xs">
-                      <div v-for="(comp, index) in aminoAcidComposition" :key="index" class="text-[color:var(--color-ink-muted)]">{{ comp }}</div>
-                    </div>
-                  </div>
-                  <div v-if="aminoAcidSequence.properties && (aminoAcidSequence.properties.netCharge || aminoAcidSequence.properties.hydrophobic || aminoAcidSequence.properties.stability || aminoAcidSequence.properties.solubility)">
-                    <div class="text-[color:var(--color-ink-subtle)] text-xs mb-2">Properties</div>
-                    <div class="space-y-1 text-xs">
-                      <div v-if="aminoAcidSequence.properties.netCharge" class="text-[color:var(--color-ink-muted)]">Net Charge: {{ aminoAcidSequence.properties.netCharge }}</div>
-                      <div v-if="aminoAcidSequence.properties.hydrophobic" class="text-[color:var(--color-ink-muted)]">Hydrophobic: {{ aminoAcidSequence.properties.hydrophobic }}</div>
-                      <div v-if="aminoAcidSequence.properties.stability" class="text-[color:var(--color-ink-muted)]">Stability: {{ aminoAcidSequence.properties.stability }}</div>
-                      <div v-if="aminoAcidSequence.properties.solubility" class="text-[color:var(--color-ink-muted)]">Solubility: {{ aminoAcidSequence.properties.solubility }}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -1687,7 +1692,37 @@ const aminoAcidComposition = computed(() => {
 })
 
 const page = usePage()
-const showSequence = ref(false)
+
+// Parse amino acid sequence into single-letter codes for the chain SVG
+const residueLetters = computed(() => {
+  const seq = props.aminoAcidSequence?.sequence || ''
+  if (!seq) return []
+  // Try splitting by dash (three-letter codes like Gly-Glu-Pro)
+  if (seq.includes('-')) {
+    return seq.split('-').map(s => s.trim().charAt(0).toUpperCase()).filter(Boolean)
+  }
+  // If it's already single-letter codes (GEPPPGKPADDAGLV)
+  if (seq.length < 30 && /^[A-Z]+$/.test(seq.trim())) {
+    return seq.trim().split('')
+  }
+  // Fallback: take first letter of each space-separated token
+  return seq.split(/[\s-]+/).map(s => s.charAt(0).toUpperCase()).filter(Boolean).slice(0, 30)
+})
+
+// Color each residue by type (hydrophobic, polar, charged, etc.)
+function residueColor(letter) {
+  const colors = {
+    // Hydrophobic — indigo
+    G: '#4F46E5', A: '#4F46E5', V: '#4F46E5', L: '#4F46E5', I: '#4F46E5', P: '#4F46E5', F: '#4F46E5', M: '#4F46E5', W: '#4F46E5',
+    // Polar — teal
+    S: '#0D9488', T: '#0D9488', C: '#0D9488', Y: '#0D9488', N: '#0D9488', Q: '#0D9488',
+    // Positive charge — blue
+    K: '#2563EB', R: '#2563EB', H: '#2563EB',
+    // Negative charge — rose
+    D: '#E11D48', E: '#E11D48',
+  }
+  return colors[letter] || '#6B7280'
+}
 
 // Computed values for reactive SEO updates
 const seoTitle = computed(() => {
