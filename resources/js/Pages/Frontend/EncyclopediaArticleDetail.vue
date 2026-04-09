@@ -948,7 +948,6 @@
           </div>
         </div>
       </div>
-    </div>
   </ModernLayout>
 </template>
 
