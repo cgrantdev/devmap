@@ -80,34 +80,78 @@
               </div>
             </div>
 
-            <!-- Right: structural diagram from PubChem -->
-            <div class="lg:w-60 flex-shrink-0 self-start bg-white border border-[color:var(--color-hairline)] overflow-hidden">
-              <div class="relative bg-white p-1.5">
+            <!-- Right: 2D + 3D structure views with toggle -->
+            <div class="lg:w-64 flex-shrink-0 self-start bg-white border border-[color:var(--color-hairline)] overflow-hidden">
+              <!-- Tab toggle -->
+              <div class="flex border-b border-[color:var(--color-hairline)]">
+                <button
+                  type="button"
+                  @click="structureView = '2d'"
+                  :class="[
+                    'flex-1 py-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-center transition-colors',
+                    structureView === '2d'
+                      ? 'text-[color:var(--color-accent-600)] border-b-2 border-[color:var(--color-accent-600)] bg-[color:var(--color-accent-50)]'
+                      : 'text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)]',
+                  ]"
+                >
+                  2D Structure
+                </button>
+                <button
+                  type="button"
+                  @click="structureView = '3d'"
+                  :class="[
+                    'flex-1 py-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-center transition-colors',
+                    structureView === '3d'
+                      ? 'text-[color:var(--color-accent-600)] border-b-2 border-[color:var(--color-accent-600)] bg-[color:var(--color-accent-50)]'
+                      : 'text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)]',
+                  ]"
+                >
+                  3D Model
+                </button>
+              </div>
+
+              <!-- 2D: PubChem structure image -->
+              <div v-show="structureView === '2d'" class="p-1.5 bg-white">
                 <img
-                  v-if="molecularInfo.casNumber"
-                  :src="`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(categoryName || name)}/PNG?image_size=240x240`"
-                  :alt="`${categoryName || name} molecular structure`"
+                  v-if="molecularInfo.casNumber && !structureImageFailed"
+                  :src="`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(categoryName || name)}/PNG?image_size=250x250`"
+                  :alt="`${categoryName || name} 2D structure`"
                   class="w-full h-auto"
                   loading="lazy"
                   @error="structureImageFailed = true"
                 />
-                <!-- Fallback: our SVG chain if PubChem fails -->
-                <div v-if="structureImageFailed && residueLetters.length > 0" class="p-3">
-                  <div class="relative bg-[color:var(--color-bg)] p-2" :style="{ backgroundImage: 'radial-gradient(circle, #E4E4E7 0.5px, transparent 0.5px)', backgroundSize: '8px 8px' }">
-                    <svg viewBox="0 0 220 100" class="w-full">
-                      <line v-for="i in residueLetters.length - 1" :key="'b'+i" :x1="residuePositions[i-1]?.x" :y1="residuePositions[i-1]?.y" :x2="residuePositions[i]?.x" :y2="residuePositions[i]?.y" stroke="#D4D4D8" stroke-width="1" />
-                      <g v-for="(letter, i) in residueLetters" :key="'r'+i">
-                        <circle :cx="residuePositions[i]?.x" :cy="residuePositions[i]?.y" r="8" :fill="residueColor(letter)" stroke="white" stroke-width="1.5" />
-                        <text :x="residuePositions[i]?.x" :y="(residuePositions[i]?.y||0)+3" text-anchor="middle" fill="white" font-size="6" font-weight="700" font-family="var(--font-mono)">{{ letter }}</text>
-                      </g>
-                    </svg>
-                  </div>
+                <!-- Fallback SVG -->
+                <div v-if="structureImageFailed && residueLetters.length > 0" class="p-2 bg-[color:var(--color-bg)]" :style="{ backgroundImage: 'radial-gradient(circle, #E4E4E7 0.5px, transparent 0.5px)', backgroundSize: '8px 8px' }">
+                  <svg viewBox="0 0 220 100" class="w-full">
+                    <line v-for="i in residueLetters.length - 1" :key="'b'+i" :x1="residuePositions[i-1]?.x" :y1="residuePositions[i-1]?.y" :x2="residuePositions[i]?.x" :y2="residuePositions[i]?.y" stroke="#D4D4D8" stroke-width="1" />
+                    <g v-for="(letter, i) in residueLetters" :key="'r'+i">
+                      <circle :cx="residuePositions[i]?.x" :cy="residuePositions[i]?.y" r="8" :fill="residueColor(letter)" stroke="white" stroke-width="1.5" />
+                      <text :x="residuePositions[i]?.x" :y="(residuePositions[i]?.y||0)+3" text-anchor="middle" fill="white" font-size="6" font-weight="700" font-family="var(--font-mono)">{{ letter }}</text>
+                    </g>
+                  </svg>
                 </div>
               </div>
-              <div class="px-3 py-2 border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
-                <div class="flex items-center justify-between text-[9px] text-[color:var(--color-ink-subtle)]">
-                  <span class="ui-mono uppercase tracking-wider">{{ categoryName || name }} · 2D Structure</span>
-                  <span>PubChem</span>
+
+              <!-- 3D: PubChem 3D conformer viewer (iframe) -->
+              <div v-show="structureView === '3d'" class="bg-white" style="height: 250px;">
+                <iframe
+                  v-if="structureView === '3d' && pubchemCid"
+                  :src="`https://pubchem.ncbi.nlm.nih.gov/compound/${pubchemCid}#section=3D-Conformer&embed=true`"
+                  class="w-full h-full border-0"
+                  loading="lazy"
+                  sandbox="allow-scripts allow-same-origin"
+                  title="3D conformer viewer"
+                ></iframe>
+                <div v-else-if="structureView === '3d' && !pubchemCid" class="flex items-center justify-center h-full text-xs text-[color:var(--color-ink-subtle)]">
+                  3D model not available for this compound
+                </div>
+              </div>
+
+              <!-- Footer label -->
+              <div class="px-3 py-1.5 border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+                <div class="flex items-center justify-between text-[8px] text-[color:var(--color-ink-subtle)]">
+                  <span class="ui-mono uppercase tracking-wider">{{ categoryName || name }}</span>
+                  <span>Source: PubChem</span>
                 </div>
               </div>
             </div>
@@ -1657,6 +1701,24 @@ const aminoAcidComposition = computed(() => {
 
 const page = usePage()
 const structureImageFailed = ref(false)
+const structureView = ref('2d')
+
+// Known PubChem CIDs for common peptides (since PubChem's embed viewer needs CID, not name)
+const pubchemCidMap = {
+  'BPC-157': '108101',
+  'TB-500': '16134956',
+  'Semaglutide': '56843331',
+  'Tirzepatide': '156588324',
+  'Ipamorelin': '20754357',
+  'Sermorelin': '16129620',
+  'GHK-Cu': '637519',
+  'PT-141': '9941379',
+  'AOD-9604': '16131115',
+  'CJC-1295': '56841945',
+  'NAD+': '5893',
+  'MOTS-c': '91810728',
+}
+const pubchemCid = computed(() => pubchemCidMap[props.categoryName || props.name] || null)
 
 // Parse amino acid sequence into single-letter codes for the chain SVG
 const residueLetters = computed(() => {
