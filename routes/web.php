@@ -303,7 +303,10 @@ Route::middleware('auth')->group(function () {
 
 // /vendors now serves the modern Brands page (same controller as /brands)
 Route::get('/vendors', [BrandsController::class, 'index'])->name('vendors.public');
-Route::get('/shop/{vendor_name}', [PublicVendorController::class, 'show'])->name('shop.public');
+// /shop/{slug} redirects to the rich brand products page
+Route::get('/shop/{vendor_name}', function ($vendor_name) {
+    return redirect("/brand/{$vendor_name}/products", 301);
+})->name('shop.public');
 Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('product.public');
 
 // Catch-all route for any other page slugs (must be last to avoid conflicts with other routes)
