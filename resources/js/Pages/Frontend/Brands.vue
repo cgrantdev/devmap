@@ -147,64 +147,44 @@
         </a>
       </div>
 
-      <!-- Vendor list (rich rows, not card grid) -->
-      <div v-if="filteredBrands.length > 0" class="space-y-3">
+      <!-- Vendor card grid — equal weight, sortable -->
+      <div v-if="filteredBrands.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         <a
-          v-for="(brand, idx) in filteredBrands"
+          v-for="brand in filteredBrands"
           :key="brand.id"
           :href="`/shop/${brand.slug}`"
-          class="ui-focus group flex items-center gap-5 p-4 md:p-5 rounded-[14px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-sm)] transition-all duration-[180ms]"
+          class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms]"
         >
-          <!-- Logo -->
-          <div class="w-12 h-12 md:w-14 md:h-14 rounded-[12px] flex-shrink-0 overflow-hidden flex items-center justify-center" :style="{ background: vendorGradient(brand.name) }">
-            <img
-              v-if="brand.logo"
-              :src="brand.logo"
-              :alt="brand.name"
-              class="max-h-full max-w-full object-contain p-1.5"
-              loading="lazy"
-            />
-            <span v-else class="ui-display text-white text-lg font-bold">{{ brand.initials }}</span>
-          </div>
-
-          <!-- Info -->
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
+          <!-- Header: logo + name + rating -->
+          <div class="p-5 pb-4 flex items-start gap-4">
+            <div class="w-12 h-12 flex-shrink-0 border border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] flex items-center justify-center overflow-hidden">
+              <img v-if="brand.logo" :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain p-1" loading="lazy" />
+              <span v-else class="ui-display text-sm font-bold text-[color:var(--color-ink-muted)]">{{ brand.initials }}</span>
+            </div>
+            <div class="flex-1 min-w-0">
               <h3 class="ui-display text-[16px] font-semibold text-[color:var(--color-ink)] truncate tracking-tight">{{ brand.name }}</h3>
-              <span v-if="brand.is_partner" class="ui-mono text-[9px] uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] font-semibold flex-shrink-0">Partner</span>
-            </div>
-            <div class="flex items-center flex-wrap gap-x-4 gap-y-1 text-xs text-[color:var(--color-ink-muted)]">
-              <span v-if="brand.location" class="flex items-center gap-1">
-                <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
-                {{ brand.location }}
-              </span>
-              <span class="flex items-center gap-1">
-                <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.product_count }}</span> compounds
-              </span>
-              <span v-if="brand.last_updated" class="flex items-center gap-1 text-[color:var(--color-ink-subtle)]">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                Updated {{ brand.last_updated }} ago
-              </span>
-            </div>
-          </div>
-
-          <!-- Rating -->
-          <div class="hidden sm:flex flex-col items-end gap-1 flex-shrink-0">
-            <div class="flex items-center gap-1.5">
-              <div class="flex gap-0.5">
+              <div class="flex items-center gap-1.5 mt-1 text-xs text-[color:var(--color-ink-muted)]">
                 <svg v-for="n in 5" :key="n" class="w-3 h-3" :class="n <= Math.round(parseFloat(brand.rating)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ parseFloat(brand.rating).toFixed(1) }}</span>
+                <span class="text-[color:var(--color-ink-subtle)]">({{ brand.reviews }})</span>
               </div>
-              <span class="ui-mono text-sm font-bold text-[color:var(--color-ink)]">{{ parseFloat(brand.rating).toFixed(1) }}</span>
             </div>
-            <span class="text-[11px] text-[color:var(--color-ink-subtle)]">{{ brand.reviews }} reviews</span>
+            <span v-if="brand.is_partner" class="ui-mono text-[9px] uppercase tracking-[0.1em] px-1.5 py-0.5 bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] font-semibold flex-shrink-0">Partner</span>
           </div>
 
-          <!-- CTA arrow -->
-          <div class="flex-shrink-0 hidden md:block">
-            <svg class="w-5 h-5 text-[color:var(--color-ink-subtle)] group-hover:text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-all duration-[180ms]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 18l6-6-6-6"/>
-            </svg>
+          <!-- Footer: location + compounds + view -->
+          <div class="px-5 pt-3 pb-4 flex items-center gap-4 text-xs text-[color:var(--color-ink-muted)] mt-auto border-t border-[color:var(--color-hairline-soft)]">
+            <span v-if="brand.location" class="flex items-center gap-1">
+              <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+              {{ brand.location }}
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.product_count }}</span> compounds
+            </span>
+            <span class="ml-auto text-[color:var(--color-accent-600)] font-semibold group-hover:translate-x-0.5 transition-transform duration-[180ms] flex items-center gap-0.5">
+              View
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
           </div>
         </a>
       </div>
