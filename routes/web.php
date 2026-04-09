@@ -42,6 +42,9 @@ use App\Http\Controllers\Frontend\DealsController;
 use App\Http\Controllers\Frontend\PagesController as FrontendPagesController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+// Preview of the 2026 homepage redesign (Phase 2). Not linked anywhere yet
+// so it lives alongside the live homepage while we iterate.
+Route::get('/home-v2', [HomeController::class, 'v2'])->name('home.v2');
 
 // Affiliate outbound redirect (click tracking)
 Route::get('/go/{product}', [\App\Http\Controllers\OutboundClickController::class, 'redirect'])

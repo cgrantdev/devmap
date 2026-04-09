@@ -352,5 +352,157 @@ class HomeController extends Controller
         }
         return strtoupper(substr($name, 0, 2));
     }
+
+    /**
+     * Preview of the redesigned homepage at /home-v2.
+     * Independent data-fetching from index() so the live site stays untouched
+     * while we iterate on the new design.
+     */
+    public function v2()
+    {
+        // Headline stats for the hero trust row
+        $verifiedVendorCount = Brand::where('is_active', true)
+            ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
+            ->count();
+
+        $totalVendorCount = Brand::where('is_active', true)->count();
+
+        $totalCompoundCount = Product::visible()
+            ->where('status', 'active')
+            ->count();
+
+        $totalCategoryCount = ProductCategory::where('is_active', true)->count();
+
+        $stats = [
+            'verified_vendors' => $verifiedVendorCount,
+            'total_vendors' => $totalVendorCount,
+            'compounds' => $totalCompoundCount,
+            'categories' => $totalCategoryCount,
+        ];
+
+        // Top 6 verified vendors for the hero vendors grid, enriched with
+        // three product thumbnail URLs and a "last tested" label derived from
+        // the most recent product update (proxy until real COA timestamps land).
+        $verifiedVendors = Brand::where('is_active', true)
+            ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
+            ->with(['vendorSetting'])
+            ->withCount(['products as product_count' => function ($q) {
+                $q->visible()->where('status', 'active');
+            }])
+            ->orderByDesc('rating_average')
+            ->orderByDesc('product_count')
+            ->take(6)
+            ->get()
+            ->map(function ($brand) {
+                $thumbs = Product::visible()
+                    ->where('status', 'active')
+                    ->where('brand_id', $brand->id)
+                    ->whereNotNull('image_url')
+                    ->take(4)
+                    ->pluck('image_url')
+                    ->toArray();
+
+                $lastUpdated = Product::visible()
+                    ->where('status', 'active')
+                    ->where('brand_id', $brand->id)
+                    ->max('updated_at');
+
+                return [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                    'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
+                    'logo_url' => $brand->vendorSetting && $brand->vendorSetting->logo
+                        ? asset('storage/' . $brand->vendorSetting->logo)
+                        : null,
+                    'rating_average' => (float) ($brand->rating_average ?? 0),
+                    'rating_count' => (int) ($brand->rating_count ?? 0),
+                    'verified' => true,
+                    'product_count' => (int) $brand->product_count,
+                    'last_tested_label' => $lastUpdated
+                        ? \Carbon\Carbon::parse($lastUpdated)->diffForHumans(null, true)
+                        : null,
+                    'product_thumbs' => $thumbs,
+                ];
+            });
+
+        // Trending compounds — 8 highest-rated products. Later: swap to real
+        // click-count ordering from product_clicks once we have enough data.
+        $trendingProducts = Product::visible()
+            ->where('status', 'active')
+            ->with('brand.vendorSetting')
+            ->orderByDesc('rating_count')
+            ->orderByDesc('featured')
+            ->orderByDesc('rating_average')
+            ->take(8)
+            ->get()
+            ->map(function ($product) {
+                $salePrice = $product->discount_price && $product->discount_price < $product->price
+                    ? $product->discount_price
+                    : $product->price;
+
+                $brandVerified = $product->brand && $product->brand->vendorSetting
+                    ? ($product->brand->vendorSetting->approval_status === 'approved')
+                    : false;
+
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'image_url' => $product->image_url,
+                    'url' => '/product/' . ($product->slug ?? 'product') . '/' . $product->id,
+                    'brand_name' => $product->brand?->name,
+                    'brand_verified' => $brandVerified,
+                    'price' => $salePrice,
+                    'original_price' => ($product->discount_price && $product->discount_price < $product->price)
+                        ? $product->price
+                        : null,
+                    'price_per_mg' => null, // Placeholder until we parse size_mg consistently
+                    'verified' => $brandVerified,
+                    'lab_tested' => (bool) ($product->lab_tested ?? false),
+                    'featured' => (bool) ($product->featured ?? false),
+                ];
+            });
+
+        // Ticker strip — rotating live price snippets
+        $tickerItems = $trendingProducts->take(12)->map(fn ($p) => [
+            'name' => $p['name'],
+            'brand' => $p['brand_name'],
+            'price' => $p['price'],
+        ])->values();
+
+        // Latest editorial — 3 research insights for the editorial section
+        $editorial = Blog::where('status', 'published')
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->orderByDesc('published_at')
+            ->take(3)
+            ->get()
+            ->map(function ($blog) {
+                return [
+                    'id' => $blog->id,
+                    'title' => $blog->title,
+                    'slug' => $blog->slug,
+                    'excerpt' => $blog->description,
+                    'image' => $blog->image ? Storage::url('blogs/' . $blog->image) : null,
+                    'date' => $blog->published_at ? $blog->published_at->format('M d, Y') : null,
+                    'read_time' => $blog->read_time ?? '5 min read',
+                ];
+            });
+
+        // SEO
+        $seo = [
+            'title' => 'PeptideMap — The definitive platform for research peptide vendors',
+            'description' => 'Compare verified suppliers, inspect lab testing, and discover research peptides — all in one place.',
+            'url' => url('/home-v2'),
+        ];
+
+        return Inertia::render('Frontend/WelcomeV2', [
+            'stats' => $stats,
+            'verifiedVendors' => $verifiedVendors,
+            'trendingProducts' => $trendingProducts,
+            'tickerItems' => $tickerItems,
+            'editorial' => $editorial,
+            'seo' => $seo,
+        ]);
+    }
 }
 
