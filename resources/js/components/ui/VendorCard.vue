@@ -3,20 +3,7 @@
     <!-- Top: logo + verified badge -->
     <div class="flex items-start justify-between mb-5">
       <div class="flex items-center gap-3">
-        <div
-          class="w-12 h-12 rounded-[10px] bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] flex items-center justify-center overflow-hidden"
-        >
-          <img
-            v-if="vendor.logo_url"
-            :src="vendor.logo_url"
-            :alt="`${vendor.name} logo`"
-            class="w-full h-full object-cover"
-            loading="lazy"
-          />
-          <span v-else class="ui-display font-semibold text-[color:var(--color-ink-muted)] text-lg">
-            {{ initial }}
-          </span>
-        </div>
+        <VendorLogo :src="vendor.logo_url" :name="vendor.name" size="md" radius="md" />
         <div class="min-w-0">
           <h3 class="ui-display font-semibold text-[color:var(--color-ink)] text-base leading-tight truncate">
             {{ vendor.name }}
@@ -94,6 +81,7 @@
 import { computed } from 'vue'
 import Card from './Card.vue'
 import VerifiedShield from './VerifiedShield.vue'
+import VendorLogo from './VendorLogo.vue'
 
 const props = defineProps({
   vendor: {
@@ -110,6 +98,5 @@ const props = defineProps({
   },
 })
 
-const initial = computed(() => (props.vendor.name || '?').charAt(0).toUpperCase())
 const thumbs = computed(() => (props.vendor.product_thumbs || []).slice(0, 4))
 </script>

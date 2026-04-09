@@ -10,7 +10,7 @@
     <!-- ========================================================= -->
     <section class="relative overflow-hidden">
       <div class="ui-spotlight absolute inset-0 pointer-events-none" />
-      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-20 pb-28 lg:pt-28 lg:pb-36">
+      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-20 pb-20 lg:pt-28 lg:pb-24">
         <div class="max-w-3xl">
           <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[color:var(--color-hairline)] bg-white/60 backdrop-blur text-xs font-medium text-[color:var(--color-ink-muted)] mb-6">
             <span class="relative flex h-1.5 w-1.5">
@@ -44,7 +44,7 @@
           </div>
 
           <!-- Trust row -->
-          <div class="mt-16 pt-8 border-t border-[color:var(--color-hairline)] grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div class="mt-14 pt-8 border-t border-[color:var(--color-hairline)] grid grid-cols-2 md:grid-cols-4 gap-8">
             <Stat label="Verified vendors" :value="formatNumber(stats.verified_vendors)" size="md" />
             <Stat label="Compounds tracked" :value="formatNumber(stats.compounds)" size="md" />
             <Stat label="Product categories" :value="formatNumber(stats.categories)" size="md" />
@@ -55,7 +55,27 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 2. LIVE PRICE TICKER                                       -->
+    <!-- 2. PREMIUM VENDOR PARTNERS (paid placement)                -->
+    <!-- ========================================================= -->
+    <section v-if="premiumVendors.length" class="max-w-[1280px] mx-auto px-6 lg:px-10 pb-16 lg:pb-20">
+      <div class="flex items-end justify-between mb-6 gap-4 flex-wrap">
+        <div>
+          <div class="text-xs uppercase tracking-[0.1em] font-semibold text-[color:var(--color-accent-600)] mb-2">
+            Featured partners
+          </div>
+          <h2 class="ui-display text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">
+            Spotlight vendors
+          </h2>
+        </div>
+        <a href="/become-a-vendor" class="text-xs text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-accent-600)] ui-focus">
+          Become a partner →
+        </a>
+      </div>
+      <PremiumVendorHero :vendors="premiumVendors" />
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 3. LIVE PRICE TICKER                                       -->
     <!-- ========================================================= -->
     <section v-if="tickerItems.length" class="border-y border-[color:var(--color-hairline)] bg-white overflow-hidden">
       <div class="flex gap-12 py-4 ui-marquee whitespace-nowrap">
@@ -72,9 +92,16 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 3. VERIFIED VENDORS                                        -->
+    <!-- 4. SPONSORED AD SLOT #1                                    -->
     <!-- ========================================================= -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-16">
+      <SponsoredBanner />
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 5. VERIFIED VENDORS                                        -->
+    <!-- ========================================================= -->
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pb-24 lg:pb-28">
       <div class="flex items-end justify-between mb-12 gap-4 flex-wrap">
         <div class="max-w-xl">
           <div class="text-xs uppercase tracking-[0.1em] font-semibold text-[color:var(--color-accent-600)] mb-3">
@@ -100,31 +127,33 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <VendorCard v-for="vendor in verifiedVendors" :key="vendor.id" :vendor="vendor" />
       </div>
-
-      <div v-if="!verifiedVendors.length" class="text-center py-20 text-[color:var(--color-ink-subtle)]">
-        No verified vendors yet.
-      </div>
     </section>
 
     <!-- ========================================================= -->
-    <!-- 4. TRENDING COMPOUNDS                                      -->
+    <!-- 6. LIMITED TIME DEALS                                      -->
     <!-- ========================================================= -->
-    <section class="bg-white border-y border-[color:var(--color-hairline)]">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+    <section v-if="limitedDeals.length" class="bg-white border-y border-[color:var(--color-hairline)]">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-28">
         <div class="flex items-end justify-between mb-12 gap-4 flex-wrap">
           <div class="max-w-xl">
-            <div class="text-xs uppercase tracking-[0.1em] font-semibold text-[color:var(--color-biotech-600)] mb-3">
-              Most researched
+            <div class="flex items-center gap-2 mb-3">
+              <svg class="w-4 h-4 text-[color:var(--color-caution)]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <div class="text-xs uppercase tracking-[0.1em] font-semibold text-[color:var(--color-caution)]">
+                Limited time
+              </div>
             </div>
             <h2 class="ui-display text-3xl md:text-4xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-3">
-              Trending compounds
+              Active discount codes
             </h2>
             <p class="text-[color:var(--color-ink-muted)] leading-relaxed">
-              Highest-rated research peptides across our verified vendor network, updated daily.
+              Verified vendor deals with one-click coupon copy. No sign-ups, no email walls.
             </p>
           </div>
-          <Button as="a" href="/products" variant="secondary">
-            Browse all
+          <Button as="a" href="/deals" variant="secondary">
+            All deals
             <template #icon-right>
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M5 12h14M13 5l7 7-7 7"/>
@@ -133,20 +162,124 @@
           </Button>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          <ProductCard v-for="product in trendingProducts" :key="product.id" :product="product" />
-        </div>
-
-        <div v-if="!trendingProducts.length" class="text-center py-20 text-[color:var(--color-ink-subtle)]">
-          No products loaded.
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <DealCard v-for="deal in limitedDeals" :key="deal.id" :deal="deal" />
         </div>
       </div>
     </section>
 
     <!-- ========================================================= -->
-    <!-- 5. TRUST BAR (why us)                                      -->
+    <!-- 7. TRENDING COMPOUNDS                                      -->
     <!-- ========================================================= -->
-    <section id="how-verification-works" class="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-28">
+      <div class="flex items-end justify-between mb-12 gap-4 flex-wrap">
+        <div class="max-w-xl">
+          <div class="text-xs uppercase tracking-[0.1em] font-semibold text-[color:var(--color-biotech-600)] mb-3">
+            Most researched
+          </div>
+          <h2 class="ui-display text-3xl md:text-4xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-3">
+            Trending compounds
+          </h2>
+          <p class="text-[color:var(--color-ink-muted)] leading-relaxed">
+            Highest-rated research peptides across our verified vendor network, updated daily.
+          </p>
+        </div>
+        <Button as="a" href="/products" variant="secondary">
+          Browse all
+          <template #icon-right>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+          </template>
+        </Button>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <ProductCard v-for="product in trendingProducts" :key="product.id" :product="product" />
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 8. PEPTIDE ENCYCLOPEDIA                                    -->
+    <!-- ========================================================= -->
+    <section v-if="encyclopediaCategories.length" class="bg-white border-y border-[color:var(--color-hairline)]">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-28">
+        <div class="flex items-end justify-between mb-12 gap-4 flex-wrap">
+          <div class="max-w-xl">
+            <div class="text-xs uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-muted)] mb-3">
+              Reference
+            </div>
+            <h2 class="ui-display text-3xl md:text-4xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-3">
+              Peptide encyclopedia
+            </h2>
+            <p class="text-[color:var(--color-ink-muted)] leading-relaxed">
+              Research-grade information on every major peptide category. Mechanism of action, typical research protocols, and vendor availability — all cited.
+            </p>
+          </div>
+          <Button as="a" href="/encyclopedia" variant="secondary">
+            Full encyclopedia
+            <template #icon-right>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M13 5l7 7-7 7"/>
+              </svg>
+            </template>
+          </Button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <a
+            v-for="cat in encyclopediaCategories"
+            :key="cat.id"
+            :href="cat.url"
+            class="ui-focus group relative rounded-[14px] border border-[color:var(--color-hairline)] bg-white p-6 ui-lift flex flex-col gap-4"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-[10px] bg-[color:var(--color-accent-50)] border border-[color:var(--color-hairline)] flex items-center justify-center text-[color:var(--color-accent-600)]">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="ui-display font-semibold text-[color:var(--color-ink)] text-base leading-tight">
+                    {{ cat.name }}
+                  </h3>
+                  <div class="text-xs text-[color:var(--color-ink-muted)] ui-mono mt-0.5">
+                    {{ cat.products_count }} compounds
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p v-if="cat.description" class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed line-clamp-2">
+              {{ cat.description }}
+            </p>
+            <span class="mt-auto inline-flex items-center gap-1 text-xs text-[color:var(--color-accent-600)] font-medium group-hover:translate-x-0.5 transition-transform duration-[180ms]">
+              Read article
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M13 5l7 7-7 7"/>
+              </svg>
+            </span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 9. SPONSORED AD SLOT #2                                    -->
+    <!-- ========================================================= -->
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-16">
+      <SponsoredBanner
+        title="Promote your flagship compound"
+        subtitle="Mid-page placement drives 3× the click-through of footer ads."
+        cta-label="Inquire about placement"
+      />
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 10. TRUST BAR                                              -->
+    <!-- ========================================================= -->
+    <section id="how-verification-works" class="max-w-[1280px] mx-auto px-6 lg:px-10 pb-24 lg:pb-28">
       <div class="max-w-2xl mb-14">
         <div class="text-xs uppercase tracking-[0.1em] font-semibold text-[color:var(--color-accent-600)] mb-3">
           Why PeptideMap
@@ -160,10 +293,10 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 6. EDITORIAL / RESEARCH                                    -->
+    <!-- 11. EDITORIAL / RESEARCH                                   -->
     <!-- ========================================================= -->
     <section v-if="editorial.length" class="bg-white border-y border-[color:var(--color-hairline)]">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-28">
         <div class="flex items-end justify-between mb-12 gap-4 flex-wrap">
           <div class="max-w-xl">
             <div class="text-xs uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-muted)] mb-3">
@@ -216,9 +349,9 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 7. VENDOR CTA                                              -->
+    <!-- 12. VENDOR CTA                                             -->
     <!-- ========================================================= -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-24 lg:py-28">
       <div class="relative rounded-[20px] overflow-hidden border border-[color:var(--color-hairline)] bg-gradient-to-br from-[color:var(--color-ink)] to-[color:var(--color-accent-700)] p-12 md:p-16">
         <div class="absolute inset-0 ui-spotlight pointer-events-none opacity-50" />
         <div class="relative max-w-2xl">
@@ -258,12 +391,18 @@ import Stat from '@/components/ui/Stat.vue'
 import VendorCard from '@/components/ui/VendorCard.vue'
 import ProductCard from '@/components/ui/ProductCard.vue'
 import TrustBar from '@/components/ui/TrustBar.vue'
+import SponsoredBanner from '@/components/ui/SponsoredBanner.vue'
+import PremiumVendorHero from '@/components/ui/PremiumVendorHero.vue'
+import DealCard from '@/components/ui/DealCard.vue'
 
 defineProps({
   stats: { type: Object, default: () => ({}) },
   verifiedVendors: { type: Array, default: () => [] },
+  premiumVendors: { type: Array, default: () => [] },
   trendingProducts: { type: Array, default: () => [] },
   tickerItems: { type: Array, default: () => [] },
+  limitedDeals: { type: Array, default: () => [] },
+  encyclopediaCategories: { type: Array, default: () => [] },
   editorial: { type: Array, default: () => [] },
   seo: { type: Object, default: () => ({}) },
 })

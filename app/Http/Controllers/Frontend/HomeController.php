@@ -488,6 +488,147 @@ class HomeController extends Controller
                 ];
             });
 
+        // Premium / featured vendors for the homepage hero slot (paid placement).
+        // Use vendor_settings.is_partner or featured as the selector, fall back
+        // to top-rated approved vendors so the section never sits empty.
+        $premiumVendors = Brand::where('is_active', true)
+            ->where(function ($q) {
+                $q->whereHas('vendorSetting', function ($s) {
+                    $s->where('approval_status', 'approved')
+                        ->where(function ($f) {
+                            $f->where('is_partner', true)->orWhere('featured', true);
+                        });
+                });
+            })
+            ->with(['vendorSetting', 'vendorSetting.location'])
+            ->withCount(['products as product_count' => function ($q) {
+                $q->visible()->where('status', 'active');
+            }])
+            ->orderByDesc('rating_average')
+            ->take(3)
+            ->get();
+
+        // Fallback if nobody is flagged partner/featured yet
+        if ($premiumVendors->isEmpty()) {
+            $premiumVendors = Brand::where('is_active', true)
+                ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
+                ->with(['vendorSetting', 'vendorSetting.location'])
+                ->withCount(['products as product_count' => function ($q) {
+                    $q->visible()->where('status', 'active');
+                }])
+                ->orderByDesc('rating_average')
+                ->orderByDesc('product_count')
+                ->take(3)
+                ->get();
+        }
+
+        $premiumVendors = $premiumVendors->map(function ($brand) {
+            $vs = $brand->vendorSetting;
+            return [
+                'id' => $brand->id,
+                'name' => $brand->name,
+                'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
+                'logo' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
+                'verified' => $vs && $vs->approval_status === 'approved',
+                'rating' => (float) ($brand->rating_average ?? 0),
+                'reviews' => (int) ($brand->rating_count ?? 0),
+                'product_count' => (int) $brand->product_count,
+                'location' => $vs && $vs->location ? $vs->location->name : null,
+                'description' => $vs && $vs->description
+                    ? Str::limit(strip_tags($vs->description), 160)
+                    : null,
+            ];
+        });
+
+        // Limited-time deals: reuse the same logic pattern as index(), trimmed.
+        $limitedDeals = Deal::where('active', true)
+            ->where(function ($query) {
+                $query->whereNull('expiry_date')->orWhere('expiry_date', '>=', now());
+            })
+            ->with(['brand.vendorSetting'])
+            ->orderByDesc('discount')
+            ->take(8)
+            ->get()
+            ->map(function ($deal) {
+                $brand = $deal->brand;
+                if (!$brand || !$brand->is_active) return null;
+
+                $logoUrl = $brand->vendorSetting && $brand->vendorSetting->logo
+                    ? asset('storage/' . $brand->vendorSetting->logo)
+                    : null;
+
+                return [
+                    'id' => $deal->id,
+                    'name' => $brand->name,
+                    'logo' => $logoUrl,
+                    'rating' => (float) ($brand->rating_average ?? 0),
+                    'reviews' => (int) ($brand->rating_count ?? 0),
+                    'discount' => (int) $deal->discount,
+                    'code' => $deal->code,
+                    'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
+                ];
+            })
+            ->filter()
+            ->values();
+
+        // Fallback: brands with coupon codes
+        if ($limitedDeals->count() < 4) {
+            $brandsWithCoupons = Brand::where('is_active', true)
+                ->whereHas('vendorSetting', function ($q) {
+                    $q->where('approval_status', 'approved')
+                        ->whereNotNull('coupon_code')
+                        ->where('coupon_code', '!=', '');
+                })
+                ->with(['vendorSetting'])
+                ->take(8 - $limitedDeals->count())
+                ->get()
+                ->map(function ($brand) {
+                    $vs = $brand->vendorSetting;
+                    return [
+                        'id' => $brand->id,
+                        'name' => $brand->name,
+                        'logo' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
+                        'rating' => (float) ($brand->rating_average ?? 0),
+                        'reviews' => (int) ($brand->rating_count ?? 0),
+                        'discount' => 15,
+                        'code' => $vs->coupon_code ?? 'PMAP',
+                        'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
+                    ];
+                });
+            $limitedDeals = $limitedDeals->merge($brandsWithCoupons)->take(8)->values();
+        }
+
+        // Peptide encyclopedia highlights — categories with published education posts
+        $encyclopediaCategories = ProductCategory::where('is_active', true)
+            ->whereHas('educationPost', function ($q) {
+                $q->where('status', 'published')
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now());
+            })
+            ->withCount(['products as products_count' => function ($q) {
+                $q->visible()->where('status', 'active');
+            }])
+            ->with('educationPost')
+            ->orderByDesc('products_count')
+            ->take(6)
+            ->get()
+            ->map(function ($category) {
+                $post = $category->educationPost;
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'slug' => $category->slug,
+                    'description' => $post && $post->description
+                        ? Str::limit(strip_tags($post->description), 140)
+                        : ($category->description ? Str::limit(strip_tags($category->description), 140) : null),
+                    'products_count' => (int) $category->products_count,
+                    'image' => $category->image_url
+                        ? Storage::url('categories/' . $category->image_url)
+                        : null,
+                    'url' => '/encyclopedia/' . $category->slug,
+                ];
+            });
+
         // SEO
         $seo = [
             'title' => 'PeptideMap — The definitive platform for research peptide vendors',
@@ -498,8 +639,11 @@ class HomeController extends Controller
         return Inertia::render('Frontend/WelcomeV2', [
             'stats' => $stats,
             'verifiedVendors' => $verifiedVendors,
+            'premiumVendors' => $premiumVendors,
             'trendingProducts' => $trendingProducts,
             'tickerItems' => $tickerItems,
+            'limitedDeals' => $limitedDeals,
+            'encyclopediaCategories' => $encyclopediaCategories,
             'editorial' => $editorial,
             'seo' => $seo,
         ]);
