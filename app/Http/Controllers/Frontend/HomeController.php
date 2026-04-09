@@ -354,6 +354,24 @@ class HomeController extends Controller
     }
 
     /**
+     * Resolve an image URL, falling back to a deterministic picsum.photos
+     * placeholder when the real file is missing/unavailable. Temporary until
+     * the production storage tree is rsync'd across.
+     */
+    private function resolveImage(?string $path, string $folder, string $seed, int $w, int $h): ?string
+    {
+        if ($path) {
+            $full = storage_path('app/public/' . $folder . '/' . $path);
+            if (file_exists($full)) {
+                return asset('storage/' . $folder . '/' . $path);
+            }
+        }
+        // Fallback: picsum.photos with a deterministic seed so each blog/product
+        // always gets the same placeholder across reloads.
+        return "https://picsum.photos/seed/{$seed}/{$w}/{$h}";
+    }
+
+    /**
      * Preview of the redesigned homepage at /home-v2.
      * Independent data-fetching from index() so the live site stays untouched
      * while we iterate on the new design.
@@ -438,10 +456,20 @@ class HomeController extends Controller
                     ? ($product->brand->vendorSetting->approval_status === 'approved')
                     : false;
 
+                // Product image: may be a full URL (from scraper) or a local file path.
+                $imageUrl = $product->image_url;
+                if ($imageUrl && !str_starts_with($imageUrl, 'http')) {
+                    // Local file path stored in DB — try resolve to asset URL
+                    $full = storage_path('app/public/' . $imageUrl);
+                    $imageUrl = file_exists($full) ? asset('storage/' . $imageUrl) : null;
+                }
+                // Fallback placeholder keyed to product id
+                $placeholder = "https://picsum.photos/seed/pmap-prod-{$product->id}/600/600";
+
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
-                    'image_url' => $product->image_url,
+                    'image_url' => $imageUrl ?: $placeholder,
                     'url' => '/product/' . ($product->slug ?? 'product') . '/' . $product->id,
                     'brand_name' => $product->brand?->name,
                     'brand_verified' => $brandVerified,
@@ -449,7 +477,7 @@ class HomeController extends Controller
                     'original_price' => ($product->discount_price && $product->discount_price < $product->price)
                         ? $product->price
                         : null,
-                    'price_per_mg' => null, // Placeholder until we parse size_mg consistently
+                    'price_per_mg' => null,
                     'verified' => $brandVerified,
                     'lab_tested' => (bool) ($product->lab_tested ?? false),
                     'featured' => (bool) ($product->featured ?? false),
@@ -471,12 +499,13 @@ class HomeController extends Controller
             ->take(3)
             ->get()
             ->map(function ($blog) {
+                $image = $this->resolveImage($blog->image, 'blogs', "pmap-blog-{$blog->id}", 800, 500);
                 return [
                     'id' => $blog->id,
                     'title' => $blog->title,
                     'slug' => $blog->slug,
                     'excerpt' => $blog->description,
-                    'image' => $blog->image ? Storage::url('blogs/' . $blog->image) : null,
+                    'image' => $image,
                     'date' => $blog->published_at ? $blog->published_at->format('M d, Y') : null,
                     'read_time' => $blog->read_time ?? '5 min read',
                 ];
@@ -608,6 +637,7 @@ class HomeController extends Controller
             ->get()
             ->map(function ($category) {
                 $post = $category->educationPost;
+                $image = $this->resolveImage($category->image_url, 'categories', "pmap-cat-{$category->id}", 800, 500);
                 return [
                     'id' => $category->id,
                     'name' => $category->name,
@@ -616,9 +646,7 @@ class HomeController extends Controller
                         ? Str::limit(strip_tags($post->description), 140)
                         : ($category->description ? Str::limit(strip_tags($category->description), 140) : null),
                     'products_count' => (int) $category->products_count,
-                    'image' => $category->image_url
-                        ? Storage::url('categories/' . $category->image_url)
-                        : null,
+                    'image' => $image,
                     'url' => '/encyclopedia/' . $category->slug,
                 ];
             });

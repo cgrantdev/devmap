@@ -88,10 +88,10 @@ defineProps({
     default: null,
     /* shape: { url, image?, title?, subtitle?, alt?, target? } */
   },
-  title: { type: String, default: 'Your brand, front and center' },
+  title: { type: String, default: 'AD GOES HERE' },
   subtitle: {
     type: String,
-    default: 'Premium ad placement between sections. Inquire about rates.',
+    default: 'Premium mid-page placement. Inquire about rates.',
   },
   ctaLabel: { type: String, default: 'Advertise here' },
   ctaUrl: { type: String, default: '/become-a-vendor' },

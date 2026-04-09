@@ -4,14 +4,13 @@
     v-if="asTrigger"
     type="button"
     @click="open = true"
-    class="ui-focus flex items-center gap-2 h-10 px-3 rounded-[10px] bg-white border border-[color:var(--color-hairline)] text-sm text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] transition-colors min-w-[260px]"
+    class="ui-focus flex items-center gap-2 h-10 px-3.5 rounded-[10px] bg-white border border-[color:var(--color-hairline)] text-[13px] text-[color:var(--color-ink-subtle)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink-muted)] transition-colors min-w-[240px]"
   >
     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
       <circle cx="11" cy="11" r="8" />
       <path d="M21 21l-4.35-4.35" stroke-linecap="round" />
     </svg>
-    <span class="flex-1 text-left">Search vendors, compounds…</span>
-    <kbd class="ui-mono text-[10px] px-1.5 py-0.5 rounded border border-[color:var(--color-hairline)] bg-[color:var(--color-hairline-soft)]">⌘K</kbd>
+    <span class="flex-1 text-left">search vendors, compounds…</span>
   </button>
 
   <!-- Modal overlay -->

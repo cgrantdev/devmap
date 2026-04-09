@@ -3,11 +3,15 @@
     <button
       type="button"
       @click="open = !open"
-      class="ui-focus flex items-center gap-2 h-10 px-3 rounded-[10px] border border-[color:var(--color-hairline)] bg-white text-sm font-medium text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)] transition-colors"
+      class="ui-focus flex items-center gap-2 h-10 pl-2.5 pr-2 rounded-[10px] border border-[color:var(--color-hairline)] bg-white text-sm font-medium text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] transition-colors"
     >
-      <span class="text-base leading-none" aria-hidden="true">{{ selected.flag }}</span>
-      <span class="hidden md:inline">{{ selected.code }}</span>
-      <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+      <img
+        :src="flagUrl(selected.code, 40)"
+        :alt="`${selected.name} flag`"
+        class="w-5 h-[15px] rounded-[2px] object-cover shadow-[0_0_0_1px_rgba(0,0,0,0.04)]"
+      />
+      <span class="hidden md:inline text-[13px] font-semibold tracking-tight">{{ selected.code }}</span>
+      <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 9l6 6 6-6"/>
       </svg>
     </button>
@@ -40,7 +44,11 @@
                 : 'text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)]',
             ]"
           >
-            <span class="text-base leading-none" aria-hidden="true">{{ country.flag }}</span>
+            <img
+              :src="flagUrl(country.code, 40)"
+              :alt="`${country.name} flag`"
+              class="w-5 h-[15px] rounded-[2px] object-cover shadow-[0_0_0_1px_rgba(0,0,0,0.04)] flex-shrink-0"
+            />
             <span class="flex-1 truncate">{{ country.name }}</span>
             <svg
               v-if="selected.code === country.code"
@@ -65,19 +73,27 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const countries = [
-  { code: 'US', flag: '🇺🇸', name: 'United States' },
-  { code: 'CA', flag: '🇨🇦', name: 'Canada' },
-  { code: 'GB', flag: '🇬🇧', name: 'United Kingdom' },
-  { code: 'EU', flag: '🇪🇺', name: 'European Union' },
-  { code: 'AU', flag: '🇦🇺', name: 'Australia' },
-  { code: 'DE', flag: '🇩🇪', name: 'Germany' },
-  { code: 'FR', flag: '🇫🇷', name: 'France' },
-  { code: 'JP', flag: '🇯🇵', name: 'Japan' },
-  { code: 'SG', flag: '🇸🇬', name: 'Singapore' },
-  { code: 'AE', flag: '🇦🇪', name: 'United Arab Emirates' },
-  { code: 'MX', flag: '🇲🇽', name: 'Mexico' },
-  { code: 'BR', flag: '🇧🇷', name: 'Brazil' },
+  { code: 'US', name: 'United States' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'EU', name: 'European Union' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'FR', name: 'France' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'SG', name: 'Singapore' },
+  { code: 'AE', name: 'United Arab Emirates' },
+  { code: 'MX', name: 'Mexico' },
+  { code: 'BR', name: 'Brazil' },
 ]
+
+// flagcdn.com serves PNG flags at arbitrary widths. Free, fast, cached on CDN.
+// For EU we fall back to a generic star graphic since there's no ISO country code.
+function flagUrl(code, width = 40) {
+  if (!code) return ''
+  if (code === 'EU') return `https://flagcdn.com/w${width}/eu.png`
+  return `https://flagcdn.com/w${width}/${code.toLowerCase()}.png`
+}
 
 const STORAGE_KEY = 'pmap.country'
 const selected = ref(countries[0])
