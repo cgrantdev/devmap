@@ -36,39 +36,34 @@
             Back to Encyclopedia
           </button>
 
-          <div class="mb-6 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-            <!-- Title Section -->
-            <div>
-              <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
-              <p class="text-lg text-[color:var(--color-ink-muted)]">{{ subtitle }}</p>
+          <!-- Wikipedia-style: title + subtitle left, tags inline -->
+          <div class="mb-6">
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+              <span
+                v-for="(tag, index) in tags"
+                :key="index"
+                :class="getTagColorClass(tag)"
+                class="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.06em]"
+              >
+                {{ tag }}
+              </span>
             </div>
-
-            <!-- Tags and Research Info -->
-            <div class="flex flex-col gap-3 flex-shrink-0">
-              <div class="flex items-center gap-2">
-                <span
-                  v-for="(tag, index) in tags"
-                  :key="index"
-                  :class="getTagColorClass(tag)"
-                  class="px-3 py-1 text-sm font-medium"
-                >
-                  {{ tag }}
-                </span>
-              </div>
-              <div class="text-right">
-                <div class="text-[color:var(--color-ink-muted)] text-sm">Primary Research: University of Zagreb</div>
-                <a
-                  :href="primaryResearch.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] text-xs mt-1 transition-colors font-medium"
-                >
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M7 17L17 7M17 7H7M17 7v10"/>
-                  </svg>
-                  View Research
-                </a>
-              </div>
+            <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
+            <div class="flex flex-wrap items-center gap-4 text-sm text-[color:var(--color-ink-muted)]">
+              <span>{{ subtitle }}</span>
+              <span class="text-[color:var(--color-hairline)]">·</span>
+              <a
+                v-if="primaryResearch.url"
+                :href="primaryResearch.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors font-medium"
+              >
+                Primary Research
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 17L17 7M17 7H7M17 7v10"/>
+                </svg>
+              </a>
             </div>
           </div>
 
@@ -981,22 +976,18 @@ const formatMechanismItem = (item) => {
 
 // Function to get tag color classes based on tag value
 const getTagColorClass = (tag) => {
-  if (!tag) {
-    return 'bg-blue-500/20 text-blue-100 border border-blue-400/30'
-  }
-  
-  const tagLower = tag.toString().toLowerCase().trim()
-  
-  if (tagLower.includes('pentadecapeptide')) {
-    return 'bg-blue-500/20 text-blue-100 border border-blue-400/30'
-  } else if (tagLower.includes('research only') || tagLower === 'research only') {
-    return 'bg-amber-500/20 text-amber-100 border border-amber-400/30'
-  } else if (tagLower.includes('gastric origin') || tagLower === 'gastric origin') {
-    return 'bg-emerald-500/20 text-emerald-100 border border-emerald-400/30'
-  }
-  
-  // Default color (blue) if no match
-  return 'bg-blue-500/20 text-blue-100 border border-blue-400/30'
+  if (!tag) return 'bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] border border-[color:var(--color-accent-100)]'
+
+  const t = tag.toString().toLowerCase().trim()
+
+  if (t.includes('pentadecapeptide') || t.includes('peptide'))
+    return 'bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] border border-[color:var(--color-accent-100)]'
+  if (t.includes('research'))
+    return 'bg-[color:var(--color-caution-bg)] text-[#92400E] border border-[#FDE68A]'
+  if (t.includes('gastric') || t.includes('origin') || t.includes('healing'))
+    return 'bg-[color:var(--color-verified-bg)] text-[#065F46] border border-[#A7F3D0]'
+
+  return 'bg-[color:var(--color-hairline-soft)] text-[color:var(--color-ink-muted)] border border-[color:var(--color-hairline)]'
 }
 
 // Function to get color class for key points based on index
