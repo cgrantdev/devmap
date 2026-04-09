@@ -13,9 +13,10 @@
   </Head>
 
   <ModernLayout>
-    <!-- Light header -->
-    <section class="border-b border-[color:var(--color-hairline)]">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-8">
+    <!-- Header with subtle accent wash -->
+    <section class="relative overflow-hidden border-b border-[color:var(--color-hairline)]">
+      <div class="absolute inset-0 bg-gradient-to-br from-[color:var(--color-accent-50)] via-transparent to-transparent opacity-50 pointer-events-none" />
+      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-8">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Vendor network</div>
         <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">All Vendors</h1>
         <p class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-8">
@@ -78,6 +79,7 @@
             Top vendors
           </button>
         </div>
+      </div>
       </div>
     </section>
 

@@ -45,29 +45,24 @@ class EncyclopediaController extends Controller
 
     public function index(Request $request)
     {
-        // Get all active product categories with additional data
-        // Only include categories that have an education_post entry with research articles and is published
+        // Get all active peptide categories (not just ones with published articles).
+        // Exclude known non-peptide categories (accessories, supplies, etc.).
+        $excludeNames = [
+            'Bacteriostatic Water', 'Syringes', 'Accessories', 'Supplies',
+            'Mixing Kit', 'Mixing Kits', 'Alcohol Swabs',
+        ];
+
         $query = ProductCategory::where('is_active', true)
-            ->whereHas('educationPost', function ($epQuery) {
-                $epQuery->where('status', 'published')
-                    ->whereNotNull('published_at')
-                    ->where('published_at', '<=', now())
-                    ->where(function ($subQ) {
-                        $subQ->where(function ($researchQ) {
-                            $researchQ->whereNotNull('research_url')
-                                 ->where('research_url', '!=', '');
-                        })->orWhere(function ($researchQ) {
-                            $researchQ->whereNotNull('research_title')
-                                 ->where('research_title', '!=', '');
-                        });
-                    });
-            })
+            ->whereNotIn('name', $excludeNames)
             ->withCount([
                 'products as products_count' => function ($q) {
                     $q->visible()->where('status', 'active');
                 }
             ])
-            ->with('educationPost');
+            ->with(['educationPost' => function ($q) {
+                // Eagerly load the education post if it exists (published or not)
+                // so we can show "has article" vs "coming soon" in the UI
+            }]);
 
         // Apply search
         if ($request->has('search') && $request->search) {

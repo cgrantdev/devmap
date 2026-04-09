@@ -1,13 +1,31 @@
 <template>
   <ModernLayout>
-    <!-- Header Section -->
-    <section class="border-b border-[color:var(--color-hairline)]">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-8">
-        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Reference</div>
-        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">Peptide Encyclopedia</h1>
-        <p class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-8">
-          Your comprehensive guide to peptides. Learn about benefits, dosing protocols, safety information, and real user experiences.
-        </p>
+    <!-- Header Section — subtle accent wash -->
+    <section class="relative overflow-hidden border-b border-[color:var(--color-hairline)]">
+      <!-- Very subtle gradient wash (light, not dark) -->
+      <div class="absolute inset-0 bg-gradient-to-br from-[color:var(--color-accent-50)] via-transparent to-transparent opacity-60 pointer-events-none" />
+      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-8">
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-8">
+          <div>
+            <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Reference</div>
+            <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">Peptide Encyclopedia</h1>
+            <p class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
+              Research-grade profiles on every major compound. Mechanisms, protocols, vendor availability.
+            </p>
+          </div>
+          <!-- Inline stats -->
+          <div class="flex items-center gap-6 flex-shrink-0">
+            <div class="text-center">
+              <div class="ui-mono text-2xl font-bold text-[color:var(--color-ink)]">{{ categories.length }}</div>
+              <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Compounds</div>
+            </div>
+            <div class="w-px h-10 bg-[color:var(--color-hairline)]" />
+            <div class="text-center">
+              <div class="ui-mono text-2xl font-bold text-[color:var(--color-ink)]">{{ articlesCount }}</div>
+              <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Articles</div>
+            </div>
+          </div>
+        </div>
 
         <!-- Search Bar -->
         <div class="relative max-w-2xl">
@@ -16,7 +34,7 @@
             @input="handleSearch"
             type="text"
             placeholder="Search peptides by name or description..."
-            class="ui-focus w-full h-11 pl-11 pr-4 bg-white border border-[color:var(--color-hairline)] rounded-[10px] text-[color:var(--color-ink)] text-[15px] placeholder-[color:var(--color-ink-subtle)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/20 transition-all"
+            class="ui-focus w-full h-11 pl-11 pr-4 bg-white border border-[color:var(--color-hairline)] rounded-[10px] text-[color:var(--color-ink)] text-[15px] placeholder-[color:var(--color-ink-subtle)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/20 transition-all shadow-sm"
           />
           <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8" />
@@ -206,6 +224,12 @@ const filters = [
 ]
 
 // Filter peptides
+// Alias for the header stats
+const categories = computed(() => props.peptides || [])
+const articlesCount = computed(() =>
+  (props.peptides || []).filter(p => p.description && p.description.length > 50).length
+)
+
 const filteredPeptides = computed(() => {
   let result = props.peptides || []
 

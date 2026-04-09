@@ -1,8 +1,9 @@
 <template>
   <ModernLayout>
-    <!-- Header Section -->
-    <section class="border-b border-[color:var(--color-hairline)]">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-8">
+    <!-- Header Section with subtle warm wash -->
+    <section class="relative overflow-hidden border-b border-[color:var(--color-hairline)]">
+      <div class="absolute inset-0 bg-gradient-to-br from-[color:var(--color-caution-bg)] via-transparent to-transparent opacity-60 pointer-events-none" />
+      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-8">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-caution)] mb-3">Limited time</div>
         <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">Active Discount Codes</h1>
         <p class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-3">
@@ -14,6 +15,7 @@
           </svg>
           <span class="ui-mono">Use code PMAP at checkout</span>
         </div>
+      </div>
       </div>
     </section>
 
