@@ -36,82 +36,42 @@
             Back to Encyclopedia
           </button>
 
-          <!-- Two-column header: title left, compound info card right -->
-          <div class="flex flex-col lg:flex-row gap-6 mb-6">
-            <!-- Left: title + subtitle + tags -->
-            <div class="flex-1 min-w-0">
-              <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
-              <p class="text-lg text-[color:var(--color-ink-muted)] mb-4">{{ subtitle }}</p>
-              <div class="flex flex-wrap items-center gap-2">
-                <span
-                  v-for="(tag, index) in tags"
-                  :key="index"
-                  :class="getTagColorClass(tag)"
-                  class="px-2 py-0.5 text-[11px] font-semibold"
-                >
-                  {{ tag }}
-                </span>
-                <a
-                  v-if="primaryResearch.url"
-                  :href="primaryResearch.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors text-xs font-medium"
-                >
-                  Primary Research
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M7 17L17 7M17 7H7M17 7v10"/>
-                  </svg>
-                </a>
-              </div>
+          <!-- Title -->
+          <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
+          <p class="text-lg text-[color:var(--color-ink-muted)] mb-4">{{ subtitle }}</p>
 
-              <!-- Inline chain viz below tags (left-aligned, part of the title area) -->
-              <div v-if="residueLetters.length > 0" class="mt-5 overflow-x-auto pb-1">
-                <svg :width="residueLetters.length * 28 + 12" height="36">
-                  <line x1="20" y1="18" :x2="(residueLetters.length - 1) * 28 + 20" y2="18" stroke="var(--color-hairline)" stroke-width="1.5" />
-                  <g v-for="(letter, i) in residueLetters" :key="i">
-                    <circle :cx="i * 28 + 20" cy="18" r="9" :fill="residueColor(letter)" stroke="white" stroke-width="1.5" />
-                    <text :x="i * 28 + 20" y="21" text-anchor="middle" fill="white" font-size="7" font-weight="700" font-family="var(--font-mono)">{{ letter }}</text>
-                  </g>
-                </svg>
-                <p class="ui-mono text-[9px] text-[color:var(--color-ink-subtle)] mt-1">{{ aminoAcidSequence.sequence }}</p>
-              </div>
-            </div>
-
-            <!-- Right: compact compound info card -->
-            <div class="lg:w-64 flex-shrink-0 bg-white border border-[color:var(--color-hairline)] overflow-hidden self-start">
-              <!-- Tiny SVG at top -->
-              <div v-if="residueLetters.length > 0" class="relative h-24 bg-[color:var(--color-bg)] border-b border-[color:var(--color-hairline)] p-2">
-                <div class="absolute inset-0 pointer-events-none" :style="{ backgroundImage: 'radial-gradient(circle, #E4E4E7 0.5px, transparent 0.5px)', backgroundSize: '8px 8px' }" />
-                <svg viewBox="0 0 220 90" class="w-full h-full relative z-10">
-                  <line v-for="i in residueLetters.length - 1" :key="'b'+i" :x1="residuePositions[i-1]?.x" :y1="residuePositions[i-1]?.y" :x2="residuePositions[i]?.x" :y2="residuePositions[i]?.y" stroke="#D4D4D8" stroke-width="1" />
-                  <g v-for="(letter, i) in residueLetters" :key="'r'+i">
-                    <circle :cx="residuePositions[i]?.x" :cy="residuePositions[i]?.y" r="8" :fill="residueColor(letter)" stroke="white" stroke-width="1.5" />
-                    <text :x="residuePositions[i]?.x" :y="(residuePositions[i]?.y||0)+3" text-anchor="middle" fill="white" font-size="6" font-weight="700" font-family="var(--font-mono)">{{ letter }}</text>
-                  </g>
-                </svg>
-              </div>
-
-              <!-- Compact data rows -->
-              <div class="p-3 text-[11px]">
-                <div class="flex justify-between py-1.5" v-if="molecularInfo.formula"><span class="text-[color:var(--color-ink-muted)]">Formula</span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.formula }}</span></div>
-                <div class="border-t border-[color:var(--color-hairline-soft)]"></div>
-                <div class="flex justify-between py-1.5" v-if="molecularInfo.molecularWeight"><span class="text-[color:var(--color-ink-muted)]">Weight</span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.molecularWeight }}</span></div>
-                <div class="border-t border-[color:var(--color-hairline-soft)]"></div>
-                <div class="flex justify-between py-1.5" v-if="molecularInfo.casNumber"><span class="text-[color:var(--color-ink-muted)]">CAS</span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber }}</span></div>
-                <div v-if="aminoAcidSequence.residueCount > 0" class="border-t border-[color:var(--color-hairline-soft)]"></div>
-                <div class="flex justify-between py-1.5" v-if="aminoAcidSequence.residueCount > 0"><span class="text-[color:var(--color-ink-muted)]">Residues</span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.residueCount }}</span></div>
-                <div v-if="primaryResearch.institution" class="border-t border-[color:var(--color-hairline-soft)]"></div>
-                <div class="flex justify-between py-1.5 gap-2" v-if="primaryResearch.institution"><span class="text-[color:var(--color-ink-muted)]">Research</span><span class="font-medium text-[color:var(--color-ink)] text-right text-[10px]">{{ primaryResearch.institution }}</span></div>
-              </div>
-
-              <div class="px-3 pb-3">
-                <a :href="`/compare`" class="ui-focus flex items-center justify-center gap-1 w-full h-8 text-[11px] font-semibold text-[color:var(--color-accent-600)] border border-[color:var(--color-hairline)] hover:border-[color:var(--color-accent-400)] hover:bg-[color:var(--color-accent-50)] transition-all">
-                  Compare prices →
-                </a>
-              </div>
-            </div>
+          <!-- Tags row -->
+          <div class="flex flex-wrap items-center gap-2 mb-4">
+            <span v-for="(tag, index) in tags" :key="index" :class="getTagColorClass(tag)" class="px-2 py-0.5 text-[11px] font-semibold">{{ tag }}</span>
+            <a v-if="primaryResearch.url" :href="primaryResearch.url" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] text-xs font-medium">
+              Primary Research <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+            </a>
           </div>
+
+          <!-- Molecular data + chain — one compact horizontal strip -->
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[color:var(--color-ink-muted)] pb-4 mb-2 border-b border-[color:var(--color-hairline)]">
+            <span v-if="molecularInfo.formula">Formula <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.formula }}</span></span>
+            <span v-if="molecularInfo.molecularWeight" class="text-[color:var(--color-ink-subtle)]">·</span>
+            <span v-if="molecularInfo.molecularWeight"><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.molecularWeight }}</span></span>
+            <span v-if="molecularInfo.casNumber" class="text-[color:var(--color-ink-subtle)]">·</span>
+            <span v-if="molecularInfo.casNumber">CAS <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber }}</span></span>
+            <span v-if="aminoAcidSequence.residueCount > 0" class="text-[color:var(--color-ink-subtle)]">·</span>
+            <span v-if="aminoAcidSequence.residueCount > 0"><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.residueCount }}</span> residues</span>
+            <span v-if="primaryResearch.institution" class="text-[color:var(--color-ink-subtle)]">·</span>
+            <span v-if="primaryResearch.institution">Research: <span class="font-medium text-[color:var(--color-ink)]">{{ primaryResearch.institution }}</span></span>
+          </div>
+
+          <!-- Chain visualization — single line, compact -->
+          <div v-if="residueLetters.length > 0" class="mb-1 overflow-x-auto">
+            <svg :width="residueLetters.length * 26 + 10" height="32">
+              <line x1="18" y1="16" :x2="(residueLetters.length - 1) * 26 + 18" y2="16" stroke="var(--color-hairline)" stroke-width="1.5" />
+              <g v-for="(letter, i) in residueLetters" :key="i">
+                <circle :cx="i * 26 + 18" cy="16" r="8" :fill="residueColor(letter)" stroke="white" stroke-width="1.5" />
+                <text :x="i * 26 + 18" y="19" text-anchor="middle" fill="white" font-size="6.5" font-weight="700" font-family="var(--font-mono)">{{ letter }}</text>
+              </g>
+            </svg>
+          </div>
+          <p v-if="aminoAcidSequence.sequence" class="ui-mono text-[9px] text-[color:var(--color-ink-subtle)] mb-4 break-all">{{ aminoAcidSequence.sequence }}</p>
         </div>
       </div>
 
