@@ -80,7 +80,6 @@
           </button>
         </div>
       </div>
-      </div>
     </section>
 
     <!-- Results -->
