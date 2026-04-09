@@ -125,7 +125,7 @@ const currentYear = new Date().getFullYear()
 
 const navLinks = [
   { href: '/vendors', label: 'Vendors' },
-  { href: '/products', label: 'Compounds' },
+  { href: '/products', label: 'Peptides' },
   { href: '/compare', label: 'Compare' },
   { href: '/encyclopedia', label: 'Encyclopedia' },
   { href: '/news', label: 'Research' },
