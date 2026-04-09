@@ -82,31 +82,32 @@
           </template>
         </SectionHeader>
 
-        <!-- List rows, not card grid — matches /vendors page -->
-        <div class="space-y-3">
+        <!-- Card grid — same style as /vendors page -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <a
-            v-for="(vendor, idx) in verifiedVendors.slice(0, 6)"
+            v-for="vendor in verifiedVendors.slice(0, 6)"
             :key="vendor.id"
             :href="vendor.url"
-            class="ui-focus group flex items-center gap-4 md:gap-5 p-4 rounded-[14px] border border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-sm)] transition-all duration-[180ms]"
+            class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
           >
-            <div class="w-11 h-11 rounded-[10px] flex-shrink-0 overflow-hidden flex items-center justify-center" :style="{ background: vendorGradient(vendor.name) }">
-              <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-full object-contain p-1" loading="lazy" />
-              <span v-else class="ui-display text-white text-sm font-bold">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
+            <div class="aspect-[16/9] bg-[color:var(--color-bg)] border-b border-[color:var(--color-hairline)] flex items-center justify-center p-8">
+              <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-[75%] object-contain" loading="lazy" />
+              <span v-else class="ui-display text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
             </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="ui-display text-[15px] font-semibold text-[color:var(--color-ink)] truncate tracking-tight">{{ vendor.name }}</h3>
-              <div class="flex items-center gap-3 text-xs text-[color:var(--color-ink-muted)] mt-0.5">
-                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendor.product_count }}</span> compounds
+            <div class="p-5 flex-1 flex flex-col gap-3">
+              <h3 class="ui-display text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight">{{ vendor.name }}</h3>
+              <div class="flex items-center gap-1.5 text-xs">
+                <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(vendor.rating_average) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ (vendor.rating_average || 0).toFixed(1) }}</span>
+                <span class="text-[color:var(--color-ink-subtle)]">({{ vendor.rating_count || 0 }})</span>
+              </div>
+              <div class="mt-auto pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-xs text-[color:var(--color-ink-muted)]">
+                <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendor.product_count }}</span> compounds</span>
+                <span class="text-[color:var(--color-accent-600)] font-semibold group-hover:translate-x-0.5 transition-transform duration-[180ms] flex items-center gap-0.5">
+                  View <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </span>
               </div>
             </div>
-            <div class="hidden sm:flex items-center gap-1.5 flex-shrink-0">
-              <div class="flex gap-0.5">
-                <svg v-for="n in 5" :key="n" class="w-3 h-3" :class="n <= Math.round(vendor.rating_average) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-              </div>
-              <span class="ui-mono text-sm font-bold text-[color:var(--color-ink)]">{{ (vendor.rating_average || 0).toFixed(1) }}</span>
-            </div>
-            <svg class="w-4 h-4 text-[color:var(--color-ink-subtle)] group-hover:text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-all flex-shrink-0 hidden md:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           </a>
         </div>
       </div>

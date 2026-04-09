@@ -41,9 +41,9 @@
             <div class="flex-1 min-w-0">
               <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
               <p class="text-lg text-[color:var(--color-ink-muted)] mb-4">{{ subtitle }}</p>
-              <div class="flex flex-wrap items-center gap-2 mb-3">
-                <span v-for="(tag, index) in tags" :key="index" :class="getTagColorClass(tag)" class="px-2 py-0.5 text-[11px] font-semibold">{{ tag }}</span>
-              </div>
+              <!-- Short TLDR intro -->
+              <p v-if="description" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4 line-clamp-2">{{ description }}</p>
+
               <div v-if="primaryResearch.institution" class="text-sm text-[color:var(--color-ink-muted)]">
                 Primary Research: <span class="font-medium text-[color:var(--color-ink)]">{{ primaryResearch.institution }}</span>
                 <a v-if="primaryResearch.url" :href="primaryResearch.url" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 ml-2 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] text-xs font-medium">
@@ -104,17 +104,6 @@
             </div>
           </div>
 
-          <!-- Chain viz below the data bar -->
-          <div v-if="residueLetters.length > 0" class="mt-4 pt-4 border-t border-[color:var(--color-hairline)] overflow-x-auto">
-            <svg :width="residueLetters.length * 26 + 10" height="32">
-              <line x1="18" y1="16" :x2="(residueLetters.length - 1) * 26 + 18" y2="16" stroke="var(--color-hairline)" stroke-width="1.5" />
-              <g v-for="(letter, i) in residueLetters" :key="i">
-                <circle :cx="i * 26 + 18" cy="16" r="8" :fill="residueColor(letter)" stroke="white" stroke-width="1.5" />
-                <text :x="i * 26 + 18" y="19" text-anchor="middle" fill="white" font-size="6.5" font-weight="700" font-family="var(--font-mono)">{{ letter }}</text>
-              </g>
-            </svg>
-            <p v-if="aminoAcidSequence.sequence" class="ui-mono text-[9px] text-[color:var(--color-ink-subtle)] mt-1 break-all">{{ aminoAcidSequence.sequence }}</p>
-          </div>
         </div>
       </div>
 
@@ -1457,6 +1446,10 @@ const props = defineProps({
     required: true
   },
   categoryName: {
+    type: String,
+    default: ''
+  },
+  description: {
     type: String,
     default: ''
   },
