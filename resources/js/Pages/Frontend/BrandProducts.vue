@@ -1,131 +1,73 @@
 <template>
   <ModernLayout>
-    <!-- Brand Detail Section -->
+    <!-- Vendor Detail -->
     <div class="min-h-screen">
-      <!-- Facebook-style cover photo banner -->
-      <div class="relative h-48 md:h-56 overflow-hidden" :style="{ background: coverGradient }">
-        <!-- Grid texture overlay -->
+      <!-- Cover banner — flat gradient, no overlap, sharp -->
+      <div class="relative h-36 md:h-44" :style="{ background: coverGradient }">
         <div class="absolute inset-0 opacity-[0.04]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '28px 28px' }" />
-        <!-- Glow orb -->
-        <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-white/10 blur-3xl pointer-events-none" />
-        <!-- Partner chip -->
         <div v-if="brand.is_partner" class="absolute top-4 right-4 z-10">
-          <span class="ui-mono text-[10px] uppercase tracking-[0.12em] px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white border border-white/20 font-semibold">Partner</span>
+          <span class="ui-mono text-[10px] uppercase tracking-[0.12em] px-2.5 py-1 bg-white/15 backdrop-blur-sm text-white border border-white/15 font-semibold">Partner</span>
         </div>
       </div>
 
-      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 -mt-16 pb-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-2 flex">
-            <div class="rounded-[16px] shadow-[var(--shadow-md)] p-8 md:p-10 w-full relative bg-white border border-[color:var(--color-hairline)]">
-              <div class="flex flex-col md:flex-row gap-6">
-                <div class="flex-shrink-0 -mt-20 md:-mt-16">
-                  <div class="relative w-24 h-24 bg-white rounded-[14px] border-4 border-white shadow-lg flex items-center justify-center overflow-hidden" :style="{ background: brand.logo ? 'white' : coverGradient }">
-                    <img
-                      v-if="brand.logo"
-                      :src="brand.logo"
-                      :alt="brand.name + ' logo'"
-                      class="w-full h-full object-contain p-2"
-                      loading="lazy"
-                    />
-                    <span v-else class="text-2xl font-bold text-white select-none ui-display">{{ brand.initials }}</span>
-                  </div>
-                </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex flex-wrap items-center gap-3 mb-3">
-                      <h1 class="text-3xl text-slate-800">{{ brand.name }}</h1>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-4 mb-4">
-                      <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-50">
-                        <!-- Rating -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-4 h-4 fill-yellow-400 text-yellow-400" aria-hidden="true">
-                          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
-                        </svg>
-                        <span class="text-gray-900">{{ brand.rating || 0 }}</span>
-                        <span class="text-gray-500 text-sm">({{ brand.reviews || totalReviews }})</span>
-                      </div>
-                      <div class="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full text-gray-600 bg-gray-50">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucid lucid-map-pin w-4 h-4" aria-hidden="true">
-                          <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
-                          <circle cx="12" cy="10" r="3"></circle>
-                        </svg>
-                        {{ brand.location }}
-                      </div>
-                    </div>
-                    <p class="text-gray-600 mb-5 line-clamp-3">
-                      {{ brand.description }}
-                    </p>
-                    <div class="flex flex-wrap gap-3">
-                      <a :href="brand.shop_url || '#'" :target="brand.shop_url ? '_blank' : '_self'" rel="noopener noreferrer" class="px-6 py-3 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg bg-slate-700 hover:bg-slate-600 text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-4 h-4" aria-hidden="true">
-                          <path d="M15 3h6v6"></path>
-                          <path d="M10 14 21 3"></path>
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        </svg>
-                        Visit Website
-                      </a>
-                      <button 
-                        @click="copyDiscountCode"
-                        class="px-6 py-3 rounded-lg flex items-center gap-3 transition-all border-[3px] border-dashed border-green-600 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 group cursor-pointer"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag w-5 h-5" aria-hidden="true">
-                          <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path>
-                          <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                        </svg>
-                        <span class="text-sm font-semibold">Use Code:</span>
-                        <span class="font-mono tracking-wider font-bold">{{ brand.discount_code || 'PMAP' }}</span>
-                        <!-- <span class="text-xs opacity-75 ml-auto">Click to Copy</span> -->
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      <!-- Vendor header — directly below banner, no overlap, no floating cards -->
+      <div class="border-b border-[color:var(--color-hairline)] bg-white">
+        <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-6">
+          <div class="flex flex-col md:flex-row md:items-start gap-5">
+            <!-- Logo -->
+            <div class="w-16 h-16 flex-shrink-0 border border-[color:var(--color-hairline)] bg-white flex items-center justify-center overflow-hidden" :style="{ background: brand.logo ? 'white' : coverGradient }">
+              <img v-if="brand.logo" :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain p-1.5" loading="lazy" />
+              <span v-else class="text-xl font-bold text-white select-none ui-display">{{ brand.initials }}</span>
             </div>
 
-            <div class="lg:col-span-1 flex">
-              <div class="rounded-2xl shadow-lg p-6 w-full bg-white">
-                <div class="flex items-center gap-2 mb-4">
-                  <div class="p-2 rounded-lg bg-slate-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info w-4 h-4 text-white" aria-hidden="true">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <path d="M12 16v-4"></path>
-                      <path d="M12 8h.01"></path>
-                    </svg>
-                  </div>
-                  <h3 class="text-slate-800">Contact Info</h3>
+            <!-- Name + meta -->
+            <div class="flex-1 min-w-0">
+              <h1 class="ui-display text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-2">{{ brand.name }}</h1>
+              <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[color:var(--color-ink-muted)]">
+                <div class="flex items-center gap-1.5">
+                  <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(brand.rating || 0) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.rating || '0.0' }}</span>
+                  <span>({{ brand.reviews || totalReviews }})</span>
                 </div>
-                <div class="space-y-2">
-                  <a href="`mailto:${brand.contact_email || 'info@peptidexyz.com'}`" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 transition-colors group">
-                    <div class="bg-slate-100 p-2 rounded-lg group-hover:bg-slate-700 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail w-4 h-4 text-slate-700 group-hover:text-white" aria-hidden="true">
-                        <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path>
-                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                      </svg>
-                    </div>
-                    <span class="text-sm text-slate-600 group-hover:text-slate-700 truncate">{{ brand.contact_email || 'info@peptidexyz.com' }}</span>
-                  </a>
-                  <a href="`tel:${brand.phone_number || '222-222-2222'}`" class="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 transition-colors group">
-                    <div class="bg-slate-100 p-2 rounded-lg group-hover:bg-slate-700 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone w-4 h-4 text-slate-700 group-hover:text-white" aria-hidden="true">
-                        <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"></path>
-                      </svg>
-                    </div>
-                    <span class="text-sm text-slate-600 group-hover:text-slate-700">{{ brand.phone_number || '222-222-2222' }}</span>
-                  </a>
-                  <div class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-50">
-                    <div class="bg-slate-200 p-2 rounded-lg">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-4 h-4 text-slate-700" aria-hidden="true">
-                        <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                      </svg>
-                    </div>
-                    <span class="text-sm text-slate-600">{{ brand.location }}</span>
-                  </div>
-                </div>
+                <span v-if="brand.location" class="flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {{ brand.location }}
+                </span>
+                <span v-if="brand.contact_email" class="flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 01-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                  {{ brand.contact_email }}
+                </span>
+                <span v-if="brand.phone_number" class="flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                  {{ brand.phone_number }}
+                </span>
               </div>
+              <p v-if="brand.description" class="mt-3 text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl line-clamp-2">
+                {{ brand.description }}
+              </p>
+            </div>
+
+            <!-- CTAs -->
+            <div class="flex items-center gap-3 flex-shrink-0 md:pt-1">
+              <a
+                :href="brand.shop_url || '#'"
+                :target="brand.shop_url ? '_blank' : '_self'"
+                rel="noopener noreferrer"
+                class="ui-focus inline-flex items-center gap-2 h-10 px-5 text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_8px_20px_-8px_rgba(79,70,229,0.4)] hover:-translate-y-[1px] transition-all"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                Visit website
+              </a>
+              <button
+                @click="copyDiscountCode"
+                class="ui-focus inline-flex items-center gap-2 h-10 px-4 border border-dashed border-[color:var(--color-hairline)] text-[13px] font-semibold text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)] transition-all"
+              >
+                <span class="ui-mono">{{ brand.discount_code || 'PMAP' }}</span>
+                <span class="text-[color:var(--color-ink-subtle)]">· copy</span>
+              </button>
             </div>
           </div>
-        </div> 
+        </div>
       </div>
 
       <!-- Product Listing Section -->
