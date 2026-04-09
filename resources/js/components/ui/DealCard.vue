@@ -1,26 +1,29 @@
 <template>
   <Card hoverable radius="lg" :padding="false" class="group relative flex flex-col">
-    <!-- Top band: logo centered + prominent, with gradient background -->
-    <div class="relative overflow-hidden">
+    <!-- Top band: vendor logo IS the banner, centered on gradient -->
+    <div class="relative aspect-[16/9] overflow-hidden">
       <div class="absolute inset-0" :style="{ background: bandGradient }" />
-      <div
-        class="absolute inset-0 opacity-[0.08] pointer-events-none"
-        :style="{
-          backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)',
-          backgroundSize: '20px 20px',
-        }"
-      />
+      <!-- Centered logo -->
+      <div class="absolute inset-0 flex items-center justify-center p-5">
+        <img
+          v-if="deal.logo"
+          :src="deal.logo"
+          :alt="`${deal.name} logo`"
+          class="max-h-full max-w-[65%] object-contain drop-shadow-lg"
+          loading="lazy"
+        />
+        <span
+          v-else
+          class="ui-display text-white/90 text-3xl font-bold tracking-tight drop-shadow-lg"
+        >
+          {{ dealInitial }}
+        </span>
+      </div>
       <!-- Discount badge top-right -->
       <div class="absolute top-3 right-3 z-10">
         <span class="ui-mono text-[11px] font-bold px-2 py-1 rounded-md bg-white/95 backdrop-blur text-[color:var(--color-ink)]">
           -{{ deal.discount }}%
         </span>
-      </div>
-
-      <div class="relative flex flex-col items-center pt-8 pb-5">
-        <div class="p-1.5 bg-white rounded-[14px] border border-white/20 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.25)]">
-          <VendorLogo :src="deal.logo" :name="deal.name" size="lg" radius="md" />
-        </div>
       </div>
     </div>
 
@@ -82,10 +85,17 @@
 <script setup>
 import { ref, computed } from 'vue'
 import Card from './Card.vue'
-import VendorLogo from './VendorLogo.vue'
 
 const props = defineProps({
   deal: { type: Object, required: true },
+})
+
+const dealInitial = computed(() => {
+  const n = (props.deal.name || '?').trim()
+  const parts = n.split(/\s+/)
+  return parts.length >= 2
+    ? (parts[0][0] + parts[1][0]).toUpperCase()
+    : n.slice(0, 2).toUpperCase()
 })
 
 const copied = ref(false)

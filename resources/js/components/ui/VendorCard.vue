@@ -4,22 +4,26 @@
     class="ui-focus group relative flex flex-col rounded-[14px] border border-[color:var(--color-hairline)] bg-white overflow-hidden ui-lift"
     :aria-label="vendor.name"
   >
-    <!-- Banner: vendor logo as blurred background fill -->
-    <div class="relative aspect-[16/6] overflow-hidden">
-      <!-- Base gradient -->
+    <!-- Banner: vendor logo centered on gradient background -->
+    <div class="relative aspect-[16/7] overflow-hidden">
       <div class="absolute inset-0" :style="{ background: coverGradient }" />
-      <!-- Large blurred logo behind (if logo exists) — creates branded banner effect -->
-      <img
-        v-if="vendor.logo_url"
-        :src="vendor.logo_url"
-        alt=""
-        class="absolute inset-0 w-full h-full object-contain scale-[1.8] blur-[40px] opacity-30 pointer-events-none"
-        loading="lazy"
-      />
-      <!-- Subtle overlay for depth -->
-      <div class="absolute inset-0 bg-gradient-to-br from-black/20 to-transparent pointer-events-none" />
-
-      <!-- Partner chip (only if actually premium) -->
+      <!-- Centered logo as the banner focal point -->
+      <div class="absolute inset-0 flex items-center justify-center p-6">
+        <img
+          v-if="vendor.logo_url"
+          :src="vendor.logo_url"
+          :alt="`${vendor.name} logo`"
+          class="max-h-full max-w-[70%] object-contain drop-shadow-lg"
+          loading="lazy"
+        />
+        <span
+          v-else
+          class="ui-display text-white/90 text-4xl font-bold tracking-tight drop-shadow-lg"
+        >
+          {{ initial }}
+        </span>
+      </div>
+      <!-- Partner chip -->
       <div v-if="vendor.is_partner" class="absolute top-3 right-3 z-10">
         <span class="ui-mono text-[9px] uppercase tracking-[0.14em] px-2 py-0.5 rounded-full bg-white/15 backdrop-blur-sm text-white border border-white/20 font-semibold">
           Partner
@@ -27,20 +31,13 @@
       </div>
     </div>
 
-    <!-- Header row: logo floats over banner -->
-    <div class="relative px-5 -mt-10">
-      <div class="inline-block p-1 bg-white rounded-[14px] border border-[color:var(--color-hairline)] shadow-sm">
-        <VendorLogo :src="vendor.logo_url" :name="vendor.name" size="lg" radius="md" />
-      </div>
-    </div>
-
     <!-- Body -->
-    <div class="px-5 pt-4 pb-5 flex-1 flex flex-col gap-4">
+    <div class="px-5 pt-5 pb-5 flex-1 flex flex-col gap-4">
       <div>
         <h3 class="ui-display text-[19px] font-semibold text-[color:var(--color-ink)] leading-tight tracking-tight">
           {{ vendor.name }}
         </h3>
-        <div v-if="vendor.tagline" class="text-xs text-[color:var(--color-ink-muted)] mt-0.5 line-clamp-1">
+        <div v-if="vendor.tagline" class="text-xs text-[color:var(--color-ink-muted)] mt-1 line-clamp-1">
           {{ vendor.tagline }}
         </div>
       </div>
@@ -120,14 +117,15 @@ const props = defineProps({
   vendor: {
     type: Object,
     required: true,
-    /* shape: {
-      id, name, logo_url, url, tagline?,
-      rating_average, rating_count,
-      product_count, location, founded_year?,
-      last_tested_label?,
-      is_partner?,
-    } */
   },
+})
+
+const initial = computed(() => {
+  const n = (props.vendor.name || '?').trim()
+  const parts = n.split(/\s+/)
+  return parts.length >= 2
+    ? (parts[0][0] + parts[1][0]).toUpperCase()
+    : n.slice(0, 2).toUpperCase()
 })
 
 const coverGradient = computed(() => {
