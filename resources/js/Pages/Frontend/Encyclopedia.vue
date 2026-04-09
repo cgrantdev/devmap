@@ -1,14 +1,11 @@
 <template>
   <ModernLayout>
     <!-- Header Section -->
-    <section class="relative overflow-hidden border-b border-[color:var(--color-hairline)]">
-      <div class="absolute inset-0 bg-gradient-to-br from-[#0F172A] to-[#4F46E5]" />
-      <div class="absolute inset-0 opacity-[0.03]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '40px 40px' }" />
-      <div class="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-[color:var(--color-accent-500)] opacity-[0.15] blur-[100px] pointer-events-none" />
-      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-10 pb-14">
-        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-400)] mb-3">Reference</div>
-        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-white mb-4">Peptide Encyclopedia</h1>
-        <p class="text-lg text-white/70 leading-relaxed max-w-2xl mb-8">
+    <section class="border-b border-[color:var(--color-hairline)]">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-8">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Reference</div>
+        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">Peptide Encyclopedia</h1>
+        <p class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-8">
           Your comprehensive guide to peptides. Learn about benefits, dosing protocols, safety information, and real user experiences.
         </p>
 
@@ -19,9 +16,9 @@
             @input="handleSearch"
             type="text"
             placeholder="Search peptides by name or description..."
-            class="w-full pl-12 pr-4 py-3.5 bg-white/95 backdrop-blur rounded-[12px] text-[color:var(--color-ink)] border border-white/20 shadow-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)] text-[15px]"
+            class="ui-focus w-full h-11 pl-11 pr-4 bg-white border border-[color:var(--color-hairline)] rounded-[10px] text-[color:var(--color-ink)] text-[15px] placeholder-[color:var(--color-ink-subtle)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/20 transition-all"
           />
-          <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.35-4.35" />
           </svg>

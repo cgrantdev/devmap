@@ -13,24 +13,16 @@
   </Head>
 
   <ModernLayout>
-    <!-- Dark gradient hero -->
-    <section class="relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-br from-[#0A0B0E] via-[#111827] to-[#4F46E5]" />
-      <div class="absolute inset-0 opacity-[0.025]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '48px 48px' }" />
-      <div class="absolute top-1/3 right-[5%] w-[500px] h-[500px] rounded-full bg-[color:var(--color-accent-500)] opacity-[0.12] blur-[120px] pointer-events-none" />
-
-      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-12 pb-16">
-        <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-[color:var(--color-accent-400)] mb-3">
-          Vendor network
-        </div>
-        <h1 class="ui-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-[-0.025em] text-white mb-4 leading-[0.98]">
-          All Vendors
-        </h1>
-        <p class="text-lg text-white/60 leading-relaxed max-w-2xl mb-10">
-          Compare vendors, read reviews, and find the best peptide sources — all in one place.
+    <!-- Light header -->
+    <section class="border-b border-[color:var(--color-hairline)]">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-8">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Vendor network</div>
+        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">All Vendors</h1>
+        <p class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-8">
+          Compare vendors, read reviews, and find the best peptide sources.
         </p>
 
-        <!-- Search + sort inline on the hero -->
+        <!-- Search + sort -->
         <div class="flex flex-col sm:flex-row gap-3 max-w-3xl">
           <div class="relative flex-1">
             <input
@@ -38,25 +30,25 @@
               @input="handleSearchInput"
               type="text"
               placeholder="Search vendors by name or location…"
-              class="ui-focus w-full h-12 pl-11 pr-4 bg-white/[0.08] border border-white/[0.12] rounded-[12px] text-white text-[15px] placeholder-white/40 backdrop-blur-sm focus:bg-white/[0.12] focus:border-white/25 focus:outline-none focus:ring-0 transition-colors"
+              class="ui-focus w-full h-11 pl-10 pr-4 bg-white border border-[color:var(--color-hairline)] rounded-[10px] text-[color:var(--color-ink)] text-[15px] placeholder-[color:var(--color-ink-subtle)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/20 transition-all"
             />
-            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
             </svg>
           </div>
           <select
             :value="sortValue"
             @change="handleSortChange"
-            class="ui-focus h-12 px-4 bg-white/[0.08] border border-white/[0.12] rounded-[12px] text-white text-[14px] backdrop-blur-sm focus:outline-none focus:ring-0 cursor-pointer appearance-none"
+            class="ui-focus h-11 px-4 bg-white border border-[color:var(--color-hairline)] rounded-[10px] text-[color:var(--color-ink)] text-[14px] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/20 cursor-pointer"
           >
-            <option value="rating|desc" class="text-[color:var(--color-ink)]">Highest Rated</option>
-            <option value="reviews|desc" class="text-[color:var(--color-ink)]">Most Reviews</option>
-            <option value="name|asc" class="text-[color:var(--color-ink)]">Alphabetical</option>
+            <option value="rating|desc">Highest Rated</option>
+            <option value="reviews|desc">Most Reviews</option>
+            <option value="name|asc">Alphabetical</option>
           </select>
         </div>
 
-        <!-- Filter chips row -->
-        <div class="flex flex-wrap items-center gap-2 mt-5">
+        <!-- Filter chips -->
+        <div class="flex flex-wrap items-center gap-2 mt-4">
           <button
             v-for="loc in locationFilters"
             :key="loc.value"
@@ -64,20 +56,20 @@
             :class="[
               'ui-focus h-8 px-3.5 rounded-full text-[12px] font-semibold transition-all duration-200 border',
               selectedFilters.location === loc.value
-                ? 'bg-white text-[color:var(--color-ink)] border-white shadow-sm'
-                : 'bg-white/[0.06] text-white/60 border-white/[0.1] hover:bg-white/[0.1] hover:text-white/80',
+                ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
+                : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)]',
             ]"
           >
             {{ loc.label }}
           </button>
-          <span class="text-white/20 text-sm mx-1">|</span>
+          <span class="text-[color:var(--color-hairline)] text-sm mx-1">|</span>
           <button
             @click="toggleTopVendors"
             :class="[
               'ui-focus h-8 px-3.5 rounded-full text-[12px] font-semibold transition-all duration-200 border flex items-center gap-1.5',
               selectedFilters.topVendorsOnly
-                ? 'bg-[color:var(--color-accent-500)] text-white border-[color:var(--color-accent-400)]'
-                : 'bg-white/[0.06] text-white/60 border-white/[0.1] hover:bg-white/[0.1] hover:text-white/80',
+                ? 'bg-[color:var(--color-accent-600)] text-white border-[color:var(--color-accent-600)]'
+                : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)]',
             ]"
           >
             <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">

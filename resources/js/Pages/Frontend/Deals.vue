@@ -1,17 +1,14 @@
 <template>
   <ModernLayout>
     <!-- Header Section -->
-    <section class="relative overflow-hidden border-b border-[color:var(--color-hairline)]">
-      <div class="absolute inset-0 bg-gradient-to-br from-[#0F172A] to-[#7C3AED]" />
-      <div class="absolute inset-0 opacity-[0.03]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '40px 40px' }" />
-      <div class="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-[color:var(--color-caution)] opacity-[0.12] blur-[100px] pointer-events-none" />
-      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-10 pb-14">
+    <section class="border-b border-[color:var(--color-hairline)]">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-8">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-caution)] mb-3">Limited time</div>
-        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-white mb-4">Active Discount Codes</h1>
-        <p class="text-lg text-white/70 leading-relaxed max-w-2xl mb-4">
+        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">Active Discount Codes</h1>
+        <p class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-3">
           Save up to 25% on premium research peptides. All discounts verified and updated regularly.
         </p>
-        <div class="flex items-center gap-2 text-white/50 text-sm">
+        <div class="flex items-center gap-2 text-[color:var(--color-ink-subtle)] text-sm">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 6v6l4 2" /><circle cx="12" cy="12" r="10" />
           </svg>

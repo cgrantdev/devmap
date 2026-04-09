@@ -92,42 +92,27 @@
       />
     </section>
 
-    <!-- TRENDING COMPOUNDS — FULL-BLEED DARK SECTION               -->
+    <!-- TRENDING COMPOUNDS                                         -->
     <!-- ========================================================= -->
-    <section class="relative bg-[#0A0B0E] text-white overflow-hidden">
-      <!-- Decorative orbs -->
-      <div class="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-[color:var(--color-accent-500)] opacity-[0.12] blur-[120px] pointer-events-none" />
-      <div class="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-[color:var(--color-biotech-500)] opacity-[0.12] blur-[120px] pointer-events-none" />
-      <div
-        class="absolute inset-0 opacity-[0.025] pointer-events-none"
-        :style="{
-          backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-        }"
-      />
-
-      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 py-20 lg:py-24">
-        <div class="flex items-end justify-between gap-6 flex-wrap mb-10 md:mb-14">
-          <div class="max-w-2xl">
-            <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-[color:var(--color-biotech-400)] mb-3">
-              Most researched
-            </div>
-            <h2 class="ui-display text-[32px] md:text-5xl font-semibold tracking-[-0.02em] text-white leading-[1.05]">
-              Trending compounds
-            </h2>
-            <p class="mt-3 text-white/60 text-base leading-relaxed max-w-xl">
-              Highest-rated research peptides across our vendor network, updated daily.
-            </p>
-          </div>
-          <Button as="a" href="/products" variant="secondary" class="!bg-white/10 !border-white/20 !text-white hover:!bg-white/20">
-            Browse all
-            <template #icon-right>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 12h14M13 5l7 7-7 7"/>
-              </svg>
-            </template>
-          </Button>
-        </div>
+    <section class="bg-white border-y border-[color:var(--color-hairline)]">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-16 lg:py-20">
+        <SectionHeader
+          eyebrow="Most researched"
+          title="Trending compounds"
+          description="Highest-rated research peptides across our vendor network, updated daily."
+          accent="biotech"
+        >
+          <template #cta>
+            <Button as="a" href="/products" variant="secondary">
+              Browse all
+              <template #icon-right>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M13 5l7 7-7 7"/>
+                </svg>
+              </template>
+            </Button>
+          </template>
+        </SectionHeader>
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           <ProductCard v-for="product in trendingProducts" :key="product.id" :product="product" />
@@ -268,9 +253,9 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- BECOME A VENDOR — FULL BLEED, BADASS                       -->
+    <!-- BECOME A VENDOR                                             -->
     <!-- ========================================================= -->
-    <section class="relative bg-[#0A0B0E] text-white overflow-hidden">
+    <section class="relative bg-[color:var(--color-ink)] text-white overflow-hidden">
       <!-- Background art -->
       <div
         class="absolute inset-0"
