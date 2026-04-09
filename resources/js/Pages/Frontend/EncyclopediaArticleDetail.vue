@@ -64,52 +64,44 @@
                   </svg>
                 </a>
               </div>
-              <!-- Molecular data inline — directly under tags, no separate section -->
-              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[color:var(--color-ink-muted)]">
-                <span v-if="molecularInfo.formula" class="flex items-center gap-1">
-                  <span class="text-[color:var(--color-ink-subtle)]">Formula</span>
-                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.formula }}</span>
-                </span>
-                <span v-if="molecularInfo.molecularWeight" class="flex items-center gap-1">
-                  <span class="text-[color:var(--color-ink-subtle)]">·</span>
-                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.molecularWeight }}</span>
-                </span>
-                <span v-if="molecularInfo.casNumber" class="flex items-center gap-1">
-                  <span class="text-[color:var(--color-ink-subtle)]">· CAS</span>
-                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber }}</span>
-                </span>
-                <span v-if="aminoAcidSequence.residueCount > 0" class="flex items-center gap-1">
-                  <span class="text-[color:var(--color-ink-subtle)]">·</span>
-                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.residueCount }} residues</span>
-                </span>
+              <!-- Molecular data + primary research — all on one line -->
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[color:var(--color-ink-muted)] mb-2">
+                <span v-if="molecularInfo.formula" class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.formula }}</span>
+                <span v-if="molecularInfo.molecularWeight" class="text-[color:var(--color-ink-subtle)]">·</span>
+                <span v-if="molecularInfo.molecularWeight" class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.molecularWeight }}</span>
+                <span v-if="molecularInfo.casNumber" class="text-[color:var(--color-ink-subtle)]">·</span>
+                <span v-if="molecularInfo.casNumber">CAS <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber }}</span></span>
+                <span v-if="aminoAcidSequence.residueCount > 0" class="text-[color:var(--color-ink-subtle)]">·</span>
+                <span v-if="aminoAcidSequence.residueCount > 0" class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.residueCount }} residues</span>
+              </div>
+              <div v-if="primaryResearch.institution" class="text-xs text-[color:var(--color-ink-muted)]">
+                Primary Research: <span class="font-medium text-[color:var(--color-ink)]">{{ primaryResearch.institution }}</span>
+              </div>
+
+              <!-- Chain viz + sequence tight under the data -->
+              <div v-if="residueLetters.length > 0" class="mt-4 overflow-x-auto pb-1">
+                <svg :width="residueLetters.length * 32 + 16" height="44">
+                  <line x1="24" y1="22" :x2="(residueLetters.length - 1) * 32 + 24" y2="22" stroke="var(--color-hairline)" stroke-width="2" />
+                  <g v-for="(letter, i) in residueLetters" :key="i">
+                    <circle :cx="i * 32 + 24" cy="22" r="11" :fill="residueColor(letter)" stroke="white" stroke-width="1.5" />
+                    <text :x="i * 32 + 24" y="26" text-anchor="middle" fill="white" font-size="9" font-weight="700" font-family="var(--font-mono)">{{ letter }}</text>
+                  </g>
+                </svg>
+              </div>
+              <div v-if="aminoAcidSequence.sequence" class="mt-1">
+                <p class="ui-mono text-[10px] leading-relaxed text-[color:var(--color-ink-subtle)] break-all">{{ aminoAcidSequence.sequence }}</p>
               </div>
             </div>
 
-            <!-- Small square 3D model — light background with dot grid -->
-            <div v-if="aminoAcidSequence.sequence" class="flex-shrink-0 w-40 h-40 md:w-48 md:h-48 relative bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] overflow-hidden">
-              <!-- Dot grid background -->
+            <!-- Small square 3D model — light bg with dot grid -->
+            <div v-if="aminoAcidSequence.sequence" class="flex-shrink-0 w-40 h-40 md:w-48 md:h-48 relative bg-white border border-[color:var(--color-hairline)] overflow-hidden">
               <div class="absolute inset-0 pointer-events-none" :style="{ backgroundImage: 'radial-gradient(circle, #D4D4D8 0.8px, transparent 0.8px)', backgroundSize: '12px 12px' }" />
               <div ref="viewer3d" class="w-full h-full relative z-10"></div>
-              <div class="absolute bottom-1.5 left-2 right-2 flex items-center justify-between">
+              <div class="absolute bottom-1.5 left-2 right-2 flex items-center justify-between z-20">
                 <span class="text-[8px] ui-mono text-[color:var(--color-ink-subtle)] uppercase tracking-wider">{{ categoryName || name }}</span>
                 <span class="text-[8px] ui-mono text-[color:var(--color-ink-subtle)]/50">drag to rotate</span>
               </div>
             </div>
-          </div>
-
-
-          <!-- Chain visualization + sequence — compact, inline -->
-          <div v-if="residueLetters.length > 0" class="mb-4 overflow-x-auto pb-1">
-            <svg :width="residueLetters.length * 32 + 16" height="44">
-              <line x1="24" y1="22" :x2="(residueLetters.length - 1) * 32 + 24" y2="22" stroke="var(--color-hairline)" stroke-width="2" />
-              <g v-for="(letter, i) in residueLetters" :key="i">
-                <circle :cx="i * 32 + 24" cy="22" r="11" :fill="residueColor(letter)" stroke="white" stroke-width="1.5" />
-                <text :x="i * 32 + 24" y="26" text-anchor="middle" fill="white" font-size="9" font-weight="700" font-family="var(--font-mono)">{{ letter }}</text>
-              </g>
-            </svg>
-          </div>
-          <div v-if="aminoAcidSequence.sequence" class="mb-5">
-            <p class="ui-mono text-[11px] leading-relaxed text-[color:var(--color-ink-muted)] break-all">{{ aminoAcidSequence.sequence }}</p>
           </div>
         </div>
       </div>
@@ -1679,7 +1671,7 @@ onMounted(async () => {
     if (!$3Dmol) return
 
     const v = $3Dmol.createViewer(viewer3d.value, {
-      backgroundColor: '#FAFAF9',
+      backgroundColor: 'white',
       antialias: true,
     })
 
@@ -1718,8 +1710,8 @@ onMounted(async () => {
     }
 
     v.setStyle({}, {
-      stick: { radius: 0.12, color: '#A1A1AA' },
-      sphere: { radius: 0.45, colorscheme: { prop: 'resn', map: resColorMap }},
+      stick: { radius: 0.2, color: '#D4D4D8' },
+      sphere: { radius: 0.55, colorscheme: { prop: 'resn', map: resColorMap }},
     })
 
     // Label each residue with its 3-letter code
