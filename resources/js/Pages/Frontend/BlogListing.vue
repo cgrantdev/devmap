@@ -1,5 +1,5 @@
 <template>
-  <FrontLayout>
+  <ModernLayout>
     <!-- Research Insights Section -->
     <section class="py-16 bg-white">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -112,13 +112,13 @@
         </div>
       </div>
     </section>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import BlogPostCard from '@/components/BlogPostCard.vue'
 
 const props = defineProps({

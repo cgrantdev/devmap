@@ -1,5 +1,5 @@
 <template>
-  <FrontLayout>
+  <ModernLayout>
     <!-- Header Section -->
     <section class="bg-white border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -202,13 +202,13 @@
         </div>
       </div>
     </section>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import CompareProductItem from '@/components/CompareProductItem.vue'
 
 const props = defineProps({

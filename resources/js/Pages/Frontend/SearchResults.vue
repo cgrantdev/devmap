@@ -1,5 +1,5 @@
 <template>
-  <FrontLayout>
+  <ModernLayout>
     <div class="min-h-screen bg-slate-50">
       <!-- Search Bar Section -->
       <div class="bg-white border-b border-slate-200">
@@ -341,13 +341,13 @@
         </div>
       </div>
     </div>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import VendorIcon from '@/components/VendorIcon.vue'
 
 const props = defineProps({

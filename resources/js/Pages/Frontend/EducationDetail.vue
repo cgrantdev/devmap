@@ -1,5 +1,5 @@
 <template>
-  <FrontLayout>
+  <ModernLayout>
     <!-- Education Post Detail Section -->
     <section class="py-16 bg-white">
       <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -132,13 +132,13 @@
 
       </div>
     </section>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import RatingDisplay from '@/components/RatingDisplay.vue'
 import MainButton from '@/components/MainButton.vue'
 

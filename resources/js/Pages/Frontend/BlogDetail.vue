@@ -19,7 +19,7 @@
     <!-- Canonical URL -->
     <link rel="canonical" :href="canonical" />
   </Head>
-  <FrontLayout>
+  <ModernLayout>
     <!-- Blog Detail Section -->
     <div class="min-h-screen bg-gray-50">
       <div class="bg-white border-b border-gray-200">
@@ -194,13 +194,13 @@
       </div>
 
     </div>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import BlogPostCard from '@/components/BlogPostCard.vue'
 
 const props = defineProps({

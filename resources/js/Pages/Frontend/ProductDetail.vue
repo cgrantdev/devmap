@@ -1,5 +1,5 @@
 <template>
-  <FrontLayout>
+  <ModernLayout>
     <div class="min-h-screen bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex items-center gap-2 text-sm text-gray-600 mb-6">
@@ -329,13 +329,13 @@
         </div>
       </div>
     </div>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { ref, computed, watchEffect } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import ProductSimpleDetailCard from '@/components/ProductSimpleDetailCard.vue'
 
 const props = defineProps({

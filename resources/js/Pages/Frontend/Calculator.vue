@@ -1,5 +1,5 @@
 <template>
-  <FrontLayout>
+  <ModernLayout>
     <!-- Header Section -->
     <section class="bg-gradient-to-br from-slate-700 to-slate-600 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -265,13 +265,13 @@
         </div>
       </div>
     </section>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { ref, reactive, computed, watchEffect } from 'vue'
 import { usePage } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
 const props = defineProps({
   seo: {

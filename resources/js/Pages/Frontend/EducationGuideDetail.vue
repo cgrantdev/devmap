@@ -19,7 +19,7 @@
     <!-- Canonical URL -->
     <link rel="canonical" :href="canonical" />
   </Head>
-    <FrontLayout>
+    <ModernLayout>
       <!-- Header Section with Gradient -->
       <div class="min-h-screen bg-gray-50">
         <div class="border-b-4 bg-gradient-to-br from-purple-600 to-blue-600 text-white">
@@ -244,13 +244,13 @@
             </div> -->
         </div>
       </div>
-    </FrontLayout>
+    </ModernLayout>
 </template>
   
 <script setup>
 import { computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'   
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'   
 
 const props = defineProps({
     id: {

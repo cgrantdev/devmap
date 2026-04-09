@@ -1,5 +1,5 @@
 <template>
-  <FrontLayout>
+  <ModernLayout>
     <div class="min-h-screen bg-slate-50">
       <!-- Header Section -->
       <div class="bg-white border-b border-slate-200">
@@ -887,13 +887,13 @@
 
       
     </div>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { router, useForm, usePage } from '@inertiajs/vue3';
-import FrontLayout from '@/Pages/Layouts/FrontLayout.vue';
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue';
 
 const props = defineProps({
   step: {

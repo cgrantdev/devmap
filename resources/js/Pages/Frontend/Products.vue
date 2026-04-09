@@ -19,7 +19,7 @@
     <!-- Canonical URL -->
     <link rel="canonical" :href="url" />
   </Head>
-  <FrontLayout>
+  <ModernLayout>
     <!-- Discover Peptides Section -->
     <section class="min-h-screen bg-gray-50">
       <div class="bg-white border-b border-gray-200">
@@ -59,13 +59,13 @@
         </div>
       </div>
     </section>   
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, nextTick, watchEffect } from 'vue'
 import { Head, Link, router, usePage } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import CategoryCard from '@/components/CategoryCard.vue'
 import BlogPostCard from '@/components/BlogPostCard.vue'
 import MainButton from '@/components/MainButton.vue'

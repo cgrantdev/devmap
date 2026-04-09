@@ -19,7 +19,7 @@
     <!-- Canonical URL -->
     <link rel="canonical" :href="canonical" />
   </Head>
-  <FrontLayout>
+  <ModernLayout>
     <div class="min-h-screen bg-gray-50">
       <!-- Header Section (Dark Background) -->
       <div class="bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 border-b border-slate-300 relative overflow-hidden">
@@ -960,13 +960,13 @@
         </div>
       </div>
     </div>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
 // Format mechanism item text to bold key terms
 const formatMechanismItem = (item) => {

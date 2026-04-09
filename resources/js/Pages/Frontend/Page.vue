@@ -1,5 +1,5 @@
 <template>
-  <FrontLayout>
+  <ModernLayout>
     <section class="py-16 bg-white">
       <div class="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8">
         <h1 class="text-4xl font-bold text-gray-800 mb-8">{{ page?.title || 'Page' }}</h1>
@@ -15,11 +15,11 @@
         </div>
       </div>
     </section>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
 defineProps({
   page: Object

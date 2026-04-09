@@ -19,7 +19,7 @@
     <!-- Canonical URL -->
     <link rel="canonical" :href="url" />
   </Head>
-  <FrontLayout>
+  <ModernLayout>
     <!-- Brands Section -->
     <section class="min-h-screen bg-gray-50">
       <div class="bg-white border-b border-gray-200">
@@ -153,13 +153,13 @@
           </div>
         </div>      
     </section>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { ref, computed, h, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import VendorCard from '@/components/VendorCard.vue'
 import MainButton from '@/components/MainButton.vue'
 

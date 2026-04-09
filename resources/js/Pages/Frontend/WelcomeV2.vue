@@ -10,7 +10,7 @@
     <!-- ========================================================= -->
     <section class="relative">
       <div class="ui-spotlight absolute inset-0 pointer-events-none" />
-      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-10 lg:pt-14">
+      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-4 lg:pt-6">
         <HeroCarousel :slides="heroSlides" />
       </div>
     </section>

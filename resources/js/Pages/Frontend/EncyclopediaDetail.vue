@@ -1,5 +1,5 @@
 <template>
-  <FrontLayout>
+  <ModernLayout>
     <div class="min-h-screen bg-gray-50">
       <!-- Header Section -->
       <div class="bg-white border-b border-gray-200">
@@ -374,12 +374,12 @@
         </section>
       </div>
     </div>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { router } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import ProductCard from '@/components/ProductCard.vue'
 
 defineProps({

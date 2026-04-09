@@ -1,5 +1,5 @@
 <template>
-  <FrontLayout>
+  <ModernLayout>
     <!-- Header Section with Gradient -->
     <section class="bg-gradient-to-br from-blue-600 to-purple-700 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -201,13 +201,13 @@
         </div>
       </div>
     </section>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { ref, computed, h, watchEffect } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import KnowledgeCenterCard from '@/components/KnowledgeCenterCard.vue'
 import ResearchLibraryCard from '@/components/ResearchLibraryCard.vue'
 import EducationalGuideCard from '@/components/EducationalGuideCard.vue'

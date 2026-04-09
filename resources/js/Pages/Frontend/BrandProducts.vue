@@ -1,5 +1,5 @@
 <template>
-  <FrontLayout>
+  <ModernLayout>
     <!-- Brand Detail Section -->
     <div class="min-h-screen bg-gray-50">
       <div class="relative overflow-hidden bg-white">
@@ -751,13 +751,13 @@
         </div>
       </div>
     </div>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, nextTick, h, defineComponent, watchEffect } from 'vue'
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import MainButton from '@/components/MainButton.vue'
 import ProductSimpleCard from '@/components/ProductSimpleCard.vue'
 import RatingDisplay from '@/components/RatingDisplay.vue'

@@ -19,7 +19,7 @@
     <!-- Canonical URL -->
     <link rel="canonical" :href="canonical" />
   </Head>
-  <FrontLayout>
+  <ModernLayout>
     <div class="min-h-screen bg-gray-50">
       <div class="bg-white border-b border-gray-200">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -250,13 +250,13 @@
         </div> -->
       </div>
     </div>
-  </FrontLayout>
+  </ModernLayout>
 </template>
 
 <script setup>
 import { computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
-import FrontLayout from '../Layouts/FrontLayout.vue'
+import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
 const props = defineProps({
   id: {
