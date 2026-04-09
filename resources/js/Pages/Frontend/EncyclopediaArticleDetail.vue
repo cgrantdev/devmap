@@ -80,47 +80,18 @@
               </div>
             </div>
 
-            <!-- Right: 2D + 3D structure views with toggle -->
-            <div class="lg:w-64 flex-shrink-0 self-start bg-white border border-[color:var(--color-hairline)] overflow-hidden">
-              <!-- Tab toggle -->
-              <div class="flex border-b border-[color:var(--color-hairline)]">
-                <button
-                  type="button"
-                  @click="structureView = '2d'"
-                  :class="[
-                    'flex-1 py-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-center transition-colors',
-                    structureView === '2d'
-                      ? 'text-[color:var(--color-accent-600)] border-b-2 border-[color:var(--color-accent-600)] bg-[color:var(--color-accent-50)]'
-                      : 'text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)]',
-                  ]"
-                >
-                  2D Structure
-                </button>
-                <button
-                  type="button"
-                  @click="structureView = '3d'"
-                  :class="[
-                    'flex-1 py-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-center transition-colors',
-                    structureView === '3d'
-                      ? 'text-[color:var(--color-accent-600)] border-b-2 border-[color:var(--color-accent-600)] bg-[color:var(--color-accent-50)]'
-                      : 'text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)]',
-                  ]"
-                >
-                  3D Model
-                </button>
-              </div>
-
-              <!-- 2D: PubChem structure image -->
-              <div v-show="structureView === '2d'" class="p-1.5 bg-white">
+            <!-- Right: 2D structure from PubChem -->
+            <div class="lg:w-60 flex-shrink-0 self-start bg-white border border-[color:var(--color-hairline)] overflow-hidden">
+              <div class="p-1.5 bg-white">
                 <img
-                  v-if="molecularInfo.casNumber && !structureImageFailed"
-                  :src="`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(categoryName || name)}/PNG?image_size=250x250`"
-                  :alt="`${categoryName || name} 2D structure`"
+                  v-if="!structureImageFailed"
+                  :src="`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(categoryName || name)}/PNG?image_size=240x240`"
+                  :alt="`${categoryName || name} structure`"
                   class="w-full h-auto"
                   loading="lazy"
                   @error="structureImageFailed = true"
                 />
-                <!-- Fallback SVG -->
+                <!-- Fallback: our chain SVG -->
                 <div v-if="structureImageFailed && residueLetters.length > 0" class="p-2 bg-[color:var(--color-bg)]" :style="{ backgroundImage: 'radial-gradient(circle, #E4E4E7 0.5px, transparent 0.5px)', backgroundSize: '8px 8px' }">
                   <svg viewBox="0 0 220 100" class="w-full">
                     <line v-for="i in residueLetters.length - 1" :key="'b'+i" :x1="residuePositions[i-1]?.x" :y1="residuePositions[i-1]?.y" :x2="residuePositions[i]?.x" :y2="residuePositions[i]?.y" stroke="#D4D4D8" stroke-width="1" />
@@ -131,38 +102,10 @@
                   </svg>
                 </div>
               </div>
-
-              <!-- 3D: PubChem 3D conformer image (static, reliable) + link to interactive -->
-              <div v-show="structureView === '3d'" class="bg-white p-1.5">
-                <img
-                  v-if="pubchemCid"
-                  :src="`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${pubchemCid}/PNG?record_type=3d&image_size=250x250`"
-                  :alt="`${categoryName || name} 3D conformer`"
-                  class="w-full h-auto"
-                  loading="lazy"
-                  @error="no3d = true"
-                />
-                <div v-if="!pubchemCid || no3d" class="flex flex-col items-center justify-center py-12 text-xs text-[color:var(--color-ink-subtle)]">
-                  <svg class="w-8 h-8 mb-2 text-[color:var(--color-hairline)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  3D not available
-                </div>
-                <a
-                  v-if="pubchemCid && !no3d"
-                  :href="`https://pubchem.ncbi.nlm.nih.gov/compound/${pubchemCid}#section=3D-Conformer`"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="mt-1.5 flex items-center justify-center gap-1 text-[10px] text-[color:var(--color-accent-600)] font-medium hover:text-[color:var(--color-accent-700)]"
-                >
-                  Open interactive 3D on PubChem
-                  <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-                </a>
-              </div>
-
-              <!-- Footer label -->
               <div class="px-3 py-1.5 border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
                 <div class="flex items-center justify-between text-[8px] text-[color:var(--color-ink-subtle)]">
                   <span class="ui-mono uppercase tracking-wider">{{ categoryName || name }}</span>
-                  <span>Source: PubChem</span>
+                  <span>PubChem</span>
                 </div>
               </div>
             </div>
