@@ -36,28 +36,25 @@
             Back to Encyclopedia
           </button>
 
-          <!-- Wikipedia-style: title + subtitle left, tags inline -->
+          <!-- Title first, tags as supporting metadata below -->
           <div class="mb-6">
-            <div class="flex flex-wrap items-center gap-2 mb-3">
+            <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
+            <p class="text-lg text-[color:var(--color-ink-muted)] mb-3">{{ subtitle }}</p>
+            <div class="flex flex-wrap items-center gap-3">
               <span
                 v-for="(tag, index) in tags"
                 :key="index"
                 :class="getTagColorClass(tag)"
-                class="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.06em]"
+                class="px-2 py-0.5 text-[11px] font-semibold"
               >
                 {{ tag }}
               </span>
-            </div>
-            <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
-            <div class="flex flex-wrap items-center gap-4 text-sm text-[color:var(--color-ink-muted)]">
-              <span>{{ subtitle }}</span>
-              <span class="text-[color:var(--color-hairline)]">·</span>
               <a
                 v-if="primaryResearch.url"
                 :href="primaryResearch.url"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors font-medium"
+                class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors text-xs font-medium"
               >
                 Primary Research
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -93,45 +90,52 @@
                 </div>
               </div>
             </div>
+            <!-- Amino acid sequence — collapsed by default, expandable -->
             <div class="bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-5 lg:col-span-2">
-              <h3 class="text-[color:var(--color-ink-muted)] text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dna w-4 h-4" aria-hidden="true">
-                  <path d="m10 16 1.5 1.5"></path>                              
-                  <path d="m14 8-1.5-1.5"></path>
-                  <path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"></path>
-                  <path d="m16.5 10.5 1 1"></path>
-                  <path d="m17 6-2.891-2.891"></path>
-                  <path d="M2 15c6.667-6 13.333 0 20-6"></path>
-                  <path d="m20 9 .891.891"></path>
-                  <path d="M3.109 14.109 4 15"></path>
-                  <path d="m6.5 12.5 1 1"></path>
-                  <path d="m7 18 2.891 2.891"></path>
-                  <path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"></path>
+              <button
+                type="button"
+                @click="showSequence = !showSequence"
+                class="w-full flex items-center justify-between text-left group"
+              >
+                <h3 class="text-[color:var(--color-ink-muted)] text-xs uppercase tracking-wider flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m10 16 1.5 1.5"/><path d="m14 8-1.5-1.5"/><path d="M15 2c-1.798 1.998-2.518 3.995-2.807 5.993"/><path d="M2 15c6.667-6 13.333 0 20-6"/><path d="M9 22c1.798-1.998 2.518-3.995 2.807-5.993"/>
+                  </svg>
+                  Amino Acid Sequence{{ aminoAcidSequence.residueCount > 0 ? ` (${aminoAcidSequence.residueCount} Residues)` : '' }}
+                </h3>
+                <svg
+                  class="w-4 h-4 text-[color:var(--color-ink-subtle)] transition-transform duration-200"
+                  :class="showSequence ? 'rotate-180' : ''"
+                  fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"
+                >
+                  <path d="m6 9 6 6 6-6"/>
                 </svg>
-                Amino Acid Sequence{{ aminoAcidSequence.residueCount > 0 ? ` (${aminoAcidSequence.residueCount} Residues)` : '' }}
-              </h3>
-              <div v-if="aminoAcidSequence.sequence" class="bg-white border border-[color:var(--color-hairline)] p-4">
-                <p class="text-[color:var(--color-ink)] ui-mono text-sm leading-relaxed">
-                  {{ aminoAcidSequence.sequence }}
-                </p>
-              </div>
-              <div v-else class="bg-white border border-[color:var(--color-hairline)] p-4">
-                <p class="text-[color:var(--color-ink-subtle)] text-sm">No sequence data available</p>
-              </div>
-              <div class="grid grid-cols-2 gap-4 mt-4">
-                <div v-if="aminoAcidComposition && aminoAcidComposition.length > 0">
-                  <div class="text-[color:var(--color-ink-subtle)] text-xs mb-2">Composition</div>
-                  <div class="space-y-1 text-xs">
-                    <div v-for="(comp, index) in aminoAcidComposition" :key="index" class="text-[color:var(--color-ink-muted)]">{{ comp }}</div>
-                  </div>
+              </button>
+
+              <div v-if="showSequence" class="mt-4">
+                <div v-if="aminoAcidSequence.sequence" class="bg-white border border-[color:var(--color-hairline)] p-4">
+                  <p class="text-[color:var(--color-ink)] ui-mono text-xs leading-relaxed break-all">
+                    {{ aminoAcidSequence.sequence }}
+                  </p>
                 </div>
-                <div v-if="aminoAcidSequence.properties && (aminoAcidSequence.properties.netCharge || aminoAcidSequence.properties.hydrophobic || aminoAcidSequence.properties.stability || aminoAcidSequence.properties.solubility)">
-                  <div class="text-[color:var(--color-ink-subtle)] text-xs mb-2">Properties</div>
-                  <div class="space-y-1 text-xs">
-                    <div v-if="aminoAcidSequence.properties.netCharge" class="text-[color:var(--color-ink-muted)]">Net Charge: {{ aminoAcidSequence.properties.netCharge }}</div>
-                    <div v-if="aminoAcidSequence.properties.hydrophobic" class="text-[color:var(--color-ink-muted)]">Hydrophobic: {{ aminoAcidSequence.properties.hydrophobic }}</div>
-                    <div v-if="aminoAcidSequence.properties.stability" class="text-[color:var(--color-ink-muted)]">Stability: {{ aminoAcidSequence.properties.stability }}</div>
-                    <div v-if="aminoAcidSequence.properties.solubility" class="text-[color:var(--color-ink-muted)]">Solubility: {{ aminoAcidSequence.properties.solubility }}</div>
+                <div v-else class="bg-white border border-[color:var(--color-hairline)] p-4">
+                  <p class="text-[color:var(--color-ink-subtle)] text-sm">No sequence data available</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                  <div v-if="aminoAcidComposition && aminoAcidComposition.length > 0">
+                    <div class="text-[color:var(--color-ink-subtle)] text-xs mb-2">Composition</div>
+                    <div class="space-y-1 text-xs">
+                      <div v-for="(comp, index) in aminoAcidComposition" :key="index" class="text-[color:var(--color-ink-muted)]">{{ comp }}</div>
+                    </div>
+                  </div>
+                  <div v-if="aminoAcidSequence.properties && (aminoAcidSequence.properties.netCharge || aminoAcidSequence.properties.hydrophobic || aminoAcidSequence.properties.stability || aminoAcidSequence.properties.solubility)">
+                    <div class="text-[color:var(--color-ink-subtle)] text-xs mb-2">Properties</div>
+                    <div class="space-y-1 text-xs">
+                      <div v-if="aminoAcidSequence.properties.netCharge" class="text-[color:var(--color-ink-muted)]">Net Charge: {{ aminoAcidSequence.properties.netCharge }}</div>
+                      <div v-if="aminoAcidSequence.properties.hydrophobic" class="text-[color:var(--color-ink-muted)]">Hydrophobic: {{ aminoAcidSequence.properties.hydrophobic }}</div>
+                      <div v-if="aminoAcidSequence.properties.stability" class="text-[color:var(--color-ink-muted)]">Stability: {{ aminoAcidSequence.properties.stability }}</div>
+                      <div v-if="aminoAcidSequence.properties.solubility" class="text-[color:var(--color-ink-muted)]">Solubility: {{ aminoAcidSequence.properties.solubility }}</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -947,7 +951,7 @@
 </template>
 
 <script setup>
-import { computed, watchEffect } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
@@ -1681,6 +1685,7 @@ const aminoAcidComposition = computed(() => {
 })
 
 const page = usePage()
+const showSequence = ref(false)
 
 // Computed values for reactive SEO updates
 const seoTitle = computed(() => {
