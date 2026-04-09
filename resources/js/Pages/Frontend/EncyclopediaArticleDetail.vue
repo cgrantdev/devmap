@@ -36,64 +36,65 @@
             Back to Encyclopedia
           </button>
 
-          <!-- Title first, tags as supporting metadata below -->
-          <div class="mb-6">
-            <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
-            <p class="text-lg text-[color:var(--color-ink-muted)] mb-3">{{ subtitle }}</p>
-            <div class="flex flex-wrap items-center gap-3">
-              <span
-                v-for="(tag, index) in tags"
-                :key="index"
-                :class="getTagColorClass(tag)"
-                class="px-2 py-0.5 text-[11px] font-semibold"
-              >
-                {{ tag }}
-              </span>
-              <a
-                v-if="primaryResearch.url"
-                :href="primaryResearch.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors text-xs font-medium"
-              >
-                Primary Research
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M7 17L17 7M17 7H7M17 7v10"/>
-                </svg>
-              </a>
+          <!-- Header: title left, molecular infobox right (Wikipedia-style) -->
+          <div class="flex flex-col lg:flex-row gap-6 mb-6">
+            <!-- Left: title + subtitle + tags -->
+            <div class="flex-1 min-w-0">
+              <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
+              <p class="text-lg text-[color:var(--color-ink-muted)] mb-4">{{ subtitle }}</p>
+              <div class="flex flex-wrap items-center gap-3">
+                <span
+                  v-for="(tag, index) in tags"
+                  :key="index"
+                  :class="getTagColorClass(tag)"
+                  class="px-2 py-0.5 text-[11px] font-semibold"
+                >
+                  {{ tag }}
+                </span>
+                <a
+                  v-if="primaryResearch.url"
+                  :href="primaryResearch.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors text-xs font-medium"
+                >
+                  Primary Research
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 17L17 7M17 7H7M17 7v10"/>
+                  </svg>
+                </a>
+              </div>
             </div>
-          </div>
 
-          <!-- Molecular Info Cards — light version -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div class="bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-5">
-              <h3 class="text-[color:var(--color-ink-muted)] text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-atom w-4 h-4" aria-hidden="true">
-                  <circle cx="12" cy="12" r="1"></circle>
-                  <path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"></path>
-                  <path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"></path>
-                </svg>
-                Molecular Information
-              </h3>
-              <div class="space-y-4">
-                <div>
-                  <div class="text-[color:var(--color-ink-subtle)] text-xs mb-1">Formula</div>
-                  <div class="text-[color:var(--color-ink)] ui-mono text-xl">{{ molecularInfo.formula || '-' }}</div>
+            <!-- Right: compact molecular infobox -->
+            <div class="lg:w-72 flex-shrink-0 bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-5">
+              <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">Quick facts</div>
+              <div class="space-y-3">
+                <div class="flex items-baseline justify-between gap-3">
+                  <span class="text-xs text-[color:var(--color-ink-muted)]">Formula</span>
+                  <span class="ui-mono text-sm font-semibold text-[color:var(--color-ink)] text-right">{{ molecularInfo.formula || '—' }}</span>
                 </div>
-                <div>
-                  <div class="text-[color:var(--color-ink-subtle)] text-xs mb-1">Molecular Weight</div>
-                  <div class="text-[color:var(--color-ink)] font-semibold text-xl">{{ molecularInfo.molecularWeight || '-' }}</div>
+                <div class="border-t border-[color:var(--color-hairline-soft)]"></div>
+                <div class="flex items-baseline justify-between gap-3">
+                  <span class="text-xs text-[color:var(--color-ink-muted)]">Weight</span>
+                  <span class="ui-mono text-sm font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.molecularWeight || '—' }}</span>
                 </div>
-                <div>
-                  <div class="text-[color:var(--color-ink-subtle)] text-xs mb-1">CAS Registry Number</div>
-                  <div class="text-[color:var(--color-ink)] ui-mono text-xl">{{ molecularInfo.casNumber || '-' }}</div>
+                <div class="border-t border-[color:var(--color-hairline-soft)]"></div>
+                <div class="flex items-baseline justify-between gap-3">
+                  <span class="text-xs text-[color:var(--color-ink-muted)]">CAS Number</span>
+                  <span class="ui-mono text-sm font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber || '—' }}</span>
+                </div>
+                <div v-if="aminoAcidSequence.residueCount > 0" class="border-t border-[color:var(--color-hairline-soft)]"></div>
+                <div v-if="aminoAcidSequence.residueCount > 0" class="flex items-baseline justify-between gap-3">
+                  <span class="text-xs text-[color:var(--color-ink-muted)]">Residues</span>
+                  <span class="ui-mono text-sm font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.residueCount }}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Amino acid sequence — standalone collapsible strip below the grid -->
-          <div class="mt-4 bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-4">
+          <!-- Amino acid sequence — collapsible strip -->
+          <div class="bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-4">
               <button
                 type="button"
                 @click="showSequence = !showSequence"
