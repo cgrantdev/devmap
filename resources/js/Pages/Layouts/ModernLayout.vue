@@ -33,13 +33,14 @@
           </a>
         </nav>
 
-        <!-- Right side: search + auth -->
+        <!-- Right side: search + country + auth -->
         <div class="ml-auto flex items-center gap-3">
           <div class="hidden md:block">
             <SearchPalette />
           </div>
+          <CountrySelector class="hidden sm:block" />
           <Button as="a" href="/login" variant="ghost" size="sm">Sign in</Button>
-          <Button as="a" href="/become-a-vendor" variant="secondary" size="sm" class="hidden sm:inline-flex">
+          <Button as="a" href="/become-a-vendor" variant="secondary" size="sm" class="hidden lg:inline-flex">
             For vendors
           </Button>
         </div>
@@ -109,6 +110,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import Button from '@/components/ui/Button.vue'
 import SearchPalette from '@/components/ui/SearchPalette.vue'
+import CountrySelector from '@/components/ui/CountrySelector.vue'
 
 const scrolled = ref(false)
 const currentYear = new Date().getFullYear()

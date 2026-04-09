@@ -1,12 +1,17 @@
 <template>
-  <div class="flex flex-col gap-1.5">
-    <div v-if="label" class="text-xs uppercase tracking-[0.08em] text-[color:var(--color-ink-subtle)] font-medium">
+  <div :class="['flex flex-col', centered ? 'items-center text-center gap-2' : 'gap-1.5']">
+    <!-- Label goes ABOVE when default, BELOW when centered -->
+    <div
+      v-if="label && !centered"
+      class="text-xs uppercase tracking-[0.08em] text-[color:var(--color-ink-subtle)] font-medium"
+    >
       {{ label }}
     </div>
-    <div class="flex items-baseline gap-2">
+
+    <div :class="['flex', centered ? 'items-baseline justify-center' : 'items-baseline', 'gap-2']">
       <span
         :class="[
-          'ui-display font-semibold text-[color:var(--color-ink)] tracking-tight',
+          'ui-display font-semibold text-[color:var(--color-ink)] tracking-[-0.02em] leading-none',
           sizeClasses,
         ]"
       >
@@ -24,6 +29,14 @@
         {{ deltaPositive ? '↑' : '↓' }} {{ formattedDelta }}
       </span>
     </div>
+
+    <div
+      v-if="label && centered"
+      class="text-[11px] md:text-xs uppercase tracking-[0.12em] text-[color:var(--color-ink-subtle)] font-semibold"
+    >
+      {{ label }}
+    </div>
+
     <div v-if="hint" class="text-sm text-[color:var(--color-ink-muted)]">
       {{ hint }}
     </div>
@@ -42,12 +55,13 @@ const props = defineProps({
     type: String,
     default: 'md', // 'sm' | 'md' | 'lg' | 'xl'
   },
+  centered: { type: Boolean, default: false },
 })
 
 const sizeClasses = computed(() => ({
   sm: 'text-xl',
   md: 'text-3xl',
-  lg: 'text-4xl',
+  lg: 'text-4xl md:text-[44px]',
   xl: 'text-5xl md:text-6xl',
 }[props.size]))
 

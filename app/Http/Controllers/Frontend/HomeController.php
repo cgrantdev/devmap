@@ -380,12 +380,10 @@ class HomeController extends Controller
             'categories' => $totalCategoryCount,
         ];
 
-        // Top 6 verified vendors for the hero vendors grid, enriched with
-        // three product thumbnail URLs and a "last tested" label derived from
-        // the most recent product update (proxy until real COA timestamps land).
+        // Top 6 vendors for the vendor grid on the homepage.
         $verifiedVendors = Brand::where('is_active', true)
             ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
-            ->with(['vendorSetting'])
+            ->with(['vendorSetting', 'vendorSetting.location'])
             ->withCount(['products as product_count' => function ($q) {
                 $q->visible()->where('status', 'active');
             }])
@@ -394,13 +392,7 @@ class HomeController extends Controller
             ->take(6)
             ->get()
             ->map(function ($brand) {
-                $thumbs = Product::visible()
-                    ->where('status', 'active')
-                    ->where('brand_id', $brand->id)
-                    ->whereNotNull('image_url')
-                    ->take(4)
-                    ->pluck('image_url')
-                    ->toArray();
+                $vs = $brand->vendorSetting;
 
                 $lastUpdated = Product::visible()
                     ->where('status', 'active')
@@ -410,18 +402,20 @@ class HomeController extends Controller
                 return [
                     'id' => $brand->id,
                     'name' => $brand->name,
-                    'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
-                    'logo_url' => $brand->vendorSetting && $brand->vendorSetting->logo
-                        ? asset('storage/' . $brand->vendorSetting->logo)
+                    'tagline' => $vs && $vs->description
+                        ? Str::limit(strip_tags($vs->description), 80)
                         : null,
+                    'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
+                    'logo_url' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
                     'rating_average' => (float) ($brand->rating_average ?? 0),
                     'rating_count' => (int) ($brand->rating_count ?? 0),
-                    'verified' => true,
                     'product_count' => (int) $brand->product_count,
+                    'location' => $vs && $vs->location ? $vs->location->name : null,
+                    'founded_year' => $vs && $vs->founded_year ? (int) $vs->founded_year : null,
+                    'is_partner' => $vs && (($vs->is_partner ?? false) || ($vs->featured ?? false)),
                     'last_tested_label' => $lastUpdated
                         ? \Carbon\Carbon::parse($lastUpdated)->diffForHumans(null, true)
                         : null,
-                    'product_thumbs' => $thumbs,
                 ];
             });
 
