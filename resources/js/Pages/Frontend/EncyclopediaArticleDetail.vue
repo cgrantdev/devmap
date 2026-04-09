@@ -80,13 +80,12 @@
               </div>
             </div>
 
-            <!-- Right: structural diagram from PubChem (or fallback SVG chain) -->
-            <div class="lg:w-72 flex-shrink-0 self-start bg-white border border-[color:var(--color-hairline)] overflow-hidden">
-              <div class="relative bg-white p-2">
-                <!-- Try PubChem structure image via CAS number -->
+            <!-- Right: structural diagram from PubChem -->
+            <div class="lg:w-60 flex-shrink-0 self-start bg-white border border-[color:var(--color-hairline)] overflow-hidden">
+              <div class="relative bg-white p-1.5">
                 <img
                   v-if="molecularInfo.casNumber"
-                  :src="`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(categoryName || name)}/PNG?image_size=300x300`"
+                  :src="`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(categoryName || name)}/PNG?image_size=240x240`"
                   :alt="`${categoryName || name} molecular structure`"
                   class="w-full h-auto"
                   loading="lazy"
