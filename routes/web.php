@@ -30,6 +30,7 @@ use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Frontend\ProductsController;
 use App\Http\Controllers\Frontend\BrandsController;
+// Note: BrandsController also serves /vendors (see route below)
 use App\Http\Controllers\Frontend\BlogsController;
 use App\Http\Controllers\Frontend\EducationController;
 use App\Http\Controllers\Frontend\EncyclopediaController;
@@ -300,7 +301,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/vendor/logout', [VendorAuthenticatedSessionController::class, 'destroy'])->name('vendor.logout');
 });
 
-Route::get('/vendors', [PublicVendorController::class, 'list'])->name('vendors.public');
+// /vendors now serves the modern Brands page (same controller as /brands)
+Route::get('/vendors', [BrandsController::class, 'index'])->name('vendors.public');
 Route::get('/shop/{vendor_name}', [PublicVendorController::class, 'show'])->name('shop.public');
 Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('product.public');
 
