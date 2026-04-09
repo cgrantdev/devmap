@@ -472,7 +472,6 @@
           </aside>
         </div>
       </div>
-    </div>
 
     <!-- Success/Error Messages -->
     <div
