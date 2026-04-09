@@ -189,6 +189,75 @@ html {
     animation-play-state: paused;
 }
 
+/* ---------------------------------------------------------------
+   Global typography + color upgrade for legacy pages.
+   Applies to all pages wrapped in ModernLayout's <main> tag.
+   These rules give an instant visual lift without touching Vue files.
+   --------------------------------------------------------------- */
+
+/* All headings in the main content area get the modern display font */
+main h1, main h2, main h3, main h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+    font-feature-settings: "ss01", "cv11";
+}
+
+main h1 {
+    letter-spacing: -0.02em;
+}
+
+/* Warm up the body text slightly — Tailwind's gray-600/700 can feel cold.
+   We nudge them toward our zinc-toned ink colors via overrides on the
+   most common text-gray-* classes used by legacy pages. */
+main .text-gray-900 { color: var(--color-ink); }
+main .text-gray-800 { color: var(--color-ink); }
+main .text-gray-700 { color: #3f3f46; }
+main .text-gray-600 { color: var(--color-ink-muted); }
+main .text-gray-500 { color: var(--color-ink-muted); }
+main .text-gray-400 { color: var(--color-ink-subtle); }
+main .text-slate-900 { color: var(--color-ink); }
+main .text-slate-800 { color: var(--color-ink); }
+main .text-slate-700 { color: #3f3f46; }
+main .text-slate-600 { color: var(--color-ink-muted); }
+main .text-slate-500 { color: var(--color-ink-muted); }
+main .text-slate-400 { color: var(--color-ink-subtle); }
+
+/* Background upgrades — warm the grays */
+main .bg-gray-50 { background-color: var(--color-bg); }
+main .bg-gray-100 { background-color: var(--color-hairline-soft); }
+main .bg-slate-50 { background-color: var(--color-bg); }
+main .bg-slate-100 { background-color: var(--color-hairline-soft); }
+
+/* Border upgrades */
+main .border-gray-200 { border-color: var(--color-hairline); }
+main .border-gray-300 { border-color: var(--color-hairline); }
+main .border-slate-200 { border-color: var(--color-hairline); }
+main .border-slate-300 { border-color: var(--color-hairline); }
+
+/* Blue accent normalization — standardize to our indigo accent */
+main .bg-blue-600 { background-color: var(--color-accent-600); }
+main .bg-blue-700 { background-color: var(--color-accent-700); }
+main .hover\:bg-blue-700:hover { background-color: var(--color-accent-700); }
+main .text-blue-600 { color: var(--color-accent-600); }
+main .text-blue-700 { color: var(--color-accent-700); }
+main .hover\:text-blue-600:hover { color: var(--color-accent-600); }
+
+/* Ring/focus accent normalization */
+main .ring-blue-500 { --tw-ring-color: var(--color-accent-500); }
+main .focus\:ring-blue-500:focus { --tw-ring-color: var(--color-accent-500); }
+
+/* Cards and containers — consistent rounded corners and shadows */
+main .rounded-lg { border-radius: var(--radius-lg); }
+main .rounded-xl { border-radius: var(--radius-xl); }
+main .shadow-sm { box-shadow: var(--shadow-sm); }
+main .shadow-md { box-shadow: var(--shadow-md); }
+
+/* Smooth transitions on all interactive elements */
+main a, main button {
+    transition: color 150ms ease-out, background-color 150ms ease-out,
+                border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+
 /* Design System Variables */
 :root {
     /* Font Families */

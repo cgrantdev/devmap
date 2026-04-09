@@ -1,9 +1,9 @@
 <template>
   <ModernLayout>
     <!-- Hero Section -->
-    <section class="pt-0 pb-16 bg-white">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-[1360px] h-[574px] rounded-[24px] overflow-hidden relative mx-auto">
+    <section class="pt-4 pb-16">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10">
+        <div class="w-full max-w-[1280px] h-[420px] rounded-[20px] overflow-hidden relative mx-auto">
           <!-- Background Image -->
           <div 
             ref="heroBgRef"

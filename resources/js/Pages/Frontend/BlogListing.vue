@@ -1,10 +1,13 @@
 <template>
   <ModernLayout>
     <!-- Research Insights Section -->
-    <section class="py-16 bg-white">
-      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="font-hv-muse font-normal text-5xl leading-normal tracking-normal text-gray-800 text-center mb-12 p-0 w-full">Research Insights</h2>
-        
+    <section class="pt-8 pb-16">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10">
+        <div class="border-b border-[color:var(--color-hairline)] pb-10 mb-12">
+          <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Research & education</div>
+          <h2 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)]">Research Insights</h2>
+        </div>
+
         <!-- Featured Article -->
         <div v-if="featured" class="mb-16">
           <div class="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col md:flex-row gap-6">

@@ -21,14 +21,15 @@
   </Head>
   <ModernLayout>
     <!-- Brands Section -->
-    <section class="min-h-screen bg-gray-50">
-      <div class="bg-white border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 class="text-4xl text-gray-900 mb-4">All Vendors</h1>
-          <p class="text-xl text-gray-600">Compare vendors, read reviews, and find the best peptide sources</p>
+    <section class="min-h-screen">
+      <div class="border-b border-[color:var(--color-hairline)]">
+        <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-10">
+          <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Vendor network</div>
+          <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">All Vendors</h1>
+          <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">Compare vendors, read reviews, and find the best peptide sources</p>
         </div>
       </div>
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
         <!-- Main Content Area (Full Width) -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
           <!-- Search Bar, Sort, and Filters (First Row) -->

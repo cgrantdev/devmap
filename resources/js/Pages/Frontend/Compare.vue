@@ -1,17 +1,18 @@
 <template>
   <ModernLayout>
     <!-- Header Section -->
-    <section class="bg-white border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 class="text-4xl text-gray-900 mb-4">Compare Products</h1>
-        <p class="text-xl text-gray-600">
+    <section class="border-b border-[color:var(--color-hairline)]">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-10">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Side-by-side</div>
+        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">Compare Products</h1>
+        <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
           Compare peptides side-by-side: prices, purity, reviews, and more.
         </p>
       </div>
     </section>
 
     <!-- Information Banner -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
       <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
         <div class="flex items-start gap-3">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" aria-hidden="true">

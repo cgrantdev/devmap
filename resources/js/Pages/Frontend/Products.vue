@@ -21,25 +21,26 @@
   </Head>
   <ModernLayout>
     <!-- Discover Peptides Section -->
-    <section class="min-h-screen bg-gray-50">
-      <div class="bg-white border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 class="text-4xl text-gray-900 mb-4">Peptide Categories</h1>
-          <p class="text-xl text-gray-600">Browse by category to find the perfect peptides for your needs</p>
+    <section class="min-h-screen">
+      <div class="border-b border-gray-200">
+        <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-10">
+          <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Browse compounds</div>
+          <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">Peptide Categories</h1>
+          <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">Browse by category to find the perfect peptides for your needs</p>
         </div>
       </div>
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+
         <!-- Search Bar -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <div class="bg-white rounded-[14px] shadow-[var(--shadow-sm)] border border-[color:var(--color-hairline)] p-5 mb-8">
           <div class="relative">
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Search categories..."
-              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full pl-10 pr-4 py-2.5 border border-[color:var(--color-hairline)] rounded-[10px] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)] text-[15px]"
             />
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" aria-hidden="true">
               <path d="m21 21-4.34-4.34"></path>
               <circle cx="11" cy="11" r="8"></circle>
             </svg>

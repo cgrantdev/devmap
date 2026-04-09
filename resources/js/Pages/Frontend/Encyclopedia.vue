@@ -1,20 +1,15 @@
 <template>
   <ModernLayout>
     <!-- Header Section -->
-    <section class="bg-gradient-to-br from-slate-700 to-slate-600 text-white">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <!-- Icon and Title -->
-          <div class="flex items-center gap-3 mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pill w-12 h-12" aria-hidden="true">
-            <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"></path>
-            <path d="m8.5 8.5 7 7"></path>
-          </svg>
-          <h1 class="text-5xl">Peptide Encyclopedia</h1>
-        </div>
-        
-        <!-- Subtitle -->
-        <p class="text-xl text-slate-100 mb-8 max-w-3xl">
-          Your comprehensive guide to peptides. Learn about benefits, dosing protocols, safety information, and real user experiences for every peptide.
+    <section class="relative overflow-hidden border-b border-[color:var(--color-hairline)]">
+      <div class="absolute inset-0 bg-gradient-to-br from-[#0F172A] to-[#4F46E5]" />
+      <div class="absolute inset-0 opacity-[0.03]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '40px 40px' }" />
+      <div class="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-[color:var(--color-accent-500)] opacity-[0.15] blur-[100px] pointer-events-none" />
+      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-10 pb-14">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-400)] mb-3">Reference</div>
+        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-white mb-4">Peptide Encyclopedia</h1>
+        <p class="text-lg text-white/70 leading-relaxed max-w-2xl mb-8">
+          Your comprehensive guide to peptides. Learn about benefits, dosing protocols, safety information, and real user experiences.
         </p>
 
         <!-- Search Bar -->
@@ -24,17 +19,17 @@
             @input="handleSearch"
             type="text"
             placeholder="Search peptides by name or description..."
-            class="w-full pl-12 pr-4 py-4 bg-white rounded-lg text-slate-900 border border-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent"
+            class="w-full pl-12 pr-4 py-3.5 bg-white/95 backdrop-blur rounded-[12px] text-[color:var(--color-ink)] border border-white/20 shadow-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)] text-[15px]"
           />
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" aria-hidden="true">
-            <path d="m21 21-4.34-4.34"></path>
-            <circle cx="11" cy="11" r="8"></circle>
+          <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
           </svg>
         </div>
       </div>
     </section>
 
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
       <!-- Information Banner -->
       <div class="mb-8 bg-slate-50 border border-slate-200 rounded-lg p-6">
         <div class="flex items-start gap-3">
