@@ -132,19 +132,30 @@
                 </div>
               </div>
 
-              <!-- 3D: PubChem 3D conformer viewer (iframe) -->
-              <div v-show="structureView === '3d'" class="bg-white" style="height: 250px;">
-                <iframe
-                  v-if="structureView === '3d' && pubchemCid"
-                  :src="`https://pubchem.ncbi.nlm.nih.gov/compound/${pubchemCid}#section=3D-Conformer&embed=true`"
-                  class="w-full h-full border-0"
+              <!-- 3D: PubChem 3D conformer image (static, reliable) + link to interactive -->
+              <div v-show="structureView === '3d'" class="bg-white p-1.5">
+                <img
+                  v-if="pubchemCid"
+                  :src="`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${pubchemCid}/PNG?record_type=3d&image_size=250x250`"
+                  :alt="`${categoryName || name} 3D conformer`"
+                  class="w-full h-auto"
                   loading="lazy"
-                  sandbox="allow-scripts allow-same-origin"
-                  title="3D conformer viewer"
-                ></iframe>
-                <div v-else-if="structureView === '3d' && !pubchemCid" class="flex items-center justify-center h-full text-xs text-[color:var(--color-ink-subtle)]">
-                  3D model not available for this compound
+                  @error="no3d = true"
+                />
+                <div v-if="!pubchemCid || no3d" class="flex flex-col items-center justify-center py-12 text-xs text-[color:var(--color-ink-subtle)]">
+                  <svg class="w-8 h-8 mb-2 text-[color:var(--color-hairline)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  3D not available
                 </div>
+                <a
+                  v-if="pubchemCid && !no3d"
+                  :href="`https://pubchem.ncbi.nlm.nih.gov/compound/${pubchemCid}#section=3D-Conformer`"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="mt-1.5 flex items-center justify-center gap-1 text-[10px] text-[color:var(--color-accent-600)] font-medium hover:text-[color:var(--color-accent-700)]"
+                >
+                  Open interactive 3D on PubChem
+                  <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                </a>
               </div>
 
               <!-- Footer label -->
@@ -1702,6 +1713,7 @@ const aminoAcidComposition = computed(() => {
 const page = usePage()
 const structureImageFailed = ref(false)
 const structureView = ref('2d')
+const no3d = ref(false)
 
 // Known PubChem CIDs for common peptides (since PubChem's embed viewer needs CID, not name)
 const pubchemCidMap = {
