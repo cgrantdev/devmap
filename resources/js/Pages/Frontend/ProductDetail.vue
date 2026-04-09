@@ -14,18 +14,19 @@
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 md:p-8">
             <!-- Left: Product Image -->
             <div>
-              <div class="aspect-square bg-gray-50 rounded-lg p-12 sticky top-24">
+              <div class="aspect-square bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-8 sticky top-24 flex items-center justify-center">
                 <img
                   v-if="product.image_url"
                   :src="product.image_url"
                   :alt="product.name"
-                  class="w-full h-full object-contain flex items-center justify-center rounded-lg select-none"
+                  class="max-w-full max-h-full object-contain select-none"
+                  loading="lazy"
                 />
-                <div v-else class="w-full aspect-square bg-gray-50 rounded-lg flex items-center justify-center">
-                  <!-- Vial illustration placeholder -->
-                  <svg class="w-64 h-64 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                <div v-else class="text-center">
+                  <svg class="w-20 h-20 text-[color:var(--color-ink-subtle)] mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 2v6l-4 7c-1 1.8 0 4 2 4h10c2 0 3-2.2 2-4l-4-7V2"/><path d="M8 2h8"/>
                   </svg>
+                  <span class="text-sm text-[color:var(--color-ink-subtle)]">No image available</span>
                 </div>
               </div>
             </div>
@@ -148,32 +149,29 @@
               </div>
   
               <!-- Seller Information -->
-              <div v-if="brand" class="border-t border-gray-200 pt-6 mb-6">
-                <div class="flex items-center gap-3 mb-3">
-                  <div v-if="brand.logo">
-                    <img :src="brand.logo" :alt="brand.name" class="w-12 h-full object-cover" />
+              <div v-if="brand" class="border-t border-[color:var(--color-hairline)] pt-5 mb-6">
+                <div class="flex items-center gap-4">
+                  <div class="w-10 h-10 flex-shrink-0 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] flex items-center justify-center overflow-hidden">
+                    <img v-if="brand.logo" :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain p-1" loading="lazy" />
+                    <span v-else class="ui-display text-sm font-bold text-[color:var(--color-ink-muted)]">{{ brandInitials }}</span>
                   </div>
-                  <div v-else class="w-12 h-12 rounded-lg object-cover">
-                    {{ brandInitials }}
-                  </div>
-                  <div>
-                    <div class="text-sm text-gray-600">Sold by</div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-[11px] text-[color:var(--color-ink-subtle)] uppercase tracking-[0.08em] font-semibold">Sold by</div>
                     <a
-                      v-if="brand.shop_url"
                       :href="`/brand/${brand.slug}/products`"
-                      rel="noopener noreferrer"
-                      class="text-blue-600 hover:text-blue-700"
+                      class="text-[14px] font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors"
                     >
                       {{ brand.name }}
-                    </a>                    
+                    </a>
                   </div>
+                  <a
+                    :href="`/brand/${brand.slug}/products`"
+                    class="ui-focus flex items-center gap-1 text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors flex-shrink-0"
+                  >
+                    All products
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                  </a>
                 </div>
-                <a                  
-                  :href="`/brand/${brand.slug}/products`"
-                  class="block w-full text-center border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors text-sm"
-                >
-                  View All Products from {{ brand.name }}
-                </a>
               </div>
   
               <!-- Disclaimer -->

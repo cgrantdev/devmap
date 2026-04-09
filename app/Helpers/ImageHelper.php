@@ -8,6 +8,19 @@ use Illuminate\Support\Facades\Storage;
 class ImageHelper
 {
     /**
+     * Resolve a vendor logo URL. Returns the real file if it exists,
+     * otherwise a generated placeholder from ui-avatars.com.
+     */
+    public static function resolveVendorLogo(?string $logoPath, string $vendorName): string
+    {
+        if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+            return asset('storage/' . $logoPath);
+        }
+        $encoded = urlencode($vendorName);
+        return "https://ui-avatars.com/api/?name={$encoded}&background=4F46E5&color=fff&size=128&font-size=0.38&bold=true&format=svg";
+    }
+
+    /**
      * Convert uploaded image to WebP format using GD library
      * 
      * @param \Illuminate\Http\UploadedFile $uploadedFile

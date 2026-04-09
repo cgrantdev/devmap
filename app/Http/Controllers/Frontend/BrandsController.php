@@ -125,14 +125,10 @@ class BrandsController extends Controller
                     $location = $locationId ? Location::find($locationId) : null;
                 }
                 
-                // Get logo URL from vendor settings
-                $logoUrl = null;
-                if ($brand->vendorSetting && $brand->vendorSetting->logo) {
-                    // Check if the file actually exists in storage
-                    if (Storage::disk('public')->exists($brand->vendorSetting->logo)) {
-                        $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
-                    }
-                }
+                $logoUrl = \App\Helpers\ImageHelper::resolveVendorLogo(
+                    $brand->vendorSetting?->logo,
+                    $brand->name
+                );
                 
                 return [
                     'id' => $brand->id,
