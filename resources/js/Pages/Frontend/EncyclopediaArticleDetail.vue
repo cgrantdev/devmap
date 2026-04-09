@@ -36,42 +36,83 @@
             Back to Encyclopedia
           </button>
 
-          <!-- Title -->
-          <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
-          <p class="text-lg text-[color:var(--color-ink-muted)] mb-4">{{ subtitle }}</p>
+          <!-- Two-column: text left, structure image right -->
+          <div class="flex flex-col lg:flex-row gap-6 mb-4">
+            <!-- Left: title + data -->
+            <div class="flex-1 min-w-0">
+              <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
+              <p class="text-lg text-[color:var(--color-ink-muted)] mb-4">{{ subtitle }}</p>
 
-          <!-- Tags row -->
-          <div class="flex flex-wrap items-center gap-2 mb-4">
-            <span v-for="(tag, index) in tags" :key="index" :class="getTagColorClass(tag)" class="px-2 py-0.5 text-[11px] font-semibold">{{ tag }}</span>
-            <a v-if="primaryResearch.url" :href="primaryResearch.url" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] text-xs font-medium">
-              Primary Research <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-            </a>
-          </div>
+              <!-- Tags -->
+              <div class="flex flex-wrap items-center gap-2 mb-4">
+                <span v-for="(tag, index) in tags" :key="index" :class="getTagColorClass(tag)" class="px-2 py-0.5 text-[11px] font-semibold">{{ tag }}</span>
+                <a v-if="primaryResearch.url" :href="primaryResearch.url" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] text-xs font-medium">
+                  Primary Research <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                </a>
+              </div>
 
-          <!-- Molecular data + chain — one compact horizontal strip -->
-          <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[color:var(--color-ink-muted)] pb-4 mb-2 border-b border-[color:var(--color-hairline)]">
-            <span v-if="molecularInfo.formula">Formula <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.formula }}</span></span>
-            <span v-if="molecularInfo.molecularWeight" class="text-[color:var(--color-ink-subtle)]">·</span>
-            <span v-if="molecularInfo.molecularWeight"><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.molecularWeight }}</span></span>
-            <span v-if="molecularInfo.casNumber" class="text-[color:var(--color-ink-subtle)]">·</span>
-            <span v-if="molecularInfo.casNumber">CAS <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber }}</span></span>
-            <span v-if="aminoAcidSequence.residueCount > 0" class="text-[color:var(--color-ink-subtle)]">·</span>
-            <span v-if="aminoAcidSequence.residueCount > 0"><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.residueCount }}</span> residues</span>
-            <span v-if="primaryResearch.institution" class="text-[color:var(--color-ink-subtle)]">·</span>
-            <span v-if="primaryResearch.institution">Research: <span class="font-medium text-[color:var(--color-ink)]">{{ primaryResearch.institution }}</span></span>
-          </div>
+              <!-- Molecular data row -->
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[color:var(--color-ink-muted)] pb-4 border-b border-[color:var(--color-hairline)]">
+                <span v-if="molecularInfo.formula">Formula <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.formula }}</span></span>
+                <span v-if="molecularInfo.molecularWeight" class="text-[color:var(--color-ink-subtle)]">·</span>
+                <span v-if="molecularInfo.molecularWeight"><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.molecularWeight }}</span></span>
+                <span v-if="molecularInfo.casNumber" class="text-[color:var(--color-ink-subtle)]">·</span>
+                <span v-if="molecularInfo.casNumber">CAS <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber }}</span></span>
+                <span v-if="aminoAcidSequence.residueCount > 0" class="text-[color:var(--color-ink-subtle)]">·</span>
+                <span v-if="aminoAcidSequence.residueCount > 0"><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.residueCount }}</span> residues</span>
+              </div>
 
-          <!-- Chain visualization — single line, compact -->
-          <div v-if="residueLetters.length > 0" class="mb-1 overflow-x-auto">
-            <svg :width="residueLetters.length * 26 + 10" height="32">
-              <line x1="18" y1="16" :x2="(residueLetters.length - 1) * 26 + 18" y2="16" stroke="var(--color-hairline)" stroke-width="1.5" />
-              <g v-for="(letter, i) in residueLetters" :key="i">
-                <circle :cx="i * 26 + 18" cy="16" r="8" :fill="residueColor(letter)" stroke="white" stroke-width="1.5" />
-                <text :x="i * 26 + 18" y="19" text-anchor="middle" fill="white" font-size="6.5" font-weight="700" font-family="var(--font-mono)">{{ letter }}</text>
-              </g>
-            </svg>
+              <!-- Research institution below the line -->
+              <div v-if="primaryResearch.institution" class="pt-3 text-xs text-[color:var(--color-ink-muted)]">
+                Primary Research: <span class="font-medium text-[color:var(--color-ink)]">{{ primaryResearch.institution }}</span>
+              </div>
+
+              <!-- Chain viz -->
+              <div v-if="residueLetters.length > 0" class="mt-4 overflow-x-auto">
+                <svg :width="residueLetters.length * 26 + 10" height="32">
+                  <line x1="18" y1="16" :x2="(residueLetters.length - 1) * 26 + 18" y2="16" stroke="var(--color-hairline)" stroke-width="1.5" />
+                  <g v-for="(letter, i) in residueLetters" :key="i">
+                    <circle :cx="i * 26 + 18" cy="16" r="8" :fill="residueColor(letter)" stroke="white" stroke-width="1.5" />
+                    <text :x="i * 26 + 18" y="19" text-anchor="middle" fill="white" font-size="6.5" font-weight="700" font-family="var(--font-mono)">{{ letter }}</text>
+                  </g>
+                </svg>
+                <p v-if="aminoAcidSequence.sequence" class="ui-mono text-[9px] text-[color:var(--color-ink-subtle)] mt-1 break-all">{{ aminoAcidSequence.sequence }}</p>
+              </div>
+            </div>
+
+            <!-- Right: structural diagram from PubChem (or fallback SVG chain) -->
+            <div class="lg:w-72 flex-shrink-0 self-start bg-white border border-[color:var(--color-hairline)] overflow-hidden">
+              <div class="relative bg-white p-2">
+                <!-- Try PubChem structure image via CAS number -->
+                <img
+                  v-if="molecularInfo.casNumber"
+                  :src="`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(categoryName || name)}/PNG?image_size=300x300`"
+                  :alt="`${categoryName || name} molecular structure`"
+                  class="w-full h-auto"
+                  loading="lazy"
+                  @error="structureImageFailed = true"
+                />
+                <!-- Fallback: our SVG chain if PubChem fails -->
+                <div v-if="structureImageFailed && residueLetters.length > 0" class="p-3">
+                  <div class="relative bg-[color:var(--color-bg)] p-2" :style="{ backgroundImage: 'radial-gradient(circle, #E4E4E7 0.5px, transparent 0.5px)', backgroundSize: '8px 8px' }">
+                    <svg viewBox="0 0 220 100" class="w-full">
+                      <line v-for="i in residueLetters.length - 1" :key="'b'+i" :x1="residuePositions[i-1]?.x" :y1="residuePositions[i-1]?.y" :x2="residuePositions[i]?.x" :y2="residuePositions[i]?.y" stroke="#D4D4D8" stroke-width="1" />
+                      <g v-for="(letter, i) in residueLetters" :key="'r'+i">
+                        <circle :cx="residuePositions[i]?.x" :cy="residuePositions[i]?.y" r="8" :fill="residueColor(letter)" stroke="white" stroke-width="1.5" />
+                        <text :x="residuePositions[i]?.x" :y="(residuePositions[i]?.y||0)+3" text-anchor="middle" fill="white" font-size="6" font-weight="700" font-family="var(--font-mono)">{{ letter }}</text>
+                      </g>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="px-3 py-2 border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+                <div class="flex items-center justify-between text-[9px] text-[color:var(--color-ink-subtle)]">
+                  <span class="ui-mono uppercase tracking-wider">{{ categoryName || name }} · 2D Structure</span>
+                  <span>PubChem</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <p v-if="aminoAcidSequence.sequence" class="ui-mono text-[9px] text-[color:var(--color-ink-subtle)] mb-4 break-all">{{ aminoAcidSequence.sequence }}</p>
         </div>
       </div>
 
@@ -1616,6 +1657,7 @@ const aminoAcidComposition = computed(() => {
 })
 
 const page = usePage()
+const structureImageFailed = ref(false)
 
 // Parse amino acid sequence into single-letter codes for the chain SVG
 const residueLetters = computed(() => {
