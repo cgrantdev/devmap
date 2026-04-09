@@ -197,7 +197,6 @@
               </span>
             </div>
           </div>
-          </div>
         </a>
       </div>
 
