@@ -41,7 +41,8 @@
             <div class="flex-1 min-w-0">
               <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
               <p class="text-lg text-[color:var(--color-ink-muted)] mb-3">{{ subtitle }}</p>
-              <div class="flex flex-wrap items-center gap-3">
+              <!-- Tags + molecular data — all tight together -->
+              <div class="flex flex-wrap items-center gap-2 mb-3">
                 <span
                   v-for="(tag, index) in tags"
                   :key="index"
@@ -63,11 +64,32 @@
                   </svg>
                 </a>
               </div>
+              <!-- Molecular data inline — directly under tags, no separate section -->
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[color:var(--color-ink-muted)]">
+                <span v-if="molecularInfo.formula" class="flex items-center gap-1">
+                  <span class="text-[color:var(--color-ink-subtle)]">Formula</span>
+                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.formula }}</span>
+                </span>
+                <span v-if="molecularInfo.molecularWeight" class="flex items-center gap-1">
+                  <span class="text-[color:var(--color-ink-subtle)]">·</span>
+                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.molecularWeight }}</span>
+                </span>
+                <span v-if="molecularInfo.casNumber" class="flex items-center gap-1">
+                  <span class="text-[color:var(--color-ink-subtle)]">· CAS</span>
+                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber }}</span>
+                </span>
+                <span v-if="aminoAcidSequence.residueCount > 0" class="flex items-center gap-1">
+                  <span class="text-[color:var(--color-ink-subtle)]">·</span>
+                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.residueCount }} residues</span>
+                </span>
+              </div>
             </div>
 
-            <!-- Small square 3D model — light background -->
+            <!-- Small square 3D model — light background with dot grid -->
             <div v-if="aminoAcidSequence.sequence" class="flex-shrink-0 w-40 h-40 md:w-48 md:h-48 relative bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] overflow-hidden">
-              <div ref="viewer3d" class="w-full h-full"></div>
+              <!-- Dot grid background -->
+              <div class="absolute inset-0 pointer-events-none" :style="{ backgroundImage: 'radial-gradient(circle, #D4D4D8 0.8px, transparent 0.8px)', backgroundSize: '12px 12px' }" />
+              <div ref="viewer3d" class="w-full h-full relative z-10"></div>
               <div class="absolute bottom-1.5 left-2 right-2 flex items-center justify-between">
                 <span class="text-[8px] ui-mono text-[color:var(--color-ink-subtle)] uppercase tracking-wider">{{ categoryName || name }}</span>
                 <span class="text-[8px] ui-mono text-[color:var(--color-ink-subtle)]/50">drag to rotate</span>
@@ -75,29 +97,6 @@
             </div>
           </div>
 
-          <!-- Molecular data as a single inline row — not a card -->
-          <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[color:var(--color-ink-muted)] mb-4 pb-4 border-b border-[color:var(--color-hairline)]">
-            <span v-if="molecularInfo.formula" class="flex items-center gap-1.5">
-              <span class="text-[10px] uppercase tracking-[0.08em] text-[color:var(--color-ink-subtle)] font-semibold">Formula</span>
-              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.formula }}</span>
-            </span>
-            <span v-if="molecularInfo.molecularWeight" class="flex items-center gap-1.5">
-              <span class="text-[10px] uppercase tracking-[0.08em] text-[color:var(--color-ink-subtle)] font-semibold">Weight</span>
-              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.molecularWeight }}</span>
-            </span>
-            <span v-if="molecularInfo.casNumber" class="flex items-center gap-1.5">
-              <span class="text-[10px] uppercase tracking-[0.08em] text-[color:var(--color-ink-subtle)] font-semibold">CAS</span>
-              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber }}</span>
-            </span>
-            <span v-if="aminoAcidSequence.residueCount > 0" class="flex items-center gap-1.5">
-              <span class="text-[10px] uppercase tracking-[0.08em] text-[color:var(--color-ink-subtle)] font-semibold">Residues</span>
-              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.residueCount }}</span>
-            </span>
-            <span v-if="aminoAcidSequence.properties?.netCharge" class="flex items-center gap-1.5">
-              <span class="text-[10px] uppercase tracking-[0.08em] text-[color:var(--color-ink-subtle)] font-semibold">Charge</span>
-              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.properties.netCharge }}</span>
-            </span>
-          </div>
 
           <!-- Chain visualization + sequence — compact, inline -->
           <div v-if="residueLetters.length > 0" class="mb-4 overflow-x-auto pb-1">
