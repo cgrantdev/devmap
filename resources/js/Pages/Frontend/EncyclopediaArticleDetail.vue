@@ -93,13 +93,48 @@
               </div>
             </div>
 
-            <!-- Small square 3D model — light bg with dot grid -->
-            <div v-if="aminoAcidSequence.sequence" class="flex-shrink-0 w-40 h-40 md:w-48 md:h-48 relative bg-white border border-[color:var(--color-hairline)] overflow-hidden">
-              <div class="absolute inset-0 pointer-events-none" :style="{ backgroundImage: 'radial-gradient(circle, #D4D4D8 0.8px, transparent 0.8px)', backgroundSize: '12px 12px' }" />
-              <div ref="viewer3d" class="w-full h-full relative z-10"></div>
+            <!-- Peptide structure diagram — clean SVG schematic -->
+            <div v-if="residueLetters.length > 0" class="flex-shrink-0 w-48 h-48 md:w-56 md:h-56 relative bg-white border border-[color:var(--color-hairline)] overflow-hidden p-3">
+              <!-- Dot grid -->
+              <div class="absolute inset-0 pointer-events-none" :style="{ backgroundImage: 'radial-gradient(circle, #E4E4E7 0.6px, transparent 0.6px)', backgroundSize: '10px 10px' }" />
+              <!-- Peptide chain arranged in a folded/zigzag pattern -->
+              <svg viewBox="0 0 200 200" class="w-full h-full relative z-10">
+                <!-- Bonds between residues -->
+                <line
+                  v-for="i in residueLetters.length - 1"
+                  :key="'bond-' + i"
+                  :x1="residuePositions[i-1]?.x"
+                  :y1="residuePositions[i-1]?.y"
+                  :x2="residuePositions[i]?.x"
+                  :y2="residuePositions[i]?.y"
+                  stroke="#D4D4D8"
+                  stroke-width="1.5"
+                />
+                <!-- Residue nodes -->
+                <g v-for="(letter, i) in residueLetters" :key="'res-' + i">
+                  <circle
+                    :cx="residuePositions[i]?.x"
+                    :cy="residuePositions[i]?.y"
+                    r="12"
+                    :fill="residueColor(letter)"
+                    stroke="white"
+                    stroke-width="2"
+                  />
+                  <text
+                    :x="residuePositions[i]?.x"
+                    :y="(residuePositions[i]?.y || 0) + 3.5"
+                    text-anchor="middle"
+                    fill="white"
+                    font-size="8"
+                    font-weight="700"
+                    font-family="var(--font-mono)"
+                  >{{ letter }}</text>
+                </g>
+              </svg>
+              <!-- Label -->
               <div class="absolute bottom-1.5 left-2 right-2 flex items-center justify-between z-20">
                 <span class="text-[8px] ui-mono text-[color:var(--color-ink-subtle)] uppercase tracking-wider">{{ categoryName || name }}</span>
-                <span class="text-[8px] ui-mono text-[color:var(--color-ink-subtle)]/50">drag to rotate</span>
+                <span class="text-[8px] ui-mono text-[color:var(--color-ink-subtle)]/60">{{ residueLetters.length }} aa</span>
               </div>
             </div>
           </div>
@@ -913,7 +948,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect, onMounted, nextTick } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
@@ -1647,7 +1682,6 @@ const aminoAcidComposition = computed(() => {
 })
 
 const page = usePage()
-const viewer3d = ref(null)
 
 // Load 3Dmol.js and render a simple peptide backbone
 onMounted(async () => {
@@ -1754,6 +1788,26 @@ const residueLetters = computed(() => {
   }
   // Fallback: take first letter of each space-separated token
   return seq.split(/[\s-]+/).map(s => s.charAt(0).toUpperCase()).filter(Boolean).slice(0, 30)
+})
+
+// Arrange residues in a zigzag/folded pattern that fits in a 200x200 SVG
+const residuePositions = computed(() => {
+  const letters = residueLetters.value
+  if (!letters.length) return []
+
+  const cols = Math.ceil(Math.sqrt(letters.length * 1.5))
+  const spacing = 180 / Math.max(cols, 1)
+  const padX = 16
+  const padY = 20
+
+  return letters.map((_, i) => {
+    const row = Math.floor(i / cols)
+    const colIndex = row % 2 === 0 ? (i % cols) : (cols - 1 - (i % cols)) // zigzag
+    return {
+      x: padX + colIndex * spacing + spacing / 2,
+      y: padY + row * (spacing * 0.9) + spacing / 2,
+    }
+  })
 })
 
 // Color each residue by type (hydrophobic, polar, charged, etc.)
