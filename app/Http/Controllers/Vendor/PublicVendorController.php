@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Models\User;
 use App\Models\VendorSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class PublicVendorController extends Controller
@@ -91,23 +93,29 @@ class PublicVendorController extends Controller
 
     public function list()
     {
-        $vendors = User::where('role', 'vendor')
+        // Query via Brand (which has the vendorSetting FK) instead of User.
+        // The old code used User::whereHas('vendorSetting') which generated
+        // `vendor_settings.user_id` — a column that doesn't exist.
+        $vendors = Brand::where('is_active', true)
             ->whereHas('vendorSetting', function ($q) {
-                $q->where('status', 1);
+                $q->where('approval_status', 'approved');
             })
             ->with(['vendorSetting' => function ($q) {
-                $q->select('brand_id', 'description', 'banner', 'logo');
+                $q->select('id', 'brand_id', 'description', 'banner', 'logo');
             }])
-            ->get(['id', 'name']);
+            ->get(['id', 'name', 'slug', 'rating_average', 'rating_count']);
 
-        $vendors = $vendors->map(function ($vendor) {
+        $vendors = $vendors->map(function ($brand) {
+            $vs = $brand->vendorSetting;
             return [
-                'id' => $vendor->id,
-                'name' => $vendor->name,
-                'description' => $vendor->vendorSetting->description ?? null,
-                'banner' => $vendor->vendorSetting->banner ? asset('storage/' . $vendor->vendorSetting->banner) : null,
-                'logo' => $vendor->vendorSetting->logo ? asset('storage/' . $vendor->vendorSetting->logo) : null,
-                'slug' => str_replace(' ', '-', strtolower($vendor->name)),
+                'id' => $brand->id,
+                'name' => $brand->name,
+                'description' => $vs->description ?? null,
+                'banner' => $vs && $vs->banner ? asset('storage/' . $vs->banner) : null,
+                'logo' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
+                'slug' => $brand->slug ?? Str::slug($brand->name),
+                'rating_average' => (float) ($brand->rating_average ?? 0),
+                'rating_count' => (int) ($brand->rating_count ?? 0),
             ];
         });
 
