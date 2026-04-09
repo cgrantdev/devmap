@@ -15,26 +15,32 @@ class PublicVendorController extends Controller
 {
     public function show(Request $request, $vendor_name)
     {
-        // Convert URL-friendly name back to vendor name
-        $name = str_replace('-', ' ', $vendor_name);
-        
-        $user = User::where('name', 'LIKE', $name)
-            ->where('role', 'vendor')
-            ->firstOrFail();
-            
-        $vendorSetting = $user->vendorSetting;
-        
-        // Check if current user is admin or the vendor themselves
-        $currentUser = Auth::user();
-        $isAdmin = $currentUser && $currentUser->role === 'admin';
-        $isOwnPage = $currentUser && $currentUser->id === $user->id;
-        
-        // Only show if vendor has active status, unless user is admin or the vendor themselves
-        if (!$vendorSetting || ($vendorSetting->status !== 1 && !$isAdmin && !$isOwnPage)) {
+        // Find brand by slug (preferred) or by name conversion from URL
+        $brand = Brand::where('slug', $vendor_name)
+            ->orWhere('slug', Str::slug($vendor_name))
+            ->with(['vendorSetting', 'vendorSetting.location'])
+            ->first();
+
+        // Fallback: try name-based lookup for legacy URLs
+        if (!$brand) {
+            $name = str_replace('-', ' ', $vendor_name);
+            $brand = Brand::where('name', 'LIKE', $name)
+                ->with(['vendorSetting', 'vendorSetting.location'])
+                ->first();
+        }
+
+        if (!$brand || !$brand->is_active) {
             abort(404);
         }
 
-        // Define price ranges (add 'all')
+        $vendorSetting = $brand->vendorSetting;
+
+        // Check if current user is admin
+        $currentUser = Auth::user();
+        $isAdmin = $currentUser && $currentUser->role === 'admin';
+        $isOwnPage = $currentUser && $brand->user_id === $currentUser->id;
+
+        // Define price ranges
         $ranges = [
             'all' => [null, null],
             '0-50' => [0, 50],
@@ -44,13 +50,12 @@ class PublicVendorController extends Controller
             '200+' => [200, null],
         ];
 
-        // Get counts for each range
+        // Get counts for each range via brand products
         $counts = [];
-        // All products count
-        $counts['all'] = $user->products()->count();
+        $counts['all'] = $brand->products()->visible()->count();
         foreach ($ranges as $key => [$min, $max]) {
             if ($key === 'all') continue;
-            $query = $user->products();
+            $query = $brand->products()->visible();
             if ($max === null) {
                 $query->where('price', '>=', $min);
             } else {
@@ -59,14 +64,12 @@ class PublicVendorController extends Controller
             $counts[$key] = $query->count();
         }
 
-        // Get search query
         $search = $request->query('search', '');
-        // Get selected cost filter
         $selected = $request->query('cost', 'all');
         $selectedRange = $ranges[$selected] ?? $ranges['all'];
 
-        // Build products query
-        $productsQuery = $user->products()->latest();
+        // Build products query via Brand relationship
+        $productsQuery = $brand->products()->visible()->latest();
         if ($selected !== 'all') {
             if ($selectedRange[1] === null) {
                 $productsQuery->where('price', '>=', $selectedRange[0]);
@@ -77,11 +80,19 @@ class PublicVendorController extends Controller
         if ($search) {
             $productsQuery->where('name', 'like', '%' . $search . '%');
         }
-        $items = $productsQuery->get(['id', 'name', 'price', 'discount_price', 'second_price', 'image_url', 'product_url', 'description']);
+        $items = $productsQuery->get(['id', 'name', 'slug', 'price', 'discount_price', 'second_price', 'image_url', 'product_url', 'description']);
+
+        // Build a vendor-like object the Vue page expects
+        $vendor = (object) [
+            'id' => $brand->id,
+            'name' => $brand->name,
+            'slug' => $brand->slug,
+            'email' => $vendorSetting?->contact_email,
+        ];
 
         return Inertia::render('Vendor/Public', [
             'settings' => $vendorSetting,
-            'vendor' => $user,
+            'vendor' => $vendor,
             'items' => $items,
             'isAdmin' => $isAdmin,
             'isOwnPage' => $isOwnPage,
