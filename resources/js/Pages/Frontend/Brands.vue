@@ -155,11 +155,6 @@
           :href="`/shop/${brand.slug}`"
           class="ui-focus group flex items-center gap-5 p-4 md:p-5 rounded-[14px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-sm)] transition-all duration-[180ms]"
         >
-          <!-- Rank -->
-          <div class="hidden md:flex w-8 flex-shrink-0 items-center justify-center">
-            <span class="ui-mono text-sm font-bold text-[color:var(--color-ink-subtle)]">{{ idx + 1 }}</span>
-          </div>
-
           <!-- Logo -->
           <div class="w-12 h-12 md:w-14 md:h-14 rounded-[12px] flex-shrink-0 overflow-hidden flex items-center justify-center" :style="{ background: vendorGradient(brand.name) }">
             <img

@@ -90,7 +90,6 @@
             :href="vendor.url"
             class="ui-focus group flex items-center gap-4 md:gap-5 p-4 rounded-[14px] border border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-sm)] transition-all duration-[180ms]"
           >
-            <span class="hidden md:flex w-7 items-center justify-center ui-mono text-sm font-bold text-[color:var(--color-ink-subtle)]">{{ idx + 1 }}</span>
             <div class="w-11 h-11 rounded-[10px] flex-shrink-0 overflow-hidden flex items-center justify-center" :style="{ background: vendorGradient(vendor.name) }">
               <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-full object-contain p-1" loading="lazy" />
               <span v-else class="ui-display text-white text-sm font-bold">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
