@@ -101,100 +101,130 @@
         </div>
       </div>
 
-      <!-- Vendor grid -->
-      <div v-if="filteredBrands.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Featured vendor spotlight (first partner/featured vendor gets a big card) -->
+      <div v-if="featuredVendor" class="mb-8">
         <a
-          v-for="brand in filteredBrands"
+          :href="`/shop/${featuredVendor.slug}`"
+          class="ui-focus group flex flex-col md:flex-row rounded-[16px] border border-[color:var(--color-accent-400)]/30 bg-gradient-to-r from-[color:var(--color-accent-50)] to-white overflow-hidden hover:shadow-[var(--shadow-md)] transition-all duration-[200ms]"
+        >
+          <!-- Logo area -->
+          <div class="md:w-56 flex-shrink-0 flex items-center justify-center p-8" :style="{ background: vendorGradient(featuredVendor.name) }">
+            <img
+              v-if="featuredVendor.logo"
+              :src="featuredVendor.logo"
+              :alt="featuredVendor.name"
+              class="max-h-20 max-w-[80%] object-contain drop-shadow-lg"
+              loading="lazy"
+            />
+            <span v-else class="ui-display text-white text-4xl font-bold">{{ featuredVendor.initials }}</span>
+          </div>
+          <!-- Info -->
+          <div class="flex-1 p-6 flex flex-col justify-center gap-3">
+            <div class="flex items-center gap-2">
+              <span class="ui-mono text-[10px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-full bg-[color:var(--color-accent-600)] text-white font-semibold">Featured</span>
+            </div>
+            <h2 class="ui-display text-2xl font-semibold text-[color:var(--color-ink)] tracking-tight">{{ featuredVendor.name }}</h2>
+            <div class="flex items-center flex-wrap gap-4 text-sm text-[color:var(--color-ink-muted)]">
+              <div class="flex items-center gap-1">
+                <div class="flex gap-0.5">
+                  <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(parseFloat(featuredVendor.rating)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                </div>
+                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ parseFloat(featuredVendor.rating).toFixed(1) }}</span>
+                <span>({{ featuredVendor.reviews }})</span>
+              </div>
+              <span v-if="featuredVendor.location" class="flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ featuredVendor.location }}
+              </span>
+              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ featuredVendor.product_count }}</span> compounds
+            </div>
+          </div>
+          <div class="hidden md:flex items-center pr-6">
+            <span class="inline-flex items-center gap-1.5 text-sm font-semibold text-[color:var(--color-accent-600)] group-hover:translate-x-1 transition-transform duration-200">
+              View vendor
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Vendor list (rich rows, not card grid) -->
+      <div v-if="filteredBrands.length > 0" class="space-y-3">
+        <a
+          v-for="(brand, idx) in filteredBrands"
           :key="brand.id"
           :href="`/shop/${brand.slug}`"
-          class="ui-focus group flex flex-col rounded-[16px] border border-[color:var(--color-hairline)] bg-white overflow-hidden hover:shadow-[var(--shadow-md)] hover:border-[color:var(--color-accent-400)] hover:-translate-y-[2px] transition-all duration-[200ms]"
+          class="ui-focus group flex items-center gap-5 p-4 md:p-5 rounded-[14px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-sm)] transition-all duration-[180ms]"
         >
-          <!-- Banner: logo centered on gradient -->
-          <div class="relative aspect-[16/7] overflow-hidden">
-            <div class="absolute inset-0" :style="{ background: vendorGradient(brand.name) }" />
-            <div class="absolute inset-0 flex items-center justify-center p-6">
-              <img
-                v-if="brand.logo"
-                :src="brand.logo"
-                :alt="`${brand.name} logo`"
-                class="max-h-full max-w-[65%] object-contain drop-shadow-lg"
-                loading="lazy"
-              />
-              <span v-else class="ui-display text-white/90 text-4xl font-bold tracking-tight drop-shadow-lg">
-                {{ brand.initials }}
-              </span>
+          <!-- Rank -->
+          <div class="hidden md:flex w-8 flex-shrink-0 items-center justify-center">
+            <span class="ui-mono text-sm font-bold text-[color:var(--color-ink-subtle)]">{{ idx + 1 }}</span>
+          </div>
+
+          <!-- Logo -->
+          <div class="w-12 h-12 md:w-14 md:h-14 rounded-[12px] flex-shrink-0 overflow-hidden flex items-center justify-center" :style="{ background: vendorGradient(brand.name) }">
+            <img
+              v-if="brand.logo"
+              :src="brand.logo"
+              :alt="brand.name"
+              class="max-h-full max-w-full object-contain p-1.5"
+              loading="lazy"
+            />
+            <span v-else class="ui-display text-white text-lg font-bold">{{ brand.initials }}</span>
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="ui-display text-[16px] font-semibold text-[color:var(--color-ink)] truncate tracking-tight">{{ brand.name }}</h3>
+              <span v-if="brand.is_partner" class="ui-mono text-[9px] uppercase tracking-[0.1em] px-1.5 py-0.5 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] font-semibold flex-shrink-0">Partner</span>
             </div>
-            <!-- Partner chip -->
-            <div v-if="brand.is_partner" class="absolute top-3 right-3 z-10">
-              <span class="ui-mono text-[9px] uppercase tracking-[0.14em] px-2 py-0.5 rounded-full bg-white/15 backdrop-blur-sm text-white border border-white/20 font-semibold">
-                Partner
+            <div class="flex items-center flex-wrap gap-x-4 gap-y-1 text-xs text-[color:var(--color-ink-muted)]">
+              <span v-if="brand.location" class="flex items-center gap-1">
+                <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ brand.location }}
+              </span>
+              <span class="flex items-center gap-1">
+                <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.product_count }}</span> compounds
               </span>
             </div>
           </div>
 
-          <!-- Body -->
-          <div class="flex-1 flex flex-col gap-4 p-5">
-            <div>
-              <h3 class="ui-display text-[18px] font-semibold text-[color:var(--color-ink)] leading-tight tracking-tight">
-                {{ brand.name }}
-              </h3>
-              <div v-if="brand.location" class="flex items-center gap-1.5 mt-1 text-xs text-[color:var(--color-ink-muted)]">
-                <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/>
-                </svg>
-                {{ brand.location }}
+          <!-- Rating -->
+          <div class="hidden sm:flex flex-col items-end gap-1 flex-shrink-0">
+            <div class="flex items-center gap-1.5">
+              <div class="flex gap-0.5">
+                <svg v-for="n in 5" :key="n" class="w-3 h-3" :class="n <= Math.round(parseFloat(brand.rating)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
               </div>
+              <span class="ui-mono text-sm font-bold text-[color:var(--color-ink)]">{{ parseFloat(brand.rating).toFixed(1) }}</span>
             </div>
+            <span class="text-[11px] text-[color:var(--color-ink-subtle)]">{{ brand.reviews }} reviews</span>
+          </div>
 
-            <!-- Rating -->
-            <div class="flex items-center gap-2">
-              <div class="flex items-center gap-0.5">
-                <svg
-                  v-for="n in 5" :key="n"
-                  class="w-3.5 h-3.5"
-                  :class="n <= Math.round(parseFloat(brand.rating)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'"
-                  viewBox="0 0 20 20" fill="currentColor"
-                >
-                  <path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z" />
-                </svg>
-              </div>
-              <span class="ui-mono text-sm font-semibold text-[color:var(--color-ink)]">{{ parseFloat(brand.rating).toFixed(1) }}</span>
-              <span class="text-xs text-[color:var(--color-ink-subtle)]">({{ brand.reviews }})</span>
-            </div>
-
-            <!-- Footer stats -->
-            <div class="mt-auto pt-4 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between">
-              <div class="flex items-center gap-1.5 text-xs text-[color:var(--color-ink-muted)]">
-                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.product_count }}</span>
-                compounds
-              </div>
-              <span class="inline-flex items-center gap-1 text-[13px] font-semibold text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-transform duration-[180ms]">
-                View
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M5 12h14M13 5l7 7-7 7"/>
-                </svg>
-              </span>
-            </div>
+          <!-- CTA arrow -->
+          <div class="flex-shrink-0 hidden md:block">
+            <svg class="w-5 h-5 text-[color:var(--color-ink-subtle)] group-hover:text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-all duration-[180ms]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
           </div>
         </a>
       </div>
 
       <!-- Empty state -->
-      <div v-else class="py-24 text-center">
-        <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-[color:var(--color-hairline-soft)] flex items-center justify-center">
-          <svg class="w-7 h-7 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+      <div v-else class="py-20 text-center">
+        <div class="w-14 h-14 mx-auto mb-5 rounded-full bg-[color:var(--color-hairline-soft)] flex items-center justify-center">
+          <svg class="w-6 h-6 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
         </div>
-        <h3 class="ui-display text-xl font-semibold text-[color:var(--color-ink)] mb-2">No vendors found</h3>
-        <p class="text-[color:var(--color-ink-muted)] text-sm max-w-md mx-auto">
-          Try adjusting your search or filters. All verified vendors are shown by default.
-        </p>
+        <h3 class="ui-display text-lg font-semibold text-[color:var(--color-ink)] mb-2">No vendors found</h3>
+        <p class="text-[color:var(--color-ink-muted)] text-sm mb-5">Try adjusting your search or filters.</p>
         <button
           @click="clearFilters"
-          class="ui-focus mt-6 h-10 px-5 rounded-[10px] bg-[color:var(--color-accent-600)] text-white text-[14px] font-semibold hover:bg-[color:var(--color-accent-700)] transition-colors"
+          class="ui-focus h-9 px-5 rounded-[9px] bg-[color:var(--color-accent-600)] text-white text-[13px] font-semibold hover:bg-[color:var(--color-accent-700)] transition-colors"
         >
-          Clear all filters
+          Clear filters
         </button>
       </div>
     </section>
@@ -247,6 +277,11 @@ const locationFilters = [
 
 const sortValue = computed(() => `${props.sort || 'rating'}|${props.sortDir || 'desc'}`)
 const filteredBrands = computed(() => props.brands)
+
+// First partner/featured vendor gets a spotlight card
+const featuredVendor = computed(() =>
+  props.brands.find(b => b.is_partner || b.featured) || null
+)
 
 const hasActiveFilters = computed(() =>
   searchQuery.value || selectedFilters.value.location || selectedFilters.value.topVendorsOnly
