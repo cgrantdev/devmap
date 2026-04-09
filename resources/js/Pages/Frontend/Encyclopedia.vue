@@ -109,6 +109,19 @@
       <div v-else class="text-center py-20">
         <p class="text-gray-500 text-lg">No peptides found matching your search.</p>
       </div>
+
+      <!-- More coming soon -->
+      <div class="mt-12 py-10 border-t border-[color:var(--color-hairline)] text-center">
+        <div class="w-12 h-12 mx-auto mb-4 bg-[color:var(--color-accent-50)] flex items-center justify-center">
+          <svg class="w-6 h-6 text-[color:var(--color-accent-600)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 2v6l-4 7c-1 1.8 0 4 2 4h10c2 0 3-2.2 2-4l-4-7V2"/><path d="M8 2h8"/>
+          </svg>
+        </div>
+        <h3 class="ui-display text-lg font-semibold text-[color:var(--color-ink)] mb-2">More articles coming soon</h3>
+        <p class="text-sm text-[color:var(--color-ink-muted)] max-w-md mx-auto">
+          We're actively writing research profiles for every compound on PeptideMap. Check back regularly for new entries.
+        </p>
+      </div>
     </section>
   </ModernLayout>
 </template>

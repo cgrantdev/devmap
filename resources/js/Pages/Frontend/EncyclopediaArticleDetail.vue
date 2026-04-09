@@ -20,74 +20,62 @@
     <link rel="canonical" :href="canonical" />
   </Head>
   <ModernLayout>
-    <div class="min-h-screen bg-gray-50">
-      <!-- Header Section (Dark Background) -->
-      <div class="bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 border-b border-slate-300 relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+    <div class="min-h-screen">
+      <!-- Header Section (Light) -->
+      <div class="border-b border-[color:var(--color-hairline)] bg-white">
+        <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-6 relative z-10">
           <!-- Back Button -->
-          <button 
+          <button
             @click="router.visit('/encyclopedia')"
-            class="flex items-center gap-2 text-slate-100 hover:text-white mb-6 transition-colors group"
+            class="flex items-center gap-2 text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] mb-5 transition-colors group text-sm"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left w-4 h-4 group-hover:-translate-x-1 transition-transform" aria-hidden="true">
+            <svg class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
               <path d="m12 19-7-7 7-7"></path>
               <path d="M19 12H5"></path>
             </svg>
             Back to Encyclopedia
           </button>
 
-          <div class="mb-8 flex items-start justify-between gap-8">
+          <div class="mb-6 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <!-- Title Section -->
-            <div class="flex items-start gap-5">
-              <div class="p-4 bg-white/10 rounded-xl backdrop-blur-sm border border-white/20 shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flask-conical w-10 h-10 text-white" aria-hidden="true">
-                  <path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"></path>
-                  <path d="M6.453 15h11.094"></path>
-                  <path d="M8.5 2h7"></path>
-                </svg>
-              </div>
-              <div>
-                <h1 class="text-5xl font-semibold text-white mb-2">{{ categoryName || name }}</h1>
-                <p class="text-xl text-slate-200">{{ subtitle }}</p>
-              </div>
+            <div>
+              <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
+              <p class="text-lg text-[color:var(--color-ink-muted)]">{{ subtitle }}</p>
             </div>
 
             <!-- Tags and Research Info -->
-            <div class="flex flex-col gap-3">
-              <!-- Tags -->
+            <div class="flex flex-col gap-3 flex-shrink-0">
               <div class="flex items-center gap-2">
-                <span 
-                  v-for="(tag, index) in tags" 
+                <span
+                  v-for="(tag, index) in tags"
                   :key="index"
                   :class="getTagColorClass(tag)"
-                  class="px-3 py-1 rounded-full text-sm font-medium backdrop-blur-sm"
+                  class="px-3 py-1 text-sm font-medium"
                 >
                   {{ tag }}
                 </span>
               </div>
-
-              <!-- Primary Research -->
-              <div class="text-center">
-                <div class="text-white/80 text-sm italic">Primary Research: University of Zagreb (Croatia)</div>
-                <a                   
+              <div class="text-right">
+                <div class="text-[color:var(--color-ink-muted)] text-sm">Primary Research: University of Zagreb</div>
+                <a
                   :href="primaryResearch.url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1 text-white/50 hover:text-white/80 text-xs mt-1 transition-colors"
+                  class="inline-flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] text-xs mt-1 transition-colors font-medium"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-3 h-3" aria-hidden="true">
-                    <path d="M15 3h6v6"></path>
-                    <path d="M10 14 21 3"></path>
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 17L17 7M17 7H7M17 7v10"/>
                   </svg>
                   View Research
                 </a>
               </div>
             </div>
           </div>
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 shadow-lg">
-              <h3 class="text-white/80 text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
+
+          <!-- Molecular Info Cards — light version -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-5">
+              <h3 class="text-[color:var(--color-ink-muted)] text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-atom w-4 h-4" aria-hidden="true">
                   <circle cx="12" cy="12" r="1"></circle>
                   <path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"></path>
@@ -97,21 +85,21 @@
               </h3>
               <div class="space-y-4">
                 <div>
-                  <div class="text-white/60 text-xs mb-1">Formula</div>
-                  <div class="text-white font-mono text-xl">{{ molecularInfo.formula || '-' }}</div>
+                  <div class="text-[color:var(--color-ink-subtle)] text-xs mb-1">Formula</div>
+                  <div class="text-[color:var(--color-ink)] ui-mono text-xl">{{ molecularInfo.formula || '-' }}</div>
                 </div>
                 <div>
-                  <div class="text-white/60 text-xs mb-1">Molecular Weight</div>
-                  <div class="text-white font-semibold text-xl">{{ molecularInfo.molecularWeight || '-' }}</div>
+                  <div class="text-[color:var(--color-ink-subtle)] text-xs mb-1">Molecular Weight</div>
+                  <div class="text-[color:var(--color-ink)] font-semibold text-xl">{{ molecularInfo.molecularWeight || '-' }}</div>
                 </div>
                 <div>
-                  <div class="text-white/60 text-xs mb-1">CAS Registry Number</div>
-                  <div class="text-white font-mono text-xl">{{ molecularInfo.casNumber || '-' }}</div>
+                  <div class="text-[color:var(--color-ink-subtle)] text-xs mb-1">CAS Registry Number</div>
+                  <div class="text-[color:var(--color-ink)] ui-mono text-xl">{{ molecularInfo.casNumber || '-' }}</div>
                 </div>
               </div>
             </div>
-            <div class="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 shadow-lg lg:col-span-2">
-              <h3 class="text-white/80 text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
+            <div class="bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-5 lg:col-span-2">
+              <h3 class="text-[color:var(--color-ink-muted)] text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-dna w-4 h-4" aria-hidden="true">
                   <path d="m10 16 1.5 1.5"></path>                              
                   <path d="m14 8-1.5-1.5"></path>
@@ -127,28 +115,28 @@
                 </svg>
                 Amino Acid Sequence{{ aminoAcidSequence.residueCount > 0 ? ` (${aminoAcidSequence.residueCount} Residues)` : '' }}
               </h3>
-              <div v-if="aminoAcidSequence.sequence" class="bg-white/5 rounded-lg p-4 border border-white/10">
-                <p class="text-white font-mono text-sm leading-relaxed">
+              <div v-if="aminoAcidSequence.sequence" class="bg-white border border-[color:var(--color-hairline)] p-4">
+                <p class="text-[color:var(--color-ink)] ui-mono text-sm leading-relaxed">
                   {{ aminoAcidSequence.sequence }}
                 </p>
               </div>
-              <div v-else class="bg-white/5 rounded-lg p-4 border border-white/10">
-                <p class="text-white/60 text-sm">No sequence data available</p>
+              <div v-else class="bg-white border border-[color:var(--color-hairline)] p-4">
+                <p class="text-[color:var(--color-ink-subtle)] text-sm">No sequence data available</p>
               </div>
               <div class="grid grid-cols-2 gap-4 mt-4">
                 <div v-if="aminoAcidComposition && aminoAcidComposition.length > 0">
-                  <div class="text-white/60 text-xs mb-2">Composition</div>
+                  <div class="text-[color:var(--color-ink-subtle)] text-xs mb-2">Composition</div>
                   <div class="space-y-1 text-xs">
-                    <div v-for="(comp, index) in aminoAcidComposition" :key="index" class="text-white/80">{{ comp }}</div>
+                    <div v-for="(comp, index) in aminoAcidComposition" :key="index" class="text-[color:var(--color-ink-muted)]">{{ comp }}</div>
                   </div>
                 </div>
                 <div v-if="aminoAcidSequence.properties && (aminoAcidSequence.properties.netCharge || aminoAcidSequence.properties.hydrophobic || aminoAcidSequence.properties.stability || aminoAcidSequence.properties.solubility)">
-                  <div class="text-white/60 text-xs mb-2">Properties</div>
+                  <div class="text-[color:var(--color-ink-subtle)] text-xs mb-2">Properties</div>
                   <div class="space-y-1 text-xs">
-                    <div v-if="aminoAcidSequence.properties.netCharge" class="text-white/80">Net Charge: {{ aminoAcidSequence.properties.netCharge }}</div>
-                    <div v-if="aminoAcidSequence.properties.hydrophobic" class="text-white/80">Hydrophobic: {{ aminoAcidSequence.properties.hydrophobic }}</div>
-                    <div v-if="aminoAcidSequence.properties.stability" class="text-white/80">Stability: {{ aminoAcidSequence.properties.stability }}</div>
-                    <div v-if="aminoAcidSequence.properties.solubility" class="text-white/80">Solubility: {{ aminoAcidSequence.properties.solubility }}</div>
+                    <div v-if="aminoAcidSequence.properties.netCharge" class="text-[color:var(--color-ink-muted)]">Net Charge: {{ aminoAcidSequence.properties.netCharge }}</div>
+                    <div v-if="aminoAcidSequence.properties.hydrophobic" class="text-[color:var(--color-ink-muted)]">Hydrophobic: {{ aminoAcidSequence.properties.hydrophobic }}</div>
+                    <div v-if="aminoAcidSequence.properties.stability" class="text-[color:var(--color-ink-muted)]">Stability: {{ aminoAcidSequence.properties.stability }}</div>
+                    <div v-if="aminoAcidSequence.properties.solubility" class="text-[color:var(--color-ink-muted)]">Solubility: {{ aminoAcidSequence.properties.solubility }}</div>
                   </div>
                 </div>
               </div>
