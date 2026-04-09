@@ -1,22 +1,17 @@
 <template>
   <ModernLayout>
-    <div class="min-h-screen bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex items-center gap-2 text-sm text-gray-600 mb-6">
-          <button 
-            @click="handleClick1"
-            class="hover:text-gray-900">Products
-          </button>
-          <span>/</span>
-          <button 
-            @click="handleClick2"
-            class="hover:text-gray-900">{{ product.category?.name || 'N/A' }}
-          </button>
-          <span>/</span>
-          <span class="text-gray-900">{{ product.name || 'N/A' }}</span>
+    <div class="min-h-screen">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-6">
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2 text-[13px] text-[color:var(--color-ink-muted)] mb-6">
+          <button @click="handleClick1" class="hover:text-[color:var(--color-ink)] transition-colors">Products</button>
+          <span class="text-[color:var(--color-ink-subtle)]">/</span>
+          <button @click="handleClick2" class="hover:text-[color:var(--color-ink)] transition-colors">{{ product.category?.name || 'N/A' }}</button>
+          <span class="text-[color:var(--color-ink-subtle)]">/</span>
+          <span class="text-[color:var(--color-ink)] font-medium">{{ product.name || 'N/A' }}</span>
         </div>
-        <div class="bg-white rounded-lg border border-gray-200 mb-8">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
+        <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-sm)] mb-8">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 md:p-8">
             <!-- Left: Product Image -->
             <div>
               <div class="aspect-square bg-gray-50 rounded-lg p-12 sticky top-24">
@@ -43,7 +38,22 @@
               </div>
   
               <!-- Product Title -->
-              <h1 class="text-3xl text-gray-900 mb-3">{{ product.name }}</h1>
+              <h1 class="ui-display text-[28px] md:text-3xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ product.name }}</h1>
+
+              <!-- Trust badges — surfaced from buried features, visible immediately -->
+              <div class="flex flex-wrap gap-2 mb-3">
+                <span v-if="product.lab_tested" class="inline-flex items-center gap-1 px-2 py-1 rounded-[6px] bg-[color:var(--color-verified-bg)] text-[color:var(--color-verified)] text-[11px] font-semibold">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Lab tested
+                </span>
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-[6px] bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-semibold">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6l-4 7c-1 1.8 0 4 2 4h10c2 0 3-2.2 2-4l-4-7V2"/><path d="M8 2h8"/></svg>
+                  COA available
+                </span>
+                <span v-if="product.purity" class="inline-flex items-center gap-1 px-2 py-1 rounded-[6px] bg-[color:var(--color-hairline-soft)] text-[color:var(--color-ink-muted)] text-[11px] font-semibold ui-mono">
+                  {{ product.purity }}% purity
+                </span>
+              </div>
   
               <!-- Brand/Seller -->
               <Link                
@@ -85,69 +95,56 @@
                 </span>
               </div>              
   
-              <!-- Price -->
+              <!-- Price — monospace, prominent -->
               <div class="mb-6">
-                <div class="text-4xl text-gray-900 mb-1">
-                  ${{ product.discount_price || product.price }}
-                </div>                
-              </div>
-  
-              <!-- Product Features -->
-              <div class="space-y-2 mb-6">
-                <div class="flex items-center gap-2 text-sm text-gray-700">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-big w-4 h-4 text-green-600" aria-hidden="true">
-                    <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
-                    <path d="m9 11 3 3L22 4"></path>
-                  </svg>
-                  <span>Third-party lab tested</span>
+                <div class="flex items-baseline gap-3">
+                  <span class="ui-mono text-4xl font-bold text-[color:var(--color-ink)]">
+                    ${{ product.discount_price || product.price }}
+                  </span>
+                  <span
+                    v-if="product.discount_price && product.discount_price < product.price"
+                    class="ui-mono text-lg text-[color:var(--color-ink-subtle)] line-through"
+                  >
+                    ${{ product.price }}
+                  </span>
                 </div>
-                <div class="flex items-center gap-2 text-sm text-gray-700">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-big w-4 h-4 text-green-600" aria-hidden="true">
-                    <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
-                    <path d="m9 11 3 3L22 4"></path>
-                  </svg>
-                  <span>Certificate of Analysis available</span>
-                </div>
-                <div class="flex items-center gap-2 text-sm text-gray-700">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-big w-4 h-4 text-green-600" aria-hidden="true">
-                    <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
-                    <path d="m9 11 3 3L22 4"></path>
-                  </svg>
-                  <span>Research grade quality</span>
+                <div v-if="product.size_mg" class="ui-mono text-sm text-[color:var(--color-ink-muted)] mt-1">
+                  {{ product.size_mg }}mg vial
                 </div>
               </div>
-  
-              <!-- Discount Code -->
-              <button
-                @click="copyDiscountCode"
-                class="w-full mb-6 px-6 py-4 rounded-lg flex items-center justify-between transition-all border-[3px] border-dashed border-green-600 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 group cursor-pointer"
-              >
-                <div class="flex items-center gap-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag w-5 h-5" aria-hidden="true">
-                    <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path>
-                    <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                  </svg>
-                  <span class="text-sm font-semibold">Use Code:</span>
-                  <span class="font-mono tracking-wider font-bold">{{ brand?.discount_code || 'PMAP' }}</span>
-                </div>                
-                <span class="text-xs opacity-75">Click to Copy</span>
-              </button>              
-  
-              <!-- Purchase Button -->
-              <div v-if="product.product_url">
+
+              <!-- Purchase Button — primary CTA, clean -->
+              <div v-if="product.product_url" class="mb-4">
                 <a
                   :href="`/go/${product.id}`"
                   target="_blank"
                   rel="noopener noreferrer nofollow sponsored"
-                  class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg transition-colors flex items-center justify-center gap-2 mb-6"
+                  class="ui-focus w-full h-[52px] flex items-center justify-center gap-2 rounded-[13px] text-[15px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_10px_24px_-8px_rgba(79,70,229,0.4)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_2px_4px_rgba(10,11,14,0.1),0_14px_32px_-8px_rgba(79,70,229,0.55)] hover:-translate-y-[1px] active:translate-y-0 transition-all"
                 >
-                  Visit {{ brand.name }} to Purchase
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5" aria-hidden="true">
-                    <path d="M15 3h6v6"></path>
-                    <path d="M10 14 21 3"></path>
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  Visit {{ brand.name }} to purchase
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 17L17 7M17 7H7M17 7v10" />
                   </svg>
                 </a>
+              </div>
+
+              <!-- Compare link + discount code — secondary, below CTA -->
+              <div class="flex items-center justify-between gap-4 mb-6">
+                <a
+                  v-if="product.category"
+                  :href="`/compare#${product.category.slug || ''}`"
+                  class="text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors flex items-center gap-1"
+                >
+                  Compare prices for {{ product.category.name }}
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </a>
+                <button
+                  @click="copyDiscountCode"
+                  class="ui-focus flex items-center gap-2 px-3 py-1.5 rounded-[8px] border border-dashed border-[color:var(--color-hairline)] text-[12px] font-semibold text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)] transition-all"
+                >
+                  <span class="ui-mono">{{ brand?.discount_code || 'PMAP' }}</span>
+                  <span class="text-[color:var(--color-ink-subtle)]">· copy</span>
+                </button>
               </div>
   
               <!-- Seller Information -->

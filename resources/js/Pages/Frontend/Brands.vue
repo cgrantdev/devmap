@@ -188,6 +188,10 @@
                 <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                 <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.product_count }}</span> compounds
               </span>
+              <span v-if="brand.last_updated" class="flex items-center gap-1 text-[color:var(--color-ink-subtle)]">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Updated {{ brand.last_updated }} ago
+              </span>
             </div>
           </div>
 

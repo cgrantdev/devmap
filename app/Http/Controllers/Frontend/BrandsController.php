@@ -146,6 +146,7 @@ class BrandsController extends Controller
                     'reviews' => (int) ($brand->rating_count ?? 0),
                     'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
                     'featured' => $brand->vendorSetting && $brand->vendorSetting->featured ? true : false,
+                    'last_updated' => $brand->updated_at?->diffForHumans(null, true) ?? null,
                 ];
             });
         
