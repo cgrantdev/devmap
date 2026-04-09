@@ -1,186 +1,220 @@
 <template>
   <Head :title="title">
     <meta name="description" :content="description" />
-    
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" :content="url" />
     <meta property="og:title" :content="ogTitle" />
     <meta property="og:description" :content="ogDescription" />
     <meta v-if="ogImage" property="og:image" :content="ogImage" />
-    
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" :content="url" />
     <meta name="twitter:title" :content="ogTitle" />
     <meta name="twitter:description" :content="ogDescription" />
-    <meta v-if="ogImage" name="twitter:image" :content="ogImage" />
-    
-    <!-- Canonical URL -->
     <link rel="canonical" :href="url" />
   </Head>
+
   <ModernLayout>
-    <!-- Brands Section -->
-    <section class="min-h-screen">
-      <div class="border-b border-[color:var(--color-hairline)]">
-        <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-10">
-          <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Vendor network</div>
-          <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">All Vendors</h1>
-          <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">Compare vendors, read reviews, and find the best peptide sources</p>
+    <!-- Dark gradient hero -->
+    <section class="relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-[#0A0B0E] via-[#111827] to-[#4F46E5]" />
+      <div class="absolute inset-0 opacity-[0.025]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '48px 48px' }" />
+      <div class="absolute top-1/3 right-[5%] w-[500px] h-[500px] rounded-full bg-[color:var(--color-accent-500)] opacity-[0.12] blur-[120px] pointer-events-none" />
+
+      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-12 pb-16">
+        <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-[color:var(--color-accent-400)] mb-3">
+          Vendor network
+        </div>
+        <h1 class="ui-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-[-0.025em] text-white mb-4 leading-[0.98]">
+          All Vendors
+        </h1>
+        <p class="text-lg text-white/60 leading-relaxed max-w-2xl mb-10">
+          Compare vendors, read reviews, and find the best peptide sources — all in one place.
+        </p>
+
+        <!-- Search + sort inline on the hero -->
+        <div class="flex flex-col sm:flex-row gap-3 max-w-3xl">
+          <div class="relative flex-1">
+            <input
+              v-model="searchQuery"
+              @input="handleSearchInput"
+              type="text"
+              placeholder="Search vendors by name or location…"
+              class="ui-focus w-full h-12 pl-11 pr-4 bg-white/[0.08] border border-white/[0.12] rounded-[12px] text-white text-[15px] placeholder-white/40 backdrop-blur-sm focus:bg-white/[0.12] focus:border-white/25 focus:outline-none focus:ring-0 transition-colors"
+            />
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            </svg>
+          </div>
+          <select
+            :value="sortValue"
+            @change="handleSortChange"
+            class="ui-focus h-12 px-4 bg-white/[0.08] border border-white/[0.12] rounded-[12px] text-white text-[14px] backdrop-blur-sm focus:outline-none focus:ring-0 cursor-pointer appearance-none"
+          >
+            <option value="rating|desc" class="text-[color:var(--color-ink)]">Highest Rated</option>
+            <option value="reviews|desc" class="text-[color:var(--color-ink)]">Most Reviews</option>
+            <option value="name|asc" class="text-[color:var(--color-ink)]">Alphabetical</option>
+          </select>
+        </div>
+
+        <!-- Filter chips row -->
+        <div class="flex flex-wrap items-center gap-2 mt-5">
+          <button
+            v-for="loc in locationFilters"
+            :key="loc.value"
+            @click="toggleLocation(loc.value)"
+            :class="[
+              'ui-focus h-8 px-3.5 rounded-full text-[12px] font-semibold transition-all duration-200 border',
+              selectedFilters.location === loc.value
+                ? 'bg-white text-[color:var(--color-ink)] border-white shadow-sm'
+                : 'bg-white/[0.06] text-white/60 border-white/[0.1] hover:bg-white/[0.1] hover:text-white/80',
+            ]"
+          >
+            {{ loc.label }}
+          </button>
+          <span class="text-white/20 text-sm mx-1">|</span>
+          <button
+            @click="toggleTopVendors"
+            :class="[
+              'ui-focus h-8 px-3.5 rounded-full text-[12px] font-semibold transition-all duration-200 border flex items-center gap-1.5',
+              selectedFilters.topVendorsOnly
+                ? 'bg-[color:var(--color-accent-500)] text-white border-[color:var(--color-accent-400)]'
+                : 'bg-white/[0.06] text-white/60 border-white/[0.1] hover:bg-white/[0.1] hover:text-white/80',
+            ]"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z" /><path d="M9.5 12.5l2 2 4-4.5" />
+            </svg>
+            Top vendors
+          </button>
         </div>
       </div>
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
-        <!-- Main Content Area (Full Width) -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <!-- Search Bar, Sort, and Filters (First Row) -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            <!-- Search Bar -->
-            <div class="md:col-span-2 relative">
-              <input
-                v-model="searchQuery"
-                @input="handleSearchInput"
-                type="text"
-                placeholder="Search vendors..."
-                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true">
-                <path d="m21 21-4.34-4.34"></path>
-                <circle cx="11" cy="11" r="8"></circle>
-              </svg>
-            </div>
+    </section>
 
-            <!-- Sort and Filters (on the right) -->
-            <select
-              class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              :value="sortValue"
-              @change="handleSortChange"
-            >
-              <option value="rating|desc">Highest Rated</option>
-              <option value="reviews|desc">Most Reviews</option>
-              <option value="name|asc">Alphabetical</option>
-            </select>
-              
-            <button
-              type="button"
-              class="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              @click="showFilterPanel = !showFilterPanel"
-            >
-              <component :is="filterIcon" class="w-4 h-4" />
-              <span>Filters</span>
-              <component
-                :is="chevronIcon"
-                class="w-4 h-4 transition-transform"
-                :class="showFilterPanel ? 'rotate-180' : ''"
-              />
-            </button>            
-          </div>
-
-          <!-- Filter Panel -->
-          <div v-if="showFilterPanel" class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
-            
-            <!-- Location Filter -->
-            <div>
-              <label class="block text-sm text-gray-700 mb-2">Location</label>
-              <select
-                v-model="selectedFilters.location"
-                @change="applyFilters"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              >
-                <option value="">All Locations</option>
-                <option value="United States">United States</option>
-                <option value="Switzerland">Switzerland</option>
-                <option value="Canada">Canada</option>
-                <option value="United Kingdom">United Kingdom</option>
-                <option value="Australia">Australia</option>
-              </select>
-            </div>
-
-            <!-- Minimum Rating Filter -->
-            <div>
-              <label class="block text-sm text-gray-700 mb-2">Minimum Rating</label>
-              <select
-                v-model="selectedFilters.minRating"
-                @change="applyFilters"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              >
-                <option value="">All Ratings</option>
-                <option value="4.5">4.5+ Stars</option>
-                <option value="4.0">4.0+ Stars</option>
-                <option value="3.5">3.5+ Stars</option>
-              </select>
-            </div>
-
-            <!-- Vendor Type Filter -->
-            <div>
-              <label class="block text-sm text-gray-700 mb-2">Vendor Type</label>
-              <label class="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="checkbox"
-                  v-model="selectedFilters.topVendorsOnly"
-                  @change="applyFilters"
-                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                />
-                <span class="text-sm text-gray-700">Top Vendors Only</span>
-              </label>
-            </div>
-            
-          </div>
+    <!-- Results -->
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+      <!-- Stats strip -->
+      <div class="flex items-center justify-between mb-8">
+        <div class="text-[14px] text-[color:var(--color-ink-muted)]">
+          <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ filteredBrands.length }}</span>
+          vendor{{ filteredBrands.length !== 1 ? 's' : '' }} found
         </div>
-
-        <!-- Vendors Found -->
-        <div class="mb-4">
-          <p class="text-gray-600">{{ filteredBrands.length }} vendors found</p>
+        <div v-if="hasActiveFilters" class="flex items-center gap-2">
+          <button
+            @click="clearFilters"
+            class="ui-focus text-[13px] text-[color:var(--color-accent-600)] font-medium hover:text-[color:var(--color-accent-700)] transition-colors"
+          >
+            Clear filters
+          </button>
         </div>
-      
-        <div v-if="filteredBrands.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <VendorCard
-            v-for="brand in filteredBrands"
+      </div>
+
+      <!-- Vendor grid -->
+      <div v-if="filteredBrands.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a
+          v-for="brand in filteredBrands"
           :key="brand.id"
-          :id="brand.id"
-          :name="brand.name"
-          :slug="brand.slug"
-          :logo="brand.logo"
-          :initials="brand.initials"
-          :location="brand.location"
-          :rating="brand.rating || '0.00'"
-          :reviews="brand.reviews || 0"
-          :is-partner="brand.is_partner || false"
-          :featured="brand.featured || false"
-        />
-        </div>
-        
-        <div v-else class="text-center py-20">
-            <p class="font-roboto font-normal text-lg text-gray-500">No vendors found matching your search.</p>
+          :href="`/shop/${brand.slug}`"
+          class="ui-focus group flex flex-col rounded-[16px] border border-[color:var(--color-hairline)] bg-white overflow-hidden hover:shadow-[var(--shadow-md)] hover:border-[color:var(--color-accent-400)] hover:-translate-y-[2px] transition-all duration-[200ms]"
+        >
+          <!-- Banner: logo centered on gradient -->
+          <div class="relative aspect-[16/7] overflow-hidden">
+            <div class="absolute inset-0" :style="{ background: vendorGradient(brand.name) }" />
+            <div class="absolute inset-0 flex items-center justify-center p-6">
+              <img
+                v-if="brand.logo"
+                :src="brand.logo"
+                :alt="`${brand.name} logo`"
+                class="max-h-full max-w-[65%] object-contain drop-shadow-lg"
+                loading="lazy"
+              />
+              <span v-else class="ui-display text-white/90 text-4xl font-bold tracking-tight drop-shadow-lg">
+                {{ brand.initials }}
+              </span>
+            </div>
+            <!-- Partner chip -->
+            <div v-if="brand.is_partner" class="absolute top-3 right-3 z-10">
+              <span class="ui-mono text-[9px] uppercase tracking-[0.14em] px-2 py-0.5 rounded-full bg-white/15 backdrop-blur-sm text-white border border-white/20 font-semibold">
+                Partner
+              </span>
+            </div>
           </div>
-        </div>      
+
+          <!-- Body -->
+          <div class="flex-1 flex flex-col gap-4 p-5">
+            <div>
+              <h3 class="ui-display text-[18px] font-semibold text-[color:var(--color-ink)] leading-tight tracking-tight">
+                {{ brand.name }}
+              </h3>
+              <div v-if="brand.location" class="flex items-center gap-1.5 mt-1 text-xs text-[color:var(--color-ink-muted)]">
+                <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/>
+                </svg>
+                {{ brand.location }}
+              </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="flex items-center gap-2">
+              <div class="flex items-center gap-0.5">
+                <svg
+                  v-for="n in 5" :key="n"
+                  class="w-3.5 h-3.5"
+                  :class="n <= Math.round(parseFloat(brand.rating)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'"
+                  viewBox="0 0 20 20" fill="currentColor"
+                >
+                  <path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z" />
+                </svg>
+              </div>
+              <span class="ui-mono text-sm font-semibold text-[color:var(--color-ink)]">{{ parseFloat(brand.rating).toFixed(1) }}</span>
+              <span class="text-xs text-[color:var(--color-ink-subtle)]">({{ brand.reviews }})</span>
+            </div>
+
+            <!-- Footer stats -->
+            <div class="mt-auto pt-4 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between">
+              <div class="flex items-center gap-1.5 text-xs text-[color:var(--color-ink-muted)]">
+                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.product_count }}</span>
+                compounds
+              </div>
+              <span class="inline-flex items-center gap-1 text-[13px] font-semibold text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-transform duration-[180ms]">
+                View
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M13 5l7 7-7 7"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Empty state -->
+      <div v-else class="py-24 text-center">
+        <div class="w-16 h-16 mx-auto mb-6 rounded-full bg-[color:var(--color-hairline-soft)] flex items-center justify-center">
+          <svg class="w-7 h-7 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+          </svg>
+        </div>
+        <h3 class="ui-display text-xl font-semibold text-[color:var(--color-ink)] mb-2">No vendors found</h3>
+        <p class="text-[color:var(--color-ink-muted)] text-sm max-w-md mx-auto">
+          Try adjusting your search or filters. All verified vendors are shown by default.
+        </p>
+        <button
+          @click="clearFilters"
+          class="ui-focus mt-6 h-10 px-5 rounded-[10px] bg-[color:var(--color-accent-600)] text-white text-[14px] font-semibold hover:bg-[color:var(--color-accent-700)] transition-colors"
+        >
+          Clear all filters
+        </button>
+      </div>
     </section>
   </ModernLayout>
 </template>
 
 <script setup>
-import { ref, computed, h, watchEffect } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
-import VendorCard from '@/components/VendorCard.vue'
-import MainButton from '@/components/MainButton.vue'
 
 const props = defineProps({
-  seo: {
-    type: Object,
-    default: () => ({
-      title: null,
-      description: null,
-      og_title: null,
-      og_description: null,
-      og_image: null,
-      image: null,
-      url: null,
-    })
-  },
-  brands: {
-    type: Array,
-    default: () => []
-  },
+  seo: { type: Object, default: () => ({}) },
+  brands: { type: Array, default: () => [] },
   search: String,
   sort: String,
   sortDir: String,
@@ -189,191 +223,100 @@ const props = defineProps({
 
 const page = usePage()
 
-// Computed values for reactive SEO updates
 const title = computed(() => {
-  const baseTitle = props.seo?.title || 'Top Rated Peptide Vendors & Brands'
-  const siteName = page.props.site_name || 'Peptidemap'
-  return `${baseTitle} - ${siteName}`
+  const base = props.seo?.title || 'Top Rated Peptide Vendors'
+  const site = page.props.site_name || 'PeptideMap'
+  return `${base} - ${site}`
 })
+const description = computed(() => props.seo?.description || 'Browse and compare top-rated peptide vendors.')
+const url = computed(() => props.seo?.url || page.url)
+const ogTitle = computed(() => props.seo?.og_title || title.value)
+const ogDescription = computed(() => props.seo?.og_description || description.value)
+const ogImage = computed(() => props.seo?.og_image || null)
 
-const description = computed(() => {
-  return props.seo?.description || 'Browse and compare top-rated peptide vendors and brands. Read reviews, compare prices, and find trusted suppliers for your research needs.'
-})
+watchEffect(() => { document.title = title.value })
 
-const url = computed(() => {
-  return props.seo?.url || page.url
-})
-
-const ogTitle = computed(() => {
-  return props.seo?.og_title || title.value
-})
-
-const ogDescription = computed(() => {
-  return props.seo?.og_description || description.value
-})
-
-const ogImage = computed(() => {
-  return props.seo?.og_image || props.seo?.image || null
-})
-
-// Watch for title changes and update document title immediately
-watchEffect(() => {
-  document.title = title.value
-})
-
-// Filter panel
-const showFilterPanel = ref(false)
-// Initialize searchQuery from props or URL
 const searchQuery = ref(props.search || '')
-
-// Selected filters
 const selectedFilters = ref({
   location: props.filters?.location || '',
   minRating: props.filters?.min_rating || '',
-  topVendorsOnly: props.filters?.top_vendors_only === '1' || false,
+  topVendorsOnly: props.filters?.top_vendors_only === '1',
 })
 
-// Filter icon component
-const filterIcon = h('svg', {
-  xmlns: 'http://www.w3.org/2000/svg',
-  width: '24',
-  height: '24',
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor'
-}, [
-  h('path', {
-    d: 'M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z'
-  })
-])
+const locationFilters = [
+  { label: 'All', value: '' },
+  { label: 'United States', value: 'United States' },
+  { label: 'Canada', value: 'Canada' },
+  { label: 'United Kingdom', value: 'United Kingdom' },
+  { label: 'Australia', value: 'Australia' },
+]
 
-const chevronIcon = h('svg', {
-  xmlns: 'http://www.w3.org/2000/svg',
-  width: '24',
-  height: '24',
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  'stroke-width': '2',
-  'stroke-linecap': 'round',
-  'stroke-linejoin': 'round'
-}, [
-  h('path', { d: 'm6 9 6 6 6-6' })
-])
+const sortValue = computed(() => `${props.sort || 'rating'}|${props.sortDir || 'desc'}`)
+const filteredBrands = computed(() => props.brands)
 
-// Sort value computed
-const sortValue = computed(() => {
-  const sort = props.sort || 'rating'
-  const dir = props.sortDir || 'desc'
-  return `${sort}|${dir}`
-})
+const hasActiveFilters = computed(() =>
+  searchQuery.value || selectedFilters.value.location || selectedFilters.value.topVendorsOnly
+)
 
-// Handle sort change
-const handleSortChange = (event) => {
-  const value = event?.target?.value || 'rating|desc'
-  const [sort, dir] = value.split('|')
-  applySort(sort, dir)
+function handleSortChange(e) {
+  const [sort, dir] = (e?.target?.value || 'rating|desc').split('|')
+  navigate({ sort, sort_dir: dir })
 }
 
-// Apply sort
-const applySort = (sort, dir) => {
-  const params = new URLSearchParams(window.location.search)
-  
-  // Preserve search query
-  if (searchQuery.value) {
-    params.set('search', searchQuery.value)
-  } else {
-    params.delete('search')
-  }
-  
+let searchTimeout = null
+function handleSearchInput() {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => navigate({}), 400)
+}
+
+function toggleLocation(loc) {
+  selectedFilters.value.location = selectedFilters.value.location === loc ? '' : loc
+  navigate({})
+}
+
+function toggleTopVendors() {
+  selectedFilters.value.topVendorsOnly = !selectedFilters.value.topVendorsOnly
+  navigate({})
+}
+
+function clearFilters() {
+  searchQuery.value = ''
+  selectedFilters.value = { location: '', minRating: '', topVendorsOnly: false }
+  router.visit('/brands', { preserveState: true, preserveScroll: true })
+}
+
+function navigate(overrides = {}) {
+  const params = new URLSearchParams()
+  const s = searchQuery.value.trim()
+  if (s) params.set('search', s)
+
+  const sort = overrides.sort || props.sort || 'rating'
+  const dir = overrides.sort_dir || props.sortDir || 'desc'
   params.set('sort', sort)
   params.set('sort_dir', dir)
-  
-  router.visit(`/brands?${params.toString()}`, {
-    preserveState: true,
-    preserveScroll: true,
-  })
+
+  if (selectedFilters.value.location) params.set('location', selectedFilters.value.location)
+  if (selectedFilters.value.minRating) params.set('min_rating', selectedFilters.value.minRating)
+  if (selectedFilters.value.topVendorsOnly) params.set('top_vendors_only', '1')
+
+  router.visit(`/brands?${params.toString()}`, { preserveState: true, preserveScroll: true })
 }
 
-// Debounced search
-let searchTimeout = null
-
-const handleSearchInput = () => {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    applySearch()
-  }, 500)
+function vendorGradient(name) {
+  const palette = [
+    ['#1E293B', '#4F46E5'],
+    ['#0F172A', '#6366F1'],
+    ['#1E3A8A', '#3B82F6'],
+    ['#0C4A6E', '#0EA5E9'],
+    ['#134E4A', '#14B8A6'],
+    ['#312E81', '#4F46E5'],
+    ['#111827', '#7C3AED'],
+    ['#164E63', '#06B6D4'],
+  ]
+  const n = (name || '?').trim()
+  let h = 0
+  for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) & 0xffffffff
+  const [a, b] = palette[Math.abs(h) % palette.length]
+  return `linear-gradient(135deg, ${a} 0%, ${b} 100%)`
 }
-
-const applySearch = () => {
-  const params = new URLSearchParams(window.location.search)
-  
-  // Update search parameter
-  if (searchQuery.value) {
-    params.set('search', searchQuery.value)
-  } else {
-    params.delete('search')
-  }
-  
-  // Preserve sort
-  if (props.sort) {
-    params.set('sort', props.sort)
-  }
-  if (props.sortDir) {
-    params.set('sort_dir', props.sortDir)
-  }
-  
-  router.visit(`/brands?${params.toString()}`, {
-    preserveState: true,
-    preserveScroll: true,
-  })
-}
-
-// Apply filters
-const applyFilters = () => {
-  const params = new URLSearchParams(window.location.search)
-  
-  // Preserve search query
-  if (searchQuery.value) {
-    params.set('search', searchQuery.value)
-  } else {
-    params.delete('search')
-  }
-  
-  // Preserve sort
-  if (props.sort) {
-    params.set('sort', props.sort)
-  }
-  if (props.sortDir) {
-    params.set('sort_dir', props.sortDir)
-  }
-  
-  // Add filter parameters
-  if (selectedFilters.value.location) {
-    params.set('location', selectedFilters.value.location)
-  } else {
-    params.delete('location')
-  }
-  
-  if (selectedFilters.value.minRating) {
-    params.set('min_rating', selectedFilters.value.minRating)
-  } else {
-    params.delete('min_rating')
-  }
-  
-  if (selectedFilters.value.topVendorsOnly) {
-    params.set('top_vendors_only', '1')
-  } else {
-    params.delete('top_vendors_only')
-  }
-  
-  router.visit(`/brands?${params.toString()}`, {
-    preserveState: true,
-    preserveScroll: true,
-  })
-}
-
-// Brands are filtered by the backend
-const filteredBrands = computed(() => props.brands)
 </script>
-

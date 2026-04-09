@@ -4,7 +4,7 @@
     <header
       :class="[
         'fixed top-0 left-0 right-0 z-50 transition-all duration-[200ms] ease-out',
-        scrolled ? 'bg-[#0A0B0E]/85 backdrop-blur-lg border-b border-white/10 [&_a]:text-white/80 [&_a:hover]:text-white [&_.ui-display]:text-white [&_button]:text-white/80' : 'bg-transparent',
+        scrolled ? 'bg-black/75 backdrop-blur-xl border-b border-white/[0.06]' : 'bg-transparent',
       ]"
     >
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 h-16 flex items-center gap-8">
@@ -16,21 +16,21 @@
               <path d="M9.5 12.5l2 2 4-4.5"/>
             </svg>
           </div>
-          <span :class="['ui-display text-[17px] font-semibold tracking-tight transition-colors', scrolled ? 'text-white' : 'text-[color:var(--color-ink)]']">
+          <span :class="['ui-display text-[17px] font-semibold tracking-tight transition-colors duration-200', scrolled ? 'text-white' : 'text-[color:var(--color-ink)]']">
             PeptideMap
           </span>
         </a>
 
         <!-- Primary nav -->
-        <nav class="hidden lg:flex items-center gap-1 text-sm font-medium">
+        <nav class="hidden lg:flex items-center gap-1 text-[13px] font-medium">
           <a
             v-for="link in navLinks"
             :key="link.href"
             :href="link.href"
             :class="[
-              'ui-focus px-3 py-1.5 rounded-[8px] transition-colors',
+              'ui-focus px-3 py-1.5 rounded-[8px] transition-colors duration-200',
               scrolled
-                ? 'text-white/65 hover:text-white hover:bg-white/10'
+                ? 'text-white/60 hover:text-white hover:bg-white/[0.08]'
                 : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)]',
             ]"
           >
@@ -47,9 +47,9 @@
           <a
             href="/login"
             :class="[
-              'ui-focus px-3 py-1.5 rounded-[8px] text-sm font-medium transition-colors',
+              'ui-focus px-3 py-1.5 rounded-[8px] text-[13px] font-medium transition-colors duration-200',
               scrolled
-                ? 'text-white/70 hover:text-white hover:bg-white/10'
+                ? 'text-white/55 hover:text-white hover:bg-white/[0.08]'
                 : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)]',
             ]"
           >
@@ -58,9 +58,9 @@
           <a
             href="/become-a-vendor"
             :class="[
-              'ui-focus hidden lg:inline-flex items-center h-9 px-4 rounded-[9px] text-[13px] font-semibold transition-all',
+              'ui-focus hidden lg:inline-flex items-center h-9 px-4 rounded-[9px] text-[13px] font-semibold transition-all duration-200',
               scrolled
-                ? 'bg-white/10 border border-white/20 text-white hover:bg-white/20'
+                ? 'bg-white/[0.08] border border-white/[0.12] text-white/90 hover:bg-white/[0.14]'
                 : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink)] shadow-[0_1px_2px_rgba(10,11,14,0.04)] hover:border-[color:var(--color-ink-subtle)]',
             ]"
           >
