@@ -109,6 +109,12 @@
             <div class="lg:col-span-2 bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] p-5">
               <div class="text-[10px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">Amino Acid Sequence{{ aminoAcidSequence.residueCount > 0 ? ` · ${aminoAcidSequence.residueCount} Residues` : '' }}</div>
 
+              <!-- 3D peptide model viewer -->
+              <div v-if="aminoAcidSequence.sequence" class="mb-4 relative bg-[#0A0B0E] border border-[color:var(--color-hairline)] overflow-hidden" style="height: 200px;">
+                <div ref="viewer3d" class="w-full h-full"></div>
+                <div class="absolute bottom-2 right-2 text-[9px] ui-mono text-white/30">3D model · drag to rotate</div>
+              </div>
+
               <!-- Chain visualization SVG -->
               <div v-if="residueLetters.length > 0" class="mb-4 overflow-x-auto pb-2">
                 <svg :width="residueLetters.length * 36 + 20" height="56" class="min-w-full">
@@ -148,12 +154,11 @@
               </div>
             </div>
           </div>
-          </div>
         </div>
       </div>
 
-      <!-- Main Content -->
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Main Content — tighter gap to header -->
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-6">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <!-- Left Column -->
           <div class="lg:col-span-1">
@@ -958,7 +963,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect } from 'vue'
+import { ref, computed, watchEffect, onMounted, nextTick } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
@@ -1692,6 +1697,77 @@ const aminoAcidComposition = computed(() => {
 })
 
 const page = usePage()
+const viewer3d = ref(null)
+
+// Load 3Dmol.js and render a simple peptide backbone
+onMounted(async () => {
+  await nextTick()
+  if (!viewer3d.value || !props.aminoAcidSequence?.sequence) return
+
+  try {
+    // Load 3Dmol from CDN
+    if (!window.$3Dmol) {
+      const script = document.createElement('script')
+      script.src = 'https://3Dmol.org/build/3Dmol-min.js'
+      script.async = true
+      await new Promise((resolve, reject) => {
+        script.onload = resolve
+        script.onerror = reject
+        document.head.appendChild(script)
+      })
+    }
+
+    const $3Dmol = window.$3Dmol
+    if (!$3Dmol) return
+
+    const v = $3Dmol.createViewer(viewer3d.value, {
+      backgroundColor: '#0A0B0E',
+      antialias: true,
+    })
+
+    // Generate a simple PDB-like structure from the sequence
+    // This creates a linear backbone that 3Dmol can render
+    const letters = residueLetters.value
+    const threeLetterCodes = {
+      G: 'GLY', A: 'ALA', V: 'VAL', L: 'LEU', I: 'ILE', P: 'PRO',
+      F: 'PHE', M: 'MET', W: 'TRP', S: 'SER', T: 'THR', C: 'CYS',
+      Y: 'TYR', N: 'ASN', Q: 'GLN', K: 'LYS', R: 'ARG', H: 'HIS',
+      D: 'ASP', E: 'GLU',
+    }
+
+    let pdb = ''
+    letters.forEach((letter, i) => {
+      const resName = threeLetterCodes[letter] || 'ALA'
+      const angle = (i * 100 * Math.PI) / 180 // alpha helix angle
+      const rise = i * 1.5
+      const x = (4 * Math.cos(angle)).toFixed(3)
+      const y = (4 * Math.sin(angle)).toFixed(3)
+      const z = rise.toFixed(3)
+      const serial = String(i + 1).padStart(5)
+      const resSeq = String(i + 1).padStart(4)
+      pdb += `ATOM  ${serial}  CA  ${resName} A${resSeq}    ${x.padStart(8)}${y.padStart(8)}${z.padStart(8)}  1.00  0.00           C\n`
+    })
+    pdb += 'END\n'
+
+    v.addModel(pdb, 'pdb')
+    v.setStyle({}, {
+      stick: { radius: 0.15, colorscheme: 'whiteCarbon' },
+      sphere: { radius: 0.4, colorscheme: { prop: 'resn', map: {
+        GLY: '#6366F1', ALA: '#6366F1', VAL: '#6366F1', LEU: '#6366F1', ILE: '#6366F1', PRO: '#6366F1',
+        PHE: '#6366F1', MET: '#6366F1', TRP: '#6366F1',
+        SER: '#0D9488', THR: '#0D9488', CYS: '#0D9488', TYR: '#0D9488', ASN: '#0D9488', GLN: '#0D9488',
+        LYS: '#3B82F6', ARG: '#3B82F6', HIS: '#3B82F6',
+        ASP: '#E11D48', GLU: '#E11D48',
+      }}},
+    })
+    v.zoomTo()
+    v.spin('y', 0.5)
+    v.render()
+  } catch (e) {
+    // Silently fail — 3D viewer is enhancement, not critical
+    console.warn('3Dmol failed to load:', e)
+  }
+})
 
 // Parse amino acid sequence into single-letter codes for the chain SVG
 const residueLetters = computed(() => {
