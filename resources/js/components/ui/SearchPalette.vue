@@ -4,7 +4,12 @@
     v-if="asTrigger"
     type="button"
     @click="open = true"
-    class="ui-focus flex items-center gap-2 h-10 px-3.5 rounded-[10px] bg-white border border-[color:var(--color-hairline)] text-[13px] text-[color:var(--color-ink-subtle)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink-muted)] transition-colors min-w-[240px]"
+    :class="[
+      'ui-focus flex items-center gap-2 h-10 px-3.5 rounded-[10px] text-[13px] transition-colors min-w-[220px]',
+      dark
+        ? 'bg-white/10 border border-white/15 text-white/50 hover:bg-white/15 hover:text-white/70'
+        : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-subtle)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink-muted)]',
+    ]"
   >
     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
       <circle cx="11" cy="11" r="8" />
@@ -90,6 +95,7 @@ import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 
 defineProps({
   asTrigger: { type: Boolean, default: true },
+  dark: { type: Boolean, default: false },
 })
 
 const open = ref(false)

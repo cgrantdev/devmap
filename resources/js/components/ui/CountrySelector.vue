@@ -3,7 +3,12 @@
     <button
       type="button"
       @click="open = !open"
-      class="ui-focus flex items-center gap-2 h-10 pl-2.5 pr-2 rounded-[10px] border border-[color:var(--color-hairline)] bg-white text-sm font-medium text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] transition-colors"
+      :class="[
+        'ui-focus flex items-center gap-2 h-10 pl-2.5 pr-2 rounded-[10px] text-sm font-medium transition-colors',
+        dark
+          ? 'bg-white/10 border border-white/15 text-white hover:bg-white/15'
+          : 'border border-[color:var(--color-hairline)] bg-white text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)]',
+      ]"
     >
       <img
         :src="flagUrl(selected.code, 40)"
@@ -70,7 +75,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, defineProps } from 'vue'
+
+const props = defineProps({
+  dark: { type: Boolean, default: false },
+})
 
 const countries = [
   { code: 'US', name: 'United States' },

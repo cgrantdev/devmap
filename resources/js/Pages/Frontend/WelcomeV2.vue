@@ -56,17 +56,7 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- AD SLOT #1 (thin, after brand strip)                       -->
-    <!-- ========================================================= -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-12 lg:pt-14">
-      <AdSlot
-        title="Your brand, front and center on PeptideMap."
-        subtitle="Premium mid-page placement. ~3× the CTR of footer ads."
-      />
-    </section>
-
-    <!-- ========================================================= -->
-    <!-- VERIFIED VENDORS                                           -->
+    <!-- VERIFIED VENDORS (before any ads)                          -->
     <!-- ========================================================= -->
     <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-16 lg:py-20">
       <SectionHeader
@@ -93,6 +83,15 @@
     </section>
 
     <!-- ========================================================= -->
+    <!-- AD SLOT #1 (after vendors, before compounds)                -->
+    <!-- ========================================================= -->
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pb-6">
+      <AdSlot
+        title="AD GOES HERE"
+        subtitle="Premium placement between vendor listings and trending compounds."
+      />
+    </section>
+
     <!-- TRENDING COMPOUNDS — FULL-BLEED DARK SECTION               -->
     <!-- ========================================================= -->
     <section class="relative bg-[#0A0B0E] text-white overflow-hidden">
