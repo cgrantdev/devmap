@@ -1,205 +1,184 @@
 <template>
   <ModernLayout>
-    <!-- Header Section -->
+    <Head>
+      <title>{{ seo.title }}</title>
+      <meta name="description" :content="seo.description" />
+    </Head>
+
+    <!-- Header -->
     <section class="border-b border-[color:var(--color-hairline)]">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-10">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Side-by-side</div>
-        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">Compare Products</h1>
+        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">
+          Compare Peptide Prices
+        </h1>
         <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
-          Compare peptides side-by-side: prices, purity, reviews, and more.
+          Every vendor, every price, sorted cheapest-first. Click any compound to jump to its vendor pricing table.
         </p>
       </div>
     </section>
 
-    <!-- Information Banner -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-        <div class="flex items-start gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" x2="12" y1="8" y2="12"></line>
-            <line x1="12" x2="12.01" y1="16" y2="16"></line>
-          </svg>
-          <div>
-            <h3 class="text-blue-900 mb-1">How to use Compare</h3>
-            <p class="text-sm text-blue-800">
-              Search for products below and select up to 4 to compare side-by-side. Great for finding the best deals, highest purity, or comparing vendors!
-            </p>
+    <!-- Compound quick-nav grid -->
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        <a
+          v-for="compound in compounds"
+          :key="compound.id"
+          :href="`#${compound.anchor}`"
+          class="ui-focus group flex flex-col gap-2 p-4 rounded-[12px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all duration-[180ms]"
+        >
+          <div class="ui-display text-[15px] font-semibold text-[color:var(--color-ink)] leading-tight group-hover:text-[color:var(--color-accent-600)] transition-colors">
+            {{ compound.name }}
           </div>
-        </div>
+          <div class="flex items-center gap-3 text-[11px] text-[color:var(--color-ink-muted)]">
+            <span class="ui-mono font-semibold text-[color:var(--color-ink)]">
+              {{ compound.vendor_count }} vendor{{ compound.vendor_count !== 1 ? 's' : '' }}
+            </span>
+            <span v-if="compound.cheapest_price" class="ui-mono text-[color:var(--color-verified)]">
+              from ${{ formatPrice(compound.cheapest_price) }}
+            </span>
+          </div>
+        </a>
       </div>
+    </section>
 
-      <!-- Selection Status and Search -->
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-        <!-- Selection Status -->
-        <div class="mb-4">
-          <label class="block text-sm text-gray-700 mb-2">
-            Selected ({{ selectedProducts.length }}/4)
-          </label>
-          <p v-if="selectedProducts.length === 0" class="text-sm text-gray-500">
-            No products selected yet.
-          </p>
-          <div v-else class="flex flex-wrap gap-2 mt-2">
-            <div
-              v-for="product in selectedProducts"
-              :key="product.id"
-              class="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2"
-            >
-              <span class="text-sm text-gray-700">{{ product.name }}</span>
-              <button
-                @click="removeProduct(product.id)"
-                class="text-gray-500 hover:text-gray-700"
+    <!-- Per-compound vendor pricing sections -->
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pb-20">
+      <div class="space-y-16">
+        <div
+          v-for="(compound, idx) in compounds"
+          :key="compound.id"
+          :id="compound.anchor"
+          class="scroll-mt-24"
+        >
+          <!-- Compound header -->
+          <div class="flex items-start justify-between gap-4 mb-6 flex-wrap">
+            <div>
+              <div class="flex items-center gap-3 mb-2">
+                <span class="ui-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)]">
+                  #{{ idx + 1 }}
+                </span>
+                <h2 class="ui-display text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">
+                  {{ compound.name }}
+                </h2>
+              </div>
+              <p v-if="compound.description" class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl line-clamp-2">
+                {{ compound.description }}
+              </p>
+            </div>
+            <div class="flex items-center gap-3 flex-shrink-0">
+              <a
+                v-if="compound.encyclopedia_url"
+                :href="compound.encyclopedia_url"
+                class="ui-focus inline-flex items-center gap-1.5 h-9 px-4 rounded-[9px] border border-[color:var(--color-hairline)] bg-white text-[13px] font-semibold text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M18 6L6 18"></path>
-                  <path d="M6 6l12 12"></path>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19.5A2.5 2.5 0 016.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
                 </svg>
-              </button>
+                Read article
+              </a>
             </div>
           </div>
-        </div>
 
-        <!-- Search Bar -->
-        <div class="relative">
-          <input
-            v-model="searchQuery"
-            @input="handleSearch"
-            type="text"
-            placeholder="Search products to compare..."
-            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" aria-hidden="true">
-            <path d="m21 21-4.34-4.34"></path>
-            <circle cx="11" cy="11" r="8"></circle>
-          </svg>
-        </div>
-      </div>
-    </section>
+          <!-- Price table -->
+          <div v-if="compound.products.length" class="bg-white rounded-[14px] border border-[color:var(--color-hairline)] overflow-hidden shadow-[var(--shadow-xs)]">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+                  <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendor</th>
+                  <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Product</th>
+                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Price</th>
+                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden sm:table-cell">Discount</th>
+                  <th class="text-right px-5 py-3 w-[100px]"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(product, pidx) in compound.products"
+                  :key="product.id"
+                  :class="[
+                    'border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] transition-colors',
+                    pidx === 0 ? 'bg-[color:var(--color-verified-bg)]' : '',
+                  ]"
+                >
+                  <!-- Vendor -->
+                  <td class="px-5 py-4">
+                    <div class="flex items-center gap-2.5">
+                      <div class="flex-shrink-0 w-7 h-7 rounded-[6px] overflow-hidden bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)]">
+                        <img
+                          v-if="product.brand_logo"
+                          :src="product.brand_logo"
+                          :alt="product.brand_name"
+                          class="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div>
+                        <a
+                          :href="`/shop/${product.brand_slug}`"
+                          class="font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors"
+                        >
+                          {{ product.brand_name }}
+                        </a>
+                        <div v-if="pidx === 0" class="flex items-center gap-1 mt-0.5">
+                          <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Best price</span>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <!-- Product -->
+                  <td class="px-5 py-4 text-[color:var(--color-ink-muted)]">
+                    <span class="line-clamp-1">{{ product.name }}</span>
+                    <span v-if="product.size_mg" class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)]">
+                      {{ product.size_mg }}mg
+                    </span>
+                  </td>
+                  <!-- Price -->
+                  <td class="px-5 py-4 text-right">
+                    <div v-if="product.discount_price && product.discount_price < product.price" class="flex flex-col items-end">
+                      <span class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">${{ formatPrice(product.discount_price) }}</span>
+                      <span class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)] line-through">${{ formatPrice(product.price) }}</span>
+                    </div>
+                    <span v-else class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">
+                      ${{ formatPrice(product.price) }}
+                    </span>
+                  </td>
+                  <!-- Savings -->
+                  <td class="px-5 py-4 text-right hidden sm:table-cell">
+                    <span
+                      v-if="product.discount_price && product.discount_price < product.price"
+                      class="ui-mono text-xs font-semibold text-[color:var(--color-verified)]"
+                    >
+                      -{{ Math.round((1 - product.discount_price / product.price) * 100) }}%
+                    </span>
+                    <span v-else class="text-[color:var(--color-ink-subtle)]">—</span>
+                  </td>
+                  <!-- CTA -->
+                  <td class="px-5 py-4 text-right">
+                    <a
+                      :href="product.go_url"
+                      target="_blank"
+                      rel="noopener noreferrer nofollow sponsored"
+                      class="ui-focus inline-flex items-center gap-1 h-8 px-3 rounded-[8px] text-[12px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08)] hover:shadow-[0_2px_8px_-2px_rgba(79,70,229,0.5)] hover:-translate-y-[0.5px] transition-all"
+                    >
+                      Buy
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7 17L17 7M17 7H7M17 7v10" />
+                      </svg>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-    <!-- Products List -->
-    <section class="bg-gray-50 min-h-screen">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div v-if="filteredProducts.length > 0" class="space-y-3">
-          <CompareProductItem
-            v-for="product in filteredProducts"
-            :key="product.id"
-            :product="product"
-            :is-selected="isSelected(product.id)"
-            @toggle="toggleProduct"
-          />
-        </div>
-        <div v-else class="text-center py-12">
-          <p class="text-gray-500">No products found. Try a different search term.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Comparison Table (shown when products are selected) -->
-    <section v-if="selectedProducts.length > 0" class="bg-white border-t border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Comparison</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full border-collapse">
-            <thead>
-              <tr class="border-b border-gray-200">
-                <th class="text-left py-3 px-4 font-semibold text-gray-900">Feature</th>
-                <th
-                  v-for="product in selectedProducts"
-                  :key="product.id"
-                  class="text-center py-3 px-4 font-semibold text-gray-900 min-w-[200px]"
-                >
-                  {{ product.name }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b border-gray-100">
-                <td class="py-3 px-4 font-medium text-gray-700">Price</td>
-                <td
-                  v-for="product in selectedProducts"
-                  :key="product.id"
-                  class="py-3 px-4 text-center text-gray-600"
-                >
-                  ${{ formatPrice(product.discount_price || product.price) }}
-                </td>
-              </tr>
-              <tr class="border-b border-gray-100">
-                <td class="py-3 px-4 font-medium text-gray-700">Brand</td>
-                <td
-                  v-for="product in selectedProducts"
-                  :key="product.id"
-                  class="py-3 px-4 text-center text-gray-600"
-                >
-                  {{ product.brand_name || 'N/A' }}
-                </td>
-              </tr>
-              <tr class="border-b border-gray-100">
-                <td class="py-3 px-4 font-medium text-gray-700">Purity</td>
-                <td
-                  v-for="product in selectedProducts"
-                  :key="product.id"
-                  class="py-3 px-4 text-center text-gray-600"
-                >
-                  {{ product.purity ? `${product.purity}%` : 'N/A' }}
-                </td>
-              </tr>
-              <tr class="border-b border-gray-100">
-                <td class="py-3 px-4 font-medium text-gray-700">Rating</td>
-                <td
-                  v-for="product in selectedProducts"
-                  :key="product.id"
-                  class="py-3 px-4 text-center text-gray-600"
-                >
-                  {{ product.rating_average }}/5 ({{ product.rating_count }} reviews)
-                </td>
-              </tr>
-              <tr class="border-b border-gray-100">
-                <td class="py-3 px-4 font-medium text-gray-700">Size</td>
-                <td
-                  v-for="product in selectedProducts"
-                  :key="product.id"
-                  class="py-3 px-4 text-center text-gray-600"
-                >
-                  {{ product.size_mg ? `${product.size_mg}mg` : 'N/A' }}
-                </td>
-              </tr>
-              <tr class="border-b border-gray-100">
-                <td class="py-3 px-4 font-medium text-gray-700">Availability</td>
-                <td
-                  v-for="product in selectedProducts"
-                  :key="product.id"
-                  class="py-3 px-4 text-center"
-                >
-                  <span
-                    :class="[
-                      'px-2 py-1 rounded text-xs font-medium',
-                      product.availability === 'in_stock' 
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-red-100 text-red-700'
-                    ]"
-                  >
-                    {{ product.availability === 'in_stock' ? 'In Stock' : 'Out of Stock' }}
-                  </span>
-                </td>
-              </tr>
-              <tr class="border-b border-gray-100">
-                <td class="py-3 px-4 font-medium text-gray-700">Verified</td>
-                <td
-                  v-for="product in selectedProducts"
-                  :key="product.id"
-                  class="py-3 px-4 text-center"
-                >
-                  <span
-                    v-if="product.verified"
-                    class="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700"
-                  >
-                    Verified
-                  </span>
-                  <span v-else class="text-gray-400">-</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- Empty state -->
+          <div
+            v-else
+            class="bg-white rounded-[14px] border border-dashed border-[color:var(--color-hairline)] p-10 text-center text-[color:var(--color-ink-subtle)] text-sm"
+          >
+            No vendors currently stock this compound.
+          </div>
         </div>
       </div>
     </section>
@@ -207,107 +186,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
-import CompareProductItem from '@/components/CompareProductItem.vue'
 
-const props = defineProps({
-  products: {
-    type: Array,
-    default: () => []
-  },
-  selectedProducts: {
-    type: Array,
-    default: () => []
-  },
-  search: {
-    type: String,
-    default: ''
-  },
-  selectedIds: {
-    type: Array,
-    default: () => []
-  }
+defineProps({
+  compounds: { type: Array, default: () => [] },
+  seo: { type: Object, default: () => ({}) },
 })
 
-const searchQuery = ref(props.search || '')
-const selectedProductIds = ref([...props.selectedIds])
-
-// Get selected products from props (these are fetched from server)
-const selectedProducts = computed(() => {
-  return props.selectedProducts || []
-})
-
-// Filter products (exclude already selected ones from search results)
-const filteredProducts = computed(() => {
-  let result = props.products || []
-  
-  // Filter out already selected products
-  result = result.filter(p => !selectedProductIds.value.includes(p.id))
-  
-  // Apply search if needed
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase().trim()
-    result = result.filter(p => 
-      p.name.toLowerCase().includes(query) ||
-      (p.brand_name && p.brand_name.toLowerCase().includes(query))
-    )
-  }
-  
-  return result
-})
-
-const isSelected = (productId) => {
-  return selectedProductIds.value.includes(productId)
-}
-
-const toggleProduct = (product) => {
-  const index = selectedProductIds.value.indexOf(product.id)
-  
-  if (index > -1) {
-    // Remove if already selected
-    selectedProductIds.value.splice(index, 1)
-  } else {
-    // Add if not selected and under limit
-    if (selectedProductIds.value.length < 4) {
-      selectedProductIds.value.push(product.id)
-    }
-  }
-  
-  updateURL()
-}
-
-const removeProduct = (productId) => {
-  const index = selectedProductIds.value.indexOf(productId)
-  if (index > -1) {
-    selectedProductIds.value.splice(index, 1)
-    updateURL()
-  }
-}
-
-const handleSearch = () => {
-  updateURL()
-}
-
-const updateURL = () => {
-  const params = new URLSearchParams()
-  if (searchQuery.value.trim()) {
-    params.set('search', searchQuery.value.trim())
-  }
-  if (selectedProductIds.value.length > 0) {
-    params.set('selected', selectedProductIds.value.join(','))
-  }
-  
-  const queryString = params.toString()
-  router.visit(`/compare${queryString ? '?' + queryString : ''}`, {
-    preserveState: true,
-    preserveScroll: true,
-    replace: true
-  })
-}
-
-const formatPrice = (price) => {
-  return parseFloat(price || 0).toFixed(2)
+function formatPrice(p) {
+  if (p === null || p === undefined || p === '') return '—'
+  const num = typeof p === 'number' ? p : parseFloat(p)
+  return isNaN(num) ? String(p) : num.toFixed(2)
 }
 </script>

@@ -4,75 +4,83 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductCategory;
+use App\Models\Brand;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
-use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class CompareController extends Controller
 {
+    /**
+     * The ordered list of featured compound category IDs for the compare page.
+     * Maintained manually to match the product team's priority list.
+     */
+    private const FEATURED_COMPOUND_NAMES = [
+        'GLP3-R (Retatrutide)',
+        'BPC-157 / TB-500',
+        'GLP1-S (Semaglutide)',
+        'GLP2-T (Tirzepatide)',
+        'GLOW',
+        'KLOW',
+        'BPC-157',
+        'Tesamorelin',
+        'Sermorelin',
+        'CJC-1295 / Ipamorelin',   // closest match for "Tesamorelin / Ipamorelin / CJC 1295"
+        'NAD+',
+        'AOD-9604',
+        'Ipamorelin',               // placeholder for "Tesamorelin / Ipamorelin / BPC-157 Blend"
+        'CJC-1295',
+        'GHK-Cu',
+        'PT-141',
+        'TB-500',
+        'MOTS-c',
+    ];
+
+    /**
+     * Display name overrides (so the page shows the user-facing name
+     * even if the DB category uses a coded name like "GLP3-R (Retatrutide)").
+     */
+    private const DISPLAY_NAMES = [
+        'GLP3-R (Retatrutide)' => 'Retatrutide',
+        'GLP1-S (Semaglutide)' => 'Semaglutide',
+        'GLP2-T (Tirzepatide)' => 'Tirzepatide',
+        'BPC-157 / TB-500' => 'BPC-157 / TB-500 Blend',
+        'CJC-1295 / Ipamorelin' => 'Ipamorelin / CJC-1295 Blend',
+        'GLOW' => 'GLOW — GHK-Cu/BPC-157/TB-500',
+        'KLOW' => 'KLOW — GHK-Cu/BPC-157/TB-500/KPV',
+    ];
+
     public function index(Request $request)
     {
-        // Get products for search/selection
-        $query = Product::with(['brand', 'category', 'location'])
-            ->visible()
-            ->where('status', 'active');
-
-        // Apply search
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        // Limit results for search
-        $products = $query->orderBy('name')
-            ->take(50) // Limit to 50 for performance
+        // Fetch all featured categories in one query
+        $categories = ProductCategory::where('is_active', true)
+            ->whereIn('name', self::FEATURED_COMPOUND_NAMES)
+            ->with(['educationPost' => function ($q) {
+                $q->select('id', 'product_category_id', 'slug', 'description');
+            }])
             ->get()
-            ->map(function ($product) {
-                // Extract purity from name
-                $purity = null;
-                if (preg_match('/(\d+(?:\.\d+)?)\s*%/i', $product->name, $matches)) {
-                    $purity = (float) $matches[1];
-                }
+            ->keyBy('name');
 
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'slug' => $product->slug,
-                    'price' => $product->price,
-                    'discount_price' => $product->discount_price,
-                    'image_url' => $product->image_url,
-                    'brand_name' => $product->brand ? $product->brand->name : null,
-                    'brand_slug' => $product->brand ? ($product->brand->slug ?? null) : null,
-                    'rating_average' => number_format($product->rating_average ?? 0, 1, '.', ''),
-                    'rating_count' => (int) ($product->rating_count ?? 0),
-                    'purity' => $purity,
-                    'size_mg' => $product->size_mg,
-                    'availability' => $product->availability,
-                    'verified' => $product->verified ?? false,
-                    'category_name' => $product->category ? $product->category->name : null,
-                ];
-            });
+        // For each compound, get all visible products with brand info, sorted by effective price
+        $compounds = collect();
 
-        // Get selected product IDs from query string
-        $selectedIds = $request->get('selected', '');
-        $selectedIds = $selectedIds ? explode(',', $selectedIds) : [];
+        foreach (self::FEATURED_COMPOUND_NAMES as $catName) {
+            $category = $categories->get($catName);
+            if (!$category) {
+                continue; // skip if category doesn't exist in DB
+            }
 
-        // Get selected products details
-        $selectedProducts = [];
-        if (!empty($selectedIds)) {
-            $selectedProducts = Product::with(['brand', 'category', 'location'])
-                ->visible()
+            $products = Product::visible()
                 ->where('status', 'active')
-                ->whereIn('id', $selectedIds)
+                ->where('product_category_id', $category->id)
+                ->with('brand')
+                ->orderByRaw('COALESCE(discount_price, price) ASC')
                 ->get()
                 ->map(function ($product) {
-                    $purity = null;
-                    if (preg_match('/(\d+(?:\.\d+)?)\s*%/i', $product->name, $matches)) {
-                        $purity = (float) $matches[1];
-                    }
+                    $effectivePrice = $product->discount_price && $product->discount_price < $product->price
+                        ? $product->discount_price
+                        : $product->price;
 
                     return [
                         'id' => $product->id,
@@ -80,36 +88,46 @@ class CompareController extends Controller
                         'slug' => $product->slug,
                         'price' => $product->price,
                         'discount_price' => $product->discount_price,
+                        'effective_price' => $effectivePrice,
                         'image_url' => $product->image_url,
-                        'brand_name' => $product->brand ? $product->brand->name : null,
-                        'brand_slug' => $product->brand ? ($product->brand->slug ?? null) : null,
-                        'rating_average' => number_format($product->rating_average ?? 0, 1, '.', ''),
-                        'rating_count' => (int) ($product->rating_count ?? 0),
-                        'purity' => $purity,
-                        'size_mg' => $product->size_mg,
-                        'availability' => $product->availability,
-                        'verified' => $product->verified ?? false,
-                        'category_name' => $product->category ? $product->category->name : null,
-                        'description' => $product->description,
                         'product_url' => $product->product_url,
+                        'go_url' => "/go/{$product->id}",
+                        'brand_name' => $product->brand?->name,
+                        'brand_slug' => $product->brand?->slug,
+                        'brand_logo' => $product->brand?->vendorSetting?->logo
+                            ? asset('storage/' . $product->brand->vendorSetting->logo)
+                            : null,
+                        'size_mg' => $product->size_mg,
                     ];
-                })
-                ->values();
+                });
+
+            $displayName = self::DISPLAY_NAMES[$catName] ?? $category->name;
+            $educationPost = $category->educationPost;
+
+            $compounds->push([
+                'id' => $category->id,
+                'name' => $displayName,
+                'slug' => $category->slug,
+                'anchor' => Str::slug($displayName),
+                'description' => $educationPost?->description
+                    ? Str::limit(strip_tags($educationPost->description), 200)
+                    : null,
+                'encyclopedia_url' => $educationPost
+                    ? "/encyclopedia/{$category->slug}"
+                    : null,
+                'product_count' => $products->count(),
+                'cheapest_price' => $products->first()['effective_price'] ?? null,
+                'vendor_count' => $products->pluck('brand_name')->unique()->count(),
+                'products' => $products->values(),
+            ]);
         }
 
-        // Generate SEO data
-        $seoData = new SEOData(
-            title: 'Compare Peptide Products - Side by Side Comparison | PeptideSync',
-            description: 'Compare research peptides side by side. Compare prices, ratings, purity, and specifications to find the best product for your research needs.',
-            url: url('/compare'),
-        );
-        session(['page_seo_data' => $seoData]);
-
         return Inertia::render('Frontend/Compare', [
-            'products' => $products,
-            'selectedProducts' => $selectedProducts,
-            'search' => $request->get('search', ''),
-            'selectedIds' => $selectedIds,
+            'compounds' => $compounds,
+            'seo' => [
+                'title' => 'Compare Peptide Prices — PeptideMap',
+                'description' => 'Compare research peptide prices across verified vendors. Side-by-side vendor pricing for BPC-157, Semaglutide, Tirzepatide, and more.',
+            ],
         ]);
     }
 }
