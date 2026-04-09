@@ -629,6 +629,67 @@ class HomeController extends Controller
                 ];
             });
 
+        // Attach a rotating sponsor from premiumVendors to each encyclopedia
+        // entry, so sponsored content is cycled deterministically.
+        $sponsorPool = $premiumVendors->values();
+        $encyclopediaCategories = $encyclopediaCategories->values()->map(function ($cat, $i) use ($sponsorPool) {
+            if ($sponsorPool->isEmpty()) {
+                return $cat;
+            }
+            $sponsor = $sponsorPool[$i % $sponsorPool->count()];
+            $cat['sponsor'] = [
+                'name' => $sponsor['name'],
+                'logo' => $sponsor['logo'],
+            ];
+            return $cat;
+        });
+
+        // Build the hero carousel slides:
+        //  - 1 platform intro slide (always first)
+        //  - Up to 4 rotating premium vendor slides
+        $heroSlides = collect();
+        $heroSlides->push([
+            'eyebrow' => 'Verification engine live · Updated continuously',
+            'title' => 'The definitive platform for research peptide vendors.',
+            'subtitle' => 'Compare verified suppliers, inspect lab testing, and discover new compounds — all in one place.',
+            'cta' => 'Explore verified vendors',
+            'url' => '/vendors',
+            'badge' => 'Platform',
+            'gradient' => ['#0A0B0E', '#4F46E5'],
+        ]);
+
+        foreach ($premiumVendors->take(4) as $v) {
+            $heroSlides->push([
+                'eyebrow' => 'Featured partner',
+                'title' => $v['name'],
+                'subtitle' => $v['description'] ?? 'Research-grade peptides. Lab tested. Verified on PeptideMap.',
+                'cta' => 'Visit vendor',
+                'url' => $v['url'],
+                'image' => null, // use gradient fallback; can later support banner image
+                'badge' => 'Featured',
+                'sponsored' => true,
+                'gradient' => null, // HeroCarousel picks a default gradient by index
+            ]);
+        }
+
+        // Brand strip marquee — all verified vendors with a logo (or placeholder)
+        $brandStripVendors = Brand::where('is_active', true)
+            ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
+            ->with('vendorSetting')
+            ->orderByDesc('rating_average')
+            ->take(16)
+            ->get()
+            ->map(function ($brand) {
+                $vs = $brand->vendorSetting;
+                return [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                    'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
+                    'logo' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
+                    'verified' => true,
+                ];
+            });
+
         // SEO
         $seo = [
             'title' => 'PeptideMap — The definitive platform for research peptide vendors',
@@ -638,10 +699,10 @@ class HomeController extends Controller
 
         return Inertia::render('Frontend/WelcomeV2', [
             'stats' => $stats,
+            'heroSlides' => $heroSlides,
+            'brandStripVendors' => $brandStripVendors,
             'verifiedVendors' => $verifiedVendors,
-            'premiumVendors' => $premiumVendors,
             'trendingProducts' => $trendingProducts,
-            'tickerItems' => $tickerItems,
             'limitedDeals' => $limitedDeals,
             'encyclopediaCategories' => $encyclopediaCategories,
             'editorial' => $editorial,
