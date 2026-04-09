@@ -1,3 +1,7 @@
+/* Modern 2026 design system fonts (loaded from Google Fonts via CDN).
+   Inter Tight for UI/headings, JetBrains Mono for data (prices, dosages, COAs). */
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 /* HV Muse Font Face Declarations */
 @font-face {
     font-family: 'HV Muse';
@@ -25,11 +29,164 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* --- Modern 2026 design system tokens ---
+       These power the new components under resources/js/components/ui/*.
+       Legacy pages continue to use the tokens below; they don't collide. */
+    --font-display: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    /* Surfaces */
+    --color-bg: #FAFAF9;
+    --color-surface: #FFFFFF;
+    --color-ink: #0A0B0E;
+    --color-ink-muted: #52525B;
+    --color-ink-subtle: #A1A1AA;
+    --color-hairline: #E4E4E7;
+    --color-hairline-soft: #F4F4F5;
+
+    /* Accent (primary CTA gradient) */
+    --color-accent-50: #EEF2FF;
+    --color-accent-100: #E0E7FF;
+    --color-accent-400: #818CF8;
+    --color-accent-500: #6366F1;
+    --color-accent-600: #4F46E5;
+    --color-accent-700: #4338CA;
+
+    /* Biotech blue (secondary accent) */
+    --color-biotech-400: #60A5FA;
+    --color-biotech-500: #3B82F6;
+    --color-biotech-600: #2563EB;
+
+    /* Semantic */
+    --color-verified: #10B981;
+    --color-verified-bg: #ECFDF5;
+    --color-caution: #F59E0B;
+    --color-caution-bg: #FFFBEB;
+    --color-danger: #EF4444;
+    --color-danger-bg: #FEF2F2;
+
+    /* Elevation */
+    --shadow-xs: 0 1px 2px rgba(10, 11, 14, 0.04);
+    --shadow-sm: 0 1px 2px rgba(10, 11, 14, 0.06), 0 2px 6px -2px rgba(10, 11, 14, 0.04);
+    --shadow-md: 0 1px 2px rgba(10, 11, 14, 0.06), 0 8px 24px -12px rgba(10, 11, 14, 0.12);
+    --shadow-lg: 0 4px 8px -2px rgba(10, 11, 14, 0.08), 0 24px 48px -16px rgba(10, 11, 14, 0.16);
+
+    /* Motion */
+    --ease-out-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+
+    /* Radii */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
 }
 
 /* Prevent Layout Shift on Scrollbar */
 html {
     scrollbar-gutter: stable;
+}
+
+/* ---------------------------------------------------------------
+   Modern UI primitive helpers — scoped by `.ui-` prefix so they
+   don't bleed into legacy pages. Pair with components in
+   resources/js/components/ui/*.
+   --------------------------------------------------------------- */
+
+.ui-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    font-feature-settings: "ss01", "cv11";
+}
+
+.ui-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+}
+
+/* Gradient text (for hero accents) */
+.ui-gradient-text {
+    background: linear-gradient(135deg, var(--color-ink) 0%, var(--color-accent-600) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Primary gradient pill (Button primary) */
+.ui-gradient-bg {
+    background: linear-gradient(135deg, var(--color-accent-600) 0%, var(--color-biotech-500) 100%);
+}
+
+/* Subtle radial spotlight, used behind hero */
+.ui-spotlight {
+    background: radial-gradient(
+        ellipse 800px 400px at 50% 0%,
+        rgba(99, 102, 241, 0.08) 0%,
+        transparent 60%
+    );
+}
+
+/* Hairline divider */
+.ui-hairline {
+    border-color: var(--color-hairline);
+}
+
+/* Lift-on-hover card pattern */
+.ui-lift {
+    transition: transform 180ms var(--ease-out-smooth), box-shadow 180ms var(--ease-out-smooth),
+        border-color 180ms var(--ease-out-smooth);
+}
+.ui-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-accent-400);
+}
+
+/* Glass surface for sticky nav */
+.ui-glass {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    border-bottom: 1px solid var(--color-hairline);
+}
+
+/* Focus ring — accessible default for all interactive primitives */
+.ui-focus {
+    outline: none;
+}
+.ui-focus:focus-visible {
+    box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-accent-500);
+}
+
+/* Verified shield "breathe" animation (runs once on mount) */
+@keyframes ui-breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+.ui-breathe {
+    animation: ui-breathe 1800ms var(--ease-out-smooth) 300ms 1;
+    transform-origin: center;
+}
+
+/* Count-up placeholder — used where we want numbers to animate in.
+   Real count-up logic lives in JS. */
+.ui-numeric {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Marquee / ticker (homepage price strip) */
+@keyframes ui-marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+.ui-marquee {
+    animation: ui-marquee 60s linear infinite;
+}
+.ui-marquee:hover {
+    animation-play-state: paused;
 }
 
 /* Design System Variables */
