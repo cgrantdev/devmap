@@ -12,48 +12,20 @@ class EncyclopediaEntriesManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = EducationPost::query()->with('category');
-        
-        // Search functionality
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('research_title', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%");
-            });
-        }
-        
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortType = $request->get('sort_type', 'desc');
-        
-        // Validate sortBy
-        $allowedSortColumns = ['id', 'title', 'status', 'published_at', 'created_at'];
-        if (!in_array($sortBy, $allowedSortColumns)) {
-            $sortBy = 'created_at';
-        }
-        
-        // Validate sortType
-        $sortType = strtolower($sortType) === 'asc' ? 'asc' : 'desc';
-        
-        $query->orderBy($sortBy, $sortType);
-        
-        // Pagination
-        $perPage = $request->get('per_page', 20);
-        $entries = $query->paginate($perPage)
-            ->through(function ($item) {
+        $entries = EducationPost::with('category')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($item) {
                 return [
                     'id' => $item->id,
                     'title' => $item->research_title ?? $item->title,
                     'research_title' => $item->research_title,
                     'slug' => $item->slug,
                     'category' => $item->category ? $item->category->name : null,
-                    'description' => $item->description,
                     'peptide_full_name' => $item->peptide_full_name,
                     'status' => $item->status,
-                    'published_at' => $item->published_at ? $item->published_at->format('Y-m-d') : null,
-                    'created_at' => $item->created_at->format('Y-m-d H:i'),
+                    'published_at' => $item->published_at ? $item->published_at->format('M j, Y') : null,
+                    'created_at' => $item->created_at->format('M j, Y'),
                 ];
             });
 
@@ -165,9 +137,9 @@ class EncyclopediaEntriesManagementController extends Controller
             $validated['published_at'] = null;
         }
 
-        EducationPost::create($validated);
+        $entry = EducationPost::create($validated);
 
-        return redirect()->route('admin.encyclopedia-entries.index')
+        return redirect("/admin/encyclopedia-entries/{$entry->id}/edit")
             ->with('success', 'Encyclopedia entry created successfully.');
     }
 
@@ -329,7 +301,7 @@ class EncyclopediaEntriesManagementController extends Controller
 
         $entry->update($validated);
 
-        return redirect()->route('admin.encyclopedia-entries.index')
+        return redirect()->back()
             ->with('success', 'Encyclopedia entry updated successfully.');
     }
 

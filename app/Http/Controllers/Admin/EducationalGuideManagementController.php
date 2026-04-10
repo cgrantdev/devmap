@@ -12,49 +12,18 @@ class EducationalGuideManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = EducationalGuide::query();
-        
-        // Search functionality
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%");
-            });
-        }
-        
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortType = $request->get('sort_type', 'desc');
-        
-        // Validate sortBy
-        $allowedSortColumns = ['id', 'title', 'status', 'is_featured', 'published_at', 'created_at'];
-        if (!in_array($sortBy, $allowedSortColumns)) {
-            $sortBy = 'created_at';
-        }
-        
-        // Validate sortType
-        $sortType = strtolower($sortType) === 'asc' ? 'asc' : 'desc';
-        
-        $query->orderBy($sortBy, $sortType);
-        
-        // Pagination
-        $perPage = $request->get('per_page', 20);
-        $guides = $query->paginate($perPage)
-            ->through(function ($guide) {
+        $guides = EducationalGuide::orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($guide) {
                 return [
                     'id' => $guide->id,
                     'title' => $guide->title,
                     'slug' => $guide->slug,
                     'tag' => $guide->tag,
-                    'reading_time' => $guide->reading_time,
-                    'description' => $guide->description,
-                    'peptides' => $guide->peptides ?? [],
-                    'guide_url' => $guide->guide_url,
-                    'published_at' => $guide->published_at ? $guide->published_at->format('Y-m-d') : null,
+                    'published_at' => $guide->published_at ? $guide->published_at->format('M j, Y') : null,
                     'is_featured' => $guide->is_featured,
                     'status' => $guide->status,
-                    'created_at' => $guide->created_at->format('Y-m-d H:i'),
+                    'created_at' => $guide->created_at->format('M j, Y'),
                 ];
             });
 
@@ -124,9 +93,9 @@ class EducationalGuideManagementController extends Controller
             $validated['published_at'] = null;
         }
 
-        EducationalGuide::create($validated);
+        $guide = EducationalGuide::create($validated);
 
-        return redirect()->route('admin.educational-guides.index')
+        return redirect("/admin/educational-guides/{$guide->id}/edit")
             ->with('success', 'Educational guide created successfully.');
     }
 
@@ -232,7 +201,7 @@ class EducationalGuideManagementController extends Controller
 
         $guide->update($validated);
 
-        return redirect()->route('admin.educational-guides.index')
+        return redirect()->back()
             ->with('success', 'Educational guide updated successfully.');
     }
 

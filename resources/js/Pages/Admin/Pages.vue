@@ -1,203 +1,91 @@
 <template>
   <AdminLayout>
-    <div class="mb-8">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-normal text-slate-700">Pages</h1>
-        <Link href="/admin/pages/create" class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium">
-          + Create New Page
+    <PageHeader title="Pages" :subtitle="`${pages.length} pages total`">
+      <template #actions>
+        <Link
+          href="/admin/pages/create"
+          class="h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:-translate-y-[0.5px] transition-all flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          New Page
         </Link>
-      </div>
+      </template>
+    </PageHeader>
 
-      <!-- Flash messages are now handled by toast notifications -->
+    <!-- Flash -->
+    <div v-if="$page.props.flash?.success" class="mb-4 px-4 py-3 bg-[color:var(--color-verified-bg)] border border-[#A7F3D0] text-[#065F46] text-sm">
+      {{ $page.props.flash.success }}
+    </div>
 
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-100">
-        <div class="flex items-center gap-4 mb-4 px-6 pt-6">
-          <span class="text-slate-600">Search: </span>
-          <input 
-            type="text" 
-            v-model="searchValue" 
-            @input="handleSearchInput" 
-            class="border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Search pages..."
-          />
-        </div>
+    <!-- Filters -->
+    <FilterBar
+      v-model:search="searchTerm"
+      placeholder="Search pages..."
+    />
 
-        <div class="overflow-x-auto px-6 pb-6">
-          <EasyDataTable
-            :headers="headers"
-            :items="pages.data || []"
-            :search-field="searchField"
-            :search-value="searchValue"
-            :server-items-length="pages.total || 0"
-            :server-options="serverOptions"
-            @update:server-options="handleServerOptionsChange"
-            @update:search-value="handleSearchChange"
-            :loading="loading"
-            server
-            table-class-name="customize-table"
-            header-text-direction="left"
-            body-text-direction="left"
+    <!-- Table -->
+    <div class="bg-white border border-[color:var(--color-hairline)] overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Page</th>
+            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Slug</th>
+            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Updated</th>
+            <th class="px-5 py-3 w-20"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="pg in filteredPages"
+            :key="pg.id"
+            class="border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] cursor-pointer transition-colors group"
+            @click="router.visit(`/admin/pages/${pg.id}/edit`)"
           >
-            <template #item-title="{ title, slug }">
-              <a :href="`/${slug}`" target="_blank" class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-150">
-                {{ title }}
-              </a>
-            </template>
-            <template #item-slug="{ slug }">
-              <code class="text-xs bg-slate-100 px-2 py-1 rounded">{{ slug }}</code>
-            </template>
-            <template #item-actions="{ id, title }">
-              <div class="flex items-center gap-3">
-                <Link :href="`/admin/pages/${id}/edit`" class="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-150">
-                  Edit
-                </Link>
-                <button
-                  @click="deletePage(id, title)"
-                  :disabled="deleteForm.processing"
-                  class="text-red-600 hover:text-red-800 font-medium transition-colors duration-150 disabled:opacity-50"
-                >
-                  Delete
-                </button>
-              </div>
-            </template>
-          </EasyDataTable>
-        </div>
+            <td class="px-5 py-3.5">
+              <div class="text-[13px] font-medium text-[color:var(--color-ink)]">{{ pg.title }}</div>
+            </td>
+            <td class="px-5 py-3.5">
+              <code class="text-[12px] ui-mono text-[color:var(--color-ink-muted)] bg-[color:var(--color-hairline-soft)] px-1.5 py-0.5">{{ pg.slug }}</code>
+            </td>
+            <td class="px-5 py-3.5 text-[13px] text-[color:var(--color-ink-muted)] ui-mono">
+              {{ pg.updated_at || pg.created_at }}
+            </td>
+            <td class="px-5 py-3.5">
+              <svg class="w-4 h-4 text-[color:var(--color-ink-subtle)] group-hover:text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div v-if="filteredPages.length === 0" class="py-12 text-center text-sm text-[color:var(--color-ink-subtle)]">
+        No pages found.
       </div>
     </div>
   </AdminLayout>
 </template>
 
 <script setup>
-import { Link, router, useForm } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
+import { Link, router } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
-import { ref, watch } from 'vue'
-import EasyDataTable from 'vue3-easy-data-table'
-import 'vue3-easy-data-table/dist/style.css'
+import PageHeader from '@/components/admin/PageHeader.vue'
+import FilterBar from '@/components/admin/FilterBar.vue'
 
 const props = defineProps({
-  pages: Object
+  pages: { type: Array, default: () => [] },
 })
 
-// Initialize searchValue from URL parameters
-const getSearchFromUrl = () => {
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    return urlParams.get('search') || ''
+const searchTerm = ref('')
+
+const filteredPages = computed(() => {
+  let list = props.pages
+  if (searchTerm.value) {
+    const q = searchTerm.value.toLowerCase()
+    list = list.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      (p.slug || '').toLowerCase().includes(q)
+    )
   }
-  return ''
-}
-
-const searchValue = ref(getSearchFromUrl())
-const searchField = ['title', 'slug']
-const loading = ref(false)
-const isUserAction = ref(false)
-
-// Initialize serverOptions from URL parameters or props
-const getSortByFromUrl = () => {
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    return urlParams.get('sort_by') || 'created_at'
-  }
-  return 'created_at'
-}
-
-const getSortTypeFromUrl = () => {
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search)
-    return urlParams.get('sort_type') || 'desc'
-  }
-  return 'desc'
-}
-
-const serverOptions = ref({
-  page: props.pages?.current_page || 1,
-  rowsPerPage: props.pages?.per_page || 20,
-  sortBy: getSortByFromUrl(),
-  sortType: getSortTypeFromUrl()
+  return list
 })
-
-const headers = [
-  { text: 'Title', value: 'title', sortable: true },
-  { text: 'Slug', value: 'slug', sortable: true },
-  { text: 'Created', value: 'created_at', sortable: true },
-  { text: 'Updated', value: 'updated_at', sortable: true },
-  { text: 'Actions', value: 'actions', sortable: false }
-]
-
-const deleteForm = useForm({})
-
-const handleSearchInput = () => {
-  isUserAction.value = true
-  handleSearchChange(searchValue.value)
-}
-
-const handleSearchChange = (value) => {
-  if (!isUserAction.value) return
-  
-  loading.value = true
-  const params = new URLSearchParams(window.location.search)
-  
-  if (value) {
-    params.set('search', value)
-  } else {
-    params.delete('search')
-  }
-  
-  params.set('page', '1')
-  params.set('sort_by', serverOptions.value.sortBy)
-  params.set('sort_type', serverOptions.value.sortType)
-  params.set('rows_per_page', serverOptions.value.rowsPerPage)
-  
-  router.get(`/admin/pages?${params.toString()}`, {}, {
-    preserveState: true,
-    preserveScroll: true,
-    onFinish: () => {
-      loading.value = false
-      isUserAction.value = false
-    }
-  })
-}
-
-const handleServerOptionsChange = (options) => {
-  isUserAction.value = true
-  serverOptions.value = { ...options }
-  
-  loading.value = true
-  const params = new URLSearchParams(window.location.search)
-  
-  params.set('page', options.page)
-  params.set('sort_by', options.sortBy)
-  params.set('sort_type', options.sortType)
-  params.set('rows_per_page', options.rowsPerPage)
-  
-  if (searchValue.value) {
-    params.set('search', searchValue.value)
-  }
-  
-  router.get(`/admin/pages?${params.toString()}`, {}, {
-    preserveState: true,
-    preserveScroll: true,
-    onFinish: () => {
-      loading.value = false
-      isUserAction.value = false
-    }
-  })
-}
-
-const deletePage = (id, title) => {
-  if (confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
-    deleteForm.delete(`/admin/pages/${id}`, {
-      preserveScroll: true,
-    })
-  }
-}
-
-// Sync serverOptions with props when they change
-watch(() => props.pages, (pages) => {
-  if (pages && !isUserAction.value) {
-    serverOptions.value.page = pages.current_page || 1
-    serverOptions.value.rowsPerPage = pages.per_page || 20
-  }
-}, { immediate: true, deep: true })
 </script>
-

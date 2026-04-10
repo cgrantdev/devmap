@@ -12,55 +12,18 @@ class ResearchManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Research::query();
-        
-        // Search functionality
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('peptide', 'like', "%{$search}%");
-            });
-        }
-        
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortType = $request->get('sort_type', 'desc');
-        
-        // Validate sortBy
-        $allowedSortColumns = ['id', 'title', 'category', 'status', 'published_at', 'created_at'];
-        if (!in_array($sortBy, $allowedSortColumns)) {
-            $sortBy = 'created_at';
-        }
-        
-        // Validate sortType
-        $sortType = strtolower($sortType) === 'asc' ? 'asc' : 'desc';
-        
-        $query->orderBy($sortBy, $sortType);
-        
-        // Pagination
-        $perPage = $request->get('per_page', 20);
-        $research = $query->paginate($perPage)
-            ->through(function ($item) {
+        $research = Research::orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($item) {
                 return [
                     'id' => $item->id,
                     'title' => $item->title,
-                    'category' => $item->peptide, // Display peptide name in category column
                     'peptide' => $item->peptide,
                     'evidence_level' => $item->evidence_level,
-                    'journal_type' => $item->journal_type,
                     'study_type' => $item->study_type,
-                    'study_summary' => $item->study_summary,
-                    'background' => $item->background,
-                    'key_findings' => $item->key_findings ?? [],
-                    'methodology' => $item->methodology,
-                    'clinical_implications' => $item->clinical_implications,
-                    'limitations' => $item->limitations,
-                    'pubmed_url' => $item->pubmed_url,
-                    'tags' => $item->tags ?? [],
-                    'published_at' => $item->published_at ? $item->published_at->format('Y-m-d') : null,
+                    'published_at' => $item->published_at ? $item->published_at->format('M j, Y') : null,
                     'status' => $item->status,
-                    'created_at' => $item->created_at->format('Y-m-d H:i'),
+                    'created_at' => $item->created_at->format('M j, Y'),
                 ];
             });
 
@@ -120,9 +83,9 @@ class ResearchManagementController extends Controller
             $validated['published_at'] = null;
         }
 
-        Research::create($validated);
+        $paper = Research::create($validated);
 
-        return redirect()->route('admin.research.index')
+        return redirect("/admin/research/{$paper->id}/edit")
             ->with('success', 'Research paper created successfully.');
     }
 
@@ -208,7 +171,7 @@ class ResearchManagementController extends Controller
 
         $research->update($validated);
 
-        return redirect()->route('admin.research.index')
+        return redirect()->back()
             ->with('success', 'Research paper updated successfully.');
     }
 

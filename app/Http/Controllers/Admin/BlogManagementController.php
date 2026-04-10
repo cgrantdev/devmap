@@ -15,47 +15,22 @@ class BlogManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Blog::query();
-        
-        // Search functionality
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%");
-            });
-        }
-        
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortType = $request->get('sort_type', 'desc');
-        
-        // Validate sortBy
-        $allowedSortColumns = ['id', 'title', 'status', 'is_featured', 'published_at', 'created_at'];
-        if (!in_array($sortBy, $allowedSortColumns)) {
-            $sortBy = 'created_at';
-        }
-        
-        // Validate sortType
-        $sortType = strtolower($sortType) === 'asc' ? 'asc' : 'desc';
-        
-        $query->orderBy($sortBy, $sortType);
-        
-        // Pagination
-        $perPage = $request->get('per_page', 20);
-        $blogs = $query->paginate($perPage)
-            ->through(function ($blog) {
+        $blogs = Blog::orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($blog) {
                 return [
                     'id' => $blog->id,
                     'title' => $blog->title,
                     'slug' => $blog->slug,
+                    'blog_type' => $blog->blog_type,
+                    'author_name' => $blog->author_name,
                     'description' => $blog->description,
                     'image' => $blog->image ? (Storage::disk('public')->exists('blogs/' . $blog->image) ? asset('storage/blogs/' . $blog->image) : '/images/blogs/' . $blog->image) : null,
                     'read_time' => $blog->read_time,
-                    'published_at' => $blog->published_at ? $blog->published_at->format('Y-m-d') : null,
+                    'published_at' => $blog->published_at ? $blog->published_at->format('M j, Y') : null,
                     'is_featured' => $blog->is_featured,
                     'status' => $blog->status,
-                    'created_at' => $blog->created_at->format('Y-m-d H:i'),
+                    'created_at' => $blog->created_at->format('M j, Y'),
                 ];
             });
 
@@ -117,9 +92,9 @@ class BlogManagementController extends Controller
             unset($validated['image']);
         }
 
-        Blog::create($validated);
+        $blog = Blog::create($validated);
 
-        return redirect()->route('admin.blogs.index')
+        return redirect("/admin/blogs/{$blog->id}/edit")
             ->with('success', 'Blog post created successfully.');
     }
 
@@ -217,7 +192,7 @@ class BlogManagementController extends Controller
 
         $blog->update($validated);
 
-        return redirect()->route('admin.blogs.index')
+        return redirect()->back()
             ->with('success', 'Blog post updated successfully.');
     }
 

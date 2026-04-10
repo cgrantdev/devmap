@@ -6,7 +6,7 @@
       <div class="absolute inset-0 opacity-[0.03]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '40px 40px' }" />
       <div class="relative z-10 max-w-md px-12">
         <div class="mb-8">
-          <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-10 brightness-0 invert" />
+          <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-12 brightness-0 invert" />
         </div>
         <h2 class="text-white text-3xl font-semibold tracking-tight leading-tight mb-4" style="font-family: 'Inter Tight', sans-serif;">
           The definitive platform for research peptide vendors.
@@ -22,7 +22,7 @@
       <div class="w-full max-w-sm">
         <!-- Mobile logo -->
         <div class="mb-8 lg:hidden">
-          <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-8" />
+          <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-10 brightness-0" />
         </div>
 
         <h1 class="text-2xl font-semibold tracking-tight text-[#0A0B0E] mb-1" style="font-family: 'Inter Tight', sans-serif;">Sign in</h1>

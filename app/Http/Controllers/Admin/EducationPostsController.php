@@ -16,36 +16,10 @@ class EducationPostsController extends Controller
 {
     public function index(Request $request)
     {
-        $query = EducationPost::query();
-        
-        // Search functionality
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%");
-            });
-        }
-        
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortType = $request->get('sort_type', 'desc');
-        
-        // Validate sortBy
-        $allowedSortColumns = ['id', 'title', 'status', 'rating', 'published_at', 'created_at'];
-        if (!in_array($sortBy, $allowedSortColumns)) {
-            $sortBy = 'created_at';
-        }
-        
-        // Validate sortType
-        $sortType = strtolower($sortType) === 'asc' ? 'asc' : 'desc';
-        
-        $query->orderBy($sortBy, $sortType);
-        
-        // Pagination
-        $perPage = $request->get('per_page', 20);
-        $posts = $query->with('category')->paginate($perPage)
-            ->through(function ($post) {
+        $posts = EducationPost::with('category')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($post) {
                 return [
                     'id' => $post->id,
                     'title' => $post->title,
@@ -54,9 +28,9 @@ class EducationPostsController extends Controller
                     'image' => $post->image ? (Storage::disk('public')->exists('education_posts/' . $post->image) ? asset('storage/education_posts/' . $post->image) : (file_exists(public_path('images/peptides/' . $post->image)) ? '/images/peptides/' . $post->image : null)) : null,
                     'rating' => number_format($post->rating, 2, '.', ''),
                     'rating_count' => $post->rating_count,
-                    'published_at' => $post->published_at ? $post->published_at->format('Y-m-d') : null,
+                    'published_at' => $post->published_at ? $post->published_at->format('M j, Y') : null,
                     'status' => $post->status,
-                    'created_at' => $post->created_at->format('Y-m-d H:i'),
+                    'created_at' => $post->created_at->format('M j, Y'),
                     'category_name' => $post->category ? $post->category->name : '-',
                 ];
             });
@@ -151,9 +125,9 @@ class EducationPostsController extends Controller
             unset($validated['image']);
         }
 
-        EducationPost::create($validated);
+        $post = EducationPost::create($validated);
 
-        return redirect()->route('admin.education-posts.index')
+        return redirect("/admin/education-posts/{$post->id}/edit")
             ->with('success', 'Education post created successfully.');
     }
 
@@ -273,7 +247,7 @@ class EducationPostsController extends Controller
 
         $post->update($validated);
 
-        return redirect()->route('admin.education-posts.index')
+        return redirect()->back()
             ->with('success', 'Education post updated successfully.');
     }
 

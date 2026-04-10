@@ -16,46 +16,11 @@ class CategoriesController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ProductCategory::withCount('products');
-        
-        // Search functionality
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%");
-            });
-        }
-        
-        // Sorting
-        $sortBy = $request->get('sort_by', 'name');
-        $sortType = $request->get('sort_type', 'asc');
-        
-        // Validate sortBy
-        $allowedSortColumns = ['id', 'name', 'slug', 'is_active', 'created_at', 'products_count'];
-        if (!in_array($sortBy, $allowedSortColumns)) {
-            $sortBy = 'name';
-        }
-        
-        // Validate sortType
-        $sortType = strtolower($sortType) === 'desc' ? 'desc' : 'asc';
-        
-        // Priority: Active categories first (unless explicitly sorting by is_active)
-        if ($sortBy !== 'is_active') {
-            $query->orderBy('is_active', 'desc');
-        }
-        
-        // Apply user's chosen sort
-        if ($sortBy === 'products_count') {
-            $query->orderBy('products_count', $sortType);
-        } else {
-            $query->orderBy($sortBy, $sortType);
-        }
-        
-        // Pagination
-        $perPage = $request->get('per_page', 20);
-        $categories = $query->paginate($perPage)
-            ->through(function ($category) {
+        $categories = ProductCategory::withCount('products')
+            ->orderBy('is_active', 'desc')
+            ->orderBy('name', 'asc')
+            ->get()
+            ->map(function ($category) {
                 return [
                     'id' => $category->id,
                     'name' => $category->name,
@@ -64,7 +29,7 @@ class CategoriesController extends Controller
                     'image_url' => $category->image_url ? Storage::url('categories/' . $category->image_url) : null,
                     'is_active' => $category->is_active,
                     'products_count' => $category->products_count,
-                    'created_at' => $category->created_at->format('Y-m-d H:i'),
+                    'created_at' => $category->created_at->format('M j, Y'),
                     'research_area' => $category->research_area,
                 ];
             });
@@ -115,9 +80,9 @@ class CategoriesController extends Controller
             unset($validated['image']);
         }
         
-        ProductCategory::create($validated);
-        
-        return redirect()->route('admin.categories.index')
+        $category = ProductCategory::create($validated);
+
+        return redirect("/admin/categories/{$category->id}/edit")
             ->with('success', 'Category created successfully.');
     }
 
@@ -244,8 +209,8 @@ class CategoriesController extends Controller
         }
         
         $category->update($validated);
-        
-        return redirect()->route('admin.categories.index')
+
+        return redirect()->back()
             ->with('success', 'Category updated successfully.');
     }
 

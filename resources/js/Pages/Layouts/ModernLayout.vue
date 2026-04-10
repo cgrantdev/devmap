@@ -10,7 +10,7 @@
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 h-16 flex items-center gap-8">
         <!-- Logo -->
         <a href="/" class="ui-focus flex items-center">
-          <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-7" />
+          <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-9 brightness-0" />
         </a>
 
         <!-- Primary nav -->
@@ -59,7 +59,7 @@
           <!-- Brand column -->
           <div class="col-span-2 lg:col-span-2">
             <div class="mb-4">
-              <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-7" />
+              <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-9 brightness-0" />
             </div>
             <p class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-sm">
               The definitive platform for research peptide discovery. Verified vendors, lab-tested compounds, transparent data.

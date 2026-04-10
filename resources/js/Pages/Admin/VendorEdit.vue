@@ -176,8 +176,6 @@ import AdminLayout from './Layout.vue'
 import FormPage from '@/components/admin/FormPage.vue'
 import FormSection from '@/components/admin/FormSection.vue'
 import FormField from '@/components/admin/FormField.vue'
-import EasyDataTable from 'vue3-easy-data-table'
-import 'vue3-easy-data-table/dist/style.css'
 import { useAdminLoading } from '../../composables/useAdminLoading'
 import { useToast as useVueToastification } from 'vue-toastification'
 

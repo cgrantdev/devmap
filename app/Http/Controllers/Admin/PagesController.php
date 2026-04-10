@@ -12,25 +12,17 @@ class PagesController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Page::query();
-
-        // Search
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('slug', 'like', "%{$search}%");
+        $pages = Page::orderBy('updated_at', 'desc')
+            ->get()
+            ->map(function ($page) {
+                return [
+                    'id' => $page->id,
+                    'title' => $page->title,
+                    'slug' => $page->slug,
+                    'updated_at' => $page->updated_at->format('M j, Y'),
+                    'created_at' => $page->created_at->format('M j, Y'),
+                ];
             });
-        }
-
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortType = $request->get('sort_type', 'desc');
-        $query->orderBy($sortBy, $sortType);
-
-        // Pagination
-        $perPage = $request->get('rows_per_page', 20);
-        $pages = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Admin/Pages', [
             'pages' => $pages,
@@ -67,9 +59,9 @@ class PagesController extends Controller
             }
         }
 
-        Page::create($validated);
+        $page = Page::create($validated);
 
-        return redirect()->route('admin.pages.index')
+        return redirect("/admin/pages/{$page->id}/edit")
             ->with('success', 'Page created successfully.');
     }
 
@@ -109,7 +101,7 @@ class PagesController extends Controller
 
         $page->update($validated);
 
-        return redirect()->route('admin.pages.index')
+        return redirect()->back()
             ->with('success', 'Page updated successfully.');
     }
 

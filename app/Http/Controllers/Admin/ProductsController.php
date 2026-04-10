@@ -10,28 +10,69 @@ use Inertia\Inertia;
 
 class ProductsController extends Controller
 {
-    public function edit($id)
+    public function create()
     {
-        $product = Product::with('category')->findOrFail($id);
-        
-        // Get all categories for the select box
         $categories = ProductCategory::orderBy('name')
             ->get()
-            ->map(function ($category) {
-                return [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                ];
-            });
-        
+            ->map(fn ($c) => ['id' => $c->id, 'name' => $c->name]);
+
+        $brands = \App\Models\Brand::orderBy('name')
+            ->get()
+            ->map(fn ($b) => ['id' => $b->id, 'name' => $b->name]);
+
+        return Inertia::render('Admin/ProductEdit', [
+            'product' => null,
+            'categories' => $categories,
+            'brands' => $brands,
+        ]);
+    }
+
+    public function edit($id)
+    {
+        $product = Product::with(['category', 'brand'])->findOrFail($id);
+
+        $categories = ProductCategory::orderBy('name')
+            ->get()
+            ->map(fn ($c) => ['id' => $c->id, 'name' => $c->name]);
+
+        $brands = \App\Models\Brand::orderBy('name')
+            ->get()
+            ->map(fn ($b) => ['id' => $b->id, 'name' => $b->name]);
+
         return Inertia::render('Admin/ProductEdit', [
             'product' => [
                 'id' => $product->id,
                 'name' => $product->name,
+                'slug' => $product->slug,
+                'description' => $product->description,
+                'price' => $product->price,
+                'discount_price' => $product->discount_price,
+                'brand_id' => $product->brand_id,
+                'brand_name' => $product->brand?->name,
                 'product_category_id' => $product->product_category_id,
+                'category_name' => $product->category?->name,
+                'size_mg' => $product->size_mg,
+                'purity' => $product->purity,
+                'availability' => $product->availability,
+                'status' => $product->status,
                 'hidden' => (bool) $product->hidden,
+                'featured' => (bool) $product->featured,
+                'lab_tested' => (bool) $product->lab_tested,
+                'first_timer_deals' => (bool) $product->first_timer_deals,
+                'auto_update' => (bool) $product->auto_update,
+                'verified' => (bool) $product->verified,
+                'rating_average' => $product->rating_average,
+                'rating_count' => $product->rating_count,
+                'image_url' => $product->image_url,
+                'product_url' => $product->product_url,
+                'seo_page_title' => $product->seo_page_title,
+                'seo_description' => $product->seo_description,
+                'seo_og_title' => $product->seo_og_title,
+                'seo_og_description' => $product->seo_og_description,
+                'seo_og_image' => $product->seo_og_image,
             ],
             'categories' => $categories,
+            'brands' => $brands,
         ]);
     }
 
