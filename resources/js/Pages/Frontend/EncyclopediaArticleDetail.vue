@@ -40,7 +40,7 @@
           <div class="flex flex-col lg:flex-row gap-6 mb-0">
             <div class="flex-1 min-w-0">
               <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
-              <p class="text-lg text-[color:var(--color-ink-muted)] mb-4">{{ subtitle }}</p>
+              <p class="text-lg text-[color:var(--color-ink-muted)] italic mb-4">{{ subtitle }}</p>
               <!-- Short TLDR intro — uses overview (the actual compound description) -->
               <p v-if="overviewShort || overview" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">{{ overviewShort || overview }}</p>
 
