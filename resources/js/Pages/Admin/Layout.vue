@@ -3,17 +3,10 @@
     <!-- Sidebar -->
     <aside class="w-60 bg-[#0F172A] text-white flex-shrink-0 flex flex-col sticky top-0 h-screen overflow-y-auto">
       <!-- Logo -->
-      <div class="px-5 py-5 border-b border-white/[0.06]">
+      <div class="px-5 py-4 border-b border-white/[0.06]">
         <a href="/admin/dashboard" class="flex items-center gap-2.5">
-          <div class="w-7 h-7 bg-gradient-to-br from-[#5B5FE8] to-[#4338CA] flex items-center justify-center">
-            <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/><path d="M9.5 12.5l2 2 4-4.5"/>
-            </svg>
-          </div>
-          <div>
-            <div class="text-[14px] font-semibold tracking-tight">PeptideMap</div>
-            <div class="text-[10px] text-white/40 uppercase tracking-[0.1em]">Admin</div>
-          </div>
+          <img src="/images/logo.png" alt="PeptideMaps" class="h-6 brightness-0 invert" />
+          <span class="text-[10px] text-white/40 uppercase tracking-[0.1em] border-l border-white/10 pl-2.5 ml-0.5">Admin</span>
         </a>
       </div>
 

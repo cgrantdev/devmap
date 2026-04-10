@@ -5,13 +5,8 @@
       <div class="absolute inset-0" :style="{ background: 'radial-gradient(ellipse 800px 500px at 30% 40%, rgba(99,102,241,0.2) 0%, transparent 60%)' }" />
       <div class="absolute inset-0 opacity-[0.03]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '40px 40px' }" />
       <div class="relative z-10 max-w-md px-12">
-        <div class="flex items-center gap-3 mb-8">
-          <div class="w-10 h-10 bg-gradient-to-br from-[#5B5FE8] to-[#4338CA] flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/><path d="M9.5 12.5l2 2 4-4.5"/>
-            </svg>
-          </div>
-          <span class="text-white text-xl font-semibold tracking-tight" style="font-family: 'Inter Tight', sans-serif;">PeptideMap</span>
+        <div class="mb-8">
+          <img src="/images/logo.png" alt="PeptideMaps" class="h-10 brightness-0 invert" />
         </div>
         <h2 class="text-white text-3xl font-semibold tracking-tight leading-tight mb-4" style="font-family: 'Inter Tight', sans-serif;">
           The definitive platform for research peptide vendors.
@@ -26,13 +21,8 @@
     <div class="flex-1 flex items-center justify-center px-6 py-12 bg-white">
       <div class="w-full max-w-sm">
         <!-- Mobile logo -->
-        <div class="flex items-center gap-2.5 mb-8 lg:hidden">
-          <div class="w-8 h-8 bg-gradient-to-br from-[#5B5FE8] to-[#4338CA] flex items-center justify-center">
-            <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/><path d="M9.5 12.5l2 2 4-4.5"/>
-            </svg>
-          </div>
-          <span class="text-lg font-semibold tracking-tight" style="font-family: 'Inter Tight', sans-serif;">PeptideMap</span>
+        <div class="mb-8 lg:hidden">
+          <img src="/images/logo.png" alt="PeptideMaps" class="h-8" />
         </div>
 
         <h1 class="text-2xl font-semibold tracking-tight text-[#0A0B0E] mb-1" style="font-family: 'Inter Tight', sans-serif;">Sign in</h1>

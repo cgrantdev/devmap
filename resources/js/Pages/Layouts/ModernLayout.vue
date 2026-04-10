@@ -9,16 +9,8 @@
     >
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 h-16 flex items-center gap-8">
         <!-- Logo -->
-        <a href="/" class="ui-focus flex items-center gap-2 group">
-          <div class="w-8 h-8 rounded-[8px] ui-gradient-bg flex items-center justify-center">
-            <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/>
-              <path d="M9.5 12.5l2 2 4-4.5"/>
-            </svg>
-          </div>
-          <span class="ui-display text-[17px] font-semibold tracking-tight text-[color:var(--color-ink)]">
-            PeptideMap
-          </span>
+        <a href="/" class="ui-focus flex items-center">
+          <img src="/images/logo.png" alt="PeptideMaps" class="h-7" />
         </a>
 
         <!-- Primary nav -->
@@ -66,14 +58,8 @@
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10">
           <!-- Brand column -->
           <div class="col-span-2 lg:col-span-2">
-            <div class="flex items-center gap-2 mb-4">
-              <div class="w-8 h-8 rounded-[8px] ui-gradient-bg flex items-center justify-center">
-                <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2L4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/>
-                  <path d="M9.5 12.5l2 2 4-4.5"/>
-                </svg>
-              </div>
-              <span class="ui-display text-base font-semibold">PeptideMap</span>
+            <div class="mb-4">
+              <img src="/images/logo.png" alt="PeptideMaps" class="h-7" />
             </div>
             <p class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-sm">
               The definitive platform for research peptide discovery. Verified vendors, lab-tested compounds, transparent data.
