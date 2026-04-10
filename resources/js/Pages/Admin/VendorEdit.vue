@@ -1,28 +1,163 @@
 <template>
   <AdminLayout>
-    <div class="mx-auto">
-      <div class="flex justify-between items-center mb-6">
-        <div>
-          <h1 class="text-3xl font-normal text-slate-700">{{ vendor ? 'Edit Vendor' : 'Create New Vendor' }}</h1>
-          <p class="text-slate-500 mt-2">{{ vendor ? 'Update vendor details' : 'Add a new vendor' }}</p>
-        </div>
-        <Link href="/admin/vendors" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors">Back</Link>
+    <FormPage
+      :title="vendor ? vendor.name : 'New Vendor'"
+      back-label="Vendors"
+      back-href="/admin/vendors"
+      :tabs="[
+        { id: 'general', label: 'General' },
+        { id: 'contact', label: 'Contact' },
+        { id: 'policies', label: 'Policies' },
+        { id: 'marketing', label: 'Marketing' },
+        { id: 'seo', label: 'SEO' },
+        { id: 'products', label: `Products (${(products || []).length})` },
+      ]"
+      v-model:active-tab="activeTab"
+      :saving="editForm.processing"
+      :saved="justSaved"
+      @save="submitEditVendor"
+    >
+      <!-- Error banner -->
+      <div v-if="Object.keys(editForm.errors).length > 0" class="mb-6 px-4 py-3 bg-[color:var(--color-danger-bg)] border border-[#FECACA] text-[#991B1B] text-sm">
+        <span v-for="(error, field) in editForm.errors" :key="field">{{ Array.isArray(error) ? error[0] : error }} </span>
       </div>
-      <!-- Flash messages are now handled by toast notifications -->
-      
-      <!-- Profile Edit Card -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
-        <h2 class="text-xl font-semibold text-slate-800 mb-6">Vendor Details</h2>
-        <!-- Error Message -->
-        <div v-if="Object.keys(editForm.errors).length > 0" class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl">
-          <p class="font-medium">Please fix the following errors:</p>
-          <ul class="list-disc list-inside mt-2">
-            <li v-for="(error, field) in editForm.errors" :key="field" class="text-sm">
-              {{ Array.isArray(error) ? error[0] : error }}
-            </li>
-          </ul>
+
+      <form @submit.prevent="submitEditVendor">
+
+        <!-- GENERAL TAB -->
+        <div v-show="activeTab === 'general'">
+          <FormSection title="Basic Information" :columns="2">
+            <FormField label="Vendor Name" required>
+              <input v-model="editForm.name" type="text" required class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+            <FormField label="Website">
+              <input v-model="editForm.shop_url" type="url" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
+
+          <FormSection title="Description">
+            <FormField label="About this vendor">
+              <textarea v-model="editForm.description" rows="4" class="w-full px-3 py-2 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
+
+          <FormSection title="Location & Details" :columns="2">
+            <FormField label="Location">
+              <input v-model="editForm.location" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+            <FormField label="Founded Year">
+              <input v-model.number="editForm.founded_year" type="number" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
+
+          <FormSection title="Status">
+            <div class="flex flex-wrap gap-6">
+              <label class="flex items-center gap-2 text-sm"><input type="checkbox" v-model="editForm.is_active" class="w-4 h-4 accent-[color:var(--color-accent-600)]" /> Active</label>
+              <label class="flex items-center gap-2 text-sm"><input type="checkbox" v-model="editForm.top_vendor" class="w-4 h-4 accent-[color:var(--color-accent-600)]" /> Top Vendor</label>
+              <label class="flex items-center gap-2 text-sm"><input type="checkbox" v-model="editForm.featured" class="w-4 h-4 accent-[color:var(--color-accent-600)]" /> Featured</label>
+              <label class="flex items-center gap-2 text-sm"><input type="checkbox" v-model="editForm.is_partner" class="w-4 h-4 accent-[color:var(--color-accent-600)]" /> Partner</label>
+            </div>
+          </FormSection>
+
+          <FormSection title="Media" :columns="2">
+            <FormField label="Banner Image">
+              <input type="file" accept="image/*" @change="handleFileChange($event, 'banner')" class="text-sm" />
+              <img v-if="bannerPreview || currentBannerUrl" :src="bannerPreview || currentBannerUrl" class="mt-2 h-20 object-cover border border-[color:var(--color-hairline)]" />
+            </FormField>
+            <FormField label="Logo (PNG)">
+              <input type="file" accept=".png,image/png" @change="handleFileChange($event, 'logo')" class="text-sm" />
+              <img v-if="logoPreview || currentLogoUrl" :src="logoPreview || currentLogoUrl" class="mt-2 h-16 object-contain border border-[color:var(--color-hairline)]" />
+            </FormField>
+          </FormSection>
         </div>
-        <form @submit.prevent="submitEditVendor" class="space-y-6">
+
+        <!-- CONTACT TAB -->
+        <div v-show="activeTab === 'contact'">
+          <FormSection title="Contact Information" :columns="2">
+            <FormField label="Email">
+              <input v-model="editForm.contact_email" type="email" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+            <FormField label="Phone">
+              <input v-model="editForm.phone_number" type="tel" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
+          <FormSection title="Business Hours">
+            <FormField label="Hours" hint="e.g., Mon-Fri: 9AM-6PM EST">
+              <input v-model="editForm.business_hours" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
+        </div>
+
+        <!-- POLICIES TAB -->
+        <div v-show="activeTab === 'policies'">
+          <FormSection title="Shipping">
+            <FormField label="Shipping Information">
+              <textarea v-model="editForm.shipping_info" rows="3" class="w-full px-3 py-2 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
+          <FormSection title="Returns">
+            <FormField label="Return Policy">
+              <textarea v-model="editForm.return_policy" rows="3" class="w-full px-3 py-2 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
+          <FormSection title="Payment Methods">
+            <div class="flex flex-wrap gap-6">
+              <label v-for="method in ['Credit Card', 'PayPal', 'Cryptocurrency', 'Bank Transfer']" :key="method" class="flex items-center gap-2 text-sm">
+                <input type="checkbox" :value="method" v-model="editForm.payment_methods" class="w-4 h-4 accent-[color:var(--color-accent-600)]" />
+                {{ method }}
+              </label>
+            </div>
+          </FormSection>
+        </div>
+
+        <!-- MARKETING TAB -->
+        <div v-show="activeTab === 'marketing'">
+          <FormSection title="Coupon & Affiliate" :columns="2">
+            <FormField label="Coupon Code">
+              <input v-model="editForm.coupon_code" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] ui-mono focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+            <FormField label="Banner Image URL">
+              <input v-model="editForm.banner_image_url" type="url" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
+          <FormSection title="Affiliate Tracking" :columns="2">
+            <FormField label="Affiliate URL Template" hint="Placeholders: {product_url}, {slug}, {id}, {affiliate_tag}">
+              <input v-model="editForm.affiliate_url_template" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] ui-mono focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" placeholder="https://vendor.com/{slug}?ref={affiliate_tag}" />
+            </FormField>
+            <FormField label="Affiliate Tag">
+              <input v-model="editForm.affiliate_tag" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" placeholder="peptidemap" />
+            </FormField>
+          </FormSection>
+        </div>
+
+        <!-- SEO TAB -->
+        <div v-show="activeTab === 'seo'">
+          <FormSection title="Search Engine Optimization">
+            <FormField label="Page Title">
+              <input v-model="editForm.seo_page_title" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+            <FormField label="Meta Description">
+              <textarea v-model="editForm.seo_description" rows="3" class="w-full px-3 py-2 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
+          <FormSection title="Open Graph" :columns="2">
+            <FormField label="OG Title">
+              <input v-model="editForm.seo_og_title" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+            <FormField label="OG Image URL">
+              <input v-model="editForm.seo_og_image" type="url" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+            <FormField label="OG Description" class="md:col-span-2">
+              <textarea v-model="editForm.seo_og_description" rows="2" class="w-full px-3 py-2 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
+        </div>
+
+      </form>
+
+      <!-- PRODUCTS TAB (outside the form) -->
+      <div v-show="activeTab === 'products'">
+        <FormSection :title="`${(products || []).length} products`">
           <!-- Basic Info -->
           <div class="grid grid-cols-2 gap-4">
             <div>
@@ -345,16 +480,20 @@
             <button @click="deleteProduct(id)" class="text-red-600 hover:text-red-900">Delete</button>
           </template>
         </EasyDataTable>
+        </FormSection>
       </div>
-    </div>
+
+    </FormPage>
   </AdminLayout>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { useForm, usePage, Link } from '@inertiajs/vue3'
+import { useForm, usePage, Link, router } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
-import { router } from '@inertiajs/vue3'
+import FormPage from '@/components/admin/FormPage.vue'
+import FormSection from '@/components/admin/FormSection.vue'
+import FormField from '@/components/admin/FormField.vue'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import { useAdminLoading } from '../../composables/useAdminLoading'
@@ -376,6 +515,9 @@ const props = defineProps({
     default: () => []
   }
 })
+
+const activeTab = ref('general')
+const justSaved = ref(false)
 
 const bannerPreview = ref(null)
 const logoPreview = ref(null)
@@ -415,6 +557,7 @@ const editForm = useForm({
   contact_email: props.vendor?.settings?.contact_email || '',
   phone_number: props.vendor?.settings?.phone_number || '',
   location_id: props.vendor?.settings?.location_id || null,
+  location: props.vendor?.location || '',
   shop_url: props.vendor?.settings?.shop_url || '',
   founded_year: props.vendor?.settings?.founded_year || null,
   coupon_code: props.vendor?.settings?.coupon_code || '',
@@ -484,6 +627,8 @@ function submitEditVendor() {
       preserveState: true,
       preserveScroll: true,
       onSuccess: () => {
+        justSaved.value = true
+        setTimeout(() => justSaved.value = false, 3000)
         bannerPreview.value = null
         logoPreview.value = null
         cacheBuster.value = Date.now()
