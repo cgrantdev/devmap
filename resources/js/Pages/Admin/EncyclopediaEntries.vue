@@ -18,7 +18,7 @@
       </div>
 
       <div class="flex items-center gap-4 mb-4 px-6">
-        <span>search value: </span>
+        
         <input type="text" v-model="searchValue" @input="handleSearchInput" class="border rounded px-3 py-2">
       </div>
 

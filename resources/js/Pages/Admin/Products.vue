@@ -2,7 +2,7 @@
   <AdminLayout>
     <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-3xl text-gray-900 mb-2">Product Management</h1>
+      <h1 class="ui-display text-2xl font-semibold tracking-tight text-[color:var(--color-ink)]">Products</h1>
       <p class="text-gray-600">Manage all products</p>
     </div>
 

@@ -1,28 +1,27 @@
 <template>
   <AdminLayout>
-    <div class="mb-8 flex items-center justify-between">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
       <div>
-        <h1 class="text-3xl font-normal text-slate-700">Blog Management</h1>
-        <p class="text-slate-500 mt-2">Manage all blog posts</p>
+        <h1 class="ui-display text-2xl font-semibold tracking-tight text-[color:var(--color-ink)]">Blog Posts</h1>
+        <p class="text-sm text-[color:var(--color-ink-muted)] mt-1">Create and manage blog content</p>
       </div>
-      <Link href="/admin/blogs/create" class="inline-flex items-center px-5 py-2.5 bg-blue-500 text-white rounded-xl hover:bg-blue-600 font-medium shadow-sm hover:shadow transition-all duration-200">
-        + New Blog Post
+      <Link href="/admin/blogs/create" class="h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:-translate-y-[0.5px] transition-all flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        New Post
       </Link>
     </div>
-    
-    <!-- Flash messages are now handled by toast notifications -->
-    
-    <div class="bg-white rounded-lg shadow">
-      <div class="p-6">
-        <h2 class="text-xl font-semibold">All Blogs</h2>
+
+    <div class="bg-white border border-[color:var(--color-hairline)]">
+      <!-- Search -->
+      <div class="px-5 py-3 border-b border-[color:var(--color-hairline)]">
+        <div class="relative max-w-sm">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" v-model="searchValue" @input="handleSearchInput" placeholder="Search posts..." class="w-full h-9 pl-9 pr-4 text-sm border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+        </div>
       </div>
 
-      <div class="flex items-center gap-4 mb-4 px-6">
-        <span>search value: </span>
-        <input type="text" v-model="searchValue" @input="handleSearchInput" class="border rounded px-3 py-2">
-      </div>
-
-      <div class="overflow-x-auto px-6 pb-6">
+      <div class="overflow-x-auto px-5 pb-5 pt-2">
       <EasyDataTable
         :headers="headers"
         :items="blogs.data || []"

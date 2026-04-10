@@ -2,7 +2,7 @@
   <AdminLayout>
     <div class="mb-8 flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-normal text-slate-700">Research Management</h1>
+        <h1 class="ui-display text-2xl font-semibold tracking-tight text-[color:var(--color-ink)]">Research</h1>
         <p class="text-slate-500 mt-2">Manage all research papers</p>
       </div>
       <Link href="/admin/research/create" class="inline-flex items-center px-5 py-2.5 bg-yellow-500 text-white rounded-xl hover:bg-yellow-600 font-medium shadow-sm hover:shadow transition-all duration-200">
@@ -18,7 +18,7 @@
       </div>
 
       <div class="flex items-center gap-4 mb-4 px-6">
-        <span>search value: </span>
+        
         <input type="text" v-model="searchValue" @input="handleSearchInput" class="border rounded px-3 py-2">
       </div>
 

@@ -1,45 +1,40 @@
 <template>
   <AdminLayout>
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-3xl text-gray-900 mb-2">Vendor Management</h1>
-      <p class="text-gray-600">Manage all vendors and their information</p>
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="ui-display text-2xl font-semibold tracking-tight text-[color:var(--color-ink)]">Vendors</h1>
+        <p class="text-sm text-[color:var(--color-ink-muted)] mt-1">{{ filteredVendors.length }} vendors total</p>
+      </div>
+      <button
+        @click="openAddModal"
+        class="h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:-translate-y-[0.5px] transition-all flex items-center gap-2"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Add Vendor
+      </button>
     </div>
 
-    <!-- Success Message -->
-    <div v-if="$page.props.flash.success" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+    <!-- Flash messages -->
+    <div v-if="$page.props.flash.success" class="mb-4 px-4 py-3 bg-[color:var(--color-verified-bg)] border border-[#A7F3D0] text-[#065F46] text-sm">
       {{ $page.props.flash.success }}
     </div>
-    
-    <!-- Error Message -->
-    <div v-if="$page.props.flash.error" class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+    <div v-if="$page.props.flash.error" class="mb-4 px-4 py-3 bg-[color:var(--color-danger-bg)] border border-[#FECACA] text-[#991B1B] text-sm">
       {{ $page.props.flash.error }}
     </div>
 
-    <!-- Actions Bar -->
-    <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-      <div class="flex items-center justify-between gap-4">
-        <div class="flex-1 relative">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" aria-hidden="true">
-            <path d="m21 21-4.34-4.34" />
-            <circle cx="11" cy="11" r="8"></circle>
-          </svg>
-          <input
-            type="text"
-            placeholder="Search vendors..."
-            v-model="searchTerm"
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <button 
-          @click="openAddModal"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          Add Vendor
-        </button>
+    <!-- Search -->
+    <div class="mb-4">
+      <div class="relative max-w-sm">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input
+          type="text"
+          placeholder="Search vendors..."
+          v-model="searchTerm"
+          class="w-full h-9 pl-9 pr-4 text-sm border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
+        />
       </div>
     </div>
 
