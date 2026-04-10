@@ -50,9 +50,8 @@
                 <span v-if="halfLife" class="text-[color:var(--color-ink-subtle)]">·</span>
                 <span v-if="halfLife">Half-life: <span class="ui-mono font-medium text-[color:var(--color-ink)]">{{ halfLife }}</span></span>
                 <span v-if="vendorCount > 0" class="text-[color:var(--color-ink-subtle)]">·</span>
-                <span v-if="vendorCount > 0">Available from <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendorCount }}</span> vendors</span>
-                <a v-if="vendorCount > 0" href="/compare" class="inline-flex items-center gap-1 font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
-                  Compare prices <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                <a v-if="vendorCount > 0" :href="`/compare#${slugify(categoryName || name)}`" class="inline-flex items-center gap-1 font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
+                  {{ vendorCount }} vendors <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
               </div>
 
@@ -1685,6 +1684,10 @@ const aminoAcidComposition = computed(() => {
 
 const page = usePage()
 const structureImageFailed = ref(false)
+
+function slugify(str) {
+  return (str || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
 const structureView = ref('2d')
 const no3d = ref(false)
 
