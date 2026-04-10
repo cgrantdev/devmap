@@ -375,6 +375,102 @@ main .rounded-3xl { border-radius: 24px; }
 main .shadow-lg { box-shadow: var(--shadow-lg); }
 main .shadow { box-shadow: var(--shadow-sm); }
 
+/* ---------------------------------------------------------------
+   Admin panel global styling
+   Normalizes all admin pages wrapped in the AdminLayout.
+   --------------------------------------------------------------- */
+
+/* Admin page headers — consistent typography */
+.min-h-screen h1.text-3xl,
+.min-h-screen h1.text-2xl {
+    font-family: var(--font-display);
+    letter-spacing: -0.015em;
+    color: var(--color-ink);
+}
+
+/* Admin cards — consistent borders, shadows, radius */
+.bg-gray-100 .bg-white,
+.bg-\[color\:var\(--color-bg\)\] .bg-white {
+    border-color: var(--color-hairline);
+    box-shadow: var(--shadow-xs);
+}
+
+/* Admin tables — cleaner styling */
+.bg-gray-100 table th,
+.bg-\[color\:var\(--color-bg\)\] table th {
+    font-family: var(--font-display);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-subtle);
+    font-weight: 600;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--color-hairline);
+    background: var(--color-bg);
+}
+
+.bg-gray-100 table td,
+.bg-\[color\:var\(--color-bg\)\] table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-hairline-soft);
+    font-size: 14px;
+    color: var(--color-ink);
+}
+
+.bg-gray-100 table tr:hover td,
+.bg-\[color\:var\(--color-bg\)\] table tr:hover td {
+    background: var(--color-hairline-soft);
+}
+
+/* Admin stat cards — consistent look */
+.bg-gray-100 .rounded-lg.border.p-6,
+.bg-gray-100 .rounded-xl.border.p-5,
+.bg-gray-100 .rounded-xl.border.p-6 {
+    border-color: var(--color-hairline);
+    box-shadow: var(--shadow-xs);
+}
+
+/* Admin buttons — normalize */
+.bg-gray-100 .bg-blue-600,
+.bg-gray-100 .bg-blue-500 {
+    background: linear-gradient(to bottom, #5B5FE8, #4338CA);
+}
+
+.bg-gray-100 .bg-blue-600:hover,
+.bg-gray-100 .bg-blue-500:hover {
+    background: linear-gradient(to bottom, #4F46E5, #3730A3);
+}
+
+/* Admin form inputs — consistent styling */
+.bg-gray-100 input[type="text"],
+.bg-gray-100 input[type="email"],
+.bg-gray-100 input[type="url"],
+.bg-gray-100 input[type="number"],
+.bg-gray-100 input[type="password"],
+.bg-gray-100 textarea,
+.bg-gray-100 select {
+    border-color: var(--color-hairline);
+    font-size: 14px;
+}
+
+.bg-gray-100 input:focus,
+.bg-gray-100 textarea:focus,
+.bg-gray-100 select:focus {
+    border-color: var(--color-accent-500);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+/* Admin flash messages — cleaner */
+.bg-gray-100 .bg-green-50 {
+    background: var(--color-verified-bg);
+    border-color: #A7F3D0;
+}
+
+.bg-gray-100 .bg-red-50 {
+    background: var(--color-danger-bg);
+    border-color: #FECACA;
+}
+
 /* Design System Variables */
 :root {
     /* Font Families */
