@@ -44,11 +44,16 @@
               <!-- Short TLDR intro — uses overview (the actual compound description) -->
               <p v-if="overviewShort || overview" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">{{ overviewShort || overview }}</p>
 
-              <!-- Clinical quick reference -->
-              <div v-if="(routes && routes.length) || halfLife" class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[color:var(--color-ink-muted)] mb-4">
+              <!-- Clinical quick reference + vendor availability -->
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[color:var(--color-ink-muted)] mb-4">
                 <span v-if="routes && routes.length">Administration: <span class="font-medium text-[color:var(--color-ink)]">{{ routes.join(', ') }}</span></span>
                 <span v-if="halfLife" class="text-[color:var(--color-ink-subtle)]">·</span>
                 <span v-if="halfLife">Half-life: <span class="ui-mono font-medium text-[color:var(--color-ink)]">{{ halfLife }}</span></span>
+                <span v-if="vendorCount > 0" class="text-[color:var(--color-ink-subtle)]">·</span>
+                <span v-if="vendorCount > 0">Available from <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendorCount }}</span> vendors</span>
+                <a v-if="vendorCount > 0" href="/compare" class="inline-flex items-center gap-1 font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
+                  Compare prices <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </a>
               </div>
 
               <div v-if="primaryResearch.institution" class="text-sm text-[color:var(--color-ink-muted)]">
@@ -1475,6 +1480,10 @@ const props = defineProps({
   halfLife: {
     type: String,
     default: ''
+  },
+  vendorCount: {
+    type: Number,
+    default: 0
   },
   slug: {
     type: String,

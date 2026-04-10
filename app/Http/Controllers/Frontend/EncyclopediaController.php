@@ -751,6 +751,11 @@ class EncyclopediaController extends Controller
             'drugStatus' => $this->getClinicalData($category->name, 'status'),
             'routes' => $this->getClinicalData($category->name, 'routes'),
             'halfLife' => $this->getClinicalData($category->name, 'halfLife'),
+            'vendorCount' => Product::visible()
+                ->where('status', 'active')
+                ->where('product_category_id', $category->id)
+                ->distinct('brand_id')
+                ->count('brand_id'),
             'areasOfResearch' => $educationPost && $educationPost->areas_of_research ? (is_array($educationPost->areas_of_research) ? $educationPost->areas_of_research : json_decode($educationPost->areas_of_research, true) ?? []) : [],
             'areasOfResearchIntro' => $educationPost->areas_of_research_intro ?? '',
             'background' => $educationPost->background ?? '',
