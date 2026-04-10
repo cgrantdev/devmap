@@ -44,14 +44,10 @@
               <!-- Short TLDR intro — uses overview (the actual compound description) -->
               <p v-if="overviewShort || overview" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">{{ overviewShort || overview }}</p>
 
-              <!-- Quick reference identifiers -->
-              <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[color:var(--color-ink-muted)] mb-4">
-                <span v-if="molecularInfo.casNumber">CAS <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber }}</span></span>
-                <span v-if="drugStatus" class="flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full" :class="drugStatus === 'Approved' ? 'bg-[color:var(--color-verified)]' : 'bg-[color:var(--color-caution)]'" />
-                  {{ drugStatus }}
-                </span>
-                <span v-if="routes && routes.length">Routes: <span class="font-medium text-[color:var(--color-ink)]">{{ routes.join(', ') }}</span></span>
+              <!-- Clinical quick reference -->
+              <div v-if="(routes && routes.length) || halfLife" class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[color:var(--color-ink-muted)] mb-4">
+                <span v-if="routes && routes.length">Administration: <span class="font-medium text-[color:var(--color-ink)]">{{ routes.join(', ') }}</span></span>
+                <span v-if="halfLife" class="text-[color:var(--color-ink-subtle)]">·</span>
                 <span v-if="halfLife">Half-life: <span class="ui-mono font-medium text-[color:var(--color-ink)]">{{ halfLife }}</span></span>
               </div>
 
