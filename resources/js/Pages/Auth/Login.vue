@@ -100,6 +100,7 @@ const errors = usePage().props.errors || {}
 const form = useForm({
   email: '',
   password: '',
+  _token: usePage().props.csrf_token,
 })
 
 function submit() {
