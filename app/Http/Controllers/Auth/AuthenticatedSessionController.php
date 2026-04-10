@@ -12,11 +12,7 @@ class AuthenticatedSessionController extends Controller
 {
     public function create()
     {
-        return Inertia::render('Auth/Login')
-            ->withHeaders([
-                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-                'Pragma' => 'no-cache',
-            ]);
+        return Inertia::render('Auth/Login');
     }
 
     public function store(LoginRequest $request)
