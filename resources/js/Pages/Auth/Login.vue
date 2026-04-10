@@ -105,6 +105,15 @@ const form = useForm({
 function submit() {
   form.post('/login', {
     preserveScroll: true,
+    onError: () => {
+      form.password = ''
+    },
+    onFinish: () => {
+      // If we get a 419 (token expired), reload the page to get a fresh token
+      if (form.hasErrors && Object.values(form.errors).some(e => String(e).includes('expired') || String(e).includes('419'))) {
+        window.location.reload()
+      }
+    },
   })
 }
 </script>
