@@ -39,17 +39,16 @@
     </div>
 
     <!-- Vendors Table -->
-    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div class="bg-white border border-[color:var(--color-hairline)] overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Vendor</th>
-              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Location</th>
-              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Rating</th>
-              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Reviews</th>
-              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider">Actions</th>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+              <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendor</th>
+              <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Location</th>
+              <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Rating</th>
+              <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Status</th>
+              <th class="px-5 py-3 text-right text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
@@ -185,12 +184,15 @@
     <!-- Edit Vendor Modal -->
     <div
       v-if="showEditModal"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       @click.self="closeEditModal"
     >
-      <div class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6 border-b border-gray-200">
-          <h2 class="text-2xl text-gray-900">{{ isEditMode ? 'Edit Vendor' : 'Add Vendor' }}</h2>
+      <div class="bg-white border border-[color:var(--color-hairline)] shadow-[var(--shadow-lg)] max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-4 border-b border-[color:var(--color-hairline)] flex items-center justify-between sticky top-0 bg-white z-10">
+          <h2 class="ui-display text-lg font-semibold text-[color:var(--color-ink)]">{{ isEditMode ? 'Edit Vendor' : 'Add Vendor' }}</h2>
+          <button @click="closeEditModal" class="w-8 h-8 flex items-center justify-center text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)] transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
         </div>
 
         <form @submit.prevent="submitVendor" class="p-6 space-y-6">
@@ -207,7 +209,7 @@
           <!-- Basic Info -->
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm text-gray-700 mb-2">Vendor Name *</label>
+              <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Vendor Name *</label>
               <input
                 v-model="editForm.name"
                 type="text"
@@ -216,7 +218,7 @@
               />
             </div>
             <div>
-              <label class="block text-sm text-gray-700 mb-2">Website *</label>
+              <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Website *</label>
               <input
                 v-model="editForm.shop_url"
                 type="url"
@@ -228,7 +230,7 @@
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm text-gray-700 mb-2">Email</label>
+              <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Email</label>
               <input
                 v-model="editForm.email"
                 type="email"
@@ -236,7 +238,7 @@
               />
             </div>
             <div>
-              <label class="block text-sm text-gray-700 mb-2">Phone</label>
+              <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Phone</label>
               <input
                 v-model="editForm.phone_number"
                 type="tel"
@@ -247,7 +249,7 @@
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm text-gray-700 mb-2">Location *</label>
+              <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Location *</label>
               <input
                 v-model="editForm.location"
                 type="text"
@@ -256,7 +258,7 @@
               />
             </div>
             <div>
-              <label class="block text-sm text-gray-700 mb-2">Founded Year</label>
+              <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Founded Year</label>
               <input
                 v-model.number="editForm.founded_year"
                 type="number"
@@ -267,7 +269,7 @@
 
 
           <div>
-            <label class="block text-sm text-gray-700 mb-2">Description</label>
+            <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Description</label>
             <textarea
               v-model="editForm.description"
               rows="3"
@@ -277,7 +279,7 @@
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm text-gray-700 mb-2">Coupon Code</label>
+              <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Coupon Code</label>
               <input
                 v-model="editForm.coupon_code"
                 type="text"
@@ -285,7 +287,7 @@
               />
             </div>
             <div>
-              <label class="block text-sm text-gray-700 mb-2">Banner Image URL</label>
+              <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Banner Image URL</label>
               <input
                 v-model="editForm.banner_image_url"
                 type="url"
@@ -295,7 +297,7 @@
           </div>
 
           <div>
-            <label class="block text-sm text-gray-700 mb-2">Shipping Information</label>
+            <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Shipping Information</label>
             <textarea
               v-model="editForm.shipping_info"
               rows="2"
@@ -304,7 +306,7 @@
           </div>
 
           <div>
-            <label class="block text-sm text-gray-700 mb-2">Return Policy</label>
+            <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Return Policy</label>
             <textarea
               v-model="editForm.return_policy"
               rows="2"
@@ -313,7 +315,7 @@
           </div>
 
           <div>
-            <label class="block text-sm text-gray-700 mb-2">Business Hours</label>
+            <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Business Hours</label>
             <input
               v-model="editForm.business_hours"
               type="text"
@@ -324,7 +326,7 @@
 
           <!-- Payment Methods -->
           <div>
-            <label class="block text-sm text-gray-700 mb-2">Payment Methods</label>
+            <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Payment Methods</label>
             <div class="flex gap-6 flex-wrap">
               <label class="flex items-center gap-2">
                 <input
@@ -367,7 +369,7 @@
 
           <!-- Checkboxes -->
           <div>
-            <label class="block text-sm text-gray-700 mb-2">Status</label> 
+            <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Status</label> 
             <div class="flex gap-6 flex-wrap">
               <label class="flex items-center gap-2">
                 <input
@@ -405,11 +407,11 @@
           </div>
 
           <!-- SEO Data Section -->
-          <div class="border-t border-gray-200 pt-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">SEO Data</h3>
+          <div class="border-t border-[color:var(--color-hairline)] pt-6">
+            <h3 class="ui-display text-sm font-semibold text-[color:var(--color-ink)] mb-4 uppercase tracking-[0.06em]">SEO Data</h3>
             <div class="space-y-4">
               <div>
-                <label class="block text-sm text-gray-700 mb-2">Page Title</label>
+                <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Page Title</label>
                 <input
                   v-model="editForm.seo_page_title"
                   type="text"
@@ -418,7 +420,7 @@
                 />
               </div>
               <div>
-                <label class="block text-sm text-gray-700 mb-2">Description</label>
+                <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Description</label>
                 <textarea
                   v-model="editForm.seo_description"
                   rows="3"
@@ -427,7 +429,7 @@
                 ></textarea>
               </div>
               <div>
-                <label class="block text-sm text-gray-700 mb-2">OG:Title</label>
+                <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">OG:Title</label>
                 <input
                   v-model="editForm.seo_og_title"
                   type="text"
@@ -436,7 +438,7 @@
                 />
               </div>
               <div>
-                <label class="block text-sm text-gray-700 mb-2">OG:Image</label>
+                <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">OG:Image</label>
                 <input
                   v-model="editForm.seo_og_image"
                   type="url"
@@ -445,7 +447,7 @@
                 />
               </div>
               <div>
-                <label class="block text-sm text-gray-700 mb-2">OG:Description</label>
+                <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">OG:Description</label>
                 <textarea
                   v-model="editForm.seo_og_description"
                   rows="3"
@@ -457,18 +459,18 @@
           </div>
 
           <!-- Action Buttons -->
-          <div class="p-6 border-t border-gray-200 flex justify-end gap-3">
+          <div class="px-6 py-4 border-t border-[color:var(--color-hairline)] flex justify-end gap-3 sticky bottom-0 bg-white">
             <button
               type="button"
               @click="closeEditModal"
-              class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              class="h-9 px-4 text-[13px] font-medium border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               :disabled="editForm.processing"
-              class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              class="h-9 px-5 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:-translate-y-[0.5px] transition-all disabled:opacity-50"
             >
               {{ editForm.processing ? (isEditMode ? 'Saving...' : 'Adding...') : (isEditMode ? 'Save Changes' : 'Add Vendor') }}
             </button>
