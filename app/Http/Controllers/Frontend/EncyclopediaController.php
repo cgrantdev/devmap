@@ -746,7 +746,7 @@ class EncyclopediaController extends Controller
             ],
             'keyPoints' => $educationPost && $educationPost->key_points ? (is_array($educationPost->key_points) ? $educationPost->key_points : json_decode($educationPost->key_points, true) ?? []) : [],
             'overview' => $educationPost->overview ?? '',
-            'overviewShort' => $this->truncateToSentences($educationPost->overview ?? '', 350),
+            'overviewShort' => $this->truncateToSentences($educationPost->overview ?? '', 450),
             // Clinical reference data (hardcoded for now, can be DB fields later)
             'drugStatus' => $this->getClinicalData($category->name, 'status'),
             'routes' => $this->getClinicalData($category->name, 'routes'),
