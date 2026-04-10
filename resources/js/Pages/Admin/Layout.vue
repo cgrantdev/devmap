@@ -1,170 +1,99 @@
 <template>
-  <div class="min-h-screen flex flex-col">
-    <!-- Header -->
-    <!-- <Header /> -->
-    
-    <main>
-      <div class="min-h-screen bg-gray-100 flex">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-gray-900 text-white flex-shrink-0">
-          <div class="p-6 border-b border-gray-800">
-            <h1 class="text-xl">Admin Panel</h1>
-            <p class="text-sm text-gray-400 mt-1">Peptidemaps</p>
+  <div class="min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="w-60 bg-[#0F172A] text-white flex-shrink-0 flex flex-col sticky top-0 h-screen overflow-y-auto">
+      <!-- Logo -->
+      <div class="px-5 py-5 border-b border-white/[0.06]">
+        <a href="/admin/dashboard" class="flex items-center gap-2.5">
+          <div class="w-7 h-7 bg-gradient-to-br from-[#5B5FE8] to-[#4338CA] flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"/><path d="M9.5 12.5l2 2 4-4.5"/>
+            </svg>
           </div>
-          <nav class="p-4">
-            <div class="space-y-1">
-              <Link href="/admin/dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url === '/admin/dashboard' }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard w-5 h-5" aria-hidden="true">
-                  <rect width="7" height="9" x="3" y="3" rx="1"></rect>
-                  <rect width="7" height="5" x="14" y="3" rx="1"></rect>
-                  <rect width="7" height="9" x="14" y="12" rx="1"></rect>
-                  <rect width="7" height="5" x="3" y="16" rx="1"></rect>
-                </svg>
-                <span>Dashboard</span>
-              </Link>
-              <Link href="/admin/vendors" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800 relative" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/vendors') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store w-5 h-5" aria-hidden="true">
-                  <path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"></path>
-                  <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"></path>
-                  <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"></path>
-                </svg>
-                <span>Vendors</span>
-                <div v-if="$page.props.pending_vendors_count > 0" class="ml-auto relative flex-shrink-0">
-                  <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                  <span class="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] bg-red-600 text-white text-[10px] font-bold rounded-full px-1">
-                    {{ $page.props.pending_vendors_count }}
-                  </span>
-                </div>
-              </Link>
-              <!-- <Link href="/admin/locations" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/locations') }">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                <span>Locations</span>
-              </Link> -->
-              <Link href="/admin/categories" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/categories') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder w-5 h-5" aria-hidden="true">
-                  <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.5L12 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2Z"></path>
-                </svg>
-                <span>Categories</span>
-              </Link>
-              <Link href="/admin/products" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/products') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package w-5 h-5" aria-hidden="true">
-                  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path>
-                  <path d="M12 22V12"></path>
-                  <polyline points="3.29 7 12 12 20.71 7"></polyline>
-                  <path d="m7.5 4.27 9 5.15"></path>
-                </svg>
-                <span>Products</span>
-              </Link>
-              <Link href="/admin/product-scraping" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/product-scraping') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw w-5 h-5" aria-hidden="true">
-                  <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-                  <path d="M21 3v5h-5"></path>
-                  <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-                  <path d="M8 16H3v5"></path>
-                </svg>
-                <span>Product Scraping</span>
-              </Link>
-              <Link href="/admin/staged-products" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/staged-products') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
-                  <path d="M16 16v3a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m9 14 2 2 4-4"/>
-                </svg>
-                <span>Staged Products</span>
-              </Link>
-              <Link href="/admin/reviews" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/reviews') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw w-5 h-5" aria-hidden="true">
-                  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path>
-                </svg>
-                <span>Reviews</span>
-                <div v-if="$page.props.pending_reviews_count > 0" class="ml-auto relative flex-shrink-0">
-                  <div class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                  <span class="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] bg-yellow-600 text-white text-[10px] font-bold rounded-full px-1">
-                    {{ $page.props.pending_reviews_count }}
-                  </span>
-                </div>
-              </Link>
-              <Link href="/admin/deals" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/deals') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag w-5 h-5" aria-hidden="true">
-                  <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path>
-                  <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                </svg>
-                <span>Deals & Coupons</span>
-              </Link>
-              <Link href="/admin/banners" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/banners') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image w-5 h-5" aria-hidden="true">
-                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
-                  <circle cx="9" cy="9" r="2" fill="currentColor"></circle>
-                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
-                </svg>
-                <span>Banner Ads</span>
-              </Link>
-              <Link href="/admin/users" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/users') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users w-5 h-5" aria-hidden="true">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                  <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
-                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                  <circle cx="9" cy="7" r="4" fill="none"></circle>
-                </svg>
-                <span>Users</span>
-              </Link>
-              <Link href="/admin/content" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/content') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-5 h-5" aria-hidden="true">
-                  <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path>
-                  <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
-                  <path d="M10 9H8"></path>
-                  <path d="M16 13H8"></path>
-                  <path d="M16 17H8"></path>
-                </svg>
-                <span>Content</span>
-              </Link>
-              <Link href="/admin/analytics" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/analytics') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-column w-5 h-5" aria-hidden="true">
-                  <path d="M3 3v16a2 2 0 0 0 2 2h16"></path>
-                  <path d="M18 17V9"></path>
-                  <path d="M13 17V5"></path>
-                  <path d="M8 17v-3"></path>
-                </svg>
-                <span>Analytics</span>
-              </Link>
-              <Link href="/admin/settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/settings') }">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-5 h-5" aria-hidden="true">
-                  <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path>
-                  <circle cx="12" cy="12" r="3" fill="none"></circle>
-                </svg>
-                <span>Settings</span>
-              </Link>
-            </div>
-          </nav>
-          <form @submit.prevent="logout" class="absolute bottom-0 w-64 p-4 border-t border-gray-800">
-            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out w-5 h-5" aria-hidden="true">
-                <path d="m16 17 5-5-5-5"></path>
-                <path d="M21 12H9"></path>
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              </svg>
-              <span>Logout</span>
-            </button>
-          </form>
-        </aside>
-        <!-- Main Content -->
-        <main class="flex-1 overflow-auto">
-          <div class="p-8">
-            <slot />
+          <div>
+            <div class="text-[14px] font-semibold tracking-tight">PeptideMap</div>
+            <div class="text-[10px] text-white/40 uppercase tracking-[0.1em]">Admin</div>
           </div>
-        </main>
+        </a>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 px-3 py-4 space-y-6">
+        <!-- Overview -->
+        <div>
+          <NavItem href="/admin/dashboard" icon="dashboard" label="Dashboard" />
+          <NavItem href="/admin/analytics" icon="chart" label="Analytics" />
+        </div>
+
+        <!-- Catalog -->
+        <div>
+          <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Catalog</div>
+          <NavItem href="/admin/vendors" icon="store" label="Vendors" :badge="$page.props.pending_vendors_count" badge-color="red" />
+          <NavItem href="/admin/products" icon="package" label="Products" />
+          <NavItem href="/admin/categories" icon="folder" label="Categories" />
+          <NavItem href="/admin/deals" icon="tag" label="Deals & Coupons" />
+        </div>
+
+        <!-- Ingestion -->
+        <div>
+          <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Ingestion</div>
+          <NavItem href="/admin/product-scraping" icon="refresh" label="Scraping" />
+          <NavItem href="/admin/staged-products" icon="clipboard" label="Staged Products" />
+        </div>
+
+        <!-- Content -->
+        <div>
+          <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Content</div>
+          <NavItem href="/admin/blogs" icon="file" label="Blog Posts" />
+          <NavItem href="/admin/education-posts" icon="file" label="Education Posts" />
+          <NavItem href="/admin/encyclopedia-entries" icon="book" label="Encyclopedia" />
+          <NavItem href="/admin/research" icon="file" label="Research" />
+          <NavItem href="/admin/educational-guides" icon="file" label="Guides" />
+        </div>
+
+        <!-- Marketing -->
+        <div>
+          <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Marketing</div>
+          <NavItem href="/admin/banners" icon="image" label="Banner Ads" />
+          <NavItem href="/admin/reviews" icon="message" label="Reviews" :badge="$page.props.pending_reviews_count" badge-color="yellow" />
+        </div>
+
+        <!-- System -->
+        <div>
+          <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">System</div>
+          <NavItem href="/admin/users" icon="users" label="Users" />
+          <NavItem href="/admin/settings" icon="settings" label="Settings" />
+        </div>
+      </nav>
+
+      <!-- Logout -->
+      <div class="px-3 py-4 border-t border-white/[0.06]">
+        <form @submit.prevent="logout">
+          <button type="submit" class="w-full flex items-center gap-3 px-3 py-2 text-[13px] text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+            </svg>
+            Logout
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 min-h-screen bg-[color:var(--color-bg)]">
+      <div class="p-6 lg:p-8">
+        <slot />
       </div>
     </main>
 
-    <!-- Footer -->
-    <!-- <Footer /> -->
-
-    <!-- Global Loading Overlay -->
-    <div v-if="isLoading" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/75">
+    <!-- Loading overlay -->
+    <div v-if="isLoading" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div class="flex flex-col items-center">
-        <svg class="animate-spin h-12 w-12 text-white mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        <svg class="animate-spin h-10 w-10 text-white mb-3" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
         </svg>
-        <span class="text-white text-lg font-semibold">{{ loadingMessage }}</span>
+        <span class="text-white text-sm font-medium">{{ loadingMessage }}</span>
       </div>
     </div>
   </div>
@@ -174,21 +103,81 @@
 import { useForm, usePage, Link } from '@inertiajs/vue3'
 import { useAdminLoading } from '../../composables/useAdminLoading'
 import { useToast } from '../../composables/useToast'
-import Header from '../Components/Header.vue'
-import Footer from '../Components/Footer.vue'
+import { h, defineComponent } from 'vue'
 
 const { isLoading, loadingMessage } = useAdminLoading()
-const { toast } = useToast() // Initialize toast to watch for flash messages
+const { toast } = useToast()
+
+const page = usePage()
 
 const form = useForm({
-  _token: usePage().props.csrf_token
+  _token: page.props.csrf_token
 })
 
 function logout() {
   form.post('/admin/logout', {
-    onSuccess: () => {
-      window.location.href = '/admin/login'
-    }
+    onSuccess: () => { window.location.href = '/admin/login' }
   })
 }
-</script> 
+
+// Reusable nav item component
+const NavItem = defineComponent({
+  props: {
+    href: String,
+    icon: String,
+    label: String,
+    badge: { type: Number, default: 0 },
+    badgeColor: { type: String, default: 'red' },
+  },
+  setup(props) {
+    const icons = {
+      dashboard: 'M3 3h7v9H3V3zm11 0h7v5h-7V3zm0 9h7v9h-7v-9zM3 16h7v5H3v-5z',
+      chart: 'M3 3v18h18M18 9l-5 5-3-3-5 5',
+      store: 'M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z',
+      package: 'M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zm0 9l8-4.5M12 12v9M4 7.5l8 4.5',
+      folder: 'M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z',
+      tag: 'M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82zM7 7h.01',
+      refresh: 'M1 4v6h6M23 20v-6h-6M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15',
+      clipboard: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
+      file: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8',
+      book: 'M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z',
+      image: 'M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zm16 12l-3.09-3.09a2 2 0 00-2.82 0L6 21M9 9a2 2 0 11-4 0 2 2 0 014 0z',
+      message: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z',
+      users: 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 7a4 4 0 100-8 4 4 0 000 8zm14 14v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75',
+      settings: 'M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z',
+    }
+
+    return () => {
+      const isActive = page.url.startsWith(props.href)
+      const badgeColors = { red: 'bg-red-500', yellow: 'bg-amber-500' }
+
+      return h(Link, {
+        href: props.href,
+        class: [
+          'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
+          isActive
+            ? 'bg-white/[0.08] text-white font-medium'
+            : 'text-white/55 hover:text-white hover:bg-white/[0.04]',
+        ].join(' '),
+      }, () => [
+        h('svg', {
+          class: 'w-4 h-4 flex-shrink-0',
+          viewBox: '0 0 24 24',
+          fill: 'none',
+          stroke: 'currentColor',
+          'stroke-width': '2',
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+          innerHTML: `<path d="${icons[props.icon] || icons.file}"/>`,
+        }),
+        h('span', { class: 'flex-1 truncate' }, props.label),
+        props.badge > 0
+          ? h('span', {
+              class: `ml-auto text-[10px] font-bold px-1.5 py-0.5 text-white ${badgeColors[props.badgeColor] || 'bg-red-500'}`,
+            }, String(props.badge))
+          : null,
+      ])
+    }
+  },
+})
+</script>
