@@ -20,6 +20,33 @@ class EncyclopediaController extends Controller
      * Safely truncate a string to a given length
      * Works without mbstring extension
      */
+    /**
+     * Truncate text to complete sentences within a character limit.
+     * No ellipsis — ends on a full stop.
+     */
+    private function truncateToSentences($text, $maxChars = 350)
+    {
+        if (empty($text) || strlen($text) <= $maxChars) return $text;
+
+        $text = strip_tags($text);
+        $cut = substr($text, 0, $maxChars);
+
+        // Find the last sentence-ending punctuation
+        $lastPeriod = strrpos($cut, '.');
+        $lastExcl = strrpos($cut, '!');
+        $lastQ = strrpos($cut, '?');
+
+        $lastEnd = max($lastPeriod ?: 0, $lastExcl ?: 0, $lastQ ?: 0);
+
+        if ($lastEnd > 50) {
+            return substr($text, 0, $lastEnd + 1);
+        }
+
+        // Fallback: cut at last space
+        $lastSpace = strrpos($cut, ' ');
+        return $lastSpace ? substr($text, 0, $lastSpace) : $cut;
+    }
+
     private function safeLimit($value, $limit = 100, $end = '...')
     {
         if (empty($value)) {
@@ -660,6 +687,7 @@ class EncyclopediaController extends Controller
             ],
             'keyPoints' => $educationPost && $educationPost->key_points ? (is_array($educationPost->key_points) ? $educationPost->key_points : json_decode($educationPost->key_points, true) ?? []) : [],
             'overview' => $educationPost->overview ?? '',
+            'overviewShort' => $this->truncateToSentences($educationPost->overview ?? '', 350),
             'areasOfResearch' => $educationPost && $educationPost->areas_of_research ? (is_array($educationPost->areas_of_research) ? $educationPost->areas_of_research : json_decode($educationPost->areas_of_research, true) ?? []) : [],
             'areasOfResearchIntro' => $educationPost->areas_of_research_intro ?? '',
             'background' => $educationPost->background ?? '',
