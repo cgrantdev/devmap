@@ -131,29 +131,48 @@
     </main>
 
     <!-- Footer -->
-    <footer class="mt-20 lg:mt-32 border-t border-[color:var(--color-hairline)] bg-white">
-      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-10 lg:py-16">
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-10">
-          <!-- Brand column -->
-          <div class="col-span-2 lg:col-span-2">
-            <div class="mb-4">
-              <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-8 lg:h-9 brightness-0" />
+    <footer class="mt-16 lg:mt-24 bg-[#0A0B0E] text-white">
+      <!-- Top section: brand + newsletter -->
+      <div class="border-b border-white/[0.06]">
+        <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-16">
+          <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+            <div class="max-w-md">
+              <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-10 lg:h-12 brightness-0 invert mb-4" />
+              <p class="text-[15px] text-white/50 leading-relaxed">
+                The definitive platform for research peptide discovery. Verified vendors, lab-tested compounds, transparent data.
+              </p>
             </div>
-            <p class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-sm">
-              The definitive platform for research peptide discovery. Verified vendors, lab-tested compounds, transparent data.
-            </p>
+            <!-- Newsletter -->
+            <div class="w-full lg:w-auto lg:min-w-[380px]">
+              <h4 class="text-[13px] font-semibold text-white mb-2">Stay in the loop</h4>
+              <p class="text-[13px] text-white/40 mb-3">Get weekly research updates and vendor news.</p>
+              <form @submit.prevent class="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  class="flex-1 h-10 px-4 bg-white/[0.06] border border-white/[0.08] text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-colors"
+                />
+                <button type="submit" class="h-10 px-5 bg-white text-[#0A0B0E] text-[13px] font-semibold hover:bg-white/90 transition-colors flex-shrink-0">
+                  Subscribe
+                </button>
+              </form>
+            </div>
           </div>
+        </div>
+      </div>
 
-          <!-- Link columns -->
+      <!-- Middle section: link columns -->
+      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-10 lg:py-14">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
           <div v-for="col in footerColumns" :key="col.title">
-            <h4 class="ui-display text-xs uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink)] mb-4">
+            <h4 class="text-[11px] uppercase tracking-[0.1em] font-semibold text-white/30 mb-4">
               {{ col.title }}
             </h4>
             <ul class="space-y-2.5">
               <li v-for="link in col.links" :key="link.href">
                 <a
                   :href="link.href"
-                  class="ui-focus text-sm text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] transition-colors"
+                  class="text-[13px] text-white/50 hover:text-white transition-colors"
                 >
                   {{ link.label }}
                 </a>
@@ -161,16 +180,36 @@
             </ul>
           </div>
         </div>
+      </div>
 
-        <!-- Bottom bar -->
-        <div class="mt-10 lg:mt-16 pt-6 lg:pt-8 border-t border-[color:var(--color-hairline)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <p class="text-xs text-[color:var(--color-ink-subtle)] ui-mono">
-            © {{ currentYear }} PeptideMap. For research use only.
+      <!-- Bottom bar -->
+      <div class="border-t border-white/[0.06]">
+        <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-5 lg:py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p class="text-[12px] text-white/25 ui-mono">
+            © {{ currentYear }} PeptideMaps. For research use only.
           </p>
-          <div class="flex items-center gap-5 text-xs text-[color:var(--color-ink-muted)]">
-            <a href="/privacy" class="hover:text-[color:var(--color-ink)]">Privacy</a>
-            <a href="/terms" class="hover:text-[color:var(--color-ink)]">Terms</a>
-            <a href="/disclaimer" class="hover:text-[color:var(--color-ink)]">Disclaimer</a>
+          <div class="flex items-center gap-5">
+            <!-- Social icons -->
+            <div class="flex items-center gap-3">
+              <a href="#" class="text-white/25 hover:text-white/60 transition-colors" aria-label="Twitter / X">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </a>
+              <a href="#" class="text-white/25 hover:text-white/60 transition-colors" aria-label="Discord">
+                <svg class="w-4.5 h-4.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+              </a>
+              <a href="#" class="text-white/25 hover:text-white/60 transition-colors" aria-label="LinkedIn">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </a>
+              <a href="#" class="text-white/25 hover:text-white/60 transition-colors" aria-label="GitHub">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+              </a>
+            </div>
+            <span class="w-px h-3 bg-white/10" />
+            <div class="flex items-center gap-4 text-[12px] text-white/25">
+              <a href="/privacy" class="hover:text-white/50 transition-colors">Privacy</a>
+              <a href="/terms" class="hover:text-white/50 transition-colors">Terms</a>
+              <a href="/disclaimer" class="hover:text-white/50 transition-colors">Disclaimer</a>
+            </div>
           </div>
         </div>
       </div>
@@ -203,26 +242,33 @@ const footerColumns = [
     links: [
       { href: '/vendors', label: 'All vendors' },
       { href: '/products', label: 'All compounds' },
-      { href: '/compare', label: 'Compare' },
-      { href: '/deals', label: 'Deals' },
+      { href: '/compare', label: 'Price comparison' },
+      { href: '/deals', label: 'Deals & offers' },
     ],
   },
   {
     title: 'Learn',
     links: [
       { href: '/encyclopedia', label: 'Encyclopedia' },
-      { href: '/education', label: 'Education' },
-      { href: '/news', label: 'Research' },
+      { href: '/education', label: 'Peptide guides' },
+      { href: '/news', label: 'Research papers' },
       { href: '/blogs', label: 'Blog' },
+    ],
+  },
+  {
+    title: 'For vendors',
+    links: [
+      { href: '/become-a-vendor', label: 'Get listed' },
+      { href: '/vendor/login', label: 'Vendor dashboard' },
     ],
   },
   {
     title: 'Company',
     links: [
-      { href: '/become-a-vendor', label: 'For vendors' },
-      { href: '/vendor/login', label: 'Vendor login' },
       { href: '/about', label: 'About' },
       { href: '/contact', label: 'Contact' },
+      { href: '/privacy', label: 'Privacy policy' },
+      { href: '/terms', label: 'Terms of service' },
     ],
   },
 ]

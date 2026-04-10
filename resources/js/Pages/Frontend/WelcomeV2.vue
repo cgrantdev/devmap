@@ -10,7 +10,7 @@
     <!-- ========================================================= -->
     <section class="relative">
       <div class="ui-spotlight absolute inset-0 pointer-events-none" />
-      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 pt-4 lg:pt-6">
+      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-3 lg:pt-6">
         <HeroCarousel :slides="heroSlides" />
       </div>
     </section>
@@ -18,7 +18,7 @@
     <!-- ========================================================= -->
     <!-- 2. COMPOUND CATEGORIES — "What are you researching?"       -->
     <!-- ========================================================= -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-16 lg:py-20">
+    <section class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
       <SectionHeader
         eyebrow="Browse compounds"
         title="What are you researching?"
@@ -37,17 +37,17 @@
         </template>
       </SectionHeader>
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
         <a
           v-for="compound in topCompounds"
           :key="compound.slug"
           :href="`/encyclopedia/${compound.slug}`"
-          class="ui-focus group flex flex-col gap-3 p-5 rounded-[14px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms]"
+          class="ui-focus group flex flex-col gap-2 lg:gap-3 p-4 lg:p-5 rounded-[14px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms]"
         >
-          <div class="ui-display text-[16px] font-semibold text-[color:var(--color-ink)] tracking-tight group-hover:text-[color:var(--color-accent-600)] transition-colors leading-tight">
+          <div class="ui-display text-[14px] lg:text-[16px] font-semibold text-[color:var(--color-ink)] tracking-tight group-hover:text-[color:var(--color-accent-600)] transition-colors leading-tight">
             {{ compound.name }}
           </div>
-          <div class="flex items-center gap-3 text-[12px] text-[color:var(--color-ink-muted)]">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-[11px] lg:text-[12px] text-[color:var(--color-ink-muted)]">
             <span class="flex items-center gap-1">
               <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
               <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ compound.vendor_count }}</span> vendors
@@ -61,10 +61,10 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 3. VENDORS — top vendors as list rows (one representation) -->
+    <!-- 3. VENDORS — top vendors as card grid                      -->
     <!-- ========================================================= -->
     <section class="bg-white border-y border-[color:var(--color-hairline)]">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-16 lg:py-20">
+      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
         <SectionHeader
           eyebrow="Vendor network"
           title="Top-rated vendors"
@@ -82,26 +82,24 @@
           </template>
         </SectionHeader>
 
-        <!-- Card grid — same style as /vendors page -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-5">
           <a
-            v-for="vendor in verifiedVendors.slice(0, 8)"
+            v-for="vendor in verifiedVendors.slice(0, 6)"
             :key="vendor.id"
             :href="vendor.url"
             class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
           >
-            <div class="aspect-[16/9] bg-[color:var(--color-bg)] border-b border-[color:var(--color-hairline)] flex items-center justify-center p-8">
+            <div class="aspect-[16/9] bg-[color:var(--color-bg)] border-b border-[color:var(--color-hairline)] flex items-center justify-center p-4 lg:p-8">
               <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-[75%] object-contain" loading="lazy" />
-              <span v-else class="ui-display text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
+              <span v-else class="ui-display text-2xl lg:text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
             </div>
-            <div class="p-5 flex-1 flex flex-col gap-3">
-              <h3 class="ui-display text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight">{{ vendor.name }}</h3>
-              <div class="flex items-center gap-1.5 text-xs">
-                <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(vendor.rating_average) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ (vendor.rating_average || 0).toFixed(1) }}</span>
-                <span class="text-[color:var(--color-ink-subtle)]">({{ vendor.rating_count || 0 }})</span>
+            <div class="p-3 lg:p-5 flex-1 flex flex-col gap-2 lg:gap-3">
+              <h3 class="ui-display text-[14px] lg:text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate">{{ vendor.name }}</h3>
+              <div class="flex items-center gap-1 text-xs">
+                <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(vendor.rating_average) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                <span class="ui-mono font-semibold text-[color:var(--color-ink)] ml-0.5">{{ (vendor.rating_average || 0).toFixed(1) }}</span>
               </div>
-              <div class="mt-auto pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-xs text-[color:var(--color-ink-muted)]">
+              <div class="mt-auto pt-2 lg:pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-[11px] lg:text-xs text-[color:var(--color-ink-muted)]">
                 <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendor.product_count }}</span> compounds</span>
                 <span class="text-[color:var(--color-accent-600)] font-semibold group-hover:translate-x-0.5 transition-transform duration-[180ms] flex items-center gap-0.5">
                   View <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
@@ -114,16 +112,16 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 4. COMPARE CTA — drives to comparison page                 -->
+    <!-- 4. COMPARE CTA                                             -->
     <!-- ========================================================= -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-16 lg:py-20">
-      <div class="rounded-[20px] border border-[color:var(--color-hairline)] bg-gradient-to-r from-[color:var(--color-accent-50)] to-white p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center gap-8">
+    <section class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
+      <div class="rounded-[16px] lg:rounded-[20px] border border-[color:var(--color-hairline)] bg-gradient-to-r from-[color:var(--color-accent-50)] to-white p-7 md:p-14 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
         <div class="flex-1">
           <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Price comparison</div>
-          <h2 class="ui-display text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-3">
+          <h2 class="ui-display text-xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-3">
             See every vendor's price, side by side
           </h2>
-          <p class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-xl">
+          <p class="text-[14px] lg:text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-xl">
             {{ formatNumber(stats.compounds) }} compounds across {{ formatNumber(stats.total_vendors) }} vendors. Sorted cheapest-first. Updated continuously.
           </p>
         </div>
@@ -139,10 +137,10 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 5. LATEST RESEARCH — authority builder                     -->
+    <!-- 5. LATEST RESEARCH                                         -->
     <!-- ========================================================= -->
     <section v-if="editorial.length" class="bg-white border-y border-[color:var(--color-hairline)]">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-16 lg:py-20">
+      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
         <SectionHeader
           eyebrow="Research & education"
           title="Latest insights"
@@ -160,7 +158,7 @@
           </template>
         </SectionHeader>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           <a
             v-for="post in editorial"
             :key="post.id"
@@ -180,7 +178,7 @@
               <span>·</span>
               <span>{{ post.read_time }}</span>
             </div>
-            <h3 class="ui-display text-lg font-semibold tracking-tight text-[color:var(--color-ink)] leading-snug group-hover:text-[color:var(--color-accent-600)] transition-colors">
+            <h3 class="ui-display text-base lg:text-lg font-semibold tracking-tight text-[color:var(--color-ink)] leading-snug group-hover:text-[color:var(--color-accent-600)] transition-colors">
               {{ post.title }}
             </h3>
           </a>
@@ -195,21 +193,21 @@
       <div class="absolute inset-0" :style="{ background: 'radial-gradient(ellipse 900px 500px at 20% 40%, rgba(99,102,241,0.25) 0%, transparent 60%)' }" />
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[140%] h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-      <div class="relative max-w-[1280px] mx-auto px-6 lg:px-10 py-20 lg:py-24">
-        <div class="flex flex-col md:flex-row items-start md:items-center gap-10">
+      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 py-16 lg:py-24">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-10">
           <div class="flex-1 max-w-xl">
             <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-[color:var(--color-accent-400)] mb-3">For vendors</div>
-            <h2 class="ui-display text-3xl md:text-4xl font-semibold tracking-tight text-white leading-[1.1] mb-4">
+            <h2 class="ui-display text-2xl md:text-4xl font-semibold tracking-tight text-white leading-[1.1] mb-4">
               List your research peptides on PeptideMap
             </h2>
-            <p class="text-white/60 text-[15px] leading-relaxed">
+            <p class="text-white/60 text-[14px] lg:text-[15px] leading-relaxed">
               Auto-sync from WooCommerce. Click analytics. Free during beta.
             </p>
           </div>
           <div class="flex items-center gap-4 flex-shrink-0">
             <a
               href="/become-a-vendor"
-              class="ui-focus inline-flex items-center gap-2 h-12 px-7 rounded-[12px] bg-white text-[color:var(--color-ink)] text-[15px] font-semibold hover:bg-white/95 transition-all shadow-lg"
+              class="ui-focus inline-flex items-center gap-2 h-11 lg:h-12 px-6 lg:px-7 rounded-[12px] bg-white text-[color:var(--color-ink)] text-[14px] lg:text-[15px] font-semibold hover:bg-white/95 transition-all shadow-lg"
             >
               Get listed
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -246,16 +244,5 @@ defineProps({
 function formatNumber(n) {
   if (n === null || n === undefined) return '—'
   return new Intl.NumberFormat().format(n)
-}
-
-function vendorGradient(name) {
-  const palette = [
-    ['#1E293B', '#4F46E5'], ['#0F172A', '#6366F1'], ['#1E3A8A', '#3B82F6'],
-    ['#0C4A6E', '#0EA5E9'], ['#134E4A', '#14B8A6'], ['#312E81', '#4F46E5'],
-  ]
-  let h = 0
-  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffffffff
-  const [a, b] = palette[Math.abs(h) % palette.length]
-  return `linear-gradient(135deg, ${a} 0%, ${b} 100%)`
 }
 </script>
