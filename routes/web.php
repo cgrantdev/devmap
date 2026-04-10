@@ -54,6 +54,16 @@ Route::get('/go/{product}', [\App\Http\Controllers\OutboundClickController::clas
     ->middleware('throttle:60,1')
     ->name('product.go');
 
+// Newsletter subscribe (no CSRF — used by static coming soon page)
+Route::post('/api/subscribe', function (\Illuminate\Http\Request $request) {
+    $validated = $request->validate(['email' => 'required|email|max:255']);
+    \App\Models\NewsletterSubscriber::firstOrCreate(
+        ['email' => strtolower(trim($validated['email']))],
+        ['source' => $request->input('source', 'coming_soon')]
+    );
+    return response()->json(['ok' => true, 'message' => 'You\'re on the list!']);
+})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
 // Search
 Route::get('/search', [\App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('search');
 

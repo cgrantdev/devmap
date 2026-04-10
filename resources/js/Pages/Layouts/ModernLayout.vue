@@ -146,16 +146,19 @@
             <div class="w-full lg:w-auto lg:min-w-[380px]">
               <h4 class="text-[13px] font-semibold text-white mb-2">Stay in the loop</h4>
               <p class="text-[13px] text-white/40 mb-3">Get weekly research updates and vendor news.</p>
-              <form @submit.prevent class="flex gap-2">
+              <form @submit.prevent="subscribeNewsletter" class="flex gap-2">
                 <input
+                  v-model="newsletterEmail"
                   type="email"
                   placeholder="you@example.com"
                   class="flex-1 h-10 px-4 bg-white/[0.06] border border-white/[0.08] text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-colors"
+                  required
                 />
-                <button type="submit" class="h-10 px-5 bg-white text-[#0A0B0E] text-[13px] font-semibold hover:bg-white/90 transition-colors flex-shrink-0">
-                  Subscribe
+                <button type="submit" :disabled="newsletterLoading" class="h-10 px-5 bg-white text-[#0A0B0E] text-[13px] font-semibold hover:bg-white/90 transition-colors flex-shrink-0 disabled:opacity-60">
+                  {{ newsletterLoading ? '...' : 'Subscribe' }}
                 </button>
               </form>
+              <p v-if="newsletterMsg" :class="['text-[12px] mt-2', newsletterOk ? 'text-emerald-400' : 'text-red-400']">{{ newsletterMsg }}</p>
             </div>
           </div>
         </div>
@@ -227,6 +230,38 @@ const scrolled = ref(false)
 const mobileOpen = ref(false)
 const showMobileSearch = ref(false)
 const currentYear = new Date().getFullYear()
+
+// Newsletter
+const newsletterEmail = ref('')
+const newsletterMsg = ref('')
+const newsletterOk = ref(false)
+const newsletterLoading = ref(false)
+
+async function subscribeNewsletter() {
+  if (!newsletterEmail.value) return
+  newsletterLoading.value = true
+  newsletterMsg.value = ''
+  try {
+    const res = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ email: newsletterEmail.value, source: 'footer' }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      newsletterMsg.value = "You're on the list!"
+      newsletterOk.value = true
+      newsletterEmail.value = ''
+    } else {
+      newsletterMsg.value = data.errors?.email?.[0] || 'Something went wrong.'
+      newsletterOk.value = false
+    }
+  } catch {
+    newsletterMsg.value = 'Network error. Try again.'
+    newsletterOk.value = false
+  }
+  newsletterLoading.value = false
+}
 
 const navLinks = [
   { href: '/vendors', label: 'Vendors' },

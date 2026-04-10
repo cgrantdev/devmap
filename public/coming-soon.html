@@ -211,6 +211,20 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
+    .form-msg {
+      font-size: 13px;
+      margin-top: -1.5rem;
+      margin-bottom: 2rem;
+      min-height: 20px;
+    }
+    .form-msg.success { color: rgba(52,211,153,0.9); }
+    .form-msg.error { color: rgba(248,113,113,0.9); }
+
+    .email-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
     /* Pulse animation on the glow */
     @keyframes pulse-glow {
       0%, 100% { opacity: 1; }
@@ -258,10 +272,11 @@
     </div>
 
     <!-- Email signup -->
-    <form class="email-form" onsubmit="return false;">
-      <input type="email" class="email-input" placeholder="you@example.com" required>
-      <button type="submit" class="email-btn">Notify me</button>
+    <form class="email-form" id="subscribe-form">
+      <input type="email" class="email-input" id="email-input" placeholder="you@example.com" required>
+      <button type="submit" class="email-btn" id="submit-btn">Notify me</button>
     </form>
+    <p class="form-msg" id="form-msg"></p>
 
     <!-- Features -->
     <div class="features">
@@ -296,6 +311,45 @@
 
     tick();
     setInterval(tick, 1000);
+
+    // Email subscribe
+    document.getElementById('subscribe-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const msg = document.getElementById('form-msg');
+      const email = document.getElementById('email-input').value.trim();
+
+      if (!email) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      msg.textContent = '';
+      msg.className = 'form-msg';
+
+      try {
+        const res = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ email, source: 'coming_soon' })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          msg.textContent = "You're on the list! We'll notify you at launch.";
+          msg.className = 'form-msg success';
+          document.getElementById('email-input').value = '';
+        } else {
+          const error = data.errors?.email?.[0] || data.message || 'Something went wrong.';
+          msg.textContent = error;
+          msg.className = 'form-msg error';
+        }
+      } catch (err) {
+        msg.textContent = 'Network error. Please try again.';
+        msg.className = 'form-msg error';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Notify me';
+    });
   </script>
 </body>
 </html>
