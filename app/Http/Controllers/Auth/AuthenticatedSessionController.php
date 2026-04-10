@@ -19,32 +19,20 @@ class AuthenticatedSessionController extends Controller
     {
         try {
             $request->authenticate();
-
             $request->session()->regenerate();
 
-            // Support both customer + vendor logins here.
-            // Admins should use the admin login page.
-            if ($request->user()->role === 'admin') {
-                Auth::logout();
-                return back()->withErrors([
-                    'email' => 'Please use the admin login page for admin access.',
-                ])->withInput();
+            $user = $request->user();
+
+            if (!$user->hasVerifiedEmail()) {
+                return redirect('/email/verify');
             }
 
-            if (!in_array($request->user()->role, ['customer', 'vendor'], true)) {
-                Auth::logout();
-                return back()->withErrors([
-                    'email' => 'Please use the correct login page for your account type.',
-                ])->withInput();
-            }
-
-            if (!$request->user()->hasVerifiedEmail()) {
-                return redirect('/email/verify')->with('info', 'Please verify your email address before continuing.');
-            }
-
-            return $request->user()->role === 'vendor'
-                ? redirect()->intended('/vendor/dashboard')
-                : redirect()->intended('/');
+            // Route to the right dashboard based on role
+            return match ($user->role) {
+                'admin' => redirect()->intended('/admin/dashboard'),
+                'vendor' => redirect()->intended('/vendor/dashboard'),
+                default => redirect()->intended('/'),
+            };
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {

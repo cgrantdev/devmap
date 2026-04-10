@@ -87,10 +87,9 @@ Route::middleware('guest')->group(function () {
     // Vendor routes
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
-    Route::get('/vendor/login', [VendorAuthenticatedSessionController::class, 'create'])->name('vendor.login');
-
-    // Admin routes
-    Route::get('/admin/login', [AdminAuthenticatedSessionController::class, 'create'])->name('admin.login');
+    // All login pages redirect to unified /login
+    Route::get('/vendor/login', fn () => redirect('/login'))->name('vendor.login');
+    Route::get('/admin/login', fn () => redirect('/login'))->name('admin.login');
 });
 
 // Email verification routes (require authentication but not email verification)
