@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PeptideMaps — Coming Soon</title>
+  <meta name="description" content="PeptideMaps is the definitive discovery platform for research peptide vendors. Compare verified suppliers, inspect lab testing, and discover new compounds. Launching May 1, 2026.">
+  <meta property="og:title" content="PeptideMaps — Coming Soon">
+  <meta property="og:description" content="The definitive discovery platform for research peptide vendors. Launching May 1, 2026.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0A0B0E;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Animated gradient background */
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 800px 500px at 30% 35%, rgba(99,102,241,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 600px 400px at 70% 65%, rgba(79,70,229,0.1) 0%, transparent 60%);
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem;
+      max-width: 640px;
+    }
+
+    .logo {
+      height: 56px;
+      filter: brightness(0) invert(1);
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 640px) {
+      .logo { height: 44px; margin-bottom: 2rem; }
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 600;
+      color: rgba(129,140,248,0.8);
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+    }
+
+    .subtitle {
+      font-size: clamp(15px, 2.5vw, 17px);
+      color: rgba(255,255,255,0.45);
+      line-height: 1.7;
+      margin-bottom: 3rem;
+    }
+
+    /* Countdown */
+    .countdown {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 480px) {
+      .countdown { gap: 0.6rem; }
+    }
+
+    .countdown-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 72px;
+    }
+
+    .countdown-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(32px, 6vw, 48px);
+      font-weight: 500;
+      line-height: 1;
+      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .countdown-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.25);
+      margin-top: 0.5rem;
+      font-weight: 600;
+    }
+
+    .countdown-sep {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(24px, 4vw, 36px);
+      color: rgba(255,255,255,0.15);
+      line-height: 1;
+      padding-top: 4px;
+    }
+
+    /* Email form */
+    .email-form {
+      display: flex;
+      gap: 0;
+      max-width: 440px;
+      margin: 0 auto 2rem;
+    }
+
+    .email-input {
+      flex: 1;
+      height: 48px;
+      padding: 0 1rem;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-right: none;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .email-input::placeholder { color: rgba(255,255,255,0.25); }
+    .email-input:focus { border-color: rgba(99,102,241,0.5); }
+
+    .email-btn {
+      height: 48px;
+      padding: 0 1.5rem;
+      background: #fff;
+      color: #0A0B0E;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .email-btn:hover { background: rgba(255,255,255,0.9); }
+
+    .features {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 13px;
+      color: rgba(255,255,255,0.35);
+    }
+
+    .feature-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(99,102,241,0.6);
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.15);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Pulse animation on the glow */
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .bg-glow { animation: pulse-glow 8s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <div class="content">
+    <img src="/images/logo.png" alt="PeptideMaps" class="logo">
+
+    <div class="eyebrow">Launching May 1, 2026</div>
+
+    <h1>The definitive platform for research peptide discovery</h1>
+
+    <p class="subtitle">
+      Compare verified vendors, inspect lab testing data, and discover compounds — all in one place. Built for researchers who demand transparency.
+    </p>
+
+    <!-- Countdown -->
+    <div class="countdown" id="countdown">
+      <div class="countdown-unit">
+        <span class="countdown-number" id="days">--</span>
+        <span class="countdown-label">Days</span>
+      </div>
+      <span class="countdown-sep">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-number" id="hours">--</span>
+        <span class="countdown-label">Hours</span>
+      </div>
+      <span class="countdown-sep">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-number" id="mins">--</span>
+        <span class="countdown-label">Minutes</span>
+      </div>
+      <span class="countdown-sep">:</span>
+      <div class="countdown-unit">
+        <span class="countdown-number" id="secs">--</span>
+        <span class="countdown-label">Seconds</span>
+      </div>
+    </div>
+
+    <!-- Email signup -->
+    <form class="email-form" onsubmit="return false;">
+      <input type="email" class="email-input" placeholder="you@example.com" required>
+      <button type="submit" class="email-btn">Notify me</button>
+    </form>
+
+    <!-- Features -->
+    <div class="features">
+      <div class="feature"><span class="feature-dot"></span> Verified vendors</div>
+      <div class="feature"><span class="feature-dot"></span> Price comparison</div>
+      <div class="feature"><span class="feature-dot"></span> COA transparency</div>
+      <div class="feature"><span class="feature-dot"></span> Lab-tested compounds</div>
+    </div>
+  </div>
+
+  <div class="footer">© 2026 PeptideMaps. For research use only.</div>
+
+  <script>
+    const launch = new Date('2026-05-01T00:00:00-04:00').getTime();
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function tick() {
+      const now = Date.now();
+      const diff = Math.max(0, launch - now);
+
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+
+      document.getElementById('days').textContent = pad(d);
+      document.getElementById('hours').textContent = pad(h);
+      document.getElementById('mins').textContent = pad(m);
+      document.getElementById('secs').textContent = pad(s);
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>
