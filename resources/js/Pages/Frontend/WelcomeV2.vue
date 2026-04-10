@@ -85,7 +85,7 @@
         <!-- Card grid — same style as /vendors page -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           <a
-            v-for="vendor in verifiedVendors.slice(0, 6)"
+            v-for="vendor in verifiedVendors.slice(0, 8)"
             :key="vendor.id"
             :href="vendor.url"
             class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"

@@ -407,7 +407,7 @@ class HomeController extends Controller
             }])
             ->orderByDesc('rating_average')
             ->orderByDesc('product_count')
-            ->take(6)
+            ->take(8)
             ->get()
             ->map(function ($brand) {
                 $vs = $brand->vendorSetting;
