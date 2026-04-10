@@ -139,16 +139,14 @@ class BlogsController extends Controller
             ->limit(4)
             ->get()
             ->map(function ($b) {
-                $imageUrl = $b->image ? Storage::url('blogs/' . $b->image) : null;
                 return [
                     'id' => $b->id,
                     'title' => $b->title,
                     'slug' => $b->slug,
                     'description' => $b->description,
-                    'outline' => $b->outline,
-                    'image' => $imageUrl,
-                    'readTime' => $b->read_time ?? '19 Min Read',
-                    'date' => $b->published_at ? $b->published_at->format('d M Y') : null,
+                    'image' => $b->image ? (str_starts_with($b->image, 'http') ? $b->image : Storage::url('blogs/' . $b->image)) : null,
+                    'readTime' => $b->read_time,
+                    'date' => $b->published_at ? $b->published_at->format('M j, Y') : null,
                 ];
             });
 

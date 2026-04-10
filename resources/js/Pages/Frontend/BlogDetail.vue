@@ -1,474 +1,153 @@
 <template>
   <Head :title="title">
     <meta name="description" :content="description" />
-    
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="article" />
     <meta property="og:url" :content="url" />
     <meta property="og:title" :content="ogTitle" />
     <meta property="og:description" :content="ogDescription" />
     <meta v-if="ogImage" property="og:image" :content="ogImage" />
-    
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" :content="url" />
     <meta name="twitter:title" :content="ogTitle" />
     <meta name="twitter:description" :content="ogDescription" />
     <meta v-if="ogImage" name="twitter:image" :content="ogImage" />
-    
-    <!-- Canonical URL -->
     <link rel="canonical" :href="canonical" />
   </Head>
+
   <ModernLayout>
-    <!-- Blog Detail Section -->
-    <div class="min-h-screen bg-gray-50">
-      <div class="bg-white border-b border-gray-200">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <!-- Back Button -->
-          <button 
-            @click="router.visit('/news')"
-            class="text-gray-600 hover:text-gray-900 flex items-center gap-2 mb-6 transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left w-4 h-4" aria-hidden="true">
-              <path d="m12 19-7-7 7-7"></path>
-              <path d="M19 12H5"></path>
-            </svg>
-            Back to Knowledge Center
-          </button>
-          <div class="flex items-center gap-2 mb-4">
-            <span 
-              v-if="blog.categoryTag"
-              :class="[
-                'text-xs px-3 py-1 rounded-full',
-                getCategoryTagClass(blog.categoryTag)
-              ]"
-            >
-              {{ blog.categoryTag }}
-            </span>
-            <span 
-              v-if="blog.is_featured"
-              class="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 flex items-center gap-1.5"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#facc15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5" aria-hidden="true">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-              </svg>  
-              Featured
-            </span>
-          </div>
-          <h1 class="text-4xl text-gray-900 mb-4">{{ blog.title }}</h1>
-          <div class="flex items-center gap-6 text-gray-600 mb-6">
-            <div v-if="blog.author_name" class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-4 h-4" aria-hidden="true">
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              <span>Dr. {{ blog.author_name }}
-                <span v-if="blog.author_job" class="text-gray-500"> • {{ blog.author_job }}</span>
-              </span>
-            </div>
-            <div v-else class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-4 h-4" aria-hidden="true">
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              <span>PeptideMap Editorial</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-4 h-4" aria-hidden="true">
-                <path d="M8 2v4"></path>
-                <path d="M16 2v4"></path>
-                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
-                <path d="M3 10h18"></path>
-              </svg>
-              <span>{{ blog.date }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock w-4 h-4" aria-hidden="true">
-                <path d="M12 6v6l4 2"></path>
-                <circle cx="12" cy="12" r="10"></circle>
-              </svg>
-              <span>{{ blog.readTime }}</span>
-            </div>            
-          </div>
-          <div class="flex items-center gap-3">
-            <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share2 lucide-share-2 w-4 h-4" aria-hidden="true">
-                <circle cx="18" cy="5" r="3"></circle>
-                <circle cx="6" cy="12" r="3"></circle>
-                <circle cx="18" cy="19" r="3"></circle>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-              </svg>
-              Share
-            </button>
-            <button class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bookmark w-4 h-4" aria-hidden="true">
-                <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
-              </svg>
-              Save
-            </button>
-          </div>
+    <article class="max-w-[1280px] mx-auto px-5 lg:px-10">
+
+      <!-- Header -->
+      <div class="max-w-3xl mx-auto pt-8 lg:pt-12">
+        <!-- Back + category -->
+        <div class="flex items-center gap-3 mb-6">
+          <a href="/news" class="text-[13px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] transition-colors flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            News
+          </a>
+          <span v-if="blog.categoryTag" class="text-[color:var(--color-hairline)]">/</span>
+          <span v-if="blog.categoryTag" class="text-[11px] font-semibold text-[color:var(--color-accent-600)] uppercase tracking-wide">{{ blog.categoryTag }}</span>
+        </div>
+
+        <!-- Title -->
+        <h1 class="ui-display text-3xl lg:text-[42px] font-semibold tracking-tight text-[color:var(--color-ink)] leading-[1.15] mb-5">
+          {{ blog.title }}
+        </h1>
+
+        <!-- Meta -->
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-[color:var(--color-ink-muted)] mb-8">
+          <span v-if="blog.author_name" class="font-medium text-[color:var(--color-ink)]">
+            {{ blog.author_name }}
+            <span v-if="blog.author_job" class="font-normal text-[color:var(--color-ink-subtle)]">· {{ blog.author_job }}</span>
+          </span>
+          <span v-if="blog.date" class="ui-mono">{{ blog.date }}</span>
+          <span v-if="blog.readTime">{{ blog.readTime }}</span>
         </div>
       </div>
 
-      <div v-if="blog.image" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <img 
-          :src="blog.image" 
-          :alt="blog.title"
-          class="w-full h-96 object-cover rounded-lg shadow-lg"
-          loading="lazy"
-          @error="handleImageError($event)"
-        />
+      <!-- Featured image -->
+      <div v-if="blog.image" class="max-w-4xl mx-auto mb-10 lg:mb-14">
+        <div class="aspect-[2/1] bg-[#0F172A] overflow-hidden relative">
+          <img :src="blog.image" :alt="blog.title" class="w-full h-full object-cover opacity-90" loading="lazy" @error="$event.target.style.display='none'" />
+          <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/30 via-transparent to-[#4F46E5]/15 pointer-events-none" />
+        </div>
       </div>
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="bg-white rounded-lg shadow-sm p-8">
-          <p v-if="blog.outline" class="text-xl text-gray-700 mb-8 pb-8 border-b border-gray-200 italic">
-            {{ blog.outline}}
-          </p>
-          <div class="prose prose-lg max-w-none">
-            <div v-if="blog.description" class="mb-8">
-              <p class="text-gray-700 whitespace-pre-line">{{ blog.description }}</p>
-            </div>
-            
-            <div v-if="blog.introduction" class="mb-8">
-              <h2 class="text-2xl text-gray-900 mt-8 mb-4">Introduction</h2>
-              <p class="text-gray-700 mb-4 whitespace-pre-line">{{ blog.introduction }}</p>
-            </div>
-            
-            <div v-if="blog.key_points && blog.key_points.length > 0" class="mb-8">
-              <h2 class="text-2xl text-gray-900 mt-8 mb-4">Key Points</h2>
-              <ul class="list-disc pl-6 mb-6 text-gray-700 space-y-2">
-                <li v-for="(point, index) in blog.key_points" :key="index">{{ point }}</li>
-              </ul>
-            </div>
-            
-            <div v-if="blog.detailed_analysis" class="mb-8">
-              <h2 class="text-2xl text-gray-900 mt-8 mb-4">Detailed Analysis</h2>
-              <p class="text-gray-700 mb-4 whitespace-pre-line">{{ blog.detailed_analysis }}</p>
-            </div>
-            
-            <div v-if="blog.conclusion" class="mb-8">
-              <h2 class="text-2xl text-gray-900 mt-8 mb-4">Conclusion</h2>
-              <p class="text-gray-700 mb-4 whitespace-pre-line">{{ blog.conclusion }}</p>
-            </div>
-            
-            <!-- Fallback to content if new fields are not available -->
-            <div v-if="!blog.introduction && !blog.detailed_analysis && blog.content" class="blog-content-html" v-html="blog.content"></div>
-            
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
-              <p class="text-sm text-blue-900">
-                <strong>Note:</strong>
-                This article is for informational purposes only. Always consult with a qualified healthcare professional before starting any new supplement or peptide regimen.
-              </p>
-            </div>
-          </div>
+
+      <!-- Body -->
+      <div class="max-w-3xl mx-auto pb-16 lg:pb-24">
+
+        <!-- Description / lede -->
+        <p v-if="blog.description" class="text-[17px] lg:text-[19px] text-[color:var(--color-ink-muted)] leading-relaxed mb-10 font-medium">
+          {{ blog.description }}
+        </p>
+
+        <!-- Introduction -->
+        <div v-if="blog.introduction" class="mb-10">
+          <p class="text-[16px] text-[color:var(--color-ink)] leading-[1.8] whitespace-pre-line">{{ blog.introduction }}</p>
         </div>
-        <div v-if="blog.tags && blog.tags.length > 0" class="mt-8 pt-8 border-t border-gray-200">
-          <h3 class="text-sm text-gray-500 mb-3">Tags:</h3>
-          <div class="flex flex-wrap gap-2">
-            <span 
-              v-for="(tag, index) in blog.tags" 
-              :key="index"
-              class="text-sm bg-gray-100 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-200 cursor-pointer transition-colors"
-            >
-              {{ tag }}
-            </span>
-          </div>
+
+        <!-- Key Points -->
+        <div v-if="blog.key_points && blog.key_points.length > 0" class="mb-10 bg-[color:var(--color-accent-50)] border border-[color:var(--color-accent-100)] p-6 lg:p-8">
+          <h2 class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-accent-600)] mb-4">Key Takeaways</h2>
+          <ul class="space-y-3">
+            <li v-for="(point, i) in blog.key_points" :key="i" class="flex gap-3 text-[15px] text-[color:var(--color-ink)] leading-relaxed">
+              <span class="flex-shrink-0 w-5 h-5 bg-[color:var(--color-accent-600)] text-white text-[11px] font-bold flex items-center justify-center mt-0.5">{{ i + 1 }}</span>
+              <span>{{ point }}</span>
+            </li>
+          </ul>
         </div>
+
+        <!-- Detailed Analysis -->
+        <div v-if="blog.detailed_analysis" class="mb-10">
+          <div class="text-[16px] text-[color:var(--color-ink)] leading-[1.8] whitespace-pre-line">{{ blog.detailed_analysis }}</div>
+        </div>
+
+        <!-- Conclusion -->
+        <div v-if="blog.conclusion" class="mb-10 border-l-4 border-[color:var(--color-accent-500)] pl-6 lg:pl-8">
+          <h2 class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-3">Conclusion</h2>
+          <p class="text-[16px] text-[color:var(--color-ink)] leading-[1.8] whitespace-pre-line">{{ blog.conclusion }}</p>
+        </div>
+
+        <!-- HTML content fallback -->
+        <div v-if="!blog.introduction && !blog.detailed_analysis && blog.content" class="prose prose-lg max-w-none" v-html="blog.content"></div>
+
+        <!-- Disclaimer -->
+        <div class="mt-10 p-5 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] text-[13px] text-[color:var(--color-ink-muted)]">
+          <strong class="text-[color:var(--color-ink)]">Disclaimer:</strong> This article is for informational and educational purposes only. The compounds discussed are intended for research use only and are not approved for human therapeutic use. Consult a qualified professional before making any decisions based on this content.
+        </div>
+
+        <!-- Tags -->
+        <div v-if="blog.tags?.length" class="mt-8 flex flex-wrap gap-2">
+          <span
+            v-for="tag in blog.tags"
+            :key="tag"
+            class="text-[12px] font-medium text-[color:var(--color-ink-subtle)] bg-[color:var(--color-hairline-soft)] px-3 py-1"
+          >{{ tag }}</span>
+        </div>
+
         <!-- Related Articles -->
-        <div v-if="related && related.length > 0" class="mt-12">
-          <h2 class="text-2xl text-gray-900 mb-6">Related Articles</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <BlogPostCard
+        <div v-if="related?.length" class="mt-16 pt-10 border-t border-[color:var(--color-hairline)]">
+          <h2 class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-6">Related Articles</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <a
               v-for="item in related"
               :key="item.id"
-              :title="item.title"
-              :description="item.outline"
-              :image="item.image"
-              :read-time="item.readTime"
-              :date="item.date"
-              :to="`/blog/${item.slug}`"
-            />
+              :href="`/blog/${item.slug}`"
+              class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
+            >
+              <div class="aspect-[16/9] bg-[#0F172A] overflow-hidden relative">
+                <img v-if="item.image" :src="item.image" :alt="item.title" class="w-full h-full object-cover opacity-80 group-hover:opacity-90 group-hover:scale-[1.03] transition-all duration-500" loading="lazy" />
+                <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/40 via-transparent to-[#4F46E5]/20 pointer-events-none" />
+              </div>
+              <div class="p-4 flex-1 flex flex-col gap-1.5">
+                <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ item.date }}</span>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] leading-snug group-hover:text-[color:var(--color-accent-600)] transition-colors line-clamp-2">{{ item.title }}</h3>
+              </div>
+            </a>
           </div>
         </div>
       </div>
-
-    </div>
+    </article>
   </ModernLayout>
 </template>
 
 <script setup>
-import { computed, watchEffect } from 'vue'
-import { Head, router, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { Head, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
-import BlogPostCard from '@/components/BlogPostCard.vue'
 
 const props = defineProps({
   blog: Object,
-  related: Array,
-  seo: {
-    type: Object,
-    default: () => ({
-      title: null,
-      description: null,
-      og_title: null,
-      og_description: null,
-      og_image: null,
-      image: null,
-      url: null,
-      canonical: null,
-    })
-  }
+  related: { type: Array, default: () => [] },
+  seo: { type: Object, default: () => ({}) },
 })
 
 const page = usePage()
 
-// Computed values for reactive SEO updates
-const title = computed(() => {
-  if (props.seo?.title) {
-    return props.seo.title
-  }
-  const siteName = page.props.site_name || 'Peptidemap'
-  return `${props.blog?.title || 'News'} - ${siteName}`
-})
-
-const description = computed(() => {
-  if (props.seo?.description) {
-    return props.seo.description
-  }
-  if (props.blog?.description) {
-    const desc = props.blog.description.replace(/\s+/g, ' ').trim()
-    return desc.length > 160 ? desc.substring(0, 160) + '...' : desc
-  }
-  return `Read the latest article about ${props.blog?.title || 'this news'} on Peptidemap.`
-})
-
-const url = computed(() => {
-  return props.seo?.url || page.url
-})
-
-const ogTitle = computed(() => {
-  return props.seo?.og_title || title.value
-})
-
-const ogDescription = computed(() => {
-  return props.seo?.og_description || description.value
-})
-
-const ogImage = computed(() => {
-  return props.seo?.og_image || props.seo?.image || props.blog?.image || null
-})
-
-const canonical = computed(() => {
-  return props.seo?.canonical || url.value
-})
-
-// Watch for SEO changes and update document meta tags
-watchEffect(() => {
-  document.title = title.value
-  let metaDescription = document.querySelector('meta[name="description"]')
-  if (!metaDescription) {
-    metaDescription = document.createElement('meta')
-    metaDescription.setAttribute('name', 'description')
-    document.head.appendChild(metaDescription)
-  }
-  metaDescription.setAttribute('content', description.value)
-
-  let canonicalLink = document.querySelector('link[rel="canonical"]')
-  if (!canonicalLink) {
-    canonicalLink = document.createElement('link')
-    canonicalLink.setAttribute('rel', 'canonical')
-    document.head.appendChild(canonicalLink)
-  }
-  canonicalLink.setAttribute('href', canonical.value)
-
-  const updateMetaTag = (property, content) => {
-    if (!content) return
-    let meta = document.querySelector(`meta[property="${property}"]`)
-    if (!meta) {
-      meta = document.createElement('meta')
-      meta.setAttribute('property', property)
-      document.head.appendChild(meta)
-    }
-    meta.setAttribute('content', content)
-  }
-
-  updateMetaTag('og:title', ogTitle.value)
-  updateMetaTag('og:description', ogDescription.value)
-  updateMetaTag('og:url', url.value)
-  if (ogImage.value) {
-    updateMetaTag('og:image', ogImage.value)
-  }
-})
-
-const getCategoryTagClass = (category) => {
-  const classes = {
-    'Regulation': 'bg-red-100 text-red-800',
-    'Research': 'bg-blue-100 text-blue-800',
-    'Industry': 'bg-green-100 text-green-800',
-    'Guides': 'bg-purple-100 text-purple-800',
-    'Community': 'bg-yellow-100 text-yellow-800',
-  }
-  return classes[category] || 'bg-gray-100 text-gray-800'
-}
-
-const handleImageError = (event) => {
-  event.target.style.display = 'none'
-}
-
+const title = computed(() => props.seo?.title || `${props.blog?.title || 'News'} - ${page.props.site_name || 'PeptideMaps'}`)
+const description = computed(() => props.seo?.description || props.blog?.description?.substring(0, 160) || '')
+const url = computed(() => props.seo?.url || page.url)
+const ogTitle = computed(() => props.seo?.og_title || title.value)
+const ogDescription = computed(() => props.seo?.og_description || description.value)
+const ogImage = computed(() => props.seo?.og_image || props.blog?.image || null)
+const canonical = computed(() => props.seo?.canonical || url.value)
 </script>
-
-<style scoped>
-.blog-content-html {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 17px;
-  line-height: 1.6;
-  color: #374151;
-}
-
-.blog-content-html :deep(p) {
-  margin: 0 0 1em 0;
-  font-size: 17px;
-  line-height: 1.6;
-  color: #374151;
-}
-
-.blog-content-html :deep(h1),
-.blog-content-html :deep(h2),
-.blog-content-html :deep(h3),
-.blog-content-html :deep(h4),
-.blog-content-html :deep(h5),
-.blog-content-html :deep(h6) {
-  font-family: 'HV Muse', serif;
-  font-weight: normal;
-  margin: 1.5em 0 0.75em 0;
-  color: #1F2937;
-  line-height: 1.3;
-}
-
-.blog-content-html :deep(h1) {
-  font-size: 36px;
-}
-
-.blog-content-html :deep(h2) {
-  font-size: 30px;
-}
-
-.blog-content-html :deep(h3) {
-  font-size: 24px;
-}
-
-.blog-content-html :deep(h4) {
-  font-size: 20px;
-}
-
-.blog-content-html :deep(h5) {
-  font-size: 18px;
-}
-
-.blog-content-html :deep(h6) {
-  font-size: 17px;
-}
-
-.blog-content-html :deep(ul),
-.blog-content-html :deep(ol) {
-  margin: 1em 0;
-  padding-left: 2em;
-}
-
-.blog-content-html :deep(li) {
-  margin: 0.5em 0;
-  line-height: 1.6;
-}
-
-.blog-content-html :deep(strong),
-.blog-content-html :deep(b) {
-  font-weight: 600;
-  color: #1F2937;
-}
-
-.blog-content-html :deep(em),
-.blog-content-html :deep(i) {
-  font-style: italic;
-}
-
-.blog-content-html :deep(u) {
-  text-decoration: underline;
-}
-
-.blog-content-html :deep(s),
-.blog-content-html :deep(strike) {
-  text-decoration: line-through;
-}
-
-.blog-content-html :deep(a) {
-  color: #2563eb;
-  text-decoration: underline;
-  transition: color 0.2s;
-}
-
-.blog-content-html :deep(a:hover) {
-  color: #1d4ed8;
-}
-
-.blog-content-html :deep(img) {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin: 1.5em 0;
-}
-
-.blog-content-html :deep(blockquote) {
-  border-left: 4px solid #E5E7EB;
-  padding-left: 1.5em;
-  margin: 1.5em 0;
-  font-style: italic;
-  color: #6B7280;
-}
-
-.blog-content-html :deep(code) {
-  background-color: #F3F4F6;
-  padding: 0.2em 0.4em;
-  border-radius: 4px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.9em;
-}
-
-.blog-content-html :deep(pre) {
-  background-color: #F3F4F6;
-  padding: 1em;
-  border-radius: 8px;
-  overflow-x: auto;
-  margin: 1.5em 0;
-}
-
-.blog-content-html :deep(pre code) {
-  background-color: transparent;
-  padding: 0;
-}
-
-.blog-content-html :deep(table) {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5em 0;
-}
-
-.blog-content-html :deep(table th),
-.blog-content-html :deep(table td) {
-  border: 1px solid #E5E7EB;
-  padding: 0.75em;
-  text-align: left;
-}
-
-.blog-content-html :deep(table th) {
-  background-color: #F9FAFB;
-  font-weight: 600;
-}
-
-.blog-content-html :deep(hr) {
-  border: none;
-  border-top: 1px solid #E5E7EB;
-  margin: 2em 0;
-}
-</style>
-
