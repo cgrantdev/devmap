@@ -64,6 +64,12 @@
                 </svg>
                 <span>Product Scraping</span>
               </Link>
+              <Link href="/admin/staged-products" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/staged-products') }">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                  <path d="M16 16v3a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m9 14 2 2 4-4"/>
+                </svg>
+                <span>Staged Products</span>
+              </Link>
               <Link href="/admin/reviews" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-300 hover:bg-gray-800" :class="{ 'bg-blue-600 text-white': $page.url.startsWith('/admin/reviews') }">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw w-5 h-5" aria-hidden="true">
                   <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path>

@@ -30,10 +30,16 @@ class BannersController extends Controller
                         'image_url' => $banner->image ? asset('storage/' . $banner->image) : $banner->image_url,
                         'image' => $banner->image,
                         'position' => $banner->position,
+                        'slot' => $banner->slot,
                         'link' => $banner->link,
                         'brand_id' => $banner->brand_id,
                         'vendor_name' => $banner->brand?->name,
                         'active' => $banner->active,
+                        'impressions' => $banner->impressions ?? 0,
+                        'clicks' => $banner->clicks ?? 0,
+                        'ctr' => $banner->ctr,
+                        'start_date' => $banner->start_date?->format('Y-m-d'),
+                        'end_date' => $banner->end_date?->format('Y-m-d'),
                     ];
                 });
         }

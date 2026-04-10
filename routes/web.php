@@ -309,6 +309,10 @@ Route::get('/shop/{vendor_name}', function ($vendor_name) {
 })->name('shop.public');
 Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('product.public');
 
+// Public banner API (no auth required — served to frontend ad slots)
+Route::get('/api/banners/{slot}', [\App\Http\Controllers\Api\BannerController::class, 'show']);
+Route::post('/api/banners/{banner}/click', [\App\Http\Controllers\Api\BannerController::class, 'click']);
+
 // Catch-all route for any other page slugs (must be last to avoid conflicts with other routes)
 // This allows creating new pages dynamically without adding routes
 Route::get('/{slug}', [FrontendPagesController::class, 'show'])->name('page.show')->where('slug', '[a-z0-9-]+');
