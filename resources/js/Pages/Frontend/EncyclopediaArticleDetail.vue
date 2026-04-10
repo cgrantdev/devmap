@@ -44,23 +44,10 @@
               <!-- Short TLDR intro — uses overview (the actual compound description) -->
               <p v-if="overviewShort || overview" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">{{ overviewShort || overview }}</p>
 
-              <!-- Clinical quick reference + vendor availability -->
-              <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[color:var(--color-ink-muted)] mb-4">
-                <span v-if="routes && routes.length">Administration: <span class="font-medium text-[color:var(--color-ink)]">{{ routes.join(', ') }}</span></span>
-                <span v-if="halfLife" class="text-[color:var(--color-ink-subtle)]">·</span>
-                <span v-if="halfLife">Half-life: <span class="ui-mono font-medium text-[color:var(--color-ink)]">{{ halfLife }}</span></span>
-                <span v-if="vendorCount > 0" class="text-[color:var(--color-ink-subtle)]">·</span>
-                <a v-if="vendorCount > 0" :href="`/compare#${slugify(categoryName || name)}`" class="inline-flex items-center gap-1 font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
-                  {{ vendorCount }} vendors <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                </a>
-              </div>
-
-              <div v-if="primaryResearch.institution" class="text-sm text-[color:var(--color-ink-muted)]">
-                Primary Research: <span class="font-medium text-[color:var(--color-ink)]">{{ primaryResearch.institution }}</span>
-                <a v-if="primaryResearch.url" :href="primaryResearch.url" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 ml-2 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] text-xs font-medium">
-                  View <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-                </a>
-              </div>
+              <!-- Vendor availability -->
+              <a v-if="vendorCount > 0" :href="`/compare#${slugify(categoryName || name)}`" class="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
+                Available from {{ vendorCount }} vendors <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </a>
             </div>
 
             <!-- Structure image -->
