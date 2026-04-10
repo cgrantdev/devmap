@@ -149,7 +149,11 @@ class KnowledgeCenterController extends Controller
     {
         $imageUrl = null;
         if ($blog->image) {
-            $imageUrl = Storage::url('blogs/' . $blog->image);
+            if (str_starts_with($blog->image, 'http://') || str_starts_with($blog->image, 'https://')) {
+                $imageUrl = $blog->image;
+            } else {
+                $imageUrl = Storage::url('blogs/' . $blog->image);
+            }
         }
 
         // Use blog_type from database if available, otherwise determine from content

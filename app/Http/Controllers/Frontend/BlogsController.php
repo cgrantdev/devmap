@@ -69,7 +69,7 @@ class BlogsController extends Controller
         $formattedBlogs = $blogs->map(function ($blog) {
             $imageUrl = null;
             if ($blog->image) {
-                $imageUrl = Storage::url('blogs/' . $blog->image);
+                $imageUrl = (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/' . $blog->image));
             }
             return [
                 'id' => $blog->id,
@@ -85,7 +85,7 @@ class BlogsController extends Controller
 
         $formattedFeatured = null;
         if ($featured) {
-            $featuredImage = $featured->image ? Storage::url('blogs/' . $featured->image) : null;
+            $featuredImage = $featured->image ? (str_starts_with($featured->image, 'http') ? $featured->image : Storage::url('blogs/' . $featured->image)) : null;
             $formattedFeatured = [
                 'id' => $featured->id,
                 'title' => $featured->title,
@@ -152,7 +152,7 @@ class BlogsController extends Controller
                 ];
             });
 
-        $imageUrl = $blog->image ? Storage::url('blogs/' . $blog->image) : null;
+        $imageUrl = $blog->image ? (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/' . $blog->image)) : null;
         
         // Use blog_type for category tag, fallback to computed tag if not set
         $combinedContent = $blog->introduction . ' ' . $blog->detailed_analysis . ' ' . $blog->conclusion;

@@ -100,7 +100,7 @@ class HomeController extends Controller
                     'title' => $blog->title,
                     'slug' => $blog->slug,
                     'description' => $blog->description,
-                    'image' => $blog->image ? Storage::url('blogs/' . $blog->image) : null,
+                    'image' => $blog->image ? (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/' . $blog->image)) : null,
                     'date' => $blog->published_at ? $blog->published_at->format('M d, Y') : null,
                     'readTime' => $blog->read_time ?? '5 min read',
                 ];
@@ -119,7 +119,7 @@ class HomeController extends Controller
                     'title' => $blog->title,
                     'slug' => $blog->slug,
                     'description' => $blog->description,
-                    'image' => $blog->image ? Storage::url('blogs/' . $blog->image) : null,
+                    'image' => $blog->image ? (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/' . $blog->image)) : null,
                     'date' => $blog->published_at ? $blog->published_at->format('M d, Y') : null,
                 ];
             });
