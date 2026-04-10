@@ -408,10 +408,6 @@
             </div>
           </div>
 
-          <div class="flex justify-end pt-4 border-t border-slate-200 gap-3">
-            <Link href="/admin/vendors" class="px-6 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
-              Cancel
-            </Link>
     </FormPage>
   </AdminLayout>
 </template>
