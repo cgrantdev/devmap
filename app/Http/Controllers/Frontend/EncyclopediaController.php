@@ -24,6 +24,65 @@ class EncyclopediaController extends Controller
      * Truncate text to complete sentences within a character limit.
      * No ellipsis — ends on a full stop.
      */
+    /**
+     * Clinical reference data for known compounds (Wikipedia-sourced).
+     * TODO: move to database fields on education_posts table.
+     */
+    private function getClinicalData($compoundName, $field)
+    {
+        $data = [
+            'BPC-157' => [
+                'status' => 'Not marketed',
+                'routes' => ['Oral', 'Subcutaneous', 'IM', 'IV'],
+                'halfLife' => '7.9–30 min',
+            ],
+            'Semaglutide' => [
+                'status' => 'FDA Approved',
+                'routes' => ['Oral', 'Subcutaneous'],
+                'halfLife' => '~7 days',
+            ],
+            'Tirzepatide' => [
+                'status' => 'FDA Approved',
+                'routes' => ['Subcutaneous'],
+                'halfLife' => '~5 days',
+            ],
+            'TB-500' => [
+                'status' => 'Experimental',
+                'routes' => ['Subcutaneous', 'IM'],
+                'halfLife' => '',
+            ],
+            'Ipamorelin' => [
+                'status' => 'Not marketed',
+                'routes' => ['Subcutaneous', 'IV'],
+                'halfLife' => '~2 hours',
+            ],
+            'Sermorelin' => [
+                'status' => 'Prescription (US)',
+                'routes' => ['Subcutaneous'],
+                'halfLife' => '10–20 min',
+            ],
+            'PT-141' => [
+                'status' => 'FDA Approved (Vyleesi)',
+                'routes' => ['Subcutaneous'],
+                'halfLife' => '~2.7 hours',
+            ],
+            'NAD+' => [
+                'status' => 'Supplement',
+                'routes' => ['Oral', 'IV', 'Subcutaneous'],
+                'halfLife' => '',
+            ],
+            'GHK-Cu' => [
+                'status' => 'Cosmetic / Research',
+                'routes' => ['Topical', 'Subcutaneous'],
+                'halfLife' => '',
+            ],
+        ];
+
+        $compound = $data[$compoundName] ?? null;
+        if (!$compound) return $field === 'routes' ? [] : '';
+        return $compound[$field] ?? ($field === 'routes' ? [] : '');
+    }
+
     private function truncateToSentences($text, $maxChars = 350)
     {
         if (empty($text) || strlen($text) <= $maxChars) return $text;
@@ -688,6 +747,10 @@ class EncyclopediaController extends Controller
             'keyPoints' => $educationPost && $educationPost->key_points ? (is_array($educationPost->key_points) ? $educationPost->key_points : json_decode($educationPost->key_points, true) ?? []) : [],
             'overview' => $educationPost->overview ?? '',
             'overviewShort' => $this->truncateToSentences($educationPost->overview ?? '', 350),
+            // Clinical reference data (hardcoded for now, can be DB fields later)
+            'drugStatus' => $this->getClinicalData($category->name, 'status'),
+            'routes' => $this->getClinicalData($category->name, 'routes'),
+            'halfLife' => $this->getClinicalData($category->name, 'halfLife'),
             'areasOfResearch' => $educationPost && $educationPost->areas_of_research ? (is_array($educationPost->areas_of_research) ? $educationPost->areas_of_research : json_decode($educationPost->areas_of_research, true) ?? []) : [],
             'areasOfResearchIntro' => $educationPost->areas_of_research_intro ?? '',
             'background' => $educationPost->background ?? '',

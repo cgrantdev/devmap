@@ -44,6 +44,17 @@
               <!-- Short TLDR intro — uses overview (the actual compound description) -->
               <p v-if="overviewShort || overview" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">{{ overviewShort || overview }}</p>
 
+              <!-- Quick reference identifiers -->
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[color:var(--color-ink-muted)] mb-4">
+                <span v-if="molecularInfo.casNumber">CAS <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ molecularInfo.casNumber }}</span></span>
+                <span v-if="drugStatus" class="flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full" :class="drugStatus === 'Approved' ? 'bg-[color:var(--color-verified)]' : 'bg-[color:var(--color-caution)]'" />
+                  {{ drugStatus }}
+                </span>
+                <span v-if="routes && routes.length">Routes: <span class="font-medium text-[color:var(--color-ink)]">{{ routes.join(', ') }}</span></span>
+                <span v-if="halfLife">Half-life: <span class="ui-mono font-medium text-[color:var(--color-ink)]">{{ halfLife }}</span></span>
+              </div>
+
               <div v-if="primaryResearch.institution" class="text-sm text-[color:var(--color-ink-muted)]">
                 Primary Research: <span class="font-medium text-[color:var(--color-ink)]">{{ primaryResearch.institution }}</span>
                 <a v-if="primaryResearch.url" :href="primaryResearch.url" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 ml-2 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] text-xs font-medium">
@@ -1454,6 +1465,18 @@ const props = defineProps({
     default: ''
   },
   overviewShort: {
+    type: String,
+    default: ''
+  },
+  drugStatus: {
+    type: String,
+    default: ''
+  },
+  routes: {
+    type: Array,
+    default: () => []
+  },
+  halfLife: {
     type: String,
     default: ''
   },
