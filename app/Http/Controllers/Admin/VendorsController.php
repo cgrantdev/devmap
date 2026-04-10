@@ -16,6 +16,7 @@ use App\Helpers\ImageHelper;
 use App\Helpers\ActivityLogger;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use App\Models\ScrapingConfig;
 
 class VendorsController extends Controller
 {
@@ -263,6 +264,8 @@ class VendorsController extends Controller
                 'logo' => $brand->vendorSetting->logo,
                 'banner_url' => $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
                 'logo_url' => $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
+                'api_platform' => $brand->vendorSetting->api_platform,
+                'has_api_key' => !empty($brand->vendorSetting->api_key),
             ] : null,
         ];
 
@@ -308,6 +311,8 @@ class VendorsController extends Controller
             'is_active' => 'nullable|boolean',
             'affiliate_url_template' => 'nullable|string|max:2048',
             'affiliate_tag' => 'nullable|string|max:100',
+            'api_platform' => 'nullable|string|in:woocommerce,medusa,shopify,custom,page_scrape',
+            'api_key' => 'nullable|string|max:1000',
         ]);
 
         // Update brand name, is_active, and affiliate fields
@@ -404,7 +409,22 @@ class VendorsController extends Controller
         if (isset($validated['seo_og_image'])) {
             $settings->seo_og_image = $validated['seo_og_image'];
         }
+
+        // Integration fields
+        if (array_key_exists('api_platform', $validated)) {
+            $settings->api_platform = $validated['api_platform'];
+        }
+        // Only update api_key if a non-empty value was sent (blank = don't change)
+        if (!empty($validated['api_key'])) {
+            $settings->api_key = $validated['api_key'];
+        }
+
         $settings->save();
+
+        // Auto-create/update ScrapingConfig when platform is set
+        if ($settings->api_platform) {
+            $this->syncScrapingConfig($brand, $settings);
+        }
 
         return redirect()->route('admin.vendors')->with('success', 'Vendor updated successfully.');
     }
@@ -1188,4 +1208,40 @@ class VendorsController extends Controller
         
         return null;
     }
-} 
+
+    /**
+     * Auto-create or update a ScrapingConfig when vendor integration settings change.
+     */
+    protected function syncScrapingConfig(Brand $brand, VendorSetting $settings): void
+    {
+        $typeMap = [
+            'woocommerce' => 'woo_api',
+            'page_scrape' => 'page_scrape',
+            'medusa' => 'page_scrape', // until we build a dedicated Medusa adapter
+            'shopify' => 'page_scrape', // until we build a dedicated Shopify adapter
+            'custom' => 'page_scrape',
+        ];
+
+        $type = $typeMap[$settings->api_platform] ?? 'page_scrape';
+
+        $config = ScrapingConfig::updateOrCreate(
+            ['vendor_id' => $brand->id],
+            [
+                'vendor_name' => $brand->name,
+                'type' => $type,
+                'store_url' => $settings->shop_url,
+                'enabled' => true,
+                'frequency' => 'daily',
+                'auto_promote' => true,
+            ]
+        );
+
+        // For WooCommerce, store API key as consumer_key in auth_credentials
+        if ($settings->api_platform === 'woocommerce' && $settings->api_key) {
+            $creds = $config->auth_credentials ?? [];
+            $creds['consumer_key'] = $settings->api_key;
+            $config->auth_credentials = $creds;
+            $config->save();
+        }
+    }
+}

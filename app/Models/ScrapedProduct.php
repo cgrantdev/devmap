@@ -18,6 +18,7 @@ class ScrapedProduct extends Model
     public const SOURCE_WOO_API = 'woo_api';
     public const SOURCE_WP_REST = 'wp_rest';
     public const SOURCE_XML_FEED = 'xml_feed';
+    public const SOURCE_PAGE_SCRAPE = 'page_scrape';
 
     protected $fillable = [
         'scraping_config_id',

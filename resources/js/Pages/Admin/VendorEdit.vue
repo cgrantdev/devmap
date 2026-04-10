@@ -9,6 +9,7 @@
         { id: 'contact', label: 'Contact' },
         { id: 'policies', label: 'Policies' },
         { id: 'marketing', label: 'Marketing' },
+        { id: 'integration', label: 'Integration' },
         { id: 'seo', label: 'SEO' },
         { id: 'products', label: `Products (${(products || []).length})` },
       ]"
@@ -127,6 +128,49 @@
             <FormField label="Affiliate Tag">
               <input v-model="editForm.affiliate_tag" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" placeholder="peptidemap" />
             </FormField>
+          </FormSection>
+        </div>
+
+        <!-- INTEGRATION TAB -->
+        <div v-show="activeTab === 'integration'">
+          <FormSection title="Platform" :columns="2">
+            <FormField label="E-Commerce Platform" hint="Select the vendor's store platform for automatic product sync">
+              <select v-model="editForm.api_platform" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15">
+                <option :value="null">None (manual only)</option>
+                <option value="woocommerce">WooCommerce</option>
+                <option value="medusa">Medusa</option>
+                <option value="shopify">Shopify</option>
+                <option value="custom">Custom API</option>
+                <option value="page_scrape">Page Scraper</option>
+              </select>
+            </FormField>
+            <FormField label="Store URL" hint="Base URL of the vendor's store">
+              <input v-model="editForm.shop_url" type="url" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" placeholder="https://store.example.com" />
+            </FormField>
+          </FormSection>
+
+          <FormSection v-if="editForm.api_platform && editForm.api_platform !== 'page_scrape'" title="API Credentials">
+            <FormField label="API Key" hint="Publishable key, consumer key, or access token. Stored encrypted.">
+              <input v-model="editForm.api_key" type="password" autocomplete="off" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 ui-mono" placeholder="Enter API key..." />
+            </FormField>
+            <p class="text-[12px] text-[color:var(--color-ink-subtle)] mt-2">
+              <span v-if="editForm.api_platform === 'woocommerce'">WooCommerce REST API consumer key + secret (format: ck_xxx / cs_xxx). Enter the consumer key here.</span>
+              <span v-else-if="editForm.api_platform === 'medusa'">Medusa publishable API key (format: pk_xxx).</span>
+              <span v-else-if="editForm.api_platform === 'shopify'">Shopify Admin API access token.</span>
+              <span v-else>API key or access token for the vendor's API.</span>
+            </p>
+          </FormSection>
+
+          <FormSection v-if="editForm.api_platform === 'page_scrape'" title="Page Scraper" description="Automatically fetches each product's page URL and extracts current prices, images, and stock status from the HTML.">
+            <div class="bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] p-4 text-[13px] text-[color:var(--color-ink-muted)] space-y-2">
+              <p>The page scraper will visit each product's URL and extract data using:</p>
+              <ol class="list-decimal list-inside space-y-1 text-[12px]">
+                <li>JSON-LD structured data (most reliable)</li>
+                <li>Open Graph meta tags (og:image, og:title, product:price)</li>
+                <li>Common HTML patterns as fallback</li>
+              </ol>
+              <p class="text-[12px] text-[color:var(--color-ink-subtle)]">Products need a valid product URL set. Images are pulled directly from product pages.</p>
+            </div>
           </FormSection>
         </div>
 
@@ -254,6 +298,8 @@ const editForm = useForm({
   is_active: props.vendor?.is_active ?? false,
   affiliate_url_template: props.vendor?.affiliate_url_template || '',
   affiliate_tag: props.vendor?.affiliate_tag || '',
+  api_platform: props.vendor?.settings?.api_platform || null,
+  api_key: '', // never pre-filled for security — blank means "don't change"
   _token: usePage().props.csrf_token
 })
 

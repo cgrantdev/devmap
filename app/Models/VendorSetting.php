@@ -37,6 +37,8 @@ class VendorSetting extends Model
         'seo_og_title',
         'seo_og_description',
         'seo_og_image',
+        'api_platform',
+        'api_key',
     ];
 
     protected $casts = [
@@ -46,6 +48,7 @@ class VendorSetting extends Model
         'is_partner' => 'boolean',
         'status' => 'integer',
         'payment_methods' => 'array',
+        'api_key' => 'encrypted',
     ];
 
     public function brand()
