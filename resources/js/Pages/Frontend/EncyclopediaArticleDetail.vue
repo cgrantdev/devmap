@@ -42,7 +42,7 @@
               <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
               <p class="text-lg text-[color:var(--color-ink-muted)] mb-4">{{ subtitle }}</p>
               <!-- Short TLDR intro — uses overview (the actual compound description) -->
-              <p v-if="overview" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4 line-clamp-2">{{ overview }}</p>
+              <p v-if="overview" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4 line-clamp-5">{{ overview }}</p>
 
               <div v-if="primaryResearch.institution" class="text-sm text-[color:var(--color-ink-muted)]">
                 Primary Research: <span class="font-medium text-[color:var(--color-ink)]">{{ primaryResearch.institution }}</span>
