@@ -60,10 +60,11 @@
               </a>
               <button
                 @click="copyDiscountCode"
-                class="ui-focus inline-flex items-center gap-2 h-10 px-4 border border-dashed border-[color:var(--color-hairline)] text-[13px] font-semibold text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)] transition-all"
+                class="ui-focus group inline-flex items-center gap-3 h-10 pl-3 pr-4 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all"
               >
-                <span class="ui-mono">{{ brand.discount_code || 'PMAP' }}</span>
-                <span class="text-[color:var(--color-ink-subtle)]">· copy</span>
+                <span class="text-[10px] uppercase tracking-[0.08em] font-semibold text-emerald-600">Coupon</span>
+                <span class="ui-mono text-[15px] font-bold text-emerald-800 tracking-wide">{{ brand.discount_code || 'PMAP' }}</span>
+                <svg class="w-3.5 h-3.5 text-emerald-500 group-hover:text-emerald-700 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
             </div>
           </div>
