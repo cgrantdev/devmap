@@ -5,7 +5,7 @@
       <!-- Logo -->
       <div class="px-5 py-4 border-b border-white/[0.06]">
         <a href="/admin/dashboard" class="flex items-center gap-2.5">
-          <img src="/images/logo.png" alt="PeptideMaps" class="h-6 brightness-0 invert" />
+          <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-6 brightness-0 invert" />
           <span class="text-[10px] text-white/40 uppercase tracking-[0.1em] border-l border-white/10 pl-2.5 ml-0.5">Admin</span>
         </a>
       </div>
