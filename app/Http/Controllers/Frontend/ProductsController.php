@@ -804,6 +804,7 @@ class ProductsController extends Controller
                 'return_policy' => $brand->vendorSetting && $brand->vendorSetting->return_policy ? $brand->vendorSetting->return_policy : null,
                 'payment_methods' => $brand->vendorSetting && $brand->vendorSetting->payment_methods ? $brand->vendorSetting->payment_methods : [],
                 'discount_code' => $discountCode,
+                'affiliate_visit_url' => $this->buildAffiliateVisitUrl($brand),
                 'shipping_time' => round($shippingTime, 1),
                 'customer_service' => round($customerService, 1),
                 'quality' => round($quality, 1),
@@ -837,5 +838,25 @@ class ProductsController extends Controller
             }
         }
         return null;
+    }
+
+    /**
+     * Build an affiliate-tagged URL for the "Visit website" button.
+     * Uses the affiliate_url_template with the shop_url as the base.
+     */
+    protected function buildAffiliateVisitUrl($brand): ?string
+    {
+        $shopUrl = $brand->vendorSetting->shop_url ?? null;
+        if (!$shopUrl) return null;
+
+        $template = $brand->affiliate_url_template;
+        if (empty($template)) return $shopUrl;
+
+        return strtr($template, [
+            '{product_url}' => $shopUrl,
+            '{slug}' => $brand->slug ?? '',
+            '{id}' => (string) $brand->id,
+            '{affiliate_tag}' => (string) ($brand->affiliate_tag ?? ''),
+        ]);
     }
 }

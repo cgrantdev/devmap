@@ -52,9 +52,9 @@
             <!-- CTAs -->
             <div class="flex items-center gap-3 flex-shrink-0 md:pt-1">
               <a
-                :href="brand.shop_url || '#'"
-                :target="brand.shop_url ? '_blank' : '_self'"
-                rel="noopener noreferrer"
+                :href="brand.affiliate_visit_url || brand.shop_url || '#'"
+                :target="(brand.affiliate_visit_url || brand.shop_url) ? '_blank' : '_self'"
+                rel="noopener noreferrer nofollow sponsored"
                 class="ui-focus inline-flex items-center gap-2 h-10 px-5 text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_8px_20px_-8px_rgba(79,70,229,0.4)] hover:-translate-y-[1px] transition-all"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
