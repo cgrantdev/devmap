@@ -44,8 +44,8 @@
                   {{ brand.phone_number }}
                 </span>
               </div>
-              <p v-if="brand.description" class="mt-3 text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl overflow-hidden" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
-                {{ brand.description }}
+              <p v-if="brand.description" class="mt-3 text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
+                {{ truncateToSentences(brand.description, 3) }}
               </p>
             </div>
 
@@ -1217,6 +1217,13 @@ const handlePerPageChange = (perPage) => {
 
 const handleCtaClick = (url) => {
   router.visit(url)
+}
+
+function truncateToSentences(text, maxSentences = 3) {
+  if (!text) return ''
+  const sentences = text.match(/[^.!?]+[.!?]+/g)
+  if (!sentences) return text
+  return sentences.slice(0, maxSentences).join(' ').trim()
 }
 
 const copyDiscountCode = async () => {
