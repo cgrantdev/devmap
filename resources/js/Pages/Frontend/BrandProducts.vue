@@ -1219,11 +1219,13 @@ const handleCtaClick = (url) => {
   router.visit(url)
 }
 
-function truncateToSentences(text, maxSentences = 3) {
-  if (!text) return ''
-  const sentences = text.match(/[^.!?]+[.!?]+/g)
-  if (!sentences) return text
-  return sentences.slice(0, maxSentences).join(' ').trim()
+function truncateToSentences(text, maxChars = 250) {
+  if (!text || text.length <= maxChars) return text
+  // Find the last sentence-ending punctuation before maxChars
+  const truncated = text.substring(0, maxChars)
+  const lastPeriod = truncated.lastIndexOf('. ')
+  if (lastPeriod > 100) return truncated.substring(0, lastPeriod + 1)
+  return truncated + '...'
 }
 
 const copyDiscountCode = async () => {
