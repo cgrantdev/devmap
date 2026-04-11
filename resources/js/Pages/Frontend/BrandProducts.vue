@@ -14,153 +14,120 @@
 
       <!-- Vendor header -->
       <div class="border-b border-[color:var(--color-hairline)] bg-white">
-        <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-6">
-          <div class="flex flex-col md:flex-row md:items-center gap-5">
+        <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-5 lg:py-6">
+          <!-- Top row: logo + name + CTAs -->
+          <div class="flex items-center gap-4 mb-3">
             <!-- Logo -->
-            <div class="w-16 h-16 flex-shrink-0 border border-[color:var(--color-hairline)] bg-white flex items-center justify-center overflow-hidden" :style="{ background: brand.logo ? 'white' : coverGradient }">
-              <img v-if="brand.logo" :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain p-1.5" loading="lazy" />
-              <span v-else class="text-xl font-bold text-white select-none ui-display">{{ brand.initials }}</span>
+            <div class="w-12 h-12 lg:w-16 lg:h-16 flex-shrink-0 border border-[color:var(--color-hairline)] bg-white flex items-center justify-center overflow-hidden" :style="{ background: brand.logo ? 'white' : coverGradient }">
+              <img v-if="brand.logo" :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain p-1" loading="lazy" />
+              <span v-else class="text-lg lg:text-xl font-bold text-white select-none ui-display">{{ brand.initials }}</span>
             </div>
 
-            <!-- Name + meta -->
+            <!-- Name + rating -->
             <div class="flex-1 min-w-0">
-              <h1 class="ui-display text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-1.5">{{ brand.name }}</h1>
-              <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-[color:var(--color-ink-muted)]">
-                <div class="flex items-center gap-1.5">
-                  <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(brand.rating || 0) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.rating || '0.0' }}</span>
-                  <span>({{ brand.reviews || totalReviews }})</span>
-                </div>
-                <span v-if="brand.location" class="flex items-center gap-1">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+              <h1 class="ui-display text-xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">{{ brand.name }}</h1>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(brand.rating || 0) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                <span class="ui-mono text-[12px] lg:text-[13px] font-semibold text-[color:var(--color-ink)]">{{ brand.rating || '0.0' }}</span>
+                <span class="text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">({{ brand.reviews || totalReviews }})</span>
+                <span v-if="brand.location" class="hidden sm:flex items-center gap-1 ml-2 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
                   {{ brand.location }}
                 </span>
               </div>
-              <p v-if="brand.description" class="mt-2 text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
-                {{ truncateDesc(brand.description) }}
-              </p>
             </div>
 
-            <!-- CTAs -->
-            <div class="flex items-center gap-3 flex-shrink-0">
-              <a
-                :href="brand.affiliate_visit_url || brand.shop_url || '#'"
-                :target="(brand.affiliate_visit_url || brand.shop_url) ? '_blank' : '_self'"
-                rel="noopener noreferrer nofollow sponsored"
-                class="ui-focus inline-flex items-center justify-center gap-2 h-11 px-6 text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_8px_20px_-8px_rgba(79,70,229,0.4)] hover:-translate-y-[1px] transition-all"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-                Visit website
-              </a>
-              <button
-                @click="copyDiscountCode"
-                class="ui-focus group inline-flex items-center justify-center gap-3 h-12 px-5 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all"
-              >
-                <span class="text-[10px] uppercase tracking-[0.1em] font-semibold text-emerald-600">Coupon Code</span>
-                <span class="ui-mono text-[18px] font-bold text-emerald-800 tracking-widest">{{ brand.discount_code || 'PMAP' }}</span>
-                <svg class="w-4 h-4 text-emerald-500 group-hover:text-emerald-700 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-              </button>
-            </div>
+            <!-- Visit button (desktop) -->
+            <a
+              :href="brand.affiliate_visit_url || brand.shop_url || '#'"
+              :target="(brand.affiliate_visit_url || brand.shop_url) ? '_blank' : '_self'"
+              rel="noopener noreferrer nofollow sponsored"
+              class="ui-focus hidden md:inline-flex items-center gap-2 h-10 lg:h-11 px-5 lg:px-6 text-[13px] lg:text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_8px_20px_-8px_rgba(79,70,229,0.4)] hover:-translate-y-[1px] transition-all flex-shrink-0"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+              Visit website
+            </a>
+
+            <!-- Coupon (desktop) -->
+            <button
+              @click="copyDiscountCode"
+              class="ui-focus group hidden md:inline-flex items-center gap-3 h-10 lg:h-11 px-4 lg:px-5 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all flex-shrink-0"
+            >
+              <span class="text-[9px] lg:text-[10px] uppercase tracking-[0.1em] font-semibold text-emerald-600">Coupon</span>
+              <span class="ui-mono text-[15px] lg:text-[18px] font-bold text-emerald-800 tracking-widest">{{ brand.discount_code || 'PMAP' }}</span>
+              <svg class="w-3.5 h-3.5 text-emerald-500 group-hover:text-emerald-700 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            </button>
+          </div>
+
+          <!-- Description -->
+          <p v-if="brand.description" class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-3 md:mb-0">
+            {{ truncateDesc(brand.description) }}
+          </p>
+
+          <!-- Mobile CTAs -->
+          <div class="flex gap-2 md:hidden">
+            <a
+              :href="brand.affiliate_visit_url || brand.shop_url || '#'"
+              :target="(brand.affiliate_visit_url || brand.shop_url) ? '_blank' : '_self'"
+              rel="noopener noreferrer nofollow sponsored"
+              class="ui-focus flex-1 inline-flex items-center justify-center gap-2 h-10 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+              Visit website
+            </a>
+            <button
+              @click="copyDiscountCode"
+              class="ui-focus group flex-1 inline-flex items-center justify-center gap-2 h-10 border-2 border-dashed border-emerald-300 bg-emerald-50"
+            >
+              <span class="text-[9px] uppercase tracking-[0.08em] font-semibold text-emerald-600">Code</span>
+              <span class="ui-mono text-[14px] font-bold text-emerald-800 tracking-wide">{{ brand.discount_code || 'PMAP' }}</span>
+              <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            </button>
           </div>
         </div>
       </div>
 
       <!-- Product Listing Section -->
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <!-- Left Main Content Area (2/3) -->
-          <div class="lg:col-span-3 space-y-8">
+      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-8 lg:py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+          <!-- Left Main Content Area -->
+          <div class="lg:col-span-3 space-y-6">
             <section>
-              <!-- Products Section Header -->
-              <div class="flex items-center gap-3 mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package w-6 h-6 text-gray-900" aria-hidden="true">
-                  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path>
-                  <path d="M12 22V12"></path>
-                  <polyline points="3.29 7 12 12 20.71 7"></polyline>
-                  <path d="m7.5 4.27 9 5.15"></path>
-                </svg>
-                <h2 class="text-2xl text-gray-900">Products </h2>
-                <span class="text-gray-500">({{ products.total }})</span>
+              <!-- Products header + search -->
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Products <span class="ui-mono">({{ products.total }})</span></h2>
               </div>
-              <div class="mb-6 space-y-4">
-                <div class="relative">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" aria-hidden="true">
-                    <path d="m21 21-4.34-4.34"></path>
-                    <circle cx="11" cy="11" r="8"></circle>
-                  </svg>
 
-                  <input
-                    v-model="searchQuery"
-                    @input="handleSearchInput"
-                    type="text"
-                    placeholder="Search products..."
-                    class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                  />                  
-                </div>
-                <div class="flex items-center gap-2">
-                  <!-- Sort by Options -->
-                  <span class="text-sm text-gray-600">Sort by:</span>
-                  <div class="flex gap-2 flex-wrap">
-                    <button
-                      @click="applySort('featured', 'desc')"
-                      :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all',
-                        currentSort === 'featured' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
-                      ]"
-                    >
-                      Featured
-                    </button>
-                    <button
-                      @click="applySort('price', 'asc')"
-                      :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all',
-                        currentSort === 'price' && currentSortDir === 'asc' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
-                      ]"
-                    >
-                      Price: Low to High
-                    </button>
-                    <button
-                      @click="applySort('price', 'desc')"
-                      :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all',
-                        currentSort === 'price' && currentSortDir === 'desc' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
-                      ]"
-                    >
-                      Price: High to Low
-                    </button>
-                    <button
-                      @click="applySort('rating', 'desc')"
-                      :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all',
-                        currentSort === 'rating' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
-                      ]"
-                    >
-                      Highest Rated
-                    </button>
-                    <button
-                      @click="applySort('reviews', 'desc')"
-                      :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all',
-                        currentSort === 'reviews' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
-                      ]"
-                    >
-                      Most Reviews
-                    </button>
-                    <button
-                      @click="applySort('name', 'asc')"
-                      :class="[
-                        'px-4 py-2 rounded-lg text-sm transition-all',
-                        currentSort === 'name' ? 'bg-slate-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:border-slate-300'
-                      ]"
-                    >
-                      Name A-Z
-                    </button>
-                  </div>
-                </div>
+              <div class="relative mb-4">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input
+                  v-model="searchQuery"
+                  @input="handleSearchInput"
+                  type="text"
+                  placeholder="Search products..."
+                  class="w-full h-10 pl-9 pr-4 text-sm border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 transition-colors"
+                />
+              </div>
+
+              <!-- Sort buttons — horizontal scroll on mobile -->
+              <div class="flex items-center gap-1.5 mb-6 overflow-x-auto pb-1 -mx-1 px-1">
+                <button
+                  v-for="s in sortOptions"
+                  :key="s.key"
+                  @click="applySort(s.sort, s.dir)"
+                  :class="[
+                    'h-8 px-3 text-[12px] font-medium whitespace-nowrap transition-colors flex-shrink-0',
+                    (currentSort === s.sort && (s.dir === undefined || currentSortDir === s.dir))
+                      ? 'bg-[color:var(--color-ink)] text-white'
+                      : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)]',
+                  ]"
+                >
+                  {{ s.label }}
+                </button>
               </div>
 
               <!-- Product Grid -->
-              <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
                 <ProductSimpleCard
                   v-for="product in products.data"
                   :key="product.id"
@@ -878,6 +845,15 @@ const searchQuery = ref(props.search || '')
 const perPage = ref(props.products.per_page || 20)
 const currentSort = ref(props.sort || 'featured')
 const currentSortDir = ref(props.sortDir || 'desc')
+
+const sortOptions = [
+  { key: 'featured', label: 'Featured', sort: 'featured', dir: 'desc' },
+  { key: 'price-asc', label: 'Price: Low', sort: 'price', dir: 'asc' },
+  { key: 'price-desc', label: 'Price: High', sort: 'price', dir: 'desc' },
+  { key: 'rating', label: 'Top Rated', sort: 'rating', dir: 'desc' },
+  { key: 'reviews', label: 'Most Reviews', sort: 'reviews', dir: 'desc' },
+  { key: 'name', label: 'A-Z', sort: 'name', dir: 'asc' },
+]
 
 // Certifications (mock data - can be moved to backend)
 const certifications = ref(['ISO 9001', 'cGMP Compliant', 'FDA Registered'])
