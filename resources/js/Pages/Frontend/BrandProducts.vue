@@ -4,7 +4,7 @@
     <div class="min-h-screen">
       <!-- Cover banner -->
       <div class="relative h-36 md:h-52 overflow-hidden" :style="{ background: coverGradient }">
-        <img v-if="brand.banner" :src="brand.banner" :alt="brand.name" class="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+        <img v-if="brand.banner || brand.banner_image_url" :src="brand.banner || brand.banner_image_url" :alt="brand.name" class="absolute inset-0 w-full h-full object-cover" loading="lazy" />
         <div class="absolute inset-0 bg-gradient-to-r from-[#0F172A]/60 via-[#0F172A]/20 to-transparent" />
         <div class="absolute inset-0 opacity-[0.03]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '28px 28px' }" />
         <div v-if="brand.is_partner" class="absolute top-4 right-4 z-10">

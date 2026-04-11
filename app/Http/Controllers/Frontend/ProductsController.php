@@ -796,6 +796,7 @@ class ProductsController extends Controller
                 'phone_number' => $brand->vendorSetting->phone_number ?? null,
                 'logo' => $this->getBrandLogoUrl($brand),
                 'banner' => $brand->vendorSetting && $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
+                'banner_image_url' => $brand->vendorSetting->banner_image_url ?? null,
                 'location' => $location ? $location->name : null,
                 'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
                 'founded_year' => $brand->vendorSetting && $brand->vendorSetting->founded_year ? $brand->vendorSetting->founded_year : null,

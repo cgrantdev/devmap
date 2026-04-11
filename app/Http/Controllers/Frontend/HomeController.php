@@ -618,7 +618,7 @@ class HomeController extends Controller
                         'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
                     ];
                 });
-            $limitedDeals = $limitedDeals->merge($brandsWithCoupons)->take(8)->values();
+            $limitedDeals = collect($limitedDeals->all())->merge($brandsWithCoupons)->take(8)->values();
         }
 
         // Peptide encyclopedia highlights — categories with published education posts
