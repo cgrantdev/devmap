@@ -4,7 +4,7 @@
     <header
       :class="[
         'fixed top-0 left-0 right-0 z-50 transition-all duration-[200ms] ease-out',
-        scrolled || mobileOpen ? 'bg-white/70 backdrop-blur-xl border-b border-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.04)]' : 'bg-transparent',
+        scrolled || mobileOpen ? 'bg-white/80 backdrop-blur-xl shadow-[0_1px_2px_rgba(0,0,0,0.03)]' : 'bg-transparent',
       ]"
     >
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 h-14 lg:h-16 flex items-center gap-8">

@@ -44,7 +44,7 @@
                   {{ brand.phone_number }}
                 </span>
               </div>
-              <p v-if="brand.description" class="mt-3 text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl line-clamp-2">
+              <p v-if="brand.description" class="mt-3 text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl overflow-hidden" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
                 {{ brand.description }}
               </p>
             </div>
