@@ -45,7 +45,7 @@
                 </span>
               </div>
               <p v-if="brand.description" class="mt-3 text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
-                {{ truncateToSentences(brand.description, 3) }}
+                {{ truncateDesc(brand.description) }}
               </p>
             </div>
 
@@ -1219,13 +1219,11 @@ const handleCtaClick = (url) => {
   router.visit(url)
 }
 
-function truncateToSentences(text, maxChars = 250) {
-  if (!text || text.length <= maxChars) return text
-  // Find the last sentence-ending punctuation before maxChars
-  const truncated = text.substring(0, maxChars)
-  const lastPeriod = truncated.lastIndexOf('. ')
-  if (lastPeriod > 100) return truncated.substring(0, lastPeriod + 1)
-  return truncated + '...'
+function truncateDesc(text) {
+  if (!text || text.length <= 300) return text
+  const cut = text.substring(0, 300)
+  const lastSpace = cut.lastIndexOf(' ')
+  return (lastSpace > 200 ? cut.substring(0, lastSpace) : cut) + '...'
 }
 
 const copyDiscountCode = async () => {
