@@ -2,9 +2,11 @@
   <ModernLayout>
     <!-- Vendor Detail -->
     <div class="min-h-screen">
-      <!-- Cover banner — flat gradient, no overlap, sharp -->
-      <div class="relative h-36 md:h-44" :style="{ background: coverGradient }">
-        <div class="absolute inset-0 opacity-[0.04]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '28px 28px' }" />
+      <!-- Cover banner -->
+      <div class="relative h-36 md:h-52 overflow-hidden" :style="{ background: coverGradient }">
+        <img v-if="brand.banner" :src="brand.banner" :alt="brand.name" class="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+        <div class="absolute inset-0 bg-gradient-to-r from-[#0F172A]/60 via-[#0F172A]/20 to-transparent" />
+        <div class="absolute inset-0 opacity-[0.03]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '28px 28px' }" />
         <div v-if="brand.is_partner" class="absolute top-4 right-4 z-10">
           <span class="ui-mono text-[10px] uppercase tracking-[0.12em] px-2.5 py-1 bg-white/15 backdrop-blur-sm text-white border border-white/15 font-semibold">Partner</span>
         </div>
