@@ -12,10 +12,10 @@
         </div>
       </div>
 
-      <!-- Vendor header — directly below banner, no overlap, no floating cards -->
+      <!-- Vendor header -->
       <div class="border-b border-[color:var(--color-hairline)] bg-white">
         <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-6">
-          <div class="flex flex-col md:flex-row md:items-start gap-5">
+          <div class="flex flex-col md:flex-row md:items-center gap-5">
             <!-- Logo -->
             <div class="w-16 h-16 flex-shrink-0 border border-[color:var(--color-hairline)] bg-white flex items-center justify-center overflow-hidden" :style="{ background: brand.logo ? 'white' : coverGradient }">
               <img v-if="brand.logo" :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain p-1.5" loading="lazy" />
@@ -24,8 +24,8 @@
 
             <!-- Name + meta -->
             <div class="flex-1 min-w-0">
-              <h1 class="ui-display text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-2">{{ brand.name }}</h1>
-              <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[color:var(--color-ink-muted)]">
+              <h1 class="ui-display text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-1.5">{{ brand.name }}</h1>
+              <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-[color:var(--color-ink-muted)]">
                 <div class="flex items-center gap-1.5">
                   <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(brand.rating || 0) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
                   <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.rating || '0.0' }}</span>
@@ -35,38 +35,34 @@
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
                   {{ brand.location }}
                 </span>
-                <span v-if="brand.contact_email" class="flex items-center gap-1">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 01-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-                  {{ brand.contact_email }}
-                </span>
-                <span v-if="brand.phone_number" class="flex items-center gap-1">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-                  {{ brand.phone_number }}
-                </span>
+                <a v-if="brand.shop_url" :href="brand.affiliate_visit_url || brand.shop_url" target="_blank" rel="noopener noreferrer nofollow sponsored" class="flex items-center gap-1 text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                  {{ brand.shop_url.replace('https://', '').replace('http://', '').replace(/\/$/, '') }}
+                </a>
               </div>
-              <p v-if="brand.description" class="mt-3 text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
+              <p v-if="brand.description" class="mt-2 text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
                 {{ truncateDesc(brand.description) }}
               </p>
             </div>
 
-            <!-- CTAs -->
-            <div class="flex items-center gap-3 flex-shrink-0 md:pt-1">
+            <!-- CTAs — stacked -->
+            <div class="flex flex-col gap-2.5 flex-shrink-0 items-stretch md:items-end">
               <a
                 :href="brand.affiliate_visit_url || brand.shop_url || '#'"
                 :target="(brand.affiliate_visit_url || brand.shop_url) ? '_blank' : '_self'"
                 rel="noopener noreferrer nofollow sponsored"
-                class="ui-focus inline-flex items-center gap-2 h-10 px-5 text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_8px_20px_-8px_rgba(79,70,229,0.4)] hover:-translate-y-[1px] transition-all"
+                class="ui-focus inline-flex items-center justify-center gap-2 h-11 px-6 text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_8px_20px_-8px_rgba(79,70,229,0.4)] hover:-translate-y-[1px] transition-all"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
                 Visit website
               </a>
               <button
                 @click="copyDiscountCode"
-                class="ui-focus group inline-flex items-center gap-3 h-10 pl-3 pr-4 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all"
+                class="ui-focus group inline-flex items-center justify-center gap-3 h-12 px-5 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all"
               >
-                <span class="text-[10px] uppercase tracking-[0.08em] font-semibold text-emerald-600">Coupon</span>
-                <span class="ui-mono text-[15px] font-bold text-emerald-800 tracking-wide">{{ brand.discount_code || 'PMAP' }}</span>
-                <svg class="w-3.5 h-3.5 text-emerald-500 group-hover:text-emerald-700 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                <span class="text-[10px] uppercase tracking-[0.1em] font-semibold text-emerald-600">Coupon Code</span>
+                <span class="ui-mono text-[18px] font-bold text-emerald-800 tracking-widest">{{ brand.discount_code || 'PMAP' }}</span>
+                <svg class="w-4 h-4 text-emerald-500 group-hover:text-emerald-700 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
             </div>
           </div>
