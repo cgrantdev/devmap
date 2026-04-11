@@ -45,8 +45,8 @@
               </p>
             </div>
 
-            <!-- CTAs — stacked -->
-            <div class="flex flex-col gap-2.5 flex-shrink-0 items-stretch md:items-end">
+            <!-- CTAs -->
+            <div class="flex items-center gap-3 flex-shrink-0">
               <a
                 :href="brand.affiliate_visit_url || brand.shop_url || '#'"
                 :target="(brand.affiliate_visit_url || brand.shop_url) ? '_blank' : '_self'"
