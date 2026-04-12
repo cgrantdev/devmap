@@ -27,8 +27,36 @@
 
         <!-- Right side -->
         <div class="ml-auto flex items-center gap-1.5 sm:gap-2 lg:gap-3">
-          <!-- Search — always visible, compact on small screens -->
-          <SearchPalette class="hidden sm:block" />
+          <!-- Combined search + country flag (sm+) -->
+          <div class="hidden sm:flex items-center relative" ref="searchCountryRef">
+            <SearchPalette :country-code="selectedCountry" @toggle-country="showCountryPicker = !showCountryPicker" />
+            <!-- Inline country picker dropdown -->
+            <transition
+              enter-active-class="transition-all duration-[150ms] ease-out"
+              enter-from-class="opacity-0 translate-y-1"
+              enter-to-class="opacity-100 translate-y-0"
+              leave-active-class="transition-all duration-[100ms] ease-in"
+              leave-from-class="opacity-100 translate-y-0"
+              leave-to-class="opacity-0 translate-y-1"
+            >
+              <div v-if="showCountryPicker" class="absolute right-0 top-full mt-2 w-56 rounded-[12px] bg-white border border-[color:var(--color-hairline)] shadow-[var(--shadow-lg)] overflow-hidden z-50">
+                <div class="px-3 py-2 border-b border-[color:var(--color-hairline)] text-[10px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Ships to</div>
+                <div class="max-h-64 overflow-y-auto py-1">
+                  <button
+                    v-for="c in countryList"
+                    :key="c.code"
+                    type="button"
+                    @click="selectCountry(c.code)"
+                    :class="['w-full flex items-center gap-3 px-3 py-2 text-sm text-left transition-colors', selectedCountry === c.code ? 'bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)]' : 'text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)]']"
+                  >
+                    <img :src="`https://flagcdn.com/w40/${c.code.toLowerCase()}.png`" :alt="c.name" class="w-5 h-[15px] rounded-[2px] object-cover flex-shrink-0" />
+                    <span class="flex-1 truncate">{{ c.name }}</span>
+                    <svg v-if="selectedCountry === c.code" class="w-3.5 h-3.5 text-[color:var(--color-accent-600)]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </button>
+                </div>
+              </div>
+            </transition>
+          </div>
 
           <!-- Search icon only on xs -->
           <button
@@ -37,9 +65,6 @@
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           </button>
-
-          <!-- Country — compact flag only -->
-          <CountrySelector class="hidden md:block" />
 
           <!-- Sign in -->
           <a
@@ -230,7 +255,32 @@ import CountrySelector from '@/components/ui/CountrySelector.vue'
 const scrolled = ref(false)
 const mobileOpen = ref(false)
 const showMobileSearch = ref(false)
+const showCountryPicker = ref(false)
+const searchCountryRef = ref(null)
 const currentYear = new Date().getFullYear()
+
+// Country selection
+const countryList = [
+  { code: 'US', name: 'United States' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'FR', name: 'France' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'MX', name: 'Mexico' },
+  { code: 'BR', name: 'Brazil' },
+]
+const selectedCountry = ref('US')
+
+// Load from localStorage
+try { const s = localStorage.getItem('pmap.country'); if (s) selectedCountry.value = s } catch {}
+
+function selectCountry(code) {
+  selectedCountry.value = code
+  showCountryPicker.value = false
+  try { localStorage.setItem('pmap.country', code) } catch {}
+}
 
 // Newsletter
 const newsletterEmail = ref('')
@@ -320,12 +370,20 @@ watch(mobileOpen, (open) => {
   if (open) showMobileSearch.value = false
 })
 
+function handleClickOutsideCountry(e) {
+  if (searchCountryRef.value && !searchCountryRef.value.contains(e.target)) {
+    showCountryPicker.value = false
+  }
+}
+
 onMounted(() => {
   handleScroll()
   window.addEventListener('scroll', handleScroll, { passive: true })
+  document.addEventListener('click', handleClickOutsideCountry)
 })
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  document.removeEventListener('click', handleClickOutsideCountry)
   document.body.style.overflow = ''
 })
 </script>
