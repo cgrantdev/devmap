@@ -235,6 +235,7 @@ class VendorsController extends Controller
             'id' => $brand->id,
             'brand_id' => $brand->id,
             'name' => $brand->name,
+            'slug' => $brand->slug,
             'email' => $brand->vendorSetting->contact_email ?? null,
             'is_active' => $brand->is_active,
             'affiliate_url_template' => $brand->affiliate_url_template,

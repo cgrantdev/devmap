@@ -18,6 +18,17 @@
       :saved="justSaved"
       @save="submitEditVendor"
     >
+      <template #actions>
+        <a
+          v-if="vendor"
+          :href="`/brand/${vendor.slug || vendor.name?.toLowerCase().replace(/\\s+/g, '-')}/products`"
+          target="_blank"
+          class="h-9 px-4 text-[13px] font-medium text-[color:var(--color-ink-muted)] border border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)] transition-all flex items-center gap-1.5"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+          View storefront
+        </a>
+      </template>
       <!-- Error banner -->
       <div v-if="Object.keys(editForm.errors).length > 0" class="mb-6 px-4 py-3 bg-[color:var(--color-danger-bg)] border border-[#FECACA] text-[#991B1B] text-sm">
         <span v-for="(error, field) in editForm.errors" :key="field">{{ Array.isArray(error) ? error[0] : error }} </span>

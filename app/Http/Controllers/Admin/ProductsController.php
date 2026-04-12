@@ -129,42 +129,49 @@ class ProductsController extends Controller
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'brand_id' => 'required|exists:brands,id',
             'product_category_id' => 'required|exists:product_categories,id',
             'price' => 'required|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0',
             'size_mg' => 'nullable|string|max:255',
             'original_price' => 'nullable|numeric|min:0',
             'purity' => 'nullable|numeric|min:0|max:100',
+            'availability' => 'nullable|string|in:in_stock,out_of_stock,pre_order',
             'featured' => 'sometimes|boolean',
             'hidden' => 'sometimes|boolean',
             'lab_tested' => 'sometimes|boolean',
             'first_timer_deals' => 'sometimes|boolean',
             'auto_update' => 'sometimes|boolean',
+            'verified' => 'sometimes|boolean',
+            'image_url' => 'nullable|string|max:2048',
+            'product_url' => 'nullable|string|max:2048',
             'seo_page_title' => 'nullable|string|max:255',
             'seo_description' => 'nullable|string|max:500',
             'seo_og_title' => 'nullable|string|max:255',
             'seo_og_description' => 'nullable|string|max:500',
             'seo_og_image' => 'nullable|url|max:500',
         ]);
-        
-        // Handle pricing logic:
-        // If original_price is provided and greater than price, product is on sale
-        // Store: price = original price, discount_price = sale price (the lower price)
+
+        // Convert size_mg from text (e.g. "10mL", "5mg") to numeric
+        if (isset($validated['size_mg'])) {
+            $numericSize = preg_replace('/[^0-9.]/', '', $validated['size_mg']);
+            $validated['size_mg'] = $numericSize !== '' ? (float) $numericSize : null;
+        }
+
+        // Handle pricing logic
         if (isset($validated['original_price']) && $validated['original_price'] > $validated['price']) {
-            // Product is on sale
             $originalPrice = $validated['original_price'];
             $salePrice = $validated['price'];
             $validated['price'] = $originalPrice;
             $validated['discount_price'] = $salePrice;
-        } else {
-            // Not on sale, clear discount_price
+        } elseif (!isset($validated['discount_price'])) {
             $validated['discount_price'] = null;
         }
-        
-        // Remove original_price from validated as it's not a direct column
+
         unset($validated['original_price']);
         
         $product->update($validated);
