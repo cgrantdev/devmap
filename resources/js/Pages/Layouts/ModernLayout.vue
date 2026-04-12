@@ -7,9 +7,9 @@
         scrolled || mobileOpen ? 'bg-white/80 backdrop-blur-xl shadow-[0_1px_2px_rgba(0,0,0,0.03)]' : 'bg-transparent',
       ]"
     >
-      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 h-14 lg:h-16 flex items-center gap-8">
+      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 h-14 lg:h-16 flex items-center gap-4 lg:gap-8">
         <!-- Logo -->
-        <a href="/" class="ui-focus flex items-center">
+        <a href="/" class="ui-focus flex items-center flex-shrink-0">
           <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-8 lg:h-9 brightness-0 translate-y-[1px]" />
         </a>
 
