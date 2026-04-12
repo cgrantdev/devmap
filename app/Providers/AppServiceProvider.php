@@ -34,4 +34,5 @@ class AppServiceProvider extends ServiceProvider
                 apiKey: $config['api_key'] ?? config('services.sendlayer.api_key', ''),
             );
         });
+    }
 }
