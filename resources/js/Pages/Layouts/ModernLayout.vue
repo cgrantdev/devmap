@@ -1,9 +1,22 @@
 <template>
   <div class="min-h-screen bg-[color:var(--color-bg)] text-[color:var(--color-ink)] antialiased">
+    <!-- Notice bar -->
+    <div v-if="showNotice" class="fixed top-0 left-0 right-0 z-[60] bg-[#0A0B0E] text-white">
+      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 h-9 flex items-center justify-center gap-2 text-[12px] sm:text-[13px]">
+        <span class="text-white/50">🚀</span>
+        <span class="text-white/70">Now in beta — vendors list <strong class="text-white font-semibold">free</strong> during launch.</span>
+        <a href="/become-a-vendor" class="font-semibold text-[color:var(--color-accent-400)] hover:text-white transition-colors">Get Listed →</a>
+        <button @click="showNotice = false" class="absolute right-3 lg:right-6 text-white/30 hover:text-white/60 transition-colors p-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
     <!-- Sticky glass nav -->
     <header
       :class="[
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-[200ms] ease-out',
+        'fixed left-0 right-0 z-50 transition-all duration-[200ms] ease-out',
+        showNotice ? 'top-9' : 'top-0',
         scrolled || mobileOpen ? 'bg-white/80 backdrop-blur-xl shadow-[0_1px_2px_rgba(0,0,0,0.03)]' : 'bg-transparent',
       ]"
     >
@@ -124,7 +137,7 @@
     </Transition>
 
     <!-- Page content -->
-    <main class="pt-14 lg:pt-16">
+    <main :class="showNotice ? 'pt-[86px] lg:pt-[100px]' : 'pt-14 lg:pt-16'">
       <slot />
     </main>
 
@@ -227,6 +240,7 @@ import CountrySelector from '@/components/ui/CountrySelector.vue'
 const scrolled = ref(false)
 const mobileOpen = ref(false)
 const showMobileSearch = ref(false)
+const showNotice = ref(true)
 const currentYear = new Date().getFullYear()
 
 // Newsletter
