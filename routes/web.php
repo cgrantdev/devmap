@@ -152,6 +152,11 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/vendors/{id}/toggle-status', [VendorsController::class, 'toggleStatus'])->name('admin.vendors.toggle-status');
     Route::post('/vendors/{id}/approve', [VendorsController::class, 'approve'])->name('admin.vendors.approve');
     Route::post('/vendors/{id}/reject', [VendorsController::class, 'reject'])->name('admin.vendors.reject');
+    // Vendor Discovery
+    Route::get('/discover', [\App\Http\Controllers\Admin\VendorDiscoveryController::class, 'index'])->name('admin.discover');
+    Route::post('/discover/scan', [\App\Http\Controllers\Admin\VendorDiscoveryController::class, 'scan'])->name('admin.discover.scan');
+    Route::post('/discover/import', [\App\Http\Controllers\Admin\VendorDiscoveryController::class, 'import'])->name('admin.discover.import');
+
     // Admin impersonation — log in as a vendor user to view their dashboard
     Route::get('/impersonate/{userId}', function ($userId) {
         $admin = auth()->user();

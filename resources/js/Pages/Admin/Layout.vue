@@ -30,6 +30,7 @@
         <!-- Ingestion -->
         <div>
           <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Ingestion</div>
+          <NavItem href="/admin/discover" icon="search" label="Vendor Discovery" />
           <NavItem href="/admin/product-scraping" icon="refresh" label="Scraping" />
           <NavItem href="/admin/staged-products" icon="clipboard" label="Staged Products" />
         </div>
