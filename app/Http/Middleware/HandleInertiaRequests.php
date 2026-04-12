@@ -50,6 +50,7 @@ class HandleInertiaRequests extends Middleware
                 'info' => fn () => $request->session()->get('info'),
             ],
             'csrf_token' => csrf_token(),
+            'impersonating' => fn () => $request->session()->has('impersonating_from'),
             'site_name' => fn () => Setting::where('key', 'site_name')->value('value') ?? 'PeptideSync',
             'site_description' => fn () => Setting::where('key', 'site_description')->value('value') ?? 'Compare peptide brands, prices, and reviews',
             'contact_email' => fn () => Setting::where('key', 'contact_email')->value('value') ?? 'contact@peptidemaps.com',

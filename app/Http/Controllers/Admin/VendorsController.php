@@ -23,7 +23,7 @@ class VendorsController extends Controller
     public function index()
     {
         // Get all vendors (including pending for admin review)
-        $vendors = Brand::with(['vendorSetting.location'])
+        $vendors = Brand::with(['vendorSetting.location'])->withCount('products')
             ->whereHas('vendorSetting', function ($query) {
                 // Only show approved vendors in main list, or all if we want to show pending separately
                 // For now, show all but we'll filter in the frontend
@@ -37,6 +37,8 @@ class VendorsController extends Controller
                     'brand_id' => $brand->id,
                     'name' => $brand->name,
                     'slug' => $brand->slug,
+                    'user_id' => $brand->user_id,
+                    'products_count' => $brand->products_count,
                     'email' => $brand->vendorSetting?->contact_email ?? null,
                     'location' => $brand->vendorSetting && $brand->vendorSetting->location ? $brand->vendorSetting->location->name : null,
                     'created_at' => $brand->created_at->format('n/j/Y'), // Format: 12/3/2025

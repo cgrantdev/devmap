@@ -1,5 +1,11 @@
 <template>
   <div class="min-h-screen flex flex-col">
+    <!-- Impersonation banner -->
+    <div v-if="$page.props.impersonating" class="bg-amber-500 text-amber-950 text-center py-2 px-4 text-[13px] font-semibold flex items-center justify-center gap-3 z-50">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Viewing as vendor — {{ $page.props.auth?.user?.name || 'vendor' }}
+      <a href="/admin/stop-impersonating" class="underline hover:no-underline ml-2">Return to admin</a>
+    </div>
     <main>
       <div class="min-h-screen bg-gray-100 flex">
     <!-- Sidebar -->

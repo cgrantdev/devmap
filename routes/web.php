@@ -152,6 +152,26 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/vendors/{id}/toggle-status', [VendorsController::class, 'toggleStatus'])->name('admin.vendors.toggle-status');
     Route::post('/vendors/{id}/approve', [VendorsController::class, 'approve'])->name('admin.vendors.approve');
     Route::post('/vendors/{id}/reject', [VendorsController::class, 'reject'])->name('admin.vendors.reject');
+    // Admin impersonation — log in as a vendor user to view their dashboard
+    Route::get('/impersonate/{userId}', function ($userId) {
+        $admin = auth()->user();
+        if (!$admin || $admin->role !== 'admin') abort(403);
+        $target = \App\Models\User::findOrFail($userId);
+        session(['impersonating_from' => $admin->id]);
+        auth()->login($target);
+        return redirect('/vendor/dashboard');
+    })->name('admin.impersonate');
+
+    // Stop impersonation — return to admin
+    Route::get('/stop-impersonating', function () {
+        $adminId = session('impersonating_from');
+        if ($adminId) {
+            auth()->login(\App\Models\User::findOrFail($adminId));
+            session()->forget('impersonating_from');
+        }
+        return redirect('/admin/vendors');
+    })->name('admin.stop-impersonate');
+
     Route::get('/vendors/{id}/products', [VendorsController::class, 'products'])->name('admin.vendors.products');
     Route::post('/vendors/{id}/products/import', [VendorsController::class, 'importProductsFromFile'])->name('admin.vendors.products.import');
     Route::post('/vendors/{id}/products/import-url', [VendorsController::class, 'importProductsFromUrl'])->name('admin.vendors.products.import-url');

@@ -40,7 +40,7 @@
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Products</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Rating</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Status</th>
-            <th class="px-5 py-3 w-20"></th>
+            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Dashboard</th>
           </tr>
         </thead>
         <tbody>
@@ -93,8 +93,17 @@
                 label="Inactive"
               />
             </td>
-            <td class="px-5 py-3.5">
-              <svg class="w-4 h-4 text-[color:var(--color-ink-subtle)] group-hover:text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            <td class="px-5 py-3.5" @click.stop>
+              <a
+                v-if="vendor.user_id"
+                :href="`/admin/impersonate/${vendor.user_id}`"
+                class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium text-[color:var(--color-accent-600)] bg-[color:var(--color-accent-50)] hover:bg-[color:var(--color-accent-100)] transition-colors"
+                title="View vendor dashboard as this vendor"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+                Dashboard
+              </a>
+              <span v-else class="text-[11px] text-[color:var(--color-ink-subtle)]">No user</span>
             </td>
           </tr>
         </tbody>
