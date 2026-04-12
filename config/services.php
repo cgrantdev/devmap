@@ -18,6 +18,10 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
+    'sendlayer' => [
+        'api_key' => env('SENDLAYER_API_KEY'),
+    ],
+
     'resend' => [
         'key' => env('RESEND_KEY'),
     ],

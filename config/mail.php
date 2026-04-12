@@ -53,6 +53,11 @@ return [
             'transport' => 'ses',
         ],
 
+        'sendlayer' => [
+            'transport' => 'sendlayer',
+            'api_key' => env('SENDLAYER_API_KEY'),
+        ],
+
         'postmark' => [
             'transport' => 'postmark',
             // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
