@@ -1,37 +1,22 @@
 <template>
-  <!-- Trigger button (used by nav) — combined search + country flag -->
-  <div v-if="asTrigger" class="flex items-center">
-    <button
-      type="button"
-      @click="open = true"
-      :class="[
-        'ui-focus flex items-center gap-2 h-9 pl-3 pr-2 text-[13px] transition-colors',
-        dark
-          ? 'bg-white/10 border border-white/15 text-white/50 hover:bg-white/15 hover:text-white/70 rounded-[10px]'
-          : 'bg-white border border-[color:var(--color-hairline)] border-r-0 text-[color:var(--color-ink-subtle)] hover:border-[color:var(--color-accent-400)] rounded-l-[10px]',
-      ]"
-    >
-      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="8" />
-        <path d="M21 21l-4.35-4.35" stroke-linecap="round" />
-      </svg>
-      <span class="flex-1 text-left truncate">search vendors, compounds…</span>
-    </button>
-    <button
-      v-if="!dark"
-      type="button"
-      @click="$emit('toggle-country')"
-      class="ui-focus flex items-center gap-1.5 h-9 pl-2.5 pr-2.5 bg-white border border-[color:var(--color-hairline)] border-l-[color:var(--color-hairline-soft)] rounded-r-[10px] text-[13px] font-semibold text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] transition-colors"
-    >
-      <img
-        :src="`https://flagcdn.com/w40/${(countryCode || 'us').toLowerCase()}.png`"
-        :alt="countryCode"
-        class="w-5 h-[15px] rounded-[2px] object-cover shadow-[0_0_0_1px_rgba(0,0,0,0.04)]"
-      />
-      <span class="hidden lg:inline text-[color:var(--color-ink-muted)]">{{ countryCode || 'US' }}</span>
-      <svg class="w-2.5 h-2.5 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-    </button>
-  </div>
+  <!-- Trigger button (used by nav) -->
+  <button
+    v-if="asTrigger"
+    type="button"
+    @click="open = true"
+    :class="[
+      'ui-focus flex items-center gap-2 h-9 px-3 rounded-[10px] text-[13px] transition-colors',
+      dark
+        ? 'bg-white/10 border border-white/15 text-white/50 hover:bg-white/15 hover:text-white/70'
+        : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-subtle)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink-muted)]',
+    ]"
+  >
+    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8" />
+      <path d="M21 21l-4.35-4.35" stroke-linecap="round" />
+    </svg>
+    <span class="flex-1 text-left truncate">search vendors, compounds…</span>
+  </button>
 
   <!-- Modal overlay -->
   <Teleport to="body">
