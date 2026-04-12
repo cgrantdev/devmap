@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\VendorWelcomeEmail;
+use App\Mail\NewVendorNotification;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class BecomeVendorController extends Controller
@@ -150,6 +153,33 @@ class BecomeVendorController extends Controller
 
             // Send email verification notification
             $user->sendEmailVerificationNotification();
+
+            // Send welcome email with credentials to vendor
+            try {
+                Mail::to($validated['email'])->send(new VendorWelcomeEmail(
+                    companyName: $validated['companyName'],
+                    email: $validated['email'],
+                    password: $validated['password'],
+                    loginUrl: url('/login'),
+                ));
+            } catch (\Throwable $e) {
+                \Log::warning('Failed to send vendor welcome email', ['email' => $validated['email'], 'error' => $e->getMessage()]);
+            }
+
+            // Notify admin of new vendor signup
+            try {
+                $locationName = isset($validated['country']) ? Location::find($validated['country'])?->name : null;
+                Mail::to('info@peptidemap.com')->send(new NewVendorNotification(
+                    brand: $brand,
+                    contactEmail: $validated['email'],
+                    website: $validated['website'] ?? '',
+                    phone: $validated['phoneNumber'] ?? null,
+                    country: $locationName,
+                    description: $validated['companyDescription'] ?? null,
+                ));
+            } catch (\Throwable $e) {
+                \Log::warning('Failed to send admin vendor notification', ['brand' => $brand->id, 'error' => $e->getMessage()]);
+            }
 
             return back()->with('success', 'Registration completed successfully. Your account is currently under review and should be activated shortly.');
         } catch (\Exception $e) {

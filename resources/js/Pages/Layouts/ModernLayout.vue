@@ -38,20 +38,21 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           </button>
 
-          <!-- Sign in -->
+          <!-- Sign in (subtle) -->
           <a
             href="/login"
-            class="ui-focus hidden md:inline-flex px-3 py-1.5 rounded-[8px] text-[13px] font-medium transition-colors duration-200 text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04]"
+            class="ui-focus hidden md:inline-flex px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-200 text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)]"
           >
             Sign in
           </a>
 
-          <!-- For vendors -->
+          <!-- Get Listed (primary CTA) -->
           <a
             href="/become-a-vendor"
-            class="ui-focus hidden lg:inline-flex items-center h-9 px-4 rounded-[9px] text-[13px] font-semibold transition-all duration-200 bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink)] shadow-[0_1px_2px_rgba(10,11,14,0.04)] hover:border-[color:var(--color-ink-subtle)]"
+            class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[0_1px_2px_rgba(10,11,14,0.08),0_4px_12px_-4px_rgba(79,70,229,0.3)] hover:-translate-y-[0.5px] hover:shadow-[0_1px_2px_rgba(10,11,14,0.1),0_6px_16px_-4px_rgba(79,70,229,0.4)] transition-all"
           >
-            For vendors
+            Get Listed
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </a>
 
           <!-- Hamburger (below lg) -->
@@ -93,31 +94,30 @@
 
           <div class="border-t border-[color:var(--color-hairline)] mx-4" />
 
-          <!-- Secondary links -->
-          <div class="px-2 py-3">
-            <a
-              href="/login"
-              class="flex items-center gap-3 px-4 py-3 rounded-[8px] text-[15px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
-              @click="mobileOpen = false"
-            >
-              <svg class="w-4.5 h-4.5 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              Sign in
-            </a>
+          <!-- Get Listed CTA -->
+          <div class="px-4 py-3">
             <a
               href="/become-a-vendor"
-              class="flex items-center gap-3 px-4 py-3 rounded-[8px] text-[15px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
+              class="flex items-center justify-center gap-2 h-11 text-[15px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm transition-all"
               @click="mobileOpen = false"
             >
-              <svg class="w-4.5 h-4.5 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              For vendors
+              Get Listed
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
             </a>
           </div>
 
           <div class="border-t border-[color:var(--color-hairline)] mx-4" />
 
-          <!-- Country selector -->
-          <div class="px-6 py-4">
-            <CountrySelector />
+          <!-- Sign in -->
+          <div class="px-2 py-2">
+            <a
+              href="/login"
+              class="flex items-center gap-3 px-4 py-2.5 rounded-[8px] text-[14px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
+              @click="mobileOpen = false"
+            >
+              <svg class="w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Sign in
+            </a>
           </div>
         </div>
       </div>
