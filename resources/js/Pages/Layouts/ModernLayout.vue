@@ -26,21 +26,30 @@
         </nav>
 
         <!-- Right side -->
-        <div class="ml-auto flex items-center gap-2 lg:gap-3">
-          <!-- Search (desktop) -->
-          <div class="hidden md:block">
-            <SearchPalette />
-          </div>
-          <!-- Country (desktop) -->
-          <CountrySelector class="hidden lg:block" />
-          <!-- Sign in (desktop) -->
+        <div class="ml-auto flex items-center gap-1.5 sm:gap-2 lg:gap-3">
+          <!-- Search — always visible, compact on small screens -->
+          <SearchPalette class="hidden sm:block" />
+
+          <!-- Search icon only on xs -->
+          <button
+            @click="showMobileSearch = !showMobileSearch"
+            class="sm:hidden p-2 rounded-[8px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </button>
+
+          <!-- Country — compact flag only -->
+          <CountrySelector class="hidden md:block" />
+
+          <!-- Sign in -->
           <a
             href="/login"
-            class="ui-focus hidden lg:inline-flex px-3 py-1.5 rounded-[8px] text-[13px] font-medium transition-colors duration-200 text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04]"
+            class="ui-focus hidden md:inline-flex px-3 py-1.5 rounded-[8px] text-[13px] font-medium transition-colors duration-200 text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04]"
           >
             Sign in
           </a>
-          <!-- For vendors (desktop) -->
+
+          <!-- For vendors -->
           <a
             href="/become-a-vendor"
             class="ui-focus hidden lg:inline-flex items-center h-9 px-4 rounded-[9px] text-[13px] font-semibold transition-all duration-200 bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink)] shadow-[0_1px_2px_rgba(10,11,14,0.04)] hover:border-[color:var(--color-ink-subtle)]"
@@ -48,15 +57,7 @@
             For vendors
           </a>
 
-          <!-- Mobile search button -->
-          <button
-            @click="showMobileSearch = !showMobileSearch"
-            class="lg:hidden p-2 -mr-1 rounded-[8px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors md:hidden"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          </button>
-
-          <!-- Hamburger -->
+          <!-- Hamburger (below lg) -->
           <button
             @click="mobileOpen = !mobileOpen"
             class="lg:hidden p-2 -mr-1 rounded-[8px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"

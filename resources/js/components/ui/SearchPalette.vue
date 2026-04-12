@@ -5,7 +5,7 @@
     type="button"
     @click="open = true"
     :class="[
-      'ui-focus flex items-center gap-2 h-10 px-3.5 rounded-[10px] text-[13px] transition-colors min-w-[220px]',
+      'ui-focus flex items-center gap-2 h-9 px-3 rounded-[10px] text-[13px] transition-colors',
       dark
         ? 'bg-white/10 border border-white/15 text-white/50 hover:bg-white/15 hover:text-white/70'
         : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-subtle)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink-muted)]',
@@ -15,7 +15,7 @@
       <circle cx="11" cy="11" r="8" />
       <path d="M21 21l-4.35-4.35" stroke-linecap="round" />
     </svg>
-    <span class="flex-1 text-left">search vendors, compounds…</span>
+    <span class="flex-1 text-left truncate">search vendors, compounds…</span>
   </button>
 
   <!-- Modal overlay -->
