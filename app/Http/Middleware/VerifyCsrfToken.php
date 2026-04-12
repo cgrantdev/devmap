@@ -12,7 +12,10 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
+        'admin/discover',
         'admin/discover/*',
+        'admin/discover/scan',
+        'admin/discover/import',
         'api/subscribe',
     ];
 } 

@@ -176,7 +176,7 @@ function toggleAll(e) {
 
 function startScan() {
   scanLoading.value = true
-  router.post('/admin/discover/scan', {}, {
+  router.post('/admin/discover/scan', { _token: usePage().props.csrf_token }, {
     preserveScroll: true,
     onFinish: () => { scanLoading.value = false },
   })
