@@ -193,11 +193,20 @@
         </div>
       </div>
 
+      <!-- RUO notice -->
+      <div class="border-t border-white/[0.06]">
+        <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-4">
+          <p class="text-[11px] text-white/25 leading-relaxed">
+            <strong class="text-white/35">Research Use Only (RUO).</strong> All products listed on PeptideMap are intended for laboratory and research purposes only. They are not intended for human consumption, therapeutic use, or self-administration. PeptideMap is a directory and comparison service — we do not sell, distribute, or endorse peptides for any non-research purpose. Always comply with applicable laws and regulations.
+          </p>
+        </div>
+      </div>
+
       <!-- Bottom bar -->
       <div class="border-t border-white/[0.06]">
         <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p class="text-[12px] text-white/20 ui-mono">
-            © {{ currentYear }} PeptideMaps. For research use only.
+            © {{ currentYear }} PeptideMaps
           </p>
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-3">
@@ -267,6 +276,7 @@ const navLinks = [
   { href: '/products', label: 'Peptides' },
   { href: '/compare', label: 'Compare' },
   { href: '/encyclopedia', label: 'Encyclopedia' },
+  { href: '/calculator', label: 'Calculator' },
   { href: '/news', label: 'Research' },
 ]
 

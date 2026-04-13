@@ -8,17 +8,28 @@
     <!-- Hero -->
     <section class="border-b border-[color:var(--color-hairline)] bg-gradient-to-b from-[color:var(--color-bg)] to-white">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-10">
-        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Free tool</div>
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Research tool</div>
         <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">
-          Peptide Calculator
+          Peptide Reconstitution Calculator
         </h1>
         <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
-          Reconstitution volume, injection dosage, syringe units, and doses per vial &mdash; all in one place. The most accurate peptide calculator available.
+          Calculate reconstitution concentrations, aliquot volumes, and yields per vial for research peptide preparation.
         </p>
       </div>
     </section>
 
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+    <!-- RUO Banner -->
+    <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6">
+      <div class="flex items-start gap-3 p-4 rounded-[12px] bg-amber-50 border border-amber-200">
+        <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <div>
+          <p class="text-[12px] font-semibold text-amber-900">Research Use Only (RUO)</p>
+          <p class="text-[11px] text-amber-800 leading-relaxed mt-0.5">This calculator is provided as a reference tool for laboratory research peptide reconstitution. All products and calculations are intended for <strong>in-vitro research and laboratory use only</strong>. Not for human consumption, diagnostic, or therapeutic use. Not medical advice.</p>
+        </div>
+      </div>
+    </div>
+
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
       <div class="grid lg:grid-cols-[420px_1fr] gap-8 items-start">
 
         <!-- LEFT: Inputs -->
@@ -57,12 +68,12 @@
           <!-- Water volume -->
           <CalcField label="Bacteriostatic water added" unit="mL" v-model="waterMl" :step="0.5" :min="0.1" />
 
-          <!-- Desired dose (reconstitution mode doesn't need this) -->
-          <CalcField v-if="mode !== 'reconstitution'" label="Desired dose per injection" unit="mcg" v-model="doseMcg" :step="10" :min="1" />
+          <!-- Desired aliquot (reconstitution mode doesn't need this) -->
+          <CalcField v-if="mode !== 'reconstitution'" label="Desired aliquot amount" unit="mcg" v-model="doseMcg" :step="10" :min="1" />
 
           <!-- Syringe size -->
           <div class="mb-5">
-            <label class="block text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-2">Syringe size</label>
+            <label class="block text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-2">Syringe capacity</label>
             <div class="flex gap-2">
               <button
                 v-for="s in syringes"
@@ -78,9 +89,9 @@
             </div>
           </div>
 
-          <!-- Injection frequency (for schedule mode) -->
+          <!-- Administration frequency (for schedule mode) -->
           <div v-if="mode === 'schedule'" class="mb-5">
-            <label class="block text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-2">Injection frequency</label>
+            <label class="block text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-2">Administration frequency</label>
             <select
               v-model="frequency"
               class="w-full h-10 px-3 text-[13px] border border-[color:var(--color-hairline)] rounded-[8px] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
@@ -97,7 +108,7 @@
           <!-- Disclaimer -->
           <div class="mt-6 pt-5 border-t border-[color:var(--color-hairline)]">
             <p class="text-[11px] text-[color:var(--color-ink-subtle)] leading-relaxed">
-              For research and educational purposes only. Not medical advice. Always consult a qualified healthcare professional.
+              <strong>RUO.</strong> For in-vitro research and laboratory use only. Not for human consumption or therapeutic use. Not medical advice.
             </p>
           </div>
         </div>
@@ -111,16 +122,12 @@
               label="Concentration"
               :value="concentration.toLocaleString('en-US', { maximumFractionDigits: 1 })"
               unit="mcg/mL"
-              icon="concentration"
-              color="accent"
             />
             <ResultCard
               v-if="mode !== 'reconstitution'"
-              label="Volume to inject"
+              label="Volume per aliquot"
               :value="volumeMl"
               unit="mL"
-              icon="syringe"
-              color="verified"
               highlight
             />
             <ResultCard
@@ -128,32 +135,25 @@
               label="Syringe units"
               :value="String(syringeMarks)"
               :unit="`of ${syringeUnits} units`"
-              icon="units"
-              color="caution"
             />
             <ResultCard
-              label="Doses per vial"
+              label="Aliquots per vial"
               :value="mode !== 'reconstitution' ? String(dosesPerVial) : '—'"
-              unit="injections"
-              icon="vial"
-              color="ink"
+              unit="total"
             />
           </div>
 
-          <!-- Syringe visual -->
+          <!-- Volume visual -->
           <div v-if="mode !== 'reconstitution'" class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
-            <h3 class="text-[13px] font-semibold text-[color:var(--color-ink)] mb-4">Syringe visualization</h3>
+            <h3 class="text-[13px] font-semibold text-[color:var(--color-ink)] mb-4">Volume visualization</h3>
             <div class="flex items-center gap-6">
-              <!-- Syringe barrel -->
               <div class="relative w-full max-w-[360px] h-14 rounded-full border-2 border-[color:var(--color-ink)]/20 bg-[color:var(--color-bg)] overflow-hidden">
                 <div
                   class="absolute left-0 top-0 bottom-0 rounded-full transition-all duration-500 ease-out"
                   :class="fillPercent > 80 ? 'bg-[color:var(--color-danger)]/30' : 'bg-[color:var(--color-accent-500)]/25'"
                   :style="{ width: Math.min(fillPercent, 100) + '%' }"
                 ></div>
-                <!-- Tick marks -->
                 <div v-for="tick in 10" :key="tick" class="absolute top-0 h-3 border-l border-[color:var(--color-ink)]/10" :style="{ left: (tick * 10) + '%' }"></div>
-                <!-- Needle indicator -->
                 <div
                   class="absolute top-1/2 -translate-y-1/2 w-0.5 h-10 bg-[color:var(--color-accent-600)] shadow-[0_0_6px_rgba(79,70,229,0.5)] transition-all duration-500 ease-out"
                   :style="{ left: Math.min(fillPercent, 100) + '%' }"
@@ -166,17 +166,17 @@
             </div>
             <div v-if="fillPercent > 100" class="mt-3 flex items-center gap-2 text-[12px] text-[color:var(--color-danger)] font-semibold">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-              Volume exceeds syringe capacity. Use a larger syringe or add more water to reduce concentration.
+              Volume exceeds syringe capacity. Use a larger syringe or increase reconstitution volume.
             </div>
           </div>
 
           <!-- Schedule mode: vial duration -->
           <div v-if="mode === 'schedule'" class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
-            <h3 class="text-[13px] font-semibold text-[color:var(--color-ink)] mb-4">Vial schedule</h3>
+            <h3 class="text-[13px] font-semibold text-[color:var(--color-ink)] mb-4">Vial yield schedule</h3>
             <div class="grid sm:grid-cols-3 gap-4">
               <div class="text-center p-4 rounded-[12px] bg-[color:var(--color-bg)]">
                 <div class="ui-mono text-2xl font-bold text-[color:var(--color-ink)]">{{ dosesPerVial }}</div>
-                <div class="text-[11px] text-[color:var(--color-ink-subtle)] mt-1">doses per vial</div>
+                <div class="text-[11px] text-[color:var(--color-ink-subtle)] mt-1">aliquots per vial</div>
               </div>
               <div class="text-center p-4 rounded-[12px] bg-[color:var(--color-bg)]">
                 <div class="ui-mono text-2xl font-bold text-[color:var(--color-accent-600)]">{{ vialDurationDays }}</div>
@@ -192,33 +192,35 @@
           <!-- Reconstitution mode: water volume guide -->
           <div v-if="mode === 'reconstitution'" class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
             <h3 class="text-[13px] font-semibold text-[color:var(--color-ink)] mb-4">Concentration by water volume</h3>
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b border-[color:var(--color-hairline)]">
-                  <th class="text-left py-2 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Water added</th>
-                  <th class="text-right py-2 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Concentration</th>
-                  <th class="text-right py-2 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">100mcg dose</th>
-                  <th class="text-right py-2 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">250mcg dose</th>
-                  <th class="text-right py-2 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">500mcg dose</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="row in reconTable"
-                  :key="row.water"
-                  :class="[
-                    'border-b border-[color:var(--color-hairline-soft)]',
-                    row.water === waterMl ? 'bg-[color:var(--color-accent-50)] font-semibold' : '',
-                  ]"
-                >
-                  <td class="py-2.5 ui-mono">{{ row.water }}mL</td>
-                  <td class="py-2.5 text-right ui-mono">{{ row.conc.toLocaleString() }} mcg/mL</td>
-                  <td class="py-2.5 text-right ui-mono">{{ row.d100 }} units</td>
-                  <td class="py-2.5 text-right ui-mono">{{ row.d250 }} units</td>
-                  <td class="py-2.5 text-right ui-mono">{{ row.d500 }} units</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-[color:var(--color-hairline)]">
+                    <th class="text-left py-2 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Water</th>
+                    <th class="text-right py-2 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Concentration</th>
+                    <th class="text-right py-2 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">100mcg</th>
+                    <th class="text-right py-2 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">250mcg</th>
+                    <th class="text-right py-2 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">500mcg</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="row in reconTable"
+                    :key="row.water"
+                    :class="[
+                      'border-b border-[color:var(--color-hairline-soft)]',
+                      row.water === waterMl ? 'bg-[color:var(--color-accent-50)] font-semibold' : '',
+                    ]"
+                  >
+                    <td class="py-2.5 ui-mono">{{ row.water }}mL</td>
+                    <td class="py-2.5 text-right ui-mono">{{ row.conc.toLocaleString() }} mcg/mL</td>
+                    <td class="py-2.5 text-right ui-mono">{{ row.d100 }} units</td>
+                    <td class="py-2.5 text-right ui-mono">{{ row.d250 }} units</td>
+                    <td class="py-2.5 text-right ui-mono">{{ row.d500 }} units</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <!-- Calculation breakdown -->
@@ -231,15 +233,15 @@
               </div>
               <div v-if="mode !== 'reconstitution'" class="flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-bold flex items-center justify-center flex-shrink-0">2</span>
-                <span>{{ doseMcg }}mcg &divide; {{ concentration.toLocaleString() }} mcg/mL = <strong class="text-[color:var(--color-ink)]">{{ volumeMl }}mL</strong> per injection</span>
+                <span>{{ doseMcg }}mcg &divide; {{ concentration.toLocaleString() }} mcg/mL = <strong class="text-[color:var(--color-ink)]">{{ volumeMl }}mL</strong> per aliquot</span>
               </div>
               <div v-if="mode !== 'reconstitution'" class="flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-bold flex items-center justify-center flex-shrink-0">3</span>
-                <span>{{ volumeMl }}mL &times; 100 = <strong class="text-[color:var(--color-ink)]">{{ syringeMarks }} units</strong> on a {{ syringeUnits }}-unit insulin syringe</span>
+                <span>{{ volumeMl }}mL &times; 100 = <strong class="text-[color:var(--color-ink)]">{{ syringeMarks }} units</strong> on a {{ syringeUnits }}-unit syringe</span>
               </div>
               <div v-if="mode !== 'reconstitution'" class="flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-bold flex items-center justify-center flex-shrink-0">4</span>
-                <span>{{ waterMl }}mL total &divide; {{ volumeMl }}mL per dose = <strong class="text-[color:var(--color-ink)]">{{ dosesPerVial }} doses</strong> per vial</span>
+                <span>{{ waterMl }}mL total &divide; {{ volumeMl }}mL per aliquot = <strong class="text-[color:var(--color-ink)]">{{ dosesPerVial }} aliquots</strong> per vial</span>
               </div>
             </div>
           </div>
@@ -256,7 +258,7 @@
               </div>
             </div>
             <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
-              <h3 class="text-[13px] font-semibold text-[color:var(--color-ink)] mb-3">Common syringe sizes</h3>
+              <h3 class="text-[13px] font-semibold text-[color:var(--color-ink)] mb-3">Common syringe capacities</h3>
               <div class="space-y-2 text-[13px]">
                 <div class="flex items-center gap-2">
                   <span class="w-2 h-2 rounded-full bg-[color:var(--color-accent-500)]"></span>
@@ -276,14 +278,22 @@
 
           <!-- SEO content -->
           <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
-            <h2 class="ui-display text-xl font-semibold text-[color:var(--color-ink)] mb-3">How to reconstitute peptides</h2>
+            <h2 class="ui-display text-xl font-semibold text-[color:var(--color-ink)] mb-3">How to reconstitute research peptides</h2>
             <div class="space-y-3 text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
-              <p><strong class="text-[color:var(--color-ink)]">Step 1 &mdash; Gather supplies.</strong> You will need your lyophilized peptide vial, bacteriostatic water (BAC water), an alcohol swab, and an insulin syringe. A 1mL (100-unit) syringe is the most common choice.</p>
-              <p><strong class="text-[color:var(--color-ink)]">Step 2 &mdash; Calculate your concentration.</strong> Use the calculator above. Enter the peptide amount printed on your vial label (e.g. 5mg) and the volume of BAC water you plan to add. A common ratio is 2mL of water per 5mg vial, giving a concentration of 2,500 mcg/mL.</p>
-              <p><strong class="text-[color:var(--color-ink)]">Step 3 &mdash; Add water slowly.</strong> Swab both vial tops with alcohol. Draw the desired volume of BAC water into your syringe and inject it into the peptide vial. Aim the stream at the glass wall, not directly onto the powder. Let it dissolve gently &mdash; do not shake.</p>
-              <p><strong class="text-[color:var(--color-ink)]">Step 4 &mdash; Draw your dose.</strong> Once fully dissolved (solution should be clear), use the calculator to determine how many units to draw. For a 250mcg dose from a 2,500 mcg/mL solution, you would draw 10 units (0.10 mL).</p>
-              <p><strong class="text-[color:var(--color-ink)]">Step 5 &mdash; Store properly.</strong> Reconstituted peptides should be refrigerated at 2&ndash;8&deg;C and typically used within 28&ndash;30 days. Never freeze reconstituted peptides.</p>
+              <p><strong class="text-[color:var(--color-ink)]">Step 1 &mdash; Gather supplies.</strong> You will need the lyophilized peptide vial, bacteriostatic water (BAC water), alcohol swabs, and an appropriate syringe for measuring volume. A 1mL (100-unit) syringe is the most common choice for laboratory use.</p>
+              <p><strong class="text-[color:var(--color-ink)]">Step 2 &mdash; Calculate your concentration.</strong> Use the calculator above. Enter the peptide amount printed on the vial label (e.g. 5mg) and the volume of BAC water you plan to add. A common ratio is 2mL of water per 5mg vial, giving a concentration of 2,500 mcg/mL.</p>
+              <p><strong class="text-[color:var(--color-ink)]">Step 3 &mdash; Add water slowly.</strong> Swab both vial tops with alcohol. Draw the desired volume of BAC water and introduce it to the peptide vial. Direct the stream at the glass wall, not directly onto the lyophilized powder. Allow it to dissolve gently &mdash; do not shake or vortex aggressively.</p>
+              <p><strong class="text-[color:var(--color-ink)]">Step 4 &mdash; Measure your aliquot.</strong> Once fully dissolved (solution should be clear), use the calculator to determine the appropriate volume. For a 250mcg aliquot from a 2,500 mcg/mL solution, the volume is 10 units (0.10 mL).</p>
+              <p><strong class="text-[color:var(--color-ink)]">Step 5 &mdash; Store properly.</strong> Reconstituted peptides should be refrigerated at 2&ndash;8&deg;C and are typically stable for 28&ndash;30 days. Do not freeze reconstituted peptides.</p>
             </div>
+          </div>
+
+          <!-- Bottom RUO notice -->
+          <div class="flex items-start gap-3 p-4 rounded-[12px] bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)]">
+            <svg class="w-4 h-4 text-[color:var(--color-ink-subtle)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <p class="text-[11px] text-[color:var(--color-ink-subtle)] leading-relaxed">
+              <strong class="text-[color:var(--color-ink-muted)]">Research Use Only.</strong> All products listed on PeptideMap are intended for laboratory and research purposes only. They are not intended for human consumption, therapeutic use, or any form of self-administration. Always comply with local regulations. PeptideMap does not provide medical advice.
+            </p>
           </div>
 
         </div>
@@ -365,14 +375,14 @@ const dosesPerVial = computed(() => {
 })
 
 // Schedule
-const injectionsPerWeek = computed(() => {
+const administrationsPerWeek = computed(() => {
   const map = { daily: 7, eod: 3.5, '3x': 3, '2x': 2, weekly: 1, biweekly: 0.5 }
   return map[frequency.value] || 1
 })
 
 const vialDurationDays = computed(() => {
-  if (dosesPerVial.value <= 0 || injectionsPerWeek.value <= 0) return 0
-  return Math.floor(dosesPerVial.value / (injectionsPerWeek.value / 7))
+  if (dosesPerVial.value <= 0 || administrationsPerWeek.value <= 0) return 0
+  return Math.floor(dosesPerVial.value / (administrationsPerWeek.value / 7))
 })
 
 const vialsPerMonth = computed(() => {
@@ -419,7 +429,7 @@ const CalcField = {
 }
 
 const ResultCard = {
-  props: ['label', 'value', 'unit', 'icon', 'color', 'highlight'],
+  props: ['label', 'value', 'unit', 'highlight'],
   template: `
     <div :class="[
       'rounded-[14px] border p-5 transition-all',

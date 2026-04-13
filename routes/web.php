@@ -86,8 +86,8 @@ Route::get('/compare', [CompareController::class, 'index'])->name('compare');
 Route::get('/calculator', function () {
     return Inertia::render('Frontend/Calculator', [
         'seo' => [
-            'title' => 'Peptide Reconstitution & Dosage Calculator — PeptideMap',
-            'description' => 'Free peptide calculator for reconstitution, dosage, and injection volume. Calculate exactly how much bacteriostatic water to add and your precise injection dose.',
+            'title' => 'Peptide Reconstitution Calculator — PeptideMap',
+            'description' => 'Free research peptide reconstitution calculator. Calculate concentration, aliquot volume, and vial yield for laboratory peptide preparation. For research use only.',
         ],
     ]);
 })->name('calculator');
