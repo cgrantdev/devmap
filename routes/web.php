@@ -178,6 +178,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
         return redirect('/admin/vendors');
     })->name('admin.stop-impersonate');
 
+    Route::post('/vendors/{id}/scrape', [VendorsController::class, 'triggerScrape'])->name('admin.vendors.scrape');
     Route::get('/vendors/{id}/products', [VendorsController::class, 'products'])->name('admin.vendors.products');
     Route::post('/vendors/{id}/products/import', [VendorsController::class, 'importProductsFromFile'])->name('admin.vendors.products.import');
     Route::post('/vendors/{id}/products/import-url', [VendorsController::class, 'importProductsFromUrl'])->name('admin.vendors.products.import-url');

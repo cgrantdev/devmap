@@ -17,6 +17,7 @@ class VerifyCsrfToken extends Middleware
         'admin/discover/scan',
         'admin/discover/import',
         'admin/discover/activate',
+        'admin/vendors/*/scrape',
         'api/subscribe',
     ];
 } 

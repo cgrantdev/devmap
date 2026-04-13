@@ -276,10 +276,24 @@ class VendorsController extends Controller
 
         $locations = Location::orderBy('name')->get();
 
+        // Scraping status
+        $scrapingConfig = ScrapingConfig::where('vendor_id', $brand->id)->first();
+        $scrapingStatus = $scrapingConfig ? [
+            'id' => $scrapingConfig->id,
+            'type' => $scrapingConfig->type,
+            'enabled' => $scrapingConfig->enabled,
+            'last_run_at' => $scrapingConfig->last_run_at?->toIso8601String(),
+            'last_error' => $scrapingConfig->last_error,
+            'success_count' => $scrapingConfig->success_count,
+            'error_count' => $scrapingConfig->error_count,
+            'staged_count' => \App\Models\ScrapedProduct::where('scraping_config_id', $scrapingConfig->id)->count(),
+        ] : null;
+
         return Inertia::render('Admin/VendorEdit', [
             'vendor' => $vendorData,
             'products' => $products,
             'locations' => $locations,
+            'scrapingStatus' => $scrapingStatus,
         ]);
     }
 
@@ -1217,6 +1231,39 @@ class VendorsController extends Controller
     /**
      * Auto-create or update a ScrapingConfig when vendor integration settings change.
      */
+    public function triggerScrape($id)
+    {
+        $brand = Brand::with('vendorSetting')->findOrFail($id);
+        $config = ScrapingConfig::where('vendor_id', $brand->id)->first();
+
+        if (!$config) {
+            // Auto-create config
+            $vs = $brand->vendorSetting;
+            $config = ScrapingConfig::create([
+                'vendor_id' => $brand->id,
+                'vendor_name' => $brand->name,
+                'type' => $vs && $vs->api_platform === 'woocommerce' ? 'woo_api' : 'page_scrape',
+                'store_url' => $vs->shop_url ?? '',
+                'products_url' => $vs->shop_url ?? '',
+                'enabled' => true,
+                'frequency' => 'daily',
+                'auto_promote' => true,
+            ]);
+        }
+
+        if ($config->type === 'woo_api') {
+            $creds = $config->auth_credentials ?? [];
+            if (empty($creds['consumer_key']) || empty($creds['consumer_secret'])) {
+                return back()->with('error', 'WooCommerce API keys required. Add consumer key and secret in Integration tab.');
+            }
+            \App\Jobs\RunWooCommerceIngestJob::dispatch($config);
+        } else {
+            \App\Jobs\RunPageScraperJob::dispatch($config);
+        }
+
+        return back()->with('success', 'Scrape triggered! Check back in a minute for results.');
+    }
+
     protected function syncScrapingConfig(Brand $brand, VendorSetting $settings): void
     {
         $typeMap = [

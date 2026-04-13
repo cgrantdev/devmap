@@ -183,6 +183,51 @@
               <p class="text-[12px] text-[color:var(--color-ink-subtle)]">Products need a valid product URL set. Images are pulled directly from product pages.</p>
             </div>
           </FormSection>
+
+          <!-- Scraping Status -->
+          <FormSection v-if="vendor" title="Scraping Status">
+            <div v-if="scrapingStatus" class="space-y-4">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] p-3">
+                  <div class="text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-1">Status</div>
+                  <div class="text-[14px] font-semibold" :class="scrapingStatus.enabled ? 'text-[color:var(--color-verified)]' : 'text-[color:var(--color-ink-muted)]'">{{ scrapingStatus.enabled ? 'Enabled' : 'Disabled' }}</div>
+                </div>
+                <div class="bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] p-3">
+                  <div class="text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-1">Last Run</div>
+                  <div class="text-[13px] text-[color:var(--color-ink)] ui-mono">{{ scrapingStatus.last_run_at ? new Date(scrapingStatus.last_run_at).toLocaleDateString() : 'Never' }}</div>
+                </div>
+                <div class="bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] p-3">
+                  <div class="text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-1">Runs</div>
+                  <div class="text-[14px] font-semibold text-[color:var(--color-ink)]">
+                    <span class="text-[color:var(--color-verified)]">{{ scrapingStatus.success_count }}</span>
+                    <span v-if="scrapingStatus.error_count" class="text-[color:var(--color-danger)]"> / {{ scrapingStatus.error_count }} errors</span>
+                  </div>
+                </div>
+                <div class="bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] p-3">
+                  <div class="text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-1">Staged Products</div>
+                  <div class="text-[14px] font-semibold text-[color:var(--color-ink)]">{{ scrapingStatus.staged_count }}</div>
+                </div>
+              </div>
+
+              <div v-if="scrapingStatus.last_error" class="px-4 py-3 bg-[color:var(--color-danger-bg)] border border-red-200 text-[#991B1B] text-[13px]">
+                <span class="font-semibold">Last error:</span> {{ scrapingStatus.last_error }}
+              </div>
+
+              <button
+                @click="triggerScrape"
+                :disabled="scrapeLoading"
+                class="h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:-translate-y-[0.5px] transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                <svg v-if="!scrapeLoading" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+                <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
+                {{ scrapeLoading ? 'Running...' : 'Run Scrape Now' }}
+              </button>
+            </div>
+
+            <div v-else class="text-[13px] text-[color:var(--color-ink-subtle)]">
+              No scraping config yet. Save with a platform selected to create one, or click "Run Scrape Now" after saving.
+            </div>
+          </FormSection>
         </div>
 
         <!-- SEO TAB -->
@@ -248,11 +293,25 @@ const props = defineProps({
   locations: {
     type: Array,
     default: () => []
-  }
+  },
+  scrapingStatus: {
+    type: Object,
+    default: null,
+  },
 })
 
 const activeTab = ref('general')
 const justSaved = ref(false)
+const scrapeLoading = ref(false)
+
+function triggerScrape() {
+  if (!props.vendor) return
+  scrapeLoading.value = true
+  router.post(`/admin/vendors/${props.vendor.id}/scrape`, { _token: usePage().props.csrf_token }, {
+    preserveScroll: true,
+    onFinish: () => { scrapeLoading.value = false },
+  })
+}
 
 const bannerPreview = ref(null)
 const logoPreview = ref(null)
