@@ -22,13 +22,15 @@ class VendorsController extends Controller
 {
     public function index()
     {
-        // Get all vendors (including pending for admin review)
+        // Only show onboarded vendors (active or manually added) — not bulk-imported pending ones
         $vendors = Brand::with(['vendorSetting.location'])->withCount('products')
-            ->whereHas('vendorSetting', function ($query) {
-                // Only show approved vendors in main list, or all if we want to show pending separately
-                // For now, show all but we'll filter in the frontend
+            ->where(function ($q) {
+                $q->where('is_active', true)
+                  ->orWhereHas('vendorSetting', function ($sq) {
+                      $sq->where('approval_status', 'approved');
+                  })
+                  ->orHas('products'); // Show vendors that have products regardless
             })
-            ->orWhereDoesntHave('vendorSetting')
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($brand) {
