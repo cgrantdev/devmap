@@ -18,6 +18,8 @@ class VerifyCsrfToken extends Middleware
         'admin/discover/import',
         'admin/discover/activate',
         'admin/vendors/*/scrape',
+        'admin/vendors/*/discover-products',
+        'api/woo-auth-callback',
         'api/subscribe',
     ];
 } 

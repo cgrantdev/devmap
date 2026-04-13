@@ -186,6 +186,36 @@
 
           <!-- Scraping Status -->
           <FormSection v-if="vendor" title="Scraping Status">
+            <!-- Action buttons -->
+            <div class="flex flex-wrap gap-2 mb-4">
+              <button
+                @click="triggerScrape"
+                :disabled="scrapeLoading"
+                class="h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:-translate-y-[0.5px] transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                <svg v-if="!scrapeLoading" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+                <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
+                {{ scrapeLoading ? 'Running...' : 'Update Products' }}
+              </button>
+              <button
+                @click="discoverProducts"
+                :disabled="discoverLoading"
+                class="h-9 px-4 text-[13px] font-semibold text-[color:var(--color-ink)] border border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)] transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                <svg v-if="!discoverLoading" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
+                {{ discoverLoading ? 'Discovering...' : 'Discover Products' }}
+              </button>
+              <a
+                v-if="editForm.api_platform === 'woocommerce' || !editForm.api_platform"
+                :href="`/admin/vendors/${vendor?.id}/woo-connect`"
+                class="h-9 px-4 text-[13px] font-semibold text-white bg-[#7F54B3] hover:bg-[#6B42A0] transition-all flex items-center gap-2"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+                Connect WooCommerce
+              </a>
+            </div>
+
             <div v-if="scrapingStatus" class="space-y-4">
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] p-3">
@@ -213,15 +243,6 @@
                 <span class="font-semibold">Last error:</span> {{ scrapingStatus.last_error }}
               </div>
 
-              <button
-                @click="triggerScrape"
-                :disabled="scrapeLoading"
-                class="h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:-translate-y-[0.5px] transition-all disabled:opacity-50 flex items-center gap-2"
-              >
-                <svg v-if="!scrapeLoading" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
-                <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
-                {{ scrapeLoading ? 'Running...' : 'Run Scrape Now' }}
-              </button>
             </div>
 
             <div v-else class="text-[13px] text-[color:var(--color-ink-subtle)]">
@@ -303,6 +324,7 @@ const props = defineProps({
 const activeTab = ref('general')
 const justSaved = ref(false)
 const scrapeLoading = ref(false)
+const discoverLoading = ref(false)
 
 function triggerScrape() {
   if (!props.vendor) return
@@ -310,6 +332,15 @@ function triggerScrape() {
   router.post(`/admin/vendors/${props.vendor.id}/scrape`, { _token: usePage().props.csrf_token }, {
     preserveScroll: true,
     onFinish: () => { scrapeLoading.value = false },
+  })
+}
+
+function discoverProducts() {
+  if (!props.vendor) return
+  discoverLoading.value = true
+  router.post(`/admin/vendors/${props.vendor.id}/discover-products`, { _token: usePage().props.csrf_token }, {
+    preserveScroll: true,
+    onFinish: () => { discoverLoading.value = false },
   })
 }
 

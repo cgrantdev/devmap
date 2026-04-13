@@ -419,24 +419,40 @@
             </div>
 
             <form @submit.prevent="handleStep3Submit" class="space-y-6">
-              <!-- Estimated Monthly Sales Volume -->
+              <!-- Store Connection Method -->
               <div>
-                <label for="sales_volume" class="block text-sm text-slate-700 mb-2">
-                  Estimated Monthly Sales Volume
+                <label class="block text-sm font-medium text-slate-700 mb-3">
+                  How should we sync your products?
                 </label>
-                <div class="relative">
-                  <select
-                    id="sales_volume"
-                    v-model="formData.salesVolume"
-                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
-                  >
-                    <option value="">Select range...</option>
-                    <option value="0-10000">$0 - $10,000</option>
-                    <option value="10000-50000">$10,000 - $50,000</option>
-                    <option value="50000-100000">$50,000 - $100,000</option>
-                    <option value="100000-500000">$100,000 - $500,000</option>
-                    <option value="500000+">$500,000+</option>
-                  </select>                  
+                <div class="space-y-3">
+                  <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'woocommerce' ? 'border-indigo-400 bg-indigo-50' : ''">
+                    <input type="radio" v-model="formData.connectionMethod" value="woocommerce" class="mt-0.5 accent-indigo-600" />
+                    <div>
+                      <div class="text-sm font-medium text-slate-800">WooCommerce Auto-Connect</div>
+                      <div class="text-xs text-slate-500 mt-0.5">One-click connection. We'll read your product catalog automatically.</div>
+                    </div>
+                  </label>
+                  <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'api_key' ? 'border-indigo-400 bg-indigo-50' : ''">
+                    <input type="radio" v-model="formData.connectionMethod" value="api_key" class="mt-0.5 accent-indigo-600" />
+                    <div>
+                      <div class="text-sm font-medium text-slate-800">REST API Key</div>
+                      <div class="text-xs text-slate-500 mt-0.5">Provide your WooCommerce or Shopify API key. We'll sync products daily.</div>
+                    </div>
+                  </label>
+                  <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'auto_scrape' ? 'border-indigo-400 bg-indigo-50' : ''">
+                    <input type="radio" v-model="formData.connectionMethod" value="auto_scrape" class="mt-0.5 accent-indigo-600" />
+                    <div>
+                      <div class="text-sm font-medium text-slate-800">Auto-Scrape My Store</div>
+                      <div class="text-xs text-slate-500 mt-0.5">We'll automatically discover and import products from your website.</div>
+                    </div>
+                  </label>
+                  <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'manual' ? 'border-indigo-400 bg-indigo-50' : ''">
+                    <input type="radio" v-model="formData.connectionMethod" value="manual" class="mt-0.5 accent-indigo-600" />
+                    <div>
+                      <div class="text-sm font-medium text-slate-800">I'll Add Products Manually</div>
+                      <div class="text-xs text-slate-500 mt-0.5">Upload products through the vendor dashboard after approval.</div>
+                    </div>
+                  </label>
                 </div>
               </div>
 
@@ -916,7 +932,7 @@ const formData = ref({
   phone: '',
   password: '',
   confirmPassword: '',
-  salesVolume: '',
+  connectionMethod: 'woocommerce',
   productCount: '',
   companyDescription: '',
   paymentMethods: [],
@@ -1030,7 +1046,7 @@ const handleStep3Submit = () => {
     password_confirmation: formData.value.confirmPassword,
     
     // Step 3
-    salesVolume: formData.value.salesVolume || null,
+    connectionMethod: formData.value.connectionMethod || 'manual',
     productCount: formData.value.productCount || null,
     companyDescription: formData.value.companyDescription || null,
     paymentMethods: formData.value.paymentMethods || [],

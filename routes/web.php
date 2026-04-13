@@ -54,6 +54,10 @@ Route::get('/go/{product}', [\App\Http\Controllers\OutboundClickController::clas
     ->middleware('throttle:60,1')
     ->name('product.go');
 
+// WooCommerce auth callback (no CSRF — called by WooCommerce server)
+Route::post('/api/woo-auth-callback', [\App\Http\Controllers\Admin\WooCommerceAuthController::class, 'handleCallback'])
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
 // Newsletter subscribe (no CSRF — used by static coming soon page)
 Route::post('/api/subscribe', function (\Illuminate\Http\Request $request) {
     $validated = $request->validate(['email' => 'required|email|max:255']);
@@ -179,6 +183,8 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     })->name('admin.stop-impersonate');
 
     Route::post('/vendors/{id}/scrape', [VendorsController::class, 'triggerScrape'])->name('admin.vendors.scrape');
+    Route::post('/vendors/{id}/discover-products', [VendorsController::class, 'discoverProducts'])->name('admin.vendors.discover-products');
+    Route::get('/vendors/{id}/woo-connect', [\App\Http\Controllers\Admin\WooCommerceAuthController::class, 'generateAuthUrl'])->name('admin.vendors.woo-connect');
     Route::get('/vendors/{id}/products', [VendorsController::class, 'products'])->name('admin.vendors.products');
     Route::post('/vendors/{id}/products/import', [VendorsController::class, 'importProductsFromFile'])->name('admin.vendors.products.import');
     Route::post('/vendors/{id}/products/import-url', [VendorsController::class, 'importProductsFromUrl'])->name('admin.vendors.products.import-url');

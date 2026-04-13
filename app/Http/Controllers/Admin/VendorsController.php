@@ -1231,6 +1231,19 @@ class VendorsController extends Controller
     /**
      * Auto-create or update a ScrapingConfig when vendor integration settings change.
      */
+    public function discoverProducts($id)
+    {
+        $brand = Brand::with('vendorSetting')->findOrFail($id);
+        $storeUrl = $brand->vendorSetting->shop_url ?? null;
+
+        if (!$storeUrl) {
+            return back()->with('error', 'Store URL required. Set it in the Integration tab.');
+        }
+
+        \App\Jobs\DiscoverProductsJob::dispatch($brand, $storeUrl);
+        return back()->with('success', 'Product discovery started! Products will appear in the Products tab shortly.');
+    }
+
     public function triggerScrape($id)
     {
         $brand = Brand::with('vendorSetting')->findOrFail($id);
