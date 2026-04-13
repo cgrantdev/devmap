@@ -175,6 +175,7 @@ class VendorDiscoveryController extends Controller
                             'email' => $email,
                             'password' => Hash::make(Str::random(24)),
                             'role' => 'vendor',
+                            'email_verified_at' => now(),
                         ]);
                     } else {
                         $user = $existingUser;

@@ -16,6 +16,11 @@ class EnsureEmailIsVerified
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Skip verification check when admin is impersonating a vendor
+        if (session('impersonating_from')) {
+            return $next($request);
+        }
+
         if (Auth::check() && !Auth::user()->hasVerifiedEmail()) {
             return redirect('/email/verify')->with('info', 'Please verify your email address before accessing this page.');
         }
