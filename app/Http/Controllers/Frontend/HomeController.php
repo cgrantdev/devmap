@@ -491,12 +491,12 @@ class HomeController extends Controller
             'price' => $p['price'],
         ])->values();
 
-        // Latest editorial — 3 research insights for the editorial section
+        // Latest editorial — 4 research insights for the editorial section
         $editorial = Blog::where('status', 'published')
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
             ->orderByDesc('published_at')
-            ->take(3)
+            ->take(4)
             ->get()
             ->map(function ($blog) {
                 $image = $this->resolveImage($blog->image, 'blogs', "pmap-blog-{$blog->id}", 800, 500);

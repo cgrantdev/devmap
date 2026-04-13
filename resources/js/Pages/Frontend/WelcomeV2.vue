@@ -16,26 +16,6 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- VENDOR LOGO MARQUEE — social proof strip                   -->
-    <!-- ========================================================= -->
-    <div v-if="verifiedVendors.length" class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] py-5 overflow-hidden relative">
-      <div class="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[color:var(--color-bg)] to-transparent z-10 pointer-events-none" />
-      <div class="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[color:var(--color-bg)] to-transparent z-10 pointer-events-none" />
-      <div class="flex items-center gap-14 ui-marquee">
-        <template v-for="i in 4" :key="i">
-          <div
-            v-for="vendor in verifiedVendors"
-            :key="`${i}-${vendor.id}`"
-            class="flex-shrink-0 h-7 w-24 flex items-center justify-center opacity-25 hover:opacity-50 transition-opacity"
-          >
-            <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-full object-contain brightness-0" loading="lazy" />
-            <span v-else class="text-[11px] font-semibold text-[color:var(--color-ink-subtle)] whitespace-nowrap">{{ vendor.name }}</span>
-          </div>
-        </template>
-      </div>
-    </div>
-
-    <!-- ========================================================= -->
     <!-- 2. COMPOUND CATEGORIES — "What are you researching?"       -->
     <!-- ========================================================= -->
     <section class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
@@ -199,10 +179,10 @@
             </div>
           </a>
 
-          <!-- 2 smaller articles stacked -->
+          <!-- Smaller articles stacked -->
           <div class="flex flex-col gap-5 lg:gap-6">
             <a
-              v-for="post in editorial.slice(1, 3)"
+              v-for="post in editorial.slice(1, 4)"
               :key="post.id"
               :href="`/blog/${post.slug}`"
               class="ui-focus group flex flex-row border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[0.5px] transition-all duration-[200ms] overflow-hidden"
