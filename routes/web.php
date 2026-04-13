@@ -16,8 +16,7 @@ use App\Http\Controllers\Admin\VendorsController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\BlogManagementController;
 use App\Http\Controllers\Admin\ResearchManagementController;
-use App\Http\Controllers\Admin\EducationalGuideManagementController;
-use App\Http\Controllers\Admin\EducationPostsController;
+// EducationalGuideManagementController + EducationPostsController removed
 use App\Http\Controllers\Admin\EncyclopediaEntriesManagementController;
 use App\Http\Controllers\Admin\CategoriesController;
 use App\Http\Controllers\Admin\LocationsController;
@@ -32,7 +31,7 @@ use App\Http\Controllers\Frontend\ProductsController;
 use App\Http\Controllers\Frontend\BrandsController;
 // Note: BrandsController also serves /vendors (see route below)
 use App\Http\Controllers\Frontend\BlogsController;
-use App\Http\Controllers\Frontend\EducationController;
+// EducationController removed
 use App\Http\Controllers\Frontend\EncyclopediaController;
 use App\Http\Controllers\Frontend\CompareController;
 use App\Http\Controllers\Frontend\KnowledgeCenterController;
@@ -79,14 +78,20 @@ Route::get('/brand/{slug}/products', [ProductsController::class, 'byBrand'])->na
 Route::get('/brands', [BrandsController::class, 'index'])->name('brands');
 Route::get('/blogs', [BlogsController::class, 'index'])->name('blogs');
 Route::get('/blog/{slug}', [BlogsController::class, 'show'])->name('blog.show');
-Route::get('/education', [EducationController::class, 'index'])->name('education');
-Route::get('/education/{slug}', [EducationController::class, 'show'])->name('education.show');
+// Education posts removed — content now lives in Encyclopedia + Blog
 Route::get('/encyclopedia', [EncyclopediaController::class, 'index'])->name('encyclopedia');
 Route::get('/encyclopedia/{slug}', [EncyclopediaController::class, 'show'])->name('encyclopedia.show');
 Route::get('/encyclopedia/article/{slug}', [EncyclopediaController::class, 'showArticle'])->name('encyclopedia.article.show');
 Route::get('/compare', [CompareController::class, 'index'])->name('compare');
+Route::get('/calculator', function () {
+    return Inertia::render('Frontend/Calculator', [
+        'seo' => [
+            'title' => 'Peptide Reconstitution & Dosage Calculator — PeptideMap',
+            'description' => 'Free peptide calculator for reconstitution, dosage, and injection volume. Calculate exactly how much bacteriostatic water to add and your precise injection dose.',
+        ],
+    ]);
+})->name('calculator');
 Route::get('/news', [KnowledgeCenterController::class, 'index'])->name('news');
-Route::get('/guide/{id}', [KnowledgeCenterController::class, 'showGuide'])->name('guide.show');
 Route::get('/research/{id}', [KnowledgeCenterController::class, 'showResearch'])->name('research.show');
 Route::get('/deals', [DealsController::class, 'index'])->name('deals');
 Route::get('/become-a-vendor', [BecomeVendorController::class, 'index'])->name('become-a-vendor');
@@ -239,22 +244,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::patch('/research/{id}/quick-update', [ResearchManagementController::class, 'quickUpdate'])->name('admin.research.quick-update');
     Route::delete('/research/{id}', [ResearchManagementController::class, 'destroy'])->name('admin.research.destroy');
     
-    // Educational Guides
-    Route::get('/educational-guides', [EducationalGuideManagementController::class, 'index'])->name('admin.educational-guides.index');
-    Route::get('/educational-guides/create', [EducationalGuideManagementController::class, 'create'])->name('admin.educational-guides.create');
-    Route::post('/educational-guides', [EducationalGuideManagementController::class, 'store'])->name('admin.educational-guides.store');
-    Route::get('/educational-guides/{id}/edit', [EducationalGuideManagementController::class, 'edit'])->name('admin.educational-guides.edit');
-    Route::post('/educational-guides/{id}', [EducationalGuideManagementController::class, 'update'])->name('admin.educational-guides.update');
-    Route::patch('/educational-guides/{id}/quick-update', [EducationalGuideManagementController::class, 'quickUpdate'])->name('admin.educational-guides.quick-update');
-    Route::delete('/educational-guides/{id}', [EducationalGuideManagementController::class, 'destroy'])->name('admin.educational-guides.destroy');
-    
-    // Education Posts
-    Route::get('/education-posts', [EducationPostsController::class, 'index'])->name('admin.education-posts.index');
-    Route::get('/education-posts/create', [EducationPostsController::class, 'create'])->name('admin.education-posts.create');
-    Route::post('/education-posts', [EducationPostsController::class, 'store'])->name('admin.education-posts.store');
-    Route::get('/education-posts/{id}/edit', [EducationPostsController::class, 'edit'])->name('admin.education-posts.edit');
-    Route::post('/education-posts/{id}', [EducationPostsController::class, 'update'])->name('admin.education-posts.update');
-    Route::delete('/education-posts/{id}', [EducationPostsController::class, 'destroy'])->name('admin.education-posts.destroy');
+    // Educational Guides + Education Posts removed — content in Encyclopedia + Blog
     
     // Encyclopedia Entries
     Route::get('/encyclopedia-entries', [EncyclopediaEntriesManagementController::class, 'index'])->name('admin.encyclopedia-entries.index');

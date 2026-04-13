@@ -284,9 +284,9 @@ const footerColumns = [
     title: 'Learn',
     links: [
       { href: '/encyclopedia', label: 'Encyclopedia' },
-      { href: '/education', label: 'Peptide guides' },
-      { href: '/news', label: 'Research papers' },
+      { href: '/news', label: 'Research' },
       { href: '/blogs', label: 'Blog' },
+      { href: '/calculator', label: 'Peptide calculator' },
     ],
   },
   {

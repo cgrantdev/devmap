@@ -39,10 +39,8 @@
         <div>
           <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Content</div>
           <NavItem href="/admin/blogs" icon="file" label="Blog Posts" />
-          <NavItem href="/admin/education-posts" icon="file" label="Education Posts" />
           <NavItem href="/admin/encyclopedia-entries" icon="book" label="Encyclopedia" />
           <NavItem href="/admin/research" icon="file" label="Research" />
-          <NavItem href="/admin/educational-guides" icon="file" label="Guides" />
         </div>
 
         <!-- Marketing -->

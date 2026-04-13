@@ -57,7 +57,8 @@ class CompareController extends Controller
         $categories = ProductCategory::where('is_active', true)
             ->whereIn('name', self::FEATURED_COMPOUND_NAMES)
             ->with(['educationPost' => function ($q) {
-                $q->select('id', 'product_category_id', 'slug', 'description');
+                $q->where('status', 'published')
+                  ->select('id', 'product_category_id', 'slug', 'description', 'status');
             }])
             ->get()
             ->keyBy('name');

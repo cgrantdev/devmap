@@ -51,7 +51,10 @@
             <div class="p-3 lg:p-5 flex-1 flex flex-col gap-2 lg:gap-3">
               <div class="flex items-center justify-between">
                 <h3 class="ui-display text-[14px] lg:text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate">{{ vendor.name }}</h3>
-                <span v-if="vendor.coupon_code" class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 border-dashed ui-mono">{{ vendor.coupon_code }}</span>
+                <span v-if="vendor.coupon_code" class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 border-dashed">
+                  <span class="text-emerald-500 text-[8px] uppercase tracking-wider font-semibold">Code</span>
+                  <span class="ui-mono">{{ vendor.coupon_code }}</span>
+                </span>
               </div>
               <div class="flex items-center gap-1 text-xs">
                 <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(vendor.rating_average) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
