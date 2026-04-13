@@ -54,8 +54,8 @@ class HandleInertiaRequests extends Middleware
             'site_name' => fn () => Setting::where('key', 'site_name')->value('value') ?? 'PeptideSync',
             'site_description' => fn () => Setting::where('key', 'site_description')->value('value') ?? 'Compare peptide brands, prices, and reviews',
             'contact_email' => fn () => Setting::where('key', 'contact_email')->value('value') ?? 'contact@peptidemaps.com',
-            'pending_vendors_count' => fn () => $request->user() && $request->user()->isAdmin() 
-                ? Brand::whereHas('vendorSetting', function ($query) {
+            'pending_vendors_count' => fn () => $request->user() && $request->user()->isAdmin()
+                ? Brand::whereNotNull('user_id')->whereHas('vendorSetting', function ($query) {
                     $query->where('approval_status', 'pending');
                 })->count() 
                 : 0,

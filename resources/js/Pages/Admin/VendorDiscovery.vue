@@ -14,8 +14,16 @@
       </template>
     </PageHeader>
 
+    <!-- Scan progress banner -->
+    <div v-if="scanning" class="mb-4 px-4 py-3 bg-indigo-50 border border-indigo-200 text-indigo-800 text-sm flex items-center gap-3">
+      <svg class="w-4 h-4 animate-spin flex-shrink-0" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
+      <span class="font-medium">Scan in progress</span>
+      <span v-if="scanProgress" class="text-indigo-600">— {{ scanProgress }}</span>
+      <span class="ml-auto text-[12px] text-indigo-500">Auto-refreshing...</span>
+    </div>
+
     <!-- Flash -->
-    <div v-if="$page.props.flash?.success" class="mb-4 px-4 py-3 bg-[color:var(--color-verified-bg)] border border-[#A7F3D0] text-[#065F46] text-sm">
+    <div v-if="$page.props.flash?.success && !scanning" class="mb-4 px-4 py-3 bg-[color:var(--color-verified-bg)] border border-[#A7F3D0] text-[#065F46] text-sm">
       {{ $page.props.flash.success }}
     </div>
 
@@ -136,7 +144,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import PageHeader from '@/components/admin/PageHeader.vue'
@@ -144,10 +152,32 @@ import PageHeader from '@/components/admin/PageHeader.vue'
 const props = defineProps({
   results: { type: Array, default: () => [] },
   scanning: { type: Boolean, default: false },
+  scanProgress: { type: String, default: '' },
   lastScanAt: { type: String, default: null },
 })
 
 const selected = ref([])
+
+// Auto-refresh while scanning
+let pollInterval = null
+
+function startPolling() {
+  if (pollInterval) return
+  pollInterval = setInterval(() => {
+    router.reload({ only: ['results', 'scanning', 'scanProgress', 'lastScanAt'], preserveScroll: true })
+  }, 5000)
+}
+
+function stopPolling() {
+  if (pollInterval) { clearInterval(pollInterval); pollInterval = null }
+}
+
+watch(() => props.scanning, (val) => {
+  if (val) startPolling()
+  else stopPolling()
+}, { immediate: true })
+
+onUnmounted(() => stopPolling())
 const activeFilter = ref('all')
 const scanLoading = ref(false)
 const importLoading = ref(false)

@@ -49,6 +49,7 @@ class VendorDiscoveryController extends Controller
         return Inertia::render('Admin/VendorDiscovery', [
             'results' => array_values($results),
             'scanning' => Cache::get('vendor_discovery_scanning', false),
+            'scanProgress' => Cache::get('vendor_discovery_progress', ''),
             'lastScanAt' => Cache::get('vendor_discovery_last_scan'),
         ]);
     }
@@ -73,9 +74,11 @@ class VendorDiscoveryController extends Controller
     {
         $discovered = [];
         $existingSlugs = Brand::pluck('slug')->toArray();
+        $total = count($this->knownSites);
 
-        // Scan known sites (skip affiliate URL detection to save time)
-        foreach ($this->knownSites as $url) {
+        // Scan known sites
+        foreach ($this->knownSites as $i => $url) {
+            Cache::put('vendor_discovery_progress', 'Checking known sites... ' . ($i + 1) . '/' . $total, 600);
             $result = $this->analyzeSite($url);
             if ($result) {
                 $result['already_exists'] = in_array($result['slug'], $existingSlugs);
@@ -90,7 +93,8 @@ class VendorDiscoveryController extends Controller
             'best peptide companies 2026',
         ];
 
-        foreach ($queries as $query) {
+        foreach ($queries as $qi => $query) {
+            Cache::put('vendor_discovery_progress', 'Searching Google... (' . ($qi + 1) . '/' . count($queries) . ') — ' . count($discovered) . ' found so far', 600);
             $urls = $this->searchGoogle($query);
             foreach ($urls as $url) {
                 if (count($discovered) >= 40) break 2;
@@ -111,6 +115,7 @@ class VendorDiscoveryController extends Controller
         Cache::put('vendor_discovery_results', $discovered, 86400);
         Cache::put('vendor_discovery_last_scan', now()->toIso8601String(), 86400);
         Cache::forget('vendor_discovery_scanning');
+        Cache::forget('vendor_discovery_progress');
     }
 
     public function import(Request $request)
