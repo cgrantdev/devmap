@@ -82,20 +82,16 @@ class DiscoverProductsJob implements ShouldQueue
             if (!empty($p['name'])) {
                 $category = \App\Models\CategoryAlias::matchCategory($p['name']);
             }
-            if (!$category && !empty($p['name'])) {
-                // Fallback: create a category from the product name (strip dosage)
-                $catName = preg_replace('/\s*\([\d].*\)\s*$/', '', $p['name']);
-                $catName = preg_replace('/\s*\d+\s*mg\s*$/i', '', $catName);
-                $catName = preg_replace('/\s*Blend\s*$/i', '', $catName);
-                $catName = preg_replace('/\s*Kit\s*$/i', '', $catName);
-                $catName = trim($catName);
-                if (!empty($catName)) {
-                    $category = ProductCategory::firstOrCreate(
-                        ['slug' => Str::slug($catName)],
-                        ['name' => $catName, 'is_active' => true]
-                    );
-                }
+            // If no alias match, mark as hidden (uncategorized) for manual review
+            if (!$category) {
+                $defaultCat = ProductCategory::firstOrCreate(
+                    ['slug' => 'uncategorized'],
+                    ['name' => 'Uncategorized', 'is_active' => false]
+                );
+                $category = $defaultCat;
             }
+
+            $isUncategorized = $category->slug === 'uncategorized';
 
             Product::create([
                 'name' => $p['name'] ?? 'Unknown Product',
@@ -110,7 +106,7 @@ class DiscoverProductsJob implements ShouldQueue
                 'availability' => 'in_stock',
                 'purity' => 99.0,
                 'lab_tested' => true,
-                'hidden' => false,
+                'hidden' => $isUncategorized, // Hide uncategorized products from frontend
                 'auto_scraped' => true,
             ]);
             $created++;

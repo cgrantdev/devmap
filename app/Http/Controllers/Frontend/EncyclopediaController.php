@@ -423,7 +423,7 @@ class EncyclopediaController extends Controller
     {
         $category = ProductCategory::where('slug', $slug)
             ->where('is_active', true)
-            ->with('educationPost')
+            ->with(['educationPost' => fn($q) => $q->where('status', 'published')])
             ->firstOrFail();
 
         $educationPost = $category->educationPost;
@@ -612,7 +612,7 @@ class EncyclopediaController extends Controller
         // Reuse the same logic as show() but render the new article detail page
         $category = ProductCategory::where('slug', $slug)
             ->where('is_active', true)
-            ->with('educationPost')
+            ->with(['educationPost' => fn($q) => $q->where('status', 'published')])
             ->firstOrFail();
 
         $educationPost = $category->educationPost;

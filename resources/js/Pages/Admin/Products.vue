@@ -72,7 +72,10 @@
                   <span v-else class="text-[10px] font-bold text-[color:var(--color-ink-muted)]">{{ product.name.substring(0, 2).toUpperCase() }}</span>
                 </div>
                 <div class="min-w-0">
-                  <div class="text-[13px] font-medium text-[color:var(--color-ink)] truncate max-w-xs">{{ product.name }}</div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[13px] font-medium text-[color:var(--color-ink)] truncate max-w-xs">{{ product.name }}</span>
+                    <span v-if="product.category_name === 'Uncategorized' || product.hidden" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-bold text-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)]" title="Needs manual categorization">⚠ UNCATEGORIZED</span>
+                  </div>
                   <div v-if="product.dosage || product.size_mg" class="text-[11px] text-[color:var(--color-ink-subtle)]">{{ product.dosage || product.size_mg }}</div>
                 </div>
               </div>
