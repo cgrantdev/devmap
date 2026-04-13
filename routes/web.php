@@ -177,15 +177,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
         return redirect('/vendor/dashboard');
     })->name('admin.impersonate');
 
-    // Stop impersonation — return to admin
-    Route::get('/stop-impersonating', function () {
-        $adminId = session('impersonating_from');
-        if ($adminId) {
-            auth()->login(\App\Models\User::findOrFail($adminId));
-            session()->forget('impersonating_from');
-        }
-        return redirect('/admin/vendors');
-    })->name('admin.stop-impersonate');
+    // Stop impersonation route moved outside admin middleware (see below)
 
     Route::post('/vendors/{id}/scrape', [VendorsController::class, 'triggerScrape'])->name('admin.vendors.scrape');
     Route::post('/vendors/{id}/discover-products', [VendorsController::class, 'discoverProducts'])->name('admin.vendors.discover-products');
@@ -316,6 +308,16 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/product-scraping/configs', [ScrapingConfigController::class, 'store']);
     Route::put('/product-scraping/configs/{id}', [ScrapingConfigController::class, 'update'])->name('admin.product-scraping.update');
 });
+
+// Stop impersonation — outside admin middleware so vendor-role users can hit it
+Route::middleware('auth')->get('/admin/stop-impersonating', function () {
+    $adminId = session('impersonating_from');
+    if ($adminId) {
+        auth()->login(\App\Models\User::findOrFail($adminId));
+        session()->forget('impersonating_from');
+    }
+    return redirect('/admin/vendors');
+})->name('admin.stop-impersonate');
 
 // Authentication routes
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);

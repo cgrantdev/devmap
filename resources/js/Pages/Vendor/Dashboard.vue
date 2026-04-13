@@ -1,197 +1,113 @@
 <template>
   <Layout>
+    <!-- Header -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">Vendor Dashboard</h1>
-      <p class="text-gray-600 mt-2">Welcome back, {{ $page.props.auth.user.name }}!</p>
+      <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-1">Overview</div>
+      <h1 class="ui-display text-3xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)]">
+        Welcome back, {{ $page.props.auth.user.name }}
+      </h1>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <Link href="/vendor/storefront-analytics" class="bg-white rounded-lg border border-gray-200 p-6 hover:border-blue-500 hover:shadow-lg transition-all">
-        <div class="flex items-center gap-4">
-          <div class="bg-blue-500 w-12 h-12 rounded-lg flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store w-6 h-6 text-white">
-              <path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"></path>
-              <path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"></path>
-              <path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"></path>
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900">Storefront Analytics</h3>
-            <p class="text-sm text-gray-600">Track your storefront performance</p>
-          </div>
-        </div>
-      </Link>
-
-      <Link href="/vendor/advertisement-analytics" class="bg-white rounded-lg border border-gray-200 p-6 hover:border-blue-500 hover:shadow-lg transition-all">
-        <div class="flex items-center gap-4">
-          <div class="bg-green-500 w-12 h-12 rounded-lg flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-megaphone w-6 h-6 text-white">
-              <path d="m3 11 18-5v12L3 14v-3z"></path>
-              <path d="m11.6 16.8 3.5 2.7 3.5-2.7"></path>
-              <path d="m11.6 16.8 3.5 2.7v-6.2l-3.5-2.7"></path>
-              <path d="m8.1 10.7 3.5 2.7 3.5-2.7"></path>
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900">Advertisement Analytics</h3>
-            <p class="text-sm text-gray-600">Monitor ad performance</p>
-          </div>
-        </div>
-      </Link>
-
-      <Link href="/vendor/products" class="bg-white rounded-lg border border-gray-200 p-6 hover:border-blue-500 hover:shadow-lg transition-all">
-        <div class="flex items-center gap-4">
-          <div class="bg-purple-500 w-12 h-12 rounded-lg flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-white">
-              <path d="M6 2l3 6"></path>
-              <path d="M18 2l-3 6"></path>
-              <path d="M3 7h18"></path>
-              <path d="M4 7l1 13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2l1-13"></path>
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900">Products</h3>
-            <p class="text-sm text-gray-600">View and manage your catalog</p>
-          </div>
-        </div>
-      </Link>
-
-      <Link href="/vendor/reviews" class="bg-white rounded-lg border border-gray-200 p-6 hover:border-blue-500 hover:shadow-lg transition-all">
-        <div class="flex items-center gap-4">
-          <div class="bg-yellow-500 w-12 h-12 rounded-lg flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-square w-6 h-6 text-white">
-              <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"></path>
-                </svg>
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900">Reviews</h3>
-            <p class="text-sm text-gray-600">Manage customer reviews</p>
-          </div>
-        </div>
-      </Link>
+    <!-- Stat cards -->
+    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+      <div v-for="stat in statCards" :key="stat.label" class="bg-white rounded-[12px] border border-[color:var(--color-hairline)] p-5 shadow-[var(--shadow-xs)]">
+        <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">{{ stat.label }}</div>
+        <div class="mt-2 ui-mono text-2xl font-bold text-[color:var(--color-ink)]">{{ stat.value }}</div>
+      </div>
     </div>
 
-    <!-- Summary Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4 mb-8">
-      <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <div class="text-sm text-gray-500">Total Products</div>
-        <div class="mt-2 text-3xl font-bold text-gray-900">{{ stats.totalProducts || 0 }}</div>
-      </div>
-
-      <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <div class="text-sm text-gray-500">Active Products</div>
-        <div class="mt-2 text-3xl font-bold text-gray-900">{{ stats.activeProducts || 0 }}</div>
-      </div>
-
-      <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <div class="text-sm text-gray-500">Storefront Views</div>
-        <div class="mt-2 text-3xl font-bold text-gray-900">{{ stats.totalViews || 0 }}</div>
-      </div>
-
-      <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <div class="text-sm text-gray-500">Total Reviews</div>
-        <div class="mt-2 text-3xl font-bold text-gray-900">{{ stats.totalReviews || 0 }}</div>
-      </div>
-
-      <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <div class="text-sm text-gray-500">Average Rating</div>
-        <div class="mt-2 text-3xl font-bold text-gray-900">{{ stats.averageRating || '0.0' }}</div>
-      </div>
+    <!-- Quick links -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <Link
+        v-for="link in quickLinks"
+        :key="link.href"
+        :href="link.href"
+        class="group bg-white rounded-[12px] border border-[color:var(--color-hairline)] p-5 shadow-[var(--shadow-xs)] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all"
+      >
+        <div class="flex items-center gap-3">
+          <div :class="['w-10 h-10 rounded-[10px] flex items-center justify-center flex-shrink-0', link.bg]">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" v-html="link.icon"></svg>
+          </div>
+          <div>
+            <div class="text-[13px] font-semibold text-[color:var(--color-ink)] group-hover:text-[color:var(--color-accent-600)] transition-colors">{{ link.label }}</div>
+            <div class="text-[11px] text-[color:var(--color-ink-subtle)]">{{ link.desc }}</div>
+          </div>
+        </div>
+      </Link>
     </div>
 
     <!-- Recent Products -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div class="flex items-center justify-between px-6 py-5 border-b border-gray-200">
+    <div class="bg-white rounded-[14px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-5 border-b border-[color:var(--color-hairline)]">
         <div>
-          <h2 class="text-xl font-semibold text-gray-900">Recent Products</h2>
-          <p class="text-sm text-gray-600 mt-1">Quick preview of your latest products</p>
+          <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)]">Recent products</h2>
+          <p class="text-[12px] text-[color:var(--color-ink-subtle)] mt-0.5">Your latest catalog items</p>
         </div>
-
         <Link
           href="/vendor/products"
-          class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+          class="h-8 px-3 text-[12px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] rounded-[8px] shadow-sm hover:-translate-y-[0.5px] transition-all inline-flex items-center gap-1.5"
         >
-          View All Products
+          View all
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </Link>
       </div>
 
-      <div v-if="recentProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6">
-        <div
-          v-for="product in recentProducts"
-          :key="product.id"
-          class="rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition bg-white"
-        >
-          <div class="aspect-[4/3] bg-gray-100">
-            <img
-              v-if="product.image_url"
-              :src="product.image_url"
-              :alt="product.name"
-              class="w-full h-full object-cover"
-              loading="lazy"
-            />
-            <div v-else class="w-full h-full flex items-center justify-center text-sm text-gray-400">
-              No image
-            </div>
-          </div>
-
-          <div class="p-5">
-            <div class="flex items-start justify-between gap-3">
-              <h3 class="text-base font-semibold text-gray-900 line-clamp-2">
-                {{ product.name }}
-              </h3>
-
-              <span
-                class="shrink-0 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium"
-                :class="product.hidden ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'"
-              >
-                {{ product.hidden ? 'Hidden' : (product.status || 'Active') }}
-              </span>
-            </div>
-
-            <div class="mt-3 flex items-center gap-2">
-              <span class="text-lg font-bold text-gray-900">{{ formatPrice(product.price) }}</span>
-              <span v-if="product.original_price" class="text-sm text-gray-400 line-through">
-                {{ formatPrice(product.original_price) }}
-              </span>
-            </div>
-
-            <div class="mt-3 flex items-center gap-3 text-sm text-gray-600">
-              <span>⭐ {{ product.rating_average || '0.0' }}</span>
-              <span>•</span>
-              <span>{{ product.rating_count || 0 }} reviews</span>
-            </div>
-
-            <div class="mt-5 flex items-center gap-3">
-              <a
-                v-if="product.product_url"
-                :href="product.product_url"
-                target="_blank"
-                class="inline-flex items-center px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                View Product
-              </a>
-
-              <Link
-                href="/vendor/import"
-                class="inline-flex items-center px-3 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-black"
-              >
-                Edit Catalog
-              </Link>
-            </div>
-          </div>
-        </div>
+      <div v-if="recentProducts.length > 0">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+              <th class="px-6 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Product</th>
+              <th class="px-6 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Price</th>
+              <th class="px-6 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Rating</th>
+              <th class="px-6 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="product in recentProducts"
+              :key="product.id"
+              class="border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] transition-colors"
+            >
+              <td class="px-6 py-3.5">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 flex-shrink-0 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] rounded-[6px] overflow-hidden flex items-center justify-center">
+                    <img v-if="product.image_url" :src="product.image_url" :alt="product.name" class="w-full h-full object-cover" loading="lazy" />
+                    <span v-else class="text-[10px] font-bold text-[color:var(--color-ink-muted)]">{{ product.name.substring(0, 2).toUpperCase() }}</span>
+                  </div>
+                  <span class="text-[13px] font-medium text-[color:var(--color-ink)] truncate max-w-[200px]">{{ product.name }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-3.5 ui-mono text-[13px] text-[color:var(--color-ink)]">{{ formatPrice(product.price) }}</td>
+              <td class="px-6 py-3.5">
+                <div class="flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5 text-[color:var(--color-caution)]" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                  <span class="ui-mono text-[13px] text-[color:var(--color-ink)]">{{ product.rating_average || '0.0' }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-3.5">
+                <span
+                  :class="[
+                    'inline-flex px-2 py-0.5 text-[10px] font-semibold rounded-sm',
+                    product.hidden
+                      ? 'bg-[color:var(--color-danger-bg)] text-[color:var(--color-danger)]'
+                      : 'bg-[color:var(--color-verified-bg)] text-[#065F46]',
+                  ]"
+                >{{ product.hidden ? 'Hidden' : 'Active' }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div v-else class="px-6 py-12 text-center">
-        <div class="text-lg font-semibold text-gray-900">No products yet</div>
-        <p class="mt-2 text-sm text-gray-600">Import or add products so they appear here.</p>
-
+      <div v-else class="px-6 py-16 text-center">
+        <div class="text-[15px] font-semibold text-[color:var(--color-ink)]">No products yet</div>
+        <p class="mt-1 text-[13px] text-[color:var(--color-ink-subtle)]">Import or add products to see them here.</p>
         <Link
           href="/vendor/import"
-          class="inline-flex items-center mt-5 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700"
+          class="mt-4 inline-flex h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] rounded-[8px] items-center gap-2 shadow-sm"
         >
-          Import Products
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          Import products
         </Link>
       </div>
     </div>
@@ -211,7 +127,6 @@ const props = defineProps({
       totalViews: 0,
       totalReviews: 0,
       averageRating: '0.0',
-      flaggedReviews: 0
     })
   },
   recentProducts: {
@@ -220,13 +135,24 @@ const props = defineProps({
   }
 })
 
+const statCards = [
+  { label: 'Total products', value: props.stats.totalProducts || 0 },
+  { label: 'Active products', value: props.stats.activeProducts || 0 },
+  { label: 'Storefront views', value: props.stats.totalViews || 0 },
+  { label: 'Reviews', value: props.stats.totalReviews || 0 },
+  { label: 'Avg. rating', value: props.stats.averageRating || '0.0' },
+]
+
+const quickLinks = [
+  { href: '/vendor/products', label: 'Products', desc: 'Manage your catalog', bg: 'bg-[color:var(--color-accent-600)]', icon: '<path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>' },
+  { href: '/vendor/storefront-analytics', label: 'Storefront', desc: 'Views & clicks', bg: 'bg-[#059669]', icon: '<path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>' },
+  { href: '/vendor/reviews', label: 'Reviews', desc: 'Customer feedback', bg: 'bg-[#D97706]', icon: '<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>' },
+  { href: '/vendor/integrations', label: 'Integrations', desc: 'Connect your store', bg: 'bg-[#7C3AED]', icon: '<path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>' },
+]
+
 function formatPrice(value) {
   const number = Number(value)
-
-  if (Number.isNaN(number) || number <= 0) {
-    return '$0.00'
-  }
-
+  if (Number.isNaN(number) || number <= 0) return '$0.00'
   return `$${number.toFixed(2)}`
 }
-</script> 
+</script>
