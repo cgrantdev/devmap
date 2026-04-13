@@ -16,7 +16,61 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 2. COMPOUND CATEGORIES — "What are you researching?"       -->
+    <!-- 2. VENDORS — top vendors (moved above compounds)           -->
+    <!-- ========================================================= -->
+    <section class="bg-white border-y border-[color:var(--color-hairline)]">
+      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
+        <SectionHeader
+          eyebrow="Vendor network"
+          title="Top-rated vendors"
+          accent="accent"
+        >
+          <template #cta>
+            <Button as="a" href="/vendors" variant="secondary">
+              All vendors
+              <template #icon-right>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M13 5l7 7-7 7"/>
+                </svg>
+              </template>
+            </Button>
+          </template>
+        </SectionHeader>
+
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-5">
+          <a
+            v-for="vendor in verifiedVendors.slice(0, 6)"
+            :key="vendor.id"
+            :href="vendor.url"
+            class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
+          >
+            <div class="aspect-[16/9] bg-white border-b border-[color:var(--color-hairline)] flex items-center justify-center p-4 lg:p-8">
+              <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-[75%] object-contain" loading="lazy" />
+              <span v-else class="ui-display text-2xl lg:text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
+            </div>
+            <div class="p-3 lg:p-5 flex-1 flex flex-col gap-2 lg:gap-3">
+              <div class="flex items-center justify-between">
+                <h3 class="ui-display text-[14px] lg:text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate">{{ vendor.name }}</h3>
+                <span v-if="vendor.coupon_code" class="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 border-dashed ui-mono">{{ vendor.coupon_code }}</span>
+              </div>
+              <div class="flex items-center gap-1 text-xs">
+                <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(vendor.rating_average) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                <span class="ui-mono font-semibold text-[color:var(--color-ink)] ml-0.5">{{ (vendor.rating_average || 0).toFixed(1) }}</span>
+              </div>
+              <div class="mt-auto pt-2 lg:pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-[11px] lg:text-xs text-[color:var(--color-ink-muted)]">
+                <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendor.product_count }}</span> compounds</span>
+                <span class="text-[color:var(--color-accent-600)] font-semibold group-hover:translate-x-0.5 transition-transform duration-[180ms] flex items-center gap-0.5">
+                  View <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- 3. COMPOUND CATEGORIES — "What are you researching?"       -->
     <!-- ========================================================= -->
     <section class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
       <SectionHeader
@@ -57,57 +111,6 @@
             </span>
           </div>
         </a>
-      </div>
-    </section>
-
-    <!-- ========================================================= -->
-    <!-- 3. VENDORS — top vendors as card grid                      -->
-    <!-- ========================================================= -->
-    <section class="bg-white border-y border-[color:var(--color-hairline)]">
-      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
-        <SectionHeader
-          eyebrow="Vendor network"
-          title="Top-rated vendors"
-          accent="accent"
-        >
-          <template #cta>
-            <Button as="a" href="/vendors" variant="secondary">
-              All vendors
-              <template #icon-right>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M5 12h14M13 5l7 7-7 7"/>
-                </svg>
-              </template>
-            </Button>
-          </template>
-        </SectionHeader>
-
-        <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-5">
-          <a
-            v-for="vendor in verifiedVendors.slice(0, 6)"
-            :key="vendor.id"
-            :href="vendor.url"
-            class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
-          >
-            <div class="aspect-[16/9] bg-[color:var(--color-bg)] border-b border-[color:var(--color-hairline)] flex items-center justify-center p-4 lg:p-8">
-              <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-[75%] object-contain" loading="lazy" />
-              <span v-else class="ui-display text-2xl lg:text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
-            </div>
-            <div class="p-3 lg:p-5 flex-1 flex flex-col gap-2 lg:gap-3">
-              <h3 class="ui-display text-[14px] lg:text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate">{{ vendor.name }}</h3>
-              <div class="flex items-center gap-1 text-xs">
-                <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(vendor.rating_average) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-                <span class="ui-mono font-semibold text-[color:var(--color-ink)] ml-0.5">{{ (vendor.rating_average || 0).toFixed(1) }}</span>
-              </div>
-              <div class="mt-auto pt-2 lg:pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-[11px] lg:text-xs text-[color:var(--color-ink-muted)]">
-                <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendor.product_count }}</span> compounds</span>
-                <span class="text-[color:var(--color-accent-600)] font-semibold group-hover:translate-x-0.5 transition-transform duration-[180ms] flex items-center gap-0.5">
-                  View <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                </span>
-              </div>
-            </div>
-          </a>
-        </div>
       </div>
     </section>
 

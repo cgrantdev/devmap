@@ -431,6 +431,7 @@ class HomeController extends Controller
                     'location' => $vs && $vs->location ? $vs->location->name : null,
                     'founded_year' => $vs && $vs->founded_year ? (int) $vs->founded_year : null,
                     'is_partner' => $vs && (($vs->is_partner ?? false) || ($vs->featured ?? false)),
+                    'coupon_code' => $vs->coupon_code ?? null,
                     'last_tested_label' => $lastUpdated
                         ? \Carbon\Carbon::parse($lastUpdated)->diffForHumans(null, true)
                         : null,
