@@ -38,19 +38,60 @@ class VendorDiscoveryController extends Controller
 
     public function index()
     {
-        $results = Cache::get('vendor_discovery_results', []);
-        $existingSlugs = Brand::pluck('slug')->toArray();
+        // Show ALL pending/inactive vendors from the database (imported from discovery)
+        $dbVendors = Brand::with('vendorSetting')
+            ->where('is_active', false)
+            ->whereHas('vendorSetting', function ($q) {
+                $q->where('approval_status', 'pending');
+            })
+            ->orderBy('name')
+            ->get()
+            ->map(function ($brand) {
+                $vs = $brand->vendorSetting;
+                // Extract affiliate URL from description if stored there
+                $affiliateUrl = null;
+                if ($vs->description && preg_match('/Affiliate Program: (https?:\/\/\S+)/', $vs->description, $m)) {
+                    $affiliateUrl = $m[1];
+                }
+                return [
+                    'name' => $brand->name,
+                    'slug' => $brand->slug,
+                    'url' => $vs->shop_url ?? $vs->website,
+                    'domain' => parse_url($vs->shop_url ?? $vs->website ?? '', PHP_URL_HOST),
+                    'platform' => $vs->api_platform,
+                    'has_affiliate' => !empty($affiliateUrl),
+                    'affiliate_url' => $affiliateUrl,
+                    'email' => $vs->contact_email,
+                    'description' => $vs->description ? preg_replace('/\n\nAffiliate Program:.*$/', '', $vs->description) : null,
+                    'already_exists' => false, // These are all pending
+                    'brand_id' => $brand->id,
+                ];
+            });
 
-        // Mark existing vendors
-        foreach ($results as &$r) {
-            $r['already_exists'] = in_array($r['slug'] ?? Str::slug($r['name'] ?? ''), $existingSlugs);
+        // Merge with any fresh scan results
+        $scanResults = Cache::get('vendor_discovery_results', []);
+        $dbSlugs = $dbVendors->pluck('slug')->toArray();
+        $activeSlugs = Brand::where('is_active', true)->pluck('slug')->toArray();
+
+        // Add scan results that aren't already in DB
+        foreach ($scanResults as $sr) {
+            if (!in_array($sr['slug'], $dbSlugs) && !in_array($sr['slug'], $activeSlugs)) {
+                $sr['brand_id'] = null;
+                $dbVendors->push($sr);
+            }
+        }
+
+        // Mark active vendors in scan results
+        foreach ($scanResults as &$sr) {
+            $sr['already_exists'] = in_array($sr['slug'], $activeSlugs) || in_array($sr['slug'], $dbSlugs);
         }
 
         return Inertia::render('Admin/VendorDiscovery', [
-            'results' => array_values($results),
+            'results' => $dbVendors->values()->toArray(),
             'scanning' => Cache::get('vendor_discovery_scanning', false),
             'scanProgress' => Cache::get('vendor_discovery_progress', ''),
             'lastScanAt' => Cache::get('vendor_discovery_last_scan'),
+            'totalActive' => count($activeSlugs),
         ]);
     }
 

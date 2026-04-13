@@ -28,11 +28,11 @@
     </div>
 
     <!-- Stats -->
-    <div v-if="results.length" class="flex items-center gap-6 mb-4 text-[13px] text-[color:var(--color-ink-muted)]">
-      <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ results.length }}</span> vendors found</span>
-      <span><span class="ui-mono font-semibold text-[color:var(--color-verified)]">{{ results.filter(r => !r.already_exists).length }}</span> new</span>
-      <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ results.filter(r => r.has_affiliate).length }}</span> with affiliate programs</span>
+    <div v-if="results.length" class="flex flex-wrap items-center gap-4 lg:gap-6 mb-4 text-[13px] text-[color:var(--color-ink-muted)]">
+      <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ results.length }}</span> pending vendors</span>
+      <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ results.filter(r => r.has_affiliate).length }}</span> with affiliates</span>
       <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ results.filter(r => r.platform === 'woocommerce').length }}</span> WooCommerce</span>
+      <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ results.filter(r => r.platform === 'page_scrape').length }}</span> other platforms</span>
       <span v-if="lastScanAt" class="ml-auto text-[11px]">Last scan: {{ lastScanAt }}</span>
     </div>
 
@@ -126,8 +126,12 @@
               <span v-else class="text-[11px] text-[color:var(--color-ink-subtle)]">—</span>
             </td>
             <td class="px-4 py-3">
-              <span v-if="vendor.already_exists" class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold bg-[color:var(--color-hairline-soft)] text-[color:var(--color-ink-muted)]">Already listed</span>
-              <span v-else class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold bg-[color:var(--color-verified-bg)] text-[#065F46]">New</span>
+              <a
+                v-if="vendor.brand_id"
+                :href="`/admin/vendors/${vendor.brand_id}/edit`"
+                class="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium text-[color:var(--color-accent-600)] bg-[color:var(--color-accent-50)] hover:bg-[color:var(--color-accent-100)] transition-colors"
+              >Edit</a>
+              <span v-else class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold bg-[color:var(--color-caution-bg)] text-[#92400E]">Not imported</span>
             </td>
           </tr>
         </tbody>
@@ -184,17 +188,17 @@ const importLoading = ref(false)
 
 const filters = computed(() => [
   { label: 'All', value: 'all', count: props.results.length },
-  { label: 'New', value: 'new', count: props.results.filter(r => !r.already_exists).length },
-  { label: 'Affiliate', value: 'affiliate', count: props.results.filter(r => r.has_affiliate).length },
+  { label: 'Has Affiliate', value: 'affiliate', count: props.results.filter(r => r.has_affiliate).length },
   { label: 'WooCommerce', value: 'woocommerce', count: props.results.filter(r => r.platform === 'woocommerce').length },
-  { label: 'Shopify', value: 'shopify', count: props.results.filter(r => r.platform === 'shopify').length },
+  { label: 'Has Email', value: 'email', count: props.results.filter(r => r.email).length },
 ])
 
 const filteredResults = computed(() => {
-  if (activeFilter.value === 'all') return props.results
-  if (activeFilter.value === 'new') return props.results.filter(r => !r.already_exists)
-  if (activeFilter.value === 'affiliate') return props.results.filter(r => r.has_affiliate)
-  return props.results.filter(r => r.platform === activeFilter.value)
+  let list = props.results
+  if (activeFilter.value === 'affiliate') list = list.filter(r => r.has_affiliate)
+  else if (activeFilter.value === 'woocommerce') list = list.filter(r => r.platform === 'woocommerce')
+  else if (activeFilter.value === 'email') list = list.filter(r => r.email)
+  return list
 })
 
 function toggleAll(e) {
