@@ -96,14 +96,14 @@
               <div
                 :class="[
                   'w-10 h-10 rounded-full flex items-center justify-center transition-all bg-slate-200 text-slate-400',
-                  (step > 3 || showSuccessMessage || $page.props.flash?.success)
+                  step > 3
                     ? 'bg-slate-700 text-white'
                     : step === 3
                     ? 'bg-slate-700 text-white'
                     : 'bg-slate-200 text-gray-600'
                 ]"
               >
-                <svg v-if="step > 3 || showSuccessMessage || $page.props.flash?.success" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check w-5 h-5" aria-hidden="true">
+                <svg v-if="step > 3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check w-5 h-5" aria-hidden="true">
                   <circle cx="12" cy="12" r="10"></circle>
                   <path d="m9 12 2 2 4-4"></path>
                 </svg>
@@ -112,21 +112,26 @@
               <span class="text-xs text-slate-600 mt-2 hidden sm:block">Business Info</span>
             </div>
 
-            <!-- Connector Line
-            <div
-              :class="[
-                'h-0.5 flex-1 mx-2',
-                step > 3 ? 'bg-slate-700' : 'bg-slate-200'
-              ]"
-            ></div> -->
+            <!-- Connector Line -->
+            <div :class="['h-0.5 flex-1 mx-2', step > 3 ? 'bg-slate-700' : 'bg-slate-200']"></div>
 
-            <!-- Step 4: Plan & Payment
+            <!-- Step 4: Connect Store -->
             <div class="flex flex-col items-center flex-1">
               <div
                 :class="[
                   'w-10 h-10 rounded-full flex items-center justify-center transition-all bg-slate-200 text-slate-400',
-                  step === 4
-                    ? 'bg-slate-700 text-white'
+                  (step > 4 || showSuccessMessage || $page.props.flash?.success) ? 'bg-slate-700 text-white' : step === 4 ? 'bg-slate-700 text-white' : 'bg-slate-200 text-gray-600'
+                ]"
+              >
+                <svg v-if="showSuccessMessage || $page.props.flash?.success" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                <span v-else>4</span>
+              </div>
+              <span class="text-xs text-slate-600 mt-2 hidden sm:block">Connect Store</span>
+            </div>
+
+            <!-- OLD Step 4 indicator (hidden)
+            <div class="flex flex-col items-center flex-1" style="display:none">
+              <div :class="['w-10 h-10 rounded-full flex items-center justify-center transition-all bg-slate-200 text-slate-400', step === 4 ? 'bg-slate-700 text-white'
                     : 'bg-slate-200 text-gray-600'
                 ]"
               >
@@ -419,43 +424,6 @@
             </div>
 
             <form @submit.prevent="handleStep3Submit" class="space-y-6">
-              <!-- Store Connection Method -->
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-3">
-                  How should we sync your products?
-                </label>
-                <div class="space-y-3">
-                  <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'woocommerce' ? 'border-indigo-400 bg-indigo-50' : ''">
-                    <input type="radio" v-model="formData.connectionMethod" value="woocommerce" class="mt-0.5 accent-indigo-600" />
-                    <div>
-                      <div class="text-sm font-medium text-slate-800">WooCommerce Auto-Connect</div>
-                      <div class="text-xs text-slate-500 mt-0.5">One-click connection. We'll read your product catalog automatically.</div>
-                    </div>
-                  </label>
-                  <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'api_key' ? 'border-indigo-400 bg-indigo-50' : ''">
-                    <input type="radio" v-model="formData.connectionMethod" value="api_key" class="mt-0.5 accent-indigo-600" />
-                    <div>
-                      <div class="text-sm font-medium text-slate-800">REST API Key</div>
-                      <div class="text-xs text-slate-500 mt-0.5">Provide your WooCommerce or Shopify API key. We'll sync products daily.</div>
-                    </div>
-                  </label>
-                  <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'auto_scrape' ? 'border-indigo-400 bg-indigo-50' : ''">
-                    <input type="radio" v-model="formData.connectionMethod" value="auto_scrape" class="mt-0.5 accent-indigo-600" />
-                    <div>
-                      <div class="text-sm font-medium text-slate-800">Auto-Scrape My Store</div>
-                      <div class="text-xs text-slate-500 mt-0.5">We'll automatically discover and import products from your website.</div>
-                    </div>
-                  </label>
-                  <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'manual' ? 'border-indigo-400 bg-indigo-50' : ''">
-                    <input type="radio" v-model="formData.connectionMethod" value="manual" class="mt-0.5 accent-indigo-600" />
-                    <div>
-                      <div class="text-sm font-medium text-slate-800">I'll Add Products Manually</div>
-                      <div class="text-xs text-slate-500 mt-0.5">Upload products through the vendor dashboard after approval.</div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
               <!-- Number of Products -->
               <div>
                 <label for="product_count" class="block text-sm text-slate-700 mb-2">
@@ -651,59 +619,70 @@
 
               <!-- Navigation Buttons -->
               <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-200">
-                <button
-                  type="button"
-                  @click="goToStep(2)"
-                  :disabled="isSubmitting"
-                  class="px-6 py-2 text-slate-600 hover:text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  :disabled="isSubmitting"
-                  :class="[
-                    'flex items-center gap-2 px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors',
-                    isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-                  ]"
-                >
-                  <span v-if="isSubmitting">Submitting...</span>
-                  <span v-else>Complete Registration</span>
-                  <svg v-if="!isSubmitting" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check w-4 h-4" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="m9 12 2 2 4-4"></path>
-                  </svg>
-                  <svg v-else xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-2 w-4 h-4 animate-spin">
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-                  </svg>
-                </button>
-                <!-- <button
-                  type="submit"
-                  class="flex items-center gap-2 px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
-                >
+                <button type="button" @click="goToStep(2)" class="px-6 py-2 text-slate-600 hover:text-slate-700 transition-colors">Back</button>
+                <button type="submit" class="flex items-center gap-2 px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
                   Continue
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right w-4 h-4">
-                    <path d="M5 12h14"></path>
-                    <path d="m12 5 7 7-7 7"></path>
-                  </svg>
-                </button> -->
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
               </div>
             </form>
           </div>
 
-          <!-- Step 4: Plan & Payment
+          <!-- Step 4: Connect Your Store -->
           <div v-if="step === 4" class="space-y-6">
             <div>
-              <h2 class="text-slate-900 mb-2">Choose Your Plan</h2>
-              <p class="text-slate-600 mb-6">Select the plan that works for your business</p>
+              <h2 class="text-slate-900 mb-2">Connect Your Store</h2>
+              <p class="text-slate-600 text-sm">Choose how you'd like to sync your products with PeptideMaps</p>
             </div>
 
             <form @submit.prevent="handleStep4Submit" class="space-y-6">
-              // Plan Selection Cards
-              <div class="space-y-4">
-                // Basic Plan
-                <div
-                  @click="formData.selectedPlan = 'basic'"
+              <div class="space-y-3">
+                <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'woocommerce' ? 'border-indigo-400 bg-indigo-50' : ''">
+                  <input type="radio" v-model="formData.connectionMethod" value="woocommerce" class="mt-1 accent-indigo-600" />
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2">
+                      <div class="text-sm font-semibold text-slate-800">WooCommerce Auto-Connect</div>
+                      <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Recommended</span>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-1">One-click connection to your WooCommerce store. We'll automatically import and sync your product catalog daily.</div>
+                  </div>
+                </label>
+                <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'api_key' ? 'border-indigo-400 bg-indigo-50' : ''">
+                  <input type="radio" v-model="formData.connectionMethod" value="api_key" class="mt-1 accent-indigo-600" />
+                  <div>
+                    <div class="text-sm font-semibold text-slate-800">Provide REST API Key</div>
+                    <div class="text-xs text-slate-500 mt-1">Share your WooCommerce, Shopify, or custom API credentials. We'll sync products on a daily schedule.</div>
+                  </div>
+                </label>
+                <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'auto_scrape' ? 'border-indigo-400 bg-indigo-50' : ''">
+                  <input type="radio" v-model="formData.connectionMethod" value="auto_scrape" class="mt-1 accent-indigo-600" />
+                  <div>
+                    <div class="text-sm font-semibold text-slate-800">Auto-Discover From My Website</div>
+                    <div class="text-xs text-slate-500 mt-1">We'll crawl your store and automatically find and import your products. No API key needed.</div>
+                  </div>
+                </label>
+              </div>
+
+              <!-- Navigation Buttons -->
+              <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-200">
+                <button type="button" @click="goToStep(3)" class="px-6 py-2 text-slate-600 hover:text-slate-700 transition-colors">Back</button>
+                <button
+                  type="submit"
+                  :disabled="isSubmitting"
+                  :class="['flex items-center gap-2 px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors', isSubmitting ? 'opacity-50 cursor-not-allowed' : '']"
+                >
+                  <span v-if="isSubmitting">Submitting...</span>
+                  <span v-else>Complete Registration</span>
+                  <svg v-if="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- OLD Step 4 placeholder (removed)
+          <div v-if="false" class="space-y-6">
+            <div @click="formData.selectedPlan = 'basic'"
                   :class="[
                     'border-2 rounded-lg p-6 cursor-pointer transition-all border-slate-700 bg-slate-50',
                     formData.selectedPlan === 'basic'
@@ -1016,9 +995,13 @@ const isSubmitting = ref(false);
 const showSuccessMessage = ref(false);
 
 const handleStep3Submit = () => {
+  step.value = 4;
+}
+
+const handleStep4Submit = () => {
   // Validate required fields
   if (!formData.value.companyName || !formData.value.website || !formData.value.country ||
-      !formData.value.fullName || !formData.value.email || 
+      !formData.value.fullName || !formData.value.email ||
       !formData.value.password || !formData.value.confirmPassword) {
     return;
   }
@@ -1088,20 +1071,5 @@ const handleStep3Submit = () => {
   });
 };
 
-const handleStep4Submit = () => {
-  // Validate that a plan is selected
-  if (!formData.value.selectedPlan) {
-    return;
-  }
-
-  // Here you would typically submit the form to the backend
-  // For now, we'll just log the data
-  console.log('Form Data:', formData.value);
-  
-  // TODO: Submit form data to backend API
-  // router.post('/become-a-vendor/submit', formData.value);
-  
-  // After successful submission, redirect to success page or vendor dashboard
-  // router.visit('/become-a-vendor/success');
-};
+// Old step 4 handler removed — now handled above
 </script>
