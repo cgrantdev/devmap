@@ -80,8 +80,11 @@ Route::get('/blogs', [BlogsController::class, 'index'])->name('blogs');
 Route::get('/blog/{slug}', [BlogsController::class, 'show'])->name('blog.show');
 // Education posts removed — content now lives in Encyclopedia + Blog
 Route::get('/encyclopedia', [EncyclopediaController::class, 'index'])->name('encyclopedia');
-Route::get('/encyclopedia/{slug}', [EncyclopediaController::class, 'show'])->name('encyclopedia.show');
 Route::get('/encyclopedia/article/{slug}', [EncyclopediaController::class, 'showArticle'])->name('encyclopedia.article.show');
+// Redirect old /encyclopedia/{slug} to the article page
+Route::get('/encyclopedia/{slug}', function ($slug) {
+    return redirect("/encyclopedia/article/{$slug}", 301);
+})->name('encyclopedia.show');
 Route::get('/compare', [CompareController::class, 'index'])->name('compare');
 Route::get('/calculator', function () {
     return Inertia::render('Frontend/Calculator', [
