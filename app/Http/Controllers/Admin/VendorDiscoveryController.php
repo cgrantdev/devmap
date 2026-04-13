@@ -59,11 +59,22 @@ class VendorDiscoveryController extends Controller
             return back()->with('error', 'A scan is already in progress.');
         }
 
-        Cache::put('vendor_discovery_scanning', true, 600); // 10 min timeout
+        // Run scan in background job
+        Cache::put('vendor_discovery_scanning', true, 600);
+        dispatch(function () {
+            $controller = new self();
+            $controller->runScan();
+        })->afterResponse();
+
+        return back()->with('success', 'Scan started! Results will appear shortly. Refresh the page in ~30 seconds.');
+    }
+
+    public function runScan(): void
+    {
         $discovered = [];
         $existingSlugs = Brand::pluck('slug')->toArray();
 
-        // Scan known sites
+        // Scan known sites (skip affiliate URL detection to save time)
         foreach ($this->knownSites as $url) {
             $result = $this->analyzeSite($url);
             if ($result) {
@@ -76,15 +87,13 @@ class VendorDiscoveryController extends Controller
         $queries = [
             'buy research peptides online',
             'research peptide vendor USA',
-            'peptide supplier reviews 2026',
-            'best peptide companies',
-            'peptide affiliate program',
+            'best peptide companies 2026',
         ];
 
         foreach ($queries as $query) {
             $urls = $this->searchGoogle($query);
             foreach ($urls as $url) {
-                if (count($discovered) >= 50) break 2;
+                if (count($discovered) >= 40) break 2;
                 $domain = parse_url($url, PHP_URL_HOST);
                 $slug = Str::slug(str_replace(['www.', '.com', '.co', '.is', '.io', '.net'], '', $domain));
                 if (isset($discovered[$slug])) continue;
@@ -99,11 +108,9 @@ class VendorDiscoveryController extends Controller
             sleep(1);
         }
 
-        Cache::put('vendor_discovery_results', $discovered, 86400); // 24h
+        Cache::put('vendor_discovery_results', $discovered, 86400);
         Cache::put('vendor_discovery_last_scan', now()->toIso8601String(), 86400);
         Cache::forget('vendor_discovery_scanning');
-
-        return back()->with('success', 'Scan complete! Found ' . count($discovered) . ' potential vendors.');
     }
 
     public function import(Request $request)
@@ -242,32 +249,20 @@ class VendorDiscoveryController extends Controller
         $found = false;
         $affiliateUrl = null;
 
-        // Check for affiliate links in the page HTML
-        if (preg_match('/href=["\']([^"\']*(?:affiliate|partners|referral)[^"\']*)["\']/', $l, $m)) {
+        // Check for affiliate links in the page HTML (fast — no extra HTTP requests)
+        if (preg_match('/href=["\']([^"\']*(?:affiliate-program|affiliate-area|affiliate-registration|affiliate-account|\/affiliates)[^"\']*)["\']/', $l, $m)) {
             $found = true;
-            $path = $m[1];
+            $path = html_entity_decode($m[1]);
             $affiliateUrl = str_starts_with($path, 'http') ? $path : $base . '/' . ltrim($path, '/');
         }
 
-        // Check common affiliate page paths
-        if (!$found) {
-            $paths = ['/affiliate-program', '/affiliate-area', '/affiliates', '/affiliate', '/affiliate-registration', '/affiliate-account', '/partners', '/referral'];
-            foreach ($paths as $path) {
-                try {
-                    $check = Http::timeout(5)->withHeaders(['User-Agent' => 'PeptideMapBot/1.0'])->get($base . $path);
-                    if ($check->successful() && $check->status() !== 404) {
-                        $body = strtolower($check->body());
-                        if (str_contains($body, 'affiliate') || str_contains($body, 'commission') || str_contains($body, 'referral') || str_contains($body, 'register')) {
-                            $found = true;
-                            $affiliateUrl = $base . $path;
-                            break;
-                        }
-                    }
-                } catch (\Throwable $e) {}
-            }
+        // Check for GoAffPro integration
+        if (!$found && preg_match('/goaffpro\.com[^"\']*create-account[^"\']*/', $l, $m)) {
+            $found = true;
+            $affiliateUrl = 'https://' . $m[0];
         }
 
-        // Content-based detection (no URL found but mentions exist)
+        // Content-based detection
         if (!$found && (str_contains($l, 'affiliate program') || (str_contains($l, 'affiliate') && str_contains($l, 'commission')))) {
             $found = true;
         }
