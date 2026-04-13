@@ -102,7 +102,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Link, router } from '@inertiajs/vue3'
+import { Link, router, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import PageHeader from '@/components/admin/PageHeader.vue'
 import FilterBar from '@/components/admin/FilterBar.vue'
@@ -139,7 +139,9 @@ const filteredEntries = computed(() => {
 })
 
 function toggleVisibility(entryId) {
-  router.post(`/admin/encyclopedia-entries/${entryId}/toggle-visibility`, {}, {
+  router.post(`/admin/encyclopedia-entries/${entryId}/toggle-visibility`, {
+    _token: usePage().props.csrf_token,
+  }, {
     preserveScroll: true,
   })
 }
