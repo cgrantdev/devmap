@@ -648,7 +648,7 @@ class HomeController extends Controller
                         : ($category->description ? Str::limit(strip_tags($category->description), 140) : null),
                     'products_count' => (int) $category->products_count,
                     'image' => $image,
-                    'url' => '/encyclopedia/article/' . $category->slug,
+                    'url' => '/encyclopedia/' . $category->slug,
                 ];
             });
 

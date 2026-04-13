@@ -712,8 +712,8 @@ class EncyclopediaController extends Controller
             'og_image' => $seoOgImage,
             // Backward-compatible field used by some pages
             'image' => $seoOgImage,
-            'url' => url("/encyclopedia/article/{$slug}"),
-            'canonical' => url("/encyclopedia/article/{$slug}"),
+            'url' => url("/encyclopedia/{$slug}"),
+            'canonical' => url("/encyclopedia/{$slug}"),
         ];
         
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)

@@ -115,7 +115,7 @@ const hasImage = computed(() => {
 })
 
 const handleClick = () => {
-  router.visit(`/encyclopedia/article/${props.slug}`)
+  router.visit(`/encyclopedia/${props.slug}`)
 }
 
 const onError = (event) => {

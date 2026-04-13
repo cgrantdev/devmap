@@ -164,7 +164,7 @@ const props = defineProps({
 })
 
 const handleClick = () => {
-  router.visit(`/encyclopedia/article/${props.slug}`)
+  router.visit(`/encyclopedia/${props.slug}`)
 }
 
 const hasError = ref(false)

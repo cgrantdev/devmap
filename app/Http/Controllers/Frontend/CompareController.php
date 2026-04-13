@@ -114,7 +114,7 @@ class CompareController extends Controller
                     ? Str::limit(strip_tags($educationPost->description), 200)
                     : null,
                 'encyclopedia_url' => ($educationPost && $educationPost->status === 'published')
-                    ? "/encyclopedia/article/{$category->slug}"
+                    ? "/encyclopedia/{$category->slug}"
                     : null,
                 'product_count' => $products->count(),
                 'cheapest_price' => $products->first()['effective_price'] ?? null,
