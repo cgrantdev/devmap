@@ -51,6 +51,11 @@ class ProductCategory extends Model
         return $this->hasMany(Product::class);
     }
 
+    public function aliases()
+    {
+        return $this->hasMany(CategoryAlias::class, 'product_category_id');
+    }
+
     public function educationPost()
     {
         return $this->hasOne(EducationPost::class, 'product_category_id');

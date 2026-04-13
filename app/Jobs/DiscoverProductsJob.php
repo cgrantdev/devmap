@@ -77,15 +77,24 @@ class DiscoverProductsJob implements ShouldQueue
                 continue;
             }
 
-            // Try to match to an existing category by name
+            // Try to match category via alias database first, then by name
             $category = null;
             if (!empty($p['name'])) {
-                $category = ProductCategory::where('is_active', true)
-                    ->where(function ($q) use ($p) {
-                        $q->where('name', 'LIKE', '%' . $p['name'] . '%')
-                          ->orWhere('slug', 'LIKE', '%' . Str::slug($p['name']) . '%');
-                    })
-                    ->first();
+                $category = \App\Models\CategoryAlias::matchCategory($p['name']);
+            }
+            if (!$category && !empty($p['name'])) {
+                // Fallback: create a category from the product name (strip dosage)
+                $catName = preg_replace('/\s*\([\d].*\)\s*$/', '', $p['name']);
+                $catName = preg_replace('/\s*\d+\s*mg\s*$/i', '', $catName);
+                $catName = preg_replace('/\s*Blend\s*$/i', '', $catName);
+                $catName = preg_replace('/\s*Kit\s*$/i', '', $catName);
+                $catName = trim($catName);
+                if (!empty($catName)) {
+                    $category = ProductCategory::firstOrCreate(
+                        ['slug' => Str::slug($catName)],
+                        ['name' => $catName, 'is_active' => true]
+                    );
+                }
             }
 
             Product::create([
