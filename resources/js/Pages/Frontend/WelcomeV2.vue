@@ -16,6 +16,26 @@
     </section>
 
     <!-- ========================================================= -->
+    <!-- VENDOR LOGO MARQUEE — social proof strip                   -->
+    <!-- ========================================================= -->
+    <div v-if="verifiedVendors.length" class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] py-5 overflow-hidden relative">
+      <div class="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[color:var(--color-bg)] to-transparent z-10 pointer-events-none" />
+      <div class="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[color:var(--color-bg)] to-transparent z-10 pointer-events-none" />
+      <div class="flex items-center gap-14 ui-marquee">
+        <template v-for="i in 4" :key="i">
+          <div
+            v-for="vendor in verifiedVendors"
+            :key="`${i}-${vendor.id}`"
+            class="flex-shrink-0 h-7 w-24 flex items-center justify-center opacity-25 hover:opacity-50 transition-opacity"
+          >
+            <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-full object-contain brightness-0" loading="lazy" />
+            <span v-else class="text-[11px] font-semibold text-[color:var(--color-ink-subtle)] whitespace-nowrap">{{ vendor.name }}</span>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- ========================================================= -->
     <!-- 2. COMPOUND CATEGORIES — "What are you researching?"       -->
     <!-- ========================================================= -->
     <section class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
@@ -205,70 +225,30 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 6. VENDOR LOGO MARQUEE + CTA                               -->
+    <!-- 6. VENDOR CTA — light, compact                             -->
     <!-- ========================================================= -->
-    <section class="relative bg-[#0A0B0E] text-white overflow-hidden">
-      <div class="absolute inset-0" :style="{ background: 'radial-gradient(ellipse 900px 500px at 30% 30%, rgba(99,102,241,0.18) 0%, transparent 60%)' }" />
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[140%] h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-
-      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-14 lg:pt-20 pb-10 lg:pb-14">
-        <!-- Vendor CTA -->
-        <div class="text-center mb-10 lg:mb-14">
-          <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-[color:var(--color-accent-400)] mb-3">For vendors</div>
-          <h2 class="ui-display text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-white leading-[1.15] mb-4 max-w-2xl mx-auto">
+    <section class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-16">
+      <div class="border border-[color:var(--color-hairline)] bg-gradient-to-r from-[color:var(--color-accent-50)] to-white p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
+        <div class="flex-1">
+          <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-2">For vendors</div>
+          <h2 class="ui-display text-xl md:text-2xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-2">
             List your research peptides on PeptideMaps
           </h2>
-          <p class="text-white/45 text-[15px] leading-relaxed max-w-lg mx-auto mb-8">
+          <p class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">
             Auto-sync from WooCommerce. Click analytics. Affiliate tracking. Free during beta.
           </p>
-          <div class="flex items-center justify-center gap-4">
-            <a
-              href="/become-a-vendor"
-              class="ui-focus inline-flex items-center gap-2 h-12 px-7 bg-white text-[#0A0B0E] text-[15px] font-semibold hover:bg-white/95 transition-all shadow-lg"
-            >
-              Get listed
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            </a>
-            <a href="/vendor/login" class="text-sm text-white/40 hover:text-white/70 font-medium transition-colors">
-              Vendor sign in →
-            </a>
-          </div>
         </div>
-
-        <!-- Stats row -->
-        <div class="flex items-center justify-center gap-8 lg:gap-16 text-center mb-10 lg:mb-14">
-          <div>
-            <div class="ui-mono text-2xl lg:text-3xl font-bold text-white">{{ formatNumber(stats.total_vendors) }}+</div>
-            <div class="text-[12px] text-white/30 mt-1">Vendors</div>
-          </div>
-          <div class="w-px h-8 bg-white/10" />
-          <div>
-            <div class="ui-mono text-2xl lg:text-3xl font-bold text-white">{{ formatNumber(stats.compounds) }}+</div>
-            <div class="text-[12px] text-white/30 mt-1">Compounds</div>
-          </div>
-          <div class="w-px h-8 bg-white/10" />
-          <div>
-            <div class="ui-mono text-2xl lg:text-3xl font-bold text-white">99%+</div>
-            <div class="text-[12px] text-white/30 mt-1">Purity verified</div>
-          </div>
-        </div>
-
-        <!-- Logo marquee -->
-        <div v-if="verifiedVendors.length" class="relative overflow-hidden py-4 -mx-5 lg:-mx-10">
-          <div class="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#0A0B0E] to-transparent z-10 pointer-events-none" />
-          <div class="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#0A0B0E] to-transparent z-10 pointer-events-none" />
-          <div class="flex items-center gap-12 ui-marquee">
-            <template v-for="i in 3" :key="i">
-              <div
-                v-for="vendor in verifiedVendors"
-                :key="`${i}-${vendor.id}`"
-                class="flex-shrink-0 h-8 w-24 flex items-center justify-center opacity-30 hover:opacity-60 transition-opacity"
-              >
-                <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-full object-contain brightness-0 invert" loading="lazy" />
-                <span v-else class="text-[11px] font-semibold text-white/40 whitespace-nowrap">{{ vendor.name }}</span>
-              </div>
-            </template>
-          </div>
+        <div class="flex items-center gap-4 flex-shrink-0">
+          <a
+            href="/become-a-vendor"
+            class="ui-focus inline-flex items-center gap-2 h-11 px-6 text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:-translate-y-[0.5px] transition-all"
+          >
+            Get listed
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+          <a href="/vendor/login" class="text-[13px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] font-medium transition-colors">
+            Vendor sign in →
+          </a>
         </div>
       </div>
     </section>
