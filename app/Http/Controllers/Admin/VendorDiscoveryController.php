@@ -176,13 +176,16 @@ class VendorDiscoveryController extends Controller
             $name = $this->extractName($html, $domain);
             $slug = Str::slug($name);
 
+            $affiliateData = $this->detectAffiliate($html, $url);
+
             return [
                 'name' => $name,
                 'slug' => $slug,
                 'url' => $url,
                 'domain' => $domain,
                 'platform' => $this->detectPlatform($html, $url),
-                'has_affiliate' => $this->detectAffiliate($html, $url),
+                'has_affiliate' => $affiliateData['found'],
+                'affiliate_url' => $affiliateData['url'],
                 'email' => $this->extractEmail($html),
                 'description' => $this->extractDescription($html),
             ];
@@ -232,12 +235,44 @@ class VendorDiscoveryController extends Controller
         return null;
     }
 
-    private function detectAffiliate(string $html, string $url): bool
+    private function detectAffiliate(string $html, string $url): array
     {
+        $base = rtrim($url, '/');
         $l = strtolower($html);
-        if (str_contains($l, 'affiliate program') || (str_contains($l, 'affiliate') && str_contains($l, 'commission'))) return true;
-        if (preg_match('/href=["\'][^"\']*\/affiliate[s]?["\']/', $l)) return true;
-        return false;
+        $found = false;
+        $affiliateUrl = null;
+
+        // Check for affiliate links in the page HTML
+        if (preg_match('/href=["\']([^"\']*(?:affiliate|partners|referral)[^"\']*)["\']/', $l, $m)) {
+            $found = true;
+            $path = $m[1];
+            $affiliateUrl = str_starts_with($path, 'http') ? $path : $base . '/' . ltrim($path, '/');
+        }
+
+        // Check common affiliate page paths
+        if (!$found) {
+            $paths = ['/affiliate-program', '/affiliate-area', '/affiliates', '/affiliate', '/affiliate-registration', '/affiliate-account', '/partners', '/referral'];
+            foreach ($paths as $path) {
+                try {
+                    $check = Http::timeout(5)->withHeaders(['User-Agent' => 'PeptideMapBot/1.0'])->get($base . $path);
+                    if ($check->successful() && $check->status() !== 404) {
+                        $body = strtolower($check->body());
+                        if (str_contains($body, 'affiliate') || str_contains($body, 'commission') || str_contains($body, 'referral') || str_contains($body, 'register')) {
+                            $found = true;
+                            $affiliateUrl = $base . $path;
+                            break;
+                        }
+                    }
+                } catch (\Throwable $e) {}
+            }
+        }
+
+        // Content-based detection (no URL found but mentions exist)
+        if (!$found && (str_contains($l, 'affiliate program') || (str_contains($l, 'affiliate') && str_contains($l, 'commission')))) {
+            $found = true;
+        }
+
+        return ['found' => $found, 'url' => $affiliateUrl];
     }
 
     private function extractEmail(string $html): ?string

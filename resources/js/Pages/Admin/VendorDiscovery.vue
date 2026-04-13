@@ -106,10 +106,11 @@
               <span v-else class="text-[11px] text-[color:var(--color-ink-subtle)]">—</span>
             </td>
             <td class="px-4 py-3">
-              <span v-if="vendor.has_affiliate" class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
+              <a v-if="vendor.affiliate_url" :href="vendor.affiliate_url" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:underline">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Yes
-              </span>
+                Sign up
+              </a>
+              <span v-else-if="vendor.has_affiliate" class="text-[11px] font-semibold text-emerald-600">Yes</span>
               <span v-else class="text-[11px] text-[color:var(--color-ink-subtle)]">—</span>
             </td>
             <td class="px-4 py-3">
