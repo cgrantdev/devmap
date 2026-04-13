@@ -135,7 +135,7 @@ class EncyclopediaController extends Controller
         // Exclude known non-peptide categories (accessories, supplies, etc.).
         $excludeNames = [
             'Bacteriostatic Water', 'Syringes', 'Accessories', 'Supplies',
-            'Mixing Kit', 'Mixing Kits', 'Alcohol Swabs',
+            'Mixing Kit', 'Mixing Kits', 'Alcohol Swabs', 'Uncategorized',
         ];
 
         $query = ProductCategory::where('is_active', true)
