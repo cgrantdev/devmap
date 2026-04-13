@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Models\User;
 use App\Models\VendorSetting;
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -160,6 +162,27 @@ class VendorDiscoveryController extends Controller
             $brand = Brand::with('vendorSetting')->find($id);
             if ($brand && !$brand->is_active) {
                 $brand->update(['is_active' => true]);
+
+                // Auto-create a vendor user account if none exists
+                if (!$brand->user_id) {
+                    $vs = $brand->vendorSetting;
+                    $email = $vs?->contact_email ?? Str::slug($brand->name) . '@vendor.peptidemap.com';
+                    $existingUser = User::where('email', $email)->first();
+
+                    if (!$existingUser) {
+                        $user = User::create([
+                            'name' => $brand->name,
+                            'email' => $email,
+                            'password' => Hash::make(Str::random(24)),
+                            'role' => 'vendor',
+                        ]);
+                    } else {
+                        $user = $existingUser;
+                    }
+
+                    $brand->update(['user_id' => $user->id]);
+                }
+
                 if ($brand->vendorSetting) {
                     $brand->vendorSetting->update(['approval_status' => 'approved', 'status' => 1]);
 

@@ -52,7 +52,7 @@
           class="scroll-mt-24"
         >
           <!-- Compound header -->
-          <div class="flex items-start justify-between gap-4 mb-6 flex-wrap">
+          <div class="flex items-start justify-between gap-4 mb-4 flex-wrap">
             <div>
               <div class="flex items-center gap-3 mb-2">
                 <span class="ui-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)]">
@@ -80,21 +80,45 @@
             </div>
           </div>
 
+          <!-- Mg size selector tabs -->
+          <div v-if="getSizes(compound).length > 1" class="flex items-center gap-1.5 mb-4">
+            <button
+              @click="setSize(idx, null)"
+              :class="[
+                'ui-mono h-8 px-3 rounded-[8px] text-[12px] font-semibold transition-all',
+                getSelectedSize(idx) === null
+                  ? 'bg-[color:var(--color-ink)] text-white shadow-sm'
+                  : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]',
+              ]"
+            >All sizes</button>
+            <button
+              v-for="size in getSizes(compound)"
+              :key="size"
+              @click="setSize(idx, size)"
+              :class="[
+                'ui-mono h-8 px-3 rounded-[8px] text-[12px] font-semibold transition-all',
+                getSelectedSize(idx) === size
+                  ? 'bg-[color:var(--color-ink)] text-white shadow-sm'
+                  : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]',
+              ]"
+            >{{ formatMg(size) }}mg</button>
+          </div>
+
           <!-- Price table -->
-          <div v-if="compound.products.length" class="bg-white rounded-[14px] border border-[color:var(--color-hairline)] overflow-hidden shadow-[var(--shadow-xs)]">
+          <div v-if="getFilteredProducts(compound, idx).length" class="bg-white rounded-[14px] border border-[color:var(--color-hairline)] overflow-hidden shadow-[var(--shadow-xs)]">
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
                   <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendor</th>
                   <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Product</th>
                   <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Price</th>
-                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden sm:table-cell">Discount</th>
+                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden sm:table-cell">Savings</th>
                   <th class="text-right px-5 py-3 w-[100px]"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr
-                  v-for="(product, pidx) in compound.products"
+                  v-for="(product, pidx) in getFilteredProducts(compound, idx)"
                   :key="product.id"
                   :class="[
                     'border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] transition-colors',
@@ -122,6 +146,12 @@
                         </a>
                         <div v-if="pidx === 0" class="flex items-center gap-1 mt-0.5">
                           <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Best price</span>
+                          <span
+                            v-if="percentCheaper(getFilteredProducts(compound, idx))"
+                            class="ml-1 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-[color:var(--color-verified-bg)] border border-[#A7F3D0] text-[10px] font-bold text-[#065F46]"
+                          >
+                            {{ percentCheaper(getFilteredProducts(compound, idx)) }}% cheaper
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -130,7 +160,7 @@
                   <td class="px-5 py-4 text-[color:var(--color-ink-muted)]">
                     <span class="line-clamp-1">{{ product.name }}</span>
                     <span v-if="product.size_mg" class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)]">
-                      {{ product.size_mg }}mg
+                      {{ formatMg(product.size_mg) }}mg
                     </span>
                   </td>
                   <!-- Price -->
@@ -174,10 +204,15 @@
 
           <!-- Empty state -->
           <div
-            v-else
+            v-if="!getFilteredProducts(compound, idx).length"
             class="bg-white rounded-[14px] border border-dashed border-[color:var(--color-hairline)] p-10 text-center text-[color:var(--color-ink-subtle)] text-sm"
           >
-            No vendors currently stock this compound.
+            <template v-if="compound.products.length && !getFilteredProducts(compound, idx).length">
+              No products at this dosage. Try a different size above.
+            </template>
+            <template v-else>
+              No vendors currently stock this compound.
+            </template>
           </div>
         </div>
       </div>
@@ -186,17 +221,52 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
-defineProps({
+const props = defineProps({
   compounds: { type: Array, default: () => [] },
   seo: { type: Object, default: () => ({}) },
 })
+
+// Track selected mg size per compound (by index). null = "All"
+const selectedSizes = ref({})
+
+function getSizes(compound) {
+  return [...new Set(compound.products.map(p => Number(p.size_mg)).filter(Boolean))].sort((a, b) => a - b)
+}
+
+function getSelectedSize(idx) {
+  return selectedSizes.value[idx] ?? null
+}
+
+function setSize(idx, size) {
+  selectedSizes.value = { ...selectedSizes.value, [idx]: size }
+}
+
+function getFilteredProducts(compound, idx) {
+  const size = getSelectedSize(idx)
+  if (!size) return compound.products
+  return compound.products.filter(p => Number(p.size_mg) === size)
+}
+
+function percentCheaper(products) {
+  if (products.length < 2) return null
+  const first = parseFloat(products[0]?.effective_price)
+  const second = parseFloat(products[1]?.effective_price)
+  if (!first || !second || first >= second) return null
+  return Math.round((1 - first / second) * 100)
+}
 
 function formatPrice(p) {
   if (p === null || p === undefined || p === '') return '—'
   const num = typeof p === 'number' ? p : parseFloat(p)
   return isNaN(num) ? String(p) : num.toFixed(2)
+}
+
+function formatMg(mg) {
+  const n = Number(mg)
+  return n % 1 === 0 ? n.toFixed(0) : n.toString()
 }
 </script>
