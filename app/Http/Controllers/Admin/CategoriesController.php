@@ -132,6 +132,10 @@ class CategoriesController extends Controller
                 ];
             });
         
+        $aliases = \App\Models\CategoryAlias::where('product_category_id', $category->id)
+            ->orderBy('keyword')
+            ->get(['id', 'keyword']);
+
         return Inertia::render('Admin/CategoryEdit', [
             'category' => [
                 'id' => $category->id,
@@ -145,7 +149,7 @@ class CategoriesController extends Controller
                 'products_count' => $category->products_count,
                 'research_area' => $category->research_area,
             ],
-            'similarCategories' => $similarCategories,
+            'aliases' => $aliases,
             'products' => $products,
         ]);
     }
@@ -165,11 +169,10 @@ class CategoriesController extends Controller
             'is_active' => 'boolean',
             'research_area' => 'nullable|string|max:255',
         ]);
-        
+
         // Auto-generate slug if not provided
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['name']);
-            // Ensure unique slug
             $baseSlug = $validated['slug'];
             $counter = 1;
             while (ProductCategory::where('slug', $validated['slug'])->where('id', '!=', $id)->exists()) {
@@ -177,7 +180,7 @@ class CategoriesController extends Controller
                 $counter++;
             }
         }
-        
+
         // Handle image upload and convert to WebP
         if ($request->hasFile('image')) {
             // Delete old image if exists
@@ -398,6 +401,34 @@ class CategoriesController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'Error merging categories: ' . $e->getMessage());
         }
+    }
+
+    public function addAlias(Request $request, $id)
+    {
+        $category = ProductCategory::findOrFail($id);
+        $validated = $request->validate(['keyword' => 'required|string|max:100']);
+
+        $keyword = strtolower(trim($validated['keyword']));
+
+        // Check if alias already exists for any category
+        $existing = \App\Models\CategoryAlias::where('keyword', $keyword)->first();
+        if ($existing) {
+            return back()->with('error', "Alias '{$keyword}' already exists for category '{$existing->category->name}'.");
+        }
+
+        \App\Models\CategoryAlias::create([
+            'product_category_id' => $category->id,
+            'keyword' => $keyword,
+        ]);
+
+        return back()->with('success', "Alias '{$keyword}' added.");
+    }
+
+    public function removeAlias($aliasId)
+    {
+        $alias = \App\Models\CategoryAlias::findOrFail($aliasId);
+        $alias->delete();
+        return back()->with('success', 'Alias removed.');
     }
 
     private function findSimilarCategories(ProductCategory $category)

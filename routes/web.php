@@ -210,6 +210,8 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/categories/{id}/merge', [CategoriesController::class, 'merge'])->name('admin.categories.merge');
     Route::post('/categories/bulk-merge', [CategoriesController::class, 'bulkMerge'])->name('admin.categories.bulk-merge');
     Route::post('/categories/bulk-delete', [CategoriesController::class, 'bulkDelete'])->name('admin.categories.bulk-delete');
+    Route::post('/categories/{id}/aliases', [CategoriesController::class, 'addAlias'])->name('admin.categories.add-alias');
+    Route::delete('/categories/aliases/{aliasId}', [CategoriesController::class, 'removeAlias'])->name('admin.categories.remove-alias');
     
     // Locations
     Route::get('/locations', [LocationsController::class, 'index'])->name('admin.locations.index');
