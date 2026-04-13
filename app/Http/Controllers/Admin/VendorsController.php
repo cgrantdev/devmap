@@ -666,7 +666,11 @@ class VendorsController extends Controller
         
         // Filter by category
         if ($request->has('category') && $request->category && $request->category !== 'all') {
-            $query->where('product_category_id', $request->category);
+            if ($request->category === 'uncategorized') {
+                $query->whereHas('category', fn($q) => $q->where('slug', 'uncategorized'));
+            } else {
+                $query->where('product_category_id', $request->category);
+            }
         }
         
         // Search functionality

@@ -40,6 +40,7 @@
       <!-- Category filter -->
       <select v-model="filterCategory" @change="fetchData(1)" class="h-9 px-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none">
         <option value="all">All Categories</option>
+        <option value="uncategorized">⚠ Uncategorized Only</option>
         <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
       </select>
     </div>
@@ -74,7 +75,6 @@
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5">
                     <span class="text-[13px] font-medium text-[color:var(--color-ink)] truncate max-w-xs">{{ product.name }}</span>
-                    <span v-if="product.category_name === 'Uncategorized' || product.hidden" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-bold text-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)]" title="Needs manual categorization">⚠ UNCATEGORIZED</span>
                   </div>
                   <div v-if="product.dosage || product.size_mg" class="text-[11px] text-[color:var(--color-ink-subtle)]">{{ product.dosage || product.size_mg }}</div>
                 </div>
@@ -83,8 +83,9 @@
             <td class="px-5 py-3.5 text-[13px] text-[color:var(--color-ink-muted)]">
               {{ product.vendor_name || product.brand_name || '—' }}
             </td>
-            <td class="px-5 py-3.5 text-[13px] text-[color:var(--color-ink-muted)]">
-              {{ product.category_name || '—' }}
+            <td class="px-5 py-3.5">
+              <span v-if="product.category_name === 'Uncategorized'" class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold text-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)]">⚠ UNCATEGORIZED</span>
+              <span v-else class="text-[13px] text-[color:var(--color-ink-muted)]">{{ product.category_name || '—' }}</span>
             </td>
             <td class="px-5 py-3.5">
               <span class="ui-mono text-[13px] text-[color:var(--color-ink)]">${{ product.price || '0.00' }}</span>
