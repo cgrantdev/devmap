@@ -140,6 +140,9 @@ class EncyclopediaController extends Controller
 
         $query = ProductCategory::where('is_active', true)
             ->whereNotIn('name', $excludeNames)
+            ->where('name', 'NOT LIKE', '%/%')
+            ->where('name', 'NOT LIKE', '%GLOW%')
+            ->where('name', 'NOT LIKE', '%KLOW%')
             ->withCount([
                 'products as products_count' => function ($q) {
                     $q->visible()->where('status', 'active');
