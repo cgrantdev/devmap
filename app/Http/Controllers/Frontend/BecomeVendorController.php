@@ -63,7 +63,9 @@ class BecomeVendorController extends Controller
             'password' => 'required|string|min:8|confirmed',
             
             // Step 3: Business Info
-            'salesVolume' => 'nullable|string|max:50',
+            'connectionMethod' => 'nullable|string|in:woocommerce,api_key,auto_scrape',
+            'apiConsumerKey' => 'nullable|string|max:255',
+            'apiConsumerSecret' => 'nullable|string|max:255',
             'productCount' => 'nullable|string|max:50',
             'companyDescription' => 'nullable|string|max:2000',
             'paymentMethods' => 'nullable|array',
@@ -124,6 +126,11 @@ class BecomeVendorController extends Controller
                 'payment_methods' => $validated['paymentMethods'] ?? null,
                 'status' => 0, // Inactive until approved
                 'approval_status' => 'pending', // Pending approval
+                'api_platform' => match ($validated['connectionMethod'] ?? null) {
+                    'woocommerce', 'api_key' => 'woocommerce',
+                    'auto_scrape' => 'page_scrape',
+                    default => null,
+                },
             ]);
 
             // Handle logo upload
@@ -148,6 +155,24 @@ class BecomeVendorController extends Controller
             }
 
             $settings->save();
+
+            // Create ScrapingConfig if API keys provided
+            if (!empty($validated['apiConsumerKey']) && !empty($validated['apiConsumerSecret'])) {
+                \App\Models\ScrapingConfig::create([
+                    'vendor_id' => $brand->id,
+                    'vendor_name' => $brand->name,
+                    'type' => 'woo_api',
+                    'store_url' => $validated['website'],
+                    'products_url' => $validated['website'],
+                    'auth_credentials' => [
+                        'consumer_key' => $validated['apiConsumerKey'],
+                        'consumer_secret' => $validated['apiConsumerSecret'],
+                    ],
+                    'enabled' => true,
+                    'frequency' => 'daily',
+                    'auto_promote' => true,
+                ]);
+            }
 
             DB::commit();
 

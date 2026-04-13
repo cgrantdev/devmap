@@ -43,10 +43,15 @@ class DiscoverProductsJob implements ShouldQueue
 
         Log::info('DiscoverProducts: starting', ['brand' => $this->brand->name, 'url' => $url]);
 
-        $products = $this->crawlForProducts($url);
+        // Strategy 0: Try WooCommerce Store API first (public, no auth)
+        $products = $this->tryWooCommerceStoreApi($url);
+
+        // Strategy 1: Crawl HTML pages
+        if (empty($products)) {
+            $products = $this->crawlForProducts($url);
+        }
 
         if (empty($products)) {
-            // Try common store page paths
             $paths = ['/shop', '/store', '/products', '/collections', '/us/store', '/peptides'];
             foreach ($paths as $path) {
                 $products = $this->crawlForProducts(rtrim($url, '/') . $path);
@@ -107,6 +112,50 @@ class DiscoverProductsJob implements ShouldQueue
             'found' => count($products),
             'created' => $created,
         ]);
+    }
+
+    /**
+     * Try WooCommerce Store API (public, no auth needed).
+     * Works for any WooCommerce store without API keys.
+     */
+    private function tryWooCommerceStoreApi(string $url): array
+    {
+        $base = rtrim($url, '/');
+        $products = [];
+        $page = 1;
+
+        try {
+            while ($page <= 5) { // Max 500 products
+                $response = Http::timeout(15)
+                    ->withHeaders(['User-Agent' => 'PeptideMapBot/1.0'])
+                    ->get($base . '/wp-json/wc/store/v1/products', ['per_page' => 100, 'page' => $page]);
+
+                if (!$response->successful()) break;
+
+                $items = $response->json();
+                if (!is_array($items) || empty($items)) break;
+
+                foreach ($items as $p) {
+                    $name = html_entity_decode($p['name'] ?? 'Unknown');
+                    $price = isset($p['prices']['price']) ? (float) $p['prices']['price'] / 100 : null;
+                    $products[] = [
+                        'name' => $name,
+                        'url' => $p['permalink'] ?? null,
+                        'price' => $price,
+                        'image' => $p['images'][0]['src'] ?? null,
+                        'description' => Str::limit(strip_tags($p['short_description'] ?? ''), 500),
+                    ];
+                }
+
+                if (count($items) < 100) break;
+                $page++;
+                usleep(300_000);
+            }
+        } catch (\Throwable $e) {
+            // WC Store API not available — fall through to HTML crawling
+        }
+
+        return $products;
     }
 
     private function crawlForProducts(string $url): array

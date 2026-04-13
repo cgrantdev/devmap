@@ -663,15 +663,38 @@
                 </label>
               </div>
 
+              <!-- API Key input (shown when api_key selected) -->
+              <div v-if="formData.connectionMethod === 'api_key'" class="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-4">
+                <h3 class="text-sm font-semibold text-slate-800">How to get your WooCommerce API Key:</h3>
+                <ol class="text-xs text-slate-600 space-y-2 list-decimal list-inside">
+                  <li>Log in to your WordPress admin panel</li>
+                  <li>Go to <strong>WooCommerce → Settings → Advanced → REST API</strong></li>
+                  <li>Click <strong>"Add key"</strong></li>
+                  <li>Set Description to <strong>"PeptideMaps"</strong>, Permissions to <strong>"Read"</strong></li>
+                  <li>Click <strong>"Generate API key"</strong></li>
+                  <li>Copy the <strong>Consumer Key</strong> and <strong>Consumer Secret</strong> below</li>
+                </ol>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Consumer Key</label>
+                    <input v-model="formData.apiConsumerKey" type="text" placeholder="ck_xxxxxxxxxxxxxxxx" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-slate-400" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Consumer Secret</label>
+                    <input v-model="formData.apiConsumerSecret" type="password" placeholder="cs_xxxxxxxxxxxxxxxx" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-slate-400" />
+                  </div>
+                </div>
+              </div>
+
               <!-- Navigation Buttons -->
               <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-200">
                 <button type="button" @click="goToStep(3)" class="px-6 py-2 text-slate-600 hover:text-slate-700 transition-colors">Back</button>
                 <button
                   type="submit"
                   :disabled="isSubmitting"
-                  :class="['flex items-center gap-2 px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors', isSubmitting ? 'opacity-50 cursor-not-allowed' : '']"
+                  :class="['flex items-center gap-2 px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors', isSubmitting ? 'opacity-50 cursor-not-allowed' : '']"
                 >
-                  <span v-if="isSubmitting">Submitting...</span>
+                  <span v-if="isSubmitting">Creating account...</span>
                   <span v-else>Complete Registration</span>
                   <svg v-if="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
                   <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
@@ -912,6 +935,8 @@ const formData = ref({
   password: '',
   confirmPassword: '',
   connectionMethod: 'woocommerce',
+  apiConsumerKey: '',
+  apiConsumerSecret: '',
   productCount: '',
   companyDescription: '',
   paymentMethods: [],
@@ -1029,7 +1054,9 @@ const handleStep4Submit = () => {
     password_confirmation: formData.value.confirmPassword,
     
     // Step 3
-    connectionMethod: formData.value.connectionMethod || 'manual',
+    connectionMethod: formData.value.connectionMethod || 'auto_scrape',
+    apiConsumerKey: formData.value.apiConsumerKey || null,
+    apiConsumerSecret: formData.value.apiConsumerSecret || null,
     productCount: formData.value.productCount || null,
     companyDescription: formData.value.companyDescription || null,
     paymentMethods: formData.value.paymentMethods || [],
