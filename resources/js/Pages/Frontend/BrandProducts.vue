@@ -34,6 +34,10 @@
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
                   {{ brand.location }}
                 </span>
+                <span v-if="brand.contact_email" class="hidden sm:flex items-center gap-1 ml-2 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 01-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                  {{ brand.contact_email }}
+                </span>
               </div>
             </div>
 

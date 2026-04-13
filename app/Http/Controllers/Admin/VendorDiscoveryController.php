@@ -155,18 +155,50 @@ class VendorDiscoveryController extends Controller
         ]);
 
         $activated = 0;
+        $scraped = 0;
         foreach ($validated['brand_ids'] as $id) {
-            $brand = Brand::find($id);
+            $brand = Brand::with('vendorSetting')->find($id);
             if ($brand && !$brand->is_active) {
                 $brand->update(['is_active' => true]);
                 if ($brand->vendorSetting) {
                     $brand->vendorSetting->update(['approval_status' => 'approved', 'status' => 1]);
+
+                    // Auto-create ScrapingConfig for this vendor
+                    $vs = $brand->vendorSetting;
+                    $type = match ($vs->api_platform) {
+                        'woocommerce' => 'woo_api',
+                        default => 'page_scrape',
+                    };
+
+                    $config = \App\Models\ScrapingConfig::updateOrCreate(
+                        ['vendor_id' => $brand->id],
+                        [
+                            'vendor_name' => $brand->name,
+                            'type' => $type,
+                            'store_url' => $vs->shop_url,
+                            'enabled' => true,
+                            'frequency' => 'daily',
+                            'auto_promote' => true,
+                        ]
+                    );
+
+                    // Dispatch page scraper if it's not WooCommerce (WooCommerce needs API keys)
+                    if ($type === 'page_scrape' && $vs->shop_url) {
+                        try {
+                            \App\Jobs\RunPageScraperJob::dispatch($config);
+                            $scraped++;
+                        } catch (\Throwable $e) {
+                            \Log::warning("Failed to dispatch scraper for {$brand->name}: {$e->getMessage()}");
+                        }
+                    }
                 }
                 $activated++;
             }
         }
 
-        return back()->with('success', "Activated {$activated} vendor" . ($activated !== 1 ? 's' : '') . ".");
+        $msg = "Activated {$activated} vendor" . ($activated !== 1 ? 's' : '') . ".";
+        if ($scraped > 0) $msg .= " Product scraping started for {$scraped}.";
+        return back()->with('success', $msg);
     }
 
     public function import(Request $request)
