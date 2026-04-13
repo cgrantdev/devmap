@@ -9,8 +9,20 @@
       </div>
 
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pb-8">
-        <!-- Sort + Dosage bar -->
+        <!-- Sort + Dosage + Search bar -->
         <div class="flex flex-wrap items-center gap-3 mb-6">
+          <!-- Search -->
+          <div class="relative flex-1 max-w-xs">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input
+              v-model="searchQuery"
+              @input="handleSearchInput"
+              type="text"
+              placeholder="Search products..."
+              class="w-full h-9 pl-9 pr-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
+            />
+          </div>
+
           <!-- Sort -->
           <select
             class="h-9 px-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none"
@@ -309,56 +321,12 @@ const removePurityFilter = () => {
 
 const applyFilters = () => {
   const params = new URLSearchParams()
-  
-  // Preserve search query
-  if (searchQuery.value) {
-    params.set('search', searchQuery.value)
-  }
-  
-  if (selectedFilters.value.use !== null) {
-    params.set('use', selectedFilters.value.use)
-  }
-  if (selectedFilters.value.type !== null) {
-    params.set('type', selectedFilters.value.type)
-  }
-  if (selectedFilters.value.location !== null) {
-    params.set('location', selectedFilters.value.location)
-  } else {
-    params.delete('location')
-  }
-  if (selectedFilters.value.verification) {
-    params.set('verification', selectedFilters.value.verification)
-  }
-  if (selectedFilters.value.brand !== null) {
-    params.set('brand', selectedFilters.value.brand)
-  }
-  if (selectedFilters.value.cost_min) {
-    params.set('cost_min', selectedFilters.value.cost_min)
-  }
-  if (selectedFilters.value.cost_max) {
-    params.set('cost_max', selectedFilters.value.cost_max)
-  }
-  if (selectedFilters.value.inStock) {
-    params.set('in_stock', '1')
-  }
-  if (selectedFilters.value.onSale) {
-    params.set('on_sale', '1')
-  }
-  if (selectedFilters.value.labTested) {
-    params.set('lab_tested', '1')
-  }
-  if (selectedFilters.value.firstTimerDeals) {
-    params.set('first_timer_deals', '1')
-  }
-  if (selectedFilters.value.minPurity > 0) {
-    params.set('min_purity', selectedFilters.value.minPurity)
-  }
-  if (props.sort) {
-    params.set('sort', props.sort)
-  }
-  if (props.sortDir) {
-    params.set('sort_dir', props.sortDir)
-  }
+
+  if (searchQuery.value) params.set('search', searchQuery.value)
+  if (selectedSize.value) params.set('size', selectedSize.value)
+  if (selectedBrand.value) params.set('brand', selectedBrand.value)
+  if (props.sort) params.set('sort', props.sort)
+  if (props.sortDir) params.set('sort_dir', props.sortDir)
 
   router.visit(`/product/${props.slug}?${params.toString()}`, {
     preserveState: true,
