@@ -381,6 +381,11 @@ class ProductsController extends Controller
             $query->where('brand_id', $request->brand);
         }
 
+        // Dosage size filter
+        if ($request->has('size') && $request->size) {
+            $query->where('size_mg', (float) $request->size);
+        }
+
         if ($request->has('cost_min') && $request->cost_min) {
             $query->where('price', '>=', $request->cost_min);
         }
@@ -446,24 +451,23 @@ class ProductsController extends Controller
             ->where('status', 'active')
             ->where('product_category_id', $category->id);
 
+        // Available dosage sizes for this category
+        $availableSizes = (clone $baseQuery)
+            ->whereNotNull('size_mg')
+            ->where('size_mg', '>', 0)
+            ->selectRaw('DISTINCT size_mg')
+            ->orderBy('size_mg')
+            ->pluck('size_mg')
+            ->map(fn($s) => (float) $s)
+            ->values();
+
         $filterOptions = [
-            'uses' => Puse::whereHas('products', function ($q) use ($category) {
-                $q->visible()
-                  ->where('status', 'active')
-                  ->where('product_category_id', $category->id);
-            })->get(['id', 'name']),
-            'types' => Type::whereHas('products', function ($q) use ($category) {
-                $q->visible()
-                  ->where('status', 'active')
-                  ->where('product_category_id', $category->id);
-            })->get(['id', 'name']),
             'brands' => Brand::whereHas('products', function ($q) use ($category) {
                 $q->visible()
                   ->where('status', 'active')
                   ->where('product_category_id', $category->id);
             })->get(['id', 'name']),
-            // Provide all locations from the locations table so the filter always shows full list
-            'locations' => Location::orderBy('name')->get(['id', 'name']),
+            'sizes' => $availableSizes,
         ];
 
         // Get price range
