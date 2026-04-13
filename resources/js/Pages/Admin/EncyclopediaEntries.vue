@@ -26,6 +26,7 @@
         { value: 'all', label: 'All', count: entries.length },
         { value: 'published', label: 'Published', count: entries.filter(e => e.status === 'published').length },
         { value: 'draft', label: 'Drafts', count: entries.filter(e => e.status === 'draft').length },
+        { value: 'hidden', label: 'Hidden', count: entries.filter(e => !e.show_in_encyclopedia).length },
       ]"
     />
 
@@ -37,6 +38,7 @@
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Entry</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Category</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Status</th>
+            <th class="px-5 py-3 text-center text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Visible</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Date</th>
             <th class="px-5 py-3 w-20"></th>
           </tr>
@@ -59,6 +61,27 @@
             </td>
             <td class="px-5 py-3.5">
               <StatusBadge :status="entry.status" :label="entry.status === 'published' ? 'Published' : 'Draft'" />
+            </td>
+            <td class="px-5 py-3.5 text-center">
+              <button
+                @click.stop="toggleVisibility(entry.id)"
+                :title="entry.show_in_encyclopedia ? 'Visible — click to hide' : 'Hidden — click to show'"
+                class="inline-flex items-center justify-center w-8 h-8 rounded transition-colors"
+                :class="entry.show_in_encyclopedia
+                  ? 'text-[#059669] hover:bg-[#ECFDF5]'
+                  : 'text-[color:var(--color-ink-subtle)] hover:bg-[color:var(--color-hairline-soft)]'"
+              >
+                <!-- Eye open -->
+                <svg v-if="entry.show_in_encyclopedia" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+                <!-- Eye off -->
+                <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              </button>
             </td>
             <td class="px-5 py-3.5 text-[13px] text-[color:var(--color-ink-muted)] ui-mono">
               {{ entry.published_at || entry.created_at }}
@@ -108,8 +131,16 @@ const filteredEntries = computed(() => {
     list = list.filter(e => e.status === 'published')
   } else if (statusFilter.value === 'draft') {
     list = list.filter(e => e.status === 'draft')
+  } else if (statusFilter.value === 'hidden') {
+    list = list.filter(e => !e.show_in_encyclopedia)
   }
 
   return list
 })
+
+function toggleVisibility(entryId) {
+  router.post(`/admin/encyclopedia-entries/${entryId}/toggle-visibility`, {}, {
+    preserveScroll: true,
+  })
+}
 </script>

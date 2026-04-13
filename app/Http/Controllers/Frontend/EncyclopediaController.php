@@ -151,7 +151,11 @@ class EncyclopediaController extends Controller
             ->with(['educationPost' => function ($q) {
                 // Eagerly load the education post if it exists (published or not)
                 // so we can show "has article" vs "coming soon" in the UI
-            }]);
+            }])
+            // Exclude categories whose article has been hidden from the encyclopedia
+            ->whereDoesntHave('educationPost', function ($q) {
+                $q->where('show_in_encyclopedia', false);
+            });
 
         // Apply search
         if ($request->has('search') && $request->search) {
@@ -243,6 +247,7 @@ class EncyclopediaController extends Controller
 
         // Get all published encyclopedia entries (EducationPost)
         $encyclopediaEntries = EducationPost::where('status', 'published')
+            ->where('show_in_encyclopedia', true)
             ->with('category')
             ->orderBy('title')
             ->get()

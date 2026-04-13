@@ -38,6 +38,7 @@ class EducationPost extends Model
         'faqs',
         'published_at',
         'status',
+        'show_in_encyclopedia',
         'product_category_id',
         // New encyclopedia entry fields
         'tags',
@@ -78,6 +79,7 @@ class EducationPost extends Model
 
     protected $casts = [
         'published_at' => 'date',
+        'show_in_encyclopedia' => 'boolean',
         'rating' => 'decimal:2',
         'key_effects' => 'array',
         'common_use_cases' => 'array',

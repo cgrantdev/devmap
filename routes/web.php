@@ -247,6 +247,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::post('/encyclopedia-entries/{id}', [EncyclopediaEntriesManagementController::class, 'update'])->name('admin.encyclopedia-entries.update');
     Route::patch('/encyclopedia-entries/{id}/quick-update', [EncyclopediaEntriesManagementController::class, 'quickUpdate'])->name('admin.encyclopedia-entries.quick-update');
     Route::delete('/encyclopedia-entries/{id}', [EncyclopediaEntriesManagementController::class, 'destroy'])->name('admin.encyclopedia-entries.destroy');
+    Route::post('/encyclopedia-entries/{id}/toggle-visibility', [EncyclopediaEntriesManagementController::class, 'toggleVisibility'])->name('admin.encyclopedia-entries.toggle-visibility');
     
     // Pages
     Route::get('/pages', [PagesController::class, 'index'])->name('admin.pages.index');

@@ -24,6 +24,7 @@ class EncyclopediaEntriesManagementController extends Controller
                     'category' => $item->category ? $item->category->name : null,
                     'peptide_full_name' => $item->peptide_full_name,
                     'status' => $item->status,
+                    'show_in_encyclopedia' => (bool) $item->show_in_encyclopedia,
                     'published_at' => $item->published_at ? $item->published_at->format('M j, Y') : null,
                     'created_at' => $item->created_at->format('M j, Y'),
                 ];
@@ -336,5 +337,16 @@ class EncyclopediaEntriesManagementController extends Controller
 
         return redirect()->route('admin.encyclopedia-entries.index')
             ->with('success', 'Encyclopedia entry deleted successfully.');
+    }
+
+    public function toggleVisibility($id)
+    {
+        $entry = EducationPost::findOrFail($id);
+        $entry->show_in_encyclopedia = !$entry->show_in_encyclopedia;
+        $entry->save();
+
+        $state = $entry->show_in_encyclopedia ? 'visible' : 'hidden';
+
+        return redirect()->back()->with('success', "{$entry->title} is now {$state} in the encyclopedia.");
     }
 }
