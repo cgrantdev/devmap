@@ -156,6 +156,7 @@ Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->gr
     Route::get('/discover', [\App\Http\Controllers\Admin\VendorDiscoveryController::class, 'index'])->name('admin.discover');
     Route::post('/discover/scan', [\App\Http\Controllers\Admin\VendorDiscoveryController::class, 'scan'])->name('admin.discover.scan');
     Route::post('/discover/import', [\App\Http\Controllers\Admin\VendorDiscoveryController::class, 'import'])->name('admin.discover.import');
+    Route::post('/discover/activate', [\App\Http\Controllers\Admin\VendorDiscoveryController::class, 'activate'])->name('admin.discover.activate');
 
     // Admin impersonation — log in as a vendor user to view their dashboard
     Route::get('/impersonate/{userId}', function ($userId) {

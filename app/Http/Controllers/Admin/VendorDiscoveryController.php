@@ -38,8 +38,11 @@ class VendorDiscoveryController extends Controller
 
     public function index()
     {
-        // Show ALL pending/inactive vendors from the database (imported from discovery)
-        $dbVendors = Brand::with('vendorSetting')
+        $allSlugs = Brand::pluck('slug')->toArray();
+        $activeSlugs = Brand::where('is_active', true)->pluck('slug')->toArray();
+
+        // Pending vendors — in DB but not activated
+        $pending = Brand::with('vendorSetting')
             ->where('is_active', false)
             ->whereHas('vendorSetting', function ($q) {
                 $q->where('approval_status', 'pending');
@@ -48,7 +51,6 @@ class VendorDiscoveryController extends Controller
             ->get()
             ->map(function ($brand) {
                 $vs = $brand->vendorSetting;
-                // Extract affiliate URL from description if stored there
                 $affiliateUrl = null;
                 if ($vs->description && preg_match('/Affiliate Program: (https?:\/\/\S+)/', $vs->description, $m)) {
                     $affiliateUrl = $m[1];
@@ -62,36 +64,22 @@ class VendorDiscoveryController extends Controller
                     'has_affiliate' => !empty($affiliateUrl),
                     'affiliate_url' => $affiliateUrl,
                     'email' => $vs->contact_email,
-                    'description' => $vs->description ? preg_replace('/\n\nAffiliate Program:.*$/', '', $vs->description) : null,
-                    'already_exists' => false, // These are all pending
+                    'description' => $vs->description ? preg_replace('/\n\nAffiliate Program:.*$/s', '', $vs->description) : null,
                     'brand_id' => $brand->id,
                 ];
             });
 
-        // Merge with any fresh scan results
-        $scanResults = Cache::get('vendor_discovery_results', []);
-        $dbSlugs = $dbVendors->pluck('slug')->toArray();
-        $activeSlugs = Brand::where('is_active', true)->pluck('slug')->toArray();
-
-        // Add scan results that aren't already in DB
-        foreach ($scanResults as $sr) {
-            if (!in_array($sr['slug'], $dbSlugs) && !in_array($sr['slug'], $activeSlugs)) {
-                $sr['brand_id'] = null;
-                $dbVendors->push($sr);
-            }
-        }
-
-        // Mark active vendors in scan results
-        foreach ($scanResults as &$sr) {
-            $sr['already_exists'] = in_array($sr['slug'], $activeSlugs) || in_array($sr['slug'], $dbSlugs);
-        }
+        // New discoveries — from scan cache, NOT already in DB
+        $scanResults = collect(Cache::get('vendor_discovery_results', []))
+            ->filter(fn($r) => !in_array($r['slug'] ?? '', $allSlugs))
+            ->values();
 
         return Inertia::render('Admin/VendorDiscovery', [
-            'results' => $dbVendors->values()->toArray(),
+            'pending' => $pending->values()->toArray(),
+            'newDiscoveries' => $scanResults->toArray(),
             'scanning' => Cache::get('vendor_discovery_scanning', false),
             'scanProgress' => Cache::get('vendor_discovery_progress', ''),
             'lastScanAt' => Cache::get('vendor_discovery_last_scan'),
-            'totalActive' => count($activeSlugs),
         ]);
     }
 
@@ -157,6 +145,28 @@ class VendorDiscoveryController extends Controller
         Cache::put('vendor_discovery_last_scan', now()->toIso8601String(), 86400);
         Cache::forget('vendor_discovery_scanning');
         Cache::forget('vendor_discovery_progress');
+    }
+
+    public function activate(Request $request)
+    {
+        $validated = $request->validate([
+            'brand_ids' => 'required|array|min:1',
+            'brand_ids.*' => 'integer|exists:brands,id',
+        ]);
+
+        $activated = 0;
+        foreach ($validated['brand_ids'] as $id) {
+            $brand = Brand::find($id);
+            if ($brand && !$brand->is_active) {
+                $brand->update(['is_active' => true]);
+                if ($brand->vendorSetting) {
+                    $brand->vendorSetting->update(['approval_status' => 'approved', 'status' => 1]);
+                }
+                $activated++;
+            }
+        }
+
+        return back()->with('success', "Activated {$activated} vendor" . ($activated !== 1 ? 's' : '') . ".");
     }
 
     public function import(Request $request)
