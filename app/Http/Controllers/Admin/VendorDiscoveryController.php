@@ -176,6 +176,7 @@ class VendorDiscoveryController extends Controller
                             'vendor_name' => $brand->name,
                             'type' => $type,
                             'store_url' => $vs->shop_url,
+                            'products_url' => $vs->shop_url,
                             'enabled' => true,
                             'frequency' => 'daily',
                             'auto_promote' => true,

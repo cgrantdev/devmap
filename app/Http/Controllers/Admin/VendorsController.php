@@ -1235,6 +1235,7 @@ class VendorsController extends Controller
                 'vendor_name' => $brand->name,
                 'type' => $type,
                 'store_url' => $settings->shop_url,
+                'products_url' => $settings->shop_url,
                 'enabled' => true,
                 'frequency' => 'daily',
                 'auto_promote' => true,
