@@ -359,6 +359,7 @@ function handleFileChange(event, field) {
 function submitEditVendor() {
   if (props.vendor) {
     // Update existing vendor
+    editForm._token = usePage().props.csrf_token
     editForm.post(`/admin/vendors/${props.vendor.id}`, {
       forceFormData: true,
       preserveState: true,
@@ -369,24 +370,21 @@ function submitEditVendor() {
         bannerPreview.value = null
         logoPreview.value = null
         cacheBuster.value = Date.now()
-        // Clear file inputs
         const fileInputs = document.querySelectorAll('input[type="file"]')
         fileInputs.forEach(input => input.value = '')
-        // Toast will be shown automatically from flash message
       },
       onError: (errors) => {
         if (errors && Object.keys(errors).length > 0) {
           toastError('Please fix the errors and try again.')
         }
       },
-      data: { _method: 'put' }
     })
   } else {
     // Create new vendor
+    editForm._token = usePage().props.csrf_token
     editForm.post('/admin/vendors', {
       forceFormData: true,
       onSuccess: () => {
-        // Toast will be shown automatically from flash message
         router.visit('/admin/vendors')
       },
       onError: (errors) => {

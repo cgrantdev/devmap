@@ -221,6 +221,7 @@ function importSelected() {
 
   importLoading.value = true
   router.post('/admin/discover/import', {
+    _token: usePage().props.csrf_token,
     vendors: vendors.map(v => ({
       name: v.name,
       url: v.url,
