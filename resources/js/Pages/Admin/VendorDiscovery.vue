@@ -74,7 +74,7 @@
             </th>
             <th class="px-4 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendor</th>
             <th class="px-4 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Platform</th>
-            <th class="px-4 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Affiliate</th>
+            <th class="px-4 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Affiliate Signup</th>
             <th class="px-4 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Email</th>
             <th class="px-4 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Status</th>
           </tr>
@@ -100,7 +100,7 @@
                 <a :href="vendor.url" target="_blank" class="text-[11px] text-[color:var(--color-accent-600)] hover:underline truncate max-w-xs">
                   {{ vendor.domain || vendor.url?.replace('https://', '').replace('http://', '') }}
                 </a>
-                <div v-if="vendor.description" class="text-[11px] text-[color:var(--color-ink-subtle)] truncate max-w-md mt-0.5">{{ vendor.description }}</div>
+                <div v-if="vendor.description && !vendor.description.startsWith('Affiliate')" class="text-[11px] text-[color:var(--color-ink-subtle)] truncate max-w-md mt-0.5">{{ vendor.description }}</div>
               </div>
             </td>
             <td class="px-4 py-3">
@@ -114,11 +114,9 @@
               <span v-else class="text-[11px] text-[color:var(--color-ink-subtle)]">—</span>
             </td>
             <td class="px-4 py-3">
-              <a v-if="vendor.affiliate_url" :href="vendor.affiliate_url" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 hover:underline">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                Sign up
+              <a v-if="vendor.affiliate_url" :href="vendor.affiliate_url" target="_blank" class="text-[11px] text-[color:var(--color-accent-600)] hover:underline break-all leading-tight block max-w-[200px]">
+                {{ vendor.affiliate_url.replace('https://', '').replace('http://', '') }}
               </a>
-              <span v-else-if="vendor.has_affiliate" class="text-[11px] font-semibold text-emerald-600">Yes</span>
               <span v-else class="text-[11px] text-[color:var(--color-ink-subtle)]">—</span>
             </td>
             <td class="px-4 py-3">
