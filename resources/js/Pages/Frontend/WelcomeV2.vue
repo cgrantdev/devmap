@@ -137,7 +137,7 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 5. LATEST RESEARCH                                         -->
+    <!-- 5. LATEST RESEARCH — with descriptions                     -->
     <!-- ========================================================= -->
     <section v-if="editorial.length" class="bg-white border-y border-[color:var(--color-hairline)]">
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
@@ -158,65 +158,116 @@
           </template>
         </SectionHeader>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <!-- Featured first article + 2 smaller -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
+          <!-- Featured (first article, bigger) -->
           <a
-            v-for="post in editorial"
-            :key="post.id"
-            :href="`/blog/${post.slug}`"
-            class="ui-focus group"
+            v-if="editorial[0]"
+            :href="`/blog/${editorial[0].slug}`"
+            class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
           >
-            <BlogImage
-              :src="post.image"
-              :title="post.title"
-              :alt="post.title"
-              aspect="16/10"
-              radius="lg"
-              class="mb-4 border border-[color:var(--color-hairline)]"
-            />
-            <div class="flex items-center gap-2 text-[11px] text-[color:var(--color-ink-subtle)] mb-2 ui-mono">
-              <span>{{ post.date }}</span>
-              <span>·</span>
-              <span>{{ post.read_time }}</span>
+            <div class="aspect-[16/9] bg-[#0F172A] overflow-hidden relative">
+              <img v-if="editorial[0].image" :src="editorial[0].image" :alt="editorial[0].title" class="w-full h-full object-cover opacity-80 group-hover:opacity-90 group-hover:scale-[1.03] transition-all duration-500" loading="lazy" />
+              <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/40 via-transparent to-[#4F46E5]/20 pointer-events-none" />
             </div>
-            <h3 class="ui-display text-base lg:text-lg font-semibold tracking-tight text-[color:var(--color-ink)] leading-snug group-hover:text-[color:var(--color-accent-600)] transition-colors">
-              {{ post.title }}
-            </h3>
+            <div class="p-5 lg:p-6 flex-1 flex flex-col gap-2">
+              <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ editorial[0].date }} · {{ editorial[0].read_time }}</span>
+              <h3 class="ui-display text-lg lg:text-xl font-semibold tracking-tight text-[color:var(--color-ink)] leading-snug group-hover:text-[color:var(--color-accent-600)] transition-colors">
+                {{ editorial[0].title }}
+              </h3>
+              <p class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed line-clamp-3">{{ editorial[0].excerpt }}</p>
+            </div>
           </a>
+
+          <!-- 2 smaller articles stacked -->
+          <div class="flex flex-col gap-5 lg:gap-6">
+            <a
+              v-for="post in editorial.slice(1, 3)"
+              :key="post.id"
+              :href="`/blog/${post.slug}`"
+              class="ui-focus group flex flex-row border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[0.5px] transition-all duration-[200ms] overflow-hidden"
+            >
+              <div class="w-40 lg:w-48 flex-shrink-0 bg-[#0F172A] overflow-hidden relative">
+                <img v-if="post.image" :src="post.image" :alt="post.title" class="w-full h-full object-cover opacity-80 group-hover:opacity-90 transition-all duration-500" loading="lazy" />
+                <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/30 via-transparent to-[#4F46E5]/15 pointer-events-none" />
+              </div>
+              <div class="p-4 lg:p-5 flex-1 flex flex-col gap-1.5 justify-center">
+                <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ post.date }} · {{ post.read_time }}</span>
+                <h3 class="ui-display text-[15px] font-semibold tracking-tight text-[color:var(--color-ink)] leading-snug group-hover:text-[color:var(--color-accent-600)] transition-colors">
+                  {{ post.title }}
+                </h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed line-clamp-2">{{ post.excerpt }}</p>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- ========================================================= -->
-    <!-- 6. BECOME A VENDOR CTA                                     -->
+    <!-- 6. VENDOR LOGO MARQUEE + CTA                               -->
     <!-- ========================================================= -->
-    <section class="relative bg-[color:var(--color-ink)] text-white overflow-hidden">
-      <div class="absolute inset-0" :style="{ background: 'radial-gradient(ellipse 900px 500px at 20% 40%, rgba(99,102,241,0.25) 0%, transparent 60%)' }" />
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[140%] h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+    <section class="relative bg-[#0A0B0E] text-white overflow-hidden">
+      <div class="absolute inset-0" :style="{ background: 'radial-gradient(ellipse 900px 500px at 30% 30%, rgba(99,102,241,0.18) 0%, transparent 60%)' }" />
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[140%] h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
-      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 py-16 lg:py-24">
-        <div class="flex flex-col md:flex-row items-start md:items-center gap-8 md:gap-10">
-          <div class="flex-1 max-w-xl">
-            <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-[color:var(--color-accent-400)] mb-3">For vendors</div>
-            <h2 class="ui-display text-2xl md:text-4xl font-semibold tracking-tight text-white leading-[1.1] mb-4">
-              List your research peptides on PeptideMap
-            </h2>
-            <p class="text-white/60 text-[14px] lg:text-[15px] leading-relaxed">
-              Auto-sync from WooCommerce. Click analytics. Free during beta.
-            </p>
-          </div>
-          <div class="flex items-center gap-4 flex-shrink-0">
+      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-14 lg:pt-20 pb-10 lg:pb-14">
+        <!-- Vendor CTA -->
+        <div class="text-center mb-10 lg:mb-14">
+          <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-[color:var(--color-accent-400)] mb-3">For vendors</div>
+          <h2 class="ui-display text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-white leading-[1.15] mb-4 max-w-2xl mx-auto">
+            List your research peptides on PeptideMaps
+          </h2>
+          <p class="text-white/45 text-[15px] leading-relaxed max-w-lg mx-auto mb-8">
+            Auto-sync from WooCommerce. Click analytics. Affiliate tracking. Free during beta.
+          </p>
+          <div class="flex items-center justify-center gap-4">
             <a
               href="/become-a-vendor"
-              class="ui-focus inline-flex items-center gap-2 h-11 lg:h-12 px-6 lg:px-7 rounded-[12px] bg-white text-[color:var(--color-ink)] text-[14px] lg:text-[15px] font-semibold hover:bg-white/95 transition-all shadow-lg"
+              class="ui-focus inline-flex items-center gap-2 h-12 px-7 bg-white text-[#0A0B0E] text-[15px] font-semibold hover:bg-white/95 transition-all shadow-lg"
             >
               Get listed
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 12h14M13 5l7 7-7 7"/>
-              </svg>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
             </a>
-            <a href="/vendor/login" class="text-sm text-white/50 hover:text-white font-medium transition-colors">
+            <a href="/vendor/login" class="text-sm text-white/40 hover:text-white/70 font-medium transition-colors">
               Vendor sign in →
             </a>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="flex items-center justify-center gap-8 lg:gap-16 text-center mb-10 lg:mb-14">
+          <div>
+            <div class="ui-mono text-2xl lg:text-3xl font-bold text-white">{{ formatNumber(stats.total_vendors) }}+</div>
+            <div class="text-[12px] text-white/30 mt-1">Vendors</div>
+          </div>
+          <div class="w-px h-8 bg-white/10" />
+          <div>
+            <div class="ui-mono text-2xl lg:text-3xl font-bold text-white">{{ formatNumber(stats.compounds) }}+</div>
+            <div class="text-[12px] text-white/30 mt-1">Compounds</div>
+          </div>
+          <div class="w-px h-8 bg-white/10" />
+          <div>
+            <div class="ui-mono text-2xl lg:text-3xl font-bold text-white">99%+</div>
+            <div class="text-[12px] text-white/30 mt-1">Purity verified</div>
+          </div>
+        </div>
+
+        <!-- Logo marquee -->
+        <div v-if="verifiedVendors.length" class="relative overflow-hidden py-4 -mx-5 lg:-mx-10">
+          <div class="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#0A0B0E] to-transparent z-10 pointer-events-none" />
+          <div class="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#0A0B0E] to-transparent z-10 pointer-events-none" />
+          <div class="flex items-center gap-12 ui-marquee">
+            <template v-for="i in 3" :key="i">
+              <div
+                v-for="vendor in verifiedVendors"
+                :key="`${i}-${vendor.id}`"
+                class="flex-shrink-0 h-8 w-24 flex items-center justify-center opacity-30 hover:opacity-60 transition-opacity"
+              >
+                <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-full object-contain brightness-0 invert" loading="lazy" />
+                <span v-else class="text-[11px] font-semibold text-white/40 whitespace-nowrap">{{ vendor.name }}</span>
+              </div>
+            </template>
           </div>
         </div>
       </div>
