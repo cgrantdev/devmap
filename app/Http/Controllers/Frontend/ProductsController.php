@@ -56,6 +56,8 @@ class ProductsController extends Controller
                     $q->visible()->where('status', 'active');
                 }
             ])
+            ->having('products_count', '>', 0)
+            ->orderByDesc('products_count')
             ->orderBy('name')
             ->get()
             ->map(function ($category) {
