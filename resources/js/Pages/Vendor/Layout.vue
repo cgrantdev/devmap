@@ -25,8 +25,7 @@
           <NavItem href="/vendor/profile" icon="user" label="Profile & Branding" />
           <NavItem href="/vendor/products" icon="products" label="Products" />
           <NavItem href="/vendor/reviews" icon="reviews" label="Reviews" :badge="$page.props.approved_reviews_count" />
-          <NavItem href="/vendor/storefront-analytics" icon="analytics" label="Storefront Analytics" />
-          <NavItem href="/vendor/advertisement-analytics" icon="ads" label="Ad Analytics" />
+          <NavItem href="/vendor/storefront-analytics" icon="analytics" label="Analytics" />
           <NavItem href="/vendor/integrations" icon="integrations" label="Integrations" />
         </nav>
 
