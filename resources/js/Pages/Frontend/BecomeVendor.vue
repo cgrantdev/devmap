@@ -628,60 +628,165 @@
             </form>
           </div>
 
-          <!-- Step 4: Connect Your Store -->
+          <!-- Step 4: Connect Your Store (REST API Key) -->
           <div v-if="step === 4" class="space-y-6">
             <div>
               <h2 class="text-slate-900 mb-2">Connect Your Store</h2>
-              <p class="text-slate-600 text-sm">Choose how you'd like to sync your products with PeptideMaps</p>
+              <p class="text-slate-600 text-sm">Add your WooCommerce REST API key so we can automatically import and sync your product catalog.</p>
             </div>
 
             <form @submit.prevent="handleStep4Submit" class="space-y-6">
-              <div class="space-y-3">
-                <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'woocommerce' ? 'border-indigo-400 bg-indigo-50' : ''">
-                  <input type="radio" v-model="formData.connectionMethod" value="woocommerce" class="mt-1 accent-indigo-600" />
-                  <div class="flex-1">
-                    <div class="flex items-center gap-2">
-                      <div class="text-sm font-semibold text-slate-800">WooCommerce Auto-Connect</div>
-                      <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Recommended</span>
+              <!-- Guide: How to get your REST API key -->
+              <div class="bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
+                <button
+                  type="button"
+                  @click="showApiGuide = !showApiGuide"
+                  class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-100 transition-colors"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-slate-700 text-white flex items-center justify-center flex-shrink-0">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
-                    <div class="text-xs text-slate-500 mt-1">One-click connection to your WooCommerce store. We'll automatically import and sync your product catalog daily.</div>
+                    <div>
+                      <div class="text-sm font-semibold text-slate-800">How to get your WooCommerce REST API Key</div>
+                      <div class="text-xs text-slate-500 mt-0.5">Step-by-step guide with screenshots</div>
+                    </div>
                   </div>
-                </label>
-                <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'api_key' ? 'border-indigo-400 bg-indigo-50' : ''">
-                  <input type="radio" v-model="formData.connectionMethod" value="api_key" class="mt-1 accent-indigo-600" />
+                  <svg
+                    class="w-5 h-5 text-slate-400 transition-transform"
+                    :class="showApiGuide ? 'rotate-180' : ''"
+                    fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"
+                  ><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+
+                <div v-if="showApiGuide" class="px-5 pb-5 space-y-5 border-t border-slate-200">
+                  <!-- Step 1 -->
+                  <div class="pt-5">
+                    <div class="flex items-start gap-3">
+                      <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-slate-800">Log in to your WordPress admin panel</p>
+                        <p class="text-xs text-slate-500 mt-1">Navigate to <code class="px-1.5 py-0.5 bg-slate-200 rounded text-slate-700">yoursite.com/wp-admin</code></p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Step 2 -->
                   <div>
-                    <div class="text-sm font-semibold text-slate-800">Provide REST API Key</div>
-                    <div class="text-xs text-slate-500 mt-1">Share your WooCommerce, Shopify, or custom API credentials. We'll sync products on a daily schedule.</div>
+                    <div class="flex items-start gap-3">
+                      <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-slate-800">Go to WooCommerce Settings</p>
+                        <p class="text-xs text-slate-500 mt-1">In the left sidebar, click <strong>WooCommerce → Settings</strong>, then click the <strong>Advanced</strong> tab, then <strong>REST API</strong>.</p>
+                        <div class="mt-3 rounded-lg border border-slate-200 bg-white p-4">
+                          <div class="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18"/></svg>
+                            Navigation path
+                          </div>
+                          <div class="flex items-center gap-2 text-sm">
+                            <span class="px-2 py-1 bg-slate-100 rounded text-slate-700 font-medium">WooCommerce</span>
+                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                            <span class="px-2 py-1 bg-slate-100 rounded text-slate-700 font-medium">Settings</span>
+                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                            <span class="px-2 py-1 bg-slate-100 rounded text-slate-700 font-medium">Advanced</span>
+                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                            <span class="px-2 py-1 bg-indigo-100 rounded text-indigo-700 font-semibold">REST API</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </label>
-                <label class="flex items-start gap-4 p-4 border border-slate-200 rounded-lg cursor-pointer hover:border-slate-400 transition-colors" :class="formData.connectionMethod === 'auto_scrape' ? 'border-indigo-400 bg-indigo-50' : ''">
-                  <input type="radio" v-model="formData.connectionMethod" value="auto_scrape" class="mt-1 accent-indigo-600" />
+
+                  <!-- Step 3 -->
                   <div>
-                    <div class="text-sm font-semibold text-slate-800">Auto-Discover From My Website</div>
-                    <div class="text-xs text-slate-500 mt-1">We'll crawl your store and automatically find and import your products. No API key needed.</div>
+                    <div class="flex items-start gap-3">
+                      <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-slate-800">Click "Add key"</p>
+                        <p class="text-xs text-slate-500 mt-1">You'll see a list of existing API keys (if any). Click the <strong>"Add key"</strong> button.</p>
+                      </div>
+                    </div>
                   </div>
-                </label>
+
+                  <!-- Step 4 -->
+                  <div>
+                    <div class="flex items-start gap-3">
+                      <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">4</span>
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-slate-800">Fill in the key details</p>
+                        <div class="mt-3 rounded-lg border border-slate-200 bg-white p-4 space-y-3">
+                          <div class="flex items-center justify-between text-sm">
+                            <span class="text-slate-600">Description</span>
+                            <span class="px-2 py-1 bg-slate-100 rounded font-mono text-slate-800">PeptideMap</span>
+                          </div>
+                          <div class="border-t border-slate-100"></div>
+                          <div class="flex items-center justify-between text-sm">
+                            <span class="text-slate-600">User</span>
+                            <span class="text-slate-800">Your admin account</span>
+                          </div>
+                          <div class="border-t border-slate-100"></div>
+                          <div class="flex items-center justify-between text-sm">
+                            <span class="text-slate-600">Permissions</span>
+                            <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded font-semibold">Read</span>
+                          </div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">We only need <strong>Read</strong> access to import your products. We never modify your store.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Step 5 -->
+                  <div>
+                    <div class="flex items-start gap-3">
+                      <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">5</span>
+                      <div class="flex-1">
+                        <p class="text-sm font-medium text-slate-800">Click "Generate API key" and copy both keys</p>
+                        <div class="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                          <div class="flex items-start gap-2">
+                            <svg class="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <p class="text-xs text-amber-800"><strong>Important:</strong> The Consumer Secret is only shown once. Copy both keys immediately and paste them below.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <!-- API Key input (shown when api_key selected) -->
-              <div v-if="formData.connectionMethod === 'api_key'" class="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-4">
-                <h3 class="text-sm font-semibold text-slate-800">How to get your WooCommerce API Key:</h3>
-                <ol class="text-xs text-slate-600 space-y-2 list-decimal list-inside">
-                  <li>Log in to your WordPress admin panel</li>
-                  <li>Go to <strong>WooCommerce → Settings → Advanced → REST API</strong></li>
-                  <li>Click <strong>"Add key"</strong></li>
-                  <li>Set Description to <strong>"PeptideMaps"</strong>, Permissions to <strong>"Read"</strong></li>
-                  <li>Click <strong>"Generate API key"</strong></li>
-                  <li>Copy the <strong>Consumer Key</strong> and <strong>Consumer Secret</strong> below</li>
-                </ol>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Consumer Key</label>
-                    <input v-model="formData.apiConsumerKey" type="text" placeholder="ck_xxxxxxxxxxxxxxxx" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-slate-400" />
+              <!-- API Key input fields -->
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Key</label>
+                  <div class="relative">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                    <input
+                      v-model="formData.apiConsumerKey"
+                      type="text"
+                      placeholder="ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                      class="w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    />
                   </div>
-                  <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Consumer Secret</label>
-                    <input v-model="formData.apiConsumerSecret" type="password" placeholder="cs_xxxxxxxxxxxxxxxx" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-slate-400" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Secret</label>
+                  <div class="relative">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input
+                      v-model="formData.apiConsumerSecret"
+                      type="password"
+                      placeholder="cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                      class="w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Info note -->
+              <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                  <svg class="w-5 h-5 text-slate-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <div class="text-sm text-slate-600">
+                    <p>Your API keys are encrypted and stored securely. We use <strong>read-only</strong> access to import your product catalog and sync prices daily. You can also add or update these later from your <strong>Vendor Dashboard → Integrations</strong>.</p>
                   </div>
                 </div>
               </div>
@@ -689,16 +794,26 @@
               <!-- Navigation Buttons -->
               <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-200">
                 <button type="button" @click="goToStep(3)" class="px-6 py-2 text-slate-600 hover:text-slate-700 transition-colors">Back</button>
-                <button
-                  type="submit"
-                  :disabled="isSubmitting"
-                  :class="['flex items-center gap-2 px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors', isSubmitting ? 'opacity-50 cursor-not-allowed' : '']"
-                >
-                  <span v-if="isSubmitting">Creating account...</span>
-                  <span v-else>Complete Registration</span>
-                  <svg v-if="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                  <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
-                </button>
+                <div class="flex items-center gap-3">
+                  <button
+                    type="button"
+                    @click="skipAndSubmit"
+                    :disabled="isSubmitting"
+                    class="px-5 py-2.5 text-sm text-slate-600 hover:text-slate-800 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+                  >
+                    Skip for now
+                  </button>
+                  <button
+                    type="submit"
+                    :disabled="isSubmitting"
+                    :class="['flex items-center gap-2 px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors', isSubmitting ? 'opacity-50 cursor-not-allowed' : '']"
+                  >
+                    <span v-if="isSubmitting">Creating account...</span>
+                    <span v-else>Complete Registration</span>
+                    <svg v-if="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                    <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -934,7 +1049,7 @@ const formData = ref({
   phone: '',
   password: '',
   confirmPassword: '',
-  connectionMethod: 'woocommerce',
+  connectionMethod: 'api_key',
   apiConsumerKey: '',
   apiConsumerSecret: '',
   productCount: '',
@@ -1018,10 +1133,19 @@ const handleLogoUpload = (event) => {
 const page = usePage();
 const isSubmitting = ref(false);
 const showSuccessMessage = ref(false);
+const showApiGuide = ref(false);
 
 const handleStep3Submit = () => {
   step.value = 4;
 }
+
+const skipAndSubmit = () => {
+  // Clear API keys and submit without them
+  formData.value.apiConsumerKey = '';
+  formData.value.apiConsumerSecret = '';
+  formData.value.connectionMethod = 'auto_scrape';
+  handleStep4Submit();
+};
 
 const handleStep4Submit = () => {
   // Validate required fields
