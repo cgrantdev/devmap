@@ -23,13 +23,16 @@ class AuthenticatedSessionController extends Controller
 
             $user = $request->user();
 
-            if (!$user->hasVerifiedEmail()) {
+            // Admin and admin_viewer (internal staff) skip email verification.
+            $isStaff = in_array($user->role, ['admin', 'admin_viewer'], true);
+
+            if (!$isStaff && !$user->hasVerifiedEmail()) {
                 return redirect('/email/verify');
             }
 
             // Route to the right dashboard based on role
             return match ($user->role) {
-                'admin' => redirect()->intended('/admin/dashboard'),
+                'admin', 'admin_viewer' => redirect()->intended('/admin/dashboard'),
                 'vendor' => redirect()->intended('/vendor/dashboard'),
                 default => redirect()->intended('/'),
             };
