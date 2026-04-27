@@ -21,6 +21,12 @@ class EnsureEmailIsVerified
             return $next($request);
         }
 
+        // Skip for admin and admin_viewer roles — internal staff accounts
+        // don't need email verification.
+        if (Auth::check() && in_array(Auth::user()->role, ['admin', 'admin_viewer'], true)) {
+            return $next($request);
+        }
+
         if (Auth::check() && !Auth::user()->hasVerifiedEmail()) {
             return redirect('/email/verify')->with('info', 'Please verify your email address before accessing this page.');
         }
