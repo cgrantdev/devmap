@@ -21,7 +21,7 @@ class AdminAuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($request->user()->role !== 'admin') {
+        if (!in_array($request->user()->role, ['admin', 'admin_viewer'], true)) {
             Auth::logout();
             return back()->withErrors([
                 'email' => 'These credentials are for admin access only.',

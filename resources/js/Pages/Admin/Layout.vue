@@ -72,6 +72,23 @@
 
     <!-- Main content -->
     <main class="flex-1 min-h-screen bg-[color:var(--color-bg)]">
+      <!-- View-only banner for admin_viewer role -->
+      <div v-if="isAdminViewer" class="bg-amber-50 border-b border-amber-200 px-6 py-2.5 flex items-center justify-center gap-2 text-[13px] text-amber-900">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <span><strong>View-only mode.</strong> Your account can browse the admin panel but cannot create, edit, or delete any data.</span>
+      </div>
+
+      <!-- Flash error (e.g. blocked write attempts for view-only accounts) -->
+      <div v-if="page.props.flash?.error" class="bg-red-50 border-b border-red-200 px-6 py-2.5 flex items-center justify-center gap-2 text-[13px] text-red-800">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>{{ page.props.flash.error }}</span>
+      </div>
+
       <div class="p-6 lg:p-8">
         <slot />
       </div>
@@ -94,12 +111,14 @@
 import { useForm, usePage, Link } from '@inertiajs/vue3'
 import { useAdminLoading } from '../../composables/useAdminLoading'
 import { useToast } from '../../composables/useToast'
-import { h, defineComponent } from 'vue'
+import { h, defineComponent, computed } from 'vue'
 
 const { isLoading, loadingMessage } = useAdminLoading()
 const { toast } = useToast()
 
 const page = usePage()
+
+const isAdminViewer = computed(() => page.props.auth?.user?.role === 'admin_viewer')
 
 const form = useForm({
   _token: page.props.csrf_token

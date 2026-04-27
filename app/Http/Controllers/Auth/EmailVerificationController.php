@@ -14,7 +14,7 @@ class EmailVerificationController extends Controller
         // If user is already verified, redirect to dashboard
         if (Auth::check() && Auth::user()->hasVerifiedEmail()) {
             $user = Auth::user();
-            if ($user->isAdmin()) {
+            if ($user->canAccessAdmin()) {
                 return redirect('/admin/dashboard');
             } else {
                 return redirect('/vendor/dashboard');
@@ -88,7 +88,7 @@ class EmailVerificationController extends Controller
 
         // If user is logged in, redirect to appropriate dashboard
         if (Auth::check() && Auth::id() == $user->id) {
-            if ($user->isAdmin()) {
+            if ($user->canAccessAdmin()) {
                 return redirect('/admin/dashboard')->with('success', 'Email verified successfully!');
             } else {
                 return redirect('/vendor/dashboard')->with('success', 'Email verified successfully!');

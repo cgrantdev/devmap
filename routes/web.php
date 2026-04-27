@@ -151,7 +151,7 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
 });
 
 // Admin routes
-Route::middleware(['auth', 'role:admin', 'email.verified'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.viewer.writes'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/vendors', [VendorsController::class, 'index'])->name('admin.vendors');
     Route::get('/vendors/create', [VendorsController::class, 'create'])->name('admin.vendors.create');

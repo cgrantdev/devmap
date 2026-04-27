@@ -50,6 +50,20 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === 'admin';
     }
 
+    public function isAdminViewer(): bool
+    {
+        return $this->role === 'admin_viewer';
+    }
+
+    /**
+     * Anyone with admin or admin_viewer role can access the admin dashboard.
+     * Use isAdmin() for actions that must be limited to full admins.
+     */
+    public function canAccessAdmin(): bool
+    {
+        return in_array($this->role, ['admin', 'admin_viewer'], true);
+    }
+
     public function isVendor(): bool
     {
         return $this->role === 'vendor';

@@ -41,6 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
             'email.verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
             'role' => \App\Http\Middleware\CheckRole::class,
+            'block.viewer.writes' => \App\Http\Middleware\BlockAdminViewerWrites::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
