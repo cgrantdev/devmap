@@ -28,6 +28,18 @@ class ComingSoon
                 return $next($request);
             }
 
+            // Allow admin and vendor login + the protected admin/vendor areas
+            // so staff can access the dashboard while the countdown is up.
+            if (
+                str_starts_with($path, 'admin') ||
+                str_starts_with($path, 'vendor') ||
+                $path === 'login' ||
+                $path === 'logout' ||
+                str_starts_with($path, 'email/')
+            ) {
+                return $next($request);
+            }
+
             return response()->file(public_path('coming-soon.html'));
         }
 
