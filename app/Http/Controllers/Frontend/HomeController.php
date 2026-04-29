@@ -684,33 +684,19 @@ class HomeController extends Controller
             'gradient' => ['#0A0B0E', '#4F46E5'],
         ]);
 
-        // Certified Peptides — 3 rotating banner slides (test sponsored placement).
-        // TODO: move to admin-managed sponsored-slot system once that ships.
-        $certifiedSlides = [
-            [
-                'title' => 'Certified Peptides',
-                'subtitle' => '99% HPLC-tested research peptides with verified COAs. Direct from the lab to your bench.',
-                'image' => '/images/banners/certified-peptides-1.png',
-            ],
-            [
-                'title' => 'BPC-157 · TB-500 · GHK-Cu',
-                'subtitle' => 'Healing and recovery research compounds, lab-tested and batch-traceable. Browse the full Certified Peptides catalog.',
-                'image' => '/images/banners/certified-peptides-2.png',
-            ],
-            [
-                'title' => 'Research-grade. Verified.',
-                'subtitle' => 'Independent third-party HPLC verification on every batch. 89+ compounds available from Certified Peptides.',
-                'image' => '/images/banners/certified-peptides-3.png',
-            ],
-        ];
-        foreach ($certifiedSlides as $slide) {
-            $heroSlides->push(array_merge($slide, [
-                'eyebrow' => 'Featured Vendor',
-                'cta' => 'Browse the catalog',
-                'url' => '/brand/certified-pep/products',
-                'sponsored' => true,
-            ]));
-        }
+        // Featured Partner — Certified Peptides
+        // Test placement; move to admin-managed sponsored-slot system later.
+        $heroSlides->push([
+            'eyebrow' => 'Featured Partner',
+            'title' => 'Lab-tested research peptides from Certified Peptides',
+            'title_highlight' => 'Certified Peptides',
+            'subtitle' => '99% HPLC-verified COAs on every batch — BPC-157, TB-500, GHK-Cu, and the full catalog.',
+            'cta' => 'Browse catalog',
+            'url' => '/brand/certified-pep/products',
+            'image' => '/images/banners/certified-peptides-3.png',
+            'image_mobile' => '/images/banners/cert-mobile.png',
+            'coupon_code' => 'pmap',
+        ]);
 
         // Auto-generated slides for the other premium vendors (skip Certified
         // Pep — it has its own dedicated banner slides above).
