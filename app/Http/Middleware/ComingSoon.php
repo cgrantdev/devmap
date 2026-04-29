@@ -17,23 +17,30 @@ class ComingSoon
         $path = $request->path();
 
         // join.peptidemap.com — standalone vendor invitation page.
-        // Whitelist: assets, /join, the form submission endpoint, and CSRF.
-        // Anything else gets redirected back to the invitation root.
+        // The root path "/" is served by a domain-scoped route in web.php.
+        // /join is canonicalized → "/" so we always show join.peptidemap.com/
+        // Whitelist: root, assets, the form submission endpoint, and CSRF.
         if ($host === 'join.peptidemap.com') {
+            // Canonicalize /join → / on this subdomain
+            if ($path === 'join') {
+                $query = $request->getQueryString();
+                return redirect('/' . ($query ? ('?' . $query) : ''), 301);
+            }
+
             $allowed =
+                $path === '/' ||
+                $path === '' ||
                 str_starts_with($path, 'images/') ||
                 str_starts_with($path, 'build/') ||
                 str_starts_with($path, 'storage/') ||
-                $path === 'join' ||
-                str_starts_with($path, 'join/') ||
+                str_starts_with($path, 'videos/') ||
                 $path === 'become-a-vendor' || // POST submission target
                 $path === 'sanctum/csrf-cookie';
 
             if (!$allowed) {
-                // Forward root and unknown paths to the join page (preserve query string)
+                // Anything unexpected → bounce to the invitation root
                 $query = $request->getQueryString();
-                $target = '/join' . ($query ? ('?' . $query) : '');
-                return redirect($target, 302);
+                return redirect('/' . ($query ? ('?' . $query) : ''), 302);
             }
 
             return $next($request);

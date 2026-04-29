@@ -100,8 +100,14 @@ Route::get('/deals', [DealsController::class, 'index'])->name('deals');
 Route::get('/become-a-vendor', [BecomeVendorController::class, 'index'])->name('become-a-vendor');
 Route::post('/become-a-vendor', [BecomeVendorController::class, 'store'])->name('become-a-vendor.store');
 
-// Standalone vendor invitation page (served at /join on any host,
-// and as the root page on join.peptidemap.com via ComingSoon middleware).
+// Standalone vendor invitation page.
+//
+// On join.peptidemap.com, this is served at the root: join.peptidemap.com/
+// (the ComingSoon middleware canonicalizes /join → / on that host).
+// The fallback /join route on any other host still works for testing.
+Route::domain('join.peptidemap.com')->group(function () {
+    Route::get('/', [JoinController::class, 'show'])->name('join.root');
+});
 Route::get('/join', [JoinController::class, 'show'])->name('join');
 
 // Demo preview — public entry-point that auto-logs visitors into the
