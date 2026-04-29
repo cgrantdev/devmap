@@ -110,11 +110,17 @@ class IngestionService
     public function promote(ScrapedProduct $staged): Product
     {
         return DB::transaction(function () use ($staged) {
+            // Resolve product_category_id:
+            //   1. Use the scraping config's category if it pinned one (legacy single-category vendors)
+            //   2. Otherwise auto-match the product name against the category_aliases table
+            $categoryId = $staged->scrapingConfig?->product_category_id
+                ?? $this->matchCategoryByName($staged->name);
+
             $productData = [
                 'name' => $staged->name,
                 'description' => $staged->description,
                 'brand_id' => $staged->brand_id ?? $staged->scrapingConfig?->vendor_id,
-                'product_category_id' => $staged->scrapingConfig?->product_category_id ?? null,
+                'product_category_id' => $categoryId,
                 'price' => $staged->price,
                 'discount_price' => $staged->discount_price,
                 'image_url' => $staged->image_url,
@@ -185,5 +191,37 @@ class IngestionService
             }
         }
         return $slug;
+    }
+
+    /**
+     * Resolve a product_category_id by matching the product name against
+     * the category_aliases table. Aliases are tried longest-first so
+     * "BPC-157" wins over a generic "BPC" alias if both exist.
+     *
+     * Returns null when nothing matches (the product still imports, it
+     * just won't appear on compound/encyclopedia/compare pages).
+     */
+    protected function matchCategoryByName(?string $name): ?int
+    {
+        if (empty($name)) return null;
+
+        // Cache aliases per-request to avoid hammering the DB during bulk syncs
+        static $aliases = null;
+        if ($aliases === null) {
+            $aliases = DB::table('category_aliases')
+                ->orderByRaw('CHAR_LENGTH(keyword) DESC')
+                ->get(['keyword', 'product_category_id']);
+        }
+
+        $haystack = mb_strtolower($name);
+        foreach ($aliases as $alias) {
+            $needle = mb_strtolower($alias->keyword);
+            if ($needle === '') continue;
+            if (str_contains($haystack, $needle)) {
+                return (int) $alias->product_category_id;
+            }
+        }
+
+        return null;
     }
 }
