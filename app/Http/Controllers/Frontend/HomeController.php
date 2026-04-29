@@ -44,34 +44,6 @@ class HomeController extends Controller
             }
         }
 
-        // Hardcoded sponsored slides for Certified Peptides (test placement).
-        // TODO: move to admin-managed sponsored-slot system once that ships.
-        $certifiedSlides = [
-            [
-                'title' => 'Certified Peptides',
-                'subtitle' => '99% HPLC-tested research peptides with verified COAs. Direct from the lab to your bench.',
-                'image' => '/images/banners/certified-peptides-1.png',
-            ],
-            [
-                'title' => 'BPC-157 · TB-500 · GHK-Cu',
-                'subtitle' => 'Healing and recovery research compounds, lab-tested and batch-traceable. Browse the full Certified Peptides catalog.',
-                'image' => '/images/banners/certified-peptides-2.png',
-            ],
-            [
-                'title' => 'Research-grade. Verified.',
-                'subtitle' => 'Independent third-party HPLC verification on every batch. 89+ compounds available from Certified Peptides.',
-                'image' => '/images/banners/certified-peptides-3.png',
-            ],
-        ];
-
-        foreach ($certifiedSlides as $slide) {
-            $heroSlides[] = array_merge($slide, [
-                'eyebrow' => 'Featured Vendor',
-                'cta' => 'Browse the catalog',
-                'url' => '/brand/certified-pep/products',
-                'sponsored' => true,
-            ]);
-        }
 
         // Education categories - only show categories with published encyclopedia articles
         $categories = ProductCategory::where('is_active', true)
@@ -580,6 +552,7 @@ class HomeController extends Controller
             return [
                 'id' => $brand->id,
                 'name' => $brand->name,
+                'slug' => $brand->slug ?? Str::slug($brand->name),
                 'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
                 'logo' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
                 'verified' => $vs && $vs->approval_status === 'approved',
@@ -698,7 +671,8 @@ class HomeController extends Controller
 
         // Build the hero carousel slides:
         //  - 1 platform intro slide (always first)
-        //  - Up to 4 rotating premium vendor slides
+        //  - 3 dedicated Certified Peptides slides (with banner imagery)
+        //  - Up to 4 rotating premium vendor slides (excluding Certified Pep)
         $heroSlides = collect();
         $heroSlides->push([
             'eyebrow' => 'Verification engine live · Updated continuously',
@@ -710,7 +684,38 @@ class HomeController extends Controller
             'gradient' => ['#0A0B0E', '#4F46E5'],
         ]);
 
+        // Certified Peptides — 3 rotating banner slides (test sponsored placement).
+        // TODO: move to admin-managed sponsored-slot system once that ships.
+        $certifiedSlides = [
+            [
+                'title' => 'Certified Peptides',
+                'subtitle' => '99% HPLC-tested research peptides with verified COAs. Direct from the lab to your bench.',
+                'image' => '/images/banners/certified-peptides-1.png',
+            ],
+            [
+                'title' => 'BPC-157 · TB-500 · GHK-Cu',
+                'subtitle' => 'Healing and recovery research compounds, lab-tested and batch-traceable. Browse the full Certified Peptides catalog.',
+                'image' => '/images/banners/certified-peptides-2.png',
+            ],
+            [
+                'title' => 'Research-grade. Verified.',
+                'subtitle' => 'Independent third-party HPLC verification on every batch. 89+ compounds available from Certified Peptides.',
+                'image' => '/images/banners/certified-peptides-3.png',
+            ],
+        ];
+        foreach ($certifiedSlides as $slide) {
+            $heroSlides->push(array_merge($slide, [
+                'eyebrow' => 'Featured Vendor',
+                'cta' => 'Browse the catalog',
+                'url' => '/brand/certified-pep/products',
+                'sponsored' => true,
+            ]));
+        }
+
+        // Auto-generated slides for the other premium vendors (skip Certified
+        // Pep — it has its own dedicated banner slides above).
         foreach ($premiumVendors->take(4) as $v) {
+            if (($v['slug'] ?? null) === 'certified-pep') continue;
             $heroSlides->push([
                 'eyebrow' => 'Featured partner',
                 'title' => $v['name'],
