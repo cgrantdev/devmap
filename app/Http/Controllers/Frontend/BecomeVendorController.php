@@ -231,9 +231,51 @@ class BecomeVendorController extends Controller
             ]);
 
             return redirect('/registration-complete');
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            \Log::error('Vendor signup DB exception', [
+                'sql_state' => $e->errorInfo[0] ?? null,
+                'driver_code' => $e->errorInfo[1] ?? null,
+                'message' => $e->getMessage(),
+                'email' => $request->input('email'),
+                'company' => $request->input('companyName'),
+            ]);
+
+            // Map common DB errors to friendly user-facing messages
+            $message = 'There was a database error during registration. Please try again or contact support.';
+            $errorCode = $e->errorInfo[1] ?? null;
+
+            if ($errorCode === 1062) { // Duplicate entry
+                if (str_contains($e->getMessage(), 'users_email_unique') || str_contains($e->getMessage(), 'email')) {
+                    return back()->withErrors(['email' => 'This email is already registered.'])->withInput();
+                }
+                if (str_contains($e->getMessage(), 'brands_slug')) {
+                    return back()->withErrors(['companyName' => 'This company name is already taken.'])->withInput();
+                }
+                $message = 'A duplicate record was detected. Please check your details and try again.';
+            }
+
+            return back()->withErrors(['error' => $message])->withInput();
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'An error occurred during registration. Please try again.'])->withInput();
+            \Log::error('Vendor signup unexpected exception', [
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'email' => $request->input('email'),
+                'company' => $request->input('companyName'),
+            ]);
+
+            $userMessage = 'An unexpected error occurred during registration. Our team has been notified — please try again or contact support@peptidemap.com.';
+
+            // Surface the actual message in non-production environments to help debugging
+            if (app()->environment(['local', 'staging'])) {
+                $userMessage = '[' . app()->environment() . '] ' . $e->getMessage();
+            }
+
+            return back()->withErrors(['error' => $userMessage])->withInput();
         }
     }
 
