@@ -47,13 +47,14 @@
 
         <!-- Right side -->
         <div class="ml-auto flex items-center gap-1.5 sm:gap-2 lg:gap-3">
-          <!-- Search (sm+) -->
-          <SearchPalette class="hidden sm:block" />
+          <!-- Full search bar (desktop / lg+ only) -->
+          <SearchPalette class="hidden lg:block" />
 
-          <!-- Search icon only on xs -->
+          <!-- Search icon (under lg — frees up space for the CTA + hamburger) -->
           <button
             @click="showMobileSearch = !showMobileSearch"
-            class="sm:hidden p-2 rounded-[8px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
+            class="lg:hidden p-2 rounded-[8px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
+            aria-label="Search"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           </button>
@@ -91,7 +92,9 @@
           <!-- Hamburger (below lg) -->
           <button
             @click="mobileOpen = !mobileOpen"
-            class="lg:hidden p-2 -mr-1 rounded-[8px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
+            class="lg:hidden p-2 rounded-[8px] border border-[color:var(--color-hairline)] text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
+            :aria-expanded="mobileOpen"
+            aria-label="Open menu"
           >
             <svg v-if="!mobileOpen" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
             <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -99,8 +102,8 @@
         </div>
       </div>
 
-      <!-- Mobile search bar (slides down) -->
-      <div v-if="showMobileSearch" class="md:hidden px-5 pb-3">
+      <!-- Mobile / tablet search bar (slides down when icon is tapped) -->
+      <div v-if="showMobileSearch" class="lg:hidden px-5 pb-3">
         <SearchPalette />
       </div>
     </header>
