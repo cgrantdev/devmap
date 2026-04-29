@@ -80,7 +80,16 @@
           </div>
         </div>
 
-        <div class="bg-white border-x border-b border-slate-200 rounded-b-lg p-8 sm:p-10">
+        <!-- Submission error banner -->
+        <div v-if="submissionError" class="mt-4 px-4 py-3 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-3 text-sm text-rose-800">
+          <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span class="flex-1">{{ submissionError }}</span>
+          <button @click="submissionError = ''" class="text-rose-600 hover:text-rose-900 flex-shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="bg-white border-x border-b border-slate-200 rounded-b-lg p-8 sm:p-10 mt-0" :class="submissionError ? 'mt-4' : ''">
           <!-- Step 1: Company -->
           <form v-if="step === 1" @submit.prevent="handleStep1Submit" class="space-y-6">
             <div>
@@ -91,13 +100,15 @@
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-1.5">Company Name <span class="text-rose-500">*</span></label>
               <input v-model="formData.companyName" type="text" required placeholder="Your Peptide Company LLC"
-                class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400" />
+                :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', fieldErrors.companyName ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']" />
+              <p v-if="fieldErrors.companyName" class="text-xs text-rose-600 mt-1">{{ fieldErrors.companyName }}</p>
             </div>
 
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-1.5">Website <span class="text-rose-500">*</span></label>
               <input v-model="formData.website" type="url" required placeholder="https://yourcompany.com"
-                class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400" />
+                :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', fieldErrors.website ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']" />
+              <p v-if="fieldErrors.website" class="text-xs text-rose-600 mt-1">{{ fieldErrors.website }}</p>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -141,7 +152,8 @@
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-1.5">Email Address <span class="text-rose-500">*</span></label>
               <input v-model="formData.email" type="email" required placeholder="john@yourcompany.com"
-                class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400" />
+                :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', fieldErrors.email ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']" />
+              <p v-if="fieldErrors.email" class="text-xs text-rose-600 mt-1">{{ fieldErrors.email }}</p>
             </div>
 
             <div>
@@ -356,14 +368,16 @@
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Key <span class="text-rose-500">*</span></label>
                 <input v-model="formData.apiConsumerKey" type="text" required placeholder="ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                  :class="['w-full px-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', consumerKeyInvalid ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']" />
-                <p v-if="consumerKeyInvalid" class="text-xs text-rose-600 mt-1">Consumer Key must start with <code>ck_</code></p>
+                  :class="['w-full px-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', (consumerKeyInvalid || fieldErrors.apiConsumerKey) ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']" />
+                <p v-if="fieldErrors.apiConsumerKey" class="text-xs text-rose-600 mt-1">{{ fieldErrors.apiConsumerKey }}</p>
+                <p v-else-if="consumerKeyInvalid" class="text-xs text-rose-600 mt-1">Consumer Key must start with <code>ck_</code></p>
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Secret <span class="text-rose-500">*</span></label>
                 <input v-model="formData.apiConsumerSecret" type="password" required placeholder="cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                  :class="['w-full px-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', consumerSecretInvalid ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']" />
-                <p v-if="consumerSecretInvalid" class="text-xs text-rose-600 mt-1">Consumer Secret must start with <code>cs_</code></p>
+                  :class="['w-full px-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', (consumerSecretInvalid || fieldErrors.apiConsumerSecret) ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']" />
+                <p v-if="fieldErrors.apiConsumerSecret" class="text-xs text-rose-600 mt-1">{{ fieldErrors.apiConsumerSecret }}</p>
+                <p v-else-if="consumerSecretInvalid" class="text-xs text-rose-600 mt-1">Consumer Secret must start with <code>cs_</code></p>
               </div>
             </div>
 
@@ -483,6 +497,23 @@ const showApiGuide = ref(false)
 const apiVideoUrl = '/videos/woocommerce-rest-api-guide.mp4'
 const isSubmitting = ref(false)
 const showSuccessMessage = ref(false)
+
+// --- Submission error state ---
+// Field-level errors keyed by backend field name (e.g. errors.email)
+const fieldErrors = ref({})
+// Top-of-form error message shown when submission fails
+const submissionError = ref('')
+
+// Maps each form field to the step that owns it, so we can jump the
+// user to the right step when a field-level error comes back.
+const fieldStepMap = {
+  companyName: 1, website: 1, yearEstablished: 1, country: 1,
+  fullName: 2, email: 2, phone: 2, password: 2, password_confirmation: 2,
+  productCount: 3, companyDescription: 3, paymentMethods: 3,
+  shippingInformation: 3, returnPolicy: 3, businessHours: 3,
+  uniqueSellingPoints: 3, logoFile: 3,
+  apiConsumerKey: 4, apiConsumerSecret: 4, connectionMethod: 4,
+}
 
 const passwordMismatch = computed(() => {
   return formData.value.password && formData.value.confirmPassword &&
@@ -642,21 +673,60 @@ const submitRegistration = () => {
     _token: page.props.csrf_token,
   })
 
+  // Reset error state before submitting
+  fieldErrors.value = {}
+  submissionError.value = ''
+
   submitForm.post('/become-a-vendor', {
-    preserveScroll: false,
+    preserveScroll: true,
     forceFormData: true,
     onSuccess: () => {
       isSubmitting.value = false
       showSuccessMessage.value = true
       clearDraft()
+      fieldErrors.value = {}
+      submissionError.value = ''
       window.scrollTo({ top: 0, behavior: 'smooth' })
     },
     onError: (errors) => {
       isSubmitting.value = false
       console.error('Registration errors:', errors)
+
+      // 419 CSRF expired — refresh to get new token
       if (errors.message && errors.message.includes('419')) {
         window.location.reload()
+        return
       }
+
+      // No structured errors? Treat as a generic failure.
+      if (!errors || Object.keys(errors).length === 0) {
+        submissionError.value = 'Something went wrong on our end. Please try again in a moment.'
+        return
+      }
+
+      fieldErrors.value = { ...errors }
+
+      // Find the earliest step that has an error and jump to it
+      let earliestStep = 4
+      for (const field in errors) {
+        const fieldStep = fieldStepMap[field]
+        if (fieldStep && fieldStep < earliestStep) earliestStep = fieldStep
+      }
+
+      if (earliestStep < step.value) {
+        // Jump back to the step with the problem
+        step.value = earliestStep
+        submissionError.value = "Some details need fixing — we've taken you back to the relevant step."
+      } else {
+        // Errors on current step — show a banner summary
+        const errorMessages = Object.values(errors).flat()
+        submissionError.value = errorMessages[0] || 'Please review the errors below and try again.'
+      }
+
+      setTimeout(() => {
+        const el = document.getElementById('accept')
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 50)
     },
     onFinish: () => {
       isSubmitting.value = false

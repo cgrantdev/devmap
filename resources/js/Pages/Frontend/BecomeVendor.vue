@@ -152,6 +152,15 @@
           <button @click="discardDraft" class="text-xs font-medium text-emerald-700 hover:text-emerald-900 underline underline-offset-2">Start over</button>
         </div>
 
+        <!-- Submission error banner -->
+        <div v-if="submissionError" class="mb-4 px-4 py-3 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-3 text-sm text-rose-800">
+          <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span class="flex-1">{{ submissionError }}</span>
+          <button @click="submissionError = ''" class="text-rose-600 hover:text-rose-900 flex-shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
           <!-- Step 1: Company Information -->
           <div v-if="step === 1" class="space-y-6">
@@ -180,9 +189,10 @@
                     type="text"
                     placeholder="Your Peptide Company LLC"
                     required
-                    class="w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    :class="['w-full pl-11 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', fieldErrors.companyName ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                   />
                 </div>
+                <p v-if="fieldErrors.companyName" class="text-xs text-rose-600 mt-1">{{ fieldErrors.companyName }}</p>
               </div>
 
               <!-- Website -->
@@ -321,9 +331,10 @@
                     type="email"
                     placeholder="john@yourcompany.com"
                     required
-                    class="w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    :class="['w-full pl-11 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', fieldErrors.email ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                   />
                 </div>
+                <p v-if="fieldErrors.email" class="text-xs text-rose-600 mt-1">{{ fieldErrors.email }}</p>
               </div>
 
               <!-- Phone Number -->
@@ -808,10 +819,11 @@
                       type="text"
                       required
                       placeholder="ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                      :class="['w-full pl-11 pr-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', consumerKeyInvalid ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
+                      :class="['w-full pl-11 pr-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', (consumerKeyInvalid || fieldErrors.apiConsumerKey) ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                     />
                   </div>
-                  <p v-if="consumerKeyInvalid" class="text-xs text-rose-600 mt-1">Consumer Key must start with <code>ck_</code></p>
+                  <p v-if="fieldErrors.apiConsumerKey" class="text-xs text-rose-600 mt-1">{{ fieldErrors.apiConsumerKey }}</p>
+                  <p v-else-if="consumerKeyInvalid" class="text-xs text-rose-600 mt-1">Consumer Key must start with <code>ck_</code></p>
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Secret <span class="text-rose-500">*</span></label>
@@ -822,10 +834,11 @@
                       type="password"
                       required
                       placeholder="cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                      :class="['w-full pl-11 pr-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', consumerSecretInvalid ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
+                      :class="['w-full pl-11 pr-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', (consumerSecretInvalid || fieldErrors.apiConsumerSecret) ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                     />
                   </div>
-                  <p v-if="consumerSecretInvalid" class="text-xs text-rose-600 mt-1">Consumer Secret must start with <code>cs_</code></p>
+                  <p v-if="fieldErrors.apiConsumerSecret" class="text-xs text-rose-600 mt-1">{{ fieldErrors.apiConsumerSecret }}</p>
+                  <p v-else-if="consumerSecretInvalid" class="text-xs text-rose-600 mt-1">Consumer Secret must start with <code>cs_</code></p>
                 </div>
               </div>
 
@@ -1289,6 +1302,18 @@ const showSuccessMessage = ref(false);
 const showApiGuide = ref(false);
 const apiVideoUrl = '/videos/woocommerce-rest-api-guide.mp4';
 
+// --- Submission error state ---
+const fieldErrors = ref({});
+const submissionError = ref('');
+const fieldStepMap = {
+  companyName: 1, website: 1, yearEstablished: 1, country: 1,
+  fullName: 2, email: 2, phone: 2, password: 2, password_confirmation: 2,
+  productCount: 3, companyDescription: 3, paymentMethods: 3,
+  shippingInformation: 3, returnPolicy: 3, businessHours: 3,
+  uniqueSellingPoints: 3, logoFile: 3,
+  apiConsumerKey: 4, apiConsumerSecret: 4, connectionMethod: 4,
+};
+
 const handleStep3Submit = () => {
   step.value = 4;
 }
@@ -1344,26 +1369,58 @@ const handleStep4Submit = () => {
   const csrfToken = page.props.csrf_token || '';
   submitForm._token = csrfToken;
 
+  // Reset error state before submitting
+  fieldErrors.value = {};
+  submissionError.value = '';
+
   submitForm.post('/become-a-vendor', {
-    preserveScroll: false,
+    preserveScroll: true,
     forceFormData: true, // Force FormData for file uploads
     onSuccess: (page) => {
       isSubmitting.value = false;
       showSuccessMessage.value = true;
       clearDraft();
+      fieldErrors.value = {};
+      submissionError.value = '';
       // Scroll to top to show success message
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      // Reload shared props to update pending vendors count in admin panel
-      // This ensures the count updates immediately after signup
       router.reload({ only: ['pending_vendors_count'] });
     },
     onError: (errors) => {
       isSubmitting.value = false;
       console.error('Registration errors:', errors);
-      // If CSRF token error, refresh the page to get a new token
+
+      // 419 CSRF expired — refresh to get new token
       if (errors.message && errors.message.includes('419')) {
         window.location.reload();
+        return;
       }
+
+      // No structured errors? Treat as a generic failure.
+      if (!errors || Object.keys(errors).length === 0) {
+        submissionError.value = 'Something went wrong on our end. Please try again in a moment.';
+        return;
+      }
+
+      fieldErrors.value = { ...errors };
+
+      // Find the earliest step with a problem and jump back to it
+      let earliestStep = 4;
+      for (const field in errors) {
+        const fs = fieldStepMap[field];
+        if (fs && fs < earliestStep) earliestStep = fs;
+      }
+
+      if (earliestStep < step.value) {
+        step.value = earliestStep;
+        router.get('/become-a-vendor', { step: earliestStep }, { preserveState: true, replace: true });
+        submissionError.value = "Some details need fixing — we've taken you back to the relevant step.";
+      } else {
+        const errorMessages = Object.values(errors).flat();
+        submissionError.value = errorMessages[0] || 'Please review the errors below and try again.';
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     onFinish: () => {
       isSubmitting.value = false;
