@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\DemoScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -15,6 +16,7 @@ class Brand extends Model
         'slug',
         'user_id',
         'is_active',
+        'is_demo',
         'rating_average',
         'rating_count',
         'shipping_time',
@@ -34,11 +36,15 @@ class Brand extends Model
     protected $casts = [
         'rating_average' => 'decimal:2',
         'rating_count' => 'integer',
+        'is_demo' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     protected static function boot()
     {
         parent::boot();
+
+        static::addGlobalScope(new DemoScope());
 
         static::creating(function ($brand) {
             if (empty($brand->slug)) {

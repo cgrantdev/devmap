@@ -45,6 +45,7 @@ class VendorsController extends Controller
                     'location' => $brand->vendorSetting && $brand->vendorSetting->location ? $brand->vendorSetting->location->name : null,
                     'created_at' => $brand->created_at->format('n/j/Y'), // Format: 12/3/2025
                     'is_active' => $brand->is_active,
+                    'is_demo' => (bool) $brand->is_demo,
                     'rating_average' => $brand->rating_average ?? 0,
                     'rating_count' => $brand->rating_count ?? 0,
                     'approval_status' => $brand->vendorSetting?->approval_status ?? 'approved', // Default to approved for backwards compatibility
@@ -95,20 +96,39 @@ class VendorsController extends Controller
     public function toggleStatus(Request $request, $id)
     {
         $brand = Brand::findOrFail($id);
-        
+
         // Toggle brand is_active status
         $brand->is_active = !$brand->is_active;
         $brand->save();
-        
+
         // Also update vendor setting status if it exists
         if ($brand->vendorSetting) {
             $brand->vendorSetting->status = $brand->is_active ? 1 : 0;
             $brand->vendorSetting->save();
         }
-        
+
         $statusText = $brand->is_active ? 'activated' : 'deactivated';
-        
+
         return redirect()->back()->with('success', "Vendor has been {$statusText} successfully.");
+    }
+
+    /**
+     * Flip a brand between real and demo. Cascades to all of its products
+     * so the public demo subdomain stays in sync with the brand setting.
+     */
+    public function toggleDemo($id)
+    {
+        $brand = Brand::findOrFail($id);
+        $brand->is_demo = !$brand->is_demo;
+        $brand->save();
+
+        // Cascade to products so they show on the matching subdomain
+        \App\Models\Product::withoutGlobalScope(\App\Models\Scopes\DemoScope::class)
+            ->where('brand_id', $brand->id)
+            ->update(['is_demo' => $brand->is_demo]);
+
+        $state = $brand->is_demo ? 'demo' : 'real';
+        return redirect()->back()->with('success', "{$brand->name} is now marked as {$state}.");
     }
 
     public function create()

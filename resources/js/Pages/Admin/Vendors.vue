@@ -27,6 +27,8 @@
         { value: 'active', label: 'Active', count: vendors.filter(v => v.is_active).length },
         { value: 'pending', label: 'Pending', count: vendors.filter(v => v.approval_status === 'pending' || v.settings?.approval_status === 'pending').length },
         { value: 'inactive', label: 'Inactive', count: vendors.filter(v => !v.is_active).length },
+        { value: 'demo', label: 'Demo', count: vendors.filter(v => v.is_demo).length },
+        { value: 'real', label: 'Real', count: vendors.filter(v => !v.is_demo).length },
       ]"
     />
 
@@ -40,6 +42,7 @@
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Products</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Rating</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Status</th>
+            <th class="px-5 py-3 text-center text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Demo</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Dashboard</th>
           </tr>
         </thead>
@@ -92,6 +95,21 @@
                 status="inactive"
                 label="Inactive"
               />
+            </td>
+            <td class="px-5 py-3.5 text-center" @click.stop>
+              <button
+                @click="toggleDemo(vendor.id)"
+                :title="vendor.is_demo ? 'Demo vendor — click to mark real' : 'Real vendor — click to mark demo'"
+                :class="[
+                  'inline-flex items-center gap-1 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.06em] rounded transition-colors',
+                  vendor.is_demo
+                    ? 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                ]"
+              >
+                <span class="w-1.5 h-1.5 rounded-full" :class="vendor.is_demo ? 'bg-amber-500' : 'bg-slate-400'"></span>
+                {{ vendor.is_demo ? 'Demo' : 'Real' }}
+              </button>
             </td>
             <td class="px-5 py-3.5" @click.stop>
               <a
@@ -148,8 +166,20 @@ const filteredVendors = computed(() => {
     list = list.filter(v => v.approval_status === 'pending' || v.settings?.approval_status === 'pending')
   } else if (statusFilter.value === 'inactive') {
     list = list.filter(v => !v.is_active)
+  } else if (statusFilter.value === 'demo') {
+    list = list.filter(v => v.is_demo)
+  } else if (statusFilter.value === 'real') {
+    list = list.filter(v => !v.is_demo)
   }
 
   return list
 })
+
+function toggleDemo(vendorId) {
+  router.post(`/admin/vendors/${vendorId}/toggle-demo`, {
+    _token: usePage().props.csrf_token,
+  }, {
+    preserveScroll: true,
+  })
+}
 </script>

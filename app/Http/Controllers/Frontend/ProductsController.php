@@ -619,8 +619,12 @@ class ProductsController extends Controller
             $query->orderBy($sortBy, $sortDir);
         }
 
-        // Paginate
-        $perPage = $request->get('per_page', 20);
+        // Paginate — default to a high cap so vendor pages show their full catalog by default.
+        // Vendors with very large catalogs can still set ?per_page=N to opt back into pagination.
+        $perPage = (int) $request->get('per_page', 500);
+        if ($perPage < 1 || $perPage > 1000) {
+            $perPage = 500;
+        }
         $products = $query->paginate($perPage)->withQueryString();
 
         // Get filter options for this brand

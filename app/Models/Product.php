@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\DemoScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new DemoScope());
+    }
 
     protected $fillable = [
         'name',
@@ -24,6 +30,7 @@ class Product extends Model
         'availability',
         'status',
         'hidden',
+        'is_demo',
         'featured',
         'lab_tested',
         'first_timer_deals',
@@ -75,6 +82,7 @@ class Product extends Model
     protected $casts = [
         'last_scraped_at' => 'datetime',
         'hidden' => 'boolean',
+        'is_demo' => 'boolean',
         'featured' => 'boolean',
         'lab_tested' => 'boolean',
         'first_timer_deals' => 'boolean',

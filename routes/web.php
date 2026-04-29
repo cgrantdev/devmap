@@ -165,6 +165,7 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     Route::post('/vendors/{id}', [VendorsController::class, 'update'])->name('admin.vendors.update');
     Route::delete('/vendors/{id}', [VendorsController::class, 'destroy'])->name('admin.vendors.destroy');
     Route::post('/vendors/{id}/toggle-status', [VendorsController::class, 'toggleStatus'])->name('admin.vendors.toggle-status');
+    Route::post('/vendors/{id}/toggle-demo', [VendorsController::class, 'toggleDemo'])->name('admin.vendors.toggle-demo');
     Route::post('/vendors/{id}/approve', [VendorsController::class, 'approve'])->name('admin.vendors.approve');
     Route::post('/vendors/{id}/reject', [VendorsController::class, 'reject'])->name('admin.vendors.reject');
     // Vendor Discovery
