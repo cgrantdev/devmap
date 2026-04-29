@@ -51,16 +51,28 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           </button>
 
-          <!-- Sign in (subtle) -->
+          <!-- Sign in (subtle) — hidden for staff (they have View Admin instead) -->
           <a
+            v-if="!isStaff"
             href="/login"
             class="ui-focus hidden md:inline-flex px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-200 text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)]"
           >
             Sign in
           </a>
 
-          <!-- Get Listed (primary CTA) -->
+          <!-- View Admin (staff CTA) — replaces Get Listed for admin/admin_viewer -->
           <a
+            v-if="isStaff"
+            href="/admin/dashboard"
+            class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-slate-800 to-slate-900 shadow-[0_1px_2px_rgba(10,11,14,0.08),0_4px_12px_-4px_rgba(15,23,42,0.3)] hover:-translate-y-[0.5px] hover:shadow-[0_1px_2px_rgba(10,11,14,0.1),0_6px_16px_-4px_rgba(15,23,42,0.4)] transition-all"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            View Admin
+          </a>
+
+          <!-- Get Listed (primary CTA) — hidden for staff -->
+          <a
+            v-else
             href="/become-a-vendor"
             class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[0_1px_2px_rgba(10,11,14,0.08),0_4px_12px_-4px_rgba(79,70,229,0.3)] hover:-translate-y-[0.5px] hover:shadow-[0_1px_2px_rgba(10,11,14,0.1),0_6px_16px_-4px_rgba(79,70,229,0.4)] transition-all"
           >
@@ -107,9 +119,19 @@
 
           <div class="border-t border-[color:var(--color-hairline)] mx-4" />
 
-          <!-- Get Listed CTA -->
+          <!-- View Admin (staff) or Get Listed (everyone else) -->
           <div class="px-4 py-3">
             <a
+              v-if="isStaff"
+              href="/admin/dashboard"
+              class="flex items-center justify-center gap-2 h-11 text-[15px] font-semibold text-white bg-gradient-to-b from-slate-800 to-slate-900 shadow-sm transition-all"
+              @click="mobileOpen = false"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              View Admin
+            </a>
+            <a
+              v-else
               href="/become-a-vendor"
               class="flex items-center justify-center gap-2 h-11 text-[15px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm transition-all"
               @click="mobileOpen = false"
@@ -121,8 +143,8 @@
 
           <div class="border-t border-[color:var(--color-hairline)] mx-4" />
 
-          <!-- Sign in -->
-          <div class="px-2 py-2">
+          <!-- Sign in (only when not staff) -->
+          <div v-if="!isStaff" class="px-2 py-2">
             <a
               href="/login"
               class="flex items-center gap-3 px-4 py-2.5 rounded-[8px] text-[14px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
@@ -228,10 +250,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import Button from '@/components/ui/Button.vue'
 import SearchPalette from '@/components/ui/SearchPalette.vue'
 import CountrySelector from '@/components/ui/CountrySelector.vue'
+
+const page = usePage()
+const isStaff = computed(() => {
+  const role = page.props.auth?.user?.role
+  return role === 'admin' || role === 'admin_viewer'
+})
 
 const scrolled = ref(false)
 const mobileOpen = ref(false)
