@@ -43,6 +43,14 @@ use App\Http\Controllers\Frontend\DemoPreviewController;
 use App\Http\Controllers\Frontend\DealsController;
 use App\Http\Controllers\Frontend\PagesController as FrontendPagesController;
 
+// join.peptidemap.com is a single-purpose subdomain — its root path
+// serves the vendor invitation page, not the marketplace homepage.
+// Must be registered BEFORE the bare "/" route or Laravel's first-match
+// resolution will hand the request to HomeController.
+Route::domain('join.peptidemap.com')->group(function () {
+    Route::get('/', [JoinController::class, 'show'])->name('join.root');
+});
+
 // Modern 2026 homepage is now the default
 Route::get('/', [HomeController::class, 'v2'])->name('home');
 // Legacy homepage (kept for reference, remove when fully migrated)
@@ -100,14 +108,8 @@ Route::get('/deals', [DealsController::class, 'index'])->name('deals');
 Route::get('/become-a-vendor', [BecomeVendorController::class, 'index'])->name('become-a-vendor');
 Route::post('/become-a-vendor', [BecomeVendorController::class, 'store'])->name('become-a-vendor.store');
 
-// Standalone vendor invitation page.
-//
-// On join.peptidemap.com, this is served at the root: join.peptidemap.com/
-// (the ComingSoon middleware canonicalizes /join → / on that host).
-// The fallback /join route on any other host still works for testing.
-Route::domain('join.peptidemap.com')->group(function () {
-    Route::get('/', [JoinController::class, 'show'])->name('join.root');
-});
+// /join works on any host — used for testing on dev.peptidemap.com.
+// The join.peptidemap.com root route is registered earlier in this file.
 Route::get('/join', [JoinController::class, 'show'])->name('join');
 
 // Demo preview — public entry-point that auto-logs visitors into the
