@@ -14,11 +14,34 @@ class ComingSoon
     public function handle(Request $request, Closure $next)
     {
         $host = $request->getHost();
+        $path = $request->path();
+
+        // join.peptidemap.com — standalone vendor invitation page.
+        // Whitelist: assets, /join, the form submission endpoint, and CSRF.
+        // Anything else gets redirected back to the invitation root.
+        if ($host === 'join.peptidemap.com') {
+            $allowed =
+                str_starts_with($path, 'images/') ||
+                str_starts_with($path, 'build/') ||
+                str_starts_with($path, 'storage/') ||
+                $path === 'join' ||
+                str_starts_with($path, 'join/') ||
+                $path === 'become-a-vendor' || // POST submission target
+                $path === 'sanctum/csrf-cookie';
+
+            if (!$allowed) {
+                // Forward root and unknown paths to the join page (preserve query string)
+                $query = $request->getQueryString();
+                $target = '/join' . ($query ? ('?' . $query) : '');
+                return redirect($target, 302);
+            }
+
+            return $next($request);
+        }
 
         // Only gate the bare production domains
         if ($host === 'peptidemap.com' || $host === 'www.peptidemap.com') {
             // Allow through if it's a known asset request
-            $path = $request->path();
             if (str_starts_with($path, 'images/') || str_starts_with($path, 'build/') || str_starts_with($path, 'storage/')) {
                 return $next($request);
             }

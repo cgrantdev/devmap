@@ -38,6 +38,7 @@ use App\Http\Controllers\Frontend\KnowledgeCenterController;
 use App\Http\Controllers\Frontend\VendorReviewsController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\BecomeVendorController;
+use App\Http\Controllers\Frontend\JoinController;
 use App\Http\Controllers\Frontend\DealsController;
 use App\Http\Controllers\Frontend\PagesController as FrontendPagesController;
 
@@ -97,6 +98,10 @@ Route::get('/research/{id}', [KnowledgeCenterController::class, 'showResearch'])
 Route::get('/deals', [DealsController::class, 'index'])->name('deals');
 Route::get('/become-a-vendor', [BecomeVendorController::class, 'index'])->name('become-a-vendor');
 Route::post('/become-a-vendor', [BecomeVendorController::class, 'store'])->name('become-a-vendor.store');
+
+// Standalone vendor invitation page (served at /join on any host,
+// and as the root page on join.peptidemap.com via ComingSoon middleware).
+Route::get('/join', [JoinController::class, 'show'])->name('join');
 
 // Vendor Reviews
 Route::post('/brands/{brandId}/reviews', [VendorReviewsController::class, 'store'])->name('vendor.reviews.store');
