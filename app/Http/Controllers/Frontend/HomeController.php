@@ -670,19 +670,9 @@ class HomeController extends Controller
         });
 
         // Build the hero carousel slides:
-        //  - 1 platform intro slide (always first)
-        //  - 3 dedicated Certified Peptides slides (with banner imagery)
-        //  - Up to 4 rotating premium vendor slides (excluding Certified Pep)
+        //  - Certified Peptides featured partner slide (with banner imagery)
+        //  - Up to 4 rotating premium-vendor slides (filtered)
         $heroSlides = collect();
-        $heroSlides->push([
-            'eyebrow' => 'Verification engine live · Updated continuously',
-            'title' => 'The definitive platform for research peptide vendors.',
-            'subtitle' => 'Compare verified suppliers, inspect lab testing, and discover new compounds — all in one place.',
-            'cta' => 'Explore verified vendors',
-            'url' => '/vendors',
-            'badge' => 'Platform',
-            'gradient' => ['#0A0B0E', '#4F46E5'],
-        ]);
 
         // Featured Partner — Certified Peptides
         // Test placement; move to admin-managed sponsored-slot system later.
@@ -698,10 +688,12 @@ class HomeController extends Controller
             'coupon_code' => 'pmap',
         ]);
 
-        // Auto-generated slides for the other premium vendors (skip Certified
-        // Pep — it has its own dedicated banner slides above).
+        // Auto-generated slides for the other premium vendors. Skip:
+        //  - certified-pep (already has its dedicated banner slide above)
+        //  - amino-club (legacy seed brand, not a real vendor we want to feature)
+        $skipSlugs = ['certified-pep', 'amino-club'];
         foreach ($premiumVendors->take(4) as $v) {
-            if (($v['slug'] ?? null) === 'certified-pep') continue;
+            if (in_array($v['slug'] ?? null, $skipSlugs, true)) continue;
             $heroSlides->push([
                 'eyebrow' => 'Featured partner',
                 'title' => $v['name'],
