@@ -1,74 +1,48 @@
 <template>
   <div class="min-h-screen bg-slate-50">
     <!-- Top bar (minimal, no main nav) -->
-    <header class="bg-[#0F172A] text-white">
+    <header class="bg-white border-b border-slate-200">
       <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <img :src="'/images/logo.png'" alt="PeptideMap" class="h-7 brightness-0 invert" />
+          <img :src="'/images/logo.png'" alt="PeptideMap" class="h-7" />
         </div>
-        <div class="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-white/60">
-          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-          Private Invitation
-        </div>
+        <a href="https://demo.peptidemap.com" target="_blank" rel="noopener" class="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors">
+          Preview the directory
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+        </a>
       </div>
     </header>
 
     <!-- Invitation hero -->
-    <section class="bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0F172A] text-white relative overflow-hidden">
-      <!-- subtle grid texture -->
-      <div class="absolute inset-0 opacity-[0.04]" style="background-image: linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px); background-size: 32px 32px;"></div>
-
-      <div class="relative max-w-3xl mx-auto px-6 py-20 text-center">
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 mb-8 border border-white/15 rounded-full text-[10px] uppercase tracking-[0.18em] text-white/70">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          Private Invitation · Launch Cohort 2026
+    <section class="bg-white border-b border-slate-200">
+      <div class="max-w-3xl mx-auto px-6 py-16 sm:py-20 text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 bg-slate-100 rounded-full text-[10px] uppercase tracking-[0.18em] text-slate-600 font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          Private Invitation
         </div>
 
-        <p v-if="invitation?.company" class="text-emerald-300/90 text-sm font-medium mb-3">
+        <p v-if="invitation?.company" class="text-slate-500 text-sm mb-3">
           Hi {{ invitation.company }},
         </p>
 
-        <h1 class="text-4xl sm:text-5xl font-light leading-[1.05] tracking-tight mb-5">
-          You've been invited<br />
-          <span class="font-medium bg-gradient-to-r from-white to-emerald-200 bg-clip-text text-transparent">to join PeptideMap.</span>
+        <h1 class="text-3xl sm:text-4xl font-semibold text-slate-900 leading-tight tracking-tight mb-5">
+          You've been invited to join PeptideMap.
         </h1>
 
-        <p class="text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed mb-10">
-          We're hand-selecting peptide vendors with verifiable quality, transparent COAs, and competitive pricing for our directory's launch cohort. This invitation is extended to your team.
+        <p class="text-base sm:text-lg text-slate-600 max-w-xl mx-auto leading-relaxed mb-8">
+          We're hand-selecting peptide vendors with verifiable quality, transparent COAs, and competitive pricing for our launch cohort.
         </p>
 
-        <!-- Three pillars -->
-        <div class="grid sm:grid-cols-3 gap-4 max-w-2xl mx-auto mt-12">
-          <div class="border border-white/10 bg-white/[0.03] backdrop-blur-sm p-5 text-left">
-            <div class="text-emerald-400 mb-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </div>
-            <div class="text-sm font-semibold text-white mb-1">Verified Listing</div>
-            <div class="text-xs text-slate-400 leading-relaxed">Featured placement on a directory built around vendor verification, not advertising spend.</div>
-          </div>
-          <div class="border border-white/10 bg-white/[0.03] backdrop-blur-sm p-5 text-left">
-            <div class="text-emerald-400 mb-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            </div>
-            <div class="text-sm font-semibold text-white mb-1">Compare-Page Placement</div>
-            <div class="text-xs text-slate-400 leading-relaxed">Side-by-side comparison surfaces your pricing and quality directly to qualified researchers.</div>
-          </div>
-          <div class="border border-white/10 bg-white/[0.03] backdrop-blur-sm p-5 text-left">
-            <div class="text-emerald-400 mb-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-            </div>
-            <div class="text-sm font-semibold text-white mb-1">Vendor Analytics</div>
-            <div class="text-xs text-slate-400 leading-relaxed">Live visibility into clicks, comparisons, and reviews — direct from your private dashboard.</div>
-          </div>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <a href="#accept" class="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg transition-colors">
+            Accept Invitation
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="https://demo.peptidemap.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
+            Preview the directory
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+          </a>
         </div>
-
-        <a href="#accept" class="inline-flex items-center gap-2 mt-12 px-7 py-3 bg-white text-slate-900 text-sm font-semibold rounded-full hover:bg-slate-100 transition-all hover:-translate-y-0.5">
-          Accept Your Invitation
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
       </div>
     </section>
 
