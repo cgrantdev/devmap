@@ -106,11 +106,11 @@
               </div>
 
               <!-- Title with optional highlighted vendor span -->
-              <h1 class="ui-display text-white text-3xl lg:text-4xl font-semibold tracking-[-0.02em] leading-[1.1]">
+              <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-[-0.02em] leading-[1.1]" style="color: #ffffff;">
                 <template v-if="slide.title_highlight && slide.title.includes(slide.title_highlight)">
-                  <span>{{ slide.title.split(slide.title_highlight)[0] }}</span><span class="text-[color:var(--color-accent-300)]">{{ slide.title_highlight }}</span><span>{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
+                  <span style="color: #ffffff;">{{ slide.title.split(slide.title_highlight)[0] }}</span><span style="color: var(--color-accent-300, #a5b4fc);">{{ slide.title_highlight }}</span><span style="color: #ffffff;">{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
                 </template>
-                <template v-else>{{ slide.title }}</template>
+                <template v-else><span style="color: #ffffff;">{{ slide.title }}</span></template>
               </h1>
 
               <p
