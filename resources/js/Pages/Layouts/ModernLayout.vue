@@ -58,15 +58,6 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           </button>
 
-          <!-- Sign in (subtle) — hidden for staff (they have View Admin instead) -->
-          <a
-            v-if="!isStaff"
-            href="/login"
-            class="ui-focus hidden md:inline-flex px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-200 text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)]"
-          >
-            Sign in
-          </a>
-
           <!-- View Admin (staff CTA) — replaces Get Listed for admin/admin_viewer -->
           <a
             v-if="isStaff"
@@ -166,19 +157,6 @@
             </a>
           </div>
 
-          <div class="border-t border-[color:var(--color-hairline)] mx-4" />
-
-          <!-- Sign in (only when not staff) -->
-          <div v-if="!isStaff" class="px-2 py-2">
-            <a
-              href="/login"
-              class="flex items-center gap-3 px-4 py-2.5 rounded-[8px] text-[14px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
-              @click="mobileOpen = false"
-            >
-              <svg class="w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              Sign in
-            </a>
-          </div>
         </div>
       </div>
     </Transition>
