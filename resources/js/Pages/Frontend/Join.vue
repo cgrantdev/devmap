@@ -15,7 +15,7 @@
 
     <!-- Invitation hero -->
     <section class="bg-white border-b border-slate-200">
-      <div class="max-w-3xl mx-auto px-6 py-16 sm:py-20 text-center">
+      <div class="max-w-3xl mx-auto px-6 py-12 sm:py-16 text-center">
         <div class="inline-flex items-center gap-2 px-3 py-1 mb-6 bg-slate-100 rounded-full text-[10px] uppercase tracking-[0.18em] text-slate-600 font-medium">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
           Private Invitation
@@ -33,16 +33,10 @@
           We're hand-selecting peptide vendors with verifiable quality, transparent COAs, and competitive pricing for our launch cohort.
         </p>
 
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <a href="#accept" class="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg transition-colors">
-            Accept Invitation
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-          <a href="https://demo.peptidemap.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
-            Preview the directory
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
-          </a>
-        </div>
+        <a href="https://demo.peptidemap.com" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
+          Preview the directory at demo.peptidemap.com
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+        </a>
       </div>
     </section>
 
