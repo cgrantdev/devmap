@@ -3,9 +3,16 @@
     <!-- Notice bar -->
     <div v-if="showNotice" class="fixed top-0 left-0 right-0 z-[60] bg-[#0A0B0E] text-white">
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 h-9 flex items-center justify-center gap-2 text-[12px] sm:text-[13px]">
-        <span class="text-white/50">🚀</span>
-        <span class="text-white/70">Now in beta — vendors list <strong class="text-white font-semibold">free</strong> during launch.</span>
-        <a href="/become-a-vendor" class="font-semibold text-[color:var(--color-accent-400)] hover:text-white transition-colors">Get Listed →</a>
+        <template v-if="isDemoHost">
+          <span class="text-white/50">👋</span>
+          <span class="text-white/70">You're previewing the PeptideMap demo. All vendors and data shown are fictional.</span>
+          <button v-if="!isLoggedIn" @click="tryVendorDashboard" class="font-semibold text-[color:var(--color-accent-400)] hover:text-white transition-colors">Try the vendor dashboard →</button>
+        </template>
+        <template v-else>
+          <span class="text-white/50">🚀</span>
+          <span class="text-white/70">Now in beta — vendors list <strong class="text-white font-semibold">free</strong> during launch.</span>
+          <a href="/become-a-vendor" class="font-semibold text-[color:var(--color-accent-400)] hover:text-white transition-colors">Get Listed →</a>
+        </template>
         <button @click="showNotice = false" class="absolute right-3 lg:right-6 text-white/30 hover:text-white/60 transition-colors p-1">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
@@ -70,7 +77,17 @@
             View Admin
           </a>
 
-          <!-- Get Listed (primary CTA) — hidden for staff -->
+          <!-- Try Vendor Dashboard (demo subdomain only, when not staff/logged-in) -->
+          <button
+            v-else-if="isDemoHost && !isLoggedIn"
+            @click="tryVendorDashboard"
+            class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[0_1px_2px_rgba(10,11,14,0.08),0_4px_12px_-4px_rgba(79,70,229,0.3)] hover:-translate-y-[0.5px] hover:shadow-[0_1px_2px_rgba(10,11,14,0.1),0_6px_16px_-4px_rgba(79,70,229,0.4)] transition-all"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Try Vendor Dashboard
+          </button>
+
+          <!-- Get Listed (primary CTA) — default for everyone else -->
           <a
             v-else
             href="/become-a-vendor"
@@ -119,7 +136,7 @@
 
           <div class="border-t border-[color:var(--color-hairline)] mx-4" />
 
-          <!-- View Admin (staff) or Get Listed (everyone else) -->
+          <!-- View Admin (staff) / Try Vendor Dashboard (demo) / Get Listed (default) -->
           <div class="px-4 py-3">
             <a
               v-if="isStaff"
@@ -130,6 +147,14 @@
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
               View Admin
             </a>
+            <button
+              v-else-if="isDemoHost && !isLoggedIn"
+              @click="() => { mobileOpen = false; tryVendorDashboard() }"
+              class="w-full flex items-center justify-center gap-2 h-11 text-[15px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm transition-all"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+              Try Vendor Dashboard
+            </button>
             <a
               v-else
               href="/become-a-vendor"
@@ -261,6 +286,23 @@ const isStaff = computed(() => {
   const role = page.props.auth?.user?.role
   return role === 'admin' || role === 'admin_viewer'
 })
+const isDemoHost = computed(() => page.props.is_demo_host === true)
+const isLoggedIn = computed(() => !!page.props.auth?.user)
+
+function tryVendorDashboard() {
+  // Posts to /demo/preview-vendor which auto-logs in as Helix Research and
+  // redirects to /vendor/dashboard with a "demo preview" banner.
+  const form = document.createElement('form')
+  form.method = 'POST'
+  form.action = '/demo/preview-vendor'
+  const token = document.createElement('input')
+  token.type = 'hidden'
+  token.name = '_token'
+  token.value = page.props.csrf_token
+  form.appendChild(token)
+  document.body.appendChild(form)
+  form.submit()
+}
 
 const scrolled = ref(false)
 const mobileOpen = ref(false)

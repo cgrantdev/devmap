@@ -39,6 +39,7 @@ use App\Http\Controllers\Frontend\VendorReviewsController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\BecomeVendorController;
 use App\Http\Controllers\Frontend\JoinController;
+use App\Http\Controllers\Frontend\DemoPreviewController;
 use App\Http\Controllers\Frontend\DealsController;
 use App\Http\Controllers\Frontend\PagesController as FrontendPagesController;
 
@@ -102,6 +103,12 @@ Route::post('/become-a-vendor', [BecomeVendorController::class, 'store'])->name(
 // Standalone vendor invitation page (served at /join on any host,
 // and as the root page on join.peptidemap.com via ComingSoon middleware).
 Route::get('/join', [JoinController::class, 'show'])->name('join');
+
+// Demo preview — public entry-point that auto-logs visitors into the
+// seeded Helix Research Co. demo vendor account. Restricted to the
+// demo.peptidemap.com host inside the controller.
+Route::post('/demo/preview-vendor', [DemoPreviewController::class, 'start'])->name('demo.preview-vendor');
+Route::post('/demo/exit', [DemoPreviewController::class, 'exit'])->name('demo.exit');
 
 // Vendor Reviews
 Route::post('/brands/{brandId}/reviews', [VendorReviewsController::class, 'store'])->name('vendor.reviews.store');

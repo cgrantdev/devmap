@@ -10,6 +10,18 @@
       </a>
     </div>
 
+    <!-- Demo preview banner -->
+    <div v-if="$page.props.demo_preview" class="bg-gradient-to-r from-[#4338CA] to-[#5B5FE8] text-white text-center py-2 px-4 text-[12px] font-semibold flex items-center justify-center gap-3 z-50">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span>Demo preview — you're viewing the dashboard as <strong>{{ $page.props.demo_preview_brand_name || 'a sample vendor' }}</strong>. All data shown is fictional.</span>
+      <form @submit.prevent="exitDemo" class="inline-flex">
+        <button type="submit" class="ml-2 inline-flex items-center gap-1 px-3 py-1 rounded-md bg-white/20 hover:bg-white/30 transition-colors text-white text-[11px] font-bold uppercase tracking-wider">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          Exit demo
+        </button>
+      </form>
+    </div>
+
     <div class="flex flex-1">
       <!-- Sidebar -->
       <aside class="w-[240px] flex-shrink-0 bg-[color:var(--color-ink)] flex flex-col">
@@ -62,6 +74,14 @@ function logout() {
   form.post('/vendor/logout', {
     onSuccess: () => {
       window.location.href = '/login'
+    }
+  })
+}
+
+function exitDemo() {
+  form.post('/demo/exit', {
+    onSuccess: () => {
+      window.location.href = '/'
     }
   })
 }
