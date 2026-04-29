@@ -8,26 +8,27 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class VendorWelcomeEmail extends Mailable
+class VendorAcceptedEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public function __construct(
         public string $companyName,
         public string $email,
+        public string $loginUrl,
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Welcome to PeptideMap — your application is under review",
+            subject: "You're in — welcome to PeptideMap, {$this->companyName}",
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'emails.vendor-welcome',
+            view: 'emails.vendor-accepted',
         );
     }
 }

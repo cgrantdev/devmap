@@ -504,34 +504,51 @@ class VendorsController extends Controller
     }
 
     /**
-     * Approve a pending vendor
+     * Approve a pending vendor.
+     * Activates the brand, marks the user's email verified, and sends them
+     * a "you're in" email with a link to their dashboard.
      */
     public function approve($id)
     {
         $brand = Brand::findOrFail($id);
-        
+
         if (!$brand->vendorSetting) {
             return redirect()->route('admin.vendors')->with('error', 'Vendor settings not found.');
         }
-        
+
         // Update approval status and activate vendor
         $brand->vendorSetting->approval_status = 'approved';
         $brand->vendorSetting->status = 1; // Active
         $brand->vendorSetting->save();
-        
+
         $brand->is_active = true;
         $brand->save();
-        
-        // Mark user's email as verified to make them active
-        if ($brand->user_id) {
-            $user = User::find($brand->user_id);
-            if ($user && !$user->email_verified_at) {
-                $user->email_verified_at = now();
-                $user->save();
+
+        // Mark user's email as verified so they can sign in
+        $user = $brand->user_id ? User::find($brand->user_id) : null;
+        if ($user && !$user->email_verified_at) {
+            $user->email_verified_at = now();
+            $user->save();
+        }
+
+        // Send "you're in" email
+        if ($user) {
+            try {
+                \Mail::to($user->email)->send(new \App\Mail\VendorAcceptedEmail(
+                    companyName: $brand->name,
+                    email: $user->email,
+                    loginUrl: url('/login'),
+                ));
+            } catch (\Throwable $e) {
+                \Log::warning('Failed to send vendor accepted email', [
+                    'brand_id' => $brand->id,
+                    'email' => $user->email,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
-        
-        return redirect()->route('admin.vendors')->with('success', 'Vendor approved successfully.');
+
+        return redirect()->back()->with('success', "{$brand->name} has been approved. Welcome email sent.");
     }
 
     /**

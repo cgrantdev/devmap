@@ -99,7 +99,10 @@ class BecomeVendorController extends Controller
                 return back()->withErrors(['companyName' => 'This company name is already taken.'])->withInput();
             }
 
-            // Create User account
+            // Create User account.
+            // Vendor email verification is handled by the admin during the
+            // approval flow — we don't make applicants verify themselves.
+            // email_verified_at is set when admin clicks Approve.
             $user = User::create([
                 'name' => $validated['fullName'],
                 'email' => $validated['email'],
@@ -190,16 +193,14 @@ class BecomeVendorController extends Controller
 
             DB::commit();
 
-            // Send email verification notification
-            $user->sendEmailVerificationNotification();
+            // No email-verification flow for vendors — the admin verifies
+            // them manually during the approval step instead.
 
-            // Send welcome email with credentials to vendor
+            // Send welcome / "application received" email
             try {
                 Mail::to($validated['email'])->send(new VendorWelcomeEmail(
                     companyName: $validated['companyName'],
                     email: $validated['email'],
-                    password: $validated['password'],
-                    loginUrl: url('/login'),
                 ));
             } catch (\Throwable $e) {
                 \Log::warning('Failed to send vendor welcome email', ['email' => $validated['email'], 'error' => $e->getMessage()]);
