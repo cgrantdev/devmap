@@ -107,6 +107,7 @@ Route::get('/research/{id}', [KnowledgeCenterController::class, 'showResearch'])
 Route::get('/deals', [DealsController::class, 'index'])->name('deals');
 Route::get('/become-a-vendor', [BecomeVendorController::class, 'index'])->name('become-a-vendor');
 Route::post('/become-a-vendor', [BecomeVendorController::class, 'store'])->name('become-a-vendor.store');
+Route::get('/registration-complete', [BecomeVendorController::class, 'complete'])->name('registration.complete');
 
 // /join works on any host — used for testing on dev.peptidemap.com.
 // The join.peptidemap.com root route is registered earlier in this file.

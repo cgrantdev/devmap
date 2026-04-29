@@ -51,21 +51,29 @@ class BecomeVendorController extends Controller
     {
         $validated = $request->validate([
             // Step 1: Company Information
-            'companyName' => 'required|string|max:255',
-            'website' => 'required|url|max:255',
+            'companyName' => 'required|string|min:2|max:255',
+            'website' => ['required', 'url:http,https', 'max:255'],
             'yearEstablished' => 'nullable|integer|min:1800|max:' . date('Y'),
             'country' => 'required|exists:locations,id',
-            
+
             // Step 2: Contact Details
-            'fullName' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
+            'fullName' => 'required|string|min:2|max:255',
+            'email' => 'required|email:rfc,dns|max:255|unique:users,email',
             'phone' => 'nullable|string|max:50',
-            'password' => 'required|string|min:8|confirmed',
-            
-            // Step 3: Business Info
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/[a-z]/',     // lowercase
+                'regex:/[A-Z]/',     // uppercase
+                'regex:/[0-9]/',     // number
+            ],
+
+            // Step 3 + 4: Business Info + REST API credentials (now required)
             'connectionMethod' => 'nullable|string|in:woocommerce,api_key,auto_scrape',
-            'apiConsumerKey' => 'nullable|string|max:255',
-            'apiConsumerSecret' => 'nullable|string|max:255',
+            'apiConsumerKey' => ['required', 'string', 'min:10', 'max:255', 'starts_with:ck_'],
+            'apiConsumerSecret' => ['required', 'string', 'min:10', 'max:255', 'starts_with:cs_'],
             'productCount' => 'nullable|string|max:50',
             'companyDescription' => 'nullable|string|max:2000',
             'paymentMethods' => 'nullable|array',
@@ -75,6 +83,12 @@ class BecomeVendorController extends Controller
             'businessHours' => 'nullable|string|max:255',
             'uniqueSellingPoints' => 'nullable|string|max:2000',
             'logoFile' => 'nullable|mimes:png|max:2048',
+        ], [
+            'password.regex' => 'Password must include at least one uppercase, one lowercase, and one number.',
+            'apiConsumerKey.starts_with' => 'Consumer Key must start with "ck_".',
+            'apiConsumerSecret.starts_with' => 'Consumer Secret must start with "cs_".',
+            'website.url' => 'Please enter a valid URL starting with http:// or https://.',
+            'email.email' => 'Please enter a valid email address.',
         ]);
 
         try {
@@ -206,10 +220,42 @@ class BecomeVendorController extends Controller
                 \Log::warning('Failed to send admin vendor notification', ['brand' => $brand->id, 'error' => $e->getMessage()]);
             }
 
-            return back()->with('success', 'Registration completed successfully. Your account is currently under review and should be activated shortly.');
+            // Stash the brand details in session so the confirmation page
+            // can show a personalized "thanks" without exposing IDs in URL.
+            session([
+                'registration_complete' => [
+                    'company' => $validated['companyName'],
+                    'email' => $validated['email'],
+                    'submitted_at' => now()->toIso8601String(),
+                ],
+            ]);
+
+            return redirect('/registration-complete');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'An error occurred during registration. Please try again.'])->withInput();
         }
+    }
+
+    /**
+     * Confirmation page shown after a successful vendor signup.
+     * Reads the company name from session (set by store() above).
+     * Direct visits without a session payload bounce back to /become-a-vendor.
+     */
+    public function complete(Request $request)
+    {
+        $payload = session('registration_complete');
+
+        if (!$payload || empty($payload['company'])) {
+            return redirect('/become-a-vendor');
+        }
+
+        // Clear the session payload so a refresh doesn't keep it around
+        session()->forget('registration_complete');
+
+        return Inertia::render('Frontend/RegistrationComplete', [
+            'company' => $payload['company'],
+            'email' => $payload['email'] ?? null,
+        ]);
     }
 }

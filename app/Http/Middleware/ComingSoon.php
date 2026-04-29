@@ -35,6 +35,7 @@ class ComingSoon
                 str_starts_with($path, 'storage/') ||
                 str_starts_with($path, 'videos/') ||
                 $path === 'become-a-vendor' || // POST submission target
+                $path === 'registration-complete' || // success page after submit
                 $path === 'sanctum/csrf-cookie';
 
             if (!$allowed) {

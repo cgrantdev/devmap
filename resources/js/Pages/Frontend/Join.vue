@@ -154,7 +154,30 @@
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1.5">Password <span class="text-rose-500">*</span></label>
                 <input v-model="formData.password" type="password" required placeholder="********"
-                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400" />
+                  :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', passwordWeak ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']" />
+                <!-- Strength meter -->
+                <div v-if="formData.password" class="mt-2 space-y-1.5">
+                  <div class="flex gap-1">
+                    <div :class="['h-1 flex-1 rounded-full', passwordScore >= 1 ? 'bg-rose-500' : 'bg-slate-200']"></div>
+                    <div :class="['h-1 flex-1 rounded-full', passwordScore >= 2 ? 'bg-amber-500' : 'bg-slate-200']"></div>
+                    <div :class="['h-1 flex-1 rounded-full', passwordScore >= 3 ? 'bg-yellow-500' : 'bg-slate-200']"></div>
+                    <div :class="['h-1 flex-1 rounded-full', passwordScore >= 4 ? 'bg-emerald-500' : 'bg-slate-200']"></div>
+                  </div>
+                  <ul class="text-[11px] text-slate-500 space-y-0.5 leading-tight">
+                    <li :class="passwordChecks.length ? 'text-emerald-600' : ''">
+                      <span v-if="passwordChecks.length">✓</span><span v-else>○</span> At least 8 characters
+                    </li>
+                    <li :class="passwordChecks.upper ? 'text-emerald-600' : ''">
+                      <span v-if="passwordChecks.upper">✓</span><span v-else>○</span> One uppercase letter
+                    </li>
+                    <li :class="passwordChecks.lower ? 'text-emerald-600' : ''">
+                      <span v-if="passwordChecks.lower">✓</span><span v-else>○</span> One lowercase letter
+                    </li>
+                    <li :class="passwordChecks.number ? 'text-emerald-600' : ''">
+                      <span v-if="passwordChecks.number">✓</span><span v-else>○</span> One number
+                    </li>
+                  </ul>
+                </div>
               </div>
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1.5">Confirm Password <span class="text-rose-500">*</span></label>
@@ -164,10 +187,12 @@
               </div>
             </div>
 
+            <p v-if="step2ErrorMessage" class="text-sm text-rose-600">{{ step2ErrorMessage }}</p>
+
             <div class="flex items-center justify-between pt-6 border-t border-slate-100">
               <button type="button" @click="goToStep(1)" class="text-sm text-slate-500 hover:text-slate-700">Back</button>
-              <button type="submit" :disabled="passwordMismatch"
-                :class="['flex items-center gap-2 px-6 py-2.5 text-white text-sm font-medium rounded-lg transition-colors', passwordMismatch ? 'bg-slate-300 cursor-not-allowed' : 'bg-[#0F172A] hover:bg-slate-800']">
+              <button type="submit" :disabled="step2Invalid"
+                :class="['flex items-center gap-2 px-6 py-2.5 text-white text-sm font-medium rounded-lg transition-colors', step2Invalid ? 'bg-slate-300 cursor-not-allowed' : 'bg-[#0F172A] hover:bg-slate-800']">
                 Continue
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
@@ -329,32 +354,28 @@
 
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Key</label>
-                <input v-model="formData.apiConsumerKey" type="text" placeholder="ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-slate-400" />
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Key <span class="text-rose-500">*</span></label>
+                <input v-model="formData.apiConsumerKey" type="text" required placeholder="ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  :class="['w-full px-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', consumerKeyInvalid ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']" />
+                <p v-if="consumerKeyInvalid" class="text-xs text-rose-600 mt-1">Consumer Key must start with <code>ck_</code></p>
               </div>
               <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Secret</label>
-                <input v-model="formData.apiConsumerSecret" type="password" placeholder="cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-slate-400" />
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Secret <span class="text-rose-500">*</span></label>
+                <input v-model="formData.apiConsumerSecret" type="password" required placeholder="cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                  :class="['w-full px-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', consumerSecretInvalid ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']" />
+                <p v-if="consumerSecretInvalid" class="text-xs text-rose-600 mt-1">Consumer Secret must start with <code>cs_</code></p>
               </div>
             </div>
 
             <div class="flex items-center justify-between pt-6 border-t border-slate-100">
               <button type="button" @click="goToStep(3)" class="text-sm text-slate-500 hover:text-slate-700">Back</button>
-              <div class="flex items-center gap-3">
-                <button type="button" @click="skipAndSubmit" :disabled="isSubmitting"
-                  class="px-5 py-2.5 text-sm text-slate-600 hover:text-slate-800 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
-                  Skip for now
-                </button>
-                <button type="submit" :disabled="isSubmitting"
-                  :class="['flex items-center gap-2 px-6 py-2.5 bg-[#0F172A] hover:bg-slate-800 text-white text-sm font-medium rounded-lg transition-colors', isSubmitting ? 'opacity-50 cursor-not-allowed' : '']">
-                  <span v-if="isSubmitting">Creating...</span>
-                  <span v-else>Complete Registration</span>
-                  <svg v-if="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                  <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
-                </button>
-              </div>
+              <button type="submit" :disabled="isSubmitting || step4Invalid"
+                :class="['flex items-center gap-2 px-6 py-2.5 text-white text-sm font-medium rounded-lg transition-colors', (isSubmitting || step4Invalid) ? 'bg-slate-300 cursor-not-allowed' : 'bg-[#0F172A] hover:bg-slate-800']">
+                <span v-if="isSubmitting">Creating...</span>
+                <span v-else>Complete Registration</span>
+                <svg v-if="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
+              </button>
             </div>
           </form>
         </div>
@@ -468,6 +489,35 @@ const passwordMismatch = computed(() => {
          formData.value.password !== formData.value.confirmPassword
 })
 
+// Password strength
+const passwordChecks = computed(() => ({
+  length: (formData.value.password || '').length >= 8,
+  upper: /[A-Z]/.test(formData.value.password || ''),
+  lower: /[a-z]/.test(formData.value.password || ''),
+  number: /[0-9]/.test(formData.value.password || ''),
+}))
+const passwordScore = computed(() => Object.values(passwordChecks.value).filter(Boolean).length)
+const passwordStrong = computed(() => passwordScore.value === 4)
+const passwordWeak = computed(() => formData.value.password && !passwordStrong.value)
+
+const step2ErrorMessage = ref('')
+const step2Invalid = computed(() => passwordMismatch.value || !passwordStrong.value)
+
+// API key format
+const consumerKeyInvalid = computed(() => {
+  const v = (formData.value.apiConsumerKey || '').trim()
+  return v.length > 0 && !v.startsWith('ck_')
+})
+const consumerSecretInvalid = computed(() => {
+  const v = (formData.value.apiConsumerSecret || '').trim()
+  return v.length > 0 && !v.startsWith('cs_')
+})
+const step4Invalid = computed(() => {
+  const k = (formData.value.apiConsumerKey || '').trim()
+  const s = (formData.value.apiConsumerSecret || '').trim()
+  return !k || !s || consumerKeyInvalid.value || consumerSecretInvalid.value
+})
+
 const draftRestored = ref(false)
 
 onMounted(() => {
@@ -519,8 +569,19 @@ const handleStep1Submit = () => {
 }
 
 const handleStep2Submit = () => {
-  if (!formData.value.fullName || !formData.value.email || !formData.value.password || !formData.value.confirmPassword) return
-  if (formData.value.password !== formData.value.confirmPassword) return
+  step2ErrorMessage.value = ''
+  if (!formData.value.fullName || !formData.value.email || !formData.value.password || !formData.value.confirmPassword) {
+    step2ErrorMessage.value = 'Please fill in all required fields.'
+    return
+  }
+  if (!passwordStrong.value) {
+    step2ErrorMessage.value = 'Password must include uppercase, lowercase, a number, and be at least 8 characters.'
+    return
+  }
+  if (formData.value.password !== formData.value.confirmPassword) {
+    step2ErrorMessage.value = 'Passwords do not match.'
+    return
+  }
   goToStep(3)
 }
 
@@ -604,13 +665,7 @@ const submitRegistration = () => {
 }
 
 const handleStep4Submit = () => {
-  submitRegistration()
-}
-
-const skipAndSubmit = () => {
-  formData.value.apiConsumerKey = ''
-  formData.value.apiConsumerSecret = ''
-  formData.value.connectionMethod = 'auto_scrape'
+  if (step4Invalid.value) return
   submitRegistration()
 }
 </script>

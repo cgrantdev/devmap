@@ -22,7 +22,7 @@ class VendorWelcomeEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Welcome to PeptideMaps — Your vendor account is ready",
+            subject: "Welcome to PeptideMap — your application is under review",
         );
     }
 
