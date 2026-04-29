@@ -44,17 +44,34 @@ class HomeController extends Controller
             }
         }
 
-        // Hardcoded sponsored slide for Certified Peptides (test placement).
+        // Hardcoded sponsored slides for Certified Peptides (test placement).
         // TODO: move to admin-managed sponsored-slot system once that ships.
-        $heroSlides[] = [
-            'title' => 'Certified Peptides',
-            'subtitle' => '99% HPLC-tested research peptides with verified COAs. BPC-157, TB-500, and the full catalog — direct from the lab.',
-            'eyebrow' => 'Featured Vendor',
-            'cta' => 'Browse the catalog',
-            'url' => '/brand/certified-pep/products',
-            'image' => '/images/banners/certified-peptides.jpg',
-            'sponsored' => true,
+        $certifiedSlides = [
+            [
+                'title' => 'Certified Peptides',
+                'subtitle' => '99% HPLC-tested research peptides with verified COAs. Direct from the lab to your bench.',
+                'image' => '/images/banners/certified-peptides-1.png',
+            ],
+            [
+                'title' => 'BPC-157 · TB-500 · GHK-Cu',
+                'subtitle' => 'Healing and recovery research compounds, lab-tested and batch-traceable. Browse the full Certified Peptides catalog.',
+                'image' => '/images/banners/certified-peptides-2.png',
+            ],
+            [
+                'title' => 'Research-grade. Verified.',
+                'subtitle' => 'Independent third-party HPLC verification on every batch. 89+ compounds available from Certified Peptides.',
+                'image' => '/images/banners/certified-peptides-3.png',
+            ],
         ];
+
+        foreach ($certifiedSlides as $slide) {
+            $heroSlides[] = array_merge($slide, [
+                'eyebrow' => 'Featured Vendor',
+                'cta' => 'Browse the catalog',
+                'url' => '/brand/certified-pep/products',
+                'sponsored' => true,
+            ]);
+        }
 
         // Education categories - only show categories with published encyclopedia articles
         $categories = ProductCategory::where('is_active', true)
