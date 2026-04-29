@@ -164,7 +164,7 @@ class DemoVendorsSeeder extends Seeder
                         'location_id' => $locationId,
                         'product_category_id' => $catId,
                         'size_mg' => $sizeMg,
-                        'purity' => mt_rand(0, 100) < 70 ? '≥98%' : '≥99%',
+                        'purity' => mt_rand(0, 100) < 70 ? 98.5 : 99.0,
                         'availability' => 'in_stock',
                         'status' => 'active',
                         'hidden' => false,
