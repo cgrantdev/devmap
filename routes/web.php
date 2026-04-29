@@ -175,6 +175,7 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
 Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.viewer.writes'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/vendors', [VendorsController::class, 'index'])->name('admin.vendors');
+    Route::get('/applicants', [VendorsController::class, 'applicants'])->name('admin.applicants');
     Route::get('/vendors/create', [VendorsController::class, 'create'])->name('admin.vendors.create');
     Route::post('/vendors', [VendorsController::class, 'store'])->name('admin.vendors.store');
     Route::get('/vendors/{id}/edit', [VendorsController::class, 'edit'])->name('admin.vendors.edit');

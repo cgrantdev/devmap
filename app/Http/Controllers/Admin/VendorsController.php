@@ -20,16 +20,66 @@ use App\Models\ScrapingConfig;
 
 class VendorsController extends Controller
 {
+    /**
+     * Dedicated applicant review queue — only shows pending vendor signups.
+     * The /admin/vendors page covers approved/active vendors instead.
+     */
+    public function applicants()
+    {
+        $applicants = Brand::with(['vendorSetting.location', 'user'])
+            ->whereHas('vendorSetting', function ($q) {
+                $q->where('approval_status', 'pending');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($brand) {
+                $settings = $brand->vendorSetting;
+                $hasApiKeys = \App\Models\ScrapingConfig::where('vendor_id', $brand->id)
+                    ->where('type', 'woo_api')
+                    ->exists();
+
+                return [
+                    'id' => $brand->id,
+                    'name' => $brand->name,
+                    'slug' => $brand->slug,
+                    'contact_name' => $brand->user?->name,
+                    'contact_email' => $brand->user?->email ?? $settings?->contact_email,
+                    'phone' => $settings?->phone_number,
+                    'website' => $settings?->website ?? $settings?->shop_url,
+                    'country' => $settings?->location?->name,
+                    'description' => $settings?->description,
+                    'shipping_info' => $settings?->shipping_info,
+                    'return_policy' => $settings?->return_policy,
+                    'business_hours' => $settings?->business_hours,
+                    'payment_methods' => $settings?->payment_methods ?? [],
+                    'founded_year' => $settings?->founded_year,
+                    'logo_url' => $settings?->logo ? asset('storage/' . $settings->logo) : null,
+                    'has_api_keys' => $hasApiKeys,
+                    'submitted_at' => $brand->created_at->diffForHumans(),
+                    'submitted_at_iso' => $brand->created_at->toIso8601String(),
+                ];
+            });
+
+        return Inertia::render('Admin/Applicants', [
+            'applicants' => $applicants,
+        ]);
+    }
+
     public function index()
     {
-        // Only show onboarded vendors (active or manually added) — not bulk-imported pending ones
+        // Only show onboarded vendors (active or manually added).
+        // Pending applications live on /admin/applicants — exclude them here
+        // so this list stays focused on managing live vendors.
         $vendors = Brand::with(['vendorSetting.location'])->withCount('products')
             ->where(function ($q) {
                 $q->where('is_active', true)
                   ->orWhereHas('vendorSetting', function ($sq) {
                       $sq->where('approval_status', 'approved');
                   })
-                  ->orHas('products'); // Show vendors that have products regardless
+                  ->orHas('products');
+            })
+            ->whereDoesntHave('vendorSetting', function ($q) {
+                $q->where('approval_status', 'pending');
             })
             ->orderBy('created_at', 'desc')
             ->get()

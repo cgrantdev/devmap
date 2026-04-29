@@ -25,7 +25,6 @@
       :tabs="[
         { value: 'all', label: 'All', count: vendors.length },
         { value: 'active', label: 'Active', count: vendors.filter(v => v.is_active).length },
-        { value: 'pending', label: 'Pending', count: vendors.filter(v => v.approval_status === 'pending' || v.settings?.approval_status === 'pending').length },
         { value: 'inactive', label: 'Inactive', count: vendors.filter(v => !v.is_active).length },
         { value: 'demo', label: 'Demo', count: vendors.filter(v => v.is_demo).length },
         { value: 'real', label: 'Real', count: vendors.filter(v => !v.is_demo).length },
@@ -79,27 +78,8 @@
                 <span class="ui-mono text-[13px] text-[color:var(--color-ink)]">{{ vendor.rating_average || vendor.rating || '0.0' }}</span>
               </div>
             </td>
-            <td class="px-5 py-3.5" @click.stop>
-              <!-- Pending: show inline Approve / Reject buttons -->
-              <div v-if="isPending(vendor)" class="flex items-center gap-1.5">
-                <button
-                  @click="approveVendor(vendor)"
-                  title="Approve vendor — activates account and sends welcome email"
-                  class="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-semibold rounded bg-emerald-100 text-emerald-800 hover:bg-emerald-200 transition-colors"
-                >
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Approve
-                </button>
-                <button
-                  @click="rejectVendor(vendor)"
-                  title="Reject and delete this vendor application"
-                  class="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-semibold rounded bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors"
-                >
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                  Reject
-                </button>
-              </div>
-              <StatusBadge v-else-if="vendor.is_active" status="active" label="Active" />
+            <td class="px-5 py-3.5">
+              <StatusBadge v-if="vendor.is_active" status="active" label="Active" />
               <StatusBadge v-else status="inactive" label="Inactive" />
             </td>
             <td class="px-5 py-3.5 text-center" @click.stop>
@@ -168,8 +148,6 @@ const filteredVendors = computed(() => {
 
   if (statusFilter.value === 'active') {
     list = list.filter(v => v.is_active)
-  } else if (statusFilter.value === 'pending') {
-    list = list.filter(v => v.approval_status === 'pending' || v.settings?.approval_status === 'pending')
   } else if (statusFilter.value === 'inactive') {
     list = list.filter(v => !v.is_active)
   } else if (statusFilter.value === 'demo') {
@@ -189,25 +167,4 @@ function toggleDemo(vendorId) {
   })
 }
 
-function isPending(vendor) {
-  return vendor.approval_status === 'pending' || vendor.settings?.approval_status === 'pending'
-}
-
-function approveVendor(vendor) {
-  if (!confirm(`Approve "${vendor.name}"? This will activate their account and send them a welcome email.`)) return
-  router.post(`/admin/vendors/${vendor.id}/approve`, {
-    _token: usePage().props.csrf_token,
-  }, {
-    preserveScroll: true,
-  })
-}
-
-function rejectVendor(vendor) {
-  if (!confirm(`Reject and delete "${vendor.name}"? This permanently removes the vendor record, user account, and any imported products.`)) return
-  router.post(`/admin/vendors/${vendor.id}/reject`, {
-    _token: usePage().props.csrf_token,
-  }, {
-    preserveScroll: true,
-  })
-}
 </script>

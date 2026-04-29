@@ -21,7 +21,8 @@
         <!-- Catalog -->
         <div>
           <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Catalog</div>
-          <NavItem href="/admin/vendors" icon="store" label="Vendors" :badge="$page.props.pending_vendors_count" badge-color="red" />
+          <NavItem href="/admin/applicants" icon="user-plus" label="Applicants" :badge="$page.props.pending_vendors_count" badge-color="red" />
+          <NavItem href="/admin/vendors" icon="store" label="Vendors" />
           <NavItem href="/admin/products" icon="package" label="Products" />
           <NavItem href="/admin/categories" icon="folder" label="Categories" />
           <NavItem href="/admin/deals" icon="tag" label="Deals & Coupons" />
@@ -144,6 +145,7 @@ const NavItem = defineComponent({
       dashboard: 'M3 3h7v9H3V3zm11 0h7v5h-7V3zm0 9h7v9h-7v-9zM3 16h7v5H3v-5z',
       chart: 'M3 3v18h18M18 9l-5 5-3-3-5 5',
       store: 'M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z',
+      'user-plus': 'M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M19 8v6M16 11h6M9 11a4 4 0 100-8 4 4 0 000 8z',
       package: 'M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zm0 9l8-4.5M12 12v9M4 7.5l8 4.5',
       folder: 'M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z',
       tag: 'M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82zM7 7h.01',
