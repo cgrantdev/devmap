@@ -590,144 +590,112 @@
               </div>
               <h2 class="text-2xl font-semibold text-slate-900 tracking-tight">Connect your store</h2>
               <p class="text-sm text-slate-600 mt-2 leading-relaxed">
-                Add your WooCommerce REST API key so we can automatically import your product catalog and keep your pricing in sync. We only need <strong class="text-slate-900">read-only</strong> access — we never modify your store.
+                Almost there. We use a WooCommerce REST API key to:
               </p>
-              <p class="text-xs text-slate-500 mt-3">
-                Not sure how to find it? Watch the 60-second walkthrough below, or expand the written guide.
+              <ul class="mt-2 space-y-1.5 text-sm text-slate-600">
+                <li class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Automatically import your product catalog (no manual entry)
+                </li>
+                <li class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Keep prices and stock in sync daily
+                </li>
+                <li class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Surface new products as you launch them
+                </li>
+              </ul>
+              <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+                We only request <strong class="text-slate-900">read-only</strong> access — your store data stays unchanged.
               </p>
             </div>
 
             <form @submit.prevent="handleStep4Submit" class="space-y-6">
-              <!-- Video walkthrough -->
-              <div class="bg-slate-900 rounded-lg overflow-hidden border border-slate-200">
-                <div class="px-5 py-3 bg-slate-100 border-b border-slate-200 flex items-center gap-2">
-                  <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  <span class="text-sm font-semibold text-slate-800">Quick walkthrough</span>
-                  <span class="ml-auto text-xs text-slate-500">~60 seconds</span>
+              <!-- Written guide (always visible, primary content) -->
+              <div class="bg-slate-50 border border-slate-200 rounded-lg p-5">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-sm font-semibold text-slate-800">How to get your REST API key</h3>
+                  <span class="text-[11px] text-slate-500">5 steps · ~2 minutes</span>
                 </div>
-                <video
-                  :src="apiVideoUrl"
-                  controls
-                  preload="metadata"
-                  class="w-full block"
-                >
-                  Your browser doesn't support video playback. See the written steps below.
-                </video>
-              </div>
-
-              <!-- Guide: How to get your REST API key (written fallback) -->
-              <div class="bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
-                <button
-                  type="button"
-                  @click="showApiGuide = !showApiGuide"
-                  class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-100 transition-colors"
-                >
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-slate-700 text-white flex items-center justify-center flex-shrink-0">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                    </div>
-                    <div>
-                      <div class="text-sm font-semibold text-slate-800">Prefer written steps?</div>
-                      <div class="text-xs text-slate-500 mt-0.5">5-step guide for getting your WooCommerce REST API key</div>
-                    </div>
-                  </div>
-                  <svg
-                    class="w-5 h-5 text-slate-400 transition-transform"
-                    :class="showApiGuide ? 'rotate-180' : ''"
-                    fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"
-                  ><path d="m6 9 6 6 6-6"/></svg>
-                </button>
-
-                <div v-if="showApiGuide" class="px-5 pb-5 space-y-5 border-t border-slate-200">
-                  <!-- Step 1 -->
-                  <div class="pt-5">
-                    <div class="flex items-start gap-3">
-                      <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
-                      <div class="flex-1">
-                        <p class="text-sm font-medium text-slate-800">Log in to your WordPress admin panel</p>
-                        <p class="text-xs text-slate-500 mt-1">Navigate to <code class="px-1.5 py-0.5 bg-slate-200 rounded text-slate-700">yoursite.com/wp-admin</code></p>
+                <ol class="space-y-4">
+                  <li class="flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+                    <p class="text-sm text-slate-700 leading-relaxed">Log in to your WordPress admin panel at <code class="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-[12px]">yoursite.com/wp-admin</code></p>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+                    <div class="flex-1">
+                      <p class="text-sm text-slate-700 leading-relaxed">Navigate to <strong>WooCommerce → Settings → Advanced → REST API</strong></p>
+                      <div class="mt-2 flex items-center gap-1.5 text-xs flex-wrap">
+                        <span class="px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-700 font-medium">WooCommerce</span>
+                        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                        <span class="px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-700 font-medium">Settings</span>
+                        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                        <span class="px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-700 font-medium">Advanced</span>
+                        <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                        <span class="px-2 py-0.5 bg-emerald-100 rounded text-emerald-700 font-semibold">REST API</span>
                       </div>
                     </div>
-                  </div>
-
-                  <!-- Step 2 -->
-                  <div>
-                    <div class="flex items-start gap-3">
-                      <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
-                      <div class="flex-1">
-                        <p class="text-sm font-medium text-slate-800">Go to WooCommerce Settings</p>
-                        <p class="text-xs text-slate-500 mt-1">In the left sidebar, click <strong>WooCommerce → Settings</strong>, then click the <strong>Advanced</strong> tab, then <strong>REST API</strong>.</p>
-                        <div class="mt-3 rounded-lg border border-slate-200 bg-white p-4">
-                          <div class="flex items-center gap-2 text-xs text-slate-500 mb-2">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18"/></svg>
-                            Navigation path
-                          </div>
-                          <div class="flex items-center gap-2 text-sm">
-                            <span class="px-2 py-1 bg-slate-100 rounded text-slate-700 font-medium">WooCommerce</span>
-                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-                            <span class="px-2 py-1 bg-slate-100 rounded text-slate-700 font-medium">Settings</span>
-                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-                            <span class="px-2 py-1 bg-slate-100 rounded text-slate-700 font-medium">Advanced</span>
-                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-                            <span class="px-2 py-1 bg-indigo-100 rounded text-indigo-700 font-semibold">REST API</span>
-                          </div>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                    <p class="text-sm text-slate-700 leading-relaxed">Click <strong>"Add key"</strong> at the top of the page</p>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">4</span>
+                    <div class="flex-1">
+                      <p class="text-sm text-slate-700 leading-relaxed mb-2">Fill in the key details:</p>
+                      <div class="rounded border border-slate-200 bg-white p-3 space-y-2 text-sm">
+                        <div class="flex items-center justify-between">
+                          <span class="text-slate-500">Description</span>
+                          <span class="px-2 py-0.5 bg-slate-100 rounded font-mono text-slate-800 text-xs">PeptideMap</span>
+                        </div>
+                        <div class="border-t border-slate-100"></div>
+                        <div class="flex items-center justify-between">
+                          <span class="text-slate-500">Permissions</span>
+                          <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded font-semibold text-xs">Read</span>
                         </div>
                       </div>
                     </div>
-                  </div>
-
-                  <!-- Step 3 -->
-                  <div>
-                    <div class="flex items-start gap-3">
-                      <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
-                      <div class="flex-1">
-                        <p class="text-sm font-medium text-slate-800">Click "Add key"</p>
-                        <p class="text-xs text-slate-500 mt-1">You'll see a list of existing API keys (if any). Click the <strong>"Add key"</strong> button.</p>
+                  </li>
+                  <li class="flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">5</span>
+                    <div class="flex-1">
+                      <p class="text-sm text-slate-700 leading-relaxed">Click <strong>"Generate API key"</strong>, then copy both keys into the fields below</p>
+                      <div class="mt-2 rounded border border-amber-200 bg-amber-50 p-2.5 text-xs text-amber-800 flex items-start gap-2">
+                        <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <span><strong>Important:</strong> The Consumer Secret is only shown once. Copy it before leaving the page.</span>
                       </div>
                     </div>
-                  </div>
+                  </li>
+                </ol>
 
-                  <!-- Step 4 -->
-                  <div>
-                    <div class="flex items-start gap-3">
-                      <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">4</span>
-                      <div class="flex-1">
-                        <p class="text-sm font-medium text-slate-800">Fill in the key details</p>
-                        <div class="mt-3 rounded-lg border border-slate-200 bg-white p-4 space-y-3">
-                          <div class="flex items-center justify-between text-sm">
-                            <span class="text-slate-600">Description</span>
-                            <span class="px-2 py-1 bg-slate-100 rounded font-mono text-slate-800">PeptideMap</span>
-                          </div>
-                          <div class="border-t border-slate-100"></div>
-                          <div class="flex items-center justify-between text-sm">
-                            <span class="text-slate-600">User</span>
-                            <span class="text-slate-800">Your admin account</span>
-                          </div>
-                          <div class="border-t border-slate-100"></div>
-                          <div class="flex items-center justify-between text-sm">
-                            <span class="text-slate-600">Permissions</span>
-                            <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded font-semibold">Read</span>
-                          </div>
-                        </div>
-                        <p class="text-xs text-slate-500 mt-2">We only need <strong>Read</strong> access to import your products. We never modify your store.</p>
-                      </div>
+                <!-- Need help? Video toggle -->
+                <div class="mt-5 pt-4 border-t border-slate-200">
+                  <button
+                    v-if="!showApiVideo"
+                    type="button"
+                    @click="showApiVideo = true"
+                    class="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                    Need help? Watch the 60-second walkthrough
+                  </button>
+                  <div v-else>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">Walkthrough video</span>
+                      <button type="button" @click="showApiVideo = false" class="text-xs text-slate-500 hover:text-slate-700">Hide video</button>
                     </div>
-                  </div>
-
-                  <!-- Step 5 -->
-                  <div>
-                    <div class="flex items-start gap-3">
-                      <span class="w-6 h-6 rounded-full bg-slate-700 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">5</span>
-                      <div class="flex-1">
-                        <p class="text-sm font-medium text-slate-800">Click "Generate API key" and copy both keys</p>
-                        <div class="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                          <div class="flex items-start gap-2">
-                            <svg class="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                            <p class="text-xs text-amber-800"><strong>Important:</strong> The Consumer Secret is only shown once. Copy both keys immediately and paste them below.</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <video
+                      :src="apiVideoUrl"
+                      controls
+                      autoplay
+                      preload="metadata"
+                      class="w-full block rounded border border-slate-200"
+                    >
+                      Your browser doesn't support video playback.
+                    </video>
                   </div>
                 </div>
               </div>
@@ -1259,7 +1227,7 @@ const handleLogoUpload = (event) => {
 const page = usePage();
 const isSubmitting = ref(false);
 const showSuccessMessage = ref(false);
-const showApiGuide = ref(false);
+const showApiVideo = ref(false);
 const apiVideoUrl = '/videos/woocommerce-rest-api-guide.mp4';
 
 // --- Submission error state ---
