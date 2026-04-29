@@ -68,13 +68,19 @@
         <div class="bg-white border border-slate-200 rounded-t-lg px-8 py-5">
           <div class="flex items-center justify-between">
             <div v-for="(label, i) in stepLabels" :key="i" class="contents">
-              <div class="flex flex-col items-center flex-1">
+              <button
+                type="button"
+                @click="jumpToStep(i + 1)"
+                :disabled="i + 1 > maxStepReached"
+                :class="['flex flex-col items-center flex-1 transition-opacity', (i + 1 <= maxStepReached) ? 'cursor-pointer hover:opacity-75' : 'cursor-not-allowed opacity-100']"
+                :title="(i + 1 <= maxStepReached) ? `Jump to ${label}` : 'Complete the current step first'"
+              >
                 <div :class="['w-9 h-9 rounded-full flex items-center justify-center transition-all text-sm font-semibold', step >= i + 1 ? 'bg-[#0F172A] text-white' : 'bg-slate-100 text-slate-400']">
                   <svg v-if="step > i + 1" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/></svg>
                   <span v-else>{{ i + 1 }}</span>
                 </div>
                 <span class="text-[11px] text-slate-500 mt-2 hidden sm:block">{{ label }}</span>
-              </div>
+              </button>
               <div v-if="i < stepLabels.length - 1" :class="['h-px flex-1 mx-2 transition-all', step > i + 1 ? 'bg-[#0F172A]' : 'bg-slate-200']"></div>
             </div>
           </div>
@@ -284,8 +290,17 @@
           <!-- Step 4: REST API Key -->
           <form v-if="step === 4" @submit.prevent="handleStep4Submit" class="space-y-6">
             <div>
-              <h2 class="text-xl font-semibold text-slate-900">Connect Your Store</h2>
-              <p class="text-sm text-slate-500 mt-1">Add your WooCommerce REST API key so we can sync your product catalog. You can also skip and add this later.</p>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 mb-3 bg-emerald-50 text-emerald-700 rounded-full text-[10px] uppercase tracking-[0.08em] font-semibold">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Final step
+              </div>
+              <h2 class="text-2xl font-semibold text-slate-900 tracking-tight">Connect your store</h2>
+              <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                Add your WooCommerce REST API key so we can automatically import your product catalog and keep your pricing in sync. We only need <strong class="text-slate-900">read-only</strong> access — we never modify your store.
+              </p>
+              <p class="text-xs text-slate-500 mt-3">
+                Not sure how to find it? Watch the 60-second walkthrough below, or expand the written guide.
+              </p>
             </div>
 
             <!-- Video walkthrough -->
@@ -493,6 +508,10 @@ const formData = ref({
 })
 
 const step = ref(props.step || 1)
+// Tracks the highest step the user has progressed to. Step circles can be
+// clicked to jump back to any step they've already visited; jumping forward
+// past unfilled steps is blocked.
+const maxStepReached = ref(props.step || 1)
 const showApiGuide = ref(false)
 const apiVideoUrl = '/videos/woocommerce-rest-api-guide.mp4'
 const isSubmitting = ref(false)
@@ -560,6 +579,7 @@ onMounted(() => {
     Object.assign(formData.value, draft.data)
     if (draft.step >= 1 && draft.step <= 4) {
       step.value = draft.step
+      maxStepReached.value = Math.max(maxStepReached.value, draft.step)
     }
     draftRestored.value = true
   }
@@ -587,12 +607,28 @@ function discardDraft() {
     businessHours: '', uniqueSellingPoints: '', logoFile: null,
   }
   step.value = 1
+  maxStepReached.value = 1
   draftRestored.value = false
 }
 
 const goToStep = (newStep) => {
   step.value = newStep
+  if (newStep > maxStepReached.value) maxStepReached.value = newStep
   // Scroll to form
+  setTimeout(() => {
+    const el = document.getElementById('accept')
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, 50)
+}
+
+/**
+ * Jump to a step from the progress indicator. Only allows navigation to
+ * previously-reached steps so users can't skip ahead with unfilled fields.
+ */
+const jumpToStep = (targetStep) => {
+  if (targetStep < 1 || targetStep > 4) return
+  if (targetStep > maxStepReached.value) return
+  step.value = targetStep
   setTimeout(() => {
     const el = document.getElementById('accept')
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })

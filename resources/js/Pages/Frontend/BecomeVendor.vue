@@ -33,112 +33,25 @@
       <div class="bg-white border-b border-slate-200">
         <div class="max-w-4xl mx-auto px-4 py-6">
           <div class="flex items-center justify-between">
-            <!-- Step 1: Company Info -->
-            <div class="flex flex-col items-center flex-1">
-              <div
-                :class="[
-                  'w-10 h-10 rounded-full flex items-center justify-center transition-all bg-slate-200 text-slate-400',
-                  step > 1
-                    ? 'bg-slate-700 text-white'
-                    : step === 1
-                    ? 'bg-slate-700 text-white'
-                    : 'bg-slate-200 text-gray-600'
-                ]"
+            <template v-for="(label, i) in stepLabels" :key="i">
+              <button
+                type="button"
+                @click="jumpToStep(i + 1)"
+                :disabled="i + 1 > maxStepReached"
+                :class="['flex flex-col items-center flex-1 transition-opacity', (i + 1 <= maxStepReached) ? 'cursor-pointer hover:opacity-75' : 'cursor-not-allowed']"
+                :title="(i + 1 <= maxStepReached) ? `Jump to ${label}` : 'Complete the current step first'"
               >
-                <svg v-if="step > 1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check w-5 h-5" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="m9 12 2 2 4-4"></path>
-                </svg>
-                <span v-else>1</span>
-              </div>
-              <span class="text-xs text-slate-600 mt-2 hidden sm:block">Company Info</span>
-            </div>
-
-            <!-- Connector Line -->
-            <div
-              :class="[
-                'h-0.5 flex-1 transition-all bg-slate-200',
-                step > 1 ? 'bg-slate-700' : 'bg-slate-200'
-              ]"
-            ></div>
-
-            <!-- Step 2: Contact Details -->
-            <div class="flex flex-col items-center flex-1">
-              <div
-                :class="[
-                  'w-10 h-10 rounded-full flex items-center justify-center transition-all bg-slate-200 text-slate-400',
-                  step === 2
-                    ? 'bg-slate-700 text-white'
-                    : step > 2
-                    ? 'bg-slate-700 text-white'
-                    : 'bg-slate-200 text-gray-600'
-                ]"
-              >
-              <svg v-if="step > 2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check w-5 h-5" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="m9 12 2 2 4-4"></path>
-                </svg>
-                <span v-else>2</span>
-              </div>
-              <span class="text-xs text-slate-600 mt-2 hidden sm:block">Contact Details</span>
-            </div>
-
-            <!-- Connector Line -->
-            <div
-              :class="[
-                'h-0.5 flex-1 mx-2',
-                step > 2 ? 'bg-slate-700' : 'bg-slate-200'
-              ]"
-            ></div>
-
-            <!-- Step 3: Business Info -->
-            <div class="flex flex-col items-center flex-1">
-              <div
-                :class="[
-                  'w-10 h-10 rounded-full flex items-center justify-center transition-all bg-slate-200 text-slate-400',
-                  step > 3
-                    ? 'bg-slate-700 text-white'
-                    : step === 3
-                    ? 'bg-slate-700 text-white'
-                    : 'bg-slate-200 text-gray-600'
-                ]"
-              >
-                <svg v-if="step > 3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check w-5 h-5" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="m9 12 2 2 4-4"></path>
-                </svg>
-                <span v-else>3</span>
-              </div>
-              <span class="text-xs text-slate-600 mt-2 hidden sm:block">Business Info</span>
-            </div>
-
-            <!-- Connector Line -->
-            <div :class="['h-0.5 flex-1 mx-2', step > 3 ? 'bg-slate-700' : 'bg-slate-200']"></div>
-
-            <!-- Step 4: Connect Store -->
-            <div class="flex flex-col items-center flex-1">
-              <div
-                :class="[
-                  'w-10 h-10 rounded-full flex items-center justify-center transition-all bg-slate-200 text-slate-400',
-                  (step > 4 || showSuccessMessage || $page.props.flash?.success) ? 'bg-slate-700 text-white' : step === 4 ? 'bg-slate-700 text-white' : 'bg-slate-200 text-gray-600'
-                ]"
-              >
-                <svg v-if="showSuccessMessage || $page.props.flash?.success" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-                <span v-else>4</span>
-              </div>
-              <span class="text-xs text-slate-600 mt-2 hidden sm:block">Connect Store</span>
-            </div>
-
-            <!-- OLD Step 4 indicator (hidden)
-            <div class="flex flex-col items-center flex-1" style="display:none">
-              <div :class="['w-10 h-10 rounded-full flex items-center justify-center transition-all bg-slate-200 text-slate-400', step === 4 ? 'bg-slate-700 text-white'
-                    : 'bg-slate-200 text-gray-600'
-                ]"
-              >
-                4
-              </div>
-              <span class="text-xs text-slate-600 mt-2 hidden sm:block">Plan & Payment</span>
-            </div> -->
+                <div :class="['w-10 h-10 rounded-full flex items-center justify-center transition-all text-sm font-semibold', step >= i + 1 ? 'bg-slate-700 text-white' : 'bg-slate-200 text-gray-600']">
+                  <svg v-if="step > i + 1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="m9 12 2 2 4-4"></path>
+                  </svg>
+                  <span v-else>{{ i + 1 }}</span>
+                </div>
+                <span class="text-xs text-slate-600 mt-2 hidden sm:block">{{ label }}</span>
+              </button>
+              <div v-if="i < stepLabels.length - 1" :class="['h-0.5 flex-1 mx-2 transition-all', step > i + 1 ? 'bg-slate-700' : 'bg-slate-200']"></div>
+            </template>
           </div>
         </div>
       </div>
@@ -671,8 +584,17 @@
           <!-- Step 4: Connect Your Store (REST API Key) -->
           <div v-if="step === 4" class="space-y-6">
             <div>
-              <h2 class="text-slate-900 mb-2">Connect Your Store</h2>
-              <p class="text-slate-600 text-sm">Add your WooCommerce REST API key so we can automatically import and sync your product catalog.</p>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 mb-3 bg-emerald-50 text-emerald-700 rounded-full text-[10px] uppercase tracking-[0.08em] font-semibold">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Final step
+              </div>
+              <h2 class="text-2xl font-semibold text-slate-900 tracking-tight">Connect your store</h2>
+              <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                Add your WooCommerce REST API key so we can automatically import your product catalog and keep your pricing in sync. We only need <strong class="text-slate-900">read-only</strong> access — we never modify your store.
+              </p>
+              <p class="text-xs text-slate-500 mt-3">
+                Not sure how to find it? Watch the 60-second walkthrough below, or expand the written guide.
+              </p>
             </div>
 
             <form @submit.prevent="handleStep4Submit" class="space-y-6">
@@ -1162,6 +1084,11 @@ const formData = ref({
 });
 
 const step = ref(props.step);
+const stepLabels = ['Company Info', 'Contact Details', 'Business Info', 'Connect Store'];
+// Tracks the highest step the user has progressed to. Step circles can be
+// clicked to jump back to any visited step; jumping forward past unfilled
+// fields is blocked.
+const maxStepReached = ref(props.step || 1);
 
 const passwordMismatch = computed(() => {
   return formData.value.password && formData.value.confirmPassword &&
@@ -1208,6 +1135,7 @@ onMounted(() => {
     Object.assign(formData.value, draft.data);
     if (draft.step >= 1 && draft.step <= 4) {
       step.value = draft.step;
+      maxStepReached.value = Math.max(maxStepReached.value, draft.step);
       // Sync URL to match the restored step (only if it differs)
       if (props.step !== draft.step) {
         router.get('/become-a-vendor', { step: draft.step }, {
@@ -1242,13 +1170,29 @@ function discardDraft() {
     selectedPlan: 'basic',
   };
   step.value = 1;
+  maxStepReached.value = 1;
   draftRestored.value = false;
   router.get('/become-a-vendor', { step: 1 }, { preserveState: true, replace: true });
 }
 
 const goToStep = (newStep) => {
   step.value = newStep;
+  if (newStep > maxStepReached.value) maxStepReached.value = newStep;
   router.get('/become-a-vendor', { step: newStep }, {
+    preserveState: true,
+    preserveScroll: true,
+  });
+};
+
+/**
+ * Jump to a step from the progress indicator. Only allows navigation to
+ * previously-reached steps so users can't skip ahead with unfilled fields.
+ */
+const jumpToStep = (targetStep) => {
+  if (targetStep < 1 || targetStep > 4) return;
+  if (targetStep > maxStepReached.value) return;
+  step.value = targetStep;
+  router.get('/become-a-vendor', { step: targetStep }, {
     preserveState: true,
     preserveScroll: true,
   });
