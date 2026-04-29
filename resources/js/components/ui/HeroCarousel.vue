@@ -57,8 +57,8 @@
             </span>
           </div>
 
-          <!-- Mobile content — top-aligned, vendor name only -->
-          <div class="md:hidden relative h-full flex flex-col items-start px-6 pt-7 pointer-events-none">
+          <!-- Mobile content — top-aligned, vendor name only, center-justified -->
+          <div class="md:hidden relative h-full flex flex-col items-center text-center px-6 pt-7 pointer-events-none">
             <div
               v-if="slide.eyebrow"
               class="text-[10px] uppercase tracking-[0.14em] font-semibold text-white/60 mb-2"
@@ -68,7 +68,7 @@
             <h1 class="ui-display text-white text-[26px] font-semibold tracking-[-0.02em] leading-[1.05]">
               {{ slide.title_highlight || slide.title }}
             </h1>
-            <div class="mt-5 flex flex-wrap items-center gap-2 pointer-events-auto">
+            <div class="mt-5 flex flex-wrap items-center justify-center gap-2 pointer-events-auto">
               <a
                 :href="slide.url"
                 :target="slide.target || '_self'"
@@ -94,18 +94,19 @@
             </div>
           </div>
 
-          <!-- Desktop content — vertically centered with full sentence + subtitle -->
+          <!-- Desktop content — vertically centered, capped at ~60% width so the
+               product photography on the right stays unobstructed -->
           <div class="hidden md:flex relative h-full items-center px-14 lg:px-20 pointer-events-none">
-            <div class="max-w-2xl">
+            <div class="w-[60%] max-w-[640px]">
               <div
                 v-if="slide.eyebrow"
-                class="text-[13px] uppercase tracking-[0.14em] font-semibold text-white/60 mb-4"
+                class="text-[12px] uppercase tracking-[0.14em] font-semibold text-white/60 mb-3"
               >
                 {{ slide.eyebrow }}
               </div>
 
               <!-- Title with optional highlighted vendor span -->
-              <h1 class="ui-display text-white text-5xl lg:text-[56px] font-semibold tracking-[-0.025em] leading-[1.02]">
+              <h1 class="ui-display text-white text-3xl lg:text-4xl font-semibold tracking-[-0.02em] leading-[1.1]">
                 <template v-if="slide.title_highlight && slide.title.includes(slide.title_highlight)">
                   <span>{{ slide.title.split(slide.title_highlight)[0] }}</span><span class="text-[color:var(--color-accent-300)]">{{ slide.title_highlight }}</span><span>{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
                 </template>
@@ -114,7 +115,7 @@
 
               <p
                 v-if="slide.subtitle"
-                class="mt-5 text-white/75 text-lg leading-relaxed max-w-xl line-clamp-3"
+                class="mt-4 text-white/75 text-[15px] leading-relaxed line-clamp-3"
               >
                 {{ slide.subtitle }}
               </p>
