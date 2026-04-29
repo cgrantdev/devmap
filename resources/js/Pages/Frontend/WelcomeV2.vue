@@ -156,52 +156,6 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 4.5. FEATURED VENDOR BANNER — Certified Peptides           -->
-    <!-- ========================================================= -->
-    <section class="max-w-[1280px] mx-auto px-5 lg:px-10 pb-12 lg:pb-20">
-      <a
-        href="/brand/certified-pep/products"
-        class="group relative block rounded-[16px] overflow-hidden border border-[#0F4C2D] bg-[#0A2018] hover:border-[#1A6A40] transition-colors"
-        style="min-height: 240px;"
-      >
-        <!-- Background image (right-aligned product shot) -->
-        <div
-          class="absolute inset-0 bg-no-repeat bg-right bg-cover"
-          style="background-image: url('/images/banners/certified-peptides.jpg'); background-size: cover; background-position: right center;"
-          aria-hidden="true"
-        ></div>
-
-        <!-- Left fade overlay so text stays legible -->
-        <div class="absolute inset-0 bg-gradient-to-r from-[#0A2018]/95 via-[#0A2018]/70 to-transparent" aria-hidden="true"></div>
-
-        <!-- Content -->
-        <div class="relative z-10 px-6 sm:px-10 py-10 sm:py-14 max-w-xl">
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 mb-4 bg-emerald-500/15 border border-emerald-500/30 rounded-full text-[10px] uppercase tracking-[0.12em] font-semibold text-emerald-300">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            Featured Vendor
-          </div>
-
-          <h2 class="ui-display text-2xl sm:text-3xl font-semibold tracking-tight text-white leading-tight mb-2">
-            Certified Peptides
-          </h2>
-          <p class="text-sm sm:text-[15px] text-emerald-100/80 leading-relaxed mb-5">
-            99% HPLC-tested research peptides with verified COAs. BPC-157, TB-500, and the full catalog — direct from the lab.
-          </p>
-
-          <div class="inline-flex items-center gap-2 text-sm font-semibold text-white group-hover:text-emerald-300 transition-colors">
-            Browse the catalog
-            <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </div>
-        </div>
-
-        <!-- Sponsored marker (small, top-right) -->
-        <div class="absolute top-4 right-4 z-10 text-[10px] uppercase tracking-[0.12em] font-medium text-white/40">
-          Sponsored
-        </div>
-      </a>
-    </section>
-
-    <!-- ========================================================= -->
     <!-- 5. ENCYCLOPEDIA — compound knowledge base                  -->
     <!-- ========================================================= -->
     <section v-if="encyclopediaCategories && encyclopediaCategories.length" class="bg-[#0A0B0E]">

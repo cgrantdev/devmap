@@ -44,6 +44,18 @@ class HomeController extends Controller
             }
         }
 
+        // Hardcoded sponsored slide for Certified Peptides (test placement).
+        // TODO: move to admin-managed sponsored-slot system once that ships.
+        $heroSlides[] = [
+            'title' => 'Certified Peptides',
+            'subtitle' => '99% HPLC-tested research peptides with verified COAs. BPC-157, TB-500, and the full catalog — direct from the lab.',
+            'eyebrow' => 'Featured Vendor',
+            'cta' => 'Browse the catalog',
+            'url' => '/brand/certified-pep/products',
+            'image' => '/images/banners/certified-peptides.jpg',
+            'sponsored' => true,
+        ];
+
         // Education categories - only show categories with published encyclopedia articles
         $categories = ProductCategory::where('is_active', true)
             ->whereHas('educationPost', function ($epQuery) {
