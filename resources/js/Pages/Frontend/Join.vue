@@ -252,7 +252,7 @@
                 <span class="ml-auto text-xs text-slate-500">~60 seconds</span>
               </div>
               <video
-                src="/videos/woocommerce-rest-api-guide.mp4"
+                :src="apiVideoUrl"
                 controls
                 preload="metadata"
                 class="w-full block"
@@ -407,6 +407,7 @@ const formData = ref({
 
 const step = ref(props.step || 1)
 const showApiGuide = ref(false)
+const apiVideoUrl = '/videos/woocommerce-rest-api-guide.mp4'
 const isSubmitting = ref(false)
 const showSuccessMessage = ref(false)
 
