@@ -57,6 +57,13 @@
     <!-- Form section -->
     <section v-if="!showSuccessMessage && !$page.props.flash?.success" id="accept" class="py-16 px-6">
       <div class="max-w-3xl mx-auto">
+        <!-- Resumed-draft notice -->
+        <div v-if="draftRestored" class="mb-4 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-3 text-sm text-emerald-800">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="flex-1">Welcome back — we picked up where you left off.</span>
+          <button @click="discardDraft" class="text-xs font-medium text-emerald-700 hover:text-emerald-900 underline underline-offset-2">Start over</button>
+        </div>
+
         <!-- Progress -->
         <div class="bg-white border border-slate-200 rounded-t-lg px-8 py-5">
           <div class="flex items-center justify-between">
@@ -371,8 +378,53 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { router, useForm, usePage } from '@inertiajs/vue3'
+
+// --- Draft persistence -----------------------------------------------------
+// Form state survives page refreshes via localStorage. Sensitive fields
+// (password, confirmPassword) and non-serializable fields (logoFile) are
+// never persisted. Drafts auto-expire after 24 hours.
+const DRAFT_KEY = 'pmap_join_signup_v1'
+const DRAFT_TTL_MS = 24 * 60 * 60 * 1000
+const DRAFT_SKIP_FIELDS = ['password', 'confirmPassword', 'logoFile']
+
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (!parsed?.savedAt || Date.now() - parsed.savedAt > DRAFT_TTL_MS) {
+      localStorage.removeItem(DRAFT_KEY)
+      return null
+    }
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+function saveDraft(data, step) {
+  try {
+    const persistable = {}
+    for (const key in data) {
+      if (!DRAFT_SKIP_FIELDS.includes(key)) {
+        persistable[key] = data[key]
+      }
+    }
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      savedAt: Date.now(),
+      step,
+      data: persistable,
+    }))
+  } catch {
+    // Storage full / disabled — silently skip
+  }
+}
+
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY) } catch {}
+}
 
 const props = defineProps({
   step: { type: Number, default: 1 },
@@ -416,9 +468,41 @@ const passwordMismatch = computed(() => {
          formData.value.password !== formData.value.confirmPassword
 })
 
+const draftRestored = ref(false)
+
 onMounted(() => {
   step.value = props.step || 1
+
+  // Restore from a saved draft, if any
+  const draft = loadDraft()
+  if (draft?.data) {
+    Object.assign(formData.value, draft.data)
+    if (draft.step >= 1 && draft.step <= 4) {
+      step.value = draft.step
+    }
+    draftRestored.value = true
+  }
 })
+
+// Persist on every change (deep watch) and on step change
+watch(formData, (val) => saveDraft(val, step.value), { deep: true })
+watch(step, (newStep) => saveDraft(formData.value, newStep))
+
+function discardDraft() {
+  clearDraft()
+  // Reset all form fields to their initial values
+  formData.value = {
+    companyName: props.invitation?.company || '',
+    website: '', yearEstablished: '', country: '',
+    fullName: '', email: '', phone: '', password: '', confirmPassword: '',
+    connectionMethod: 'api_key', apiConsumerKey: '', apiConsumerSecret: '',
+    productCount: '', companyDescription: '',
+    paymentMethods: [], shippingInformation: '', returnPolicy: '',
+    businessHours: '', uniqueSellingPoints: '', logoFile: null,
+  }
+  step.value = 1
+  draftRestored.value = false
+}
 
 const goToStep = (newStep) => {
   step.value = newStep
@@ -503,6 +587,7 @@ const submitRegistration = () => {
     onSuccess: () => {
       isSubmitting.value = false
       showSuccessMessage.value = true
+      clearDraft()
       window.scrollTo({ top: 0, behavior: 'smooth' })
     },
     onError: (errors) => {

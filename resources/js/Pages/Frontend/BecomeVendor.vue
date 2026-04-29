@@ -145,6 +145,13 @@
 
       <!-- Form Card -->
       <div v-if="!showSuccessMessage && !$page.props.flash?.success" class="max-w-2xl mx-auto px-4 py-12">
+        <!-- Resumed-draft notice -->
+        <div v-if="draftRestored" class="mb-4 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-3 text-sm text-emerald-800">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="flex-1">Welcome back — we picked up where you left off.</span>
+          <button @click="discardDraft" class="text-xs font-medium text-emerald-700 hover:text-emerald-900 underline underline-offset-2">Start over</button>
+        </div>
+
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
           <!-- Step 1: Company Information -->
           <div v-if="step === 1" class="space-y-6">
@@ -1041,9 +1048,54 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { router, useForm, usePage } from '@inertiajs/vue3';
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue';
+
+// --- Draft persistence -----------------------------------------------------
+// Form state survives page refreshes via localStorage. Sensitive fields
+// (password, confirmPassword) and non-serializable fields (logoFile) are
+// never persisted. Drafts auto-expire after 24 hours.
+const DRAFT_KEY = 'pmap_become_vendor_signup_v1';
+const DRAFT_TTL_MS = 24 * 60 * 60 * 1000;
+const DRAFT_SKIP_FIELDS = ['password', 'confirmPassword', 'logoFile'];
+
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.savedAt || Date.now() - parsed.savedAt > DRAFT_TTL_MS) {
+      localStorage.removeItem(DRAFT_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function saveDraft(data, step) {
+  try {
+    const persistable = {};
+    for (const key in data) {
+      if (!DRAFT_SKIP_FIELDS.includes(key)) {
+        persistable[key] = data[key];
+      }
+    }
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      savedAt: Date.now(),
+      step,
+      data: persistable,
+    }));
+  } catch {
+    // Storage full / disabled — silently skip
+  }
+}
+
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch {}
+}
 
 const props = defineProps({
   step: {
@@ -1087,9 +1139,49 @@ const passwordMismatch = computed(() => {
          formData.value.password !== formData.value.confirmPassword;
 });
 
+const draftRestored = ref(false);
+
 onMounted(() => {
   step.value = props.step;
+
+  // Restore from a saved draft, if any
+  const draft = loadDraft();
+  if (draft?.data) {
+    Object.assign(formData.value, draft.data);
+    if (draft.step >= 1 && draft.step <= 4) {
+      step.value = draft.step;
+      // Sync URL to match the restored step (only if it differs)
+      if (props.step !== draft.step) {
+        router.get('/become-a-vendor', { step: draft.step }, {
+          preserveState: true,
+          preserveScroll: true,
+          replace: true,
+        });
+      }
+    }
+    draftRestored.value = true;
+  }
 });
+
+// Persist on every change (deep watch) and on step change
+watch(formData, (val) => saveDraft(val, step.value), { deep: true });
+watch(step, (newStep) => saveDraft(formData.value, newStep));
+
+function discardDraft() {
+  clearDraft();
+  formData.value = {
+    companyName: '', website: '', yearEstablished: '', country: '',
+    fullName: '', email: '', phone: '', password: '', confirmPassword: '',
+    connectionMethod: 'api_key', apiConsumerKey: '', apiConsumerSecret: '',
+    productCount: '', companyDescription: '',
+    paymentMethods: [], shippingInformation: '', returnPolicy: '',
+    businessHours: '', uniqueSellingPoints: '', logoFile: null,
+    selectedPlan: 'basic',
+  };
+  step.value = 1;
+  draftRestored.value = false;
+  router.get('/become-a-vendor', { step: 1 }, { preserveState: true, replace: true });
+}
 
 const goToStep = (newStep) => {
   step.value = newStep;
@@ -1220,6 +1312,7 @@ const handleStep4Submit = () => {
     onSuccess: (page) => {
       isSubmitting.value = false;
       showSuccessMessage.value = true;
+      clearDraft();
       // Scroll to top to show success message
       window.scrollTo({ top: 0, behavior: 'smooth' });
       // Reload shared props to update pending vendors count in admin panel
