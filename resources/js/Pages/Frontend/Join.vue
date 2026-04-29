@@ -244,6 +244,23 @@
               <p class="text-sm text-slate-500 mt-1">Add your WooCommerce REST API key so we can sync your product catalog. You can also skip and add this later.</p>
             </div>
 
+            <!-- Video walkthrough -->
+            <div class="bg-slate-900 rounded-lg overflow-hidden border border-slate-200">
+              <div class="px-5 py-3 bg-slate-100 border-b border-slate-200 flex items-center gap-2">
+                <svg class="w-4 h-4 text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span class="text-sm font-semibold text-slate-800">Quick walkthrough</span>
+                <span class="ml-auto text-xs text-slate-500">~60 seconds</span>
+              </div>
+              <video
+                src="/videos/woocommerce-rest-api-guide.mp4"
+                controls
+                preload="metadata"
+                class="w-full block"
+              >
+                Your browser doesn't support video playback. See the written steps below.
+              </video>
+            </div>
+
             <!-- API Guide -->
             <div class="bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
               <button type="button" @click="showApiGuide = !showApiGuide"
@@ -253,8 +270,8 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                   </div>
                   <div>
-                    <div class="text-sm font-semibold text-slate-800">How to get your WooCommerce REST API Key</div>
-                    <div class="text-xs text-slate-500 mt-0.5">Step-by-step guide</div>
+                    <div class="text-sm font-semibold text-slate-800">Prefer written steps?</div>
+                    <div class="text-xs text-slate-500 mt-0.5">5-step guide for getting your WooCommerce REST API key</div>
                   </div>
                 </div>
                 <svg :class="['w-5 h-5 text-slate-400 transition-transform', showApiGuide ? 'rotate-180' : '']" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
