@@ -29,9 +29,8 @@
             :style="{ background: slideGradient(slide, i) }"
           />
 
-          <!-- Overlays for legibility — stronger on mobile (portrait image) so text bottom-anchors readably -->
-          <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-br from-black/85 via-black/40 to-transparent md:from-black/70 md:via-black/25 pointer-events-none" />
-          <div class="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+          <!-- Overlays for legibility — softer than before so the product art breathes -->
+          <div class="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-black/60 via-black/30 to-transparent md:from-black/55 md:via-black/15 pointer-events-none" />
 
           <!-- Decorative orbs for text-only slides -->
           <template v-if="!slide.image">
@@ -58,57 +57,96 @@
             </span>
           </div>
 
-          <!-- Content — bottom-anchored on mobile (so portrait product image breathes), centered on desktop -->
-          <div class="relative h-full flex items-end md:items-center px-6 md:px-14 lg:px-20 pb-8 md:pb-0 pointer-events-none">
+          <!-- Mobile content — top-aligned, vendor name only -->
+          <div class="md:hidden relative h-full flex flex-col items-start px-6 pt-7 pointer-events-none">
+            <div
+              v-if="slide.eyebrow"
+              class="text-[10px] uppercase tracking-[0.14em] font-semibold text-white/60 mb-2"
+            >
+              {{ slide.eyebrow }}
+            </div>
+            <h1 class="ui-display text-white text-[26px] font-semibold tracking-[-0.02em] leading-[1.05]">
+              {{ slide.title_highlight || slide.title }}
+            </h1>
+            <div class="mt-5 flex flex-wrap items-center gap-2 pointer-events-auto">
+              <a
+                :href="slide.url"
+                :target="slide.target || '_self'"
+                :rel="slide.sponsored ? 'noopener sponsored' : undefined"
+                class="ui-focus inline-flex items-center gap-1.5 h-10 px-4 rounded-[10px] bg-white text-[color:var(--color-ink)] text-[13px] font-semibold hover:bg-white/95 transition-all shadow-md"
+              >
+                {{ slide.cta || 'Learn more' }}
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </a>
+              <button
+                v-if="slide.coupon_code"
+                type="button"
+                @click="copyCoupon(slide.coupon_code, i)"
+                class="ui-focus inline-flex items-center gap-2 h-10 pl-2.5 pr-3 rounded-[10px] bg-gradient-to-b from-emerald-400/20 to-emerald-500/15 border border-emerald-300/40 text-white hover:from-emerald-400/30 hover:to-emerald-500/20 transition-colors shadow-sm"
+                :title="`Tap to copy ${slide.coupon_code}`"
+              >
+                <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-emerald-300/20">
+                  <svg v-if="copiedIndex !== i" class="w-3 h-3 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                  <svg v-else class="w-3 h-3 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="ui-mono font-bold tracking-wide text-[13px] text-emerald-50 uppercase">{{ slide.coupon_code }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Desktop content — vertically centered with full sentence + subtitle -->
+          <div class="hidden md:flex relative h-full items-center px-14 lg:px-20 pointer-events-none">
             <div class="max-w-2xl">
               <div
                 v-if="slide.eyebrow"
-                class="text-xs md:text-[13px] uppercase tracking-[0.14em] font-semibold text-white/60 mb-3 md:mb-4"
+                class="text-[13px] uppercase tracking-[0.14em] font-semibold text-white/60 mb-4"
               >
                 {{ slide.eyebrow }}
               </div>
 
-              <!-- Title — supports an optional highlighted span for vendor name -->
-              <h1 class="ui-display text-white text-3xl md:text-5xl lg:text-[56px] font-semibold tracking-[-0.025em] leading-[0.98]">
+              <!-- Title with optional highlighted vendor span -->
+              <h1 class="ui-display text-white text-5xl lg:text-[56px] font-semibold tracking-[-0.025em] leading-[1.02]">
                 <template v-if="slide.title_highlight && slide.title.includes(slide.title_highlight)">
-                  <span>{{ slide.title.split(slide.title_highlight)[0] }}</span><span class="text-[color:var(--color-accent-400)]">{{ slide.title_highlight }}</span><span>{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
+                  <span>{{ slide.title.split(slide.title_highlight)[0] }}</span><span class="text-[color:var(--color-accent-300)]">{{ slide.title_highlight }}</span><span>{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
                 </template>
                 <template v-else>{{ slide.title }}</template>
               </h1>
 
               <p
                 v-if="slide.subtitle"
-                class="mt-4 md:mt-5 text-white/70 text-sm md:text-lg leading-relaxed max-w-xl line-clamp-2 md:line-clamp-3"
+                class="mt-5 text-white/75 text-lg leading-relaxed max-w-xl line-clamp-3"
               >
                 {{ slide.subtitle }}
               </p>
 
-              <!-- Action row — primary CTA + optional coupon-code pill -->
-              <div class="mt-6 md:mt-8 flex flex-wrap items-center gap-3 pointer-events-auto">
+              <!-- Action row -->
+              <div class="mt-8 flex flex-wrap items-center gap-3 pointer-events-auto">
                 <a
                   :href="slide.url"
                   :target="slide.target || '_self'"
                   :rel="slide.sponsored ? 'noopener sponsored' : undefined"
-                  class="ui-focus inline-flex items-center gap-2 h-11 md:h-12 px-5 md:px-6 rounded-[12px] bg-white text-[color:var(--color-ink)] text-sm md:text-[15px] font-semibold hover:bg-white/95 hover:-translate-y-[1px] transition-all shadow-lg"
+                  class="ui-focus inline-flex items-center gap-2 h-12 px-6 rounded-[12px] bg-white text-[color:var(--color-ink)] text-[15px] font-semibold hover:bg-white/95 hover:-translate-y-[1px] transition-all shadow-lg"
                 >
                   {{ slide.cta || 'Learn more' }}
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12h14M13 5l7 7-7 7"/>
-                  </svg>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
 
-                <!-- Coupon code pill — copy-to-clipboard on click -->
+                <!-- Coupon-code pill (refined: green-tint deal vibe, larger code, copy confirmation) -->
                 <button
                   v-if="slide.coupon_code"
                   type="button"
                   @click="copyCoupon(slide.coupon_code, i)"
-                  class="ui-focus inline-flex items-center gap-2 h-11 md:h-12 px-4 md:px-5 rounded-[12px] bg-white/10 backdrop-blur-md border border-white/15 text-white text-sm md:text-[15px] font-medium hover:bg-white/15 transition-colors"
-                  :title="`Click to copy code ${slide.coupon_code}`"
+                  class="ui-focus inline-flex items-center gap-3 h-12 pl-3 pr-5 rounded-[12px] bg-gradient-to-b from-emerald-400/20 to-emerald-500/15 border border-emerald-300/40 text-white hover:from-emerald-400/30 hover:to-emerald-500/20 transition-colors shadow-sm"
+                  :title="`Click to copy ${slide.coupon_code}`"
                 >
-                  <svg v-if="copiedIndex !== i" class="w-3.5 h-3.5 text-white/60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                  <svg v-else class="w-3.5 h-3.5 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span class="text-white/60 text-[11px] uppercase tracking-[0.08em] font-semibold">Code</span>
-                  <span class="ui-mono font-bold tracking-wide">{{ slide.coupon_code }}</span>
+                  <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-emerald-300/20">
+                    <svg v-if="copiedIndex !== i" class="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    <svg v-else class="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
+                  <div class="flex flex-col items-start leading-tight">
+                    <span class="text-emerald-100/70 text-[10px] uppercase tracking-[0.1em] font-semibold">Code</span>
+                    <span class="ui-mono font-bold tracking-wide text-[15px] text-emerald-50 uppercase">{{ slide.coupon_code }}</span>
+                  </div>
                 </button>
               </div>
             </div>
