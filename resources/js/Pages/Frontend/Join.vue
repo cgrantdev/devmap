@@ -106,7 +106,7 @@
 
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-1.5">Website <span class="text-rose-500">*</span></label>
-              <input v-model="formData.website" type="url" required placeholder="https://yourcompany.com"
+              <input v-model="formData.website" @blur="normalizeWebsite" type="url" required placeholder="https://yourcompany.com"
                 :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', fieldErrors.website ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']" />
               <p v-if="fieldErrors.website" class="text-xs text-rose-600 mt-1">{{ fieldErrors.website }}</p>
             </div>
@@ -471,7 +471,7 @@ const stepLabels = ['Company', 'Contact', 'Business', 'Connect']
 
 const formData = ref({
   companyName: props.invitation?.company || '',
-  website: '',
+  website: 'https://',
   yearEstablished: '',
   country: '',
   fullName: '',
@@ -563,6 +563,11 @@ onMounted(() => {
     }
     draftRestored.value = true
   }
+
+  // Safety: ensure website has https:// prefix even after a draft restore
+  if (!formData.value.website || formData.value.website === '') {
+    formData.value.website = 'https://'
+  }
 })
 
 // Persist on every change (deep watch) and on step change
@@ -574,7 +579,7 @@ function discardDraft() {
   // Reset all form fields to their initial values
   formData.value = {
     companyName: props.invitation?.company || '',
-    website: '', yearEstablished: '', country: '',
+    website: 'https://', yearEstablished: '', country: '',
     fullName: '', email: '', phone: '', password: '', confirmPassword: '',
     connectionMethod: 'api_key', apiConsumerKey: '', apiConsumerSecret: '',
     productCount: '', companyDescription: '',
@@ -594,8 +599,29 @@ const goToStep = (newStep) => {
   }, 50)
 }
 
+/**
+ * Normalize a website URL — auto-prepend https:// if missing, strip
+ * accidental duplicate protocols like "https://https://example.com",
+ * and trim whitespace. Runs on blur so it cleans up paste mistakes
+ * before submission.
+ */
+function normalizeWebsite() {
+  let v = (formData.value.website || '').trim()
+  // Strip duplicate protocols (e.g. "https://http://x.com" or "https://https://x.com")
+  v = v.replace(/^(https?:\/\/)+/i, '')
+  // Anything left? prepend https://
+  if (v.length > 0) {
+    formData.value.website = 'https://' + v
+  } else {
+    formData.value.website = 'https://'
+  }
+}
+
 const handleStep1Submit = () => {
-  if (!formData.value.companyName || !formData.value.website || !formData.value.country) return
+  normalizeWebsite()
+  // Reject if website is empty or just "https://" (no domain)
+  const hasDomain = (formData.value.website || '').replace(/^https?:\/\//i, '').trim().length > 0
+  if (!formData.value.companyName || !hasDomain || !formData.value.country) return
   goToStep(2)
 }
 

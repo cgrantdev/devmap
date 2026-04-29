@@ -209,12 +209,14 @@
                   <input
                     id="website"
                     v-model="formData.website"
+                    @blur="normalizeWebsite"
                     type="url"
                     placeholder="https://yourcompany.com"
                     required
-                    class="w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    :class="['w-full pl-11 pr-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', fieldErrors.website ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                   />
                 </div>
+                <p v-if="fieldErrors.website" class="text-xs text-rose-600 mt-1">{{ fieldErrors.website }}</p>
               </div>
 
               <!-- Year Established, Country -->
@@ -1137,7 +1139,7 @@ const props = defineProps({
 
 const formData = ref({
   companyName: '',
-  website: '',
+  website: 'https://',
   yearEstablished: '',
   country: '',
   fullName: '',
@@ -1217,6 +1219,11 @@ onMounted(() => {
     }
     draftRestored.value = true;
   }
+
+  // Safety: ensure website has https:// prefix even after a draft restore
+  if (!formData.value.website || formData.value.website === '') {
+    formData.value.website = 'https://';
+  }
 });
 
 // Persist on every change (deep watch) and on step change
@@ -1226,7 +1233,7 @@ watch(step, (newStep) => saveDraft(formData.value, newStep));
 function discardDraft() {
   clearDraft();
   formData.value = {
-    companyName: '', website: '', yearEstablished: '', country: '',
+    companyName: '', website: 'https://', yearEstablished: '', country: '',
     fullName: '', email: '', phone: '', password: '', confirmPassword: '',
     connectionMethod: 'api_key', apiConsumerKey: '', apiConsumerSecret: '',
     productCount: '', companyDescription: '',
@@ -1255,13 +1262,22 @@ const goBack = () => {
   }
 };
 
+/**
+ * Normalize the website URL — auto-prepend https:// if missing,
+ * strip duplicate protocols, trim whitespace.
+ */
+function normalizeWebsite() {
+  let v = (formData.value.website || '').trim();
+  v = v.replace(/^(https?:\/\/)+/i, '');
+  formData.value.website = v.length > 0 ? 'https://' + v : 'https://';
+}
+
 const handleStep1Submit = () => {
-  // Validate form
-  if (!formData.value.companyName || !formData.value.website || !formData.value.country) {
+  normalizeWebsite();
+  const hasDomain = (formData.value.website || '').replace(/^https?:\/\//i, '').trim().length > 0;
+  if (!formData.value.companyName || !hasDomain || !formData.value.country) {
     return;
   }
-
-  // Move to next step
   goToStep(2);
 };
 
