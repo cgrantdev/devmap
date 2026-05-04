@@ -30,7 +30,7 @@
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 h-14 lg:h-16 flex items-center gap-4 lg:gap-8">
         <!-- Logo -->
         <a href="/" class="ui-focus flex items-center flex-shrink-0">
-          <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-8 lg:h-9 brightness-0 translate-y-[1px]" />
+          <img :src="'/images/logo.png?v=2'" alt="PeptideMaps" class="h-8 lg:h-9 brightness-0 translate-y-[1px]" />
         </a>
 
         <!-- Primary nav (desktop) -->
@@ -180,7 +180,7 @@
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
             <!-- Left: brand + newsletter -->
             <div>
-              <img :src="'/images/logo.png'" alt="PeptideMaps" class="h-10 brightness-0 invert mb-5" />
+              <img :src="'/images/logo.png?v=2'" alt="PeptideMaps" class="h-10 brightness-0 invert mb-5" />
               <p class="text-[15px] text-white/45 leading-relaxed mb-8 max-w-md">
                 The definitive platform for research peptide discovery. Verified vendors, lab-tested compounds, transparent data.
               </p>

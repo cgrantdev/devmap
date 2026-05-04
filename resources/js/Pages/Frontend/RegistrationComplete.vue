@@ -4,7 +4,7 @@
     <header class="bg-white border-b border-slate-200">
       <div class="max-w-5xl mx-auto px-6 py-4 flex items-center">
         <a href="/" class="flex items-center">
-          <img :src="'/images/logo.png'" alt="PeptideMap" class="h-7" />
+          <img :src="'/images/logo.png?v=2'" alt="PeptideMap" class="h-7" />
         </a>
       </div>
     </header>

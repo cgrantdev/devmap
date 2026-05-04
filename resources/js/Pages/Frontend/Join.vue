@@ -4,7 +4,7 @@
     <header class="bg-white border-b border-slate-200">
       <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <img :src="'/images/logo.png'" alt="PeptideMap" class="h-7" />
+          <img :src="'/images/logo.png?v=2'" alt="PeptideMap" class="h-7" />
         </div>
         <a href="https://demo.peptidemap.com" target="_blank" rel="noopener" class="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors">
           Preview the directory
