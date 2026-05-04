@@ -57,70 +57,6 @@
           </ol>
         </div>
 
-        <!-- Optional: WordPress plugin (only when API not refused, since the
-             plugin's whole job is sending API keys to PeptideMap) -->
-        <div v-if="!refusedApi && connectionToken" class="mt-8 bg-white border border-slate-200 rounded-lg p-8 text-left">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-lg bg-slate-900 flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="7.5 4.21 12 6.81 16.5 4.21"/><polyline points="7.5 19.79 7.5 14.6 3 12"/><polyline points="21 12 16.5 14.6 16.5 19.79"/></svg>
-            </div>
-            <div>
-              <h2 class="text-base font-semibold text-slate-900">One-click plugin (optional)</h2>
-              <p class="text-xs text-slate-500 mt-0.5">For WooCommerce stores — installs the API connection automatically.</p>
-            </div>
-          </div>
-
-          <p class="text-sm text-slate-600 leading-relaxed mb-4">
-            Install the plugin <strong>on your WordPress site</strong>. It generates a read-only WooCommerce API key for you, then securely sends it back to PeptideMap. No manual key copying.
-          </p>
-
-          <!-- Connection token (the plugin needs this) -->
-          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4">
-            <div class="text-[10px] uppercase tracking-[0.08em] text-slate-500 font-semibold mb-1.5">Your connection token</div>
-            <div class="flex items-center gap-2">
-              <code class="flex-1 text-[12px] font-mono text-slate-800 bg-white px-3 py-2 rounded border border-slate-200 select-all break-all">{{ connectionToken }}</code>
-              <button
-                @click="copyToken"
-                type="button"
-                class="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded transition-colors"
-              >
-                <svg v-if="!tokenCopied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                <svg v-else class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                {{ tokenCopied ? 'Copied' : 'Copy' }}
-              </button>
-            </div>
-            <p class="text-[11px] text-slate-500 mt-2">You'll paste this into the plugin on your WordPress site (Step 4 below). Keep it safe.</p>
-          </div>
-
-          <!-- Quick install steps -->
-          <ol class="text-sm text-slate-700 space-y-2.5 mb-5">
-            <li class="flex gap-2.5">
-              <span class="text-slate-400 font-mono text-xs mt-0.5">1.</span>
-              <span>From PeptideMap: <a :href="pluginDownloadUrl" class="text-indigo-600 hover:text-indigo-800 font-medium underline underline-offset-2">download peptidemap-connect.zip</a></span>
-            </li>
-            <li class="flex gap-2.5">
-              <span class="text-slate-400 font-mono text-xs mt-0.5">2.</span>
-              <span>In <strong>your</strong> WordPress admin: <strong>Plugins → Add New → Upload Plugin</strong>, select the .zip, click Install Now, then Activate.</span>
-            </li>
-            <li class="flex gap-2.5">
-              <span class="text-slate-400 font-mono text-xs mt-0.5">3.</span>
-              <span>In <strong>your</strong> WordPress sidebar, go to <strong>WooCommerce → PeptideMap</strong>.</span>
-            </li>
-            <li class="flex gap-2.5">
-              <span class="text-slate-400 font-mono text-xs mt-0.5">4.</span>
-              <span>Paste the token above into the plugin's <em>Connection Token</em> field, then click <strong>Connect to PeptideMap</strong>. Done.</span>
-            </li>
-          </ol>
-
-          <a
-            :href="pluginDownloadUrl"
-            class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg transition-colors"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            Download plugin
-          </a>
-        </div>
-
         <!-- Support -->
         <div class="mt-8 text-sm text-slate-500">
           Questions in the meantime?
@@ -148,31 +84,12 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 
-const props = defineProps({
+defineProps({
   company: { type: String, default: '' },
   email: { type: String, default: null },
-  connectionToken: { type: String, default: null },
-  refusedApi: { type: Boolean, default: false },
-  pluginDownloadUrl: { type: String, default: '/downloads/peptidemap-connect.zip' },
 })
-
-const tokenCopied = ref(false)
-async function copyToken() {
-  try {
-    await navigator.clipboard.writeText(props.connectionToken || '')
-  } catch {
-    const ta = document.createElement('textarea')
-    ta.value = props.connectionToken || ''
-    document.body.appendChild(ta)
-    ta.select()
-    try { document.execCommand('copy') } catch {}
-    document.body.removeChild(ta)
-  }
-  tokenCopied.value = true
-  setTimeout(() => { tokenCopied.value = false }, 1800)
-}
 
 onMounted(() => {
   try {

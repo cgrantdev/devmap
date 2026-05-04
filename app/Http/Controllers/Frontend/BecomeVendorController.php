@@ -309,9 +309,6 @@ class BecomeVendorController extends Controller
         return Inertia::render('Frontend/RegistrationComplete', [
             'company' => $payload['company'],
             'email' => $payload['email'] ?? null,
-            'connectionToken' => $payload['connection_token'] ?? null,
-            'refusedApi' => $payload['refused_api'] ?? false,
-            'pluginDownloadUrl' => '/downloads/peptidemap-connect.zip',
         ]);
     }
 }
