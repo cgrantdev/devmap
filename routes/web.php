@@ -77,6 +77,11 @@ Route::post('/api/subscribe', function (\Illuminate\Http\Request $request) {
     return response()->json(['ok' => true, 'message' => 'You\'re on the list!']);
 })->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
+// WordPress plugin connect endpoint (no CSRF — called from external WP installs)
+Route::post('/api/vendor-plugin/connect', [\App\Http\Controllers\Api\VendorPluginController::class, 'connect'])
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])
+    ->name('api.vendor-plugin.connect');
+
 // Search
 Route::get('/search', [\App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('search');
 

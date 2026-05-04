@@ -59,6 +59,16 @@ class ComingSoon
                 return $next($request);
             }
 
+            // Allow the WordPress plugin connect endpoint
+            if ($path === 'api/vendor-plugin/connect') {
+                return $next($request);
+            }
+
+            // Allow plugin download
+            if ($path === 'downloads/peptidemap-connect.zip') {
+                return $next($request);
+            }
+
             // Allow admin and vendor login + the protected admin/vendor areas
             // so staff can access the dashboard while the countdown is up.
             if (

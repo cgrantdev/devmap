@@ -315,6 +315,15 @@
               <p class="mt-3 text-sm text-slate-600 leading-relaxed">
                 We only request <strong class="text-slate-900">read-only</strong> access — your store data stays unchanged.
               </p>
+
+              <!-- Plugin shortcut callout -->
+              <div class="mt-4 rounded-lg border border-indigo-200 bg-indigo-50/50 p-3 flex items-start gap-3">
+                <svg class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                <div class="flex-1 text-sm">
+                  <span class="font-semibold text-slate-900">Or skip the manual setup:</span>
+                  <span class="text-slate-600">After registering, you can install our small WordPress plugin (download link on the next page) — it auto-generates the API key and connects you in one click.</span>
+                </div>
+              </div>
             </div>
 
             <!-- Written guide (always visible, primary content) -->

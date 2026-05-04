@@ -235,6 +235,8 @@ class BecomeVendorController extends Controller
                 'registration_complete' => [
                     'company' => $validated['companyName'],
                     'email' => $validated['email'],
+                    'connection_token' => $brand->connection_token,
+                    'refused_api' => !empty($validated['refuseApiAccess']),
                     'submitted_at' => now()->toIso8601String(),
                 ],
             ]);
@@ -307,6 +309,9 @@ class BecomeVendorController extends Controller
         return Inertia::render('Frontend/RegistrationComplete', [
             'company' => $payload['company'],
             'email' => $payload['email'] ?? null,
+            'connectionToken' => $payload['connection_token'] ?? null,
+            'refusedApi' => $payload['refused_api'] ?? false,
+            'pluginDownloadUrl' => '/downloads/peptidemap-connect.zip',
         ]);
     }
 }

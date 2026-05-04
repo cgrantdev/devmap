@@ -26,6 +26,7 @@ class Brand extends Model
         'packaging',
         'affiliate_url_template',
         'affiliate_tag',
+        'connection_token',
     ];
 
     public function clicks()
@@ -51,14 +52,22 @@ class Brand extends Model
                 $baseSlug = Str::slug($brand->name);
                 $slug = $baseSlug;
                 $counter = 1;
-                
+
                 // Ensure unique slug
                 while (static::where('slug', $slug)->exists()) {
                     $slug = $baseSlug . '-' . $counter;
                     $counter++;
                 }
-                
+
                 $brand->slug = $slug;
+            }
+
+            // Auto-generate a per-brand connection token for the WP plugin
+            if (empty($brand->connection_token)) {
+                do {
+                    $token = 'pmap_' . Str::random(40);
+                } while (static::where('connection_token', $token)->exists());
+                $brand->connection_token = $token;
             }
         });
 
