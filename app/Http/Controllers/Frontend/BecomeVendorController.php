@@ -70,10 +70,13 @@ class BecomeVendorController extends Controller
                 'regex:/[0-9]/',     // number
             ],
 
-            // Step 3 + 4: Business Info + REST API credentials (now required)
-            'connectionMethod' => 'nullable|string|in:woocommerce,api_key,auto_scrape',
-            'apiConsumerKey' => ['required', 'string', 'min:10', 'max:255', 'starts_with:ck_'],
-            'apiConsumerSecret' => ['required', 'string', 'min:10', 'max:255', 'starts_with:cs_'],
+            // Step 3 + 4: Business Info + REST API credentials.
+            // API keys are required UNLESS the vendor explicitly opts out via
+            // refuseApiAccess=true (in which case manual mode is used).
+            'connectionMethod' => 'nullable|string|in:woocommerce,api_key,auto_scrape,manual',
+            'refuseApiAccess' => 'nullable|boolean',
+            'apiConsumerKey' => ['nullable', 'required_without:refuseApiAccess', 'string', 'min:10', 'max:255', 'starts_with:ck_'],
+            'apiConsumerSecret' => ['nullable', 'required_without:refuseApiAccess', 'string', 'min:10', 'max:255', 'starts_with:cs_'],
             'productCount' => 'nullable|string|max:50',
             'companyDescription' => 'nullable|string|max:2000',
             'paymentMethods' => 'nullable|array',
@@ -125,6 +128,11 @@ class BecomeVendorController extends Controller
                 } else {
                     $description = "Unique Selling Points:\n" . $validated['uniqueSellingPoints'];
                 }
+            }
+            // Note: applicant explicitly opted out of providing API access.
+            // Surfaces in the admin /applicants queue so staff know to follow up.
+            if (!empty($validated['refuseApiAccess'])) {
+                $description .= ($description ? "\n\n" : '') . "[Refused API access — manual updates only]";
             }
 
             // Create VendorSetting

@@ -701,15 +701,16 @@
               </div>
 
               <!-- API Key input fields -->
-              <div class="space-y-4">
+              <div class="space-y-4" :class="{ 'opacity-50 pointer-events-none': formData.refuseApiAccess }">
                 <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Key <span class="text-rose-500">*</span></label>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Key <span v-if="!formData.refuseApiAccess" class="text-rose-500">*</span></label>
                   <div class="relative">
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
                     <input
                       v-model="formData.apiConsumerKey"
                       type="text"
-                      required
+                      :required="!formData.refuseApiAccess"
+                      :disabled="formData.refuseApiAccess"
                       placeholder="ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                       :class="['w-full pl-11 pr-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', (consumerKeyInvalid || fieldErrors.apiConsumerKey) ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                     />
@@ -718,13 +719,14 @@
                   <p v-else-if="consumerKeyInvalid" class="text-xs text-rose-600 mt-1">Consumer Key must start with <code>ck_</code></p>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Secret <span class="text-rose-500">*</span></label>
+                  <label class="block text-sm font-medium text-slate-700 mb-1.5">Consumer Secret <span v-if="!formData.refuseApiAccess" class="text-rose-500">*</span></label>
                   <div class="relative">
                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     <input
                       v-model="formData.apiConsumerSecret"
                       type="password"
-                      required
+                      :required="!formData.refuseApiAccess"
+                      :disabled="formData.refuseApiAccess"
                       placeholder="cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                       :class="['w-full pl-11 pr-4 py-2.5 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2', (consumerSecretInvalid || fieldErrors.apiConsumerSecret) ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                     />
@@ -742,6 +744,25 @@
                     <p>Your API keys are encrypted and stored securely. We use <strong>read-only</strong> access to import your product catalog and sync prices daily. You can also add or update these later from your <strong>Vendor Dashboard → Integrations</strong>.</p>
                   </div>
                 </div>
+              </div>
+
+              <!-- Opt-out: refuse API access -->
+              <div class="rounded-lg border border-slate-200 bg-slate-50/50 p-4">
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input
+                    v-model="formData.refuseApiAccess"
+                    type="checkbox"
+                    class="mt-0.5 w-4 h-4 accent-slate-700 cursor-pointer"
+                  />
+                  <div class="flex-1">
+                    <span class="text-sm text-slate-800 leading-relaxed">
+                      I refuse to provide API access to allow PeptideMap to keep our products and pricing up to date.
+                    </span>
+                    <p v-if="formData.refuseApiAccess" class="mt-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded p-2.5 leading-relaxed">
+                      <strong>Heads up:</strong> Without API access, your listing won't auto-sync. You'll need to manually update product prices, stock, and availability through the vendor dashboard, and changes on your storefront won't appear on PeptideMap until you submit them yourself.
+                    </p>
+                  </div>
+                </label>
               </div>
 
               <!-- Navigation Buttons -->
@@ -1040,6 +1061,7 @@ const formData = ref({
   connectionMethod: 'api_key',
   apiConsumerKey: '',
   apiConsumerSecret: '',
+  refuseApiAccess: false,
   productCount: '',
   companyDescription: '',
   paymentMethods: [],
@@ -1087,6 +1109,8 @@ const consumerSecretInvalid = computed(() => {
   return v.length > 0 && !v.startsWith('cs_');
 });
 const step4Invalid = computed(() => {
+  // If the vendor opted out of API access, the keys aren't required.
+  if (formData.value.refuseApiAccess) return false;
   const k = (formData.value.apiConsumerKey || '').trim();
   const s = (formData.value.apiConsumerSecret || '').trim();
   return !k || !s || consumerKeyInvalid.value || consumerSecretInvalid.value;
@@ -1131,7 +1155,7 @@ function discardDraft() {
   formData.value = {
     companyName: '', website: 'https://', yearEstablished: '', country: '',
     fullName: '', email: '', phone: '', password: '', confirmPassword: '',
-    connectionMethod: 'api_key', apiConsumerKey: '', apiConsumerSecret: '',
+    connectionMethod: 'api_key', apiConsumerKey: '', apiConsumerSecret: '', refuseApiAccess: false,
     productCount: '', companyDescription: '',
     paymentMethods: [], shippingInformation: '', returnPolicy: '',
     businessHours: '', uniqueSellingPoints: '', logoFile: null,
@@ -1279,9 +1303,14 @@ const handleStep4Submit = () => {
     password_confirmation: formData.value.confirmPassword,
     
     // Step 3
-    connectionMethod: formData.value.connectionMethod || 'auto_scrape',
-    apiConsumerKey: formData.value.apiConsumerKey || null,
-    apiConsumerSecret: formData.value.apiConsumerSecret || null,
+    // If the vendor refused API access, send manual mode and drop any keys
+    // they may have typed before checking the box.
+    connectionMethod: formData.value.refuseApiAccess
+      ? 'manual'
+      : (formData.value.connectionMethod || 'auto_scrape'),
+    apiConsumerKey: formData.value.refuseApiAccess ? null : (formData.value.apiConsumerKey || null),
+    apiConsumerSecret: formData.value.refuseApiAccess ? null : (formData.value.apiConsumerSecret || null),
+    refuseApiAccess: formData.value.refuseApiAccess,
     productCount: formData.value.productCount || null,
     companyDescription: formData.value.companyDescription || null,
     paymentMethods: formData.value.paymentMethods || [],
