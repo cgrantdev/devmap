@@ -317,11 +317,22 @@
               </p>
 
               <!-- Plugin shortcut callout -->
-              <div class="mt-4 rounded-lg border border-indigo-200 bg-indigo-50/50 p-3 flex items-start gap-3">
-                <svg class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                <div class="flex-1 text-sm">
-                  <span class="font-semibold text-slate-900">Or skip the manual setup:</span>
-                  <span class="text-slate-600">After registering, you can install our small WordPress plugin (download link on the next page) — it auto-generates the API key and connects you in one click.</span>
+              <div class="mt-4 rounded-lg border border-indigo-200 bg-indigo-50/50 p-4">
+                <div class="flex items-start gap-3">
+                  <svg class="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                  <div class="flex-1">
+                    <div class="text-sm font-semibold text-slate-900 mb-1">Skip the manual setup with our WordPress plugin</div>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-3">
+                      Install once, paste your connection token (you'll get it after registering), and we're connected. The plugin auto-generates a read-only API key for you.
+                    </p>
+                    <a
+                      href="/downloads/peptidemap-connect.zip"
+                      class="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-700 hover:text-indigo-900"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                      Download plugin (3.8 KB)
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
