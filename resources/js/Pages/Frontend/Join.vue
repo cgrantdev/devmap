@@ -323,7 +323,7 @@
                   <div class="flex-1">
                     <div class="text-sm font-semibold text-slate-900 mb-1">Skip the manual setup with our WordPress plugin</div>
                     <p class="text-sm text-slate-600 leading-relaxed mb-3">
-                      Install once, paste your connection token (you'll get it after registering), and we're connected. The plugin auto-generates a read-only API key for you.
+                      Once registered, you'll get a unique connection token. Install the plugin in <strong>your</strong> WordPress site (<em>WooCommerce → PeptideMap</em>), paste the token there, and we'll auto-generate the read-only API key for you. No copying keys back and forth.
                     </p>
                     <a
                       href="/downloads/peptidemap-connect.zip"

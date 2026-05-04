@@ -71,7 +71,7 @@
           </div>
 
           <p class="text-sm text-slate-600 leading-relaxed mb-4">
-            We've made a small WordPress plugin that auto-generates a read-only WooCommerce API key and securely sends it to PeptideMap. Skip the manual key copying.
+            Install the plugin <strong>on your WordPress site</strong>. It generates a read-only WooCommerce API key for you, then securely sends it back to PeptideMap. No manual key copying.
           </p>
 
           <!-- Connection token (the plugin needs this) -->
@@ -89,26 +89,26 @@
                 {{ tokenCopied ? 'Copied' : 'Copy' }}
               </button>
             </div>
-            <p class="text-[11px] text-slate-500 mt-2">Keep this safe — you'll paste it into the plugin's settings page.</p>
+            <p class="text-[11px] text-slate-500 mt-2">You'll paste this into the plugin on your WordPress site (Step 4 below). Keep it safe.</p>
           </div>
 
           <!-- Quick install steps -->
           <ol class="text-sm text-slate-700 space-y-2.5 mb-5">
             <li class="flex gap-2.5">
               <span class="text-slate-400 font-mono text-xs mt-0.5">1.</span>
-              <span><a :href="pluginDownloadUrl" class="text-indigo-600 hover:text-indigo-800 font-medium underline underline-offset-2">Download peptidemap-connect.zip</a></span>
+              <span>From PeptideMap: <a :href="pluginDownloadUrl" class="text-indigo-600 hover:text-indigo-800 font-medium underline underline-offset-2">download peptidemap-connect.zip</a></span>
             </li>
             <li class="flex gap-2.5">
               <span class="text-slate-400 font-mono text-xs mt-0.5">2.</span>
-              <span>In WordPress admin: <strong>Plugins → Add New → Upload Plugin</strong>, select the .zip, click Install Now.</span>
+              <span>In <strong>your</strong> WordPress admin: <strong>Plugins → Add New → Upload Plugin</strong>, select the .zip, click Install Now, then Activate.</span>
             </li>
             <li class="flex gap-2.5">
               <span class="text-slate-400 font-mono text-xs mt-0.5">3.</span>
-              <span>Activate, then go to <strong>WooCommerce → PeptideMap</strong>.</span>
+              <span>In <strong>your</strong> WordPress sidebar, go to <strong>WooCommerce → PeptideMap</strong>.</span>
             </li>
             <li class="flex gap-2.5">
               <span class="text-slate-400 font-mono text-xs mt-0.5">4.</span>
-              <span>Paste the token above and click <strong>Connect to PeptideMap</strong>.</span>
+              <span>Paste the token above into the plugin's <em>Connection Token</em> field, then click <strong>Connect to PeptideMap</strong>. Done.</span>
             </li>
           </ol>
 
