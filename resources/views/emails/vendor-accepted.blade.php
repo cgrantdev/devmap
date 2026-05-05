@@ -54,10 +54,10 @@
 
                             <h2 style="margin:32px 0 12px;font-size:16px;font-weight:600;color:#0A0B0E;">When we launch, you'll be able to:</h2>
                             <ul style="margin:0 0 24px;padding-left:20px;font-size:15px;line-height:1.7;color:#52525B;">
-                                <li style="margin-bottom:8px;">Sign in at <strong>peptidemap.com/login</strong> with the email + password you chose during registration</li>
-                                <li style="margin-bottom:8px;">Upload a logo and customize your storefront branding</li>
-                                <li style="margin-bottom:8px;">Verify your imported catalog and feature your best products</li>
+                                <li style="margin-bottom:8px;">Sign in at <strong>peptidemap.com/login</strong> with the email and password you chose during registration</li>
+                                <li style="margin-bottom:8px;">Review your imported product catalog</li>
                                 <li style="margin-bottom:8px;">View storefront analytics — clicks, comparisons, and reviews</li>
+                                <li style="margin-bottom:8px;">Reply to customer reviews as they come in</li>
                             </ul>
 
                             <!-- Demo CTA -->
