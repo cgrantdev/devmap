@@ -52,16 +52,6 @@
                                 </tr>
                             </table>
 
-                            <h2 style="margin:32px 0 12px;font-size:16px;font-weight:600;color:#0A0B0E;">Between now and launch</h2>
-                            <p style="margin:0 0 12px;font-size:15px;line-height:1.7;color:#52525B;">
-                                We're working in the background to:
-                            </p>
-                            <ul style="margin:0 0 24px;padding-left:20px;font-size:15px;line-height:1.7;color:#52525B;">
-                                <li style="margin-bottom:8px;">Import your full product catalog and match items to compound listings</li>
-                                <li style="margin-bottom:8px;">Verify your COAs and apply your verified-vendor badge</li>
-                                <li style="margin-bottom:8px;">Polish your storefront page on the directory</li>
-                            </ul>
-
                             <h2 style="margin:32px 0 12px;font-size:16px;font-weight:600;color:#0A0B0E;">When we launch, you'll be able to:</h2>
                             <ul style="margin:0 0 24px;padding-left:20px;font-size:15px;line-height:1.7;color:#52525B;">
                                 <li style="margin-bottom:8px;">Sign in at <strong>peptidemap.com/login</strong> with the email + password you chose during registration</li>
