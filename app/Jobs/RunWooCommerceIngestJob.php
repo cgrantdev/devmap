@@ -68,14 +68,33 @@ class RunWooCommerceIngestJob implements ShouldQueue
                 }
 
                 foreach ($products as $p) {
+                    // Resolve price.
+                    // Variable products have empty regular_price/price on the parent
+                    // — the prices live on each variation. For those, fetch the
+                    // variations and use the cheapest one (effectively "from $X").
+                    $regularPrice = $p['regular_price'] ?? null;
+                    $salePrice = !empty($p['sale_price']) ? $p['sale_price'] : null;
+
+                    if (($p['type'] ?? null) === 'variable' && empty($regularPrice) && !empty($p['variations'])) {
+                        $variantPrices = $this->fetchVariationPrices(
+                            $storeUrl, $consumerKey, $consumerSecret, (int) $p['id']
+                        );
+                        if (!empty($variantPrices['regular'])) {
+                            $regularPrice = (string) min($variantPrices['regular']);
+                        }
+                        if (empty($salePrice) && !empty($variantPrices['sale'])) {
+                            $salePrice = (string) min($variantPrices['sale']);
+                        }
+                    }
+
                     $staged = $ingestion->upsertStaged($this->config, [
                         'source_type' => ScrapedProduct::SOURCE_WOO_API,
                         'external_id' => (string) ($p['id'] ?? ''),
                         'source_url' => $p['permalink'] ?? null,
                         'name' => $p['name'] ?? null,
                         'description' => strip_tags((string) ($p['short_description'] ?? $p['description'] ?? '')) ?: null,
-                        'price' => $p['regular_price'] ?? $p['price'] ?? null,
-                        'discount_price' => !empty($p['sale_price']) ? $p['sale_price'] : null,
+                        'price' => $regularPrice ?: ($p['price'] ?? null),
+                        'discount_price' => $salePrice,
                         'image_url' => $p['images'][0]['src'] ?? null,
                         'stock_status' => $p['stock_status'] ?? null,
                         'raw_data' => $this->compactRawData($p),
@@ -116,6 +135,49 @@ class RunWooCommerceIngestJob implements ShouldQueue
         $this->config->last_error = null;
         $this->config->calculateNextRunAt();
         $this->config->save();
+    }
+
+    /**
+     * Fetch all variation prices for a variable product. Returns
+     *   ['regular' => [12.50, 25.00, ...], 'sale' => [10.00, ...]]
+     * The caller picks min() to use the cheapest variant as the listed price.
+     */
+    protected function fetchVariationPrices(string $storeUrl, string $key, string $secret, int $productId): array
+    {
+        $endpoint = $storeUrl . '/wp-json/wc/v3/products/' . $productId . '/variations';
+        $regular = [];
+        $sale = [];
+
+        try {
+            $response = Http::withBasicAuth($key, $secret)
+                ->timeout(20)
+                ->acceptJson()
+                ->get($endpoint, ['per_page' => 100]);
+
+            if (!$response->successful()) {
+                Log::warning('Variation fetch failed', [
+                    'product_id' => $productId,
+                    'status' => $response->status(),
+                ]);
+                return ['regular' => [], 'sale' => []];
+            }
+
+            foreach ($response->json() ?? [] as $variant) {
+                if (!empty($variant['regular_price']) && is_numeric($variant['regular_price'])) {
+                    $regular[] = (float) $variant['regular_price'];
+                }
+                if (!empty($variant['sale_price']) && is_numeric($variant['sale_price'])) {
+                    $sale[] = (float) $variant['sale_price'];
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Variation fetch threw', [
+                'product_id' => $productId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return ['regular' => $regular, 'sale' => $sale];
     }
 
     /**
