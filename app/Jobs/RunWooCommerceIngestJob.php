@@ -68,33 +68,54 @@ class RunWooCommerceIngestJob implements ShouldQueue
                 }
 
                 foreach ($products as $p) {
-                    // Resolve price.
-                    // Variable products have empty regular_price/price on the parent
-                    // — the prices live on each variation. For those, fetch the
-                    // variations and use the cheapest one (effectively "from $X").
-                    $regularPrice = $p['regular_price'] ?? null;
-                    $salePrice = !empty($p['sale_price']) ? $p['sale_price'] : null;
-
-                    if (($p['type'] ?? null) === 'variable' && empty($regularPrice) && !empty($p['variations'])) {
-                        $variantPrices = $this->fetchVariationPrices(
+                    // Variable products: skip the parent and create one staged
+                    // product per variation, so each size/quantity ends up as
+                    // an independent listing on the compare/directory pages.
+                    if (($p['type'] ?? null) === 'variable' && !empty($p['variations'])) {
+                        $variants = $this->fetchVariations(
                             $storeUrl, $consumerKey, $consumerSecret, (int) $p['id']
                         );
-                        if (!empty($variantPrices['regular'])) {
-                            $regularPrice = (string) min($variantPrices['regular']);
+
+                        foreach ($variants as $variant) {
+                            $variantName = $this->buildVariantName($p, $variant);
+                            $regularPrice = !empty($variant['regular_price']) ? $variant['regular_price'] : null;
+                            $salePrice = !empty($variant['sale_price']) ? $variant['sale_price'] : null;
+
+                            // Skip variants with no price at all (likely "out of stock"
+                            // placeholders or admin-deleted variations).
+                            if (empty($regularPrice) && empty($variant['price'])) {
+                                continue;
+                            }
+
+                            $staged = $ingestion->upsertStaged($this->config, [
+                                'source_type' => ScrapedProduct::SOURCE_WOO_API,
+                                'external_id' => (string) ($p['id'] . '-v' . $variant['id']),
+                                'source_url' => $variant['permalink'] ?? $p['permalink'] ?? null,
+                                'name' => $variantName,
+                                'description' => strip_tags((string) ($p['short_description'] ?? $p['description'] ?? '')) ?: null,
+                                'price' => $regularPrice ?: ($variant['price'] ?? null),
+                                'discount_price' => $salePrice,
+                                'image_url' => $variant['image']['src'] ?? ($p['images'][0]['src'] ?? null),
+                                'stock_status' => $variant['stock_status'] ?? $p['stock_status'] ?? null,
+                                'raw_data' => $this->compactVariantRawData($p, $variant),
+                            ]);
+
+                            if ($staged) {
+                                $stagedCount++;
+                            }
                         }
-                        if (empty($salePrice) && !empty($variantPrices['sale'])) {
-                            $salePrice = (string) min($variantPrices['sale']);
-                        }
+                        continue; // skip the parent itself
                     }
 
+                    // Simple product — create one staged record from the parent payload.
                     $staged = $ingestion->upsertStaged($this->config, [
                         'source_type' => ScrapedProduct::SOURCE_WOO_API,
                         'external_id' => (string) ($p['id'] ?? ''),
                         'source_url' => $p['permalink'] ?? null,
                         'name' => $p['name'] ?? null,
                         'description' => strip_tags((string) ($p['short_description'] ?? $p['description'] ?? '')) ?: null,
-                        'price' => $regularPrice ?: ($p['price'] ?? null),
-                        'discount_price' => $salePrice,
+                        'price' => $p['regular_price'] ?? $p['price'] ?? null,
+                        'discount_price' => !empty($p['sale_price']) ? $p['sale_price'] : null,
                         'image_url' => $p['images'][0]['src'] ?? null,
                         'stock_status' => $p['stock_status'] ?? null,
                         'raw_data' => $this->compactRawData($p),
@@ -138,15 +159,13 @@ class RunWooCommerceIngestJob implements ShouldQueue
     }
 
     /**
-     * Fetch all variation prices for a variable product. Returns
-     *   ['regular' => [12.50, 25.00, ...], 'sale' => [10.00, ...]]
-     * The caller picks min() to use the cheapest variant as the listed price.
+     * Fetch every variation for a variable product. Returns the raw array
+     * of variation objects from /wp-json/wc/v3/products/{id}/variations,
+     * or [] on any failure (logged).
      */
-    protected function fetchVariationPrices(string $storeUrl, string $key, string $secret, int $productId): array
+    protected function fetchVariations(string $storeUrl, string $key, string $secret, int $productId): array
     {
         $endpoint = $storeUrl . '/wp-json/wc/v3/products/' . $productId . '/variations';
-        $regular = [];
-        $sale = [];
 
         try {
             $response = Http::withBasicAuth($key, $secret)
@@ -159,25 +178,58 @@ class RunWooCommerceIngestJob implements ShouldQueue
                     'product_id' => $productId,
                     'status' => $response->status(),
                 ]);
-                return ['regular' => [], 'sale' => []];
+                return [];
             }
 
-            foreach ($response->json() ?? [] as $variant) {
-                if (!empty($variant['regular_price']) && is_numeric($variant['regular_price'])) {
-                    $regular[] = (float) $variant['regular_price'];
-                }
-                if (!empty($variant['sale_price']) && is_numeric($variant['sale_price'])) {
-                    $sale[] = (float) $variant['sale_price'];
-                }
-            }
+            return is_array($response->json()) ? $response->json() : [];
         } catch (\Throwable $e) {
             Log::warning('Variation fetch threw', [
                 'product_id' => $productId,
                 'error' => $e->getMessage(),
             ]);
+            return [];
+        }
+    }
+
+    /**
+     * Build a display name like "BPC-157 5mg" or "EPITALON 10mg / 100ct"
+     * by appending the variation's selected attribute options to the parent's name.
+     */
+    protected function buildVariantName(array $parent, array $variant): string
+    {
+        $base = trim((string) ($parent['name'] ?? ''));
+        $attrs = collect($variant['attributes'] ?? [])
+            ->pluck('option')
+            ->filter()
+            ->map(fn ($v) => trim((string) $v))
+            ->filter()
+            ->values()
+            ->all();
+
+        if (empty($attrs)) {
+            return $base;
         }
 
-        return ['regular' => $regular, 'sale' => $sale];
+        return $base . ' — ' . implode(' / ', $attrs);
+    }
+
+    /**
+     * Variant payload kept for debugging — small subset of the parent + variation data.
+     */
+    protected function compactVariantRawData(array $parent, array $variant): array
+    {
+        return [
+            'parent_id' => $parent['id'] ?? null,
+            'parent_name' => $parent['name'] ?? null,
+            'parent_categories' => $parent['categories'] ?? null,
+            'variant_id' => $variant['id'] ?? null,
+            'variant_sku' => $variant['sku'] ?? null,
+            'variant_attributes' => $variant['attributes'] ?? null,
+            'regular_price' => $variant['regular_price'] ?? null,
+            'sale_price' => $variant['sale_price'] ?? null,
+            'stock_status' => $variant['stock_status'] ?? null,
+            'stock_quantity' => $variant['stock_quantity'] ?? null,
+        ];
     }
 
     /**
