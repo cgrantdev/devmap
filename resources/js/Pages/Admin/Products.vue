@@ -43,6 +43,13 @@
         <option value="uncategorized">⚠ Uncategorized Only</option>
         <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
       </select>
+      <!-- Missing-data filter (VA triage) -->
+      <select v-model="filterMissing" @change="fetchData(1)" class="h-9 px-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none">
+        <option value="all">All Products</option>
+        <option value="category">⚠ Missing Category</option>
+        <option value="size">⚠ Missing Size</option>
+        <option value="both">⚠ Missing Both</option>
+      </select>
     </div>
 
     <!-- Table -->
@@ -176,6 +183,7 @@ const props = defineProps({
 const searchValue = ref('')
 const filterBrand = ref('all')
 const filterCategory = ref('all')
+const filterMissing = ref('all')
 
 // Common research peptide vial sizes + blend ratios.
 // Each option is the literal string stored in size_mg.
@@ -237,6 +245,7 @@ function fetchData(page = props.products?.current_page || 1) {
     search: searchValue.value || null,
     brand: filterBrand.value !== 'all' ? filterBrand.value : null,
     category: filterCategory.value !== 'all' ? filterCategory.value : null,
+    missing: filterMissing.value !== 'all' ? filterMissing.value : null,
   }, {
     preserveState: true,
     preserveScroll: true,

@@ -754,10 +754,27 @@ class VendorsController extends Controller
         // Filter by category
         if ($request->has('category') && $request->category && $request->category !== 'all') {
             if ($request->category === 'uncategorized') {
-                $query->whereHas('category', fn($q) => $q->where('slug', 'uncategorized'));
+                // Products with no category assigned at all (NULL FK) — these
+                // are the ones a VA needs to triage.
+                $query->whereNull('product_category_id');
             } else {
                 $query->where('product_category_id', $request->category);
             }
+        }
+
+        // Filter by completeness (VA triage helper)
+        $missing = $request->get('missing', 'all');
+        if ($missing === 'category') {
+            $query->whereNull('product_category_id');
+        } elseif ($missing === 'size') {
+            $query->where(function ($q) {
+                $q->whereNull('size_mg')->orWhere('size_mg', '');
+            });
+        } elseif ($missing === 'both') {
+            $query->whereNull('product_category_id')
+                  ->where(function ($q) {
+                      $q->whereNull('size_mg')->orWhere('size_mg', '');
+                  });
         }
         
         // Search functionality
