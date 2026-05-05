@@ -21,7 +21,7 @@ class VendorAcceptedEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "You're in — welcome to PeptideMap, {$this->companyName}",
+            subject: "{$this->companyName} — you're approved for the PeptideMap launch (May 11)",
         );
     }
 
