@@ -381,9 +381,9 @@ class ProductsController extends Controller
             $query->where('brand_id', $request->brand);
         }
 
-        // Dosage size filter
+        // Dosage size filter — exact string match (size_mg is now varchar).
         if ($request->has('size') && $request->size) {
-            $query->where('size_mg', (float) $request->size);
+            $query->where('size_mg', (string) $request->size);
         }
 
         if ($request->has('cost_min') && $request->cost_min) {
@@ -451,14 +451,16 @@ class ProductsController extends Controller
             ->where('status', 'active')
             ->where('product_category_id', $category->id);
 
-        // Available dosage sizes for this category
+        // Available dosage sizes for this category — string column now,
+        // sort by the leading numeric token so "5mg" comes before "10mg"
+        // and bare blends sort to the end naturally.
         $availableSizes = (clone $baseQuery)
             ->whereNotNull('size_mg')
-            ->where('size_mg', '>', 0)
+            ->where('size_mg', '!=', '')
             ->selectRaw('DISTINCT size_mg')
-            ->orderBy('size_mg')
             ->pluck('size_mg')
-            ->map(fn($s) => (float) $s)
+            ->filter()
+            ->sortBy(fn ($s) => (float) preg_replace('/^([0-9.]+).*/', '$1', (string) $s))
             ->values();
 
         $filterOptions = [

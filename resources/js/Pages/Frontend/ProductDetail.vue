@@ -110,7 +110,7 @@
                   </span>
                 </div>
                 <div v-if="product.size_mg" class="ui-mono text-sm text-[color:var(--color-ink-muted)] mt-1">
-                  {{ product.size_mg }}mg vial
+                  {{ /[a-zA-Z]/.test(String(product.size_mg)) ? product.size_mg : `${product.size_mg}mg` }} vial
                 </div>
               </div>
 

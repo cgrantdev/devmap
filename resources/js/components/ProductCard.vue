@@ -163,10 +163,16 @@ const categoryName = computed(() => {
   return 'PRODUCT'
 })
 
-// Extract size display
+// Extract size display.
+// size_mg is now stored with its unit baked in ("10mg", "5mg/5mg",
+// "100mcg") — only fall back to appending "mg" when the value is
+// a bare legacy number.
 const sizeDisplay = computed(() => {
   if (props.sizeMg) {
-    return `${props.sizeMg}mg`
+    const str = String(props.sizeMg).trim()
+    if (/[a-zA-Z]/.test(str)) return str
+    if (!Number.isNaN(Number(str))) return `${Number(str)}mg`
+    return str
   }
   // Try to extract from name
   const name = props.name || ''

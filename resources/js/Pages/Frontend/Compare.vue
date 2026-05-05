@@ -105,7 +105,7 @@
                   ? 'bg-[color:var(--color-ink)] text-white shadow-sm'
                   : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]',
               ]"
-            >{{ formatMg(size) }}mg</button>
+            >{{ formatSize(size) }}</button>
           </div>
 
           <!-- Price table -->
@@ -164,7 +164,7 @@
                   <td class="px-5 py-4 text-[color:var(--color-ink-muted)]">
                     <span class="line-clamp-1">{{ product.name }}</span>
                     <span v-if="product.size_mg" class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)]">
-                      {{ formatMg(product.size_mg) }}mg
+                      {{ formatSize(product.size_mg) }}
                     </span>
                   </td>
                   <!-- Price -->
@@ -238,7 +238,20 @@ const props = defineProps({
 const selectedSizes = ref({})
 
 function getSizes(compound) {
-  return [...new Set(compound.products.map(p => Number(p.size_mg)).filter(Boolean))].sort((a, b) => a - b)
+  // Collect unique size strings ("10mg", "5mg/5mg", etc.) and sort by the
+  // first numeric token so the tabs read 5mg → 10mg → 20mg → blends after.
+  const unique = [...new Set(
+    compound.products
+      .map(p => p.size_mg)
+      .filter(s => s && String(s).trim() !== '')
+      .map(s => String(s).toLowerCase())
+  )]
+  return unique.sort((a, b) => {
+    const numA = parseFloat(a) || 0
+    const numB = parseFloat(b) || 0
+    if (numA !== numB) return numA - numB
+    return a.localeCompare(b)
+  })
 }
 
 function getSelectedSize(idx) {
@@ -252,7 +265,7 @@ function setSize(idx, size) {
 function getFilteredProducts(compound, idx) {
   const size = getSelectedSize(idx)
   if (!size) return compound.products
-  return compound.products.filter(p => Number(p.size_mg) === size)
+  return compound.products.filter(p => String(p.size_mg).toLowerCase() === String(size).toLowerCase())
 }
 
 function percentCheaper(products) {
@@ -269,8 +282,16 @@ function formatPrice(p) {
   return isNaN(num) ? String(p) : num.toFixed(2)
 }
 
-function formatMg(mg) {
-  const n = Number(mg)
-  return n % 1 === 0 ? n.toFixed(0) : n.toString()
+/**
+ * Render a size value cleanly. Values are stored with units already
+ * ("10mg", "5mg/5mg", "100mcg"). Bare numeric legacy values get "mg"
+ * appended for display only.
+ */
+function formatSize(value) {
+  if (!value) return ''
+  const str = String(value).trim()
+  if (/[a-zA-Z]/.test(str)) return str
+  if (!Number.isNaN(Number(str))) return `${Number(str)}mg`
+  return str
 }
 </script>
