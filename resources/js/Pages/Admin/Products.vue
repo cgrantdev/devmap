@@ -103,19 +103,11 @@
             </td>
             <td class="px-5 py-3.5" @click.stop>
               <select
-                :value="normalizedSize(product.size_mg)"
+                :value="sizeOptions.includes(normalizedSize(product.size_mg)) ? normalizedSize(product.size_mg) : ''"
                 @change="updateField(product.id, 'size_mg', $event.target.value || null)"
                 class="w-full px-2 py-1.5 text-[12px] border border-[color:var(--color-hairline)] rounded bg-white text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] focus:outline-none focus:ring-1 focus:ring-[color:var(--color-accent-400)] ui-mono"
               >
                 <option value="">—</option>
-                <!-- If the saved value isn't in the standard list, show it first
-                     so VAs see the actual stored value before standardising it -->
-                <option
-                  v-if="product.size_mg && !sizeOptions.includes(normalizedSize(product.size_mg))"
-                  :value="normalizedSize(product.size_mg)"
-                >
-                  {{ normalizedSize(product.size_mg) }} (custom)
-                </option>
                 <option v-for="size in sizeOptions" :key="size" :value="size">{{ size }}</option>
               </select>
             </td>
@@ -188,12 +180,13 @@ const filterCategory = ref('all')
 // Common research peptide vial sizes + blend ratios.
 // Each option is the literal string stored in size_mg.
 const sizeOptions = [
-  // Single-compound sizes
-  '0.5mg', '1mg', '2mg', '2.5mg', '5mg', '10mg', '15mg', '20mg',
-  '25mg', '30mg', '50mg', '100mg', '200mg', '500mg', '1000mg',
-  // Common blend ratios (sourced from real vendor listings)
-  '5mg/5mg', '10mg/10mg', '20mg/20mg',
-  '50mg/10mg/10mg', '50mg/10mg/10mg/10mg',
+  // Singles 0.5–100mg (granular at the small end where peptides actually vary)
+  '0.5mg', '1mg', '2mg', '2.5mg', '5mg', '10mg', '15mg',
+  '20mg', '25mg', '30mg', '50mg', '100mg',
+  // Larger singles 200–1000mg in 100mg increments (NAD+, methylene blue, etc.)
+  '200mg', '300mg', '400mg', '500mg', '600mg', '700mg', '800mg', '900mg', '1000mg',
+  // Common blend ratios from real vendor listings
+  '5mg/5mg', '10mg/10mg', '50mg/10mg/10mg', '50mg/10mg/10mg/10mg',
 ]
 
 /**
