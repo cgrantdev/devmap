@@ -192,8 +192,12 @@ class RunWooCommerceIngestJob implements ShouldQueue
     }
 
     /**
-     * Build a display name like "BPC-157 5mg" or "EPITALON 10mg / 100ct"
+     * Build a display name like "BPC-157 — 5mg" or "BPC-157/TB-500 — 5mg/5mg"
      * by appending the variation's selected attribute options to the parent's name.
+     *
+     * Bare numeric tokens get "mg" appended automatically — vendors often
+     * encode blend ratios like "5/5" (meaning 5mg + 5mg) which become
+     * "5mg/5mg" so the compare page can read them correctly.
      */
     protected function buildVariantName(array $parent, array $variant): string
     {
@@ -201,7 +205,7 @@ class RunWooCommerceIngestJob implements ShouldQueue
         $attrs = collect($variant['attributes'] ?? [])
             ->pluck('option')
             ->filter()
-            ->map(fn ($v) => trim((string) $v))
+            ->map(fn ($v) => $this->normalizeUnits(trim((string) $v)))
             ->filter()
             ->values()
             ->all();
@@ -211,6 +215,27 @@ class RunWooCommerceIngestJob implements ShouldQueue
         }
 
         return $base . ' — ' . implode(' / ', $attrs);
+    }
+
+    /**
+     * Append "mg" to bare numeric tokens that don't already carry a unit.
+     * Examples:
+     *   "5/5"           → "5mg/5mg"
+     *   "10/10/10"      → "10mg/10mg/10mg"
+     *   "50mg"          → "50mg" (unchanged)
+     *   "100mcg"        → "100mcg" (unchanged)
+     *   "Standard"      → "Standard" (unchanged)
+     *   "1000 IU"       → "1000 IU" (unchanged)
+     */
+    protected function normalizeUnits(string $value): string
+    {
+        // Match a number not already followed by a letter (i.e. no unit attached
+        // and no unit immediately after with optional whitespace).
+        return preg_replace_callback(
+            '/\b(\d+(?:\.\d+)?)\b(?!\s*[a-zA-Z])/',
+            fn ($m) => $m[1] . 'mg',
+            $value
+        );
     }
 
     /**
