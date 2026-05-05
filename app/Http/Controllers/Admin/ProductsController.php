@@ -217,5 +217,36 @@ class ProductsController extends Controller
 
         return redirect()->back()->with('success', 'Product deleted successfully.');
     }
+
+    /**
+     * Inline single-field updates from the admin Products list.
+     * Used by the VA-friendly inline dropdowns for category + size.
+     * Accepts product_category_id and/or size_mg.
+     */
+    public function quickUpdate(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+            'product_category_id' => 'sometimes|nullable|exists:product_categories,id',
+            'size_mg' => 'sometimes|nullable|numeric|min:0|max:100000',
+        ]);
+
+        // Only update fields that were actually sent (sometimes rule above
+        // makes them optional). This lets the frontend send just one field.
+        $update = [];
+        if ($request->has('product_category_id')) {
+            $update['product_category_id'] = $validated['product_category_id'] ?? null;
+        }
+        if ($request->has('size_mg')) {
+            $update['size_mg'] = $validated['size_mg'] ?? null;
+        }
+
+        if (!empty($update)) {
+            $product->update($update);
+        }
+
+        return redirect()->back()->with('success', 'Product updated.');
+    }
 }
 

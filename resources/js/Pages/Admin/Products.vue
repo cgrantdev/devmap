@@ -52,7 +52,8 @@
           <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Product</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Brand</th>
-            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Category</th>
+            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] w-52">Category</th>
+            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] w-28">Size</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Price</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Rating</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Flags</th>
@@ -76,16 +77,39 @@
                   <div class="flex items-center gap-1.5">
                     <span class="text-[13px] font-medium text-[color:var(--color-ink)] truncate max-w-xs">{{ product.name }}</span>
                   </div>
-                  <div v-if="product.dosage || product.size_mg" class="text-[11px] text-[color:var(--color-ink-subtle)]">{{ product.dosage || product.size_mg }}</div>
                 </div>
               </div>
             </td>
             <td class="px-5 py-3.5 text-[13px] text-[color:var(--color-ink-muted)]">
               {{ product.vendor_name || product.brand_name || '—' }}
             </td>
-            <td class="px-5 py-3.5">
-              <span v-if="product.category_name === 'Uncategorized'" class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold text-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)]">⚠ UNCATEGORIZED</span>
-              <span v-else class="text-[13px] text-[color:var(--color-ink-muted)]">{{ product.category_name || '—' }}</span>
+            <td class="px-5 py-3.5" @click.stop>
+              <select
+                :value="product.category_id || ''"
+                @change="updateField(product.id, 'product_category_id', $event.target.value || null)"
+                :class="[
+                  'w-full px-2 py-1.5 text-[12px] border rounded bg-white transition-colors focus:outline-none focus:ring-1',
+                  !product.category_id
+                    ? 'border-rose-300 text-rose-700 focus:ring-rose-300 bg-rose-50'
+                    : 'border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] focus:ring-[color:var(--color-accent-400)]'
+                ]"
+                :title="!product.category_id ? 'No category — assign one' : 'Change category'"
+              >
+                <option value="">— Uncategorized —</option>
+                <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                  {{ cat.name }}
+                </option>
+              </select>
+            </td>
+            <td class="px-5 py-3.5" @click.stop>
+              <select
+                :value="product.size_mg || ''"
+                @change="updateField(product.id, 'size_mg', $event.target.value || null)"
+                class="w-full px-2 py-1.5 text-[12px] border border-[color:var(--color-hairline)] rounded bg-white text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] focus:outline-none focus:ring-1 focus:ring-[color:var(--color-accent-400)] ui-mono"
+              >
+                <option value="">—</option>
+                <option v-for="size in sizeOptions" :key="size" :value="size">{{ size }}mg</option>
+              </select>
             </td>
             <td class="px-5 py-3.5">
               <span class="ui-mono text-[13px] text-[color:var(--color-ink)]">${{ product.price || '0.00' }}</span>
@@ -139,7 +163,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Link, router } from '@inertiajs/vue3'
+import { Link, router, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import PageHeader from '@/components/admin/PageHeader.vue'
 
@@ -152,6 +176,24 @@ const props = defineProps({
 const searchValue = ref('')
 const filterBrand = ref('all')
 const filterCategory = ref('all')
+
+// Common research peptide vial sizes — covers the bulk of real listings.
+const sizeOptions = [0.5, 1, 2, 2.5, 5, 10, 15, 20, 25, 30, 50, 100, 200, 500, 1000]
+
+/**
+ * Inline single-field update from the Category / Size dropdowns.
+ * Auto-saves on change. Uses preserveScroll so the VA can keep working
+ * down the list without losing their position.
+ */
+function updateField(productId, field, value) {
+  router.patch(`/admin/products/${productId}/quick-update`, {
+    [field]: value,
+    _token: usePage().props.csrf_token,
+  }, {
+    preserveScroll: true,
+    preserveState: true,
+  })
+}
 
 let searchTimeout = null
 

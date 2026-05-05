@@ -223,6 +223,7 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     Route::put('/products/{id}', [AdminProductsController::class, 'update'])->name('admin.products.update');
     Route::patch('/products/{id}/hidden', [AdminProductsController::class, 'setHidden'])->name('admin.products.hidden');
     Route::patch('/products/{id}/auto-update', [AdminProductsController::class, 'setAutoUpdate'])->name('admin.products.auto-update');
+    Route::patch('/products/{id}/quick-update', [AdminProductsController::class, 'quickUpdate'])->name('admin.products.quick-update');
     Route::delete('/products/{id}', [AdminProductsController::class, 'destroy'])->name('admin.products.destroy');
     
     // Categories
