@@ -103,12 +103,20 @@
             </td>
             <td class="px-5 py-3.5" @click.stop>
               <select
-                :value="product.size_mg || ''"
+                :value="normalizedSize(product.size_mg)"
                 @change="updateField(product.id, 'size_mg', $event.target.value || null)"
                 class="w-full px-2 py-1.5 text-[12px] border border-[color:var(--color-hairline)] rounded bg-white text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] focus:outline-none focus:ring-1 focus:ring-[color:var(--color-accent-400)] ui-mono"
               >
                 <option value="">—</option>
-                <option v-for="size in sizeOptions" :key="size" :value="size">{{ size }}mg</option>
+                <!-- If the saved value isn't in the standard list, show it first
+                     so VAs see the actual stored value before standardising it -->
+                <option
+                  v-if="product.size_mg && !sizeOptions.includes(normalizedSize(product.size_mg))"
+                  :value="normalizedSize(product.size_mg)"
+                >
+                  {{ normalizedSize(product.size_mg) }} (custom)
+                </option>
+                <option v-for="size in sizeOptions" :key="size" :value="size">{{ size }}</option>
               </select>
             </td>
             <td class="px-5 py-3.5">
@@ -177,8 +185,35 @@ const searchValue = ref('')
 const filterBrand = ref('all')
 const filterCategory = ref('all')
 
-// Common research peptide vial sizes — covers the bulk of real listings.
-const sizeOptions = [0.5, 1, 2, 2.5, 5, 10, 15, 20, 25, 30, 50, 100, 200, 500, 1000]
+// Common research peptide vial sizes + blend ratios.
+// Each option is the literal string stored in size_mg.
+const sizeOptions = [
+  // Single-compound sizes
+  '0.5mg', '1mg', '2mg', '2.5mg', '5mg', '10mg', '15mg', '20mg',
+  '25mg', '30mg', '50mg', '100mg', '200mg', '500mg', '1000mg',
+  // Common blend ratios (sourced from real vendor listings)
+  '5mg/5mg', '10mg/10mg', '20mg/20mg',
+  '50mg/10mg/10mg', '50mg/10mg/10mg/10mg',
+]
+
+/**
+ * Normalize size_mg for the dropdown's :value binding. Handles three cases:
+ *   "10mg"   → "10mg"   (already normalized — return as-is)
+ *   "5mg/5mg"→ "5mg/5mg"
+ *   "10.00"  → "10mg"   (legacy decimal, append unit + strip trailing zeros)
+ *   "10"     → "10mg"
+ */
+function normalizedSize(value) {
+  if (!value) return ''
+  const str = String(value)
+  if (/[a-zA-Z\/]/.test(str)) return str // already has unit or blend separator
+  if (!Number.isNaN(Number(str))) {
+    // Strip trailing zeros: "10.00" → "10", "9.50" → "9.5"
+    const num = Number(str)
+    return `${num}mg`
+  }
+  return str
+}
 
 /**
  * Inline single-field update from the Category / Size dropdowns.

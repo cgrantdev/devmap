@@ -229,7 +229,9 @@ class ProductsController extends Controller
 
         $validated = $request->validate([
             'product_category_id' => 'sometimes|nullable|exists:product_categories,id',
-            'size_mg' => 'sometimes|nullable|numeric|min:0|max:100000',
+            // Accepts numbers (10mg) or blend ratios (5mg/5mg, 50mg/10mg/10mg).
+            // Pattern: one or more "Nmg" tokens optionally separated by /.
+            'size_mg' => ['sometimes', 'nullable', 'string', 'max:50', 'regex:/^[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?(?:\/[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?)*$/i'],
         ]);
 
         // Only update fields that were actually sent (sometimes rule above
