@@ -521,36 +521,43 @@ class VendorsController extends Controller
     public function destroy($id)
     {
         $brand = Brand::findOrFail($id);
-        
-        // Delete vendor settings and files
-        if ($brand->vendorSetting) {
-            $settings = $brand->vendorSetting;
-            // Delete banner file
-            if ($settings->banner) {
-                \Storage::disk('public')->delete($settings->banner);
+        $userId = $brand->user_id;
+
+        \DB::transaction(function () use ($brand) {
+            // Vendor settings + uploaded files
+            if ($brand->vendorSetting) {
+                $settings = $brand->vendorSetting;
+                if ($settings->banner) {
+                    \Storage::disk('public')->delete($settings->banner);
+                }
+                if ($settings->logo) {
+                    \Storage::disk('public')->delete($settings->logo);
+                }
+                $settings->delete();
             }
-            // Delete logo file
-            if ($settings->logo) {
-                \Storage::disk('public')->delete($settings->logo);
-            }
-            $settings->delete();
-        }
-        
-        // Delete all products for this brand
-        $brand->products()->delete();
-        
-        // Delete user account if exists
-        if ($brand->user_id) {
-            $user = User::find($brand->user_id);
+
+            // Cascade-delete every brand-scoped record so nothing dangles
+            // and the email is fully freed for a future signup.
+            \DB::table('products')->where('brand_id', $brand->id)->delete();
+            \DB::table('scraped_products')->where('brand_id', $brand->id)->delete();
+            \DB::table('scraping_configs')->where('vendor_id', $brand->id)->delete();
+            \DB::table('vendor_reviews')->where('brand_id', $brand->id)->delete();
+            \DB::table('product_clicks')->where('brand_id', $brand->id)->delete();
+            \DB::table('deals')->where('brand_id', $brand->id)->delete();
+            \DB::table('banners')->where('brand_id', $brand->id)->delete();
+
+            $brand->delete();
+        });
+
+        // Delete the owning user last so the email is freed up for re-signup.
+        if ($userId) {
+            $user = User::find($userId);
             if ($user) {
                 $user->delete();
             }
         }
-        
-        // Delete the brand
-        $brand->delete();
-        
-        return redirect()->route('admin.vendors')->with('success', 'Vendor deleted successfully.');
+
+        return redirect()->route('admin.vendors')->with('success', 'Vendor deleted — all products, reviews, scraping configs, and the user account were removed.');
     }
 
     /**
