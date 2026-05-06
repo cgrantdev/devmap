@@ -286,6 +286,28 @@
         </FormSection>
       </div>
 
+      <!-- DANGER ZONE — visible on every tab so it's always reachable -->
+      <div v-if="vendor" class="mt-10 border border-[#FECACA] bg-[#FEF2F2] p-5">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h3 class="text-sm font-semibold text-[#991B1B]">Delete vendor</h3>
+            <p class="mt-1 text-[13px] text-[#7F1D1D]">
+              Permanently removes the brand, all
+              {{ (products || []).length }} product{{ (products || []).length === 1 ? '' : 's' }},
+              vendor settings, reviews, scraping config, click logs, banners, and the owning user account.
+              The email <span class="ui-mono">{{ vendor.contact_email || vendor.email || '—' }}</span> will be freed up for future signups. This cannot be undone.
+            </p>
+          </div>
+          <button
+            type="button"
+            @click="confirmDeleteVendor"
+            class="h-9 px-4 text-[13px] font-semibold text-white bg-[#DC2626] hover:bg-[#B91C1C] flex-shrink-0 transition-colors"
+          >
+            Delete vendor
+          </button>
+        </div>
+      </div>
+
     </FormPage>
   </AdminLayout>
 </template>
@@ -559,6 +581,24 @@ function importFromShopUrl() {
       }
     }
   )
+}
+
+function confirmDeleteVendor() {
+  if (!props.vendor) return
+  const name = props.vendor.name || 'this vendor'
+  const productCount = (props.products || []).length
+  const msg = `Delete ${name}?\n\n` +
+    `This permanently removes:\n` +
+    `  • The brand and storefront\n` +
+    `  • ${productCount} product${productCount === 1 ? '' : 's'}\n` +
+    `  • Vendor settings, reviews, scraping config, click logs\n` +
+    `  • The owning user account (email will be freed)\n\n` +
+    `This cannot be undone. Continue?`
+  if (!confirm(msg)) return
+  const form = useForm({ _token: usePage().props.csrf_token })
+  form.delete(`/admin/vendors/${props.vendor.id}`, {
+    onError: () => toastError('Failed to delete vendor. Please try again.'),
+  })
 }
 
 function deleteProduct(productId) {
