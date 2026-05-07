@@ -49,6 +49,20 @@ class ComingSoon
 
         // Only gate the bare production domains
         if ($host === 'peptidemap.com' || $host === 'www.peptidemap.com') {
+            // Anyone landing on /become-a-vendor (or related signup paths) on the
+            // bare production domain — usually from old links or search results —
+            // gets bounced to the canonical invitation subdomain. Without this the
+            // middleware silently serves the coming-soon HTML for GET and 404s
+            // the POST, which is what stranded the Hydro Research signup.
+            if (
+                $path === 'become-a-vendor' ||
+                $path === 'registration-complete' ||
+                $path === 'join'
+            ) {
+                $query = $request->getQueryString();
+                return redirect()->away('https://join.peptidemap.com/' . ($query ? ('?' . $query) : ''), 302);
+            }
+
             // Allow through if it's a known asset request
             if (str_starts_with($path, 'images/') || str_starts_with($path, 'build/') || str_starts_with($path, 'storage/')) {
                 return $next($request);
