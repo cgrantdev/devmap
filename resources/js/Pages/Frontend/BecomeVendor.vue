@@ -1126,11 +1126,24 @@ onMounted(() => {
   if (draft?.data) {
     Object.assign(formData.value, draft.data);
     if (draft.step >= 1 && draft.step <= 4) {
-      step.value = draft.step;
-      maxStepReached.value = Math.max(maxStepReached.value, draft.step);
+      // Password fields are intentionally NOT persisted to localStorage.
+      // If the draft put us past step 2 but the password is empty, we'd end up
+      // at step 4 with a silently un-clickable "Complete Registration" button —
+      // exactly the failure Max from Hydro Research reported. Bounce back to
+      // step 2 in that case so they can re-enter the password.
+      const passwordMissing = !formData.value.password || !formData.value.confirmPassword;
+      const targetStep = (draft.step >= 3 && passwordMissing) ? 2 : draft.step;
+
+      step.value = targetStep;
+      maxStepReached.value = Math.max(maxStepReached.value, targetStep);
+
+      if (targetStep !== draft.step && passwordMissing) {
+        submissionError.value = 'For your security, please re-enter your password to continue.';
+      }
+
       // Sync URL to match the restored step (only if it differs)
-      if (props.step !== draft.step) {
-        router.get('/become-a-vendor', { step: draft.step }, {
+      if (props.step !== targetStep) {
+        router.get('/become-a-vendor', { step: targetStep }, {
           preserveState: true,
           preserveScroll: true,
           replace: true,
@@ -1273,15 +1286,30 @@ const handleStep3Submit = () => {
 const handleStep4Submit = () => {
   if (step4Invalid.value) return;
 
-  // Validate required fields
-  if (!formData.value.companyName || !formData.value.website || !formData.value.country ||
-      !formData.value.fullName || !formData.value.email ||
-      !formData.value.password || !formData.value.confirmPassword) {
+  // Defensive validation: anything missing here means we're in a recovered-draft
+  // state where password fields couldn't be persisted. Bounce the user back to
+  // the relevant step instead of silently doing nothing.
+  const missingStep1 = !formData.value.companyName || !formData.value.website || !formData.value.country;
+  const missingStep2 = !formData.value.fullName || !formData.value.email ||
+                       !formData.value.password || !formData.value.confirmPassword;
+
+  if (missingStep1 || missingStep2) {
+    const target = missingStep1 ? 1 : 2;
+    step.value = target;
+    submissionError.value = target === 2
+      ? 'For your security, please re-enter your password and confirm it to complete registration.'
+      : 'Some required details are missing — please review the earlier steps.';
+    router.get('/become-a-vendor', { step: target }, { preserveState: true, replace: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
 
   // Validate password match
   if (formData.value.password !== formData.value.confirmPassword) {
+    step.value = 2;
+    submissionError.value = 'Passwords do not match. Please re-enter them.';
+    router.get('/become-a-vendor', { step: 2 }, { preserveState: true, replace: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
 
