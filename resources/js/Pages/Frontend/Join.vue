@@ -626,8 +626,18 @@ onMounted(() => {
   if (draft?.data) {
     Object.assign(formData.value, draft.data)
     if (draft.step >= 1 && draft.step <= 4) {
-      step.value = draft.step
-      maxStepReached.value = Math.max(maxStepReached.value, draft.step)
+      // Password fields are intentionally NOT persisted to localStorage.
+      // If the draft restored us past step 2 with no password, the submit
+      // would silently fail on step 4 — bounce back to step 2 instead.
+      const passwordMissing = !formData.value.password || !formData.value.confirmPassword
+      const targetStep = (draft.step >= 3 && passwordMissing) ? 2 : draft.step
+
+      step.value = targetStep
+      maxStepReached.value = Math.max(maxStepReached.value, targetStep)
+
+      if (targetStep !== draft.step && passwordMissing) {
+        submissionError.value = 'For your security, please re-enter your password to continue.'
+      }
     }
     draftRestored.value = true
   }
@@ -745,11 +755,29 @@ const handleLogoUpload = (event) => {
 const page = usePage()
 
 const submitRegistration = () => {
-  if (!formData.value.companyName || !formData.value.website || !formData.value.country ||
-      !formData.value.fullName || !formData.value.email ||
-      !formData.value.password || !formData.value.confirmPassword) return
+  // Defensive guards: anything missing means we're in a recovered-draft state
+  // where password fields couldn't be persisted. Bounce the user back instead
+  // of silently doing nothing (the bug Hydro Research hit).
+  const missingStep1 = !formData.value.companyName || !formData.value.website || !formData.value.country
+  const missingStep2 = !formData.value.fullName || !formData.value.email ||
+                       !formData.value.password || !formData.value.confirmPassword
 
-  if (formData.value.password !== formData.value.confirmPassword) return
+  if (missingStep1 || missingStep2) {
+    const target = missingStep1 ? 1 : 2
+    step.value = target
+    submissionError.value = target === 2
+      ? 'For your security, please re-enter your password and confirm it to complete registration.'
+      : 'Some required details are missing — please review the earlier steps.'
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    return
+  }
+
+  if (formData.value.password !== formData.value.confirmPassword) {
+    step.value = 2
+    submissionError.value = 'Passwords do not match. Please re-enter them.'
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    return
+  }
 
   isSubmitting.value = true
 
