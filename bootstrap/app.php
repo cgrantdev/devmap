@@ -46,5 +46,28 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Handle CSRF token mismatches (419) gracefully on the vendor signup
+        // pages. The default Laravel 419 page looks like the app is broken —
+        // instead bounce back to the form with a flash message so the user
+        // can finish (their localStorage draft restores everything except
+        // the password fields).
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            $path = trim($request->path(), '/');
+            $host = $request->getHost();
+
+            $isVendorSignup =
+                $path === 'become-a-vendor' ||
+                $path === 'join' ||
+                $host === 'join.peptidemap.com';
+
+            if ($isVendorSignup) {
+                $target = $host === 'join.peptidemap.com' ? '/' : '/become-a-vendor';
+                return redirect($target)->with(
+                    'csrf_expired',
+                    'Your session timed out. Please re-enter your password to complete registration — the rest of your details are saved.'
+                );
+            }
+
+            return null; // default 419 page elsewhere
+        });
     })->create();

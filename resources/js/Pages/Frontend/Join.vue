@@ -618,8 +618,18 @@ const step4Invalid = computed(() => {
 
 const draftRestored = ref(false)
 
+const page = usePage()
+
 onMounted(() => {
   step.value = props.step || 1
+
+  // If we were bounced here by the 419 handler, surface the flash message
+  // and jump straight to step 2 so the user can re-enter their password.
+  const csrfFlash = page.props?.flash?.csrf_expired
+  if (csrfFlash) {
+    submissionError.value = csrfFlash
+    step.value = 2
+  }
 
   // Restore from a saved draft, if any
   const draft = loadDraft()
@@ -751,8 +761,6 @@ const handleLogoUpload = (event) => {
   }
   formData.value.logoFile = file
 }
-
-const page = usePage()
 
 const submitRegistration = () => {
   // Defensive guards: anything missing means we're in a recovered-draft state
