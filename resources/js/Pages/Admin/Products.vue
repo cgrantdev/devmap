@@ -269,30 +269,33 @@
               <span v-if="product.original_price && product.original_price > product.price" class="ml-1 text-[11px] text-[color:var(--color-ink-subtle)] line-through ui-mono">${{ product.original_price }}</span>
             </td>
             <td class="px-5 py-3.5" @click.stop>
-              <div class="flex items-center justify-center gap-2">
-                <!-- ENC: thumbnail for /encyclopedia/ category card -->
+              <div
+                class="flex items-center justify-center gap-2"
+                :title="product.category_id ? `Thumb flags apply within “${categoryNameFor(product.category_id)}”` : 'Assign a category first — thumbnail flags are category-scoped'"
+              >
+                <!-- ENC: thumbnail for /encyclopedia/ card of this category -->
                 <label
-                  class="inline-flex items-center gap-1 cursor-pointer select-none"
-                  title="Use this image as the thumbnail on /encyclopedia for this product's category"
+                  :class="['inline-flex items-center gap-1 select-none', product.category_id ? 'cursor-pointer' : 'cursor-not-allowed opacity-40']"
                 >
                   <input
                     type="checkbox"
                     :checked="product.is_encyclopedia_thumb"
+                    :disabled="!product.category_id"
                     @change="updateField(product.id, 'is_encyclopedia_thumb', $event.target.checked)"
-                    class="h-3.5 w-3.5 accent-[color:var(--color-accent-600)] cursor-pointer"
+                    class="h-3.5 w-3.5 accent-[color:var(--color-accent-600)] cursor-pointer disabled:cursor-not-allowed"
                   />
                   <span :class="['text-[10px] font-bold uppercase tracking-wider', product.is_encyclopedia_thumb ? 'text-[color:var(--color-accent-700)]' : 'text-[color:var(--color-ink-subtle)]']">ENC</span>
                 </label>
-                <!-- PEP: thumbnail for /products category card -->
+                <!-- PEP: thumbnail for /products card of this category -->
                 <label
-                  class="inline-flex items-center gap-1 cursor-pointer select-none"
-                  title="Use this image as the thumbnail on /products for this product's category"
+                  :class="['inline-flex items-center gap-1 select-none', product.category_id ? 'cursor-pointer' : 'cursor-not-allowed opacity-40']"
                 >
                   <input
                     type="checkbox"
                     :checked="product.is_peptide_thumb"
+                    :disabled="!product.category_id"
                     @change="updateField(product.id, 'is_peptide_thumb', $event.target.checked)"
-                    class="h-3.5 w-3.5 accent-[color:var(--color-accent-600)] cursor-pointer"
+                    class="h-3.5 w-3.5 accent-[color:var(--color-accent-600)] cursor-pointer disabled:cursor-not-allowed"
                   />
                   <span :class="['text-[10px] font-bold uppercase tracking-wider', product.is_peptide_thumb ? 'text-[color:var(--color-accent-700)]' : 'text-[color:var(--color-ink-subtle)]']">PEP</span>
                 </label>
@@ -430,6 +433,12 @@ function normalizedSize(value) {
  * Auto-saves on change. Uses preserveScroll so the VA can keep working
  * down the list without losing their position.
  */
+// Resolve a category id back to its display name for the row tooltip.
+function categoryNameFor(id) {
+  const cat = (props.categories || []).find(c => c.id === id)
+  return cat ? cat.name : 'this category'
+}
+
 function updateField(productId, field, value) {
   router.patch(`/admin/products/${productId}/quick-update`, {
     [field]: value,

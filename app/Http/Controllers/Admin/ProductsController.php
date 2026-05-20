@@ -267,12 +267,35 @@ class ProductsController extends Controller
             $update['is_peptide_thumb'] = (bool) $validated['is_peptide_thumb'];
         }
 
-        // Mutual exclusion within a category: only one product per category
-        // can carry each thumb flag. When turning a flag ON, clear it on
-        // every other product in the same category in the same transaction.
+        // Category-scoped semantics for the thumb flags:
+        //   1. If category is being changed in THIS request, clear both
+        //      flags — the product was the icon for its old category, not
+        //      the new one. VA can re-flag intentionally on the new category.
+        //   2. If no category is set, refuse to set either flag.
+        //   3. When turning a flag ON, clear it on every other product in
+        //      the same category (mutual exclusion).
+        $categoryChanging = array_key_exists('product_category_id', $update)
+            && $update['product_category_id'] !== $product->product_category_id;
+
+        if ($categoryChanging) {
+            $update['is_encyclopedia_thumb'] = false;
+            $update['is_peptide_thumb'] = false;
+        }
+
         $targetCategoryId = array_key_exists('product_category_id', $update)
             ? $update['product_category_id']
             : $product->product_category_id;
+
+        // Reject attempts to flag a product with no category — those flags
+        // would just be inert (no /encyclopedia or /products card scoped
+        // to "no category"), which would be a silent VA footgun.
+        if (!$targetCategoryId) {
+            foreach (['is_encyclopedia_thumb', 'is_peptide_thumb'] as $flag) {
+                if (!empty($update[$flag])) {
+                    return redirect()->back()->with('error', 'Pick a category first — thumbnail flags only apply within a category.');
+                }
+            }
+        }
 
         \DB::transaction(function () use ($product, $update, $targetCategoryId) {
             if ($targetCategoryId) {
