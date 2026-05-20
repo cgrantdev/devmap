@@ -239,6 +239,7 @@ class ProductsController extends Controller
             // Accepts numbers (10mg) or blend ratios (5mg/5mg, 50mg/10mg/10mg).
             // Pattern: one or more "Nmg" tokens optionally separated by /.
             'size_mg' => ['sometimes', 'nullable', 'string', 'max:50', 'regex:/^[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?(?:\/[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?)*$/i'],
+            'hidden' => 'sometimes|boolean',
         ]);
 
         // Only update fields that were actually sent (sometimes rule above
@@ -249,6 +250,9 @@ class ProductsController extends Controller
         }
         if ($request->has('size_mg')) {
             $update['size_mg'] = $validated['size_mg'] ?? null;
+        }
+        if ($request->has('hidden')) {
+            $update['hidden'] = (bool) $validated['hidden'];
         }
 
         if (!empty($update)) {

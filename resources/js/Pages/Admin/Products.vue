@@ -92,17 +92,20 @@
             </td>
             <td class="px-5 py-3.5" @click.stop>
               <select
-                :value="product.category_id || ''"
-                @change="updateField(product.id, 'product_category_id', $event.target.value || null)"
+                :value="product.hidden ? '__hidden__' : (product.category_id || '')"
+                @change="onCategoryChange(product, $event.target.value)"
                 :class="[
                   'w-full px-2 py-1.5 text-[12px] border rounded bg-white transition-colors focus:outline-none focus:ring-1',
-                  !product.category_id
-                    ? 'border-rose-300 text-rose-700 focus:ring-rose-300 bg-rose-50'
-                    : 'border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] focus:ring-[color:var(--color-accent-400)]'
+                  product.hidden
+                    ? 'border-slate-400 text-slate-700 bg-slate-100 focus:ring-slate-400'
+                    : (!product.category_id
+                        ? 'border-rose-300 text-rose-700 focus:ring-rose-300 bg-rose-50'
+                        : 'border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] focus:ring-[color:var(--color-accent-400)]')
                 ]"
-                :title="!product.category_id ? 'No category — assign one' : 'Change category'"
+                :title="product.hidden ? 'Hidden from public site' : (!product.category_id ? 'No category — assign one' : 'Change category')"
               >
                 <option value="">— Uncategorized —</option>
+                <option value="__hidden__">🚫 Hide from site</option>
                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">
                   {{ cat.name }}
                 </option>
@@ -236,6 +239,28 @@ function updateField(productId, field, value) {
     [field]: value,
     _token: usePage().props.csrf_token,
   }, {
+    preserveScroll: true,
+    preserveState: true,
+  })
+}
+
+/**
+ * Category-dropdown change handler with one special value:
+ *   '__hidden__' → flip the product's `hidden` flag on so it stops
+ *                  appearing on the public site. Category is left
+ *                  untouched so unhiding later restores the original.
+ * Any other value (including '' / a real category id) sets the
+ * category and unhides the product in one PATCH.
+ */
+function onCategoryChange(product, value) {
+  const payload = { _token: usePage().props.csrf_token }
+  if (value === '__hidden__') {
+    payload.hidden = true
+  } else {
+    payload.product_category_id = value || null
+    if (product.hidden) payload.hidden = false
+  }
+  router.patch(`/admin/products/${product.id}/quick-update`, payload, {
     preserveScroll: true,
     preserveState: true,
   })
