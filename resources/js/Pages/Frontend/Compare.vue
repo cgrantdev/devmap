@@ -162,7 +162,17 @@
                   </td>
                   <!-- Product -->
                   <td class="px-5 py-4 text-[color:var(--color-ink-muted)]">
-                    <span class="line-clamp-1">{{ product.name }}</span>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="line-clamp-1">{{ product.name }}</span>
+                      <span
+                        v-if="product.product_type === 'Capsule'"
+                        class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800 border border-blue-200"
+                      >Capsule</span>
+                      <span
+                        v-else-if="product.product_type === 'Nasal Spray'"
+                        class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200"
+                      >Nasal Spray</span>
+                    </div>
                     <span v-if="product.size_mg" class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)]">
                       {{ formatSize(product.size_mg) }}
                     </span>

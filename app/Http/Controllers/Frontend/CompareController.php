@@ -75,6 +75,15 @@ class CompareController extends Controller
             $products = Product::visible()
                 ->where('status', 'active')
                 ->where('product_category_id', $category->id)
+                // Hide $0 / unpriced rows — they distort the price comparison
+                // and usually indicate a stale import or a parent variable
+                // product that didn't get its price resolved.
+                ->where(function ($q) {
+                    $q->where('discount_price', '>', 0)
+                      ->orWhere(function ($qq) {
+                          $qq->whereNull('discount_price')->where('price', '>', 0);
+                      });
+                })
                 ->with('brand')
                 ->orderByRaw('COALESCE(discount_price, price) ASC')
                 ->get()
