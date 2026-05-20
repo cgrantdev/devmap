@@ -752,7 +752,26 @@ class VendorsController extends Controller
     public function adminProducts(Request $request)
     {
         $query = \App\Models\Product::with(['brand', 'category']);
-        
+
+        // Tab filter: live products (default) vs hidden bucket.
+        // Hidden products are kept around (not deleted) but separated so they
+        // don't clutter the main triage view. ?tab=hidden flips the view.
+        $tab = $request->get('tab', 'live');
+        if ($tab === 'hidden') {
+            $query->where('hidden', true);
+        } else {
+            $query->where(function ($q) {
+                $q->where('hidden', false)->orWhereNull('hidden');
+            });
+        }
+
+        // Counts for the tab badges — computed before brand/category/missing
+        // filters so the badges always show the total in each bucket.
+        $liveCount = \App\Models\Product::where(function ($q) {
+            $q->where('hidden', false)->orWhereNull('hidden');
+        })->count();
+        $hiddenCount = \App\Models\Product::where('hidden', true)->count();
+
         // Filter by brand
         if ($request->has('brand') && $request->brand && $request->brand !== 'all') {
             $query->where('brand_id', $request->brand);
@@ -883,7 +902,10 @@ class VendorsController extends Controller
         return \Inertia\Inertia::render('Admin/Products', [
             'products' => $products,
             'brands' => $brands,
-            'categories' => $categories
+            'categories' => $categories,
+            'tab' => $tab,
+            'live_count' => $liveCount,
+            'hidden_count' => $hiddenCount,
         ]);
     }
 

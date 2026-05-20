@@ -17,6 +17,36 @@
       {{ $page.props.flash.success }}
     </div>
 
+    <!-- Live / Hidden tabs -->
+    <div class="mb-4 border-b border-[color:var(--color-hairline)] flex items-center gap-1">
+      <button
+        type="button"
+        @click="setTab('live')"
+        :class="[
+          'relative h-10 px-4 text-[13px] font-semibold flex items-center gap-2 transition-colors',
+          activeTab === 'live'
+            ? 'text-[color:var(--color-ink)] border-b-2 border-[color:var(--color-accent-600)] -mb-px'
+            : 'text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)]'
+        ]"
+      >
+        Live
+        <span :class="['inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[11px] rounded-full', activeTab === 'live' ? 'bg-[color:var(--color-accent-100)] text-[color:var(--color-accent-700)]' : 'bg-[color:var(--color-hairline-soft)] text-[color:var(--color-ink-subtle)]']">{{ liveCount }}</span>
+      </button>
+      <button
+        type="button"
+        @click="setTab('hidden')"
+        :class="[
+          'relative h-10 px-4 text-[13px] font-semibold flex items-center gap-2 transition-colors',
+          activeTab === 'hidden'
+            ? 'text-[color:var(--color-ink)] border-b-2 border-slate-700 -mb-px'
+            : 'text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)]'
+        ]"
+      >
+        🚫 Hidden
+        <span :class="['inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[11px] rounded-full', activeTab === 'hidden' ? 'bg-slate-200 text-slate-800' : 'bg-[color:var(--color-hairline-soft)] text-[color:var(--color-ink-subtle)]']">{{ hiddenCount }}</span>
+      </button>
+    </div>
+
     <!-- Filters -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
       <!-- Search -->
@@ -240,7 +270,21 @@ const props = defineProps({
   products: { type: Object, default: () => ({ data: [], total: 0 }) },
   brands: { type: Array, default: () => [] },
   categories: { type: Array, default: () => [] },
+  tab: { type: String, default: 'live' },
+  live_count: { type: Number, default: 0 },
+  hidden_count: { type: Number, default: 0 },
 })
+
+const activeTab = ref(props.tab || 'live')
+const liveCount = computed(() => props.live_count)
+const hiddenCount = computed(() => props.hidden_count)
+
+function setTab(tab) {
+  if (activeTab.value === tab) return
+  activeTab.value = tab
+  clearSelection()
+  fetchData(1)
+}
 
 const searchValue = ref('')
 const filterBrand = ref('all')
@@ -423,6 +467,7 @@ function fetchData(page = props.products?.current_page || 1) {
   router.get('/admin/products', {
     page,
     per_page: props.products?.per_page || 20,
+    tab: activeTab.value,
     search: searchValue.value || null,
     brand: filterBrand.value !== 'all' ? filterBrand.value : null,
     category: filterCategory.value !== 'all' ? filterCategory.value : null,
