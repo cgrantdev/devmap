@@ -127,18 +127,18 @@ class Product extends Model
      * Derived display name based on the curated category + type + size.
      *
      * Format:
-     *   {Category Name} ({size})                — for Peptide (default) or unset
-     *   {Category Name} ({size} Capsule)        — for Capsule type
-     *   {Category Name} ({size} Nasal Spray)    — for Nasal Spray type
+     *   {Category Name} ({size})                 — Peptide (default) or unset
+     *   {Category Name} ({size}) | Capsule       — Capsule type
+     *   {Category Name} ({size}) | Nasal Spray   — Nasal Spray type
      *
      * Falls back to the imported `name` if category or size is missing,
      * so half-triaged rows don't render as nameless garbage.
      *
      * Examples:
-     *   DSIP + 5mg + Peptide      → "DSIP (5mg)"
-     *   BPC-157 + 10mg + Peptide  → "BPC-157 (10mg)"
-     *   Semax + 10mg + Nasal Spray → "Semax (10mg Nasal Spray)"
-     *   NAD+ + 500mg + Capsule    → "NAD+ (500mg Capsule)"
+     *   DSIP + 5mg + Peptide       → "DSIP (5mg)"
+     *   BPC-157 + 10mg + Peptide   → "BPC-157 (10mg)"
+     *   Semax + 10mg + Nasal Spray → "Semax (10mg) | Nasal Spray"
+     *   NAD+ + 500mg + Capsule     → "NAD+ (500mg) | Capsule"
      */
     public function getDisplayNameAttribute(): string
     {
@@ -158,13 +158,16 @@ class Product extends Model
             $size .= 'mg';
         }
 
-        // Only Capsule + Nasal Spray render the type tag. Peptide is the
-        // default and "Other" doesn't add information.
+        // Base: "{Category} ({size})". Only Capsule + Nasal Spray append the
+        // pipe-separated type suffix; Peptide is the implicit default and
+        // "Other" wouldn't add useful info.
+        $base = "{$categoryName} ({$size})";
         $type = $this->product_type;
-        $tag = ($type === 'Capsule' || $type === 'Nasal Spray')
-            ? "{$size} {$type}"
-            : $size;
 
-        return "{$categoryName} ({$tag})";
+        if ($type === 'Capsule' || $type === 'Nasal Spray') {
+            return "{$base} | {$type}";
+        }
+
+        return $base;
     }
 }
