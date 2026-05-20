@@ -62,23 +62,41 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($isVendorSignup) {
                 $target = $host === 'join.peptidemap.com' ? '/' : '/become-a-vendor';
-                return redirect($target)->with(
+                if ($request->hasSession()) {
+                    $request->session()->regenerateToken();
+                }
+                $request->session()->flash(
                     'csrf_expired',
                     'Your session timed out. Please re-enter your password to complete registration — the rest of your details are saved.'
                 );
+                if ($request->header('X-Inertia')) {
+                    return response('', 409, ['X-Inertia-Location' => $target]);
+                }
+                return redirect($target);
             }
 
             // Admin + vendor dashboard actions: bounce back to the referring
-            // page (or the section index) with a flash so the user just sees
-            // a brief "session refreshed, try again" instead of the raw 419.
+            // page with a flash. Inertia requests don't follow plain 302s, so
+            // for them we return 409 with X-Inertia-Location — Inertia treats
+            // that as 'hard navigate to this URL'.
             if (str_starts_with($path, 'admin/') || $path === 'admin' ||
                 str_starts_with($path, 'vendor/') || $path === 'vendor') {
                 $referer = $request->headers->get('referer');
                 $target = $referer ?: '/' . ($path ? explode('/', $path)[0] : 'admin');
-                return redirect($target)->with(
-                    'error',
-                    'Your session refreshed — please try that action again.'
-                );
+
+                // Always regenerate the session token so the next request from
+                // the refreshed page has a valid CSRF pair.
+                if ($request->hasSession()) {
+                    $request->session()->regenerateToken();
+                }
+
+                $request->session()->flash('error', 'Your session refreshed — please try that action again.');
+
+                if ($request->header('X-Inertia')) {
+                    return response('', 409, ['X-Inertia-Location' => $target]);
+                }
+
+                return redirect($target);
             }
 
             return null; // default 419 page elsewhere
