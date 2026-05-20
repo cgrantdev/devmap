@@ -125,10 +125,24 @@
         <!-- MARKETING TAB -->
         <div v-show="activeTab === 'marketing'">
           <FormSection title="Coupon & Affiliate" :columns="2">
-            <FormField label="Coupon Code">
+            <FormField label="Coupon Code" hint="Promo code visitors will use at this vendor's checkout">
               <input v-model="editForm.coupon_code" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] ui-mono focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
             </FormField>
-            <FormField label="Banner Image URL">
+            <FormField label="Discount %" hint="What the coupon takes off retail. Drives the 'PeptideMap Price' shown across the site.">
+              <div class="relative">
+                <input
+                  v-model.number="editForm.coupon_discount_percent"
+                  type="number"
+                  min="0"
+                  max="99"
+                  step="0.5"
+                  placeholder="e.g. 15"
+                  class="w-full h-10 pl-3 pr-8 text-sm border border-[color:var(--color-hairline)] ui-mono focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
+                />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[color:var(--color-ink-subtle)] pointer-events-none">%</span>
+              </div>
+            </FormField>
+            <FormField label="Banner Image URL" class="md:col-span-2">
               <input v-model="editForm.banner_image_url" type="url" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
             </FormField>
           </FormSection>
@@ -408,6 +422,7 @@ const editForm = useForm({
   shop_url: props.vendor?.settings?.shop_url || '',
   founded_year: props.vendor?.settings?.founded_year || null,
   coupon_code: props.vendor?.settings?.coupon_code || '',
+  coupon_discount_percent: props.vendor?.settings?.coupon_discount_percent ?? null,
   shipping_info: props.vendor?.settings?.shipping_info || '',
   return_policy: props.vendor?.settings?.return_policy || '',
   business_hours: props.vendor?.settings?.business_hours || '',
@@ -439,6 +454,7 @@ watch(() => props.vendor, (newVendor) => {
     editForm.shop_url = newVendor.settings?.shop_url || ''
     editForm.founded_year = newVendor.settings?.founded_year || null
     editForm.coupon_code = newVendor.settings?.coupon_code || ''
+    editForm.coupon_discount_percent = newVendor.settings?.coupon_discount_percent ?? null
     editForm.shipping_info = newVendor.settings?.shipping_info || ''
     editForm.return_policy = newVendor.settings?.return_policy || ''
     editForm.business_hours = newVendor.settings?.business_hours || ''

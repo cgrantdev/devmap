@@ -94,7 +94,7 @@ class SearchController extends Controller
 
             // Search Products
             if ($tab === 'all' || $tab === 'products') {
-                $productsQuery = Product::with(['brand', 'category'])
+                $productsQuery = Product::with(['brand.vendorSetting', 'category'])
                     ->visible()
                     ->where('status', 'active');
 
@@ -124,6 +124,7 @@ class SearchController extends Controller
                         'id' => $product->id,
                         'name' => $product->display_name,
                         'product_type' => $product->product_type,
+                        'brand_discount_percent' => $product->brand_discount_percent,
                         'slug' => $product->slug,
                         'brand_name' => $product->brand ? $product->brand->name : '',
                         'brand_slug' => $product->brand ? $product->brand->slug : '',

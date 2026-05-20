@@ -360,6 +360,7 @@
               :size-mg="product.size_mg"
               :availability="product.availability"
               :product-type="product.product_type"
+              :brand-discount-percent="product.brand_discount_percent"
               :to="`/product/${product.slug}/${product.id}`"
             />
           </div>

@@ -84,7 +84,7 @@ class CompareController extends Controller
                           $qq->whereNull('discount_price')->where('price', '>', 0);
                       });
                 })
-                ->with('brand')
+                ->with('brand.vendorSetting')
                 ->orderByRaw('COALESCE(discount_price, price) ASC')
                 ->get()
                 ->map(function ($product) {
@@ -107,6 +107,10 @@ class CompareController extends Controller
                         'brand_slug' => $product->brand?->slug,
                         'brand_logo' => $product->brand?->vendorSetting?->logo
                             ? asset('storage/' . $product->brand->vendorSetting->logo)
+                            : null,
+                        'brand_coupon_code' => $product->brand?->vendorSetting?->coupon_code,
+                        'brand_discount_percent' => $product->brand?->vendorSetting?->coupon_discount_percent !== null
+                            ? (float) $product->brand->vendorSetting->coupon_discount_percent
                             : null,
                         'size_mg' => $product->size_mg,
                     ];

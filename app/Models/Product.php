@@ -93,7 +93,7 @@ class Product extends Model
     // Always include the derived display_name when the model is serialized
     // (toArray, toJson, Inertia payloads, etc.) so the frontend gets it
     // alongside the original `name`.
-    protected $appends = ['display_name'];
+    protected $appends = ['display_name', 'brand_discount_percent'];
 
     public function scopeVisible($query)
     {
@@ -162,5 +162,27 @@ class Product extends Model
         // (Capsule / Nasal Spray), the frontend renders a colored chip next
         // to the name rather than appending it to the string.
         return "{$categoryName} ({$size})";
+    }
+
+    /**
+     * The vendor's PeptideMap discount percentage, pulled through the brand's
+     * vendor_settings.coupon_discount_percent. Surfaced on every serialized
+     * product so cards / listing pages can compute the "PeptideMap Price"
+     * without an extra controller round-trip.
+     *
+     * Returns null when the brand has no discount configured.
+     * Requires brand.vendorSetting to be eager-loaded; otherwise returns null
+     * rather than firing an N+1 query.
+     */
+    public function getBrandDiscountPercentAttribute(): ?float
+    {
+        if (!$this->relationLoaded('brand') || !$this->brand) {
+            return null;
+        }
+        if (!$this->brand->relationLoaded('vendorSetting') || !$this->brand->vendorSetting) {
+            return null;
+        }
+        $pct = $this->brand->vendorSetting->coupon_discount_percent;
+        return $pct !== null ? (float) $pct : null;
     }
 }

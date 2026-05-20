@@ -112,6 +112,9 @@ class VendorsController extends Controller
                         'phone_number' => $brand->vendorSetting->phone_number ?? null,
                         'founded_year' => $brand->vendorSetting->founded_year ?? null,
                         'coupon_code' => $brand->vendorSetting->coupon_code ?? null,
+                        'coupon_discount_percent' => $brand->vendorSetting->coupon_discount_percent !== null
+                            ? (float) $brand->vendorSetting->coupon_discount_percent
+                            : null,
                         'shipping_info' => $brand->vendorSetting->shipping_info ?? null,
                         'return_policy' => $brand->vendorSetting->return_policy ?? null,
                         'business_hours' => $brand->vendorSetting->business_hours ?? null,
@@ -213,6 +216,7 @@ class VendorsController extends Controller
             'location' => 'required|string|max:255',
             'founded_year' => 'nullable|integer|min:1800|max:' . date('Y'),
             'coupon_code' => 'nullable|string|max:50',
+            'coupon_discount_percent' => 'nullable|numeric|min:0|max:99',
             'shipping_info' => 'nullable|string|max:2000',
             'return_policy' => 'nullable|string|max:2000',
             'business_hours' => 'nullable|string|max:255',
@@ -281,6 +285,7 @@ class VendorsController extends Controller
         
         $settings->founded_year = $validated['founded_year'] ?? null;
         $settings->coupon_code = $validated['coupon_code'] ?? null;
+        $settings->coupon_discount_percent = $validated['coupon_discount_percent'] ?? null;
         $settings->shipping_info = $validated['shipping_info'] ?? null;
         $settings->return_policy = $validated['return_policy'] ?? null;
         $settings->business_hours = $validated['business_hours'] ?? null;
@@ -322,6 +327,9 @@ class VendorsController extends Controller
                 'location_id' => $brand->vendorSetting->location_id,
                 'founded_year' => $brand->vendorSetting->founded_year,
                 'coupon_code' => $brand->vendorSetting->coupon_code,
+                'coupon_discount_percent' => $brand->vendorSetting->coupon_discount_percent !== null
+                    ? (float) $brand->vendorSetting->coupon_discount_percent
+                    : null,
                 'shipping_info' => $brand->vendorSetting->shipping_info,
                 'return_policy' => $brand->vendorSetting->return_policy,
                 'business_hours' => $brand->vendorSetting->business_hours,
@@ -381,6 +389,7 @@ class VendorsController extends Controller
             'location' => 'nullable|string|max:255',
             'founded_year' => 'nullable|integer|min:1800|max:' . date('Y'),
             'coupon_code' => 'nullable|string|max:50',
+            'coupon_discount_percent' => 'nullable|numeric|min:0|max:99',
             'shipping_info' => 'nullable|string|max:2000',
             'return_policy' => 'nullable|string|max:2000',
             'business_hours' => 'nullable|string|max:255',
@@ -473,6 +482,11 @@ class VendorsController extends Controller
         
         $settings->founded_year = $validated['founded_year'] ?? $settings->founded_year;
         $settings->coupon_code = $validated['coupon_code'] ?? $settings->coupon_code;
+        // Use array_key_exists so an explicit null/blank clears the discount
+        // (?? would only assign when the key was absent from the payload).
+        if (array_key_exists('coupon_discount_percent', $validated)) {
+            $settings->coupon_discount_percent = $validated['coupon_discount_percent'];
+        }
         $settings->shipping_info = $validated['shipping_info'] ?? $settings->shipping_info;
         $settings->return_policy = $validated['return_policy'] ?? $settings->return_policy;
         $settings->business_hours = $validated['business_hours'] ?? $settings->business_hours;

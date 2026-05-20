@@ -95,8 +95,16 @@
       </div> -->
 
       <!-- Price -->
-      <div class="text-lg text-gray-900 font-semibold mb-3">
-        ${{ displayPrice }}
+      <div class="mb-3">
+        <template v-if="peptideMapPrice">
+          <div class="text-[10px] uppercase tracking-wide text-gray-500 leading-tight">Retail</div>
+          <div class="text-sm text-gray-400 line-through leading-tight">${{ displayPrice }}</div>
+          <div class="text-[10px] uppercase tracking-wide text-emerald-700 font-semibold mt-1 leading-tight">PeptideMap Price</div>
+          <div class="text-lg text-emerald-700 font-bold leading-tight">${{ peptideMapPrice }}</div>
+        </template>
+        <div v-else class="text-lg text-gray-900 font-semibold">
+          ${{ displayPrice }}
+        </div>
       </div>
 
       <!-- View Details Button -->
@@ -135,6 +143,7 @@ const props = defineProps({
   availability: { type: String, default: 'in_stock' },
   purity: { type: [String, Number], default: null },
   productType: { type: String, default: null },
+  brandDiscountPercent: { type: [String, Number], default: null },
 })
 
 // Color-coded format chip shown next to the product name. Only Capsule
@@ -218,10 +227,22 @@ const formattedRating = computed(() => {
   return rating.toFixed(1)
 })
 
-// Display price
+// Display price (vendor's listed price — the "retail" reference)
 const displayPrice = computed(() => {
   const price = props.discountPrice || props.price || 0
   return parseFloat(price).toFixed(2)
+})
+
+// PeptideMap Price = retail × (1 − discount%). Null when the vendor has no
+// configured discount or the math comes out non-positive. Renders alongside
+// the (struck-through) retail price when present.
+const peptideMapPrice = computed(() => {
+  const pct = parseFloat(props.brandDiscountPercent)
+  if (!pct || pct <= 0 || pct >= 100) return null
+  const retail = parseFloat(props.discountPrice || props.price || 0)
+  if (!retail || retail <= 0) return null
+  const finalPrice = retail * (1 - pct / 100)
+  return finalPrice.toFixed(2)
 })
 
 // Stock status

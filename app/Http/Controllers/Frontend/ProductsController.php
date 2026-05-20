@@ -320,6 +320,9 @@ class ProductsController extends Controller
                     : null,
                 'shop_url' => $brand->vendorSetting->shop_url ?? null,
                 'discount_code' => $discountCode,
+                'discount_percent' => $brand->vendorSetting?->coupon_discount_percent !== null
+                    ? (float) $brand->vendorSetting->coupon_discount_percent
+                    : null,
             ] : null,
             'relatedProducts' => $relatedProducts,
             'reviews' => $reviews,
@@ -339,7 +342,7 @@ class ProductsController extends Controller
         }
 
         // Start building query for products in this category
-        $query = Product::with(['brand', 'location', 'types', 'puses', 'category'])
+        $query = Product::with(['brand.vendorSetting', 'location', 'types', 'puses', 'category'])
             ->visible()
             ->where('product_category_id', $category->id)
             ->where('status', 'active');
@@ -542,7 +545,7 @@ class ProductsController extends Controller
         $brandId = $brand->id;
 
         // Build query for all products of this brand
-        $query = Product::with(['brand', 'location', 'types', 'puses', 'category'])
+        $query = Product::with(['brand.vendorSetting', 'location', 'types', 'puses', 'category'])
             ->visible()
             ->where('brand_id', $brandId)
             ->where('status', 'active');

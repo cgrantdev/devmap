@@ -244,7 +244,15 @@
                     </span>
                   </div>
                   <div class="flex items-center justify-between pt-3 border-t border-slate-200">
-                    <span class="text-slate-900">${{ Number(product.discount_price || product.price || 0).toFixed(2) }}</span>                    
+                    <template v-if="searchPeptideMapPrice(product)">
+                      <div class="flex flex-col leading-tight">
+                        <span class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Retail</span>
+                        <span class="text-xs text-slate-400 line-through">${{ Number(product.discount_price || product.price || 0).toFixed(2) }}</span>
+                        <span class="text-[10px] uppercase tracking-wide text-emerald-700 font-semibold mt-0.5">PeptideMap</span>
+                        <span class="text-slate-900 font-semibold text-emerald-700">${{ searchPeptideMapPrice(product) }}</span>
+                      </div>
+                    </template>
+                    <span v-else class="text-slate-900">${{ Number(product.discount_price || product.price || 0).toFixed(2) }}</span>
                     <span v-if="product.tag" class="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded">{{ product.tag }}</span>
                   </div>
                 </div>
@@ -399,6 +407,17 @@ const props = defineProps({
     })
   },
 })
+
+// PeptideMap-applied price for a product based on the brand's configured
+// discount %. Returns null when no discount or math degenerates, so the
+// template can fall back to the plain price.
+function searchPeptideMapPrice(product) {
+  const pct = parseFloat(product?.brand_discount_percent)
+  if (!pct || pct <= 0 || pct >= 100) return null
+  const base = parseFloat(product?.discount_price || product?.price || 0)
+  if (!base || base <= 0) return null
+  return (base * (1 - pct / 100)).toFixed(2)
+}
 
 const searchQuery = ref(props.query || '')
 const currentTab = ref(props.tab || 'all')

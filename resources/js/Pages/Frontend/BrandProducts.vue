@@ -142,6 +142,7 @@
                   :rating-average="product.rating_average"
                   :rating-count="product.rating_count"
                   :product-type="product.product_type"
+                  :brand-discount-percent="product.brand_discount_percent"
                   :to="`/product/${product.slug}/${product.id}`"
                 />
               </div>

@@ -181,15 +181,25 @@
                       {{ formatSize(product.size_mg) }}
                     </span>
                   </td>
-                  <!-- Price -->
+                  <!-- Price (Retail + PeptideMap when discount configured) -->
                   <td class="px-5 py-4 text-right">
-                    <div v-if="product.discount_price && product.discount_price < product.price" class="flex flex-col items-end">
-                      <span class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">${{ formatPrice(product.discount_price) }}</span>
-                      <span class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)] line-through">${{ formatPrice(product.price) }}</span>
-                    </div>
-                    <span v-else class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">
-                      ${{ formatPrice(product.price) }}
-                    </span>
+                    <template v-if="peptideMapPriceFor(product)">
+                      <div class="flex flex-col items-end leading-tight">
+                        <span class="text-[9px] uppercase tracking-wide text-[color:var(--color-ink-subtle)] font-semibold">Retail</span>
+                        <span class="ui-mono text-[12px] text-[color:var(--color-ink-subtle)] line-through">${{ formatPrice(effectiveRetail(product)) }}</span>
+                        <span class="text-[9px] uppercase tracking-wide text-emerald-700 font-semibold mt-1">PeptideMap</span>
+                        <span class="ui-mono text-[15px] font-bold text-emerald-700">${{ peptideMapPriceFor(product) }}</span>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <div v-if="product.discount_price && product.discount_price < product.price" class="flex flex-col items-end">
+                        <span class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">${{ formatPrice(product.discount_price) }}</span>
+                        <span class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)] line-through">${{ formatPrice(product.price) }}</span>
+                      </div>
+                      <span v-else class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">
+                        ${{ formatPrice(product.price) }}
+                      </span>
+                    </template>
                   </td>
                   <!-- Savings -->
                   <td class="px-5 py-4 text-right hidden sm:table-cell">
@@ -294,6 +304,26 @@ function formatPrice(p) {
   if (p === null || p === undefined || p === '') return '—'
   const num = typeof p === 'number' ? p : parseFloat(p)
   return isNaN(num) ? String(p) : num.toFixed(2)
+}
+
+// Vendor's effective retail price — discount_price wins when it's a real
+// vendor-side sale, otherwise the plain list price.
+function effectiveRetail(product) {
+  const dp = parseFloat(product?.discount_price)
+  const p = parseFloat(product?.price)
+  if (!isNaN(dp) && dp > 0 && dp < p) return dp
+  return isNaN(p) ? 0 : p
+}
+
+// PeptideMap-applied price using the vendor's configured discount %.
+// Returns null when no discount is set so the cell falls back to the
+// usual retail-only render.
+function peptideMapPriceFor(product) {
+  const pct = parseFloat(product?.brand_discount_percent)
+  if (!pct || pct <= 0 || pct >= 100) return null
+  const base = effectiveRetail(product)
+  if (!base || base <= 0) return null
+  return (base * (1 - pct / 100)).toFixed(2)
 }
 
 /**

@@ -87,17 +87,28 @@
   
               <!-- Price — monospace, prominent -->
               <div class="mb-6">
-                <div class="flex items-baseline gap-3">
-                  <span class="ui-mono text-4xl font-bold text-[color:var(--color-ink)]">
-                    ${{ product.discount_price || product.price }}
-                  </span>
-                  <span
-                    v-if="product.discount_price && product.discount_price < product.price"
-                    class="ui-mono text-lg text-[color:var(--color-ink-subtle)] line-through"
-                  >
-                    ${{ product.price }}
-                  </span>
-                </div>
+                <template v-if="peptideMapPrice">
+                  <div class="text-[11px] uppercase tracking-wide text-[color:var(--color-ink-subtle)] font-semibold">Retail Price</div>
+                  <div class="ui-mono text-xl text-[color:var(--color-ink-subtle)] line-through">${{ retailPrice }}</div>
+                  <div class="text-[11px] uppercase tracking-wide text-emerald-700 font-semibold mt-2">PeptideMap Price</div>
+                  <div class="flex items-baseline gap-3">
+                    <span class="ui-mono text-4xl font-bold text-emerald-700">${{ peptideMapPrice }}</span>
+                    <span class="ui-mono text-sm text-emerald-700 font-semibold">with code {{ brand?.discount_code || 'PMAP' }}</span>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="flex items-baseline gap-3">
+                    <span class="ui-mono text-4xl font-bold text-[color:var(--color-ink)]">
+                      ${{ product.discount_price || product.price }}
+                    </span>
+                    <span
+                      v-if="product.discount_price && product.discount_price < product.price"
+                      class="ui-mono text-lg text-[color:var(--color-ink-subtle)] line-through"
+                    >
+                      ${{ product.price }}
+                    </span>
+                  </div>
+                </template>
                 <div v-if="product.size_mg" class="ui-mono text-sm text-[color:var(--color-ink-muted)] mt-1">
                   {{ /[a-zA-Z]/.test(String(product.size_mg)) ? product.size_mg : `${product.size_mg}mg` }} vial
                 </div>
@@ -350,6 +361,22 @@ const props = defineProps({
 })
 
 const page = usePage()
+
+// Retail price (vendor's listed price; uses discount_price if vendor's own
+// sale is active). When the brand has a configured PeptideMap discount %,
+// compute and surface the discounted figure as the primary.
+const retailPrice = computed(() => {
+  const base = parseFloat(props.product?.discount_price || props.product?.price || 0)
+  return base.toFixed(2)
+})
+
+const peptideMapPrice = computed(() => {
+  const pct = parseFloat(props.brand?.discount_percent)
+  if (!pct || pct <= 0 || pct >= 100) return null
+  const base = parseFloat(props.product?.discount_price || props.product?.price || 0)
+  if (!base || base <= 0) return null
+  return (base * (1 - pct / 100)).toFixed(2)
+})
 
 // Color-coded format chip next to the title. Mirrors the convention
 // used on ProductCard / ProductSimpleCard for consistency across the

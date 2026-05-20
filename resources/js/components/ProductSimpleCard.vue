@@ -64,9 +64,15 @@
         </div>
   
         <!-- Price -->
-        <div class="text-lg text-gray-900">
-          ${{ displayPrice }}
-        </div>       
+        <div>
+          <template v-if="peptideMapPrice">
+            <div class="text-[10px] uppercase tracking-wide text-gray-500 leading-tight">Retail</div>
+            <div class="text-sm text-gray-400 line-through leading-tight">${{ displayPrice }}</div>
+            <div class="text-[10px] uppercase tracking-wide text-emerald-700 font-semibold mt-1 leading-tight">PeptideMap Price</div>
+            <div class="text-lg text-emerald-700 font-bold leading-tight">${{ peptideMapPrice }}</div>
+          </template>
+          <div v-else class="text-lg text-gray-900">${{ displayPrice }}</div>
+        </div>
       </div>
     </div>
   </template>
@@ -84,6 +90,7 @@
     ratingAverage: { type: [String, Number], default: 0 },
     ratingCount: { type: [String, Number], default: 0 },
     productType: { type: String, default: null },
+    brandDiscountPercent: { type: [String, Number], default: null },
     to: { type: String, required: true },
   })
 
@@ -114,11 +121,21 @@
     return rating.toFixed(1)
   })
   
-  // Display price
+  // Vendor's listed price (retail reference).
   const displayPrice = computed(() => {
     const price = props.discountPrice || props.price || 0
     return parseFloat(price).toFixed(2)
-  }) 
+  })
+
+  // PeptideMap Price = retail × (1 − discount%). Null when no configured
+  // discount or math comes out non-positive — falls back to retail-only.
+  const peptideMapPrice = computed(() => {
+    const pct = parseFloat(props.brandDiscountPercent)
+    if (!pct || pct <= 0 || pct >= 100) return null
+    const retail = parseFloat(props.discountPrice || props.price || 0)
+    if (!retail || retail <= 0) return null
+    return (retail * (1 - pct / 100)).toFixed(2)
+  })
   
   const handleClick = () => {
     router.visit(props.to)

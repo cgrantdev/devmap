@@ -472,6 +472,7 @@ class HomeController extends Controller
                     'id' => $product->id,
                     'name' => $product->display_name,
                     'product_type' => $product->product_type,
+                    'brand_discount_percent' => $product->brand_discount_percent,
                     'image_url' => $imageUrl ?: $placeholder,
                     'url' => '/product/' . ($product->slug ?? 'product') . '/' . $product->id,
                     'brand_name' => $product->brand?->name,
