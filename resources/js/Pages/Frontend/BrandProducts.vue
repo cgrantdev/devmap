@@ -135,12 +135,13 @@
                 <ProductSimpleCard
                   v-for="product in products.data"
                   :key="product.id"
-                  :name="product.name"
+                  :name="product.display_name || product.name"
                   :image-url="product.image_url"
                   :price="product.price"
                   :discount-price="product.discount_price"
                   :rating-average="product.rating_average"
                   :rating-count="product.rating_count"
+                  :product-type="product.product_type"
                   :to="`/product/${product.slug}/${product.id}`"
                 />
               </div>

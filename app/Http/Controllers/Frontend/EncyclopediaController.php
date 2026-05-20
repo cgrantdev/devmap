@@ -453,6 +453,7 @@ class EncyclopediaController extends Controller
                 return [
                     'id' => $product->id,
                     'name' => $product->display_name,
+                    'product_type' => $product->product_type,
                     'slug' => $product->slug,
                     'image_url' => $product->image_url,
                     'price' => $product->price,
@@ -642,6 +643,7 @@ class EncyclopediaController extends Controller
                 return [
                     'id' => $product->id,
                     'name' => $product->display_name,
+                    'product_type' => $product->product_type,
                     'slug' => $product->slug,
                     'image_url' => $product->image_url,
                     'price' => $product->price,

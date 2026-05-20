@@ -39,10 +39,16 @@
   
       <!-- Bottom Section: Product Information -->
       <div class="p-4">  
-        <!-- Product Title -->
-        <h3 class="text-sm text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-          {{ name }}
-        </h3>  
+        <!-- Product Title + Type chip -->
+        <div class="flex items-start gap-1.5 mb-2">
+          <h3 class="text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 min-w-0">
+            {{ name }}
+          </h3>
+          <span
+            v-if="typeChip"
+            :class="['flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold leading-tight mt-0.5', typeChip.classes]"
+          >{{ typeChip.label }}</span>
+        </div>
   
         <!-- Rating -->
         <div class="flex items-center gap-1 mb-2">
@@ -77,7 +83,21 @@
     brandName: { type: String, default: '' },
     ratingAverage: { type: [String, Number], default: 0 },
     ratingCount: { type: [String, Number], default: 0 },
+    productType: { type: String, default: null },
     to: { type: String, required: true },
+  })
+
+  // Color-coded format chip rendered next to the product name. Only
+  // Capsule + Nasal Spray render — Peptide is the implicit default.
+  const typeChip = computed(() => {
+    switch (props.productType) {
+      case 'Capsule':
+        return { label: 'Capsule', classes: 'bg-blue-100 text-blue-800 border border-blue-200' }
+      case 'Nasal Spray':
+        return { label: 'Nasal Spray', classes: 'bg-emerald-100 text-emerald-800 border border-emerald-200' }
+      default:
+        return null
+    }
   })
   
   const hasError = ref(false)

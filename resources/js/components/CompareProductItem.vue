@@ -48,7 +48,13 @@
 
       <!-- Product Info -->
       <div class="flex-1 min-w-0">
-        <h3 class="font-semibold text-gray-900 mb-1 truncate">{{ product.name }}</h3>
+        <div class="flex items-center gap-2 mb-1">
+          <h3 class="font-semibold text-gray-900 truncate">{{ product.name }}</h3>
+          <span
+            v-if="typeChip"
+            :class="['flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold', typeChip.classes]"
+          >{{ typeChip.label }}</span>
+        </div>
         <div class="flex items-center gap-4 text-sm text-gray-600">
           <span v-if="product.brand_name">{{ product.brand_name }}</span>
           <span v-if="product.purity">{{ product.purity }}% purity</span>
@@ -61,7 +67,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   product: {
@@ -71,6 +77,19 @@ const props = defineProps({
   isSelected: {
     type: Boolean,
     default: false
+  }
+})
+
+// Color-coded format chip; Capsule = blue, Nasal Spray = green.
+// Peptide (the default) renders no chip.
+const typeChip = computed(() => {
+  switch (props.product?.product_type) {
+    case 'Capsule':
+      return { label: 'Capsule', classes: 'bg-blue-100 text-blue-800 border border-blue-200' }
+    case 'Nasal Spray':
+      return { label: 'Nasal Spray', classes: 'bg-emerald-100 text-emerald-800 border border-emerald-200' }
+    default:
+      return null
   }
 })
 

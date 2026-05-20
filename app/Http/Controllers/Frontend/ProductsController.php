@@ -138,6 +138,7 @@ class ProductsController extends Controller
                 return [
                     'id' => $p->id,
                     'name' => $p->display_name,
+                    'product_type' => $p->product_type,
                     'slug' => $p->slug,
                     'image_url' => $p->image_url,
                     'price' => $p->price,
@@ -290,6 +291,7 @@ class ProductsController extends Controller
                 'id' => $product->id,
                 'name' => $product->display_name,
                 'original_name' => $product->getRawOriginal('name'),
+                'product_type' => $product->product_type,
                 'slug' => $product->slug,
                 'description' => $product->description,
                 'price' => $product->price,

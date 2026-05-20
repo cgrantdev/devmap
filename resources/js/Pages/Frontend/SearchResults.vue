@@ -215,7 +215,17 @@
                 >
                   <div class="flex items-start justify-between mb-3">
                     <div>
-                      <h3 class="text-slate-900 mb-1">{{ product.name }}</h3>
+                      <div class="flex items-start gap-2 mb-1 flex-wrap">
+                        <h3 class="text-slate-900">{{ product.name }}</h3>
+                        <span
+                          v-if="product.product_type === 'Capsule'"
+                          class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800 border border-blue-200 mt-0.5"
+                        >Capsule</span>
+                        <span
+                          v-else-if="product.product_type === 'Nasal Spray'"
+                          class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 mt-0.5"
+                        >Nasal Spray</span>
+                      </div>
                       <p class="text-sm text-slate-600">{{ product.brand_name }}</p>
                     </div>
                     <span

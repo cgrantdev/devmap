@@ -38,8 +38,14 @@
                 {{ product.category.name }}
               </div>
   
-              <!-- Product Title -->
-              <h1 class="ui-display text-[28px] md:text-3xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ product.name }}</h1>
+              <!-- Product Title + Type chip -->
+              <div class="flex items-start gap-2 mb-2 flex-wrap">
+                <h1 class="ui-display text-[28px] md:text-3xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)]">{{ product.name }}</h1>
+                <span
+                  v-if="productTypeChip"
+                  :class="['inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold mt-2', productTypeChip.classes]"
+                >{{ productTypeChip.label }}</span>
+              </div>
 
               <!-- Trust badges — surfaced from buried features, visible immediately -->
               <div class="flex flex-wrap gap-2 mb-3">
@@ -344,6 +350,20 @@ const props = defineProps({
 })
 
 const page = usePage()
+
+// Color-coded format chip next to the title. Mirrors the convention
+// used on ProductCard / ProductSimpleCard for consistency across the
+// site. Only Capsule + Nasal Spray render — Peptide is implicit.
+const productTypeChip = computed(() => {
+  switch (props.product?.product_type) {
+    case 'Capsule':
+      return { label: 'Capsule', classes: 'bg-blue-100 text-blue-800 border border-blue-200' }
+    case 'Nasal Spray':
+      return { label: 'Nasal Spray', classes: 'bg-emerald-100 text-emerald-800 border border-emerald-200' }
+    default:
+      return null
+  }
+})
 
 // Computed values for reactive SEO updates (automatically from product data)
 const title = computed(() => {

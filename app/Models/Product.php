@@ -158,16 +158,9 @@ class Product extends Model
             $size .= 'mg';
         }
 
-        // Base: "{Category} ({size})". Only Capsule + Nasal Spray append the
-        // pipe-separated type suffix; Peptide is the implicit default and
-        // "Other" wouldn't add useful info.
-        $base = "{$categoryName} ({$size})";
-        $type = $this->product_type;
-
-        if ($type === 'Capsule' || $type === 'Nasal Spray') {
-            return "{$base} | {$type}";
-        }
-
-        return $base;
+        // Always just "{Category} ({size})". When the product type matters
+        // (Capsule / Nasal Spray), the frontend renders a colored chip next
+        // to the name rather than appending it to the string.
+        return "{$categoryName} ({$size})";
     }
 }

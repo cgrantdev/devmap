@@ -170,13 +170,24 @@
                     <span class="text-[13px] font-medium text-[color:var(--color-ink)] truncate max-w-xs" :title="product.name">{{ product.name }}</span>
                   </div>
                   <!-- Derived public display name preview. Only shown when it
-                       differs from the raw import (i.e. category + size are set). -->
+                       differs from the raw import (i.e. category + size are set).
+                       Type renders as a colored chip to mirror the public site. -->
                   <div
                     v-if="product.display_name && product.display_name !== product.name"
-                    class="text-[11px] text-[color:var(--color-accent-600)] truncate max-w-xs mt-0.5"
-                    :title="`Shows on the public site as: ${product.display_name}`"
+                    class="flex items-center gap-1.5 mt-0.5 max-w-xs"
                   >
-                    → {{ product.display_name }}
+                    <span
+                      class="text-[11px] text-[color:var(--color-accent-600)] truncate"
+                      :title="`Shows on the public site as: ${product.display_name}`"
+                    >→ {{ product.display_name }}</span>
+                    <span
+                      v-if="product.product_type === 'Capsule'"
+                      class="flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800 border border-blue-200"
+                    >Capsule</span>
+                    <span
+                      v-else-if="product.product_type === 'Nasal Spray'"
+                      class="flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200"
+                    >Nasal Spray</span>
                   </div>
                 </div>
               </div>

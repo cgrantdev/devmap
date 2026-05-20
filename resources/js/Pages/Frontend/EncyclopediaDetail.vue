@@ -359,6 +359,7 @@
               :category-name="product.category?.name || categoryTag"
               :size-mg="product.size_mg"
               :availability="product.availability"
+              :product-type="product.product_type"
               :to="`/product/${product.slug}/${product.id}`"
             />
           </div>

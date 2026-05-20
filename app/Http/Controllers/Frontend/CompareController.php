@@ -86,6 +86,7 @@ class CompareController extends Controller
                     return [
                         'id' => $product->id,
                         'name' => $product->display_name,
+                        'product_type' => $product->product_type,
                         'slug' => $product->slug,
                         'price' => $product->price,
                         'discount_price' => $product->discount_price,
