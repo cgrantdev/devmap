@@ -614,7 +614,7 @@ function confirmDelete(product) {
 function fetchData(page = props.products?.current_page || 1) {
   router.get('/admin/products', {
     page,
-    per_page: props.products?.per_page || 20,
+    per_page: props.products?.per_page || 100,
     tab: activeTab.value,
     search: searchValue.value || null,
     brand: filterBrand.value !== 'all' ? filterBrand.value : null,

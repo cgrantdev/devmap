@@ -858,7 +858,11 @@ class VendorsController extends Controller
         }
         
         // Pagination
-        $perPage = $request->get('per_page', 20);
+        $perPage = (int) $request->get('per_page', 100);
+        // Cap so a bad ?per_page=99999 can't accidentally load the whole catalog
+        if ($perPage < 1 || $perPage > 500) {
+            $perPage = 100;
+        }
         $products = $query->paginate($perPage)
             ->through(function ($product) {
                 // If discount_price exists, price is original and discount_price is sale price
