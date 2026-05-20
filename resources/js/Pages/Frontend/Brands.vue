@@ -319,35 +319,26 @@ function vendorGradient(name) {
 </script>
 
 <style scoped>
-/* Animated gold border for featured/partner vendors. Goal: unmistakably
-   premium — thick 4px conic-gradient frame with high-contrast amber→gold
-   tones, a soft amber halo, and a slow "breathing" lift on top of the
-   spinning gradient so the card looks alive on the page. */
+/* Animated gold border for featured/partner vendors. Tasteful, not
+   billboard: 2px conic-gradient frame with a subtle amber lift, slow
+   rotation, and a soft drop shadow. No bright halo, no brightness
+   pumping — the gold stays still and just the gradient orientation
+   moves so the eye catches it. */
 .pmap-gold-border {
   position: relative;
-  border: 4px solid transparent;
+  border: 2px solid transparent;
   background:
     linear-gradient(white, white) padding-box,
     conic-gradient(from var(--gold-angle, 0deg),
-      #f59e0b, #fde047, #fbbf24, #fef9c3, #d97706, #fcd34d, #fef3c7, #f59e0b
+      #d97706, #fbbf24, #f59e0b, #fcd34d, #b45309, #fbbf24, #d97706
     ) border-box;
-  animation:
-    pmap-gold-spin 4s linear infinite,
-    pmap-gold-pulse 3s ease-in-out infinite;
-  box-shadow:
-    0 0 0 1px rgba(251, 191, 36, 0.35),
-    0 6px 20px -4px rgba(245, 158, 11, 0.45),
-    0 0 32px -8px rgba(251, 191, 36, 0.5);
+  animation: pmap-gold-spin 6s linear infinite;
+  box-shadow: 0 4px 14px -4px rgba(245, 158, 11, 0.25);
 }
 
 .pmap-gold-border:hover {
-  animation:
-    pmap-gold-spin 1.5s linear infinite,
-    pmap-gold-pulse 3s ease-in-out infinite;
-  box-shadow:
-    0 0 0 1px rgba(251, 191, 36, 0.5),
-    0 10px 28px -4px rgba(245, 158, 11, 0.55),
-    0 0 40px -6px rgba(251, 191, 36, 0.65);
+  animation: pmap-gold-spin 3s linear infinite;
+  box-shadow: 0 6px 18px -4px rgba(245, 158, 11, 0.35);
 }
 
 @property --gold-angle {
@@ -360,25 +351,14 @@ function vendorGradient(name) {
   to { --gold-angle: 360deg; }
 }
 
-/* Breathing halo — alternates the outer glow intensity so the card
-   shimmers without moving. Pairs with the spin to read as "shiny". */
-@keyframes pmap-gold-pulse {
-  0%, 100% {
-    filter: brightness(1) saturate(1);
-  }
-  50% {
-    filter: brightness(1.08) saturate(1.15);
-  }
-}
-
 /* Safari + older browsers that don't support @property fall back to a
-   static thick gold border — still distinctly featured. */
+   static gold border. */
 @supports not (background: conic-gradient(from 0deg, red, blue)) {
   .pmap-gold-border {
-    border: 4px solid #f59e0b;
+    border: 2px solid #d97706;
     background: white;
-    animation: pmap-gold-pulse 3s ease-in-out infinite;
-    box-shadow: 0 6px 20px -4px rgba(245, 158, 11, 0.45);
+    animation: none;
+    box-shadow: 0 4px 14px -4px rgba(245, 158, 11, 0.25);
   }
 }
 

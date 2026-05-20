@@ -153,6 +153,8 @@
               <Pagination
                 v-if="products && products.last_page > 1"
                 :pagination="products"
+                :get-page-url="getPageUrl"
+                :on-per-page-change="handlePerPageChange"
               />
             </section>
             <section>
