@@ -137,7 +137,7 @@ class ProductsController extends Controller
             ->map(function ($p) {
                 return [
                     'id' => $p->id,
-                    'name' => $p->name,
+                    'name' => $p->display_name,
                     'slug' => $p->slug,
                     'image_url' => $p->image_url,
                     'price' => $p->price,
@@ -288,7 +288,8 @@ class ProductsController extends Controller
         return Inertia::render('Frontend/ProductDetail', [
             'product' => [
                 'id' => $product->id,
-                'name' => $product->name,
+                'name' => $product->display_name,
+                'original_name' => $product->getRawOriginal('name'),
                 'slug' => $product->slug,
                 'description' => $product->description,
                 'price' => $product->price,

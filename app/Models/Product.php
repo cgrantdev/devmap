@@ -90,6 +90,11 @@ class Product extends Model
         'auto_update' => 'boolean',
     ];
 
+    // Always include the derived display_name when the model is serialized
+    // (toArray, toJson, Inertia payloads, etc.) so the frontend gets it
+    // alongside the original `name`.
+    protected $appends = ['display_name'];
+
     public function scopeVisible($query)
     {
         return $query->where('hidden', false);
@@ -116,5 +121,50 @@ class Product extends Model
             return $this->price; // price is original, discount_price is sale
         }
         return null;
+    }
+
+    /**
+     * Derived display name based on the curated category + type + size.
+     *
+     * Format:
+     *   {Category Name} ({size})                — for Peptide (default) or unset
+     *   {Category Name} ({size} Capsule)        — for Capsule type
+     *   {Category Name} ({size} Nasal Spray)    — for Nasal Spray type
+     *
+     * Falls back to the imported `name` if category or size is missing,
+     * so half-triaged rows don't render as nameless garbage.
+     *
+     * Examples:
+     *   DSIP + 5mg + Peptide      → "DSIP (5mg)"
+     *   BPC-157 + 10mg + Peptide  → "BPC-157 (10mg)"
+     *   Semax + 10mg + Nasal Spray → "Semax (10mg Nasal Spray)"
+     *   NAD+ + 500mg + Capsule    → "NAD+ (500mg Capsule)"
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        $category = $this->relationLoaded('category') ? $this->category : $this->category()->first();
+        $categoryName = $category ? trim($category->name) : null;
+        $size = $this->size_mg ? trim((string) $this->size_mg) : null;
+
+        // Fall back to the imported name if we don't have enough to build a
+        // clean display name. Better to show the raw import than something
+        // like "(5mg)" with no peptide name.
+        if (!$categoryName || !$size) {
+            return $this->name ?? '';
+        }
+
+        // Normalize size: if it's a bare number, append "mg"
+        if (preg_match('/^\d+(\.\d+)?$/', $size)) {
+            $size .= 'mg';
+        }
+
+        // Only Capsule + Nasal Spray render the type tag. Peptide is the
+        // default and "Other" doesn't add information.
+        $type = $this->product_type;
+        $tag = ($type === 'Capsule' || $type === 'Nasal Spray')
+            ? "{$size} {$type}"
+            : $size;
+
+        return "{$categoryName} ({$tag})";
     }
 }

@@ -122,7 +122,7 @@ class SearchController extends Controller
                     
                     return [
                         'id' => $product->id,
-                        'name' => $product->name,
+                        'name' => $product->display_name,
                         'slug' => $product->slug,
                         'brand_name' => $product->brand ? $product->brand->name : '',
                         'brand_slug' => $product->brand ? $product->brand->slug : '',

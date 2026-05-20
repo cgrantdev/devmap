@@ -855,6 +855,7 @@ class VendorsController extends Controller
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
+                    'display_name' => $product->display_name,
                     'slug' => \Str::slug($product->name),
                     'price' => $salePrice,
                     'original_price' => $originalPrice,

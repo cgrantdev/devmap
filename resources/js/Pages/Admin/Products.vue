@@ -167,7 +167,16 @@
                 </div>
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[13px] font-medium text-[color:var(--color-ink)] truncate max-w-xs">{{ product.name }}</span>
+                    <span class="text-[13px] font-medium text-[color:var(--color-ink)] truncate max-w-xs" :title="product.name">{{ product.name }}</span>
+                  </div>
+                  <!-- Derived public display name preview. Only shown when it
+                       differs from the raw import (i.e. category + size are set). -->
+                  <div
+                    v-if="product.display_name && product.display_name !== product.name"
+                    class="text-[11px] text-[color:var(--color-accent-600)] truncate max-w-xs mt-0.5"
+                    :title="`Shows on the public site as: ${product.display_name}`"
+                  >
+                    → {{ product.display_name }}
                   </div>
                 </div>
               </div>

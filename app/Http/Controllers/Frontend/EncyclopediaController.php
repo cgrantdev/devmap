@@ -452,7 +452,7 @@ class EncyclopediaController extends Controller
             ->map(function ($product) use ($category) {
                 return [
                     'id' => $product->id,
-                    'name' => $product->name,
+                    'name' => $product->display_name,
                     'slug' => $product->slug,
                     'image_url' => $product->image_url,
                     'price' => $product->price,
@@ -641,7 +641,7 @@ class EncyclopediaController extends Controller
             ->map(function ($product) use ($category) {
                 return [
                     'id' => $product->id,
-                    'name' => $product->name,
+                    'name' => $product->display_name,
                     'slug' => $product->slug,
                     'image_url' => $product->image_url,
                     'price' => $product->price,

@@ -470,7 +470,7 @@ class HomeController extends Controller
 
                 return [
                     'id' => $product->id,
-                    'name' => $product->name,
+                    'name' => $product->display_name,
                     'image_url' => $imageUrl ?: $placeholder,
                     'url' => '/product/' . ($product->slug ?? 'product') . '/' . $product->id,
                     'brand_name' => $product->brand?->name,
