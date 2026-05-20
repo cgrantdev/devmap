@@ -222,18 +222,32 @@ class CategoriesController extends Controller
         $category = ProductCategory::withCount('products')->findOrFail($id);
         $categoryName = $category->name;
         $productsCount = $category->products_count;
-        
+
         DB::beginTransaction();
         try {
-            // Delete all products associated with this category
-            Product::where('product_category_id', $category->id)->delete();
-            
-            // Delete the category
+            // Don't destroy the products — just unlink them so they become
+            // "Uncategorized" and can be re-assigned via the admin Products
+            // page. Nuking real product rows when deleting a category was
+            // almost always the wrong default and easy to do by accident.
+            if ($productsCount > 0) {
+                Product::where('product_category_id', $category->id)
+                    ->update(['product_category_id' => null]);
+            }
+
+            // Clean up any aliases that fed into this category so the
+            // auto-matcher doesn't keep trying to assign to a dead FK.
+            DB::table('category_aliases')
+                ->where('product_category_id', $category->id)
+                ->delete();
+
             $category->delete();
-            
+
             DB::commit();
-            
-            $message = "Category '{$categoryName}' and {$productsCount} associated product(s) deleted successfully.";
+
+            $message = "Deleted category '{$categoryName}'."
+                . ($productsCount > 0
+                    ? " {$productsCount} product" . ($productsCount === 1 ? '' : 's') . " set to Uncategorized."
+                    : '');
             return redirect()->route('admin.categories.index')
                 ->with('success', $message);
         } catch (\Exception $e) {

@@ -112,6 +112,30 @@
         </div>
         <p v-else class="text-[13px] text-[color:var(--color-ink-subtle)] py-4">No products in this category.</p>
       </FormSection>
+
+      <!-- Danger zone -->
+      <div v-if="category" class="mt-10 border border-[#FECACA] bg-[#FEF2F2] p-5">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h3 class="text-sm font-semibold text-[#991B1B]">Delete category</h3>
+            <p class="mt-1 text-[13px] text-[#7F1D1D]">
+              Removes "<span class="font-semibold">{{ category.name }}</span>" from the catalog.
+              <template v-if="(products || []).length > 0">
+                The {{ (products || []).length }} product{{ (products || []).length === 1 ? '' : 's' }}
+                currently in this category will be set to Uncategorized — they stay in the system and can be re-assigned later.
+              </template>
+              Any auto-match aliases pointing to this category will also be removed.
+            </p>
+          </div>
+          <button
+            type="button"
+            @click="confirmDelete"
+            class="h-9 px-4 text-[13px] font-semibold text-white bg-[#DC2626] hover:bg-[#B91C1C] flex-shrink-0 transition-colors"
+          >
+            Delete category
+          </button>
+        </div>
+      </div>
     </template>
   </AdminLayout>
 </template>
@@ -154,6 +178,17 @@ const form = useForm({
 })
 
 const aliases = ref(props.aliases || [])
+
+function confirmDelete() {
+  if (!props.category) return
+  const count = (props.products || []).length
+  const productLine = count > 0
+    ? `${count} product${count === 1 ? '' : 's'} currently in this category will be set to Uncategorized (the products themselves stay).`
+    : 'No products are currently assigned to this category.'
+  const msg = `Delete "${props.category.name}"?\n\n${productLine}\n\nThis cannot be undone.`
+  if (!confirm(msg)) return
+  router.delete(`/admin/categories/${props.category.id}`)
+}
 
 function submit() {
   form._token = page.props.csrf_token
