@@ -131,8 +131,11 @@
             <span v-else class="ui-display text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ brand.initials }}</span>
             <span
               v-if="brand.is_partner || brand.featured"
-              class="absolute top-3 right-3 ui-mono text-[9px] uppercase tracking-[0.1em] px-2 py-0.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white font-bold shadow-[0_1px_2px_rgba(0,0,0,0.2)]"
-            >★ Featured</span>
+              class="pmap-featured-pill absolute top-3 right-3 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-white font-bold shadow-[0_2px_8px_rgba(245,158,11,0.5)]"
+            >
+              <span class="text-yellow-100">★</span>
+              <span>Featured</span>
+            </span>
           </div>
 
           <!-- Info -->
@@ -231,7 +234,22 @@ const locationFilters = [
 ]
 
 const sortValue = computed(() => `${props.sort || 'rating'}|${props.sortDir || 'desc'}`)
-const filteredBrands = computed(() => props.brands)
+// Featured / partner vendors float to the top of whatever order the
+// backend sent (search, sort, etc.). Within each tier, original order
+// is preserved (stable sort) so the backend's sort decisions still
+// apply inside the featured bucket and inside the regular bucket.
+const filteredBrands = computed(() => {
+  const items = props.brands.slice()
+  const isFeatured = (b) => !!(b.is_partner || b.featured)
+  return items
+    .map((b, idx) => ({ b, idx }))
+    .sort((a, x) => {
+      const af = isFeatured(a.b), xf = isFeatured(x.b)
+      if (af !== xf) return af ? -1 : 1
+      return a.idx - x.idx
+    })
+    .map(({ b }) => b)
+})
 
 const hasActiveFilters = computed(() =>
   searchQuery.value || selectedFilters.value.location || selectedFilters.value.topVendorsOnly
@@ -301,19 +319,35 @@ function vendorGradient(name) {
 </script>
 
 <style scoped>
-/* Animated gold border for featured/partner vendors. Uses a conic gradient
-   so the gold has visible variation (light/dark amber → champagne) rather
-   than a flat yellow line. Rotates slowly to give it a 'shiny' feel. */
+/* Animated gold border for featured/partner vendors. Goal: unmistakably
+   premium — thick 4px conic-gradient frame with high-contrast amber→gold
+   tones, a soft amber halo, and a slow "breathing" lift on top of the
+   spinning gradient so the card looks alive on the page. */
 .pmap-gold-border {
   position: relative;
-  border: 2px solid transparent;
+  border: 4px solid transparent;
   background:
     linear-gradient(white, white) padding-box,
     conic-gradient(from var(--gold-angle, 0deg),
-      #fbbf24, #fcd34d, #f59e0b, #fde68a, #d97706, #fef3c7, #fbbf24
+      #f59e0b, #fde047, #fbbf24, #fef9c3, #d97706, #fcd34d, #fef3c7, #f59e0b
     ) border-box;
-  animation: pmap-gold-spin 8s linear infinite;
-  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.15), 0 4px 16px -4px rgba(251, 191, 36, 0.25);
+  animation:
+    pmap-gold-spin 4s linear infinite,
+    pmap-gold-pulse 3s ease-in-out infinite;
+  box-shadow:
+    0 0 0 1px rgba(251, 191, 36, 0.35),
+    0 6px 20px -4px rgba(245, 158, 11, 0.45),
+    0 0 32px -8px rgba(251, 191, 36, 0.5);
+}
+
+.pmap-gold-border:hover {
+  animation:
+    pmap-gold-spin 1.5s linear infinite,
+    pmap-gold-pulse 3s ease-in-out infinite;
+  box-shadow:
+    0 0 0 1px rgba(251, 191, 36, 0.5),
+    0 10px 28px -4px rgba(245, 158, 11, 0.55),
+    0 0 40px -6px rgba(251, 191, 36, 0.65);
 }
 
 @property --gold-angle {
@@ -326,18 +360,42 @@ function vendorGradient(name) {
   to { --gold-angle: 360deg; }
 }
 
-/* Safari + older browsers that don't support @property fall back to a
-   static gradient — still gold, just doesn't rotate. */
-@supports not (background: conic-gradient(from 0deg, red, blue)) {
-  .pmap-gold-border {
-    border: 2px solid #fbbf24;
-    background: white;
-    animation: none;
+/* Breathing halo — alternates the outer glow intensity so the card
+   shimmers without moving. Pairs with the spin to read as "shiny". */
+@keyframes pmap-gold-pulse {
+  0%, 100% {
+    filter: brightness(1) saturate(1);
+  }
+  50% {
+    filter: brightness(1.08) saturate(1.15);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* Safari + older browsers that don't support @property fall back to a
+   static thick gold border — still distinctly featured. */
+@supports not (background: conic-gradient(from 0deg, red, blue)) {
   .pmap-gold-border {
+    border: 4px solid #f59e0b;
+    background: white;
+    animation: pmap-gold-pulse 3s ease-in-out infinite;
+    box-shadow: 0 6px 20px -4px rgba(245, 158, 11, 0.45);
+  }
+}
+
+/* Pill gets a continuous shimmer effect — animated gradient background
+   that slides under the text to feel like polished metal. */
+.pmap-featured-pill {
+  background-size: 200% 100%;
+  animation: pmap-pill-shimmer 2.5s ease-in-out infinite;
+}
+@keyframes pmap-pill-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmap-gold-border,
+  .pmap-featured-pill {
     animation: none;
   }
 }
