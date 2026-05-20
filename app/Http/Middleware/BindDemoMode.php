@@ -20,21 +20,22 @@ class BindDemoMode
     public function handle(Request $request, Closure $next)
     {
         $path = $request->path();
-
-        // Admin and the vendor dashboard see all data — no demo filter.
-        // IMPORTANT: match `vendor/` (with slash) not `vendor` — otherwise
-        // the public `/vendors` listing was treated like the dashboard and
-        // demo brands leaked onto every host. Same care for `admin/`.
-        if (
-            $path === 'admin' || str_starts_with($path, 'admin/') ||
-            $path === 'vendor' || str_starts_with($path, 'vendor/')
-        ) {
-            return $next($request);
-        }
-
         $host = $request->getHost();
         $demoMode = $host === 'demo.peptidemap.com';
 
+        // Vendor dashboard routes need to bypass the demo filter so a vendor
+        // can always see their own data regardless of host (a real vendor on
+        // demo.peptidemap.com still needs their dashboard to work).
+        // IMPORTANT: match `vendor/` not `vendor` to avoid matching `vendors`
+        // (the public listing).
+        if ($path === 'vendor' || str_starts_with($path, 'vendor/')) {
+            return $next($request);
+        }
+
+        // Admin routes follow the host rule like everything else:
+        //   dev/peptidemap.com/admin/vendors  → only real brands
+        //   demo.peptidemap.com/admin/vendors → only demo brands
+        // This keeps demo data out of every non-demo surface, including admin.
         app()->instance('demo_mode', $demoMode);
 
         return $next($request);
