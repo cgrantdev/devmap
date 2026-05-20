@@ -178,7 +178,7 @@
                        block the row's click target. -->
                   <div
                     v-if="product.image_url"
-                    class="pmap-thumb-zoom__preview pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 hidden group-hover/thumb:flex w-56 h-56 bg-white border border-[color:var(--color-hairline)] shadow-2xl rounded-md z-50 items-center justify-center p-2"
+                    class="pmap-thumb-zoom__preview pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 hidden group-hover/thumb:flex w-[28rem] h-[28rem] bg-white border border-[color:var(--color-hairline)] shadow-2xl rounded-md z-50 items-center justify-center p-3"
                   >
                     <img :src="product.image_url" :alt="product.name" class="max-w-full max-h-full object-contain" />
                   </div>
