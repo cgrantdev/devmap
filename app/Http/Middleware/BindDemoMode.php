@@ -21,8 +21,14 @@ class BindDemoMode
     {
         $path = $request->path();
 
-        // Admin routes see all data — no demo filter.
-        if (str_starts_with($path, 'admin') || str_starts_with($path, 'vendor')) {
+        // Admin and the vendor dashboard see all data — no demo filter.
+        // IMPORTANT: match `vendor/` (with slash) not `vendor` — otherwise
+        // the public `/vendors` listing was treated like the dashboard and
+        // demo brands leaked onto every host. Same care for `admin/`.
+        if (
+            $path === 'admin' || str_starts_with($path, 'admin/') ||
+            $path === 'vendor' || str_starts_with($path, 'vendor/')
+        ) {
             return $next($request);
         }
 
