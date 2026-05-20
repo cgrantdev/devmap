@@ -19,12 +19,18 @@
       </div>
     </div>
 
-    <!-- Sticky glass nav -->
+    <!-- Sticky glass nav.
+         Mobile: always a frosted-glass surface so the hamburger + logo
+         have contrast against the (often dark) hero image at page load.
+         Desktop: transparent until scrolled, so the hero can run full-bleed
+         under the nav without the bar feeling heavy. -->
     <header
       :class="[
         'fixed left-0 right-0 z-50 transition-all duration-[200ms] ease-out',
         showNotice ? 'top-9' : 'top-0',
-        scrolled || mobileOpen ? 'bg-white/80 backdrop-blur-xl shadow-[0_1px_2px_rgba(0,0,0,0.03)]' : 'bg-transparent',
+        (scrolled || mobileOpen || showMobileSearch)
+          ? 'bg-white/85 backdrop-blur-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] border-b border-black/[0.04]'
+          : 'bg-white/85 backdrop-blur-xl lg:bg-transparent lg:backdrop-blur-none lg:shadow-none lg:border-b-0',
       ]"
     >
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 h-14 lg:h-16 flex items-center gap-4 lg:gap-8">
@@ -112,30 +118,51 @@
     <Transition name="mobile-nav">
       <div v-if="mobileOpen" class="fixed inset-0 z-40 lg:hidden" @click="mobileOpen = false">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" />
-        <!-- Drawer -->
-        <div class="absolute top-14 right-0 w-72 max-h-[calc(100vh-3.5rem)] bg-white border-l border-[color:var(--color-hairline)] shadow-2xl overflow-y-auto" @click.stop>
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <!-- Drawer — full-height right side, ~85% width capped at 360px -->
+        <div
+          class="absolute top-0 right-0 bottom-0 w-[85%] max-w-[360px] bg-white shadow-2xl flex flex-col"
+          :class="showNotice ? 'pt-9' : 'pt-0'"
+          @click.stop
+        >
+          <!-- Drawer header: logo + close -->
+          <div class="flex-shrink-0 flex items-center justify-between px-5 h-14 border-b border-[color:var(--color-hairline)]">
+            <img :src="'/images/logo.png?v=2'" alt="PeptideMap" class="h-7 brightness-0" />
+            <button
+              @click="mobileOpen = false"
+              class="p-2 -mr-2 rounded-[8px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
+              aria-label="Close menu"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- Search built into the drawer -->
+          <div class="flex-shrink-0 px-5 py-4 border-b border-[color:var(--color-hairline)]">
+            <SearchPalette @navigate="mobileOpen = false" />
+          </div>
+
           <!-- Nav links -->
-          <nav class="px-2 py-3">
+          <nav class="flex-1 overflow-y-auto px-3 py-3">
+            <div class="text-[10px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] px-3 py-2">Browse</div>
             <a
               v-for="link in navLinks"
               :key="link.href"
               :href="link.href"
-              class="flex items-center gap-3 px-4 py-3 rounded-[8px] text-[15px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
+              class="ui-focus flex items-center justify-between px-3 py-3 rounded-[10px] text-[15px] font-medium text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
               @click="mobileOpen = false"
             >
-              {{ link.label }}
+              <span>{{ link.label }}</span>
+              <svg class="w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
             </a>
           </nav>
 
-          <div class="border-t border-[color:var(--color-hairline)] mx-4" />
-
-          <!-- View Admin (staff) / Try Vendor Dashboard (demo) / Get Listed (default) -->
-          <div class="px-4 py-3">
+          <!-- Footer CTA pinned to bottom -->
+          <div class="flex-shrink-0 px-5 py-4 border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
             <a
               v-if="isStaff"
               href="/admin/dashboard"
-              class="flex items-center justify-center gap-2 h-11 text-[15px] font-semibold text-white bg-gradient-to-b from-slate-800 to-slate-900 shadow-sm transition-all"
+              class="ui-focus flex items-center justify-center gap-2 h-11 rounded-[10px] text-[14px] font-semibold text-white bg-gradient-to-b from-slate-800 to-slate-900 shadow-sm transition-all hover:-translate-y-[0.5px]"
               @click="mobileOpen = false"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -144,7 +171,7 @@
             <button
               v-else-if="isDemoHost && !isLoggedIn"
               @click="() => { mobileOpen = false; tryVendorDashboard() }"
-              class="w-full flex items-center justify-center gap-2 h-11 text-[15px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm transition-all"
+              class="ui-focus w-full flex items-center justify-center gap-2 h-11 rounded-[10px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm transition-all hover:-translate-y-[0.5px]"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
               Try Vendor Dashboard
@@ -152,14 +179,13 @@
             <a
               v-else
               href="/become-a-vendor"
-              class="flex items-center justify-center gap-2 h-11 text-[15px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm transition-all"
+              class="ui-focus flex items-center justify-center gap-2 h-11 rounded-[10px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm transition-all hover:-translate-y-[0.5px]"
               @click="mobileOpen = false"
             >
               Get Listed
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
             </a>
           </div>
-
         </div>
       </div>
     </Transition>
