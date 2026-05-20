@@ -125,6 +125,7 @@ class SearchController extends Controller
                         'name' => $product->display_name,
                         'product_type' => $product->product_type,
                         'brand_discount_percent' => $product->brand_discount_percent,
+                        'brand_coupon_code' => $product->brand_coupon_code,
                         'slug' => $product->slug,
                         'brand_name' => $product->brand ? $product->brand->name : '',
                         'brand_slug' => $product->brand ? $product->brand->slug : '',

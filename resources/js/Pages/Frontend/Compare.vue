@@ -115,7 +115,8 @@
                 <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
                   <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendor</th>
                   <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Product</th>
-                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Price</th>
+                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Retail</th>
+                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700 bg-emerald-50/50">Price with code</th>
                   <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden sm:table-cell">Savings</th>
                   <th class="text-right px-5 py-3 w-[100px]"></th>
                 </tr>
@@ -181,25 +182,25 @@
                       {{ formatSize(product.size_mg) }}
                     </span>
                   </td>
-                  <!-- Price (Retail + PeptideMap when discount configured) -->
+                  <!-- Retail price -->
                   <td class="px-5 py-4 text-right">
-                    <template v-if="peptideMapPriceFor(product)">
+                    <div v-if="product.discount_price && product.discount_price < product.price" class="flex flex-col items-end">
+                      <span class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">${{ formatPrice(product.discount_price) }}</span>
+                      <span class="ui-mono text-[11px] text-[color:var(--color-ink)] line-through">${{ formatPrice(product.price) }}</span>
+                    </div>
+                    <span v-else class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">
+                      ${{ formatPrice(product.price) }}
+                    </span>
+                  </td>
+                  <!-- Price with code (separate column; tinted emerald) -->
+                  <td class="px-5 py-4 text-right bg-emerald-50/50">
+                    <template v-if="discountedPriceFor(product)">
                       <div class="flex flex-col items-end leading-tight">
-                        <span class="text-[9px] uppercase tracking-wide text-[color:var(--color-ink-subtle)] font-semibold">Retail</span>
-                        <span class="ui-mono text-[12px] text-[color:var(--color-ink-subtle)] line-through">${{ formatPrice(effectiveRetail(product)) }}</span>
-                        <span class="text-[9px] uppercase tracking-wide text-emerald-700 font-semibold mt-1">PeptideMap</span>
-                        <span class="ui-mono text-[15px] font-bold text-emerald-700">${{ peptideMapPriceFor(product) }}</span>
+                        <span class="ui-mono text-[15px] font-bold text-emerald-700">${{ discountedPriceFor(product) }}</span>
+                        <span class="ui-mono text-[10px] text-emerald-700 font-semibold uppercase tracking-wide mt-0.5">{{ couponCodeFor(product) }}</span>
                       </div>
                     </template>
-                    <template v-else>
-                      <div v-if="product.discount_price && product.discount_price < product.price" class="flex flex-col items-end">
-                        <span class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">${{ formatPrice(product.discount_price) }}</span>
-                        <span class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)] line-through">${{ formatPrice(product.price) }}</span>
-                      </div>
-                      <span v-else class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">
-                        ${{ formatPrice(product.price) }}
-                      </span>
-                    </template>
+                    <span v-else class="text-[12px] text-[color:var(--color-ink-subtle)]">—</span>
                   </td>
                   <!-- Savings -->
                   <td class="px-5 py-4 text-right hidden sm:table-cell">
@@ -315,15 +316,21 @@ function effectiveRetail(product) {
   return isNaN(p) ? 0 : p
 }
 
-// PeptideMap-applied price using the vendor's configured discount %.
-// Returns null when no discount is set so the cell falls back to the
-// usual retail-only render.
-function peptideMapPriceFor(product) {
+// Discounted price using the vendor's configured PeptideMap discount %.
+// Returns null when no discount is set so the column shows a dash.
+function discountedPriceFor(product) {
   const pct = parseFloat(product?.brand_discount_percent)
   if (!pct || pct <= 0 || pct >= 100) return null
   const base = effectiveRetail(product)
   if (!base || base <= 0) return null
   return (base * (1 - pct / 100)).toFixed(2)
+}
+
+// Coupon code label for the discounted price column. Falls back to PMAP
+// so the label is never blank when a discount applies.
+function couponCodeFor(product) {
+  const raw = (product?.brand_coupon_code || '').trim()
+  return (raw || 'PMAP').toUpperCase()
 }
 
 /**

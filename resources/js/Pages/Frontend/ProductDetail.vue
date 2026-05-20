@@ -87,14 +87,15 @@
   
               <!-- Price — monospace, prominent -->
               <div class="mb-6">
-                <template v-if="peptideMapPrice">
-                  <div class="text-[11px] uppercase tracking-wide text-[color:var(--color-ink-subtle)] font-semibold">Retail Price</div>
-                  <div class="ui-mono text-xl text-[color:var(--color-ink-subtle)] line-through">${{ retailPrice }}</div>
-                  <div class="text-[11px] uppercase tracking-wide text-emerald-700 font-semibold mt-2">PeptideMap Price</div>
+                <template v-if="discountedPrice">
                   <div class="flex items-baseline gap-3">
-                    <span class="ui-mono text-4xl font-bold text-emerald-700">${{ peptideMapPrice }}</span>
-                    <span class="ui-mono text-sm text-emerald-700 font-semibold">with code {{ brand?.discount_code || 'PMAP' }}</span>
+                    <span class="text-[12px] uppercase tracking-wide text-[color:var(--color-ink)] font-semibold">Retail</span>
+                    <span class="ui-mono text-xl text-[color:var(--color-ink)] line-through font-medium">${{ retailPrice }}</span>
                   </div>
+                  <div class="text-[12px] uppercase tracking-wide text-emerald-700 font-semibold mt-3">
+                    Price with code <span class="ui-mono">{{ effectiveCouponCode }}</span>
+                  </div>
+                  <div class="ui-mono text-4xl font-bold text-emerald-700 leading-tight">${{ discountedPrice }}</div>
                 </template>
                 <template v-else>
                   <div class="flex items-baseline gap-3">
@@ -370,12 +371,18 @@ const retailPrice = computed(() => {
   return base.toFixed(2)
 })
 
-const peptideMapPrice = computed(() => {
+const discountedPrice = computed(() => {
   const pct = parseFloat(props.brand?.discount_percent)
   if (!pct || pct <= 0 || pct >= 100) return null
   const base = parseFloat(props.product?.discount_price || props.product?.price || 0)
   if (!base || base <= 0) return null
   return (base * (1 - pct / 100)).toFixed(2)
+})
+
+// Effective coupon code label — vendor's code if set, otherwise PMAP.
+const effectiveCouponCode = computed(() => {
+  const raw = (props.brand?.discount_code || '').trim()
+  return (raw || 'PMAP').toUpperCase()
 })
 
 // Color-coded format chip next to the title. Mirrors the convention

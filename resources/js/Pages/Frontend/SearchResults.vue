@@ -244,12 +244,16 @@
                     </span>
                   </div>
                   <div class="flex items-center justify-between pt-3 border-t border-slate-200">
-                    <template v-if="searchPeptideMapPrice(product)">
+                    <template v-if="discountedPriceFor(product)">
                       <div class="flex flex-col leading-tight">
-                        <span class="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">Retail</span>
-                        <span class="text-xs text-slate-400 line-through">${{ Number(product.discount_price || product.price || 0).toFixed(2) }}</span>
-                        <span class="text-[10px] uppercase tracking-wide text-emerald-700 font-semibold mt-0.5">PeptideMap</span>
-                        <span class="text-slate-900 font-semibold text-emerald-700">${{ searchPeptideMapPrice(product) }}</span>
+                        <div class="flex items-baseline gap-1.5">
+                          <span class="text-[10px] uppercase tracking-wide text-slate-700 font-semibold">Retail</span>
+                          <span class="text-sm text-slate-700 line-through">${{ Number(product.discount_price || product.price || 0).toFixed(2) }}</span>
+                        </div>
+                        <span class="text-[10px] uppercase tracking-wide text-emerald-700 font-semibold mt-1">
+                          Price with code <span class="ui-mono">{{ couponCodeFor(product) }}</span>
+                        </span>
+                        <span class="text-emerald-700 font-bold">${{ discountedPriceFor(product) }}</span>
                       </div>
                     </template>
                     <span v-else class="text-slate-900">${{ Number(product.discount_price || product.price || 0).toFixed(2) }}</span>
@@ -408,15 +412,20 @@ const props = defineProps({
   },
 })
 
-// PeptideMap-applied price for a product based on the brand's configured
-// discount %. Returns null when no discount or math degenerates, so the
-// template can fall back to the plain price.
-function searchPeptideMapPrice(product) {
+// Discounted price for the product based on the brand's PeptideMap %.
+// Null = no discount configured, so the template falls back to plain price.
+function discountedPriceFor(product) {
   const pct = parseFloat(product?.brand_discount_percent)
   if (!pct || pct <= 0 || pct >= 100) return null
   const base = parseFloat(product?.discount_price || product?.price || 0)
   if (!base || base <= 0) return null
   return (base * (1 - pct / 100)).toFixed(2)
+}
+
+// Coupon label — vendor's code uppercased, defaults to PMAP.
+function couponCodeFor(product) {
+  const raw = (product?.brand_coupon_code || '').trim()
+  return (raw || 'PMAP').toUpperCase()
 }
 
 const searchQuery = ref(props.query || '')

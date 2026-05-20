@@ -93,7 +93,7 @@ class Product extends Model
     // Always include the derived display_name when the model is serialized
     // (toArray, toJson, Inertia payloads, etc.) so the frontend gets it
     // alongside the original `name`.
-    protected $appends = ['display_name', 'brand_discount_percent'];
+    protected $appends = ['display_name', 'brand_discount_percent', 'brand_coupon_code'];
 
     public function scopeVisible($query)
     {
@@ -184,5 +184,21 @@ class Product extends Model
         }
         $pct = $this->brand->vendorSetting->coupon_discount_percent;
         return $pct !== null ? (float) $pct : null;
+    }
+
+    /**
+     * Sibling to brand_discount_percent: the vendor's coupon code. Used by
+     * frontend cards/pages to label the discounted price as "Price with
+     * code XYZ". Same eager-load requirements (brand.vendorSetting).
+     */
+    public function getBrandCouponCodeAttribute(): ?string
+    {
+        if (!$this->relationLoaded('brand') || !$this->brand) {
+            return null;
+        }
+        if (!$this->brand->relationLoaded('vendorSetting') || !$this->brand->vendorSetting) {
+            return null;
+        }
+        return $this->brand->vendorSetting->coupon_code ?: null;
     }
 }

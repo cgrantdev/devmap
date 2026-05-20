@@ -96,11 +96,15 @@
 
       <!-- Price -->
       <div class="mb-3">
-        <template v-if="peptideMapPrice">
-          <div class="text-[10px] uppercase tracking-wide text-gray-500 leading-tight">Retail</div>
-          <div class="text-sm text-gray-400 line-through leading-tight">${{ displayPrice }}</div>
-          <div class="text-[10px] uppercase tracking-wide text-emerald-700 font-semibold mt-1 leading-tight">PeptideMap Price</div>
-          <div class="text-lg text-emerald-700 font-bold leading-tight">${{ peptideMapPrice }}</div>
+        <template v-if="discountedPrice">
+          <div class="flex items-baseline gap-2">
+            <span class="text-[11px] uppercase tracking-wide text-gray-700 font-semibold leading-tight">Retail</span>
+            <span class="text-base text-gray-700 line-through leading-tight">${{ displayPrice }}</span>
+          </div>
+          <div class="text-[11px] uppercase tracking-wide text-emerald-700 font-semibold mt-1.5 leading-tight">
+            Price with code <span class="ui-mono">{{ effectiveCouponCode }}</span>
+          </div>
+          <div class="text-xl text-emerald-700 font-bold leading-tight">${{ discountedPrice }}</div>
         </template>
         <div v-else class="text-lg text-gray-900 font-semibold">
           ${{ displayPrice }}
@@ -144,6 +148,7 @@ const props = defineProps({
   purity: { type: [String, Number], default: null },
   productType: { type: String, default: null },
   brandDiscountPercent: { type: [String, Number], default: null },
+  brandCouponCode: { type: String, default: null },
 })
 
 // Color-coded format chip shown next to the product name. Only Capsule
@@ -233,16 +238,21 @@ const displayPrice = computed(() => {
   return parseFloat(price).toFixed(2)
 })
 
-// PeptideMap Price = retail × (1 − discount%). Null when the vendor has no
-// configured discount or the math comes out non-positive. Renders alongside
-// the (struck-through) retail price when present.
-const peptideMapPrice = computed(() => {
+// Effective coupon code shown on the label — falls back to PMAP if the
+// brand hasn't set one. Always upper-cased for visual consistency.
+const effectiveCouponCode = computed(() => {
+  const raw = (props.brandCouponCode || '').trim()
+  return (raw || 'PMAP').toUpperCase()
+})
+
+// Discounted price = retail × (1 − discount%). Null when no discount or
+// math degenerates — card then falls back to plain retail price.
+const discountedPrice = computed(() => {
   const pct = parseFloat(props.brandDiscountPercent)
   if (!pct || pct <= 0 || pct >= 100) return null
   const retail = parseFloat(props.discountPrice || props.price || 0)
   if (!retail || retail <= 0) return null
-  const finalPrice = retail * (1 - pct / 100)
-  return finalPrice.toFixed(2)
+  return (retail * (1 - pct / 100)).toFixed(2)
 })
 
 // Stock status
