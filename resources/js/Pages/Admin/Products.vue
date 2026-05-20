@@ -188,6 +188,10 @@
                       v-else-if="product.product_type === 'Nasal Spray'"
                       class="flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200"
                     >Nasal Spray</span>
+                    <span
+                      v-else-if="product.product_type === 'Kit'"
+                      class="flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200"
+                    >Kit</span>
                   </div>
                 </div>
               </div>
@@ -344,7 +348,7 @@ const filterMissing = ref('all')
 // Product formats (vial, capsule, nasal spray, other). Stored as a
 // free-text varchar but constrained to this list both in the inline
 // dropdown and in the controller's `in:` validation rule.
-const typeOptions = ['Peptide', 'Capsule', 'Nasal Spray', 'Other']
+const typeOptions = ['Peptide', 'Capsule', 'Nasal Spray', 'Kit', 'Other']
 
 // Common research peptide vial sizes + blend ratios.
 // Each option is the literal string stored in size_mg.

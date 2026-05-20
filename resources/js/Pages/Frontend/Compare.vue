@@ -172,6 +172,10 @@
                         v-else-if="product.product_type === 'Nasal Spray'"
                         class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200"
                       >Nasal Spray</span>
+                      <span
+                        v-else-if="product.product_type === 'Kit'"
+                        class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200"
+                      >Kit</span>
                     </div>
                     <span v-if="product.size_mg" class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)]">
                       {{ formatSize(product.size_mg) }}

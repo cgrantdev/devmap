@@ -225,6 +225,10 @@
                           v-else-if="product.product_type === 'Nasal Spray'"
                           class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 mt-0.5"
                         >Nasal Spray</span>
+                        <span
+                          v-else-if="product.product_type === 'Kit'"
+                          class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200 mt-0.5"
+                        >Kit</span>
                       </div>
                       <p class="text-sm text-slate-600">{{ product.brand_name }}</p>
                     </div>
