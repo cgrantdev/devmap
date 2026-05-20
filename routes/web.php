@@ -223,6 +223,10 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     Route::put('/products/{id}', [AdminProductsController::class, 'update'])->name('admin.products.update');
     Route::patch('/products/{id}/hidden', [AdminProductsController::class, 'setHidden'])->name('admin.products.hidden');
     Route::patch('/products/{id}/auto-update', [AdminProductsController::class, 'setAutoUpdate'])->name('admin.products.auto-update');
+    // Bulk endpoints MUST be declared before the wildcard {id} routes below,
+    // otherwise Laravel will match /products/bulk-delete as DELETE /products/{id="bulk-delete"}.
+    Route::patch('/products/bulk-update', [AdminProductsController::class, 'bulkUpdate'])->name('admin.products.bulk-update');
+    Route::delete('/products/bulk-delete', [AdminProductsController::class, 'bulkDelete'])->name('admin.products.bulk-delete');
     Route::patch('/products/{id}/quick-update', [AdminProductsController::class, 'quickUpdate'])->name('admin.products.quick-update');
     Route::delete('/products/{id}', [AdminProductsController::class, 'destroy'])->name('admin.products.destroy');
     

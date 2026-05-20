@@ -52,11 +52,51 @@
       </select>
     </div>
 
+    <!-- Bulk-action bar — slides in when at least one row is selected -->
+    <div
+      v-if="selectedIds.length > 0"
+      class="mb-3 flex flex-wrap items-center gap-3 px-4 py-2.5 bg-[color:var(--color-accent-50)] border border-[color:var(--color-accent-300)] rounded"
+    >
+      <span class="text-[13px] font-semibold text-[color:var(--color-accent-700)]">
+        {{ selectedIds.length }} selected
+      </span>
+      <span class="text-[12px] text-[color:var(--color-ink-muted)]">·</span>
+      <button @click="clearSelection" type="button" class="text-[12px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] underline">
+        Clear
+      </button>
+      <span class="text-[12px] text-[color:var(--color-ink-muted)]">·</span>
+      <span class="text-[12px] text-[color:var(--color-ink-muted)]">Apply to selected:</span>
+      <select v-model="bulkCategory" @change="bulkApplyCategory" class="h-8 px-2 text-[12px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none rounded">
+        <option value="">Set category…</option>
+        <option value="__uncategorized__">— Clear category —</option>
+        <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+      </select>
+      <button @click="bulkHide(true)" type="button" :disabled="bulkBusy" class="h-8 px-3 text-[12px] font-semibold text-white bg-slate-700 hover:bg-slate-800 rounded disabled:opacity-50">
+        🚫 Hide from site
+      </button>
+      <button @click="bulkHide(false)" type="button" :disabled="bulkBusy" class="h-8 px-3 text-[12px] font-semibold text-slate-700 border border-slate-300 bg-white hover:bg-slate-50 rounded disabled:opacity-50">
+        Unhide
+      </button>
+      <button @click="bulkDelete" type="button" :disabled="bulkBusy" class="h-8 px-3 text-[12px] font-semibold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded disabled:opacity-50 ml-auto">
+        Delete {{ selectedIds.length }}…
+      </button>
+    </div>
+
     <!-- Table -->
     <div class="bg-white border border-[color:var(--color-hairline)] overflow-hidden">
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+            <th class="px-3 py-3 w-10">
+              <input
+                type="checkbox"
+                :checked="allOnPageSelected"
+                :indeterminate.prop="someOnPageSelected"
+                @change="toggleSelectAllOnPage"
+                class="h-4 w-4 cursor-pointer accent-[color:var(--color-accent-600)]"
+                title="Select all on this page"
+              />
+            </th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Product</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Brand</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] w-52">Category</th>
@@ -72,8 +112,17 @@
             v-for="product in products.data || []"
             :key="product.id"
             class="border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] cursor-pointer transition-colors group"
+            :class="selectedIds.includes(product.id) ? 'bg-[color:var(--color-accent-50)]' : ''"
             @click="router.visit(`/admin/products/${product.id}/edit`)"
           >
+            <td class="px-3 py-3.5 w-10" @click.stop>
+              <input
+                type="checkbox"
+                :value="product.id"
+                v-model="selectedIds"
+                class="h-4 w-4 cursor-pointer accent-[color:var(--color-accent-600)]"
+              />
+            </td>
             <td class="px-5 py-3.5">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 flex-shrink-0 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] overflow-hidden flex items-center justify-center">
@@ -182,7 +231,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import PageHeader from '@/components/admin/PageHeader.vue'
@@ -272,6 +321,94 @@ function handleSearchInput() {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => fetchData(1), 500)
 }
+
+// ---- Bulk-selection state ----------------------------------------------
+const selectedIds = ref([])
+const bulkCategory = ref('')
+const bulkBusy = ref(false)
+
+const visibleIds = computed(() => (props.products?.data || []).map(p => p.id))
+const allOnPageSelected = computed(() =>
+  visibleIds.value.length > 0 && visibleIds.value.every(id => selectedIds.value.includes(id))
+)
+const someOnPageSelected = computed(() =>
+  visibleIds.value.some(id => selectedIds.value.includes(id)) && !allOnPageSelected.value
+)
+
+function toggleSelectAllOnPage(e) {
+  if (e.target.checked) {
+    // Union: keep selections from other pages, add this page's ids
+    const set = new Set([...selectedIds.value, ...visibleIds.value])
+    selectedIds.value = [...set]
+  } else {
+    selectedIds.value = selectedIds.value.filter(id => !visibleIds.value.includes(id))
+  }
+}
+
+function clearSelection() {
+  selectedIds.value = []
+  bulkCategory.value = ''
+}
+
+// When the page of products changes (search/filter/pagination), clear
+// selections so the user doesn't accidentally apply a bulk action to
+// rows they can no longer see.
+watch(() => props.products?.data, () => { clearSelection() })
+
+function bulkApplyCategory() {
+  if (!bulkCategory.value || selectedIds.value.length === 0) return
+  const isClear = bulkCategory.value === '__uncategorized__'
+  const label = isClear
+    ? 'Clear the category on'
+    : `Set the category on`
+  if (!confirm(`${label} ${selectedIds.value.length} product${selectedIds.value.length === 1 ? '' : 's'}?`)) {
+    bulkCategory.value = ''
+    return
+  }
+  bulkBusy.value = true
+  router.patch('/admin/products/bulk-update', {
+    ids: selectedIds.value,
+    product_category_id: isClear ? null : bulkCategory.value,
+    _token: usePage().props.csrf_token,
+  }, {
+    preserveScroll: true,
+    onFinish: () => {
+      bulkBusy.value = false
+      bulkCategory.value = ''
+    },
+  })
+}
+
+function bulkHide(hide) {
+  if (selectedIds.value.length === 0) return
+  const verb = hide ? 'Hide' : 'Unhide'
+  if (!confirm(`${verb} ${selectedIds.value.length} product${selectedIds.value.length === 1 ? '' : 's'}?`)) return
+  bulkBusy.value = true
+  router.patch('/admin/products/bulk-update', {
+    ids: selectedIds.value,
+    hidden: hide,
+    _token: usePage().props.csrf_token,
+  }, {
+    preserveScroll: true,
+    onFinish: () => { bulkBusy.value = false },
+  })
+}
+
+function bulkDelete() {
+  if (selectedIds.value.length === 0) return
+  const n = selectedIds.value.length
+  if (!confirm(`Permanently delete ${n} product${n === 1 ? '' : 's'}?\n\nThis cannot be undone.`)) return
+  bulkBusy.value = true
+  router.delete('/admin/products/bulk-delete', {
+    data: {
+      ids: selectedIds.value,
+      _token: usePage().props.csrf_token,
+    },
+    preserveScroll: true,
+    onFinish: () => { bulkBusy.value = false },
+  })
+}
+// ------------------------------------------------------------------------
 
 function confirmDelete(product) {
   const msg = `Delete "${product.name}"?\n\nThis permanently removes the product and any associated click logs. This cannot be undone.`

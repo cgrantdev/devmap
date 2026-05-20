@@ -261,5 +261,64 @@ class ProductsController extends Controller
 
         return redirect()->back()->with('success', 'Product updated.');
     }
+
+    /**
+     * Bulk update a set of products. Accepts the same shape as quickUpdate
+     * (product_category_id, hidden) but applied to many ids at once.
+     * VA workflow: filter to "Missing Category", select-all, set category.
+     */
+    public function bulkUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1|max:500',
+            'ids.*' => 'integer|exists:products,id',
+            'product_category_id' => 'sometimes|nullable|exists:product_categories,id',
+            'hidden' => 'sometimes|boolean',
+        ]);
+
+        $update = [];
+        if ($request->has('product_category_id')) {
+            $update['product_category_id'] = $validated['product_category_id'] ?? null;
+        }
+        if ($request->has('hidden')) {
+            $update['hidden'] = (bool) $validated['hidden'];
+        }
+
+        if (empty($update)) {
+            return redirect()->back()->with('error', 'No fields provided to update.');
+        }
+
+        $count = Product::whereIn('id', $validated['ids'])->update($update);
+
+        $what = [];
+        if (array_key_exists('product_category_id', $update)) {
+            $what[] = $update['product_category_id'] ? 'category' : 'cleared category';
+        }
+        if (array_key_exists('hidden', $update)) {
+            $what[] = $update['hidden'] ? 'hidden from site' : 'unhidden';
+        }
+        $summary = implode(' + ', $what);
+
+        return redirect()->back()->with('success', "Updated {$count} product" . ($count === 1 ? '' : 's') . " ({$summary}).");
+    }
+
+    /**
+     * Bulk delete: same cascade as destroy() but applied to a list.
+     */
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array|min:1|max:500',
+            'ids.*' => 'integer|exists:products,id',
+        ]);
+
+        $count = 0;
+        \DB::transaction(function () use ($validated, &$count) {
+            \DB::table('product_clicks')->whereIn('product_id', $validated['ids'])->delete();
+            $count = Product::whereIn('id', $validated['ids'])->delete();
+        });
+
+        return redirect()->back()->with('success', "Deleted {$count} product" . ($count === 1 ? '' : 's') . '.');
+    }
 }
 
