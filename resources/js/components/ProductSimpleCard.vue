@@ -1,15 +1,16 @@
 <template>
     <div
-      class="bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-all cursor-pointer overflow-hidden group"
+      class="bg-white border border-gray-100 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all cursor-pointer overflow-hidden group"
       @click="handleClick"
     >
-      <!-- Top Section: Product Image -->
-      <div class="aspect-square bg-gray-50 p-4 border-b border-gray-200"> 
+      <!-- Top Section: Product Image — full-bleed, minimal padding so the
+           image dominates the card on vendor listings. -->
+      <div class="aspect-square bg-white">
         <img
           v-if="imageUrl && !hasError"
           :src="imageUrl"
           :alt="name"
-          class="w-full h-full object-contain rounded-lg flex items-center justify-center select-none"
+          class="w-full h-full object-cover select-none group-hover:scale-[1.02] transition-transform duration-300"
           loading="lazy"
           @error="onError"
         />

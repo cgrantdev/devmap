@@ -52,10 +52,10 @@
               Visit website
             </a>
 
-            <!-- Coupon (desktop) -->
+            <!-- Coupon (desktop) — periodically wiggles to draw attention -->
             <button
               @click="copyDiscountCode"
-              class="ui-focus group hidden md:inline-flex items-center gap-3 h-10 lg:h-11 px-4 lg:px-5 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all flex-shrink-0"
+              class="pmap-coupon-shake ui-focus group hidden md:inline-flex items-center gap-3 h-10 lg:h-11 px-4 lg:px-5 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all flex-shrink-0"
             >
               <span class="text-[9px] lg:text-[10px] uppercase tracking-[0.1em] font-semibold text-emerald-600">Coupon</span>
               <span class="ui-mono text-[15px] lg:text-[18px] font-bold text-emerald-800 tracking-widest">{{ brand.discount_code || 'PMAP' }}</span>
@@ -81,7 +81,7 @@
             </a>
             <button
               @click="copyDiscountCode"
-              class="ui-focus group flex-1 inline-flex items-center justify-center gap-2 h-10 border-2 border-dashed border-emerald-300 bg-emerald-50"
+              class="pmap-coupon-shake ui-focus group flex-1 inline-flex items-center justify-center gap-2 h-10 border-2 border-dashed border-emerald-300 bg-emerald-50"
             >
               <span class="text-[9px] uppercase tracking-[0.08em] font-semibold text-emerald-600">Code</span>
               <span class="ui-mono text-[14px] font-bold text-emerald-800 tracking-wide">{{ brand.discount_code || 'PMAP' }}</span>
@@ -130,8 +130,9 @@
                 </button>
               </div>
 
-              <!-- Product Grid -->
-              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
+              <!-- Product Grid — 3-up at md+ with generous spacing so each
+                   product image gets room to breathe -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 <ProductSimpleCard
                   v-for="product in products.data"
                   :key="product.id"
@@ -1376,4 +1377,31 @@ onMounted(() => {
   })
 })
 </script>
+
+<style scoped>
+/* Periodic gentle wiggle on the PMAP coupon button so it draws the eye
+   without being annoying. Plays every ~6s, lasts ~700ms. Respects
+   prefers-reduced-motion. */
+.pmap-coupon-shake {
+  animation: pmap-coupon-shake 6s ease-in-out infinite;
+  transform-origin: center center;
+  will-change: transform;
+}
+.pmap-coupon-shake:hover {
+  animation-play-state: paused;
+}
+@keyframes pmap-coupon-shake {
+  0%, 88%, 100% { transform: rotate(0deg) translateY(0); }
+  90% { transform: rotate(-2deg) translateY(-1px); }
+  92% { transform: rotate(2deg) translateY(-1px); }
+  94% { transform: rotate(-2deg) translateY(0); }
+  96% { transform: rotate(2deg) translateY(0); }
+  98% { transform: rotate(-1deg) translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pmap-coupon-shake {
+    animation: none;
+  }
+}
+</style>
 

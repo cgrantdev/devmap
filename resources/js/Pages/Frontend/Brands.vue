@@ -101,60 +101,23 @@
         </div>
       </div>
 
-      <!-- Featured vendor spotlight (first partner/featured vendor gets a big card) -->
-      <div v-if="featuredVendor" class="mb-8">
-        <a
-          :href="`/shop/${featuredVendor.slug}`"
-          class="ui-focus group flex flex-col md:flex-row rounded-[16px] border border-[color:var(--color-accent-400)]/30 bg-gradient-to-r from-[color:var(--color-accent-50)] to-white overflow-hidden hover:shadow-[var(--shadow-md)] transition-all duration-[200ms]"
-        >
-          <!-- Logo area -->
-          <div class="md:w-56 flex-shrink-0 flex items-center justify-center p-8" :style="{ background: vendorGradient(featuredVendor.name) }">
-            <img
-              v-if="featuredVendor.logo"
-              :src="featuredVendor.logo"
-              :alt="featuredVendor.name"
-              class="max-h-20 max-w-[80%] object-contain drop-shadow-lg"
-              loading="lazy"
-            />
-            <span v-else class="ui-display text-white text-4xl font-bold">{{ featuredVendor.initials }}</span>
-          </div>
-          <!-- Info -->
-          <div class="flex-1 p-6 flex flex-col justify-center gap-3">
-            <div class="flex items-center gap-2">
-              <span class="ui-mono text-[10px] uppercase tracking-[0.1em] px-2 py-0.5 rounded-full bg-[color:var(--color-accent-600)] text-white font-semibold">Featured</span>
-            </div>
-            <h2 class="ui-display text-2xl font-semibold text-[color:var(--color-ink)] tracking-tight">{{ featuredVendor.name }}</h2>
-            <div class="flex items-center flex-wrap gap-4 text-sm text-[color:var(--color-ink-muted)]">
-              <div class="flex items-center gap-1">
-                <div class="flex gap-0.5">
-                  <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(parseFloat(featuredVendor.rating)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-                </div>
-                <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ parseFloat(featuredVendor.rating).toFixed(1) }}</span>
-                <span>({{ featuredVendor.reviews }})</span>
-              </div>
-              <span v-if="featuredVendor.location" class="flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
-                {{ featuredVendor.location }}
-              </span>
-              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ featuredVendor.product_count }}</span> compounds
-            </div>
-          </div>
-          <div class="hidden md:flex items-center pr-6">
-            <span class="inline-flex items-center gap-1.5 text-sm font-semibold text-[color:var(--color-accent-600)] group-hover:translate-x-1 transition-transform duration-200">
-              View vendor
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            </span>
-          </div>
-        </a>
-      </div>
+      <!-- Featured vendor spotlight removed — featured vendors now get a
+           shiny gold border treatment inline in the main grid below. -->
 
-      <!-- Vendor card grid — logo prominent, equal weight -->
+      <!-- Vendor card grid — logo prominent, equal weight.
+           Featured/partner vendors get a shiny animated gold border so they
+           stand out without breaking the grid rhythm. -->
       <div v-if="filteredBrands.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         <a
           v-for="brand in filteredBrands"
           :key="brand.id"
           :href="`/shop/${brand.slug}`"
-          class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
+          :class="[
+            'ui-focus group flex flex-col bg-white hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden',
+            brand.is_partner || brand.featured
+              ? 'pmap-gold-border'
+              : 'border border-[color:var(--color-hairline)] hover:border-[color:var(--color-accent-400)]',
+          ]"
         >
           <!-- Big logo area -->
           <div class="aspect-[16/9] bg-[color:var(--color-bg)] border-b border-[color:var(--color-hairline)] flex items-center justify-center p-8 relative">
@@ -166,7 +129,10 @@
               loading="lazy"
             />
             <span v-else class="ui-display text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ brand.initials }}</span>
-            <span v-if="brand.is_partner" class="absolute top-3 right-3 ui-mono text-[9px] uppercase tracking-[0.1em] px-1.5 py-0.5 bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] font-semibold">Partner</span>
+            <span
+              v-if="brand.is_partner || brand.featured"
+              class="absolute top-3 right-3 ui-mono text-[9px] uppercase tracking-[0.1em] px-2 py-0.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white font-bold shadow-[0_1px_2px_rgba(0,0,0,0.2)]"
+            >★ Featured</span>
           </div>
 
           <!-- Info -->
@@ -267,11 +233,6 @@ const locationFilters = [
 const sortValue = computed(() => `${props.sort || 'rating'}|${props.sortDir || 'desc'}`)
 const filteredBrands = computed(() => props.brands)
 
-// First partner/featured vendor gets a spotlight card
-const featuredVendor = computed(() =>
-  props.brands.find(b => b.is_partner || b.featured) || null
-)
-
 const hasActiveFilters = computed(() =>
   searchQuery.value || selectedFilters.value.location || selectedFilters.value.topVendorsOnly
 )
@@ -338,3 +299,46 @@ function vendorGradient(name) {
   return `linear-gradient(135deg, ${a} 0%, ${b} 100%)`
 }
 </script>
+
+<style scoped>
+/* Animated gold border for featured/partner vendors. Uses a conic gradient
+   so the gold has visible variation (light/dark amber → champagne) rather
+   than a flat yellow line. Rotates slowly to give it a 'shiny' feel. */
+.pmap-gold-border {
+  position: relative;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(white, white) padding-box,
+    conic-gradient(from var(--gold-angle, 0deg),
+      #fbbf24, #fcd34d, #f59e0b, #fde68a, #d97706, #fef3c7, #fbbf24
+    ) border-box;
+  animation: pmap-gold-spin 8s linear infinite;
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.15), 0 4px 16px -4px rgba(251, 191, 36, 0.25);
+}
+
+@property --gold-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes pmap-gold-spin {
+  to { --gold-angle: 360deg; }
+}
+
+/* Safari + older browsers that don't support @property fall back to a
+   static gradient — still gold, just doesn't rotate. */
+@supports not (background: conic-gradient(from 0deg, red, blue)) {
+  .pmap-gold-border {
+    border: 2px solid #fbbf24;
+    background: white;
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmap-gold-border {
+    animation: none;
+  }
+}
+</style>

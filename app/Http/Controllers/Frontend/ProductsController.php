@@ -627,11 +627,12 @@ class ProductsController extends Controller
             $query->orderBy($sortBy, $sortDir);
         }
 
-        // Paginate — default to a high cap so vendor pages show their full catalog by default.
-        // Vendors with very large catalogs can still set ?per_page=N to opt back into pagination.
-        $perPage = (int) $request->get('per_page', 500);
+        // Paginate — vendor pages now use a 12-item grid so each product
+        // image gets room to breathe. Users can opt into larger pages via
+        // ?per_page=N up to a sane cap.
+        $perPage = (int) $request->get('per_page', 12);
         if ($perPage < 1 || $perPage > 1000) {
-            $perPage = 500;
+            $perPage = 12;
         }
         $products = $query->paginate($perPage)->withQueryString();
 
