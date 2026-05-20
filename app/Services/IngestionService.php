@@ -110,33 +110,46 @@ class IngestionService
     public function promote(ScrapedProduct $staged): Product
     {
         return DB::transaction(function () use ($staged) {
-            // Resolve product_category_id:
+            // Resolve product_category_id (used only for NEW products — see below):
             //   1. Use the scraping config's category if it pinned one (legacy single-category vendors)
             //   2. Otherwise auto-match the product name against the category_aliases table
             $categoryId = $staged->scrapingConfig?->product_category_id
                 ?? $this->matchCategoryByName($staged->name);
 
-            $productData = [
-                'name' => $staged->name,
-                'description' => $staged->description,
-                'brand_id' => $staged->brand_id ?? $staged->scrapingConfig?->vendor_id,
-                'product_category_id' => $categoryId,
-                'price' => $staged->price,
-                'discount_price' => $staged->discount_price,
-                'image_url' => $staged->image_url,
-                'product_url' => $staged->source_url,
-                'auto_scraped' => true,
-                'last_scraped_at' => $staged->last_scraped_at ?? now(),
-            ];
-
             if ($staged->product_id && $product = Product::find($staged->product_id)) {
-                // Respect manual auto_update flag on existing products
+                // Existing product — preserve everything a VA might have
+                // curated (name, category, type, size, slug) and only refresh
+                // upstream-owned fields (price, image, stock, description).
+                //
+                // Otherwise an auto-sync would clobber "DSIP" back to
+                // "DSIP (Delta Sleep Inducing Peptide 5mg)" and undo the work
+                // of every triage pass.
                 if ($product->auto_update || $staged->manual_override) {
-                    $product->update($productData);
+                    $product->update([
+                        'description' => $staged->description,
+                        'price' => $staged->price,
+                        'discount_price' => $staged->discount_price,
+                        'image_url' => $staged->image_url,
+                        'product_url' => $staged->source_url,
+                        'auto_scraped' => true,
+                        'last_scraped_at' => $staged->last_scraped_at ?? now(),
+                    ]);
                 }
             } else {
-                $productData['slug'] = $this->uniqueSlug($staged->name);
-                $product = Product::create($productData);
+                // First-time import — accept everything the staged row carries.
+                $product = Product::create([
+                    'name' => $staged->name,
+                    'slug' => $this->uniqueSlug($staged->name),
+                    'description' => $staged->description,
+                    'brand_id' => $staged->brand_id ?? $staged->scrapingConfig?->vendor_id,
+                    'product_category_id' => $categoryId,
+                    'price' => $staged->price,
+                    'discount_price' => $staged->discount_price,
+                    'image_url' => $staged->image_url,
+                    'product_url' => $staged->source_url,
+                    'auto_scraped' => true,
+                    'last_scraped_at' => $staged->last_scraped_at ?? now(),
+                ]);
                 $staged->product_id = $product->id;
             }
 
