@@ -119,7 +119,9 @@
     </div>
 
     <!-- Table -->
-    <div class="bg-white border border-[color:var(--color-hairline)] overflow-hidden">
+    <!-- overflow-visible (not hidden) so the hover image preview on
+         product thumbnails can float outside the table without clipping. -->
+    <div class="bg-white border border-[color:var(--color-hairline)] overflow-visible">
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
@@ -161,9 +163,25 @@
             </td>
             <td class="px-5 py-3.5">
               <div class="flex items-center gap-3">
-                <div class="w-9 h-9 flex-shrink-0 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] overflow-hidden flex items-center justify-center">
-                  <img v-if="product.image_url" :src="product.image_url" :alt="product.name" class="w-full h-full object-cover" loading="lazy" />
+                <div class="pmap-thumb-zoom relative w-9 h-9 flex-shrink-0 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] overflow-visible flex items-center justify-center group/thumb">
+                  <img
+                    v-if="product.image_url"
+                    :src="product.image_url"
+                    :alt="product.name"
+                    class="w-9 h-9 object-cover"
+                    loading="lazy"
+                  />
                   <span v-else class="text-[10px] font-bold text-[color:var(--color-ink-muted)]">{{ product.name.substring(0, 2).toUpperCase() }}</span>
+
+                  <!-- Hover preview — full-size image floats out to the right
+                       of the thumb on hover. Pointer-events-none so it doesn't
+                       block the row's click target. -->
+                  <div
+                    v-if="product.image_url"
+                    class="pmap-thumb-zoom__preview pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 hidden group-hover/thumb:flex w-56 h-56 bg-white border border-[color:var(--color-hairline)] shadow-2xl rounded-md z-50 items-center justify-center p-2"
+                  >
+                    <img :src="product.image_url" :alt="product.name" class="max-w-full max-h-full object-contain" />
+                  </div>
                 </div>
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5">
