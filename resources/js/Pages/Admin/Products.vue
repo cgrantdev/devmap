@@ -77,8 +77,9 @@
       <select v-model="filterMissing" @change="fetchData(1)" class="h-9 px-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none">
         <option value="all">All Products</option>
         <option value="category">⚠ Missing Category</option>
+        <option value="type">⚠ Missing Type</option>
         <option value="size">⚠ Missing Size</option>
-        <option value="both">⚠ Missing Both</option>
+        <option value="both">⚠ Missing Cat + Size</option>
       </select>
     </div>
 
@@ -100,6 +101,11 @@
         <option value="">Set category…</option>
         <option value="__uncategorized__">— Clear category —</option>
         <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+      </select>
+      <select v-model="bulkType" @change="bulkApplyType" class="h-8 px-2 text-[12px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none rounded">
+        <option value="">Set type…</option>
+        <option value="__clear__">— Clear type —</option>
+        <option v-for="t in typeOptions" :key="t" :value="t">{{ t }}</option>
       </select>
       <button @click="bulkHide(true)" type="button" :disabled="bulkBusy" class="h-8 px-3 text-[12px] font-semibold text-white bg-slate-700 hover:bg-slate-800 rounded disabled:opacity-50">
         🚫 Hide from site
@@ -130,6 +136,7 @@
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Product</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Brand</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] w-52">Category</th>
+            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] w-36">Type</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] w-28">Size</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Price</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Rating</th>
@@ -188,6 +195,22 @@
                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">
                   {{ cat.name }}
                 </option>
+              </select>
+            </td>
+            <td class="px-5 py-3.5" @click.stop>
+              <select
+                :value="product.product_type || ''"
+                @change="updateField(product.id, 'product_type', $event.target.value || null)"
+                :class="[
+                  'w-full px-2 py-1.5 text-[12px] border rounded bg-white transition-colors focus:outline-none focus:ring-1',
+                  !product.product_type
+                    ? 'border-amber-300 text-amber-700 focus:ring-amber-300 bg-amber-50'
+                    : 'border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] focus:ring-[color:var(--color-accent-400)]'
+                ]"
+                :title="!product.product_type ? 'No type — assign one' : 'Change type'"
+              >
+                <option value="">—</option>
+                <option v-for="t in typeOptions" :key="t" :value="t">{{ t }}</option>
               </select>
             </td>
             <td class="px-5 py-3.5" @click.stop>
@@ -305,6 +328,11 @@ const filterBrand = ref('all')
 const filterCategory = ref('all')
 const filterMissing = ref('all')
 
+// Product formats (vial, capsule, nasal spray, other). Stored as a
+// free-text varchar but constrained to this list both in the inline
+// dropdown and in the controller's `in:` validation rule.
+const typeOptions = ['Vial', 'Capsule', 'Nasal Spray', 'Other']
+
 // Common research peptide vial sizes + blend ratios.
 // Each option is the literal string stored in size_mg.
 const sizeOptions = [
@@ -383,6 +411,7 @@ function handleSearchInput() {
 // ---- Bulk-selection state ----------------------------------------------
 const selectedIds = ref([])
 const bulkCategory = ref('')
+const bulkType = ref('')
 const bulkBusy = ref(false)
 
 const visibleIds = computed(() => (props.products?.data || []).map(p => p.id))
@@ -406,6 +435,7 @@ function toggleSelectAllOnPage(e) {
 function clearSelection() {
   selectedIds.value = []
   bulkCategory.value = ''
+  bulkType.value = ''
 }
 
 // When the page of products changes (search/filter/pagination), clear
@@ -433,6 +463,28 @@ function bulkApplyCategory() {
     onFinish: () => {
       bulkBusy.value = false
       bulkCategory.value = ''
+    },
+  })
+}
+
+function bulkApplyType() {
+  if (!bulkType.value || selectedIds.value.length === 0) return
+  const isClear = bulkType.value === '__clear__'
+  const label = isClear ? 'Clear the type on' : 'Set the type on'
+  if (!confirm(`${label} ${selectedIds.value.length} product${selectedIds.value.length === 1 ? '' : 's'}?`)) {
+    bulkType.value = ''
+    return
+  }
+  bulkBusy.value = true
+  router.patch('/admin/products/bulk-update', {
+    ids: selectedIds.value,
+    product_type: isClear ? null : bulkType.value,
+    _token: usePage().props.csrf_token,
+  }, {
+    preserveScroll: true,
+    onFinish: () => {
+      bulkBusy.value = false
+      bulkType.value = ''
     },
   })
 }

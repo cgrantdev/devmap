@@ -240,6 +240,7 @@ class ProductsController extends Controller
             // Pattern: one or more "Nmg" tokens optionally separated by /.
             'size_mg' => ['sometimes', 'nullable', 'string', 'max:50', 'regex:/^[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?(?:\/[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?)*$/i'],
             'hidden' => 'sometimes|boolean',
+            'product_type' => ['sometimes', 'nullable', 'string', 'in:Vial,Capsule,Nasal Spray,Other'],
         ]);
 
         // Only update fields that were actually sent (sometimes rule above
@@ -253,6 +254,9 @@ class ProductsController extends Controller
         }
         if ($request->has('hidden')) {
             $update['hidden'] = (bool) $validated['hidden'];
+        }
+        if ($request->has('product_type')) {
+            $update['product_type'] = $validated['product_type'] ?? null;
         }
 
         if (!empty($update)) {
@@ -274,6 +278,7 @@ class ProductsController extends Controller
             'ids.*' => 'integer|exists:products,id',
             'product_category_id' => 'sometimes|nullable|exists:product_categories,id',
             'hidden' => 'sometimes|boolean',
+            'product_type' => ['sometimes', 'nullable', 'string', 'in:Vial,Capsule,Nasal Spray,Other'],
         ]);
 
         $update = [];
@@ -282,6 +287,9 @@ class ProductsController extends Controller
         }
         if ($request->has('hidden')) {
             $update['hidden'] = (bool) $validated['hidden'];
+        }
+        if ($request->has('product_type')) {
+            $update['product_type'] = $validated['product_type'] ?? null;
         }
 
         if (empty($update)) {
@@ -296,6 +304,9 @@ class ProductsController extends Controller
         }
         if (array_key_exists('hidden', $update)) {
             $what[] = $update['hidden'] ? 'hidden from site' : 'unhidden';
+        }
+        if (array_key_exists('product_type', $update)) {
+            $what[] = $update['product_type'] ? "type: {$update['product_type']}" : 'cleared type';
         }
         $summary = implode(' + ', $what);
 

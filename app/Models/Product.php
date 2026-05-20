@@ -25,6 +25,7 @@ class Product extends Model
         'brand_id',
         'location_id',
         'product_category_id',
+        'product_type',
         'size_mg',
         'purity',
         'availability',

@@ -792,6 +792,10 @@ class VendorsController extends Controller
         $missing = $request->get('missing', 'all');
         if ($missing === 'category') {
             $query->whereNull('product_category_id');
+        } elseif ($missing === 'type') {
+            $query->where(function ($q) {
+                $q->whereNull('product_type')->orWhere('product_type', '');
+            });
         } elseif ($missing === 'size') {
             $query->where(function ($q) {
                 $q->whereNull('size_mg')->orWhere('size_mg', '');
@@ -856,6 +860,7 @@ class VendorsController extends Controller
                     'original_price' => $originalPrice,
                     'image_url' => $product->image_url,
                     'hidden' => (bool) ($product->hidden ?? false),
+                    'product_type' => $product->product_type,
                     'featured' => (bool) ($product->featured ?? false),
                     'lab_tested' => (bool) ($product->lab_tested ?? false),
                     'first_timer_deals' => (bool) ($product->first_timer_deals ?? false),
