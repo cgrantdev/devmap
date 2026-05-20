@@ -180,16 +180,18 @@ class EncyclopediaController extends Controller
         $categories = $query->orderBy('name')->get()->map(function ($category) {
             $educationPost = $category->educationPost;
             
-            // Get category image - use category image if available, otherwise get a sample product image
+            // Get category image — use the category's own image if set,
+            // otherwise prefer a product explicitly flagged as the
+            // encyclopedia thumb; fall back to any visible product image.
             $image = null;
             if ($category->image_url) {
                 $image = Storage::url('categories/' . $category->image_url);
             } else {
-                // Get a sample product image for this category
                 $sampleProduct = Product::visible()
                     ->where('status', 'active')
                     ->where('product_category_id', $category->id)
                     ->whereNotNull('image_url')
+                    ->orderByDesc('is_encyclopedia_thumb') // explicit pick wins
                     ->first();
                 $image = $sampleProduct ? $sampleProduct->image_url : '/images/peptides/default.png';
             }

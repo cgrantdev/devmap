@@ -35,6 +35,8 @@ class Product extends Model
         'featured',
         'lab_tested',
         'first_timer_deals',
+        'is_encyclopedia_thumb',
+        'is_peptide_thumb',
         'auto_update',
         'verified',
         'rating_average',
@@ -87,6 +89,8 @@ class Product extends Model
         'featured' => 'boolean',
         'lab_tested' => 'boolean',
         'first_timer_deals' => 'boolean',
+        'is_encyclopedia_thumb' => 'boolean',
+        'is_peptide_thumb' => 'boolean',
         'auto_update' => 'boolean',
     ];
 

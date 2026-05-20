@@ -876,6 +876,8 @@ class VendorsController extends Controller
                     'image_url' => $product->image_url,
                     'hidden' => (bool) ($product->hidden ?? false),
                     'product_type' => $product->product_type,
+                    'is_encyclopedia_thumb' => (bool) ($product->is_encyclopedia_thumb ?? false),
+                    'is_peptide_thumb' => (bool) ($product->is_peptide_thumb ?? false),
                     'featured' => (bool) ($product->featured ?? false),
                     'lab_tested' => (bool) ($product->lab_tested ?? false),
                     'first_timer_deals' => (bool) ($product->first_timer_deals ?? false),

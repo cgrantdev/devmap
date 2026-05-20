@@ -61,17 +61,19 @@ class ProductsController extends Controller
             ->orderBy('name')
             ->get()
             ->map(function ($category) {
-                // Use category image if available, otherwise get a sample product image
+                // Use category image if available, otherwise prefer the
+                // product explicitly flagged is_peptide_thumb for this category;
+                // fall back to any visible product with an image.
                 $image = null;
                 if ($category->image_url) {
                     $image = \Illuminate\Support\Facades\Storage::url('categories/' . $category->image_url);
                 } else {
-                // Get a sample product image for this category
-                $sampleProduct = Product::visible()
-                    ->where('status', 'active')
-                    ->where('product_category_id', $category->id)
-                    ->whereNotNull('image_url')
-                    ->first();
+                    $sampleProduct = Product::visible()
+                        ->where('status', 'active')
+                        ->where('product_category_id', $category->id)
+                        ->whereNotNull('image_url')
+                        ->orderByDesc('is_peptide_thumb') // explicit pick wins
+                        ->first();
                     $image = $sampleProduct ? $sampleProduct->image_url : '/images/peptides/default.png';
                 }
                 

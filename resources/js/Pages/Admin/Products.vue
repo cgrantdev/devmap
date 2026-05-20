@@ -141,7 +141,7 @@
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] w-36">Type</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] w-28">Size</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Price</th>
-            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Flags</th>
+            <th class="px-5 py-3 w-28 text-center text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]" title="Pick this product's image as the thumbnail for its category on /encyclopedia and /products">Thumb</th>
             <th class="px-5 py-3 w-48 text-right text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Actions</th>
           </tr>
         </thead>
@@ -268,11 +268,34 @@
               <span class="ui-mono text-[13px] text-[color:var(--color-ink)]">${{ product.price || '0.00' }}</span>
               <span v-if="product.original_price && product.original_price > product.price" class="ml-1 text-[11px] text-[color:var(--color-ink-subtle)] line-through ui-mono">${{ product.original_price }}</span>
             </td>
-            <td class="px-5 py-3.5">
-              <div class="flex flex-wrap gap-1">
-                <span v-if="product.featured" class="inline-flex px-1.5 py-0.5 text-[10px] font-semibold bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-600)]">Featured</span>
-                <span v-if="product.lab_tested" class="inline-flex px-1.5 py-0.5 text-[10px] font-semibold bg-[color:var(--color-verified-bg)] text-[#065F46]">Lab Tested</span>
-                <span v-if="product.hidden" class="inline-flex px-1.5 py-0.5 text-[10px] font-semibold bg-[color:var(--color-hairline-soft)] text-[color:var(--color-ink-muted)]">Hidden</span>
+            <td class="px-5 py-3.5" @click.stop>
+              <div class="flex items-center justify-center gap-2">
+                <!-- ENC: thumbnail for /encyclopedia/ category card -->
+                <label
+                  class="inline-flex items-center gap-1 cursor-pointer select-none"
+                  title="Use this image as the thumbnail on /encyclopedia for this product's category"
+                >
+                  <input
+                    type="checkbox"
+                    :checked="product.is_encyclopedia_thumb"
+                    @change="updateField(product.id, 'is_encyclopedia_thumb', $event.target.checked)"
+                    class="h-3.5 w-3.5 accent-[color:var(--color-accent-600)] cursor-pointer"
+                  />
+                  <span :class="['text-[10px] font-bold uppercase tracking-wider', product.is_encyclopedia_thumb ? 'text-[color:var(--color-accent-700)]' : 'text-[color:var(--color-ink-subtle)]']">ENC</span>
+                </label>
+                <!-- PEP: thumbnail for /products category card -->
+                <label
+                  class="inline-flex items-center gap-1 cursor-pointer select-none"
+                  title="Use this image as the thumbnail on /products for this product's category"
+                >
+                  <input
+                    type="checkbox"
+                    :checked="product.is_peptide_thumb"
+                    @change="updateField(product.id, 'is_peptide_thumb', $event.target.checked)"
+                    class="h-3.5 w-3.5 accent-[color:var(--color-accent-600)] cursor-pointer"
+                  />
+                  <span :class="['text-[10px] font-bold uppercase tracking-wider', product.is_peptide_thumb ? 'text-[color:var(--color-accent-700)]' : 'text-[color:var(--color-ink-subtle)]']">PEP</span>
+                </label>
               </div>
             </td>
             <td class="px-5 py-3.5 text-right whitespace-nowrap" @click.stop>

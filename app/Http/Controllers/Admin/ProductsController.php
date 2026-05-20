@@ -241,6 +241,8 @@ class ProductsController extends Controller
             'size_mg' => ['sometimes', 'nullable', 'string', 'max:50', 'regex:/^[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?(?:\/[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?)*$/i'],
             'hidden' => 'sometimes|boolean',
             'product_type' => ['sometimes', 'nullable', 'string', 'in:Peptide,Capsule,Nasal Spray,Kit,Other'],
+            'is_encyclopedia_thumb' => 'sometimes|boolean',
+            'is_peptide_thumb' => 'sometimes|boolean',
         ]);
 
         // Only update fields that were actually sent (sometimes rule above
@@ -258,10 +260,35 @@ class ProductsController extends Controller
         if ($request->has('product_type')) {
             $update['product_type'] = $validated['product_type'] ?? null;
         }
-
-        if (!empty($update)) {
-            $product->update($update);
+        if ($request->has('is_encyclopedia_thumb')) {
+            $update['is_encyclopedia_thumb'] = (bool) $validated['is_encyclopedia_thumb'];
         }
+        if ($request->has('is_peptide_thumb')) {
+            $update['is_peptide_thumb'] = (bool) $validated['is_peptide_thumb'];
+        }
+
+        // Mutual exclusion within a category: only one product per category
+        // can carry each thumb flag. When turning a flag ON, clear it on
+        // every other product in the same category in the same transaction.
+        $targetCategoryId = array_key_exists('product_category_id', $update)
+            ? $update['product_category_id']
+            : $product->product_category_id;
+
+        \DB::transaction(function () use ($product, $update, $targetCategoryId) {
+            if ($targetCategoryId) {
+                foreach (['is_encyclopedia_thumb', 'is_peptide_thumb'] as $flag) {
+                    if (!empty($update[$flag])) {
+                        Product::where('product_category_id', $targetCategoryId)
+                            ->where('id', '!=', $product->id)
+                            ->where($flag, true)
+                            ->update([$flag => false]);
+                    }
+                }
+            }
+            if (!empty($update)) {
+                $product->update($update);
+            }
+        });
 
         return redirect()->back()->with('success', 'Product updated.');
     }
