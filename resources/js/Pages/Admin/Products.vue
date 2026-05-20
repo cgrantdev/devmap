@@ -64,7 +64,7 @@
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Price</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Rating</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Flags</th>
-            <th class="px-5 py-3 w-20"></th>
+            <th class="px-5 py-3 w-28 text-right text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -135,8 +135,18 @@
                 <span v-if="product.hidden" class="inline-flex px-1.5 py-0.5 text-[10px] font-semibold bg-[color:var(--color-hairline-soft)] text-[color:var(--color-ink-muted)]">Hidden</span>
               </div>
             </td>
-            <td class="px-5 py-3.5">
-              <svg class="w-4 h-4 text-[color:var(--color-ink-subtle)] group-hover:text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            <td class="px-5 py-3.5 text-right" @click.stop>
+              <button
+                type="button"
+                @click="confirmDelete(product)"
+                class="inline-flex items-center gap-1.5 h-8 px-3 text-[12px] font-semibold text-white bg-[#DC2626] hover:bg-[#B91C1C] rounded transition-colors"
+                title="Delete this product"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/><path d="M10 11v6M14 11v6"/>
+                </svg>
+                Delete
+              </button>
             </td>
           </tr>
         </tbody>
@@ -236,6 +246,15 @@ let searchTimeout = null
 function handleSearchInput() {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => fetchData(1), 500)
+}
+
+function confirmDelete(product) {
+  const msg = `Delete "${product.name}"?\n\nThis permanently removes the product and any associated click logs. This cannot be undone.`
+  if (!confirm(msg)) return
+  router.delete(`/admin/products/${product.id}`, {
+    preserveScroll: true,
+    preserveState: false, // force refresh so the row drops out of the list
+  })
 }
 
 function fetchData(page = props.products?.current_page || 1) {

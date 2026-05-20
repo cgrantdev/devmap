@@ -213,9 +213,16 @@ class ProductsController extends Controller
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
-        $product->delete();
+        $name = $product->name;
 
-        return redirect()->back()->with('success', 'Product deleted successfully.');
+        \DB::transaction(function () use ($product) {
+            // Drop related rows so nothing dangles. Reviews are vendor-scoped
+            // (not per-product), so they stay.
+            \DB::table('product_clicks')->where('product_id', $product->id)->delete();
+            $product->delete();
+        });
+
+        return redirect()->back()->with('success', "Deleted: {$name}");
     }
 
     /**
