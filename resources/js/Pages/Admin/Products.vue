@@ -324,7 +324,7 @@ const filterMissing = ref('all')
 // Product formats (vial, capsule, nasal spray, other). Stored as a
 // free-text varchar but constrained to this list both in the inline
 // dropdown and in the controller's `in:` validation rule.
-const typeOptions = ['Vial', 'Capsule', 'Nasal Spray', 'Other']
+const typeOptions = ['Peptide', 'Capsule', 'Nasal Spray', 'Other']
 
 // Common research peptide vial sizes + blend ratios.
 // Each option is the literal string stored in size_mg.

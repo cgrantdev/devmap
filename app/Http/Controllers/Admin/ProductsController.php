@@ -240,7 +240,7 @@ class ProductsController extends Controller
             // Pattern: one or more "Nmg" tokens optionally separated by /.
             'size_mg' => ['sometimes', 'nullable', 'string', 'max:50', 'regex:/^[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?(?:\/[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?)*$/i'],
             'hidden' => 'sometimes|boolean',
-            'product_type' => ['sometimes', 'nullable', 'string', 'in:Vial,Capsule,Nasal Spray,Other'],
+            'product_type' => ['sometimes', 'nullable', 'string', 'in:Peptide,Capsule,Nasal Spray,Other'],
         ]);
 
         // Only update fields that were actually sent (sometimes rule above
@@ -278,7 +278,7 @@ class ProductsController extends Controller
             'ids.*' => 'integer|exists:products,id',
             'product_category_id' => 'sometimes|nullable|exists:product_categories,id',
             'hidden' => 'sometimes|boolean',
-            'product_type' => ['sometimes', 'nullable', 'string', 'in:Vial,Capsule,Nasal Spray,Other'],
+            'product_type' => ['sometimes', 'nullable', 'string', 'in:Peptide,Capsule,Nasal Spray,Other'],
         ]);
 
         $update = [];
