@@ -32,7 +32,6 @@
             <option value="price|asc">Price: Low → High</option>
             <option value="price|desc">Price: High → Low</option>
             <option value="popular|desc">Most Popular</option>
-            <option value="rating|desc">Highest Rated</option>
           </select>
 
           <!-- Dosage size filter -->

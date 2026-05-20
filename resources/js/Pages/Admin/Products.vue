@@ -139,7 +139,6 @@
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] w-36">Type</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] w-28">Size</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Price</th>
-            <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Rating</th>
             <th class="px-5 py-3 text-left text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Flags</th>
             <th class="px-5 py-3 w-48 text-right text-[10px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Actions</th>
           </tr>
@@ -226,12 +225,6 @@
             <td class="px-5 py-3.5">
               <span class="ui-mono text-[13px] text-[color:var(--color-ink)]">${{ product.price || '0.00' }}</span>
               <span v-if="product.original_price && product.original_price > product.price" class="ml-1 text-[11px] text-[color:var(--color-ink-subtle)] line-through ui-mono">${{ product.original_price }}</span>
-            </td>
-            <td class="px-5 py-3.5">
-              <div class="flex items-center gap-1">
-                <svg class="w-3.5 h-3.5 text-[color:var(--color-caution)]" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-                <span class="ui-mono text-[13px] text-[color:var(--color-ink)]">{{ product.rating || '0.0' }}</span>
-              </div>
             </td>
             <td class="px-5 py-3.5">
               <div class="flex flex-wrap gap-1">

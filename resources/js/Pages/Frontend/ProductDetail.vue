@@ -69,32 +69,15 @@
                 </svg>
               </Link>
   
-              <!-- Rating -->
-              <div class="flex items-center justify-between pb-4 mb-4 border-b border-gray-200">
-                <div class="flex items-center gap-3">
-                  <div class="flex items-center gap-1">
-                    <svg
-                      v-for="i in 5"
-                      :key="i"
-                      class="lucide lucide-star w-5 h-5"
-                      :class="i <= Math.round(product.rating_average) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
-                    </svg>
-                  </div>
-                  <span class="text-gray-900">{{ product.rating_average }}</span>
-                  <span class="text-gray-500">({{ product.rating_count }} reviews)</span>
-                </div>
-                <!-- Stock Status -->
+              <!-- Stock Status -->
+              <div class="flex items-center justify-end pb-4 mb-4 border-b border-gray-200">
                 <span
                   :class="product.availability === 'in_stock' ? 'text-green-600' : 'text-red-600'"
                   class="text-sm"
                 >
                   {{ product.availability === 'in_stock' ? 'In Stock' : 'Out of Stock' }}
                 </span>
-              </div>              
+              </div>
   
               <!-- Price — monospace, prominent -->
               <div class="mb-6">
@@ -212,7 +195,7 @@
                 :class="activeTab === 'reviews' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'"
                 class="px-6 py-4 text-sm transition-colors relative"
               >
-                Reviews ({{ product.rating_count }})
+                Vendor Reviews ({{ (reviews || []).length }})
                 <div v-if="activeTab === 'reviews'" class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
               </button>
             </div>
@@ -252,8 +235,14 @@
               </div>
             </div>
 
-            <!-- Reviews Tab -->
+            <!-- Vendor Reviews Tab — these are reviews of the seller (brand),
+                 not the individual product. We removed per-product reviews
+                 because the rating numbers were scraped, not authored on PM. -->
             <div v-if="activeTab === 'reviews'" class="max-w-4xl">
+              <div v-if="brand" class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-900">
+                These are reviews of <strong>{{ brand.name }}</strong> as a vendor, not of this specific product.
+                <Link :href="`/brand/${brand.slug}/products`" class="text-blue-700 underline font-medium ml-1">See the full vendor profile →</Link>
+              </div>
               <!-- Reviews List -->
               <div v-if="reviews && reviews.length > 0" class="space-y-6">
                 <div 
