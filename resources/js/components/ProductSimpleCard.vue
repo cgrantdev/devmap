@@ -3,14 +3,15 @@
       class="bg-white border border-gray-100 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all cursor-pointer overflow-hidden group"
       @click="handleClick"
     >
-      <!-- Top Section: Product Image — full-bleed, minimal padding so the
-           image dominates the card on vendor listings. -->
-      <div class="aspect-square bg-white">
+      <!-- Top Section: Product Image — object-contain so vials/boxes fit
+           inside the card without cropping. Light bg so transparent PNGs
+           don't disappear, with a gentle hover scale. -->
+      <div class="aspect-square bg-gray-50 p-3 flex items-center justify-center">
         <img
           v-if="imageUrl && !hasError"
           :src="imageUrl"
           :alt="name"
-          class="w-full h-full object-cover select-none group-hover:scale-[1.02] transition-transform duration-300"
+          class="max-w-full max-h-full object-contain select-none group-hover:scale-[1.04] transition-transform duration-300"
           loading="lazy"
           @error="onError"
         />

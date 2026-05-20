@@ -148,6 +148,12 @@
                   :to="`/product/${product.slug}/${product.id}`"
                 />
               </div>
+
+              <!-- Pagination — appears once there's more than one page -->
+              <Pagination
+                v-if="products && products.last_page > 1"
+                :pagination="products"
+              />
             </section>
             <section>
               <h2 class="text-2xl text-gray-900 mb-6">Customer Reviews</h2>
@@ -1378,12 +1384,13 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-/* Periodic gentle wiggle on the PMAP coupon button so it draws the eye
-   without being annoying. Plays every ~6s, lasts ~700ms. Respects
-   prefers-reduced-motion. */
+<style>
+/* Global (not scoped) so the keyframes name + selector survive Vue's
+   data-attribute rewriting. Periodic wiggle on the PMAP coupon button
+   to draw the eye — every ~4s, lasts ~800ms. More noticeable than the
+   first pass: 5deg rotation + a subtle scale punch. */
 .pmap-coupon-shake {
-  animation: pmap-coupon-shake 6s ease-in-out infinite;
+  animation: pmap-coupon-shake 4s ease-in-out infinite;
   transform-origin: center center;
   will-change: transform;
 }
@@ -1391,12 +1398,13 @@ onMounted(() => {
   animation-play-state: paused;
 }
 @keyframes pmap-coupon-shake {
-  0%, 88%, 100% { transform: rotate(0deg) translateY(0); }
-  90% { transform: rotate(-2deg) translateY(-1px); }
-  92% { transform: rotate(2deg) translateY(-1px); }
-  94% { transform: rotate(-2deg) translateY(0); }
-  96% { transform: rotate(2deg) translateY(0); }
-  98% { transform: rotate(-1deg) translateY(0); }
+  0%, 80%, 100% { transform: rotate(0deg) scale(1); }
+  82% { transform: rotate(-5deg) scale(1.04); }
+  85% { transform: rotate(5deg) scale(1.04); }
+  88% { transform: rotate(-4deg) scale(1.03); }
+  91% { transform: rotate(4deg) scale(1.02); }
+  94% { transform: rotate(-2deg) scale(1.01); }
+  97% { transform: rotate(0deg) scale(1); }
 }
 @media (prefers-reduced-motion: reduce) {
   .pmap-coupon-shake {
