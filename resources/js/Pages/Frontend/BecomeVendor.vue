@@ -516,22 +516,23 @@
               <!-- Logo Upload -->
               <div>
                 <label for="logo_file" class="block text-sm text-slate-700 mb-2">
-                  Please upload a transparent .png logo file (1000px x 1000px)
+                  Upload your logo
                 </label>
                 <div class="mt-2">
                   <input
                     id="logo_file"
                     type="file"
-                    accept="image/png"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
                     @change="handleLogoUpload"
                     class="block w-full text-sm text-slate-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600 file:cursor-pointer cursor-pointer"
                   />
                   <p class="mt-1 text-xs text-slate-500">
-                    Accepted format: PNG only. Recommended size: 1000px x 1000px with transparent background.
+                    PNG, JPG, WebP, or SVG · up to 8 MB · square (e.g. 1000×1000) transparent preferred.
                   </p>
                   <div v-if="formData.logoFile" class="mt-2 text-sm text-slate-600">
                     Selected: {{ formData.logoFile.name }}
                   </div>
+                  <p v-if="fieldErrors.logoFile" class="mt-1 text-xs text-rose-600">{{ fieldErrors.logoFile }}</p>
                 </div>
               </div>
 
@@ -1396,13 +1397,18 @@ const handleStep4Submit = () => {
         if (fs && fs < earliestStep) earliestStep = fs;
       }
 
+      // Build a readable summary so the user sees the actual problem
+      // (e.g. "Logo file is too large") instead of a generic message.
+      const errorList = Object.values(errors).flat().filter(Boolean);
+      const summary = errorList.slice(0, 3).join(' ')
+        + (errorList.length > 3 ? ` (+${errorList.length - 3} more — see fields below)` : '');
+
       if (earliestStep < step.value) {
         step.value = earliestStep;
         router.get('/become-a-vendor', { step: earliestStep }, { preserveState: true, replace: true });
-        submissionError.value = "Some details need fixing — we've taken you back to the relevant step.";
+        submissionError.value = summary || "Some details need fixing — we've taken you back to the relevant step.";
       } else {
-        const errorMessages = Object.values(errors).flat();
-        submissionError.value = errorMessages[0] || 'Please review the errors below and try again.';
+        submissionError.value = summary || 'Please review the errors below and try again.';
       }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });

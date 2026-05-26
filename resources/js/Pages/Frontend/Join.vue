@@ -272,10 +272,13 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1.5">Logo (PNG, 1000×1000px transparent)</label>
-              <input type="file" accept="image/png" @change="handleLogoUpload"
-                class="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer" />
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">Logo</label>
+              <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" @change="handleLogoUpload"
+                :class="['block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium hover:file:bg-slate-200 cursor-pointer',
+                  fieldErrors.logoFile ? 'text-rose-700 file:bg-rose-100 file:text-rose-700' : 'text-slate-600 file:bg-slate-100 file:text-slate-700']" />
+              <p class="text-xs text-slate-500 mt-1">PNG, JPG, WebP, or SVG · up to 8 MB · square (e.g. 1000×1000) transparent preferred</p>
               <p v-if="formData.logoFile" class="text-xs text-slate-500 mt-1">Selected: {{ formData.logoFile.name }}</p>
+              <p v-if="fieldErrors.logoFile" class="text-xs text-rose-600 mt-1">{{ fieldErrors.logoFile }}</p>
             </div>
 
             <div class="flex items-center justify-between pt-6 border-t border-slate-100">
@@ -864,14 +867,20 @@ const submitRegistration = () => {
         if (fieldStep && fieldStep < earliestStep) earliestStep = fieldStep
       }
 
+      // Build a concise summary of what's wrong so the user can fix it
+      // without having to hunt for inline messages. Caps at 3 to keep the
+      // banner readable; the rest still render inline per-field.
+      const errorList = Object.values(errors).flat().filter(Boolean)
+      const summary = errorList.slice(0, 3).join(' ')
+        + (errorList.length > 3 ? ` (+${errorList.length - 3} more — see fields below)` : '')
+
       if (earliestStep < step.value) {
         // Jump back to the step with the problem
         step.value = earliestStep
-        submissionError.value = "Some details need fixing — we've taken you back to the relevant step."
+        submissionError.value = summary || "Some details need fixing — we've taken you back to the relevant step."
       } else {
-        // Errors on current step — show a banner summary
-        const errorMessages = Object.values(errors).flat()
-        submissionError.value = errorMessages[0] || 'Please review the errors below and try again.'
+        // Errors on current step — show the same summary
+        submissionError.value = summary || 'Please review the errors below and try again.'
       }
 
       setTimeout(() => {

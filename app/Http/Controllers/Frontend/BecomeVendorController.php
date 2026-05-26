@@ -78,20 +78,29 @@ class BecomeVendorController extends Controller
             'apiConsumerKey' => ['nullable', 'required_without:refuseApiAccess', 'string', 'min:10', 'max:255', 'starts_with:ck_'],
             'apiConsumerSecret' => ['nullable', 'required_without:refuseApiAccess', 'string', 'min:10', 'max:255', 'starts_with:cs_'],
             'productCount' => 'nullable|string|max:50',
-            'companyDescription' => 'nullable|string|max:2000',
+            'companyDescription' => 'nullable|string|max:5000',
             'paymentMethods' => 'nullable|array',
             'paymentMethods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
-            'shippingInformation' => 'nullable|string|max:2000',
-            'returnPolicy' => 'nullable|string|max:2000',
-            'businessHours' => 'nullable|string|max:255',
-            'uniqueSellingPoints' => 'nullable|string|max:2000',
-            'logoFile' => 'nullable|mimes:png|max:2048',
+            'shippingInformation' => 'nullable|string|max:5000',
+            'returnPolicy' => 'nullable|string|max:5000',
+            'businessHours' => 'nullable|string|max:500',
+            'uniqueSellingPoints' => 'nullable|string|max:5000',
+            // Logo: accept PNG/JPG/JPEG/WebP/SVG up to 8 MB. Real vendor logos
+            // are often 2-5 MB (transparent backgrounds, full-resolution) and
+            // the older 2 MB PNG-only rule was bouncing legitimate signups.
+            'logoFile' => 'nullable|file|mimes:png,jpg,jpeg,webp,svg|max:8192',
         ], [
             'password.regex' => 'Password must include at least one uppercase, one lowercase, and one number.',
             'apiConsumerKey.starts_with' => 'Consumer Key must start with "ck_".',
             'apiConsumerSecret.starts_with' => 'Consumer Secret must start with "cs_".',
             'website.url' => 'Please enter a valid URL starting with http:// or https://.',
             'email.email' => 'Please enter a valid email address.',
+            'logoFile.mimes' => 'Logo must be a PNG, JPG, WebP, or SVG file.',
+            'logoFile.max' => 'Logo file is too large. Please use a file under 8 MB.',
+            'companyDescription.max' => 'Company description is too long (5,000 character limit).',
+            'shippingInformation.max' => 'Shipping information is too long (5,000 character limit).',
+            'returnPolicy.max' => 'Return policy is too long (5,000 character limit).',
+            'uniqueSellingPoints.max' => 'Unique selling points is too long (5,000 character limit).',
         ]);
 
         try {
@@ -158,24 +167,37 @@ class BecomeVendorController extends Controller
                 },
             ]);
 
-            // Handle logo upload
+            // Handle logo upload — accept PNG/JPG/WebP/SVG. PNG/JPG/WebP get
+            // converted to WebP for storage savings; SVG is kept as-is since
+            // it's already vector. Previously the controller silently dropped
+            // anything that wasn't PNG, which is why some signups looked
+            // logo-less after submitting.
             if ($request->hasFile('logoFile')) {
                 $logoFile = $request->file('logoFile');
                 $extension = strtolower($logoFile->getClientOriginalExtension());
                 $mimeType = $logoFile->getMimeType();
-                
-                // Check if it's PNG
-                if ($extension === 'png' || $mimeType === 'image/png') {
-                    // Convert PNG to WebP
+
+                $isRaster = in_array($extension, ['png', 'jpg', 'jpeg', 'webp'], true)
+                    || in_array($mimeType, ['image/png', 'image/jpeg', 'image/webp'], true);
+                $isSvg = $extension === 'svg' || $mimeType === 'image/svg+xml';
+
+                if ($isRaster) {
                     try {
                         $logoFilename = ImageHelper::convertToWebP($logoFile, 'vendor_logos');
                         $settings->logo = 'vendor_logos/' . $logoFilename;
                     } catch (\Exception $e) {
-                        // If WebP conversion fails, save as PNG
-                        $logoFilename = Str::random(40) . '.png';
+                        // WebP conversion failed (lib missing, malformed file).
+                        // Fall back to storing the original under a random name
+                        // so the vendor's logo still lands somewhere.
+                        $safeExt = in_array($extension, ['png', 'jpg', 'jpeg', 'webp'], true) ? $extension : 'png';
+                        $logoFilename = Str::random(40) . '.' . $safeExt;
                         $logoFile->storeAs('vendor_logos', $logoFilename, 'public');
                         $settings->logo = 'vendor_logos/' . $logoFilename;
                     }
+                } elseif ($isSvg) {
+                    $logoFilename = Str::random(40) . '.svg';
+                    $logoFile->storeAs('vendor_logos', $logoFilename, 'public');
+                    $settings->logo = 'vendor_logos/' . $logoFilename;
                 }
             }
 

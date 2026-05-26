@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Build-A-Kit Tracker — new tiers mockup</title>
+<style>
+  :root {
+    --teal-900: #1f5b5e;
+    --teal-700: #2d7a7d;
+    --teal-500: #3e9396;
+    --teal-100: #d6ebec;
+    --teal-50:  #ecf6f7;
+    --ink-900:  #0f1f20;
+    --ink-700:  #34474a;
+    --ink-500:  #6b7f82;
+    --ink-300:  #aabbbd;
+    --line:     #d8e3e4;
+    --bg:       #f4f7f7;
+    --gold:     #b88a2e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink-900);
+    background: var(--bg);
+    padding: 40px 24px 80px;
+  }
+  h1 { font-size: 22px; margin: 0 0 6px; font-weight: 600; }
+  .lede { color: var(--ink-500); margin: 0 0 32px; font-size: 14px; max-width: 760px; }
+
+  .stack { display: flex; flex-direction: column; gap: 28px; max-width: 760px; }
+  .state-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+    margin: 0 0 8px 4px;
+    font-weight: 600;
+  }
+
+  /* Tracker card */
+  .tracker {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 20px 16px;
+  }
+  .tracker--max {
+    border-color: var(--teal-700);
+    background: linear-gradient(180deg, #fff 0%, #f3fafa 100%);
+  }
+
+  .row-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .pill {
+    background: var(--teal-900);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 5px 9px;
+    border-radius: 4px;
+    flex: 0 0 auto;
+  }
+  .status {
+    font-size: 14px;
+    color: var(--ink-700);
+    flex: 1 1 auto;
+  }
+  .status strong { color: var(--ink-900); font-weight: 600; }
+  .count {
+    font-size: 13px;
+    color: var(--ink-500);
+    flex: 0 0 auto;
+    font-variant-numeric: tabular-nums;
+  }
+  .count strong { color: var(--ink-900); font-weight: 600; }
+
+  /* Tier bar */
+  .tiers {
+    display: grid;
+    grid-template-columns: 5fr 5fr 10fr 15fr; /* widths proportional to tier ranges */
+    gap: 4px;
+    margin: 6px 0 4px;
+  }
+  .tier {
+    position: relative;
+    border-radius: 6px;
+    background: var(--teal-50);
+    height: 38px;
+    overflow: hidden;
+    border: 1px solid transparent;
+  }
+  .tier__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--teal-700);
+    transform-origin: left;
+    transition: transform .3s ease;
+  }
+  .tier__label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-700);
+    z-index: 1;
+    mix-blend-mode: normal;
+  }
+  .tier--complete .tier__label { color: #fff; }
+  .tier--active { border-color: var(--teal-700); }
+  .tier--active .tier__label { color: var(--ink-900); }
+  /* When the active tier is partially filled, label needs to read on both halves —
+     keep it dark and rely on the fill being teal-700 which has decent contrast with bold text. */
+  .tier--active.tier--partial .tier__label { color: var(--ink-900); }
+
+  .tier__check {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--teal-700);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 900;
+  }
+
+  /* Milestone scale row under bar */
+  .scale {
+    display: grid;
+    grid-template-columns: 5fr 5fr 10fr 15fr;
+    gap: 4px;
+    margin-top: 6px;
+    padding: 0 2px;
+  }
+  .scale__cell {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--ink-500);
+    font-variant-numeric: tabular-nums;
+  }
+  .scale__cell span:last-child { color: var(--ink-300); }
+
+  /* Helper line */
+  .hint {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--ink-700);
+  }
+  .hint strong { color: var(--teal-900); font-weight: 600; }
+
+  /* Applied banner */
+  .applied {
+    margin-top: 12px;
+    background: var(--teal-700);
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .applied__left { display: flex; align-items: center; gap: 10px; }
+  .applied__check {
+    width: 18px; height: 18px;
+    background: #fff;
+    color: var(--teal-700);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 900;
+  }
+  .applied__amount { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .applied--max {
+    background: linear-gradient(90deg, var(--teal-900), var(--teal-700));
+    box-shadow: 0 0 0 1px var(--teal-700) inset;
+  }
+  .applied--max .applied__check { color: var(--gold); }
+
+  /* No-discount empty state banner */
+  .applied--empty {
+    background: var(--teal-50);
+    color: var(--ink-700);
+    font-weight: 500;
+  }
+  .applied--empty .applied__check {
+    background: var(--ink-300);
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+
+<h1>Build-A-Kit tracker — new tier mockup</h1>
+<p class="lede">
+  Tiers: 5–9 = 10% · 10–19 = 20% · 20–34 = 25% · 35+ = 35%.
+  Each tier is a segment; segment width is proportional to the size of its vial range, so the visual
+  weight matches how much work is left. The active tier shows partial fill; completed tiers are solid.
+  At 35+, the final segment locks in as "max" and stops competing for attention.
+</p>
+
+<div class="stack">
+
+  <!-- State 1: empty / 0 vials -->
+  <div>
+    <p class="state-label">0 vials — no discount yet</p>
+    <div class="tracker">
+      <div class="row-top">
+        <span class="pill">BUILD-A-KIT</span>
+        <span class="status">Add <strong>5 vials</strong> to unlock 10% off your kit.</span>
+        <span class="count"><strong>0</strong> / 35+ vials</span>
+      </div>
+
+      <div class="tiers">
+        <div class="tier"><div class="tier__fill" style="transform: scaleX(0)"></div><div class="tier__label">10%</div></div>
+        <div class="tier"><div class="tier__fill" style="transform: scaleX(0)"></div><div class="tier__label">20%</div></div>
+        <div class="tier"><div class="tier__fill" style="transform: scaleX(0)"></div><div class="tier__label">25%</div></div>
+        <div class="tier"><div class="tier__fill" style="transform: scaleX(0)"></div><div class="tier__label">35%</div></div>
+      </div>
+      <div class="scale">
+        <div class="scale__cell"><span>0</span><span>5</span></div>
+        <div class="scale__cell"><span></span><span>10</span></div>
+        <div class="scale__cell"><span></span><span>20</span></div>
+        <div class="scale__cell"><span></span><span>35+</span></div>
+      </div>
+
+      <div class="applied applied--empty">
+        <div class="applied__left">
+          <span class="applied__check">i</span>
+          <span>No discount applied yet — add 5 vials to start saving</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 2: 3 vials, in first ramp -->
+  <div>
+    <p class="state-label">3 vials — partway to first tier</p>
+    <div class="tracker">
+      <div class="row-top">
+        <span class="pill">BUILD-A-KIT</span>
+        <span class="status">Add <strong>2 more vials</strong> to unlock 10% off.</span>
+        <span class="count"><strong>3</strong> / 35+ vials</span>
+      </div>
+
+      <div class="tiers">
+        <div class="tier tier--active tier--partial"><div class="tier__fill" style="transform: scaleX(0.6)"></div><div class="tier__label">10%</div></div>
+        <div class="tier"><div class="tier__fill" style="transform: scaleX(0)"></div><div class="tier__label">20%</div></div>
+        <div class="tier"><div class="tier__fill" style="transform: scaleX(0)"></div><div class="tier__label">25%</div></div>
+        <div class="tier"><div class="tier__fill" style="transform: scaleX(0)"></div><div class="tier__label">35%</div></div>
+      </div>
+      <div class="scale">
+        <div class="scale__cell"><span>0</span><span>5</span></div>
+        <div class="scale__cell"><span></span><span>10</span></div>
+        <div class="scale__cell"><span></span><span>20</span></div>
+        <div class="scale__cell"><span></span><span>35+</span></div>
+      </div>
+
+      <div class="applied applied--empty">
+        <div class="applied__left">
+          <span class="applied__check">i</span>
+          <span>No discount applied yet — keep adding vials to start saving</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 3: 6 vials, 10% unlocked -->
+  <div>
+    <p class="state-label">6 vials — 10% unlocked, heading to 20%</p>
+    <div class="tracker">
+      <div class="row-top">
+        <span class="pill">BUILD-A-KIT</span>
+        <span class="status"><strong>10% off</strong> — add 4 more vials to unlock 20%.</span>
+        <span class="count"><strong>6</strong> / 35+ vials</span>
+      </div>
+
+      <div class="tiers">
+        <div class="tier tier--complete"><div class="tier__fill" style="transform: scaleX(1)"></div><div class="tier__label"><span class="tier__check">✓</span>10%</div></div>
+        <div class="tier tier--active tier--partial"><div class="tier__fill" style="transform: scaleX(0.2)"></div><div class="tier__label">20%</div></div>
+        <div class="tier"><div class="tier__fill" style="transform: scaleX(0)"></div><div class="tier__label">25%</div></div>
+        <div class="tier"><div class="tier__fill" style="transform: scaleX(0)"></div><div class="tier__label">35%</div></div>
+      </div>
+      <div class="scale">
+        <div class="scale__cell"><span>0</span><span>5</span></div>
+        <div class="scale__cell"><span></span><span>10</span></div>
+        <div class="scale__cell"><span></span><span>20</span></div>
+        <div class="scale__cell"><span></span><span>35+</span></div>
+      </div>
+
+      <div class="applied">
+        <div class="applied__left">
+          <span class="applied__check">✓</span>
+          <span>10% Build-A-Kit discount applied</span>
+        </div>
+        <span class="applied__amount">−$51.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 4: 11 vials, 20% unlocked -->
+  <div>
+    <p class="state-label">11 vials — 20% unlocked, 9 to go for 25%</p>
+    <div class="tracker">
+      <div class="row-top">
+        <span class="pill">BUILD-A-KIT</span>
+        <span class="status"><strong>20% off</strong> — add 9 more vials to unlock 25%.</span>
+        <span class="count"><strong>11</strong> / 35+ vials</span>
+      </div>
+
+      <div class="tiers">
+        <div class="tier tier--complete"><div class="tier__fill" style="transform: scaleX(1)"></div><div class="tier__label"><span class="tier__check">✓</span>10%</div></div>
+        <div class="tier tier--complete"><div class="tier__fill" style="transform: scaleX(1)"></div><div class="tier__label"><span class="tier__check">✓</span>20%</div></div>
+        <div class="tier tier--active tier--partial"><div class="tier__fill" style="transform: scaleX(0.1)"></div><div class="tier__label">25%</div></div>
+        <div class="tier"><div class="tier__fill" style="transform: scaleX(0)"></div><div class="tier__label">35%</div></div>
+      </div>
+      <div class="scale">
+        <div class="scale__cell"><span>0</span><span>5</span></div>
+        <div class="scale__cell"><span></span><span>10</span></div>
+        <div class="scale__cell"><span></span><span>20</span></div>
+        <div class="scale__cell"><span></span><span>35+</span></div>
+      </div>
+
+      <div class="applied">
+        <div class="applied__left">
+          <span class="applied__check">✓</span>
+          <span>20% Build-A-Kit discount applied</span>
+        </div>
+        <span class="applied__amount">−$177.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 5: 22 vials, 25% unlocked -->
+  <div>
+    <p class="state-label">22 vials — 25% unlocked, 13 to go for max</p>
+    <div class="tracker">
+      <div class="row-top">
+        <span class="pill">BUILD-A-KIT</span>
+        <span class="status"><strong>25% off</strong> — add 13 more vials to unlock max 35%.</span>
+        <span class="count"><strong>22</strong> / 35+ vials</span>
+      </div>
+
+      <div class="tiers">
+        <div class="tier tier--complete"><div class="tier__fill" style="transform: scaleX(1)"></div><div class="tier__label"><span class="tier__check">✓</span>10%</div></div>
+        <div class="tier tier--complete"><div class="tier__fill" style="transform: scaleX(1)"></div><div class="tier__label"><span class="tier__check">✓</span>20%</div></div>
+        <div class="tier tier--complete"><div class="tier__fill" style="transform: scaleX(1)"></div><div class="tier__label"><span class="tier__check">✓</span>25%</div></div>
+        <div class="tier tier--active tier--partial"><div class="tier__fill" style="transform: scaleX(0.133)"></div><div class="tier__label">35%</div></div>
+      </div>
+      <div class="scale">
+        <div class="scale__cell"><span>0</span><span>5</span></div>
+        <div class="scale__cell"><span></span><span>10</span></div>
+        <div class="scale__cell"><span></span><span>20</span></div>
+        <div class="scale__cell"><span></span><span>35+</span></div>
+      </div>
+
+      <div class="applied">
+        <div class="applied__left">
+          <span class="applied__check">✓</span>
+          <span>25% Build-A-Kit discount applied</span>
+        </div>
+        <span class="applied__amount">−$610.50</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- State 6: 37 vials, max tier -->
+  <div>
+    <p class="state-label">37 vials — max tier reached</p>
+    <div class="tracker tracker--max">
+      <div class="row-top">
+        <span class="pill">BUILD-A-KIT</span>
+        <span class="status"><strong>Max 35% unlocked</strong> — top-tier discount applied to your kit.</span>
+        <span class="count"><strong>37</strong> / 35+ vials</span>
+      </div>
+
+      <div class="tiers">
+        <div class="tier tier--complete"><div class="tier__fill" style="transform: scaleX(1)"></div><div class="tier__label"><span class="tier__check">✓</span>10%</div></div>
+        <div class="tier tier--complete"><div class="tier__fill" style="transform: scaleX(1)"></div><div class="tier__label"><span class="tier__check">✓</span>20%</div></div>
+        <div class="tier tier--complete"><div class="tier__fill" style="transform: scaleX(1)"></div><div class="tier__label"><span class="tier__check">✓</span>25%</div></div>
+        <div class="tier tier--complete"><div class="tier__fill" style="transform: scaleX(1)"></div><div class="tier__label"><span class="tier__check">✓</span>35%</div></div>
+      </div>
+      <div class="scale">
+        <div class="scale__cell"><span>0</span><span>5</span></div>
+        <div class="scale__cell"><span></span><span>10</span></div>
+        <div class="scale__cell"><span></span><span>20</span></div>
+        <div class="scale__cell"><span></span><span>35+</span></div>
+      </div>
+
+      <div class="applied applied--max">
+        <div class="applied__left">
+          <span class="applied__check">★</span>
+          <span>35% Build-A-Kit discount applied — max tier</span>
+        </div>
+        <span class="applied__amount">−$1,118.25</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
