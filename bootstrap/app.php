@@ -59,6 +59,15 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e->getStatusCode() !== 419) {
                 return null;
             }
+            \Log::warning('csrf 419 caught', [
+                'path' => $request->path(),
+                'method' => $request->method(),
+                'x_inertia' => $request->header('X-Inertia'),
+                'referer' => $request->header('referer'),
+                'has_session' => $request->hasSession(),
+                'header_token_prefix' => substr((string) $request->header('X-XSRF-TOKEN'), 0, 12),
+                'session_token_prefix' => $request->hasSession() ? substr((string) $request->session()->token(), 0, 12) : null,
+            ]);
             $path = trim($request->path(), '/');
             $host = $request->getHost();
 
@@ -83,21 +92,22 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             // Admin + vendor dashboard actions: bounce back to the referring
-            // page with a flash. Inertia requests don't follow plain 302s, so
-            // for them we return 409 with X-Inertia-Location — Inertia treats
-            // that as 'hard navigate to this URL'.
+            // page so the user gets a fresh CSRF token. Inertia ignores plain
+            // 302s on XHR, so for those we return 409 with X-Inertia-Location.
+            //
+            // Notes:
+            //   - We do NOT regenerate the session token here. The user's
+            //     valid token is already in their session — they just sent
+            //     a stale one in this request (browser cached old form data,
+            //     double-submit, etc.). Regenerating triggered a chain of
+            //     mismatches on every subsequent action.
+            //   - No flash message — the reload is silent. A persistent
+            //     'session refreshed' banner on every click was worse UX
+            //     than the original error.
             if (str_starts_with($path, 'admin/') || $path === 'admin' ||
                 str_starts_with($path, 'vendor/') || $path === 'vendor') {
                 $referer = $request->headers->get('referer');
                 $target = $referer ?: '/' . ($path ? explode('/', $path)[0] : 'admin');
-
-                // Always regenerate the session token so the next request from
-                // the refreshed page has a valid CSRF pair.
-                if ($request->hasSession()) {
-                    $request->session()->regenerateToken();
-                }
-
-                $request->session()->flash('error', 'Your session refreshed — please try that action again.');
 
                 if ($request->header('X-Inertia')) {
                     return response('', 409, ['X-Inertia-Location' => $target]);
