@@ -59,15 +59,35 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e->getStatusCode() !== 419) {
                 return null;
             }
-            \Log::warning('csrf 419 caught', [
-                'path' => $request->path(),
-                'method' => $request->method(),
-                'x_inertia' => $request->header('X-Inertia'),
-                'referer' => $request->header('referer'),
-                'has_session' => $request->hasSession(),
-                'header_token_prefix' => substr((string) $request->header('X-XSRF-TOKEN'), 0, 12),
-                'session_token_prefix' => $request->hasSession() ? substr((string) $request->session()->token(), 0, 12) : null,
-            ]);
+            // Diagnostic: log what the framework saw vs what's in session,
+            // including whether the X-XSRF-TOKEN header decrypts to the
+            // same value as the session token. Helps catch APP_KEY mismatch,
+            // cookie/session-cookie name collisions, etc.
+            try {
+                $encrypter = app(\Illuminate\Contracts\Encryption\Encrypter::class);
+                $header = (string) $request->header('X-XSRF-TOKEN');
+                $decrypted = $header ? \Illuminate\Cookie\CookieValuePrefix::remove($encrypter->decrypt($header, false)) : null;
+                $sessionTok = $request->hasSession() ? $request->session()->token() : null;
+                \Log::warning('csrf 419 caught', [
+                    'path' => $request->path(),
+                    'method' => $request->method(),
+                    'x_inertia' => $request->header('X-Inertia') ? 'true' : null,
+                    'referer' => $request->header('referer'),
+                    'header_raw_len' => strlen($header),
+                    'header_decrypted_len' => $decrypted !== null ? strlen($decrypted) : null,
+                    'header_decrypted' => $decrypted,
+                    'session_token' => $sessionTok,
+                    'tokens_match' => $decrypted !== null && $sessionTok !== null && hash_equals($sessionTok, $decrypted),
+                ]);
+            } catch (\Throwable $diag) {
+                \Log::warning('csrf 419 caught (decrypt failed)', [
+                    'path' => $request->path(),
+                    'method' => $request->method(),
+                    'decrypt_error' => $diag->getMessage(),
+                    'header_token_prefix' => substr((string) $request->header('X-XSRF-TOKEN'), 0, 16),
+                    'session_token' => $request->hasSession() ? $request->session()->token() : null,
+                ]);
+            }
             $path = trim($request->path(), '/');
             $host = $request->getHost();
 
