@@ -13,26 +13,31 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // In Laravel 11+, $middleware->web([...]) APPENDS to the framework's
         // default web stack rather than replacing it. Listing our custom
-        // EncryptCookies / VerifyCsrfToken classes here caused cookies to be
-        // encrypted twice on response (XSRF-TOKEN was double-wrapped) and
-        // CSRF to be checked twice on request. Every form post and admin
-        // delete failed with 419 because the decrypted header still came back
-        // encrypted from the second wrap. Use ->replace() to swap our custom
-        // versions in for the framework defaults instead.
+        // EncryptCookies / VerifyCsrfToken classes there caused cookies to be
+        // double-encrypted on response (XSRF-TOKEN got wrapped twice) and
+        // CSRF to be checked twice on request. Every admin form / delete
+        // failed with 419 because the decrypted header still came back
+        // encrypted from the second wrap.
+        //
+        // Append-only for actually-new middleware. Configure CSRF exceptions
+        // via the framework helper instead of subclassing VerifyCsrfToken.
         $middleware->web(append: [
             \App\Http\Middleware\ComingSoon::class,
             \App\Http\Middleware\BindDemoMode::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
 
-        $middleware->replace(
-            \Illuminate\Cookie\Middleware\EncryptCookies::class,
-            \App\Http\Middleware\EncryptCookies::class,
-        );
-        $middleware->replace(
-            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,
-        );
+        $middleware->validateCsrfTokens(except: [
+            'admin/discover',
+            'admin/discover/*',
+            'admin/discover/scan',
+            'admin/discover/import',
+            'admin/discover/activate',
+            'admin/vendors/*/scrape',
+            'admin/vendors/*/discover-products',
+            'api/woo-auth-callback',
+            'api/subscribe',
+        ]);
 
         $middleware->api([
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
