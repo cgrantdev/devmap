@@ -52,6 +52,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // can finish (their localStorage draft restores everything except
         // the password fields).
         $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
+            \Log::warning('TokenMismatch handler fired', [
+                'path' => $request->path(),
+                'method' => $request->method(),
+                'x_inertia' => $request->header('X-Inertia'),
+                'referer' => $request->header('referer'),
+            ]);
             $path = trim($request->path(), '/');
             $host = $request->getHost();
 
