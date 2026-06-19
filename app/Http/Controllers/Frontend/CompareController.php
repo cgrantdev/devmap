@@ -16,37 +16,53 @@ class CompareController extends Controller
      * The ordered list of featured compound category IDs for the compare page.
      * Maintained manually to match the product team's priority list.
      */
+    /**
+     * Compounds shown on /compare, in priority order. First 13 are the
+     * user-curated 'top' list — the obesity GLP-1s, the popular blends,
+     * and the highest-traffic singles. The rest are filled out by remaining
+     * categories with healthy product counts so the page displays ~25 compounds
+     * total. Categories that don't exist in the DB are silently skipped, so
+     * additions here are safe even if the underlying category doesn't exist
+     * yet.
+     */
     private const FEATURED_COMPOUND_NAMES = [
-        'GLP3-R (Retatrutide)',
+        // Top priority (in the order the user requested)
+        'Retatrutide',
+        'Tirzepatide',
+        'Semaglutide',
+        'Tesamorelin',
         'BPC-157 / TB-500',
-        'GLP1-S (Semaglutide)',
-        'GLP2-T (Tirzepatide)',
+        'GHK-Cu',
         'GLOW',
         'KLOW',
-        'BPC-157',
-        'Tesamorelin',
-        'Sermorelin',
-        'CJC-1295 / Ipamorelin',   // closest match for "Tesamorelin / Ipamorelin / CJC 1295"
-        'NAD+',
-        'AOD-9604',
-        'Ipamorelin',               // placeholder for "Tesamorelin / Ipamorelin / BPC-157 Blend"
-        'CJC-1295',
-        'GHK-Cu',
-        'PT-141',
-        'TB-500',
+        'CJC-1295 / Ipamorelin',
         'MOTS-c',
+        'BPC-157',
+        'NAD+',
+        'Glutathione',
+        // Then other popular compounds, ranked by current product count
+        'Ipamorelin',
+        'AOD-9604',
+        'CJC-1295',
+        'TB-500',
+        'Sermorelin',
+        'Cagrilintide',
+        '5-AMINO-1MQ',
+        'PT-141',
+        'IGF-1 LR3',
+        'Kisspeptin',
+        'SS-31',
+        'Tesofensine',
     ];
 
     /**
-     * Display name overrides (so the page shows the user-facing name
-     * even if the DB category uses a coded name like "GLP3-R (Retatrutide)").
+     * Display name overrides (so the page shows a friendlier label than the
+     * raw category name when it helps — blends especially benefit from
+     * spelling out their constituents).
      */
     private const DISPLAY_NAMES = [
-        'GLP3-R (Retatrutide)' => 'Retatrutide',
-        'GLP1-S (Semaglutide)' => 'Semaglutide',
-        'GLP2-T (Tirzepatide)' => 'Tirzepatide',
         'BPC-157 / TB-500' => 'BPC-157 / TB-500 Blend',
-        'CJC-1295 / Ipamorelin' => 'Ipamorelin / CJC-1295 Blend',
+        'CJC-1295 / Ipamorelin' => 'CJC-1295 / Ipamorelin Blend',
         'GLOW' => 'GLOW — GHK-Cu/BPC-157/TB-500',
         'KLOW' => 'KLOW — GHK-Cu/BPC-157/TB-500/KPV',
     ];
