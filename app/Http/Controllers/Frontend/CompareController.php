@@ -87,10 +87,16 @@ class CompareController extends Controller
                 ->with('brand.vendorSetting')
                 ->get()
                 ->map(function ($product) {
-                    // Vendor's retail price (their own sale wins when active).
-                    $retail = $product->discount_price && $product->discount_price < $product->price
-                        ? $product->discount_price
-                        : $product->price;
+                    // Cast to float UP FRONT. Eloquent returns decimal columns
+                    // as strings, and sortBy() comparing string "100.00" vs
+                    // string "70.00" sorts lexically ('1' < '7'), putting the
+                    // $100 rows in the middle of the list. Forcing float
+                    // makes every comparison numeric.
+                    $retail = (float) (
+                        $product->discount_price && $product->discount_price < $product->price
+                            ? $product->discount_price
+                            : $product->price
+                    );
 
                     // PeptideMap-applied price using the brand's discount %.
                     $pct = $product->brand?->vendorSetting?->coupon_discount_percent;
@@ -128,11 +134,10 @@ class CompareController extends Controller
                 })
                 // Sort cheapest-first within this compound based on what the
                 // visitor will actually pay (PMAP price when applicable,
-                // retail otherwise). Done in PHP because pmap_price depends
-                // on a joined coupon_discount_percent column — easier to
-                // compute the column in PHP than express the conditional
-                // formula in SQL across MySQL/SQLite.
-                ->sortBy('final_price')
+                // retail otherwise). Numeric sort enforced even though
+                // every final_price is now a float, in case a future change
+                // reintroduces mixed types.
+                ->sortBy(fn ($p) => (float) $p['final_price'])
                 ->values();
 
             $displayName = self::DISPLAY_NAMES[$catName] ?? $category->name;
