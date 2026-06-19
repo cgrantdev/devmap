@@ -11,17 +11,28 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->web([
+        // In Laravel 11+, $middleware->web([...]) APPENDS to the framework's
+        // default web stack rather than replacing it. Listing our custom
+        // EncryptCookies / VerifyCsrfToken classes here caused cookies to be
+        // encrypted twice on response (XSRF-TOKEN was double-wrapped) and
+        // CSRF to be checked twice on request. Every form post and admin
+        // delete failed with 419 because the decrypted header still came back
+        // encrypted from the second wrap. Use ->replace() to swap our custom
+        // versions in for the framework defaults instead.
+        $middleware->web(append: [
             \App\Http\Middleware\ComingSoon::class,
             \App\Http\Middleware\BindDemoMode::class,
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
         ]);
+
+        $middleware->replace(
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \App\Http\Middleware\EncryptCookies::class,
+        );
+        $middleware->replace(
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+            \App\Http\Middleware\VerifyCsrfToken::class,
+        );
 
         $middleware->api([
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
