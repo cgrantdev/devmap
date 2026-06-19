@@ -120,7 +120,7 @@
           ]"
         >
           <!-- Big logo area -->
-          <div class="aspect-[16/9] bg-[color:var(--color-bg)] border-b border-[color:var(--color-hairline)] flex items-center justify-center p-8 relative">
+          <div class="aspect-[16/9] bg-white border-b border-[color:var(--color-hairline)] flex items-center justify-center p-8 relative">
             <img
               v-if="brand.logo"
               :src="brand.logo"
