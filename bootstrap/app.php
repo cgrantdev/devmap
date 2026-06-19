@@ -51,13 +51,14 @@ return Application::configure(basePath: dirname(__DIR__))
         // instead bounce back to the form with a flash message so the user
         // can finish (their localStorage draft restores everything except
         // the password fields).
-        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, $request) {
-            \Log::warning('TokenMismatch handler fired', [
-                'path' => $request->path(),
-                'method' => $request->method(),
-                'x_inertia' => $request->header('X-Inertia'),
-                'referer' => $request->header('referer'),
-            ]);
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, $request) {
+            // Only handle 419 (CSRF/page-expired). Laravel converts
+            // TokenMismatchException → HttpException(419) before render
+            // callbacks fire, so type-hinting TokenMismatchException
+            // never matches in Laravel 12+.
+            if ($e->getStatusCode() !== 419) {
+                return null;
+            }
             $path = trim($request->path(), '/');
             $host = $request->getHost();
 
