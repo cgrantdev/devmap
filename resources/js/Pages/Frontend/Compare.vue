@@ -295,8 +295,11 @@ function getFilteredProducts(compound, idx) {
 
 function percentCheaper(products) {
   if (products.length < 2) return null
-  const first = parseFloat(products[0]?.effective_price)
-  const second = parseFloat(products[1]?.effective_price)
+  // Compare against the same field the rows are sorted by (final_price =
+  // post-coupon when applicable, retail otherwise) so 'X% cheaper than #2'
+  // reflects what visitors actually pay.
+  const first = parseFloat(products[0]?.final_price ?? products[0]?.effective_price)
+  const second = parseFloat(products[1]?.final_price ?? products[1]?.effective_price)
   if (!first || !second || first >= second) return null
   return Math.round((1 - first / second) * 100)
 }

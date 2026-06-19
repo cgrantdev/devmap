@@ -85,12 +85,23 @@ class CompareController extends Controller
                       });
                 })
                 ->with('brand.vendorSetting')
-                ->orderByRaw('COALESCE(discount_price, price) ASC')
                 ->get()
                 ->map(function ($product) {
-                    $effectivePrice = $product->discount_price && $product->discount_price < $product->price
+                    // Vendor's retail price (their own sale wins when active).
+                    $retail = $product->discount_price && $product->discount_price < $product->price
                         ? $product->discount_price
                         : $product->price;
+
+                    // PeptideMap-applied price using the brand's discount %.
+                    $pct = $product->brand?->vendorSetting?->coupon_discount_percent;
+                    $pmapPrice = ($pct !== null && $pct > 0 && $pct < 100 && $retail > 0)
+                        ? round($retail * (1 - ((float) $pct / 100)), 2)
+                        : null;
+
+                    // The figure we sort on per category — what the visitor
+                    // actually pays. Falls back to retail when there's no
+                    // PeptideMap discount configured for this vendor.
+                    $finalPrice = $pmapPrice ?? $retail;
 
                     return [
                         'id' => $product->id,
@@ -99,7 +110,9 @@ class CompareController extends Controller
                         'slug' => $product->slug,
                         'price' => $product->price,
                         'discount_price' => $product->discount_price,
-                        'effective_price' => $effectivePrice,
+                        'effective_price' => $retail,
+                        'final_price' => $finalPrice,
+                        'pmap_price' => $pmapPrice,
                         'image_url' => $product->image_url,
                         'product_url' => $product->product_url,
                         'go_url' => "/go/{$product->id}",
@@ -109,12 +122,18 @@ class CompareController extends Controller
                             ? asset('storage/' . $product->brand->vendorSetting->logo)
                             : null,
                         'brand_coupon_code' => $product->brand?->vendorSetting?->coupon_code,
-                        'brand_discount_percent' => $product->brand?->vendorSetting?->coupon_discount_percent !== null
-                            ? (float) $product->brand->vendorSetting->coupon_discount_percent
-                            : null,
+                        'brand_discount_percent' => $pct !== null ? (float) $pct : null,
                         'size_mg' => $product->size_mg,
                     ];
-                });
+                })
+                // Sort cheapest-first within this compound based on what the
+                // visitor will actually pay (PMAP price when applicable,
+                // retail otherwise). Done in PHP because pmap_price depends
+                // on a joined coupon_discount_percent column — easier to
+                // compute the column in PHP than express the conditional
+                // formula in SQL across MySQL/SQLite.
+                ->sortBy('final_price')
+                ->values();
 
             $displayName = self::DISPLAY_NAMES[$catName] ?? $category->name;
             $educationPost = $category->educationPost;
@@ -131,7 +150,10 @@ class CompareController extends Controller
                     ? "/encyclopedia/{$category->slug}"
                     : null,
                 'product_count' => $products->count(),
-                'cheapest_price' => $products->first()['effective_price'] ?? null,
+                // Use final_price (post-coupon) so the 'from $X' badge
+                // shown on the compound header matches what visitors actually
+                // pay — same metric as the row sort below.
+                'cheapest_price' => $products->first()['final_price'] ?? null,
                 'vendor_count' => $products->pluck('brand_name')->unique()->count(),
                 'products' => $products->values(),
             ]);
