@@ -453,8 +453,15 @@ class ProductsController extends Controller
             $query->orderBy($sortBy, $sortDir);
         }
 
-        // Paginate
-        $perPage = $request->get('per_page', 20);
+        // Category pages should show every product in the category, not a
+        // paginated slice — researchers compare vendor pricing across the
+        // whole catalog for one compound, so cutting it off at page 1 hides
+        // exactly the data they came for. Default per_page to a high cap
+        // and respect an explicit smaller override if a user/bot wants one.
+        $perPage = (int) $request->get('per_page', 1000);
+        if ($perPage < 1 || $perPage > 1000) {
+            $perPage = 1000;
+        }
         $products = $query->paginate($perPage)->withQueryString();
 
         // Get filter options for this category
