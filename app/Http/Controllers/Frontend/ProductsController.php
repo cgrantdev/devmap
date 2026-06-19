@@ -72,9 +72,12 @@ class ProductsController extends Controller
                         ->where('status', 'active')
                         ->where('product_category_id', $category->id)
                         ->whereNotNull('image_url')
+                        ->where('image_url', '!=', '') // skip blank strings
                         ->orderByDesc('is_peptide_thumb') // explicit pick wins
                         ->first();
-                    $image = $sampleProduct ? $sampleProduct->image_url : '/images/peptides/default.png';
+                    // null instead of a missing default.png so the Vue card
+                    // can render its themed SVG placeholder cleanly.
+                    $image = $sampleProduct ? $sampleProduct->image_url : null;
                 }
                 
                 return [
