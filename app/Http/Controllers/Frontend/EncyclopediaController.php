@@ -180,20 +180,38 @@ class EncyclopediaController extends Controller
         $categories = $query->orderBy('name')->get()->map(function ($category) {
             $educationPost = $category->educationPost;
             
-            // Get category image — use the category's own image if set,
-            // otherwise prefer a product explicitly flagged as the
-            // encyclopedia thumb; fall back to any visible product image.
+            // Priority order:
+            //  1. Product explicitly flagged is_encyclopedia_thumb for
+            //     this category — the VA's deliberate pick wins.
+            //  2. Category's own image_url, only if the file exists on
+            //     disk (stale DB pointers from deleted uploads otherwise
+            //     render as broken).
+            //  3. Any visible product in this category with an image.
+            //  4. null — Vue card renders the themed SVG placeholder.
             $image = null;
-            if ($category->image_url) {
+
+            $flagged = Product::visible()
+                ->where('status', 'active')
+                ->where('product_category_id', $category->id)
+                ->where('is_encyclopedia_thumb', true)
+                ->whereNotNull('image_url')
+                ->where('image_url', '!=', '')
+                ->first();
+
+            if ($flagged) {
+                $image = $flagged->image_url;
+            } elseif ($category->image_url
+                && Storage::disk('public')->exists('categories/' . $category->image_url)
+            ) {
                 $image = Storage::url('categories/' . $category->image_url);
             } else {
-                $sampleProduct = Product::visible()
+                $sample = Product::visible()
                     ->where('status', 'active')
                     ->where('product_category_id', $category->id)
                     ->whereNotNull('image_url')
-                    ->orderByDesc('is_encyclopedia_thumb') // explicit pick wins
+                    ->where('image_url', '!=', '')
                     ->first();
-                $image = $sampleProduct ? $sampleProduct->image_url : '/images/peptides/default.png';
+                $image = $sample ? $sample->image_url : null;
             }
 
             // Determine category tag - use education_tag from database, fallback to computed

@@ -61,23 +61,38 @@ class ProductsController extends Controller
             ->orderBy('name')
             ->get()
             ->map(function ($category) {
-                // Use category image if available, otherwise prefer the
-                // product explicitly flagged is_peptide_thumb for this category;
-                // fall back to any visible product with an image.
+                // Priority order:
+                //  1. A product explicitly flagged is_peptide_thumb for
+                //     this category — this is the VA's deliberate pick.
+                //  2. The category's own image_url (only if the underlying
+                //     file actually exists on disk — stale DB references
+                //     from deleted uploads otherwise render as broken).
+                //  3. Any visible product in this category with an image.
+                //  4. null — Vue card renders the themed SVG placeholder.
                 $image = null;
-                if ($category->image_url) {
+
+                $flagged = Product::visible()
+                    ->where('status', 'active')
+                    ->where('product_category_id', $category->id)
+                    ->where('is_peptide_thumb', true)
+                    ->whereNotNull('image_url')
+                    ->where('image_url', '!=', '')
+                    ->first();
+
+                if ($flagged) {
+                    $image = $flagged->image_url;
+                } elseif ($category->image_url
+                    && \Illuminate\Support\Facades\Storage::disk('public')->exists('categories/' . $category->image_url)
+                ) {
                     $image = \Illuminate\Support\Facades\Storage::url('categories/' . $category->image_url);
                 } else {
-                    $sampleProduct = Product::visible()
+                    $sample = Product::visible()
                         ->where('status', 'active')
                         ->where('product_category_id', $category->id)
                         ->whereNotNull('image_url')
-                        ->where('image_url', '!=', '') // skip blank strings
-                        ->orderByDesc('is_peptide_thumb') // explicit pick wins
+                        ->where('image_url', '!=', '')
                         ->first();
-                    // null instead of a missing default.png so the Vue card
-                    // can render its themed SVG placeholder cleanly.
-                    $image = $sampleProduct ? $sampleProduct->image_url : null;
+                    $image = $sample ? $sample->image_url : null;
                 }
                 
                 return [
