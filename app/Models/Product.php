@@ -92,6 +92,18 @@ class Product extends Model
         'is_encyclopedia_thumb' => 'boolean',
         'is_peptide_thumb' => 'boolean',
         'auto_update' => 'boolean',
+        // Money fields as floats. Eloquent's default for decimal columns is
+        // string ('100.00'), which then gets compared as a string in JS:
+        // '69.99' < '100.00' is FALSE lexically ('6' > '1'), which breaks
+        // every 'discount_price < price' check across the frontend (Compare,
+        // ProductDetail, search results, brand pages, etc.). Forcing float
+        // here means every payload that touches Product ships numbers and
+        // every JS comparison is numeric.
+        'price' => 'float',
+        'discount_price' => 'float',
+        'second_price' => 'float',
+        'rating_average' => 'float',
+        'purity' => 'float',
     ];
 
     // Always include the derived display_name when the model is serialized
