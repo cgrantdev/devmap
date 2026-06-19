@@ -114,8 +114,15 @@ class CompareController extends Controller
                         'name' => $product->display_name,
                         'product_type' => $product->product_type,
                         'slug' => $product->slug,
-                        'price' => $product->price,
-                        'discount_price' => $product->discount_price,
+                        // Cast prices to float so the Vue template can do
+                        // numeric comparisons. Eloquent ships decimal columns
+                        // as strings; '69.99' < '100.00' is FALSE in JS
+                        // lexical comparison (because '6' > '1'), which broke
+                        // the 'show discount + retail strikethrough' branch
+                        // for vendors whose discount has more digits left of
+                        // the decimal than retail.
+                        'price' => $product->price !== null ? (float) $product->price : null,
+                        'discount_price' => $product->discount_price !== null ? (float) $product->discount_price : null,
                         'effective_price' => $retail,
                         'final_price' => $finalPrice,
                         'pmap_price' => $pmapPrice,
