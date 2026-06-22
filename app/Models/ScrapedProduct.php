@@ -19,6 +19,10 @@ class ScrapedProduct extends Model
     public const SOURCE_WP_REST = 'wp_rest';
     public const SOURCE_XML_FEED = 'xml_feed';
     public const SOURCE_PAGE_SCRAPE = 'page_scrape';
+    // Non-WooCommerce ingest sources
+    public const SOURCE_JSON_FEED = 'json_feed';
+    public const SOURCE_MEDUSA_STORE = 'medusa_store';
+    public const SOURCE_BIGCOMMERCE = 'bigcommerce';
 
     protected $fillable = [
         'scraping_config_id',

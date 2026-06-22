@@ -12,6 +12,14 @@ class ScrapingConfig extends Model
     public const TYPE_WOO_API = 'woo_api';
     public const TYPE_WP_REST = 'wp_rest';
     public const TYPE_XML_FEED = 'xml_feed';
+    // Newer integration paths for non-WooCommerce vendors.
+    // Generic JSON feed = our canonical schema (Mr. Peps style custom builds,
+    // or any vendor who publishes a /products.json on their own server).
+    // Medusa = the Medusa.js Store API at {store_url}/store/products.
+    // BigCommerce = V3 REST at api.bigcommerce.com/stores/{hash}/v3/catalog.
+    public const TYPE_JSON_FEED = 'json_feed';
+    public const TYPE_MEDUSA_STORE = 'medusa_store';
+    public const TYPE_BIGCOMMERCE = 'bigcommerce';
 
     protected $fillable = [
         'vendor_id',
