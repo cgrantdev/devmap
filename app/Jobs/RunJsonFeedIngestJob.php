@@ -112,21 +112,44 @@ class RunJsonFeedIngestJob implements ShouldQueue
                 continue;
             }
 
-            // Canonical: one row per product.
-            $price = $p['price'] ?? null;
+            // Canonical: one row per product. Accepts several common field
+            // aliases so vendors don't have to reshape their existing feeds:
+            //   image      → image_url  (Certa Peptides, misc.)
+            //   permalink  → url        (WooCommerce Store API style)
+            //   regular_price / sale_price + on_sale
+            //   product_id + variation_id → external_id (Certa's flat variants)
+            $imageUrl = $p['image_url'] ?? $p['image'] ?? $p['thumbnail'] ?? null;
+            $sourceUrl = $p['url'] ?? $p['permalink'] ?? null;
+            $onSale = !empty($p['on_sale']);
+            $regularPrice = $p['regular_price'] ?? null;
+            $price = $p['price'] ?? $regularPrice;
+            // Sale price = discount_price, sale_price, OR (when on_sale=true)
+            // the current price if it's below regular_price.
             $salePrice = $p['sale_price'] ?? $p['discount_price'] ?? null;
+            if (!$salePrice && $onSale && $regularPrice && $price && $price < $regularPrice) {
+                $salePrice = $price;
+                $price = $regularPrice; // present retail as the higher figure
+            }
             if (!$price && !$salePrice) continue;
+
+            // Prefer variation_id when present (a WooCommerce variant flattened
+            // into the feed) so re-runs stably match the same staged row.
+            $externalId = (string) (
+                ($p['variation_id'] ?? null)
+                    ? ($p['product_id'] ?? '') . '-v' . $p['variation_id']
+                    : ($p['id'] ?? $p['product_id'] ?? $p['sku'] ?? $sourceUrl ?? $p['name'] ?? '')
+            );
 
             $staged = $ingestion->upsertStaged($this->config, [
                 'source_type' => ScrapedProduct::SOURCE_JSON_FEED,
-                'external_id' => (string) ($p['id'] ?? $p['url'] ?? $p['name'] ?? ''),
-                'source_url' => $p['url'] ?? null,
-                'name' => $p['name'] ?? null,
-                'description' => $p['description'] ?? null,
+                'external_id' => $externalId,
+                'source_url' => $sourceUrl,
+                'name' => $this->addDoseToName($p),
+                'description' => is_string($p['description'] ?? null) ? strip_tags($p['description']) : null,
                 'price' => $price,
                 'discount_price' => $salePrice,
-                'image_url' => $p['image_url'] ?? null,
-                'stock_status' => $this->stockStatus($p['in_stock'] ?? null),
+                'image_url' => $imageUrl,
+                'stock_status' => $this->stockStatus($p['in_stock'] ?? $p['stock_status'] ?? null),
                 'raw_data' => $p,
             ]);
 
@@ -197,6 +220,21 @@ class RunJsonFeedIngestJob implements ShouldQueue
             if (in_array($l, ['false', 'no', 'out_of_stock', 'outofstock', 'unavailable'], true)) return 'out_of_stock';
         }
         return null;
+    }
+
+    /** Certa Peptides publishes one row per dose with the dose in a separate
+     *  `dose` field rather than baked into `name`. Fold it in so downstream
+     *  display / dedup logic sees a distinct name per variant. */
+    protected function addDoseToName(array $product): ?string
+    {
+        $name = $product['name'] ?? null;
+        if (!$name) return null;
+        $dose = $product['dose'] ?? $product['size'] ?? null;
+        if (!$dose) return $name;
+        // Skip if the dose is already suffixed in the name (guards against
+        // vendors who put it in both places).
+        if (stripos($name, (string) $dose) !== false) return $name;
+        return trim($name) . ' — ' . trim((string) $dose);
     }
 
     protected function recordFailure(string $message): void
