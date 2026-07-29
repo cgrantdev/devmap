@@ -65,9 +65,18 @@ class RunMedusaIngestJob implements ShouldQueue
                 $query = ['limit' => $limit, 'offset' => $offset];
                 if ($regionId) $query['region_id'] = $regionId;
 
+                // Medusa v2 requires a publishable API key on every Store API
+                // request. It's tied to a sales channel and scopes which
+                // products/prices the endpoint exposes. Send it as the
+                // documented x-publishable-api-key header when configured.
+                $headers = ['User-Agent' => 'PeptideMap/1.0 ingest'];
+                if (!empty($creds['publishable_api_key'])) {
+                    $headers['x-publishable-api-key'] = $creds['publishable_api_key'];
+                }
+
                 $response = Http::timeout(45)
                     ->acceptJson()
-                    ->withHeaders(['User-Agent' => 'PeptideMap/1.0 ingest'])
+                    ->withHeaders($headers)
                     ->get($endpoint, $query);
 
                 if (!$response->successful()) {
