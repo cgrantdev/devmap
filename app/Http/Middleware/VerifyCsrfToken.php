@@ -23,6 +23,5 @@ class VerifyCsrfToken extends Middleware
         'api/subscribe',
         'api/banner-events/impressions',
         'api/banner-events/click',
-        'api/banners/*/click',
     ];
 } 

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Banner;
 use App\Models\BannerEvent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -30,7 +29,6 @@ class BannerEventController extends Controller
         $ctx = $this->context($request);
         $rows = [];
         $now = Carbon::now();
-        $bannerIdsToBump = [];
 
         foreach ($data['events'] as $ev) {
             $rows[] = array_merge($ctx, [
@@ -42,16 +40,9 @@ class BannerEventController extends Controller
                 'meta' => isset($ev['meta']) ? json_encode($ev['meta']) : null,
                 'created_at' => $now,
             ]);
-            if (!empty($ev['banner_id'])) $bannerIdsToBump[] = (int) $ev['banner_id'];
         }
 
         BannerEvent::insert($rows);
-
-        if ($bannerIdsToBump) {
-            foreach (array_count_values($bannerIdsToBump) as $id => $n) {
-                Banner::where('id', $id)->increment('impressions', $n);
-            }
-        }
 
         return response()->json(['ok' => true, 'count' => count($rows)]);
     }
@@ -83,10 +74,6 @@ class BannerEventController extends Controller
             'meta' => $data['meta'] ?? null,
             'created_at' => Carbon::now(),
         ]));
-
-        if (!empty($data['banner_id'])) {
-            Banner::where('id', $data['banner_id'])->increment('clicks');
-        }
 
         return response()->json(['ok' => true]);
     }

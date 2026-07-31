@@ -40,7 +40,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/subscribe',
             'api/banner-events/impressions',
             'api/banner-events/click',
-            'api/banners/*/click',
         ]);
 
         $middleware->api([

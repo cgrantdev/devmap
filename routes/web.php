@@ -308,12 +308,8 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     Route::put('/deals/{id}', [\App\Http\Controllers\Admin\DealsController::class, 'update'])->name('admin.deals.update');
     Route::delete('/deals/{id}', [\App\Http\Controllers\Admin\DealsController::class, 'destroy'])->name('admin.deals.destroy');
     
-    // Banners
+    // Homepage hero-slide banner management
     Route::get('/banners', [\App\Http\Controllers\Admin\BannersController::class, 'index'])->name('admin.banners.index');
-    Route::post('/banners', [\App\Http\Controllers\Admin\BannersController::class, 'store'])->name('admin.banners.store');
-    Route::put('/banners/{id}', [\App\Http\Controllers\Admin\BannersController::class, 'update'])->name('admin.banners.update');
-    Route::post('/banners/{id}/toggle', [\App\Http\Controllers\Admin\BannersController::class, 'toggle'])->name('admin.banners.toggle');
-    Route::delete('/banners/{id}', [\App\Http\Controllers\Admin\BannersController::class, 'destroy'])->name('admin.banners.destroy');
     Route::post('/banners/hero-slides', [\App\Http\Controllers\Admin\BannersController::class, 'updateHeroSlides'])->name('admin.banners.hero-slides.update');
     
     // Analytics
@@ -380,10 +376,6 @@ Route::get('/shop/{vendor_name}', function ($vendor_name) {
     return redirect("/brand/{$vendor_name}/products", 301);
 })->name('shop.public');
 Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('product.public');
-
-// Public banner API (no auth required — served to frontend ad slots)
-Route::get('/api/banners/{slot}', [\App\Http\Controllers\Api\BannerController::class, 'show']);
-Route::post('/api/banners/{banner}/click', [\App\Http\Controllers\Api\BannerController::class, 'click']);
 
 // Banner-slot analytics — generic; any slot can be tracked whether or not it maps to a Banner row.
 Route::post('/api/banner-events/impressions', [\App\Http\Controllers\Api\BannerEventController::class, 'impressions']);
