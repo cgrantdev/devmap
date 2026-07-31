@@ -56,11 +56,22 @@ class OutboundClickController extends Controller
     }
 
     /**
-     * Resolve the outbound URL using the brand's affiliate template if set,
-     * otherwise falling back to the raw product_url.
+     * Resolve the outbound URL. Priority order:
+     *   1. vendor_settings.referral_url — a single full URL per vendor,
+     *      typically their affiliate program's Referral Link. When set,
+     *      every outbound click goes there (matches how the affiliate
+     *      programs actually credit us — a single tracked entry point).
+     *   2. brands.affiliate_url_template — legacy per-product templating.
+     *   3. products.product_url — raw scraped URL, no tracking.
      */
     protected function resolveDestinationUrl(Product $product): ?string
     {
+        // 1. Vendor-wide referral URL wins if configured.
+        $referral = $product->brand?->vendorSetting?->referral_url;
+        if (!empty($referral)) {
+            return $referral;
+        }
+
         $template = $product->brand?->affiliate_url_template;
         $productUrl = $product->product_url;
 

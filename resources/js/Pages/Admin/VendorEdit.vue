@@ -124,6 +124,26 @@
 
         <!-- MARKETING TAB -->
         <div v-show="activeTab === 'marketing'">
+          <FormSection title="Affiliate / Referral Link">
+            <FormField
+              label="Referral URL"
+              hint="Full URL from the vendor's affiliate program that credits us for the click. Every 'Buy' button and 'Visit website' link on this vendor's products goes here. Paste directly from the Master List spreadsheet."
+            >
+              <input
+                v-model="editForm.referral_url"
+                type="url"
+                placeholder="https://vendor.com/?ref=PMAP"
+                class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] ui-mono focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
+              />
+              <p v-if="editForm.referral_url" class="mt-1.5 text-[11px] text-[color:var(--color-ink-subtle)]">
+                Every outbound click on this vendor's products will redirect through <span class="ui-mono">{{ editForm.referral_url }}</span>.
+              </p>
+              <p v-else class="mt-1.5 text-[11px] text-[color:var(--color-caution)]">
+                No referral URL set — outbound clicks fall back to the raw product URL with no tracking. Grab this vendor's link from the Master List and paste above.
+              </p>
+            </FormField>
+          </FormSection>
+
           <FormSection title="Coupon & Affiliate" :columns="2">
             <FormField label="Coupon Code" hint="Promo code visitors will use at this vendor's checkout">
               <input v-model="editForm.coupon_code" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] ui-mono focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
@@ -423,6 +443,7 @@ const editForm = useForm({
   founded_year: props.vendor?.settings?.founded_year || null,
   coupon_code: props.vendor?.settings?.coupon_code || '',
   coupon_discount_percent: props.vendor?.settings?.coupon_discount_percent ?? null,
+  referral_url: props.vendor?.settings?.referral_url || '',
   shipping_info: props.vendor?.settings?.shipping_info || '',
   return_policy: props.vendor?.settings?.return_policy || '',
   business_hours: props.vendor?.settings?.business_hours || '',
@@ -455,6 +476,7 @@ watch(() => props.vendor, (newVendor) => {
     editForm.founded_year = newVendor.settings?.founded_year || null
     editForm.coupon_code = newVendor.settings?.coupon_code || ''
     editForm.coupon_discount_percent = newVendor.settings?.coupon_discount_percent ?? null
+    editForm.referral_url = newVendor.settings?.referral_url || ''
     editForm.shipping_info = newVendor.settings?.shipping_info || ''
     editForm.return_policy = newVendor.settings?.return_policy || ''
     editForm.business_hours = newVendor.settings?.business_hours || ''

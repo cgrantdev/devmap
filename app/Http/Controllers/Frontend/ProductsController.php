@@ -887,11 +887,20 @@ class ProductsController extends Controller
     }
 
     /**
-     * Build an affiliate-tagged URL for the "Visit website" button.
-     * Uses the affiliate_url_template with the shop_url as the base.
+     * Build an affiliate-tagged URL for the 'Visit website' button.
+     * Priority order matches OutboundClickController::resolveDestinationUrl:
+     *   1. vendor_settings.referral_url (the affiliate program's canonical
+     *      tracked URL — single source of truth per vendor)
+     *   2. brands.affiliate_url_template applied to shop_url
+     *   3. raw shop_url
      */
     protected function buildAffiliateVisitUrl($brand): ?string
     {
+        $referral = $brand->vendorSetting->referral_url ?? null;
+        if (!empty($referral)) {
+            return $referral;
+        }
+
         $shopUrl = $brand->vendorSetting->shop_url ?? null;
         if (!$shopUrl) return null;
 

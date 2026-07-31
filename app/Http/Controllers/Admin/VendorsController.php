@@ -106,6 +106,7 @@ class VendorsController extends Controller
                         'logo_url' => $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
                         'banner_url' => $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
                         'shop_url' => $brand->vendorSetting->shop_url ?? null, // shop_url is the website
+                        'referral_url' => $brand->vendorSetting->referral_url ?? null,
                         'location_id' => $brand->vendorSetting->location_id ?? null,
                         'description' => $brand->vendorSetting->description ?? null,
                         'contact_email' => $brand->vendorSetting->contact_email ?? null,
@@ -209,6 +210,7 @@ class VendorsController extends Controller
                 },
             ],
             'shop_url' => 'required|url|max:255',
+            'referral_url' => 'nullable|url|max:2000',
             'email' => 'nullable|email|max:255',
             'description' => 'nullable|string|max:1000',
             'contact_email' => 'nullable|email|max:255',
@@ -271,6 +273,7 @@ class VendorsController extends Controller
         
         $settings->description = $validated['description'] ?? null;
         $settings->shop_url = $validated['shop_url'] ?? null; // shop_url is the website
+        $settings->referral_url = $validated['referral_url'] ?? null;
         // Save email to contact_email field
         $settings->contact_email = $validated['email'] ?? $validated['contact_email'] ?? null;
         $settings->phone_number = $validated['phone_number'] ?? null;
@@ -322,6 +325,7 @@ class VendorsController extends Controller
             'settings' => $brand->vendorSetting ? [
                 'description' => $brand->vendorSetting->description,
                 'shop_url' => $brand->vendorSetting->shop_url, // shop_url is the website
+                'referral_url' => $brand->vendorSetting->referral_url,
                 'contact_email' => $brand->vendorSetting->contact_email,
                 'phone_number' => $brand->vendorSetting->phone_number,
                 'location_id' => $brand->vendorSetting->location_id,
@@ -462,6 +466,9 @@ class VendorsController extends Controller
 
         $settings->description = $validated['description'] ?? $settings->description;
         $settings->shop_url = $validated['shop_url'] ?? $settings->shop_url; // shop_url is the website
+        if (array_key_exists('referral_url', $validated)) {
+            $settings->referral_url = $validated['referral_url'];
+        }
         // Save email to contact_email field (use email if provided, otherwise contact_email, otherwise keep existing)
         if (isset($validated['email'])) {
             $settings->contact_email = $validated['email'];

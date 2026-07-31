@@ -25,6 +25,7 @@ class VendorSetting extends Model
         'founded_year',
         'coupon_code',
         'coupon_discount_percent',
+        'referral_url',
         'shipping_info',
         'return_policy',
         'business_hours',
