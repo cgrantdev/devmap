@@ -15,7 +15,7 @@ class ComingSoon
     {
         $host = $request->getHost();
         $path = $request->path();
-        $siteLive = filter_var(env('SITE_LIVE', false), FILTER_VALIDATE_BOOLEAN);
+        $siteLive = (bool) config('app.site_live');
 
         // GO-LIVE MODE: when SITE_LIVE=true is set in .env
         //  - peptidemap.com / www.peptidemap.com serve the real site (no coming-soon gate)

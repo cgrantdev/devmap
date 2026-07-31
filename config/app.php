@@ -16,6 +16,13 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
+    | When true, peptidemap.com serves the live site (bypassing coming-soon)
+    | and dev.peptidemap.com 301-redirects user-facing GETs to the apex.
+    | Exposed via config (not env()) so it survives `php artisan config:cache`.
+    */
+    'site_live' => filter_var(env('SITE_LIVE', false), FILTER_VALIDATE_BOOLEAN),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
