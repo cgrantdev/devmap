@@ -15,6 +15,40 @@ class ComingSoon
     {
         $host = $request->getHost();
         $path = $request->path();
+        $siteLive = filter_var(env('SITE_LIVE', false), FILTER_VALIDATE_BOOLEAN);
+
+        // GO-LIVE MODE: when SITE_LIVE=true is set in .env
+        //  - peptidemap.com / www.peptidemap.com serve the real site (no coming-soon gate)
+        //  - dev.peptidemap.com 301-redirects every path to the apex, preserving the URL
+        //    so vendors who bookmarked dev.peptidemap.com/... still land on the right page
+        //  - www.peptidemap.com 301-redirects to apex (single canonical hostname)
+        if ($siteLive) {
+            if ($host === 'www.peptidemap.com') {
+                // Single canonical apex — always safe to 301 all methods here
+                // because www.peptidemap.com was never handed out to vendors
+                // as an integration endpoint.
+                return redirect()->away('https://peptidemap.com/' . ltrim($request->getRequestUri(), '/'), 301);
+            }
+            if ($host === 'dev.peptidemap.com') {
+                // Preserve dev.peptidemap.com as a live endpoint for anything
+                // vendors may have integrated against (WordPress plugin,
+                // WooCommerce OAuth callback, admin/vendor login sessions).
+                // Only redirect user-facing GET traffic — 301 would drop POST
+                // bodies on the floor and break their webhook posts.
+                $isApi         = str_starts_with($path, 'api/');
+                $isDownload    = str_starts_with($path, 'downloads/');
+                $isAsset       = str_starts_with($path, 'build/')
+                              || str_starts_with($path, 'storage/')
+                              || str_starts_with($path, 'images/')
+                              || str_starts_with($path, 'videos/');
+                $isSanctum     = str_starts_with($path, 'sanctum/');
+
+                if ($request->isMethod('GET') && !$isApi && !$isDownload && !$isAsset && !$isSanctum) {
+                    return redirect()->away('https://peptidemap.com/' . ltrim($request->getRequestUri(), '/'), 301);
+                }
+                // Non-GET or infrastructure paths: serve normally on dev.
+            }
+        }
 
         // join.peptidemap.com — standalone vendor invitation page.
         // The root path "/" is served by a domain-scoped route in web.php.
@@ -47,8 +81,8 @@ class ComingSoon
             return $next($request);
         }
 
-        // Only gate the bare production domains
-        if ($host === 'peptidemap.com' || $host === 'www.peptidemap.com') {
+        // Only gate the bare production domains, and only while not live.
+        if (!$siteLive && ($host === 'peptidemap.com' || $host === 'www.peptidemap.com')) {
             // Anyone landing on /become-a-vendor (or related signup paths) on the
             // bare production domain — usually from old links or search results —
             // gets bounced to the canonical invitation subdomain. Without this the
