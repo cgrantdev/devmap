@@ -187,7 +187,7 @@
             </div>
             <p v-if="entry.description" class="text-[13px] text-white/40 leading-relaxed line-clamp-2 mb-4">{{ entry.description }}</p>
             <div class="flex items-center gap-3 text-[11px]">
-              <span class="ui-mono text-white/60"><span class="text-white font-semibold">{{ entry.vendor_count }}</span> vendors</span>
+              <span class="text-white/70 group-hover:text-[color:var(--color-accent-400)] font-semibold uppercase tracking-[0.08em] transition-colors">View Vendors</span>
               <span v-if="entry.from_price" class="ui-mono text-emerald-400">from ${{ entry.from_price }}</span>
             </div>
           </a>
