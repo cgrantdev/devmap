@@ -42,8 +42,6 @@
             @change="handleSortChange"
             class="ui-focus h-11 px-4 bg-white border border-[color:var(--color-hairline)] rounded-[10px] text-[color:var(--color-ink)] text-[14px] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/20 cursor-pointer"
           >
-            <option value="rating|desc">Highest Rated</option>
-            <option value="reviews|desc">Most Reviews</option>
             <option value="products|desc">Most Compounds</option>
             <option value="name|asc">Alphabetical</option>
           </select>
@@ -148,8 +146,12 @@
               </div>
             </div>
 
-            <!-- Rating -->
-            <div class="flex items-center gap-1.5 text-xs">
+            <!-- Rating — hidden until the vendor has at least one review.
+                 Empty ratings ('0.0 (0)' across the whole grid) read as
+                 neglect / no-data-here; better to omit until vendors start
+                 collecting real reviews on their storefront. Once they do,
+                 the block reappears automatically. -->
+            <div v-if="(brand.reviews || 0) > 0" class="flex items-center gap-1.5 text-xs">
               <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(parseFloat(brand.rating)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
               <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ parseFloat(brand.rating).toFixed(1) }}</span>
               <span class="text-[color:var(--color-ink-subtle)]">({{ brand.reviews }})</span>
