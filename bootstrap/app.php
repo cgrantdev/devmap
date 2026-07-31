@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\ComingSoon::class,
             \App\Http\Middleware\BindDemoMode::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
+            \App\Http\Middleware\LogPageView::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

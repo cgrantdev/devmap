@@ -138,6 +138,90 @@
     </div>
 
     <!-- ============================================================ -->
+    <!-- Page views by type                                           -->
+    <!-- ============================================================ -->
+    <div class="mt-10">
+      <div class="flex items-baseline justify-between mb-4">
+        <h2 class="text-xl text-gray-900">Page views</h2>
+        <p class="text-xs text-gray-500">Server-side view counts across public pages (bots excluded).</p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wide">
+            <tr>
+              <th class="text-left px-4 py-3">Page type</th>
+              <th class="text-right px-3 py-3">Views (7d)</th>
+              <th class="text-right px-3 py-3">Views (30d)</th>
+              <th class="text-right px-4 py-3">Views (all)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr v-for="row in pageTypes" :key="row.page_type">
+              <td class="px-4 py-3 font-mono text-gray-800">{{ row.page_type }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(row.views_7d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(row.views_30d) }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ formatNumber(row.views_all) }}</td>
+            </tr>
+            <tr v-if="!pageTypes.length">
+              <td colspan="4" class="px-4 py-6 text-center text-gray-500">No page views yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- Per-vendor breakdown                                         -->
+    <!-- ============================================================ -->
+    <div class="mt-10">
+      <div class="flex items-baseline justify-between mb-4">
+        <h2 class="text-xl text-gray-900">Vendor performance</h2>
+        <p class="text-xs text-gray-500">Storefront page views, outbound "Visit website" clicks, and product clicks — last 30 days.</p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wide">
+            <tr>
+              <th class="text-left px-4 py-3">Vendor</th>
+              <th class="text-right px-3 py-3">Page views</th>
+              <th class="text-right px-3 py-3">Uniques</th>
+              <th class="text-right px-3 py-3">Storefront clicks</th>
+              <th class="text-right px-3 py-3">Product clicks</th>
+              <th class="text-right px-3 py-3">Coupon copies</th>
+              <th class="text-right px-3 py-3">Visit CTR</th>
+              <th class="text-right px-4 py-3">Product CTR</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr v-for="v in vendorBreakdown" :key="v.brand_id">
+              <td class="px-4 py-3">
+                <a
+                  v-if="v.slug"
+                  :href="`/brand/${v.slug}/products`"
+                  class="text-blue-700 hover:underline"
+                  target="_blank"
+                >{{ v.name }}</a>
+                <span v-else class="text-gray-800">{{ v.name }}</span>
+              </td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(v.page_views_30d) }}</td>
+              <td class="px-3 py-3 text-right text-gray-500">{{ formatNumber(v.unique_visitors_30d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(v.storefront_clicks_30d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(v.product_clicks_30d) }}</td>
+              <td class="px-3 py-3 text-right text-gray-500">{{ formatNumber(v.coupon_copies_30d) }}</td>
+              <td class="px-3 py-3 text-right text-blue-700 font-medium">{{ v.visit_ctr_30d ?? '—' }}</td>
+              <td class="px-4 py-3 text-right text-emerald-700 font-medium">{{ v.product_ctr_30d ?? '—' }}</td>
+            </tr>
+            <tr v-if="!vendorBreakdown.length">
+              <td colspan="8" class="px-4 py-6 text-center text-gray-500">
+                No vendor traffic yet. Data starts appearing after visitors browse the storefronts.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- Banner-slot analytics                                        -->
     <!-- ============================================================ -->
     <div class="mt-10">
@@ -269,6 +353,9 @@ const props = defineProps({
   bannerSlots: { type: Array, default: () => [] },
   bannerSlides: { type: Array, default: () => [] },
   bannerByDay: { type: Array, default: () => [] },
+  pageTypes: { type: Array, default: () => [] },
+  pageViewsByDay: { type: Array, default: () => [] },
+  vendorBreakdown: { type: Array, default: () => [] },
 })
 
 const formatNumber = (n) => new Intl.NumberFormat().format(n ?? 0)

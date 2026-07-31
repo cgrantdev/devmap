@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Brand;
 use App\Models\ProductClick;
 use App\Models\BannerEvent;
+use App\Models\PageView;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -108,6 +109,8 @@ class AnalyticsController extends Controller
             ->toArray();
 
         $banners = $this->bannerAnalytics();
+        $pages = $this->pageViewAnalytics();
+        $vendorBreakdown = $this->vendorBreakdown();
 
         return Inertia::render('Admin/Analytics', [
             'stats' => $stats,
@@ -117,7 +120,131 @@ class AnalyticsController extends Controller
             'bannerSlots' => $banners['slots'],
             'bannerSlides' => $banners['slides'],
             'bannerByDay' => $banners['byDay'],
+            'pageTypes' => $pages['types'],
+            'pageViewsByDay' => $pages['byDay'],
+            'vendorBreakdown' => $vendorBreakdown,
         ]);
+    }
+
+    /**
+     * Page-view totals grouped by page_type for 7d/30d/all-time and a 30d daily series.
+     */
+    private function pageViewAnalytics(): array
+    {
+        $since7 = now()->subDays(7);
+        $since30 = now()->subDays(30);
+
+        $agg = function ($since = null) {
+            $q = PageView::humans()
+                ->selectRaw('page_type, COUNT(*) as n')
+                ->groupBy('page_type');
+            if ($since) $q->where('created_at', '>=', $since);
+            return $q->pluck('n', 'page_type')->toArray();
+        };
+
+        $t7 = $agg($since7);
+        $t30 = $agg($since30);
+        $tAll = $agg();
+        $names = array_unique(array_merge(array_keys($t7), array_keys($t30), array_keys($tAll)));
+        sort($names);
+
+        $types = [];
+        foreach ($names as $name) {
+            $types[] = [
+                'page_type' => $name,
+                'views_7d'  => (int) ($t7[$name] ?? 0),
+                'views_30d' => (int) ($t30[$name] ?? 0),
+                'views_all' => (int) ($tAll[$name] ?? 0),
+            ];
+        }
+        usort($types, fn($a, $b) => $b['views_30d'] <=> $a['views_30d']);
+
+        $byDay = PageView::humans()
+            ->where('created_at', '>=', $since30)
+            ->selectRaw('DATE(created_at) as day, COUNT(*) as n')
+            ->groupBy('day')
+            ->orderBy('day')
+            ->get()
+            ->map(fn($r) => ['day' => (string) $r->day, 'views' => (int) $r->n])
+            ->values()
+            ->toArray();
+
+        return ['types' => $types, 'byDay' => $byDay];
+    }
+
+    /**
+     * Per-vendor breakdown (30d) — storefront page views, storefront outbound clicks
+     * (banner_events with slot='brand_storefront_visit'), and product clicks.
+     */
+    private function vendorBreakdown(): array
+    {
+        $since30 = now()->subDays(30);
+
+        $views = PageView::humans()
+            ->where('page_type', 'brand')
+            ->where('created_at', '>=', $since30)
+            ->whereNotNull('brand_id')
+            ->selectRaw('brand_id, COUNT(*) as n, COUNT(DISTINCT ip_hash) as uniq')
+            ->groupBy('brand_id')
+            ->get()
+            ->keyBy('brand_id');
+
+        $storefrontClicks = BannerEvent::humans()->clicks()
+            ->where('slot', 'brand_storefront_visit')
+            ->where('created_at', '>=', $since30)
+            ->whereNotNull('brand_id')
+            ->selectRaw('brand_id, COUNT(*) as n')
+            ->groupBy('brand_id')
+            ->pluck('n', 'brand_id')
+            ->toArray();
+
+        $couponCopies = BannerEvent::humans()->clicks()
+            ->where('slot', 'brand_storefront_coupon')
+            ->where('created_at', '>=', $since30)
+            ->whereNotNull('brand_id')
+            ->selectRaw('brand_id, COUNT(*) as n')
+            ->groupBy('brand_id')
+            ->pluck('n', 'brand_id')
+            ->toArray();
+
+        $productClicks = ProductClick::humans()
+            ->where('created_at', '>=', $since30)
+            ->whereNotNull('brand_id')
+            ->selectRaw('brand_id, COUNT(*) as n')
+            ->groupBy('brand_id')
+            ->pluck('n', 'brand_id')
+            ->toArray();
+
+        $brandIds = array_unique(array_merge(
+            $views->keys()->all(),
+            array_keys($storefrontClicks),
+            array_keys($couponCopies),
+            array_keys($productClicks),
+        ));
+        if (!$brandIds) return [];
+
+        $brands = Brand::whereIn('id', $brandIds)->get(['id', 'name', 'slug'])->keyBy('id');
+
+        $rows = [];
+        foreach ($brandIds as $bid) {
+            $v = (int) ($views[$bid]->n ?? 0);
+            $sc = (int) ($storefrontClicks[$bid] ?? 0);
+            $pc = (int) ($productClicks[$bid] ?? 0);
+            $rows[] = [
+                'brand_id'          => (int) $bid,
+                'name'              => $brands[$bid]->name ?? '(deleted)',
+                'slug'              => $brands[$bid]->slug ?? null,
+                'page_views_30d'    => $v,
+                'unique_visitors_30d' => (int) ($views[$bid]->uniq ?? 0),
+                'storefront_clicks_30d' => $sc,
+                'coupon_copies_30d' => (int) ($couponCopies[$bid] ?? 0),
+                'product_clicks_30d' => $pc,
+                'visit_ctr_30d'     => $this->ctr($v, $sc),
+                'product_ctr_30d'   => $this->ctr($v, $pc),
+            ];
+        }
+        usort($rows, fn($a, $b) => $b['page_views_30d'] <=> $a['page_views_30d']);
+        return $rows;
     }
 
     /**
