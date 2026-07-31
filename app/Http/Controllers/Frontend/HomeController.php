@@ -672,42 +672,38 @@ class HomeController extends Controller
             return $cat;
         });
 
-        // Build the hero carousel slides:
-        //  - Certified Peptides featured partner slide (with banner imagery)
-        //  - Up to 4 rotating premium-vendor slides (filtered)
-        $heroSlides = collect();
-
-        // Featured Partner — Certified Peptides
-        // Test placement; move to admin-managed sponsored-slot system later.
-        $heroSlides->push([
-            'eyebrow' => 'Featured Partner',
-            'title' => 'Lab-tested research peptides from Certified Peptides',
-            'title_highlight' => 'Certified Peptides',
-            'subtitle' => '99% HPLC-verified COAs on every batch — BPC-157, TB-500, GHK-Cu, and the full catalog.',
-            'cta' => 'Browse catalog',
-            'url' => '/brand/certified-pep/products',
-            'image' => '/images/banners/certified-peptides-3.png',
-            'image_mobile' => '/images/banners/cert-mobile.png',
-            'coupon_code' => 'pmap',
-        ]);
-
-        // Auto-generated slides for the other premium vendors. Skip:
-        //  - certified-pep (already has its dedicated banner slide above)
-        //  - amino-club (legacy seed brand, not a real vendor we want to feature)
-        $skipSlugs = ['certified-pep', 'amino-club'];
-        foreach ($premiumVendors->take(4) as $v) {
-            if (in_array($v['slug'] ?? null, $skipSlugs, true)) continue;
+        // Hero carousel slides — managed by admin at /admin/banners.
+        // Loaded from the `hero_slides` setting; if none configured yet, we
+        // fall back to a seeded Certified Peptides slide + auto-generated
+        // premium-vendor slides so the homepage never renders empty.
+        $heroSlides = $this->loadAdminHeroSlides();
+        if ($heroSlides->isEmpty()) {
             $heroSlides->push([
-                'eyebrow' => 'Featured partner',
-                'title' => $v['name'],
-                'subtitle' => $v['description'] ?? 'Research-grade peptides. Lab tested. Verified on PeptideMap.',
-                'cta' => 'Visit vendor',
-                'url' => $v['url'],
-                'image' => null, // use gradient fallback; can later support banner image
-                'badge' => 'Featured',
-                'sponsored' => true,
-                'gradient' => null, // HeroCarousel picks a default gradient by index
+                'eyebrow' => 'Featured Partner',
+                'title' => 'Lab-tested research peptides from Certified Peptides',
+                'title_highlight' => 'Certified Peptides',
+                'subtitle' => '99% HPLC-verified COAs on every batch — BPC-157, TB-500, GHK-Cu, and the full catalog.',
+                'cta' => 'Browse catalog',
+                'url' => '/brand/certified-pep/products',
+                'image' => '/images/banners/certified-peptides-3.png',
+                'image_mobile' => '/images/banners/cert-mobile.png',
+                'coupon_code' => 'pmap',
             ]);
+
+            $skipSlugs = ['certified-pep', 'amino-club'];
+            foreach ($premiumVendors->take(4) as $v) {
+                if (in_array($v['slug'] ?? null, $skipSlugs, true)) continue;
+                $heroSlides->push([
+                    'eyebrow' => 'Featured partner',
+                    'title' => $v['name'],
+                    'subtitle' => $v['description'] ?? 'Research-grade peptides. Lab tested. Verified on PeptideMap.',
+                    'cta' => 'Visit vendor',
+                    'url' => $v['url'],
+                    'image' => null,
+                    'badge' => 'Featured',
+                    'sponsored' => true,
+                ]);
+            }
         }
 
         // Brand strip marquee — all verified vendors with a logo (or placeholder)
@@ -795,6 +791,52 @@ class HomeController extends Controller
             'editorial' => $editorial,
             'seo' => $seo,
         ]);
+    }
+
+    /**
+     * Load hero-slide config saved by admins (/admin/banners) and map the
+     * stored field names to the shape HeroCarousel.vue consumes.
+     *
+     * Storage schema (per slide, JSON in settings.hero_slides.value):
+     *   title, title_highlight, eyebrow, badge, subtitle,
+     *   cta_text, cta_url, coupon_code,
+     *   image, image_mobile,          // filenames in storage/hero_slides/ OR
+     *                                 // absolute /paths OR full https:// URLs
+     *   order, is_active, sponsored, target
+     */
+    private function loadAdminHeroSlides(): \Illuminate\Support\Collection
+    {
+        $raw = Setting::where('key', 'hero_slides')->value('value');
+        if (!$raw) return collect();
+
+        $decoded = json_decode($raw, true) ?? [];
+
+        return collect($decoded)
+            ->filter(fn ($s) => ($s['is_active'] ?? true) && !empty($s['title'] ?? null))
+            ->sortBy(fn ($s) => (int) ($s['order'] ?? 0))
+            ->map(fn ($s) => [
+                'eyebrow'         => $s['eyebrow'] ?? null,
+                'badge'           => $s['badge'] ?? null,
+                'title'           => $s['title'] ?? '',
+                'title_highlight' => $s['title_highlight'] ?? null,
+                'subtitle'        => $s['subtitle'] ?? null,
+                'cta'             => $s['cta_text'] ?? null,
+                'url'             => $s['cta_url'] ?? null,
+                'target'          => $s['target'] ?? null,
+                'sponsored'       => (bool) ($s['sponsored'] ?? false),
+                'image'           => $this->resolveHeroImage($s['image'] ?? null),
+                'image_mobile'    => $this->resolveHeroImage($s['image_mobile'] ?? null),
+                'coupon_code'     => $s['coupon_code'] ?? null,
+            ])
+            ->values();
+    }
+
+    private function resolveHeroImage(?string $image): ?string
+    {
+        if (!$image) return null;
+        if (preg_match('#^(https?:)?//#i', $image)) return $image;
+        if (str_starts_with($image, '/')) return $image;
+        return \Storage::url('hero_slides/' . $image);
     }
 }
 

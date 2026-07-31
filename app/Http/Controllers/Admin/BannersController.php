@@ -59,14 +59,11 @@ class BannersController extends Controller
         
         if ($heroSlidesSetting && $heroSlidesSetting->value) {
             $heroSlides = json_decode($heroSlidesSetting->value, true) ?? [];
-            // Add full image URLs
             foreach ($heroSlides as &$slide) {
-                if (isset($slide['image']) && $slide['image']) {
-                    $slide['image_url'] = Storage::url('hero_slides/' . $slide['image']);
-                } else {
-                    $slide['image_url'] = null;
-                }
+                $slide['image_url'] = $this->resolveHeroImageUrl($slide['image'] ?? null);
+                $slide['image_mobile_url'] = $this->resolveHeroImageUrl($slide['image_mobile'] ?? null);
             }
+            unset($slide);
         }
 
         // Get PHP upload limits for display
@@ -212,6 +209,22 @@ class BannersController extends Controller
         return redirect()->back()->with('success', 'Banner deleted successfully.');
     }
 
+    /**
+     * Turn a stored image reference into a URL the browser can load.
+     * Accepts three shapes:
+     *  - null / empty        → null
+     *  - starts with http(s) → returned as-is (external CDN URL)
+     *  - starts with '/'     → returned as-is (bundled asset like /images/banners/foo.png)
+     *  - anything else       → treated as a filename in storage/app/public/hero_slides/
+     */
+    private function resolveHeroImageUrl(?string $image): ?string
+    {
+        if (!$image) return null;
+        if (preg_match('#^(https?:)?//#i', $image)) return $image;
+        if (str_starts_with($image, '/')) return $image;
+        return Storage::url('hero_slides/' . $image);
+    }
+
     public function updateHeroSlides(Request $request)
     {
         // Get PHP upload limits
@@ -227,13 +240,20 @@ class BannersController extends Controller
         // Validate slides data
         foreach ($heroSlides as $index => $slide) {
             $request->validate([
-                "hero_slides.{$index}.title" => 'required|string|max:255',
-                "hero_slides.{$index}.subtitle" => 'nullable|string|max:255',
-                "hero_slides.{$index}.cta_text" => 'nullable|string|max:255',
-                "hero_slides.{$index}.cta_url" => 'nullable|string|max:255',
-                "hero_slides.{$index}.image" => "nullable|image|max:{$maxFileSize}",
-                "hero_slides.{$index}.order" => 'required|integer|min:0',
-                "hero_slides.{$index}.is_active" => 'nullable|boolean',
+                "hero_slides.{$index}.title"           => 'required|string|max:255',
+                "hero_slides.{$index}.title_highlight" => 'nullable|string|max:255',
+                "hero_slides.{$index}.eyebrow"         => 'nullable|string|max:64',
+                "hero_slides.{$index}.badge"           => 'nullable|string|max:64',
+                "hero_slides.{$index}.subtitle"        => 'nullable|string|max:500',
+                "hero_slides.{$index}.cta_text"        => 'nullable|string|max:64',
+                "hero_slides.{$index}.cta_url"         => 'nullable|string|max:500',
+                "hero_slides.{$index}.coupon_code"     => 'nullable|string|max:64',
+                "hero_slides.{$index}.image"           => "nullable|image|max:{$maxFileSize}",
+                "hero_slides.{$index}.image_mobile"    => "nullable|image|max:{$maxFileSize}",
+                "hero_slides.{$index}.order"           => 'required|integer|min:0',
+                "hero_slides.{$index}.is_active"       => 'nullable|boolean',
+                "hero_slides.{$index}.sponsored"       => 'nullable|boolean',
+                "hero_slides.{$index}.target"          => 'nullable|in:_self,_blank',
             ]);
         }
         
@@ -246,9 +266,9 @@ class BannersController extends Controller
 
         // Handle image uploads and prepare data for storage
         foreach ($heroSlides as $index => &$slide) {
-            // Check if there's a new image file uploaded for this slide
+            // ---- Desktop image ----
             $imageKey = "hero_slides.{$index}.image";
-            
+
             if ($request->hasFile($imageKey)) {
                 $file = $request->file($imageKey);
                 
@@ -317,15 +337,50 @@ class BannersController extends Controller
                 // If no image provided and no existing image, set to null
                 $slide['image'] = null;
             }
-            
-            // Convert is_active to boolean
-            $slide['is_active'] = isset($slide['is_active']) && ($slide['is_active'] === '1' || $slide['is_active'] === true || $slide['is_active'] === 1);
-            
-            // Ensure order is integer
+
+            // ---- Mobile image ---- (same three-way resolve as desktop image)
+            $mobileKey = "hero_slides.{$index}.image_mobile";
+            if ($request->hasFile($mobileKey)) {
+                $file = $request->file($mobileKey);
+                if ($file->isValid()) {
+                    try {
+                        if (isset($existingSlides[$index]['image_mobile']) && $existingSlides[$index]['image_mobile']) {
+                            ImageHelper::deleteImage($existingSlides[$index]['image_mobile'], 'hero_slides');
+                        }
+                        $slide['image_mobile'] = ImageHelper::convertToWebP($file, 'hero_slides');
+                    } catch (\Exception $e) {
+                        \Log::error('Hero slide mobile image conversion failed', [
+                            'slide_index' => $index, 'error' => $e->getMessage(),
+                        ]);
+                        return redirect()->back()
+                            ->withErrors([$mobileKey => 'Failed to process mobile image: ' . $e->getMessage()])
+                            ->withInput();
+                    }
+                }
+            } elseif (isset($slide['existing_image_mobile']) && !empty($slide['existing_image_mobile'])) {
+                $slide['image_mobile'] = $slide['existing_image_mobile'];
+            } elseif (isset($existingSlides[$index]['image_mobile']) && !empty($existingSlides[$index]['image_mobile'])) {
+                $slide['image_mobile'] = $existingSlides[$index]['image_mobile'];
+            } else {
+                $slide['image_mobile'] = null;
+            }
+
+            // Coerce booleans coming in as '1'/'0' strings from FormData.
+            $toBool = fn ($v) => $v === '1' || $v === 1 || $v === true || $v === 'true';
+            $slide['is_active'] = $toBool($slide['is_active'] ?? true);
+            $slide['sponsored'] = $toBool($slide['sponsored'] ?? false);
+
+            // Optional string fields — normalize to string or null so JSON stays clean.
+            foreach (['title_highlight', 'eyebrow', 'badge', 'subtitle', 'cta_text', 'cta_url', 'coupon_code', 'target'] as $k) {
+                $slide[$k] = isset($slide[$k]) && $slide[$k] !== '' ? (string) $slide[$k] : null;
+            }
+
             $slide['order'] = (int) ($slide['order'] ?? $index);
-            
-            // Remove image_url and imagePreview from stored data
-            unset($slide['image_url'], $slide['imagePreview'], $slide['existing_image']);
+
+            unset(
+                $slide['image_url'], $slide['imagePreview'], $slide['existing_image'],
+                $slide['image_mobile_url'], $slide['imageMobilePreview'], $slide['existing_image_mobile'],
+            );
         }
 
         // Store as JSON

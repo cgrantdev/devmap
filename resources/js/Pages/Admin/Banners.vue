@@ -221,97 +221,119 @@
             </button>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label class="block mb-1.5 font-semibold text-slate-800">Title *</label>
-              <input 
-                v-model="slide.title" 
-                type="text" 
-                required
-                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.title`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']"
-              />
+              <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Eyebrow</label>
+              <input v-model="slide.eyebrow" type="text" placeholder="e.g. Featured Partner"
+                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <p class="text-xs text-slate-500 mt-1">Small label above the title.</p>
+            </div>
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Badge</label>
+              <input v-model="slide.badge" type="text" placeholder="e.g. Featured"
+                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <p class="text-xs text-slate-500 mt-1">Chip in the top-left corner.</p>
+            </div>
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Coupon Code</label>
+              <input v-model="slide.coupon_code" type="text" placeholder="e.g. PMAP"
+                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase" />
+              <p class="text-xs text-slate-500 mt-1">Green copy-to-clipboard pill.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Title *</label>
+              <input v-model="slide.title" type="text" required
+                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.title`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']" />
               <div v-if="$page.props.errors[`hero_slides.${index}.title`]" class="text-red-500 text-sm mt-1">
                 {{ $page.props.errors[`hero_slides.${index}.title`] }}
               </div>
             </div>
             <div>
-              <label class="block mb-1.5 font-semibold text-slate-800">Subtitle</label>
-              <input 
-                v-model="slide.subtitle" 
-                type="text"
-                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.subtitle`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']"
-              />
-              <div v-if="$page.props.errors[`hero_slides.${index}.subtitle`]" class="text-red-500 text-sm mt-1">
-                {{ $page.props.errors[`hero_slides.${index}.subtitle`] }}
-              </div>
+              <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Title Highlight</label>
+              <input v-model="slide.title_highlight" type="text" placeholder="e.g. Certified Peptides"
+                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <p class="text-xs text-slate-500 mt-1">Substring inside the title to accent in a different color.</p>
             </div>
           </div>
-          
-          <div class="grid grid-cols-2 gap-4 mt-4">
+
+          <div class="mt-4">
+            <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Subtitle</label>
+            <textarea v-model="slide.subtitle" rows="2"
+              class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <div>
-              <label class="block mb-1.5 font-semibold text-slate-800">CTA Text</label>
-              <input 
-                v-model="slide.cta_text" 
-                type="text"
-                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <label class="block mb-1.5 font-semibold text-slate-800 text-sm">CTA Text</label>
+              <input v-model="slide.cta_text" type="text" placeholder="e.g. Browse catalog"
+                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>
-              <label class="block mb-1.5 font-semibold text-slate-800">CTA URL</label>
-              <input 
-                v-model="slide.cta_url" 
-                type="text"
-                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <label class="block mb-1.5 font-semibold text-slate-800 text-sm">CTA URL</label>
+              <input v-model="slide.cta_url" type="text" placeholder="/brand/foo/products or https://…"
+                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <p class="text-xs text-slate-500 mt-1">Whole slide links here.</p>
+            </div>
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Open link in</label>
+              <select v-model="slide.target"
+                class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="_self">Same tab</option>
+                <option value="_blank">New tab</option>
+              </select>
             </div>
           </div>
-          
-          <div class="grid grid-cols-2 gap-4 mt-4">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <div>
-              <label class="block mb-1.5 font-semibold text-slate-800">Image</label>
-              <input 
-                @change="handleSlideImageChange(index, $event)"
-                type="file" 
-                accept="image/*"
-                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.image`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']"
-              />
-              <p class="text-xs text-slate-500 mt-1">
-                Maximum file size: <span class="font-semibold text-slate-700">{{ maxFileSize }}</span>
-              </p>
+              <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Desktop background image</label>
+              <input @change="handleSlideImageChange(index, $event)" type="file" accept="image/*"
+                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.image`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']" />
+              <p class="text-xs text-slate-500 mt-1">Landscape. Max: <span class="font-semibold text-slate-700">{{ maxFileSize }}</span></p>
               <div v-if="$page.props.errors[`hero_slides.${index}.image`]" class="text-red-500 text-sm mt-1">
                 {{ $page.props.errors[`hero_slides.${index}.image`] }}
               </div>
               <div v-if="slide.image_url || slide.imagePreview" class="mt-2">
-                <img 
-                  :src="slide.imagePreview || slide.image_url" 
-                  alt="Preview" 
-                  class="w-full h-48 object-cover rounded-xl border border-slate-200" 
-                />
+                <img :src="slide.imagePreview || slide.image_url" alt="Preview"
+                  class="w-full h-40 object-cover rounded-xl border border-slate-200" />
                 <p v-if="slide.imagePreview" class="text-xs text-slate-500 mt-1">New image preview</p>
               </div>
+              <p v-else class="mt-2 text-xs text-slate-400 italic">Leave empty for a gradient background.</p>
             </div>
             <div>
-              <label class="block mb-1.5 font-semibold text-slate-800">Order</label>
-              <input 
-                v-model.number="slide.order" 
-                type="number" 
-                min="0"
-                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.order`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']"
-              />
-              <div v-if="$page.props.errors[`hero_slides.${index}.order`]" class="text-red-500 text-sm mt-1">
-                {{ $page.props.errors[`hero_slides.${index}.order`] }}
+              <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Mobile background image</label>
+              <input @change="handleSlideMobileImageChange(index, $event)" type="file" accept="image/*"
+                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.image_mobile`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']" />
+              <p class="text-xs text-slate-500 mt-1">Portrait crop shown under 768px. Falls back to desktop image.</p>
+              <div v-if="$page.props.errors[`hero_slides.${index}.image_mobile`]" class="text-red-500 text-sm mt-1">
+                {{ $page.props.errors[`hero_slides.${index}.image_mobile`] }}
               </div>
-              <div class="mt-2">
-                <label class="flex items-center gap-2">
-                  <input 
-                    v-model="slide.is_active" 
-                    type="checkbox"
-                    class="rounded"
-                  />
-                  <span class="text-sm text-slate-700">Active</span>
-                </label>
+              <div v-if="slide.image_mobile_url || slide.imageMobilePreview" class="mt-2">
+                <img :src="slide.imageMobilePreview || slide.image_mobile_url" alt="Mobile preview"
+                  class="w-40 h-64 object-cover rounded-xl border border-slate-200 mx-auto" />
+                <p v-if="slide.imageMobilePreview" class="text-xs text-slate-500 mt-1 text-center">New image preview</p>
               </div>
             </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 items-end">
+            <div>
+              <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Order</label>
+              <input v-model.number="slide.order" type="number" min="0"
+                :class="['w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2', $page.props.errors[`hero_slides.${index}.order`] ? 'border-red-300 focus:ring-red-500' : 'border-slate-100 focus:ring-blue-500']" />
+              <p class="text-xs text-slate-500 mt-1">Lower shows first.</p>
+            </div>
+            <label class="flex items-center gap-2 pb-2">
+              <input v-model="slide.is_active" type="checkbox" class="rounded" />
+              <span class="text-sm text-slate-700 font-semibold">Active</span>
+            </label>
+            <label class="flex items-center gap-2 pb-2">
+              <input v-model="slide.sponsored" type="checkbox" class="rounded" />
+              <span class="text-sm text-slate-700 font-semibold">Sponsored (adds rel="sponsored")</span>
+            </label>
           </div>
         </div>
 
@@ -499,26 +521,44 @@ function resetForm() {
 
 // Hero Slides functionality
 const heroSlides = ref(props.heroSlides.map((slide, index) => ({
+  eyebrow: slide.eyebrow || '',
+  badge: slide.badge || '',
   title: slide.title || '',
+  title_highlight: slide.title_highlight || '',
   subtitle: slide.subtitle || '',
   cta_text: slide.cta_text || '',
   cta_url: slide.cta_url || '',
+  coupon_code: slide.coupon_code || '',
+  target: slide.target || '_self',
+  sponsored: slide.sponsored ?? false,
   image: slide.image || null,
   image_url: slide.image_url || null,
   imagePreview: null,
+  image_mobile: slide.image_mobile || null,
+  image_mobile_url: slide.image_mobile_url || null,
+  imageMobilePreview: null,
   order: slide.order !== undefined ? slide.order : index,
   is_active: slide.is_active !== undefined ? slide.is_active : true,
 })))
 
 const addHeroSlide = () => {
   heroSlides.value.push({
+    eyebrow: '',
+    badge: '',
     title: '',
+    title_highlight: '',
     subtitle: '',
     cta_text: '',
     cta_url: '',
+    coupon_code: '',
+    target: '_self',
+    sponsored: false,
     image: null,
     image_url: null,
     imagePreview: null,
+    image_mobile: null,
+    image_mobile_url: null,
+    imageMobilePreview: null,
     order: heroSlides.value.length,
     is_active: true,
   })
@@ -533,25 +573,30 @@ const removeHeroSlide = (index) => {
 const handleSlideImageChange = (index, event) => {
   const file = event.target.files[0]
   if (file) {
-    // Set the new file
     heroSlides.value[index].image = file
-    // Clear the old image_url so preview takes precedence
     heroSlides.value[index].image_url = null
-    // Clear any existing preview first
     heroSlides.value[index].imagePreview = null
-    
     const reader = new FileReader()
-    reader.onload = (e) => {
-      heroSlides.value[index].imagePreview = e.target.result
-    }
-    reader.onerror = () => {
-      console.error('Failed to read file')
-      heroSlides.value[index].imagePreview = null
-    }
+    reader.onload = (e) => { heroSlides.value[index].imagePreview = e.target.result }
+    reader.onerror = () => { heroSlides.value[index].imagePreview = null }
     reader.readAsDataURL(file)
   } else {
-    // If no file selected, clear preview
     heroSlides.value[index].imagePreview = null
+  }
+}
+
+const handleSlideMobileImageChange = (index, event) => {
+  const file = event.target.files[0]
+  if (file) {
+    heroSlides.value[index].image_mobile = file
+    heroSlides.value[index].image_mobile_url = null
+    heroSlides.value[index].imageMobilePreview = null
+    const reader = new FileReader()
+    reader.onload = (e) => { heroSlides.value[index].imageMobilePreview = e.target.result }
+    reader.onerror = () => { heroSlides.value[index].imageMobilePreview = null }
+    reader.readAsDataURL(file)
+  } else {
+    heroSlides.value[index].imageMobilePreview = null
   }
 }
 
@@ -569,22 +614,31 @@ const saveHeroSlides = () => {
   
   // Append each slide's data in the format Laravel expects for validation
   heroSlides.value.forEach((slide, index) => {
-    formData.append(`hero_slides[${index}][title]`, slide.title || '')
-    formData.append(`hero_slides[${index}][subtitle]`, slide.subtitle || '')
-    formData.append(`hero_slides[${index}][cta_text]`, slide.cta_text || '')
-    formData.append(`hero_slides[${index}][cta_url]`, slide.cta_url || '')
-    formData.append(`hero_slides[${index}][order]`, slide.order !== undefined ? slide.order : index)
-    formData.append(`hero_slides[${index}][is_active]`, slide.is_active ? '1' : '0')
-    
-    // Only append image if it's a File (new upload)
-    // Don't send existing image strings - the controller will preserve them
-    if (slide.image && slide.image instanceof File) {
+    const put = (k, v) => formData.append(`hero_slides[${index}][${k}]`, v ?? '')
+    put('title', slide.title)
+    put('title_highlight', slide.title_highlight)
+    put('eyebrow', slide.eyebrow)
+    put('badge', slide.badge)
+    put('subtitle', slide.subtitle)
+    put('cta_text', slide.cta_text)
+    put('cta_url', slide.cta_url)
+    put('coupon_code', slide.coupon_code)
+    put('target', slide.target || '_self')
+    put('order', slide.order !== undefined ? slide.order : index)
+    put('is_active', slide.is_active ? '1' : '0')
+    put('sponsored', slide.sponsored ? '1' : '0')
+
+    // Desktop image
+    if (slide.image instanceof File) {
       formData.append(`hero_slides[${index}][image]`, slide.image)
-    }
-    
-    // Store existing image filename separately so controller knows to keep it
-    if (slide.image && typeof slide.image === 'string') {
+    } else if (typeof slide.image === 'string' && slide.image) {
       formData.append(`hero_slides[${index}][existing_image]`, slide.image)
+    }
+    // Mobile image
+    if (slide.image_mobile instanceof File) {
+      formData.append(`hero_slides[${index}][image_mobile]`, slide.image_mobile)
+    } else if (typeof slide.image_mobile === 'string' && slide.image_mobile) {
+      formData.append(`hero_slides[${index}][existing_image_mobile]`, slide.image_mobile)
     }
   })
   
