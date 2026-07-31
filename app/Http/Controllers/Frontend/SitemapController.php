@@ -52,7 +52,7 @@ class SitemapController extends Controller
         // Brand storefronts.
         Brand::where('is_active', true)
             ->whereNotNull('slug')
-            ->select('slug', 'updated_at')
+            ->select('id', 'slug', 'updated_at')
             ->chunkById(500, function ($chunk) use (&$urls) {
                 foreach ($chunk as $b) {
                     $urls[] = [
@@ -83,7 +83,7 @@ class SitemapController extends Controller
         // Encyclopedia = active ProductCategory rows served at /encyclopedia/{slug}.
         ProductCategory::where('is_active', true)
             ->whereNotNull('slug')
-            ->select('slug', 'updated_at')
+            ->select('id', 'slug', 'updated_at')
             ->chunkById(500, function ($chunk) use (&$urls) {
                 foreach ($chunk as $c) {
                     $urls[] = [
@@ -99,7 +99,7 @@ class SitemapController extends Controller
         if (\Schema::hasTable('blogs')) {
             Blog::where('status', 'published')
                 ->whereNotNull('slug')
-                ->select('slug', 'updated_at')
+                ->select('id', 'slug', 'updated_at')
                 ->chunkById(500, function ($chunk) use (&$urls) {
                     foreach ($chunk as $b) {
                         $urls[] = [
