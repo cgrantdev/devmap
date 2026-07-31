@@ -117,8 +117,7 @@ class AnalyticsController extends Controller
             'topVendors' => $topVendors,
             'topProducts' => $topProducts,
             'clicksByDay' => $clicksByDay,
-            'bannerSlots' => $banners['slots'],
-            'bannerSlides' => $banners['slides'],
+            'bannerBanners' => $banners['banners'],
             'bannerByDay' => $banners['byDay'],
             'pageTypes' => $pages['types'],
             'pageViewsByDay' => $pages['byDay'],
@@ -258,108 +257,95 @@ class AnalyticsController extends Controller
         $since7  = now()->subDays(7);
         $since30 = now()->subDays(30);
 
-        $rowsToKV = function ($rows, $keyA, $keyB, $valueKey = 'n') {
-            $out = [];
-            foreach ($rows as $r) {
-                $a = (string) $r->{$keyA};
-                $b = (string) $r->{$keyB};
-                $out[$a][$b] = (int) $r->{$valueKey};
-            }
-            return $out;
-        };
-
-        $slotAgg = function ($since = null) {
+        // One row per (slot, banner_key, event_type, window). Windows are
+        // stitched together in PHP so each banner ends up as a single flat row.
+        $agg = function ($since = null) {
             $q = BannerEvent::humans()
-                ->selectRaw('slot, event_type, COUNT(*) as n')
-                ->groupBy('slot', 'event_type');
+                ->selectRaw("
+                    slot,
+                    COALESCE(banner_key, '(unknown)') as banner_key,
+                    event_type,
+                    COUNT(*) as n,
+                    MAX(brand_id) as brand_id,
+                    MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, '\$.label'))) as meta_label,
+                    MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, '\$.title'))) as meta_title,
+                    MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, '\$.url'))) as meta_url
+                ")
+                ->groupBy('slot', 'banner_key', 'event_type');
             if ($since) $q->where('created_at', '>=', $since);
             return $q->get();
         };
 
-        $slots7   = $rowsToKV($slotAgg($since7), 'slot', 'event_type');
-        $slots30  = $rowsToKV($slotAgg($since30), 'slot', 'event_type');
-        $slotsAll = $rowsToKV($slotAgg(), 'slot', 'event_type');
+        $rows7   = $agg($since7);
+        $rows30  = $agg($since30);
+        $rowsAll = $agg();
 
-        $allSlotNames = array_unique(array_merge(
-            array_keys($slots7), array_keys($slots30), array_keys($slotsAll),
-        ));
-        sort($allSlotNames);
-
-        $slotsPayload = [];
-        foreach ($allSlotNames as $slot) {
-            $slotsPayload[] = [
-                'slot'         => $slot,
-                'impressions_7d'   => (int) ($slots7[$slot]['impression'] ?? 0),
-                'clicks_7d'        => (int) ($slots7[$slot]['click'] ?? 0),
-                'impressions_30d'  => (int) ($slots30[$slot]['impression'] ?? 0),
-                'clicks_30d'       => (int) ($slots30[$slot]['click'] ?? 0),
-                'impressions_all'  => (int) ($slotsAll[$slot]['impression'] ?? 0),
-                'clicks_all'       => (int) ($slotsAll[$slot]['click'] ?? 0),
-                'ctr_30d'          => $this->ctr(
-                    (int) ($slots30[$slot]['impression'] ?? 0),
-                    (int) ($slots30[$slot]['click'] ?? 0),
-                ),
-            ];
-        }
-        usort($slotsPayload, fn($a, $b) => $b['impressions_30d'] <=> $a['impressions_30d']);
-
-        // Per-slide (banner_key) breakdown within each slot for last 30d.
-        $slideRows = BannerEvent::humans()
-            ->where('created_at', '>=', $since30)
-            ->selectRaw('slot, COALESCE(banner_key, \'(unknown)\') as banner_key, event_type, COUNT(*) as n, MAX(brand_id) as brand_id, MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, \'$.label\'))) as meta_label, MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, \'$.title\'))) as meta_title, MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, \'$.url\'))) as meta_url')
-            ->groupBy('slot', 'banner_key', 'event_type')
-            ->get();
-
-        // Pre-load brand names for any slides that carry brand_id.
-        $brandIds = $slideRows->pluck('brand_id')->filter()->unique()->all();
+        // Collect brand ids from any row so we can resolve names in bulk.
+        $brandIds = $rowsAll->pluck('brand_id')->filter()->unique()->all();
         $brandsById = $brandIds
             ? Brand::whereIn('id', $brandIds)->pluck('name', 'id')->all()
             : [];
 
-        $bySlotSlide = [];
-        foreach ($slideRows as $r) {
-            $slot = $r->slot;
-            $key = $r->banner_key;
-            $bySlotSlide[$slot][$key]['counts'][$r->event_type] = (int) $r->n;
+        // Bucket by "slot|banner_key" so we can merge counts + metadata from
+        // all three time-window queries into a single row per banner.
+        $byBanner = [];
+        $ingest = function ($rows, string $windowSuffix) use (&$byBanner) {
+            foreach ($rows as $r) {
+                $id = $r->slot . '|' . $r->banner_key;
+                if (!isset($byBanner[$id])) {
+                    $byBanner[$id] = [
+                        'slot' => $r->slot,
+                        'banner_key' => $r->banner_key,
+                        'meta_label' => null,
+                        'meta_title' => null,
+                        'meta_url'   => null,
+                        'brand_id'   => null,
+                        'impressions_7d'  => 0, 'clicks_7d'  => 0,
+                        'impressions_30d' => 0, 'clicks_30d' => 0,
+                        'impressions_all' => 0, 'clicks_all' => 0,
+                    ];
+                }
+                $key = ($r->event_type === 'impression' ? 'impressions_' : 'clicks_') . $windowSuffix;
+                $byBanner[$id][$key] += (int) $r->n;
+                // Metadata: last-write-wins, but any non-null real value wins over "null" string / null.
+                foreach (['meta_label', 'meta_title', 'meta_url'] as $mk) {
+                    $v = $r->{$mk} ?? null;
+                    if ($v !== null && $v !== '' && $v !== 'null') $byBanner[$id][$mk] = $v;
+                }
+                if ($r->brand_id) $byBanner[$id]['brand_id'] = (int) $r->brand_id;
+            }
+        };
+        $ingest($rows7, '7d');
+        $ingest($rows30, '30d');
+        $ingest($rowsAll, 'all');
+
+        $banners = [];
+        foreach ($byBanner as $b) {
             // Prefer the admin-defined analytics_label; then brand name; then the slide's title.
             $label = null;
-            if (!empty($r->meta_label) && $r->meta_label !== 'null') {
-                $label = $r->meta_label;
-            } elseif (!empty($r->brand_id) && isset($brandsById[$r->brand_id])) {
-                $label = $brandsById[$r->brand_id];
-            } elseif (!empty($r->meta_title) && $r->meta_title !== 'null') {
-                $label = $r->meta_title;
-            }
-            if ($label && empty($bySlotSlide[$slot][$key]['label'])) {
-                $bySlotSlide[$slot][$key]['label'] = $label;
-            }
-            if (!empty($r->meta_url) && $r->meta_url !== 'null' && empty($bySlotSlide[$slot][$key]['url'])) {
-                $bySlotSlide[$slot][$key]['url'] = $r->meta_url;
-            }
-        }
+            if (!empty($b['meta_label'])) $label = $b['meta_label'];
+            elseif (!empty($b['brand_id']) && isset($brandsById[$b['brand_id']])) $label = $brandsById[$b['brand_id']];
+            elseif (!empty($b['meta_title'])) $label = $b['meta_title'];
+            else $label = $this->humanizeKey($b['banner_key']);
 
-        $slidesPayload = [];
-        foreach ($bySlotSlide as $slot => $slides) {
-            $items = [];
-            foreach ($slides as $key => $data) {
-                $counts = $data['counts'] ?? [];
-                $imp = (int) ($counts['impression'] ?? 0);
-                $clk = (int) ($counts['click'] ?? 0);
-                $items[] = [
-                    'banner_key'  => $key,
-                    'label'       => $data['label'] ?? $this->humanizeKey($key),
-                    'url'         => $data['url'] ?? null,
-                    'impressions' => $imp,
-                    'clicks'      => $clk,
-                    'ctr'         => $this->ctr($imp, $clk),
-                ];
-            }
-            usort($items, fn($a, $b) => $b['impressions'] <=> $a['impressions']);
-            $slidesPayload[] = ['slot' => $slot, 'items' => $items];
+            $banners[] = [
+                'slot'             => $b['slot'],
+                'banner_key'       => $b['banner_key'],
+                'label'            => $label,
+                'url'              => $b['meta_url'] ?? null,
+                'impressions_7d'   => $b['impressions_7d'],
+                'clicks_7d'        => $b['clicks_7d'],
+                'impressions_30d'  => $b['impressions_30d'],
+                'clicks_30d'       => $b['clicks_30d'],
+                'impressions_all'  => $b['impressions_all'],
+                'clicks_all'       => $b['clicks_all'],
+                'ctr_30d'          => $this->ctr($b['impressions_30d'], $b['clicks_30d']),
+            ];
         }
-        usort($slidesPayload, fn($a, $b) => strcmp($a['slot'], $b['slot']));
+        // Most 30d impressions first.
+        usort($banners, fn($a, $b) => $b['impressions_30d'] <=> $a['impressions_30d']);
 
-        // Daily aggregate for a chart (last 30d).
+        // Daily aggregate for the 30-day chart.
         $byDayRows = BannerEvent::humans()
             ->where('created_at', '>=', $since30)
             ->selectRaw('DATE(created_at) as day, event_type, COUNT(*) as n')
@@ -375,9 +361,8 @@ class AnalyticsController extends Controller
         }
 
         return [
-            'slots'  => $slotsPayload,
-            'slides' => $slidesPayload,
-            'byDay'  => array_values($byDay),
+            'banners' => $banners,
+            'byDay'   => array_values($byDay),
         ];
     }
 

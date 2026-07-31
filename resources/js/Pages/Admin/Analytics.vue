@@ -222,86 +222,55 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- Banner-slot analytics                                        -->
+    <!-- Banner analytics — one row per banner                        -->
     <!-- ============================================================ -->
     <div class="mt-10">
       <div class="flex items-baseline justify-between mb-4">
-        <h2 class="text-xl text-gray-900">Banner slots</h2>
-        <p class="text-xs text-gray-500">Impressions, clicks, and CTR for every tracked slot.</p>
+        <h2 class="text-xl text-gray-900">Banners</h2>
+        <p class="text-xs text-gray-500">Impressions, clicks, and CTR per banner. Set the label from <a href="/admin/banners" class="text-blue-600 hover:underline">Homepage Banners → Analytics Tag</a>.</p>
       </div>
 
       <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <table class="w-full text-sm">
           <thead class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wide">
             <tr>
-              <th class="text-left px-4 py-3">Slot</th>
+              <th class="text-left px-4 py-3">Banner</th>
+              <th class="text-left px-3 py-3">Slot</th>
               <th class="text-right px-3 py-3">Impr (7d)</th>
               <th class="text-right px-3 py-3">Clicks (7d)</th>
               <th class="text-right px-3 py-3">Impr (30d)</th>
               <th class="text-right px-3 py-3">Clicks (30d)</th>
               <th class="text-right px-3 py-3">CTR (30d)</th>
-              <th class="text-right px-4 py-3">Impr (all)</th>
+              <th class="text-right px-3 py-3">Impr (all)</th>
               <th class="text-right px-4 py-3">Clicks (all)</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
-            <tr v-for="row in bannerSlots" :key="row.slot">
-              <td class="px-4 py-3 font-mono text-gray-800">{{ row.slot }}</td>
-              <td class="px-3 py-3 text-right">{{ formatNumber(row.impressions_7d) }}</td>
-              <td class="px-3 py-3 text-right">{{ formatNumber(row.clicks_7d) }}</td>
-              <td class="px-3 py-3 text-right">{{ formatNumber(row.impressions_30d) }}</td>
-              <td class="px-3 py-3 text-right">{{ formatNumber(row.clicks_30d) }}</td>
-              <td class="px-3 py-3 text-right font-medium text-blue-700">{{ row.ctr_30d ?? '—' }}</td>
-              <td class="px-4 py-3 text-right text-gray-500">{{ formatNumber(row.impressions_all) }}</td>
-              <td class="px-4 py-3 text-right text-gray-500">{{ formatNumber(row.clicks_all) }}</td>
+            <tr v-for="b in bannerBanners" :key="`${b.slot}|${b.banner_key}`">
+              <td class="px-4 py-3">
+                <div class="flex flex-col">
+                  <a v-if="b.url" :href="b.url" target="_blank" rel="noopener"
+                    class="text-gray-900 font-medium hover:text-blue-700 hover:underline">{{ b.label }}</a>
+                  <span v-else class="text-gray-900 font-medium">{{ b.label }}</span>
+                  <span class="text-xs text-gray-400 font-mono">{{ b.banner_key }}</span>
+                </div>
+              </td>
+              <td class="px-3 py-3 font-mono text-xs text-gray-600">{{ b.slot }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(b.impressions_7d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(b.clicks_7d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(b.impressions_30d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(b.clicks_30d) }}</td>
+              <td class="px-3 py-3 text-right font-medium text-blue-700">{{ b.ctr_30d ?? '—' }}</td>
+              <td class="px-3 py-3 text-right text-gray-500">{{ formatNumber(b.impressions_all) }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ formatNumber(b.clicks_all) }}</td>
             </tr>
-            <tr v-if="!bannerSlots.length">
-              <td colspan="8" class="px-4 py-6 text-center text-gray-500">
-                No banner events tracked yet. Impressions start appearing after visitors load pages with tracked slots.
+            <tr v-if="!bannerBanners.length">
+              <td colspan="9" class="px-4 py-6 text-center text-gray-500">
+                No banner events tracked yet. Impressions appear after visitors load pages with tracked banners.
               </td>
             </tr>
           </tbody>
         </table>
-      </div>
-
-      <!-- Per-slide breakdown (30d) -->
-      <div v-if="bannerSlides.length" class="mt-8 space-y-6">
-        <div v-for="group in bannerSlides" :key="group.slot" class="bg-white rounded-lg border border-gray-200 p-5">
-          <div class="flex items-baseline justify-between mb-3">
-            <h3 class="text-base text-gray-900">Slot: <span class="font-mono">{{ group.slot }}</span></h3>
-            <span class="text-xs text-gray-500">Last 30 days, by slide</span>
-          </div>
-          <table class="w-full text-sm">
-            <thead class="text-gray-500 text-xs uppercase tracking-wide">
-              <tr>
-                <th class="text-left py-2">Banner</th>
-                <th class="text-right py-2 px-3">Impressions</th>
-                <th class="text-right py-2 px-3">Clicks</th>
-                <th class="text-right py-2">CTR</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-              <tr v-for="item in group.items" :key="item.banner_key">
-                <td class="py-2">
-                  <div class="flex flex-col">
-                    <a
-                      v-if="item.url"
-                      :href="item.url"
-                      target="_blank"
-                      rel="noopener"
-                      class="text-gray-900 font-medium hover:text-blue-700 hover:underline"
-                    >{{ item.label || item.banner_key }}</a>
-                    <span v-else class="text-gray-900 font-medium">{{ item.label || item.banner_key }}</span>
-                    <span class="text-xs text-gray-400 font-mono">{{ item.banner_key }}</span>
-                  </div>
-                </td>
-                <td class="py-2 px-3 text-right">{{ formatNumber(item.impressions) }}</td>
-                <td class="py-2 px-3 text-right">{{ formatNumber(item.clicks) }}</td>
-                <td class="py-2 text-right text-blue-700 font-medium">{{ item.ctr ?? '—' }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </div>
 
       <!-- 30-day daily totals (simple bars) -->
@@ -362,8 +331,7 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
-  bannerSlots: { type: Array, default: () => [] },
-  bannerSlides: { type: Array, default: () => [] },
+  bannerBanners: { type: Array, default: () => [] },
   bannerByDay: { type: Array, default: () => [] },
   pageTypes: { type: Array, default: () => [] },
   pageViewsByDay: { type: Array, default: () => [] },
