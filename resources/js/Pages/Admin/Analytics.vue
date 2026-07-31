@@ -171,49 +171,52 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- Per-vendor breakdown                                         -->
+    <!-- Storefronts — one row per vendor, all interactions rolled up -->
     <!-- ============================================================ -->
     <div class="mt-10">
       <div class="flex items-baseline justify-between mb-4">
-        <h2 class="text-xl text-gray-900">Vendor performance</h2>
-        <p class="text-xs text-gray-500">Storefront page views, outbound "Visit website" clicks, and product clicks — last 30 days.</p>
+        <h2 class="text-xl text-gray-900">Storefronts</h2>
+        <p class="text-xs text-gray-500">Per-vendor storefront traffic: views, product clicks, "Visit website" CTA clicks, coupon copies.</p>
       </div>
-      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <table class="w-full text-sm">
-          <thead class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wide">
+      <div class="bg-white rounded-lg border border-gray-200 overflow-x-auto">
+        <table class="w-full text-sm min-w-[900px]">
+          <thead class="bg-gray-50 text-gray-600 text-[11px] uppercase tracking-wide">
             <tr>
               <th class="text-left px-4 py-3">Vendor</th>
-              <th class="text-right px-3 py-3">Page views</th>
-              <th class="text-right px-3 py-3">Uniques</th>
-              <th class="text-right px-3 py-3">Storefront clicks</th>
-              <th class="text-right px-3 py-3">Product clicks</th>
-              <th class="text-right px-3 py-3">Coupon copies</th>
-              <th class="text-right px-3 py-3">Visit CTR</th>
-              <th class="text-right px-4 py-3">Product CTR</th>
+              <th class="text-right px-2 py-3">Views 7d</th>
+              <th class="text-right px-2 py-3">Views 30d</th>
+              <th class="text-right px-2 py-3">Views all</th>
+              <th class="text-right px-2 py-3">Product clicks 7d</th>
+              <th class="text-right px-2 py-3">Product clicks 30d</th>
+              <th class="text-right px-2 py-3">Product clicks all</th>
+              <th class="text-right px-2 py-3">CTA clicks 7d</th>
+              <th class="text-right px-2 py-3">CTA clicks 30d</th>
+              <th class="text-right px-2 py-3">CTA clicks all</th>
+              <th class="text-right px-2 py-3">Coupon copies 30d</th>
+              <th class="text-right px-4 py-3">CTR (30d)</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
             <tr v-for="v in vendorBreakdown" :key="v.brand_id">
               <td class="px-4 py-3">
-                <a
-                  v-if="v.slug"
-                  :href="`/brand/${v.slug}/products`"
-                  class="text-blue-700 hover:underline"
-                  target="_blank"
-                >{{ v.name }}</a>
+                <a v-if="v.slug" :href="`/brand/${v.slug}/products`" class="text-blue-700 hover:underline" target="_blank">{{ v.name }}</a>
                 <span v-else class="text-gray-800">{{ v.name }}</span>
               </td>
-              <td class="px-3 py-3 text-right">{{ formatNumber(v.page_views_30d) }}</td>
-              <td class="px-3 py-3 text-right text-gray-500">{{ formatNumber(v.unique_visitors_30d) }}</td>
-              <td class="px-3 py-3 text-right">{{ formatNumber(v.storefront_clicks_30d) }}</td>
-              <td class="px-3 py-3 text-right">{{ formatNumber(v.product_clicks_30d) }}</td>
-              <td class="px-3 py-3 text-right text-gray-500">{{ formatNumber(v.coupon_copies_30d) }}</td>
-              <td class="px-3 py-3 text-right text-blue-700 font-medium">{{ v.visit_ctr_30d ?? '—' }}</td>
-              <td class="px-4 py-3 text-right text-emerald-700 font-medium">{{ v.product_ctr_30d ?? '—' }}</td>
+              <td class="px-2 py-3 text-right">{{ formatNumber(v.page_views_7d) }}</td>
+              <td class="px-2 py-3 text-right">{{ formatNumber(v.page_views_30d) }}</td>
+              <td class="px-2 py-3 text-right text-gray-500">{{ formatNumber(v.page_views_all) }}</td>
+              <td class="px-2 py-3 text-right">{{ formatNumber(v.product_clicks_7d) }}</td>
+              <td class="px-2 py-3 text-right">{{ formatNumber(v.product_clicks_30d) }}</td>
+              <td class="px-2 py-3 text-right text-gray-500">{{ formatNumber(v.product_clicks_all) }}</td>
+              <td class="px-2 py-3 text-right">{{ formatNumber(v.storefront_clicks_7d) }}</td>
+              <td class="px-2 py-3 text-right">{{ formatNumber(v.storefront_clicks_30d) }}</td>
+              <td class="px-2 py-3 text-right text-gray-500">{{ formatNumber(v.storefront_clicks_all) }}</td>
+              <td class="px-2 py-3 text-right text-gray-500">{{ formatNumber(v.coupon_copies_30d) }}</td>
+              <td class="px-4 py-3 text-right text-blue-700 font-medium">{{ v.visit_ctr_30d ?? '—' }}</td>
             </tr>
             <tr v-if="!vendorBreakdown.length">
-              <td colspan="8" class="px-4 py-6 text-center text-gray-500">
-                No vendor traffic yet. Data starts appearing after visitors browse the storefronts.
+              <td colspan="12" class="px-4 py-6 text-center text-gray-500">
+                No storefront traffic yet.
               </td>
             </tr>
           </tbody>
@@ -222,27 +225,26 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- Banner analytics — one row per banner                        -->
+    <!-- Banners — hero carousel + homepage CTA                       -->
     <!-- ============================================================ -->
     <div class="mt-10">
       <div class="flex items-baseline justify-between mb-4">
         <h2 class="text-xl text-gray-900">Banners</h2>
-        <p class="text-xs text-gray-500">Impressions, clicks, and CTR per banner. Set the label from <a href="/admin/banners" class="text-blue-600 hover:underline">Homepage Banners → Analytics Tag</a>.</p>
+        <p class="text-xs text-gray-500">Homepage hero carousel. Set the label from <a href="/admin/banners" class="text-blue-600 hover:underline">Homepage Banners → Analytics Tag</a>.</p>
       </div>
 
-      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        <table class="w-full text-sm">
-          <thead class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wide">
+      <div class="bg-white rounded-lg border border-gray-200 overflow-x-auto">
+        <table class="w-full text-sm min-w-[800px]">
+          <thead class="bg-gray-50 text-gray-600 text-[11px] uppercase tracking-wide">
             <tr>
               <th class="text-left px-4 py-3">Banner</th>
-              <th class="text-left px-3 py-3">Slot</th>
-              <th class="text-right px-3 py-3">Impr (7d)</th>
-              <th class="text-right px-3 py-3">Clicks (7d)</th>
-              <th class="text-right px-3 py-3">Impr (30d)</th>
-              <th class="text-right px-3 py-3">Clicks (30d)</th>
-              <th class="text-right px-3 py-3">CTR (30d)</th>
-              <th class="text-right px-3 py-3">Impr (all)</th>
-              <th class="text-right px-4 py-3">Clicks (all)</th>
+              <th class="text-right px-3 py-3">Impr 7d</th>
+              <th class="text-right px-3 py-3">Clicks 7d</th>
+              <th class="text-right px-3 py-3">Impr 30d</th>
+              <th class="text-right px-3 py-3">Clicks 30d</th>
+              <th class="text-right px-3 py-3">Impr all</th>
+              <th class="text-right px-3 py-3">Clicks all</th>
+              <th class="text-right px-4 py-3">CTR 30d</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -255,18 +257,17 @@
                   <span class="text-xs text-gray-400 font-mono">{{ b.banner_key }}</span>
                 </div>
               </td>
-              <td class="px-3 py-3 font-mono text-xs text-gray-600">{{ b.slot }}</td>
               <td class="px-3 py-3 text-right">{{ formatNumber(b.impressions_7d) }}</td>
               <td class="px-3 py-3 text-right">{{ formatNumber(b.clicks_7d) }}</td>
               <td class="px-3 py-3 text-right">{{ formatNumber(b.impressions_30d) }}</td>
               <td class="px-3 py-3 text-right">{{ formatNumber(b.clicks_30d) }}</td>
-              <td class="px-3 py-3 text-right font-medium text-blue-700">{{ b.ctr_30d ?? '—' }}</td>
               <td class="px-3 py-3 text-right text-gray-500">{{ formatNumber(b.impressions_all) }}</td>
-              <td class="px-4 py-3 text-right text-gray-500">{{ formatNumber(b.clicks_all) }}</td>
+              <td class="px-3 py-3 text-right text-gray-500">{{ formatNumber(b.clicks_all) }}</td>
+              <td class="px-4 py-3 text-right font-medium text-blue-700">{{ b.ctr_30d ?? '—' }}</td>
             </tr>
             <tr v-if="!bannerBanners.length">
-              <td colspan="9" class="px-4 py-6 text-center text-gray-500">
-                No banner events tracked yet. Impressions appear after visitors load pages with tracked banners.
+              <td colspan="8" class="px-4 py-6 text-center text-gray-500">
+                No banner events tracked yet. Impressions appear after visitors load the homepage.
               </td>
             </tr>
           </tbody>
@@ -302,6 +303,54 @@
         </div>
       </div>
     </div>
+
+    <!-- ============================================================ -->
+    <!-- Site CTAs — internal metrics, not shown to vendors           -->
+    <!-- ============================================================ -->
+    <div class="mt-10">
+      <div class="flex items-baseline justify-between mb-4">
+        <h2 class="text-xl text-gray-900">Site CTAs <span class="text-xs font-normal text-gray-500 ml-2">Internal — funnel metrics for us</span></h2>
+        <p class="text-xs text-gray-500">Non-banner call-to-action clicks on public pages (e.g. "Become a vendor").</p>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 overflow-x-auto">
+        <table class="w-full text-sm min-w-[800px]">
+          <thead class="bg-gray-50 text-gray-600 text-[11px] uppercase tracking-wide">
+            <tr>
+              <th class="text-left px-4 py-3">CTA</th>
+              <th class="text-right px-3 py-3">Impr 7d</th>
+              <th class="text-right px-3 py-3">Clicks 7d</th>
+              <th class="text-right px-3 py-3">Impr 30d</th>
+              <th class="text-right px-3 py-3">Clicks 30d</th>
+              <th class="text-right px-3 py-3">Impr all</th>
+              <th class="text-right px-3 py-3">Clicks all</th>
+              <th class="text-right px-4 py-3">CTR 30d</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr v-for="c in siteCtas" :key="`${c.slot}|${c.banner_key}`">
+              <td class="px-4 py-3">
+                <div class="flex flex-col">
+                  <span class="text-gray-900 font-medium">{{ c.label }}</span>
+                  <span class="text-xs text-gray-400 font-mono">{{ c.slot }}</span>
+                </div>
+              </td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(c.impressions_7d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(c.clicks_7d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(c.impressions_30d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(c.clicks_30d) }}</td>
+              <td class="px-3 py-3 text-right text-gray-500">{{ formatNumber(c.impressions_all) }}</td>
+              <td class="px-3 py-3 text-right text-gray-500">{{ formatNumber(c.clicks_all) }}</td>
+              <td class="px-4 py-3 text-right font-medium text-blue-700">{{ c.ctr_30d ?? '—' }}</td>
+            </tr>
+            <tr v-if="!siteCtas.length">
+              <td colspan="8" class="px-4 py-6 text-center text-gray-500">
+                No CTA events yet.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </AdminLayout>
 </template>
 
@@ -332,6 +381,7 @@ const props = defineProps({
     default: () => []
   },
   bannerBanners: { type: Array, default: () => [] },
+  siteCtas: { type: Array, default: () => [] },
   bannerByDay: { type: Array, default: () => [] },
   pageTypes: { type: Array, default: () => [] },
   pageViewsByDay: { type: Array, default: () => [] },

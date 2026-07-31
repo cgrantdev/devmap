@@ -108,7 +108,8 @@ class AnalyticsController extends Controller
             ->values()
             ->toArray();
 
-        $banners = $this->bannerAnalytics();
+        $banners = $this->bannerAnalytics(self::BANNER_SLOTS);
+        $siteCtas = $this->bannerAnalytics(self::SITE_CTA_SLOTS);
         $pages = $this->pageViewAnalytics();
         $vendorBreakdown = $this->vendorBreakdown();
 
@@ -119,6 +120,7 @@ class AnalyticsController extends Controller
             'clicksByDay' => $clicksByDay,
             'bannerBanners' => $banners['banners'],
             'bannerByDay' => $banners['byDay'],
+            'siteCtas' => $siteCtas['banners'],
             'pageTypes' => $pages['types'],
             'pageViewsByDay' => $pages['byDay'],
             'vendorBreakdown' => $vendorBreakdown,
@@ -177,69 +179,87 @@ class AnalyticsController extends Controller
      */
     private function vendorBreakdown(): array
     {
+        $since7 = now()->subDays(7);
         $since30 = now()->subDays(30);
 
-        $views = PageView::humans()
-            ->where('page_type', 'brand')
-            ->where('created_at', '>=', $since30)
-            ->whereNotNull('brand_id')
-            ->selectRaw('brand_id, COUNT(*) as n, COUNT(DISTINCT ip_hash) as uniq')
-            ->groupBy('brand_id')
-            ->get()
-            ->keyBy('brand_id');
+        // Bucket every per-vendor count into (metric, window) so each brand
+        // ends up as a single row with 7d/30d/all-time for every column.
+        $viewsAgg = function ($since = null) {
+            $q = PageView::humans()
+                ->where('page_type', 'brand')
+                ->whereNotNull('brand_id')
+                ->selectRaw('brand_id, COUNT(*) as n, COUNT(DISTINCT ip_hash) as uniq')
+                ->groupBy('brand_id');
+            if ($since) $q->where('created_at', '>=', $since);
+            return $q->get()->keyBy('brand_id');
+        };
+        $slotAgg = function (string $slot, $since = null) {
+            $q = BannerEvent::humans()->clicks()
+                ->where('slot', $slot)
+                ->whereNotNull('brand_id')
+                ->selectRaw('brand_id, COUNT(*) as n')
+                ->groupBy('brand_id');
+            if ($since) $q->where('created_at', '>=', $since);
+            return $q->pluck('n', 'brand_id')->toArray();
+        };
+        $productAgg = function ($since = null) {
+            $q = ProductClick::humans()
+                ->whereNotNull('brand_id')
+                ->selectRaw('brand_id, COUNT(*) as n')
+                ->groupBy('brand_id');
+            if ($since) $q->where('created_at', '>=', $since);
+            return $q->pluck('n', 'brand_id')->toArray();
+        };
 
-        $storefrontClicks = BannerEvent::humans()->clicks()
-            ->where('slot', 'brand_storefront_visit')
-            ->where('created_at', '>=', $since30)
-            ->whereNotNull('brand_id')
-            ->selectRaw('brand_id, COUNT(*) as n')
-            ->groupBy('brand_id')
-            ->pluck('n', 'brand_id')
-            ->toArray();
-
-        $couponCopies = BannerEvent::humans()->clicks()
-            ->where('slot', 'brand_storefront_coupon')
-            ->where('created_at', '>=', $since30)
-            ->whereNotNull('brand_id')
-            ->selectRaw('brand_id, COUNT(*) as n')
-            ->groupBy('brand_id')
-            ->pluck('n', 'brand_id')
-            ->toArray();
-
-        $productClicks = ProductClick::humans()
-            ->where('created_at', '>=', $since30)
-            ->whereNotNull('brand_id')
-            ->selectRaw('brand_id, COUNT(*) as n')
-            ->groupBy('brand_id')
-            ->pluck('n', 'brand_id')
-            ->toArray();
+        $views7  = $viewsAgg($since7);  $views30 = $viewsAgg($since30);  $viewsAll = $viewsAgg();
+        $sc7  = $slotAgg('brand_storefront_visit', $since7);
+        $sc30 = $slotAgg('brand_storefront_visit', $since30);
+        $scAll = $slotAgg('brand_storefront_visit');
+        $cc7  = $slotAgg('brand_storefront_coupon', $since7);
+        $cc30 = $slotAgg('brand_storefront_coupon', $since30);
+        $ccAll = $slotAgg('brand_storefront_coupon');
+        $pc7  = $productAgg($since7);
+        $pc30 = $productAgg($since30);
+        $pcAll = $productAgg();
 
         $brandIds = array_unique(array_merge(
-            $views->keys()->all(),
-            array_keys($storefrontClicks),
-            array_keys($couponCopies),
-            array_keys($productClicks),
+            $viewsAll->keys()->all(),
+            array_keys($scAll), array_keys($ccAll), array_keys($pcAll),
         ));
         if (!$brandIds) return [];
 
+        // Skip brands that have since been deleted — analytics for orphaned
+        // brand_ids is confusing and never actionable.
         $brands = Brand::whereIn('id', $brandIds)->get(['id', 'name', 'slug'])->keyBy('id');
+        $brandIds = array_filter($brandIds, fn ($id) => isset($brands[$id]));
+        if (!$brandIds) return [];
 
         $rows = [];
         foreach ($brandIds as $bid) {
-            $v = (int) ($views[$bid]->n ?? 0);
-            $sc = (int) ($storefrontClicks[$bid] ?? 0);
-            $pc = (int) ($productClicks[$bid] ?? 0);
             $rows[] = [
                 'brand_id'          => (int) $bid,
-                'name'              => $brands[$bid]->name ?? '(deleted)',
-                'slug'              => $brands[$bid]->slug ?? null,
-                'page_views_30d'    => $v,
-                'unique_visitors_30d' => (int) ($views[$bid]->uniq ?? 0),
-                'storefront_clicks_30d' => $sc,
-                'coupon_copies_30d' => (int) ($couponCopies[$bid] ?? 0),
-                'product_clicks_30d' => $pc,
-                'visit_ctr_30d'     => $this->ctr($v, $sc),
-                'product_ctr_30d'   => $this->ctr($v, $pc),
+                'name'              => $brands[$bid]->name,
+                'slug'              => $brands[$bid]->slug,
+
+                'page_views_7d'     => (int) ($views7[$bid]->n ?? 0),
+                'page_views_30d'    => (int) ($views30[$bid]->n ?? 0),
+                'page_views_all'    => (int) ($viewsAll[$bid]->n ?? 0),
+                'unique_visitors_30d' => (int) ($views30[$bid]->uniq ?? 0),
+
+                'product_clicks_7d'  => (int) ($pc7[$bid] ?? 0),
+                'product_clicks_30d' => (int) ($pc30[$bid] ?? 0),
+                'product_clicks_all' => (int) ($pcAll[$bid] ?? 0),
+
+                'storefront_clicks_7d'  => (int) ($sc7[$bid] ?? 0),
+                'storefront_clicks_30d' => (int) ($sc30[$bid] ?? 0),
+                'storefront_clicks_all' => (int) ($scAll[$bid] ?? 0),
+
+                'coupon_copies_7d'  => (int) ($cc7[$bid] ?? 0),
+                'coupon_copies_30d' => (int) ($cc30[$bid] ?? 0),
+                'coupon_copies_all' => (int) ($ccAll[$bid] ?? 0),
+
+                'visit_ctr_30d'   => $this->ctr((int) ($views30[$bid]->n ?? 0), (int) ($sc30[$bid] ?? 0)),
+                'product_ctr_30d' => $this->ctr((int) ($views30[$bid]->n ?? 0), (int) ($pc30[$bid] ?? 0)),
             ];
         }
         usort($rows, fn($a, $b) => $b['page_views_30d'] <=> $a['page_views_30d']);
@@ -252,15 +272,25 @@ class AnalyticsController extends Controller
      *   - per-slide breakdown for each slot in the last 30d
      *   - daily impression + click totals across all slots (last 30d)
      */
-    private function bannerAnalytics(): array
+    /**
+     * Slots that appear in the vendor-facing "Banners" table (hero carousel).
+     * Storefront slots roll up into the Storefronts table; internal-CTA slots
+     * roll up into the Site CTAs table.
+     */
+    private const BANNER_SLOTS   = ['homepage_hero'];
+    private const SITE_CTA_SLOTS = ['homepage_vendor_cta'];
+
+    private function bannerAnalytics(array $slots = null): array
     {
+        $slots = $slots ?? self::BANNER_SLOTS;
         $since7  = now()->subDays(7);
         $since30 = now()->subDays(30);
 
         // One row per (slot, banner_key, event_type, window). Windows are
         // stitched together in PHP so each banner ends up as a single flat row.
-        $agg = function ($since = null) {
+        $agg = function ($since = null) use ($slots) {
             $q = BannerEvent::humans()
+                ->whereIn('slot', $slots)
                 ->selectRaw("
                     slot,
                     COALESCE(banner_key, '(unknown)') as banner_key,
