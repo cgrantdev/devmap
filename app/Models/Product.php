@@ -111,9 +111,18 @@ class Product extends Model
     // alongside the original `name`.
     protected $appends = ['display_name', 'brand_discount_percent', 'brand_coupon_code'];
 
+    /**
+     * Public-facing product query. Excludes hidden rows AND products whose
+     * brand has been deactivated (is_active = 0) — an inactive brand's
+     * products should never surface in listings, search, compare, encyclopedia,
+     * or homepage tiles. Admin listings that need to see everything should
+     * call `withoutGlobalScopes()` or query directly without this scope.
+     */
     public function scopeVisible($query)
     {
-        return $query->where('hidden', false);
+        return $query
+            ->where('hidden', false)
+            ->whereHas('brand', fn ($q) => $q->where('is_active', true));
     }
 
     /**
