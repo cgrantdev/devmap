@@ -781,7 +781,7 @@ class HomeController extends Controller
             'url'            => 'https://peptidemap.com/',
             'og_title'       => 'Compare every research-peptide vendor — Peptidemap',
             'og_description' => '40+ verified vendors · 2,500+ products · lab-tested · coupons included. The definitive research-peptide directory.',
-            'og_image'       => 'https://peptidemap.com/images/og-default-v4.png',
+            'og_image'       => 'https://peptidemap.com/images/og-default-v5.png',
         ];
         session(['page_seo_data' => $seo]);
 
