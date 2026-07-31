@@ -132,7 +132,10 @@
                 </nav>
               </div>
   
-              <!-- Sponsored Sections -->              
+              <!-- Sponsored sidebar slots — hidden until sponsorship is
+                   monetized. Toggle the guard below back to true to restore
+                   all three cards. -->
+              <template v-if="false">
               <div class="mt-6">
                 <a href="#" class="block border border-slate-300 rounded-lg overflow-hidden hover:border-slate-400 transition-all hover:shadow-md group cursor-pointer">
                   <div class="relative h-48 bg-gradient-to-br from-slate-600 via-slate-700 to-slate-800 p-4 flex flex-col justify-between">
@@ -181,6 +184,7 @@
                   </div>
                 </a>
               </div>
+              </template>
             </div>
           </div>
 
@@ -248,8 +252,8 @@
                   <p v-else class="text-slate-700 leading-relaxed mb-4">No overview available.</p>
                 </section>
 
-                <!-- Sponsored Advertisement -->
-                <div class="mb-12">
+                <!-- Sponsored inline ad — hidden until monetized -->
+                <div v-if="false" class="mb-12">
                   <a href="#" class="block border border-slate-300 rounded-lg overflow-hidden hover:border-slate-400 transition-all hover:shadow-lg group cursor-pointer">
                     <div class="relative h-32 bg-gradient-to-r from-slate-600 via-slate-700 to-slate-800 p-6 flex items-center justify-between">
                       <div class="flex-1 space-y-2 z-10">
@@ -257,7 +261,7 @@
                         <div class="text-white text-2xl font-bold leading-tight">Limitless Life Nootropics</div>
                         <div class="text-slate-200 text-base">Premium BPC-157 with Third-Party Testing & Fast Shipping</div>
                       </div>
-                      <div class="flex flex-col items-end gap-2 z-10">                      
+                      <div class="flex flex-col items-end gap-2 z-10">
                         <div class="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg text-white font-mono text-sm border border-white/20">Code: PMAP</div>
                       </div>
                       <div class="absolute inset-0 opacity-10">
@@ -426,8 +430,8 @@
                   </div>                
                 </section>
 
-                                <!-- Sponsored Advertisement -->
-                <div class="mb-12">
+                <!-- Sponsored inline ad — hidden until monetized -->
+                <div v-if="false" class="mb-12">
                   <a href="#" class="block border border-slate-300 rounded-lg overflow-hidden hover:border-slate-400 transition-all hover:shadow-lg group cursor-pointer">
                     <div class="relative h-32 bg-gradient-to-r from-slate-600 via-slate-700 to-slate-800 p-6 flex items-center justify-between">
                       <div class="flex-1 space-y-2 z-10">
@@ -435,7 +439,7 @@
                         <div class="text-white text-2xl font-bold leading-tight">Peptide Sciences</div>
                         <div class="text-slate-200 text-base">Research-Grade Peptides | Certified Quality & Purity</div>
                       </div>
-                      <div class="flex flex-col items-end gap-2 z-10">                      
+                      <div class="flex flex-col items-end gap-2 z-10">
                         <div class="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg text-white font-mono text-sm border border-white/20">Code: PMAP</div>
                       </div>
                       <div class="absolute inset-0 opacity-10">
