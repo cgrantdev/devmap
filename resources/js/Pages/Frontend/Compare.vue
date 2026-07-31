@@ -202,13 +202,14 @@
                     </template>
                     <span v-else class="text-[12px] text-[color:var(--color-ink-subtle)]">—</span>
                   </td>
-                  <!-- Savings -->
+                  <!-- Savings — retail → what you actually pay (folds in
+                       both the vendor's own sale AND any PMAP coupon). -->
                   <td class="px-5 py-4 text-right hidden sm:table-cell">
                     <span
-                      v-if="product.discount_price && product.discount_price < product.price"
+                      v-if="totalSavingsPct(product)"
                       class="ui-mono text-xs font-semibold text-[color:var(--color-verified)]"
                     >
-                      -{{ Math.round((1 - product.discount_price / product.price) * 100) }}%
+                      -{{ totalSavingsPct(product) }}%
                     </span>
                     <span v-else class="text-[color:var(--color-ink-subtle)]">—</span>
                   </td>
@@ -334,6 +335,16 @@ function discountedPriceFor(product) {
 function couponCodeFor(product) {
   const raw = (product?.brand_coupon_code || '').trim()
   return (raw || 'PMAP').toUpperCase()
+}
+
+// Total savings vs. bare retail. Combines the vendor's own sale
+// (discount_price vs price) AND any PMAP coupon we apply on top.
+// Returns null when there's nothing to show so the cell renders '—'.
+function totalSavingsPct(product) {
+  const listPrice = parseFloat(product?.price)
+  const finalPrice = parseFloat(product?.final_price ?? product?.effective_price)
+  if (!listPrice || !finalPrice || finalPrice >= listPrice) return null
+  return Math.round((1 - finalPrice / listPrice) * 100)
 }
 
 /**
