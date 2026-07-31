@@ -52,6 +52,10 @@ Route::domain('join.peptidemap.com')->group(function () {
 });
 
 // Modern 2026 homepage is now the default
+// SEO — sitemap + host-aware robots.txt. Both are cached at the controller layer.
+Route::get('/sitemap.xml', [\App\Http\Controllers\Frontend\SitemapController::class, 'index']);
+Route::get('/robots.txt', [\App\Http\Controllers\Frontend\RobotsController::class, 'show']);
+
 Route::get('/', [HomeController::class, 'v2'])->name('home');
 // Legacy homepage (kept for reference, remove when fully migrated)
 Route::get('/home-old', [HomeController::class, 'index'])->name('home.old');

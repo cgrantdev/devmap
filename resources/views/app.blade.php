@@ -3,12 +3,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @php
-        $siteName = \App\Models\Setting::where('key', 'site_name')->value('value') ?? 'PeptideSync';
-        $siteDescription = \App\Models\Setting::where('key', 'site_description')->value('value') ?? 'Compare peptide brands, prices, and reviews';
-        $contactEmail = \App\Models\Setting::where('key', 'contact_email')->value('value') ?? 'contact@peptidemaps.com';
-        
-        // Get SEO data from session if available
+        $siteName = \App\Models\Setting::where('key', 'site_name')->value('value') ?? 'PeptideMap';
+        $siteDescription = \App\Models\Setting::where('key', 'site_description')->value('value')
+            ?? 'The definitive platform for research peptide vendors — compare verified suppliers, inspect lab testing, and discover research peptides in one place.';
+        $contactEmail = \App\Models\Setting::where('key', 'contact_email')->value('value') ?? 'info@peptidemap.com';
+        $canonicalHost = 'https://peptidemap.com';
+        $defaultOgImage = $canonicalHost . '/images/og-default.png';
+
+        // Get SEO data from session (set by controllers via session(['page_seo_data' => ...]))
         $seoData = session('page_seo_data');
         $seoKey = null;
         if (is_array($seoData)) {
@@ -20,6 +24,7 @@
             $seoOgTitle = $seoData['og_title'] ?? $seoTitle;
             $seoOgDescription = $seoData['og_description'] ?? $seoDescription;
             $seoOgImage = $seoData['og_image'] ?? $seoImage;
+            $seoOgType = $seoData['og_type'] ?? 'website';
         } else {
             $seoTitle = $seoData?->title ?? $siteName;
             $seoDescription = $seoData?->description ?? $siteDescription;
@@ -28,43 +33,92 @@
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
             $seoOgImage = $seoImage;
+            $seoOgType = 'website';
         }
 
-        // Build final browser title: append site name for all pages except home
-        $fullTitle = ($seoKey === 'home') ? $seoTitle : ($seoTitle . ' - ' . $siteName);
+        // Never leak dev.peptidemap.com / staging URLs into canonical + OG tags —
+        // rewrite every URL to the apex host regardless of which host served the request.
+        $normalizeUrl = function ($url) use ($canonicalHost) {
+            if (!$url) return null;
+            $parts = parse_url($url);
+            if (!$parts) return $url;
+            $path = ($parts['path'] ?? '/') . (isset($parts['query']) ? '?' . $parts['query'] : '');
+            return $canonicalHost . $path;
+        };
+        $seoUrl = $normalizeUrl($seoUrl) ?? $canonicalHost;
 
-        // Prevent stale SEO data leaking into later requests that don't set it
+        // Always emit an og:image — fall back to the site default so social
+        // previews never break on pages that forgot to supply one.
+        if (empty($seoOgImage)) $seoOgImage = $defaultOgImage;
+
+        // Full browser title: append site name for all pages except home.
+        $fullTitle = ($seoKey === 'home' || $seoTitle === $siteName) ? $seoTitle : ($seoTitle . ' — ' . $siteName);
+
         session()->forget('page_seo_data');
     @endphp
+
     <title>{{ $fullTitle }}</title>
     <meta name="description" content="{{ $seoDescription }}">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="{{ $seoUrl }}" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="{{ $seoOgType }}" />
+    <meta property="og:site_name" content="{{ $siteName }}" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:url" content="{{ $seoUrl }}" />
     <meta property="og:title" content="{{ $seoOgTitle }}" />
     <meta property="og:description" content="{{ $seoOgDescription }}" />
-    @if($seoOgImage)
     <meta property="og:image" content="{{ $seoOgImage }}" />
-    @endif
-    
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="{{ $seoUrl }}" />
     <meta name="twitter:title" content="{{ $seoOgTitle }}" />
     <meta name="twitter:description" content="{{ $seoOgDescription }}" />
-    @if($seoOgImage)
     <meta name="twitter:image" content="{{ $seoOgImage }}" />
-    @endif
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="{{ $seoUrl }}" />
-    
-    <!-- Contact Email -->
+
+    <!-- Contact + icons -->
     <meta name="contact" content="{{ $contactEmail }}" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
     <link rel="icon" type="image/png" sizes="180x180" href="/favicon-180.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+
+    <!-- Organization JSON-LD (rendered on every page) -->
+    <script type="application/ld+json">
+    {!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'Organization',
+        'name' => $siteName,
+        'url' => $canonicalHost,
+        'logo' => $canonicalHost . '/images/logo.png',
+        'sameAs' => [],
+        'contactPoint' => [
+            '@type' => 'ContactPoint',
+            'email' => $contactEmail,
+            'contactType' => 'customer support',
+        ],
+    ], JSON_UNESCAPED_SLASHES) !!}
+    </script>
+
+    <!-- WebSite JSON-LD (enables the search sitelinks box in Google) -->
+    <script type="application/ld+json">
+    {!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'WebSite',
+        'name' => $siteName,
+        'url' => $canonicalHost,
+        'potentialAction' => [
+            '@type' => 'SearchAction',
+            'target' => $canonicalHost . '/products?q={search_term_string}',
+            'query-input' => 'required name=search_term_string',
+        ],
+    ], JSON_UNESCAPED_SLASHES) !!}
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
