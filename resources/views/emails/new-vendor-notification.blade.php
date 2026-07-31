@@ -12,7 +12,7 @@
                     <!-- Header -->
                     <tr>
                         <td style="background-color:#0A0B0E;padding:24px 40px;">
-                            <p style="margin:0;font-size:14px;color:#A1A1AA;">PeptideMaps Admin Notification</p>
+                            <p style="margin:0;font-size:14px;color:#A1A1AA;">Peptidemap Admin Notification</p>
                         </td>
                     </tr>
 
@@ -20,7 +20,7 @@
                     <tr>
                         <td style="padding:32px 40px;">
                             <h1 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#0A0B0E;">New Vendor Signup</h1>
-                            <p style="margin:0 0 24px;font-size:15px;color:#71717A;">A new vendor has registered on PeptideMaps and is awaiting review.</p>
+                            <p style="margin:0 0 24px;font-size:15px;color:#71717A;">A new vendor has registered on Peptidemap and is awaiting review.</p>
 
                             <!-- Vendor details -->
                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F4F4F5;border-radius:8px;margin-bottom:24px;">
@@ -81,7 +81,7 @@
                     <tr>
                         <td style="padding:20px 40px;border-top:1px solid #E4E4E7;">
                             <p style="margin:0;font-size:12px;color:#A1A1AA;">
-                                This is an automated notification from PeptideMaps.
+                                This is an automated notification from Peptidemap.
                             </p>
                         </td>
                     </tr>

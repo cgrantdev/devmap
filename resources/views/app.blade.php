@@ -8,12 +8,12 @@
     <!-- Search engine verification -->
     <meta name="msvalidate.01" content="63538BD42BDE107E930BCBB0DB36B709" />
     @php
-        $siteName = \App\Models\Setting::where('key', 'site_name')->value('value') ?? 'PeptideMap';
+        $siteName = \App\Models\Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
         $siteDescription = \App\Models\Setting::where('key', 'site_description')->value('value')
             ?? 'The definitive platform for research peptide vendors — compare verified suppliers, inspect lab testing, and discover research peptides in one place.';
         $contactEmail = \App\Models\Setting::where('key', 'contact_email')->value('value') ?? 'info@peptidemap.com';
         $canonicalHost = 'https://peptidemap.com';
-        $defaultOgImage = $canonicalHost . '/images/og-default-v2.png';
+        $defaultOgImage = $canonicalHost . '/images/og-default-v3.png';
 
         // Get SEO data from session (set by controllers via session(['page_seo_data' => ...]))
         $seoData = session('page_seo_data');
@@ -56,7 +56,7 @@
 
         // Full browser title: append site name unless it's the home page OR the
         // controller-supplied title already contains the site name (older controllers
-        // pre-appended "- PeptideMap" themselves; this prevents "…— PeptideMap — PeptideMap").
+        // pre-appended "- Peptidemap" themselves; this prevents "…— Peptidemap — Peptidemap").
         $titleHasSiteName = stripos($seoTitle, $siteName) !== false;
         $fullTitle = ($seoKey === 'home' || $seoTitle === $siteName || $titleHasSiteName)
             ? $seoTitle

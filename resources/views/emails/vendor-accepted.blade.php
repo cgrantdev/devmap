@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to PeptideMap</title>
+    <title>Welcome to Peptidemap</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f8f9fa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
     <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8f9fa;padding:40px 20px;">
@@ -13,7 +13,7 @@
                     <!-- Header -->
                     <tr>
                         <td style="background-color:#0A0B0E;padding:32px 40px;text-align:center;">
-                            <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.01em;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">PeptideMap</span>
+                            <span style="color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.01em;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">Peptidemap</span>
                         </td>
                     </tr>
 
@@ -34,7 +34,7 @@
                             </h1>
 
                             <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#52525B;">
-                                Welcome aboard. Your application has been reviewed and approved — you're officially part of the PeptideMap launch cohort.
+                                Welcome aboard. Your application has been reviewed and approved — you're officially part of the Peptidemap launch cohort.
                             </p>
 
                             <!-- Launch date callout -->
@@ -46,7 +46,7 @@
                                             May 11, 2026
                                         </p>
                                         <p style="margin:0;font-size:14px;line-height:1.6;color:#52525B;">
-                                            That's when PeptideMap goes live and your storefront, products, and pricing become visible to researchers. Upon launch, you'll receive a separate email with sign-in details for your vendor dashboard.
+                                            That's when Peptidemap goes live and your storefront, products, and pricing become visible to researchers. Upon launch, you'll receive a separate email with sign-in details for your vendor dashboard.
                                         </p>
                                     </td>
                                 </tr>
@@ -84,7 +84,7 @@
                     <tr>
                         <td style="padding:24px 40px;border-top:1px solid #E4E4E7;text-align:center;">
                             <p style="margin:0;font-size:12px;color:#A1A1AA;">
-                                © {{ date('Y') }} PeptideMap. For research use only.
+                                © {{ date('Y') }} Peptidemap. For research use only.
                             </p>
                         </td>
                     </tr>

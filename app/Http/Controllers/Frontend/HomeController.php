@@ -772,12 +772,18 @@ class HomeController extends Controller
             ->values()
             ->take(16);
 
-        // SEO
+        // SEO — pushed into the session so app.blade.php can read it and
+        // render the correct <title>, canonical, and OG/Twitter tags.
         $seo = [
-            'title' => 'PeptideMap — The definitive platform for research peptide vendors',
-            'description' => 'Compare verified suppliers, inspect lab testing, and discover research peptides — all in one place.',
-            'url' => url('/'),
+            'key'            => 'home',
+            'title'          => 'Peptidemap — Compare research-peptide vendors, prices, coupons & lab testing',
+            'description'    => 'The definitive research-peptide directory. Compare 40+ verified vendors, inspect COAs, and unlock exclusive coupons on 2,500+ products — all in one place.',
+            'url'            => 'https://peptidemap.com/',
+            'og_title'       => 'Compare every research-peptide vendor — Peptidemap',
+            'og_description' => '40+ verified vendors · 2,500+ products · lab-tested · coupons included. The definitive research-peptide directory.',
+            'og_image'       => 'https://peptidemap.com/images/og-default-v3.png',
         ];
+        session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/WelcomeV2', [
             'stats' => $stats,
