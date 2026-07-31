@@ -136,11 +136,113 @@
         </div>
       </div>
     </div>
+
+    <!-- ============================================================ -->
+    <!-- Banner-slot analytics                                        -->
+    <!-- ============================================================ -->
+    <div class="mt-10">
+      <div class="flex items-baseline justify-between mb-4">
+        <h2 class="text-xl text-gray-900">Banner slots</h2>
+        <p class="text-xs text-gray-500">Impressions, clicks, and CTR for every tracked slot.</p>
+      </div>
+
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wide">
+            <tr>
+              <th class="text-left px-4 py-3">Slot</th>
+              <th class="text-right px-3 py-3">Impr (7d)</th>
+              <th class="text-right px-3 py-3">Clicks (7d)</th>
+              <th class="text-right px-3 py-3">Impr (30d)</th>
+              <th class="text-right px-3 py-3">Clicks (30d)</th>
+              <th class="text-right px-3 py-3">CTR (30d)</th>
+              <th class="text-right px-4 py-3">Impr (all)</th>
+              <th class="text-right px-4 py-3">Clicks (all)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr v-for="row in bannerSlots" :key="row.slot">
+              <td class="px-4 py-3 font-mono text-gray-800">{{ row.slot }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(row.impressions_7d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(row.clicks_7d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(row.impressions_30d) }}</td>
+              <td class="px-3 py-3 text-right">{{ formatNumber(row.clicks_30d) }}</td>
+              <td class="px-3 py-3 text-right font-medium text-blue-700">{{ row.ctr_30d ?? '—' }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ formatNumber(row.impressions_all) }}</td>
+              <td class="px-4 py-3 text-right text-gray-500">{{ formatNumber(row.clicks_all) }}</td>
+            </tr>
+            <tr v-if="!bannerSlots.length">
+              <td colspan="8" class="px-4 py-6 text-center text-gray-500">
+                No banner events tracked yet. Impressions start appearing after visitors load pages with tracked slots.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Per-slide breakdown (30d) -->
+      <div v-if="bannerSlides.length" class="mt-8 space-y-6">
+        <div v-for="group in bannerSlides" :key="group.slot" class="bg-white rounded-lg border border-gray-200 p-5">
+          <div class="flex items-baseline justify-between mb-3">
+            <h3 class="text-base text-gray-900">Slot: <span class="font-mono">{{ group.slot }}</span></h3>
+            <span class="text-xs text-gray-500">Last 30 days, by slide</span>
+          </div>
+          <table class="w-full text-sm">
+            <thead class="text-gray-500 text-xs uppercase tracking-wide">
+              <tr>
+                <th class="text-left py-2">Slide key</th>
+                <th class="text-right py-2 px-3">Impressions</th>
+                <th class="text-right py-2 px-3">Clicks</th>
+                <th class="text-right py-2">CTR</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr v-for="item in group.items" :key="item.banner_key">
+                <td class="py-2 font-mono text-gray-800">{{ item.banner_key }}</td>
+                <td class="py-2 px-3 text-right">{{ formatNumber(item.impressions) }}</td>
+                <td class="py-2 px-3 text-right">{{ formatNumber(item.clicks) }}</td>
+                <td class="py-2 text-right text-blue-700 font-medium">{{ item.ctr ?? '—' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 30-day daily totals (simple bars) -->
+      <div v-if="bannerByDay.length" class="mt-8 bg-white rounded-lg border border-gray-200 p-5">
+        <div class="flex items-baseline justify-between mb-4">
+          <h3 class="text-base text-gray-900">Daily totals across all slots</h3>
+          <span class="text-xs text-gray-500">Last 30 days</span>
+        </div>
+        <div class="flex items-end gap-1 h-40">
+          <div
+            v-for="d in bannerByDay"
+            :key="d.day"
+            class="flex-1 flex flex-col justify-end gap-0.5"
+            :title="`${d.day}: ${d.impressions} impr / ${d.clicks} clk`"
+          >
+            <div
+              class="bg-blue-500/70 rounded-sm"
+              :style="{ height: barHeight(d.impressions, maxImpressions) }"
+            />
+            <div
+              class="bg-emerald-500 rounded-sm"
+              :style="{ height: barHeight(d.clicks, maxImpressions) }"
+            />
+          </div>
+        </div>
+        <div class="mt-3 flex items-center gap-4 text-xs text-gray-600">
+          <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 bg-blue-500/70 rounded-sm"></span> Impressions</span>
+          <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 bg-emerald-500 rounded-sm"></span> Clicks</span>
+        </div>
+      </div>
+    </div>
   </AdminLayout>
 </template>
 
 <script setup>
 import AdminLayout from './Layout.vue'
+import { computed } from 'vue'
 
 const props = defineProps({
   stats: {
@@ -163,9 +265,20 @@ const props = defineProps({
   clicksByDay: {
     type: Array,
     default: () => []
-  }
+  },
+  bannerSlots: { type: Array, default: () => [] },
+  bannerSlides: { type: Array, default: () => [] },
+  bannerByDay: { type: Array, default: () => [] },
 })
 
 const formatNumber = (n) => new Intl.NumberFormat().format(n ?? 0)
+
+const maxImpressions = computed(() =>
+  Math.max(1, ...props.bannerByDay.map(d => d.impressions || 0))
+)
+function barHeight(v, max) {
+  const pct = Math.round(((v || 0) / max) * 100)
+  return `${Math.max(pct, v > 0 ? 2 : 0)}%`
+}
 </script>
 

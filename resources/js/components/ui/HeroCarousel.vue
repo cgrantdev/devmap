@@ -73,6 +73,7 @@
                 :href="slide.url"
                 :target="slide.target || '_self'"
                 :rel="slide.sponsored ? 'noopener sponsored' : undefined"
+                @click="onSlideClick(slide, i)"
                 class="ui-focus inline-flex items-center gap-1.5 h-10 px-4 rounded-[10px] bg-white text-[color:var(--color-ink)] text-[13px] font-semibold hover:bg-white/95 transition-all shadow-md"
               >
                 {{ slide.cta || 'Learn more' }}
@@ -126,6 +127,7 @@
                   :href="slide.url"
                   :target="slide.target || '_self'"
                   :rel="slide.sponsored ? 'noopener sponsored' : undefined"
+                @click="onSlideClick(slide, i)"
                   class="ui-focus inline-flex items-center gap-2 h-12 px-6 rounded-[12px] bg-white text-[color:var(--color-ink)] text-[15px] font-semibold hover:bg-white/95 hover:-translate-y-[1px] transition-all shadow-lg"
                 >
                   {{ slide.cta || 'Learn more' }}
@@ -179,12 +181,43 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import emblaCarouselVue from 'embla-carousel-vue'
 import Autoplay from 'embla-carousel-autoplay'
+import { trackImpression, trackClick } from '@/lib/bannerTracking'
 
 const props = defineProps({
   slides: { type: Array, required: true },
   autoplay: { type: Boolean, default: true },
   delay: { type: Number, default: 7000 },
+  slot: { type: String, default: 'homepage_hero' },
 })
+
+function slideKey(slide, i) {
+  const raw = slide?.key || slide?.slug || slide?.title_highlight || slide?.title || `slide-${i}`
+  return String(raw).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 128) || `slide-${i}`
+}
+
+function fireImpression(slide, i) {
+  if (!slide) return
+  trackImpression({
+    slot: props.slot,
+    banner_key: slideKey(slide, i),
+    banner_id: slide.banner_id ?? null,
+    brand_id: slide.brand_id ?? null,
+    meta: { title: slide.title || null, url: slide.url || null, position: i },
+  })
+}
+
+function onSlideClick(slide, i) {
+  if (!slide) return
+  trackClick({
+    slot: props.slot,
+    banner_key: slideKey(slide, i),
+    banner_id: slide.banner_id ?? null,
+    brand_id: slide.brand_id ?? null,
+    destination_url: slide.url || null,
+    meta: { cta: slide.cta || null, position: i },
+  })
+}
+defineExpose({ onSlideClick })
 
 const autoplayPlugin = Autoplay({
   delay: props.delay,
@@ -234,6 +267,7 @@ function scrollTo(i) { emblaApi.value?.scrollTo(i) }
 function onSelect() {
   if (!emblaApi.value) return
   selectedIndex.value = emblaApi.value.selectedScrollSnap()
+  fireImpression(props.slides[selectedIndex.value], selectedIndex.value)
 }
 
 function pause() {
@@ -255,6 +289,8 @@ onMounted(() => {
     emblaApi.value.on('select', onSelect)
     emblaApi.value.on('reInit', onSelect)
     onSelect()
+  } else {
+    fireImpression(props.slides[0], 0)
   }
 })
 

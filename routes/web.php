@@ -385,6 +385,10 @@ Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::cla
 Route::get('/api/banners/{slot}', [\App\Http\Controllers\Api\BannerController::class, 'show']);
 Route::post('/api/banners/{banner}/click', [\App\Http\Controllers\Api\BannerController::class, 'click']);
 
+// Banner-slot analytics — generic; any slot can be tracked whether or not it maps to a Banner row.
+Route::post('/api/banner-events/impressions', [\App\Http\Controllers\Api\BannerEventController::class, 'impressions']);
+Route::post('/api/banner-events/click', [\App\Http\Controllers\Api\BannerEventController::class, 'click']);
+
 // Catch-all route for any other page slugs (must be last to avoid conflicts with other routes)
 // This allows creating new pages dynamically without adding routes
 Route::get('/{slug}', [FrontendPagesController::class, 'show'])->name('page.show')->where('slug', '[a-z0-9-]+');

@@ -290,6 +290,7 @@
         <div class="flex items-center gap-4 flex-shrink-0">
           <a
             href="/become-a-vendor"
+            @click="trackVendorCtaClick"
             class="ui-focus inline-flex items-center gap-2 h-11 px-6 text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:-translate-y-[0.5px] transition-all"
           >
             Get listed
@@ -310,6 +311,20 @@ import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
 import HeroCarousel from '@/components/ui/HeroCarousel.vue'
+import { onMounted } from 'vue'
+import { trackImpression, trackClick } from '@/lib/bannerTracking'
+
+onMounted(() => {
+  trackImpression({ slot: 'homepage_vendor_cta', banner_key: 'become-a-vendor' })
+})
+
+function trackVendorCtaClick() {
+  trackClick({
+    slot: 'homepage_vendor_cta',
+    banner_key: 'become-a-vendor',
+    destination_url: '/become-a-vendor',
+  })
+}
 
 defineProps({
   stats: { type: Object, default: () => ({}) },
