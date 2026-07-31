@@ -37,6 +37,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin/vendors/*/discover-products',
             'api/woo-auth-callback',
             'api/subscribe',
+            'api/banner-events/impressions',
+            'api/banner-events/click',
+            'api/banners/*/click',
         ]);
 
         $middleware->api([
