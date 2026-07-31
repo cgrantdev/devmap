@@ -32,6 +32,19 @@
           <!-- Overlays for legibility — softer than before so the product art breathes -->
           <div class="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-black/60 via-black/30 to-transparent md:from-black/55 md:via-black/15 pointer-events-none" />
 
+          <!-- Whole-slide clickable overlay. Sits above decorative layers but below the
+               CTA/coupon action row (which uses z-20). The Embla drag handler still
+               receives pointer events because we don't preventDefault on mousedown. -->
+          <a
+            v-if="slide.url"
+            :href="slide.url"
+            :target="slide.target || '_self'"
+            :rel="slide.sponsored ? 'noopener sponsored' : undefined"
+            :aria-label="slide.title || slide.title_highlight || 'Open banner'"
+            class="absolute inset-0 z-[5]"
+            @click="onSlideClick(slide, i)"
+          />
+
           <!-- Decorative orbs for text-only slides -->
           <template v-if="!slide.image">
             <div class="absolute top-1/4 right-[8%] w-[460px] h-[460px] rounded-full bg-[color:var(--color-accent-500)] opacity-[0.18] blur-[120px] pointer-events-none" />
@@ -68,7 +81,7 @@
             <h1 class="ui-display text-white text-[26px] font-semibold tracking-[-0.02em] leading-[1.05]">
               {{ slide.title_highlight || slide.title }}
             </h1>
-            <div class="mt-5 flex flex-wrap items-center justify-center gap-2 pointer-events-auto">
+            <div class="relative z-20 mt-5 flex flex-wrap items-center justify-center gap-2 pointer-events-auto">
               <a
                 :href="slide.url"
                 :target="slide.target || '_self'"
@@ -122,7 +135,7 @@
               </p>
 
               <!-- Action row -->
-              <div class="mt-8 flex flex-wrap items-center gap-3 pointer-events-auto">
+              <div class="relative z-20 mt-8 flex flex-wrap items-center gap-3 pointer-events-auto">
                 <a
                   :href="slide.url"
                   :target="slide.target || '_self'"

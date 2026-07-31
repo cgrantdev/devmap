@@ -306,22 +306,47 @@ class AnalyticsController extends Controller
         // Per-slide (banner_key) breakdown within each slot for last 30d.
         $slideRows = BannerEvent::humans()
             ->where('created_at', '>=', $since30)
-            ->selectRaw('slot, COALESCE(banner_key, \'(unknown)\') as banner_key, event_type, COUNT(*) as n')
+            ->selectRaw('slot, COALESCE(banner_key, \'(unknown)\') as banner_key, event_type, COUNT(*) as n, MAX(brand_id) as brand_id, MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, \'$.title\'))) as meta_title, MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, \'$.url\'))) as meta_url')
             ->groupBy('slot', 'banner_key', 'event_type')
             ->get();
 
+        // Pre-load brand names for any slides that carry brand_id.
+        $brandIds = $slideRows->pluck('brand_id')->filter()->unique()->all();
+        $brandsById = $brandIds
+            ? Brand::whereIn('id', $brandIds)->pluck('name', 'id')->all()
+            : [];
+
         $bySlotSlide = [];
         foreach ($slideRows as $r) {
-            $bySlotSlide[$r->slot][$r->banner_key][$r->event_type] = (int) $r->n;
+            $slot = $r->slot;
+            $key = $r->banner_key;
+            $bySlotSlide[$slot][$key]['counts'][$r->event_type] = (int) $r->n;
+            // Prefer the most descriptive label we can build.
+            $label = null;
+            if (!empty($r->brand_id) && isset($brandsById[$r->brand_id])) {
+                $label = $brandsById[$r->brand_id];
+            } elseif (!empty($r->meta_title) && $r->meta_title !== 'null') {
+                $label = $r->meta_title;
+            }
+            if ($label && empty($bySlotSlide[$slot][$key]['label'])) {
+                $bySlotSlide[$slot][$key]['label'] = $label;
+            }
+            if (!empty($r->meta_url) && $r->meta_url !== 'null' && empty($bySlotSlide[$slot][$key]['url'])) {
+                $bySlotSlide[$slot][$key]['url'] = $r->meta_url;
+            }
         }
+
         $slidesPayload = [];
         foreach ($bySlotSlide as $slot => $slides) {
             $items = [];
-            foreach ($slides as $key => $counts) {
+            foreach ($slides as $key => $data) {
+                $counts = $data['counts'] ?? [];
                 $imp = (int) ($counts['impression'] ?? 0);
                 $clk = (int) ($counts['click'] ?? 0);
                 $items[] = [
                     'banner_key'  => $key,
+                    'label'       => $data['label'] ?? $this->humanizeKey($key),
+                    'url'         => $data['url'] ?? null,
                     'impressions' => $imp,
                     'clicks'      => $clk,
                     'ctr'         => $this->ctr($imp, $clk),
@@ -358,6 +383,16 @@ class AnalyticsController extends Controller
     {
         if ($impressions <= 0) return null;
         return number_format(($clicks / $impressions) * 100, 2) . '%';
+    }
+
+    /**
+     * "certified-peptides" → "Certified Peptides" — fallback label when we
+     * have no brand row or meta.title to lean on.
+     */
+    private function humanizeKey(string $key): string
+    {
+        $s = trim(str_replace(['-', '_'], ' ', $key));
+        return $s === '' ? $key : ucwords($s);
     }
 
     private function percentChange(int $previous, int $current): ?string

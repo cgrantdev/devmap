@@ -274,7 +274,7 @@
           <table class="w-full text-sm">
             <thead class="text-gray-500 text-xs uppercase tracking-wide">
               <tr>
-                <th class="text-left py-2">Slide key</th>
+                <th class="text-left py-2">Banner</th>
                 <th class="text-right py-2 px-3">Impressions</th>
                 <th class="text-right py-2 px-3">Clicks</th>
                 <th class="text-right py-2">CTR</th>
@@ -282,7 +282,19 @@
             </thead>
             <tbody class="divide-y divide-gray-100">
               <tr v-for="item in group.items" :key="item.banner_key">
-                <td class="py-2 font-mono text-gray-800">{{ item.banner_key }}</td>
+                <td class="py-2">
+                  <div class="flex flex-col">
+                    <a
+                      v-if="item.url"
+                      :href="item.url"
+                      target="_blank"
+                      rel="noopener"
+                      class="text-gray-900 font-medium hover:text-blue-700 hover:underline"
+                    >{{ item.label || item.banner_key }}</a>
+                    <span v-else class="text-gray-900 font-medium">{{ item.label || item.banner_key }}</span>
+                    <span class="text-xs text-gray-400 font-mono">{{ item.banner_key }}</span>
+                  </div>
+                </td>
                 <td class="py-2 px-3 text-right">{{ formatNumber(item.impressions) }}</td>
                 <td class="py-2 px-3 text-right">{{ formatNumber(item.clicks) }}</td>
                 <td class="py-2 text-right text-blue-700 font-medium">{{ item.ctr ?? '—' }}</td>
