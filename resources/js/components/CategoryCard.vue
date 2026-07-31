@@ -3,12 +3,21 @@
     class="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-lg transition-all text-left group cursor-pointer"
     @click="handleClick"
   >
-    <div class="aspect-square bg-gradient-to-br from-blue-50 to-indigo-50 p-6 flex items-center justify-center mb-6 rounded-md">
+    <!-- When a real vendor image is present, use plain white + minimal padding
+         so the vial dominates the card. When it falls back to the SVG
+         placeholder, keep the tinted gradient so the placeholder still reads
+         as intentional artwork rather than a broken image. -->
+    <div
+      :class="[
+        'aspect-square flex items-center justify-center mb-6 rounded-md',
+        image && !hasError ? 'bg-white p-2' : 'bg-gradient-to-br from-blue-50 to-indigo-50 p-6',
+      ]"
+    >
       <img
         v-if="image && !hasError"
         :src="image"
         :alt="name"
-        class="w-full h-full object-contain select-none"
+        class="w-full h-full object-contain select-none group-hover:scale-[1.03] transition-transform duration-300"
         loading="lazy"
         @error="onError"
       />

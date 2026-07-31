@@ -92,7 +92,7 @@
         <a
           v-for="compound in topCompounds"
           :key="compound.slug"
-          :href="`/encyclopedia/${compound.slug}`"
+          :href="`/product/${compound.slug}`"
           class="ui-focus group flex flex-col gap-2 lg:gap-3 p-4 lg:p-5 rounded-[14px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms]"
         >
           <div class="ui-display text-[14px] lg:text-[16px] font-semibold text-[color:var(--color-ink)] tracking-tight group-hover:text-[color:var(--color-accent-600)] transition-colors leading-tight">
