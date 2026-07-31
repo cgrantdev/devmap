@@ -51,8 +51,13 @@
         // previews never break on pages that forgot to supply one.
         if (empty($seoOgImage)) $seoOgImage = $defaultOgImage;
 
-        // Full browser title: append site name for all pages except home.
-        $fullTitle = ($seoKey === 'home' || $seoTitle === $siteName) ? $seoTitle : ($seoTitle . ' — ' . $siteName);
+        // Full browser title: append site name unless it's the home page OR the
+        // controller-supplied title already contains the site name (older controllers
+        // pre-appended "- PeptideMap" themselves; this prevents "…— PeptideMap — PeptideMap").
+        $titleHasSiteName = stripos($seoTitle, $siteName) !== false;
+        $fullTitle = ($seoKey === 'home' || $seoTitle === $siteName || $titleHasSiteName)
+            ? $seoTitle
+            : ($seoTitle . ' — ' . $siteName);
 
         session()->forget('page_seo_data');
     @endphp
