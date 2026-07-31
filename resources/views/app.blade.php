@@ -13,7 +13,7 @@
             ?? 'The definitive platform for research peptide vendors — compare verified suppliers, inspect lab testing, and discover research peptides in one place.';
         $contactEmail = \App\Models\Setting::where('key', 'contact_email')->value('value') ?? 'info@peptidemap.com';
         $canonicalHost = 'https://peptidemap.com';
-        $defaultOgImage = $canonicalHost . '/images/og-default-v5.png';
+        $defaultOgImage = $canonicalHost . '/images/og-default-v6.png';
 
         // Get SEO data from session (set by controllers via session(['page_seo_data' => ...]))
         $seoData = session('page_seo_data');
