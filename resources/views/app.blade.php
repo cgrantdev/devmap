@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <!-- Search engine verification -->
+    <meta name="msvalidate.01" content="63538BD42BDE107E930BCBB0DB36B709" />
     @php
         $siteName = \App\Models\Setting::where('key', 'site_name')->value('value') ?? 'PeptideMap';
         $siteDescription = \App\Models\Setting::where('key', 'site_description')->value('value')

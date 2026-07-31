@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PeptideMap OG</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: radial-gradient(ellipse at 78% 22%, rgba(79,70,229,0.35) 0%, transparent 55%),
+                radial-gradient(ellipse at 12% 88%, rgba(14,165,233,0.28) 0%, transparent 55%),
+                linear-gradient(180deg, #0A0B0E 0%, #0F172A 100%);
+    color: #FFFFFF;
+    position: relative;
+  }
+  /* Subtle dot-grid overlay */
+  body::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+  }
+  .card {
+    position: relative;
+    width: 100%; height: 100%;
+    padding: 60px 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .top-row {
+    display: flex; align-items: center; gap: 20px;
+  }
+  .logo-mark {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #5B5FE8 0%, #4338CA 100%);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 24px -8px rgba(79,70,229,0.6);
+  }
+  .logo-mark svg { width: 34px; height: 34px; }
+  .brand {
+    display: flex; flex-direction: column;
+  }
+  .brand-name {
+    font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05;
+  }
+  .brand-tag {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+    color: rgba(165, 180, 252, 0.85); text-transform: uppercase; margin-top: 4px;
+  }
+  .headline {
+    font-size: 84px; font-weight: 700; letter-spacing: -0.035em; line-height: 0.98;
+    max-width: 940px;
+  }
+  .headline .accent { color: #a5b4fc; }
+  .stats {
+    display: flex; align-items: center; gap: 28px;
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 15px; letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.72);
+    text-transform: uppercase;
+  }
+  .stats .sep { color: rgba(255,255,255,0.24); }
+  .stats strong { color: #FFFFFF; font-weight: 700; }
+  .bottom-row {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .live-badge {
+    display: flex; align-items: center; gap: 10px;
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 12px; letter-spacing: 0.18em; color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 12px 2px rgba(16,185,129,0.6);
+  }
+  .url {
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 15px; color: rgba(255,255,255,0.55);
+    letter-spacing: 0.02em;
+  }
+  /* Decorative glow blob */
+  .glow {
+    position: absolute; top: -180px; right: -140px;
+    width: 620px; height: 620px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(79,70,229,0.55) 0%, transparent 62%);
+    pointer-events: none; filter: blur(28px);
+  }
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="card">
+    <div class="top-row">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.8"/>
+          <circle cx="12" cy="6" r="1.7" fill="white"/>
+          <circle cx="18" cy="12" r="1.7" fill="white"/>
+          <circle cx="12" cy="18" r="1.7" fill="white"/>
+          <circle cx="6" cy="12" r="1.7" fill="white"/>
+          <circle cx="16.24" cy="7.76" r="1.3" fill="white" opacity="0.85"/>
+          <circle cx="16.24" cy="16.24" r="1.3" fill="white" opacity="0.85"/>
+          <circle cx="7.76" cy="16.24" r="1.3" fill="white" opacity="0.85"/>
+          <circle cx="7.76" cy="7.76" r="1.3" fill="white" opacity="0.85"/>
+        </svg>
+      </div>
+      <div class="brand">
+        <div class="brand-name">PeptideMap</div>
+        <div class="brand-tag">The definitive research-peptide directory</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="headline">
+        Compare every<br>
+        <span class="accent">peptide vendor.</span>
+      </div>
+      <div class="stats" style="margin-top: 36px;">
+        <span><strong>40+</strong> Vendors</span>
+        <span class="sep">·</span>
+        <span><strong>2,500+</strong> Products</span>
+        <span class="sep">·</span>
+        <span><strong>Lab</strong> Verified</span>
+        <span class="sep">·</span>
+        <span><strong>Coupons</strong> Included</span>
+      </div>
+    </div>
+
+    <div class="bottom-row">
+      <div class="live-badge">
+        <div class="dot"></div>
+        <span>Live &nbsp;·&nbsp; Est. 2026</span>
+      </div>
+      <div class="url">peptidemap.com</div>
+    </div>
+  </div>
+</body>
+</html>
