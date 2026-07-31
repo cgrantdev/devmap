@@ -50,7 +50,9 @@
                   <span class="ui-mono">{{ vendor.coupon_code }}</span>
                 </span>
               </div>
-              <div class="flex items-center gap-1 text-xs">
+              <!-- Rating hidden until the vendor has actually collected
+                   reviews on their storefront. Same treatment as /vendors. -->
+              <div v-if="(vendor.rating_count || 0) > 0" class="flex items-center gap-1 text-xs">
                 <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(vendor.rating_average) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
                 <span class="ui-mono font-semibold text-[color:var(--color-ink)] ml-0.5">{{ (vendor.rating_average || 0).toFixed(1) }}</span>
               </div>
