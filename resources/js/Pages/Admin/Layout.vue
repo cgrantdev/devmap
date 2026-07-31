@@ -47,6 +47,7 @@
         <!-- Marketing -->
         <div>
           <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Marketing</div>
+          <NavItem href="/admin/banners" icon="image" label="Homepage Banners" />
           <NavItem href="/admin/reviews" icon="message" label="Reviews" :badge="$page.props.pending_reviews_count" badge-color="yellow" />
         </div>
 
