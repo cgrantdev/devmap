@@ -31,6 +31,15 @@
             </button>
           </div>
 
+          <div class="mb-4 pb-4 border-b border-slate-100">
+            <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Analytics Tag</label>
+            <input v-model="slide.analytics_label" type="text" placeholder="e.g. certified-pep-spring-promo"
+              class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <p class="text-xs text-slate-500 mt-1">
+              Short, stable name shown in <a href="/admin/analytics" class="text-blue-600 hover:underline">Analytics</a> and used to group this banner's impressions/clicks over time. Keep it consistent across edits — changing it starts a new row in analytics.
+            </p>
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label class="block mb-1.5 font-semibold text-slate-800 text-sm">Eyebrow</label>
@@ -183,6 +192,7 @@ const props = defineProps({
 
 // Hero Slides functionality
 const heroSlides = ref(props.heroSlides.map((slide, index) => ({
+  analytics_label: slide.analytics_label || '',
   eyebrow: slide.eyebrow || '',
   badge: slide.badge || '',
   title: slide.title || '',
@@ -205,6 +215,7 @@ const heroSlides = ref(props.heroSlides.map((slide, index) => ({
 
 const addHeroSlide = () => {
   heroSlides.value.push({
+    analytics_label: '',
     eyebrow: '',
     badge: '',
     title: '',
@@ -277,6 +288,7 @@ const saveHeroSlides = () => {
   // Append each slide's data in the format Laravel expects for validation
   heroSlides.value.forEach((slide, index) => {
     const put = (k, v) => formData.append(`hero_slides[${index}][${k}]`, v ?? '')
+    put('analytics_label', slide.analytics_label)
     put('title', slide.title)
     put('title_highlight', slide.title_highlight)
     put('eyebrow', slide.eyebrow)

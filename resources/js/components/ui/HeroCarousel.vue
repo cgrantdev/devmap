@@ -203,8 +203,11 @@ const props = defineProps({
   slot: { type: String, default: 'homepage_hero' },
 })
 
+// Prefer the admin-defined analytics_label as the stable event key so renaming
+// the title/highlight doesn't split analytics into two rows. Fall back to a
+// slug of the visible text.
 function slideKey(slide, i) {
-  const raw = slide?.key || slide?.slug || slide?.title_highlight || slide?.title || `slide-${i}`
+  const raw = slide?.analytics_label || slide?.key || slide?.slug || slide?.title_highlight || slide?.title || `slide-${i}`
   return String(raw).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 128) || `slide-${i}`
 }
 
@@ -215,7 +218,12 @@ function fireImpression(slide, i) {
     banner_key: slideKey(slide, i),
     banner_id: slide.banner_id ?? null,
     brand_id: slide.brand_id ?? null,
-    meta: { title: slide.title || null, url: slide.url || null, position: i },
+    meta: {
+      label: slide.analytics_label || null,
+      title: slide.title || null,
+      url: slide.url || null,
+      position: i,
+    },
   })
 }
 
@@ -227,7 +235,11 @@ function onSlideClick(slide, i) {
     banner_id: slide.banner_id ?? null,
     brand_id: slide.brand_id ?? null,
     destination_url: slide.url || null,
-    meta: { cta: slide.cta || null, position: i },
+    meta: {
+      label: slide.analytics_label || null,
+      cta: slide.cta || null,
+      position: i,
+    },
   })
 }
 defineExpose({ onSlideClick })

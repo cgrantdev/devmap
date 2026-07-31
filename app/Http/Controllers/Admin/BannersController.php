@@ -93,6 +93,7 @@ class BannersController extends Controller
         // Validate slides data
         foreach ($heroSlides as $index => $slide) {
             $request->validate([
+                "hero_slides.{$index}.analytics_label" => 'nullable|string|max:64',
                 "hero_slides.{$index}.title"           => 'required|string|max:255',
                 "hero_slides.{$index}.title_highlight" => 'nullable|string|max:255',
                 "hero_slides.{$index}.eyebrow"         => 'nullable|string|max:64',
@@ -224,7 +225,7 @@ class BannersController extends Controller
             $slide['sponsored'] = $toBool($slide['sponsored'] ?? false);
 
             // Optional string fields â€” normalize to string or null so JSON stays clean.
-            foreach (['title_highlight', 'eyebrow', 'badge', 'subtitle', 'cta_text', 'cta_url', 'coupon_code', 'target'] as $k) {
+            foreach (['analytics_label', 'title_highlight', 'eyebrow', 'badge', 'subtitle', 'cta_text', 'cta_url', 'coupon_code', 'target'] as $k) {
                 $slide[$k] = isset($slide[$k]) && $slide[$k] !== '' ? (string) $slide[$k] : null;
             }
 

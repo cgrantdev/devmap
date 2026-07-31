@@ -815,18 +815,19 @@ class HomeController extends Controller
             ->filter(fn ($s) => ($s['is_active'] ?? true) && !empty($s['title'] ?? null))
             ->sortBy(fn ($s) => (int) ($s['order'] ?? 0))
             ->map(fn ($s) => [
-                'eyebrow'         => $s['eyebrow'] ?? null,
-                'badge'           => $s['badge'] ?? null,
-                'title'           => $s['title'] ?? '',
-                'title_highlight' => $s['title_highlight'] ?? null,
-                'subtitle'        => $s['subtitle'] ?? null,
-                'cta'             => $s['cta_text'] ?? null,
-                'url'             => $s['cta_url'] ?? null,
-                'target'          => $s['target'] ?? null,
-                'sponsored'       => (bool) ($s['sponsored'] ?? false),
-                'image'           => $this->resolveHeroImage($s['image'] ?? null),
-                'image_mobile'    => $this->resolveHeroImage($s['image_mobile'] ?? null),
-                'coupon_code'     => $s['coupon_code'] ?? null,
+                'eyebrow'          => $s['eyebrow'] ?? null,
+                'badge'            => $s['badge'] ?? null,
+                'title'            => $s['title'] ?? '',
+                'title_highlight'  => $s['title_highlight'] ?? null,
+                'subtitle'         => $s['subtitle'] ?? null,
+                'cta'              => $s['cta_text'] ?? null,
+                'url'              => $s['cta_url'] ?? null,
+                'target'           => $s['target'] ?? null,
+                'sponsored'        => (bool) ($s['sponsored'] ?? false),
+                'image'            => $this->resolveHeroImage($s['image'] ?? null),
+                'image_mobile'     => $this->resolveHeroImage($s['image_mobile'] ?? null),
+                'coupon_code'      => $s['coupon_code'] ?? null,
+                'analytics_label'  => $s['analytics_label'] ?? null,
             ])
             ->values();
     }

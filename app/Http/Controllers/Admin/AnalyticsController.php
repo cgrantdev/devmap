@@ -306,7 +306,7 @@ class AnalyticsController extends Controller
         // Per-slide (banner_key) breakdown within each slot for last 30d.
         $slideRows = BannerEvent::humans()
             ->where('created_at', '>=', $since30)
-            ->selectRaw('slot, COALESCE(banner_key, \'(unknown)\') as banner_key, event_type, COUNT(*) as n, MAX(brand_id) as brand_id, MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, \'$.title\'))) as meta_title, MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, \'$.url\'))) as meta_url')
+            ->selectRaw('slot, COALESCE(banner_key, \'(unknown)\') as banner_key, event_type, COUNT(*) as n, MAX(brand_id) as brand_id, MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, \'$.label\'))) as meta_label, MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, \'$.title\'))) as meta_title, MAX(JSON_UNQUOTE(JSON_EXTRACT(meta, \'$.url\'))) as meta_url')
             ->groupBy('slot', 'banner_key', 'event_type')
             ->get();
 
@@ -321,9 +321,11 @@ class AnalyticsController extends Controller
             $slot = $r->slot;
             $key = $r->banner_key;
             $bySlotSlide[$slot][$key]['counts'][$r->event_type] = (int) $r->n;
-            // Prefer the most descriptive label we can build.
+            // Prefer the admin-defined analytics_label; then brand name; then the slide's title.
             $label = null;
-            if (!empty($r->brand_id) && isset($brandsById[$r->brand_id])) {
+            if (!empty($r->meta_label) && $r->meta_label !== 'null') {
+                $label = $r->meta_label;
+            } elseif (!empty($r->brand_id) && isset($brandsById[$r->brand_id])) {
                 $label = $brandsById[$r->brand_id];
             } elseif (!empty($r->meta_title) && $r->meta_title !== 'null') {
                 $label = $r->meta_title;
