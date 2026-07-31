@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <AdminLayout>
     <div class="mb-8">
       <h1 class="text-3xl text-slate-900 mb-2">Homepage Banners</h1>
