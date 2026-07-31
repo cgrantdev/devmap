@@ -53,10 +53,34 @@ class BannersController extends Controller
                 ];
             });
 
-        // Get hero slides from settings
+        // Get hero slides from settings. If the setting has never been
+        // saved, seed it with the same Certified Peptides slide the live
+        // homepage falls back to — otherwise the admin sees an empty form
+        // even though the homepage clearly has a banner rendering.
         $heroSlidesSetting = Setting::where('key', 'hero_slides')->first();
+        if (!$heroSlidesSetting) {
+            $heroSlidesSetting = Setting::create([
+                'key' => 'hero_slides',
+                'value' => json_encode([[
+                    'eyebrow' => 'Featured Partner',
+                    'badge' => null,
+                    'title' => 'Lab-tested research peptides from Certified Peptides',
+                    'title_highlight' => 'Certified Peptides',
+                    'subtitle' => '99% HPLC-verified COAs on every batch — BPC-157, TB-500, GHK-Cu, and the full catalog.',
+                    'cta_text' => 'Browse catalog',
+                    'cta_url' => '/brand/certified-pep/products',
+                    'coupon_code' => 'pmap',
+                    'target' => '_self',
+                    'sponsored' => false,
+                    'image' => '/images/banners/certified-peptides-3.png',
+                    'image_mobile' => '/images/banners/cert-mobile.png',
+                    'order' => 0,
+                    'is_active' => true,
+                ]]),
+            ]);
+        }
         $heroSlides = [];
-        
+
         if ($heroSlidesSetting && $heroSlidesSetting->value) {
             $heroSlides = json_decode($heroSlidesSetting->value, true) ?? [];
             foreach ($heroSlides as &$slide) {
