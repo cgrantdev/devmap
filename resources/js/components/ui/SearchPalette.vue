@@ -102,6 +102,7 @@ defineProps({
 defineEmits(['toggle-country'])
 
 const open = ref(false)
+defineExpose({ open, show: () => { open.value = true } })
 const query = ref('')
 const input = ref(null)
 

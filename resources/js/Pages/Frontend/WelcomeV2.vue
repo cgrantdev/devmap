@@ -43,9 +43,12 @@
               <span v-else class="ui-display text-2xl lg:text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
             </div>
             <div class="p-3 lg:p-5 flex-1 flex flex-col gap-2 lg:gap-3">
-              <div class="flex items-center justify-between">
-                <h3 class="ui-display text-[14px] lg:text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate">{{ vendor.name }}</h3>
-                <span v-if="vendor.coupon_code" class="inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 border-dashed">
+              <!-- Name on its own row on mobile so it doesn't fight the coupon
+                   chip for space (was truncating to 'Insta...', 'Nur...' etc.).
+                   Chip drops below and left-aligned on <lg; inline on lg+. -->
+              <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-1.5">
+                <h3 class="ui-display text-[14px] lg:text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate min-w-0">{{ vendor.name }}</h3>
+                <span v-if="vendor.coupon_code" class="self-start inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 border-dashed flex-shrink-0">
                   <span class="text-emerald-500 text-[8px] uppercase tracking-wider font-semibold">Code</span>
                   <span class="ui-mono">{{ vendor.coupon_code }}</span>
                 </span>

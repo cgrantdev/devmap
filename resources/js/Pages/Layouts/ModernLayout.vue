@@ -2,18 +2,18 @@
   <div class="min-h-screen bg-[color:var(--color-bg)] text-[color:var(--color-ink)] antialiased">
     <!-- Notice bar -->
     <div v-if="showNotice" class="fixed top-0 left-0 right-0 z-[60] bg-[#0A0B0E] text-white">
-      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 h-9 flex items-center justify-center gap-2 text-[12px] sm:text-[13px]">
+      <div class="max-w-[1280px] mx-auto px-4 lg:px-10 h-9 flex items-center justify-center gap-1.5 sm:gap-2 text-[11px] sm:text-[13px] relative">
         <template v-if="isDemoHost">
-          <span class="text-white/50">👋</span>
-          <span class="text-white/70">You're previewing the PeptideMap demo. All vendors and data shown are fictional.</span>
-          <button v-if="!isLoggedIn" @click="tryVendorDashboard" class="font-semibold text-[color:var(--color-accent-400)] hover:text-white transition-colors">Try the vendor dashboard →</button>
+          <span class="text-white/50 hidden sm:inline">👋</span>
+          <span class="text-white/70 truncate min-w-0"><span class="hidden sm:inline">You're previewing the PeptideMap demo. </span><span class="sm:hidden">Demo — </span>All vendors and data shown are fictional.</span>
+          <button v-if="!isLoggedIn" @click="tryVendorDashboard" class="font-semibold text-[color:var(--color-accent-400)] hover:text-white transition-colors flex-shrink-0"><span class="hidden sm:inline">Try the vendor dashboard </span><span class="sm:hidden">Try dashboard </span>→</button>
         </template>
         <template v-else>
-          <span class="text-white/50">🚀</span>
-          <span class="text-white/70">Now in beta — vendors list <strong class="text-white font-semibold">free</strong> during launch.</span>
-          <a href="/become-a-vendor" class="font-semibold text-[color:var(--color-accent-400)] hover:text-white transition-colors">Get Listed →</a>
+          <span class="text-white/50 hidden sm:inline">🚀</span>
+          <span class="text-white/70 truncate min-w-0"><span class="hidden sm:inline">Now in beta — vendors list </span><span class="sm:hidden">Beta — vendors list </span><strong class="text-white font-semibold">free</strong> during launch.</span>
+          <a href="/become-a-vendor" class="font-semibold text-[color:var(--color-accent-400)] hover:text-white transition-colors flex-shrink-0">Get Listed →</a>
         </template>
-        <button @click="showNotice = false" class="absolute right-3 lg:right-6 text-white/30 hover:text-white/60 transition-colors p-1">
+        <button @click="showNotice = false" class="text-white/30 hover:text-white/60 transition-colors p-1 flex-shrink-0 ml-1 sm:ml-2 sm:absolute sm:right-3 lg:right-6">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
@@ -28,15 +28,15 @@
       :class="[
         'fixed left-0 right-0 z-50 transition-all duration-[200ms] ease-out',
         showNotice ? 'top-9' : 'top-0',
-        (scrolled || mobileOpen || showMobileSearch)
+        (scrolled || mobileOpen)
           ? 'bg-white/85 backdrop-blur-xl shadow-[0_1px_2px_rgba(0,0,0,0.04)] border-b border-black/[0.04]'
           : 'bg-white/85 backdrop-blur-xl lg:bg-transparent lg:backdrop-blur-none lg:shadow-none lg:border-b-0',
       ]"
     >
-      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 h-14 lg:h-16 flex items-center gap-4 lg:gap-8">
+      <div class="max-w-[1280px] mx-auto px-4 lg:px-10 h-14 lg:h-16 flex items-center gap-3 lg:gap-8">
         <!-- Logo -->
-        <a href="/" class="ui-focus flex items-center flex-shrink-0">
-          <img :src="'/images/logo.png?v=2'" alt="PeptideMaps" class="h-8 lg:h-9 brightness-0 translate-y-[1px]" />
+        <a href="/" class="ui-focus flex items-center flex-shrink-0 min-w-0">
+          <img :src="'/images/logo.png?v=2'" alt="Peptidemap" class="h-7 lg:h-9 brightness-0 translate-y-[1px]" />
         </a>
 
         <!-- Primary nav (desktop) -->
@@ -52,13 +52,14 @@
         </nav>
 
         <!-- Right side -->
-        <div class="ml-auto flex items-center gap-1.5 sm:gap-2 lg:gap-3">
+        <div class="ml-auto flex items-center gap-1 sm:gap-2 lg:gap-3 flex-shrink-0">
           <!-- Full search bar (desktop / lg+ only) -->
           <SearchPalette class="hidden lg:block" />
 
-          <!-- Search icon (under lg — frees up space for the CTA + hamburger) -->
+          <!-- Search icon (under lg — opens the SearchPalette modal directly;
+               dropped the inline slide-down bar that was overflowing on mobile) -->
           <button
-            @click="showMobileSearch = !showMobileSearch"
+            @click="openSearch"
             class="lg:hidden p-2 rounded-[8px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
             aria-label="Search"
           >
@@ -108,10 +109,9 @@
         </div>
       </div>
 
-      <!-- Mobile / tablet search bar (slides down when icon is tapped) -->
-      <div v-if="showMobileSearch" class="lg:hidden px-5 pb-3">
-        <SearchPalette />
-      </div>
+      <!-- Hidden SearchPalette instance that mobile can open programmatically
+           from the header magnifier icon. Kept invisible; only its open state matters. -->
+      <SearchPalette ref="mobileSearchRef" class="hidden" />
     </header>
 
     <!-- Mobile nav overlay -->
@@ -313,7 +313,10 @@ function tryVendorDashboard() {
 
 const scrolled = ref(false)
 const mobileOpen = ref(false)
-const showMobileSearch = ref(false)
+const mobileSearchRef = ref(null)
+function openSearch() {
+  mobileSearchRef.value?.show?.()
+}
 const showNotice = ref(true)
 const currentYear = new Date().getFullYear()
 
