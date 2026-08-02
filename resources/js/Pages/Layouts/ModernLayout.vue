@@ -53,8 +53,12 @@
 
         <!-- Right side -->
         <div class="ml-auto flex items-center gap-1 sm:gap-2 lg:gap-3 flex-shrink-0">
-          <!-- Full search bar (desktop / lg+ only) -->
-          <SearchPalette class="hidden lg:block" />
+          <!-- Full search bar (desktop / lg+ only).
+               SearchPalette is a multi-root component (button + Teleport), so
+               class attrs don't reach it — wrap so `hidden lg:block` sticks. -->
+          <div class="hidden lg:block">
+            <SearchPalette />
+          </div>
 
           <!-- Search icon (under lg — opens the SearchPalette modal directly;
                dropped the inline slide-down bar that was overflowing on mobile) -->
@@ -109,9 +113,11 @@
         </div>
       </div>
 
-      <!-- Hidden SearchPalette instance that mobile can open programmatically
-           from the header magnifier icon. Kept invisible; only its open state matters. -->
-      <SearchPalette ref="mobileSearchRef" class="hidden" />
+      <!-- Hidden SearchPalette instance the mobile header magnifier opens
+           programmatically. Wrapped so `hidden` actually hides the trigger button. -->
+      <div class="hidden">
+        <SearchPalette ref="mobileSearchRef" />
+      </div>
     </header>
 
     <!-- Mobile nav overlay -->
