@@ -10,20 +10,28 @@ use Illuminate\Http\Response;
  * Host-aware robots.txt.
  *
  *  peptidemap.com / www.peptidemap.com → allow crawling + sitemap reference
- *  dev.peptidemap.com                  → Disallow: / (avoid duplicate index)
- *  demo.peptidemap.com                 → Disallow: / (demo data isn't public)
- *  join.peptidemap.com                 → Disallow: / (transactional landing)
- *  anything else (e.g. Forge subdomain)→ Disallow: / (defensive)
+ *  demo.peptidemap.com                 → allow crawling (so Google sees the
+ *                                        `X-Robots-Tag: noindex` header served
+ *                                        by NoindexSubdomains middleware and
+ *                                        actually deindexes these pages).
+ *                                        Disallow: / here would freeze old
+ *                                        snippet-less entries in the index.
+ *  join.peptidemap.com                 → same reasoning as demo.
+ *  dev.peptidemap.com                  → Disallow: / (all user-facing GETs
+ *                                        already 301 to apex; blocking helps
+ *                                        crawlers save budget).
+ *  anything else (e.g. Forge subdomain)→ Disallow: / (defensive).
  */
 class RobotsController extends Controller
 {
+    private const CANONICAL_HOSTS = ['peptidemap.com', 'www.peptidemap.com'];
+    private const NOINDEX_ALLOW_CRAWL_HOSTS = ['demo.peptidemap.com', 'join.peptidemap.com'];
+
     public function show(Request $request): Response
     {
         $host = strtolower($request->getHost());
 
-        $isCanonical = ($host === 'peptidemap.com' || $host === 'www.peptidemap.com');
-
-        if ($isCanonical) {
+        if (in_array($host, self::CANONICAL_HOSTS, true)) {
             $body = "User-agent: *\n"
                   . "Disallow: /admin/\n"
                   . "Disallow: /vendor/\n"
@@ -36,6 +44,14 @@ class RobotsController extends Controller
                   . "Disallow: /sanctum/\n"
                   . "Allow: /\n\n"
                   . "Sitemap: https://peptidemap.com/sitemap.xml\n";
+        } elseif (in_array($host, self::NOINDEX_ALLOW_CRAWL_HOSTS, true)) {
+            // Deliberately permissive: pair with X-Robots-Tag: noindex header.
+            $body = "User-agent: *\n"
+                  . "Disallow: /admin/\n"
+                  . "Disallow: /vendor/\n"
+                  . "Disallow: /api/\n"
+                  . "Disallow: /sanctum/\n"
+                  . "Allow: /\n";
         } else {
             $body = "User-agent: *\n"
                   . "Disallow: /\n";

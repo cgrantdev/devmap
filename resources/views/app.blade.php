@@ -4,6 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @php
+        $noindexHosts = ['demo.peptidemap.com', 'join.peptidemap.com'];
+        $shouldNoindex = in_array(strtolower(request()->getHost()), $noindexHosts, true);
+    @endphp
+    @if($shouldNoindex)
+    <meta name="robots" content="noindex, nofollow" />
+    @endif
 
     <!-- Search engine verification -->
     <meta name="msvalidate.01" content="63538BD42BDE107E930BCBB0DB36B709" />
