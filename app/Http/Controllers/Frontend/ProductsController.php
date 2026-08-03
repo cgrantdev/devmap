@@ -399,19 +399,23 @@ class ProductsController extends Controller
             $seoDescription = $product->seo_description ?: $autoSeoDescription;
             $seoOgTitle = $product->seo_og_title ?: $seoTitle;
             $seoOgDescription = $product->seo_og_description ?: $seoDescription;
+            // Version param tied to updated_at — when the product changes
+            // (price, image, name, category), the OG URL changes too, which
+            // busts every downstream cache (Cloudflare edge + Discord/FB/X/
+            // LinkedIn OG scrapers that key on URL). Without this, a shared
+            // link's preview never updates after the first scrape.
+            $ogV = $product->updated_at?->timestamp ?? 0;
             $seoOgImage = $product->seo_og_image
                 ? (str_starts_with($product->seo_og_image, 'http') ? $product->seo_og_image : url($product->seo_og_image))
-                : route('og.product', ['id' => $product->id]);
+                : route('og.product', ['id' => $product->id]) . '?v=' . $ogV;
         } else {
-            // Auto-generate SEO from product fields
             $vendorName = $brand ? $brand->name : 'our store';
             $seoTitle = "Buy {$product->name} from {$vendorName} - {$siteName}";
             $seoDescription = $autoSeoDescription;
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
-            // Per-product OG image (branded card with product tile). Falls back
-            // to site-default automatically if Chromium generation fails.
-            $seoOgImage = route('og.product', ['id' => $product->id]);
+            $ogV = $product->updated_at?->timestamp ?? 0;
+            $seoOgImage = route('og.product', ['id' => $product->id]) . '?v=' . $ogV;
         }
         
         // Product + BreadcrumbList JSON-LD (rendered by app.blade.php)
@@ -956,19 +960,20 @@ class ProductsController extends Controller
                     : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.');
             $seoOgTitle = $vendorSetting->seo_og_title ?: $seoTitle;
             $seoOgDescription = $vendorSetting->seo_og_description ?: $seoDescription;
+            // updated_at cache-buster so social platforms refetch when the brand changes.
+            $ogV = ($brand->updated_at?->timestamp) ?: ($vendorSetting->updated_at?->timestamp ?? 0);
             $seoOgImage = $vendorSetting->seo_og_image
                 ? (str_starts_with($vendorSetting->seo_og_image, 'http') ? $vendorSetting->seo_og_image : url($vendorSetting->seo_og_image))
-                : route('og.brand', ['slug' => $brand->slug]);
+                : route('og.brand', ['slug' => $brand->slug]) . '?v=' . $ogV;
         } else {
-            // Auto-generate SEO from vendor fields
             $seoTitle = $brand->name . ': Coupon Codes & Reviews - ' . $siteName;
             $seoDescription = ($vendorSetting->description ?? '')
                 ? $this->safeLimit($vendorSetting->description, 160)
                 : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.';
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
-            // Per-brand OG image (branded card with vendor logo + tagline + product count).
-            $seoOgImage = route('og.brand', ['slug' => $brand->slug]);
+            $ogV = ($brand->updated_at?->timestamp) ?: ($vendorSetting->updated_at?->timestamp ?? 0);
+            $seoOgImage = route('og.brand', ['slug' => $brand->slug]) . '?v=' . $ogV;
         }
         
         // ItemList JSON-LD for this brand's products (rendered by app.blade.php)

@@ -711,11 +711,11 @@ class EncyclopediaController extends Controller
                         : "Comprehensive guide to {$title} peptides."));
             $seoOgTitle = $educationPost->seo_og_title ?: $seoTitle;
             $seoOgDescription = $educationPost->seo_og_description ?: $seoDescription;
+            $ogV = $educationPost?->updated_at?->timestamp ?? 0;
             $seoOgImage = $educationPost->seo_og_image
                 ? (str_starts_with($educationPost->seo_og_image, 'http') ? $educationPost->seo_og_image : url($educationPost->seo_og_image))
-                : route('og.compound', ['slug' => $slug]);
+                : route('og.compound', ['slug' => $slug]) . '?v=' . $ogV;
         } else {
-            // Auto-generate SEO from encyclopedia entry fields
             $seoTitle = "What is {$title}? - Encyclopedia - {$siteName}";
             if ($educationPost && $educationPost->overview) {
                 $seoDescription = $this->safeLimit($educationPost->overview, 160);
@@ -726,8 +726,8 @@ class EncyclopediaController extends Controller
             }
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
-            // Per-compound OG image (branded card with gradient compound name).
-            $seoOgImage = route('og.compound', ['slug' => $slug]);
+            $ogV = $educationPost?->updated_at?->timestamp ?? 0;
+            $seoOgImage = route('og.compound', ['slug' => $slug]) . '?v=' . $ogV;
         }
         
         // DefinedTerm + BreadcrumbList JSON-LD (rendered by app.blade.php)
