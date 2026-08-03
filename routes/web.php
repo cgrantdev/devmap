@@ -56,10 +56,13 @@ Route::domain('join.peptidemap.com')->group(function () {
 Route::get('/sitemap.xml', [\App\Http\Controllers\Frontend\SitemapController::class, 'index']);
 Route::get('/robots.txt', [\App\Http\Controllers\Frontend\RobotsController::class, 'show']);
 
-// Per-product OG image (server-rendered via headless Chromium, disk-cached).
+// Per-URL OG images (server-rendered via headless Chromium, disk-cached).
 Route::get('/og/product/{id}.png', [\App\Http\Controllers\Frontend\ProductOgImageController::class, 'show'])
-    ->whereNumber('id')
-    ->name('og.product');
+    ->whereNumber('id')->name('og.product');
+Route::get('/og/brand/{slug}.png', [\App\Http\Controllers\Frontend\BrandOgImageController::class, 'show'])
+    ->where('slug', '[a-z0-9-]+')->name('og.brand');
+Route::get('/og/compound/{slug}.png', [\App\Http\Controllers\Frontend\CompoundOgImageController::class, 'show'])
+    ->where('slug', '[a-z0-9-]+')->name('og.compound');
 
 Route::get('/', [HomeController::class, 'v2'])->name('home');
 // Legacy homepage (kept for reference, remove when fully migrated)

@@ -847,18 +847,19 @@ class ProductsController extends Controller
                     : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.');
             $seoOgTitle = $vendorSetting->seo_og_title ?: $seoTitle;
             $seoOgDescription = $vendorSetting->seo_og_description ?: $seoDescription;
-            $seoOgImage = $vendorSetting->seo_og_image 
+            $seoOgImage = $vendorSetting->seo_og_image
                 ? (str_starts_with($vendorSetting->seo_og_image, 'http') ? $vendorSetting->seo_og_image : url($vendorSetting->seo_og_image))
-                : $brandImage;
+                : route('og.brand', ['slug' => $brand->slug]);
         } else {
             // Auto-generate SEO from vendor fields
             $seoTitle = $brand->name . ': Coupon Codes & Reviews - ' . $siteName;
-            $seoDescription = ($vendorSetting->description ?? '') 
-                ? $this->safeLimit($vendorSetting->description, 160) 
+            $seoDescription = ($vendorSetting->description ?? '')
+                ? $this->safeLimit($vendorSetting->description, 160)
                 : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.';
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
-            $seoOgImage = $brandImage;
+            // Per-brand OG image (branded card with vendor logo + tagline + product count).
+            $seoOgImage = route('og.brand', ['slug' => $brand->slug]);
         }
         
         // ItemList JSON-LD for this brand's products (rendered by app.blade.php)
