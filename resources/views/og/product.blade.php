@@ -188,40 +188,74 @@
   }
   .cta-chip.compare .savings { color: #7dd3fc; }
 
-  /* product image — floats freely on the dark canvas with a soft radial spotlight
-     behind it. No card wrapper. Bigger drop shadow anchors it. */
+  /* Product "display case" — a consistent square frame that normalizes wildly
+     different product photos (bare vials vs full vendor marketing posters).
+     Frame stays identical; the image inside contains-fit within a fixed inner
+     panel so all products read as one uniform system. */
   .tile {
     grid-area: tile;
     width: 460px; height: 460px;
     display: flex; align-items: center; justify-content: center;
     position: relative;
   }
-  /* Radial spotlight so the product feels lit against the dark bg. Bigger,
-     softer, more atmospheric than the previous card's inner glow. */
+  /* Ambient glow behind the frame */
   .tile::before {
     content: '';
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 500px; height: 500px;
+    width: 520px; height: 520px;
     background:
-      radial-gradient(circle, rgba(56,189,248,0.25) 0%, rgba(52,211,153,0.10) 30%, transparent 65%);
-    filter: blur(24px);
+      radial-gradient(circle, rgba(56,189,248,0.28) 0%, rgba(52,211,153,0.12) 30%, transparent 65%);
+    filter: blur(32px);
     pointer-events: none;
+    z-index: 0;
   }
+  /* The actual frame — subtle depth with a soft border + inner light gradient.
+     Fixed 400×400 square so tall/wide/square source images ALL sit in the
+     same box; the image's own bg color / aspect just reads as its own
+     unique treatment inside the same consistent case. */
+  .tile-frame {
+    position: relative;
+    z-index: 1;
+    width: 400px; height: 400px;
+    border-radius: 20px;
+    padding: 28px;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 55%, rgba(255,255,255,0.01) 100%),
+      linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow:
+      0 30px 60px -20px rgba(0,0,0,0.75),
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 -1px 0 rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  /* Tiny corner accent — small dot in each corner. Feels intentional across
+     all products regardless of what the vendor's photo looks like. */
+  .tile-frame::before,
+  .tile-frame::after {
+    content: '';
+    position: absolute;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgba(134,239,172,0.5);
+    box-shadow: 0 0 8px rgba(134,239,172,0.4);
+  }
+  .tile-frame::before { top: 12px; left: 12px; }
+  .tile-frame::after  { bottom: 12px; right: 12px; }
+
   .tile img {
     max-width: 100%; max-height: 100%; object-fit: contain;
-    position: relative; z-index: 1;
-    filter: drop-shadow(0 30px 50px rgba(0,0,0,0.7));
+    filter: drop-shadow(0 12px 24px rgba(0,0,0,0.5));
   }
-  /* Only shown when there's no product image at all. */
   .tile-fallback {
-    width: 320px; height: 320px;
+    width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
     font-size: 96px; font-weight: 800; letter-spacing: -0.05em;
     color: rgba(255,255,255,0.9);
     background: linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(52,211,153,0.2) 100%);
-    border-radius: 24px;
+    border-radius: 12px;
     position: relative; z-index: 1;
   }
 
@@ -307,11 +341,13 @@
     </div>
 
     <div class="tile">
-      @if($productImage)
-        <img src="{{ $productImage }}" alt="">
-      @else
-        <div class="tile-fallback">{{ strtoupper(substr($product->display_name ?? $product->name, 0, 2)) }}</div>
-      @endif
+      <div class="tile-frame">
+        @if($productImage)
+          <img src="{{ $productImage }}" alt="">
+        @else
+          <div class="tile-fallback">{{ strtoupper(substr($product->display_name ?? $product->name, 0, 2)) }}</div>
+        @endif
+      </div>
     </div>
 
     <div class="footer">
