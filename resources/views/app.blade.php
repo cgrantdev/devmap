@@ -132,7 +132,11 @@
         'name' => $siteName,
         'url' => $canonicalHost,
         'logo' => $canonicalHost . '/images/logo.png',
-        'sameAs' => [],
+        'sameAs' => [
+            'https://www.instagram.com/peptide.map/',
+            'https://www.facebook.com/peptidemap/',
+            'https://discord.gg/uYj2M9XKa5',
+        ],
         'contactPoint' => [
             '@type' => 'ContactPoint',
             'email' => $contactEmail,
