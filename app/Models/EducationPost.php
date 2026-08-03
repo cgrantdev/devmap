@@ -99,6 +99,20 @@ class EducationPost extends Model
         'references' => 'array',
     ];
 
+    /**
+     * Array-cast fields — anything set here that gets assigned a JSON string
+     * (from a seeder or import job that mistakenly wraps in json_encode()) is
+     * unwrapped in saving() below so we never store the double-encoded shape
+     * again. Front-end iterating a doubly-encoded array walks character by
+     * character, breaking the encyclopedia editor UI.
+     */
+    private const JSON_ARRAY_FIELDS = [
+        'key_effects', 'common_use_cases', 'possible_side_effects', 'contraindications',
+        'stacking_recommendations', 'faqs', 'tags', 'key_points', 'areas_of_research',
+        'mechanism_subsections', 'preclinical_subsections', 'human_use_subsections',
+        'regulatory_subsections', 'potential_applications', 'references',
+    ];
+
     public static function boot()
     {
         parent::boot();
@@ -106,6 +120,21 @@ class EducationPost extends Model
         static::creating(function ($post) {
             if (empty($post->slug)) {
                 $post->slug = Str::slug($post->title);
+            }
+        });
+
+        // Guard: if any array-cast field is being saved as a JSON-encoded
+        // string (rather than a real PHP array), decode it once so Laravel's
+        // 'array' cast can encode it correctly on write.
+        static::saving(function ($post) {
+            foreach (self::JSON_ARRAY_FIELDS as $field) {
+                $value = $post->getAttributes()[$field] ?? null;
+                if (is_string($value) && $value !== '' && ($value[0] === '[' || $value[0] === '{')) {
+                    $decoded = json_decode($value, true);
+                    if (is_array($decoded)) {
+                        $post->{$field} = $decoded;
+                    }
+                }
             }
         });
     }

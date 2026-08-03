@@ -84,7 +84,12 @@ class GenerateEncyclopediaArticle extends Command
             'description' => "Research overview of {$name}. This article covers the compound's background, proposed mechanisms of action, preclinical research findings, and current regulatory status. For research use only.",
             'background' => "<!-- NEEDS CONTENT: Write 150-300 words about the discovery, origin, and classification of {$name}. Include amino acid count, molecular classification, and why researchers became interested in it. -->",
             'mechanism_of_action_intro' => "<!-- NEEDS CONTENT: Write 100-200 words introducing the proposed molecular mechanisms of {$name}. -->",
-            'mechanism_subsections' => json_encode([
+            // NOTE: The EducationPost model casts these fields as 'array' —
+            // Laravel encodes them to JSON on save automatically. Wrapping the
+            // value in json_encode() here would DOUBLE-encode and break the
+            // editor UI (which iterates the array; a JSON string gets iterated
+            // character-by-character). Always pass raw PHP arrays here.
+            'mechanism_subsections' => [
                 [
                     'intro' => "The molecular pathways through which {$name} exerts its effects are still being elucidated in preclinical research.",
                     'points' => [
@@ -92,9 +97,9 @@ class GenerateEncyclopediaArticle extends Command
                         "<!-- Add specific mechanism point 2 -->",
                     ],
                 ],
-            ]),
+            ],
             'preclinical_intro' => "Preclinical research on {$name} has been conducted primarily in animal models and cell culture systems. The following summarizes key findings to date.",
-            'preclinical_subsections' => json_encode([
+            'preclinical_subsections' => [
                 [
                     'title' => 'Key Research Findings',
                     'findings' => [
@@ -104,18 +109,18 @@ class GenerateEncyclopediaArticle extends Command
                         ],
                     ],
                 ],
-            ]),
+            ],
             'preclinical_disclaimer' => "All preclinical findings are from laboratory and animal studies. Results may not translate to human outcomes. Further research, including controlled clinical trials, is needed.",
             'human_use_intro' => "<!-- NEEDS CONTENT: Describe the current state of human research for {$name}, if any. If none exists, state this clearly. -->",
-            'human_use_subsections' => json_encode([
+            'human_use_subsections' => [
                 [
                     'title' => 'Clinical Evidence Status',
                     'entries' => [
                         ['type' => 'content', 'value' => "Clinical data for {$name} remains limited. No large-scale human trials have been published as of the current date."],
                     ],
                 ],
-            ]),
-            'regulatory_subsections' => json_encode([
+            ],
+            'regulatory_subsections' => [
                 [
                     'title' => 'Regulatory Status',
                     'entries' => [
@@ -123,28 +128,28 @@ class GenerateEncyclopediaArticle extends Command
                         ['type' => 'content', 'value' => "All products containing {$name} are sold strictly for laboratory and research purposes only (RUO)."],
                     ],
                 ],
-            ]),
+            ],
             'regulatory_important_note' => "{$name} is an experimental research compound. It is not approved for human consumption, therapeutic use, or self-administration. Researchers should comply with all applicable local, state, and federal regulations.",
             'potential_applications_intro' => "Based on preclinical evidence, several potential research applications have been identified for {$name}. These remain theoretical and require clinical validation.",
-            'potential_applications' => json_encode([
+            'potential_applications' => [
                 [
                     'title' => 'Research Applications Under Investigation',
                     'description' => "<!-- NEEDS CONTENT: List 3-5 potential applications based on preclinical evidence -->",
                 ],
-            ]),
+            ],
             'potential_applications_important_context' => "All potential applications are speculative and based on preclinical data. No therapeutic claims are made or implied.",
             'conclusion' => "<!-- NEEDS CONTENT: Write a 200-300 word balanced conclusion summarizing the current research landscape for {$name}, emphasizing that it remains an experimental compound requiring further study. -->",
-            'references' => json_encode([]),
-            'key_points' => json_encode([
+            'references' => [],
+            'key_points' => [
                 "{$name} is a research compound currently under preclinical investigation.",
                 "Not approved for human therapeutic use by any regulatory agency.",
                 "All findings are from laboratory and animal studies.",
-            ]),
+            ],
             'overview' => "Research overview of {$name}. This compound is currently under investigation in preclinical settings.",
             'areas_of_research_intro' => "{$name} is being studied across several research domains in preclinical models.",
-            'areas_of_research' => json_encode([]),
-            'key_effects' => json_encode(["Research compound — effects under investigation"]),
-            'common_use_cases' => json_encode(["Laboratory research", "In-vitro studies"]),
+            'areas_of_research' => [],
+            'key_effects' => ["Research compound — effects under investigation"],
+            'common_use_cases' => ["Laboratory research", "In-vitro studies"],
             'how_it_works' => "The mechanism of action of {$name} is currently being investigated in preclinical research settings.",
             'half_life' => 'Under investigation',
             'bioavailability' => 'Under investigation',
