@@ -7,8 +7,9 @@ use App\Models\Blog;
 use App\Models\Brand;
 use App\Models\CeoAgentRun;
 use App\Models\CeoNote;
-use App\Models\EducationalGuide;
+use App\Models\EducationPost;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\SeoRecommendation;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -180,7 +181,13 @@ class CeoDashboardController extends Controller
             'blogs' => Schema::hasTable('blogs') ? Blog::count() : 0,
             'blogs_last_30d' => Schema::hasTable('blogs')
                 ? Blog::where('created_at', '>=', $now->copy()->subDays(30))->count() : 0,
-            'encyclopedia' => Schema::hasTable('educational_guides') ? EducationalGuide::count() : 0,
+            // Encyclopedia surface = active ProductCategory pages (one URL each at
+            // /encyclopedia/{slug}). EducationPost is the long-form content that
+            // fills them — a category page still exists without one, just thin.
+            'encyclopedia' => Schema::hasTable('product_categories')
+                ? ProductCategory::where('is_active', true)->count() : 0,
+            'encyclopedia_with_content' => Schema::hasTable('education_posts')
+                ? EducationPost::where('status', 'published')->count() : 0,
             // Approximation of indexed surface — sum of the tables the sitemap draws from.
             'indexable_urls' => $this->indexableUrlEstimate(),
 
