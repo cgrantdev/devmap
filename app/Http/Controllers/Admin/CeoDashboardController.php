@@ -216,7 +216,7 @@ class CeoDashboardController extends Controller
         // Plus ~15 static pages. Good enough as a directional metric.
         return Brand::where('is_active', true)->count()
             + Product::visible()->where('price', '>', 0)->count()
-            + (Schema::hasTable('educational_guides') ? EducationalGuide::count() : 0)
+            + (Schema::hasTable('product_categories') ? ProductCategory::where('is_active', true)->count() : 0)
             + (Schema::hasTable('blogs') ? Blog::count() : 0)
             + 15;
     }
