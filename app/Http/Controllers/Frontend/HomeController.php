@@ -754,10 +754,19 @@ class HomeController extends Controller
                     ->distinct('brand_id')
                     ->count('brand_id');
 
+                // Exclude $0/unpriced rows — scrapers dump parent-variable
+                // products with no resolved price and they poison the MIN,
+                // making tiles read "from $0.00".
                 $cheapest = Product::visible()
                     ->where('status', 'active')
                     ->where('product_category_id', $cat->id)
-                    ->selectRaw('MIN(COALESCE(discount_price, price)) as min_price')
+                    ->where(function ($q) {
+                        $q->where('discount_price', '>', 0)
+                          ->orWhere(function ($qq) {
+                              $qq->whereNull('discount_price')->where('price', '>', 0);
+                          });
+                    })
+                    ->selectRaw('MIN(COALESCE(NULLIF(discount_price, 0), price)) as min_price')
                     ->value('min_price');
 
                 return [
