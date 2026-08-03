@@ -10,6 +10,7 @@ use App\Models\VendorReview;
 use App\Models\Product;
 use App\Models\VendorSetting;
 use App\Models\ProductClick;
+use App\Models\PageView;
 use App\Models\Location;
 use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
@@ -37,6 +38,46 @@ class DashboardController extends Controller
             ? VendorReview::query()->where('brand_id', $brand->id)->where('flagged', true)
             : VendorReview::query()->whereRaw('1 = 0');
 
+        // Last-30-day vs previous-30-day summary (deltas the vendor cares about).
+        // If we don't have a brand for this user yet, everything is 0 — safe.
+        $now = now();
+        $since30 = $now->copy()->subDays(30);
+        $since60 = $now->copy()->subDays(60);
+        $brandId = $brand?->id;
+
+        $countPageViews = fn ($from, $to = null) => $brandId
+            ? PageView::humans()->where('brand_id', $brandId)
+                ->where('created_at', '>=', $from)
+                ->when($to, fn ($q) => $q->where('created_at', '<', $to))
+                ->count()
+            : 0;
+        $countClicks = fn ($from, $to = null) => $brandId
+            ? ProductClick::humans()->where('brand_id', $brandId)
+                ->where('created_at', '>=', $from)
+                ->when($to, fn ($q) => $q->where('created_at', '<', $to))
+                ->count()
+            : 0;
+        $countReviews = fn ($from, $to = null) => $brandId
+            ? VendorReview::where('brand_id', $brandId)
+                ->where('created_at', '>=', $from)
+                ->when($to, fn ($q) => $q->where('created_at', '<', $to))
+                ->count()
+            : 0;
+
+        $views30 = $countPageViews($since30);
+        $viewsPrev = $countPageViews($since60, $since30);
+        $clicks30 = $countClicks($since30);
+        $clicksPrev = $countClicks($since60, $since30);
+        $reviews30 = $countReviews($since30);
+        $reviewsPrev = $countReviews($since60, $since30);
+
+        // % change vs previous 30-day window. Null when previous period is zero
+        // (division-by-zero would give a misleading "+∞" spike).
+        $pct = function ($current, $previous) {
+            if ($previous === 0) return null;
+            return round((($current - $previous) / $previous) * 100);
+        };
+
         $stats = [
             'totalProducts' => (clone $productsQuery)->count(),
             'activeProducts' => (clone $productsQuery)
@@ -46,6 +87,15 @@ class DashboardController extends Controller
             'totalReviews' => (clone $approvedReviewsQuery)->count(),
             'averageRating' => number_format((clone $approvedReviewsQuery)->avg('rating') ?? 0, 1),
             'flaggedReviews' => (clone $flaggedReviewsQuery)->count(),
+
+            // Last 30 days summary
+            'views30' => $views30,
+            'viewsChange' => $pct($views30, $viewsPrev),
+            'clicks30' => $clicks30,
+            'clicksChange' => $pct($clicks30, $clicksPrev),
+            'reviews30' => $reviews30,
+            'reviewsChange' => $pct($reviews30, $reviewsPrev),
+            'clickRate30' => $views30 > 0 ? round(($clicks30 / $views30) * 100, 1) : null,
         ];
 
         $recentProducts = (clone $productsQuery)

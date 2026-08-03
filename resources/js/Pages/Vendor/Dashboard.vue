@@ -16,6 +16,41 @@
       </div>
     </div>
 
+    <!-- Last 30 days summary -->
+    <div class="bg-white rounded-[14px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] mb-8 overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-5 border-b border-[color:var(--color-hairline)]">
+        <div>
+          <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)]">Last 30 days</h2>
+          <p class="text-[12px] text-[color:var(--color-ink-subtle)] mt-0.5">Storefront traffic, outbound clicks, and new reviews. Change is vs. the previous 30 days.</p>
+        </div>
+        <Link
+          href="/vendor/storefront-analytics"
+          class="text-[12px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]"
+        >
+          Full analytics →
+        </Link>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 divide-x divide-[color:var(--color-hairline)] divide-y lg:divide-y-0">
+        <div v-for="s in summary30" :key="s.label" class="p-6">
+          <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">{{ s.label }}</div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="ui-mono text-2xl font-bold text-[color:var(--color-ink)]">{{ s.value }}</span>
+            <span
+              v-if="s.change !== null && s.change !== undefined"
+              :class="[
+                'text-[11px] font-semibold ui-mono',
+                s.change > 0 ? 'text-emerald-600' : s.change < 0 ? 'text-red-500' : 'text-[color:var(--color-ink-subtle)]',
+              ]"
+            >
+              {{ s.change > 0 ? '+' : '' }}{{ s.change }}%
+            </span>
+            <span v-else class="text-[11px] text-[color:var(--color-ink-subtle)]">—</span>
+          </div>
+          <div class="mt-1 text-[11px] text-[color:var(--color-ink-subtle)]">{{ s.hint }}</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Quick links -->
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <Link
@@ -141,6 +176,35 @@ const statCards = [
   { label: 'Storefront views', value: props.stats.totalViews || 0 },
   { label: 'Reviews', value: props.stats.totalReviews || 0 },
   { label: 'Avg. rating', value: props.stats.averageRating || '0.0' },
+]
+
+// 30-day summary card. Each stat can show a % change vs the previous 30 days
+// (or "—" if the previous period had zero and there's nothing to compare against).
+const summary30 = [
+  {
+    label: 'Storefront views',
+    value: (props.stats.views30 ?? 0).toLocaleString(),
+    change: props.stats.viewsChange,
+    hint: 'People landing on your storefront page',
+  },
+  {
+    label: 'Outbound clicks',
+    value: (props.stats.clicks30 ?? 0).toLocaleString(),
+    change: props.stats.clicksChange,
+    hint: 'Clicks from your products through to your site',
+  },
+  {
+    label: 'Click-through rate',
+    value: props.stats.clickRate30 != null ? `${props.stats.clickRate30}%` : '—',
+    change: null,
+    hint: 'Clicks ÷ views',
+  },
+  {
+    label: 'New reviews',
+    value: (props.stats.reviews30 ?? 0).toLocaleString(),
+    change: props.stats.reviewsChange,
+    hint: 'Reviews written this month',
+  },
 ]
 
 const quickLinks = [

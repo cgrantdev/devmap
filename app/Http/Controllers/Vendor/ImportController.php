@@ -22,9 +22,15 @@ class ImportController extends Controller
 
     public function index()
     {
+        // Products belong to brands, not directly to users. Chain is
+        // user → vendorSetting → brand → products. Fixes 500 that hit
+        // when Vendor.Products.vue's "Edit Catalog" landed here.
         $user = Auth::user();
-        $products = $user->products()->latest()->get();
-        
+        $brandId = $user->vendorSetting?->brand_id;
+        $products = $brandId
+            ? \App\Models\Product::where('brand_id', $brandId)->latest()->get()
+            : collect();
+
         return Inertia::render('Vendor/Import', [
             'products' => $products
         ]);
