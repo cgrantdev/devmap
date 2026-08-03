@@ -46,15 +46,13 @@ client.on(Events.InteractionCreate, async interaction => {
   }
 })
 
-/* ─── Scheduled feeds — cron in UTC ───
- *
- *   */15 * * * *   price drops        (every 15 min, batched + deduped)
- *   0 12 * * *     new products digest (12:00 UTC daily)
- *   0 12 * * *     deal of the day     (12:00 UTC daily, same channel as manual deals)
- *   0 15 * * *     peptide of the day  (15:00 UTC daily)
- *   0 16 * * 0     weekly recap        (Sunday 16:00 UTC)
- *   */10 * * * *   reviews mirror      (every 10 min, rate-capped)
- */
+// Scheduled feeds — cron in UTC.
+//   every 15 min    price drops (batched top-N + deduped)
+//   12:00 daily     new products digest
+//   12:00 daily     deal of the day (same channel as manual deals)
+//   15:00 daily     peptide of the day
+//   Sun 16:00       weekly recap
+//   every 10 min    reviews mirror (rate-capped)
 
 function schedule() {
   cron.schedule('*/15 * * * *', () => tickPriceDrops(client), { timezone: 'UTC' })
