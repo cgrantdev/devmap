@@ -104,11 +104,22 @@ Route::get('/encyclopedia/{slug}', [EncyclopediaController::class, 'showArticle'
 Route::get('/encyclopedia/article/{slug}', fn ($slug) => redirect("/encyclopedia/{$slug}", 301));
 Route::get('/compare', [CompareController::class, 'index'])->name('compare');
 Route::get('/calculator', function () {
+    $seoPage = \App\Models\SeoPage::where('key', 'calculator')->first();
+    $defaultTitle = 'Peptide Reconstitution Calculator — Peptidemap';
+    $defaultDescription = 'Calculate concentration, volume, and doses per vial for 17+ popular peptides. Free tool with vial-size, BAC volume, and target-dose presets — no signup.';
+    $seo = [
+        'key' => 'calculator',
+        'title' => $seoPage?->title ?: $defaultTitle,
+        'description' => $seoPage?->description ?: $defaultDescription,
+        'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
+        'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
+        'og_image' => $seoPage?->og_image ?: null,
+        'url' => url('/calculator'),
+    ];
+    session(['page_seo_data' => $seo]);
+
     return Inertia::render('Frontend/Calculator', [
-        'seo' => [
-            'title' => 'Peptide Reconstitution Calculator — PeptideMap',
-            'description' => 'Free research peptide reconstitution calculator. Calculate concentration, aliquot volume, and vial yield for laboratory peptide preparation. For research use only.',
-        ],
+        'seo' => $seo,
     ]);
 })->name('calculator');
 Route::get('/news', [KnowledgeCenterController::class, 'index'])->name('news');
