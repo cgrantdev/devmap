@@ -199,7 +199,7 @@
           <tbody class="divide-y divide-gray-100">
             <tr v-for="v in vendorBreakdown" :key="v.brand_id">
               <td class="px-4 py-3">
-                <a v-if="v.slug" :href="`/brand/${v.slug}/products`" class="text-blue-700 hover:underline" target="_blank">{{ v.name }}</a>
+                <a v-if="v.slug" :href="`/brand/${v.slug}`" class="text-blue-700 hover:underline" target="_blank">{{ v.name }}</a>
                 <span v-else class="text-gray-800">{{ v.name }}</span>
               </td>
               <td class="px-2 py-3 text-right">{{ formatNumber(v.page_views_7d) }}</td>

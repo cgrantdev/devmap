@@ -128,7 +128,7 @@ const handleClick = () => {
   if (props.to) {
     router.visit(props.to)
   } else if (props.slug) {
-    router.visit(`/brand/${props.slug}/products`)
+    router.visit(`/brand/${props.slug}`)
   }
 }
 </script>

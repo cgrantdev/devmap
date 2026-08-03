@@ -811,7 +811,7 @@ const isCustomer = computed(() => authUser.value?.role === 'customer')
 
 // Sign-in / register CTAs round-trip back to the reviews section after auth.
 const reviewsRedirectUrl = computed(() => {
-  if (typeof window === 'undefined') return `/brand/${props.brand?.slug}/products#reviews`
+  if (typeof window === 'undefined') return `/brand/${props.brand?.slug}#reviews`
   return `${window.location.pathname}${window.location.search}#reviews`
 })
 const signInHref = computed(() => `/login?redirect=${encodeURIComponent(reviewsRedirectUrl.value)}`)
@@ -1121,7 +1121,7 @@ const applyFilters = () => {
     params.set('per_page', perPage.value)
   }
 
-  router.visit(`/brand/${props.brand.slug}/products?${params.toString()}`, {
+  router.visit(`/brand/${props.brand.slug}?${params.toString()}`, {
     preserveState: true,
     preserveScroll: true,
   })
@@ -1175,7 +1175,7 @@ const applySort = (sort, dir) => {
     params.set('per_page', perPage.value)
   }
   
-  router.visit(`/brand/${props.brand.slug}/products?${params.toString()}`, {
+  router.visit(`/brand/${props.brand.slug}?${params.toString()}`, {
     preserveState: true,
     preserveScroll: true,
   })
@@ -1233,7 +1233,7 @@ const applySearch = () => {
     params.set('per_page', perPage.value)
   }
   
-  router.visit(`/brand/${props.brand.slug}/products?${params.toString()}`, {
+  router.visit(`/brand/${props.brand.slug}?${params.toString()}`, {
     preserveState: true,
     preserveScroll: true,
   })
@@ -1242,14 +1242,14 @@ const applySearch = () => {
 const getPageUrl = (page) => {
   const params = new URLSearchParams(window.location.search)
   params.set('page', page)
-  return `/brand/${props.brand.slug}/products?${params.toString()}`
+  return `/brand/${props.brand.slug}?${params.toString()}`
 }
 
 const handlePerPageChange = (perPage) => {
   const params = new URLSearchParams(window.location.search)
   params.set('per_page', perPage)
   params.set('page', 1) // Reset to first page when changing per page
-  router.visit(`/brand/${props.brand.slug}/products?${params.toString()}`, {
+  router.visit(`/brand/${props.brand.slug}?${params.toString()}`, {
     preserveState: true,
     preserveScroll: false,
   })

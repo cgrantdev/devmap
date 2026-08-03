@@ -145,7 +145,7 @@ const getInitialsColorClass = (initials) => {
 }
 
 const handleClick = () => {
-  router.visit(`/brand/${props.slug}/products`)
+  router.visit(`/brand/${props.slug}`)
 }
 
 const handleCodeClick = (event) => {

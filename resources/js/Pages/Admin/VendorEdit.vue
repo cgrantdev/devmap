@@ -21,7 +21,7 @@
       <template #actions>
         <a
           v-if="vendor"
-          :href="`/brand/${vendor.slug || vendor.name?.toLowerCase().replace(/\\s+/g, '-')}/products`"
+          :href="`/brand/${vendor.slug || vendor.name?.toLowerCase().replace(/\\s+/g, '-')}`"
           target="_blank"
           class="h-9 px-4 text-[13px] font-medium text-[color:var(--color-ink-muted)] border border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)] transition-all flex items-center gap-1.5"
         >

@@ -92,7 +92,7 @@
             </div>
             <div>
               <label class="block mb-1.5 font-semibold text-slate-800 text-sm">CTA URL</label>
-              <input v-model="slide.cta_url" type="text" placeholder="/brand/foo/products or https://â€¦"
+              <input v-model="slide.cta_url" type="text" placeholder="/brand/foo or https://â€¦"
                 class="w-full border border-slate-100 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
               <p class="text-xs text-slate-500 mt-1">Whole slide links here.</p>
             </div>

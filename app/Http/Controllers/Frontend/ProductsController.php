@@ -446,7 +446,7 @@ class ProductsController extends Controller
             'itemListElement' => array_values(array_filter([
                 ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://peptidemap.com/'],
                 ['@type' => 'ListItem', 'position' => 2, 'name' => 'Vendors', 'item' => 'https://peptidemap.com/brands'],
-                $brand ? ['@type' => 'ListItem', 'position' => 3, 'name' => $brand->name, 'item' => 'https://peptidemap.com/brand/' . $brand->slug . '/products'] : null,
+                $brand ? ['@type' => 'ListItem', 'position' => 3, 'name' => $brand->name, 'item' => 'https://peptidemap.com/brand/' . $brand->slug] : null,
                 ['@type' => 'ListItem', 'position' => $brand ? 4 : 3, 'name' => $product->display_name],
             ])),
         ];
@@ -940,7 +940,7 @@ class ProductsController extends Controller
         // Generate SEO data for brand products
         // Priority: Use stored SEO data from database, fallback to auto-generated from vendor fields
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'PeptideMap';
-        $brandUrl = url("/brand/{$slug}/products");
+        $brandUrl = url("/brand/{$slug}");
         $brandImage = $this->getBrandLogoUrl($brand);
         
         // Check if stored SEO data exists in vendorSetting

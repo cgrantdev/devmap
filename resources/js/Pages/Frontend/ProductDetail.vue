@@ -64,7 +64,7 @@
   
               <!-- Brand/Seller -->
               <Link                
-                :href="`/brand/${brand.slug}/products`"
+                :href="`/brand/${brand.slug}`"
                 class="text-blue-600 hover:text-blue-700 mb-4 flex items-center gap-2"
               >
                 by {{ brand.name }}
@@ -164,14 +164,14 @@
                   <div class="flex-1 min-w-0">
                     <div class="text-[11px] text-[color:var(--color-ink-subtle)] uppercase tracking-[0.08em] font-semibold">Sold by</div>
                     <a
-                      :href="`/brand/${brand.slug}/products`"
+                      :href="`/brand/${brand.slug}`"
                       class="text-[14px] font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors"
                     >
                       {{ brand.name }}
                     </a>
                   </div>
                   <a
-                    :href="`/brand/${brand.slug}/products`"
+                    :href="`/brand/${brand.slug}`"
                     class="ui-focus flex items-center gap-1 text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors flex-shrink-0"
                   >
                     All products
@@ -267,7 +267,7 @@
             <div v-if="activeTab === 'reviews'" class="max-w-4xl">
               <div v-if="brand" class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-900">
                 These are reviews of <strong>{{ brand.name }}</strong> as a vendor, not of this specific product.
-                <Link :href="`/brand/${brand.slug}/products`" class="text-blue-700 underline font-medium ml-1">See the full vendor profile →</Link>
+                <Link :href="`/brand/${brand.slug}`" class="text-blue-700 underline font-medium ml-1">See the full vendor profile →</Link>
               </div>
               <!-- Reviews List -->
               <div v-if="reviews && reviews.length > 0" class="space-y-6">
@@ -401,7 +401,7 @@ const effectiveCouponCode = computed(() => {
 // product page even though there's no review form here.
 const reviewVendorHref = computed(() => {
   const slug = props.brand?.slug
-  return slug ? `/brand/${slug}/products#reviews` : '#'
+  return slug ? `/brand/${slug}#reviews` : '#'
 })
 
 // Color-coded format chip next to the title. Mirrors the convention

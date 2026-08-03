@@ -686,7 +686,7 @@ class HomeController extends Controller
                 'title_highlight' => 'Certified Peptides',
                 'subtitle' => '99% HPLC-verified COAs on every batch — BPC-157, TB-500, GHK-Cu, and the full catalog.',
                 'cta' => 'Browse catalog',
-                'url' => '/brand/certified-pep/products',
+                'url' => '/brand/certified-pep',
                 'image' => '/images/banners/certified-peptides-3.png',
                 'image_mobile' => '/images/banners/cert-mobile.png',
                 'coupon_code' => 'pmap',

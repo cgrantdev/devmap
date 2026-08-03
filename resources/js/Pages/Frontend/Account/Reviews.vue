@@ -29,7 +29,7 @@
       <div v-else class="space-y-8">
         <div v-for="group in reviewsByVendor" :key="group[0]?.brand_id">
           <h2 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-3">
-            <Link v-if="group[0]?.brand_slug" :href="`/brand/${group[0].brand_slug}/products`" class="hover:text-[color:var(--color-accent-600)]">{{ group[0]?.brand_name }}</Link>
+            <Link v-if="group[0]?.brand_slug" :href="`/brand/${group[0].brand_slug}`" class="hover:text-[color:var(--color-accent-600)]">{{ group[0]?.brand_name }}</Link>
             <span v-else>{{ group[0]?.brand_name }}</span>
           </h2>
 

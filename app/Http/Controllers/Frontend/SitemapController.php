@@ -56,7 +56,7 @@ class SitemapController extends Controller
             ->chunkById(500, function ($chunk) use (&$urls) {
                 foreach ($chunk as $b) {
                     $urls[] = [
-                        'loc'        => self::BASE_URL . '/brand/' . $b->slug . '/products',
+                        'loc'        => self::BASE_URL . '/brand/' . $b->slug,
                         'lastmod'    => $b->updated_at?->toDateString(),
                         'changefreq' => 'weekly',
                         'priority'   => '0.7',

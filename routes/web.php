@@ -114,7 +114,10 @@ Route::get('/product/{slug}/{id}', function ($slug, $id) {
     ], 301);
 })->whereNumber('id')->name('product.detail.legacy');
 Route::get('/product/{slug}', [ProductsController::class, 'show'])->name('product.show');
-Route::get('/brand/{slug}/products', [ProductsController::class, 'byBrand'])->name('brand.products');
+Route::get('/brand/{slug}', [ProductsController::class, 'byBrand'])->name('brand.products');
+Route::get('/brand/{slug}/products', function ($slug) {
+    return redirect()->route('brand.products', ['slug' => $slug], 301);
+})->name('brand.products.legacy');
 Route::get('/brands', [BrandsController::class, 'index'])->name('brands');
 Route::get('/blogs', [BlogsController::class, 'index'])->name('blogs');
 Route::get('/blog/{slug}', [BlogsController::class, 'show'])->name('blog.show');
@@ -426,7 +429,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/vendors', [BrandsController::class, 'index'])->name('vendors.public');
 // /shop/{slug} redirects to the rich brand products page
 Route::get('/shop/{vendor_name}', function ($vendor_name) {
-    return redirect("/brand/{$vendor_name}/products", 301);
+    return redirect("/brand/{$vendor_name}", 301);
 })->name('shop.public');
 Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('product.public');
 

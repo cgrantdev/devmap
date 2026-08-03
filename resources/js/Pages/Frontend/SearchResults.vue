@@ -154,7 +154,7 @@
                   v-for="vendor in results.vendors"
                   :key="vendor.id"
                   class="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
-                  @click="router.visit(`/brand/${vendor.slug}/products`)"
+                  @click="router.visit(`/brand/${vendor.slug}`)"
                 >
                   <div class="flex items-start gap-4">
                     <div class="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center text-3xl flex-shrink-0">
