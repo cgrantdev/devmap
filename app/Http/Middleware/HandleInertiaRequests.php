@@ -56,6 +56,10 @@ class HandleInertiaRequests extends Middleware
             'demo_preview' => fn () => $request->session()->get('demo_preview') === true,
             'demo_preview_brand_name' => fn () => $request->session()->get('demo_preview_brand_name'),
             'is_demo_host' => fn () => $request->getHost() === 'demo.peptidemap.com',
+            // Sidebar in Admin/Layout renders the CEO tab only when this is true.
+            // Route is separately gated by the ceo.only middleware — this prop
+            // is purely a UI hint, not a security boundary.
+            'is_ceo' => fn () => strtolower((string) ($request->user()?->email ?? '')) === 'info@peptidemap.com',
             'site_name' => fn () => Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap',
             'site_description' => fn () => Setting::where('key', 'site_description')->value('value') ?? 'Compare peptide brands, prices, and reviews',
             'contact_email' => fn () => Setting::where('key', 'contact_email')->value('value') ?? 'contact@peptidemaps.com',

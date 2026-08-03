@@ -237,6 +237,18 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
 // Admin routes
 Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.viewer.writes'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
+    // CEO-only dashboard. ceo.only middleware locks the endpoint down to
+    // info@peptidemap.com; sidebar link is gated separately in Vue via
+    // the `is_ceo` shared prop.
+    Route::middleware('ceo.only')->prefix('ceo')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'index'])->name('admin.ceo');
+        Route::post('/agent-runs', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'storeAgentRun'])->name('admin.ceo.agent-run.store');
+        Route::post('/initiatives', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'storeInitiative'])->name('admin.ceo.initiative.store');
+        Route::patch('/initiatives/{initiative}', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'updateInitiative'])->name('admin.ceo.initiative.update');
+        Route::delete('/initiatives/{initiative}', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'destroyInitiative'])->name('admin.ceo.initiative.destroy');
+        Route::post('/notepad', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'saveNotepad'])->name('admin.ceo.notepad.save');
+    });
     Route::get('/vendors', [VendorsController::class, 'index'])->name('admin.vendors');
     Route::get('/applicants', [VendorsController::class, 'applicants'])->name('admin.applicants');
     Route::get('/vendors/create', [VendorsController::class, 'create'])->name('admin.vendors.create');

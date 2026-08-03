@@ -65,6 +65,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
             'block.viewer.writes' => \App\Http\Middleware\BlockAdminViewerWrites::class,
             'bot.api' => \App\Http\Middleware\BotApiAuth::class,
+            'ceo.only' => \App\Http\Middleware\CeoOnly::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
