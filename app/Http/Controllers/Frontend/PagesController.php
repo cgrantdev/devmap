@@ -87,7 +87,7 @@ class PagesController extends Controller
         $pageTitle = $page->seo_title ?? $page->title;
         $pageDescription = $page->seo_description ?? ($page->content ? $this->safeLimit($page->content, 160) : '');
         $seoData = new SEOData(
-            title: $pageTitle . ' | PeptideSync',
+            title: $pageTitle . ' | Peptidemap',
             description: $pageDescription ?: 'Learn more about ' . $page->title,
             url: url("/{$slug}"),
         );

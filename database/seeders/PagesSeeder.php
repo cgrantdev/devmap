@@ -17,12 +17,12 @@ class PagesSeeder extends Seeder
         $pages = [
             [
                 'slug' => 'about',
-                'title' => 'About PeptideSync',
+                'title' => 'About Peptidemap',
                 'content' => '<h2>Our Mission</h2>
-<p>PeptideSync is dedicated to advancing peptide research by connecting scientists, researchers, and laboratory professionals with trusted peptide suppliers. Our platform serves as a comprehensive resource hub, providing access to high-quality peptides, educational content, and research tools to support the scientific community in their pursuit of groundbreaking discoveries.</p>
+<p>Peptidemap is dedicated to advancing peptide research by connecting scientists, researchers, and laboratory professionals with trusted peptide suppliers. Our platform serves as a comprehensive resource hub, providing access to high-quality peptides, educational content, and research tools to support the scientific community in their pursuit of groundbreaking discoveries.</p>
 
 <h2>What We Do</h2>
-<p>PeptideSync operates as an innovative aggregator platform that brings together multiple verified peptide suppliers, making it easier for researchers to:</p>
+<p>Peptidemap operates as an innovative aggregator platform that brings together multiple verified peptide suppliers, making it easier for researchers to:</p>
 <ul>
 <li>Compare products and prices from various suppliers in one centralized location</li>
 <li>Access comprehensive educational resources about peptide research, protocols, and best practices</li>
@@ -32,31 +32,31 @@ class PagesSeeder extends Seeder
 </ul>
 
 <h2>Our Commitment to Research</h2>
-<p>All products listed on PeptideSync are intended exclusively for research purposes in laboratory settings. We are committed to supporting legitimate scientific research and do not promote or endorse the use of peptides for human consumption or therapeutic purposes. Our platform strictly adheres to research-only guidelines and works exclusively with suppliers who share this commitment to scientific integrity.</p>
+<p>All products listed on Peptidemap are intended exclusively for research purposes in laboratory settings. We are committed to supporting legitimate scientific research and do not promote or endorse the use of peptides for human consumption or therapeutic purposes. Our platform strictly adheres to research-only guidelines and works exclusively with suppliers who share this commitment to scientific integrity.</p>
 
 <h2>Quality and Verification</h2>
 <p>We work diligently to ensure that all suppliers featured on our platform meet high standards of quality and reliability. While we provide a platform for comparison and information, we encourage researchers to conduct their own due diligence when selecting suppliers and to verify product specifications, purity, and documentation before making purchases. Our goal is to facilitate connections between researchers and quality suppliers while maintaining transparency throughout the process.</p>
 
 <h2>Educational Resources</h2>
-<p>Beyond product listings, PeptideSync provides extensive educational content including research articles, dosage guidelines, storage protocols, and safety information. Our goal is to empower researchers with the knowledge they need to conduct safe and effective peptide research. We believe that well-informed researchers make better decisions and contribute more meaningfully to scientific advancement.</p>
+<p>Beyond product listings, Peptidemap provides extensive educational content including research articles, dosage guidelines, storage protocols, and safety information. Our goal is to empower researchers with the knowledge they need to conduct safe and effective peptide research. We believe that well-informed researchers make better decisions and contribute more meaningfully to scientific advancement.</p>
 
 <h2>Contact Us</h2>
 <p>If you have questions about our platform, need assistance, or are interested in becoming a supplier partner, please visit our <a href="/contact">Contact</a> page. We\'re here to support the research community and welcome your feedback, suggestions, and collaboration opportunities.</p>',
-                'meta_title' => 'About Us - PeptideSync | Connecting Researchers with Trusted Peptide Suppliers',
-                'meta_description' => 'Learn about PeptideSync and our mission to connect researchers with trusted peptide suppliers. Discover our commitment to advancing peptide research through quality products and educational resources.',
+                'meta_title' => 'About Us - Peptidemap | Connecting Researchers with Trusted Peptide Suppliers',
+                'meta_description' => 'Learn about Peptidemap and our mission to connect researchers with trusted peptide suppliers. Discover our commitment to advancing peptide research through quality products and educational resources.',
             ],
             [
                 'slug' => 'disclaimer',
                 'title' => 'Disclaimer',
                 'content' => '<div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; margin-bottom: 2rem;">
-<p style="font-weight: 600; color: #92400e; margin: 0;"><strong>IMPORTANT:</strong> All products listed on PeptideSync are intended for research purposes only in laboratory settings. These products are NOT intended for human consumption, diagnostic use, or therapeutic purposes.</p>
+<p style="font-weight: 600; color: #92400e; margin: 0;"><strong>IMPORTANT:</strong> All products listed on Peptidemap are intended for research purposes only in laboratory settings. These products are NOT intended for human consumption, diagnostic use, or therapeutic purposes.</p>
 </div>
 
 <h2>Research Use Only</h2>
-<p>All peptides and related products featured on PeptideSync are sold for research purposes exclusively. These products are intended for use by qualified researchers, scientists, and laboratory professionals in controlled research environments. They are NOT approved by the FDA or any regulatory agency for human consumption, medical treatment, or diagnostic purposes.</p>
+<p>All peptides and related products featured on Peptidemap are sold for research purposes exclusively. These products are intended for use by qualified researchers, scientists, and laboratory professionals in controlled research environments. They are NOT approved by the FDA or any regulatory agency for human consumption, medical treatment, or diagnostic purposes.</p>
 
 <h2>No Medical Claims</h2>
-<p>PeptideSync does not make any medical claims, health claims, or therapeutic claims regarding any products listed on our platform. Any information provided about peptides is for educational and research purposes only. We do not diagnose, treat, cure, or prevent any disease or medical condition. All content on this platform is intended to support scientific research and should not be construed as medical advice.</p>
+<p>Peptidemap does not make any medical claims, health claims, or therapeutic claims regarding any products listed on our platform. Any information provided about peptides is for educational and research purposes only. We do not diagnose, treat, cure, or prevent any disease or medical condition. All content on this platform is intended to support scientific research and should not be construed as medical advice.</p>
 
 <h2>User Responsibility</h2>
 <p>Users of this platform are solely responsible for:</p>
@@ -70,19 +70,19 @@ class PagesSeeder extends Seeder
 </ul>
 
 <h2>Third-Party Suppliers</h2>
-<p>PeptideSync serves as an aggregator platform that provides information and links to third-party suppliers. We do not manufacture, sell, or directly supply any products. All transactions are conducted directly between users and suppliers. PeptideSync is not responsible for the quality, purity, accuracy of product descriptions, shipping, or any other aspects of transactions between users and suppliers. Users should verify all product information directly with suppliers before making purchases.</p>
+<p>Peptidemap serves as an aggregator platform that provides information and links to third-party suppliers. We do not manufacture, sell, or directly supply any products. All transactions are conducted directly between users and suppliers. Peptidemap is not responsible for the quality, purity, accuracy of product descriptions, shipping, or any other aspects of transactions between users and suppliers. Users should verify all product information directly with suppliers before making purchases.</p>
 
 <h2>No Warranties</h2>
-<p>PeptideSync provides this platform "as is" without warranties of any kind, either express or implied. We do not warrant the accuracy, completeness, or usefulness of any information on this platform. We are not liable for any errors, omissions, or inaccuracies in the content provided. Users should independently verify all information before relying on it for research purposes.</p>
+<p>Peptidemap provides this platform "as is" without warranties of any kind, either express or implied. We do not warrant the accuracy, completeness, or usefulness of any information on this platform. We are not liable for any errors, omissions, or inaccuracies in the content provided. Users should independently verify all information before relying on it for research purposes.</p>
 
 <h2>Limitation of Liability</h2>
-<p>PeptideSync, its owners, operators, and affiliates shall not be liable for any direct, indirect, incidental, special, consequential, or punitive damages resulting from the use of this platform, including but not limited to damages from product purchases, research outcomes, or reliance on information provided. This limitation applies to the fullest extent permitted by law.</p>
+<p>Peptidemap, its owners, operators, and affiliates shall not be liable for any direct, indirect, incidental, special, consequential, or punitive damages resulting from the use of this platform, including but not limited to damages from product purchases, research outcomes, or reliance on information provided. This limitation applies to the fullest extent permitted by law.</p>
 
 <h2>Regulatory Compliance</h2>
 <p>It is the responsibility of users to ensure that their purchase and use of any products complies with all applicable local, state, federal, and international laws and regulations. Some peptides may be subject to restrictions or require special permits in certain jurisdictions. Users must verify regulatory requirements in their location before purchasing or using any products.</p>
 
 <h2>Educational Content</h2>
-<p>All educational content, articles, and information provided on PeptideSync are for informational purposes only. This content should not be construed as medical advice, treatment recommendations, or professional guidance. Always consult with qualified professionals for specific research protocols and safety procedures. The information provided is general in nature and may not apply to specific research situations.</p>
+<p>All educational content, articles, and information provided on Peptidemap are for informational purposes only. This content should not be construed as medical advice, treatment recommendations, or professional guidance. Always consult with qualified professionals for specific research protocols and safety procedures. The information provided is general in nature and may not apply to specific research situations.</p>
 
 <h2>Acceptance of Terms</h2>
 <p>By using this platform, you acknowledge that you have read, understood, and agree to be bound by this disclaimer. If you do not agree with any part of this disclaimer, you must not use this platform. Continued use of the platform constitutes acceptance of these terms.</p>
@@ -92,14 +92,14 @@ class PagesSeeder extends Seeder
 <p style="margin: 0;">December 2024</p>
 <p style="margin-top: 1rem; margin-bottom: 0;">This disclaimer may be updated from time to time. We encourage users to review this page periodically to stay informed of any changes.</p>
 </div>',
-                'meta_title' => 'Disclaimer - PeptideSync | Research Use Only Policy',
-                'meta_description' => 'Read the PeptideSync disclaimer. All products are for research purposes only. Important legal information about product use, liability, and regulatory compliance.',
+                'meta_title' => 'Disclaimer - Peptidemap | Research Use Only Policy',
+                'meta_description' => 'Read the Peptidemap disclaimer. All products are for research purposes only. Important legal information about product use, liability, and regulatory compliance.',
             ],
             [
                 'slug' => 'privacy',
                 'title' => 'Privacy Policy',
                 'content' => '<h2>Introduction</h2>
-<p>At PeptideSync, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services. By using our platform, you consent to the data practices described in this policy.</p>
+<p>At Peptidemap, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services. By using our platform, you consent to the data practices described in this policy.</p>
 
 <h2>Information We Collect</h2>
 <h3>Information You Provide</h3>
@@ -167,7 +167,7 @@ class PagesSeeder extends Seeder
 <p>To exercise these rights, please contact us using the information provided in the Contact section below.</p>
 
 <h2>Third-Party Links</h2>
-<p>Our website may contain links to third-party websites, including supplier websites. We are not responsible for the privacy practices or content of these external sites. We encourage you to review the privacy policies of any third-party sites you visit. This privacy policy applies only to information collected by PeptideSync.</p>
+<p>Our website may contain links to third-party websites, including supplier websites. We are not responsible for the privacy practices or content of these external sites. We encourage you to review the privacy policies of any third-party sites you visit. This privacy policy applies only to information collected by Peptidemap.</p>
 
 <h2>Children\'s Privacy</h2>
 <p>Our services are not intended for individuals under the age of 18. We do not knowingly collect personal information from children. If we become aware that we have collected information from a child, we will take steps to delete such information promptly. If you believe we have collected information from a child, please contact us immediately.</p>
@@ -179,14 +179,14 @@ class PagesSeeder extends Seeder
 <p>We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the "Last Updated" date. We encourage you to review this policy periodically to stay informed about how we protect your information.</p>
 
 <h2>Contact Us</h2>
-<p>If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us through our <a href="/contact">Contact</a> page or email us at privacy@peptidesync.com.</p>
+<p>If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us through our <a href="/contact">Contact</a> page or email us at privacy@Peptidemap.com.</p>
 
 <div style="background-color: #f3f4f6; padding: 1.5rem; border-radius: 0.5rem; margin-top: 2rem;">
 <p style="font-weight: 600; margin-bottom: 0.5rem;">Last Updated:</p>
 <p style="margin: 0;">December 2024</p>
 </div>',
-                'meta_title' => 'Privacy Policy - PeptideSync | How We Protect Your Data',
-                'meta_description' => 'Read PeptideSync\'s privacy policy. Learn how we collect, use, and protect your personal information. Your privacy is important to us.',
+                'meta_title' => 'Privacy Policy - Peptidemap | How We Protect Your Data',
+                'meta_description' => 'Read Peptidemap\'s privacy policy. Learn how we collect, use, and protect your personal information. Your privacy is important to us.',
             ],
             [
                 'slug' => 'contact',
@@ -198,25 +198,25 @@ class PagesSeeder extends Seeder
 <div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 0.5rem;">
 <h3 style="margin-top: 0; color: #1f2937;">General Inquiries</h3>
 <p style="color: #6b7280; margin-bottom: 0.5rem;">For general questions about our platform, services, or how to get started:</p>
-<p style="font-weight: 600; color: #1f2937; margin: 0;">info@peptidesync.com</p>
+<p style="font-weight: 600; color: #1f2937; margin: 0;">info@Peptidemap.com</p>
 </div>
 
 <div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 0.5rem;">
 <h3 style="margin-top: 0; color: #1f2937;">Supplier Partnerships</h3>
 <p style="color: #6b7280; margin-bottom: 0.5rem;">Interested in becoming a featured supplier on our platform?</p>
-<p style="font-weight: 600; color: #1f2937; margin: 0;">suppliers@peptidesync.com</p>
+<p style="font-weight: 600; color: #1f2937; margin: 0;">suppliers@Peptidemap.com</p>
 </div>
 
 <div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 0.5rem;">
 <h3 style="margin-top: 0; color: #1f2937;">Technical Support</h3>
 <p style="color: #6b7280; margin-bottom: 0.5rem;">Need help with your account or experiencing technical issues?</p>
-<p style="font-weight: 600; color: #1f2937; margin: 0;">support@peptidesync.com</p>
+<p style="font-weight: 600; color: #1f2937; margin: 0;">support@Peptidemap.com</p>
 </div>
 
 <div style="background-color: #f9fafb; padding: 1.5rem; border-radius: 0.5rem;">
 <h3 style="margin-top: 0; color: #1f2937;">Research Collaboration</h3>
 <p style="color: #6b7280; margin-bottom: 0.5rem;">For research partnerships or educational content inquiries:</p>
-<p style="font-weight: 600; color: #1f2937; margin: 0;">research@peptidesync.com</p>
+<p style="font-weight: 600; color: #1f2937; margin: 0;">research@Peptidemap.com</p>
 </div>
 </div>
 
@@ -230,12 +230,12 @@ class PagesSeeder extends Seeder
 <p>Our support team is available Monday through Friday, 9:00 AM to 5:00 PM EST. We monitor emails outside of business hours and will respond as soon as possible.</p>
 
 <h2>Partnership Inquiries</h2>
-<p>If you\'re interested in partnering with PeptideSync, whether as a supplier, research institution, or content collaborator, please reach out to us. We\'re always looking for opportunities to expand our network and support the research community.</p>
+<p>If you\'re interested in partnering with Peptidemap, whether as a supplier, research institution, or content collaborator, please reach out to us. We\'re always looking for opportunities to expand our network and support the research community.</p>
 
 <h2>Feedback and Suggestions</h2>
 <p>We value your feedback and suggestions for improving our platform. If you have ideas, concerns, or recommendations, please don\'t hesitate to contact us. Your input helps us better serve the research community.</p>',
-                'meta_title' => 'Contact Us - PeptideSync | Get in Touch',
-                'meta_description' => 'Contact PeptideSync for support, partnerships, or inquiries. We\'re here to help researchers and suppliers connect.',
+                'meta_title' => 'Contact Us - Peptidemap | Get in Touch',
+                'meta_description' => 'Contact Peptidemap for support, partnerships, or inquiries. We\'re here to help researchers and suppliers connect.',
             ],
             [
                 'slug' => 'calculator',
@@ -267,8 +267,8 @@ class PagesSeeder extends Seeder
 
 <h2>Disclaimer</h2>
 <p>These calculators provide estimates based on standard formulas. Actual requirements may vary based on specific research conditions, peptide properties, and experimental protocols. Always consult with qualified researchers and follow institutional guidelines when conducting peptide research.</p>',
-                'meta_title' => 'Peptide Calculator - PeptideSync | Research Calculation Tools',
-                'meta_description' => 'Use PeptideSync\'s peptide research calculators for dosage, reconstitution, and volume calculations. Essential tools for laboratory research.',
+                'meta_title' => 'Peptide Calculator - Peptidemap | Research Calculation Tools',
+                'meta_description' => 'Use Peptidemap\'s peptide research calculators for dosage, reconstitution, and volume calculations. Essential tools for laboratory research.',
             ],
         ];
 

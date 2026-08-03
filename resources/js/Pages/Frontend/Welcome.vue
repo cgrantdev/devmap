@@ -390,7 +390,7 @@ const props = defineProps({
   seo: {
     type: Object,
     default: () => ({
-      title: 'PeptideSync - Your Trusted Source for Research Peptides',
+      title: 'Peptidemap - Your Trusted Source for Research Peptides',
       description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.',
       og_title: null,
       og_description: null,
@@ -404,7 +404,7 @@ const props = defineProps({
 // Computed values for reactive SEO updates
 const title = computed(() => {
   if (props.seo?.title) return props.seo.title
-  return page.props.site_name || 'PeptideSync'
+  return page.props.site_name || 'Peptidemap'
 })
 
 const description = computed(() => {

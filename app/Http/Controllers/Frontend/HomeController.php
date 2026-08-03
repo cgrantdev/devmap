@@ -311,7 +311,7 @@ class HomeController extends Controller
         }
 
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "home")
-        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'PeptideSync';
+        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
         $defaultDescription = Setting::where('key', 'site_description')->value('value') ?? 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.';
         $defaultImage = $heroSlides[0]['image'] ?? null;
 

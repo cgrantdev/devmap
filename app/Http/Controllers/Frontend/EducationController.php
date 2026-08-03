@@ -73,7 +73,7 @@ class EducationController extends Controller
 
         // Generate SEO data
         $seoData = new SEOData(
-            title: 'Peptide Education & Research Guides | PeptideSync',
+            title: 'Peptide Education & Research Guides | Peptidemap',
             description: 'Comprehensive educational guides on research peptides. Learn about benefits, dosing, safety, and research applications for various peptides.',
             url: url('/education'),
         );
@@ -100,7 +100,7 @@ class EducationController extends Controller
             // Generate SEO data for basic category page
             $categoryImage = $category->image_url ? \Illuminate\Support\Facades\Storage::url('categories/' . $category->image_url) : null;
             $seoData = new SEOData(
-                title: $category->name . ' - Education Guide | PeptideSync',
+                title: $category->name . ' - Education Guide | Peptidemap',
                 description: $category->description ? $this->safeLimit($category->description, 160) : 'Learn about ' . $category->name . ' research peptides.',
                 image: $categoryImage,
                 url: url("/education/{$slug}"),
@@ -153,7 +153,7 @@ class EducationController extends Controller
         // Generate SEO data for education post
         $postImage = $post->image ? \Illuminate\Support\Facades\Storage::url('education_posts/' . $post->image) : null;
         $seoData = new SEOData(
-            title: $post->title . ' - Education Guide | PeptideSync',
+            title: $post->title . ' - Education Guide | Peptidemap',
             description: $post->description ? $this->safeLimit($post->description, 160) : 'Learn about ' . $post->title . ' research peptides.',
             image: $postImage,
             url: url("/education/{$slug}"),
