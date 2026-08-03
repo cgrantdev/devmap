@@ -53,7 +53,7 @@ class RunJsonLdIngestJob implements ShouldQueue
         }
 
         $selectors = $this->config->selectors ?? [];
-        $linkPattern = $selectors['link_pattern'] ?? '#href="(/products/[^"?#]+)"#';
+        $linkPattern = $selectors['link_pattern'] ?? '~href="(/products/[^"?#]+)"~';
         $maxProducts = (int) ($selectors['max_products'] ?? 200);
         $baseUrl = $selectors['base_url'] ?? $this->originOf($listing);
 
