@@ -77,42 +77,50 @@
 
   /* content */
   .content { grid-area: content; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
-  .vendor-row {
-    display: inline-flex; align-items: center; gap: 12px;
-    margin-bottom: 20px;
+
+  /* Small vendor pill (logo + name) sitting above the headline. */
+  .vendor-pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 6px 12px 6px 6px;
+    margin-bottom: 22px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    align-self: flex-start;
   }
-  .vendor-logo {
-    width: 44px; height: 44px; border-radius: 10px;
+  .vendor-pill .logo {
+    width: 30px; height: 30px; border-radius: 50%;
     background: rgba(255,255,255,0.94);
-    padding: 6px;
+    padding: 4px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 14px -4px rgba(0,0,0,0.6);
     flex-shrink: 0;
   }
-  .vendor-logo img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
-  .vendor-logo-fallback {
+  .vendor-pill .logo img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+  .vendor-pill .logo-fallback {
     width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-    font-size: 16px; font-weight: 800; color: #0B1424;
-    background: linear-gradient(120deg, rgba(56,189,248,0.25) 0%, rgba(52,211,153,0.25) 100%);
-    border-radius: 6px;
+    font-size: 11px; font-weight: 800; color: #0B1424;
+    background: linear-gradient(120deg, rgba(56,189,248,0.35) 0%, rgba(52,211,153,0.35) 100%);
+    border-radius: 50%;
   }
-  .vendor-label {
-    display: inline-flex; flex-direction: column; gap: 3px;
+  .vendor-pill .name {
+    font-size: 14px; font-weight: 600; color: #fff; letter-spacing: -0.01em;
   }
-  .vendor-eyebrow {
-    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
-    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-    color: rgba(134,239,172,0.85);
-  }
-  .vendor-name {
-    font-size: 18px; font-weight: 600; letter-spacing: -0.01em; color: #fff;
-    line-height: 1;
-  }
-  .product-name {
-    font-size: 62px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.02;
+
+  /* "Buy {product} from {vendor}" style headline — commerce-forward, matches the
+     page's <title>. Sized so ~5-7 words fit on 2 lines within 700px. */
+  .headline {
+    font-size: 54px; font-weight: 700; letter-spacing: -0.028em; line-height: 1.05;
     color: #fff;
     display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+  .headline .from {
+    color: rgba(255,255,255,0.55); font-weight: 500;
+  }
+  .headline .vendor {
+    background: linear-gradient(120deg, #67e8f9 0%, #86efac 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
   .price-row {
     display: flex; align-items: baseline; gap: 14px;
@@ -180,47 +188,40 @@
   }
   .cta-chip.compare .savings { color: #7dd3fc; }
 
-  /* product tile — subtle dark card with soft glow instead of stark white */
+  /* product image — floats freely on the dark canvas with a soft radial spotlight
+     behind it. No card wrapper. Bigger drop shadow anchors it. */
   .tile {
     grid-area: tile;
     width: 460px; height: 460px;
-    border-radius: 24px;
-    background:
-      radial-gradient(circle at 30% 30%, rgba(56,189,248,0.10) 0%, transparent 55%),
-      linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow:
-      0 24px 60px -20px rgba(0,0,0,0.75),
-      inset 0 1px 0 rgba(255,255,255,0.06);
-    padding: 44px;
     display: flex; align-items: center; justify-content: center;
     position: relative;
-    overflow: hidden;
   }
-  /* soft radial "spotlight" behind the product image so white-bg product PNGs
-     don't feel like a rectangle floating in a rectangle */
+  /* Radial spotlight so the product feels lit against the dark bg. Bigger,
+     softer, more atmospheric than the previous card's inner glow. */
   .tile::before {
     content: '';
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 340px; height: 340px;
-    background: radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%);
-    filter: blur(20px);
+    width: 500px; height: 500px;
+    background:
+      radial-gradient(circle, rgba(56,189,248,0.25) 0%, rgba(52,211,153,0.10) 30%, transparent 65%);
+    filter: blur(24px);
     pointer-events: none;
   }
   .tile img {
     max-width: 100%; max-height: 100%; object-fit: contain;
     position: relative; z-index: 1;
-    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+    filter: drop-shadow(0 30px 50px rgba(0,0,0,0.7));
   }
+  /* Only shown when there's no product image at all. */
   .tile-fallback {
-    width: 100%; height: 100%;
+    width: 320px; height: 320px;
     display: flex; align-items: center; justify-content: center;
     font-size: 96px; font-weight: 800; letter-spacing: -0.05em;
     color: rgba(255,255,255,0.9);
-    background: linear-gradient(135deg, rgba(56,189,248,0.18) 0%, rgba(52,211,153,0.18) 100%);
-    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(52,211,153,0.2) 100%);
+    border-radius: 24px;
     position: relative; z-index: 1;
   }
 
@@ -261,21 +262,25 @@
 
     <div class="content">
       @if($product->brand)
-      <div class="vendor-row">
-        <div class="vendor-logo">
+      <div class="vendor-pill">
+        <div class="logo">
           @if($vendorLogo)
             <img src="{{ $vendorLogo }}" alt="">
           @else
-            <div class="vendor-logo-fallback">{{ strtoupper(substr($product->brand->name, 0, 2)) }}</div>
+            <div class="logo-fallback">{{ strtoupper(substr($product->brand->name, 0, 2)) }}</div>
           @endif
         </div>
-        <div class="vendor-label">
-          <span class="vendor-eyebrow">Sold by</span>
-          <span class="vendor-name">{{ $product->brand->name }}</span>
-        </div>
+        <span class="name">{{ $product->brand->name }}</span>
       </div>
+      <div class="headline">
+        Buy {{ $product->display_name ?? $product->name }}
+        @if($product->brand)
+        <span class="from">from</span> <span class="vendor">{{ $product->brand->name }}</span>
+        @endif
+      </div>
+      @else
+      <div class="headline">{{ $product->display_name ?? $product->name }}</div>
       @endif
-      <div class="product-name">{{ $product->display_name ?? $product->name }}</div>
       @if($displayPrice)
       <div class="price-row">
         <span class="price">${{ number_format($displayPrice, 2) }}</span>
