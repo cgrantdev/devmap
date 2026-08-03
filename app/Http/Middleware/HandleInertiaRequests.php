@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Setting;
 use App\Models\Brand;
+use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use App\Models\VendorReview;
@@ -66,6 +67,27 @@ class HandleInertiaRequests extends Middleware
             'pending_reviews_count' => fn () => $request->user() && $request->user()->canAccessAdmin()
                 ? VendorReview::where('status', 'pending')->count()
                 : 0,
+            // Shared wishlist membership arrays. Frontend heart-icons read
+            // these to render active/inactive state without needing every
+            // controller to pass in_wishlist_* props. Only fires for logged-in
+            // customers; two small pluck queries per request. Wrapped in
+            // Schema::hasTable so requests during a fresh install don't 500
+            // before the migration runs.
+            'wishlist' => function () use ($request) {
+                $u = $request->user();
+                if (!$u) return ['product_ids' => [], 'category_ids' => [], 'count' => 0];
+                if (!\Illuminate\Support\Facades\Schema::hasTable('wishlists')) {
+                    return ['product_ids' => [], 'category_ids' => [], 'count' => 0];
+                }
+                $rows = Wishlist::where('user_id', $u->id)
+                    ->select('wishable_type', 'product_id', 'category_id')
+                    ->get();
+                return [
+                    'product_ids' => $rows->where('wishable_type', 'product')->pluck('product_id')->filter()->values()->all(),
+                    'category_ids' => $rows->where('wishable_type', 'category')->pluck('category_id')->filter()->values()->all(),
+                    'count' => $rows->count(),
+                ];
+            },
             'approved_reviews_count' => fn () => $request->user() && $request->user()->isVendor()
                 ? (function () use ($request) {
                     $brand = Brand::where('user_id', $request->user()->id)->first();

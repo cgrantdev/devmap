@@ -1,8 +1,13 @@
 <template>
     <div
-      class="bg-white border border-gray-100 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all cursor-pointer overflow-hidden group"
+      class="bg-white border border-gray-100 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all cursor-pointer overflow-hidden group relative"
       @click="handleClick"
     >
+      <!-- Wishlist heart — top-right, layered above image -->
+      <div v-if="productId" class="absolute top-2 right-2 z-10">
+        <WishlistHeart type="product" :id="productId" size="md" />
+      </div>
+
       <!-- Top Section: Product Image — object-contain so vials/boxes fit
            inside the card without cropping. Light bg so transparent PNGs
            don't disappear, with a gentle hover scale. -->
@@ -86,7 +91,8 @@
   <script setup>
   import { computed, ref } from 'vue'
   import { router } from '@inertiajs/vue3'
-  
+  import WishlistHeart from '@/components/ui/WishlistHeart.vue'
+
   const props = defineProps({
     name: { type: String, required: true },
     imageUrl: { type: String, default: null },
@@ -98,6 +104,8 @@
     productType: { type: String, default: null },
     brandDiscountPercent: { type: [String, Number], default: null },
     brandCouponCode: { type: String, default: null },
+    // Optional — when provided, renders a wishlist heart in the top-right.
+    productId: { type: [Number, String], default: null },
     to: { type: String, required: true },
   })
 

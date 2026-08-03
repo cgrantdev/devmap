@@ -86,7 +86,11 @@
               </div>
   
               <!-- Price — monospace, prominent -->
-              <div class="mb-6">
+              <div class="mb-6 relative">
+                <!-- Wishlist heart, top-right of the price block -->
+                <div class="absolute top-0 right-0">
+                  <WishlistHeart type="product" :id="product.id" size="lg" />
+                </div>
                 <template v-if="discountedPrice">
                   <div class="flex items-baseline gap-3">
                     <span class="text-[12px] uppercase tracking-wide text-[color:var(--color-ink)] font-semibold">Retail</span>
@@ -347,6 +351,7 @@ import { ref, computed, watchEffect } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import ProductSimpleDetailCard from '@/components/ProductSimpleDetailCard.vue'
+import WishlistHeart from '@/components/ui/WishlistHeart.vue'
 
 const props = defineProps({
   product: Object,

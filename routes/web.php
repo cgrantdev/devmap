@@ -171,7 +171,15 @@ Route::middleware(['auth', 'email.verified'])->prefix('account')->group(function
     Route::get('/reviews', [\App\Http\Controllers\Frontend\AccountReviewsController::class, 'index'])->name('account.reviews');
     Route::put('/reviews/{id}', [\App\Http\Controllers\Frontend\AccountReviewsController::class, 'update'])->name('account.reviews.update');
     Route::delete('/reviews/{id}', [\App\Http\Controllers\Frontend\AccountReviewsController::class, 'destroy'])->name('account.reviews.destroy');
+    Route::get('/wishlist', [\App\Http\Controllers\Frontend\WishlistController::class, 'index'])->name('account.wishlist');
+    Route::delete('/wishlist/{id}', [\App\Http\Controllers\Frontend\WishlistController::class, 'destroy'])->name('account.wishlist.destroy');
 });
+
+// Wishlist toggle — auth-required + rate-limited to prevent spam. Registered
+// well before the catch-all /{slug} route below so it isn't shadowed.
+Route::post('/wishlist/toggle', [\App\Http\Controllers\Frontend\WishlistController::class, 'toggle'])
+    ->middleware(['auth', 'throttle:60,1'])
+    ->name('wishlist.toggle');
 
 // Guest routes
 Route::middleware('guest')->group(function () {

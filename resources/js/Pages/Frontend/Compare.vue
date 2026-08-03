@@ -29,10 +29,13 @@
           v-for="compound in compounds"
           :key="compound.id"
           :href="`#${compound.anchor}`"
-          class="ui-focus group h-full flex flex-col gap-2 p-4 rounded-[12px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all duration-[180ms]"
+          class="ui-focus group h-full flex flex-col gap-2 p-4 rounded-[12px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all duration-[180ms] relative"
           :title="compound.name"
         >
-          <div class="ui-display text-[15px] font-semibold text-[color:var(--color-ink)] leading-tight group-hover:text-[color:var(--color-accent-600)] transition-colors line-clamp-2 min-h-[2.6em]">
+          <div class="absolute top-2 right-2 z-10">
+            <WishlistHeart type="category" :id="compound.id" size="sm" />
+          </div>
+          <div class="ui-display text-[15px] font-semibold text-[color:var(--color-ink)] leading-tight group-hover:text-[color:var(--color-accent-600)] transition-colors line-clamp-2 min-h-[2.6em] pr-6">
             {{ compound.name }}
           </div>
           <div class="mt-auto flex items-center gap-3 text-[11px] text-[color:var(--color-ink-muted)]">
@@ -255,6 +258,7 @@
 import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import WishlistHeart from '@/components/ui/WishlistHeart.vue'
 
 const props = defineProps({
   compounds: { type: Array, default: () => [] },

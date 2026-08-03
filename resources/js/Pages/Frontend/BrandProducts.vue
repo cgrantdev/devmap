@@ -138,6 +138,7 @@
                 <ProductSimpleCard
                   v-for="product in products.data"
                   :key="product.id"
+                  :product-id="product.id"
                   :name="product.display_name || product.name"
                   :image-url="product.image_url"
                   :price="product.price"
