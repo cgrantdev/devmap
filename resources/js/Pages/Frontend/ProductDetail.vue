@@ -174,8 +174,12 @@
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                   </a>
                 </div>
+                <a :href="reviewVendorHref" class="mt-3 inline-flex items-center gap-1 text-[12px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
+                  Review {{ brand.name }} on Peptidemap
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </a>
               </div>
-  
+
               <!-- Disclaimer -->
               <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                 <div class="flex items-start gap-2">
@@ -272,8 +276,9 @@
                     <div>
                       <div class="flex items-center gap-2 mb-2">
                         <span class="text-gray-900 font-medium">{{ review.user_name }}</span>
-                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                          Verified Purchase
+                        <span v-if="review.verified" class="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l8 4v6c0 5.5-3.4 9.9-8 11-4.6-1.1-8-5.5-8-11V5l8-4z"/></svg>
+                          Verified via PMAP
                         </span>
                       </div>
                       <div class="flex items-center gap-1">
@@ -385,6 +390,13 @@ const discountedPrice = computed(() => {
 const effectiveCouponCode = computed(() => {
   const raw = (props.brand?.discount_code || '').trim()
   return (raw || 'PMAP').toUpperCase()
+})
+
+// "Review {vendor} on Peptidemap" CTA — drives storefront visits from the
+// product page even though there's no review form here.
+const reviewVendorHref = computed(() => {
+  const slug = props.brand?.slug
+  return slug ? `/brand/${slug}/products#reviews` : '#'
 })
 
 // Color-coded format chip next to the title. Mirrors the convention

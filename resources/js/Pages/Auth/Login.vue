@@ -86,10 +86,12 @@
 import { useForm, usePage } from '@inertiajs/vue3'
 
 const errors = usePage().props.errors || {}
+const redirectTarget = usePage().props.redirect || null
 
 const form = useForm({
   email: '',
   password: '',
+  redirect: redirectTarget,
   _token: usePage().props.csrf_token,
 })
 

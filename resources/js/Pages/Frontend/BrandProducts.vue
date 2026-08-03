@@ -159,10 +159,25 @@
                 :on-per-page-change="handlePerPageChange"
               />
             </section>
-            <section>
+            <section id="reviews">
               <h2 class="text-2xl text-gray-900 mb-6">Customer Reviews</h2>
               <!-- Customer Reviews Section -->
               <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+
+                <!-- Signed-out CTA -->
+                <div v-if="!authUser" class="mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+                  <span>Have you bought from {{ brand.name }}?</span>
+                  <a :href="signInHref" class="font-medium text-slate-900 underline hover:no-underline">Sign in</a>
+                  <span>to leave a review ·</span>
+                  <span>New here?</span>
+                  <a :href="registerHref" class="font-medium text-slate-900 underline hover:no-underline">Create a free account</a>
+                </div>
+
+                <!-- Signed-in but unverified email -->
+                <div v-else-if="authUser && !authUser.email_verified_at" class="mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                  <span>Verify your email before you can leave a review.</span>
+                  <a href="/email/verify" class="font-medium underline hover:no-underline">Resend verification email</a>
+                </div>
 
                 <!-- Leave feedback CTA (customers only) -->
                 <div v-if="isCustomer" class="space-y-3 mb-6">
@@ -240,8 +255,9 @@
                     <div>
                       <div class="flex items-center gap-2 mb-2">
                         <span class="text-gray-900 font-medium">{{ review.user_name }}</span>
-                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                          Verified Purchase
+                        <span v-if="review.verified" class="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l8 4v6c0 5.5-3.4 9.9-8 11-4.6-1.1-8-5.5-8-11V5l8-4z"/></svg>
+                          Verified via PMAP
                         </span>
                       </div>
                       <div class="flex items-center gap-1">
@@ -791,6 +807,14 @@ const page = usePage()
 // Customer auth (shared via Inertia middleware)
 const authUser = computed(() => page.props.auth?.user ?? null)
 const isCustomer = computed(() => authUser.value?.role === 'customer')
+
+// Sign-in / register CTAs round-trip back to the reviews section after auth.
+const reviewsRedirectUrl = computed(() => {
+  if (typeof window === 'undefined') return `/brand/${props.brand?.slug}/products#reviews`
+  return `${window.location.pathname}${window.location.search}#reviews`
+})
+const signInHref = computed(() => `/login?redirect=${encodeURIComponent(reviewsRedirectUrl.value)}`)
+const registerHref = computed(() => `/register?redirect=${encodeURIComponent(reviewsRedirectUrl.value)}`)
 
 // Computed values for reactive SEO updates (automatically from vendor data)
 const title = computed(() => {

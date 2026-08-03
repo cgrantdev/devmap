@@ -99,10 +99,10 @@
             <!-- Show Login Now button if email was just verified -->
             <Link
               v-if="$page.props.flash.success && $page.props.flash.success.includes('verified successfully')"
-              href="/vendor/dashboard"
+              :href="dashboardHref"
               class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
-              Go to Dashboard
+              Continue
             </Link>
           </div>
         </div>
@@ -131,4 +131,11 @@ function resendVerification() {
 function logout() {
   form.post('/logout')
 }
-</script> 
+
+const dashboardHref = (() => {
+  const role = usePage().props.auth?.user?.role
+  if (role === 'admin' || role === 'admin_viewer') return '/admin/dashboard'
+  if (role === 'vendor') return '/vendor/dashboard'
+  return '/'
+})()
+</script>

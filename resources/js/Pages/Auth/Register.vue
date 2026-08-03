@@ -38,7 +38,7 @@
       </form>
       <div class="mt-4 text-center">
         <span>Already have an account?</span>
-        <Link href="/login" class="text-blue-600 ml-1">Login</Link>
+        <Link :href="redirectTarget ? `/login?redirect=${encodeURIComponent(redirectTarget)}` : '/login'" class="text-blue-600 ml-1">Login</Link>
       </div>
     </div>
   </div>
@@ -47,12 +47,15 @@
 <script setup>
 import { useForm, usePage, Link } from '@inertiajs/vue3'
 
+const redirectTarget = usePage().props.redirect || null
+
 const form = useForm({
   name: '',
   email: '',
   password: '',
   password_confirmation: '',
   role: 'customer',
+  redirect: redirectTarget,
   _token: usePage().props.csrf_token
 })
 
