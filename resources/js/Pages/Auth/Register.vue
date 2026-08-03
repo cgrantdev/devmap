@@ -17,6 +17,10 @@
         <ul class="space-y-3 text-white/70 text-[14px]">
           <li class="flex items-start gap-3">
             <svg class="w-4 h-4 mt-0.5 text-[#34d399] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Save products + get <strong class="text-white/90">price drop alerts</strong> across all vendors</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="w-4 h-4 mt-0.5 text-[#34d399] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             <span>Leave <strong class="text-white/90">verified reviews</strong> after purchasing from any vendor</span>
           </li>
           <li class="flex items-start gap-3">

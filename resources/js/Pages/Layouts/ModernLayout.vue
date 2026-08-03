@@ -104,7 +104,7 @@
             <!-- Logged-in customer: link to their account (skips vendors/admins — they get their own dashboards above) -->
             <Link
               v-else-if="isCustomer"
-              href="/account/reviews"
+              href="/account/wishlist"
               class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-3 text-[13px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] transition-colors"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -220,7 +220,7 @@
               </Link>
               <Link
                 v-else-if="isCustomer"
-                href="/account/reviews"
+                href="/account/wishlist"
                 class="ui-focus mt-2 flex items-center justify-center gap-2 h-11 rounded-[10px] text-[14px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] border border-[color:var(--color-hairline)] transition-colors"
                 @click="mobileOpen = false"
               >

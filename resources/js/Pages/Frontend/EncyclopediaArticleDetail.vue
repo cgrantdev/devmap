@@ -39,7 +39,10 @@
           <!-- Hero: title + structure side by side -->
           <div class="flex flex-col lg:flex-row gap-6 mb-0">
             <div class="flex-1 min-w-0">
-              <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">{{ categoryName || name }}</h1>
+              <div class="flex items-center gap-3 mb-2">
+                <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)]">{{ categoryName || name }}</h1>
+                <WishlistHeart type="category" :id="Number(id)" size="md" />
+              </div>
               <p class="text-lg text-[color:var(--color-ink-muted)] italic mb-4">{{ subtitle }}</p>
               <!-- Short TLDR intro — uses overview (the actual compound description) -->
               <p v-if="overviewShort || overview" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">{{ overviewShort || overview }}</p>
@@ -919,6 +922,7 @@
 import { ref, computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import WishlistHeart from '@/components/ui/WishlistHeart.vue'
 
 // Format mechanism item text to bold key terms
 const formatMechanismItem = (item) => {
