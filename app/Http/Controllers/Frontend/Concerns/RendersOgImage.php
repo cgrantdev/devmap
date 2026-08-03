@@ -94,9 +94,11 @@ trait RendersOgImage
 
     private function fallbackOg(string $publicPath): BinaryFileResponse
     {
+        // no-store so Cloudflare doesn't cache a failed generation for an hour.
+        // Otherwise the next successful render sits unused behind a poisoned edge cache.
         return response()->file(public_path($publicPath), [
             'Content-Type' => 'image/png',
-            'Cache-Control' => 'public, max-age=3600',
+            'Cache-Control' => 'no-store, must-revalidate',
         ]);
     }
 

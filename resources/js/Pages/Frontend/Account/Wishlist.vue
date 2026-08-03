@@ -1,5 +1,9 @@
 <template>
   <ModernLayout>
+    <Head>
+      <title>My wishlist — Peptidemap</title>
+      <meta name="robots" content="noindex, nofollow" />
+    </Head>
     <div class="max-w-4xl mx-auto px-5 lg:px-10 py-10">
       <div class="flex items-center justify-between mb-8">
         <div>
@@ -153,7 +157,7 @@
 </template>
 
 <script setup>
-import { Link, usePage, router } from '@inertiajs/vue3'
+import { Link, usePage, router, Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
 defineProps({

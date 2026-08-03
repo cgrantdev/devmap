@@ -1,5 +1,9 @@
 <template>
   <ModernLayout>
+    <Head>
+      <title>My reviews — Peptidemap</title>
+      <meta name="robots" content="noindex, nofollow" />
+    </Head>
     <div class="max-w-4xl mx-auto px-5 lg:px-10 py-10">
       <h1 class="ui-display text-2xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-1">My reviews</h1>
       <p class="text-sm text-[color:var(--color-ink-muted)] mb-8">Reviews you've left for vendors, including ones still pending moderation.</p>
@@ -116,7 +120,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Link, useForm, usePage, router } from '@inertiajs/vue3'
+import { Link, useForm, usePage, router, Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
 defineProps({

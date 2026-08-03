@@ -109,8 +109,17 @@ async function toggle() {
   loading.value = true
 
   try {
-    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
-      || page.props.csrf_token
+    // Read the XSRF token straight from the cookie so cached/stale pages that
+    // may have lost the <meta name=csrf-token> still authenticate the write.
+    // Laravel's VerifyCsrfToken checks X-XSRF-TOKEN (decrypted) OR X-CSRF-TOKEN.
+    const xsrfCookie = document.cookie
+      .split('; ')
+      .find(c => c.startsWith('XSRF-TOKEN='))
+      ?.split('=')[1]
+    const xsrf = xsrfCookie ? decodeURIComponent(xsrfCookie) : ''
+    const metaCsrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+      || page.props.csrf_token || ''
+
     const res = await fetch('/wishlist/toggle', {
       method: 'POST',
       credentials: 'same-origin',
@@ -118,10 +127,17 @@ async function toggle() {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': csrf || '',
+        'X-XSRF-TOKEN': xsrf,
+        'X-CSRF-TOKEN': metaCsrf,
       },
       body: JSON.stringify({ type: props.type, id: props.id }),
     })
+    // 419 = session expired → reload once so we pick up a fresh CSRF token.
+    if (res.status === 419) {
+      active.value = prev
+      window.location.reload()
+      return
+    }
     if (!res.ok) throw new Error('toggle failed')
     const json = await res.json()
     active.value = !!json.in_wishlist
