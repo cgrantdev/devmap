@@ -36,6 +36,7 @@ export const config = {
     dealOfDay: process.env.FEATURE_DEAL_OF_DAY !== 'false',
     weeklyRecap: process.env.FEATURE_WEEKLY_RECAP !== 'false',
     blogOfDay: process.env.FEATURE_BLOG_OF_DAY !== 'false',
+    promoSpotlight: process.env.FEATURE_PROMO_SPOTLIGHT !== 'false',
   },
   // Anti-spam thresholds
   limits: {

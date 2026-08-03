@@ -5,7 +5,7 @@ import { commands } from './commands.js'
 import { api } from './api.js'
 import {
   tickPriceDrops, tickNewProducts, tickReviews,
-  tickPeptideOfDay, tickDealOfDay, tickWeeklyRecap, tickBlogOfDay,
+  tickPeptideOfDay, tickDealOfDay, tickWeeklyRecap, tickBlogOfDay, tickPromoSpotlight,
 } from './feeds.js'
 import { handleMemberJoin } from './welcome.js'
 
@@ -64,6 +64,7 @@ function schedule() {
   cron.schedule('0 14 * * *',   () => tickBlogOfDay(client),   { timezone: 'UTC' })
   cron.schedule('0 15 * * *',   () => tickPeptideOfDay(client),{ timezone: 'UTC' })
   cron.schedule('0 16 * * 0',   () => tickWeeklyRecap(client), { timezone: 'UTC' })
+  cron.schedule('0 17 * * 2,5', () => tickPromoSpotlight(client), { timezone: 'UTC' }) // Tue + Fri
   cron.schedule('*/10 * * * *', () => tickReviews(client),     { timezone: 'UTC' })
   console.log('Cron jobs scheduled')
 }

@@ -210,6 +210,43 @@ export async function tickDealOfDay(client) {
   await safeSend(client, config.channels.deals, { embeds: [embed] }, 'dealOfDay')
 }
 
+/* ─── Promo code spotlight (Tue + Fri, posted to #deals) ─── */
+
+export async function tickPromoSpotlight(client) {
+  if (!config.features.promoSpotlight) return
+  let data
+  try {
+    data = await api.promoCodes(15)
+  } catch (e) {
+    return console.error('[promoSpotlight] fetch failed:', e.message)
+  }
+  if (!data.results?.length) return console.log('[promoSpotlight] no active codes')
+
+  // Group by code (most vendors use PMAP) so the message reads as
+  // "here's who accepts each code" rather than a jumble.
+  const byCode = {}
+  for (const r of data.results) (byCode[r.code] ??= []).push(r)
+
+  const embed = new EmbedBuilder()
+    .setColor(0xF59E0B)
+    .setTitle('💸  Active vendor discount codes')
+    .setURL('https://peptidemap.com/vendors')
+    .setDescription('Use these at checkout on the vendor\'s own site. Discount is applied by the vendor, not by Peptidemap.')
+
+  for (const [code, brands] of Object.entries(byCode).slice(0, 10)) {
+    brands.sort((a, b) => b.discount_pct - a.discount_pct)
+    const lines = brands.slice(0, 12).map(b => `• [${truncate(b.brand_name, 60)}](${b.url}) — **${b.discount_pct}%**`).join('\n')
+    embed.addFields({
+      name: `\`${code}\`  (${brands.length} vendor${brands.length === 1 ? '' : 's'})`,
+      value: truncate(lines, 1024),
+      inline: false,
+    })
+  }
+  embed.setFooter({ text: 'Peptidemap · codes refresh as vendors update them' }).setTimestamp()
+
+  await safeSend(client, config.channels.deals, { embeds: [embed] }, 'promoSpotlight')
+}
+
 /* ─── Blog of the Day (rotates through existing posts) ─── */
 
 export async function tickBlogOfDay(client) {

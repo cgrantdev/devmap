@@ -336,6 +336,38 @@ class BotController extends Controller
     }
 
     /**
+     * GET /api/bot/promo-codes?limit=15
+     * Active vendor coupon codes ranked by discount percent. Skips inactive
+     * brands, zero-percent codes (placeholder-only), and empty strings.
+     */
+    public function promoCodes(Request $request): JsonResponse
+    {
+        $limit = min(30, max(1, (int) $request->query('limit', 15)));
+
+        $rows = \App\Models\VendorSetting::query()
+            ->with(['brand:id,name,slug,is_active'])
+            ->whereNotNull('coupon_code')
+            ->where('coupon_code', '!=', '')
+            ->where('coupon_discount_percent', '>', 0)
+            ->get()
+            ->filter(fn ($v) => $v->brand && $v->brand->is_active)
+            ->sortByDesc('coupon_discount_percent')
+            ->take($limit)
+            ->values();
+
+        return response()->json([
+            'count' => $rows->count(),
+            'results' => $rows->map(fn ($v) => [
+                'brand_name' => $v->brand->name,
+                'brand_slug' => $v->brand->slug,
+                'code' => $v->coupon_code,
+                'discount_pct' => (int) $v->coupon_discount_percent,
+                'url' => self::BASE . '/brand/' . $v->brand->slug,
+            ])->values(),
+        ]);
+    }
+
+    /**
      * GET /api/bot/blog-of-day
      * Rotates through existing blogs by day-of-year so #news has fresh
      * content every day even when nothing new is being written.

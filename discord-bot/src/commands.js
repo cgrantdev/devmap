@@ -92,6 +92,30 @@ export const commands = [
 
   {
     data: new SlashCommandBuilder()
+      .setName('promo')
+      .setDescription('Show active vendor discount codes (PMAP, etc.)'),
+    async execute(interaction) {
+      await interaction.deferReply()
+      const data = await api.promoCodes(15)
+      if (!data.results?.length) return interaction.editReply('No active promo codes right now.')
+      const byCode = {}
+      for (const r of data.results) (byCode[r.code] ??= []).push(r)
+      const embed = new EmbedBuilder()
+        .setColor(0xF59E0B)
+        .setTitle('💸  Active vendor discount codes')
+        .setURL('https://peptidemap.com/vendors')
+        .setDescription('Enter at checkout on the vendor site.')
+      for (const [code, brands] of Object.entries(byCode).slice(0, 10)) {
+        brands.sort((a, b) => b.discount_pct - a.discount_pct)
+        const lines = brands.slice(0, 12).map(b => `• [${truncate(b.brand_name, 60)}](${b.url}) — **${b.discount_pct}%**`).join('\n')
+        embed.addFields({ name: `\`${code}\`  (${brands.length})`, value: truncate(lines, 1024), inline: false })
+      }
+      return interaction.editReply({ embeds: [embed] })
+    },
+  },
+
+  {
+    data: new SlashCommandBuilder()
       .setName('deals')
       .setDescription('Show the biggest live price drops right now'),
     async execute(interaction) {

@@ -450,6 +450,7 @@ Route::middleware('bot.api')->prefix('api/bot')->group(function () {
     Route::get('/new-products', [\App\Http\Controllers\Api\BotController::class, 'newProducts']);
     Route::get('/reviews', [\App\Http\Controllers\Api\BotController::class, 'reviews']);
     Route::get('/blog-of-day', [\App\Http\Controllers\Api\BotController::class, 'blogOfDay']);
+    Route::get('/promo-codes', [\App\Http\Controllers\Api\BotController::class, 'promoCodes']);
 });
 
 // Catch-all route for any other page slugs (must be last to avoid conflicts with other routes)
