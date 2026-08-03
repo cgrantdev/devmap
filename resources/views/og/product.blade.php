@@ -78,13 +78,36 @@
   /* content */
   .content { grid-area: content; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
   .vendor-row {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
-    font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: rgba(134,239,172,0.9);
-    margin-bottom: 16px;
+    display: inline-flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
   }
-  .vendor-dot { width: 6px; height: 6px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px 2px rgba(52,211,153,0.55); }
+  .vendor-logo {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(255,255,255,0.94);
+    padding: 6px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px -4px rgba(0,0,0,0.6);
+    flex-shrink: 0;
+  }
+  .vendor-logo img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+  .vendor-logo-fallback {
+    width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800; color: #0B1424;
+    background: linear-gradient(120deg, rgba(56,189,248,0.25) 0%, rgba(52,211,153,0.25) 100%);
+    border-radius: 6px;
+  }
+  .vendor-label {
+    display: inline-flex; flex-direction: column; gap: 3px;
+  }
+  .vendor-eyebrow {
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: rgba(134,239,172,0.85);
+  }
+  .vendor-name {
+    font-size: 18px; font-weight: 600; letter-spacing: -0.01em; color: #fff;
+    line-height: 1;
+  }
   .product-name {
     font-size: 62px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.02;
     color: #fff;
@@ -115,36 +138,48 @@
     color: #6ee7b7;
   }
 
-  /* product tile */
+  /* product tile — subtle dark card with soft glow instead of stark white */
   .tile {
     grid-area: tile;
     width: 460px; height: 460px;
     border-radius: 24px;
-    background: linear-gradient(180deg, #ffffff 0%, #F5F7FA 100%);
+    background:
+      radial-gradient(circle at 30% 30%, rgba(56,189,248,0.10) 0%, transparent 55%),
+      linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
     border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 24px 60px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
-    padding: 40px;
+    box-shadow:
+      0 24px 60px -20px rgba(0,0,0,0.75),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+    padding: 44px;
     display: flex; align-items: center; justify-content: center;
     position: relative;
     overflow: hidden;
   }
+  /* soft radial "spotlight" behind the product image so white-bg product PNGs
+     don't feel like a rectangle floating in a rectangle */
   .tile::before {
     content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(circle at 30% 30%, rgba(56,189,248,0.08) 0%, transparent 60%);
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 340px; height: 340px;
+    background: radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%);
+    filter: blur(20px);
     pointer-events: none;
   }
   .tile img {
     max-width: 100%; max-height: 100%; object-fit: contain;
     position: relative; z-index: 1;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
   }
   .tile-fallback {
     width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
     font-size: 96px; font-weight: 800; letter-spacing: -0.05em;
-    color: #0B1424;
-    background: linear-gradient(120deg, rgba(56,189,248,0.15) 0%, rgba(52,211,153,0.15) 100%);
+    color: rgba(255,255,255,0.9);
+    background: linear-gradient(135deg, rgba(56,189,248,0.18) 0%, rgba(52,211,153,0.18) 100%);
     border-radius: 16px;
+    position: relative; z-index: 1;
   }
 
   /* footer */
@@ -184,8 +219,17 @@
     <div class="content">
       @if($product->brand)
       <div class="vendor-row">
-        <div class="vendor-dot"></div>
-        <span>{{ $product->brand->name }}</span>
+        <div class="vendor-logo">
+          @if($vendorLogo)
+            <img src="{{ $vendorLogo }}" alt="">
+          @else
+            <div class="vendor-logo-fallback">{{ strtoupper(substr($product->brand->name, 0, 2)) }}</div>
+          @endif
+        </div>
+        <div class="vendor-label">
+          <span class="vendor-eyebrow">Sold by</span>
+          <span class="vendor-name">{{ $product->brand->name }}</span>
+        </div>
       </div>
       @endif
       <div class="product-name">{{ $product->display_name ?? $product->name }}</div>

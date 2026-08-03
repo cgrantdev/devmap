@@ -61,6 +61,7 @@ class ProductOgImageController extends Controller
             $html = View::make('og.product', [
                 'product' => $product,
                 'productImage' => $this->resolveImageUrl($product),
+                'vendorLogo' => $this->resolveVendorLogo($product),
                 'displayPrice' => $this->displayPrice($product),
                 'strikePrice' => $this->strikePrice($product),
                 'discountPct' => $this->discountPct($product),
@@ -127,6 +128,15 @@ class ProductOgImageController extends Controller
         if (preg_match('#^(https?:)?//#i', $img)) return $img;
         if (str_starts_with($img, '/')) return url($img);
         return asset('storage/' . $img);
+    }
+
+    private function resolveVendorLogo(Product $product): ?string
+    {
+        $logo = $product->brand?->vendorSetting?->logo;
+        if (!$logo) return null;
+        if (preg_match('#^(https?:)?//#i', $logo)) return $logo;
+        if (str_starts_with($logo, '/')) return url($logo);
+        return asset('storage/' . $logo);
     }
 
     private function displayPrice(Product $product): ?float
