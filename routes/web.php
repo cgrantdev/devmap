@@ -244,9 +244,9 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     Route::middleware('ceo.only')->prefix('ceo')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'index'])->name('admin.ceo');
         Route::post('/agent-runs', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'storeAgentRun'])->name('admin.ceo.agent-run.store');
-        Route::post('/initiatives', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'storeInitiative'])->name('admin.ceo.initiative.store');
-        Route::patch('/initiatives/{initiative}', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'updateInitiative'])->name('admin.ceo.initiative.update');
-        Route::delete('/initiatives/{initiative}', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'destroyInitiative'])->name('admin.ceo.initiative.destroy');
+        Route::post('/recommendations', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'storeRecommendation'])->name('admin.ceo.rec.store');
+        Route::patch('/recommendations/{recommendation}', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'updateRecommendation'])->name('admin.ceo.rec.update');
+        Route::delete('/recommendations/{recommendation}', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'destroyRecommendation'])->name('admin.ceo.rec.destroy');
         Route::post('/notepad', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'saveNotepad'])->name('admin.ceo.notepad.save');
     });
     Route::get('/vendors', [VendorsController::class, 'index'])->name('admin.vendors');
