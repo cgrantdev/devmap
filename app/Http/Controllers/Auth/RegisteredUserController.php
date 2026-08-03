@@ -38,11 +38,19 @@ class RegisteredUserController extends Controller
                 ],
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
-                'role' => 'sometimes|string|in:customer,vendor,admin',
+                // Public signup is customer-or-vendor ONLY. Admin creation
+                // must happen through internal tooling (tinker / seeder / a
+                // dedicated admin-add UI) — never via the public form, or
+                // anyone with a curl command can grant themselves the keys.
+                'role' => 'sometimes|string|in:customer,vendor',
                 'redirect' => 'sometimes|nullable|string|max:2048',
             ]);
 
             $role = $validated['role'] ?? 'customer';
+            // Defensive: reject any value that ever sneaks past validation.
+            if (!in_array($role, ['customer', 'vendor'], true)) {
+                $role = 'customer';
+            }
 
             $user = User::create([
                 'name' => $validated['name'],
