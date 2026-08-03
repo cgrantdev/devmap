@@ -8,7 +8,10 @@ import { dirname } from 'node:path'
 //
 // One file per bot process; if we ever run >1 instance we'll swap to Redis.
 
-const STATE_PATH = process.env.BOT_STATE_PATH || '/var/lib/peptidemap-bot/state.json'
+import { fileURLToPath } from 'node:url'
+import { resolve, dirname as pdirname } from 'node:path'
+const __dir = pdirname(fileURLToPath(import.meta.url))
+const STATE_PATH = process.env.BOT_STATE_PATH || resolve(__dir, '../data/state.json')
 
 let cache = null
 
