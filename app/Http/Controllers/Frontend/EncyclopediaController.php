@@ -598,7 +598,7 @@ class EncyclopediaController extends Controller
 
         // Generate SEO data for encyclopedia detail
         $seoData = new SEOData(
-            title: $title . ' - Peptide Encyclopedia | PeptideSync',
+            title: $title . ' - Peptide Encyclopedia | Peptidemap',
             description: ($educationPost ? $educationPost->description : $category->description) ? $this->safeLimit($educationPost ? $educationPost->description : $category->description, 160) : 'Comprehensive guide to ' . $title . ' research peptides.',
             image: $image,
             url: url("/encyclopedia/{$slug}"),
