@@ -287,22 +287,24 @@ class ProductsController extends Controller
                     : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.');
             $seoOgTitle = $product->seo_og_title ?: $seoTitle;
             $seoOgDescription = $product->seo_og_description ?: $seoDescription;
-            $seoOgImage = $product->seo_og_image 
+            $seoOgImage = $product->seo_og_image
                 ? (str_starts_with($product->seo_og_image, 'http') ? $product->seo_og_image : url($product->seo_og_image))
-                : $productImage;
+                : route('og.product', ['id' => $product->id]);
         } else {
             // Auto-generate SEO from product fields
             $vendorName = $brand ? $brand->name : 'our store';
             $seoTitle = "Buy {$product->name} from {$vendorName} - {$siteName}";
-            
+
             // Build description: first ~150-160 chars of product description
-            $seoDescription = $product->description 
-                ? $this->safeLimit($product->description, 155) 
+            $seoDescription = $product->description
+                ? $this->safeLimit($product->description, 155)
                 : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.';
-            
+
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
-            $seoOgImage = $productImage;
+            // Per-product OG image (branded card with product tile). Falls back
+            // to site-default automatically if Chromium generation fails.
+            $seoOgImage = route('og.product', ['id' => $product->id]);
         }
         
         // Product + BreadcrumbList JSON-LD (rendered by app.blade.php)
