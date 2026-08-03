@@ -66,7 +66,11 @@ class ProductOgImageController extends Controller
                 'discountPct' => $this->discountPct($product),
             ])->render();
 
-            $tmpHtml = tempnam(sys_get_temp_dir(), 'ogsrc_') . '.html';
+            // Write temp HTML under storage/ (chromium's snap sandbox can't
+            // read /tmp; the app dir is accessible because ownership matches).
+            $tmpDir = storage_path('framework/cache/og-src');
+            if (!is_dir($tmpDir)) File::makeDirectory($tmpDir, 0755, true);
+            $tmpHtml = $tmpDir . '/product-' . $product->id . '-' . uniqid() . '.html';
             file_put_contents($tmpHtml, $html);
 
             $cmd = sprintf(
