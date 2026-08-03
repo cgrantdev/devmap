@@ -84,10 +84,11 @@ class PagesController extends Controller
         }
         
         // Generate SEO data for dynamic page
-        $pageTitle = $page->seo_title ?? $page->title;
-        $pageDescription = $page->seo_description ?? ($page->content ? $this->safeLimit($page->content, 160) : '');
+        $pageTitle = $page->meta_title ?? $page->title;
+        $pageDescription = $page->meta_description ?? ($page->content ? $this->safeLimit($page->content, 160) : '');
+        $titleHasSiteName = stripos($pageTitle, 'Peptidemap') !== false;
         $seoData = new SEOData(
-            title: $pageTitle . ' | Peptidemap',
+            title: $titleHasSiteName ? $pageTitle : $pageTitle . ' | Peptidemap',
             description: $pageDescription ?: 'Learn more about ' . $page->title,
             url: url("/{$slug}"),
         );
