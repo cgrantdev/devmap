@@ -35,6 +35,7 @@ export const config = {
     peptideOfDay: process.env.FEATURE_PEPTIDE_OF_DAY !== 'false',
     dealOfDay: process.env.FEATURE_DEAL_OF_DAY !== 'false',
     weeklyRecap: process.env.FEATURE_WEEKLY_RECAP !== 'false',
+    blogOfDay: process.env.FEATURE_BLOG_OF_DAY !== 'false',
   },
   // Anti-spam thresholds
   limits: {

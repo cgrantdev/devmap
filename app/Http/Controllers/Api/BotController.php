@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\Blog;
 use App\Models\ProductPriceSnapshot;
 use App\Models\VendorReview;
 use Illuminate\Http\JsonResponse;
@@ -331,6 +332,40 @@ class BotController extends Controller
                 'brand_url' => self::BASE . '/brand/' . ($r->brand?->slug ?? ''),
                 'created_at' => $r->created_at?->toIso8601String(),
             ])->values(),
+        ]);
+    }
+
+    /**
+     * GET /api/bot/blog-of-day
+     * Rotates through existing blogs by day-of-year so #news has fresh
+     * content every day even when nothing new is being written.
+     * Only status=published (if that column exists); no draft leakage.
+     */
+    public function blogOfDay(Request $request): JsonResponse
+    {
+        $q = Blog::query();
+        if (\Schema::hasColumn('blogs', 'status')) $q->where('status', 'published');
+        $blogs = $q->orderBy('id')->get();
+        if ($blogs->isEmpty()) return response()->json(['found' => false]);
+
+        $dayIdx = (int) date('z'); // day of year 0-365
+        $b = $blogs[$dayIdx % $blogs->count()];
+
+        $image = $b->image;
+        if ($image && !str_starts_with($image, 'http')) {
+            $image = self::BASE . '/storage/' . ltrim($image, '/');
+        }
+
+        return response()->json([
+            'found' => true,
+            'id' => $b->id,
+            'title' => $b->title,
+            'slug' => $b->slug,
+            'description' => $b->description,
+            'image_url' => $image,
+            'read_time' => $b->read_time,
+            'published_at' => $b->published_at?->toIso8601String(),
+            'url' => self::BASE . '/blog/' . $b->slug,
         ]);
     }
 

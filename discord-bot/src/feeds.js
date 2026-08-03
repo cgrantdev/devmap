@@ -210,6 +210,29 @@ export async function tickDealOfDay(client) {
   await safeSend(client, config.channels.deals, { embeds: [embed] }, 'dealOfDay')
 }
 
+/* ─── Blog of the Day (rotates through existing posts) ─── */
+
+export async function tickBlogOfDay(client) {
+  if (!config.features.blogOfDay) return
+  let data
+  try {
+    data = await api.blogOfDay()
+  } catch (e) {
+    return console.error('[blogOfDay] fetch failed:', e.message)
+  }
+  if (!data.found) return console.log('[blogOfDay] no blogs available, skipping')
+
+  const embed = new EmbedBuilder()
+    .setColor(BRAND_COLOR)
+    .setTitle(`📰  ${truncate(data.title, 240)}`)
+    .setURL(data.url)
+    .setDescription(truncate((data.description || 'Read the full article on peptidemap.com.') + `\n\n[Read on Peptidemap →](${data.url})`, 4096))
+    .setImage(data.image_url || null)
+    .setFooter({ text: `Peptidemap${data.read_time ? ' · ' + data.read_time : ''}` })
+    .setTimestamp()
+  await safeSend(client, config.channels.news, { embeds: [embed] }, 'blogOfDay')
+}
+
 /* ─── Weekly Recap (Sunday) ─── */
 
 export async function tickWeeklyRecap(client) {

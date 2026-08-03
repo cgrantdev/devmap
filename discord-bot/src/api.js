@@ -35,4 +35,5 @@ export const api = {
     get('/api/bot/price-drops', { since, threshold, limit }),
   newProducts: (since, limit = 25) => get('/api/bot/new-products', { since, limit }),
   reviews: (since, limit = 25) => get('/api/bot/reviews', { since, limit }),
+  blogOfDay: () => get('/api/bot/blog-of-day'),
 }
