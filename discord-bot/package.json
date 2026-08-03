@@ -1,0 +1,19 @@
+{
+  "name": "peptidemap-bot",
+  "version": "1.0.0",
+  "description": "Discord bot for peptidemap.com — slash commands, price-drop feed, evergreen content.",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "engines": { "node": ">=20.0.0" },
+  "scripts": {
+    "start": "node src/index.js",
+    "deploy-commands": "node src/deploy-commands.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5",
+    "node-cron": "^3.0.3",
+    "undici": "^6.19.8"
+  }
+}
