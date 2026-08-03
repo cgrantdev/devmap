@@ -90,15 +90,34 @@
             Try Vendor Dashboard
           </button>
 
-          <!-- Get Listed (primary CTA) — default for everyone else -->
-          <a
-            v-else
-            href="/become-a-vendor"
-            class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[0_1px_2px_rgba(10,11,14,0.08),0_4px_12px_-4px_rgba(79,70,229,0.3)] hover:-translate-y-[0.5px] hover:shadow-[0_1px_2px_rgba(10,11,14,0.1),0_6px_16px_-4px_rgba(79,70,229,0.4)] transition-all"
-          >
-            Get Listed
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </a>
+          <!-- Signed-out default: Sign in link + Get Listed CTA side-by-side.
+               Sign in is a ghost link (secondary), Get Listed keeps the gradient (primary).
+               Same /login endpoint handles vendors + customers — role-based redirect after auth. -->
+          <template v-else>
+            <Link
+              v-if="!isLoggedIn"
+              :href="loginHref"
+              class="ui-focus hidden sm:inline-flex items-center h-9 px-3 text-[13px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] transition-colors"
+            >
+              Sign in
+            </Link>
+            <!-- Logged-in customer: link to their account (skips vendors/admins — they get their own dashboards above) -->
+            <Link
+              v-else-if="isCustomer"
+              href="/account/reviews"
+              class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-3 text-[13px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] transition-colors"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Account
+            </Link>
+            <a
+              href="/become-a-vendor"
+              class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[0_1px_2px_rgba(10,11,14,0.08),0_4px_12px_-4px_rgba(79,70,229,0.3)] hover:-translate-y-[0.5px] hover:shadow-[0_1px_2px_rgba(10,11,14,0.1),0_6px_16px_-4px_rgba(79,70,229,0.4)] transition-all"
+            >
+              Get Listed
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+          </template>
 
           <!-- Hamburger (below lg) -->
           <button
@@ -182,15 +201,33 @@
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
               Try Vendor Dashboard
             </button>
-            <a
-              v-else
-              href="/become-a-vendor"
-              class="ui-focus flex items-center justify-center gap-2 h-11 rounded-[10px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm transition-all hover:-translate-y-[0.5px]"
-              @click="mobileOpen = false"
-            >
-              Get Listed
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            </a>
+            <template v-else>
+              <a
+                href="/become-a-vendor"
+                class="ui-focus flex items-center justify-center gap-2 h-11 rounded-[10px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm transition-all hover:-translate-y-[0.5px]"
+                @click="mobileOpen = false"
+              >
+                Get Listed
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </a>
+              <Link
+                v-if="!isLoggedIn"
+                :href="loginHref"
+                class="ui-focus mt-2 flex items-center justify-center h-11 rounded-[10px] text-[14px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] border border-[color:var(--color-hairline)] transition-colors"
+                @click="mobileOpen = false"
+              >
+                Sign in
+              </Link>
+              <Link
+                v-else-if="isCustomer"
+                href="/account/reviews"
+                class="ui-focus mt-2 flex items-center justify-center gap-2 h-11 rounded-[10px] text-[14px] font-medium text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] border border-[color:var(--color-hairline)] transition-colors"
+                @click="mobileOpen = false"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Account
+              </Link>
+            </template>
           </div>
         </div>
       </div>
@@ -289,7 +326,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
-import { usePage } from '@inertiajs/vue3'
+import { usePage, Link } from '@inertiajs/vue3'
 import Button from '@/components/ui/Button.vue'
 import SearchPalette from '@/components/ui/SearchPalette.vue'
 import CountrySelector from '@/components/ui/CountrySelector.vue'
@@ -301,6 +338,13 @@ const isStaff = computed(() => {
 })
 const isDemoHost = computed(() => page.props.is_demo_host === true)
 const isLoggedIn = computed(() => !!page.props.auth?.user)
+const isCustomer = computed(() => page.props.auth?.user?.role === 'customer')
+// Preserve the current page URL so the login redirects back after auth.
+const loginHref = computed(() => {
+  if (typeof window === 'undefined') return '/login'
+  const path = window.location.pathname + window.location.search + window.location.hash
+  return `/login?redirect=${encodeURIComponent(path)}`
+})
 
 function tryVendorDashboard() {
   // Posts to /demo/preview-vendor which auto-logs in as Helix Research and

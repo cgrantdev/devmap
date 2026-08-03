@@ -460,6 +460,27 @@ main .shadow { box-shadow: var(--shadow-sm); }
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
+/* Shared admin input utility used by FormField-based pages */
+.ui-input {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background-color: #FFFFFF;
+    border: 1px solid var(--color-hairline);
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-ink);
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.ui-input::placeholder { color: var(--color-ink-subtle); }
+.ui-input:focus {
+    border-color: var(--color-accent-500);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    outline: none;
+}
+textarea.ui-input { resize: vertical; }
+
 /* Admin flash messages — cleaner */
 .bg-gray-100 .bg-green-50 {
     background: var(--color-verified-bg);
