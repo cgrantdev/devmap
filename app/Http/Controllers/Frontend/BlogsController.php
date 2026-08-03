@@ -101,7 +101,7 @@ class BlogsController extends Controller
         // Generate SEO data
         $featuredImage = $formattedFeatured ? $formattedFeatured['image'] : null;
         $seoData = new SEOData(
-            title: 'Peptide Research Blog & News | PeptideSync',
+            title: 'Peptide Research News & Guides — Peptidemap',
             description: 'Stay updated with the latest peptide research, industry news, guides, and educational content. Expert insights and comprehensive information for researchers.',
             image: $featuredImage,
             url: url('/blogs'),

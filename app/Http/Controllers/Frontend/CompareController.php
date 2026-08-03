@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Brand;
+use App\Models\SeoPage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -187,12 +188,28 @@ class CompareController extends Controller
             ]);
         }
 
+        // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "compare")
+        $defaultTitle = 'Compare Research-Peptide Vendors Side-by-Side — Peptidemap';
+        $defaultDescription = 'Every vendor, every price, sorted cheapest-first. Compare research-peptide suppliers on GLP-1s, BPC-157, GHK-Cu, TB-500 and 100+ more compounds.';
+
+        $seoPage = SeoPage::where('key', 'compare')->first();
+        $seo = [
+            'key' => 'compare',
+            'title' => $seoPage?->title ?: $defaultTitle,
+            'description' => $seoPage?->description ?: $defaultDescription,
+            'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
+            'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
+            'og_image' => $seoPage?->og_image ?: null,
+            'image' => $seoPage?->og_image ?: null,
+            'url' => url('/compare'),
+        ];
+
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
+
         return Inertia::render('Frontend/Compare', [
             'compounds' => $compounds,
-            'seo' => [
-                'title' => 'Compare Peptide Prices — PeptideMap',
-                'description' => 'Compare research peptide prices across verified vendors. Side-by-side vendor pricing for BPC-157, Semaglutide, Tirzepatide, and more.',
-            ],
+            'seo' => $seo,
         ]);
     }
 }
