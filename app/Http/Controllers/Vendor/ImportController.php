@@ -22,13 +22,15 @@ class ImportController extends Controller
 
     public function index()
     {
-        // Products belong to brands, not directly to users. Chain is
-        // user → vendorSetting → brand → products. Fixes 500 that hit
-        // when Vendor.Products.vue's "Edit Catalog" landed here.
+        // Products belong to brands, not directly to users. Both
+        // User::products() and User::vendorSetting() are broken hasMany/hasOne
+        // relations (they assume products.user_id / vendor_settings.user_id
+        // which don't exist). Correct chain: brands.user_id → products.brand_id
+        // (matches how DashboardController::index resolves the vendor's brand).
         $user = Auth::user();
-        $brandId = $user->vendorSetting?->brand_id;
-        $products = $brandId
-            ? \App\Models\Product::where('brand_id', $brandId)->latest()->get()
+        $brand = \App\Models\Brand::where('user_id', $user->id)->first();
+        $products = $brand
+            ? Product::where('brand_id', $brand->id)->latest()->get()
             : collect();
 
         return Inertia::render('Vendor/Import', [
@@ -43,33 +45,37 @@ class ImportController extends Controller
         ]);
 
         $user = Auth::user();
+        $brand = \App\Models\Brand::where('user_id', $user->id)->first();
+        if (!$brand) {
+            return redirect()->back()->with('error', 'No brand associated with your account yet — contact support.');
+        }
         $file = $request->file('file');
-        
+
         try {
             $xmlContent = file_get_contents($file->getPathname());
             $xml = new SimpleXMLElement($xmlContent);
-            
+
             $importedCount = 0;
             $skippedCount = 0;
-            
+
             if (isset($xml->product)) {
                 foreach ($xml->product as $productData) {
                     $productUrl = (string) $productData->url;
-                    
-                    // Skip if product with same URL already exists for this user
-                    if ($productUrl && $user->products()->where('product_url', $productUrl)->exists()) {
+
+                    // Skip if product with same URL already exists for this brand.
+                    if ($productUrl && Product::where('brand_id', $brand->id)->where('product_url', $productUrl)->exists()) {
                         $skippedCount++;
                         continue;
                     }
-                    
+
                     $product = Product::create([
-                        'user_id' => $user->id,
+                        'brand_id' => $brand->id,
                         'name' => (string) $productData->name,
                         'price' => $this->extractPrice((string) $productData->price),
                         'image_url' => (string) $productData->image,
                         'product_url' => $productUrl,
                     ]);
-                    
+
                     $importedCount++;
                 }
             }
@@ -93,38 +99,41 @@ class ImportController extends Controller
         ]);
 
         $user = Auth::user();
-        
+        $brand = \App\Models\Brand::where('user_id', $user->id)->first();
+        if (!$brand) {
+            return redirect()->back()->with('error', 'No brand associated with your account yet — contact support.');
+        }
+
         try {
             $response = Http::timeout(30)->get($request->url);
-            
+
             if (!$response->successful()) {
                 return redirect()->back()->with('error', 'Failed to fetch XML from URL.');
             }
-            
+
             $xmlContent = $response->body();
             $xml = new SimpleXMLElement($xmlContent);
-            
+
             $importedCount = 0;
             $skippedCount = 0;
-            
+
             if (isset($xml->product)) {
                 foreach ($xml->product as $productData) {
                     $productUrl = (string) $productData->url;
-                    
-                    // Skip if product with same URL already exists for this user
-                    if ($productUrl && $user->products()->where('product_url', $productUrl)->exists()) {
+
+                    if ($productUrl && Product::where('brand_id', $brand->id)->where('product_url', $productUrl)->exists()) {
                         $skippedCount++;
                         continue;
                     }
-                    
+
                     $product = Product::create([
-                        'user_id' => $user->id,
+                        'brand_id' => $brand->id,
                         'name' => (string) $productData->name,
                         'price' => $this->extractPrice((string) $productData->price),
                         'image_url' => (string) $productData->image,
                         'product_url' => $productUrl,
                     ]);
-                    
+
                     $importedCount++;
                 }
             }
