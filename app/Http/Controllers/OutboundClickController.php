@@ -21,7 +21,14 @@ class OutboundClickController extends Controller
 
         // If we have no destination at all, fall back to the internal product page.
         if (empty($destination)) {
-            return redirect()->route('product.detail', [
+            if ($product->brand && $product->brand->slug) {
+                return redirect()->route('product.detail', [
+                    'vendorSlug' => $product->brand->slug,
+                    'productSlug' => $product->slug ?? 'product',
+                    'id' => $product->id,
+                ]);
+            }
+            return redirect()->route('product.detail.legacy', [
                 'slug' => $product->slug ?? 'product',
                 'id' => $product->id,
             ]);

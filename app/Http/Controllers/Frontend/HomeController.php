@@ -475,7 +475,9 @@ class HomeController extends Controller
                     'brand_discount_percent' => $product->brand_discount_percent,
                     'brand_coupon_code' => $product->brand_coupon_code,
                     'image_url' => $imageUrl ?: $placeholder,
-                    'url' => '/product/' . ($product->slug ?? 'product') . '/' . $product->id,
+                    'url' => $product->brand && $product->brand->slug
+                        ? '/product/' . $product->brand->slug . '/' . ($product->slug ?? 'product') . '/' . $product->id
+                        : '/product/' . ($product->slug ?? 'product') . '/' . $product->id,
                     'brand_name' => $product->brand?->name,
                     'brand_verified' => $brandVerified,
                     'price' => $salePrice,

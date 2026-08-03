@@ -215,13 +215,13 @@ class ProductsController extends Controller
         ]);
     }
 
-    public function showProduct(Request $request, $slug, $id)
+    public function showProduct(Request $request, $vendorSlug, $productSlug, $id)
     {
         // Find product by id and slug
         $product = Product::with(['brand', 'location', 'types', 'puses', 'category', 'brand.vendorSetting'])
             ->visible()
             ->where('id', $id)
-            ->where('slug', $slug)
+            ->where('slug', $productSlug)
             ->where('status', 'active')
             ->first();
 
@@ -329,7 +329,10 @@ class ProductsController extends Controller
         // Generate SEO data for product detail
         // Priority: Use stored SEO data from database, fallback to auto-generated from product fields
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'PeptideMap';
-        $productUrl = url("/product/{$product->slug}/{$product->id}");
+        $productSlugForUrl = $product->slug ?: Str::slug($product->display_name ?? $product->name ?? 'product');
+        $productUrl = $brand && $brand->slug
+            ? url("/product/{$brand->slug}/{$productSlugForUrl}/{$product->id}")
+            : url("/product/{$productSlugForUrl}/{$product->id}");
         
         // Build product image URL - handle both absolute URLs and relative paths
         $productImage = null;

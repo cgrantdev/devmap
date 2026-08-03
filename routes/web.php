@@ -99,7 +99,20 @@ Route::get('/search', [\App\Http\Controllers\Frontend\SearchController::class, '
 
 // Frontend pages
 Route::get('/products', [ProductsController::class, 'index'])->name('products');
-Route::get('/product/{slug}/{id}', [ProductsController::class, 'showProduct'])->name('product.detail');
+Route::get('/product/{vendorSlug}/{productSlug}/{id}', [ProductsController::class, 'showProduct'])
+    ->whereNumber('id')
+    ->name('product.detail');
+Route::get('/product/{slug}/{id}', function ($slug, $id) {
+    $product = \App\Models\Product::with('brand')->find($id);
+    if (!$product || !$product->brand) {
+        abort(404);
+    }
+    return redirect()->route('product.detail', [
+        'vendorSlug' => $product->brand->slug,
+        'productSlug' => $product->slug,
+        'id' => $product->id,
+    ], 301);
+})->whereNumber('id')->name('product.detail.legacy');
 Route::get('/product/{slug}', [ProductsController::class, 'show'])->name('product.show');
 Route::get('/brand/{slug}/products', [ProductsController::class, 'byBrand'])->name('brand.products');
 Route::get('/brands', [BrandsController::class, 'index'])->name('brands');
