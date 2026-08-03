@@ -80,7 +80,7 @@ class BotController extends Controller
 
         $like = '%' . str_replace(['%', '_'], ['\\%', '\\_'], $q) . '%';
 
-        $rows = Product::visible()
+        $rows = Product::visible()->where('price', '>', 0)
             ->with(['brand:id,name,slug', 'category:id,name'])
             ->where(function ($w) use ($like) {
                 $w->where('name', 'like', $like)
@@ -114,8 +114,8 @@ class BotController extends Controller
             ?? ProductCategory::where('name', 'like', '%' . $q . '%')->first();
 
         $products = $category
-            ? Product::visible()->where('product_category_id', $category->id)
-            : Product::visible()->where('name', 'like', '%' . $q . '%');
+            ? Product::visible()->where('price', '>', 0)->where('product_category_id', $category->id)
+            : Product::visible()->where('price', '>', 0)->where('name', 'like', '%' . $q . '%');
 
         $rows = $products
             ->with(['brand:id,name,slug'])
@@ -163,7 +163,7 @@ class BotController extends Controller
 
         if (!$category) return ['query' => $q, 'found' => false];
 
-        $products = Product::visible()->where('product_category_id', $category->id)->get();
+        $products = Product::visible()->where('price', '>', 0)->where('product_category_id', $category->id)->get();
         if ($products->isEmpty()) return ['query' => $q, 'found' => false];
 
         $prices = $products->map(fn ($p) => $this->effective($p))->filter(fn ($v) => $v > 0);
@@ -223,7 +223,7 @@ class BotController extends Controller
             return response()->json(['results' => [], 'since' => $since->toIso8601String()]);
         }
 
-        $products = Product::visible()
+        $products = Product::visible()->where('price', '>', 0)
             ->with(['brand:id,name,slug'])
             ->whereIn('id', $baseline->keys())
             ->get();
@@ -282,7 +282,7 @@ class BotController extends Controller
             : Carbon::now()->subDay();
         $limit = min(50, max(1, (int) $request->query('limit', 25)));
 
-        $rows = Product::visible()
+        $rows = Product::visible()->where('price', '>', 0)
             ->with(['brand:id,name,slug', 'category:id,name'])
             ->where('created_at', '>=', $since)
             ->orderBy('created_at', 'asc')
