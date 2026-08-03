@@ -74,7 +74,9 @@ class ProductsController extends Controller
         $pct = $vs?->coupon_discount_percent;
         $code = $vs?->coupon_code;
         if ($pct && $pct > 0 && $pct < 100 && $code) {
-            $couponSegment = " save {$pct}% with code " . strtoupper($code) . '.';
+            // Store may keep pct as decimal ("15.00"). Show whole number when possible.
+            $pctLabel = ((float) $pct == (int) $pct) ? (int) $pct : rtrim(rtrim(number_format((float) $pct, 2), '0'), '.');
+            $couponSegment = " save {$pctLabel}% with code " . strtoupper($code) . '.';
         } else {
             $couponSegment = ' verified COAs, PMAP coupons.';
         }
