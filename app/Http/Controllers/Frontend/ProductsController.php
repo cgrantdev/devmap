@@ -112,6 +112,21 @@ class ProductsController extends Controller
         $defaultDescription = 'Browse our comprehensive collection of research peptides. Compare products, prices, and vendors to find the best peptides for your research needs.';
 
         $seoPage = SeoPage::where('key', 'products')->first();
+
+        // ItemList JSON-LD for the category groups shown on this page (rendered by app.blade.php)
+        $itemListSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'ItemList',
+            'name' => 'Research Peptide Categories',
+            'numberOfItems' => $categories->count(),
+            'itemListElement' => $categories->take(20)->values()->map(fn ($c, $i) => [
+                '@type' => 'ListItem',
+                'position' => $i + 1,
+                'url' => url("/product/{$c['slug']}"),
+                'name' => $c['name'],
+            ])->all(),
+        ];
+
         $seo = [
             'key' => 'products',
             'title' => $seoPage?->title ?: $defaultTitle,
@@ -122,6 +137,7 @@ class ProductsController extends Controller
             // Backward-compatible field used by some pages
             'image' => $seoPage?->og_image ?: null,
             'url' => url('/products'),
+            'schema' => [$itemListSchema],
         ];
 
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
@@ -289,6 +305,43 @@ class ProductsController extends Controller
             $seoOgImage = $productImage;
         }
         
+        // Product + BreadcrumbList JSON-LD (rendered by app.blade.php)
+        $productSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
+            'name' => $product->display_name,
+            'image' => $productImage ? [$productImage] : null,
+            'description' => $product->description ? strip_tags($product->description) : null,
+            'brand' => $brand ? ['@type' => 'Brand', 'name' => $brand->name] : null,
+            'sku' => (string) $product->id,
+            'offers' => [
+                '@type' => 'Offer',
+                'url' => $productUrl,
+                'priceCurrency' => 'USD',
+                'price' => number_format((float) ($product->discount_price ?: $product->price), 2, '.', ''),
+                'availability' => 'https://schema.org/' . ($product->availability === 'in_stock' ? 'InStock' : 'OutOfStock'),
+                'seller' => $brand ? ['@type' => 'Organization', 'name' => $brand->name] : null,
+            ],
+        ];
+        if (($product->rating_count ?? 0) > 0) {
+            $productSchema['aggregateRating'] = [
+                '@type' => 'AggregateRating',
+                'ratingValue' => (float) $product->rating_average,
+                'reviewCount' => (int) $product->rating_count,
+            ];
+        }
+
+        $breadcrumbSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => array_values(array_filter([
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://peptidemap.com/'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Vendors', 'item' => 'https://peptidemap.com/brands'],
+                $brand ? ['@type' => 'ListItem', 'position' => 3, 'name' => $brand->name, 'item' => 'https://peptidemap.com/brand/' . $brand->slug . '/products'] : null,
+                ['@type' => 'ListItem', 'position' => $brand ? 4 : 3, 'name' => $product->display_name],
+            ])),
+        ];
+
         // Build SEO array (same format as products/brands pages)
         $seo = [
             'key' => 'product',
@@ -301,8 +354,9 @@ class ProductsController extends Controller
             'image' => $seoOgImage,
             'url' => $productUrl,
             'canonical' => $productUrl,
+            'schema' => [$productSchema, $breadcrumbSchema],
         ];
-        
+
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
 
@@ -805,6 +859,20 @@ class ProductsController extends Controller
             $seoOgImage = $brandImage;
         }
         
+        // ItemList JSON-LD for this brand's products (rendered by app.blade.php)
+        $itemListSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'ItemList',
+            'name' => "Products from {$brand->name}",
+            'numberOfItems' => $products->total(),
+            'itemListElement' => collect($products->items())->take(20)->values()->map(fn ($p, $i) => [
+                '@type' => 'ListItem',
+                'position' => $i + 1,
+                'url' => url("/product/{$p->slug}/{$p->id}"),
+                'name' => $p->display_name,
+            ])->all(),
+        ];
+
         // Build SEO array (same format as other pages)
         $seo = [
             'key' => 'brand',
@@ -817,16 +885,11 @@ class ProductsController extends Controller
             'image' => $seoOgImage,
             'url' => $brandUrl,
             'canonical' => $brandUrl,
+            'schema' => [$itemListSchema],
         ];
-        
+
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
-        $seoData = new SEOData(
-            title: $seoTitle,
-            description: $seoDescription,
-            image: $seoOgImage,
-            url: $brandUrl,
-        );
-        session(['page_seo_data' => $seoData]);
+        session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/BrandProducts', [
             'brand' => [

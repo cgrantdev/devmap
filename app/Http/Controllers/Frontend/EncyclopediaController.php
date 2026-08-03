@@ -729,6 +729,29 @@ class EncyclopediaController extends Controller
             $seoOgImage = $image;
         }
         
+        // DefinedTerm + BreadcrumbList JSON-LD (rendered by app.blade.php)
+        $definedTermSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'DefinedTerm',
+            'name' => $title,
+            'description' => $seoDescription,
+            'inDefinedTermSet' => [
+                '@type' => 'DefinedTermSet',
+                'name' => 'Peptidemap Encyclopedia',
+                'url' => 'https://peptidemap.com/encyclopedia',
+            ],
+        ];
+
+        $breadcrumbSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://peptidemap.com/'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Encyclopedia', 'item' => 'https://peptidemap.com/encyclopedia'],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $title],
+            ],
+        ];
+
         // Build SEO array (same format as products/brands pages)
         $seo = [
             'key' => 'encyclopedia',
@@ -741,8 +764,9 @@ class EncyclopediaController extends Controller
             'image' => $seoOgImage,
             'url' => url("/encyclopedia/{$slug}"),
             'canonical' => url("/encyclopedia/{$slug}"),
+            'schema' => [$definedTermSchema, $breadcrumbSchema],
         ];
-        
+
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
 

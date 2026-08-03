@@ -197,6 +197,43 @@ class BlogsController extends Controller
             $seoOgImage = $blogImage;
         }
         
+        // Article + BreadcrumbList JSON-LD (rendered by app.blade.php)
+        $articleSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Article',
+            'headline' => $blog->title,
+            'description' => $seoDescription,
+            'image' => $blogImage ? [$blogImage] : null,
+            'datePublished' => $blog->published_at ? $blog->published_at->toIso8601String() : null,
+            'dateModified' => $blog->updated_at ? $blog->updated_at->toIso8601String() : ($blog->published_at ? $blog->published_at->toIso8601String() : null),
+            'author' => [
+                '@type' => 'Person',
+                'name' => $blog->author_name ?: $siteName,
+            ],
+            'publisher' => [
+                '@type' => 'Organization',
+                'name' => $siteName,
+                'logo' => [
+                    '@type' => 'ImageObject',
+                    'url' => url('/images/logo.png'),
+                ],
+            ],
+            'mainEntityOfPage' => [
+                '@type' => 'WebPage',
+                '@id' => $blogUrl,
+            ],
+        ];
+
+        $breadcrumbSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://peptidemap.com/'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => 'https://peptidemap.com/blogs'],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $blog->title],
+            ],
+        ];
+
         // Build SEO array (same format as products/brands pages)
         $seo = [
             'key' => 'blog',
@@ -209,8 +246,9 @@ class BlogsController extends Controller
             'image' => $seoOgImage,
             'url' => $blogUrl,
             'canonical' => $blogUrl,
+            'schema' => [$articleSchema, $breadcrumbSchema],
         ];
-        
+
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
         
