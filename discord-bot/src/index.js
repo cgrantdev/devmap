@@ -7,6 +7,7 @@ import {
   tickPriceDrops, tickNewProducts, tickReviews,
   tickPeptideOfDay, tickDealOfDay, tickWeeklyRecap,
 } from './feeds.js'
+import { handleMemberJoin } from './welcome.js'
 
 const client = new Client({
   intents: [
@@ -28,6 +29,8 @@ client.once(Events.ClientReady, async c => {
     console.error('API unreachable — commands will fail until fixed:', e.message)
   }
 })
+
+client.on(Events.GuildMemberAdd, member => handleMemberJoin(member))
 
 client.on(Events.InteractionCreate, async interaction => {
   if (!interaction.isChatInputCommand()) return

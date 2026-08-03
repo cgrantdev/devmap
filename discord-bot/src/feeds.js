@@ -182,7 +182,7 @@ export async function tickPeptideOfDay(client) {
     .setFooter({ text: 'Peptidemap · daily' })
     .setTimestamp()
 
-  await safeSend(client, config.channels.news, { embeds: [embed] }, 'peptideOfDay')
+  await safeSend(client, config.channels.peptideOfDay, { embeds: [embed] }, 'peptideOfDay')
 }
 
 /* ─── Deal of the Day (single top drop, posted to #deals) ─── */

@@ -23,6 +23,8 @@ export const config = {
     deals: process.env.DISCORD_CHANNEL_DEALS || null,
     news: process.env.DISCORD_CHANNEL_NEWS || null,
     blog: process.env.DISCORD_CHANNEL_BLOG || null,
+    peptideOfDay: process.env.DISCORD_CHANNEL_PEPTIDE_OF_DAY || process.env.DISCORD_CHANNEL_NEWS || null,
+    welcome: process.env.DISCORD_CHANNEL_WELCOME || null,
   },
   // Feature switches — flip to `false` to silence a feed without redeploy
   // (just restart the systemd unit after editing .env).
