@@ -62,23 +62,6 @@
         </div>
       </div>
 
-      <!-- Filter Bar -->
-      <div class="flex gap-2 mb-8 overflow-x-auto pb-2">
-          <button
-            v-for="filter in filters"
-            :key="filter.value"
-            @click="selectFilter(filter.value)"
-            :class="[
-              'px-4 py-2 rounded-lg whitespace-nowrap transition-colors border',
-              selectedFilter === filter.value
-                ? 'bg-slate-700 text-white border-slate-700'
-                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
-            ]"
-          >
-            {{ filter.label }}
-          </button>
-      </div>
-
       <!-- Results Count -->
       <div class="mb-4">
         <p class="text-gray-600">

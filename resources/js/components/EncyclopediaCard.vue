@@ -46,13 +46,8 @@
         {{ name }}
       </h3>
     </div>
-    <!-- Category Tag -->
-    <div class="text-slate-600 text-xs italic justify-between mb-6">
-      {{ categoryTag }}
-    </div>
-
     <!-- Learn More Link (Fixed position at bottom) -->
-    <div class="pt-3 border-t border-slate-200 flex items-center justify-between">
+    <div class="mt-6 pt-3 border-t border-slate-200 flex items-center justify-between">
       <span class="text-gray-900 text-xs italic underline">Learn More</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-colors" aria-hidden="true">
         <path d="m9 18 6-6-6-6"></path>
