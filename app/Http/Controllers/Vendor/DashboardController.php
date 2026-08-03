@@ -215,11 +215,14 @@ class DashboardController extends Controller
 
         // Get recent reviews for the list (all statuses for vendor triage)
         // Note: `vendor_reviews` currently has no `product_id` column, so we cannot eager-load a `product` relationship here.
-        $reviews = VendorReview::where('brand_id', $brand->id)
+        $recentReviews = VendorReview::where('brand_id', $brand->id)
             ->latest()
             ->take(50)
-            ->get()
-            ->map(function ($review) {
+            ->get();
+        $verifiedMap = VendorReview::computeVerifiedMap($recentReviews);
+
+        $reviews = $recentReviews
+            ->map(function ($review) use ($verifiedMap) {
                 return [
                     'id' => $review->id,
                     'user_name' => $review->user_name,
@@ -227,6 +230,7 @@ class DashboardController extends Controller
                     'rating' => $review->rating,
                     'review' => $review->review,
                     'status' => $review->status,
+                    'verified' => $verifiedMap[$review->id] ?? false,
                     'created_at' => $review->created_at,
                     'vendor_reply' => $review->vendor_reply,
                     'vendor_replied_at' => $review->vendor_replied_at,

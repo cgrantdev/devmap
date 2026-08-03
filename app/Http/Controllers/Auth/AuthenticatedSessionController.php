@@ -10,9 +10,11 @@ use Inertia\Inertia;
 
 class AuthenticatedSessionController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
-        return Inertia::render('Auth/Login');
+        return Inertia::render('Auth/Login', [
+            'redirect' => $request->query('redirect'),
+        ]);
     }
 
     public function store(LoginRequest $request)
@@ -26,8 +28,20 @@ class AuthenticatedSessionController extends Controller
             // Admin and admin_viewer (internal staff) skip email verification.
             $isStaff = in_array($user->role, ['admin', 'admin_viewer'], true);
 
+            $redirect = $request->input('redirect');
+            $safeRedirect = ($redirect && str_starts_with($redirect, '/') && !str_starts_with($redirect, '//'))
+                ? $redirect
+                : null;
+
             if (!$isStaff && !$user->hasVerifiedEmail()) {
+                if ($safeRedirect) {
+                    session(['post_verify_redirect' => $safeRedirect]);
+                }
                 return redirect('/email/verify');
+            }
+
+            if ($safeRedirect) {
+                return redirect($safeRedirect);
             }
 
             // Route to the right dashboard based on role

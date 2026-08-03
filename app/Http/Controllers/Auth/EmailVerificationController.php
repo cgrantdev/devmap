@@ -11,14 +11,9 @@ class EmailVerificationController extends Controller
 {
     public function show()
     {
-        // If user is already verified, redirect to dashboard
+        // If user is already verified, redirect to the right home base
         if (Auth::check() && Auth::user()->hasVerifiedEmail()) {
-            $user = Auth::user();
-            if ($user->canAccessAdmin()) {
-                return redirect('/admin/dashboard');
-            } else {
-                return redirect('/vendor/dashboard');
-            }
+            return redirect($this->postVerifyDestination(Auth::user()));
         }
 
         return Inertia::render('Auth/VerifyEmail');
@@ -86,17 +81,35 @@ class EmailVerificationController extends Controller
         $user->markEmailAsVerified();
         \Log::info('Email verified successfully', ['user_id' => $user->id]);
 
-        // If user is logged in, redirect to appropriate dashboard
+        // If user is logged in, redirect to appropriate destination
         if (Auth::check() && Auth::id() == $user->id) {
-            if ($user->canAccessAdmin()) {
-                return redirect('/admin/dashboard')->with('success', 'Email verified successfully!');
-            } else {
-                return redirect('/vendor/dashboard')->with('success', 'Email verified successfully!');
-            }
+            return redirect($this->postVerifyDestination($user))->with('success', 'Email verified successfully!');
         }
 
         // If user is not logged in, redirect to login page
         return redirect('/login')->with('success', 'Email verified successfully! You can now log in.');
+    }
+
+    /**
+     * Where a user lands right after verifying their email. Honors a
+     * pending `post_verify_redirect` (set when they arrived via a
+     * "sign in to leave a review" CTA) before falling back to role defaults.
+     */
+    protected function postVerifyDestination($user): string
+    {
+        $pending = session()->pull('post_verify_redirect');
+        if ($pending && str_starts_with($pending, '/') && !str_starts_with($pending, '//')) {
+            return $pending;
+        }
+
+        if ($user->canAccessAdmin()) {
+            return '/admin/dashboard';
+        }
+        if ($user->isVendor()) {
+            return '/vendor/dashboard';
+        }
+
+        return '/';
     }
 
     public function resend(Request $request)

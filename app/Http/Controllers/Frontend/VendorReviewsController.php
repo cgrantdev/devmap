@@ -18,6 +18,12 @@ class VendorReviewsController extends Controller
      */
     public function store(Request $request, $brandId)
     {
+        // Belt-and-suspenders: the route also carries the `auth` middleware,
+        // but guard here too in case this action is ever wired up elsewhere.
+        if (!Auth::check()) {
+            return redirect()->route('register', ['redirect' => url()->previous()]);
+        }
+
         $validated = $request->validate([
             'rating' => 'nullable|integer|min:1|max:5',
             'review' => 'nullable|string|max:2000',
@@ -41,17 +47,23 @@ class VendorReviewsController extends Controller
 
         $brand = Brand::findOrFail($brandId);
 
-        // Get user ID if authenticated (optional)
         $userId = Auth::id();
 
-        // Check if this email has already reviewed this vendor (prevent duplicate reviews)
+        // Prevent duplicate reviews: one per user per brand (now that reviews
+        // require auth), and keep the legacy email-based check for the older
+        // anonymous/seeded reviews already in the table.
         $existingReview = VendorReview::where('brand_id', $brandId)
-            ->where('user_email', $validated['user_email'])
+            ->where(function ($q) use ($userId, $validated) {
+                $q->where('user_email', $validated['user_email']);
+                if ($userId) {
+                    $q->orWhere('user_id', $userId);
+                }
+            })
             ->first();
-        
+
         if ($existingReview) {
             return back()->withErrors([
-                'user_email' => 'You have already submitted a review for this vendor with this email address.',
+                'user_email' => 'You have already submitted a review for this vendor.',
             ])->withInput();
         }
 
@@ -88,11 +100,17 @@ class VendorReviewsController extends Controller
     public function index($brandId)
     {
         $brand = Brand::findOrFail($brandId);
-        
+
         $reviews = $brand->approvedReviews()
             ->with('user')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
+
+        $verifiedMap = VendorReview::computeVerifiedMap($reviews->getCollection());
+        $reviews->getCollection()->transform(function ($review) use ($verifiedMap) {
+            $review->verified = $verifiedMap[$review->id] ?? false;
+            return $review;
+        });
 
         return response()->json($reviews);
     }

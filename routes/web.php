@@ -161,8 +161,17 @@ Route::post('/demo/preview-vendor', [DemoPreviewController::class, 'start'])->na
 Route::post('/demo/exit', [DemoPreviewController::class, 'exit'])->name('demo.exit');
 
 // Vendor Reviews
-Route::post('/brands/{brandId}/reviews', [VendorReviewsController::class, 'store'])->name('vendor.reviews.store');
+Route::post('/brands/{brandId}/reviews', [VendorReviewsController::class, 'store'])
+    ->middleware(['auth', 'email.verified', 'throttle:5,60'])
+    ->name('vendor.reviews.store');
 Route::get('/brands/{brandId}/reviews', [VendorReviewsController::class, 'index'])->name('vendor.reviews.index');
+
+// Customer account — manage own reviews
+Route::middleware(['auth', 'email.verified'])->prefix('account')->group(function () {
+    Route::get('/reviews', [\App\Http\Controllers\Frontend\AccountReviewsController::class, 'index'])->name('account.reviews');
+    Route::put('/reviews/{id}', [\App\Http\Controllers\Frontend\AccountReviewsController::class, 'update'])->name('account.reviews.update');
+    Route::delete('/reviews/{id}', [\App\Http\Controllers\Frontend\AccountReviewsController::class, 'destroy'])->name('account.reviews.destroy');
+});
 
 // Guest routes
 Route::middleware('guest')->group(function () {

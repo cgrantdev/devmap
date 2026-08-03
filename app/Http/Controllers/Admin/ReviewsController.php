@@ -12,10 +12,11 @@ class ReviewsController extends Controller
 {
     public function index()
     {
-        $reviews = VendorReview::with('brand')
-            ->latest()
-            ->get()
-            ->map(function (VendorReview $review) {
+        $reviewModels = VendorReview::with('brand')->latest()->get();
+        $verifiedMap = VendorReview::computeVerifiedMap($reviewModels);
+
+        $reviews = $reviewModels
+            ->map(function (VendorReview $review) use ($verifiedMap) {
                 return [
                     'id' => $review->id,
                     'user_name' => $review->user_name,
@@ -23,7 +24,7 @@ class ReviewsController extends Controller
                     'comment' => $review->review,
                     'rating' => $review->rating,
                     'status' => $review->status,
-                    'verified' => (bool) ($review->verified ?? false),
+                    'verified' => $verifiedMap[$review->id] ?? false,
                     'flagged' => (bool) ($review->flagged ?? false),
                     'flag_reason' => $review->flag_reason,
                     'flag_reviewed_by' => $review->flag_reviewed_by,

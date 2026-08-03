@@ -320,7 +320,8 @@ class ProductsController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
             
-            $reviews = $approvedReviews->map(function ($review) {
+            $verifiedMap = \App\Models\VendorReview::computeVerifiedMap($approvedReviews);
+            $reviews = $approvedReviews->map(function ($review) use ($verifiedMap) {
                 return [
                     'id' => $review->id,
                     'rating' => $review->rating,
@@ -334,6 +335,7 @@ class ProductsController extends Controller
                     'quality' => $review->quality,
                     'cost' => $review->cost,
                     'packaging' => $review->packaging,
+                    'verified' => $verifiedMap[$review->id] ?? false,
                 ];
             })->toArray();
         }
@@ -892,7 +894,8 @@ class ProductsController extends Controller
         $packaging = $approvedReviews->whereNotNull('packaging')->avg('packaging') ?? 0;
 
         // Map reviews with all fields including review comment
-        $mappedReviews = $approvedReviews->map(function ($review) {
+        $verifiedMap = \App\Models\VendorReview::computeVerifiedMap($approvedReviews);
+        $mappedReviews = $approvedReviews->map(function ($review) use ($verifiedMap) {
             return [
                 'id' => $review->id,
                 'rating' => $review->rating,
@@ -906,6 +909,7 @@ class ProductsController extends Controller
                 'quality' => $review->quality,
                 'cost' => $review->cost,
                 'packaging' => $review->packaging,
+                'verified' => $verifiedMap[$review->id] ?? false,
             ];
         });
 

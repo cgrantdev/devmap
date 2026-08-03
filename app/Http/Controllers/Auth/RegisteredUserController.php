@@ -14,9 +14,11 @@ use Inertia\Inertia;
 
 class RegisteredUserController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
-        return Inertia::render('Auth/Register');
+        return Inertia::render('Auth/Register', [
+            'redirect' => $request->query('redirect'),
+        ]);
     }
 
     public function store(Request $request)
@@ -37,27 +39,46 @@ class RegisteredUserController extends Controller
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => ['required', 'confirmed', Rules\Password::defaults()],
                 'role' => 'sometimes|string|in:customer,vendor,admin',
+                'redirect' => 'sometimes|nullable|string|max:2048',
             ]);
+
+            $role = $validated['role'] ?? 'customer';
 
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
                 // Default to customer if not explicitly provided
-                'role' => $validated['role'] ?? 'customer',
+                'role' => $role,
             ]);
 
             event(new Registered($user));
 
-            // // Send verification email
-            // $user->sendEmailVerificationNotification();
-            $user->email_verified_at = now();
-            $user->save();
+            // Customers must verify their email before leaving a review
+            // (see EnsureEmailIsVerified). Vendor/admin onboarding is
+            // pre-verified so those flows aren't blocked mid-review.
+            if ($role === 'customer') {
+                $user->sendEmailVerificationNotification();
+            } else {
+                $user->email_verified_at = now();
+                $user->save();
+            }
 
             // Log the user in
             Auth::login($user);
 
-            return redirect('/email/verify')->with('success', 'Registration successful! Your account is currently under review and should be activated shortly.');
+            // Stash the post-verification destination (e.g. back to the
+            // brand page's reviews section) for a safe local redirect only.
+            $redirect = $validated['redirect'] ?? null;
+            if ($redirect && str_starts_with($redirect, '/') && !str_starts_with($redirect, '//')) {
+                session(['post_verify_redirect' => $redirect]);
+            }
+
+            $message = $role === 'customer'
+                ? 'Registration successful! Please check your email to verify your account.'
+                : 'Registration successful! Your account is currently under review and should be activated shortly.';
+
+            return redirect('/email/verify')->with('success', $message);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {

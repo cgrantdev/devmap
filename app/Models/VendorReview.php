@@ -54,6 +54,56 @@ class VendorReview extends Model
     }
 
     /**
+     * Compute a "verified via PMAP" flag for a batch of reviews without N+1
+     * queries: true when the reviewing user has an outbound product_clicks
+     * row for the same brand, dated at or before the review and within the
+     * preceding 90 days.
+     *
+     * @param  \Illuminate\Support\Collection|array  $reviews  Models/arrays with id, user_id, brand_id, created_at.
+     * @return array<int, bool> keyed by review id
+     */
+    public static function computeVerifiedMap($reviews): array
+    {
+        $reviews = collect($reviews);
+
+        $userIds = $reviews->map(fn ($r) => is_array($r) ? ($r['user_id'] ?? null) : $r->user_id)
+            ->filter()->unique()->values();
+
+        if ($userIds->isEmpty()) {
+            return $reviews->mapWithKeys(fn ($r) => [(is_array($r) ? $r['id'] : $r->id) => false])->all();
+        }
+
+        $brandIds = $reviews->map(fn ($r) => is_array($r) ? ($r['brand_id'] ?? null) : $r->brand_id)
+            ->filter()->unique()->values();
+
+        $clicks = \App\Models\ProductClick::whereIn('user_id', $userIds)
+            ->whereIn('brand_id', $brandIds)
+            ->get(['user_id', 'brand_id', 'created_at']);
+
+        $clicksByUserBrand = $clicks->groupBy(fn ($c) => $c->user_id . ':' . $c->brand_id);
+
+        return $reviews->mapWithKeys(function ($r) use ($clicksByUserBrand) {
+            $id = is_array($r) ? $r['id'] : $r->id;
+            $userId = is_array($r) ? ($r['user_id'] ?? null) : $r->user_id;
+            $brandId = is_array($r) ? ($r['brand_id'] ?? null) : $r->brand_id;
+            $createdAt = is_array($r) ? \Illuminate\Support\Carbon::parse($r['created_at']) : $r->created_at;
+
+            if (!$userId || !$createdAt) {
+                return [$id => false];
+            }
+
+            $windowStart = (clone $createdAt)->subDays(90);
+            $matches = $clicksByUserBrand->get($userId . ':' . $brandId, collect());
+
+            $verified = $matches->contains(
+                fn ($c) => $c->created_at <= $createdAt && $c->created_at >= $windowStart
+            );
+
+            return [$id => $verified];
+        })->all();
+    }
+
+    /**
      * Update brand rating when review is created/updated/deleted
      */
     protected static function boot()
