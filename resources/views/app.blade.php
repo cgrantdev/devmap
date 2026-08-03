@@ -39,10 +39,10 @@
     @php
         $siteName = \App\Models\Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
         $siteDescription = \App\Models\Setting::where('key', 'site_description')->value('value')
-            ?? 'The definitive platform for research peptide vendors — compare verified suppliers, inspect lab testing, and discover research peptides in one place.';
+            ?? 'The definitive platform for peptide vendors — compare verified suppliers, inspect lab testing, and discover peptides in one place.';
         $contactEmail = \App\Models\Setting::where('key', 'contact_email')->value('value') ?? 'info@peptidemap.com';
         $canonicalHost = 'https://peptidemap.com';
-        $defaultOgImage = $canonicalHost . '/images/og-default-v6.png';
+        $defaultOgImage = $canonicalHost . '/images/og-default-v7.png';
 
         // Get SEO data from session (set by controllers via session(['page_seo_data' => ...]))
         $seoData = session('page_seo_data');

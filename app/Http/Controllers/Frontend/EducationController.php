@@ -74,7 +74,7 @@ class EducationController extends Controller
         // Generate SEO data
         $seoData = new SEOData(
             title: 'Peptide Education & Research Guides | Peptidemap',
-            description: 'Comprehensive educational guides on research peptides. Learn about benefits, dosing, safety, and research applications for various peptides.',
+            description: 'Comprehensive educational guides on peptides. Learn about benefits, dosing, safety, and research applications for various peptides.',
             url: url('/education'),
         );
         session(['page_seo_data' => $seoData]);
@@ -101,7 +101,7 @@ class EducationController extends Controller
             $categoryImage = $category->image_url ? \Illuminate\Support\Facades\Storage::url('categories/' . $category->image_url) : null;
             $seoData = new SEOData(
                 title: $category->name . ' - Education Guide | Peptidemap',
-                description: $category->description ? $this->safeLimit($category->description, 160) : 'Learn about ' . $category->name . ' research peptides.',
+                description: $category->description ? $this->safeLimit($category->description, 160) : 'Learn about ' . $category->name . ' peptides.',
                 image: $categoryImage,
                 url: url("/education/{$slug}"),
             );
@@ -154,7 +154,7 @@ class EducationController extends Controller
         $postImage = $post->image ? \Illuminate\Support\Facades\Storage::url('education_posts/' . $post->image) : null;
         $seoData = new SEOData(
             title: $post->title . ' - Education Guide | Peptidemap',
-            description: $post->description ? $this->safeLimit($post->description, 160) : 'Learn about ' . $post->title . ' research peptides.',
+            description: $post->description ? $this->safeLimit($post->description, 160) : 'Learn about ' . $post->title . ' peptides.',
             image: $postImage,
             url: url("/education/{$slug}"),
         );

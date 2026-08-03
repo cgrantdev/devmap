@@ -91,7 +91,7 @@ return [
          * where we don't have a description set via an associated ->seo model or via
          * the ->getDynamicSEOData() method.
          */
-        'fallback' => 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.',
+        'fallback' => 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with verified discount codes.',
     ],
 
     'image' => [

@@ -148,7 +148,7 @@ const description = computed(() => {
     const desc = props.category.description.replace(/\s+/g, ' ').trim()
     return desc.length > 155 ? desc.substring(0, 155) + '...' : desc
   }
-  return 'Browse ' + (props.productName || props.category?.name || 'products') + ' research peptides. Compare products, prices, and vendors.'
+  return 'Browse ' + (props.productName || props.category?.name || 'products') + ' peptides. Compare products, prices, and vendors.'
 })
 
 const url = computed(() => {

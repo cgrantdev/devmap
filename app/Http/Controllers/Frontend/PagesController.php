@@ -52,7 +52,7 @@ class PagesController extends Controller
             // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "calculator")
             $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
             $defaultTitle = 'Peptide Calculator';
-            $defaultDescription = 'Calculate peptide dosages and reconstitution volumes. Easy-to-use calculator for research peptide preparation.';
+            $defaultDescription = 'Calculate peptide dosages and reconstitution volumes. Easy-to-use calculator for peptide preparation.';
 
             $seoPage = SeoPage::where('key', 'calculator')->first();
             $seo = [

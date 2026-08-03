@@ -390,8 +390,8 @@ const props = defineProps({
   seo: {
     type: Object,
     default: () => ({
-      title: 'Peptidemap - Your Trusted Source for Research Peptides',
-      description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.',
+      title: 'Peptidemap - Your Trusted Source for Peptides',
+      description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with verified discount codes.',
       og_title: null,
       og_description: null,
       og_image: null,
@@ -411,7 +411,7 @@ const description = computed(() => {
   return (
     props.seo?.description ||
     page.props.site_description ||
-    'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.'
+    'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with verified discount codes.'
   )
 })
 

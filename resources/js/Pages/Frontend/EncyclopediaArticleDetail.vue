@@ -1771,7 +1771,7 @@ const seoDescription = computed(() => {
     const desc = props.overview.replace(/\s+/g, ' ').trim()
     return desc.length > 160 ? desc.substring(0, 160) + '...' : desc
   }
-  return `Comprehensive guide to ${props.name || props.categoryName || 'this peptide'} research peptides.`
+  return `Comprehensive guide to ${props.name || props.categoryName || 'this peptide'} peptides.`
 })
 
 const url = computed(() => {

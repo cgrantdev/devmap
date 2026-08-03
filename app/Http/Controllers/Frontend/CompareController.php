@@ -189,8 +189,8 @@ class CompareController extends Controller
         }
 
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "compare")
-        $defaultTitle = 'Compare Research-Peptide Vendors Side-by-Side — Peptidemap';
-        $defaultDescription = 'Every vendor, every price, sorted cheapest-first. Compare research-peptide suppliers on GLP-1s, BPC-157, GHK-Cu, TB-500 and 100+ more compounds.';
+        $defaultTitle = 'Compare Peptide Vendors Side-by-Side — Peptidemap';
+        $defaultDescription = 'Every vendor, every price, sorted cheapest-first. Compare peptide suppliers on GLP-1s, BPC-157, GHK-Cu, TB-500 and 100+ more compounds.';
 
         $seoPage = SeoPage::where('key', 'compare')->first();
         $seo = [

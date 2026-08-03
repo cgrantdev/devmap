@@ -108,8 +108,8 @@ class ProductsController extends Controller
         
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "products")
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
-        $defaultTitle = 'Research Peptides - Browse All Products';
-        $defaultDescription = 'Browse our comprehensive collection of research peptides. Compare products, prices, and vendors to find the best peptides for your research needs.';
+        $defaultTitle = 'Peptides - Browse All Products';
+        $defaultDescription = 'Browse our comprehensive collection of peptides. Compare products, prices, and vendors to find the best peptides for your research needs.';
 
         $seoPage = SeoPage::where('key', 'products')->first();
 
@@ -578,7 +578,7 @@ class ProductsController extends Controller
         // Build description: first ~150-160 chars of category description
         $seoDescription = $category->description 
             ? $this->safeLimit($category->description, 155) 
-            : 'Browse ' . $category->name . ' research peptides. Compare products, prices, and vendors.';
+            : 'Browse ' . $category->name . ' peptides. Compare products, prices, and vendors.';
         
         // Build SEO array (same format as other pages)
         $seo = [

@@ -306,7 +306,7 @@ class EncyclopediaController extends Controller
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "encyclopedia")
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
         $defaultTitle = 'Peptide Encyclopedia - Comprehensive Research Guide';
-        $defaultDescription = 'Explore our comprehensive peptide encyclopedia. Detailed information on research peptides including benefits, dosing, safety, and research applications.';
+        $defaultDescription = 'Explore our comprehensive peptide encyclopedia. Detailed information on peptides including benefits, dosing, safety, and research applications.';
 
         $seoPage = SeoPage::where('key', 'encyclopedia')->first();
         $seo = [
@@ -599,7 +599,7 @@ class EncyclopediaController extends Controller
         // Generate SEO data for encyclopedia detail
         $seoData = new SEOData(
             title: $title . ' - Peptide Encyclopedia | Peptidemap',
-            description: ($educationPost ? $educationPost->description : $category->description) ? $this->safeLimit($educationPost ? $educationPost->description : $category->description, 160) : 'Comprehensive guide to ' . $title . ' research peptides.',
+            description: ($educationPost ? $educationPost->description : $category->description) ? $this->safeLimit($educationPost ? $educationPost->description : $category->description, 160) : 'Comprehensive guide to ' . $title . ' peptides.',
             image: $image,
             url: url("/encyclopedia/{$slug}"),
         );
@@ -708,7 +708,7 @@ class EncyclopediaController extends Controller
                     ? $this->safeLimit($educationPost->overview, 160) 
                     : ($educationPost->description 
                         ? $this->safeLimit($educationPost->description, 160) 
-                        : "Comprehensive guide to {$title} research peptides."));
+                        : "Comprehensive guide to {$title} peptides."));
             $seoOgTitle = $educationPost->seo_og_title ?: $seoTitle;
             $seoOgDescription = $educationPost->seo_og_description ?: $seoDescription;
             $seoOgImage = $educationPost->seo_og_image 
@@ -722,7 +722,7 @@ class EncyclopediaController extends Controller
             } elseif ($educationPost && $educationPost->description) {
                 $seoDescription = $this->safeLimit($educationPost->description, 160);
             } else {
-                $seoDescription = "Comprehensive guide to {$title} research peptides.";
+                $seoDescription = "Comprehensive guide to {$title} peptides.";
             }
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;

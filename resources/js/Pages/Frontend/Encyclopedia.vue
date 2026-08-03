@@ -173,7 +173,7 @@ const title = computed(() => {
 })
 
 const description = computed(() => {
-  return props.seo?.description || 'Explore our comprehensive peptide encyclopedia. Detailed information on research peptides including benefits, dosing, safety, and research applications.'
+  return props.seo?.description || 'Explore our comprehensive peptide encyclopedia. Detailed information on peptides including benefits, dosing, safety, and research applications.'
 })
 
 const url = computed(() => {

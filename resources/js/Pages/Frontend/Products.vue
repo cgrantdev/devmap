@@ -94,13 +94,13 @@ const page = usePage()
 
 // Computed values for reactive SEO updates
 const title = computed(() => {
-  const baseTitle = props.seo?.title || 'Research Peptides - Browse All Products'
+  const baseTitle = props.seo?.title || 'Peptides - Browse All Products'
   const siteName = page.props.site_name || 'Peptidemap'
   return `${baseTitle} - ${siteName}`
 })
 
 const description = computed(() => {
-  return props.seo?.description || 'Browse our comprehensive collection of research peptides. Compare products, prices, and vendors to find the best peptides for your research needs.'
+  return props.seo?.description || 'Browse our comprehensive collection of peptides. Compare products, prices, and vendors to find the best peptides for your research needs.'
 })
 
 const url = computed(() => {

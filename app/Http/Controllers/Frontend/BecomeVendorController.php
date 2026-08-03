@@ -33,7 +33,7 @@ class BecomeVendorController extends Controller
         // Generate SEO data
         $seoData = new SEOData(
             title: 'Become a Vendor — Peptidemap',
-            description: 'List your research peptides on Peptidemap — free during beta. Auto-sync from WooCommerce, Medusa, BigCommerce. Vendor analytics + PMAP coupon integration.',
+            description: 'List your peptides on Peptidemap — free during beta. Auto-sync from WooCommerce, Medusa, BigCommerce. Vendor analytics + PMAP coupon integration.',
             url: url('/become-a-vendor'),
         );
         session(['page_seo_data' => $seoData]);

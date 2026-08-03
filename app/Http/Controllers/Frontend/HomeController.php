@@ -312,7 +312,7 @@ class HomeController extends Controller
 
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "home")
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
-        $defaultDescription = Setting::where('key', 'site_description')->value('value') ?? 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium research peptides with verified discount codes.';
+        $defaultDescription = Setting::where('key', 'site_description')->value('value') ?? 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with verified discount codes.';
         $defaultImage = $heroSlides[0]['image'] ?? null;
 
         $seoPage = SeoPage::where('key', 'home')->first();
@@ -785,12 +785,12 @@ class HomeController extends Controller
         // render the correct <title>, canonical, and OG/Twitter tags.
         $seo = [
             'key'            => 'home',
-            'title'          => 'Peptidemap — Compare research-peptide vendors, prices, coupons & lab testing',
-            'description'    => 'The definitive research-peptide directory. Compare 40+ verified vendors, inspect COAs, and unlock exclusive coupons on 2,500+ products — all in one place.',
+            'title'          => 'Peptidemap — Compare peptide vendors, prices, coupons & lab testing',
+            'description'    => 'The definitive peptide directory. Compare 40+ verified vendors, inspect COAs, and unlock exclusive coupons on 2,500+ products — all in one place.',
             'url'            => 'https://peptidemap.com/',
-            'og_title'       => 'Compare every research-peptide vendor — Peptidemap',
-            'og_description' => '40+ verified vendors · 2,500+ products · lab-tested · coupons included. The definitive research-peptide directory.',
-            'og_image'       => 'https://peptidemap.com/images/og-default-v6.png',
+            'og_title'       => 'Compare every peptide vendor — Peptidemap',
+            'og_description' => '40+ verified vendors · 2,500+ products · lab-tested · coupons included. The definitive peptide directory.',
+            'og_image'       => 'https://peptidemap.com/images/og-default-v7.png',
         ];
         session(['page_seo_data' => $seo]);
 
