@@ -445,6 +445,9 @@ class DashboardController extends Controller
                 'hidden' => (bool) ($product->hidden ?? false),
                 'availability' => $product->availability,
                 'category' => $product->category?->name,
+                'auto_update' => (bool) ($product->auto_update ?? true),
+                'auto_scraped' => (bool) ($product->auto_scraped ?? false),
+                'last_scraped_at' => $product->last_scraped_at?->toIso8601String(),
             ],
         ]);
     }
@@ -466,6 +469,7 @@ class DashboardController extends Controller
             'featured' => 'sometimes|boolean',
             'hidden' => 'sometimes|boolean',
             'availability' => 'nullable|in:in_stock,out_of_stock',
+            'auto_update' => 'sometimes|boolean',
         ]);
 
         // If discount is >= retail, ignore it (would render as 0% savings).

@@ -85,6 +85,17 @@
         <div class="bg-white rounded-[12px] border border-[color:var(--color-hairline)] p-6 space-y-4">
           <h2 class="text-[14px] font-semibold text-[color:var(--color-ink)]">Status</h2>
 
+          <label v-if="product.auto_scraped" class="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" v-model="form.auto_update" class="mt-1" />
+            <div>
+              <div class="text-[13px] font-medium text-[color:var(--color-ink)]">Auto-sync from your site</div>
+              <div class="text-[12px] text-[color:var(--color-ink-subtle)]">
+                We re-scrape your storefront daily and refresh this product's price, image, description, and stock. Uncheck to lock the edits below and stop overwrites.
+                <span v-if="product.last_scraped_at" class="block mt-0.5 text-[color:var(--color-ink-subtle)]">Last synced {{ formatDate(product.last_scraped_at) }}.</span>
+              </div>
+            </div>
+          </label>
+
           <label class="flex items-start gap-3 cursor-pointer">
             <input type="checkbox" v-model="form.hidden" class="mt-1" />
             <div>
@@ -141,7 +152,14 @@ const form = useForm({
   featured: !!props.product.featured,
   hidden: !!props.product.hidden,
   availability: props.product.availability || 'in_stock',
+  auto_update: props.product.auto_update ?? true,
 })
+
+function formatDate(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+}
 
 function submit() {
   form.put(`/vendor/products/${props.product.id}`, {
