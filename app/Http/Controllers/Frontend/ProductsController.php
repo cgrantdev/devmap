@@ -229,25 +229,63 @@ class ProductsController extends Controller
             abort(404, 'Product not found');
         }
 
-        // Get related products (same category, different product)
-        $relatedProducts = Product::with(['brand'])
-            ->visible()
-            ->where('product_category_id', $product->product_category_id)
-            ->where('id', '!=', $product->id)
-            ->where('status', 'active')
-            ->get()
-            ->map(function ($p) {
-                return [
-                    'id' => $p->id,
-                    'name' => $p->display_name,
-                    'product_type' => $p->product_type,
-                    'slug' => $p->slug,
-                    'image_url' => $p->image_url,
-                    'price' => $p->price,
-                    'discount_price' => $p->discount_price,
-                    'brand' => $p->brand ? ['name' => $p->brand->name] : null,
-                ];
-            });
+        // Related products: comparison-shopping angle first — same compound
+        // (category) from OTHER vendors so the visitor can price-compare, then
+        // fill from same brand's other products if there's still room. Cap at
+        // 12 total to keep the section scannable.
+        //
+        // Guard against the NULL-category footgun: without this, an uncategorized
+        // product would "match" every OTHER uncategorized product in the DB
+        // because Laravel translates ->where('col', null) into `col IS NULL`.
+        $relatedLimit = 12;
+        $related = collect();
+
+        if ($product->product_category_id) {
+            // Prefer other vendors' same-compound products first.
+            $otherVendorQuery = Product::with(['brand'])
+                ->visible()
+                ->where('status', 'active')
+                ->where('product_category_id', $product->product_category_id)
+                ->where('id', '!=', $product->id)
+                ->where('brand_id', '!=', $product->brand_id);
+            // If the current product has a type, prefer same-type matches.
+            if ($product->product_type) {
+                $otherVendorQuery->where('product_type', $product->product_type);
+            }
+            $related = $otherVendorQuery
+                ->orderByDesc('rating_count')
+                ->orderByDesc('featured')
+                ->take($relatedLimit)
+                ->get();
+        }
+
+        // Top-up from same brand's other products if we still have room.
+        if ($related->count() < $relatedLimit && $product->brand_id) {
+            $fill = Product::with(['brand'])
+                ->visible()
+                ->where('status', 'active')
+                ->where('brand_id', $product->brand_id)
+                ->where('id', '!=', $product->id)
+                ->whereNotIn('id', $related->pluck('id')->all())
+                ->orderByDesc('rating_count')
+                ->orderByDesc('featured')
+                ->take($relatedLimit - $related->count())
+                ->get();
+            $related = $related->concat($fill);
+        }
+
+        $relatedProducts = $related->map(function ($p) {
+            return [
+                'id' => $p->id,
+                'name' => $p->display_name,
+                'product_type' => $p->product_type,
+                'slug' => $p->slug,
+                'image_url' => $p->image_url,
+                'price' => $p->price,
+                'discount_price' => $p->discount_price,
+                'brand' => $p->brand ? ['name' => $p->brand->name, 'slug' => $p->brand->slug] : null,
+            ];
+        });
 
         // Get brand initials
         $brand = $product->brand;

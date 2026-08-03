@@ -326,7 +326,9 @@
               :price="relatedProduct.price"
               :discount-price="relatedProduct.discount_price"
               :brand-name="relatedProduct.brand?.name"              
-              :to="`/product/${relatedProduct.slug}/${relatedProduct.id}`"
+              :to="relatedProduct.brand?.slug
+                ? `/product/${relatedProduct.brand.slug}/${relatedProduct.slug}/${relatedProduct.id}`
+                : `/product/${relatedProduct.slug}/${relatedProduct.id}`"
             />
           </div>
         </div>
