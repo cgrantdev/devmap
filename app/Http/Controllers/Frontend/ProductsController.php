@@ -25,6 +25,70 @@ class ProductsController extends Controller
      * Safely truncate a string to a given length
      * Works without mbstring extension
      */
+    /**
+     * Peptidemap-branded product meta description. Every product page gets
+     * something unique (vendor + price + comparison-shopping angle) instead
+     * of the raw vendor description that would compete against the vendor's
+     * own SERP result.
+     *
+     * Format examples (150-160 chars, always <= 160):
+     *   "SELANK 10mg from Certified Pep — $50.00. Compare 12 vendors on
+     *    Peptidemap, verified COAs, save 10% with code PMAP. Research use only."
+     *   "BPC-157 (10mg) from Amino Club — $39.99 (was $49.99). Compare 25
+     *    vendors, verified COAs, PMAP coupons. Research use only."
+     */
+    private function buildProductMetaDescription($product, $brand): string
+    {
+        $vendorName = $brand?->name ?? 'verified vendors';
+        $productLabel = $product->display_name ?? $product->name;
+        $vs = $brand?->vendorSetting;
+
+        // Price segment
+        $priceSegment = '';
+        $retail = (float) ($product->price ?? 0);
+        $discount = (float) ($product->discount_price ?? 0);
+        if ($discount > 0 && $discount < $retail) {
+            $priceSegment = ' — $' . number_format($discount, 2) . ' (was $' . number_format($retail, 2) . ')';
+        } elseif ($retail > 0) {
+            $priceSegment = ' — $' . number_format($retail, 2);
+        }
+
+        // Comparison-shopping angle: how many other vendors carry this compound
+        $compareSegment = '';
+        if ($product->product_category_id) {
+            $vendorCount = \App\Models\Product::visible()
+                ->where('status', 'active')
+                ->where('product_category_id', $product->product_category_id)
+                ->distinct('brand_id')
+                ->count('brand_id');
+            if ($vendorCount >= 2) {
+                $compareSegment = " Compare {$vendorCount} vendors on Peptidemap,";
+            }
+        }
+        if (!$compareSegment) {
+            $compareSegment = ' Compare verified peptide vendors on Peptidemap,';
+        }
+
+        // Coupon segment (PMAP savings)
+        $couponSegment = '';
+        $pct = $vs?->coupon_discount_percent;
+        $code = $vs?->coupon_code;
+        if ($pct && $pct > 0 && $pct < 100 && $code) {
+            $couponSegment = " save {$pct}% with code " . strtoupper($code) . '.';
+        } else {
+            $couponSegment = ' verified COAs, PMAP coupons.';
+        }
+
+        // Compose
+        $desc = "{$productLabel} from {$vendorName}{$priceSegment}.{$compareSegment}{$couponSegment} Research use only.";
+
+        // Safety trim to 158 chars (Google truncates around 155-160)
+        if (function_exists('mb_strlen') && mb_strlen($desc) > 158) {
+            $desc = mb_substr($desc, 0, 155) . '…';
+        }
+        return $desc;
+    }
+
     private function safeLimit($value, $limit = 100, $end = '...')
     {
         if (empty($value)) {
@@ -277,14 +341,17 @@ class ProductsController extends Controller
         
         // Check if stored SEO data exists
         $hasStoredSeo = !empty($product->seo_page_title) || !empty($product->seo_description);
-        
+
+        // Auto-build a Peptidemap-flavored meta description with vendor + price +
+        // comparison-shopping angle. Beats "Research Peptide (Selank) — 10 MG Key
+        // Features…" scraped verbatim from the vendor's own page (identical to
+        // their SERP result → Google will just prefer the vendor's, not ours).
+        $autoSeoDescription = $this->buildProductMetaDescription($product, $brand);
+
         if ($hasStoredSeo) {
-            // Use stored SEO data from database
+            // Use stored SEO data from database (admin override wins)
             $seoTitle = $product->seo_page_title ?: ($product->name . ' – ' . $siteName);
-            $seoDescription = $product->seo_description 
-                ?: ($product->description 
-                    ? $this->safeLimit($product->description, 155) 
-                    : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.');
+            $seoDescription = $product->seo_description ?: $autoSeoDescription;
             $seoOgTitle = $product->seo_og_title ?: $seoTitle;
             $seoOgDescription = $product->seo_og_description ?: $seoDescription;
             $seoOgImage = $product->seo_og_image
@@ -294,12 +361,7 @@ class ProductsController extends Controller
             // Auto-generate SEO from product fields
             $vendorName = $brand ? $brand->name : 'our store';
             $seoTitle = "Buy {$product->name} from {$vendorName} - {$siteName}";
-
-            // Build description: first ~150-160 chars of product description
-            $seoDescription = $product->description
-                ? $this->safeLimit($product->description, 155)
-                : 'View detailed information about ' . $product->name . '. Compare prices, read reviews, and find the best deals.';
-
+            $seoDescription = $autoSeoDescription;
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
             // Per-product OG image (branded card with product tile). Falls back
