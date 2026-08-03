@@ -29,6 +29,12 @@ class ComingSoon
                 // as an integration endpoint.
                 return redirect()->away('https://peptidemap.com/' . ltrim($request->getRequestUri(), '/'), 301);
             }
+            if ($host === 'demo.peptidemap.com') {
+                // Demo mode retired — all demo brands/products/users deleted
+                // once vendors moved to their real dashboards. Any lingering
+                // link to demo.peptidemap.com folds into the apex site.
+                return redirect()->away('https://peptidemap.com/', 301);
+            }
             if ($host === 'dev.peptidemap.com') {
                 // Preserve dev.peptidemap.com as a live endpoint for anything
                 // vendors may have integrated against (WordPress plugin,
