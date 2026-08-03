@@ -360,7 +360,7 @@ class BotController extends Controller
             'results' => $rows->map(fn ($v) => [
                 'brand_name' => $v->brand->name,
                 'brand_slug' => $v->brand->slug,
-                'code' => $v->coupon_code,
+                'code' => strtoupper(trim($v->coupon_code)),
                 'discount_pct' => (int) $v->coupon_discount_percent,
                 'url' => self::BASE . '/brand/' . $v->brand->slug,
             ])->values(),
