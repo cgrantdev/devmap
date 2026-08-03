@@ -738,11 +738,14 @@ class ProductsController extends Controller
         $brand = Brand::with(['approvedReviews.user'])->where('slug', $slug)->where('is_active', true)->firstOrFail();
         $brandId = $brand->id;
 
-        // Build query for all products of this brand
+        // Build query for all products of this brand. Filter out $0 rows —
+        // those are broken scrapes (Peptiva has 11 like this today) and
+        // they render as ghost cards on the brand page with no price/image.
         $query = Product::with(['brand.vendorSetting', 'location', 'types', 'puses', 'category'])
             ->visible()
             ->where('brand_id', $brandId)
-            ->where('status', 'active');
+            ->where('status', 'active')
+            ->where('price', '>', 0);
 
         // Apply search
         if ($request->has('search') && $request->search) {
