@@ -210,6 +210,14 @@
                   View Product
                 </a>
   
+            <Link
+              :href="`/vendor/products/${product.id}/edit`"
+              class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-black"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Edit
+            </Link>
+
             <button
               class="inline-flex items-center px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
               @click="setHidden(product.id, !product.hidden)"
@@ -219,9 +227,9 @@
 
                 <Link
                   href="/vendor/import"
-                  class="inline-flex items-center px-3 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-black"
+                  class="inline-flex items-center px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  Edit Catalog
+                  Bulk import
                 </Link>
               </div>
             </div>

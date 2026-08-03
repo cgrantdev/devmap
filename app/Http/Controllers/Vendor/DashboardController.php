@@ -424,6 +424,62 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function editProduct(Product $product)
+    {
+        $user = Auth::user();
+        $brand = Brand::where('user_id', $user->id)->firstOrFail();
+        abort_unless($product->brand_id === $brand->id, 403);
+
+        return Inertia::render('Vendor/ProductEdit', [
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'display_name' => $product->display_name,
+                'description' => $product->description,
+                'price' => $product->price,
+                'discount_price' => $product->discount_price,
+                'image_url' => $product->image_url,
+                'product_url' => $product->product_url,
+                'size_mg' => $product->size_mg,
+                'featured' => (bool) ($product->featured ?? false),
+                'hidden' => (bool) ($product->hidden ?? false),
+                'availability' => $product->availability,
+                'category' => $product->category?->name,
+            ],
+        ]);
+    }
+
+    public function updateProduct(Request $request, Product $product)
+    {
+        $user = Auth::user();
+        $brand = Brand::where('user_id', $user->id)->firstOrFail();
+        abort_unless($product->brand_id === $brand->id, 403);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:5000',
+            'price' => 'required|numeric|min:0|max:99999.99',
+            'discount_price' => 'nullable|numeric|min:0|max:99999.99',
+            'image_url' => 'nullable|url|max:2048',
+            'product_url' => 'nullable|url|max:2048',
+            'size_mg' => 'nullable|string|max:64',
+            'featured' => 'sometimes|boolean',
+            'hidden' => 'sometimes|boolean',
+            'availability' => 'nullable|in:in_stock,out_of_stock',
+        ]);
+
+        // If discount is >= retail, ignore it (would render as 0% savings).
+        if (!empty($validated['discount_price']) && $validated['discount_price'] >= $validated['price']) {
+            $validated['discount_price'] = null;
+        }
+
+        $product->fill($validated)->save();
+
+        return redirect()
+            ->route('vendor.products')
+            ->with('success', 'Product updated.');
+    }
+
     public function setProductHidden(Request $request, Product $product)
     {
         $user = Auth::user();
