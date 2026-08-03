@@ -13,3 +13,18 @@ Schedule::command('scraping:run-scheduled')
     ->everyMinute()
     ->withoutOverlapping()
     ->runInBackground();
+
+// Wishlist / price-alert engine.
+// Daily snapshot at 03:00 UTC captures every active product's price
+// (deduped when unchanged so the table stays small).
+Schedule::command('products:snapshot-prices')
+    ->dailyAt('03:00')
+    ->withoutOverlapping()
+    ->runInBackground();
+
+// Digest email at 09:00 UTC — one email per user grouping all their
+// drops. Cooldown + dry-run flags are baked into the command itself.
+Schedule::command('alerts:send-price-drops')
+    ->dailyAt('09:00')
+    ->withoutOverlapping()
+    ->runInBackground();
