@@ -37,6 +37,10 @@ class ProductOgImageController extends Controller
                 'displayPrice' => $this->displayPrice($product),
                 'strikePrice' => $this->strikePrice($product),
                 'discountPct' => $this->discountPct($product),
+                'couponCode' => $product->brand?->vendorSetting?->coupon_code,
+                'couponPct' => $this->couponPct($product),
+                'couponPctLabel' => $this->couponPctLabel($product),
+                'vendorCount' => $this->vendorCount($product),
             ])->render()
         );
     }
@@ -62,5 +66,29 @@ class ProductOgImageController extends Controller
         $display = $this->displayPrice($product);
         if (!$strike || !$display || $strike <= $display) return null;
         return (int) round((1 - $display / $strike) * 100);
+    }
+
+    private function couponPct(Product $product): ?float
+    {
+        $pct = $product->brand?->vendorSetting?->coupon_discount_percent;
+        return ($pct && $pct > 0 && $pct < 100) ? (float) $pct : null;
+    }
+
+    private function couponPctLabel(Product $product): ?string
+    {
+        $pct = $this->couponPct($product);
+        if ($pct === null) return null;
+        // "15.00" → "15", "12.5" → "12.5"
+        return ((float) $pct == (int) $pct) ? (string) (int) $pct : rtrim(rtrim(number_format($pct, 2), '0'), '.');
+    }
+
+    private function vendorCount(Product $product): ?int
+    {
+        if (!$product->product_category_id) return null;
+        return Product::visible()
+            ->where('status', 'active')
+            ->where('product_category_id', $product->product_category_id)
+            ->distinct('brand_id')
+            ->count('brand_id');
     }
 }

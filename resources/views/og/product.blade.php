@@ -138,6 +138,48 @@
     color: #6ee7b7;
   }
 
+  /* Prominent conversion chip — coupon savings when we have them,
+     falls back to compare-shopping badge otherwise. */
+  .cta-chip {
+    display: inline-flex; align-items: center; gap: 12px;
+    margin-top: 24px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(52,211,153,0.22) 0%, rgba(56,189,248,0.14) 100%);
+    border: 1px solid rgba(134,239,172,0.45);
+    box-shadow: 0 8px 24px -12px rgba(52,211,153,0.5);
+    align-self: flex-start;
+  }
+  .cta-chip .savings {
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 18px; font-weight: 800; letter-spacing: 0.02em;
+    color: #6ee7b7;
+    text-transform: uppercase;
+  }
+  .cta-chip .divider {
+    width: 1px; height: 20px; background: rgba(134,239,172,0.35);
+  }
+  .cta-chip .code-label {
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    color: rgba(134,239,172,0.85);
+    text-transform: uppercase;
+  }
+  .cta-chip .code {
+    font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 18px; font-weight: 800; letter-spacing: 0.08em;
+    color: #fff;
+    padding: 4px 10px;
+    background: rgba(0,0,0,0.35);
+    border: 1px dashed rgba(134,239,172,0.55);
+    border-radius: 6px;
+  }
+  .cta-chip.compare {
+    background: linear-gradient(135deg, rgba(56,189,248,0.16) 0%, rgba(52,211,153,0.10) 100%);
+    border-color: rgba(56,189,248,0.42);
+  }
+  .cta-chip.compare .savings { color: #7dd3fc; }
+
   /* product tile — subtle dark card with soft glow instead of stark white */
   .tile {
     grid-area: tile;
@@ -196,15 +238,16 @@
   }
   .footer-meta .sep { color: rgba(255,255,255,0.2); }
   .footer-meta strong { color: #fff; font-weight: 700; }
+  /* CTA button-styled URL */
   .url {
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: 10px;
     font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
-    font-size: 14px; color: rgba(255,255,255,0.9); font-weight: 500;
-    padding: 8px 14px; border-radius: 10px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 15px; color: #fff; font-weight: 600;
+    padding: 12px 20px; border-radius: 12px;
+    background: linear-gradient(135deg, #5B5FE8 0%, #4338CA 100%);
+    box-shadow: 0 8px 20px -8px rgba(79,70,229,0.55), inset 0 1px 0 rgba(255,255,255,0.2);
   }
-  .url .dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px 2px rgba(16,185,129,0.55); }
+  .url .arrow { font-size: 18px; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -242,6 +285,20 @@
         @endif
       </div>
       @endif
+
+      {{-- Prominent CTA — coupon savings if we have them, else compare-shopping badge --}}
+      @if($couponCode && $couponPct)
+      <div class="cta-chip">
+        <span class="savings">Save {{ $couponPctLabel }}%</span>
+        <span class="divider"></span>
+        <span class="code-label">Code</span>
+        <span class="code">{{ strtoupper($couponCode) }}</span>
+      </div>
+      @elseif($vendorCount && $vendorCount >= 2)
+      <div class="cta-chip compare">
+        <span class="savings">Compare {{ $vendorCount }} Vendors</span>
+      </div>
+      @endif
     </div>
 
     <div class="tile">
@@ -260,7 +317,7 @@
         <span class="sep">·</span>
         <span>Lab verified</span>
       </div>
-      <div class="url"><span class="dot"></span>peptidemap.com</div>
+      <div class="url">View on Peptidemap <span class="arrow">→</span></div>
     </div>
   </div>
 </body>
