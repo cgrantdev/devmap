@@ -64,7 +64,9 @@ class SitemapController extends Controller
                 }
             });
 
-        // Product detail pages — canonical route is /product/{id}/{slug}.
+        // Product detail pages. Route is /product/{slug}/{id}
+        // (product.detail — the working one that Vue-renders). The
+        // /product/{id}/{slug} route (product.public) exists but 404s.
         Product::where('hidden', false)
             ->where('status', 'active')
             ->whereNotNull('slug')
@@ -72,7 +74,7 @@ class SitemapController extends Controller
             ->chunkById(1000, function ($chunk) use (&$urls) {
                 foreach ($chunk as $p) {
                     $urls[] = [
-                        'loc'        => self::BASE_URL . '/product/' . $p->id . '/' . $p->slug,
+                        'loc'        => self::BASE_URL . '/product/' . $p->slug . '/' . $p->id,
                         'lastmod'    => $p->updated_at?->toDateString(),
                         'changefreq' => 'weekly',
                         'priority'   => '0.6',
