@@ -41,6 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/subscribe',
             'api/banner-events/impressions',
             'api/banner-events/click',
+            'api/bot/*',
         ]);
 
         $middleware->api([
@@ -63,6 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'email.verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
             'role' => \App\Http\Middleware\CheckRole::class,
             'block.viewer.writes' => \App\Http\Middleware\BlockAdminViewerWrites::class,
+            'bot.api' => \App\Http\Middleware\BotApiAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -32,6 +32,18 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'bot_api' => [
+        // Bearer token consumed by BotApiAuth middleware — set in .env only.
+        'token' => env('BOT_API_TOKEN'),
+    ],
+
+    'discord' => [
+        'bot_token' => env('DISCORD_BOT_TOKEN'),
+        'application_id' => env('DISCORD_APPLICATION_ID'),
+        'public_key' => env('DISCORD_PUBLIC_KEY'),
+        'guild_id' => env('DISCORD_GUILD_ID'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

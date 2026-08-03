@@ -439,6 +439,18 @@ Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::cla
 Route::post('/api/banner-events/impressions', [\App\Http\Controllers\Api\BannerEventController::class, 'impressions']);
 Route::post('/api/banner-events/click', [\App\Http\Controllers\Api\BannerEventController::class, 'click']);
 
+// Discord bot JSON API — bearer-token protected via BotApiAuth middleware.
+// Consumed only by the Node bot running on the same droplet.
+Route::middleware('bot.api')->prefix('api/bot')->group(function () {
+    Route::get('/health', [\App\Http\Controllers\Api\BotController::class, 'health']);
+    Route::get('/products/search', [\App\Http\Controllers\Api\BotController::class, 'search']);
+    Route::get('/vendors', [\App\Http\Controllers\Api\BotController::class, 'vendors']);
+    Route::get('/compare', [\App\Http\Controllers\Api\BotController::class, 'compare']);
+    Route::get('/price-drops', [\App\Http\Controllers\Api\BotController::class, 'priceDrops']);
+    Route::get('/new-products', [\App\Http\Controllers\Api\BotController::class, 'newProducts']);
+    Route::get('/reviews', [\App\Http\Controllers\Api\BotController::class, 'reviews']);
+});
+
 // Catch-all route for any other page slugs (must be last to avoid conflicts with other routes)
 // This allows creating new pages dynamically without adding routes
 Route::get('/{slug}', [FrontendPagesController::class, 'show'])->name('page.show')->where('slug', '[a-z0-9-]+');
