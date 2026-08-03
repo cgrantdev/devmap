@@ -6,10 +6,32 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @php
         $noindexHosts = ['demo.peptidemap.com', 'join.peptidemap.com'];
-        $shouldNoindex = in_array(strtolower(request()->getHost()), $noindexHosts, true);
+        $host = strtolower(request()->getHost());
+        $path = request()->path();
+        $shouldNoindex = in_array($host, $noindexHosts, true);
+        // GA4 fires only on the live public site — never on staff pages (admin/
+        // vendor dashboards would pollute the traffic numbers), never on the
+        // noindexed subdomains, and never before SITE_LIVE is flipped on.
+        $shouldTrackGa = config('app.site_live')
+            && !$shouldNoindex
+            && !str_starts_with($path, 'admin')
+            && !str_starts_with($path, 'vendor')
+            && !str_starts_with($path, 'login')
+            && !str_starts_with($path, 'logout');
     @endphp
     @if($shouldNoindex)
     <meta name="robots" content="noindex, nofollow" />
+    @endif
+
+    @if($shouldTrackGa)
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1KQQ2ZE0S0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1KQQ2ZE0S0');
+    </script>
     @endif
 
     <!-- Search engine verification -->
