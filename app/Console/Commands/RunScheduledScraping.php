@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\RunBigCommerceIngestJob;
 use App\Jobs\RunJsonFeedIngestJob;
+use App\Jobs\RunJsonLdIngestJob;
 use App\Jobs\RunMedusaIngestJob;
 use App\Jobs\RunPythonScraperJob;
 use App\Jobs\RunWooCommerceIngestJob;
@@ -63,6 +64,7 @@ class RunScheduledScraping extends Command
                 ScrapingConfig::TYPE_WOO_API     => RunWooCommerceIngestJob::dispatch($config),
                 ScrapingConfig::TYPE_JSON_FEED   => RunJsonFeedIngestJob::dispatch($config),
                 ScrapingConfig::TYPE_MEDUSA_STORE => RunMedusaIngestJob::dispatch($config),
+                ScrapingConfig::TYPE_JSON_LD     => RunJsonLdIngestJob::dispatch($config),
                 ScrapingConfig::TYPE_BIGCOMMERCE  => RunBigCommerceIngestJob::dispatch($config),
                 default                          => RunPythonScraperJob::dispatch($config),
             };

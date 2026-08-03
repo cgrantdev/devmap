@@ -23,6 +23,7 @@ class ScrapedProduct extends Model
     public const SOURCE_JSON_FEED = 'json_feed';
     public const SOURCE_MEDUSA_STORE = 'medusa_store';
     public const SOURCE_BIGCOMMERCE = 'bigcommerce';
+    public const SOURCE_JSON_LD = 'json_ld';
 
     protected $fillable = [
         'scraping_config_id',

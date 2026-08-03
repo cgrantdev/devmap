@@ -20,6 +20,11 @@ class ScrapingConfig extends Model
     public const TYPE_JSON_FEED = 'json_feed';
     public const TYPE_MEDUSA_STORE = 'medusa_store';
     public const TYPE_BIGCOMMERCE = 'bigcommerce';
+    // Generic JSON-LD scraper — reads Product schema.org markup off any
+    // storefront that emits it (Peptiva/Medusa+Next, most Shopify themes,
+    // most WooCommerce themes). No API key required, no CSS selectors to
+    // maintain — the schema is standard. See RunJsonLdIngestJob for shape.
+    public const TYPE_JSON_LD = 'json_ld';
 
     protected $fillable = [
         'vendor_id',
