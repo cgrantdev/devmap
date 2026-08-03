@@ -38,17 +38,33 @@
                 {{ product.category.name }}
               </div>
   
-              <!-- Product Title + Type chip -->
-              <div class="flex items-start gap-2 mb-2 flex-wrap">
-                <h1 class="ui-display text-[28px] md:text-3xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)]">{{ product.name }}</h1>
-                <span
-                  v-if="productTypeChip"
-                  :class="['inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold mt-2', productTypeChip.classes]"
-                >{{ productTypeChip.label }}</span>
+              <!-- Product Title + Type chip + Wishlist -->
+              <div class="flex items-start gap-3 mb-3">
+                <div class="flex items-start gap-2 flex-wrap flex-1 min-w-0">
+                  <h1 class="ui-display text-[28px] md:text-3xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)]">{{ product.name }}</h1>
+                  <span
+                    v-if="productTypeChip"
+                    :class="['inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold mt-2', productTypeChip.classes]"
+                  >{{ productTypeChip.label }}</span>
+                </div>
+                <div class="flex-shrink-0 mt-1">
+                  <WishlistHeart type="product" :id="product.id" size="lg" />
+                </div>
               </div>
 
-              <!-- Trust badges — surfaced from buried features, visible immediately -->
-              <div class="flex flex-wrap gap-2 mb-3">
+              <!-- Trust badges + stock — one chip row instead of stock floating on its own -->
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span
+                  :class="[
+                    'inline-flex items-center gap-1 px-2 py-1 rounded-[6px] text-[11px] font-semibold',
+                    product.availability === 'in_stock'
+                      ? 'bg-emerald-50 text-emerald-700'
+                      : 'bg-red-50 text-red-700'
+                  ]"
+                >
+                  <span :class="['w-1.5 h-1.5 rounded-full', product.availability === 'in_stock' ? 'bg-emerald-500' : 'bg-red-500']"></span>
+                  {{ product.availability === 'in_stock' ? 'In stock' : 'Out of stock' }}
+                </span>
                 <span v-if="product.lab_tested" class="inline-flex items-center gap-1 px-2 py-1 rounded-[6px] bg-[color:var(--color-verified-bg)] text-[color:var(--color-verified)] text-[11px] font-semibold">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                   Lab tested
@@ -61,11 +77,11 @@
                   {{ product.purity }}% purity
                 </span>
               </div>
-  
+
               <!-- Brand/Seller -->
-              <Link                
+              <Link
                 :href="`/brand/${brand.slug}`"
-                class="text-blue-600 hover:text-blue-700 mb-4 flex items-center gap-2"
+                class="text-blue-600 hover:text-blue-700 mb-5 pb-4 border-b border-gray-200 flex items-center gap-2"
               >
                 by {{ brand.name }}
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-4 h-4" aria-hidden="true">
@@ -74,32 +90,27 @@
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 </svg>
               </Link>
-  
-              <!-- Stock Status -->
-              <div class="flex items-center justify-end pb-4 mb-4 border-b border-gray-200">
-                <span
-                  :class="product.availability === 'in_stock' ? 'text-green-600' : 'text-red-600'"
-                  class="text-sm"
-                >
-                  {{ product.availability === 'in_stock' ? 'In Stock' : 'Out of Stock' }}
-                </span>
-              </div>
-  
+
               <!-- Price — monospace, prominent -->
-              <div class="mb-6 relative">
-                <!-- Wishlist heart, top-right of the price block -->
-                <div class="absolute top-0 right-0">
-                  <WishlistHeart type="product" :id="product.id" size="lg" />
-                </div>
+              <div class="mb-6">
                 <template v-if="discountedPrice">
                   <div class="flex items-baseline gap-3">
                     <span class="text-[12px] uppercase tracking-wide text-[color:var(--color-ink)] font-semibold">Retail</span>
                     <span class="ui-mono text-xl text-[color:var(--color-ink)] line-through font-medium">${{ retailPrice }}</span>
                   </div>
-                  <div class="text-[12px] uppercase tracking-wide text-emerald-700 font-semibold mt-3">
-                    Price with code <span class="ui-mono">{{ effectiveCouponCode }}</span>
+                  <div class="text-[12px] uppercase tracking-wide text-emerald-700 font-semibold mt-3 flex items-center gap-2">
+                    <span>Price with code</span>
+                    <button
+                      @click="copyDiscountCode"
+                      class="ui-focus inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[6px] border border-dashed border-emerald-400 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                      :title="couponCopied ? 'Copied' : 'Click to copy'"
+                    >
+                      <span class="ui-mono text-emerald-800">{{ effectiveCouponCode }}</span>
+                      <svg v-if="couponCopied" class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <svg v-else class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    </button>
                   </div>
-                  <div class="ui-mono text-4xl font-bold text-emerald-700 leading-tight">${{ discountedPrice }}</div>
+                  <div class="ui-mono text-4xl font-bold text-emerald-700 leading-tight mt-1">${{ discountedPrice }}</div>
                 </template>
                 <template v-else>
                   <div class="flex items-baseline gap-3">
@@ -134,24 +145,15 @@
                 </a>
               </div>
 
-              <!-- Compare link + discount code — secondary, below CTA -->
-              <div class="flex items-center justify-between gap-4 mb-6">
+              <!-- Compare link — secondary utility below CTA. Coupon lives in the price block above; no need to duplicate. -->
+              <div v-if="product.category" class="mb-6">
                 <a
-                  v-if="product.category"
                   :href="`/compare#${product.category.slug || ''}`"
-                  class="text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors flex items-center gap-1"
+                  class="text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors inline-flex items-center gap-1"
                 >
-                  Compare prices for {{ product.category.name }}
+                  Compare {{ product.category.name }} across all vendors
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
-                <button
-                  @click="copyDiscountCode"
-                  class="ui-focus group flex items-center gap-2.5 px-3 py-1.5 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all"
-                >
-                  <span class="text-[10px] uppercase tracking-[0.08em] font-semibold text-emerald-600">Coupon</span>
-                  <span class="ui-mono text-[14px] font-bold text-emerald-800 tracking-wide">{{ brand?.discount_code || 'PMAP' }}</span>
-                  <svg class="w-3 h-3 text-emerald-500 group-hover:text-emerald-700 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                </button>
               </div>
   
               <!-- Discord discussion chip — small ask, not competing with the primary CTA -->
@@ -582,46 +584,29 @@ const brandInitials = computed(() => {
   }
 })
 
+const couponCopied = ref(false)
 const copyDiscountCode = async () => {
-  const code = props.brand?.discount_code || 'PMAP'
-  
-  // Try modern Clipboard API first (requires secure context)
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    try {
-      await navigator.clipboard.writeText(code)
-    alert('Discount code copied to clipboard!')
-      return
-    } catch (err) {
-      console.warn('Clipboard API failed, trying fallback:', err)
-    }
+  const code = effectiveCouponCode.value || props.brand?.discount_code || 'PMAP'
+  let ok = false
+  if (navigator.clipboard?.writeText) {
+    try { await navigator.clipboard.writeText(code); ok = true } catch {}
   }
-  
-  // Fallback method for non-secure contexts or older browsers
-  try {
-    // Create a temporary textarea element
-    const textarea = document.createElement('textarea')
-    textarea.value = code
-    textarea.style.position = 'fixed'
-    textarea.style.left = '-999999px'
-    textarea.style.top = '-999999px'
-    document.body.appendChild(textarea)
-    textarea.focus()
-    textarea.select()
-    
-    // Try to copy using execCommand (deprecated but widely supported)
-    const successful = document.execCommand('copy')
-    document.body.removeChild(textarea)
-    
-    if (successful) {
-      alert('Discount code copied to clipboard!')
-    } else {
-      // Last resort: show the code and ask user to copy manually
-      prompt('Please copy this discount code:', code)
-    }
-  } catch (err) {
-    console.error('Fallback copy method failed:', err)
-    // Last resort: show the code and ask user to copy manually
-    prompt('Please copy this discount code:', code)
+  if (!ok) {
+    // execCommand fallback for non-HTTPS contexts + older browsers
+    try {
+      const ta = document.createElement('textarea')
+      ta.value = code
+      ta.style.cssText = 'position:fixed;left:-999px;top:-999px'
+      document.body.appendChild(ta); ta.select()
+      ok = document.execCommand('copy')
+      document.body.removeChild(ta)
+    } catch {}
+  }
+  if (ok) {
+    couponCopied.value = true
+    setTimeout(() => { couponCopied.value = false }, 2000)
+  } else {
+    prompt('Copy this discount code:', code)
   }
 }
 
