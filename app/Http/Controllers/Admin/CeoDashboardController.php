@@ -39,7 +39,20 @@ class CeoDashboardController extends Controller
             'openRecs' => $this->recs('open'),
             'inProgressRecs' => $this->recs('in_progress'),
             'shippedRecs' => $this->recs('shipped', 20),
-            'agentRequests' => $this->recs('open', 50, category: 'new-agent'),
+            // Show active new-agent items (open + in_progress) so ones you
+            // clicked "Start building" on don't vanish into limbo.
+            'agentRequests' => SeoRecommendation::where('category', 'new-agent')
+                ->whereIn('status', ['open', 'in_progress'])
+                ->orderByDesc('pinned')
+                ->orderByRaw("FIELD(status, 'in_progress', 'open')")
+                ->orderByRaw("FIELD(impact, 'high', 'medium', 'low')")
+                ->get()
+                ->map(fn ($r) => [
+                    'id' => $r->id, 'title' => $r->title, 'category' => $r->category,
+                    'impact' => $r->impact, 'effort' => $r->effort, 'status' => $r->status,
+                    'rationale' => $r->rationale, 'expected_impact' => $r->expected_impact,
+                    'commit_hashes' => $r->commit_hashes ?? [],
+                ]),
             'agentRuns' => CeoAgentRun::whereIn('agent_name', ['seo-strategist', 'seo-implementer', 'claude', 'Plan', 'Explore'])
                 ->orderByDesc('created_at')
                 ->limit(30)
@@ -69,7 +82,11 @@ class CeoDashboardController extends Controller
         return SeoRecommendation::query()
             ->where('status', $status)
             ->when($category, fn ($q) => $q->where('category', $category))
-            ->when(!$category, fn ($q) => $q->where('category', '!=', 'new-agent'))
+            // Exclude new-agent from open/in_progress here (they render in their
+            // own violet section). But INCLUDE them in shipped so a completed
+            // agent build shows up in the Recently Shipped column.
+            ->when(!$category && in_array($status, ['open', 'in_progress']),
+                fn ($q) => $q->where('category', '!=', 'new-agent'))
             ->orderByDesc('pinned')
             ->orderByRaw("FIELD(impact, 'high', 'medium', 'low')")
             ->orderBy('position')

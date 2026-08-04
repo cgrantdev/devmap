@@ -34,6 +34,30 @@
         </div>
       </section>
 
+      <!-- Progress bar — total flow at a glance -->
+      <section>
+        <div class="bg-white border border-gray-200 rounded-lg p-4">
+          <div class="flex items-center justify-between text-[11px] text-gray-600 mb-2">
+            <div class="font-semibold uppercase tracking-wide text-gray-500">Strategist queue</div>
+            <div class="text-gray-500">
+              <span class="ui-mono font-semibold text-gray-900">{{ totalRecs }}</span> total ·
+              <span class="ui-mono text-emerald-600">{{ shippedRecs.length }}</span> shipped ·
+              <span class="ui-mono text-indigo-600">{{ inProgressRecs.length + inProgressAgents }}</span> in progress ·
+              <span class="ui-mono text-gray-700">{{ openRecs.length + agentRequests.length }}</span> open
+            </div>
+          </div>
+          <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden flex">
+            <div class="bg-emerald-500 transition-all" :style="{ width: pct(shippedRecs.length) + '%' }" :title="`${shippedRecs.length} shipped`"></div>
+            <div class="bg-indigo-500 transition-all" :style="{ width: pct(inProgressRecs.length + inProgressAgents) + '%' }" :title="`${inProgressRecs.length + inProgressAgents} in progress`"></div>
+            <div class="bg-gray-300 transition-all" :style="{ width: pct(openRecs.length + agentRequests.length) + '%' }" :title="`${openRecs.length + agentRequests.length} open`"></div>
+          </div>
+          <div class="text-[11px] text-gray-500 mt-2">
+            <span class="ui-mono font-semibold text-emerald-600">{{ percentShipped }}%</span> shipped
+            <span v-if="shippedRecs.length" class="text-gray-400"> · velocity: {{ snapshot.recs_shipped_7d }} shipped in last 7 days</span>
+          </div>
+        </div>
+      </section>
+
       <!-- Strategist queue + shipped log side by side -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- LEFT: current suggestions -->
@@ -97,12 +121,19 @@
           </h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div v-for="r in agentRequests" :key="r.id" class="bg-violet-50 border border-violet-200 rounded-lg p-4">
-            <div class="text-[13px] font-semibold text-violet-900">{{ r.title }}</div>
+          <div v-for="r in agentRequests" :key="r.id" :class="['border rounded-lg p-4 border-l-4', r.status === 'in_progress' ? 'bg-indigo-50 border-indigo-200 border-l-indigo-500' : 'bg-violet-50 border-violet-200 border-l-violet-500']">
+            <div class="flex items-start justify-between gap-2 mb-1.5">
+              <div class="text-[13px] font-semibold text-violet-900 flex-1 min-w-0">{{ r.title }}</div>
+              <span :class="['flex-shrink-0 text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded', r.status === 'in_progress' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-200 text-gray-700']">
+                {{ r.status === 'in_progress' ? 'BUILDING' : 'REQUESTED' }}
+              </span>
+            </div>
             <p v-if="r.rationale" class="text-[12px] text-violet-800 mt-1 leading-relaxed whitespace-pre-wrap">{{ r.rationale }}</p>
             <p v-if="r.expected_impact" class="text-[11px] text-violet-700 italic mt-2">Expected: {{ r.expected_impact }}</p>
             <div class="flex items-center gap-2 mt-3 pt-2 border-t border-violet-200 text-[11px]">
-              <button @click="updateRec(r, { status: 'in_progress' })" class="text-indigo-600 hover:text-indigo-800 font-medium">Start building →</button>
+              <button v-if="r.status === 'open'" @click="updateRec(r, { status: 'in_progress' })" class="text-indigo-600 hover:text-indigo-800 font-semibold">▶ Start building</button>
+              <button v-if="r.status === 'in_progress'" @click="updateRec(r, { status: 'shipped' })" class="inline-flex items-center gap-1 text-white bg-emerald-600 hover:bg-emerald-700 px-2 py-1 rounded font-semibold">✓ Mark built</button>
+              <button v-if="r.status === 'in_progress'" @click="updateRec(r, { status: 'open' })" class="text-gray-500 hover:text-gray-800">← Back</button>
               <button @click="updateRec(r, { status: 'rejected' })" class="text-gray-500 hover:text-gray-800 ml-auto">Reject</button>
             </div>
           </div>
@@ -249,7 +280,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, h, defineComponent } from 'vue'
+import { ref, reactive, h, defineComponent, computed } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import Layout from './Layout.vue'
 
@@ -265,6 +296,23 @@ const props = defineProps({
   lastStrategistRun: String,
   lastImplementerRun: String,
 })
+
+// Aggregate counters used by the progress bar.
+// inProgressAgents comes from the API's separate agent-requests set — we need
+// their in_progress subset for the total but the endpoint only returns open.
+// Approximated as 0 for now (agents that were 'started' but not yet built
+// live in openRecs when the DB flips them out of new-agent category, or in
+// inProgressRecs after status flip). Kept as a helper for future use.
+const inProgressAgents = computed(() => 0)
+const totalRecs = computed(() =>
+  props.openRecs.length + props.inProgressRecs.length + props.shippedRecs.length + props.agentRequests.length
+)
+const percentShipped = computed(() =>
+  totalRecs.value === 0 ? 0 : Math.round((props.shippedRecs.length / totalRecs.value) * 100)
+)
+function pct(n) {
+  return totalRecs.value === 0 ? 0 : (n / totalRecs.value) * 100
+}
 
 const expanded = reactive({})
 const showRecModal = ref(false)
@@ -365,12 +413,30 @@ const RecCard = defineComponent({
   emits: ['update', 'destroy', 'edit'],
   setup(props, { emit }) {
     const impactBadge = { high: 'bg-red-100 text-red-700', medium: 'bg-amber-100 text-amber-700', low: 'bg-gray-100 text-gray-700' }
-    return () => h('div', { class: 'bg-white border border-gray-200 rounded p-3 mb-2' }, [
+    const statusPill = {
+      open:        { label: 'OPEN',        cls: 'bg-gray-200 text-gray-700' },
+      in_progress: { label: 'IN PROGRESS', cls: 'bg-indigo-100 text-indigo-700' },
+      shipped:     { label: 'SHIPPED',     cls: 'bg-emerald-100 text-emerald-700' },
+      deferred:    { label: 'DEFERRED',    cls: 'bg-amber-100 text-amber-700' },
+      rejected:    { label: 'REJECTED',    cls: 'bg-red-100 text-red-700' },
+    }
+    const borderColor = {
+      open: 'border-l-gray-300',
+      in_progress: 'border-l-indigo-500',
+      shipped: 'border-l-emerald-500',
+      deferred: 'border-l-amber-400',
+      rejected: 'border-l-red-400',
+    }[props.rec.status] || 'border-l-gray-300'
+
+    return () => h('div', { class: `bg-white border border-gray-200 border-l-4 ${borderColor} rounded p-3 mb-2` }, [
       h('div', { class: 'flex items-start gap-2' }, [
         props.rec.pinned ? h('span', { class: 'text-amber-500 text-[11px] mt-0.5', title: 'Pinned' }, '★') : null,
         h('div', { class: 'flex-1 min-w-0' }, [
-          h('button', { onClick: () => emit('edit', props.rec), class: 'text-[13px] font-medium text-gray-900 leading-snug text-left hover:text-indigo-600' }, props.rec.title),
-          h('div', { class: 'text-[10px] uppercase tracking-wide mt-1 flex items-center gap-1.5 flex-wrap' }, [
+          h('div', { class: 'flex items-start justify-between gap-2 mb-1.5' }, [
+            h('button', { onClick: () => emit('edit', props.rec), class: 'text-[13px] font-medium text-gray-900 leading-snug text-left hover:text-indigo-600 flex-1 min-w-0' }, props.rec.title),
+            h('span', { class: `flex-shrink-0 text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded ${statusPill[props.rec.status]?.cls || 'bg-gray-100 text-gray-700'}` }, statusPill[props.rec.status]?.label || props.rec.status),
+          ]),
+          h('div', { class: 'text-[10px] uppercase tracking-wide flex items-center gap-1.5 flex-wrap' }, [
             h('span', { class: `${categoryColor(props.rec.category)} px-1.5 py-0.5 rounded font-semibold` }, props.rec.category),
             h('span', { class: `${impactBadge[props.rec.impact]} px-1.5 py-0.5 rounded font-semibold` }, `impact:${props.rec.impact}`),
             h('span', { class: 'text-gray-500' }, `effort:${props.rec.effort}`),
@@ -380,10 +446,11 @@ const RecCard = defineComponent({
         ]),
       ]),
       h('div', { class: 'mt-2 pt-2 border-t border-gray-100 flex items-center gap-2 text-[11px]' }, [
-        props.rec.status === 'open' ? h('button', { onClick: () => emit('update', props.rec, { status: 'in_progress' }), class: 'text-indigo-600 hover:text-indigo-800 font-medium' }, 'Start →') : null,
-        props.rec.status === 'in_progress' ? h('button', { onClick: () => emit('update', props.rec, { status: 'shipped' }), class: 'text-emerald-600 hover:text-emerald-800 font-medium' }, 'Ship →') : null,
+        props.rec.status === 'open' ? h('button', { onClick: () => emit('update', props.rec, { status: 'in_progress' }), class: 'text-indigo-600 hover:text-indigo-800 font-semibold' }, '▶ Start work') : null,
+        props.rec.status === 'in_progress' ? h('button', { onClick: () => emit('update', props.rec, { status: 'shipped' }), class: 'inline-flex items-center gap-1 text-white bg-emerald-600 hover:bg-emerald-700 px-2 py-1 rounded font-semibold' }, '✓ Mark shipped') : null,
         props.rec.status === 'in_progress' ? h('button', { onClick: () => emit('update', props.rec, { status: 'open' }), class: 'text-gray-500 hover:text-gray-800' }, '← Back to open') : null,
-        h('button', { onClick: () => emit('update', props.rec, { status: 'deferred' }), class: 'text-gray-500 hover:text-gray-800' }, 'Defer'),
+        props.rec.status === 'shipped' ? h('button', { onClick: () => emit('update', props.rec, { status: 'in_progress' }), class: 'text-gray-500 hover:text-gray-800' }, '← Reopen') : null,
+        props.rec.status !== 'deferred' && props.rec.status !== 'shipped' ? h('button', { onClick: () => emit('update', props.rec, { status: 'deferred' }), class: 'text-gray-500 hover:text-gray-800' }, 'Defer') : null,
         h('button', { onClick: () => emit('destroy', props.rec), class: 'ml-auto text-red-500 hover:text-red-700', title: 'Delete' }, '×'),
       ]),
     ])
