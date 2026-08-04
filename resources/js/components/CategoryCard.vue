@@ -1,16 +1,13 @@
 <template>
-  <div
-    class="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-lg transition-all text-left group cursor-pointer"
-    @click="handleClick"
+  <a
+    :href="to"
+    class="ui-focus group flex flex-col bg-white border border-[color:var(--color-hairline)] rounded-[14px] p-4 hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-200 cursor-pointer"
   >
-    <!-- When a real vendor image is present, use plain white + minimal padding
-         so the vial dominates the card. When it falls back to the SVG
-         placeholder, keep the tinted gradient so the placeholder still reads
-         as intentional artwork rather than a broken image. -->
+    <!-- Vial image — dominates the card when a real image is present -->
     <div
       :class="[
-        'aspect-square flex items-center justify-center mb-6 rounded-md',
-        image && !hasError ? 'bg-white p-2' : 'bg-gradient-to-br from-blue-50 to-indigo-50 p-6',
+        'aspect-square flex items-center justify-center mb-4 rounded-[10px] overflow-hidden',
+        image && !hasError ? 'bg-white' : 'bg-gradient-to-br from-slate-50 to-slate-100',
       ]"
     >
       <img
@@ -21,12 +18,8 @@
         loading="lazy"
         @error="onError"
       />
-      <!-- Themed SVG fallback so every category card always renders something
-           when the image url is empty or 404s (most often: external vendor
-           CDN blocks hotlinking). Uses the category name as the label so the
-           card still communicates which compound it represents. -->
       <div v-else class="w-full h-full flex flex-col items-center justify-center text-slate-400 select-none">
-        <svg viewBox="0 0 80 100" class="w-20 h-24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg viewBox="0 0 80 100" class="w-16 h-20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <rect x="26" y="6" width="28" height="6" rx="1" fill="#475569"/>
           <rect x="22" y="12" width="36" height="76" rx="3" fill="white" stroke="#94A3B8" stroke-width="1.5"/>
           <rect x="22" y="50" width="36" height="38" rx="2" fill="#93C5FD" opacity="0.65"/>
@@ -34,58 +27,63 @@
           <line x1="60" y1="34" x2="64" y2="34" stroke="#64748B" stroke-width="1"/>
           <line x1="60" y1="46" x2="64" y2="46" stroke="#64748B" stroke-width="1"/>
           <line x1="60" y1="58" x2="64" y2="58" stroke="#64748B" stroke-width="1"/>
-          <line x1="60" y1="70" x2="64" y2="70" stroke="#64748B" stroke-width="1"/>
-          <rect x="28" y="60" width="24" height="14" rx="1" fill="white" opacity="0.85"/>
-          <line x1="30" y1="64" x2="50" y2="64" stroke="#94A3B8" stroke-width="0.6"/>
-          <line x1="30" y1="68" x2="50" y2="68" stroke="#94A3B8" stroke-width="0.6"/>
-          <line x1="30" y1="71" x2="46" y2="71" stroke="#94A3B8" stroke-width="0.6"/>
         </svg>
         <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mt-2 line-clamp-1 max-w-full px-2 text-center">{{ name }}</span>
       </div>
     </div>
-    <div class="h-14 flex items-end mb-1">      
-      <h3
-        class="pt-6 border-t border-slate-200 text-xl text-gray-900 group-hover:text-blue-600 transition-colors leading-tight"
-        :title="name"
-      >
+
+    <!-- Content -->
+    <div class="flex-1 flex flex-col">
+      <h3 class="ui-display text-[17px] font-semibold text-[color:var(--color-ink)] leading-tight group-hover:text-[color:var(--color-accent-700)] transition-colors line-clamp-2">
         {{ name }}
       </h3>
+
+      <!-- Vendor count chip — a real, concrete signal instead of the old
+           italic category tagline. Only renders when we have a number. -->
+      <div v-if="hasCount" class="mt-2 flex items-center gap-1.5 text-[11px] text-[color:var(--color-ink-muted)]">
+        <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        </svg>
+        <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ totalItems }}</strong> {{ Number(totalItems) === 1 ? 'product' : 'products' }}</span>
+      </div>
+
+      <!-- Bottom action — right-arrow hint that grows on hover instead of a
+           tiny underlined text link. Reads as "click me" without shouting. -->
+      <div class="mt-4 pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between">
+        <span class="text-[12px] font-semibold text-[color:var(--color-accent-600)] group-hover:text-[color:var(--color-accent-700)] transition-colors">
+          Compare vendors
+        </span>
+        <svg
+          class="w-4 h-4 text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-transform"
+          fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+          stroke-linecap="round" stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 12h14M13 5l7 7-7 7"/>
+        </svg>
+      </div>
     </div>
-    <!-- Research Area -->
-    <div v-if="researchArea" class="text-slate-600 text-xs italic justify-between mb-6">      
-      {{ researchArea }}
-    </div>
-    
-    <!-- Learn More Link (Fixed position at bottom) -->
-    <div class="pt-3 border-t border-slate-200 flex items-center justify-between">
-      <span class="text-gray-900 text-xs italic underline">View All</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right w-4 h-4 text-slate-500 group-hover:text-slate-700 transition-colors" aria-hidden="true">
-        <path d="m9 18 6-6-6-6"></path>
-      </svg>
-    </div>
-  </div>
+  </a>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { router } from '@inertiajs/vue3'
-// import MainButton from '@/components/MainButton.vue'
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   name: { type: String, required: true },
   image: { type: String, default: null },
   totalItems: { type: [String, Number], default: 0 },
   to: { type: String, required: true },
+  // Kept for backwards-compat with existing usages, but no longer rendered —
+  // "Healing & Recovery" style categories were reading as medical framing.
   researchArea: { type: String, default: null },
 })
 
 const hasError = ref(false)
+const hasCount = computed(() => {
+  const n = Number(props.totalItems)
+  return !Number.isNaN(n) && n > 0
+})
 
-const handleClick = () => {
-  router.visit(props.to)
-}
-
-const onError = () => {
-  hasError.value = true
-}
+const onError = () => { hasError.value = true }
 </script>
