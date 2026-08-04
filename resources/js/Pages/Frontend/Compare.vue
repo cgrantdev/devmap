@@ -127,7 +127,7 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="(product, pidx) in getFilteredProducts(compound, idx)"
+                  v-for="(product, pidx) in getVisibleProducts(compound, idx)"
                   :key="product.id"
                   :class="[
                     'border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] transition-colors',
@@ -234,6 +234,21 @@
                 </tr>
               </tbody>
             </table>
+            <!-- Show more / less toggle. Hidden when the filtered set fits under the cap. -->
+            <button
+              v-if="getFilteredProducts(compound, idx).length > 5"
+              @click="toggleCompound(idx)"
+              class="ui-focus w-full h-11 flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:bg-[color:var(--color-hairline-soft)] border-t border-[color:var(--color-hairline)] transition-colors"
+            >
+              <template v-if="isExpanded(idx)">
+                Show fewer
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+              </template>
+              <template v-else>
+                Show all {{ getFilteredProducts(compound, idx).length }} vendors
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+              </template>
+            </button>
           </div>
 
           <!-- Empty state -->
@@ -297,6 +312,19 @@ function getFilteredProducts(compound, idx) {
   const size = getSelectedSize(idx)
   if (!size) return compound.products
   return compound.products.filter(p => String(p.size_mg).toLowerCase() === String(size).toLowerCase())
+}
+
+// Collapse each compound to top 5 rows by default — the page was scrolling
+// forever with 40-100 products per compound. Users can expand any compound
+// they want to dig into. State keyed by compound idx (matches the v-for
+// key we already pass around).
+const COLLAPSED_LIMIT = 5
+const expandedCompounds = ref({})
+function isExpanded(idx) { return !!expandedCompounds.value[idx] }
+function toggleCompound(idx) { expandedCompounds.value[idx] = !expandedCompounds.value[idx] }
+function getVisibleProducts(compound, idx) {
+  const filtered = getFilteredProducts(compound, idx)
+  return isExpanded(idx) ? filtered : filtered.slice(0, COLLAPSED_LIMIT)
 }
 
 function percentCheaper(products) {
