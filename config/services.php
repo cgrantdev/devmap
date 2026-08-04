@@ -37,6 +37,26 @@ return [
         'token' => env('BOT_API_TOKEN'),
     ],
 
+    'anthropic' => [
+        // Used by RunImplementerJob to talk to the Anthropic Messages API.
+        'api_key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('ANTHROPIC_IMPLEMENTER_MODEL', 'claude-opus-5'),
+        // Hard per-run spend cap — abort loop if we cross this.
+        'max_cost_usd' => (float) env('ANTHROPIC_MAX_COST_USD', 5.0),
+        // Hard iteration cap — safety net against infinite tool loops.
+        'max_iterations' => (int) env('ANTHROPIC_MAX_ITERATIONS', 40),
+    ],
+
+    'github' => [
+        // Fine-grained PAT with Contents + Pull Requests read/write on this repo.
+        'token' => env('GITHUB_TOKEN'),
+        'owner' => env('GITHUB_OWNER', 'cgrantdev'),
+        'repo' => env('GITHUB_REPO', 'devmap'),
+        // Branch PRs land against. Kept configurable in case we ever
+        // want a staging trunk between agent and main.
+        'base_branch' => env('GITHUB_BASE_BRANCH', 'main'),
+    ],
+
     'discord' => [
         'bot_token' => env('DISCORD_BOT_TOKEN'),
         'application_id' => env('DISCORD_APPLICATION_ID'),

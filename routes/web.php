@@ -247,6 +247,7 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
         Route::post('/recommendations', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'storeRecommendation'])->name('admin.ceo.rec.store');
         Route::patch('/recommendations/{recommendation}', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'updateRecommendation'])->name('admin.ceo.rec.update');
         Route::delete('/recommendations/{recommendation}', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'destroyRecommendation'])->name('admin.ceo.rec.destroy');
+        Route::post('/recommendations/{recommendation}/implement', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'implement'])->name('admin.ceo.rec.implement');
         Route::post('/notepad', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'saveNotepad'])->name('admin.ceo.notepad.save');
     });
     Route::get('/vendors', [VendorsController::class, 'index'])->name('admin.vendors');

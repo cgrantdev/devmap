@@ -75,11 +75,11 @@
             <!-- In progress first -->
             <div v-if="inProgressRecs.length">
               <div class="text-[10px] uppercase tracking-wide font-semibold text-indigo-600 mb-1.5">In progress · {{ inProgressRecs.length }}</div>
-              <RecCard v-for="r in inProgressRecs" :key="r.id" :rec="r" @update="updateRec" @destroy="destroyRec" @edit="editRec" />
+              <RecCard v-for="r in inProgressRecs" :key="r.id" :rec="r" @update="updateRec" @destroy="destroyRec" @edit="editRec" @implement="implementRec" />
             </div>
             <div v-if="openRecs.length">
               <div class="text-[10px] uppercase tracking-wide font-semibold text-gray-500 mb-1.5">Open · {{ openRecs.length }}</div>
-              <RecCard v-for="r in openRecs" :key="r.id" :rec="r" @update="updateRec" @destroy="destroyRec" @edit="editRec" />
+              <RecCard v-for="r in openRecs" :key="r.id" :rec="r" @update="updateRec" @destroy="destroyRec" @edit="editRec" @implement="implementRec" />
             </div>
           </div>
         </div>
@@ -341,6 +341,11 @@ function submitRec() {
 function updateRec(r, patch) {
   router.patch(`/admin/ceo/recommendations/${r.id}`, patch, { preserveScroll: true })
 }
+
+function implementRec(r) {
+  if (!confirm(`Fire the autonomous implementer against "${r.title}"?\n\nThe agent will branch, edit, commit, and open a PR against main. You'll review + merge. Est. cost: ~$0.30–$3.`)) return
+  router.post(`/admin/ceo/recommendations/${r.id}/implement`, {}, { preserveScroll: true })
+}
 function destroyRec(r) {
   if (!confirm(`Delete "${r.title}"?`)) return
   router.delete(`/admin/ceo/recommendations/${r.id}`, { preserveScroll: true })
@@ -410,7 +415,7 @@ function formatAgo(ts) {
 /* -------- child components -------- */
 const RecCard = defineComponent({
   props: { rec: Object },
-  emits: ['update', 'destroy', 'edit'],
+  emits: ['update', 'destroy', 'edit', 'implement'],
   setup(props, { emit }) {
     const impactBadge = { high: 'bg-red-100 text-red-700', medium: 'bg-amber-100 text-amber-700', low: 'bg-gray-100 text-gray-700' }
     const statusPill = {
@@ -445,8 +450,32 @@ const RecCard = defineComponent({
           props.rec.expected_impact ? h('p', { class: 'text-[11px] text-emerald-700 italic mt-1' }, `→ ${props.rec.expected_impact}`) : null,
         ]),
       ]),
-      h('div', { class: 'mt-2 pt-2 border-t border-gray-100 flex items-center gap-2 text-[11px]' }, [
-        props.rec.status === 'open' ? h('button', { onClick: () => emit('update', props.rec, { status: 'in_progress' }), class: 'text-indigo-600 hover:text-indigo-800 font-semibold' }, '▶ Start work') : null,
+      // Run status panel — shown when there's an active or recent run
+      props.rec.run ? h('div', { class: 'mt-2 pt-2 border-t border-gray-100 text-[11px]' }, [
+        h('div', { class: 'flex items-center gap-2' }, [
+          props.rec.run.status === 'queued' ? h('span', { class: 'inline-flex items-center gap-1 text-amber-700' }, [
+            h('span', { class: 'w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse' }), 'Queued'
+          ]) : null,
+          props.rec.run.status === 'running' ? h('span', { class: 'inline-flex items-center gap-1 text-indigo-700' }, [
+            h('span', { class: 'w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse' }),
+            `Agent running${props.rec.run.iterations ? ` · iter ${props.rec.run.iterations}` : ''}${props.rec.run.cost_usd ? ` · $${props.rec.run.cost_usd.toFixed(2)}` : ''}`,
+          ]) : null,
+          props.rec.run.status === 'succeeded' ? h('span', { class: 'text-emerald-700 font-medium' }, `✓ Agent finished · $${props.rec.run.cost_usd.toFixed(2)}`) : null,
+          props.rec.run.status === 'failed' ? h('span', { class: 'text-red-700', title: props.rec.run.error || '' }, `✗ Agent failed`) : null,
+          props.rec.run.pr_url ? h('a', { href: props.rec.run.pr_url, target: '_blank', rel: 'noopener', class: 'ml-auto text-indigo-600 hover:text-indigo-800 font-semibold' }, `PR #${props.rec.run.pr_number} →`) : null,
+        ]),
+        props.rec.run.error && props.rec.run.status === 'failed' ? h('div', { class: 'text-[10px] text-red-600 mt-1 font-mono truncate', title: props.rec.run.error }, props.rec.run.error) : null,
+      ]) : null,
+      h('div', { class: 'mt-2 pt-2 border-t border-gray-100 flex items-center gap-2 text-[11px] flex-wrap' }, [
+        // Autonomous implement button — only offered on open recs without an active run
+        props.rec.status === 'open' && !['queued', 'running'].includes(props.rec.run?.status)
+          ? h('button', {
+              onClick: () => emit('implement', props.rec),
+              class: 'inline-flex items-center gap-1 text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:from-indigo-600 hover:to-indigo-700 px-2 py-1 rounded font-semibold',
+              title: 'Fire the autonomous SEO implementer against this rec',
+            }, '🤖 Implement')
+          : null,
+        props.rec.status === 'open' ? h('button', { onClick: () => emit('update', props.rec, { status: 'in_progress' }), class: 'text-indigo-600 hover:text-indigo-800 font-medium' }, 'Manual start') : null,
         props.rec.status === 'in_progress' ? h('button', { onClick: () => emit('update', props.rec, { status: 'shipped' }), class: 'inline-flex items-center gap-1 text-white bg-emerald-600 hover:bg-emerald-700 px-2 py-1 rounded font-semibold' }, '✓ Mark shipped') : null,
         props.rec.status === 'in_progress' ? h('button', { onClick: () => emit('update', props.rec, { status: 'open' }), class: 'text-gray-500 hover:text-gray-800' }, '← Back to open') : null,
         props.rec.status === 'shipped' ? h('button', { onClick: () => emit('update', props.rec, { status: 'in_progress' }), class: 'text-gray-500 hover:text-gray-800' }, '← Reopen') : null,
