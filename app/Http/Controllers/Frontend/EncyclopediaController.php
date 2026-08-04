@@ -702,7 +702,7 @@ class EncyclopediaController extends Controller
         
         if ($hasStoredSeo) {
             // Use stored SEO data from database
-            $seoTitle = $educationPost->seo_page_title ?: ("What is {$title}? - Encyclopedia - {$siteName}");
+            $seoTitle = $educationPost->seo_page_title ?: ("What is {$title} - Peptide Encyclopedia - {$siteName}");
             $seoDescription = $educationPost->seo_description 
                 ?: ($educationPost->overview 
                     ? $this->safeLimit($educationPost->overview, 160) 
@@ -716,7 +716,7 @@ class EncyclopediaController extends Controller
                 ? (str_starts_with($educationPost->seo_og_image, 'http') ? $educationPost->seo_og_image : url($educationPost->seo_og_image))
                 : route('og.compound', ['slug' => $slug]) . '?v=' . $ogV;
         } else {
-            $seoTitle = "What is {$title}? - Encyclopedia - {$siteName}";
+            $seoTitle = "What is {$title} - Peptide Encyclopedia - {$siteName}";
             if ($educationPost && $educationPost->overview) {
                 $seoDescription = $this->safeLimit($educationPost->overview, 160);
             } elseif ($educationPost && $educationPost->description) {
