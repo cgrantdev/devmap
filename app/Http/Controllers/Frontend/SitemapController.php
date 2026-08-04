@@ -112,8 +112,14 @@ class SitemapController extends Controller
         // Curated X-vs-Y comparison pages. Filter to pairs whose both slugs
         // resolve to active categories — otherwise we'd emit 404 URLs to
         // Google after retiring a compound.
+        // Lowercase both sides — MySQL matches case-insensitively but PHP
+        // array-key lookups are case-sensitive; CJC-1295 in the DB would
+        // silently drop pairs referencing 'cjc-1295' from the constant.
         $activeSlugs = ProductCategory::where('is_active', true)
-            ->whereNotNull('slug')->pluck('slug')->flip();
+            ->whereNotNull('slug')
+            ->pluck('slug')
+            ->map(fn ($s) => strtolower($s))
+            ->flip();
         foreach (\App\Http\Controllers\Frontend\CompareController::FEATURED_VS_PAIRS as $p) {
             if (!isset($activeSlugs[$p['a']]) || !isset($activeSlugs[$p['b']])) continue;
             $urls[] = [

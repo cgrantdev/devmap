@@ -247,10 +247,14 @@ class CompareController extends Controller
     private function resolveFeaturedPairs(): array
     {
         $slugs = collect(self::FEATURED_VS_PAIRS)->flatMap(fn ($p) => [$p['a'], $p['b']])->unique()->all();
+        // MySQL matches slug case-insensitively so the whereIn works, but
+        // PHP's array lookups are case-sensitive — key by lowercased slug
+        // so pairs referencing DB-uppercased slugs (CJC-1295 etc.) don't
+        // silently drop through the isset() gate below.
         $categories = ProductCategory::where('is_active', true)
             ->whereIn('slug', $slugs)
             ->get(['id', 'slug', 'name'])
-            ->keyBy('slug');
+            ->keyBy(fn ($c) => strtolower($c->slug));
         $displayName = fn (string $slug) => isset($categories[$slug])
             ? (self::DISPLAY_NAMES[$categories[$slug]->name] ?? $categories[$slug]->name)
             : null;
@@ -409,7 +413,13 @@ class CompareController extends Controller
             ],
             'related' => $related,
             'vsPairs' => collect($this->resolveFeaturedPairs())
-                ->filter(fn ($p) => $p['a_slug'] === $category->slug || $p['b_slug'] === $category->slug)
+                ->filter(function ($p) use ($category) {
+                    // Case-insensitive: category->slug may be DB-uppercased
+                    // ("CJC-1295") while pair slugs come from the lowercased
+                    // FEATURED_VS_PAIRS constant.
+                    $cs = strtolower($category->slug);
+                    return strtolower($p['a_slug']) === $cs || strtolower($p['b_slug']) === $cs;
+                })
                 ->take(6)
                 ->values()
                 ->all(),
