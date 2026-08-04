@@ -156,10 +156,12 @@ class ProductsController extends Controller
             'seo_og_image' => 'nullable|url|max:500',
         ]);
 
-        // Convert size_mg from text (e.g. "10mL", "5mg") to numeric
-        if (isset($validated['size_mg'])) {
-            $numericSize = preg_replace('/[^0-9.]/', '', $validated['size_mg']);
-            $validated['size_mg'] = $numericSize !== '' ? (float) $numericSize : null;
+        // Preserve size_mg as-is — the column is a string ("10mg", "5mg/5mg",
+        // "1000 IU", "30mL", etc.). The old code stripped units, casting
+        // "30mL" to 30.0 and losing the mL. Keep the raw value so IU / mL /
+        // blend sizes round-trip through the admin correctly.
+        if (isset($validated['size_mg']) && is_string($validated['size_mg'])) {
+            $validated['size_mg'] = trim($validated['size_mg']) ?: null;
         }
 
         // Handle pricing logic
@@ -238,9 +240,12 @@ class ProductsController extends Controller
             'product_category_id' => 'sometimes|nullable|exists:product_categories,id',
             // Accepts numbers (10mg) or blend ratios (5mg/5mg, 50mg/10mg/10mg).
             // Pattern: one or more "Nmg" tokens optionally separated by /.
-            'size_mg' => ['sometimes', 'nullable', 'string', 'max:50', 'regex:/^[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?(?:\/[0-9]+(?:\.[0-9]+)?(?:mcg|mg|g)?)*$/i'],
+            // Accepts numbers optionally followed by mcg/mg/g/IU/mL (with an
+            // optional space, so "1000 IU" and "30mL" both pass). Blend
+            // ratios still supported via "/" between tokens.
+            'size_mg' => ['sometimes', 'nullable', 'string', 'max:50', 'regex:/^[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml)?(?:\/[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml)?)*$/i'],
             'hidden' => 'sometimes|boolean',
-            'product_type' => ['sometimes', 'nullable', 'string', 'in:Peptide,Capsule,Nasal Spray,Kit,Other'],
+            'product_type' => ['sometimes', 'nullable', 'string', 'in:Peptide,Capsule,Nasal Spray,Topical,Kit,Other'],
             'is_encyclopedia_thumb' => 'sometimes|boolean',
             'is_peptide_thumb' => 'sometimes|boolean',
         ]);
