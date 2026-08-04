@@ -127,6 +127,12 @@ Route::get('/encyclopedia/{slug}', [EncyclopediaController::class, 'showArticle'
 // Legacy /encyclopedia/article/{slug} redirects to clean URL
 Route::get('/encyclopedia/article/{slug}', fn ($slug) => redirect("/encyclopedia/{$slug}", 301));
 Route::get('/compare', [CompareController::class, 'index'])->name('compare');
+// Per-compound compare pages — /compare/bpc-157, /compare/semaglutide, etc.
+// Placed AFTER /compare (specific) but constrained to [a-z0-9-]+ so it
+// doesn't shadow future /compare/{action}-style additions.
+Route::get('/compare/{slug}', [CompareController::class, 'show'])
+    ->where('slug', '[a-z0-9-]+')
+    ->name('compare.compound');
 Route::get('/calculator', function () {
     $seoPage = \App\Models\SeoPage::where('key', 'calculator')->first();
     $defaultTitle = 'Peptide Reconstitution Calculator — Peptidemap';

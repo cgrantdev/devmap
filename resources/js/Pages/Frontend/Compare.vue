@@ -74,7 +74,15 @@
                 {{ compound.description }}
               </p>
             </div>
-            <div class="flex items-center gap-3 flex-shrink-0">
+            <div class="flex items-center gap-2 flex-shrink-0 flex-wrap">
+              <a
+                :href="`/compare/${compound.slug}`"
+                class="ui-focus inline-flex items-center gap-1.5 h-9 px-4 rounded-[9px] bg-[color:var(--color-ink)] text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
+                :title="`Full ${compound.name} vendor comparison`"
+              >
+                Full comparison
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </a>
               <a
                 v-if="compound.encyclopedia_url"
                 :href="compound.encyclopedia_url"
