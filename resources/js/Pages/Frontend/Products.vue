@@ -54,7 +54,7 @@
             :name="product.name"
             :image="product.image"
             :total-items="product.total_items"
-            :to="`/compare/${product.slug}`"
+            :to="`/product/${product.slug}`"
             :research-area="product.research_area"
           />
         </div>

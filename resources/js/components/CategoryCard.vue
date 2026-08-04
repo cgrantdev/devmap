@@ -51,7 +51,7 @@
            tiny underlined text link. Reads as "click me" without shouting. -->
       <div class="mt-4 pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between">
         <span class="text-[12px] font-semibold text-[color:var(--color-accent-600)] group-hover:text-[color:var(--color-accent-700)] transition-colors">
-          Compare vendors
+          View all products
         </span>
         <svg
           class="w-4 h-4 text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-transform"
