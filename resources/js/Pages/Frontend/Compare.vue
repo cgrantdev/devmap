@@ -50,31 +50,6 @@
       </div>
     </section>
 
-    <!-- Head-to-head comparison cards — links to /compare/{a}-vs-{b} pages.
-         Prominent placement above the per-compound sections so people who
-         come to /compare comparing two compounds land there instead of
-         scrolling the monolith. -->
-    <section v-if="featuredPairs?.length" class="max-w-[1280px] mx-auto px-6 lg:px-10 pb-6">
-      <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">
-        Head-to-head comparisons
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-        <a
-          v-for="p in featuredPairs"
-          :key="p.url"
-          :href="p.url"
-          class="ui-focus group p-4 rounded-[10px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all"
-        >
-          <div class="text-[14px] font-semibold leading-tight">
-            <span class="text-indigo-700">{{ p.a_name }}</span>
-            <span class="text-[color:var(--color-ink-subtle)] mx-1.5 font-light">vs</span>
-            <span class="text-emerald-700">{{ p.b_name }}</span>
-          </div>
-          <div class="mt-1 text-[11px] text-[color:var(--color-ink-muted)]">{{ p.tagline }}</div>
-        </a>
-      </div>
-    </section>
-
     <!-- Per-compound vendor pricing sections -->
     <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pb-20">
       <div class="space-y-16">
@@ -296,6 +271,32 @@
               No vendors currently stock this compound.
             </template>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Head-to-head comparison cards below the primary tables. People come
+         to /compare for the tables — vs-pages are a secondary explore path,
+         better placed after users have scanned what they came for. -->
+    <section v-if="featuredPairs?.length" class="border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-12">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">
+          Head-to-head comparisons
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <a
+            v-for="p in featuredPairs"
+            :key="p.url"
+            :href="p.url"
+            class="ui-focus group p-4 rounded-[10px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all"
+          >
+            <div class="text-[14px] font-semibold leading-tight">
+              <span class="text-indigo-700">{{ p.a_name }}</span>
+              <span class="text-[color:var(--color-ink-subtle)] mx-1.5 font-light">vs</span>
+              <span class="text-emerald-700">{{ p.b_name }}</span>
+            </div>
+            <div class="mt-1 text-[11px] text-[color:var(--color-ink-muted)]">{{ p.tagline }}</div>
+          </a>
         </div>
       </div>
     </section>

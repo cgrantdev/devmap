@@ -43,6 +43,7 @@ class SitemapController extends Controller
             ['/brands',        'daily',   '0.9'],
             ['/products',      'daily',   '0.9'],
             ['/compare',       'weekly',  '0.8'],
+            ['/bacteriostatic-water', 'daily', '0.9'],  // High-intent commercial landing
             ['/encyclopedia',  'weekly',  '0.8'],
             ['/blogs',         'weekly',  '0.6'],
         ] as [$path, $freq, $priority]) {
