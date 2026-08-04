@@ -551,8 +551,9 @@ const RecCard = defineComponent({
         ]),
       ]),
       h('div', { class: 'mt-2 pt-2 border-t border-gray-100 flex items-center gap-2 text-[11px] flex-wrap' }, [
-        // Copy-prompt-for-Claude button — the primary action on open recs
-        props.rec.status === 'open'
+        // Copy-prompt-for-Claude button — available on both open and in-progress
+        // recs so you can grab the prompt regardless of which state you moved it to first.
+        ['open', 'in_progress'].includes(props.rec.status)
           ? h('button', {
               onClick: () => emit('implement', props.rec),
               class: 'inline-flex items-center gap-1 text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:from-indigo-600 hover:to-indigo-700 px-2 py-1 rounded font-semibold',
