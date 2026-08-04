@@ -5,11 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Brand;
-use App\Jobs\RunImplementerJob;
 use App\Models\CeoAgentRun;
 use App\Models\CeoNote;
 use App\Models\EducationPost;
-use App\Models\ImplementerRun;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\SeoRecommendation;
@@ -96,7 +94,6 @@ class CeoDashboardController extends Controller
             ->limit($limit)
             ->get()
             ->map(fn ($r) => [
-                'run' => $this->latestRun($r->id),
                 'id' => $r->id,
                 'title' => $r->title,
                 'category' => $r->category,
@@ -113,30 +110,6 @@ class CeoDashboardController extends Controller
                 'pinned' => $r->pinned,
                 'created_at_h' => $r->created_at?->diffForHumans(),
             ])->values();
-    }
-
-    /**
-     * Latest ImplementerRun for a rec — surfaces status, PR URL, and cost
-     * on the card so the user can watch progress from the dashboard.
-     * Returns null when no run has ever been dispatched.
-     */
-    private function latestRun(int $recId): ?array
-    {
-        $run = ImplementerRun::where('seo_recommendation_id', $recId)
-            ->latest()->first();
-        if (!$run) return null;
-        return [
-            'id' => $run->id,
-            'status' => $run->status,
-            'started_at_h' => $run->started_at?->diffForHumans(),
-            'finished_at_h' => $run->finished_at?->diffForHumans(),
-            'pr_url' => $run->pr_url,
-            'pr_number' => $run->pr_number,
-            'branch' => $run->branch,
-            'error' => $run->error,
-            'cost_usd' => (float) $run->cost_usd,
-            'iterations' => $run->iterations,
-        ];
     }
 
     /* -------- writes -------- */
@@ -190,40 +163,6 @@ class CeoDashboardController extends Controller
         return redirect()->route('admin.ceo');
     }
 
-    /**
-     * Fire the autonomous SEO implementer against one recommendation.
-     * Creates an ImplementerRun, dispatches RunImplementerJob to the
-     * dedicated 'implementer' queue, flips the rec to in_progress.
-     * Idempotent: if a run is already active for this rec, no-ops.
-     */
-    public function implement(SeoRecommendation $recommendation): RedirectResponse
-    {
-        if (!config('services.anthropic.api_key')) {
-            return redirect()->route('admin.ceo')
-                ->with('error', 'ANTHROPIC_API_KEY not configured — set it in Forge env before running the implementer.');
-        }
-
-        $activeRun = ImplementerRun::where('seo_recommendation_id', $recommendation->id)
-            ->whereIn('status', ['queued', 'running'])
-            ->latest()
-            ->first();
-
-        if ($activeRun) {
-            return redirect()->route('admin.ceo')
-                ->with('info', 'A run is already ' . $activeRun->status . ' for this recommendation.');
-        }
-
-        $run = ImplementerRun::create([
-            'seo_recommendation_id' => $recommendation->id,
-            'status' => 'queued',
-        ]);
-        $recommendation->update(['status' => 'in_progress']);
-
-        RunImplementerJob::dispatch($run->id);
-
-        return redirect()->route('admin.ceo')
-            ->with('success', "Implementer dispatched for rec #{$recommendation->id} — check back in a few minutes.");
-    }
 
     public function storeAgentRun(Request $request): RedirectResponse
     {

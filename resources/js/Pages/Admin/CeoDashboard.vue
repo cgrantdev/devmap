@@ -252,6 +252,34 @@
         </div>
       </div>
 
+      <!-- Implementer prompt modal -->
+      <div v-if="showImplementModal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" @click.self="showImplementModal = false">
+        <div class="bg-white rounded-lg w-full max-w-2xl p-6 max-h-[90vh] flex flex-col">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <div class="text-[10px] uppercase tracking-[0.12em] font-semibold text-gray-400 mb-1">Implement via Claude</div>
+              <h3 class="text-lg font-semibold text-gray-900 leading-tight">{{ implementDraft.rec?.title }}</h3>
+            </div>
+            <button @click="showImplementModal = false" class="text-gray-400 hover:text-gray-700 text-xl leading-none">&times;</button>
+          </div>
+          <p class="text-[12px] text-gray-600 mb-3 leading-relaxed">
+            Copy this prompt and paste it into a fresh Claude Code session. Claude will branch, edit, commit, and open a PR against <span class="ui-mono">main</span> — you review and merge.
+          </p>
+          <div class="flex-1 overflow-y-auto border border-gray-200 rounded bg-gray-50 p-3 mb-3">
+            <pre class="text-[11px] font-mono text-gray-800 whitespace-pre-wrap break-words">{{ implementDraft.prompt }}</pre>
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <button @click="copyPrompt" :class="['inline-flex items-center gap-2 h-10 px-4 text-[13px] font-semibold rounded transition-colors', promptCopied ? 'bg-emerald-600 text-white' : 'bg-gray-900 text-white hover:bg-gray-800']">
+              <span v-if="promptCopied">✓ Copied to clipboard</span>
+              <span v-else>📋 Copy prompt</span>
+            </button>
+            <button @click="markInProgressFromModal" class="text-[13px] font-medium text-indigo-600 hover:text-indigo-800">
+              Mark rec as in progress →
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Agent-run log modal -->
       <div v-if="showLogAgentModal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" @click.self="showLogAgentModal = false">
         <div class="bg-white rounded-lg w-full max-w-lg p-6">
@@ -342,9 +370,81 @@ function updateRec(r, patch) {
   router.patch(`/admin/ceo/recommendations/${r.id}`, patch, { preserveScroll: true })
 }
 
+const showImplementModal = ref(false)
+const implementDraft = ref({ rec: null, prompt: '' })
+const promptCopied = ref(false)
+
+function buildPrompt(r) {
+  const branch = `implementer/rec-${r.id}-${r.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 60)}`
+  const lines = [
+    `# SEO Recommendation to implement`,
+    ``,
+    `**Title:** ${r.title}`,
+    `**Category:** ${r.category}    **Impact:** ${r.impact}    **Effort:** ${r.effort}`,
+    `**Rec ID:** ${r.id}`,
+    ``,
+    `## Why (strategist's rationale)`,
+    r.rationale || '_(no rationale provided)_',
+    ``,
+    `## Expected impact`,
+    r.expected_impact || '_(no expected impact given)_',
+    ``,
+    `## How to work this`,
+    ``,
+    `1. Create a branch: \`git checkout -b ${branch}\``,
+    `2. Implement the change end-to-end (edit files, run any needed migrations, verify).`,
+    `3. Keep the diff scoped to this one recommendation — no drive-by cleanup.`,
+    `4. Commit with a message referencing rec #${r.id}.`,
+    `5. Push the branch and open a PR against \`main\` titled: \`SEO: ${r.title}\``,
+    `6. PR body should include: the strategist's rationale (above), expected impact, and what you changed.`,
+    `7. Once the PR is open, come back to the CEO dashboard (/admin/ceo) and mark rec #${r.id} as shipped, adding the PR URL and commit SHA(s).`,
+    ``,
+    `## Peptidemap context (relevant paths)`,
+    ``,
+    `- Frontend controllers: \`app/Http/Controllers/Frontend/\``,
+    `- Blade template with sitewide meta/JSON-LD: \`resources/views/app.blade.php\``,
+    `- Vue pages: \`resources/js/Pages/Frontend/\``,
+    `- Sitemap: \`app/Http/Controllers/Frontend/SitemapController.php\``,
+    `- Robots: served via Cloudflare (be aware of the CF override on /robots.txt)`,
+    `- Deploy: git push → Forge auto-pulls → \`npm run build\` on server if frontend changed`,
+    ``,
+    `## Skip if`,
+    ``,
+    `- The change requires infrastructure the user needs to touch (Cloudflare, DNS, third-party dashboards) — stop and describe what's needed instead of half-doing it.`,
+    `- The rec description is too vague to implement without decisions — ask a clarifying question first.`,
+  ]
+  return lines.join('\n')
+}
+
 function implementRec(r) {
-  if (!confirm(`Fire the autonomous implementer against "${r.title}"?\n\nThe agent will branch, edit, commit, and open a PR against main. You'll review + merge. Est. cost: ~$0.30–$3.`)) return
-  router.post(`/admin/ceo/recommendations/${r.id}/implement`, {}, { preserveScroll: true })
+  implementDraft.value = { rec: r, prompt: buildPrompt(r) }
+  promptCopied.value = false
+  showImplementModal.value = true
+}
+
+async function copyPrompt() {
+  try {
+    await navigator.clipboard.writeText(implementDraft.value.prompt)
+    promptCopied.value = true
+    setTimeout(() => { promptCopied.value = false }, 2500)
+  } catch {
+    // Fallback for non-secure contexts
+    const ta = document.createElement('textarea')
+    ta.value = implementDraft.value.prompt
+    ta.style.cssText = 'position:fixed;left:-999px;top:-999px'
+    document.body.appendChild(ta); ta.select()
+    try { document.execCommand('copy'); promptCopied.value = true; setTimeout(() => { promptCopied.value = false }, 2500) } catch {}
+    document.body.removeChild(ta)
+  }
+}
+
+function markInProgressFromModal() {
+  const r = implementDraft.value.rec
+  if (!r) return
+  router.patch(`/admin/ceo/recommendations/${r.id}`, { status: 'in_progress' }, {
+    preserveScroll: true,
+    onSuccess: () => { showImplementModal.value = false },
+  })
 }
 function destroyRec(r) {
   if (!confirm(`Delete "${r.title}"?`)) return
@@ -450,30 +550,14 @@ const RecCard = defineComponent({
           props.rec.expected_impact ? h('p', { class: 'text-[11px] text-emerald-700 italic mt-1' }, `→ ${props.rec.expected_impact}`) : null,
         ]),
       ]),
-      // Run status panel — shown when there's an active or recent run
-      props.rec.run ? h('div', { class: 'mt-2 pt-2 border-t border-gray-100 text-[11px]' }, [
-        h('div', { class: 'flex items-center gap-2' }, [
-          props.rec.run.status === 'queued' ? h('span', { class: 'inline-flex items-center gap-1 text-amber-700' }, [
-            h('span', { class: 'w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse' }), 'Queued'
-          ]) : null,
-          props.rec.run.status === 'running' ? h('span', { class: 'inline-flex items-center gap-1 text-indigo-700' }, [
-            h('span', { class: 'w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse' }),
-            `Agent running${props.rec.run.iterations ? ` · iter ${props.rec.run.iterations}` : ''}${props.rec.run.cost_usd ? ` · $${props.rec.run.cost_usd.toFixed(2)}` : ''}`,
-          ]) : null,
-          props.rec.run.status === 'succeeded' ? h('span', { class: 'text-emerald-700 font-medium' }, `✓ Agent finished · $${props.rec.run.cost_usd.toFixed(2)}`) : null,
-          props.rec.run.status === 'failed' ? h('span', { class: 'text-red-700', title: props.rec.run.error || '' }, `✗ Agent failed`) : null,
-          props.rec.run.pr_url ? h('a', { href: props.rec.run.pr_url, target: '_blank', rel: 'noopener', class: 'ml-auto text-indigo-600 hover:text-indigo-800 font-semibold' }, `PR #${props.rec.run.pr_number} →`) : null,
-        ]),
-        props.rec.run.error && props.rec.run.status === 'failed' ? h('div', { class: 'text-[10px] text-red-600 mt-1 font-mono truncate', title: props.rec.run.error }, props.rec.run.error) : null,
-      ]) : null,
       h('div', { class: 'mt-2 pt-2 border-t border-gray-100 flex items-center gap-2 text-[11px] flex-wrap' }, [
-        // Autonomous implement button — only offered on open recs without an active run
-        props.rec.status === 'open' && !['queued', 'running'].includes(props.rec.run?.status)
+        // Copy-prompt-for-Claude button — the primary action on open recs
+        props.rec.status === 'open'
           ? h('button', {
               onClick: () => emit('implement', props.rec),
               class: 'inline-flex items-center gap-1 text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:from-indigo-600 hover:to-indigo-700 px-2 py-1 rounded font-semibold',
-              title: 'Fire the autonomous SEO implementer against this rec',
-            }, '🤖 Implement')
+              title: 'Copy a ready-to-paste prompt for Claude',
+            }, '📋 Prompt for Claude')
           : null,
         props.rec.status === 'open' ? h('button', { onClick: () => emit('update', props.rec, { status: 'in_progress' }), class: 'text-indigo-600 hover:text-indigo-800 font-medium' }, 'Manual start') : null,
         props.rec.status === 'in_progress' ? h('button', { onClick: () => emit('update', props.rec, { status: 'shipped' }), class: 'inline-flex items-center gap-1 text-white bg-emerald-600 hover:bg-emerald-700 px-2 py-1 rounded font-semibold' }, '✓ Mark shipped') : null,
