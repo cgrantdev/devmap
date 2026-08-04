@@ -226,6 +226,13 @@ class CompareController extends Controller
      */
     public function show(Request $request, string $slug)
     {
+        // X-vs-Y compare pages piggyback on the same route via the -vs-
+        // separator. Since no legit compound slug contains '-vs-', a single
+        // strpos check disambiguates cleanly.
+        if (str_contains($slug, '-vs-')) {
+            return $this->showVs($slug);
+        }
+
         $category = ProductCategory::where('slug', $slug)
             ->where('is_active', true)
             ->with(['educationPost' => function ($q) {
@@ -349,6 +356,175 @@ class CompareController extends Controller
             'related' => $related,
             'seo' => $seo,
         ]);
+    }
+
+    /**
+     * X-vs-Y compare page: /compare/{a}-vs-{b}
+     *
+     * Head-to-head compound comparison. Two-column deep-dive using
+     * structured EducationPost fields (mechanism, half-life, key effects,
+     * common use cases) plus a side-by-side vendor + price snapshot.
+     *
+     * Canonical URL is alphabetical (a<b); reverse-order requests 301
+     * to the canonical to avoid duplicate-content splits.
+     */
+    private function showVs(string $slug)
+    {
+        $pos = strpos($slug, '-vs-');
+        $aSlug = substr($slug, 0, $pos);
+        $bSlug = substr($slug, $pos + 4);
+        if ($aSlug === '' || $bSlug === '' || $aSlug === $bSlug) abort(404);
+
+        // Alphabetical canonical — search engines see one page per pair.
+        if (strcmp($aSlug, $bSlug) > 0) {
+            return redirect("/compare/{$bSlug}-vs-{$aSlug}", 301);
+        }
+
+        $a = ProductCategory::where('slug', $aSlug)->where('is_active', true)
+            ->with(['educationPost' => fn ($q) => $q->where('status', 'published')])->first();
+        $b = ProductCategory::where('slug', $bSlug)->where('is_active', true)
+            ->with(['educationPost' => fn ($q) => $q->where('status', 'published')])->first();
+        if (!$a || !$b) abort(404);
+
+        $aData = $this->buildVsCompoundData($a);
+        $bData = $this->buildVsCompoundData($b);
+
+        // "Related pairs" — pick 6 other same-list pairs so users can hop
+        // to adjacent comparisons. Rotated by day-of-year so the set feels
+        // fresh across visits without needing per-user personalization.
+        $related = $this->relatedVsPairs($a, $b);
+
+        $displayA = $aData['name'];
+        $displayB = $bData['name'];
+        $cheapestA = $aData['cheapest_price'] ? '$' . number_format($aData['cheapest_price'], 2) : null;
+        $cheapestB = $bData['cheapest_price'] ? '$' . number_format($bData['cheapest_price'], 2) : null;
+
+        $seoTitle = "{$displayA} vs {$displayB} — Vendor & Price Comparison";
+        $seoDescription = "{$displayA} vs {$displayB} side-by-side: mechanism, half-life, use cases, best vendors and current prices."
+            . ($cheapestA && $cheapestB ? " Cheapest {$displayA} {$cheapestA}, cheapest {$displayB} {$cheapestB}." : '');
+
+        $breadcrumb = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home',    'item' => url('/')],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Compare', 'item' => url('/compare')],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => "{$displayA} vs {$displayB}", 'item' => url("/compare/{$aSlug}-vs-{$bSlug}")],
+            ],
+        ];
+
+        $seo = [
+            'key' => 'compare-vs',
+            'title' => $seoTitle,
+            'description' => $seoDescription,
+            'og_title' => $seoTitle,
+            'og_description' => $seoDescription,
+            'og_image' => null,
+            'image' => null,
+            'url' => url("/compare/{$aSlug}-vs-{$bSlug}"),
+            'h1' => "{$displayA} vs {$displayB}",
+            'schema' => [$breadcrumb],
+        ];
+        session(['page_seo_data' => $seo]);
+
+        return Inertia::render('Frontend/CompareCompoundVs', [
+            'a' => $aData,
+            'b' => $bData,
+            'related' => $related,
+            'seo' => $seo,
+        ]);
+    }
+
+    /**
+     * Build the compact per-compound payload used by the vs page.
+     * Fewer products than the single-compound page (top 5 only) since the
+     * point here is the head-to-head, not the full vendor drilldown —
+     * a "See all N vendors" link routes to /compare/{slug} for that.
+     */
+    private function buildVsCompoundData(ProductCategory $category): array
+    {
+        $products = $this->productsForCategory($category);
+        $ep = $category->educationPost;
+        $displayName = self::DISPLAY_NAMES[$category->name] ?? $category->name;
+
+        // These fields might be plain text, JSON array of subsections, or null.
+        // Normalize to arrays of {heading, text} entries so the Vue can render
+        // consistently without special-casing every field.
+        $normalize = function ($value) {
+            if (!$value) return [];
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+                if (is_array($decoded)) $value = $decoded;
+                else return [['heading' => null, 'text' => strip_tags($value)]];
+            }
+            if (!is_array($value)) return [];
+            $out = [];
+            foreach ($value as $item) {
+                if (is_string($item)) {
+                    $out[] = ['heading' => null, 'text' => strip_tags($item)];
+                } elseif (is_array($item)) {
+                    $out[] = [
+                        'heading' => $item['heading'] ?? $item['title'] ?? null,
+                        'text' => isset($item['content']) ? strip_tags($item['content']) : (isset($item['text']) ? strip_tags($item['text']) : null),
+                    ];
+                }
+            }
+            return array_values(array_filter($out, fn ($x) => !empty($x['text']) || !empty($x['heading'])));
+        };
+
+        return [
+            'id' => $category->id,
+            'name' => $displayName,
+            'slug' => $category->slug,
+            'compare_url' => "/compare/{$category->slug}",
+            'encyclopedia_url' => $ep ? "/encyclopedia/{$category->slug}" : null,
+            'vendor_count' => $products->pluck('brand_name')->unique()->count(),
+            'product_count' => $products->count(),
+            'cheapest_price' => $products->first()['final_price'] ?? null,
+            'top_vendors' => $products->take(5)->values(),
+            'summary' => $ep?->overview ? strip_tags($ep->overview) : ($ep?->description ? strip_tags($ep->description) : null),
+            'mechanism' => $ep?->mechanism_of_action_intro ? strip_tags($ep->mechanism_of_action_intro) : null,
+            'half_life' => $ep?->half_life,
+            'administration' => $ep?->administration,
+            'key_effects' => $normalize($ep?->key_effects ?? null),
+            'use_cases' => $normalize($ep?->common_use_cases ?? null),
+        ];
+    }
+
+    /**
+     * A handful of curated compare-pair suggestions so every vs-page has
+     * next-clicks. Ordered by relevance to the current pair (same class
+     * of compound first, then popular pairs).
+     */
+    private function relatedVsPairs(ProductCategory $a, ProductCategory $b): array
+    {
+        // Curated set — pairs known to be commonly compared. Filter out any
+        // that reference either of the current two compounds so we don't
+        // suggest a duplicate.
+        $curated = [
+            ['semaglutide', 'tirzepatide', 'The two big GLP-1s'],
+            ['bpc-157', 'tb-500', 'The classic healing stack'],
+            ['ipamorelin', 'cjc-1295', 'Growth-hormone secretagogue duo'],
+            ['ghk-cu', 'bpc-157', 'Skin & recovery comparison'],
+            ['retatrutide', 'tirzepatide', 'Next-gen vs. current-gen GLP-1'],
+            ['mots-c', 'nad', 'Mitochondrial support alternatives'],
+            ['tesamorelin', 'ipamorelin', 'GHRH vs GHRP'],
+            ['sermorelin', 'ipamorelin', 'Two ways to boost GH'],
+        ];
+        $excluded = [$a->slug, $b->slug];
+        $out = [];
+        foreach ($curated as [$s1, $s2, $tagline]) {
+            if (in_array($s1, $excluded, true) || in_array($s2, $excluded, true)) continue;
+            $out[] = [
+                'url' => "/compare/{$s1}-vs-{$s2}",
+                'title' => strtoupper($s1) . ' vs ' . strtoupper($s2),  // display names filled by Vue
+                'raw_a' => $s1,
+                'raw_b' => $s2,
+                'tagline' => $tagline,
+            ];
+            if (count($out) >= 6) break;
+        }
+        return $out;
     }
 
     /**
