@@ -392,18 +392,22 @@ const filterMissing = ref('all')
 // Product formats (vial, capsule, nasal spray, other). Stored as a
 // free-text varchar but constrained to this list both in the inline
 // dropdown and in the controller's `in:` validation rule.
-const typeOptions = ['Peptide', 'Capsule', 'Nasal Spray', 'Kit', 'Other']
+const typeOptions = ['Peptide', 'Capsule', 'Nasal Spray', 'Topical', 'Kit', 'Other']
 
 // Common research peptide vial sizes + blend ratios.
 // Each option is the literal string stored in size_mg.
 const sizeOptions = [
   // Microgram singles (GHK-Cu, oxytocin, sermorelin variants, etc.)
-  '250mcg', '500mcg',
+  '250mcg', '500mcg', '1000mcg',
   // Singles 0.5–100mg (granular at the small end where peptides actually vary)
-  '0.5mg', '1mg', '2mg', '2.5mg', '5mg', '10mg', '15mg',
+  '0.5mg', '1mg', '2mg', '2.5mg', '5mg', '6mg', '10mg', '15mg',
   '20mg', '25mg', '30mg', '50mg', '100mg',
   // Larger singles 200–1000mg in 100mg increments (NAD+, methylene blue, etc.)
   '200mg', '300mg', '400mg', '500mg', '600mg', '700mg', '800mg', '900mg', '1000mg',
+  // IU-denominated (HGH and similar)
+  '1000 IU', '2000 IU', '3000 IU', '4000 IU', '5000 IU',
+  // Volume-denominated (bacteriostatic water, mixed vials, etc.)
+  '1mL', '2mL', '3mL', '5mL', '10mL', '30mL',
   // Common blend ratios from real vendor listings
   '250mcg/250mcg', '500mcg/500mcg',
   '5mg/5mg', '10mg/10mg', '50mg/10mg/10mg', '50mg/10mg/10mg/10mg',
