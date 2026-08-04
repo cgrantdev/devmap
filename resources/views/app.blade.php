@@ -91,21 +91,6 @@
             ? $seoTitle
             : ($seoTitle . ' — ' . $siteName);
 
-        // SSR H1 — emitted into <body> before @inertia so bots (and Bing / DDG /
-        // LLM crawlers that don't run JS) see a real heading in the initial HTML.
-        // Vue hydrates its own visible H1s on top; the SSR one stays visually
-        // hidden via sr-only. Prefer an explicit page_seo_data['h1'] override,
-        // otherwise strip the " — Peptidemap" suffix off the SEO title.
-        $seoH1 = is_array($seoData) ? ($seoData['h1'] ?? null) : null;
-        if (!$seoH1) {
-            $seoH1 = preg_replace(
-                '/\s*[—\-|]\s*' . preg_quote($siteName, '/') . '\s*$/u',
-                '',
-                $seoTitle
-            );
-            if (empty(trim($seoH1))) $seoH1 = $siteName;
-        }
-
         session()->forget('page_seo_data');
     @endphp
 
@@ -187,20 +172,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     @vite(['resources/js/app.js', 'resources/css/app.css'])
-
-    {{-- Critical CSS for the SSR H1's sr-only class — inlined so it takes
-         effect before the Vite CSS bundle loads, otherwise the H1 flashes
-         visible for one paint frame on slow connections. --}}
-    <style>.ssr-seo-h1{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}</style>
-
     @inertiaHead
 </head>
 <body class="antialiased">
-    {{-- Server-rendered H1 so bots (Bing, DuckDuckGo, LLM crawlers) that
-         don't execute JS see a real heading in the initial HTML. Vue mounts
-         its own visible H1s on hydration; this one stays visually hidden. --}}
-    <h1 class="ssr-seo-h1">{{ $seoH1 }}</h1>
-
     @inertia
 </body>
 </html>

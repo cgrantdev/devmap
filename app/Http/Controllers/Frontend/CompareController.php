@@ -57,6 +57,31 @@ class CompareController extends Controller
     ];
 
     /**
+     * Curated head-to-head pairs surfaced on the /compare hub, in every
+     * per-compound compare page's "Compare with…" strip, and in the sitemap.
+     * Single source of truth so the sitemap and the UI never drift.
+     * Slugs must be in alphabetical order (canonical form) and must resolve
+     * to active ProductCategory rows.
+     */
+    public const FEATURED_VS_PAIRS = [
+        ['a' => 'semaglutide',   'b' => 'tirzepatide',   'tagline' => 'The two big GLP-1s'],
+        ['a' => 'bpc-157',       'b' => 'tb-500',        'tagline' => 'The classic healing stack'],
+        ['a' => 'cjc-1295',      'b' => 'ipamorelin',    'tagline' => 'Growth-hormone secretagogue duo'],
+        ['a' => 'bpc-157',       'b' => 'ghk-cu',        'tagline' => 'Skin & recovery'],
+        ['a' => 'retatrutide',   'b' => 'tirzepatide',   'tagline' => 'Next-gen vs. current-gen GLP-1'],
+        ['a' => 'mots-c',        'b' => 'nad',           'tagline' => 'Mitochondrial support'],
+        ['a' => 'ipamorelin',    'b' => 'tesamorelin',   'tagline' => 'GHRH vs GHRP'],
+        ['a' => 'ipamorelin',    'b' => 'sermorelin',    'tagline' => 'Two ways to boost GH'],
+        ['a' => 'aod-9604',      'b' => 'tesamorelin',   'tagline' => 'Fat-loss peptides'],
+        ['a' => 'retatrutide',   'b' => 'semaglutide',   'tagline' => 'Newer GLP-1 vs. proven'],
+        ['a' => 'ghk-cu',        'b' => 'tb-500',        'tagline' => 'Regeneration alternatives'],
+        ['a' => '5-amino-1mq',   'b' => 'mots-c',        'tagline' => 'Metabolic peptides'],
+        ['a' => 'bpc-157',       'b' => 'ipamorelin',    'tagline' => 'Recovery vs. growth'],
+        ['a' => 'kisspeptin',    'b' => 'pt-141',        'tagline' => 'Libido & fertility'],
+        ['a' => 'cagrilintide',  'b' => 'semaglutide',   'tagline' => 'Newer weight-loss combo option'],
+    ];
+
+    /**
      * Display name overrides (so the page shows a friendlier label than the
      * raw category name when it helps — blends especially benefit from
      * spelling out their constituents).
@@ -209,8 +234,37 @@ class CompareController extends Controller
 
         return Inertia::render('Frontend/Compare', [
             'compounds' => $compounds,
+            'featuredPairs' => $this->resolveFeaturedPairs(),
             'seo' => $seo,
         ]);
+    }
+
+    /**
+     * Turn FEATURED_VS_PAIRS into a Vue-consumable list — filters out any
+     * pair where either side isn't a real active category (so if we retire
+     * a compound, the sitemap and UI go quiet without a code change).
+     */
+    private function resolveFeaturedPairs(): array
+    {
+        $slugs = collect(self::FEATURED_VS_PAIRS)->flatMap(fn ($p) => [$p['a'], $p['b']])->unique()->all();
+        $categories = ProductCategory::where('is_active', true)
+            ->whereIn('slug', $slugs)
+            ->get(['id', 'slug', 'name'])
+            ->keyBy('slug');
+        $displayName = fn (string $slug) => isset($categories[$slug])
+            ? (self::DISPLAY_NAMES[$categories[$slug]->name] ?? $categories[$slug]->name)
+            : null;
+
+        return collect(self::FEATURED_VS_PAIRS)
+            ->filter(fn ($p) => isset($categories[$p['a']], $categories[$p['b']]))
+            ->map(fn ($p) => [
+                'url' => "/compare/{$p['a']}-vs-{$p['b']}",
+                'a_slug' => $p['a'], 'a_name' => $displayName($p['a']),
+                'b_slug' => $p['b'], 'b_name' => $displayName($p['b']),
+                'tagline' => $p['tagline'],
+            ])
+            ->values()
+            ->all();
     }
 
     /**
@@ -354,6 +408,11 @@ class CompareController extends Controller
                 'products' => $products,
             ],
             'related' => $related,
+            'vsPairs' => collect($this->resolveFeaturedPairs())
+                ->filter(fn ($p) => $p['a_slug'] === $category->slug || $p['b_slug'] === $category->slug)
+                ->take(6)
+                ->values()
+                ->all(),
             'seo' => $seo,
         ]);
     }

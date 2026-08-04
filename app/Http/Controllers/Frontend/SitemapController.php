@@ -85,19 +85,44 @@ class SitemapController extends Controller
             });
 
         // Encyclopedia = active ProductCategory rows served at /encyclopedia/{slug}.
+        // Same categories are also exposed as /compare/{slug} price-comparison
+        // pages — emit both URLs per category in one pass so we don't run
+        // the query twice.
         ProductCategory::where('is_active', true)
             ->whereNotNull('slug')
             ->select('id', 'slug', 'updated_at')
             ->chunkById(500, function ($chunk) use (&$urls) {
                 foreach ($chunk as $c) {
+                    $lastmod = $c->updated_at?->toDateString();
                     $urls[] = [
                         'loc'        => self::BASE_URL . '/encyclopedia/' . $c->slug,
-                        'lastmod'    => $c->updated_at?->toDateString(),
+                        'lastmod'    => $lastmod,
                         'changefreq' => 'monthly',
                         'priority'   => '0.6',
                     ];
+                    $urls[] = [
+                        'loc'        => self::BASE_URL . '/compare/' . $c->slug,
+                        'lastmod'    => $lastmod,
+                        'changefreq' => 'weekly',
+                        'priority'   => '0.7',  // commercial intent > informational
+                    ];
                 }
             });
+
+        // Curated X-vs-Y comparison pages. Filter to pairs whose both slugs
+        // resolve to active categories — otherwise we'd emit 404 URLs to
+        // Google after retiring a compound.
+        $activeSlugs = ProductCategory::where('is_active', true)
+            ->whereNotNull('slug')->pluck('slug')->flip();
+        foreach (\App\Http\Controllers\Frontend\CompareController::FEATURED_VS_PAIRS as $p) {
+            if (!isset($activeSlugs[$p['a']]) || !isset($activeSlugs[$p['b']])) continue;
+            $urls[] = [
+                'loc'        => self::BASE_URL . "/compare/{$p['a']}-vs-{$p['b']}",
+                'lastmod'    => $today,
+                'changefreq' => 'weekly',
+                'priority'   => '0.6',
+            ];
+        }
 
         // Blog posts.
         if (\Schema::hasTable('blogs')) {

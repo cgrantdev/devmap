@@ -164,6 +164,32 @@
       </div>
     </section>
 
+    <!-- Head-to-head suggestions — pairs from FEATURED_VS_PAIRS involving this compound.
+         Positioned right after the price table so someone finishing a scan
+         of the vendor list has a natural next-click to a comparison page. -->
+    <section v-if="vsPairs?.length" class="border-t border-[color:var(--color-hairline)] bg-white">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">
+          Compare {{ compound.name }} with…
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <a
+            v-for="p in vsPairs"
+            :key="p.url"
+            :href="p.url"
+            class="ui-focus group p-4 rounded-[10px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all"
+          >
+            <div class="text-[14px] font-semibold leading-tight">
+              <span class="text-indigo-700">{{ p.a_name }}</span>
+              <span class="text-[color:var(--color-ink-subtle)] mx-1.5 font-light">vs</span>
+              <span class="text-emerald-700">{{ p.b_name }}</span>
+            </div>
+            <div class="mt-1 text-[11px] text-[color:var(--color-ink-muted)]">{{ p.tagline }}</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- Related compounds (internal linking, strategist rec #16) -->
     <section v-if="related.length" class="border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
@@ -195,6 +221,7 @@ import ModernLayout from '../Layouts/ModernLayout.vue'
 defineProps({
   compound: { type: Object, required: true },
   related: { type: Array, default: () => [] },
+  vsPairs: { type: Array, default: () => [] },
   seo: { type: Object, default: () => ({}) },
 })
 
