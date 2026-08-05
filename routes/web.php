@@ -451,6 +451,12 @@ Route::middleware('auth')->group(function () {
 });
 
 // /vendors now serves the modern Brands page (same controller as /brands)
+// Vendor integration docs — technical guide for vendor IT teams hooking
+// their catalog into Peptidemap. Must be registered BEFORE /vendors so
+// Laravel doesn't try to match /vendors/integration against the index route.
+Route::get('/vendors/integration', [\App\Http\Controllers\Frontend\VendorIntegrationController::class, 'show'])
+    ->name('vendors.integration');
+
 Route::get('/vendors', [BrandsController::class, 'index'])->name('vendors.public');
 // /shop/{slug} redirects to the rich brand products page
 Route::get('/shop/{vendor_name}', function ($vendor_name) {
