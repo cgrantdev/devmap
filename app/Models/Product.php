@@ -185,10 +185,21 @@ class Product extends Model
             $size .= 'mg';
         }
 
-        // Always just "{Category} ({size})". When the product type matters
-        // (Capsule / Nasal Spray), the frontend renders a colored chip next
-        // to the name rather than appending it to the string.
-        return "{$categoryName} ({$size})";
+        // Base "{Category} ({size})"; append a type suffix for non-peptide
+        // formats so the name itself signals what you're buying (a spray
+        // vs. a lyophilized vial vs. a topical cream). Frontend also renders
+        // a colored chip — the string version is what the DB-normalized
+        // display_name emits so it flows to serialized JSON, product
+        // schema, OG images, etc.
+        $base = "{$categoryName} ({$size})";
+        $typeSuffix = match ($this->product_type) {
+            'Nasal Spray' => ' Spray',
+            'Capsule'     => ' Capsule',
+            'Topical'     => ' Topical',
+            'Kit'         => ' Kit',
+            default       => '',
+        };
+        return $base . $typeSuffix;
     }
 
     /**
