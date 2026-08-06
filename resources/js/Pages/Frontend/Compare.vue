@@ -218,9 +218,6 @@
                         class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200"
                       >Kit</span>
                     </div>
-                    <span v-if="product.size_mg" class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)]">
-                      {{ formatSize(product.size_mg) }}
-                    </span>
                   </td>
                   <!-- Retail price -->
                   <td class="px-5 py-4 text-right">
