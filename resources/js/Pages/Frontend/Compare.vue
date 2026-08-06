@@ -36,9 +36,6 @@
           </svg>
         </div>
         <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-0.5 flex-wrap">
-            <span class="text-[10px] uppercase tracking-[0.12em] font-bold text-sky-700 bg-white/70 px-1.5 py-0.5 rounded">Dedicated page</span>
-          </div>
           <div class="text-[15px] lg:text-[16px] font-semibold text-[color:var(--color-ink)] leading-tight">
             Looking for bacteriostatic water?
           </div>
