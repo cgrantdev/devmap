@@ -171,19 +171,11 @@ class Product extends Model
         $categoryName = $category ? trim($category->name) : null;
         $size = $this->size_mg ? trim((string) $this->size_mg) : null;
 
-        // Fallback: extract a size from the raw product name when size_mg is
-        // empty. Rescues comparison tables from vendor-name chaos ("BAC 10ml",
-        // "Reconstitution Solution — 10ML", "BPC-157 10mg", etc.) without
-        // requiring every product to be triaged first. Best-effort — returns
-        // null on ambiguous or unparseable names, which falls through to the
-        // raw-name branch below.
-        if (!$size && $this->name) {
-            $size = $this->extractSizeFromName($this->name);
-        }
-
         // Fall back to the imported name if we don't have enough to build a
-        // clean display name. Better to show the raw import than something
-        // like "(5mg)" with no peptide name.
+        // clean display name. Only normalize when size_mg is EXPLICITLY set
+        // — guessing at sizes by parsing the raw name risks lying (e.g.
+        // matching "3g" from a cream that's actually 3mL, or picking up a
+        // lot code number). Better to show the raw import than invent.
         if (!$categoryName || !$size) {
             return $this->name ?? '';
         }
@@ -197,27 +189,6 @@ class Product extends Model
         // (Capsule / Nasal Spray), the frontend renders a colored chip next
         // to the name rather than appending it to the string.
         return "{$categoryName} ({$size})";
-    }
-
-    /**
-     * Pull a "10mg" / "500mcg" / "10mL" / "1000 IU" style size out of an
-     * arbitrary product name. First-match wins; units canonically cased on
-     * output. Returns null if the name has no recognizable size token.
-     * Guards against absurd numbers (>10000) to avoid matching lot codes,
-     * SKUs, and CAS numbers that appear in some vendor names.
-     */
-    protected function extractSizeFromName(string $name): ?string
-    {
-        if (!preg_match('/(\d+(?:\.\d+)?)\s?(mcg|mg|g|ml|iu)\b/i', $name, $m)) {
-            return null;
-        }
-        $num = (float) $m[1];
-        if ($num <= 0 || $num > 10000) return null;
-
-        $unitLc = strtolower($m[2]);
-        $unit = ['mcg' => 'mcg', 'mg' => 'mg', 'g' => 'g', 'ml' => 'mL', 'iu' => 'IU'][$unitLc] ?? $unitLc;
-        $numStr = ($num == (int) $num) ? (string) (int) $num : (string) $num;
-        return $numStr . $unit;
     }
 
     /**
