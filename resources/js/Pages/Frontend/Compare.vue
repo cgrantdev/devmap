@@ -240,7 +240,11 @@
                       <span
                         v-else-if="product.product_type === 'Nasal Spray'"
                         class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200"
-                      >Nasal Spray</span>
+                      >Spray</span>
+                      <span
+                        v-else-if="product.product_type === 'Topical'"
+                        class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-cyan-100 text-cyan-800 border border-cyan-200"
+                      >Topical</span>
                       <span
                         v-else-if="product.product_type === 'Kit'"
                         class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200"
@@ -497,9 +501,12 @@ function discountedPriceFor(product) {
   return (base * (1 - pct / 100)).toFixed(2)
 }
 
-// Coupon code label for the discounted price column. Falls back to PMAP
-// so the label is never blank when a discount applies.
+// Coupon code label — only returned when the vendor actually has a real
+// discount percent configured. Otherwise the pill would show "PMAP" for
+// vendors where PMAP does nothing, which reads as a fake/broken coupon.
 function couponCodeFor(product) {
+  const pct = parseFloat(product?.brand_discount_percent)
+  if (!pct || pct <= 0 || pct >= 100) return null
   const raw = (product?.brand_coupon_code || '').trim()
   return (raw || 'PMAP').toUpperCase()
 }
