@@ -26,21 +26,21 @@
          compound rows below to only products of that type; 'All' resets.
          Counts derived client-side from the compounds payload so the row
          quietly hides types with zero inventory. -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8">
-      <div class="grid grid-cols-3 md:grid-cols-6 gap-2 lg:gap-3">
+    <section class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 pt-6">
+      <div class="grid grid-cols-3 md:grid-cols-6 gap-1.5 sm:gap-2 lg:gap-3">
         <button
           v-for="t in typeNavItems"
           :key="t.key"
           @click="selectedType = (selectedType === t.key ? null : t.key)"
           :class="[
-            'ui-focus group flex flex-col items-center justify-center gap-1.5 p-3 lg:p-4 rounded-[12px] border-2 transition-all',
+            'ui-focus group flex flex-col items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:p-3 lg:p-4 rounded-[10px] sm:rounded-[12px] border-2 transition-all',
             selectedType === t.key
               ? 'border-[color:var(--color-ink)] bg-[color:var(--color-ink)] text-white shadow-[var(--shadow-md)]'
               : 'border-[color:var(--color-hairline)] bg-white text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]',
           ]"
         >
-          <div class="text-2xl leading-none">{{ t.icon }}</div>
-          <div class="text-[12px] lg:text-[13px] font-semibold leading-none">{{ t.label }}</div>
+          <div class="text-lg sm:text-xl lg:text-2xl leading-none">{{ t.icon }}</div>
+          <div class="text-[11px] sm:text-[12px] lg:text-[13px] font-semibold leading-none">{{ t.label }}</div>
           <div :class="['text-[10px] ui-mono', selectedType === t.key ? 'text-white/70' : 'text-[color:var(--color-ink-subtle)]']">
             {{ t.count }}
           </div>
@@ -120,24 +120,24 @@
                it just reflected order in the featured-list constant, not
                popularity or price rank; users read it as ranking and got
                confused. -->
-          <div class="flex items-start justify-between gap-4 mb-3 flex-wrap">
+          <div class="flex items-start justify-between gap-3 sm:gap-4 mb-3 flex-wrap">
             <div class="min-w-0 flex-1">
-              <h2 class="ui-display text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-1">
+              <h2 class="ui-display text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-1 leading-tight">
                 {{ compound.name }}
               </h2>
-              <div class="flex items-baseline gap-3 text-[12px] text-[color:var(--color-ink-muted)] mb-2">
+              <div class="flex items-baseline gap-2 sm:gap-3 text-[12px] text-[color:var(--color-ink-muted)] mb-2 flex-wrap">
                 <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.vendor_count }}</strong> vendors</span>
                 <span v-if="compound.cheapest_price" class="text-[color:var(--color-ink-subtle)]">·</span>
                 <span v-if="compound.cheapest_price" class="ui-mono font-semibold text-emerald-700">from ${{ formatPrice(compound.cheapest_price) }}</span>
               </div>
-              <p v-if="compound.description" class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl line-clamp-2">
+              <p v-if="compound.description" class="text-[13px] sm:text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl line-clamp-2">
                 {{ compound.description }}
               </p>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0 flex-wrap">
               <a
                 :href="`/compare/${compound.slug}`"
-                class="ui-focus inline-flex items-center gap-1.5 h-9 px-4 rounded-[9px] bg-[color:var(--color-ink)] text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
+                class="ui-focus inline-flex items-center gap-1.5 h-8 sm:h-9 px-3 sm:px-4 rounded-[8px] sm:rounded-[9px] bg-[color:var(--color-ink)] text-white text-[12px] sm:text-[13px] font-semibold hover:opacity-90 transition-opacity"
                 :title="`Full ${compound.name} vendor comparison`"
               >
                 Full comparison
@@ -146,7 +146,7 @@
               <a
                 v-if="compound.encyclopedia_url"
                 :href="compound.encyclopedia_url"
-                class="ui-focus inline-flex items-center gap-1.5 h-9 px-4 rounded-[9px] border border-[color:var(--color-hairline)] bg-white text-[13px] font-semibold text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] transition-colors"
+                class="ui-focus inline-flex items-center gap-1.5 h-8 sm:h-9 px-3 sm:px-4 rounded-[8px] sm:rounded-[9px] border border-[color:var(--color-hairline)] bg-white text-[12px] sm:text-[13px] font-semibold text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] transition-colors"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M4 19.5A2.5 2.5 0 016.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
@@ -157,11 +157,11 @@
           </div>
 
           <!-- Mg size selector tabs -->
-          <div v-if="getSizes(compound).length > 1" class="flex items-center gap-1.5 mb-4">
+          <div v-if="getSizes(compound).length > 1" class="flex items-center gap-1.5 mb-4 overflow-x-auto -mx-1 px-1 pb-1">
             <button
               @click="setSize(idx, null)"
               :class="[
-                'ui-mono h-8 px-3 rounded-[8px] text-[12px] font-semibold transition-all',
+                'ui-mono h-8 px-3 rounded-[8px] text-[12px] font-semibold transition-all whitespace-nowrap flex-shrink-0',
                 getSelectedSize(idx) === null
                   ? 'bg-[color:var(--color-ink)] text-white shadow-sm'
                   : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]',
@@ -172,7 +172,7 @@
               :key="size"
               @click="setSize(idx, size)"
               :class="[
-                'ui-mono h-8 px-3 rounded-[8px] text-[12px] font-semibold transition-all',
+                'ui-mono h-8 px-3 rounded-[8px] text-[12px] font-semibold transition-all whitespace-nowrap flex-shrink-0',
                 getSelectedSize(idx) === size
                   ? 'bg-[color:var(--color-ink)] text-white shadow-sm'
                   : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]',
