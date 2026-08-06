@@ -54,9 +54,22 @@ class BacteriostaticWaterController extends Controller
                 // a $16 30mL beats a $10 10mL on a per-mL basis.
                 $perMlPrice = $volumeMl ? round($finalPrice / $volumeMl, 3) : null;
 
+                // Normalized display label. On this dedicated page every row
+                // IS bacteriostatic water — using each vendor's raw name
+                // leaks their internal wording ("BAC 10ml", "Sterile Water",
+                // "Reconstitution Solution") and makes the table look
+                // inconsistent. Format uniformly around the volume we
+                // extracted; keep original name as a tooltip fallback so
+                // vendor-specific info (Hospira, "sterile", brand variants)
+                // isn't fully lost.
+                $displayName = $volumeMl
+                    ? "Bacteriostatic Water · {$volumeMl} mL"
+                    : ($p->display_name ?: $p->name);
+
                 return [
                     'id' => $p->id,
-                    'name' => $p->name,
+                    'name' => $displayName,
+                    'raw_name' => $p->name,
                     'slug' => $p->slug,
                     'brand_name' => $p->brand?->name,
                     'brand_slug' => $p->brand?->slug,

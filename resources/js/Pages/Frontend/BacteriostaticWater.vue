@@ -100,7 +100,7 @@
                   </div>
                 </td>
                 <td class="px-5 py-4">
-                  <a :href="r.product_url" class="text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors">{{ r.name }}</a>
+                  <a :href="r.product_url" :title="r.raw_name" class="text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors">{{ r.name }}</a>
                 </td>
                 <td class="px-5 py-4 text-right ui-mono text-[13px] text-[color:var(--color-ink)]">
                   {{ r.volume_ml ? r.volume_ml + ' mL' : '—' }}
