@@ -124,7 +124,7 @@
 
               <!-- Product Grid — 3-up at md+ with generous spacing so each
                    product image gets room to breathe -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                 <ProductSimpleCard
                   v-for="product in products.data"
                   :key="product.id"

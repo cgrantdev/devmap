@@ -105,7 +105,7 @@
       <!-- Vendor card grid — logo prominent, equal weight.
            Featured/partner vendors get a shiny animated gold border so they
            stand out without breaking the grid rhythm. -->
-      <div v-if="filteredBrands.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div v-if="filteredBrands.length > 0" class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
         <a
           v-for="brand in filteredBrands"
           :key="brand.id"

@@ -180,18 +180,23 @@
             >{{ formatSize(size) }}</button>
           </div>
 
-          <!-- Price table -->
+          <!-- Price table. Mobile hides Product + Retail (compound name
+               already in the section header above, and retail is visible
+               as strikethrough inside 'Your price' when a coupon applies).
+               Wrapper allows horizontal scroll as a safety net for really
+               narrow screens. -->
           <div v-if="getFilteredProducts(compound, idx).length" class="bg-white rounded-[14px] border border-[color:var(--color-hairline)] overflow-hidden shadow-[var(--shadow-xs)]">
+           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
-                  <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendor</th>
-                  <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Product</th>
-                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Retail</th>
-                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700 bg-emerald-50/50">Your price</th>
-                  <th class="text-center px-3 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-amber-700 bg-amber-50/60">Coupon</th>
+                  <th class="text-left px-3 sm:px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendor</th>
+                  <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden md:table-cell">Product</th>
+                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden md:table-cell">Retail</th>
+                  <th class="text-right px-3 sm:px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700 bg-emerald-50/50">Price</th>
+                  <th class="text-center px-2 sm:px-3 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-amber-700 bg-amber-50/60">Coupon</th>
                   <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden sm:table-cell">Savings</th>
-                  <th class="text-right px-5 py-3 w-[100px]"></th>
+                  <th class="text-right px-3 sm:px-5 py-3 w-[70px] sm:w-[100px]"></th>
                 </tr>
               </thead>
               <tbody>
@@ -204,8 +209,8 @@
                   ]"
                 >
                   <!-- Vendor -->
-                  <td class="px-5 py-4">
-                    <div class="flex items-center gap-2.5">
+                  <td class="px-3 sm:px-5 py-3 sm:py-4">
+                    <div class="flex items-center gap-2 sm:gap-2.5">
                       <div class="flex-shrink-0 w-7 h-7 rounded-[6px] overflow-hidden bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)]">
                         <img
                           v-if="product.brand_logo"
@@ -215,14 +220,16 @@
                           loading="lazy"
                         />
                       </div>
-                      <div>
+                      <div class="min-w-0">
                         <a
                           :href="`/shop/${product.brand_slug}`"
-                          class="font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors"
+                          class="block font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors truncate"
                         >
                           {{ product.brand_name }}
                         </a>
-                        <div v-if="pidx === 0" class="flex items-center gap-1 mt-0.5">
+                        <!-- Mobile-only: surface the product name since the Product column is hidden <md -->
+                        <div class="md:hidden text-[11px] text-[color:var(--color-ink-subtle)] truncate">{{ product.name }}</div>
+                        <div v-if="pidx === 0" class="flex items-center gap-1 mt-0.5 flex-wrap">
                           <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Best price</span>
                           <span
                             v-if="percentCheaper(getFilteredProducts(compound, idx))"
@@ -234,8 +241,8 @@
                       </div>
                     </div>
                   </td>
-                  <!-- Product -->
-                  <td class="px-5 py-4 text-[color:var(--color-ink-muted)]">
+                  <!-- Product — hidden on mobile (name shown under vendor instead) -->
+                  <td class="px-5 py-4 text-[color:var(--color-ink-muted)] hidden md:table-cell">
                     <div class="flex items-center gap-1.5 flex-wrap">
                       <span class="line-clamp-1">{{ product.name }}</span>
                       <span
@@ -256,8 +263,8 @@
                       >Kit</span>
                     </div>
                   </td>
-                  <!-- Retail price -->
-                  <td class="px-5 py-4 text-right">
+                  <!-- Retail — hidden on mobile (strikethrough already in Price cell) -->
+                  <td class="px-5 py-4 text-right hidden md:table-cell">
                     <div v-if="product.discount_price && product.discount_price < product.price" class="flex flex-col items-end">
                       <span class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">${{ formatPrice(product.discount_price) }}</span>
                       <span class="ui-mono text-[11px] text-[color:var(--color-ink)] line-through">${{ formatPrice(product.price) }}</span>
@@ -266,29 +273,38 @@
                       ${{ formatPrice(product.price) }}
                     </span>
                   </td>
-                  <!-- Your price (post-coupon) — bare price, code moved to its own column -->
-                  <td class="px-5 py-4 text-right bg-emerald-50/50">
-                    <span v-if="discountedPriceFor(product)" class="ui-mono text-[15px] font-bold text-emerald-700">${{ discountedPriceFor(product) }}</span>
-                    <span v-else class="text-[12px] text-[color:var(--color-ink-subtle)]">—</span>
+                  <!-- Price — on mobile, folds in strikethrough retail since the Retail column is hidden -->
+                  <td class="px-3 sm:px-5 py-3 sm:py-4 text-right bg-emerald-50/50 whitespace-nowrap">
+                    <template v-if="discountedPriceFor(product)">
+                      <div class="ui-mono text-[14px] sm:text-[15px] font-bold text-emerald-700">${{ discountedPriceFor(product) }}</div>
+                      <div v-if="product.price" class="md:hidden ui-mono text-[10px] text-[color:var(--color-ink-subtle)] line-through leading-tight">${{ formatPrice(product.price) }}</div>
+                    </template>
+                    <template v-else>
+                      <div v-if="product.discount_price && product.discount_price < product.price" class="flex flex-col items-end">
+                        <span class="ui-mono text-[14px] sm:text-[15px] font-bold text-[color:var(--color-ink)]">${{ formatPrice(product.discount_price) }}</span>
+                        <span class="md:hidden ui-mono text-[10px] text-[color:var(--color-ink-subtle)] line-through leading-tight">${{ formatPrice(product.price) }}</span>
+                      </div>
+                      <span v-else class="ui-mono text-[14px] sm:text-[15px] font-bold text-[color:var(--color-ink)]">${{ formatPrice(product.price) }}</span>
+                    </template>
                   </td>
                   <!-- Coupon — its own prominent click-to-copy column so
                        people who don't want to click through can still grab
                        the code. Amber dashed border, click flashes to green. -->
-                  <td class="px-3 py-4 text-center bg-amber-50/60">
+                  <td class="px-2 sm:px-3 py-3 sm:py-4 text-center bg-amber-50/60">
                     <button
                       v-if="couponCodeFor(product)"
                       @click="copyCoupon(product.id, couponCodeFor(product))"
                       :class="[
-                        'ui-focus inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border-2 border-dashed transition-all',
+                        'ui-focus inline-flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-md border-2 border-dashed transition-all',
                         copiedCouponId === product.id
                           ? 'border-emerald-400 bg-emerald-100 text-emerald-800'
                           : 'border-amber-400 bg-amber-100 text-amber-900 hover:bg-amber-200 hover:border-amber-500',
                       ]"
                       :title="copiedCouponId === product.id ? 'Copied!' : 'Click to copy'"
                     >
-                      <span class="ui-mono text-[13px] font-bold tracking-wide">{{ couponCodeFor(product) }}</span>
+                      <span class="ui-mono text-[12px] sm:text-[13px] font-bold tracking-wide">{{ couponCodeFor(product) }}</span>
                       <svg v-if="copiedCouponId === product.id" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                      <svg v-else class="w-3 h-3 hidden sm:inline" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                     </button>
                     <span v-else class="text-[12px] text-[color:var(--color-ink-subtle)]">—</span>
                   </td>
@@ -306,7 +322,7 @@
                   <!-- CTA. href preserved so bots + right-click "open in
                        new tab" both work; @click intercepts JS clicks to
                        show the coupon reveal first. -->
-                  <td class="px-5 py-4 text-right">
+                  <td class="px-3 sm:px-5 py-3 sm:py-4 text-right">
                     <a
                       :href="product.go_url"
                       @click="openBuy($event, product)"
@@ -323,6 +339,7 @@
                 </tr>
               </tbody>
             </table>
+           </div>
             <!-- Show more / less toggle. Hidden when the filtered set fits under the cap. -->
             <button
               v-if="getFilteredProducts(compound, idx).length > 5"
