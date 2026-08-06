@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\ProductClick;
+use App\Models\ScrapingConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -69,11 +70,14 @@ class OutboundClickController extends Controller
      *      every outbound click goes there (matches how the affiliate
      *      programs actually credit us — a single tracked entry point).
      *   2. brands.affiliate_url_template — legacy per-product templating.
-     *   3. products.product_url — raw scraped URL, no tracking.
+     *   3. products.product_url — raw scraped URL, coupon-injected when
+     *      the brand has a configured PMAP discount.
      */
     protected function resolveDestinationUrl(Product $product): ?string
     {
-        // 1. Vendor-wide referral URL wins if configured.
+        // 1. Vendor-wide referral URL wins if configured. Don't touch it —
+        //    affiliate landing pages carry their own tracking and can break
+        //    when unknown query params are appended.
         $referral = $product->brand?->vendorSetting?->referral_url;
         if (!empty($referral)) {
             return $referral;
@@ -83,7 +87,11 @@ class OutboundClickController extends Controller
         $productUrl = $product->product_url;
 
         if (empty($template)) {
-            return $productUrl;
+            // Path 3: raw scraped URL. Try to inject the vendor's coupon
+            // via a platform-appropriate URL scheme so the discount
+            // pre-applies at the vendor's checkout without the user having
+            // to copy/paste PMAP manually.
+            return $this->injectCoupon($productUrl, $product);
         }
 
         $replacements = [
@@ -101,6 +109,74 @@ class OutboundClickController extends Controller
         }
 
         return $resolved;
+    }
+
+    /**
+     * Rewrite the vendor's product URL so the coupon code pre-applies on
+     * arrival, when we can. Detects platform two ways:
+     *   1. Explicit hint from the brand's ScrapingConfig.type (Woo, Medusa,
+     *      BigCommerce, JSON-LD which is usually a Shopify/Next storefront)
+     *   2. URL heuristic — /products/{handle} + non-blacklisted host reads
+     *      as Shopify
+     *
+     * Falls back to appending ?coupon= + ?discount= as a best-effort for
+     * unknown platforms — harmless when the vendor's site ignores unknown
+     * params, occasionally works for WooCommerce sites running a coupon-URL
+     * plugin.
+     *
+     * Never touches a URL when the brand has no active PMAP discount.
+     */
+    protected function injectCoupon(?string $url, Product $product): ?string
+    {
+        if (empty($url)) return $url;
+        $vendorSetting = $product->brand?->vendorSetting;
+        $pct = $vendorSetting?->coupon_discount_percent;
+        if (!$pct || $pct <= 0 || $pct >= 100) return $url;
+        $code = trim((string) ($vendorSetting?->coupon_code ?? 'PMAP'));
+        if ($code === '') return $url;
+
+        // Bail cleanly on unparseable / non-HTTP URLs.
+        $parts = @parse_url($url);
+        if (!$parts || empty($parts['host']) || empty($parts['scheme'])) return $url;
+
+        $host = strtolower($parts['host']);
+        $path = $parts['path'] ?? '/';
+        $existingQuery = $parts['query'] ?? '';
+
+        // Detect Shopify — cheapest reliable check: the .myshopify.com
+        // fallback host + /products/ path pattern. Custom Shopify domains
+        // (most vendors) also match the URL pattern.
+        // Brand → ScrapingConfig isn't a defined relation on the model, so
+        // query directly. Cached indirectly by MySQL query cache; the /go
+        // route is per-click, not high-throughput, so an extra one-row
+        // lookup per redirect is fine.
+        $scrapeType = $product->brand_id
+            ? ScrapingConfig::where('vendor_id', $product->brand_id)->value('type')
+            : null;
+        $looksShopify = str_contains($host, 'myshopify.com')
+            || (str_contains($path, '/products/')
+                && !str_contains($host, 'medusajs.')
+                && !str_contains($host, 'bigcommerce.com')
+                && !in_array($scrapeType, ['medusa_store', 'bigcommerce', 'woo_api', 'wp_rest'], true));
+
+        if ($looksShopify) {
+            // Shopify's canonical discount-application route. Preserves the
+            // original path + query as ?redirect= so user lands on the same
+            // product page with the discount already in cart.
+            $redirect = $path . ($existingQuery ? '?' . $existingQuery : '');
+            return $parts['scheme'] . '://' . $parts['host']
+                . '/discount/' . rawurlencode($code)
+                . '?redirect=' . rawurlencode($redirect);
+        }
+
+        // WooCommerce / unknown: best-effort. Append both param names —
+        // `coupon_code` is the WooCommerce URL-Coupons plugin standard,
+        // `coupon` is the widely-recognized generic. Platforms that don't
+        // recognize either silently ignore.
+        $extra = 'coupon_code=' . rawurlencode($code) . '&coupon=' . rawurlencode($code);
+        $joined = $existingQuery ? $existingQuery . '&' . $extra : $extra;
+        return $parts['scheme'] . '://' . $parts['host'] . $path . '?' . $joined
+            . (isset($parts['fragment']) ? '#' . $parts['fragment'] : '');
     }
 
     /**
