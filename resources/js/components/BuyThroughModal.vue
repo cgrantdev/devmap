@@ -61,11 +61,30 @@
           @click="handleContinue"
           target="_blank"
           rel="noopener noreferrer nofollow sponsored"
-          class="ui-focus w-full inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[10px] text-white font-semibold text-[14px] bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:-translate-y-[0.5px] transition-all"
+          class="ui-focus relative w-full inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[10px] text-white font-semibold text-[14px] bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:-translate-y-[0.5px] transition-all overflow-hidden"
         >
-          Continue to {{ brandName || 'vendor' }}
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          <!-- Progress fill that drains as the countdown ticks. Sits behind
+               the label; opacity kept low so text stays readable. -->
+          <span
+            class="absolute inset-y-0 left-0 bg-white/15 transition-[width] duration-1000 ease-linear pointer-events-none"
+            :style="{ width: countdown > 0 ? ((countdown / AUTO_REDIRECT_SECONDS) * 100) + '%' : '0%' }"
+            aria-hidden="true"
+          ></span>
+          <span class="relative flex items-center gap-2">
+            Continue to {{ brandName || 'vendor' }}
+            <span v-if="countdown > 0" class="ui-mono text-[12px] font-semibold text-white/70">
+              {{ countdown }}s
+            </span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </span>
         </a>
+        <button
+          v-if="countdown > 0"
+          @click="cancelAutoRedirect"
+          class="mt-2 w-full text-center text-[11px] text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)] transition-colors"
+        >
+          Cancel auto-redirect
+        </button>
       </div>
     </div>
   </transition>
@@ -74,18 +93,26 @@
 <script setup>
 import { ref } from 'vue'
 
+const AUTO_REDIRECT_SECONDS = 4
+
 const visible = ref(false)
 const destination = ref('')
 const code = ref('PMAP')
 const brandName = ref('')
 const discountPct = ref(null)
 const copied = ref(false)
+const countdown = ref(0)
 let _copyTimer = null
+let _countdownTimer = null
 
 /**
  * Open the modal. Called by parent pages via ref: modal.value.open({...}).
  * Kept intentionally imperative — this is a UI overlay driven by click
  * events, not app state.
+ *
+ * Also starts a 4-second auto-redirect countdown. If the user does nothing,
+ * we open the vendor page for them (opt-out via 'Cancel auto-redirect' link
+ * or clicking Copy — copying implies they want more time to grab the code).
  */
 function open({ destination: dest, code: c, brandName: b, discountPct: pct }) {
   destination.value = dest || ''
@@ -94,15 +121,44 @@ function open({ destination: dest, code: c, brandName: b, discountPct: pct }) {
   discountPct.value = pct ? Math.round(pct) : null
   copied.value = false
   visible.value = true
+  startCountdown()
+}
+
+function startCountdown() {
+  clearInterval(_countdownTimer)
+  countdown.value = AUTO_REDIRECT_SECONDS
+  _countdownTimer = setInterval(() => {
+    countdown.value -= 1
+    if (countdown.value <= 0) {
+      clearInterval(_countdownTimer)
+      autoRedirect()
+    }
+  }, 1000)
+}
+
+function cancelAutoRedirect() {
+  clearInterval(_countdownTimer)
+  countdown.value = 0
+}
+
+function autoRedirect() {
+  if (!destination.value) return
+  window.open(destination.value, '_blank', 'noopener,noreferrer')
+  visible.value = false
 }
 
 function close() {
   visible.value = false
   clearTimeout(_copyTimer)
+  clearInterval(_countdownTimer)
+  countdown.value = 0
   copied.value = false
 }
 
 async function copy() {
+  // Copying implies the user wants a moment to sit with the code — cancel
+  // the auto-redirect so they don't get yanked mid-thought.
+  cancelAutoRedirect()
   const text = code.value
   try {
     await navigator.clipboard.writeText(text)
@@ -119,11 +175,10 @@ async function copy() {
 }
 
 function handleContinue() {
-  // Auto-close as the new tab opens so the modal doesn't linger. Don't
-  // preventDefault — the anchor tag does the actual navigation, we're
-  // just tidying up.
+  // Manual click on Continue — kill both timers and let the anchor do its thing.
   visible.value = false
   clearTimeout(_copyTimer)
+  clearInterval(_countdownTimer)
 }
 
 defineExpose({ open, close })

@@ -76,50 +76,32 @@
       </a>
     </section>
 
-    <!-- Compound directory — bigger cards with breathing room; each links
-         to the dedicated /compare/{slug} vendor page. Anchor-scroll
-         behavior traded for real navigation since /compare/{slug} is a
-         better destination (schema, sitemap, focused H1). -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
-      <div class="flex items-baseline justify-between mb-4">
-        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)]">
-          Browse {{ compounds.length }} compounds
+    <!-- Compact search + jump bar. Replaces the previous 25-card grid —
+         too much real estate for what's essentially a table of contents.
+         Typing filters per-compound sections below in real time; the
+         Jump dropdown is a fallback for people who want to skim all names. -->
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6 pb-2">
+      <div class="flex flex-col md:flex-row md:items-center gap-3">
+        <div class="relative flex-1">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input
+            v-model="compoundSearch"
+            type="search"
+            placeholder="Search compounds — BPC-157, Semaglutide, Tirzepatide…"
+            class="w-full h-11 pl-10 pr-4 text-[14px] border border-[color:var(--color-hairline)] rounded-[10px] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 transition-colors"
+          />
         </div>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <a
-          v-for="compound in compounds"
-          :key="compound.id"
-          :href="`/compare/${compound.slug}`"
-          class="ui-focus group flex flex-col justify-between p-5 rounded-[14px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-200 relative"
-          :title="`Compare ${compound.name} vendors`"
+        <select
+          v-model="jumpTarget"
+          @change="jumpTo"
+          class="h-11 px-3 pr-8 text-[14px] border border-[color:var(--color-hairline)] rounded-[10px] bg-white text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 transition-colors"
         >
-          <div class="absolute top-3 right-3 z-10">
-            <WishlistHeart type="category" :id="compound.id" size="sm" />
-          </div>
-
-          <div>
-            <h3 class="ui-display text-[18px] lg:text-[19px] font-semibold text-[color:var(--color-ink)] leading-tight group-hover:text-[color:var(--color-accent-700)] transition-colors line-clamp-2 min-h-[2.4em] pr-6">
-              {{ compound.name }}
-            </h3>
-            <div class="mt-2 flex items-baseline gap-3 text-[12px]">
-              <span class="text-[color:var(--color-ink-muted)]">
-                <strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.vendor_count }}</strong> vendor{{ compound.vendor_count !== 1 ? 's' : '' }}
-              </span>
-              <span v-if="compound.cheapest_price" class="text-[color:var(--color-ink-subtle)]">·</span>
-              <span v-if="compound.cheapest_price" class="ui-mono font-semibold text-emerald-700">
-                from ${{ formatPrice(compound.cheapest_price) }}
-              </span>
-            </div>
-          </div>
-
-          <div class="mt-4 pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between">
-            <span class="text-[12px] font-semibold text-[color:var(--color-accent-600)] group-hover:text-[color:var(--color-accent-700)] transition-colors">
-              Compare vendors
-            </span>
-            <svg class="w-4 h-4 text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </div>
-        </a>
+          <option value="">Jump to compound…</option>
+          <option v-for="c in compounds" :key="c.id" :value="c.anchor">{{ c.name }}</option>
+        </select>
+        <div class="text-[12px] text-[color:var(--color-ink-subtle)] whitespace-nowrap">
+          {{ visibleCompoundCount }} of {{ compounds.length }} shown
+        </div>
       </div>
     </section>
 
@@ -128,7 +110,7 @@
       <div class="space-y-16">
         <div
           v-for="(compound, idx) in compounds"
-          v-show="!selectedType || compound.products.some(p => productMatchesType(p, selectedType))"
+          v-show="compoundMatchesSearch(compound) && (!selectedType || compound.products.some(p => productMatchesType(p, selectedType)))"
           :key="compound.id"
           :id="compound.anchor"
           class="scroll-mt-24"
@@ -433,6 +415,33 @@ const props = defineProps({
 
 // Track selected mg size per compound (by index). null = "All"
 const selectedSizes = ref({})
+
+// Compound name search — filters the per-compound sections below in real
+// time. Replaces the previous 25-card grid which ate a screen of vertical
+// space to browse a list of 25 items.
+const compoundSearch = ref('')
+const jumpTarget = ref('')
+function compoundMatchesSearch(compound) {
+  const q = compoundSearch.value.trim().toLowerCase()
+  if (!q) return true
+  return String(compound.name || '').toLowerCase().includes(q)
+}
+const visibleCompoundCount = computed(() =>
+  props.compounds.filter(c =>
+    compoundMatchesSearch(c) &&
+    (!selectedType.value || c.products.some(p => productMatchesType(p, selectedType.value)))
+  ).length
+)
+function jumpTo() {
+  const anchor = jumpTarget.value
+  if (!anchor) return
+  compoundSearch.value = ''
+  // Small tick for the section to un-hide if it was filtered out, then scroll.
+  requestAnimationFrame(() => {
+    document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    jumpTarget.value = ''
+  })
+}
 
 // Product-type filter (Peptide / Topical / Capsule / Nasal Spray / Kit / Other).
 // null = "All" — the default. Values match the product.product_type string
