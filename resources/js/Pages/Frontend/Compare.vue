@@ -156,7 +156,8 @@
                   <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendor</th>
                   <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Product</th>
                   <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Retail</th>
-                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700 bg-emerald-50/50">Price with code</th>
+                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700 bg-emerald-50/50">Your price</th>
+                  <th class="text-center px-3 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-amber-700 bg-amber-50/60">Coupon</th>
                   <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden sm:table-cell">Savings</th>
                   <th class="text-right px-5 py-3 w-[100px]"></th>
                 </tr>
@@ -229,14 +230,30 @@
                       ${{ formatPrice(product.price) }}
                     </span>
                   </td>
-                  <!-- Price with code (separate column; tinted emerald) -->
+                  <!-- Your price (post-coupon) — bare price, code moved to its own column -->
                   <td class="px-5 py-4 text-right bg-emerald-50/50">
-                    <template v-if="discountedPriceFor(product)">
-                      <div class="flex flex-col items-end leading-tight">
-                        <span class="ui-mono text-[15px] font-bold text-emerald-700">${{ discountedPriceFor(product) }}</span>
-                        <span class="ui-mono text-[10px] text-emerald-700 font-semibold uppercase tracking-wide mt-0.5">{{ couponCodeFor(product) }}</span>
-                      </div>
-                    </template>
+                    <span v-if="discountedPriceFor(product)" class="ui-mono text-[15px] font-bold text-emerald-700">${{ discountedPriceFor(product) }}</span>
+                    <span v-else class="text-[12px] text-[color:var(--color-ink-subtle)]">—</span>
+                  </td>
+                  <!-- Coupon — its own prominent click-to-copy column so
+                       people who don't want to click through can still grab
+                       the code. Amber dashed border, click flashes to green. -->
+                  <td class="px-3 py-4 text-center bg-amber-50/60">
+                    <button
+                      v-if="couponCodeFor(product)"
+                      @click="copyCoupon(product.id, couponCodeFor(product))"
+                      :class="[
+                        'ui-focus inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border-2 border-dashed transition-all',
+                        copiedCouponId === product.id
+                          ? 'border-emerald-400 bg-emerald-100 text-emerald-800'
+                          : 'border-amber-400 bg-amber-100 text-amber-900 hover:bg-amber-200 hover:border-amber-500',
+                      ]"
+                      :title="copiedCouponId === product.id ? 'Copied!' : 'Click to copy'"
+                    >
+                      <span class="ui-mono text-[13px] font-bold tracking-wide">{{ couponCodeFor(product) }}</span>
+                      <svg v-if="copiedCouponId === product.id" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    </button>
                     <span v-else class="text-[12px] text-[color:var(--color-ink-subtle)]">—</span>
                   </td>
                   <!-- Savings — retail → what you actually pay (folds in
@@ -428,6 +445,28 @@ function discountedPriceFor(product) {
 function couponCodeFor(product) {
   const raw = (product?.brand_coupon_code || '').trim()
   return (raw || 'PMAP').toUpperCase()
+}
+
+// Click-to-copy state for the coupon column. Only one code is highlighted
+// at a time — copying a second code moves the highlight; the flash clears
+// on its own after 2s. Keyed by product id so multiple rows can each show
+// their own copied state within the same rendered table.
+const copiedCouponId = ref(null)
+let _copyResetTimer = null
+async function copyCoupon(productId, code) {
+  try {
+    await navigator.clipboard.writeText(code)
+  } catch {
+    // Non-HTTPS or older browser — fall back to hidden textarea select+copy.
+    const ta = document.createElement('textarea')
+    ta.value = code; ta.style.cssText = 'position:fixed;left:-9999px'
+    document.body.appendChild(ta); ta.select()
+    try { document.execCommand('copy') } catch {}
+    document.body.removeChild(ta)
+  }
+  copiedCouponId.value = productId
+  clearTimeout(_copyResetTimer)
+  _copyResetTimer = setTimeout(() => { copiedCouponId.value = null }, 2000)
 }
 
 // Total savings vs. bare retail. Combines the vendor's own sale
