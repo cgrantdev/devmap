@@ -317,10 +317,13 @@
                     </span>
                     <span v-else class="text-[color:var(--color-ink-subtle)]">—</span>
                   </td>
-                  <!-- CTA -->
+                  <!-- CTA. href preserved so bots + right-click "open in
+                       new tab" both work; @click intercepts JS clicks to
+                       show the coupon reveal first. -->
                   <td class="px-5 py-4 text-right">
                     <a
                       :href="product.go_url"
+                      @click="openBuy($event, product)"
                       target="_blank"
                       rel="noopener noreferrer nofollow sponsored"
                       class="ui-focus inline-flex items-center gap-1 h-8 px-3 rounded-[8px] text-[12px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08)] hover:shadow-[0_2px_8px_-2px_rgba(79,70,229,0.5)] hover:-translate-y-[0.5px] transition-all"
@@ -392,6 +395,8 @@
         </div>
       </div>
     </section>
+
+    <BuyThroughModal ref="buyModal" />
   </ModernLayout>
 </template>
 
@@ -400,6 +405,25 @@ import { ref, computed } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
+import BuyThroughModal from '@/components/BuyThroughModal.vue'
+
+const buyModal = ref(null)
+
+// Intercept Buy clicks so the coupon reveal shows first. Only interrupt
+// plain left-clicks — modifier clicks (cmd, middle, right) fall through
+// to the browser's native new-tab / open-in-new-window behavior.
+function openBuy(ev, product) {
+  if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return
+  const code = couponCodeFor(product)
+  if (!code) return // No coupon = no need to interrupt; native click continues.
+  ev.preventDefault()
+  buyModal.value?.open({
+    destination: product.go_url,
+    code,
+    brandName: product.brand_name,
+    discountPct: product.brand_discount_percent,
+  })
+}
 
 const props = defineProps({
   compounds: { type: Array, default: () => [] },

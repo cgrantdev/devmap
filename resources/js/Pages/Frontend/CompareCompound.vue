@@ -141,6 +141,7 @@
                 <td class="px-5 py-4 text-right">
                   <a
                     :href="product.go_url"
+                    @click="openBuy($event, product)"
                     target="_blank"
                     rel="noopener noreferrer nofollow sponsored"
                     class="ui-focus inline-flex items-center gap-1 h-9 px-3 rounded-md text-[12px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:-translate-y-[1px] transition-all"
@@ -211,12 +212,16 @@
         </div>
       </div>
     </section>
+
+    <BuyThroughModal ref="buyModal" />
   </ModernLayout>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import ModernLayout from '../Layouts/ModernLayout.vue'
+import BuyThroughModal from '@/components/BuyThroughModal.vue'
 
 defineProps({
   compound: { type: Object, required: true },
@@ -224,6 +229,21 @@ defineProps({
   vsPairs: { type: Array, default: () => [] },
   seo: { type: Object, default: () => ({}) },
 })
+
+const buyModal = ref(null)
+function openBuy(ev, product) {
+  if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return
+  const pct = parseFloat(product?.brand_discount_percent)
+  if (!pct || pct <= 0 || pct >= 100) return
+  const code = ((product?.brand_coupon_code || '').trim() || 'PMAP').toUpperCase()
+  ev.preventDefault()
+  buyModal.value?.open({
+    destination: product.go_url,
+    code,
+    brandName: product.brand_name,
+    discountPct: pct,
+  })
+}
 
 function formatPrice(v) {
   if (v == null) return '—'

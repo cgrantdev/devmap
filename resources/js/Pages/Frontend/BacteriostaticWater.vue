@@ -117,7 +117,7 @@
                   <span v-else class="text-[color:var(--color-ink-subtle)] text-[12px]">—</span>
                 </td>
                 <td class="px-5 py-4 text-right">
-                  <a :href="r.go_url" target="_blank" rel="noopener noreferrer nofollow sponsored" class="ui-focus inline-flex items-center gap-1 h-9 px-3 rounded-md text-[12px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:-translate-y-[1px] transition-all">
+                  <a :href="r.go_url" @click="openBuy($event, r)" target="_blank" rel="noopener noreferrer nofollow sponsored" class="ui-focus inline-flex items-center gap-1 h-9 px-3 rounded-md text-[12px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:-translate-y-[1px] transition-all">
                     Buy
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
                   </a>
@@ -191,6 +191,8 @@
         </div>
       </div>
     </section>
+
+    <BuyThroughModal ref="buyModal" />
   </ModernLayout>
 </template>
 
@@ -198,6 +200,7 @@
 import { Head } from '@inertiajs/vue3'
 import { ref, computed, defineComponent, h } from 'vue'
 import ModernLayout from '../Layouts/ModernLayout.vue'
+import BuyThroughModal from '@/components/BuyThroughModal.vue'
 
 const props = defineProps({
   rows: { type: Array, default: () => [] },
@@ -207,6 +210,21 @@ const props = defineProps({
 })
 
 const selectedSize = ref(null)
+
+const buyModal = ref(null)
+function openBuy(ev, r) {
+  if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return
+  const pct = parseFloat(r?.brand_discount_percent)
+  if (!pct || pct <= 0 || pct >= 100) return
+  const code = ((r?.brand_coupon_code || '').trim() || 'PMAP').toUpperCase()
+  ev.preventDefault()
+  buyModal.value?.open({
+    destination: r.go_url,
+    code,
+    brandName: r.brand_name,
+    discountPct: pct,
+  })
+}
 
 const filteredRows = computed(() => {
   if (selectedSize.value == null) return props.rows
