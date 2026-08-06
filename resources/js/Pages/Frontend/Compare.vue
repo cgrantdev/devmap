@@ -22,6 +22,37 @@
       </div>
     </section>
 
+    <!-- Dedicated-landing banner — high-intent shortcut for people looking
+         for BAC water specifically. Sits above the compound grid so it
+         reads as a distinct destination, not just another tile. -->
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8">
+      <a
+        href="/bacteriostatic-water"
+        class="ui-focus group flex items-center gap-4 p-4 lg:p-5 rounded-[12px] border border-sky-200 bg-gradient-to-r from-sky-50 to-cyan-50/60 hover:border-sky-400 hover:shadow-[var(--shadow-md)] transition-all"
+      >
+        <div class="flex-shrink-0 w-11 h-11 rounded-full bg-white border border-sky-200 flex items-center justify-center">
+          <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>
+          </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-0.5 flex-wrap">
+            <span class="text-[10px] uppercase tracking-[0.12em] font-bold text-sky-700 bg-white/70 px-1.5 py-0.5 rounded">Dedicated page</span>
+          </div>
+          <div class="text-[15px] lg:text-[16px] font-semibold text-[color:var(--color-ink)] leading-tight">
+            Looking for bacteriostatic water?
+          </div>
+          <div class="text-[12px] text-[color:var(--color-ink-muted)] mt-0.5">
+            51 vendors, sorted by per-mL price · size filter, coupon codes, FAQ
+          </div>
+        </div>
+        <div class="flex-shrink-0 hidden sm:flex items-center gap-1 text-[13px] font-semibold text-sky-700 group-hover:text-sky-800 transition-colors">
+          Open
+          <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+    </section>
+
     <!-- Compound quick-nav grid -->
     <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
