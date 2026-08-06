@@ -76,38 +76,39 @@
       </a>
     </section>
 
-    <!-- Compact search + jump bar. Replaces the previous 25-card grid —
-         too much real estate for what's essentially a table of contents.
-         Typing filters per-compound sections below in real time; the
-         Jump dropdown is a fallback for people who want to skim all names. -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6 pb-2">
-      <div class="flex flex-col md:flex-row md:items-center gap-3">
+    <!-- Compact fuzzy search. Matches compound name/slug/description AND
+         a small ALIASES table for shortnames (reta, RTA, GLP-3R, etc.),
+         AND every product row's raw vendor name so vendor-specific
+         labels ('SLU-PP-332', 'Wolverine Spray') still surface their
+         parent compound. -->
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3">
         <div class="relative flex-1">
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input
             v-model="compoundSearch"
             type="search"
-            placeholder="Search compounds — BPC-157, Semaglutide, Tirzepatide…"
-            class="w-full h-11 pl-10 pr-4 text-[14px] border border-[color:var(--color-hairline)] rounded-[10px] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 transition-colors"
+            placeholder="Search — try BPC, reta, RTA, GLP-1, sema, cagri, wolverine…"
+            class="w-full h-11 pl-10 pr-9 text-[14px] border border-[color:var(--color-hairline)] rounded-[10px] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 transition-colors"
           />
+          <button
+            v-if="compoundSearch"
+            @click="compoundSearch = ''"
+            aria-label="Clear search"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)] p-1"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
         </div>
-        <select
-          v-model="jumpTarget"
-          @change="jumpTo"
-          class="h-11 px-3 pr-8 text-[14px] border border-[color:var(--color-hairline)] rounded-[10px] bg-white text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 transition-colors"
-        >
-          <option value="">Jump to compound…</option>
-          <option v-for="c in compounds" :key="c.id" :value="c.anchor">{{ c.name }}</option>
-        </select>
-        <div class="text-[12px] text-[color:var(--color-ink-subtle)] whitespace-nowrap">
-          {{ visibleCompoundCount }} of {{ compounds.length }} shown
+        <div class="text-[12px] text-[color:var(--color-ink-subtle)] whitespace-nowrap ui-mono">
+          {{ visibleCompoundCount }} of {{ compounds.length }}
         </div>
       </div>
     </section>
 
     <!-- Per-compound vendor pricing sections -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pb-20">
-      <div class="space-y-16">
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-10 pb-20">
+      <div class="space-y-12">
         <div
           v-for="(compound, idx) in compounds"
           v-show="compoundMatchesSearch(compound) && (!selectedType || compound.products.some(p => productMatchesType(p, selectedType)))"
@@ -115,16 +116,19 @@
           :id="compound.anchor"
           class="scroll-mt-24"
         >
-          <!-- Compound header -->
-          <div class="flex items-start justify-between gap-4 mb-4 flex-wrap">
-            <div>
-              <div class="flex items-center gap-3 mb-2">
-                <span class="ui-mono text-[11px] font-bold px-2 py-0.5 rounded-md bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)]">
-                  #{{ idx + 1 }}
-                </span>
-                <h2 class="ui-display text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">
-                  {{ compound.name }}
-                </h2>
+          <!-- Compound header. Dropped the #{{ idx+1 }} position badge —
+               it just reflected order in the featured-list constant, not
+               popularity or price rank; users read it as ranking and got
+               confused. -->
+          <div class="flex items-start justify-between gap-4 mb-3 flex-wrap">
+            <div class="min-w-0 flex-1">
+              <h2 class="ui-display text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-1">
+                {{ compound.name }}
+              </h2>
+              <div class="flex items-baseline gap-3 text-[12px] text-[color:var(--color-ink-muted)] mb-2">
+                <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.vendor_count }}</strong> vendors</span>
+                <span v-if="compound.cheapest_price" class="text-[color:var(--color-ink-subtle)]">·</span>
+                <span v-if="compound.cheapest_price" class="ui-mono font-semibold text-emerald-700">from ${{ formatPrice(compound.cheapest_price) }}</span>
               </div>
               <p v-if="compound.description" class="text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl line-clamp-2">
                 {{ compound.description }}
@@ -416,15 +420,61 @@ const props = defineProps({
 // Track selected mg size per compound (by index). null = "All"
 const selectedSizes = ref({})
 
-// Compound name search — filters the per-compound sections below in real
-// time. Replaces the previous 25-card grid which ate a screen of vertical
-// space to browse a list of 25 items.
+// Compound search — fuzzy match across name, slug, description, vendor
+// product names, AND a curated shortnames table so people can type what
+// they actually type ('reta', 'RTA', 'GLP-3R', 'sema', 'ghk') and land
+// on the right compound. Replaces the old 25-card grid which ate a
+// screen of vertical space to browse a list of 25 items.
 const compoundSearch = ref('')
-const jumpTarget = ref('')
+
+// Extend this whenever a compound has common shortnames people search
+// for that don't share letters with the full name. Values are lowercase;
+// the search input is lowercased before matching.
+const COMPOUND_ALIASES = {
+  'retatrutide':   ['reta', 'rta', 'glp3', 'glp-3', 'glp-3r', 'glp3r', 'triple agonist'],
+  'semaglutide':   ['sema', 'glp1', 'glp-1', 'ozempic', 'wegovy'],
+  'tirzepatide':   ['tirz', 'tzp', 'mounjaro', 'zepbound', 'gip'],
+  'cagrilintide':  ['cagri', 'cag'],
+  'bpc-157':       ['bpc', 'body protection compound'],
+  'tb-500':        ['tb500', 'thymosin', 'tb4'],
+  'ghk-cu':        ['ghk', 'copper peptide', 'copper'],
+  'cjc-1295':      ['cjc', 'mod grf', 'modified grf'],
+  'ipamorelin':    ['ipa', 'ipam'],
+  'sermorelin':    ['serm'],
+  'tesamorelin':   ['tesa', 'egrifta'],
+  'mots-c':        ['mots', 'motsc'],
+  'pt-141':        ['pt141', 'bremelanotide'],
+  'kisspeptin':    ['kiss', 'kp-10'],
+  '5-amino-1mq':   ['5amino', 'aminomq', '1mq'],
+  'aod-9604':      ['aod', 'aod9604'],
+  'nad+':          ['nad', 'nicotinamide'],
+  'glutathione':   ['gsh'],
+  'igf-1 lr3':     ['igf1', 'igf-1', 'igf', 'lr3'],
+  'ss-31':         ['ss31', 'elamipretide'],
+  'tesofensine':   ['tesof', 'tso'],
+  'glow':          ['glow stack', 'skin peptide'],
+  'klow':          ['klow stack'],
+}
+function compoundHaystack(compound) {
+  // Build once per compound per keystroke — small (25 rows), so fine to
+  // recompute rather than cache.
+  const name = String(compound.name || '').toLowerCase()
+  const slug = String(compound.slug || '').toLowerCase()
+  const desc = String(compound.description || '').toLowerCase()
+  const aliases = (COMPOUND_ALIASES[slug] || COMPOUND_ALIASES[name] || []).join(' ')
+  const productNames = (compound.products || [])
+    .slice(0, 20)                          // cap so a compound with 100 vendors doesn't dominate
+    .map(p => (p.name || '').toLowerCase())
+    .join(' ')
+  return `${name} ${slug} ${desc} ${aliases} ${productNames}`
+}
 function compoundMatchesSearch(compound) {
-  const q = compoundSearch.value.trim().toLowerCase()
-  if (!q) return true
-  return String(compound.name || '').toLowerCase().includes(q)
+  const raw = compoundSearch.value.trim().toLowerCase()
+  if (!raw) return true
+  // Split on whitespace so "ghk cu" matches "ghk-cu"; every token must appear.
+  const tokens = raw.split(/\s+/).filter(Boolean)
+  const hay = compoundHaystack(compound)
+  return tokens.every(t => hay.includes(t))
 }
 const visibleCompoundCount = computed(() =>
   props.compounds.filter(c =>
@@ -432,16 +482,6 @@ const visibleCompoundCount = computed(() =>
     (!selectedType.value || c.products.some(p => productMatchesType(p, selectedType.value)))
   ).length
 )
-function jumpTo() {
-  const anchor = jumpTarget.value
-  if (!anchor) return
-  compoundSearch.value = ''
-  // Small tick for the section to un-hide if it was filtered out, then scroll.
-  requestAnimationFrame(() => {
-    document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    jumpTarget.value = ''
-  })
-}
 
 // Product-type filter (Peptide / Topical / Capsule / Nasal Spray / Kit / Other).
 // null = "All" — the default. Values match the product.product_type string
