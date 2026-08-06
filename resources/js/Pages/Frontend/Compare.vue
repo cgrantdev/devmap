@@ -22,10 +22,36 @@
       </div>
     </section>
 
+    <!-- Product-type nav: 6 blocks across the top. Click filters the
+         compound rows below to only products of that type; 'All' resets.
+         Counts derived client-side from the compounds payload so the row
+         quietly hides types with zero inventory. -->
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8">
+      <div class="grid grid-cols-3 md:grid-cols-6 gap-2 lg:gap-3">
+        <button
+          v-for="t in typeNavItems"
+          :key="t.key"
+          @click="selectedType = (selectedType === t.key ? null : t.key)"
+          :class="[
+            'ui-focus group flex flex-col items-center justify-center gap-1.5 p-3 lg:p-4 rounded-[12px] border-2 transition-all',
+            selectedType === t.key
+              ? 'border-[color:var(--color-ink)] bg-[color:var(--color-ink)] text-white shadow-[var(--shadow-md)]'
+              : 'border-[color:var(--color-hairline)] bg-white text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]',
+          ]"
+        >
+          <div class="text-2xl leading-none">{{ t.icon }}</div>
+          <div class="text-[12px] lg:text-[13px] font-semibold leading-none">{{ t.label }}</div>
+          <div :class="['text-[10px] ui-mono', selectedType === t.key ? 'text-white/70' : 'text-[color:var(--color-ink-subtle)]']">
+            {{ t.count }}
+          </div>
+        </button>
+      </div>
+    </section>
+
     <!-- Dedicated-landing banner — high-intent shortcut for people looking
          for BAC water specifically. Sits above the compound grid so it
          reads as a distinct destination, not just another tile. -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8">
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6">
       <a
         href="/bacteriostatic-water"
         class="ui-focus group flex items-center gap-4 p-4 lg:p-5 rounded-[12px] border border-sky-200 bg-gradient-to-r from-sky-50 to-cyan-50/60 hover:border-sky-400 hover:shadow-[var(--shadow-md)] transition-all"
@@ -83,6 +109,7 @@
       <div class="space-y-16">
         <div
           v-for="(compound, idx) in compounds"
+          v-show="!selectedType || compound.products.some(p => productMatchesType(p, selectedType))"
           :key="compound.id"
           :id="compound.anchor"
           class="scroll-mt-24"
@@ -346,7 +373,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
@@ -359,6 +386,33 @@ const props = defineProps({
 
 // Track selected mg size per compound (by index). null = "All"
 const selectedSizes = ref({})
+
+// Product-type filter (Peptide / Topical / Capsule / Nasal Spray / Kit / Other).
+// null = "All" — the default. Values match the product.product_type string
+// stored on each row, with 'Peptide' also treated as the null/default type
+// (many older products have no product_type set — they're peptides by default).
+const selectedType = ref(null)
+function productMatchesType(product, typeKey) {
+  if (typeKey === null) return true
+  const pt = product?.product_type ?? null
+  if (typeKey === 'Peptide') return !pt || pt === 'Peptide'
+  return pt === typeKey
+}
+const typeNavItems = computed(() => {
+  const defs = [
+    { key: 'Peptide',     icon: '🧪', label: 'Peptides' },
+    { key: 'Topical',     icon: '💧', label: 'Topicals' },
+    { key: 'Capsule',     icon: '💊', label: 'Capsules' },
+    { key: 'Nasal Spray', icon: '💨', label: 'Sprays' },
+    { key: 'Kit',         icon: '📦', label: 'Kits' },
+    { key: 'Other',       icon: '⚪', label: 'Other' },
+  ]
+  return defs.map(d => ({
+    ...d,
+    count: props.compounds.reduce((n, c) =>
+      n + c.products.filter(p => productMatchesType(p, d.key)).length, 0),
+  }))
+})
 
 function getSizes(compound) {
   // Collect unique size strings ("10mg", "5mg/5mg", etc.) and sort by the
@@ -387,8 +441,11 @@ function setSize(idx, size) {
 
 function getFilteredProducts(compound, idx) {
   const size = getSelectedSize(idx)
-  if (!size) return compound.products
-  return compound.products.filter(p => String(p.size_mg).toLowerCase() === String(size).toLowerCase())
+  return compound.products.filter(p => {
+    if (size && String(p.size_mg).toLowerCase() !== String(size).toLowerCase()) return false
+    if (!productMatchesType(p, selectedType.value)) return false
+    return true
+  })
 }
 
 // Collapse each compound to top 5 rows by default — the page was scrolling
