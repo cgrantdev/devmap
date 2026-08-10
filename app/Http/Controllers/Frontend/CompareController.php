@@ -173,6 +173,8 @@ class CompareController extends Controller
                         'go_url' => "/go/{$product->id}",
                         'brand_name' => $product->brand?->name,
                         'brand_slug' => $product->brand?->slug,
+                        'brand_location' => $product->brand?->vendorSetting?->location?->name,
+                        'brand_location_id' => $product->brand?->vendorSetting?->location_id,
                         'brand_logo' => $product->brand?->vendorSetting?->logo
                             ? asset('storage/' . $product->brand->vendorSetting->logo)
                             : null,
@@ -232,9 +234,29 @@ class CompareController extends Controller
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
 
+        // Location filter options: only locations that actually have at
+         // least one vendor with a product surfaced on this page. Sorted by
+         // count desc so US-heavy inventory naturally leads the dropdown.
+        $vendorLocationIds = collect($compounds)->flatMap(fn ($c) => collect($c['products'])
+            ->pluck('brand_location_id')
+            ->filter()
+            ->unique()
+        )->countBy();
+        $locations = \App\Models\Location::whereIn('id', $vendorLocationIds->keys())
+            ->get(['id', 'name'])
+            ->map(fn ($l) => [
+                'id' => $l->id,
+                'name' => $l->name,
+                'count' => (int) $vendorLocationIds[$l->id],
+            ])
+            ->sortByDesc('count')
+            ->values()
+            ->all();
+
         return Inertia::render('Frontend/Compare', [
             'compounds' => $compounds,
             'featuredPairs' => $this->resolveFeaturedPairs(),
+            'locations' => $locations,
             'seo' => $seo,
         ]);
     }
@@ -612,7 +634,7 @@ class CompareController extends Controller
                       $qq->whereNull('discount_price')->where('price', '>', 0);
                   });
             })
-            ->with('brand.vendorSetting')
+            ->with('brand.vendorSetting.location')
             ->get()
             ->map(function ($product) {
                 $retail = (float) (

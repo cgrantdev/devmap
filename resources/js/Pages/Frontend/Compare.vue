@@ -81,8 +81,8 @@
          AND every product row's raw vendor name so vendor-specific
          labels ('SLU-PP-332', 'Wolverine Spray') still surface their
          parent compound. -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6">
-      <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+    <section class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 pt-6">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
         <div class="relative flex-1">
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input
@@ -100,6 +100,21 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
         </div>
+        <!-- Ships-from filter. Sidesteps the multi-currency mismatch
+             (EUR vs USD vendors mixed) by letting the visitor scope to
+             one location. Persists in localStorage so it carries across
+             pageviews. Only shows locations that have live inventory. -->
+        <select
+          v-if="locations.length"
+          v-model="selectedLocationId"
+          class="h-11 px-3 pr-9 text-[14px] border border-[color:var(--color-hairline)] rounded-[10px] bg-white text-[color:var(--color-ink)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 transition-colors"
+          aria-label="Filter by vendor location"
+        >
+          <option :value="null">🌎 Ships from · Any</option>
+          <option v-for="loc in locations" :key="loc.id" :value="loc.id">
+            {{ locationFlag(loc.name) }} {{ loc.name }} ({{ loc.count }})
+          </option>
+        </select>
         <div class="text-[12px] text-[color:var(--color-ink-subtle)] whitespace-nowrap ui-mono">
           {{ visibleCompoundCount }} of {{ compounds.length }}
         </div>
@@ -111,7 +126,7 @@
       <div class="space-y-12">
         <div
           v-for="(compound, idx) in compounds"
-          v-show="compoundMatchesSearch(compound) && (!selectedType || compound.products.some(p => productMatchesType(p, selectedType)))"
+          v-show="compoundMatchesSearch(compound) && compound.products.some(p => (!selectedType || productMatchesType(p, selectedType)) && productMatchesLocation(p))"
           :key="compound.id"
           :id="compound.anchor"
           class="scroll-mt-24"
@@ -404,7 +419,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
@@ -431,8 +446,51 @@ function openBuy(ev, product) {
 const props = defineProps({
   compounds: { type: Array, default: () => [] },
   featuredPairs: { type: Array, default: () => [] },
+  locations: { type: Array, default: () => [] },
   seo: { type: Object, default: () => ({}) },
 })
+
+// Ships-from filter — persisted in localStorage so the visitor's chosen
+// location survives page loads. null = 'Any' (default).
+const LOCATION_KEY = 'pmap.compare.location'
+const selectedLocationId = ref(null)
+if (typeof window !== 'undefined') {
+  const stored = localStorage.getItem(LOCATION_KEY)
+  if (stored) {
+    const id = parseInt(stored, 10)
+    // Only re-apply if the stored id is still in the current locations list —
+    // otherwise a retired vendor could permanently blank the compare page.
+    if (props.locations.some(l => l.id === id)) selectedLocationId.value = id
+  }
+  watch(selectedLocationId, (v) => {
+    if (v == null) localStorage.removeItem(LOCATION_KEY)
+    else localStorage.setItem(LOCATION_KEY, String(v))
+  })
+}
+
+function productMatchesLocation(product) {
+  if (selectedLocationId.value == null) return true
+  return product.brand_location_id === selectedLocationId.value
+}
+
+// Emoji flag hint for the ships-from dropdown. Just the countries we
+// actually have vendors in — no need to enumerate all 200 Location rows.
+function locationFlag(name) {
+  return {
+    'United States':  '🇺🇸',
+    'United Kingdom': '🇬🇧',
+    'Germany':        '🇩🇪',
+    'Czechia':        '🇨🇿',
+    'Romania':        '🇷🇴',
+    'Canada':         '🇨🇦',
+    'Australia':      '🇦🇺',
+    'Netherlands':    '🇳🇱',
+    'Poland':         '🇵🇱',
+    'France':         '🇫🇷',
+    'Italy':          '🇮🇹',
+    'Spain':          '🇪🇸',
+  }[name] || '🌍'
+}
 
 // Track selected mg size per compound (by index). null = "All"
 const selectedSizes = ref({})
@@ -496,7 +554,10 @@ function compoundMatchesSearch(compound) {
 const visibleCompoundCount = computed(() =>
   props.compounds.filter(c =>
     compoundMatchesSearch(c) &&
-    (!selectedType.value || c.products.some(p => productMatchesType(p, selectedType.value)))
+    c.products.some(p =>
+      (!selectedType.value || productMatchesType(p, selectedType.value)) &&
+      productMatchesLocation(p)
+    )
   ).length
 )
 
@@ -557,6 +618,7 @@ function getFilteredProducts(compound, idx) {
   return compound.products.filter(p => {
     if (size && String(p.size_mg).toLowerCase() !== String(size).toLowerCase()) return false
     if (!productMatchesType(p, selectedType.value)) return false
+    if (!productMatchesLocation(p)) return false
     return true
   })
 }
