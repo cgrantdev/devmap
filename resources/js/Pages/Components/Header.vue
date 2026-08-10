@@ -25,14 +25,16 @@
             </svg>
           </div>
           <div class="relative border-l border-slate-300">
-            <select class="pl-4 pr-8 py-2.5 border border-slate-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-sm appearance-none bg-white text-slate-700 border-l-0 h-full">
-              <option value="all">All</option>
-              <option value="us">United States</option>
-              <option value="uk">United Kingdom</option>
-              <option value="ca">Canada</option>
-              <option value="au">Australia</option>
-              <option value="de">Germany</option>
-              <option value="ch">Switzerland</option>
+            <select
+              :value="location"
+              @change="onLocationChange($event.target.value)"
+              class="pl-4 pr-8 py-2.5 border border-slate-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-slate-400 text-sm appearance-none bg-white text-slate-700 border-l-0 h-full"
+              aria-label="Filter site by vendor location"
+            >
+              <option value="">All Locations</option>
+              <option v-for="loc in siteLocations" :key="loc.name" :value="loc.name">
+                {{ loc.name }} ({{ loc.vendor_count }})
+              </option>
             </select>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none hidden" aria-hidden="true">
               <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
@@ -79,14 +81,16 @@
 
         <!-- Location Filter -->
         <div class="relative">
-          <select class="w-full pl-10 pr-8 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm appearance-none bg-white text-gray-700">
-            <option value="all">All Locations</option>
-            <option value="us">United States</option>
-            <option value="uk">United Kingdom</option>
-            <option value="ca">Canada</option>
-            <option value="au">Australia</option>
-            <option value="de">Germany</option>
-            <option value="ch">Switzerland</option>
+          <select
+            :value="location"
+            @change="onLocationChange($event.target.value)"
+            class="w-full pl-10 pr-8 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm appearance-none bg-white text-gray-700"
+            aria-label="Filter site by vendor location"
+          >
+            <option value="">All Locations</option>
+            <option v-for="loc in siteLocations" :key="loc.name" :value="loc.name">
+              {{ loc.name }} ({{ loc.vendor_count }})
+            </option>
           </select>
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" aria-hidden="true">
             <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
@@ -264,25 +268,7 @@
           </div>
           </form>
 
-          <!-- Location Filter -->
-          <div class="relative">
-            <select class="w-full pl-10 pr-8 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm appearance-none bg-white text-gray-700">
-              <option value="all">All Locations</option>
-              <option value="us">United States</option>
-              <option value="uk">United Kingdom</option>
-              <option value="ca">Canada</option>
-              <option value="au">Australia</option>
-              <option value="de">Germany</option>
-              <option value="ch">Switzerland</option>
-            </select>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" aria-hidden="true">
-              <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" aria-hidden="true">
-              <path d="m6 9 6 6 6-6"></path>
-            </svg>
-          </div>
+          <!-- Location filter lives in the always-visible mobile bar above; no duplicate here. -->
         </div>
 
         <!-- Navigation Links -->
@@ -419,10 +405,18 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
+import { useGlobalLocation, applyLocation } from '@/composables/useGlobalLocation'
 
 const mobileMenuOpen = ref(false)
 const page = usePage()
 const searchQuery = ref('')
+
+// Site-wide location filter. `location` is a country name (e.g. "United States")
+// or '' for all locations. `siteLocations` comes from a shared Inertia prop
+// populated in HandleInertiaRequests.
+const { location } = useGlobalLocation()
+const siteLocations = computed(() => page.props.site_locations ?? [])
+const onLocationChange = (val) => applyLocation(val)
 
 const authUser = computed(() => page.props.auth?.user ?? null)
 const isCustomer = computed(() => authUser.value?.role === 'customer')

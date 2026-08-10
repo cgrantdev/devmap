@@ -4,8 +4,10 @@ namespace App\Http\Middleware;
 
 use App\Models\Setting;
 use App\Models\Brand;
+use App\Models\Product;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
 use App\Models\VendorReview;
 
@@ -92,6 +94,22 @@ class HandleInertiaRequests extends Middleware
                     'count' => $rows->count(),
                 ];
             },
+            // Distinct vendor locations with live-inventory counts, powering the
+            // global location dropdown in Header.vue. Cached 10min — this shape
+            // rarely changes and the query joins products→brands→vendor_settings.
+            'site_locations' => fn () => Cache::remember('site_locations_v1', 600, function () {
+                return Product::visible()
+                    ->join('brands', 'products.brand_id', '=', 'brands.id')
+                    ->join('vendor_settings', 'vendor_settings.brand_id', '=', 'brands.id')
+                    ->join('locations', 'locations.id', '=', 'vendor_settings.location_id')
+                    ->selectRaw('locations.name as name, COUNT(DISTINCT brands.id) as vendor_count')
+                    ->groupBy('locations.name')
+                    ->orderByDesc('vendor_count')
+                    ->get()
+                    ->map(fn ($r) => ['name' => $r->name, 'vendor_count' => (int) $r->vendor_count])
+                    ->values()
+                    ->all();
+            }),
             'approved_reviews_count' => fn () => $request->user() && $request->user()->isVendor()
                 ? (function () use ($request) {
                     $brand = Brand::where('user_id', $request->user()->id)->first();
