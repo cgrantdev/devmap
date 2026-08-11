@@ -9,13 +9,19 @@
           ? 'bg-white/10 border border-white/15 text-white hover:bg-white/15'
           : 'border border-[color:var(--color-hairline)] bg-white text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)]',
       ]"
+      :aria-label="location ? `Filtering by ${location}` : 'Filter by vendor location'"
     >
       <img
-        :src="flagUrl(selected.code, 40)"
-        :alt="`${selected.name} flag`"
+        v-if="selectedCode"
+        :src="flagUrl(selectedCode, 40)"
+        :alt="`${location} flag`"
         class="w-5 h-[15px] rounded-[2px] object-cover shadow-[0_0_0_1px_rgba(0,0,0,0.04)]"
       />
-      <span class="hidden md:inline text-[13px] font-semibold tracking-tight">{{ selected.code }}</span>
+      <svg v-else class="w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+      <span class="hidden md:inline text-[13px] font-semibold tracking-tight">{{ selectedCode || 'ALL' }}</span>
       <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 9l6 6 6-6"/>
       </svg>
@@ -34,36 +40,54 @@
         class="absolute right-0 mt-2 w-64 rounded-[12px] bg-white border border-[color:var(--color-hairline)] shadow-[var(--shadow-lg)] overflow-hidden z-50"
       >
         <div class="px-3 py-2 border-b border-[color:var(--color-hairline)] text-[10px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">
-          Ships to
+          Vendors based in
         </div>
         <div class="max-h-80 overflow-y-auto py-1">
           <button
-            v-for="country in countries"
-            :key="country.code"
             type="button"
-            @click="select(country)"
+            @click="select('')"
             :class="[
               'ui-focus w-full flex items-center gap-3 px-3 py-2 text-sm text-left transition-colors',
-              selected.code === country.code
+              !location
+                ? 'bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)]'
+                : 'text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)]',
+            ]"
+          >
+            <span class="w-5 h-[15px] flex items-center justify-center text-[10px] font-bold text-[color:var(--color-ink-subtle)]">All</span>
+            <span class="flex-1 truncate">All locations</span>
+            <svg
+              v-if="!location"
+              class="w-3.5 h-3.5 text-[color:var(--color-accent-600)]"
+              fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+              stroke-linecap="round" stroke-linejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </button>
+          <button
+            v-for="loc in siteLocations"
+            :key="loc.name"
+            type="button"
+            @click="select(loc.name)"
+            :class="[
+              'ui-focus w-full flex items-center gap-3 px-3 py-2 text-sm text-left transition-colors',
+              location === loc.name
                 ? 'bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)]'
                 : 'text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)]',
             ]"
           >
             <img
-              :src="flagUrl(country.code, 40)"
-              :alt="`${country.name} flag`"
+              :src="flagUrl(codeFor(loc.name), 40)"
+              :alt="`${loc.name} flag`"
               class="w-5 h-[15px] rounded-[2px] object-cover shadow-[0_0_0_1px_rgba(0,0,0,0.04)] flex-shrink-0"
             />
-            <span class="flex-1 truncate">{{ country.name }}</span>
+            <span class="flex-1 truncate">{{ loc.name }}</span>
+            <span class="text-[11px] text-[color:var(--color-ink-subtle)] tabular-nums">{{ loc.vendor_count }}</span>
             <svg
-              v-if="selected.code === country.code"
+              v-if="location === loc.name"
               class="w-3.5 h-3.5 text-[color:var(--color-accent-600)]"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              viewBox="0 0 24 24"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+              stroke-linecap="round" stroke-linejoin="round"
             >
               <polyline points="20 6 9 17 4 12" />
             </svg>
@@ -75,62 +99,58 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, defineProps } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { usePage } from '@inertiajs/vue3'
+import { useGlobalLocation, applyLocation } from '@/composables/useGlobalLocation'
 
-const props = defineProps({
+defineProps({
   dark: { type: Boolean, default: false },
 })
 
-const countries = [
-  { code: 'US', name: 'United States' },
-  { code: 'CA', name: 'Canada' },
-  { code: 'GB', name: 'United Kingdom' },
-  { code: 'EU', name: 'European Union' },
-  { code: 'AU', name: 'Australia' },
-  { code: 'DE', name: 'Germany' },
-  { code: 'FR', name: 'France' },
-  { code: 'JP', name: 'Japan' },
-  { code: 'SG', name: 'Singapore' },
-  { code: 'AE', name: 'United Arab Emirates' },
-  { code: 'MX', name: 'Mexico' },
-  { code: 'BR', name: 'Brazil' },
-]
+const page = usePage()
+const siteLocations = computed(() => page.props.site_locations ?? [])
+const { location } = useGlobalLocation()
 
-// flagcdn.com serves PNG flags at arbitrary widths. Free, fast, cached on CDN.
-// For EU we fall back to a generic star graphic since there's no ISO country code.
+// Map full country name → ISO code for flag CDN. Extend as new vendor
+// locations show up in the DB.
+const NAME_TO_CODE = {
+  'United States': 'us',
+  'United Kingdom': 'gb',
+  'Germany': 'de',
+  'Czechia': 'cz',
+  'Romania': 'ro',
+  'Canada': 'ca',
+  'Australia': 'au',
+  'Netherlands': 'nl',
+  'Poland': 'pl',
+  'France': 'fr',
+  'Italy': 'it',
+  'Spain': 'es',
+  'Ireland': 'ie',
+  'Switzerland': 'ch',
+  'Singapore': 'sg',
+  'Japan': 'jp',
+  'Mexico': 'mx',
+  'Brazil': 'br',
+  'United Arab Emirates': 'ae',
+}
+function codeFor(name) { return NAME_TO_CODE[name] || null }
+const selectedCode = computed(() => {
+  const c = codeFor(location.value)
+  return c ? c.toUpperCase() : ''
+})
+
 function flagUrl(code, width = 40) {
   if (!code) return ''
-  if (code === 'EU') return `https://flagcdn.com/w${width}/eu.png`
   return `https://flagcdn.com/w${width}/${code.toLowerCase()}.png`
 }
 
-const STORAGE_KEY = 'pmap.country'
-const selected = ref(countries[0])
 const open = ref(false)
 const rootEl = ref(null)
 
-onMounted(() => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      const found = countries.find((c) => c.code === stored)
-      if (found) selected.value = found
-    }
-  } catch (e) { /* noop */ }
-
-  document.addEventListener('click', handleClickOutside)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
-
-function select(c) {
-  selected.value = c
+function select(name) {
   open.value = false
-  try { localStorage.setItem(STORAGE_KEY, c.code) } catch (e) { /* noop */ }
-  // Dispatch an event so other parts of the app can listen for region changes
-  window.dispatchEvent(new CustomEvent('pmap:country-change', { detail: c }))
+  applyLocation(name)
 }
 
 function handleClickOutside(e) {
@@ -138,4 +158,7 @@ function handleClickOutside(e) {
     open.value = false
   }
 }
+
+onMounted(() => document.addEventListener('click', handleClickOutside))
+onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 </script>

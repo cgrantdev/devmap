@@ -72,6 +72,13 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           </button>
 
+          <!-- Site-wide vendor-location filter. Reloads current URL with
+               ?location={country}; server-side filters on /vendors, /products,
+               and /search pick it up automatically. -->
+          <div class="hidden sm:block">
+            <CountrySelector />
+          </div>
+
           <!-- View Admin (staff CTA) — replaces Get Listed for admin/admin_viewer -->
           <a
             v-if="isStaff"
@@ -165,8 +172,9 @@
           </div>
 
           <!-- Search built into the drawer -->
-          <div class="flex-shrink-0 px-5 py-4 border-b border-[color:var(--color-hairline)]">
+          <div class="flex-shrink-0 px-5 py-4 border-b border-[color:var(--color-hairline)] space-y-3">
             <SearchPalette @navigate="mobileOpen = false" />
+            <CountrySelector />
           </div>
 
           <!-- Nav links -->
