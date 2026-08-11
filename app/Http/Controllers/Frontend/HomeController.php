@@ -377,17 +377,32 @@ class HomeController extends Controller
      * Independent data-fetching from index() so the live site stays untouched
      * while we iterate on the new design.
      */
-    public function v2()
+    public function v2(\Illuminate\Http\Request $request)
     {
+        // Site-wide vendor-location filter, set by the header CountrySelector.
+        // Empty string = All locations. Applied to every brand + product query
+        // below via when() so unfiltered visitors see the full catalog.
+        $locationFilter = trim((string) $request->get('location', ''));
+        $applyBrandLocation = fn ($q) => $locationFilter
+            ? $q->whereHas('vendorSetting.location', fn ($l) => $l->where('name', $locationFilter))
+            : $q;
+        $applyProductLocation = fn ($q) => $locationFilter
+            ? $q->whereHas('brand.vendorSetting.location', fn ($l) => $l->where('name', $locationFilter))
+            : $q;
+
         // Headline stats for the hero trust row
         $verifiedVendorCount = Brand::where('is_active', true)
             ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
+            ->tap($applyBrandLocation)
             ->count();
 
-        $totalVendorCount = Brand::where('is_active', true)->count();
+        $totalVendorCount = Brand::where('is_active', true)
+            ->tap($applyBrandLocation)
+            ->count();
 
         $totalCompoundCount = Product::visible()
             ->where('status', 'active')
+            ->tap($applyProductLocation)
             ->count();
 
         $totalCategoryCount = ProductCategory::where('is_active', true)->count();
@@ -402,6 +417,7 @@ class HomeController extends Controller
         // Top 6 vendors for the vendor grid on the homepage.
         $verifiedVendors = Brand::where('is_active', true)
             ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
+            ->tap($applyBrandLocation)
             ->with(['vendorSetting', 'vendorSetting.location'])
             ->withCount(['products as product_count' => function ($q) {
                 $q->visible()->where('status', 'active');
@@ -443,6 +459,7 @@ class HomeController extends Controller
         // click-count ordering from product_clicks once we have enough data.
         $trendingProducts = Product::visible()
             ->where('status', 'active')
+            ->tap($applyProductLocation)
             ->with('brand.vendorSetting')
             ->orderByDesc('rating_count')
             ->orderByDesc('featured')
@@ -530,6 +547,7 @@ class HomeController extends Controller
                         });
                 });
             })
+            ->tap($applyBrandLocation)
             ->with(['vendorSetting', 'vendorSetting.location'])
             ->withCount(['products as product_count' => function ($q) {
                 $q->visible()->where('status', 'active');
@@ -542,6 +560,7 @@ class HomeController extends Controller
         if ($premiumVendors->isEmpty()) {
             $premiumVendors = Brand::where('is_active', true)
                 ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
+                ->tap($applyBrandLocation)
                 ->with(['vendorSetting', 'vendorSetting.location'])
                 ->withCount(['products as product_count' => function ($q) {
                     $q->visible()->where('status', 'active');
@@ -576,6 +595,7 @@ class HomeController extends Controller
             ->where(function ($query) {
                 $query->whereNull('expiry_date')->orWhere('expiry_date', '>=', now());
             })
+            ->when($locationFilter, fn ($q) => $q->whereHas('brand.vendorSetting.location', fn ($l) => $l->where('name', $locationFilter)))
             ->with(['brand.vendorSetting'])
             ->orderByDesc('discount')
             ->take(8)
@@ -610,6 +630,7 @@ class HomeController extends Controller
                         ->whereNotNull('coupon_code')
                         ->where('coupon_code', '!=', '');
                 })
+                ->tap($applyBrandLocation)
                 ->with(['vendorSetting'])
                 ->take(8 - $limitedDeals->count())
                 ->get()
