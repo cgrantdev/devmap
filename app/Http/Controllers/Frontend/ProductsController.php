@@ -1029,6 +1029,18 @@ class ProductsController extends Controller
                 'location' => $location ? $location->name : null,
                 'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
                 'founded_year' => $brand->vendorSetting && $brand->vendorSetting->founded_year ? $brand->vendorSetting->founded_year : null,
+                // Vendor-declared certifications only. Empty array hides the
+                // panel — never fall back to a default list (IDUN flagged that
+                // as an unearned FDA/ISO claim in Aug 2026).
+                'certifications' => (function () use ($brand) {
+                    $raw = $brand->vendorSetting->certifications ?? null;
+                    if (is_array($raw)) return array_values(array_filter($raw));
+                    if (is_string($raw) && trim($raw)) {
+                        $decoded = json_decode($raw, true);
+                        if (is_array($decoded)) return array_values(array_filter($decoded));
+                    }
+                    return [];
+                })(),
                 'shipping_info' => $brand->vendorSetting && $brand->vendorSetting->shipping_info ? $brand->vendorSetting->shipping_info : null,
                 'return_policy' => $brand->vendorSetting && $brand->vendorSetting->return_policy ? $brand->vendorSetting->return_policy : null,
                 'payment_methods' => $brand->vendorSetting && $brand->vendorSetting->payment_methods ? $brand->vendorSetting->payment_methods : [],

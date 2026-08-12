@@ -327,8 +327,12 @@
                 </div>
               </div>
 
-              <!-- Certifications Panel -->
-              <div class="bg-white border border-gray-200 rounded-lg p-6">
+              <!-- Certifications Panel — only rendered when the vendor has
+                   actually declared certifications. Hardcoded FDA/ISO badges
+                   caused IDUN to be flagged for claiming credentials they
+                   don't hold; leave the panel off until we can verify per
+                   vendor. -->
+              <div v-if="certifications.length" class="bg-white border border-gray-200 rounded-lg p-6">
                 <div class="flex items-center gap-2 mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award w-5 h-5 text-gray-900" aria-hidden="true">
                     <path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"></path>
@@ -917,35 +921,53 @@ const sortOptions = [
   { key: 'name', label: 'A-Z', sort: 'name', dir: 'asc' },
 ]
 
-// Certifications (mock data - can be moved to backend)
-const certifications = ref(['ISO 9001', 'cGMP Compliant', 'FDA Registered'])
+// Certifications — vendor-declared only. Backend passes brand.certifications
+// as an array of strings; empty/null hides the whole panel. Never populate
+// with defaults (the previous hardcoded ISO/FDA list surfaced credentials
+// vendors don't actually hold — flagged by IDUN in Aug 2026).
+const certifications = computed(() => {
+  const raw = props.brand?.certifications
+  if (Array.isArray(raw)) return raw.filter(Boolean)
+  if (typeof raw === 'string' && raw.trim()) {
+    try {
+      const parsed = JSON.parse(raw)
+      return Array.isArray(parsed) ? parsed.filter(Boolean) : []
+    } catch {
+      return []
+    }
+  }
+  return []
+})
 
 // Payment Methods - use from database, fallback to empty array
 const paymentMethods = computed(() => {
   return props.brand?.payment_methods || []
 })
 
-// Calculate years in business from founded year
-const yearsInBusiness = computed(() => {
-  if (props.brand?.founded_year) {
-    const currentYear = new Date().getFullYear()
-    const foundedYear = parseInt(props.brand.founded_year)
-    if (!isNaN(foundedYear) && foundedYear > 0) {
-      const years = currentYear - foundedYear
-      return years > 0 ? `${years}+` : '1+'
-    }
-  }
-  return '13+' // Default fallback
+// Tenure label from founded_year. Returns null when we don't know or when
+// the vendor was founded this year — previously fell back to "1+" or "13+"
+// which read as an unearned credibility claim (flagged by IDUN in Aug 2026).
+const tenureLabel = computed(() => {
+  const foundedYear = parseInt(props.brand?.founded_year)
+  if (isNaN(foundedYear) || foundedYear <= 0) return null
+  const years = new Date().getFullYear() - foundedYear
+  if (years < 0) return null
+  if (years === 0) return `Founded ${foundedYear}`
+  if (years === 1) return '1 year in business'
+  return `${years}+ years in business`
 })
 
-// Why Choose Benefits
-const whyChooseBenefits = computed(() => [
-  'Third-party lab tested products',
-  'Fast & reliable shipping',
-  'Responsive customer service',
-  'Verified customer reviews',
-  `${yearsInBusiness.value} years in business`
-])
+// Why Choose Benefits — tenure line only appears when we can prove it.
+const whyChooseBenefits = computed(() => {
+  const base = [
+    'Third-party lab tested products',
+    'Fast & reliable shipping',
+    'Responsive customer service',
+    'Verified customer reviews',
+  ]
+  if (tenureLabel.value) base.push(tenureLabel.value)
+  return base
+})
 
 // Formatted overall rating
 const formattedOverallRating = computed(() => {
