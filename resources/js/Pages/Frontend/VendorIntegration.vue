@@ -120,30 +120,34 @@
     <section id="push-api" class="border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] scroll-mt-24">
       <div class="max-w-[1024px] mx-auto px-6 lg:px-10 py-10">
         <div class="flex items-center gap-2 mb-3">
-          <span class="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">On request</span>
-          <span class="text-[11px] text-[color:var(--color-ink-subtle)]">Your effort: ~6 hrs</span>
+          <span class="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">Live</span>
+          <span class="text-[11px] text-[color:var(--color-ink-subtle)]">Your effort: ~2 hrs</span>
         </div>
         <h2 class="ui-display text-2xl md:text-3xl font-semibold text-[color:var(--color-ink)] mb-3">Path 2 · Push API</h2>
         <p class="text-[color:var(--color-ink-muted)] leading-relaxed mb-6">
           Instead of us pulling, you push. Whenever your catalog changes on your side (new product, price update, stock change), your system POSTs to our endpoint. We upsert and reflect in the directory within seconds. Good fit if you want near-realtime pricing on Peptidemap or your platform can't host a public JSON file.
         </p>
 
-        <div class="p-4 rounded-[8px] bg-amber-50 border border-amber-200 text-[13px] text-amber-800 mb-6">
-          <strong>Available on request.</strong> We generate a per-vendor API key on your first sync. Ping <a href="mailto:info@peptidemap.com" class="underline font-semibold">info@peptidemap.com</a> and we'll spin one up.
+        <div class="p-4 rounded-[8px] bg-emerald-50 border border-emerald-200 text-[13px] text-emerald-900 mb-6">
+          <strong>Endpoint is live.</strong> Email <a href="mailto:info@peptidemap.com" class="underline font-semibold">info@peptidemap.com</a> with your vendor name and we'll mint a per-brand API key — usually same day. Store it as <code class="ui-mono text-[12px] bg-white/60 px-1 rounded">PMAP_API_KEY</code>; it's shown once at creation.
         </div>
 
-        <h3 class="text-[13px] uppercase tracking-wide font-semibold text-[color:var(--color-ink-subtle)] mb-2">Endpoint</h3>
+        <h3 class="text-[13px] uppercase tracking-wide font-semibold text-[color:var(--color-ink-subtle)] mb-2">Endpoints</h3>
+        <CodeBlock language="http" :code="pushApiEndpoints" />
+
+        <h3 class="text-[13px] uppercase tracking-wide font-semibold text-[color:var(--color-ink-subtle)] mt-6 mb-2">Bulk upsert example</h3>
         <CodeBlock language="http" :code="pushApiExample" />
 
         <h3 class="text-[13px] uppercase tracking-wide font-semibold text-[color:var(--color-ink-subtle)] mt-6 mb-2">Response</h3>
-        <CodeBlock language="json" :code="`{\n  &quot;received&quot;: 42,\n  &quot;created&quot;: 3,\n  &quot;updated&quot;: 39,\n  &quot;errors&quot;: []\n}`" />
+        <CodeBlock language="json" :code="`{\n  &quot;created&quot;: 3,\n  &quot;updated&quot;: 39,\n  &quot;errors&quot;: []\n}`" />
 
         <h3 class="text-[13px] uppercase tracking-wide font-semibold text-[color:var(--color-ink-subtle)] mt-6 mb-3">Notes</h3>
         <ul class="space-y-2 text-[14px] text-[color:var(--color-ink-muted)]">
-          <li class="flex items-start gap-2"><span class="text-[color:var(--color-ink-subtle)] mt-1">·</span>Same product schema as the JSON feed above — send one or many per POST</li>
+          <li class="flex items-start gap-2"><span class="text-[color:var(--color-ink-subtle)] mt-1">·</span>Idempotent by <code class="ui-mono text-[12px] bg-white px-1 rounded">external_id</code> (your SKU) — safe to retry</li>
           <li class="flex items-start gap-2"><span class="text-[color:var(--color-ink-subtle)] mt-1">·</span>Rate limit: 60 requests/minute per API key</li>
-          <li class="flex items-start gap-2"><span class="text-[color:var(--color-ink-subtle)] mt-1">·</span>To delete a product, send it with <code class="ui-mono text-[12px] bg-white px-1 rounded">"status": "discontinued"</code></li>
-          <li class="flex items-start gap-2"><span class="text-[color:var(--color-ink-subtle)] mt-1">·</span>Idempotent by <code class="ui-mono text-[12px] bg-white px-1 rounded">external_id</code> — safe to retry</li>
+          <li class="flex items-start gap-2"><span class="text-[color:var(--color-ink-subtle)] mt-1">·</span>Bulk cap: 500 products per <code class="ui-mono text-[12px] bg-white px-1 rounded">/bulk</code> call</li>
+          <li class="flex items-start gap-2"><span class="text-[color:var(--color-ink-subtle)] mt-1">·</span>Mark out-of-stock by sending <code class="ui-mono text-[12px] bg-white px-1 rounded">"in_stock": false</code>; DELETE hides permanently</li>
+          <li class="flex items-start gap-2"><span class="text-[color:var(--color-ink-subtle)] mt-1">·</span>API-pushed products are never overwritten by our scrapers</li>
         </ul>
       </div>
     </section>
@@ -244,15 +248,32 @@ const jsonFeedExample = `{
   ]
 }`
 
-const pushApiExample = `POST https://peptidemap.com/api/vendor/products
-Authorization: Bearer <your-api-key>
+const pushApiEndpoints = `GET    /api/vendor/products                # list your products (up to 1000)
+POST   /api/vendor/products                # upsert one product
+POST   /api/vendor/products/bulk           # upsert up to 500 products
+DELETE /api/vendor/products/{external_id}  # hide a product
+
+All requests require: Authorization: Bearer <PMAP_API_KEY>`
+
+const pushApiExample = `POST https://peptidemap.com/api/vendor/products/bulk
+Authorization: Bearer pmap_v_xxxxxxxxxxxx
 Content-Type: application/json
 
 {
   "products": [
-    { "external_id": "BIO-BPC157-10MG", "name": "BPC-157 10mg",
-      "url": "https://example.com/products/bpc-157-10mg",
-      "price": 39.99, "in_stock": true }
+    {
+      "external_id": "BIO-BPC157-10MG",
+      "name": "BPC-157 10mg",
+      "category_slug": "bpc-157",
+      "size_mg": "10mg",
+      "product_type": "Peptide",
+      "price": 39.99,
+      "discount_price": 34.99,
+      "image_url": "https://example.com/img/bpc-157.jpg",
+      "product_url": "https://example.com/products/bpc-157-10mg",
+      "purity": 99.0,
+      "in_stock": true
+    }
   ]
 }`
 

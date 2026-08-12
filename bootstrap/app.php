@@ -42,6 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/banner-events/impressions',
             'api/banner-events/click',
             'api/bot/*',
+            'api/vendor/*',
         ]);
 
         $middleware->api([
@@ -65,6 +66,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
             'block.viewer.writes' => \App\Http\Middleware\BlockAdminViewerWrites::class,
             'bot.api' => \App\Http\Middleware\BotApiAuth::class,
+            'vendor.api' => \App\Http\Middleware\VendorApiAuth::class,
             'ceo.only' => \App\Http\Middleware\CeoOnly::class,
         ]);
     })

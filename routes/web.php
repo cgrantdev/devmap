@@ -482,6 +482,17 @@ Route::middleware('bot.api')->prefix('api/bot')->group(function () {
     Route::get('/promo-codes', [\App\Http\Controllers\Api\BotController::class, 'promoCodes']);
 });
 
+// Vendor Push API — Path 2 on /vendors/integration. Bearer-token auth via
+// VendorApiAuth middleware; token identifies the brand. Vendors push their
+// live catalog and we upsert by (brand_id, external_id).
+Route::middleware(['vendor.api', 'throttle:60,1'])->prefix('api/vendor')->group(function () {
+    Route::get('/products', [\App\Http\Controllers\Api\VendorProductsController::class, 'index']);
+    Route::post('/products', [\App\Http\Controllers\Api\VendorProductsController::class, 'store']);
+    Route::post('/products/bulk', [\App\Http\Controllers\Api\VendorProductsController::class, 'bulk']);
+    Route::delete('/products/{external_id}', [\App\Http\Controllers\Api\VendorProductsController::class, 'destroy'])
+        ->where('external_id', '.*');
+});
+
 // Catch-all route for any other page slugs (must be last to avoid conflicts with other routes)
 // This allows creating new pages dynamically without adding routes
 Route::get('/{slug}', [FrontendPagesController::class, 'show'])->name('page.show')->where('slug', '[a-z0-9-]+');
