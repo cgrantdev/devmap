@@ -194,9 +194,16 @@ class VendorProductsController extends Controller
             return [$existing->fresh('brand'), false];
         }
 
-        // Ensure slug — derived from name plus external_id suffix for
-        // uniqueness. Frontend URL builder uses this.
-        $attrs['slug'] = Str::slug($data['name']) . '-' . Str::slug($data['external_id']);
+        // Ensure slug. Base = name + external_id; if that already exists on
+        // another product (legacy row without external_id, cross-brand
+        // collision, whatever), append a short hash so we never 500 on
+        // insert. products.slug has a global unique index.
+        $baseSlug = Str::slug($data['name']) . '-' . Str::slug($data['external_id']);
+        $slug = $baseSlug;
+        if (Product::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . substr(sha1($brandId . '|' . $data['external_id']), 0, 6);
+        }
+        $attrs['slug'] = $slug;
         $product = Product::create($attrs);
         return [$product->fresh('brand'), true];
     }
