@@ -199,6 +199,7 @@ class Product extends Model
             'Topical'      => ' Topical',
             'Kit'          => ' Kit',
             'Bioregulator' => ' Bioregulator',
+            'Lipotropic'   => ' Lipotropic',
             default        => '',
         };
         return $base . $typeSuffix;

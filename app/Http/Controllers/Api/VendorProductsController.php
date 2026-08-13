@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Validator;
 class VendorProductsController extends Controller
 {
     private const SIZE_REGEX = '/^[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml)?(?:\/[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml)?)*$/i';
-    private const ALLOWED_TYPES = ['Peptide', 'Capsule', 'Nasal Spray', 'Topical', 'Kit', 'Bioregulator', 'Other'];
+    private const ALLOWED_TYPES = ['Peptide', 'Capsule', 'Nasal Spray', 'Topical', 'Kit', 'Bioregulator', 'Lipotropic', 'Other'];
 
     // Cap so a runaway loop on the vendor's side can't push 100k rows in one
     // request. Anything larger should be paginated.
