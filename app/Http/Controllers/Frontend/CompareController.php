@@ -133,7 +133,7 @@ class CompareController extends Controller
                     'brand.vendorSetting.location',
                     fn ($l) => $l->where('name', $locationFilter)
                 ))
-                ->with('brand.vendorSetting')
+                ->with('brand.vendorSetting.location')
                 ->get()
                 ->map(function ($product) {
                     // Cast to float UP FRONT. Eloquent returns decimal columns
@@ -175,6 +175,8 @@ class CompareController extends Controller
                         'effective_price' => $retail,
                         'final_price' => $finalPrice,
                         'pmap_price' => $pmapPrice,
+                        'currency_code' => \App\Support\Currency::codeFor($product->brand?->vendorSetting?->location?->name),
+                        'currency_symbol' => \App\Support\Currency::symbolFor($product->brand?->vendorSetting?->location?->name),
                         'image_url' => $product->image_url,
                         'product_url' => $product->product_url,
                         'go_url' => "/go/{$product->id}",
