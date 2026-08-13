@@ -245,7 +245,7 @@ class ProductsController extends Controller
             // ratios still supported via "/" between tokens.
             'size_mg' => ['sometimes', 'nullable', 'string', 'max:50', 'regex:/^[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml)?(?:\/[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml)?)*$/i'],
             'hidden' => 'sometimes|boolean',
-            'product_type' => ['sometimes', 'nullable', 'string', 'in:Peptide,Capsule,Nasal Spray,Topical,Kit,Other'],
+            'product_type' => ['sometimes', 'nullable', 'string', 'in:Peptide,Capsule,Nasal Spray,Topical,Kit,Bioregulator,Other'],
             'is_encyclopedia_thumb' => 'sometimes|boolean',
             'is_peptide_thumb' => 'sometimes|boolean',
         ]);
@@ -333,7 +333,7 @@ class ProductsController extends Controller
             'ids.*' => 'integer|exists:products,id',
             'product_category_id' => 'sometimes|nullable|exists:product_categories,id',
             'hidden' => 'sometimes|boolean',
-            'product_type' => ['sometimes', 'nullable', 'string', 'in:Peptide,Capsule,Nasal Spray,Kit,Other'],
+            'product_type' => ['sometimes', 'nullable', 'string', 'in:Peptide,Capsule,Nasal Spray,Topical,Kit,Bioregulator,Other'],
         ]);
 
         $update = [];

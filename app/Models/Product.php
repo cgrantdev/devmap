@@ -194,11 +194,12 @@ class Product extends Model
         // schema, OG images, etc.
         $base = "{$categoryName} ({$size})";
         $typeSuffix = match ($this->product_type) {
-            'Nasal Spray' => ' Spray',
-            'Capsule'     => ' Capsule',
-            'Topical'     => ' Topical',
-            'Kit'         => ' Kit',
-            default       => '',
+            'Nasal Spray'  => ' Spray',
+            'Capsule'      => ' Capsule',
+            'Topical'      => ' Topical',
+            'Kit'          => ' Kit',
+            'Bioregulator' => ' Bioregulator',
+            default        => '',
         };
         return $base . $typeSuffix;
     }
