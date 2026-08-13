@@ -33,10 +33,16 @@ class BacteriostaticWaterController extends Controller
             abort(404, 'Bacteriostatic Water category not configured.');
         }
 
+        $locationFilter = trim((string) $request->get('location', ''));
+
         $rows = Product::visible()
             ->where('status', 'active')
             ->where('product_category_id', $category->id)
             ->where('price', '>', 0)
+            ->when($locationFilter, fn ($q) => $q->whereHas(
+                'brand.vendorSetting.location',
+                fn ($l) => $l->where('name', $locationFilter)
+            ))
             ->with('brand.vendorSetting')
             ->get()
             ->map(function ($p) {

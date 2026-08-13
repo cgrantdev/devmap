@@ -108,6 +108,9 @@ class CompareController extends Controller
         // For each compound, get all visible products with brand info, sorted by effective price
         $compounds = collect();
 
+        // Site-wide header location filter (?location=Country) applies here too.
+        $locationFilter = trim((string) $request->get('location', ''));
+
         foreach (self::FEATURED_COMPOUND_NAMES as $catName) {
             $category = $categories->get($catName);
             if (!$category) {
@@ -126,6 +129,10 @@ class CompareController extends Controller
                           $qq->whereNull('discount_price')->where('price', '>', 0);
                       });
                 })
+                ->when($locationFilter, fn ($q) => $q->whereHas(
+                    'brand.vendorSetting.location',
+                    fn ($l) => $l->where('name', $locationFilter)
+                ))
                 ->with('brand.vendorSetting')
                 ->get()
                 ->map(function ($product) {
@@ -625,6 +632,11 @@ class CompareController extends Controller
      */
     private function productsForCategory(ProductCategory $category)
     {
+        // Site-wide header location filter (?location=Country). When set,
+        // scope to vendors based in that country so the compare table only
+        // shows relevant rows.
+        $locationFilter = trim((string) request()->get('location', ''));
+
         return Product::visible()
             ->where('status', 'active')
             ->where('product_category_id', $category->id)
@@ -634,6 +646,10 @@ class CompareController extends Controller
                       $qq->whereNull('discount_price')->where('price', '>', 0);
                   });
             })
+            ->when($locationFilter, fn ($q) => $q->whereHas(
+                'brand.vendorSetting.location',
+                fn ($l) => $l->where('name', $locationFilter)
+            ))
             ->with('brand.vendorSetting.location')
             ->get()
             ->map(function ($product) {

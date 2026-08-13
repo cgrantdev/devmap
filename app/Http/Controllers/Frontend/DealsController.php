@@ -20,6 +20,14 @@ class DealsController extends Controller
     {
         $sortBy = $request->get('sort', 'best_discount'); // best_discount, top_rated, a_z
 
+        // Site-wide header location filter (?location=Country). Applied to
+        // every branch below (deals, coupon-fallback, top-brand-fallback) so
+        // the page consistently narrows to vendors in that country.
+        $locationFilter = trim((string) $request->get('location', ''));
+        $filterBrandByLocation = fn ($q) => $locationFilter
+            ? $q->whereHas('vendorSetting.location', fn ($l) => $l->where('name', $locationFilter))
+            : $q;
+
         // Get active deals with vendor info
         $dealsQuery = Deal::where('active', true)
             ->where(function ($query) {
@@ -30,6 +38,10 @@ class DealsController extends Controller
                 $query->whereNull('usage_limit')
                     ->orWhereRaw('used_count < usage_limit');
             })
+            ->when($locationFilter, fn ($q) => $q->whereHas(
+                'brand.vendorSetting.location',
+                fn ($l) => $l->where('name', $locationFilter)
+            ))
             ->with(['brand.vendorSetting']);
 
         $deals = $dealsQuery->get()
@@ -72,6 +84,7 @@ class DealsController extends Controller
                     })
                     ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
                 })
+                ->tap($filterBrandByLocation)
                 ->with(['vendorSetting'])
                 ->whereNotIn('id', $deals->pluck('id'))
                 ->orderByDesc('rating_average')
@@ -111,6 +124,7 @@ class DealsController extends Controller
                     })
                     ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
                 })
+                ->tap($filterBrandByLocation)
                 ->with(['vendorSetting'])
                 ->orderByDesc('rating_average')
                 ->take(8)
