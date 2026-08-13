@@ -4,10 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class VendorSetting extends Model
 {
     use HasFactory;
+
+    // Any create/update/delete that could change which countries have
+    // vendors invalidates the header CountrySelector's cache. Key matches
+    // HandleInertiaRequests::share().
+    protected static function booted(): void
+    {
+        $bust = fn () => Cache::forget('site_locations_v1');
+        static::saved($bust);
+        static::deleted($bust);
+    }
 
     protected $fillable = [
         'brand_id',

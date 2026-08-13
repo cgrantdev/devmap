@@ -10,6 +10,7 @@ use App\Models\VendorSetting;
 use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -222,6 +223,12 @@ class BecomeVendorController extends Controller
             }
 
             DB::commit();
+
+            // Bust the site-wide location dropdown cache so a new vendor's
+            // country appears in the header CountrySelector immediately
+            // instead of waiting up to 10 min. Keyed to match
+            // HandleInertiaRequests::share().
+            Cache::forget('site_locations_v1');
 
             // No email-verification flow for vendors — the admin verifies
             // them manually during the approval step instead.
