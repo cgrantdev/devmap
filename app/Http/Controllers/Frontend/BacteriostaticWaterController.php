@@ -72,6 +72,9 @@ class BacteriostaticWaterController extends Controller
                     ? "Bacteriostatic Water · {$volumeMl} mL"
                     : ($p->display_name ?: $p->name);
 
+                $countryName = $p->brand?->vendorSetting?->location?->name;
+                [$currencyCode, $currencySymbol] = \App\Support\Currency::forCountry($countryName);
+
                 return [
                     'id' => $p->id,
                     'name' => $displayName,
@@ -86,6 +89,8 @@ class BacteriostaticWaterController extends Controller
                     'retail_price' => $retail,
                     'final_price' => $finalPrice,
                     'pmap_price' => $pmapPrice,
+                    'currency_code' => $currencyCode,
+                    'currency_symbol' => $currencySymbol,
                     'volume_ml' => $volumeMl,
                     'per_ml_price' => $perMlPrice,
                     'go_url' => "/go/{$p->id}",
@@ -182,6 +187,10 @@ class BacteriostaticWaterController extends Controller
                 'vendor_count' => $vendorCount,
                 'product_count' => $vCount,
                 'cheapest_price' => $cheapest,
+                // Mixed-currency page — pull the leading row's symbol so the
+                // "Cheapest" stat card reads as its actual currency, not
+                // an implied USD.
+                'cheapest_currency_symbol' => $rows->first()['currency_symbol'] ?? '$',
                 'priciest_price' => $priciest,
                 'best_per_ml' => $bestPerMl,
                 'available_sizes' => $availableSizes,

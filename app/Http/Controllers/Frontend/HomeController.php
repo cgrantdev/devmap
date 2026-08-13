@@ -475,6 +475,9 @@ class HomeController extends Controller
                     ? ($product->brand->vendorSetting->approval_status === 'approved')
                     : false;
 
+                $countryName = $product->brand?->vendorSetting?->location?->name;
+                [$currencyCode, $currencySymbol] = \App\Support\Currency::forCountry($countryName);
+
                 // Product image: may be a full URL (from scraper) or a local file path.
                 $imageUrl = $product->image_url;
                 if ($imageUrl && !str_starts_with($imageUrl, 'http')) {
@@ -501,6 +504,8 @@ class HomeController extends Controller
                     'original_price' => ($product->discount_price && $product->discount_price < $product->price)
                         ? $product->price
                         : null,
+                    'currency_code' => $currencyCode,
+                    'currency_symbol' => $currencySymbol,
                     'price_per_mg' => null,
                     'verified' => $brandVerified,
                     'lab_tested' => (bool) ($product->lab_tested ?? false),

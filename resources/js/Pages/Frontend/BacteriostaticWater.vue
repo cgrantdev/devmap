@@ -35,11 +35,11 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard label="Vendors" :value="stats.vendor_count" />
           <StatCard label="Products" :value="stats.product_count" />
-          <StatCard label="Cheapest" :value="stats.cheapest_price ? '$' + fmt(stats.cheapest_price) : '—'" accent="emerald" />
+          <StatCard label="Cheapest" :value="stats.cheapest_price ? (stats.cheapest_currency_symbol || '$') + fmt(stats.cheapest_price) : '—'" accent="emerald" />
           <StatCard
             v-if="stats.best_per_ml"
             label="Best per-mL"
-            :value="'$' + stats.best_per_ml.per_ml_price.toFixed(2) + '/mL'"
+            :value="(stats.best_per_ml.currency_symbol || '$') + stats.best_per_ml.per_ml_price.toFixed(2) + '/mL'"
             :sub="`${stats.best_per_ml.brand_name} · ${stats.best_per_ml.volume_ml} mL`"
             accent="emerald"
           />
@@ -107,13 +107,13 @@
                 </td>
                 <td class="px-5 py-4 text-right ui-mono">
                   <template v-if="r.pmap_price">
-                    <div class="text-emerald-700 font-semibold">${{ fmt(r.pmap_price) }}</div>
+                    <div class="text-emerald-700 font-semibold">{{ r.currency_symbol || '$' }}{{ fmt(r.pmap_price) }}</div>
                     <div class="text-[9px] uppercase tracking-wide text-emerald-600">code {{ r.brand_coupon_code || 'PMAP' }}</div>
                   </template>
-                  <span v-else class="text-[color:var(--color-ink)]">${{ fmt(r.retail_price) }}</span>
+                  <span v-else class="text-[color:var(--color-ink)]">{{ r.currency_symbol || '$' }}{{ fmt(r.retail_price) }}</span>
                 </td>
                 <td class="px-5 py-4 text-right ui-mono bg-emerald-50/30">
-                  <span v-if="r.per_ml_price" class="font-semibold text-emerald-700">${{ r.per_ml_price.toFixed(2) }}</span>
+                  <span v-if="r.per_ml_price" class="font-semibold text-emerald-700">{{ r.currency_symbol || '$' }}{{ r.per_ml_price.toFixed(2) }}</span>
                   <span v-else class="text-[color:var(--color-ink-subtle)] text-[12px]">—</span>
                 </td>
                 <td class="px-5 py-4 text-right">

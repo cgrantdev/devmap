@@ -143,7 +143,7 @@
               <div class="flex items-baseline gap-2 sm:gap-3 text-[12px] text-[color:var(--color-ink-muted)] mb-2 flex-wrap">
                 <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.vendor_count }}</strong> vendors</span>
                 <span v-if="compound.cheapest_price" class="text-[color:var(--color-ink-subtle)]">·</span>
-                <span v-if="compound.cheapest_price" class="ui-mono font-semibold text-emerald-700">from ${{ formatPrice(compound.cheapest_price) }}</span>
+                <span v-if="compound.cheapest_price" class="ui-mono font-semibold text-emerald-700">from {{ compound.cheapest_currency_symbol || '$' }}{{ formatPrice(compound.cheapest_price) }}</span>
               </div>
               <p v-if="compound.description" class="text-[13px] sm:text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl line-clamp-2">
                 {{ compound.description }}
@@ -281,25 +281,25 @@
                   <!-- Retail — hidden on mobile (strikethrough already in Price cell) -->
                   <td class="px-5 py-4 text-right hidden md:table-cell">
                     <div v-if="product.discount_price && product.discount_price < product.price" class="flex flex-col items-end">
-                      <span class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">${{ formatPrice(product.discount_price) }}</span>
-                      <span class="ui-mono text-[11px] text-[color:var(--color-ink)] line-through">${{ formatPrice(product.price) }}</span>
+                      <span class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">{{ sym(product) }}{{ formatPrice(product.discount_price) }}</span>
+                      <span class="ui-mono text-[11px] text-[color:var(--color-ink)] line-through">{{ sym(product) }}{{ formatPrice(product.price) }}</span>
                     </div>
                     <span v-else class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">
-                      ${{ formatPrice(product.price) }}
+                      {{ sym(product) }}{{ formatPrice(product.price) }}
                     </span>
                   </td>
                   <!-- Price — on mobile, folds in strikethrough retail since the Retail column is hidden -->
                   <td class="px-3 sm:px-5 py-3 sm:py-4 text-right bg-emerald-50/50 whitespace-nowrap">
                     <template v-if="discountedPriceFor(product)">
-                      <div class="ui-mono text-[14px] sm:text-[15px] font-bold text-emerald-700">${{ discountedPriceFor(product) }}</div>
-                      <div v-if="product.price" class="md:hidden ui-mono text-[10px] text-[color:var(--color-ink-subtle)] line-through leading-tight">${{ formatPrice(product.price) }}</div>
+                      <div class="ui-mono text-[14px] sm:text-[15px] font-bold text-emerald-700">{{ sym(product) }}{{ discountedPriceFor(product) }}</div>
+                      <div v-if="product.price" class="md:hidden ui-mono text-[10px] text-[color:var(--color-ink-subtle)] line-through leading-tight">{{ sym(product) }}{{ formatPrice(product.price) }}</div>
                     </template>
                     <template v-else>
                       <div v-if="product.discount_price && product.discount_price < product.price" class="flex flex-col items-end">
-                        <span class="ui-mono text-[14px] sm:text-[15px] font-bold text-[color:var(--color-ink)]">${{ formatPrice(product.discount_price) }}</span>
-                        <span class="md:hidden ui-mono text-[10px] text-[color:var(--color-ink-subtle)] line-through leading-tight">${{ formatPrice(product.price) }}</span>
+                        <span class="ui-mono text-[14px] sm:text-[15px] font-bold text-[color:var(--color-ink)]">{{ sym(product) }}{{ formatPrice(product.discount_price) }}</span>
+                        <span class="md:hidden ui-mono text-[10px] text-[color:var(--color-ink-subtle)] line-through leading-tight">{{ sym(product) }}{{ formatPrice(product.price) }}</span>
                       </div>
-                      <span v-else class="ui-mono text-[14px] sm:text-[15px] font-bold text-[color:var(--color-ink)]">${{ formatPrice(product.price) }}</span>
+                      <span v-else class="ui-mono text-[14px] sm:text-[15px] font-bold text-[color:var(--color-ink)]">{{ sym(product) }}{{ formatPrice(product.price) }}</span>
                     </template>
                   </td>
                   <!-- Coupon — its own prominent click-to-copy column so
@@ -651,6 +651,12 @@ function formatPrice(p) {
   if (p === null || p === undefined || p === '') return '—'
   const num = typeof p === 'number' ? p : parseFloat(p)
   return isNaN(num) ? String(p) : num.toFixed(2)
+}
+
+// Currency symbol per product — controller stamps it from the vendor's
+// country. Falls back to $ for legacy rows / unknown countries.
+function sym(product) {
+  return product?.currency_symbol || '$'
 }
 
 // Vendor's effective retail price — discount_price wins when it's a real

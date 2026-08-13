@@ -217,6 +217,9 @@ class CompareController extends Controller
                 // shown on the compound header matches what visitors actually
                 // pay — same metric as the row sort below.
                 'cheapest_price' => $products->first()['final_price'] ?? null,
+                // Symbol of the cheapest row so "from £39" reads honestly
+                // when the leading vendor is UK-based.
+                'cheapest_currency_symbol' => $products->first()['currency_symbol'] ?? '$',
                 'vendor_count' => $products->pluck('brand_name')->unique()->count(),
                 'products' => $products->values(),
             ]);
@@ -664,6 +667,9 @@ class CompareController extends Controller
                     : null;
                 $finalPrice = $pmapPrice ?? $retail;
 
+                $countryName = $product->brand?->vendorSetting?->location?->name;
+                [$currencyCode, $currencySymbol] = \App\Support\Currency::forCountry($countryName);
+
                 return [
                     'id' => $product->id,
                     'name' => $product->display_name,
@@ -674,11 +680,14 @@ class CompareController extends Controller
                     'effective_price' => $retail,
                     'final_price' => $finalPrice,
                     'pmap_price' => $pmapPrice,
+                    'currency_code' => $currencyCode,
+                    'currency_symbol' => $currencySymbol,
                     'image_url' => $product->image_url,
                     'product_url' => $product->product_url,
                     'go_url' => "/go/{$product->id}",
                     'brand_name' => $product->brand?->name,
                     'brand_slug' => $product->brand?->slug,
+                    'brand_location' => $countryName,
                     'brand_logo' => $product->brand?->vendorSetting?->logo
                         ? asset('storage/' . $product->brand->vendorSetting->logo)
                         : null,
