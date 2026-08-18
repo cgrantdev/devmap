@@ -422,8 +422,8 @@ const sizeOptions = [
   '50mcg', '100mcg', '250mcg', '300mcg', '500mcg', '1000mcg',
   // Singles 0.5–100mg (granular at the small end where peptides actually vary)
   '0.5mg', '1mg', '2mg', '2.5mg', '3mg', '5mg', '6mg', '8mg', '10mg',
-  '13mg', '15mg', '16mg', '20mg', '25mg', '30mg', '35mg', '40mg', '50mg',
-  '60mg', '80mg', '100mg',
+  '13mg', '15mg', '16mg', '20mg', '25mg', '30mg', '35mg', '40mg', '45mg',
+  '50mg', '60mg', '70mg', '75mg', '80mg', '100mg',
   // Larger singles 120mg → 5000mg (NAD+, methylene blue, large-vial peptides)
   '120mg', '150mg', '200mg', '300mg', '400mg', '500mg', '600mg', '700mg',
   '800mg', '900mg', '1000mg', '1500mg', '5000mg',
@@ -431,14 +431,14 @@ const sizeOptions = [
   '1g', '2g', '3g', '5g', '6g', '9g', '10g', '50g', '100g',
   // IU-denominated: small singles (insulin-like fragments) + HGH range
   '6 IU', '8 IU', '10 IU', '12 IU', '15 IU', '24 IU', '25 IU', '35 IU', '36 IU',
-  '1000 IU', '2000 IU', '3000 IU', '4000 IU', '5000 IU', '10000 IU', '20000 IU',
+  '100 IU', '1000 IU', '2000 IU', '3000 IU', '4000 IU', '5000 IU', '10000 IU', '20000 IU',
   // Volume-denominated (bacteriostatic water, mixed vials, etc.)
   '1mL', '2mL', '3mL', '5mL', '7mL', '10mL', '20mL', '30mL',
   // Fluid-ounce sizes (topical carriers, some sprays)
-  '2oz',
+  '1oz', '2oz',
   // Common blend ratios from real vendor listings
   '250mcg/250mcg', '500mcg/500mcg',
-  '5mg/5mg', '10mg/10mg', '50mg/10mg/10mg', '50mg/10mg/10mg/10mg',
+  '5mg/5mg', '10mg/10mg', '13mg/3mg', '50mg/10mg/10mg', '50mg/10mg/10mg/10mg',
 ]
 
 /**
