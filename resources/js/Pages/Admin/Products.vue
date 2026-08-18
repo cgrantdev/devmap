@@ -73,6 +73,18 @@
         <option value="uncategorized">⚠ Uncategorized Only</option>
         <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
       </select>
+      <!-- Type filter — narrows to one product_type (Peptide, Capsule, Other, …). -->
+      <select v-model="filterType" @change="fetchData(1)" class="h-9 px-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none">
+        <option value="all">All Types</option>
+        <option value="__none__">⚠ No Type Set</option>
+        <option v-for="t in typeOptions" :key="t" :value="t">{{ t }}</option>
+      </select>
+      <!-- Size filter — populated from the sizes actually present in the DB. -->
+      <select v-model="filterSize" @change="fetchData(1)" class="h-9 px-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none">
+        <option value="all">All Sizes</option>
+        <option value="__none__">⚠ No Size Set</option>
+        <option v-for="s in sizes" :key="s" :value="s">{{ s }}</option>
+      </select>
       <!-- Missing-data filter (VA triage) -->
       <select v-model="filterMissing" @change="fetchData(1)" class="h-9 px-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none">
         <option value="all">All Products</option>
@@ -106,6 +118,11 @@
         <option value="">Set type…</option>
         <option value="__clear__">— Clear type —</option>
         <option v-for="t in typeOptions" :key="t" :value="t">{{ t }}</option>
+      </select>
+      <select v-model="bulkSize" @change="bulkApplySize" class="h-8 px-2 text-[12px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none rounded">
+        <option value="">Set size…</option>
+        <option value="__clear__">— Clear size —</option>
+        <option v-for="s in sizeOptions" :key="s" :value="s">{{ s }}</option>
       </select>
       <button @click="bulkHide(true)" type="button" :disabled="bulkBusy" class="h-8 px-3 text-[12px] font-semibold text-white bg-slate-700 hover:bg-slate-800 rounded disabled:opacity-50">
         🚫 Hide from site
@@ -368,6 +385,8 @@ const props = defineProps({
   products: { type: Object, default: () => ({ data: [], total: 0 }) },
   brands: { type: Array, default: () => [] },
   categories: { type: Array, default: () => [] },
+  sizes: { type: Array, default: () => [] },
+  filters: { type: Object, default: () => ({}) },
   tab: { type: String, default: 'live' },
   live_count: { type: Number, default: 0 },
   hidden_count: { type: Number, default: 0 },
@@ -385,9 +404,11 @@ function setTab(tab) {
 }
 
 const searchValue = ref('')
-const filterBrand = ref('all')
-const filterCategory = ref('all')
-const filterMissing = ref('all')
+const filterBrand = ref(props.filters?.brand ?? 'all')
+const filterCategory = ref(props.filters?.category ?? 'all')
+const filterType = ref(props.filters?.type ?? 'all')
+const filterSize = ref(props.filters?.size ?? 'all')
+const filterMissing = ref(props.filters?.missing ?? 'all')
 
 // Product formats (vial, capsule, nasal spray, other). Stored as a
 // free-text varchar but constrained to this list both in the inline
@@ -493,6 +514,7 @@ function handleSearchInput() {
 const selectedIds = ref([])
 const bulkCategory = ref('')
 const bulkType = ref('')
+const bulkSize = ref('')
 const bulkBusy = ref(false)
 
 const visibleIds = computed(() => (props.products?.data || []).map(p => p.id))
@@ -517,6 +539,7 @@ function clearSelection() {
   selectedIds.value = []
   bulkCategory.value = ''
   bulkType.value = ''
+  bulkSize.value = ''
 }
 
 // When the page of products changes (search/filter/pagination), clear
@@ -566,6 +589,28 @@ function bulkApplyType() {
     onFinish: () => {
       bulkBusy.value = false
       bulkType.value = ''
+    },
+  })
+}
+
+function bulkApplySize() {
+  if (!bulkSize.value || selectedIds.value.length === 0) return
+  const isClear = bulkSize.value === '__clear__'
+  const label = isClear ? 'Clear the size on' : 'Set the size on'
+  if (!confirm(`${label} ${selectedIds.value.length} product${selectedIds.value.length === 1 ? '' : 's'}?`)) {
+    bulkSize.value = ''
+    return
+  }
+  bulkBusy.value = true
+  router.patch('/admin/products/bulk-update', {
+    ids: selectedIds.value,
+    size_mg: isClear ? null : bulkSize.value,
+    _token: usePage().props.csrf_token,
+  }, {
+    preserveScroll: true,
+    onFinish: () => {
+      bulkBusy.value = false
+      bulkSize.value = ''
     },
   })
 }
@@ -630,6 +675,8 @@ function fetchData(page = props.products?.current_page || 1) {
     search: searchValue.value || null,
     brand: filterBrand.value !== 'all' ? filterBrand.value : null,
     category: filterCategory.value !== 'all' ? filterCategory.value : null,
+    type: filterType.value !== 'all' ? filterType.value : null,
+    size: filterSize.value !== 'all' ? filterSize.value : null,
     missing: filterMissing.value !== 'all' ? filterMissing.value : null,
   }, {
     preserveState: true,

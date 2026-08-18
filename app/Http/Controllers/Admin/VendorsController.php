@@ -809,6 +809,30 @@ class VendorsController extends Controller
             }
         }
 
+        // Filter by product_type (VA cleanup helper — e.g. show all "Other"
+        // rows so they can be retyped). Special "__none__" surfaces rows with
+        // no type set at all.
+        if ($request->has('type') && $request->type && $request->type !== 'all') {
+            if ($request->type === '__none__') {
+                $query->where(function ($q) {
+                    $q->whereNull('product_type')->orWhere('product_type', '');
+                });
+            } else {
+                $query->where('product_type', $request->type);
+            }
+        }
+
+        // Filter by size_mg (exact match). "__none__" = rows without a size.
+        if ($request->has('size') && $request->size && $request->size !== 'all') {
+            if ($request->size === '__none__') {
+                $query->where(function ($q) {
+                    $q->whereNull('size_mg')->orWhere('size_mg', '');
+                });
+            } else {
+                $query->where('size_mg', $request->size);
+            }
+        }
+
         // Filter by completeness (VA triage helper)
         $missing = $request->get('missing', 'all');
         if ($missing === 'category') {
@@ -932,13 +956,32 @@ class VendorsController extends Controller
                 ];
             });
 
+        // Distinct sizes currently in use, sorted with the "size feels" order
+        // (number first) — powers the Size filter dropdown so admins only see
+        // sizes that actually exist in the DB rather than every option.
+        $sizes = \App\Models\Product::whereNotNull('size_mg')
+            ->where('size_mg', '!=', '')
+            ->distinct()
+            ->orderByRaw('CAST(size_mg AS DECIMAL(10,3)) ASC, size_mg ASC')
+            ->pluck('size_mg')
+            ->values();
+
         return \Inertia\Inertia::render('Admin/Products', [
             'products' => $products,
             'brands' => $brands,
             'categories' => $categories,
+            'sizes' => $sizes,
             'tab' => $tab,
             'live_count' => $liveCount,
             'hidden_count' => $hiddenCount,
+            'filters' => [
+                'brand' => $request->get('brand', 'all'),
+                'category' => $request->get('category', 'all'),
+                'type' => $request->get('type', 'all'),
+                'size' => $request->get('size', 'all'),
+                'missing' => $missing,
+                'search' => $request->get('search', ''),
+            ],
         ]);
     }
 

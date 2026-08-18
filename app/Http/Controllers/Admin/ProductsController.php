@@ -334,6 +334,8 @@ class ProductsController extends Controller
             'product_category_id' => 'sometimes|nullable|exists:product_categories,id',
             'hidden' => 'sometimes|boolean',
             'product_type' => ['sometimes', 'nullable', 'string', 'in:Peptide,Capsule,Nasal Spray,Topical,Kit,Bioregulator,Lipotropic,Other'],
+            // Matches the same units/formats accepted on the single-row edit.
+            'size_mg' => ['sometimes', 'nullable', 'string', 'max:50', 'regex:/^[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml|oz)?(?:\/[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml|oz)?)*$/i'],
         ]);
 
         $update = [];
@@ -345,6 +347,9 @@ class ProductsController extends Controller
         }
         if ($request->has('product_type')) {
             $update['product_type'] = $validated['product_type'] ?? null;
+        }
+        if ($request->has('size_mg')) {
+            $update['size_mg'] = $validated['size_mg'] ?? null;
         }
 
         if (empty($update)) {
@@ -362,6 +367,9 @@ class ProductsController extends Controller
         }
         if (array_key_exists('product_type', $update)) {
             $what[] = $update['product_type'] ? "type: {$update['product_type']}" : 'cleared type';
+        }
+        if (array_key_exists('size_mg', $update)) {
+            $what[] = $update['size_mg'] ? "size: {$update['size_mg']}" : 'cleared size';
         }
         $summary = implode(' + ', $what);
 
