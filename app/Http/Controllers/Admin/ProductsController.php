@@ -243,7 +243,7 @@ class ProductsController extends Controller
             // Accepts numbers optionally followed by mcg/mg/g/IU/mL (with an
             // optional space, so "1000 IU" and "30mL" both pass). Blend
             // ratios still supported via "/" between tokens.
-            'size_mg' => ['sometimes', 'nullable', 'string', 'max:50', 'regex:/^[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml)?(?:\/[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml)?)*$/i'],
+            'size_mg' => ['sometimes', 'nullable', 'string', 'max:50', 'regex:/^[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml|oz)?(?:\/[0-9]+(?:\.[0-9]+)?\s?(?:mcg|mg|g|iu|ml|oz)?)*$/i'],
             'hidden' => 'sometimes|boolean',
             'product_type' => ['sometimes', 'nullable', 'string', 'in:Peptide,Capsule,Nasal Spray,Topical,Kit,Bioregulator,Lipotropic,Other'],
             'is_encyclopedia_thumb' => 'sometimes|boolean',
