@@ -102,6 +102,7 @@
 import { Head } from '@inertiajs/vue3'
 import { computed, defineComponent, h } from 'vue'
 import ModernLayout from '../Layouts/ModernLayout.vue'
+import { withSrc } from '@/composables/useOutbound'
 
 const props = defineProps({
   a: { type: Object, required: true },
@@ -274,7 +275,7 @@ const VendorMiniTable = defineComponent({
             ),
             h('td', { class: 'pl-3 pr-5 py-3 text-right' }, [
               h('a', {
-                href: p.go_url,
+                href: withSrc(p.go_url),
                 target: '_blank',
                 rel: 'noopener noreferrer nofollow sponsored',
                 class: 'ui-focus inline-flex items-center gap-1 h-8 px-3 rounded-md text-[11px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:-translate-y-[1px] transition-all',

@@ -339,7 +339,7 @@
                        show the coupon reveal first. -->
                   <td class="px-3 sm:px-5 py-3 sm:py-4 text-right">
                     <a
-                      :href="product.go_url"
+                      :href="withSrc(product.go_url)"
                       @click="openBuy($event, product)"
                       target="_blank"
                       rel="noopener noreferrer nofollow sponsored"
@@ -424,6 +424,7 @@ import { Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
 import BuyThroughModal from '@/components/BuyThroughModal.vue'
+import { withSrc } from '@/composables/useOutbound'
 
 const buyModal = ref(null)
 
@@ -436,7 +437,7 @@ function openBuy(ev, product) {
   if (!code) return // No coupon = no need to interrupt; native click continues.
   ev.preventDefault()
   buyModal.value?.open({
-    destination: product.go_url,
+    destination: withSrc(product.go_url),
     code,
     brandName: product.brand_name,
     discountPct: product.brand_discount_percent,

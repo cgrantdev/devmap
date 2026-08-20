@@ -140,7 +140,7 @@
                 </td>
                 <td class="px-5 py-4 text-right">
                   <a
-                    :href="product.go_url"
+                    :href="withSrc(product.go_url)"
                     @click="openBuy($event, product)"
                     target="_blank"
                     rel="noopener noreferrer nofollow sponsored"
@@ -222,6 +222,7 @@ import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import ModernLayout from '../Layouts/ModernLayout.vue'
 import BuyThroughModal from '@/components/BuyThroughModal.vue'
+import { withSrc } from '@/composables/useOutbound'
 
 defineProps({
   compound: { type: Object, required: true },
@@ -238,7 +239,7 @@ function openBuy(ev, product) {
   const code = ((product?.brand_coupon_code || '').trim() || 'PMAP').toUpperCase()
   ev.preventDefault()
   buyModal.value?.open({
-    destination: product.go_url,
+    destination: withSrc(product.go_url),
     code,
     brandName: product.brand_name,
     discountPct: pct,

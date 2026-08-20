@@ -35,8 +35,25 @@ class OutboundClickController extends Controller
             ]);
         }
 
+        // Tag the outbound URL with UTMs so vendors' own analytics attribute
+        // the traffic to us. Without this the vendor sees "direct" and we
+        // can't prove we sent them the sale.
+        $destination = $this->tagWithUtms($destination, $product);
+
         $userAgent = (string) $request->userAgent();
         $isBot = $this->looksLikeBot($userAgent);
+
+        // Referrer resolution: browsers strip the Referer header when the
+        // click originates from an <a rel="noreferrer"> tag (which our Buy
+        // buttons use for privacy). So we prefer an explicit ?src= param
+        // that our frontend attaches — internal_source is authoritative
+        // when present. Prefix with "internal:" so analytics can tell it
+        // apart from real cross-origin referrers.
+        $srcParam = trim((string) $request->query('src', ''));
+        $referrerHeader = (string) $request->headers->get('referer');
+        $referrerToLog = $srcParam !== ''
+            ? 'internal:' . $srcParam
+            : $referrerHeader;
 
         // Fire-and-forget log. Wrap in try to never block the redirect.
         try {
@@ -46,7 +63,7 @@ class OutboundClickController extends Controller
                 'user_id' => Auth::id(),
                 'ip_hash' => $request->ip() ? hash('sha256', $request->ip() . config('app.key')) : null,
                 'user_agent' => mb_substr($userAgent, 0, 512),
-                'referrer' => mb_substr((string) $request->headers->get('referer'), 0, 1024),
+                'referrer' => mb_substr($referrerToLog, 0, 1024),
                 'destination_url' => mb_substr($destination, 0, 2048),
                 'is_bot' => $isBot,
                 'utm_source' => $request->query('utm_source'),
@@ -61,6 +78,39 @@ class OutboundClickController extends Controller
         }
 
         return redirect()->away($destination, 302);
+    }
+
+    /**
+     * Append utm_source/medium/campaign to the outbound URL when it's a
+     * plain http(s) link. Never overwrites an existing UTM value — some
+     * vendors set their own for their affiliate program's landing pages.
+     * Shopify /discount/{code}?redirect=… URLs get UTMs on the OUTER url
+     * safely; the vendor's checkout keeps the discount either way.
+     */
+    protected function tagWithUtms(string $destination, Product $product): string
+    {
+        $parts = @parse_url($destination);
+        if (!$parts || empty($parts['scheme']) || !in_array($parts['scheme'], ['http', 'https'], true)) {
+            return $destination;
+        }
+
+        parse_str($parts['query'] ?? '', $query);
+
+        $brandSlug = $product->brand?->slug ?? 'unknown';
+
+        if (!isset($query['utm_source']))   $query['utm_source']   = 'peptidemap';
+        if (!isset($query['utm_medium']))   $query['utm_medium']   = 'affiliate';
+        if (!isset($query['utm_campaign'])) $query['utm_campaign'] = $brandSlug;
+
+        $parts['query'] = http_build_query($query);
+
+        $rebuilt = $parts['scheme'] . '://' . $parts['host']
+            . (isset($parts['port']) ? ':' . $parts['port'] : '')
+            . ($parts['path'] ?? '')
+            . '?' . $parts['query']
+            . (isset($parts['fragment']) ? '#' . $parts['fragment'] : '');
+
+        return $rebuilt;
     }
 
     /**

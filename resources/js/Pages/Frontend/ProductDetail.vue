@@ -123,7 +123,7 @@
               <!-- Purchase Button — primary CTA, clean -->
               <div v-if="product.product_url" class="mb-4">
                 <a
-                  :href="`/go/${product.id}`"
+                  :href="withSrc(`/go/${product.id}`)"
                   target="_blank"
                   rel="noopener noreferrer nofollow sponsored"
                   class="ui-focus w-full h-[52px] flex items-center justify-center gap-2 rounded-[13px] text-[15px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_10px_24px_-8px_rgba(79,70,229,0.4)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_2px_4px_rgba(10,11,14,0.1),0_14px_32px_-8px_rgba(79,70,229,0.55)] hover:-translate-y-[1px] active:translate-y-0 transition-all"
@@ -361,6 +361,7 @@
 import { ref, computed, watchEffect } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import { withSrc } from '@/composables/useOutbound'
 import ProductSimpleDetailCard from '@/components/ProductSimpleDetailCard.vue'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
 
