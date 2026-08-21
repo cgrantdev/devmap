@@ -1029,6 +1029,7 @@ class ProductsController extends Controller
                 'location' => $location ? $location->name : null,
                 'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
                 'founded_year' => $brand->vendorSetting && $brand->vendorSetting->founded_year ? $brand->vendorSetting->founded_year : null,
+                'trustpilot_url' => $brand->vendorSetting->trustpilot_url ?? null,
                 // Vendor-declared certifications only. Empty array hides the
                 // panel — never fall back to a default list (IDUN flagged that
                 // as an unearned FDA/ISO claim in Aug 2026).
@@ -1053,6 +1054,25 @@ class ProductsController extends Controller
                 'packaging' => round($packaging, 1),
             ],
             'reviews' => $mappedReviews,
+            // External reviews (Trustpilot, etc.) seeded via
+            // `php artisan reviews:import-trustpilot`. Displayed under the
+            // native reviews section with attribution + link back to the
+            // source page.
+            'externalReviews' => \App\Models\ExternalReview::where('brand_id', $brand->id)
+                ->orderByDesc('published_at')
+                ->limit(30)
+                ->get(['id', 'source', 'author', 'author_location', 'rating', 'title', 'body', 'source_url', 'published_at'])
+                ->map(fn ($r) => [
+                    'id' => $r->id,
+                    'source' => $r->source,
+                    'author' => $r->author,
+                    'author_location' => $r->author_location,
+                    'rating' => $r->rating,
+                    'title' => $r->title,
+                    'body' => $r->body,
+                    'source_url' => $r->source_url,
+                    'published_at' => $r->published_at?->format('M j, Y'),
+                ]),
             'products' => $products,
             'filterOptions' => $filterOptions,
             'priceRange' => [

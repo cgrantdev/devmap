@@ -278,11 +278,60 @@
                 </div>
               </div>
 
-              <!-- No Reviews Message -->
-              <div v-else class="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+              <!-- No Reviews Message — only when we have neither native nor external reviews -->
+              <div v-else-if="!externalReviews.length" class="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
                 <p class="text-gray-500">No reviews yet</p>
               </div>
-            </section> 
+
+              <!-- External reviews (Trustpilot etc.). Cited with source + link
+                   on every card, per the source platforms' attribution norms. -->
+              <div v-if="externalReviews.length" class="mt-8">
+                <div class="flex items-center gap-2 mb-4">
+                  <h3 class="text-lg text-gray-900">More reviews from Trustpilot</h3>
+                  <a
+                    v-if="brand.trustpilot_url"
+                    :href="brand.trustpilot_url"
+                    target="_blank"
+                    rel="noopener nofollow"
+                    class="text-[12px] text-blue-600 hover:underline"
+                  >View all on Trustpilot ↗</a>
+                </div>
+                <div class="space-y-4">
+                  <div
+                    v-for="er in externalReviews"
+                    :key="`ext-${er.id}`"
+                    class="bg-white border border-gray-200 rounded-lg p-5"
+                  >
+                    <div class="flex items-start justify-between gap-3 mb-2">
+                      <div>
+                        <div class="text-sm font-semibold text-gray-900">{{ er.author || 'Anonymous' }}</div>
+                        <div class="text-[11px] text-gray-500">
+                          <span v-if="er.author_location">{{ er.author_location }} · </span>
+                          <span v-if="er.published_at">{{ er.published_at }}</span>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-0.5">
+                        <svg v-for="i in 5" :key="i" class="w-4 h-4" :class="i <= (er.rating || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div v-if="er.title" class="text-sm font-semibold text-gray-900 mb-1">{{ er.title }}</div>
+                    <p v-if="er.body" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ er.body }}</p>
+                    <div class="mt-3 flex items-center gap-2 text-[11px] text-gray-400">
+                      <span>via Trustpilot</span>
+                      <a
+                        v-if="er.source_url"
+                        :href="er.source_url"
+                        target="_blank"
+                        rel="noopener nofollow"
+                        class="text-blue-500 hover:underline"
+                      >source ↗</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
 
           <!-- Right Sidebar (1/3) -->
@@ -738,6 +787,10 @@ const props = defineProps({
   sortDir: String,
   search: String,
   reviews: {
+    type: Array,
+    default: () => []
+  },
+  externalReviews: {
     type: Array,
     default: () => []
   },
