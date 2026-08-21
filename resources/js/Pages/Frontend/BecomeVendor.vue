@@ -1248,16 +1248,73 @@ const handleStep2Submit = () => {
   goToStep(3);
 };
 
-const handleLogoUpload = (event) => {
+// Downscale + compress a logo before upload. Large PNGs from vendor asset
+// packs (2000+ px, DSLR exports) previously blew past nginx's 1MB body limit
+// and returned 413 with no user feedback. This resizes to max 1024px (plenty
+// for a header logo) and re-encodes, keeping transparency. Robert @ Flawless
+// hit this in Aug 2026 with the S1 Labs submission — three of his four
+// brands went through fine, only the one with the oversized logo hung.
+const compressLogo = (file) => new Promise((resolve, reject) => {
+  const MAX_DIM = 1024;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    try {
+      let { width, height } = img;
+      if (width <= MAX_DIM && height <= MAX_DIM && file.size < 900_000) {
+        URL.revokeObjectURL(url);
+        return resolve(file); // already small enough
+      }
+      const scale = Math.min(MAX_DIM / width, MAX_DIM / height, 1);
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob((blob) => {
+        URL.revokeObjectURL(url);
+        if (!blob) return reject(new Error('Could not compress image.'));
+        // Wrap in a File so backend validation still sees a filename + type.
+        const compressed = new File([blob], file.name, { type: 'image/png', lastModified: Date.now() });
+        resolve(compressed);
+      }, 'image/png');
+    } catch (err) {
+      URL.revokeObjectURL(url);
+      reject(err);
+    }
+  };
+  img.onerror = () => {
+    URL.revokeObjectURL(url);
+    reject(new Error('Could not read image.'));
+  };
+  img.src = url;
+});
+
+const handleLogoUpload = async (event) => {
   const file = event.target.files[0];
-  if (file) {
-    // Validate file type
-    if (file.type !== 'image/png') {
-      alert('Please upload a PNG file only.');
+  if (!file) return;
+
+  if (file.type !== 'image/png') {
+    alert('Please upload a PNG file only.');
+    event.target.value = '';
+    formData.value.logoFile = null;
+    return;
+  }
+
+  try {
+    const optimized = await compressLogo(file);
+    if (optimized.size > 3_500_000) {
+      alert('Logo is still too large after compression. Please use a simpler PNG under 3.5 MB.');
       event.target.value = '';
       formData.value.logoFile = null;
       return;
     }
+    formData.value.logoFile = optimized;
+  } catch (err) {
+    console.error('Logo compression failed:', err);
+    // Fall back to raw file — server-side validation is the safety net.
     formData.value.logoFile = file;
   }
 };
