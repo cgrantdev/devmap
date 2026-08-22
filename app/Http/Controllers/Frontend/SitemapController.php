@@ -44,6 +44,16 @@ class SitemapController extends Controller
             ['/products',      'daily',   '0.9'],
             ['/compare',       'weekly',  '0.8'],
             ['/bacteriostatic-water', 'daily', '0.9'],  // High-intent commercial landing
+            ['/blends',        'daily',   '0.85'],
+            ['/skincare',      'daily',   '0.85'],
+            ['/bulk',          'daily',   '0.85'],
+            ['/testing-labs',  'weekly',  '0.75'],
+            ['/vs/thepeptidecatalog', 'monthly', '0.6'],
+            ['/vs/peptidecompare',    'monthly', '0.6'],
+            ['/vs/peptidepricing',    'monthly', '0.6'],
+            ['/vs/peptideprice',      'monthly', '0.6'],
+            ['/for-vendors/badge',    'monthly', '0.5'],
+            ['/vendors/integration',  'monthly', '0.5'],
             ['/encyclopedia',  'weekly',  '0.8'],
             ['/blogs',         'weekly',  '0.6'],
         ] as [$path, $freq, $priority]) {

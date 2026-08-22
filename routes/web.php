@@ -467,6 +467,19 @@ Route::get('/for-vendors/badge/{slug?}', [\App\Http\Controllers\Frontend\VendorB
     ->where('slug', '[a-zA-Z0-9\-]+')
     ->name('vendor.badge');
 
+// Vertical landing pages — competitive-audit-driven, target long-tail
+// queries competitors currently rank on. Data-driven from the product
+// catalog with a hero + intro + filtered table.
+Route::get('/blends', [\App\Http\Controllers\Frontend\LandingPageController::class, 'blends'])->name('landing.blends');
+Route::get('/skincare', [\App\Http\Controllers\Frontend\LandingPageController::class, 'skincare'])->name('landing.skincare');
+Route::get('/bulk', [\App\Http\Controllers\Frontend\LandingPageController::class, 'bulk'])->name('landing.bulk');
+Route::get('/testing-labs', [\App\Http\Controllers\Frontend\LandingPageController::class, 'testingLabs'])->name('landing.testing-labs');
+
+// Position pages targeting competitor branded queries.
+Route::get('/vs/{slug}', [\App\Http\Controllers\Frontend\VsCompetitorController::class, 'show'])
+    ->where('slug', '[a-z0-9\-]+')
+    ->name('vs.competitor');
+
 Route::get('/vendors', [BrandsController::class, 'index'])->name('vendors.public');
 // /shop/{slug} redirects to the rich brand products page
 Route::get('/shop/{vendor_name}', function ($vendor_name) {
