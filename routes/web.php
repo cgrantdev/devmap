@@ -457,6 +457,16 @@ Route::middleware('auth')->group(function () {
 Route::get('/vendors/integration', [\App\Http\Controllers\Frontend\VendorIntegrationController::class, 'show'])
     ->name('vendors.integration');
 
+// Vendor Badge Widget. SVG is served from /badge/{slug}.svg (cached, CORS-open
+// so vendor sites can embed <img>). The "grab your badge" instructions page
+// lives at /for-vendors/badge/{slug?}.
+Route::get('/badge/{slug}', [\App\Http\Controllers\Frontend\VendorBadgeController::class, 'svg'])
+    ->where('slug', '[a-zA-Z0-9\-\.]+')
+    ->name('vendor.badge.svg');
+Route::get('/for-vendors/badge/{slug?}', [\App\Http\Controllers\Frontend\VendorBadgeController::class, 'show'])
+    ->where('slug', '[a-zA-Z0-9\-]+')
+    ->name('vendor.badge');
+
 Route::get('/vendors', [BrandsController::class, 'index'])->name('vendors.public');
 // /shop/{slug} redirects to the rich brand products page
 Route::get('/shop/{vendor_name}', function ($vendor_name) {

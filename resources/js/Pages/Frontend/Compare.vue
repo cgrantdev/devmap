@@ -144,6 +144,10 @@
                 <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.vendor_count }}</strong> vendors</span>
                 <span v-if="compound.cheapest_price" class="text-[color:var(--color-ink-subtle)]">·</span>
                 <span v-if="compound.cheapest_price" class="ui-mono font-semibold text-emerald-700">from {{ compound.cheapest_currency_symbol || '$' }}{{ formatPrice(compound.cheapest_price) }}</span>
+                <span v-if="compound.prices_updated_human" class="text-[color:var(--color-ink-subtle)]">·</span>
+                <span v-if="compound.prices_updated_human" class="text-[color:var(--color-ink-subtle)]" :title="compound.prices_updated_iso">
+                  Prices updated {{ compound.prices_updated_human }}
+                </span>
               </div>
               <p v-if="compound.description" class="text-[13px] sm:text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl line-clamp-2">
                 {{ compound.description }}

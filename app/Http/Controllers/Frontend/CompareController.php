@@ -203,6 +203,18 @@ class CompareController extends Controller
             $displayName = self::DISPLAY_NAMES[$catName] ?? $category->name;
             $educationPost = $category->educationPost;
 
+            // Freshness signal — max(last_scraped_at | updated_at) across
+            // this category's products. Google-friendly and honest: gives
+            // us a "Prices updated 2 hours ago" line that competitors
+            // ("18 hours ago" is what The Peptide Catalog uses) currently
+            // beat us on.
+            $freshRow = Product::visible()
+                ->where('status', 'active')
+                ->where('product_category_id', $category->id)
+                ->selectRaw('GREATEST(COALESCE(MAX(last_scraped_at), 0), COALESCE(MAX(updated_at), 0)) as latest')
+                ->first();
+            $latestTs = $freshRow?->latest ? \Carbon\Carbon::parse($freshRow->latest) : null;
+
             $compounds->push([
                 'id' => $category->id,
                 'name' => $displayName,
@@ -223,6 +235,8 @@ class CompareController extends Controller
                 // when the leading vendor is UK-based.
                 'cheapest_currency_symbol' => $products->first()['currency_symbol'] ?? '$',
                 'vendor_count' => $products->pluck('brand_name')->unique()->count(),
+                'prices_updated_iso' => $latestTs?->toIso8601String(),
+                'prices_updated_human' => $latestTs?->diffForHumans(),
                 'products' => $products->values(),
             ]);
         }
