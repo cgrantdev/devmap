@@ -36,6 +36,7 @@ class CeoDashboardController extends Controller
     {
         return Inertia::render('Admin/CeoDashboard', [
             'snapshot' => $this->snapshot(),
+            'growthMetrics' => app(\App\Services\GrowthMetrics::class)->snapshot(),
             'openRecs' => $this->recs('open'),
             'inProgressRecs' => $this->recs('in_progress'),
             'shippedRecs' => $this->recs('shipped', 20),

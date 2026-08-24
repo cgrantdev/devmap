@@ -14,6 +14,13 @@ Schedule::command('scraping:run-scheduled')
     ->withoutOverlapping()
     ->runInBackground();
 
+// Weekly growth digest to Discord — every Monday 09:00 UTC (04:00 ET / 01:00 PT).
+// Pulls from GrowthMetrics service; posts a summary card to the growth channel.
+Schedule::command('growth:digest')
+    ->weeklyOn(1, '09:00')
+    ->timezone('UTC')
+    ->withoutOverlapping();
+
 // Wishlist / price-alert engine.
 // Daily snapshot at 03:00 UTC captures every active product's price
 // (deduped when unchanged so the table stays small).

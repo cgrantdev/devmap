@@ -34,6 +34,80 @@
         </div>
       </section>
 
+      <!-- Growth panel — live traffic + affiliate signals from our own tables.
+           Reads from GrowthMetrics service; same data the weekly Discord digest posts. -->
+      <section v-if="growthMetrics?.week_over_week" class="space-y-4">
+        <div class="flex items-baseline justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900">Growth · last 7 days</h2>
+            <p class="text-[12px] text-gray-500 mt-0.5">Human traffic only. Bots filtered. Compares to previous 7d.</p>
+          </div>
+        </div>
+
+        <!-- Week-over-week headline metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <Metric
+            label="Sessions"
+            :main="growthMetrics.week_over_week.sessions_this"
+            :sub="deltaLabel(growthMetrics.week_over_week.sessions_delta, growthMetrics.week_over_week.sessions_prev)"
+            :accent="deltaAccent(growthMetrics.week_over_week.sessions_delta)"
+          />
+          <Metric
+            label="Pageviews"
+            :main="growthMetrics.week_over_week.views_this"
+            :sub="deltaLabel(growthMetrics.week_over_week.views_delta, growthMetrics.week_over_week.views_prev)"
+            :accent="deltaAccent(growthMetrics.week_over_week.views_delta)"
+          />
+          <Metric
+            label="Affiliate clicks"
+            :main="growthMetrics.week_over_week.clicks_this"
+            :sub="deltaLabel(growthMetrics.week_over_week.clicks_delta, growthMetrics.week_over_week.clicks_prev)"
+            :accent="deltaAccent(growthMetrics.week_over_week.clicks_delta)"
+          />
+        </div>
+
+        <!-- Sparkline pair: sessions + clicks over 30d -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white border border-gray-200 rounded-lg p-4">
+            <div class="text-[11px] uppercase tracking-wide font-semibold text-gray-500 mb-2">Sessions · 30d</div>
+            <Sparkline :points="(growthMetrics.sessions_trend || []).map(r => r.sessions)" color="#4F46E5" />
+          </div>
+          <div class="bg-white border border-gray-200 rounded-lg p-4">
+            <div class="text-[11px] uppercase tracking-wide font-semibold text-gray-500 mb-2">Affiliate clicks · 30d</div>
+            <Sparkline :points="(growthMetrics.clicks_trend || []).map(r => r.clicks)" color="#10B981" />
+          </div>
+        </div>
+
+        <!-- Ranked tables: which pages, compounds, vendors are driving clicks -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <RankPanel title="Top pages · 7d" :rows="growthMetrics.top_pages" label-key="page" value-label="clicks" empty="No internal-src data yet — wait ~24h after deploy." />
+          <RankPanel title="Top compounds · 7d" :rows="growthMetrics.top_compounds" label-key="name" value-label="clicks" empty="No click data yet." />
+          <RankPanel title="Top vendors · 7d" :rows="growthMetrics.top_vendors" label-key="name" value-label="clicks" empty="No click data yet." />
+        </div>
+
+        <!-- External referrers + vendor pipeline + attribution health -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <RankPanel title="External referrers · 30d" :rows="growthMetrics.top_referrers" label-key="host" value-label="hits" empty="No external referrer data." />
+          <div class="bg-white border border-gray-200 rounded-lg p-4">
+            <div class="text-[11px] uppercase tracking-wide font-semibold text-gray-500 mb-3">Vendor pipeline</div>
+            <div class="space-y-2 text-[13px]">
+              <div class="flex justify-between"><span class="text-gray-600">Approved</span><span class="ui-mono font-semibold text-gray-900">{{ growthMetrics.vendor_pipeline?.approved ?? 0 }}</span></div>
+              <div class="flex justify-between"><span class="text-gray-600">Pending review</span><span class="ui-mono font-semibold" :class="(growthMetrics.vendor_pipeline?.pending ?? 0) > 0 ? 'text-amber-600' : 'text-gray-900'">{{ growthMetrics.vendor_pipeline?.pending ?? 0 }}</span></div>
+              <div class="flex justify-between"><span class="text-gray-600">New this week</span><span class="ui-mono font-semibold text-emerald-600">{{ growthMetrics.vendor_pipeline?.new_this_week ?? 0 }}</span></div>
+              <div class="flex justify-between"><span class="text-gray-600">New this month</span><span class="ui-mono font-semibold text-gray-900">{{ growthMetrics.vendor_pipeline?.new_this_month ?? 0 }}</span></div>
+            </div>
+          </div>
+          <div class="bg-white border border-gray-200 rounded-lg p-4">
+            <div class="text-[11px] uppercase tracking-wide font-semibold text-gray-500 mb-3">Attribution health · 7d</div>
+            <div class="space-y-2 text-[13px]">
+              <div class="flex justify-between"><span class="text-gray-600">Total clicks</span><span class="ui-mono font-semibold text-gray-900">{{ growthMetrics.attribution_health?.total ?? 0 }}</span></div>
+              <div class="flex justify-between"><span class="text-gray-600">With ?src=</span><span class="ui-mono font-semibold text-gray-900">{{ growthMetrics.attribution_health?.with_internal_src ?? 0 }} <span class="text-gray-500">({{ growthMetrics.attribution_health?.internal_src_pct ?? 0 }}%)</span></span></div>
+              <div class="flex justify-between"><span class="text-gray-600">Vendor-supplied UTMs</span><span class="ui-mono font-semibold text-gray-900">{{ growthMetrics.attribution_health?.with_utm ?? 0 }}</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Progress bar — total flow at a glance -->
       <section>
         <div class="bg-white border border-gray-200 rounded-lg p-4">
@@ -314,6 +388,7 @@ import Layout from './Layout.vue'
 
 const props = defineProps({
   snapshot: Object,
+  growthMetrics: { type: Object, default: () => ({}) },
   openRecs: Array,
   inProgressRecs: Array,
   shippedRecs: Array,
@@ -584,4 +659,72 @@ const Metric = defineComponent({
     ])
   },
 })
+
+// Sparkline: inline SVG line chart. No lib. Auto-scales, min height so
+// a flat zero-array still renders a legible baseline.
+const Sparkline = defineComponent({
+  props: { points: { type: Array, default: () => [] }, color: { type: String, default: '#4F46E5' } },
+  setup(props) {
+    return () => {
+      const pts = (props.points || []).map(v => Number(v) || 0)
+      if (pts.length === 0) return h('div', { class: 'h-16 text-[11px] text-gray-400 flex items-center justify-center' }, 'No data yet')
+      const w = 400, hh = 60, pad = 4
+      const max = Math.max(...pts, 1)
+      const step = pts.length > 1 ? (w - pad * 2) / (pts.length - 1) : 0
+      const poly = pts.map((v, i) => `${pad + i * step},${hh - pad - (v / max) * (hh - pad * 2)}`).join(' ')
+      const areaPoly = `${pad},${hh - pad} ${poly} ${w - pad},${hh - pad}`
+      const last = pts[pts.length - 1]
+      return h('div', { class: 'space-y-1' }, [
+        h('svg', { viewBox: `0 0 ${w} ${hh}`, class: 'w-full h-16', preserveAspectRatio: 'none' }, [
+          h('polygon', { points: areaPoly, fill: props.color, 'fill-opacity': '0.12' }),
+          h('polyline', { points: poly, fill: 'none', stroke: props.color, 'stroke-width': '2', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }),
+        ]),
+        h('div', { class: 'flex justify-between text-[10px] text-gray-500' }, [
+          h('span', {}, `${pts.length}d ago`),
+          h('span', { class: 'ui-mono font-semibold text-gray-800' }, `now: ${last}`),
+        ]),
+      ])
+    }
+  },
+})
+
+// Ranked list panel — top-N rows with numeric badge on the right.
+const RankPanel = defineComponent({
+  props: {
+    title: String,
+    rows: { type: Array, default: () => [] },
+    labelKey: { type: String, default: 'name' },
+    valueLabel: { type: String, default: 'value' },
+    empty: { type: String, default: 'No data.' },
+  },
+  setup(props) {
+    return () => h('div', { class: 'bg-white border border-gray-200 rounded-lg p-4' }, [
+      h('div', { class: 'text-[11px] uppercase tracking-wide font-semibold text-gray-500 mb-3' }, props.title),
+      props.rows.length === 0
+        ? h('div', { class: 'text-[12px] text-gray-400 py-2' }, props.empty)
+        : h('ol', { class: 'space-y-1.5' }, props.rows.map((r, i) =>
+            h('li', { class: 'flex items-center justify-between gap-2 text-[13px]' }, [
+              h('span', { class: 'flex items-center gap-2 min-w-0' }, [
+                h('span', { class: 'ui-mono text-[10px] text-gray-400 w-4' }, String(i + 1)),
+                h('span', { class: 'truncate text-gray-800' }, String(r[props.labelKey] ?? '—')),
+              ]),
+              h('span', { class: 'ui-mono font-semibold text-gray-900 tabular-nums flex-shrink-0' }, String(r.clicks ?? r.hits ?? r.value ?? '')),
+            ])
+          )),
+    ])
+  },
+})
+
+// Delta helpers for week-over-week Metric captions.
+function deltaLabel(delta, prev) {
+  if (delta === null || delta === undefined) return prev > 0 ? 'no prev baseline' : 'first week'
+  const sign = delta > 0 ? '+' : ''
+  return `${sign}${delta}% vs prev 7d`
+}
+function deltaAccent(delta) {
+  if (delta === null || delta === undefined) return ''
+  if (delta > 5) return 'emerald'
+  if (delta < -5) return 'red'
+  return ''
+}
 </script>

@@ -62,6 +62,9 @@ return [
         'application_id' => env('DISCORD_APPLICATION_ID'),
         'public_key' => env('DISCORD_PUBLIC_KEY'),
         'guild_id' => env('DISCORD_GUILD_ID'),
+        // Channel that receives the weekly growth digest. Restrict its
+        // visibility in the Discord UI — the bot posts here regardless.
+        'growth_channel_id' => env('DISCORD_GROWTH_CHANNEL_ID', '1541364154093404171'),
     ],
 
     'slack' => [
