@@ -953,14 +953,25 @@ class ProductsController extends Controller
         // Check if stored SEO data exists in vendorSetting
         $vendorSetting = $brand->vendorSetting;
         $hasStoredSeo = $vendorSetting && (!empty($vendorSetting->seo_page_title) || !empty($vendorSetting->seo_description));
-        
+
+        // Search-intent-optimized default. Beats the previous "we are a
+        // family-owned company…" truncation which had zero query match.
+        // Uses real counts so the description carries specificity Google
+        // rewards, plus the "coupon codes" trigger that competitors miss.
+        $brandProductCount = \App\Models\Product::visible()->where('brand_id', $brand->id)->count();
+        $otherVendorCount = \App\Models\Brand::where('is_active', true)
+            ->where('id', '!=', $brand->id)
+            ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
+            ->count();
+        $couponClause = ($vendorSetting && !empty($vendorSetting->coupon_code))
+            ? "Coupon code {$vendorSetting->coupon_code}, "
+            : '';
+        $defaultBrandDescription = "{$couponClause}real customer reviews, and live prices for {$brandProductCount} peptides from {$brand->name}. Compare against {$otherVendorCount} other verified vendors on Peptidemap.";
+
         if ($hasStoredSeo) {
             // Use stored SEO data from database
-            $seoTitle = $vendorSetting->seo_page_title ?: ($brand->name . ': Coupon Codes & Reviews - ' . $siteName);
-            $seoDescription = $vendorSetting->seo_description 
-                ?: (($vendorSetting->description ?? '') 
-                    ? $this->safeLimit($vendorSetting->description, 160) 
-                    : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.');
+            $seoTitle = $vendorSetting->seo_page_title ?: ($brand->name . ': Coupon Codes, Reviews & Prices - ' . $siteName);
+            $seoDescription = $vendorSetting->seo_description ?: $defaultBrandDescription;
             $seoOgTitle = $vendorSetting->seo_og_title ?: $seoTitle;
             $seoOgDescription = $vendorSetting->seo_og_description ?: $seoDescription;
             // updated_at cache-buster so social platforms refetch when the brand changes.
@@ -969,10 +980,8 @@ class ProductsController extends Controller
                 ? (str_starts_with($vendorSetting->seo_og_image, 'http') ? $vendorSetting->seo_og_image : url($vendorSetting->seo_og_image))
                 : route('og.brand', ['slug' => $brand->slug]) . '?v=' . $ogV;
         } else {
-            $seoTitle = $brand->name . ': Coupon Codes & Reviews - ' . $siteName;
-            $seoDescription = ($vendorSetting->description ?? '')
-                ? $this->safeLimit($vendorSetting->description, 160)
-                : 'Browse products from ' . $brand->name . '. Read reviews, compare prices, and find the best deals.';
+            $seoTitle = $brand->name . ': Coupon Codes, Reviews & Prices - ' . $siteName;
+            $seoDescription = $defaultBrandDescription;
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
             $ogV = ($brand->updated_at?->timestamp) ?: ($vendorSetting->updated_at?->timestamp ?? 0);
