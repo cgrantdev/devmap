@@ -260,6 +260,14 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
         Route::delete('/recommendations/{recommendation}', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'destroyRecommendation'])->name('admin.ceo.rec.destroy');
         Route::post('/notepad', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'saveNotepad'])->name('admin.ceo.notepad.save');
     });
+
+    // Internal SEO inventory + notes scratchpad. Same ceo.only gate as
+    // /admin/ceo. Excluded from sitemap; noindex header on the response;
+    // /admin/* already disallowed in robots.txt.
+    Route::middleware('ceo.only')->group(function () {
+        Route::get('/seo-wip', [\App\Http\Controllers\Admin\SeoWipController::class, 'index'])->name('admin.seo-wip');
+        Route::post('/seo-wip/notes', [\App\Http\Controllers\Admin\SeoWipController::class, 'saveNotes'])->name('admin.seo-wip.notes');
+    });
     Route::get('/vendors', [VendorsController::class, 'index'])->name('admin.vendors');
     Route::get('/applicants', [VendorsController::class, 'applicants'])->name('admin.applicants');
     Route::get('/vendors/create', [VendorsController::class, 'create'])->name('admin.vendors.create');
