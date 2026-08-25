@@ -47,8 +47,8 @@ class RefreshExternalReviews extends Command
 
             $this->line("Refreshing: {$brand->name}");
             $sources = $fetcher->refresh($vs);
-            $agg = $vs->fresh(['external_rating_avg', 'external_rating_count']);
-            $this->info("  → " . count($sources) . " source(s) — aggregate: ★ " . ($agg->external_rating_avg ?? '—') . " across {$agg->external_rating_count} reviews");
+            $agg = $vs->fresh();
+            $this->info("  → " . count($sources) . " source(s) — aggregate: ★ " . ($agg->external_rating_avg ?? '—') . " across " . ($agg->external_rating_count ?? 0) . " reviews");
             $ok++;
 
             // Polite pacing between fetches — we're hitting third-party sites.
