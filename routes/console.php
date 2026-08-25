@@ -21,6 +21,12 @@ Schedule::command('growth:digest')
     ->timezone('UTC')
     ->withoutOverlapping();
 
+// Auto-revert expired coupon boosts back to the vendor's standard %.
+// Every 5 minutes so a boost expires within 5 min of its declared time.
+Schedule::command('coupons:revert-expired-boosts')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();
+
 // Wishlist / price-alert engine.
 // Daily snapshot at 03:00 UTC captures every active product's price
 // (deduped when unchanged so the table stays small).

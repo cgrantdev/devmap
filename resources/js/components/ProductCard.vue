@@ -1,7 +1,7 @@
 <template>
   <div
     @click="handleClick"
-    class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group relative"
+    class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group relative flex flex-col h-full"
   >
     <!-- Top Section: Product Image -->
     <div class="aspect-square bg-gradient-to-br from-blue-50 to-purple-50 p-6 border-b border-gray-200 flex items-center justify-center"> 
@@ -45,15 +45,18 @@
       </div>
     </div>
 
-    <!-- Bottom Section: Product Information -->
-    <div class="p-4">
+    <!-- Bottom Section: Product Information. flex-col + flex-1 lets the
+         "View Product" button push to the bottom via mt-auto so buttons
+         align across a row regardless of product-name / price-block height. -->
+    <div class="p-4 flex flex-col flex-1">
       <!-- Category Tag -->
       <!-- <div class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mb-2">
         {{ categoryName }}
       </div> -->
 
-      <!-- Product Title + Type chip -->
-      <div class="flex items-start gap-1.5 mb-1">
+      <!-- Product Title + Type chip. min-h reserves 2 lines even when the
+           title fits on one so cards line up in a grid. -->
+      <div class="flex items-start gap-1.5 mb-1 min-h-[2.5rem]">
         <h3 class="text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 min-w-0">
           {{ name }}
         </h3>
@@ -111,8 +114,9 @@
         </div>
       </div>
 
-      <!-- View Details Button -->
-      <div class="flex gap-2">
+      <!-- View Details Button — mt-auto pushes to bottom so it aligns
+           across cards in a grid regardless of price-block or title height. -->
+      <div class="flex gap-2 mt-auto">
         <button
           @click="handleClick"
           class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm flex items-center justify-center gap-2 transition-colors"
