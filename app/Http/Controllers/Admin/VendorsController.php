@@ -383,6 +383,22 @@ class VendorsController extends Controller
     {
         $brand = Brand::findOrFail($id);
 
+        // Diagnostic: Julia reported (Aug 2026) that affiliate URL / coupon
+        // code edits weren't sticking. Log the payload keys + a few tell-tale
+        // values so we can trace whether the field is missing from the
+        // request, dropped by validation, or overwritten with an empty
+        // string. Remove once root-caused.
+        \Log::info('admin.vendor.update payload', [
+            'brand_id' => $brand->id,
+            'brand_slug' => $brand->slug,
+            'keys' => array_keys($request->all()),
+            'affiliate_url_template' => $request->input('affiliate_url_template'),
+            'affiliate_tag' => $request->input('affiliate_tag'),
+            'coupon_code' => $request->input('coupon_code'),
+            'coupon_discount_percent' => $request->input('coupon_discount_percent'),
+            'user' => auth()->user()?->email,
+        ]);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'shop_url' => 'nullable|url|max:255', // shop_url is the website
@@ -530,6 +546,18 @@ class VendorsController extends Controller
         }
 
         $settings->save();
+
+        // Diagnostic mate to the logging at the top of this method — dumps
+        // the persisted values so we can confirm the DB actually took the
+        // update. Compares to the "keys" list above.
+        \Log::info('admin.vendor.update saved', [
+            'brand_id' => $brand->id,
+            'brand.affiliate_url_template' => $brand->fresh()->affiliate_url_template,
+            'brand.affiliate_tag' => $brand->fresh()->affiliate_tag,
+            'settings.coupon_code' => $settings->fresh()->coupon_code,
+            'settings.coupon_discount_percent' => $settings->fresh()->coupon_discount_percent,
+            'settings.referral_url' => $settings->fresh()->referral_url,
+        ]);
 
         // Auto-create/update ScrapingConfig when platform is set
         if ($settings->api_platform) {
