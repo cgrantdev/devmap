@@ -369,14 +369,19 @@
 
           </div>
 
-          <!-- Step 3: Business Info -->
-          <div v-if="step === 3" class="space-y-6">
-            <div>
-              <h2 class="text-slate-900 mb-2">Business Information</h2>
-              <p class="text-slate-600 text-sm">Help us understand your business — the panel on the right shows how your storefront will look.</p>
-            </div>
+          <!-- Step 3: Business Info — breaks out of parent max-w-2xl to
+               use page width so the live preview sits at real proportions
+               beside the form. Form column stays reader-friendly (~480px);
+               preview takes the rest and sticks as they scroll. -->
+          <div v-if="step === 3" class="relative left-1/2 right-1/2 -translate-x-1/2 w-screen">
+            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-2">
+              <div class="mb-6">
+                <h2 class="text-slate-900 mb-2 text-xl">Business Information</h2>
+                <p class="text-slate-600 text-sm">Help us understand your business — the preview updates as you type.</p>
+              </div>
 
-            <form @submit.prevent="handleStep3Submit" class="space-y-6">
+              <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,480px)_minmax(0,1fr)] gap-8">
+                <form @submit.prevent="handleStep3Submit" class="space-y-6 min-w-0">
               <!-- Number of Products -->
               <div>
                 <label for="product_count" class="block text-sm text-slate-700 mb-2">
@@ -635,24 +640,18 @@
               </div>
             </form>
 
-          </div>
-
-          <!-- Full-width storefront preview under the form. Uses the
-               left/translate viewport-escape trick to break out of the
-               parent max-w-2xl wrapper. Real brand-page proportions with
-               sample product cards so applicants see the shape their
-               catalog will take after approval. -->
-          <div v-if="step === 3" class="mt-10 relative left-1/2 right-1/2 -translate-x-1/2 w-screen">
-            <div class="px-4 sm:px-6 lg:px-10 py-10 bg-slate-100 border-t border-b border-slate-200">
-              <div class="max-w-6xl mx-auto">
-                <div class="mb-5 flex items-baseline justify-between gap-4 flex-wrap">
-                  <div>
-                    <div class="text-[11px] uppercase tracking-wider font-semibold text-indigo-600 mb-1">Live preview</div>
-                    <h3 class="text-xl sm:text-2xl font-semibold text-slate-900">This is how your storefront will look</h3>
+                <!-- Preview column — right side of the two-col grid.
+                     Sticky on lg+ so it stays in view as they scroll the
+                     form. Falls below the form on mobile. -->
+                <aside>
+                  <div class="lg:sticky lg:top-4">
+                    <div class="mb-3 flex items-baseline justify-between gap-2 flex-wrap">
+                      <div class="text-[11px] uppercase tracking-wider font-semibold text-indigo-600">Live preview</div>
+                      <div class="text-[11px] text-slate-500">Updates as you type · Products import after approval</div>
+                    </div>
+                    <VendorStorefrontPreview :data="storefrontPreviewData" :logo="formData.logoFile" />
                   </div>
-                  <div class="text-[12px] text-slate-500">Updates as you type · Products import after approval</div>
-                </div>
-                <VendorStorefrontPreview :data="storefrontPreviewData" :logo="formData.logoFile" />
+                </aside>
               </div>
             </div>
           </div>
