@@ -29,7 +29,8 @@ class ImportTrustpilotReviews extends Command
     protected $signature = 'reviews:import-trustpilot
                             {brand : Brand slug or numeric id}
                             {--url= : Trustpilot review URL (only needed if vendor_settings.trustpilot_url is not set)}
-                            {--pages=1 : How many pages of reviews to fetch (20 per page)}';
+                            {--pages=1 : How many pages of reviews to fetch (20 per page)}
+                            {--html-file=* : Path(s) to Trustpilot HTML files saved from your browser (bypasses their datacenter-IP block). Repeat for multiple pages.}';
 
     protected $description = 'Import Trustpilot reviews for a vendor (one-time seed).';
 
@@ -62,9 +63,33 @@ class ImportTrustpilotReviews extends Command
 
         $trustpilotUrl = rtrim($trustpilotUrl, '/');
         $pagesToFetch = max(1, (int) $this->option('pages'));
+        $htmlFiles = $this->option('html-file') ?: [];
 
         $totalNew = 0;
         $totalUpdated = 0;
+
+        // File-drop path: Trustpilot 403s our datacenter IP on every endpoint,
+        // so vendors' pages must be saved from a real browser and uploaded.
+        // Usage: --html-file=/tmp/tp-page1.html --html-file=/tmp/tp-page2.html
+        if (!empty($htmlFiles)) {
+            foreach ($htmlFiles as $idx => $path) {
+                if (!is_readable($path)) {
+                    $this->error("Cannot read file: {$path}");
+                    continue;
+                }
+                $html = file_get_contents($path);
+                $this->line("Parsing local file: {$path}");
+                $reviews = $this->extractReviews($html);
+                [$new, $updated] = $this->persist($brand, $trustpilotUrl, $reviews);
+                $totalNew += $new;
+                $totalUpdated += $updated;
+                $this->info("  File {$idx}: parsed " . count($reviews) . " reviews (new={$new}, updated={$updated})");
+            }
+            Cache::forget("external_reviews_summary:{$brand->id}");
+            $this->newLine();
+            $this->info("Done. {$totalNew} new, {$totalUpdated} updated for {$brand->name}.");
+            return self::SUCCESS;
+        }
 
         for ($page = 1; $page <= $pagesToFetch; $page++) {
             $pageUrl = $page === 1 ? $trustpilotUrl : "{$trustpilotUrl}?page={$page}";
@@ -84,7 +109,7 @@ class ImportTrustpilotReviews extends Command
             }
 
             if (!$response->successful()) {
-                $this->error("HTTP {$response->status()} for {$pageUrl}");
+                $this->error("HTTP {$response->status()} for {$pageUrl}. Trustpilot blocks datacenter IPs — save the page from your browser and re-run with --html-file=/path/to/saved.html");
                 continue;
             }
 
@@ -96,34 +121,9 @@ class ImportTrustpilotReviews extends Command
                 continue;
             }
 
-            foreach ($reviews as $r) {
-                $existing = ExternalReview::where('source', 'trustpilot')
-                    ->where('source_review_id', $r['id'])
-                    ->first();
-
-                $attrs = [
-                    'brand_id' => $brand->id,
-                    'source' => 'trustpilot',
-                    'source_review_id' => $r['id'],
-                    'author' => mb_substr($r['author'] ?? '', 0, 191),
-                    'author_location' => mb_substr($r['author_location'] ?? '', 0, 191),
-                    'rating' => $r['rating'],
-                    'title' => mb_substr($r['title'] ?? '', 0, 512),
-                    'body' => $r['body'] ?? null,
-                    'source_url' => mb_substr($trustpilotUrl, 0, 1024),
-                    'published_at' => $r['published_at'] ?? null,
-                    'imported_at' => now(),
-                ];
-
-                if ($existing) {
-                    $existing->update($attrs);
-                    $totalUpdated++;
-                } else {
-                    ExternalReview::create($attrs);
-                    $totalNew++;
-                }
-            }
-
+            [$new, $updated] = $this->persist($brand, $trustpilotUrl, $reviews);
+            $totalNew += $new;
+            $totalUpdated += $updated;
             $this->info("  Page {$page}: parsed " . count($reviews) . " reviews");
 
             // Polite pacing between page fetches.
@@ -137,6 +137,39 @@ class ImportTrustpilotReviews extends Command
         $this->info("Done. {$totalNew} new, {$totalUpdated} updated for {$brand->name}.");
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Idempotent upsert for a batch of parsed reviews. Dedupes by
+     * (source, source_review_id) which is enforced by a unique index.
+     * Returns [newCount, updatedCount].
+     */
+    private function persist(\App\Models\Brand $brand, string $sourceUrl, array $reviews): array
+    {
+        $new = 0; $updated = 0;
+        foreach ($reviews as $r) {
+            $existing = ExternalReview::where('source', 'trustpilot')
+                ->where('source_review_id', $r['id'])
+                ->first();
+
+            $attrs = [
+                'brand_id' => $brand->id,
+                'source' => 'trustpilot',
+                'source_review_id' => $r['id'],
+                'author' => mb_substr($r['author'] ?? '', 0, 191),
+                'author_location' => mb_substr($r['author_location'] ?? '', 0, 191),
+                'rating' => $r['rating'],
+                'title' => mb_substr($r['title'] ?? '', 0, 512),
+                'body' => $r['body'] ?? null,
+                'source_url' => mb_substr($sourceUrl, 0, 1024),
+                'published_at' => $r['published_at'] ?? null,
+                'imported_at' => now(),
+            ];
+
+            if ($existing) { $existing->update($attrs); $updated++; }
+            else           { ExternalReview::create($attrs); $new++; }
+        }
+        return [$new, $updated];
     }
 
     /**

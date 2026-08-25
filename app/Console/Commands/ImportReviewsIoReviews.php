@@ -27,9 +27,16 @@ class ImportReviewsIoReviews extends Command
     protected $signature = 'reviews:import-reviews-io
                             {brand : Brand slug or numeric id}
                             {--url= : Reviews.io URL (only needed if vendor_settings.reviews_io_url is not set)}
-                            {--pages=1 : How many pages of reviews to fetch (20 per page)}';
+                            {--all : Fetch ALL reviews (defaults to first 100)}
+                            {--limit=100 : Hard cap on reviews to fetch when --all is not set}';
 
-    protected $description = 'Import individual Reviews.io reviews for a vendor.';
+    protected $description = 'Import individual Reviews.io reviews for a vendor via their public merchant API.';
+
+    // Reviews.io's public widget API — same endpoint their own widget calls.
+    // Paginated 100 per page, returns full review objects (id, rating,
+    // title, comments, dates, reviewer name).
+    private const API_PER_PAGE = 100;
+    private const API_BASE = 'https://api.reviews.io/merchant/reviews';
 
     public function handle(): int
     {
@@ -43,12 +50,12 @@ class ImportReviewsIoReviews extends Command
             return self::FAILURE;
         }
 
-        $urlArg = $this->option('url');
         $vs = $brand->vendorSetting;
+        $urlArg = $this->option('url');
         $storedUrl = $vs->reviews_io_url ?? null;
-        $baseUrl = $urlArg ?: $storedUrl;
+        $sourceUrl = $urlArg ?: $storedUrl;
 
-        if (!$baseUrl) {
+        if (!$sourceUrl) {
             $this->error('No Reviews.io URL. Pass --url= or set vendor_settings.reviews_io_url first.');
             return self::FAILURE;
         }
@@ -57,54 +64,67 @@ class ImportReviewsIoReviews extends Command
             $vs->update(['reviews_io_url' => $urlArg]);
         }
 
-        // Strip trailing query so pagination assembly stays clean.
-        $baseUrl = preg_replace('/\?.*$/', '', rtrim($baseUrl, '/'));
-        $pagesToFetch = max(1, (int) $this->option('pages'));
+        // Extract the store slug from the vendor's Reviews.io URL. The
+        // public URL pattern is /company-reviews/store/{store-slug} — the
+        // slug is what the API keys off ("certified-pep.com" for Certified Pep).
+        $store = $this->extractStore($sourceUrl);
+        if (!$store) {
+            $this->error("Could not parse Reviews.io store slug from URL: {$sourceUrl}");
+            return self::FAILURE;
+        }
+        $this->line("Store slug: {$store}");
 
-        $totalNew = 0; $totalUpdated = 0;
+        $limit = $this->option('all') ? PHP_INT_MAX : max(1, (int) $this->option('limit'));
+        $totalNew = 0; $totalUpdated = 0; $totalSeen = 0;
+        $page = 1;
 
-        for ($page = 1; $page <= $pagesToFetch; $page++) {
-            $pageUrl = $page === 1 ? $baseUrl : "{$baseUrl}?page={$page}";
-            $this->line("Fetching {$pageUrl}");
+        while ($totalSeen < $limit) {
+            $pageUrl = self::API_BASE . '?store=' . urlencode($store)
+                . '&per_page=' . self::API_PER_PAGE . '&page=' . $page;
+            $this->line("Fetching page {$page}");
 
             try {
                 $resp = Http::withHeaders([
                     'User-Agent' => 'Mozilla/5.0 (compatible; Peptidemap/1.0; +https://peptidemap.com)',
-                    'Accept' => 'text/html,application/xhtml+xml',
-                    'Accept-Language' => 'en-US,en;q=0.9',
+                    'Accept' => 'application/json',
                 ])->timeout(20)->get($pageUrl);
             } catch (\Throwable $e) {
                 $this->error("Fetch failed: {$e->getMessage()}");
-                continue;
+                break;
             }
 
             if (!$resp->successful()) {
-                $this->error("HTTP {$resp->status()} for {$pageUrl}");
-                continue;
+                $this->error("HTTP {$resp->status()} for page {$page}");
+                break;
             }
 
-            $reviews = $this->extractReviews($resp->body(), $baseUrl);
+            $data = $resp->json();
+            $reviews = $data['reviews'] ?? [];
             if (empty($reviews)) {
-                $this->warn("  No reviews parsed from page {$page}.");
-                continue;
+                $this->info('  (no more reviews)');
+                break;
             }
 
             foreach ($reviews as $r) {
+                if ($totalSeen >= $limit) break 2;
+                $totalSeen++;
+
+                $normalized = $this->normalize($r);
                 $existing = ExternalReview::where('source', 'reviews_io')
-                    ->where('source_review_id', $r['id'])
+                    ->where('source_review_id', $normalized['id'])
                     ->first();
 
                 $attrs = [
                     'brand_id' => $brand->id,
                     'source' => 'reviews_io',
-                    'source_review_id' => $r['id'],
-                    'author' => mb_substr($r['author'] ?? '', 0, 191),
+                    'source_review_id' => $normalized['id'],
+                    'author' => mb_substr($normalized['author'], 0, 191),
                     'author_location' => null,
-                    'rating' => $r['rating'],
-                    'title' => mb_substr($r['title'] ?? '', 0, 512),
-                    'body' => $r['body'] ?? null,
-                    'source_url' => mb_substr($baseUrl, 0, 1024),
-                    'published_at' => $r['published_at'] ?? null,
+                    'rating' => $normalized['rating'],
+                    'title' => mb_substr((string) $normalized['title'], 0, 512),
+                    'body' => $normalized['body'],
+                    'source_url' => mb_substr($sourceUrl, 0, 1024),
+                    'published_at' => $normalized['published_at'],
                     'imported_at' => now(),
                 ];
 
@@ -117,78 +137,53 @@ class ImportReviewsIoReviews extends Command
                 }
             }
 
-            $this->info("  Page {$page}: parsed " . count($reviews) . " reviews");
-            if ($page < $pagesToFetch) usleep(2_000_000);
+            $this->info("  Page {$page}: " . count($reviews) . ' reviews (' . $totalSeen . ' total this run)');
+
+            $totalPages = (int) ($data['total_pages'] ?? 1);
+            if ($page >= $totalPages) break;
+            $page++;
+            usleep(750_000); // polite pacing between API calls
         }
 
         Cache::forget("external_reviews_summary:{$brand->id}");
 
         $this->newLine();
-        $this->info("Done. {$totalNew} new, {$totalUpdated} updated for {$brand->name}.");
+        $this->info("Done. {$totalNew} new, {$totalUpdated} updated for {$brand->name} ({$totalSeen} seen).");
         return self::SUCCESS;
     }
 
     /**
-     * Extract schema.org Review nodes from the HTML. Each Reviews.io page
-     * has ~20 reviews as JSON-LD Review nodes embedded in <script> tags.
+     * Extract the Reviews.io store slug from a public review URL.
+     * https://www.reviews.io/company-reviews/store/certified-pep.com → certified-pep.com
      */
-    private function extractReviews(string $html, string $sourceUrl): array
+    private function extractStore(string $url): ?string
     {
-        $reviews = [];
-        if (!preg_match_all('/<script[^>]+type="application\/ld\+json"[^>]*>(.*?)<\/script>/s', $html, $mm)) {
-            return $reviews;
+        if (preg_match('~/company-reviews/store/([^/?#]+)~i', $url, $m)) {
+            return $m[1];
         }
-
-        foreach ($mm[1] as $blob) {
-            $data = json_decode(trim($blob), true);
-            if (!is_array($data)) continue;
-
-            $nodes = isset($data['@graph']) ? $data['@graph'] : [$data];
-            foreach ($nodes as $node) {
-                if (!is_array($node)) continue;
-
-                // Node's `review` field is an array of Review objects when
-                // this is the LocalBusiness / Organization node.
-                $items = data_get($node, 'review');
-                if (is_array($items)) {
-                    foreach ($items as $r) {
-                        if (!is_array($r) || ($r['@type'] ?? null) !== 'Review') continue;
-                        $reviews[] = $this->normalize($r, $sourceUrl);
-                    }
-                }
-
-                // Or the node itself IS a Review.
-                if (($node['@type'] ?? null) === 'Review') {
-                    $reviews[] = $this->normalize($node, $sourceUrl);
-                }
-            }
-        }
-
-        return array_values(array_filter($reviews, fn ($r) => !empty($r['body']) || !empty($r['title'])));
+        // Fall back to the last path segment if the URL doesn't match.
+        $path = parse_url($url, PHP_URL_PATH) ?: '';
+        $segments = array_values(array_filter(explode('/', $path)));
+        return end($segments) ?: null;
     }
 
-    private function normalize(array $r, string $sourceUrl): array
+    private function normalize(array $r): array
     {
-        $body = data_get($r, 'reviewBody') ?: data_get($r, 'description');
-        $author = data_get($r, 'author.name') ?: (is_string(data_get($r, 'author')) ? data_get($r, 'author') : null);
-        $date = data_get($r, 'datePublished');
-        $rating = data_get($r, 'reviewRating.ratingValue');
-
-        // Reviews.io doesn't always emit a stable per-review @id; hash the
-        // combination of author + date + body-prefix for a deterministic
-        // dedupe key so re-imports don't create dupes.
-        $id = data_get($r, '@id') ?: data_get($r, 'reviewId');
-        if (!$id) {
-            $id = 'rio_' . substr(sha1(($author ?? '') . '|' . ($date ?? '') . '|' . mb_substr((string) $body, 0, 80)), 0, 32);
+        $reviewer = $r['reviewer'] ?? [];
+        $author = trim((($reviewer['first_name'] ?? '') . ' ' . ($reviewer['last_name'] ?? '')));
+        if ($author === '') {
+            $author = $reviewer['display_name'] ?? 'Anonymous';
         }
 
         return [
-            'id' => (string) $id,
-            'author' => trim((string) ($author ?: 'Anonymous')),
-            'title' => data_get($r, 'name') ?: data_get($r, 'headline'),
-            'body' => is_string($body) ? trim($body) : null,
-            'rating' => $rating ? (int) round((float) $rating) : null,
-            'published_at' => $date ? \Carbon\Carbon::parse($date)->toDateTimeString() : null,
+            'id' => (string) ($r['store_review_id'] ?? sha1(json_encode($r))),
+            'author' => $author,
+            'title' => $r['title'] ?? null,
+            'body' => $r['comments'] ?? null,
+            'rating' => isset($r['rating']) ? (int) round((float) $r['rating']) : null,
+            'published_at' => !empty($r['date_created'])
+                ? \Carbon\Carbon::parse($r['date_created'])->toDateTimeString()
+                : null,
         ];
     }
 }
