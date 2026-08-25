@@ -1041,6 +1041,10 @@ class ProductsController extends Controller
                 'trustpilot_url' => $brand->vendorSetting->trustpilot_url ?? null,
                 'google_reviews_url' => $brand->vendorSetting->google_reviews_url ?? null,
                 'pepreviewpro_url' => $brand->vendorSetting->pepreviewpro_url ?? null,
+                // True when the logged-in user owns this brand — unlocks
+                // inline-edit affordances on their own storefront. Save
+                // endpoint is /brand/{slug}/edit-field, gated separately.
+                'is_owner' => auth()->check() && auth()->id() === $brand->user_id,
                 // External review platforms + aggregated scores. Populated
                 // by `php artisan reviews:refresh {slug}` (weekly cron).
                 // `external_ratings` is per-platform data; `external_rating_avg`

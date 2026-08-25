@@ -373,10 +373,14 @@
           <div v-if="step === 3" class="space-y-6">
             <div>
               <h2 class="text-slate-900 mb-2">Business Information</h2>
-              <p class="text-slate-600 text-sm">Help us understand your business</p>
+              <p class="text-slate-600 text-sm">Help us understand your business — the panel on the right shows how your storefront will look.</p>
             </div>
 
-            <form @submit.prevent="handleStep3Submit" class="space-y-6">
+            <!-- Two-column layout on lg+: form on the left, live storefront
+                 preview on the right (sticky so it stays in view as they scroll).
+                 Stacks on smaller screens. -->
+            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-6">
+            <form @submit.prevent="handleStep3Submit" class="space-y-6 min-w-0">
               <!-- Number of Products -->
               <div>
                 <label for="product_count" class="block text-sm text-slate-700 mb-2">
@@ -634,6 +638,16 @@
                 </button>
               </div>
             </form>
+
+              <!-- Sticky preview column — stays in view as the applicant
+                   scrolls the form. Hides on mobile since the form is
+                   already tall; they get the preview on the review step. -->
+              <aside class="hidden lg:block">
+                <div class="sticky top-4">
+                  <VendorStorefrontPreview :data="storefrontPreviewData" :logo="formData.logoFile" />
+                </div>
+              </aside>
+            </div>
           </div>
 
           <!-- Step 4: Connect Your Store (REST API Key) -->
@@ -1044,6 +1058,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import VendorStorefrontPreview from '@/components/VendorStorefrontPreview.vue';
 import { router, useForm, usePage } from '@inertiajs/vue3';
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue';
 
@@ -1145,6 +1160,29 @@ const passwordMismatch = computed(() => {
   return formData.value.password && formData.value.confirmPassword &&
          formData.value.password !== formData.value.confirmPassword;
 });
+
+// Shape the form's flat fields into the object <VendorStorefrontPreview>
+// expects. Location name comes from the selected country id — resolves
+// against props.locations. Falls back to id string on failure so the
+// preview never breaks mid-typing.
+const storefrontPreviewData = computed(() => {
+  const country = props.locations?.find(l => String(l.id) === String(formData.value.country))
+  return {
+    name: formData.value.companyName,
+    description: formData.value.companyDescription,
+    location: country?.name || null,
+    shipping_info: formData.value.shippingInformation,
+    return_policy: formData.value.returnPolicy,
+    business_hours: formData.value.businessHours,
+    payment_methods: formData.value.paymentMethods,
+    contact_email: formData.value.email,
+    phone: formData.value.phone,
+    trustpilot_url: formData.value.trustpilotUrl,
+    google_reviews_url: formData.value.googleReviewsUrl,
+    reviews_io_url: formData.value.reviewsIoUrl,
+    pepreviewpro_url: formData.value.pepreviewproUrl,
+  }
+})
 
 // Live preview of the trust panel — mirrors the shape rendered on
 // /brand/{slug} so vendors can see what their badges will look like as

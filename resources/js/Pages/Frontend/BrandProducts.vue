@@ -2,6 +2,20 @@
   <ModernLayout>
     <!-- Vendor Detail -->
     <div class="min-h-screen">
+      <!-- Owner-editing banner — only shows to the logged-in vendor viewing
+           their own storefront. Announces that inline-edit controls will
+           appear as they hover over supported fields. -->
+      <div v-if="brand.is_owner" class="bg-indigo-50 border-b border-indigo-200">
+        <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-2 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-2 text-[12px] text-indigo-900">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <strong>You're viewing your own storefront.</strong>
+            Hover over your description, shipping, or returns to inline-edit — click "Edit", change it, save.
+          </div>
+          <a href="/vendor/dashboard" class="text-[12px] text-indigo-700 hover:text-indigo-900 underline">Full dashboard →</a>
+        </div>
+      </div>
+
       <!-- Vendor header -->
       <div class="border-b border-[color:var(--color-hairline)] bg-white">
         <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-5 lg:py-6">
@@ -67,10 +81,27 @@
             </button>
           </div>
 
-          <!-- Description -->
-          <p v-if="brand.description" class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-3 md:mb-0">
-            {{ truncateDesc(brand.description) }}
-          </p>
+          <!-- Description — inline-editable for the vendor owner. Non-owners
+               see the truncated read-only version they always did. -->
+          <div v-if="brand.description || brand.is_owner" class="max-w-2xl mb-3 md:mb-0">
+            <InlineEditField
+              v-if="brand.is_owner"
+              :model-value="brand.description"
+              field="description"
+              label="description"
+              placeholder="Add a description of your business…"
+              :owner="true"
+              :brand-slug="brand.slug"
+              :multiline="true"
+              :rows="4"
+              @update:model-value="brand.description = $event"
+            >
+              <template #default="{ value }">
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">{{ value ? truncateDesc(value) : '' }}</p>
+              </template>
+            </InlineEditField>
+            <p v-else class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">{{ truncateDesc(brand.description) }}</p>
+          </div>
 
           <!-- Mobile CTAs -->
           <div class="flex gap-2 md:hidden">
@@ -499,7 +530,25 @@
                       </svg>
                       <div class="text-sm text-gray-900">Shipping</div>
                     </div>
-                    <p class="text-sm text-gray-600 pl-6">{{ props.brand.shipping_info || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
+                    <div class="pl-6">
+                      <InlineEditField
+                        v-if="brand.is_owner"
+                        :model-value="brand.shipping_info"
+                        field="shipping_info"
+                        label="shipping info"
+                        placeholder="Add your shipping details…"
+                        :owner="true"
+                        :brand-slug="brand.slug"
+                        :multiline="true"
+                        :rows="3"
+                        @update:model-value="brand.shipping_info = $event"
+                      >
+                        <template #default="{ value }">
+                          <p class="text-sm text-gray-600">{{ value || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
+                        </template>
+                      </InlineEditField>
+                      <p v-else class="text-sm text-gray-600">{{ props.brand.shipping_info || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
+                    </div>
                   </div>
                   <div>
                     <div class="flex items-center gap-2 mb-2">
@@ -509,7 +558,25 @@
                       </svg>
                       <div class="text-sm text-gray-900">Returns</div>
                     </div>
-                    <p class="text-sm text-gray-600 pl-6">{{ props.brand.return_policy || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
+                    <div class="pl-6">
+                      <InlineEditField
+                        v-if="brand.is_owner"
+                        :model-value="brand.return_policy"
+                        field="return_policy"
+                        label="return policy"
+                        placeholder="Add your return policy…"
+                        :owner="true"
+                        :brand-slug="brand.slug"
+                        :multiline="true"
+                        :rows="3"
+                        @update:model-value="brand.return_policy = $event"
+                      >
+                        <template #default="{ value }">
+                          <p class="text-sm text-gray-600">{{ value || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
+                        </template>
+                      </InlineEditField>
+                      <p v-else class="text-sm text-gray-600">{{ props.brand.return_policy || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
+                    </div>
                   </div>
                   <div>
                     <div class="flex items-center gap-2 mb-2">
@@ -829,6 +896,7 @@
 import { ref, computed, onMounted, nextTick, h, defineComponent, watchEffect } from 'vue'
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import InlineEditField from '@/components/InlineEditField.vue'
 import MainButton from '@/components/MainButton.vue'
 import ProductSimpleCard from '@/components/ProductSimpleCard.vue'
 import RatingDisplay from '@/components/RatingDisplay.vue'

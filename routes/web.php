@@ -115,6 +115,12 @@ Route::get('/product/{slug}/{id}', function ($slug, $id) {
 })->whereNumber('id')->name('product.detail.legacy');
 Route::get('/product/{slug}', [ProductsController::class, 'show'])->name('product.show');
 Route::get('/brand/{slug}', [ProductsController::class, 'byBrand'])->name('brand.products');
+
+// Inline single-field edit for a vendor's own storefront. Auth + owner
+// check happen inside the controller. Fires from the click-to-edit UI
+// on /brand/{slug} — one POST per field on blur/save.
+Route::middleware('auth')->post('/brand/{slug}/edit-field', [\App\Http\Controllers\Frontend\StorefrontEditController::class, 'update'])
+    ->name('brand.edit-field');
 Route::get('/brand/{slug}/products', function ($slug) {
     return redirect()->route('brand.products', ['slug' => $slug], 301);
 })->name('brand.products.legacy');
