@@ -405,15 +405,43 @@
                 </div>
               </div>
 
+              <!-- Tagline — short one-liner shown under the brand name on
+                   your storefront (e.g. "USA-manufactured research peptides,
+                   3rd-party tested, ships same-day"). Max 120 chars. -->
+              <div>
+                <div class="flex items-baseline justify-between mb-2">
+                  <label for="tagline" class="block text-sm text-slate-700">
+                    Tagline <span class="text-xs text-slate-500 font-normal">— one line under your name</span>
+                  </label>
+                  <span class="text-[11px] ui-mono" :class="charCountColor(formData.tagline, LIMITS.tagline)">
+                    {{ (formData.tagline || '').length }} / {{ LIMITS.tagline }}
+                  </span>
+                </div>
+                <input
+                  id="tagline"
+                  v-model="formData.tagline"
+                  type="text"
+                  :maxlength="LIMITS.tagline"
+                  placeholder="USA-manufactured research peptides, 3rd-party tested, ships same-day"
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                />
+              </div>
+
               <!-- Company Description -->
               <div>
-                <label for="company_description" class="block text-sm text-slate-700 mb-2">
-                  Company Description
-                </label>
+                <div class="flex items-baseline justify-between mb-2">
+                  <label for="company_description" class="block text-sm text-slate-700">
+                    Company Description <span class="text-xs text-slate-500 font-normal">— longer 'about us'</span>
+                  </label>
+                  <span class="text-[11px] ui-mono" :class="charCountColor(formData.companyDescription, LIMITS.description)">
+                    {{ (formData.companyDescription || '').length }} / {{ LIMITS.description }}
+                  </span>
+                </div>
                 <textarea
                   id="company_description"
                   v-model="formData.companyDescription"
                   rows="4"
+                  :maxlength="LIMITS.description"
                   placeholder="Tell us about your company..."
                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
                 ></textarea>
@@ -520,13 +548,17 @@
 
               <!-- Shipping Information -->
               <div>
-                <label for="shipping_information" class="block text-sm text-slate-700 mb-2">
-                  Shipping Information
-                </label>
+                <div class="flex items-baseline justify-between mb-2">
+                  <label for="shipping_information" class="block text-sm text-slate-700">Shipping Information</label>
+                  <span class="text-[11px] ui-mono" :class="charCountColor(formData.shippingInformation, LIMITS.shipping_info)">
+                    {{ (formData.shippingInformation || '').length }} / {{ LIMITS.shipping_info }}
+                  </span>
+                </div>
                 <textarea
                   id="shipping_information"
                   v-model="formData.shippingInformation"
                   rows="4"
+                  :maxlength="LIMITS.shipping_info"
                   placeholder="Describe your shipping policies, methods, and estimated delivery times..."
                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
                 ></textarea>
@@ -534,13 +566,17 @@
 
               <!-- Return Policy -->
               <div>
-                <label for="return_policy" class="block text-sm text-slate-700 mb-2">
-                  Return Policy
-                </label>
+                <div class="flex items-baseline justify-between mb-2">
+                  <label for="return_policy" class="block text-sm text-slate-700">Return Policy</label>
+                  <span class="text-[11px] ui-mono" :class="charCountColor(formData.returnPolicy, LIMITS.return_policy)">
+                    {{ (formData.returnPolicy || '').length }} / {{ LIMITS.return_policy }}
+                  </span>
+                </div>
                 <textarea
                   id="return_policy"
                   v-model="formData.returnPolicy"
                   rows="4"
+                  :maxlength="LIMITS.return_policy"
                   placeholder="Describe your return and refund policies..."
                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
                 ></textarea>
@@ -548,13 +584,17 @@
 
               <!-- Business Hours -->
               <div>
-                <label for="business_hours" class="block text-sm text-slate-700 mb-2">
-                  Business Hours
-                </label>
+                <div class="flex items-baseline justify-between mb-2">
+                  <label for="business_hours" class="block text-sm text-slate-700">Business Hours</label>
+                  <span class="text-[11px] ui-mono" :class="charCountColor(formData.businessHours, LIMITS.business_hours)">
+                    {{ (formData.businessHours || '').length }} / {{ LIMITS.business_hours }}
+                  </span>
+                </div>
                 <textarea
                   id="business_hours"
                   v-model="formData.businessHours"
                   rows="3"
+                  :maxlength="LIMITS.business_hours"
                   placeholder="e.g., Monday-Friday: 9 AM - 5 PM EST"
                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
                 ></textarea>
@@ -1146,6 +1186,7 @@ const formData = ref({
   returnPolicy: '',
   businessHours: '',
   uniqueSellingPoints: '',
+  tagline: '',
   logoFile: null,
   // External review platform URLs — all optional. Aggregated into the
   // trust panel on the vendor's storefront by ExternalReviewFetcher.
@@ -1168,6 +1209,26 @@ const passwordMismatch = computed(() => {
          formData.value.password !== formData.value.confirmPassword;
 });
 
+// Character limits shown as live counters. Mirrored server-side in
+// BecomeVendorController / StorefrontEditController. Adjust here + there
+// together if you tweak.
+const LIMITS = {
+  tagline: 120,
+  description: 1200,
+  shipping_info: 800,
+  return_policy: 800,
+  business_hours: 200,
+  unique_selling_points: 800,
+};
+
+// Character-counter color: gray under 80%, amber 80-99%, rose at max.
+function charCountColor(value, limit) {
+  const len = (value || '').length;
+  if (len >= limit) return 'text-rose-600 font-semibold';
+  if (len >= limit * 0.8) return 'text-amber-600';
+  return 'text-slate-400';
+}
+
 // Shape the form's flat fields into the object <VendorStorefrontPreview>
 // expects. Location name comes from the selected country id — resolves
 // against props.locations. Falls back to id string on failure so the
@@ -1176,6 +1237,7 @@ const storefrontPreviewData = computed(() => {
   const country = props.locations?.find(l => String(l.id) === String(formData.value.country))
   return {
     name: formData.value.companyName,
+    tagline: formData.value.tagline,
     description: formData.value.companyDescription,
     location: country?.name || null,
     shipping_info: formData.value.shippingInformation,
@@ -1530,6 +1592,7 @@ const handleStep4Submit = () => {
     returnPolicy: formData.value.returnPolicy || null,
     businessHours: formData.value.businessHours || null,
     uniqueSellingPoints: formData.value.uniqueSellingPoints || null,
+    tagline: formData.value.tagline || null,
     logoFile: formData.value.logoFile || null,
     trustpilotUrl: formData.value.trustpilotUrl || null,
     googleReviewsUrl: formData.value.googleReviewsUrl || null,

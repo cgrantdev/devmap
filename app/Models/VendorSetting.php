@@ -26,6 +26,7 @@ class VendorSetting extends Model
         'banner',
         'logo',
         'description',
+        'tagline',
         'contact_email',
         'phone_number',
         'status',

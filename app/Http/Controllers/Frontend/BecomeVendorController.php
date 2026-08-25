@@ -79,13 +79,18 @@ class BecomeVendorController extends Controller
             'apiConsumerKey' => ['nullable', 'required_without:refuseApiAccess', 'string', 'min:10', 'max:255', 'starts_with:ck_'],
             'apiConsumerSecret' => ['nullable', 'required_without:refuseApiAccess', 'string', 'min:10', 'max:255', 'starts_with:cs_'],
             'productCount' => 'nullable|string|max:50',
-            'companyDescription' => 'nullable|string|max:5000',
+            'companyDescription' => 'nullable|string|max:1200',
             'paymentMethods' => 'nullable|array',
             'paymentMethods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
-            'shippingInformation' => 'nullable|string|max:5000',
-            'returnPolicy' => 'nullable|string|max:5000',
-            'businessHours' => 'nullable|string|max:500',
-            'uniqueSellingPoints' => 'nullable|string|max:5000',
+            // Character limits mirror the client-side counters in
+            // BecomeVendor.vue (LIMITS constant). Kept slightly generous
+            // server-side so trailing whitespace doesn't reject a valid
+            // payload the UI accepted.
+            'tagline' => 'nullable|string|max:160',
+            'shippingInformation' => 'nullable|string|max:800',
+            'returnPolicy' => 'nullable|string|max:800',
+            'businessHours' => 'nullable|string|max:200',
+            'uniqueSellingPoints' => 'nullable|string|max:800',
             // Logo: accept PNG/JPG/JPEG/WebP/SVG up to 8 MB. Real vendor logos
             // are often 2-5 MB (transparent backgrounds, full-resolution) and
             // the older 2 MB PNG-only rule was bouncing legitimate signups.
@@ -166,6 +171,7 @@ class BecomeVendorController extends Controller
                 'return_policy' => $validated['returnPolicy'] ?? null,
                 'business_hours' => $validated['businessHours'] ?? null,
                 'payment_methods' => $validated['paymentMethods'] ?? null,
+                'tagline' => $validated['tagline'] ?? null,
                 'trustpilot_url' => $validated['trustpilotUrl'] ?? null,
                 'google_reviews_url' => $validated['googleReviewsUrl'] ?? null,
                 'reviews_io_url' => $validated['reviewsIoUrl'] ?? null,

@@ -30,6 +30,25 @@
             <!-- Name + rating -->
             <div class="flex-1 min-w-0">
               <h1 class="ui-display text-xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">{{ brand.name }}</h1>
+              <!-- Tagline — inline-editable one-liner under the brand
+                   name. Renders even for non-owners when set. -->
+              <div v-if="brand.tagline || brand.is_owner" class="mt-0.5">
+                <InlineEditField
+                  v-if="brand.is_owner"
+                  :model-value="brand.tagline"
+                  field="tagline"
+                  label="tagline"
+                  placeholder="Add a one-line tagline"
+                  :owner="true"
+                  :brand-slug="brand.slug"
+                  @update:model-value="brand.tagline = $event"
+                >
+                  <template #default="{ value }">
+                    <span class="text-[12px] lg:text-[14px] text-[color:var(--color-ink-muted)] italic">{{ value || 'Add a one-line tagline' }}</span>
+                  </template>
+                </InlineEditField>
+                <span v-else-if="brand.tagline" class="text-[12px] lg:text-[14px] text-[color:var(--color-ink-muted)] italic">{{ brand.tagline }}</span>
+              </div>
               <!-- Star row + review-count link. Stars use gap-0 with a bit
                    of negative letter-spacing to sit tight — the SVG viewBox
                    has whitespace baked in. -->

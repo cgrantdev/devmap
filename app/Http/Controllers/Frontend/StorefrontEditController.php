@@ -30,6 +30,7 @@ class StorefrontEditController extends Controller
     ];
 
     private const VENDOR_SETTING_FIELDS = [
+        'tagline',
         'description',
         'shipping_info',
         'return_policy',
@@ -86,10 +87,11 @@ class StorefrontEditController extends Controller
     {
         return match ($field) {
             'name'               => ['required', 'string', 'max:191'],
-            'description'        => ['nullable', 'string', 'max:5000'],
-            'shipping_info'      => ['nullable', 'string', 'max:5000'],
-            'return_policy'      => ['nullable', 'string', 'max:5000'],
-            'business_hours'     => ['nullable', 'string', 'max:500'],
+            'tagline'            => ['nullable', 'string', 'max:160'],
+            'description'        => ['nullable', 'string', 'max:1200'],
+            'shipping_info'      => ['nullable', 'string', 'max:800'],
+            'return_policy'      => ['nullable', 'string', 'max:800'],
+            'business_hours'     => ['nullable', 'string', 'max:200'],
             'coupon_code'        => ['nullable', 'string', 'max:64'],
             'contact_email'      => ['nullable', 'email', 'max:191'],
             'phone_number'       => ['nullable', 'string', 'max:64'],

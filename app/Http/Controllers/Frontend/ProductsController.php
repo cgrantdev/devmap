@@ -1038,6 +1038,7 @@ class ProductsController extends Controller
                 'location' => $location ? $location->name : null,
                 'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
                 'founded_year' => $brand->vendorSetting && $brand->vendorSetting->founded_year ? $brand->vendorSetting->founded_year : null,
+                'tagline' => $brand->vendorSetting->tagline ?? null,
                 'trustpilot_url' => $brand->vendorSetting->trustpilot_url ?? null,
                 'google_reviews_url' => $brand->vendorSetting->google_reviews_url ?? null,
                 'pepreviewpro_url' => $brand->vendorSetting->pepreviewpro_url ?? null,
