@@ -128,10 +128,18 @@
               ● {{ openPill.label }}
             </span>
           </div>
-          <!-- Hours -->
-          <div v-if="hoursHuman" class="flex items-start gap-2 text-[12px] text-slate-700 mb-2 pb-2 border-b border-slate-100">
-            <svg class="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span class="leading-snug">{{ hoursHuman }}</span>
+          <!-- Hours — line per day, Mon → Sun -->
+          <div v-if="hoursDays.length" class="mb-2 pb-2 border-b border-slate-100">
+            <div class="flex items-center gap-2 text-[11px] uppercase tracking-wider font-semibold text-slate-500 mb-1.5">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Hours <span v-if="hoursTz" class="text-slate-400 font-normal normal-case">· {{ hoursTz }}</span>
+            </div>
+            <div class="space-y-0.5">
+              <div v-for="d in hoursDays" :key="d.day" class="flex items-center justify-between text-[12px]">
+                <span class="text-slate-500 w-10">{{ d.day }}</span>
+                <span :class="d.label === 'Closed' ? 'text-slate-400 italic' : 'text-slate-800'">{{ d.label }}</span>
+              </div>
+            </div>
           </div>
           <div v-if="data.founded_year" class="flex items-center gap-2 text-[12px] text-slate-700 mb-2">
             <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
@@ -147,13 +155,16 @@
           </div>
         </div>
 
-        <div v-if="data.shipping_info" class="bg-white border border-slate-200 rounded-lg p-5">
+        <!-- Shipping / Returns — break-words + overflow-hidden so a long
+             unbroken run like "TESTTESTTESTTEST..." wraps instead of
+             pushing the card off the sidebar. -->
+        <div v-if="data.shipping_info" class="bg-white border border-slate-200 rounded-lg p-5 overflow-hidden">
           <h3 class="text-sm font-semibold text-slate-900 mb-2">🚚 Shipping</h3>
-          <p class="text-[12px] text-slate-600 leading-relaxed">{{ data.shipping_info }}</p>
+          <p class="text-[12px] text-slate-600 leading-relaxed break-words">{{ data.shipping_info }}</p>
         </div>
-        <div v-if="data.return_policy" class="bg-white border border-slate-200 rounded-lg p-5">
+        <div v-if="data.return_policy" class="bg-white border border-slate-200 rounded-lg p-5 overflow-hidden">
           <h3 class="text-sm font-semibold text-slate-900 mb-2">↩ Returns</h3>
-          <p class="text-[12px] text-slate-600 leading-relaxed">{{ data.return_policy }}</p>
+          <p class="text-[12px] text-slate-600 leading-relaxed break-words">{{ data.return_policy }}</p>
         </div>
 
         <!-- USP badges — single wrapping row of icon chips. Compact bar
@@ -183,7 +194,7 @@
 <script setup>
 import { computed, ref, watch, onUnmounted } from 'vue'
 import { USP_OPTIONS } from '@/data/uspOptions'
-import { humanize as humanizeHours, openStatus } from '@/composables/useBusinessHours'
+import { humanize as humanizeHours, daysList as hoursDaysList, openStatus } from '@/composables/useBusinessHours'
 
 const props = defineProps({
   data: { type: Object, default: () => ({}) },
@@ -242,9 +253,12 @@ const uspBadges = computed(() => {
   return keys.map(k => USP_MAP[k]).filter(Boolean)
 })
 
-// Humanized hours string + live open/closed pill from structured JSON.
+// Per-day list for the sidebar display, humanized string as a fallback,
+// live open/closed pill.
+const hoursDays = computed(() => hoursDaysList(props.data?.business_hours_json))
 const hoursHuman = computed(() => humanizeHours(props.data?.business_hours_json))
 const openPill = computed(() => openStatus(props.data?.business_hours_json))
+const hoursTz = computed(() => hoursDays.value[0]?.tz || '')
 
 const reviewBadges = computed(() => {
   const map = {

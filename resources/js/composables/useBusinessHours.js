@@ -68,6 +68,24 @@ export function humanize(hours) {
 }
 
 /**
+ * Per-day list — one row per day of the week, in Mon-Sun order.
+ * Returns [{day: 'Mon', label: '9am–5pm'}, {day: 'Tue', label: 'Closed'}, ...].
+ * Used when the caller wants a stacked line-by-line display instead of
+ * the compressed `humanize()` output.
+ */
+export function daysList(hours) {
+  if (!hours || typeof hours !== 'object') return []
+  const tz = TZ_ABBR[hours.timezone] || hours.timezone || ''
+  return DAY_KEYS.map(k => {
+    const h = hours[k]
+    const label = (h && h.open && h.close)
+      ? `${fmt12(h.open)}–${fmt12(h.close)}`
+      : 'Closed'
+    return { day: DAY_LABELS[k], label, tz }
+  })
+}
+
+/**
  * Returns { open: bool, label: 'Open now' | 'Closed' | 'Opens Mon 9am' }.
  * Uses the vendor's declared timezone so the answer is honest regardless
  * of where the viewer is.

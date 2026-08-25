@@ -488,12 +488,17 @@
                     ● {{ openPill.label }}
                   </span>
                 </div>
-                <!-- Structured hours row (renders above the legacy fields below) -->
-                <div v-if="hoursHuman" class="flex items-start gap-3 mb-3 pb-3 border-b border-slate-100">
-                  <svg class="w-4 h-4 text-gray-500 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  <div>
-                    <div class="text-xs text-gray-500">Hours</div>
-                    <div class="text-sm text-gray-900 leading-snug">{{ hoursHuman }}</div>
+                <!-- Structured hours — line per day, Mon → Sun -->
+                <div v-if="hoursDays.length" class="mb-3 pb-3 border-b border-slate-100">
+                  <div class="flex items-center gap-2 text-xs text-gray-500 mb-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Hours <span v-if="hoursTz" class="text-gray-400">· {{ hoursTz }}</span></span>
+                  </div>
+                  <div class="space-y-0.5 pl-6">
+                    <div v-for="d in hoursDays" :key="d.day" class="flex items-center justify-between text-sm">
+                      <span class="text-gray-500 w-12">{{ d.day }}</span>
+                      <span :class="d.label === 'Closed' ? 'text-gray-400 italic' : 'text-gray-900'">{{ d.label }}</span>
+                    </div>
                   </div>
                 </div>
                 <div class="space-y-3">
@@ -595,10 +600,10 @@
                         @update:model-value="brand.shipping_info = $event"
                       >
                         <template #default="{ value }">
-                          <p class="text-sm text-gray-600">{{ value || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
+                          <p class="text-sm text-gray-600 break-words">{{ value || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
                         </template>
                       </InlineEditField>
-                      <p v-else class="text-sm text-gray-600">{{ props.brand.shipping_info || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
+                      <p v-else class="text-sm text-gray-600 break-words">{{ props.brand.shipping_info || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
                     </div>
                   </div>
                   <div>
@@ -623,10 +628,10 @@
                         @update:model-value="brand.return_policy = $event"
                       >
                         <template #default="{ value }">
-                          <p class="text-sm text-gray-600">{{ value || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
+                          <p class="text-sm text-gray-600 break-words">{{ value || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
                         </template>
                       </InlineEditField>
-                      <p v-else class="text-sm text-gray-600">{{ props.brand.return_policy || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
+                      <p v-else class="text-sm text-gray-600 break-words">{{ props.brand.return_policy || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
                     </div>
                   </div>
                   <div>
@@ -949,7 +954,7 @@ import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import InlineEditField from '@/components/InlineEditField.vue'
 import { USP_OPTIONS } from '@/data/uspOptions'
-import { humanize as humanizeHours, openStatus } from '@/composables/useBusinessHours'
+import { humanize as humanizeHours, daysList as hoursDaysList, openStatus } from '@/composables/useBusinessHours'
 import MainButton from '@/components/MainButton.vue'
 import ProductSimpleCard from '@/components/ProductSimpleCard.vue'
 import RatingDisplay from '@/components/RatingDisplay.vue'
@@ -1218,9 +1223,11 @@ const uspBadges = computed(() => {
   return keys.map(k => USP_MAP[k]).filter(Boolean)
 })
 
-// Business-hours humanized string + live Open Now / Closed pill.
+// Per-day list, plus a fallback humanized string, plus live Open/Closed pill.
+const hoursDays = computed(() => hoursDaysList(props.brand?.business_hours_json))
 const hoursHuman = computed(() => humanizeHours(props.brand?.business_hours_json))
 const openPill = computed(() => openStatus(props.brand?.business_hours_json))
+const hoursTz = computed(() => hoursDays.value[0]?.tz || '')
 
 // Group individual imported reviews by source so each block gets its own
 // "More reviews from X" header + correct attribution + correct 'View all
