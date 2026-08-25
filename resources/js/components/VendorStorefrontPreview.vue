@@ -179,7 +179,7 @@
 
 <script setup>
 import { computed, ref, watch, onUnmounted } from 'vue'
-import { OPTIONS as USP_OPTIONS } from '@/components/UspPicker.vue'
+import { USP_OPTIONS } from '@/data/uspOptions'
 import { humanize as humanizeHours, openStatus } from '@/composables/useBusinessHours'
 
 const props = defineProps({

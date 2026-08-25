@@ -947,7 +947,7 @@ import { ref, computed, onMounted, nextTick, h, defineComponent, watchEffect } f
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import InlineEditField from '@/components/InlineEditField.vue'
-import { OPTIONS as USP_OPTIONS } from '@/components/UspPicker.vue'
+import { USP_OPTIONS } from '@/data/uspOptions'
 import { humanize as humanizeHours, openStatus } from '@/composables/useBusinessHours'
 import MainButton from '@/components/MainButton.vue'
 import ProductSimpleCard from '@/components/ProductSimpleCard.vue'
