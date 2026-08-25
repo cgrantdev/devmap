@@ -23,39 +23,39 @@ class ExternalReviewFetcher
     public function refresh(VendorSetting $vs): array
     {
         $sources = [];
+        // Existing stored data. Preserved when a scrape returns nothing so
+        // manually-entered ratings + counts survive refreshes (Trustpilot /
+        // Google / PepReviewPro can't be scraped from our datacenter IP —
+        // Julia enters those numbers via `reviews:set-manual` or admin UI).
+        $existing = is_array($vs->external_ratings_json) ? $vs->external_ratings_json : [];
 
-        if ($vs->reviews_io_url) {
-            $r = $this->fetchSchemaOrgRating($vs->reviews_io_url);
-            if ($r) {
-                $sources['reviews_io'] = array_merge($r, ['url' => $vs->reviews_io_url, 'platform' => 'Reviews.io']);
+        $platforms = [
+            ['key' => 'reviews_io',   'url' => $vs->reviews_io_url,   'label' => 'Reviews.io',    'scrape' => true],
+            ['key' => 'trustpilot',   'url' => $vs->trustpilot_url,   'label' => 'Trustpilot',    'scrape' => true],
+            ['key' => 'google',       'url' => $vs->google_reviews_url, 'label' => 'Google Reviews', 'scrape' => false],
+            ['key' => 'pepreviewpro', 'url' => $vs->pepreviewpro_url, 'label' => 'PepReviewPro',  'scrape' => true],
+        ];
+
+        foreach ($platforms as $p) {
+            if (!$p['url']) continue;
+            $entry = ['url' => $p['url'], 'platform' => $p['label']];
+
+            // Try to scrape schema.org rating from the URL when supported.
+            $scraped = $p['scrape'] ? $this->fetchSchemaOrgRating($p['url']) : null;
+            if ($scraped) {
+                $entry['rating'] = $scraped['rating'];
+                $entry['count'] = $scraped['count'];
+                $entry['manual'] = false;
             } else {
-                // Even if the scrape fails, keep the link so the badge renders.
-                $sources['reviews_io'] = ['url' => $vs->reviews_io_url, 'platform' => 'Reviews.io'];
+                // Fall back to any previously-stored numbers so manual
+                // entries survive refreshes.
+                $prev = $existing[$p['key']] ?? [];
+                if (!empty($prev['rating'])) $entry['rating'] = $prev['rating'];
+                if (!empty($prev['count']))  $entry['count'] = $prev['count'];
+                if (!empty($prev['manual'])) $entry['manual'] = true;
             }
-        }
 
-        if ($vs->trustpilot_url) {
-            $r = $this->fetchSchemaOrgRating($vs->trustpilot_url);
-            if ($r) {
-                $sources['trustpilot'] = array_merge($r, ['url' => $vs->trustpilot_url, 'platform' => 'Trustpilot']);
-            } else {
-                $sources['trustpilot'] = ['url' => $vs->trustpilot_url, 'platform' => 'Trustpilot'];
-            }
-        }
-
-        if ($vs->google_reviews_url) {
-            // Google's storepages URL is a search redirect — no reliable public
-            // rating scrape. Link only.
-            $sources['google'] = ['url' => $vs->google_reviews_url, 'platform' => 'Google Reviews'];
-        }
-
-        if ($vs->pepreviewpro_url) {
-            $r = $this->fetchSchemaOrgRating($vs->pepreviewpro_url);
-            if ($r) {
-                $sources['pepreviewpro'] = array_merge($r, ['url' => $vs->pepreviewpro_url, 'platform' => 'PepReviewPro']);
-            } else {
-                $sources['pepreviewpro'] = ['url' => $vs->pepreviewpro_url, 'platform' => 'PepReviewPro'];
-            }
+            $sources[$p['key']] = $entry;
         }
 
         // Aggregate: weighted mean across every source that gave us a real
