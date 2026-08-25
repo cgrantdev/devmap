@@ -376,11 +376,7 @@
               <p class="text-slate-600 text-sm">Help us understand your business — the panel on the right shows how your storefront will look.</p>
             </div>
 
-            <!-- Two-column layout on lg+: form on the left, live storefront
-                 preview on the right (sticky so it stays in view as they scroll).
-                 Stacks on smaller screens. -->
-            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-6">
-            <form @submit.prevent="handleStep3Submit" class="space-y-6 min-w-0">
+            <form @submit.prevent="handleStep3Submit" class="space-y-6">
               <!-- Number of Products -->
               <div>
                 <label for="product_count" class="block text-sm text-slate-700 mb-2">
@@ -639,14 +635,25 @@
               </div>
             </form>
 
-              <!-- Sticky preview column — stays in view as the applicant
-                   scrolls the form. Hides on mobile since the form is
-                   already tall; they get the preview on the review step. -->
-              <aside class="hidden lg:block">
-                <div class="sticky top-4">
-                  <VendorStorefrontPreview :data="storefrontPreviewData" :logo="formData.logoFile" />
+          </div>
+
+          <!-- Full-width storefront preview under the form. Uses the
+               left/translate viewport-escape trick to break out of the
+               parent max-w-2xl wrapper. Real brand-page proportions with
+               sample product cards so applicants see the shape their
+               catalog will take after approval. -->
+          <div v-if="step === 3" class="mt-10 relative left-1/2 right-1/2 -translate-x-1/2 w-screen">
+            <div class="px-4 sm:px-6 lg:px-10 py-10 bg-slate-100 border-t border-b border-slate-200">
+              <div class="max-w-6xl mx-auto">
+                <div class="mb-5 flex items-baseline justify-between gap-4 flex-wrap">
+                  <div>
+                    <div class="text-[11px] uppercase tracking-wider font-semibold text-indigo-600 mb-1">Live preview</div>
+                    <h3 class="text-xl sm:text-2xl font-semibold text-slate-900">This is how your storefront will look</h3>
+                  </div>
+                  <div class="text-[12px] text-slate-500">Updates as you type · Products import after approval</div>
                 </div>
-              </aside>
+                <VendorStorefrontPreview :data="storefrontPreviewData" :logo="formData.logoFile" />
+              </div>
             </div>
           </div>
 
