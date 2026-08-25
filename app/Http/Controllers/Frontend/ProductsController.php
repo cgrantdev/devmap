@@ -1039,6 +1039,14 @@ class ProductsController extends Controller
                 'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
                 'founded_year' => $brand->vendorSetting && $brand->vendorSetting->founded_year ? $brand->vendorSetting->founded_year : null,
                 'trustpilot_url' => $brand->vendorSetting->trustpilot_url ?? null,
+                // External review platforms + aggregated scores. Populated
+                // by `php artisan reviews:refresh {slug}` (weekly cron).
+                // `external_ratings` is per-platform data; `external_rating_avg`
+                // is the count-weighted mean across platforms with real numbers.
+                'external_ratings' => $brand->vendorSetting->external_ratings_json ?? [],
+                'external_rating_avg' => $brand->vendorSetting->external_rating_avg
+                    ? (float) $brand->vendorSetting->external_rating_avg : null,
+                'external_rating_count' => (int) ($brand->vendorSetting->external_rating_count ?? 0),
                 // Vendor-declared certifications only. Empty array hides the
                 // panel — never fall back to a default list (IDUN flagged that
                 // as an unearned FDA/ISO claim in Aug 2026).

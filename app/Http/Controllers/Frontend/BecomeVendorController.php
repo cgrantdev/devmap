@@ -90,6 +90,13 @@ class BecomeVendorController extends Controller
             // are often 2-5 MB (transparent backgrounds, full-resolution) and
             // the older 2 MB PNG-only rule was bouncing legitimate signups.
             'logoFile' => 'nullable|file|mimes:png,jpg,jpeg,webp,svg|max:8192',
+            // External review platform URLs — optional. Fed into
+            // ExternalReviewFetcher which populates the trust panel on the
+            // vendor's storefront.
+            'trustpilotUrl' => 'nullable|url:http,https|max:512',
+            'googleReviewsUrl' => 'nullable|url:http,https|max:512',
+            'reviewsIoUrl' => 'nullable|url:http,https|max:512',
+            'pepreviewproUrl' => 'nullable|url:http,https|max:512',
         ], [
             'password.regex' => 'Password must include at least one uppercase, one lowercase, and one number.',
             'apiConsumerKey.starts_with' => 'Consumer Key must start with "ck_".',
@@ -159,6 +166,10 @@ class BecomeVendorController extends Controller
                 'return_policy' => $validated['returnPolicy'] ?? null,
                 'business_hours' => $validated['businessHours'] ?? null,
                 'payment_methods' => $validated['paymentMethods'] ?? null,
+                'trustpilot_url' => $validated['trustpilotUrl'] ?? null,
+                'google_reviews_url' => $validated['googleReviewsUrl'] ?? null,
+                'reviews_io_url' => $validated['reviewsIoUrl'] ?? null,
+                'pepreviewpro_url' => $validated['pepreviewproUrl'] ?? null,
                 'status' => 0, // Inactive until approved
                 'approval_status' => 'pending', // Pending approval
                 'api_platform' => match ($validated['connectionMethod'] ?? null) {

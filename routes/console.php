@@ -27,6 +27,13 @@ Schedule::command('coupons:revert-expired-boosts')
     ->everyFiveMinutes()
     ->withoutOverlapping();
 
+// Refresh external review aggregates (Reviews.io, Trustpilot, PepReviewPro)
+// weekly. Ratings don't move day-to-day; hourly would be noisy scraping.
+Schedule::command('reviews:refresh')
+    ->weeklyOn(2, '04:00')  // Tuesday 04:00 UTC — off-peak
+    ->timezone('UTC')
+    ->withoutOverlapping();
+
 // Wishlist / price-alert engine.
 // Daily snapshot at 03:00 UTC captures every active product's price
 // (deduped when unchanged so the table stays small).
