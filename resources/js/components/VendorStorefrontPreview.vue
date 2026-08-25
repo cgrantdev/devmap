@@ -25,7 +25,14 @@
         </div>
         <div class="flex-1 min-w-0">
           <h1 class="text-2xl font-semibold text-slate-900 truncate">{{ data.name || 'Your brand name' }}</h1>
-          <p v-if="data.tagline" class="text-[13px] text-slate-600 mt-1 leading-snug">{{ data.tagline }}</p>
+          <p
+            v-if="data.tagline"
+            class="text-[13px] text-slate-600 mt-1 leading-snug"
+          >{{ data.tagline }}</p>
+          <p
+            v-else
+            class="text-[13px] text-slate-300 italic mt-1 leading-snug"
+          >Your tagline will appear here</p>
           <div class="flex items-center gap-1 mt-1">
             <svg v-for="n in 5" :key="n" class="w-4 h-4 text-slate-300" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
             <span class="text-[12px] text-slate-500 ml-1.5">Rating shown after your first review</span>
