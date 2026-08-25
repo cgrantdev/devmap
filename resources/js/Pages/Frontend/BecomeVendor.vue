@@ -57,7 +57,7 @@
       </div>
 
       <!-- Form Card -->
-      <div v-if="!showSuccessMessage && !$page.props.flash?.success" class="max-w-2xl mx-auto px-4 py-12">
+      <div v-if="!showSuccessMessage && !$page.props.flash?.success" :class="[step === 3 ? 'max-w-[1400px]' : 'max-w-2xl', 'mx-auto px-4 py-12']">
         <!-- Resumed-draft notice -->
         <div v-if="draftRestored" class="mb-4 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-3 text-sm text-emerald-800">
           <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -74,7 +74,10 @@
           </button>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
+        <!-- Step 3 skips the white card + padding so the two-column
+             layout (form + preview) can breathe on the page background.
+             Every other step keeps the traditional centered card. -->
+        <div :class="step === 3 ? '' : 'bg-white rounded-lg shadow-sm border border-slate-200 p-8'">
           <!-- Step 1: Company Information -->
           <div v-if="step === 1" class="space-y-6">
             <div>
@@ -369,19 +372,18 @@
 
           </div>
 
-          <!-- Step 3: Business Info — breaks out of parent max-w-2xl to
-               use page width so the live preview sits at real proportions
-               beside the form. Form column stays reader-friendly (~480px);
-               preview takes the rest and sticks as they scroll. -->
-          <div v-if="step === 3" class="relative left-1/2 right-1/2 -translate-x-1/2 w-screen">
-            <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-10 py-2">
-              <div class="mb-6">
-                <h2 class="text-slate-900 mb-2 text-xl">Business Information</h2>
-                <p class="text-slate-600 text-sm">Help us understand your business — the preview updates as you type.</p>
-              </div>
+          <!-- Step 3: Business Info. Parent container widens to
+               max-w-[1400px] at step 3 so the two-column grid has room.
+               Form column stays reader-friendly (~480px), preview takes
+               the rest and sticks as the applicant scrolls. -->
+          <div v-if="step === 3">
+            <div class="mb-6">
+              <h2 class="text-slate-900 mb-2 text-xl">Business Information</h2>
+              <p class="text-slate-600 text-sm">Help us understand your business — the preview updates as you type.</p>
+            </div>
 
-              <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,480px)_minmax(0,1fr)] gap-8">
-                <form @submit.prevent="handleStep3Submit" class="space-y-6 min-w-0">
+            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,480px)_minmax(0,1fr)] gap-8">
+              <form @submit.prevent="handleStep3Submit" class="space-y-6 min-w-0">
               <!-- Number of Products -->
               <div>
                 <label for="product_count" class="block text-sm text-slate-700 mb-2">
@@ -640,19 +642,18 @@
               </div>
             </form>
 
-                <!-- Preview column — right side of the two-col grid.
-                     Sticky on lg+ so it stays in view as they scroll the
-                     form. Falls below the form on mobile. -->
-                <aside>
-                  <div class="lg:sticky lg:top-4">
-                    <div class="mb-3 flex items-baseline justify-between gap-2 flex-wrap">
-                      <div class="text-[11px] uppercase tracking-wider font-semibold text-indigo-600">Live preview</div>
-                      <div class="text-[11px] text-slate-500">Updates as you type · Products import after approval</div>
-                    </div>
-                    <VendorStorefrontPreview :data="storefrontPreviewData" :logo="formData.logoFile" />
+              <!-- Preview column — right side of the two-col grid.
+                   Sticky on lg+ so it stays in view as they scroll the
+                   form. Falls below the form on mobile. -->
+              <aside>
+                <div class="lg:sticky lg:top-4">
+                  <div class="mb-3 flex items-baseline justify-between gap-2 flex-wrap">
+                    <div class="text-[11px] uppercase tracking-wider font-semibold text-indigo-600">Live preview</div>
+                    <div class="text-[11px] text-slate-500">Updates as you type · Products import after approval</div>
                   </div>
-                </aside>
-              </div>
+                  <VendorStorefrontPreview :data="storefrontPreviewData" :logo="formData.logoFile" />
+                </div>
+              </aside>
             </div>
           </div>
 
