@@ -30,25 +30,6 @@
             <!-- Name + rating -->
             <div class="flex-1 min-w-0">
               <h1 class="ui-display text-xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">{{ brand.name }}</h1>
-              <!-- Tagline — inline-editable one-liner under the brand
-                   name. Renders even for non-owners when set. -->
-              <div v-if="brand.tagline || brand.is_owner" class="mt-0.5">
-                <InlineEditField
-                  v-if="brand.is_owner"
-                  :model-value="brand.tagline"
-                  field="tagline"
-                  label="tagline"
-                  placeholder="Add a one-line tagline"
-                  :owner="true"
-                  :brand-slug="brand.slug"
-                  @update:model-value="brand.tagline = $event"
-                >
-                  <template #default="{ value }">
-                    <span class="text-[12px] lg:text-[14px] text-[color:var(--color-ink-muted)] italic">{{ value || 'Add a one-line tagline' }}</span>
-                  </template>
-                </InlineEditField>
-                <span v-else-if="brand.tagline" class="text-[12px] lg:text-[14px] text-[color:var(--color-ink-muted)] italic">{{ brand.tagline }}</span>
-              </div>
               <!-- Star row + review-count link. Stars use gap-0 with a bit
                    of negative letter-spacing to sit tight — the SVG viewBox
                    has whitespace baked in. -->
@@ -74,6 +55,26 @@
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.991 5.727a2 2 0 01-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
                   {{ brand.contact_email }}
                 </span>
+              </div>
+              <!-- Tagline — inline-editable one-liner. Sits BELOW the
+                   reviews/location bar so it reads as a hook line rather
+                   than a subtitle on the name. -->
+              <div v-if="brand.tagline || brand.is_owner" class="mt-1.5">
+                <InlineEditField
+                  v-if="brand.is_owner"
+                  :model-value="brand.tagline"
+                  field="tagline"
+                  label="tagline"
+                  placeholder="Add a one-line tagline"
+                  :owner="true"
+                  :brand-slug="brand.slug"
+                  @update:model-value="brand.tagline = $event"
+                >
+                  <template #default="{ value }">
+                    <span class="text-[12px] lg:text-[14px] text-[color:var(--color-ink-muted)] italic">{{ value || 'Add a one-line tagline' }}</span>
+                  </template>
+                </InlineEditField>
+                <span v-else-if="brand.tagline" class="text-[12px] lg:text-[14px] text-[color:var(--color-ink-muted)] italic">{{ brand.tagline }}</span>
               </div>
             </div>
 
@@ -531,15 +532,15 @@
                 </div>
               </div>
 
-              <!-- Highlights (structured USPs) — icon-badge grid from the
-                   vendor's picker selections. Sits below Business Details
-                   so trust signals catch the eye immediately. -->
+              <!-- Highlights (structured USPs) — single wrapping chip bar
+                   directly below Business Details. Trust signals in one
+                   glance without stealing sidebar height. -->
               <div v-if="uspBadges.length" class="bg-white border border-gray-200 rounded-lg p-6">
                 <h3 class="text-lg text-gray-900 mb-3">Highlights</h3>
-                <div class="grid grid-cols-2 gap-2">
-                  <div v-for="u in uspBadges" :key="u.key" class="flex items-center gap-1.5 px-2 py-2 rounded bg-indigo-50 border border-indigo-100">
-                    <span class="text-[15px] leading-none">{{ u.icon }}</span>
-                    <span class="text-[12px] font-medium text-indigo-900 leading-tight">{{ u.label }}</span>
+                <div class="flex flex-wrap gap-1.5">
+                  <div v-for="u in uspBadges" :key="u.key" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-100">
+                    <span class="text-[14px] leading-none">{{ u.icon }}</span>
+                    <span class="text-[12px] font-medium text-indigo-900 leading-none">{{ u.label }}</span>
                   </div>
                 </div>
               </div>

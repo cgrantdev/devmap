@@ -25,22 +25,25 @@
         </div>
         <div class="flex-1 min-w-0">
           <h1 class="text-2xl font-semibold text-slate-900 truncate">{{ data.name || 'Your brand name' }}</h1>
+          <!-- Row 1: stars + reviews + location — matches the real page's rating cluster. -->
+          <div class="flex items-center gap-1 mt-1 flex-wrap">
+            <svg v-for="n in 5" :key="n" class="w-4 h-4 text-slate-300" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+            <span class="text-[12px] text-slate-500 ml-1.5">Rating shown after your first review</span>
+            <span v-if="data.location" class="ml-2 text-[12px] text-slate-600 flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+              Ships from {{ data.location }}
+            </span>
+          </div>
+          <!-- Row 2: tagline sits BELOW the rating/ships-from line so it
+               reads as a hook, not a subtitle on the name. -->
           <p
             v-if="data.tagline"
-            class="text-[13px] text-slate-600 mt-1 leading-snug"
+            class="text-[13px] text-slate-700 mt-2 leading-snug"
           >{{ data.tagline }}</p>
           <p
             v-else
-            class="text-[13px] text-slate-300 italic mt-1 leading-snug"
+            class="text-[13px] text-slate-300 italic mt-2 leading-snug"
           >Your tagline will appear here</p>
-          <div class="flex items-center gap-1 mt-1">
-            <svg v-for="n in 5" :key="n" class="w-4 h-4 text-slate-300" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-            <span class="text-[12px] text-slate-500 ml-1.5">Rating shown after your first review</span>
-          </div>
-          <div v-if="data.location" class="text-[12px] text-slate-600 mt-1 flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
-            Ships from {{ data.location }}
-          </div>
         </div>
         <div class="hidden sm:flex flex-col gap-2 flex-shrink-0">
           <button type="button" class="h-9 px-4 rounded-md text-[12px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] cursor-default">Visit website →</button>
@@ -116,10 +119,20 @@
         </div>
       </div>
 
-      <!-- Sidebar: business details -->
+      <!-- Sidebar: business details (with hours + open/closed baked in) -->
       <aside class="space-y-4">
         <div class="bg-white border border-slate-200 rounded-lg p-5">
-          <h3 class="text-base font-semibold text-slate-900 mb-3">Business details</h3>
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <h3 class="text-base font-semibold text-slate-900">Business details</h3>
+            <span v-if="openPill" :class="['text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full', openPill.open ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700']">
+              ● {{ openPill.label }}
+            </span>
+          </div>
+          <!-- Hours -->
+          <div v-if="hoursHuman" class="flex items-start gap-2 text-[12px] text-slate-700 mb-2 pb-2 border-b border-slate-100">
+            <svg class="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="leading-snug">{{ hoursHuman }}</span>
+          </div>
           <div v-if="data.founded_year" class="flex items-center gap-2 text-[12px] text-slate-700 mb-2">
             <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             Founded {{ data.founded_year }}
@@ -142,26 +155,16 @@
           <h3 class="text-sm font-semibold text-slate-900 mb-2">↩ Returns</h3>
           <p class="text-[12px] text-slate-600 leading-relaxed">{{ data.return_policy }}</p>
         </div>
-        <!-- Hours + Open/Closed pill. Populated from structured
-             business_hours_json — humanized "Mon–Fri 9am–5pm ET" style. -->
-        <div v-if="hoursHuman || openPill" class="bg-white border border-slate-200 rounded-lg p-5">
-          <div class="flex items-center justify-between gap-2 mb-2">
-            <h3 class="text-sm font-semibold text-slate-900">🕒 Hours</h3>
-            <span v-if="openPill" :class="['text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full', openPill.open ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700']">
-              {{ openPill.label }}
-            </span>
-          </div>
-          <p class="text-[12px] text-slate-600 leading-relaxed">{{ hoursHuman || data.business_hours || '—' }}</p>
-        </div>
 
-        <!-- USP badges — icon chips from the preset picker. Shows near the
-             top of the sidebar so trust signals catch the eye immediately. -->
+        <!-- USP badges — single wrapping row of icon chips. Compact bar
+             below Business Details so trust signals catch the eye without
+             stealing sidebar height. -->
         <div v-if="uspBadges.length" class="bg-white border border-slate-200 rounded-lg p-5">
           <h3 class="text-sm font-semibold text-slate-900 mb-3">Highlights</h3>
-          <div class="grid grid-cols-2 gap-2">
-            <div v-for="u in uspBadges" :key="u.key" class="flex items-center gap-1.5 px-2 py-1.5 rounded bg-indigo-50 border border-indigo-100">
-              <span class="text-[14px] leading-none">{{ u.icon }}</span>
-              <span class="text-[11px] font-medium text-indigo-900 leading-tight">{{ u.label }}</span>
+          <div class="flex flex-wrap gap-1.5">
+            <div v-for="u in uspBadges" :key="u.key" class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-indigo-50 border border-indigo-100">
+              <span class="text-[13px] leading-none">{{ u.icon }}</span>
+              <span class="text-[11px] font-medium text-indigo-900 leading-none">{{ u.label }}</span>
             </div>
           </div>
         </div>
