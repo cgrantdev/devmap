@@ -282,18 +282,24 @@
                     <div class="text-gray-600">{{ totalReviewCount.toLocaleString() }} {{ totalReviewCount === 1 ? 'review' : 'reviews' }}</div>
                   </div>
 
-                  <!-- Star Breakdown — bins native reviews + external reviews
-                       we've imported per-review (Reviews.io / Trustpilot). -->
+                  <!-- Star Breakdown — bars sized by percentage of the
+                       samples we have (native + imported external reviews).
+                       Shows % rather than raw counts because platforms like
+                       Reviews.io only serve 20 reviews per URL fetch, so
+                       displaying "17 / 1,492" would be misleading. -->
                   <div class="space-y-2">
                     <div v-for="star in 5" :key="star" class="flex items-center gap-3">
                       <span class="text-sm text-gray-600 w-12">{{ 6 - star }} stars</span>
                       <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                         <div
                           class="h-full bg-yellow-400 transition-all"
-                          :style="{ width: combinedStarBreakdown[6 - star] && totalReviewCount ? `${(combinedStarBreakdown[6 - star] / totalReviewCount) * 100}%` : '0%' }"
+                          :style="{ width: `${starPercent(6 - star)}%` }"
                         ></div>
                       </div>
-                      <span class="text-sm text-gray-600 w-8">{{ combinedStarBreakdown[6 - star] || 0 }}</span>
+                      <span class="text-sm text-gray-600 w-10 text-right">{{ starPercent(6 - star) }}%</span>
+                    </div>
+                    <div v-if="starSampleSize < totalReviewCount" class="text-[10px] text-gray-400 pt-1">
+                      Distribution from {{ starSampleSize }} sampled reviews
                     </div>
                   </div>
                 </div>  
@@ -1101,22 +1107,33 @@ const totalReviewCount = computed(() => {
 
 // Star-count histogram combining native review objects with imported
 // external ones (Reviews.io / Trustpilot each carry a per-review rating).
-// Falls back to the existing native-only starBreakdown shape so the UI
-// doesn't need to change conditionally.
 const combinedStarBreakdown = computed(() => {
   const buckets = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
-  // Native reviews (already grouped by rating in props.reviews)
   for (const r of props.reviews || []) {
     const b = Math.round(Number(r.rating) || 0)
     if (b >= 1 && b <= 5) buckets[b]++
   }
-  // Imported external reviews carry `rating` on each row
   for (const r of props.externalReviews || []) {
     const b = Math.round(Number(r.rating) || 0)
     if (b >= 1 && b <= 5) buckets[b]++
   }
   return buckets
 })
+
+// How many reviews contribute to the histogram. Compared against
+// totalReviewCount to show "distribution from N samples" when the
+// external source only lets us fetch a subset.
+const starSampleSize = computed(() =>
+  Object.values(combinedStarBreakdown.value).reduce((a, b) => a + b, 0)
+)
+
+// Percentage per star, rounded to an integer. Percentages sum to 100
+// across the 5 rows (barring rounding drift). Zero-sample vendors get 0s.
+function starPercent(n) {
+  const total = starSampleSize.value
+  if (!total) return 0
+  return Math.round((combinedStarBreakdown.value[n] / total) * 100)
+}
 
 // Displayed rating: native + external, count-weighted. Native rating
 // carries `brand.rating` (peptidemap.com internal reviews), external
