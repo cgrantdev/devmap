@@ -401,6 +401,22 @@
                     </div>
                   </div>
                 </div>
+                <!-- Under each source's review block: link-only footers for
+                     the sources we can't scrape reviews from directly
+                     (Google needs their Places API, PepReviewPro renders
+                     via JS widget). Users still get a click-through path. -->
+                <div v-if="linkOnlySources.length" class="mt-4 pt-4 border-t border-gray-200 text-[12px] text-gray-600">
+                  <span class="font-semibold">See more reviews on:</span>
+                  <template v-for="(s, i) in linkOnlySources" :key="s.key">
+                    <a
+                      :href="s.url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="ml-2 text-blue-600 hover:underline"
+                    >{{ s.label }} ↗</a>
+                    <span v-if="i < linkOnlySources.length - 1" class="text-gray-400">·</span>
+                  </template>
+                </div>
               </div>
             </section>
           </div>
@@ -1103,6 +1119,21 @@ const totalReviewCount = computed(() => {
   const native = props.brand?.reviews || 0
   const external = props.brand?.external_rating_count || 0
   return native + external
+})
+
+// Sources where we CAN'T scrape individual reviews (Google needs their paid
+// Places API, PepReviewPro renders via a JS widget) but we still have a URL.
+// Rendered as click-through links below the review blocks so users can
+// verify externally.
+const linkOnlySources = computed(() => {
+  const list = []
+  if (props.brand?.google_reviews_url) {
+    list.push({ key: 'google', label: 'Google', url: props.brand.google_reviews_url })
+  }
+  if (props.brand?.pepreviewpro_url) {
+    list.push({ key: 'pepreviewpro', label: 'PepReviewPro', url: props.brand.pepreviewpro_url })
+  }
+  return list
 })
 
 // Star-count histogram combining native review objects with imported

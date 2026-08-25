@@ -1039,6 +1039,8 @@ class ProductsController extends Controller
                 'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
                 'founded_year' => $brand->vendorSetting && $brand->vendorSetting->founded_year ? $brand->vendorSetting->founded_year : null,
                 'trustpilot_url' => $brand->vendorSetting->trustpilot_url ?? null,
+                'google_reviews_url' => $brand->vendorSetting->google_reviews_url ?? null,
+                'pepreviewpro_url' => $brand->vendorSetting->pepreviewpro_url ?? null,
                 // External review platforms + aggregated scores. Populated
                 // by `php artisan reviews:refresh {slug}` (weekly cron).
                 // `external_ratings` is per-platform data; `external_rating_avg`
