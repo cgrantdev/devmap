@@ -15,22 +15,23 @@
 
             <!-- Name + rating -->
             <div class="flex-1 min-w-0">
-              <!-- Brand name + clickable review-count pill. Total includes
-                   both native peptidemap reviews and any external-platform
-                   reviews we've imported (Trustpilot, Reviews.io). Clicking
-                   the pill anchors down to the #reviews section. -->
-              <h1 class="ui-display text-xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] flex items-baseline gap-2 flex-wrap">
-                <span>{{ brand.name }}</span>
+              <h1 class="ui-display text-xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">{{ brand.name }}</h1>
+              <!-- Star row + review-count link. The (N) is the clickable
+                   anchor down to #reviews so people can jump straight to
+                   the review list. Total blends native peptidemap reviews
+                   with imported Trustpilot / Reviews.io counts. -->
+              <div class="flex items-center gap-1 mt-0.5">
+                <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(displayedRating) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                <span class="ui-mono text-[12px] lg:text-[13px] font-semibold text-[color:var(--color-ink)] ml-1">{{ displayedRating ? displayedRating.toFixed(1) : '0.0' }}</span>
                 <a
                   v-if="totalReviewCount > 0"
                   href="#reviews"
-                  class="text-[12px] lg:text-[13px] font-normal text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:underline whitespace-nowrap"
-                >({{ totalReviewCount.toLocaleString() }} reviews)</a>
-              </h1>
-              <div class="flex items-center gap-1.5 mt-0.5">
-                <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(displayedRating) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-                <span class="ui-mono text-[12px] lg:text-[13px] font-semibold text-[color:var(--color-ink)]">{{ displayedRating ? displayedRating.toFixed(1) : '0.0' }}</span>
-                <span class="text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">({{ totalReviewCount.toLocaleString() }})</span>
+                  class="text-[12px] lg:text-[13px] text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:underline"
+                >({{ totalReviewCount.toLocaleString() }})</a>
+                <span
+                  v-else
+                  class="text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]"
+                >(0)</span>
                 <span v-if="brand.location" class="hidden sm:flex items-center gap-1 ml-2 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
                   {{ brand.location }}
