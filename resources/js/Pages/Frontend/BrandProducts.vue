@@ -15,11 +15,22 @@
 
             <!-- Name + rating -->
             <div class="flex-1 min-w-0">
-              <h1 class="ui-display text-xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">{{ brand.name }}</h1>
+              <!-- Brand name + clickable review-count pill. Total includes
+                   both native peptidemap reviews and any external-platform
+                   reviews we've imported (Trustpilot, Reviews.io). Clicking
+                   the pill anchors down to the #reviews section. -->
+              <h1 class="ui-display text-xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] flex items-baseline gap-2 flex-wrap">
+                <span>{{ brand.name }}</span>
+                <a
+                  v-if="totalReviewCount > 0"
+                  href="#reviews"
+                  class="text-[12px] lg:text-[13px] font-normal text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:underline whitespace-nowrap"
+                >({{ totalReviewCount.toLocaleString() }} reviews)</a>
+              </h1>
               <div class="flex items-center gap-1.5 mt-0.5">
-                <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(brand.rating || 0) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-                <span class="ui-mono text-[12px] lg:text-[13px] font-semibold text-[color:var(--color-ink)]">{{ brand.rating || '0.0' }}</span>
-                <span class="text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">({{ brand.reviews || totalReviews }})</span>
+                <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(displayedRating) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                <span class="ui-mono text-[12px] lg:text-[13px] font-semibold text-[color:var(--color-ink)]">{{ displayedRating ? displayedRating.toFixed(1) : '0.0' }}</span>
+                <span class="text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">({{ totalReviewCount.toLocaleString() }})</span>
                 <span v-if="brand.location" class="hidden sm:flex items-center gap-1 ml-2 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
                   {{ brand.location }}
@@ -331,22 +342,24 @@
                 <p class="text-gray-500">No reviews yet</p>
               </div>
 
-              <!-- External reviews (Trustpilot etc.). Cited with source + link
-                   on every card, per the source platforms' attribution norms. -->
-              <div v-if="externalReviews.length" class="mt-8">
+              <!-- External reviews. Sourced from Trustpilot, Reviews.io, etc.
+                   via the per-source import commands. Grouped visually so the
+                   "via Trustpilot" line matches what the reader clicks through
+                   to; per-source attribution required by both platforms' ToS. -->
+              <div v-for="grp in externalReviewGroups" :key="grp.source" class="mt-8">
                 <div class="flex items-center gap-2 mb-4">
-                  <h3 class="text-lg text-gray-900">More reviews from Trustpilot</h3>
+                  <h3 class="text-lg text-gray-900">More reviews from {{ grp.label }}</h3>
                   <a
-                    v-if="brand.trustpilot_url"
-                    :href="brand.trustpilot_url"
+                    v-if="grp.hubUrl"
+                    :href="grp.hubUrl"
                     target="_blank"
                     rel="noopener nofollow"
                     class="text-[12px] text-blue-600 hover:underline"
-                  >View all on Trustpilot ↗</a>
+                  >View all on {{ grp.label }} ↗</a>
                 </div>
                 <div class="space-y-4">
                   <div
-                    v-for="er in externalReviews"
+                    v-for="er in grp.reviews"
                     :key="`ext-${er.id}`"
                     class="bg-white border border-gray-200 rounded-lg p-5"
                   >
@@ -367,7 +380,7 @@
                     <div v-if="er.title" class="text-sm font-semibold text-gray-900 mb-1">{{ er.title }}</div>
                     <p v-if="er.body" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ er.body }}</p>
                     <div class="mt-3 flex items-center gap-2 text-[11px] text-gray-400">
-                      <span>via Trustpilot</span>
+                      <span>via {{ grp.label }}</span>
                       <a
                         v-if="er.source_url"
                         :href="er.source_url"
@@ -1049,6 +1062,52 @@ const externalPlatformsList = computed(() => {
     }))
 })
 const externalAggScore = computed(() => props.brand?.external_rating_avg || null)
+
+// Group individual imported reviews by source so each block gets its own
+// "More reviews from X" header + correct attribution + correct 'View all
+// on X' link. externalReviews is a flat mixed array from the controller.
+const EXTERNAL_SOURCE_META = {
+  trustpilot:   { label: 'Trustpilot',    urlKey: 'trustpilot_url' },
+  reviews_io:   { label: 'Reviews.io',    urlKey: 'reviews_io_url' },
+  google:       { label: 'Google Reviews', urlKey: 'google_reviews_url' },
+  pepreviewpro: { label: 'PepReviewPro',  urlKey: 'pepreviewpro_url' },
+}
+const externalReviewGroups = computed(() => {
+  const buckets = {}
+  for (const r of props.externalReviews || []) {
+    const src = r.source || 'trustpilot'
+    if (!buckets[src]) buckets[src] = []
+    buckets[src].push(r)
+  }
+  return Object.keys(buckets).map(src => ({
+    source: src,
+    label: EXTERNAL_SOURCE_META[src]?.label || src,
+    reviews: buckets[src],
+    hubUrl: props.brand?.[EXTERNAL_SOURCE_META[src]?.urlKey] || null,
+  }))
+})
+
+// Total reviews across native + all external sources — powers the
+// "(N reviews)" pill next to the brand name across the site.
+const totalReviewCount = computed(() => {
+  const native = props.brand?.reviews || 0
+  const external = props.brand?.external_rating_count || 0
+  return native + external
+})
+
+// Displayed rating: native + external, count-weighted. Native rating
+// carries `brand.rating` (peptidemap.com internal reviews), external
+// aggregate carries `brand.external_rating_avg`. Blended so the header
+// star row + numeric matches the (N reviews) pill.
+const displayedRating = computed(() => {
+  const native = Number(props.brand?.rating) || 0
+  const nativeCount = props.brand?.reviews || 0
+  const ext = Number(props.brand?.external_rating_avg) || 0
+  const extCount = props.brand?.external_rating_count || 0
+  const total = nativeCount + extCount
+  if (total === 0) return 0
+  return (native * nativeCount + ext * extCount) / total
+})
 
 // Certifications — vendor-declared only. Backend passes brand.certifications
 // as an array of strings; empty/null hides the whole panel. Never populate

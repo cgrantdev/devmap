@@ -142,6 +142,12 @@ class BrandsController extends Controller
                     'location' => $location ? $location->name : null,
                     'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
                     'reviews' => (int) ($brand->rating_count ?? 0),
+                    // External-platform aggregates so the vendor card can
+                    // combine native + Trustpilot/Reviews.io reviews into
+                    // one honest "(N reviews)" pill.
+                    'external_rating_avg' => $brand->vendorSetting?->external_rating_avg
+                        ? (float) $brand->vendorSetting->external_rating_avg : null,
+                    'external_rating_count' => (int) ($brand->vendorSetting?->external_rating_count ?? 0),
                     'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
                     'featured' => $brand->vendorSetting && $brand->vendorSetting->featured ? true : false,
                     'last_updated' => $brand->updated_at?->diffForHumans(null, true) ?? null,

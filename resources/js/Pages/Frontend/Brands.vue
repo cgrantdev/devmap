@@ -151,10 +151,14 @@
                  neglect / no-data-here; better to omit until vendors start
                  collecting real reviews on their storefront. Once they do,
                  the block reappears automatically. -->
-            <div v-if="(brand.reviews || 0) > 0" class="flex items-center gap-1.5 text-xs">
-              <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(parseFloat(brand.rating)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ parseFloat(brand.rating).toFixed(1) }}</span>
-              <span class="text-[color:var(--color-ink-subtle)]">({{ brand.reviews }})</span>
+            <!-- Rating + review-count pill. Total includes native peptidemap
+                 reviews AND any external-platform reviews we've aggregated
+                 (Trustpilot, Reviews.io). Displayed rating is the count-
+                 weighted mean across all sources. -->
+            <div v-if="brandTotalReviews(brand) > 0" class="flex items-center gap-1.5 text-xs">
+              <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(brandDisplayedRating(brand)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+              <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brandDisplayedRating(brand).toFixed(1) }}</span>
+              <span class="text-[color:var(--color-ink-subtle)]">({{ brandTotalReviews(brand).toLocaleString() }} reviews)</span>
             </div>
 
             <!-- Stats row -->
@@ -204,6 +208,21 @@ const props = defineProps({
   sortDir: String,
   filters: Object,
 })
+
+// Combined review helpers. Blend native peptidemap reviews with any
+// external-platform reviews we've aggregated (Trustpilot, Reviews.io) so
+// vendor cards show one honest number, e.g. "★ 4.88 (1,492 reviews)".
+function brandTotalReviews(b) {
+  return (b?.reviews || 0) + (b?.external_rating_count || 0)
+}
+function brandDisplayedRating(b) {
+  const native = Number(b?.rating) || 0
+  const nc = b?.reviews || 0
+  const ext = Number(b?.external_rating_avg) || 0
+  const ec = b?.external_rating_count || 0
+  const total = nc + ec
+  return total > 0 ? (native * nc + ext * ec) / total : 0
+}
 
 const page = usePage()
 
