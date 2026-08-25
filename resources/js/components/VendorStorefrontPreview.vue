@@ -142,9 +142,28 @@
           <h3 class="text-sm font-semibold text-slate-900 mb-2">↩ Returns</h3>
           <p class="text-[12px] text-slate-600 leading-relaxed">{{ data.return_policy }}</p>
         </div>
-        <div v-if="data.business_hours" class="bg-white border border-slate-200 rounded-lg p-5">
-          <h3 class="text-sm font-semibold text-slate-900 mb-2">🕒 Hours</h3>
-          <p class="text-[12px] text-slate-600">{{ data.business_hours }}</p>
+        <!-- Hours + Open/Closed pill. Populated from structured
+             business_hours_json — humanized "Mon–Fri 9am–5pm ET" style. -->
+        <div v-if="hoursHuman || openPill" class="bg-white border border-slate-200 rounded-lg p-5">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <h3 class="text-sm font-semibold text-slate-900">🕒 Hours</h3>
+            <span v-if="openPill" :class="['text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full', openPill.open ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700']">
+              {{ openPill.label }}
+            </span>
+          </div>
+          <p class="text-[12px] text-slate-600 leading-relaxed">{{ hoursHuman || data.business_hours || '—' }}</p>
+        </div>
+
+        <!-- USP badges — icon chips from the preset picker. Shows near the
+             top of the sidebar so trust signals catch the eye immediately. -->
+        <div v-if="uspBadges.length" class="bg-white border border-slate-200 rounded-lg p-5">
+          <h3 class="text-sm font-semibold text-slate-900 mb-3">Highlights</h3>
+          <div class="grid grid-cols-2 gap-2">
+            <div v-for="u in uspBadges" :key="u.key" class="flex items-center gap-1.5 px-2 py-1.5 rounded bg-indigo-50 border border-indigo-100">
+              <span class="text-[14px] leading-none">{{ u.icon }}</span>
+              <span class="text-[11px] font-medium text-indigo-900 leading-tight">{{ u.label }}</span>
+            </div>
+          </div>
         </div>
 
         <div v-if="paymentMethodsList.length" class="bg-white border border-slate-200 rounded-lg p-5">
@@ -160,6 +179,8 @@
 
 <script setup>
 import { computed, ref, watch, onUnmounted } from 'vue'
+import { OPTIONS as USP_OPTIONS } from '@/components/UspPicker.vue'
+import { humanize as humanizeHours, openStatus } from '@/composables/useBusinessHours'
 
 const props = defineProps({
   data: { type: Object, default: () => ({}) },
@@ -208,6 +229,20 @@ const BADGE_META = {
   google:       { label: 'Google',        chip: 'G',   classes: 'bg-red-50 text-red-700 border border-red-200' },
   pepreviewpro: { label: 'PepReviewPro',  chip: 'PRP', classes: 'bg-amber-50 text-amber-700 border border-amber-200' },
 }
+// Selected USPs → resolved to icon + label using the shared preset list.
+// Silently drops any key that's not in the preset (e.g. stale rows before
+// a preset renamed a key).
+const USP_MAP = Object.fromEntries(USP_OPTIONS.map(o => [o.key, o]))
+const uspBadges = computed(() => {
+  const keys = props.data?.usps
+  if (!Array.isArray(keys)) return []
+  return keys.map(k => USP_MAP[k]).filter(Boolean)
+})
+
+// Humanized hours string + live open/closed pill from structured JSON.
+const hoursHuman = computed(() => humanizeHours(props.data?.business_hours_json))
+const openPill = computed(() => openStatus(props.data?.business_hours_json))
+
 const reviewBadges = computed(() => {
   const map = {
     reviews_io: props.data?.reviews_io_url,

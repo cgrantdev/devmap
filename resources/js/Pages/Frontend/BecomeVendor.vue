@@ -582,37 +582,14 @@
                 ></textarea>
               </div>
 
-              <!-- Business Hours -->
-              <div>
-                <div class="flex items-baseline justify-between mb-2">
-                  <label for="business_hours" class="block text-sm text-slate-700">Business Hours</label>
-                  <span class="text-[11px] ui-mono" :class="charCountColor(formData.businessHours, LIMITS.business_hours)">
-                    {{ (formData.businessHours || '').length }} / {{ LIMITS.business_hours }}
-                  </span>
-                </div>
-                <textarea
-                  id="business_hours"
-                  v-model="formData.businessHours"
-                  rows="3"
-                  :maxlength="LIMITS.business_hours"
-                  placeholder="e.g., Monday-Friday: 9 AM - 5 PM EST"
-                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
-                ></textarea>
-              </div>
+              <!-- Business Hours — structured per-day editor. Powers the
+                   Open Now / Closed pill on the storefront. -->
+              <BusinessHoursEditor v-model="formData.businessHoursJson" />
 
-              <!-- Unique Selling Points -->
-              <div>
-                <label for="unique_selling_points" class="block text-sm text-slate-700 mb-2">
-                  Unique selling points of your brand?
-                </label>
-                <textarea
-                  id="unique_selling_points"
-                  v-model="formData.uniqueSellingPoints"
-                  rows="4"
-                  placeholder="What makes your brand stand out? List key differentiators..."
-                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
-                ></textarea>
-              </div>
+              <!-- Unique Selling Points — selectable icon boxes. Preset
+                   list keeps cross-vendor rendering consistent + prevents
+                   freeform marketing text ("BEST QUALITY!!"). -->
+              <UspPicker v-model="formData.usps" />
 
               <!-- Logo Upload -->
               <div>
@@ -1106,6 +1083,8 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import VendorStorefrontPreview from '@/components/VendorStorefrontPreview.vue';
+import BusinessHoursEditor from '@/components/BusinessHoursEditor.vue';
+import UspPicker from '@/components/UspPicker.vue';
 import { router, useForm, usePage } from '@inertiajs/vue3';
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue';
 
@@ -1187,6 +1166,8 @@ const formData = ref({
   businessHours: '',
   uniqueSellingPoints: '',
   tagline: '',
+  businessHoursJson: {},
+  usps: [],
   logoFile: null,
   // External review platform URLs — all optional. Aggregated into the
   // trust panel on the vendor's storefront by ExternalReviewFetcher.
@@ -1215,8 +1196,8 @@ const passwordMismatch = computed(() => {
 const LIMITS = {
   tagline: 120,
   description: 1200,
-  shipping_info: 800,
-  return_policy: 800,
+  shipping_info: 400,
+  return_policy: 400,
   business_hours: 200,
   unique_selling_points: 800,
 };
@@ -1243,6 +1224,8 @@ const storefrontPreviewData = computed(() => {
     shipping_info: formData.value.shippingInformation,
     return_policy: formData.value.returnPolicy,
     business_hours: formData.value.businessHours,
+    business_hours_json: formData.value.businessHoursJson,
+    usps: formData.value.usps,
     payment_methods: formData.value.paymentMethods,
     contact_email: formData.value.email,
     phone: formData.value.phone,
@@ -1593,6 +1576,8 @@ const handleStep4Submit = () => {
     businessHours: formData.value.businessHours || null,
     uniqueSellingPoints: formData.value.uniqueSellingPoints || null,
     tagline: formData.value.tagline || null,
+    businessHoursJson: formData.value.businessHoursJson || null,
+    usps: formData.value.usps || [],
     logoFile: formData.value.logoFile || null,
     trustpilotUrl: formData.value.trustpilotUrl || null,
     googleReviewsUrl: formData.value.googleReviewsUrl || null,

@@ -87,9 +87,12 @@ class BecomeVendorController extends Controller
             // server-side so trailing whitespace doesn't reject a valid
             // payload the UI accepted.
             'tagline' => 'nullable|string|max:160',
-            'shippingInformation' => 'nullable|string|max:800',
-            'returnPolicy' => 'nullable|string|max:800',
+            'shippingInformation' => 'nullable|string|max:400',
+            'returnPolicy' => 'nullable|string|max:400',
             'businessHours' => 'nullable|string|max:200',
+            'businessHoursJson' => 'nullable|array',
+            'usps' => 'nullable|array|max:12',
+            'usps.*' => 'string|max:32',
             'uniqueSellingPoints' => 'nullable|string|max:800',
             // Logo: accept PNG/JPG/JPEG/WebP/SVG up to 8 MB. Real vendor logos
             // are often 2-5 MB (transparent backgrounds, full-resolution) and
@@ -170,6 +173,8 @@ class BecomeVendorController extends Controller
                 'shipping_info' => $validated['shippingInformation'] ?? null,
                 'return_policy' => $validated['returnPolicy'] ?? null,
                 'business_hours' => $validated['businessHours'] ?? null,
+                'business_hours_json' => $validated['businessHoursJson'] ?? null,
+                'usps' => $validated['usps'] ?? [],
                 'payment_methods' => $validated['paymentMethods'] ?? null,
                 'tagline' => $validated['tagline'] ?? null,
                 'trustpilot_url' => $validated['trustpilotUrl'] ?? null,

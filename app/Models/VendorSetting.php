@@ -47,6 +47,8 @@ class VendorSetting extends Model
         'external_rating_avg',
         'external_rating_count',
         'external_ratings_json',
+        'usps',
+        'business_hours_json',
         'shipping_info',
         'return_policy',
         'business_hours',
@@ -73,6 +75,8 @@ class VendorSetting extends Model
         'payment_methods' => 'array',
         'api_key' => 'encrypted',
         'external_ratings_json' => 'array',
+        'usps' => 'array',
+        'business_hours_json' => 'array',
         'coupon_boost_expires_at' => 'datetime',
         'external_rating_avg' => 'float',
     ];

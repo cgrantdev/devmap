@@ -474,9 +474,27 @@
           <!-- Right Sidebar (1/3) -->
           <aside class="lg:col-span-1">
             <div class="space-y-6 sticky top-24">
-              <!-- Business Details Panel -->
+              <!-- Business Details Panel — now includes hours + Open/Closed
+                   pill computed from structured business_hours_json. -->
               <div class="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 class="text-lg text-gray-900 mb-4">Business Details</h3>                
+                <div class="flex items-center justify-between gap-2 mb-4">
+                  <h3 class="text-lg text-gray-900">Business Details</h3>
+                  <span
+                    v-if="openPill"
+                    :class="['text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full', openPill.open ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700']"
+                    :title="openPill.open && openPill.closesAt ? `Closes at ${openPill.closesAt}` : null"
+                  >
+                    ● {{ openPill.label }}
+                  </span>
+                </div>
+                <!-- Structured hours row (renders above the legacy fields below) -->
+                <div v-if="hoursHuman" class="flex items-start gap-3 mb-3 pb-3 border-b border-slate-100">
+                  <svg class="w-4 h-4 text-gray-500 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <div>
+                    <div class="text-xs text-gray-500">Hours</div>
+                    <div class="text-sm text-gray-900 leading-snug">{{ hoursHuman }}</div>
+                  </div>
+                </div>
                 <div class="space-y-3">
                   <div class="flex items-start gap-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar w-4 h-4 text-gray-500 mt-0.5" aria-hidden="true">
@@ -509,6 +527,19 @@
                       <div class="text-xs text-gray-500">Produts</div>
                       <div class="text-sm text-gray-900">{{ products.total }} listed</div>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Highlights (structured USPs) — icon-badge grid from the
+                   vendor's picker selections. Sits below Business Details
+                   so trust signals catch the eye immediately. -->
+              <div v-if="uspBadges.length" class="bg-white border border-gray-200 rounded-lg p-6">
+                <h3 class="text-lg text-gray-900 mb-3">Highlights</h3>
+                <div class="grid grid-cols-2 gap-2">
+                  <div v-for="u in uspBadges" :key="u.key" class="flex items-center gap-1.5 px-2 py-2 rounded bg-indigo-50 border border-indigo-100">
+                    <span class="text-[15px] leading-none">{{ u.icon }}</span>
+                    <span class="text-[12px] font-medium text-indigo-900 leading-tight">{{ u.label }}</span>
                   </div>
                 </div>
               </div>
@@ -916,6 +947,8 @@ import { ref, computed, onMounted, nextTick, h, defineComponent, watchEffect } f
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import InlineEditField from '@/components/InlineEditField.vue'
+import { OPTIONS as USP_OPTIONS } from '@/components/UspPicker.vue'
+import { humanize as humanizeHours, openStatus } from '@/composables/useBusinessHours'
 import MainButton from '@/components/MainButton.vue'
 import ProductSimpleCard from '@/components/ProductSimpleCard.vue'
 import RatingDisplay from '@/components/RatingDisplay.vue'
@@ -1175,6 +1208,18 @@ const externalPlatformsList = computed(() => {
     }))
 })
 const externalAggScore = computed(() => props.brand?.external_rating_avg || null)
+
+// Structured USPs — resolve preset keys to icon+label.
+const USP_MAP = Object.fromEntries(USP_OPTIONS.map(o => [o.key, o]))
+const uspBadges = computed(() => {
+  const keys = props.brand?.usps
+  if (!Array.isArray(keys)) return []
+  return keys.map(k => USP_MAP[k]).filter(Boolean)
+})
+
+// Business-hours humanized string + live Open Now / Closed pill.
+const hoursHuman = computed(() => humanizeHours(props.brand?.business_hours_json))
+const openPill = computed(() => openStatus(props.brand?.business_hours_json))
 
 // Group individual imported reviews by source so each block gets its own
 // "More reviews from X" header + correct attribution + correct 'View all

@@ -1039,6 +1039,10 @@ class ProductsController extends Controller
                 'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
                 'founded_year' => $brand->vendorSetting && $brand->vendorSetting->founded_year ? $brand->vendorSetting->founded_year : null,
                 'tagline' => $brand->vendorSetting->tagline ?? null,
+                // Structured USPs (JSON array of preset keys) + hours.
+                // Vue renders the icon row + open-now pill from these.
+                'usps' => $brand->vendorSetting->usps ?? [],
+                'business_hours_json' => $brand->vendorSetting->business_hours_json ?? null,
                 'trustpilot_url' => $brand->vendorSetting->trustpilot_url ?? null,
                 'google_reviews_url' => $brand->vendorSetting->google_reviews_url ?? null,
                 'pepreviewpro_url' => $brand->vendorSetting->pepreviewpro_url ?? null,
