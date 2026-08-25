@@ -16,21 +16,22 @@
             <!-- Name + rating -->
             <div class="flex-1 min-w-0">
               <h1 class="ui-display text-xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">{{ brand.name }}</h1>
-              <!-- Star row + review-count link. The (N) is the clickable
-                   anchor down to #reviews so people can jump straight to
-                   the review list. Total blends native peptidemap reviews
-                   with imported Trustpilot / Reviews.io counts. -->
-              <div class="flex items-center gap-1 mt-0.5">
-                <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(displayedRating) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-                <span class="ui-mono text-[12px] lg:text-[13px] font-semibold text-[color:var(--color-ink)] ml-1">{{ displayedRating ? displayedRating.toFixed(1) : '0.0' }}</span>
+              <!-- Star row + review-count link. Stars use gap-0 with a bit
+                   of negative letter-spacing to sit tight — the SVG viewBox
+                   has whitespace baked in. -->
+              <div class="flex items-center mt-0.5">
+                <span class="inline-flex items-center gap-0">
+                  <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5 -mr-px" :class="n <= Math.round(displayedRating) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                </span>
+                <span class="ui-mono text-[12px] lg:text-[13px] font-semibold text-[color:var(--color-ink)] ml-1.5">{{ displayedRating ? displayedRating.toFixed(1) : '0.0' }}</span>
                 <a
                   v-if="totalReviewCount > 0"
                   href="#reviews"
-                  class="text-[12px] lg:text-[13px] text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:underline"
+                  class="ml-1 text-[12px] lg:text-[13px] text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:underline"
                 >({{ totalReviewCount.toLocaleString() }})</a>
                 <span
                   v-else
-                  class="text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]"
+                  class="ml-1 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]"
                 >(0)</span>
                 <span v-if="brand.location" class="hidden sm:flex items-center gap-1 ml-2 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -255,42 +256,44 @@
                   </div>
                 </div>
 
-                <!-- Overall Rating -->
+                <!-- Overall Rating — combined native + external (Trustpilot / Reviews.io).
+                     Falls back to native-only when no external data is present. -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div class="text-center">
-                    <div class="text-5xl text-gray-900 mb-2">{{ formattedOverallRating }}</div>
+                    <div class="text-5xl text-gray-900 mb-2">{{ displayedRating ? displayedRating.toFixed(1) : '0.0' }}</div>
                     <div class="flex items-center justify-center gap-1 mb-2">
-                      <svg 
-                        v-for="i in 5" 
-                        :key="i" 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="24" 
-                        height="24" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        stroke-width="2" 
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        :class="i <= Math.round(props.brand.rating || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'"
+                      <svg
+                        v-for="i in 5"
+                        :key="i"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        :class="i <= Math.round(displayedRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'"
                       >
                         <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
                       </svg>
                     </div>
-                    <div class="text-gray-600">{{ totalReviews }} {{ totalReviews === 1 ? 'review' : 'reviews' }}</div>
+                    <div class="text-gray-600">{{ totalReviewCount.toLocaleString() }} {{ totalReviewCount === 1 ? 'review' : 'reviews' }}</div>
                   </div>
-                  
-                  <!-- Star Breakdown -->
+
+                  <!-- Star Breakdown — bins native reviews + external reviews
+                       we've imported per-review (Reviews.io / Trustpilot). -->
                   <div class="space-y-2">
                     <div v-for="star in 5" :key="star" class="flex items-center gap-3">
                       <span class="text-sm text-gray-600 w-12">{{ 6 - star }} stars</span>
                       <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div 
-                          class="h-full bg-yellow-400 transition-all" 
-                          :style="{ width: starBreakdown[6 - star] ? `${(starBreakdown[6 - star] / totalReviews) * 100}%` : '0%' }"
+                        <div
+                          class="h-full bg-yellow-400 transition-all"
+                          :style="{ width: combinedStarBreakdown[6 - star] && totalReviewCount ? `${(combinedStarBreakdown[6 - star] / totalReviewCount) * 100}%` : '0%' }"
                         ></div>
                       </div>
-                      <span class="text-sm text-gray-600 w-8">{{ starBreakdown[6 - star] || 0 }}</span>
+                      <span class="text-sm text-gray-600 w-8">{{ combinedStarBreakdown[6 - star] || 0 }}</span>
                     </div>
                   </div>
                 </div>  
@@ -1094,6 +1097,25 @@ const totalReviewCount = computed(() => {
   const native = props.brand?.reviews || 0
   const external = props.brand?.external_rating_count || 0
   return native + external
+})
+
+// Star-count histogram combining native review objects with imported
+// external ones (Reviews.io / Trustpilot each carry a per-review rating).
+// Falls back to the existing native-only starBreakdown shape so the UI
+// doesn't need to change conditionally.
+const combinedStarBreakdown = computed(() => {
+  const buckets = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+  // Native reviews (already grouped by rating in props.reviews)
+  for (const r of props.reviews || []) {
+    const b = Math.round(Number(r.rating) || 0)
+    if (b >= 1 && b <= 5) buckets[b]++
+  }
+  // Imported external reviews carry `rating` on each row
+  for (const r of props.externalReviews || []) {
+    const b = Math.round(Number(r.rating) || 0)
+    if (b >= 1 && b <= 5) buckets[b]++
+  }
+  return buckets
 })
 
 // Displayed rating: native + external, count-weighted. Native rating
