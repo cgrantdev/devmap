@@ -175,18 +175,8 @@
               </div>
             </div>
 
-            <!-- Highlights (USPs) -->
-            <div v-if="uspBadges.length" class="bg-white border border-slate-200 rounded-lg p-5">
-              <h3 class="text-lg text-slate-900 mb-3">Highlights</h3>
-              <div class="flex flex-wrap gap-1.5">
-                <div v-for="u in uspBadges" :key="u.key" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-100">
-                  <span class="text-[14px] leading-none">{{ u.icon }}</span>
-                  <span class="text-[12px] font-medium text-indigo-900 leading-none">{{ u.label }}</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Policies (Shipping + Returns) -->
+            <!-- Policies (Shipping + Returns) — sits directly under
+                 Business Details on the real live brand page. -->
             <div v-if="data.shipping_info || data.return_policy" class="bg-white border border-slate-200 rounded-lg p-5 overflow-hidden">
               <h3 class="text-lg text-slate-900 mb-4">Policies</h3>
               <div v-if="data.shipping_info" class="mb-3">
@@ -199,11 +189,15 @@
               </div>
             </div>
 
-            <!-- Payment methods -->
-            <div v-if="paymentMethodsList.length" class="bg-white border border-slate-200 rounded-lg p-5">
-              <h3 class="text-lg text-slate-900 mb-3">Payment</h3>
+            <!-- Highlights (USPs) — matches the sidebar's third-slot
+                 position on the live page. -->
+            <div v-if="uspBadges.length" class="bg-white border border-slate-200 rounded-lg p-5">
+              <h3 class="text-lg text-slate-900 mb-3">Highlights</h3>
               <div class="flex flex-wrap gap-1.5">
-                <span v-for="pm in paymentMethodsList" :key="pm" class="text-[11px] px-2 py-0.5 rounded border border-slate-200 bg-slate-50 text-slate-700">{{ pm }}</span>
+                <div v-for="u in uspBadges" :key="u.key" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-100">
+                  <span class="text-[14px] leading-none">{{ u.icon }}</span>
+                  <span class="text-[12px] font-medium text-indigo-900 leading-none">{{ u.label }}</span>
+                </div>
               </div>
             </div>
           </div>

@@ -1119,7 +1119,10 @@ const formData = ref({
   uniqueSellingPoints: '',
   tagline: '',
   businessHoursJson: {},
-  usps: [],
+  // Sensible defaults — nearly every legitimate research-peptide vendor
+  // claims lab testing, per-batch COAs, high purity, and international
+  // shipping. Vendors uncheck any that don't apply during onboarding.
+  usps: ['lab_tested', 'coa_per_batch', 'high_purity', 'international'],
   logoFile: null,
   // External review platform URLs — all optional. Aggregated into the
   // trust panel on the vendor's storefront by ExternalReviewFetcher.
