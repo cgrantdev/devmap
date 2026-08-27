@@ -41,6 +41,7 @@ class CeoDashboardController extends Controller
             // rank, top queries + pages, and the "8-20 rank" opportunity
             // list. Empty when GSC hasn't been wired yet.
             'seoMetrics' => app(\App\Services\SeoMetrics::class)->snapshot(28),
+            'gscConnectedEmail' => app(\App\Services\GscClient::class)->connectedEmail(),
             'openRecs' => $this->recs('open'),
             'inProgressRecs' => $this->recs('in_progress'),
             'shippedRecs' => $this->recs('shipped', 20),

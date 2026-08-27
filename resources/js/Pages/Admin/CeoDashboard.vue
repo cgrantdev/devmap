@@ -115,14 +115,31 @@
         <div class="flex items-baseline justify-between">
           <div>
             <h2 class="text-lg font-semibold text-gray-900">Search · last {{ seoMetrics?.window_days || 28 }} days</h2>
-            <p v-if="seoMetrics?.configured" class="text-[12px] text-gray-500 mt-0.5">Google Search Console · {{ seoMetrics.window_start }} → {{ seoMetrics.window_end }}</p>
+            <p v-if="seoMetrics?.configured" class="text-[12px] text-gray-500 mt-0.5">
+              Google Search Console · {{ seoMetrics.window_start }} → {{ seoMetrics.window_end }}
+              <span v-if="gscConnectedEmail" class="text-gray-400"> · connected as {{ gscConnectedEmail }}</span>
+              <form :action="'/admin/gsc/disconnect'" method="post" class="inline-block ml-2">
+                <input type="hidden" name="_token" :value="$page.props.csrf_token" />
+                <button type="submit" class="text-[11px] text-gray-400 hover:text-rose-600 underline">disconnect</button>
+              </form>
+            </p>
             <p v-else class="text-[12px] text-gray-500 mt-0.5">Google Search Console · not yet connected</p>
           </div>
         </div>
 
-        <div v-if="!seoMetrics?.configured" class="bg-white border border-gray-200 rounded-lg p-5 text-[13px] text-gray-600 space-y-2">
-          <p><strong class="text-gray-900">To wire GSC:</strong> put your Google service-account JSON at <code class="ui-mono bg-gray-100 px-1 rounded">/home/forge/gsc-service-account.json</code>, add its email as a user in Search Console → Users, then set <code class="ui-mono bg-gray-100 px-1 rounded">GSC_SERVICE_ACCOUNT_JSON_PATH</code> + <code class="ui-mono bg-gray-100 px-1 rounded">GSC_SITE_URL</code> in the Forge site's env.</p>
-          <p class="text-gray-500">Once live: clicks, impressions, avg rank, top queries, top pages, and a "rank 8-20 opportunity" list render here.</p>
+        <div v-if="!seoMetrics?.configured" class="bg-white border border-gray-200 rounded-lg p-5 text-[13px] text-gray-600 space-y-3">
+          <p><strong class="text-gray-900">Connect Google Search Console to see clicks, impressions, rank, and top queries here.</strong></p>
+          <p class="text-gray-500">One-click OAuth — sign in with the Google account that owns Search Console for peptidemap.com.</p>
+          <div class="flex gap-3">
+            <a
+              href="/admin/gsc/connect"
+              class="inline-flex items-center gap-2 h-9 px-4 rounded-md text-[13px] font-semibold text-white bg-gradient-to-b from-[#4285F4] to-[#1a73e8] hover:shadow-md transition-shadow"
+            >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+              Connect Google Search Console
+            </a>
+          </div>
+          <p class="text-[11px] text-gray-400 pt-2 border-t border-gray-100">Uses OAuth user consent, not a service account — bypasses your org's key-creation policy.</p>
         </div>
 
         <template v-else>
@@ -460,6 +477,7 @@ const props = defineProps({
   snapshot: Object,
   growthMetrics: { type: Object, default: () => ({}) },
   seoMetrics: { type: Object, default: () => ({}) },
+  gscConnectedEmail: { type: String, default: null },
   openRecs: Array,
   inProgressRecs: Array,
   shippedRecs: Array,

@@ -58,8 +58,14 @@ return [
     ],
 
     'gsc' => [
-        // Path on disk to the Google service-account JSON key. Kept outside
-        // the repo — /home/forge/gsc-service-account.json on prod.
+        // Preferred path: OAuth 2.0 user-consent flow. Colin runs
+        // /admin/gsc/connect once, signs in with the Google account that
+        // owns Search Console, we store the refresh token encrypted.
+        // Works even when the org policy blocks service-account keys.
+        'oauth_client_id' => env('GSC_OAUTH_CLIENT_ID'),
+        'oauth_client_secret' => env('GSC_OAUTH_CLIENT_SECRET'),
+        // Legacy path: service-account JSON on disk (blocked on Colin's
+        // org, kept for future flexibility).
         'service_account_json_path' => env('GSC_SERVICE_ACCOUNT_JSON_PATH'),
         // Verified property URL. For a domain property, use the sc-domain:
         // form (e.g. "sc-domain:peptidemap.com"); for a URL-prefix property,

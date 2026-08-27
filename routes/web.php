@@ -265,6 +265,14 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
         Route::patch('/recommendations/{recommendation}', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'updateRecommendation'])->name('admin.ceo.rec.update');
         Route::delete('/recommendations/{recommendation}', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'destroyRecommendation'])->name('admin.ceo.rec.destroy');
         Route::post('/notepad', [\App\Http\Controllers\Admin\CeoDashboardController::class, 'saveNotepad'])->name('admin.ceo.notepad.save');
+
+        // GSC OAuth wiring — one-click connect on the dashboard. Auth
+        // callback lives outside the /ceo prefix because Google's redirect
+        // is a GET the user's browser makes after auth; the ceo.only
+        // middleware guards it via the auth session that started this.
+        Route::get('/gsc/connect', [\App\Http\Controllers\Admin\GscOAuthController::class, 'connect'])->name('admin.gsc.connect');
+        Route::get('/gsc/callback', [\App\Http\Controllers\Admin\GscOAuthController::class, 'callback'])->name('admin.gsc.callback');
+        Route::post('/gsc/disconnect', [\App\Http\Controllers\Admin\GscOAuthController::class, 'disconnect'])->name('admin.gsc.disconnect');
     });
 
     // Internal SEO inventory + notes scratchpad. Same ceo.only gate as

@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -28,9 +30,21 @@ class GscClient
 
     public function isConfigured(): bool
     {
+        // Two paths: OAuth refresh token stored via /admin/gsc/connect, OR
+        // legacy service-account JSON on disk. First wins.
+        if (Setting::where('key', 'gsc_oauth_refresh_token')->exists()
+            && config('services.gsc.oauth_client_id')
+            && config('services.gsc.oauth_client_secret')) {
+            return (bool) config('services.gsc.site_url');
+        }
         $path = config('services.gsc.service_account_json_path');
         $site = config('services.gsc.site_url');
         return $path && $site && is_file($path);
+    }
+
+    public function connectedEmail(): ?string
+    {
+        return Setting::where('key', 'gsc_oauth_connected_email')->value('value');
     }
 
     /**
@@ -64,36 +78,78 @@ class GscClient
     }
 
     /**
-     * Fetch + cache an access token. Google issues 1h tokens; we cache 50m
-     * to avoid stale-token races. Signs a JWT with the service account's
-     * private key, exchanges it at the OAuth2 token endpoint.
+     * Fetch + cache an access token. Prefers the OAuth refresh-token flow
+     * (Colin ran /admin/gsc/connect once) and falls back to the legacy
+     * service-account JWT flow if only that's configured.
      */
     private function accessToken(): ?string
     {
         return Cache::remember(self::TOKEN_CACHE_KEY, 3000, function () {
-            $sa = $this->loadServiceAccount();
-            if (!$sa) return null;
-
-            $jwt = $this->buildAndSignJwt($sa);
-            if (!$jwt) return null;
-
-            try {
-                $resp = Http::asForm()->timeout(15)->post(self::OAUTH_URL, [
-                    'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                    'assertion' => $jwt,
-                ]);
-            } catch (\Throwable $e) {
-                Log::warning('GSC token exchange failed', ['err' => $e->getMessage()]);
-                return null;
-            }
-
-            if (!$resp->successful()) {
-                Log::warning('GSC token exchange HTTP ' . $resp->status(), ['body' => $resp->body()]);
-                return null;
-            }
-
-            return $resp->json('access_token');
+            $oauth = $this->accessTokenFromRefresh();
+            if ($oauth) return $oauth;
+            return $this->accessTokenFromServiceAccount();
         });
+    }
+
+    /**
+     * Exchange the stored OAuth refresh token for a fresh access token.
+     * Returns null when no refresh token is present or the exchange fails.
+     */
+    private function accessTokenFromRefresh(): ?string
+    {
+        $refreshEnc = Setting::where('key', 'gsc_oauth_refresh_token')->value('value');
+        if (!$refreshEnc) return null;
+        $clientId = config('services.gsc.oauth_client_id');
+        $clientSecret = config('services.gsc.oauth_client_secret');
+        if (!$clientId || !$clientSecret) return null;
+
+        try {
+            $refresh = Crypt::decryptString($refreshEnc);
+        } catch (\Throwable $e) {
+            Log::warning('GSC refresh token decrypt failed', ['err' => $e->getMessage()]);
+            return null;
+        }
+
+        try {
+            $resp = Http::asForm()->timeout(15)->post(self::OAUTH_URL, [
+                'refresh_token' => $refresh,
+                'client_id' => $clientId,
+                'client_secret' => $clientSecret,
+                'grant_type' => 'refresh_token',
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('GSC OAuth refresh exchange failed', ['err' => $e->getMessage()]);
+            return null;
+        }
+
+        if (!$resp->successful()) {
+            Log::warning('GSC OAuth refresh HTTP ' . $resp->status(), ['body' => $resp->body()]);
+            return null;
+        }
+        return $resp->json('access_token');
+    }
+
+    /** Legacy path — service account JWT. Kept for backward compat. */
+    private function accessTokenFromServiceAccount(): ?string
+    {
+        $sa = $this->loadServiceAccount();
+        if (!$sa) return null;
+        $jwt = $this->buildAndSignJwt($sa);
+        if (!$jwt) return null;
+        try {
+            $resp = Http::asForm()->timeout(15)->post(self::OAUTH_URL, [
+                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                'assertion' => $jwt,
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('GSC service-account exchange failed', ['err' => $e->getMessage()]);
+            return null;
+        }
+        if (!$resp->successful()) {
+            Log::warning('GSC service-account HTTP ' . $resp->status(), ['body' => $resp->body()]);
+            return null;
+        }
+        return $resp->json('access_token');
     }
 
     private function loadServiceAccount(): ?array
