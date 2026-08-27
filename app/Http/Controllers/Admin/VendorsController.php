@@ -402,6 +402,10 @@ class VendorsController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'shop_url' => 'nullable|url|max:255', // shop_url is the website
+            // referral_url wasn't in the rules — that meant array_key_exists()
+            // check below never fired and Julia's edits were silently dropped.
+            // Reported Aug 2026 via video attachment.
+            'referral_url' => 'nullable|url|max:2048',
             'email' => 'nullable|email|max:255',
             'description' => 'nullable|string|max:1000',
             'contact_email' => 'nullable|email|max:255',
