@@ -15,8 +15,24 @@
         </div>
       </div>
 
+      <!-- Tab bar — grouped view of the dashboard so it stops reading
+           as one long dump. Chosen tab persists in localStorage. -->
+      <nav class="flex items-center gap-1 border-b border-gray-200 -mt-4 mb-2">
+        <button
+          v-for="t in TABS"
+          :key="t.key"
+          @click="setTab(t.key)"
+          :class="[
+            'px-4 py-2.5 text-[13px] font-medium transition-colors border-b-2 -mb-px',
+            tab === t.key
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-gray-500 hover:text-gray-800'
+          ]"
+        >{{ t.label }}</button>
+      </nav>
+
       <!-- SEO snapshot -->
-      <section>
+      <section v-show="tab === 'overview'">
         <h2 class="text-[11px] uppercase tracking-[0.12em] font-semibold text-gray-500 mb-3">SEO snapshot</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
           <Metric label="Indexable URLs" :main="snapshot.indexable_urls" sub="approx sitemap size" />
@@ -36,7 +52,7 @@
 
       <!-- Growth panel — live traffic + affiliate signals from our own tables.
            Reads from GrowthMetrics service; same data the weekly Discord digest posts. -->
-      <section v-if="growthMetrics?.week_over_week" class="space-y-4">
+      <section v-if="growthMetrics?.week_over_week" v-show="tab === 'growth'" class="space-y-4">
         <div class="flex items-baseline justify-between">
           <div>
             <h2 class="text-lg font-semibold text-gray-900">Growth · last 7 days</h2>
@@ -111,7 +127,7 @@
       <!-- SEO panel — Google Search Console rollup. Empty state guides
            Colin through the one-time wiring; live state shows totals +
            top queries + top pages + the 'rank 8-20' opportunity list. -->
-      <section class="space-y-4">
+      <section v-show="tab === 'growth'" class="space-y-4">
         <div class="flex items-baseline justify-between">
           <div>
             <h2 class="text-lg font-semibold text-gray-900">Search · last {{ seoMetrics?.window_days || 28 }} days</h2>
@@ -196,7 +212,7 @@
       </section>
 
       <!-- Progress bar — total flow at a glance -->
-      <section>
+      <section v-show="tab === 'overview'">
         <div class="bg-white border border-gray-200 rounded-lg p-4">
           <div class="flex items-center justify-between text-[11px] text-gray-600 mb-2">
             <div class="font-semibold uppercase tracking-wide text-gray-500">Strategist queue</div>
@@ -220,7 +236,7 @@
       </section>
 
       <!-- Strategist queue + shipped log side by side -->
-      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <section v-show="tab === 'strategy'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- LEFT: current suggestions -->
         <div>
           <div class="flex items-center justify-between mb-3">
@@ -275,7 +291,7 @@
       </section>
 
       <!-- Agent build requests -->
-      <section v-if="agentRequests.length">
+      <section v-if="agentRequests.length" v-show="tab === 'strategy'">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-[11px] uppercase tracking-[0.12em] font-semibold text-gray-500">
             🤖 New agents the strategist wants built <span class="ui-mono text-gray-400">({{ agentRequests.length }})</span>
@@ -302,7 +318,7 @@
       </section>
 
       <!-- Agent activity + recent commits -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div v-show="tab === 'activity'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <section class="lg:col-span-2">
           <div class="flex items-center justify-between mb-3">
             <h2 class="text-[11px] uppercase tracking-[0.12em] font-semibold text-gray-500">Agent activity log</h2>
@@ -350,7 +366,7 @@
       </div>
 
       <!-- Notepad -->
-      <section>
+      <section v-show="tab === 'activity'">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-[11px] uppercase tracking-[0.12em] font-semibold text-gray-500">Notepad</h2>
           <span class="text-[11px] text-gray-400">{{ notepadSaveStatus }}</span>
@@ -633,6 +649,23 @@ function submitAgentRun() {
 // Notepad autosave
 const notepadDraft = ref(props.notepad || '')
 const notepadSaveStatus = ref('')
+
+// Tabs — chosen tab persists across reloads so returning to the
+// dashboard puts you back where you were. Modals and notepad live
+// outside the tab panels so their state survives tab switches.
+const TABS = [
+  { key: 'overview', label: 'Overview' },
+  { key: 'growth',   label: 'Growth' },
+  { key: 'strategy', label: 'Strategy' },
+  { key: 'activity', label: 'Activity' },
+]
+const tab = ref((() => {
+  try { return localStorage.getItem('ceo.tab') || 'overview' } catch { return 'overview' }
+})())
+const setTab = (k) => {
+  tab.value = k
+  try { localStorage.setItem('ceo.tab', k) } catch {}
+}
 let saveTimer = null
 function scheduleSaveNotepad() {
   notepadSaveStatus.value = 'unsaved…'
