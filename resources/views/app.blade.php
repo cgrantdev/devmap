@@ -114,6 +114,11 @@
 
     <!-- Canonical -->
     <link rel="canonical" href="{{ $seoUrl }}" />
+    {{-- English-only site — declare both en self-reference and x-default so
+         Google understands there is no locale swap and drops any hreflang
+         warnings in Search Console. --}}
+    <link rel="alternate" hreflang="en" href="{{ $seoUrl }}" />
+    <link rel="alternate" hreflang="x-default" href="{{ $seoUrl }}" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="{{ $seoOgType }}" />

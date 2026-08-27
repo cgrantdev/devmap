@@ -156,6 +156,30 @@ Route::get('/calculator', function () {
         'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
         'og_image' => $seoPage?->og_image ?: null,
         'url' => url('/calculator'),
+        // HowTo JSON-LD earns numbered-step SERP treatment for peptide
+        // reconstitution — matches the step block rendered by Calculator.vue.
+        // Deliberately scoped to reconstitution only (no injection guides).
+        'schema' => [[
+            '@context' => 'https://schema.org',
+            '@type' => 'HowTo',
+            '@id' => url('/calculator') . '#reconstitution-howto',
+            'name' => 'How to reconstitute research peptides',
+            'description' => 'Step-by-step reconstitution of lyophilized peptides with bacteriostatic water for laboratory research use.',
+            'totalTime' => 'PT5M',
+            'supply' => [
+                ['@type' => 'HowToSupply', 'name' => 'Lyophilized peptide vial'],
+                ['@type' => 'HowToSupply', 'name' => 'Bacteriostatic water'],
+                ['@type' => 'HowToSupply', 'name' => 'Alcohol swabs'],
+            ],
+            'tool' => [['@type' => 'HowToTool', 'name' => '1 mL (100-unit) insulin syringe']],
+            'step' => [
+                ['@type' => 'HowToStep', 'position' => 1, 'name' => 'Gather supplies', 'text' => 'Prepare the lyophilized peptide vial, bacteriostatic water, alcohol swabs, and a 1 mL syringe.'],
+                ['@type' => 'HowToStep', 'position' => 2, 'name' => 'Calculate concentration', 'text' => 'Enter the peptide amount on the vial (e.g. 5 mg) and the volume of BAC water — a common ratio is 2 mL per 5 mg vial for 2,500 mcg/mL.'],
+                ['@type' => 'HowToStep', 'position' => 3, 'name' => 'Add water slowly', 'text' => 'Swab both vial tops with alcohol. Draw the calculated volume of BAC water and introduce it against the glass wall — do not shake or vortex.'],
+                ['@type' => 'HowToStep', 'position' => 4, 'name' => 'Measure aliquot', 'text' => 'Once the solution is clear, use the calculator to determine syringe units per dose — e.g. 250 mcg from a 2,500 mcg/mL solution = 10 units (0.10 mL).'],
+                ['@type' => 'HowToStep', 'position' => 5, 'name' => 'Store properly', 'text' => 'Refrigerate reconstituted peptides at 2–8 °C; typical stability is 28–30 days. Do not freeze.'],
+            ],
+        ]],
     ];
     session(['page_seo_data' => $seo]);
 

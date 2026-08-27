@@ -1093,6 +1093,17 @@ class ProductsController extends Controller
             ])->all(),
         ];
 
+        // BreadcrumbList — SERP-visible trail (Home › Brands › Brand name).
+        $breadcrumbSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => url('/')],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Brands', 'item' => url('/brands')],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $brand->name, 'item' => $brandUrl],
+            ],
+        ];
+
         // Build SEO array (same format as other pages)
         $seo = [
             'key' => 'brand',
@@ -1105,7 +1116,7 @@ class ProductsController extends Controller
             'image' => $seoOgImage,
             'url' => $brandUrl,
             'canonical' => $brandUrl,
-            'schema' => [$itemListSchema],
+            'schema' => [$itemListSchema, $breadcrumbSchema],
         ];
 
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)

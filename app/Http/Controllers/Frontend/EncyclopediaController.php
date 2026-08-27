@@ -817,6 +817,14 @@ class EncyclopediaController extends Controller
             'slug' => $category->slug,
             'subtitle' => $peptideFullName,
             'tags' => $tags,
+            // Related-page links — added 2026-08-27 to defuse the
+            // encyclopedia ↔ product-listing cannibalization risk (SEO rec #20).
+            // Frontend renders these with distinct anchor text so Google can
+            // see the three pages serve three intents: learn / compare / buy.
+            'relatedPages' => [
+                'compare' => ['url' => url("/compare/{$category->slug}"), 'anchor' => "Compare {$category->name} prices across vendors"],
+                'shop' => ['url' => url("/products?category={$category->slug}"), 'anchor' => "Shop {$category->name} — all available products"],
+            ],
             'primaryResearch' => [
                 'institution' => 'University of Zagreb (Croatia)',
                 'url' => $educationPost->research_url ?? '#'

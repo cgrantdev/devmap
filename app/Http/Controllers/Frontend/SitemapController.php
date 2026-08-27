@@ -78,9 +78,17 @@ class SitemapController extends Controller
         // Product detail pages. Route is /product/{vendorSlug}/{productSlug}/{id}
         // (product.detail — the working one that Vue-renders). The
         // /product/{id}/{slug} route (product.public) exists but 404s.
+        // Skip products with no real price (out-of-stock and $0-price rows).
+        // These render as dead/thin pages in Google's index and dilute crawl
+        // budget — the effective price fallback matches how the storefront
+        // decides whether to show a product.
         Product::where('hidden', false)
             ->where('status', 'active')
             ->whereNotNull('slug')
+            ->where(function ($q) {
+                $q->where('price', '>', 0)
+                  ->orWhere('discount_price', '>', 0);
+            })
             ->whereHas('brand', fn ($q) => $q->whereNotNull('slug'))
             ->with(['brand:id,slug'])
             ->select('id', 'slug', 'brand_id', 'updated_at')
