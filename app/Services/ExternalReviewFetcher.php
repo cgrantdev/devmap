@@ -40,19 +40,35 @@ class ExternalReviewFetcher
             if (!$p['url']) continue;
             $entry = ['url' => $p['url'], 'platform' => $p['label']];
 
-            // Try to scrape schema.org rating from the URL when supported.
-            $scraped = $p['scrape'] ? $this->fetchSchemaOrgRating($p['url']) : null;
-            if ($scraped) {
-                $entry['rating'] = $scraped['rating'];
-                $entry['count'] = $scraped['count'];
+            // Prefer locally-imported reviews when we have them — the
+            // per-review importers (reviews:import-reviews-io,
+            // reviews:import-pepreviewpro) fetch actual ratings that we
+            // can average, which beats any HTML scrape.
+            $imported = \App\Models\ExternalReview::where('brand_id', $vs->brand_id)
+                ->where('source', $p['key'])
+                ->whereNotNull('rating')
+                ->selectRaw('AVG(rating) as avg, COUNT(*) as cnt')
+                ->first();
+
+            if ($imported && $imported->cnt > 0) {
+                $entry['rating'] = round((float) $imported->avg, 2);
+                $entry['count'] = (int) $imported->cnt;
                 $entry['manual'] = false;
             } else {
-                // Fall back to any previously-stored numbers so manual
-                // entries survive refreshes.
-                $prev = $existing[$p['key']] ?? [];
-                if (!empty($prev['rating'])) $entry['rating'] = $prev['rating'];
-                if (!empty($prev['count']))  $entry['count'] = $prev['count'];
-                if (!empty($prev['manual'])) $entry['manual'] = true;
+                // Try to scrape schema.org rating from the URL when supported.
+                $scraped = $p['scrape'] ? $this->fetchSchemaOrgRating($p['url']) : null;
+                if ($scraped) {
+                    $entry['rating'] = $scraped['rating'];
+                    $entry['count'] = $scraped['count'];
+                    $entry['manual'] = false;
+                } else {
+                    // Fall back to any previously-stored numbers so manual
+                    // entries survive refreshes.
+                    $prev = $existing[$p['key']] ?? [];
+                    if (!empty($prev['rating'])) $entry['rating'] = $prev['rating'];
+                    if (!empty($prev['count']))  $entry['count'] = $prev['count'];
+                    if (!empty($prev['manual'])) $entry['manual'] = true;
+                }
             }
 
             $sources[$p['key']] = $entry;
