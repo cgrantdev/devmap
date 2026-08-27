@@ -108,6 +108,76 @@
         </div>
       </section>
 
+      <!-- SEO panel — Google Search Console rollup. Empty state guides
+           Colin through the one-time wiring; live state shows totals +
+           top queries + top pages + the 'rank 8-20' opportunity list. -->
+      <section class="space-y-4">
+        <div class="flex items-baseline justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900">Search · last {{ seoMetrics?.window_days || 28 }} days</h2>
+            <p v-if="seoMetrics?.configured" class="text-[12px] text-gray-500 mt-0.5">Google Search Console · {{ seoMetrics.window_start }} → {{ seoMetrics.window_end }}</p>
+            <p v-else class="text-[12px] text-gray-500 mt-0.5">Google Search Console · not yet connected</p>
+          </div>
+        </div>
+
+        <div v-if="!seoMetrics?.configured" class="bg-white border border-gray-200 rounded-lg p-5 text-[13px] text-gray-600 space-y-2">
+          <p><strong class="text-gray-900">To wire GSC:</strong> put your Google service-account JSON at <code class="ui-mono bg-gray-100 px-1 rounded">/home/forge/gsc-service-account.json</code>, add its email as a user in Search Console → Users, then set <code class="ui-mono bg-gray-100 px-1 rounded">GSC_SERVICE_ACCOUNT_JSON_PATH</code> + <code class="ui-mono bg-gray-100 px-1 rounded">GSC_SITE_URL</code> in the Forge site's env.</p>
+          <p class="text-gray-500">Once live: clicks, impressions, avg rank, top queries, top pages, and a "rank 8-20 opportunity" list render here.</p>
+        </div>
+
+        <template v-else>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Metric label="Clicks" :main="seoMetrics.totals.clicks" :sub="totalsDelta('clicks')" :accent="totalsAccent('clicks')" />
+            <Metric label="Impressions" :main="seoMetrics.totals.impressions.toLocaleString()" :sub="totalsDelta('impressions')" :accent="totalsAccent('impressions')" />
+            <Metric label="CTR" :main="`${(seoMetrics.totals.ctr * 100).toFixed(2)}%`" :sub="totalsDelta('ctr', true)" :accent="totalsAccent('ctr')" />
+            <Metric label="Avg rank" :main="seoMetrics.totals.position" :sub="totalsDelta('position', false, true)" :accent="rankAccent()" />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+              <div class="text-[11px] uppercase tracking-wide font-semibold text-gray-500 mb-3">Top queries · clicks</div>
+              <ol class="space-y-1.5">
+                <li v-for="(r, i) in seoMetrics.top_queries" :key="r.query" class="flex items-center justify-between gap-2 text-[13px]">
+                  <span class="flex items-center gap-2 min-w-0"><span class="ui-mono text-[10px] text-gray-400 w-4">{{ i + 1 }}</span><span class="truncate">{{ r.query }}</span></span>
+                  <span class="flex items-center gap-2 flex-shrink-0 tabular-nums text-[11px] text-gray-500">
+                    #<span class="ui-mono font-semibold text-gray-900">{{ r.position }}</span>
+                    · <span class="ui-mono font-semibold text-gray-900">{{ r.clicks }}</span> clk
+                  </span>
+                </li>
+                <li v-if="!seoMetrics.top_queries?.length" class="text-[12px] text-gray-400 py-2">No query data yet.</li>
+              </ol>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+              <div class="text-[11px] uppercase tracking-wide font-semibold text-gray-500 mb-3">Top pages · clicks</div>
+              <ol class="space-y-1.5">
+                <li v-for="(r, i) in seoMetrics.top_pages" :key="r.page" class="flex items-center justify-between gap-2 text-[13px]">
+                  <a :href="r.page" target="_blank" rel="noopener" class="flex items-center gap-2 min-w-0 hover:text-indigo-600"><span class="ui-mono text-[10px] text-gray-400 w-4">{{ i + 1 }}</span><span class="truncate">{{ shortenPage(r.page) }}</span></a>
+                  <span class="flex items-center gap-2 flex-shrink-0 tabular-nums text-[11px] text-gray-500">
+                    #<span class="ui-mono font-semibold text-gray-900">{{ r.position }}</span>
+                    · <span class="ui-mono font-semibold text-gray-900">{{ r.clicks }}</span> clk
+                  </span>
+                </li>
+                <li v-if="!seoMetrics.top_pages?.length" class="text-[12px] text-gray-400 py-2">No page data yet.</li>
+              </ol>
+            </div>
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div class="text-[11px] uppercase tracking-wide font-semibold text-amber-800 mb-3">Opportunities · rank 8-20</div>
+              <p class="text-[11px] text-amber-700 mb-3">Queries where we're hovering just off page 1 — best ROI targets.</p>
+              <ol class="space-y-1.5">
+                <li v-for="(r, i) in seoMetrics.opportunities" :key="r.query" class="flex items-center justify-between gap-2 text-[13px]">
+                  <span class="flex items-center gap-2 min-w-0"><span class="ui-mono text-[10px] text-amber-500 w-4">{{ i + 1 }}</span><span class="truncate">{{ r.query }}</span></span>
+                  <span class="flex items-center gap-2 flex-shrink-0 tabular-nums text-[11px] text-amber-800">
+                    #<span class="ui-mono font-semibold">{{ r.position }}</span>
+                    · <span class="ui-mono font-semibold">{{ r.impressions }}</span> imp
+                  </span>
+                </li>
+                <li v-if="!seoMetrics.opportunities?.length" class="text-[12px] text-amber-600 py-2">No opportunity queries in the 8-20 zone yet.</li>
+              </ol>
+            </div>
+          </div>
+        </template>
+      </section>
+
       <!-- Progress bar — total flow at a glance -->
       <section>
         <div class="bg-white border border-gray-200 rounded-lg p-4">
@@ -389,6 +459,7 @@ import Layout from './Layout.vue'
 const props = defineProps({
   snapshot: Object,
   growthMetrics: { type: Object, default: () => ({}) },
+  seoMetrics: { type: Object, default: () => ({}) },
   openRecs: Array,
   inProgressRecs: Array,
   shippedRecs: Array,
@@ -714,6 +785,54 @@ const RankPanel = defineComponent({
     ])
   },
 })
+
+// Compare a totals field this-vs-prev in the seoMetrics snapshot and
+// return a compact "+12%" caption. For `position` (rank), LOWER is better,
+// so pass invert=true. Rate fields (CTR) can be shown as a raw delta.
+function totalsDelta(field, isRate = false, invert = false) {
+  const s = props.seoMetrics
+  if (!s?.configured) return ''
+  const now = Number(s.totals?.[field] ?? 0)
+  const prev = Number(s.totals_prev?.[field] ?? 0)
+  if (!prev) return 'no prev'
+  const raw = now - prev
+  if (isRate) {
+    const pts = (raw * 100).toFixed(2)
+    return `${pts >= 0 ? '+' : ''}${pts} pt`
+  }
+  const pct = Math.round((raw / prev) * 100)
+  const sign = pct > 0 ? '+' : ''
+  return `${sign}${pct}% vs prev ${s.window_days}d`
+}
+function totalsAccent(field) {
+  const s = props.seoMetrics
+  if (!s?.configured) return ''
+  const now = Number(s.totals?.[field] ?? 0)
+  const prev = Number(s.totals_prev?.[field] ?? 0)
+  if (!prev) return ''
+  const delta = now - prev
+  if (delta > 0) return 'emerald'
+  if (delta < 0) return 'red'
+  return ''
+}
+function rankAccent() {
+  // For rank, LOWER is better (position 3 beats position 8).
+  const s = props.seoMetrics
+  if (!s?.configured) return ''
+  const now = Number(s.totals?.position ?? 0)
+  const prev = Number(s.totals_prev?.position ?? 0)
+  if (!prev) return ''
+  const delta = now - prev
+  if (delta < 0) return 'emerald'
+  if (delta > 0) return 'red'
+  return ''
+}
+function shortenPage(url) {
+  try {
+    const u = new URL(url)
+    return u.pathname + (u.search || '')
+  } catch { return url }
+}
 
 // Delta helpers for week-over-week Metric captions.
 function deltaLabel(delta, prev) {

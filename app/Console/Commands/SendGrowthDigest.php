@@ -64,10 +64,31 @@ class SendGrowthDigest extends Command
         return self::SUCCESS;
     }
 
+    /**
+     * Compose the SEO-from-GSC section of the digest. Returns "" when GSC
+     * isn't configured — silently omitted so we don't clutter the post.
+     */
+    private function seoSection(array $seo): string
+    {
+        if (empty($seo['configured'])) return '';
+        $t = $seo['totals'] ?? [];
+        $tp = $seo['totals_prev'] ?? [];
+        $ctr = number_format(($t['ctr'] ?? 0) * 100, 2);
+        $topQ = collect($seo['top_queries'] ?? [])->take(5)
+            ->map(fn ($r) => "• `{$r['query']}` — #{$r['position']} · {$r['clicks']} clk")->implode("\n") ?: '_no query data yet_';
+        $opps = collect($seo['opportunities'] ?? [])->take(5)
+            ->map(fn ($r) => "• `{$r['query']}` — #{$r['position']} · {$r['impressions']} imp")->implode("\n") ?: '_no rank-8-20 queries yet_';
+        $prevSuffix = !empty($tp['clicks']) ? " (prev {$tp['clicks']})" : '';
+        return "\n\n**Search (Google Search Console)**\nClicks: **{$t['clicks']}**{$prevSuffix}  ·  Impressions: **{$t['impressions']}**  ·  CTR: {$ctr}%  ·  Avg rank: **{$t['position']}**\n\n**Top queries**\n{$topQ}\n\n**Rank 8-20 opportunities**\n{$opps}\n";
+    }
+
     private function buildMessage(array $s): string
     {
         $wow = $s['week_over_week'] ?? [];
         $vp = $s['vendor_pipeline'] ?? [];
+        // GSC snapshot piggybacks on the same digest so Colin sees rank +
+        // impressions alongside affiliate-click movement.
+        $seo = app(\App\Services\SeoMetrics::class)->snapshot(7);
 
         $arrow = fn ($d) => $d === null ? '' : ($d > 0 ? " 📈 +{$d}%" : ($d < 0 ? " 📉 {$d}%" : ' →'));
 
@@ -100,7 +121,7 @@ Affiliate clicks: **{$wow['clicks_this']}**{$arrow($wow['clicks_delta'] ?? null)
 
 **Vendors**
 Approved: {$vp['approved']}  ·  Pending: {$vp['pending']}  ·  New this week: {$vp['new_this_week']}
-
+{$this->seoSection($seo)}
 <https://peptidemap.com/admin/ceo>
 MSG;
     }

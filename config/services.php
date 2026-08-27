@@ -57,6 +57,16 @@ return [
         'base_branch' => env('GITHUB_BASE_BRANCH', 'main'),
     ],
 
+    'gsc' => [
+        // Path on disk to the Google service-account JSON key. Kept outside
+        // the repo — /home/forge/gsc-service-account.json on prod.
+        'service_account_json_path' => env('GSC_SERVICE_ACCOUNT_JSON_PATH'),
+        // Verified property URL. For a domain property, use the sc-domain:
+        // form (e.g. "sc-domain:peptidemap.com"); for a URL-prefix property,
+        // the exact URL including scheme + trailing slash.
+        'site_url' => env('GSC_SITE_URL', 'https://peptidemap.com/'),
+    ],
+
     'discord' => [
         'bot_token' => env('DISCORD_BOT_TOKEN'),
         'application_id' => env('DISCORD_APPLICATION_ID'),
