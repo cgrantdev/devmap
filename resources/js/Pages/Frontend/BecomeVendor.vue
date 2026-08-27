@@ -447,59 +447,11 @@
                 ></textarea>
               </div>
 
-              <!-- Reviews & Trust — optional URLs for third-party review
-                   platforms. Each one appears as a badge on your storefront
-                   with live rating pulled weekly. All optional. -->
-              <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
-                <div class="flex items-baseline justify-between mb-3">
-                  <label class="block text-sm font-semibold text-slate-800">Reviews & Trust badges <span class="text-xs font-normal text-slate-500">— all optional</span></label>
-                </div>
-                <p class="text-xs text-slate-600 mb-4">
-                  Paste any review-platform URLs where customers can find you. We'll pull your live rating + count and display them as trust badges on your Peptidemap storefront. Aggregated across sources.
-                </p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label for="trustpilot_url" class="block text-xs text-slate-700 mb-1">Trustpilot URL</label>
-                    <input id="trustpilot_url" v-model="formData.trustpilotUrl" type="url" placeholder="https://www.trustpilot.com/review/your-domain.com" class="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
-                  </div>
-                  <div>
-                    <label for="google_reviews_url" class="block text-xs text-slate-700 mb-1">Google Reviews URL</label>
-                    <input id="google_reviews_url" v-model="formData.googleReviewsUrl" type="url" placeholder="https://www.google.com/storepages?q=…" class="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
-                  </div>
-                  <div>
-                    <label for="reviews_io_url" class="block text-xs text-slate-700 mb-1">Reviews.io URL</label>
-                    <input id="reviews_io_url" v-model="formData.reviewsIoUrl" type="url" placeholder="https://www.reviews.io/company-reviews/store/…" class="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
-                  </div>
-                  <div>
-                    <label for="pepreviewpro_url" class="block text-xs text-slate-700 mb-1">PepReviewPro URL</label>
-                    <input id="pepreviewpro_url" v-model="formData.pepreviewproUrl" type="url" placeholder="https://your-brand-reviews.com" class="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
-                  </div>
-                </div>
-
-                <!-- Live preview — shows the exact trust panel that'll appear
-                     on the vendor's storefront based on what URLs they've entered.
-                     Numbers only appear after we scrape (post-approval) but the
-                     layout preview lands immediately. -->
-                <div v-if="reviewsPreviewList.length" class="mt-4 p-4 rounded-lg bg-white border border-slate-200">
-                  <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mb-2">Preview on your storefront</div>
-                  <div class="space-y-2">
-                    <div
-                      v-for="p in reviewsPreviewList"
-                      :key="p.key"
-                      class="flex items-center justify-between gap-3 p-2 rounded border border-slate-200 bg-slate-50"
-                    >
-                      <div class="flex items-center gap-2">
-                        <span class="inline-flex items-center justify-center w-8 h-8 rounded text-[10px] font-bold" :class="p.badgeClasses">{{ p.badgeText }}</span>
-                        <div>
-                          <div class="text-[12px] font-semibold text-slate-800">{{ p.platform }}</div>
-                          <div class="text-[10px] text-slate-500 truncate max-w-[220px]">{{ p.url }}</div>
-                        </div>
-                      </div>
-                      <span class="text-[10px] text-slate-400">rating fetches after approval</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <!-- Third-party review-platform fields removed 2026-08-27:
+                   we don't advertise competitor review sites during
+                   onboarding. Existing vendors keep their platform URLs
+                   in the DB; import commands (reviews:import-reviews-io,
+                   reviews:import-pepreviewpro) still work via admin. -->
 
               <!-- Payment Methods Accepted -->
               <div>

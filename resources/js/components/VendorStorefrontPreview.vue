@@ -92,31 +92,9 @@
           <p v-else class="text-[13px] text-slate-400 italic">Your company description will appear here — this is what buyers read to decide.</p>
         </div>
 
-        <!-- Reviews section preview -->
-        <div v-if="reviewBadges.length" class="bg-white border border-slate-200 rounded-lg p-5">
-          <div class="flex items-center justify-between gap-4 mb-3 flex-wrap">
-            <div>
-              <div class="text-[11px] uppercase tracking-wider font-semibold text-slate-500 mb-0.5">Verified on</div>
-              <div class="text-base font-semibold text-slate-900">Third-party reviews</div>
-            </div>
-            <div class="text-right">
-              <div class="text-[11px] uppercase tracking-wider font-semibold text-slate-500 mb-0.5">Aggregate</div>
-              <div class="text-[13px] text-slate-500">shown after first refresh</div>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div v-for="b in reviewBadges" :key="b.key" class="flex items-center justify-between gap-3 p-2.5 rounded border border-slate-200">
-              <div class="flex items-center gap-2">
-                <span class="inline-flex items-center justify-center w-7 h-7 rounded text-[10px] font-bold" :class="b.classes">{{ b.chip }}</span>
-                <div>
-                  <div class="text-[12px] font-semibold text-slate-800">{{ b.label }}</div>
-                  <div class="text-[10px] text-slate-500">Fetches after approval</div>
-                </div>
-              </div>
-              <span class="text-[11px] text-slate-400">↗</span>
-            </div>
-          </div>
-        </div>
+        <!-- Third-party review-badges panel removed 2026-08-27: no
+             competitor promotion. Imported reviews still land in the
+             Customer Reviews section on the real storefront. -->
       </div>
 
       <!-- Sidebar: business details (with hours + open/closed baked in) -->

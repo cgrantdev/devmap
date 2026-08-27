@@ -214,53 +214,10 @@
                 :on-per-page-change="handlePerPageChange"
               />
             </section>
-            <!-- External review platforms trust panel. Renders only if the
-                 vendor has configured at least one platform URL. Each platform
-                 shows its own logo + rating (when scrapeable) + click-through
-                 link. Aggregated 'official' score is the count-weighted mean
-                 across every platform that reported a real rating. -->
-            <section v-if="externalPlatformsList.length" id="trust-panel" class="mb-8">
-              <div class="bg-white border border-gray-200 rounded-lg p-6">
-                <div class="flex items-center justify-between gap-4 flex-wrap mb-4">
-                  <div>
-                    <div class="text-[11px] uppercase tracking-wider font-semibold text-gray-500 mb-1">Verified on</div>
-                    <div class="text-lg font-semibold text-gray-900">Third-party reviews</div>
-                  </div>
-                  <div v-if="externalAggScore" class="text-right">
-                    <div class="text-[11px] uppercase tracking-wider font-semibold text-gray-500 mb-0.5">Aggregate</div>
-                    <div class="flex items-baseline gap-2 justify-end">
-                      <span class="text-2xl font-bold text-gray-900 ui-mono">★ {{ externalAggScore.toFixed(1) }}</span>
-                      <span class="text-[12px] text-gray-500">/ 5 · {{ (brand.external_rating_count || 0).toLocaleString() }} reviews</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <a
-                    v-for="p in externalPlatformsList"
-                    :key="p.key"
-                    :href="p.url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="flex items-center justify-between gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-400 hover:bg-blue-50/30 transition-colors group"
-                  >
-                    <div class="flex items-center gap-2 min-w-0">
-                      <span
-                        class="inline-flex items-center justify-center w-8 h-8 rounded flex-shrink-0 text-[11px] font-bold"
-                        :class="p.badgeClasses"
-                      >{{ p.badgeText }}</span>
-                      <div class="min-w-0">
-                        <div class="text-[13px] font-semibold text-gray-900 truncate">{{ p.platform }}</div>
-                        <div class="text-[11px] text-gray-500 truncate">{{ p.hasNumbers ? `${p.rating} · ${p.count.toLocaleString()} reviews` : 'View reviews on this platform' }}</div>
-                      </div>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                      <span v-if="p.hasNumbers" class="text-[13px] font-bold text-gray-900 ui-mono">★ {{ p.rating }}</span>
-                      <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-                    </div>
-                  </a>
-                </div>
-              </div>
-            </section>
+            <!-- External-platform trust panel removed 2026-08-27: we don't
+                 link out to Reviews.io / Trustpilot / PepReviewPro since
+                 they're direct competitors. Imported reviews still render
+                 in the Customer Reviews section below via ExternalReview. -->
 
             <section id="reviews">
               <h2 class="text-2xl text-gray-900 mb-6">Customer Reviews</h2>
