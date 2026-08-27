@@ -28,6 +28,34 @@ class EncyclopediaController extends Controller
      * Clinical reference data for known compounds (Wikipedia-sourced).
      * TODO: move to database fields on education_posts table.
      */
+    /**
+     * FAQPage schema builder. Accepts the array shape stored on
+     * education_posts.faqs ([{question, answer}, ...]) and returns a
+     * schema.org FAQPage node. Returns null when there are no FAQs so
+     * we don't emit an empty container Google's rich-result test rejects.
+     */
+    private function faqPageSchema(array $faqs, string $slug): ?array
+    {
+        $mainEntity = [];
+        foreach ($faqs as $f) {
+            $q = trim((string) ($f['question'] ?? ''));
+            $a = trim((string) ($f['answer'] ?? ''));
+            if ($q === '' || $a === '') continue;
+            $mainEntity[] = [
+                '@type' => 'Question',
+                'name' => $q,
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => strip_tags($a)],
+            ];
+        }
+        if (empty($mainEntity)) return null;
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            '@id' => url("/encyclopedia/{$slug}#faq"),
+            'mainEntity' => $mainEntity,
+        ];
+    }
+
     private function getClinicalData($compoundName, $field)
     {
         $data = [
@@ -765,7 +793,17 @@ class EncyclopediaController extends Controller
             'image' => $seoOgImage,
             'url' => url("/encyclopedia/{$slug}"),
             'canonical' => url("/encyclopedia/{$slug}"),
-            'schema' => [$definedTermSchema, $breadcrumbSchema],
+            'schema' => array_values(array_filter([
+                $definedTermSchema,
+                $breadcrumbSchema,
+                // FAQPage schema (SEO rec #7). Turns encyclopedia entries
+                // into rich-snippet candidates for "what is X" queries —
+                // Google renders the Q/A pairs directly under our SERP result.
+                $this->faqPageSchema(
+                    (is_array($educationPost?->faqs ?? null) ? $educationPost->faqs : []),
+                    $slug
+                ),
+            ])),
         ];
 
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)

@@ -37,6 +37,36 @@ class ProductsController extends Controller
      *   "BPC-157 (10mg) from Amino Club — $39.99 (was $49.99). Compare 25
      *    vendors, verified COAs, PMAP coupons. Research use only."
      */
+    /**
+     * Buying-hook-first product SEO title. Leads with "Buy" verb (SEO
+     * rec #5), pairs product with vendor, appends effective price when
+     * we have one. Keeps under 60 chars for Google's SERP truncation
+     * by dropping the site suffix on long names.
+     *
+     * Examples:
+     *   "Buy Tirzepatide 10mg from Amino Club — $89 · Peptidemap"
+     *   "Buy BPC-157 (5mg) from Certified Pep · Peptidemap"
+     */
+    private function buildProductSeoTitle($product, $brand, string $siteName): string
+    {
+        $productLabel = $product->display_name ?? $product->name;
+        $vendorName = $brand?->name ?? 'verified vendors';
+
+        // Effective price = discount when it's a real sale, else list.
+        $effective = ($product->discount_price && $product->discount_price < $product->price)
+            ? (float) $product->discount_price
+            : (float) $product->price;
+        $priceFragment = $effective > 0 ? ' — $' . rtrim(rtrim(number_format($effective, 2, '.', ''), '0'), '.') : '';
+
+        $core = "Buy {$productLabel} from {$vendorName}{$priceFragment}";
+        $withSite = "{$core} · {$siteName}";
+
+        // Google typically truncates SERP titles at ~60 chars. Drop the
+        // site suffix when the core alone is already long — better to
+        // show the whole hook than have "Peptidemap" get truncated to "…".
+        return mb_strlen($withSite) > 65 ? $core : $withSite;
+    }
+
     private function buildProductMetaDescription($product, $brand): string
     {
         $vendorName = $brand?->name ?? 'verified vendors';
@@ -393,9 +423,15 @@ class ProductsController extends Controller
         // their SERP result → Google will just prefer the vendor's, not ours).
         $autoSeoDescription = $this->buildProductMetaDescription($product, $brand);
 
+        // Buying-hook-first title (SEO rec #5). Leads with "Buy", includes the
+        // effective price when we have one, and always cites the vendor. Sits
+        // under Google's ~60-char SERP cap for common vendor names.
+        $autoSeoTitle = $this->buildProductSeoTitle($product, $brand, $siteName);
+
         if ($hasStoredSeo) {
-            // Use stored SEO data from database (admin override wins)
-            $seoTitle = $product->seo_page_title ?: ($product->name . ' – ' . $siteName);
+            // Admin override wins if they typed a custom title. Otherwise use
+            // the buying-hook default (was: bland "{name} – Peptidemap").
+            $seoTitle = $product->seo_page_title ?: $autoSeoTitle;
             $seoDescription = $product->seo_description ?: $autoSeoDescription;
             $seoOgTitle = $product->seo_og_title ?: $seoTitle;
             $seoOgDescription = $product->seo_og_description ?: $seoDescription;
@@ -409,8 +445,7 @@ class ProductsController extends Controller
                 ? (str_starts_with($product->seo_og_image, 'http') ? $product->seo_og_image : url($product->seo_og_image))
                 : route('og.product', ['id' => $product->id]) . '?v=' . $ogV;
         } else {
-            $vendorName = $brand ? $brand->name : 'our store';
-            $seoTitle = "Buy {$product->name} from {$vendorName} - {$siteName}";
+            $seoTitle = $autoSeoTitle;
             $seoDescription = $autoSeoDescription;
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
@@ -436,12 +471,68 @@ class ProductsController extends Controller
                 'seller' => $brand ? ['@type' => 'Organization', 'name' => $brand->name] : null,
             ],
         ];
-        if (($product->rating_count ?? 0) > 0) {
+        // AggregateRating: prefer product-level when we have it, otherwise
+        // fall back to the vendor's combined native + external aggregate
+        // (SEO rec #4 — "even if seeded from vendor-level reviews"). Missing
+        // schema was the biggest gap keeping our products off SERP star
+        // snippets even for vendors like Certified Pep with 1,492 Reviews.io
+        // reviews already imported.
+        $productRatingCount = (int) ($product->rating_count ?? 0);
+        $vs = $brand?->vendorSetting;
+        $vendorRatingAvg = $vs ? (float) ($vs->external_rating_avg ?? 0) : 0;
+        $vendorRatingCount = $vs ? (int) ($vs->external_rating_count ?? 0) : 0;
+        $vendorNativeCount = (int) ($brand->rating_count ?? 0);
+        $vendorNativeAvg = (float) ($brand->rating_average ?? 0);
+        // Weighted mean across native + external, weighted by count.
+        $combinedVendorCount = $vendorNativeCount + $vendorRatingCount;
+        $combinedVendorAvg = $combinedVendorCount > 0
+            ? (($vendorNativeAvg * $vendorNativeCount) + ($vendorRatingAvg * $vendorRatingCount)) / $combinedVendorCount
+            : 0;
+
+        if ($productRatingCount > 0) {
             $productSchema['aggregateRating'] = [
                 '@type' => 'AggregateRating',
-                'ratingValue' => (float) $product->rating_average,
-                'reviewCount' => (int) $product->rating_count,
+                'ratingValue' => round((float) $product->rating_average, 1),
+                'reviewCount' => $productRatingCount,
             ];
+        } elseif ($combinedVendorCount > 0 && $combinedVendorAvg > 0) {
+            $productSchema['aggregateRating'] = [
+                '@type' => 'AggregateRating',
+                'ratingValue' => round($combinedVendorAvg, 1),
+                'reviewCount' => $combinedVendorCount,
+            ];
+        }
+
+        // Sample Review nodes — up to 5 recent imported reviews for this
+        // vendor. Attaching vendor-level Review objects to the Product is a
+        // schema stretch but honest (buyer's trust is with the vendor).
+        // Trustpilot + Reviews.io both allow re-display with attribution.
+        if ($brand) {
+            $sampleReviews = \App\Models\ExternalReview::where('brand_id', $brand->id)
+                ->whereNotNull('rating')
+                ->whereNotNull('body')
+                ->orderByDesc('published_at')
+                ->limit(5)
+                ->get(['author', 'rating', 'body', 'published_at', 'source', 'source_url']);
+            if ($sampleReviews->isNotEmpty()) {
+                $productSchema['review'] = $sampleReviews->map(fn ($r) => [
+                    '@type' => 'Review',
+                    'author' => ['@type' => 'Person', 'name' => $r->author ?: 'Verified customer'],
+                    'reviewRating' => [
+                        '@type' => 'Rating',
+                        'ratingValue' => (int) $r->rating,
+                        'bestRating' => 5,
+                    ],
+                    'reviewBody' => \Illuminate\Support\Str::limit((string) $r->body, 500),
+                    'datePublished' => optional($r->published_at)->toIso8601String(),
+                    'publisher' => ['@type' => 'Organization', 'name' => match ($r->source) {
+                        'trustpilot' => 'Trustpilot',
+                        'reviews_io' => 'Reviews.io',
+                        'google' => 'Google Reviews',
+                        default => 'Third-party review platform',
+                    }],
+                ])->values()->all();
+            }
         }
 
         $breadcrumbSchema = [
