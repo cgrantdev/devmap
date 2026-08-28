@@ -543,26 +543,89 @@
                    freeform marketing text ("BEST QUALITY!!"). -->
               <UspPicker v-model="formData.usps" />
 
-              <!-- Logo Upload -->
+              <!-- Logo upload — vendor picks the file, we immediately
+                   show 3 mockups (vendor card, storefront header,
+                   product-card badge) so they can see EXACTLY how their
+                   logo will land across the site before committing.
+                   Colin: "Accept" or "Revise" flow. -->
               <div>
-                <label for="logo_file" class="block text-sm text-slate-700 mb-2">
-                  Upload your logo
+                <label class="block text-sm font-semibold text-slate-800 mb-2">
+                  Logo
+                  <span v-if="logoConfirmed" class="ml-2 text-[10px] uppercase tracking-wider font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full align-middle">● Approved</span>
                 </label>
-                <div class="mt-2">
+
+                <!-- Logo not yet uploaded → dropzone + spec hint -->
+                <div v-if="!formData.logoFile" class="p-6 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50">
                   <input
                     id="logo_file"
                     type="file"
-                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                    accept="image/png"
                     @change="handleLogoUpload"
                     class="block w-full text-sm text-slate-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600 file:cursor-pointer cursor-pointer"
                   />
-                  <p class="mt-1 text-xs text-slate-500">
-                    PNG, JPG, WebP, or SVG · up to 8 MB · square (e.g. 1000×1000) transparent preferred.
-                  </p>
-                  <div v-if="formData.logoFile" class="mt-2 text-sm text-slate-600">
-                    Selected: {{ formData.logoFile.name }}
+                  <div class="mt-3 text-xs text-slate-600 leading-relaxed">
+                    <div><strong class="text-slate-800">Recommended:</strong> 500×500 transparent PNG. Under 500 KB.</div>
+                    <div class="text-slate-500 mt-0.5">Your logo will be displayed at 380×215 on vendor cards, smaller in the storefront header, and as a tiny badge on product cards — a centered design that reads at any size works best.</div>
                   </div>
-                  <p v-if="fieldErrors.logoFile" class="mt-1 text-xs text-rose-600">{{ fieldErrors.logoFile }}</p>
+                  <p v-if="fieldErrors.logoFile" class="mt-2 text-xs text-rose-600">{{ fieldErrors.logoFile }}</p>
+                </div>
+
+                <!-- Logo uploaded → 3-mockup preview + Accept/Revise -->
+                <div v-else class="rounded-lg border border-slate-200 bg-white">
+                  <div class="p-4 border-b border-slate-200 flex items-center justify-between gap-3 flex-wrap">
+                    <div class="text-xs text-slate-600 truncate">
+                      <span class="font-semibold text-slate-800">{{ formData.logoFile.name }}</span>
+                      <span class="text-slate-500 ml-2">· {{ (formData.logoFile.size / 1024).toFixed(0) }} KB</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button v-if="!logoConfirmed" type="button" @click="resetLogo" class="text-[12px] font-medium text-slate-600 hover:text-slate-900 underline">Revise & re-upload</button>
+                      <button v-if="!logoConfirmed" type="button" @click="logoConfirmed = true" class="text-[12px] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded">Accept ✓</button>
+                      <button v-else type="button" @click="logoConfirmed = false; resetLogo()" class="text-[12px] font-medium text-slate-600 hover:text-slate-900 underline">Replace logo</button>
+                    </div>
+                  </div>
+
+                  <!-- 3-mockup preview grid: vendor card · storefront header · product-card badge -->
+                  <div class="p-4 bg-slate-50 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- 1) Vendor card (as on /brands grid, 380×215) -->
+                    <div>
+                      <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mb-1.5">Vendor card · /brands</div>
+                      <div class="w-full border border-slate-200 rounded-lg bg-white overflow-hidden shadow-sm" style="aspect-ratio: 380/215;">
+                        <div class="w-full h-full flex items-center justify-center p-4">
+                          <img :src="logoObjectUrl" :alt="formData.companyName || 'Logo'" class="max-w-full max-h-full object-contain" />
+                        </div>
+                      </div>
+                      <div class="text-[11px] text-slate-600 mt-1.5 font-medium truncate">{{ formData.companyName || 'Your brand' }}</div>
+                    </div>
+
+                    <!-- 2) Storefront header (as on /brand/{slug}) -->
+                    <div>
+                      <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mb-1.5">Storefront header · /brand/{slug}</div>
+                      <div class="border border-slate-200 rounded-lg bg-white p-3 flex items-center gap-3">
+                        <div class="w-14 h-14 border border-slate-200 rounded flex items-center justify-center bg-white flex-shrink-0 overflow-hidden">
+                          <img :src="logoObjectUrl" :alt="formData.companyName || 'Logo'" class="max-w-full max-h-full object-contain p-1" />
+                        </div>
+                        <div class="min-w-0">
+                          <div class="text-sm font-semibold text-slate-900 truncate">{{ formData.companyName || 'Your brand' }}</div>
+                          <div class="text-[11px] text-slate-500">Rating shown after first review</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 3) Product-card brand badge (as on product listings) -->
+                    <div>
+                      <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mb-1.5">Product card badge</div>
+                      <div class="border border-slate-200 rounded-lg bg-white p-3">
+                        <div class="flex items-center gap-2 mb-2">
+                          <div class="w-6 h-6 border border-slate-200 rounded flex items-center justify-center bg-white flex-shrink-0 overflow-hidden">
+                            <img :src="logoObjectUrl" :alt="formData.companyName || 'Logo'" class="max-w-full max-h-full object-contain" />
+                          </div>
+                          <span class="text-[11px] text-slate-600 truncate">{{ formData.companyName || 'Your brand' }}</span>
+                        </div>
+                        <div class="text-[12px] font-semibold text-slate-900 leading-tight">BPC-157 (5mg)</div>
+                        <div class="text-[13px] font-bold text-slate-900 mt-1">$29.99</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1033,7 +1096,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import VendorStorefrontPreview from '@/components/VendorStorefrontPreview.vue';
 import BusinessHoursEditor from '@/components/BusinessHoursEditor.vue';
 import UspPicker from '@/components/UspPicker.vue';
@@ -1417,6 +1480,25 @@ const compressLogo = (file) => new Promise((resolve, reject) => {
   };
   img.src = url;
 });
+
+// --- Logo confirm-flow -------------------------------------------------
+// Vendor uploads → 3 mockups appear → they click Accept (locks it) or
+// Revise (clears + re-uploads). Also: object URL for previewing the
+// File binary as an <img src>, revoked on change/unmount to avoid leaks.
+const logoConfirmed = ref(false)
+const logoObjectUrl = ref(null)
+watch(() => formData.value.logoFile, (next) => {
+  if (logoObjectUrl.value) { URL.revokeObjectURL(logoObjectUrl.value); logoObjectUrl.value = null }
+  if (next instanceof File) logoObjectUrl.value = URL.createObjectURL(next)
+}, { immediate: true })
+onUnmounted(() => { if (logoObjectUrl.value) URL.revokeObjectURL(logoObjectUrl.value) })
+function resetLogo() {
+  formData.value.logoFile = null
+  logoConfirmed.value = false
+  const input = document.getElementById('logo_file')
+  if (input) input.value = ''
+}
+// ----------------------------------------------------------------------
 
 const handleLogoUpload = async (event) => {
   const file = event.target.files[0];
