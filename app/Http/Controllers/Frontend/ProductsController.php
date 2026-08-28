@@ -1148,10 +1148,28 @@ class ProductsController extends Controller
                 'trustpilot_url' => $brand->vendorSetting->trustpilot_url ?? null,
                 'google_reviews_url' => $brand->vendorSetting->google_reviews_url ?? null,
                 'pepreviewpro_url' => $brand->vendorSetting->pepreviewpro_url ?? null,
-                // True when the logged-in user owns this brand — unlocks
-                // inline-edit affordances on their own storefront. Save
-                // endpoint is /brand/{slug}/edit-field, gated separately.
-                'is_owner' => auth()->check() && auth()->id() === $brand->user_id,
+                // True when the logged-in user owns this brand OR is an
+                // admin — unlocks inline-edit affordances on the storefront.
+                // Admins get the same affordances so Julia can fix things
+                // in-place from the live page. Save endpoint enforces the
+                // same rule server-side.
+                'is_owner' => auth()->check() && (
+                    auth()->id() === $brand->user_id
+                    || (bool) (auth()->user()->is_admin ?? false)
+                ),
+                // Per-vendor Why-Choose bullets. Frontend falls back to
+                // the generic default list when this is null/empty.
+                'why_choose_bullets' => $brand->vendorSetting->why_choose_bullets ?? null,
+                // Fields already on vendor_settings that we needed to
+                // expose for inline editing on /brand/{slug}.
+                'phone_number' => $brand->vendorSetting->phone_number ?? null,
+                'coupon_code' => $brand->vendorSetting->coupon_code ?? null,
+                'payment_methods' => is_array($brand->vendorSetting->payment_methods ?? null)
+                    ? $brand->vendorSetting->payment_methods
+                    : [],
+                'usps' => is_array($brand->vendorSetting->usps ?? null)
+                    ? $brand->vendorSetting->usps
+                    : [],
                 // External review platforms + aggregated scores. Populated
                 // by `php artisan reviews:refresh {slug}` (weekly cron).
                 // `external_ratings` is per-platform data; `external_rating_avg`

@@ -466,9 +466,23 @@
                       <path d="M16 2v4"></path>
                       <path d="M3 10h18"></path>
                     </svg>
-                    <div>
+                    <div class="min-w-0 flex-1">
                       <div class="text-xs text-gray-500">Established</div>
-                      <div class="text-sm text-gray-900">{{ brand.founded_year || '2013' }}</div>
+                      <InlineEditField
+                        v-if="brand.is_owner"
+                        :model-value="brand.founded_year ? String(brand.founded_year) : ''"
+                        field="founded_year"
+                        label="year established"
+                        placeholder="Year founded"
+                        :owner="true"
+                        :brand-slug="brand.slug"
+                        @update:model-value="brand.founded_year = $event"
+                      >
+                        <template #default="{ value }">
+                          <div class="text-sm text-gray-900">{{ value || 'Add year' }}</div>
+                        </template>
+                      </InlineEditField>
+                      <div v-else class="text-sm text-gray-900">{{ brand.founded_year || '—' }}</div>
                     </div>
                   </div>
                   <div class="flex items-start gap-3">
@@ -607,10 +621,33 @@
                 </div>
               </div>
 
-              <!-- Why Choose Panel -->
+              <!-- Why Choose Panel — per-vendor bullets when configured,
+                   generic defaults otherwise. Owners edit the list inline
+                   as newline-separated lines. -->
               <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                <h3 class="text-lg text-gray-900 mb-4">Why Choose {{ props.brand.name || 'Peptide Sciences' }}?</h3>
-                <ul class="space-y-2 text-sm text-gray-700">
+                <h3 class="text-lg text-gray-900 mb-4">Why Choose {{ props.brand.name || 'this vendor' }}?</h3>
+                <InlineEditField
+                  v-if="brand.is_owner"
+                  :model-value="whyChooseEditableText"
+                  field="why_choose_bullets"
+                  label="why-choose bullets"
+                  placeholder="One reason per line…"
+                  :owner="true"
+                  :brand-slug="brand.slug"
+                  :multiline="true"
+                  :rows="5"
+                  @update:model-value="brand.why_choose_bullets = linesToArray($event)"
+                >
+                  <template #default>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                      <li v-for="benefit in whyChooseBenefits" :key="benefit" class="flex items-start gap-2">
+                        <span class="text-gray-900 mt-0.5">✓</span>
+                        <span>{{ benefit }}</span>
+                      </li>
+                    </ul>
+                  </template>
+                </InlineEditField>
+                <ul v-else class="space-y-2 text-sm text-gray-700">
                   <li v-for="benefit in whyChooseBenefits" :key="benefit" class="flex items-start gap-2">
                     <span class="text-gray-900 mt-0.5">✓</span>
                     <span>{{ benefit }}</span>
@@ -1313,9 +1350,13 @@ const tenureLabel = computed(() => {
   return `${years}+ years in business`
 })
 
-// Why Choose Benefits — tenure line only appears when we can prove it.
+// Why Choose Benefits — vendor-specific bullets when they've set them,
+// generic defaults otherwise. Tenure line auto-appends when we can prove it.
 const whyChooseBenefits = computed(() => {
-  const base = [
+  const custom = Array.isArray(props.brand?.why_choose_bullets)
+    ? props.brand.why_choose_bullets.filter(x => typeof x === 'string' && x.trim())
+    : []
+  const base = custom.length ? custom.slice() : [
     'Third-party lab tested products',
     'Fast & reliable shipping',
     'Responsive customer service',
@@ -1324,6 +1365,19 @@ const whyChooseBenefits = computed(() => {
   if (tenureLabel.value) base.push(tenureLabel.value)
   return base
 })
+
+// Owners edit the list as one-per-line text. Empty lines are dropped
+// on save. serialize prop on InlineEditField converts back to array.
+const whyChooseEditableText = computed(() => {
+  const arr = Array.isArray(props.brand?.why_choose_bullets)
+    ? props.brand.why_choose_bullets.filter(x => typeof x === 'string' && x.trim())
+    : []
+  return arr.join('\n')
+})
+const linesToArray = (text) => (text || '')
+  .split(/\r?\n/)
+  .map(s => s.trim())
+  .filter(Boolean)
 
 // Formatted overall rating
 const formattedOverallRating = computed(() => {

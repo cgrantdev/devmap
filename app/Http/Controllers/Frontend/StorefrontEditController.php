@@ -44,19 +44,36 @@ class StorefrontEditController extends Controller
         'google_reviews_url',
         'reviews_io_url',
         'pepreviewpro_url',
+        'founded_year',
+        'payment_methods',
+        'why_choose_bullets',
+        'usps',
     ];
 
     public function update(Request $request, string $slug): JsonResponse
     {
         $brand = Brand::where('slug', $slug)->firstOrFail();
 
+        // Owner OR admin — admins edit vendor storefronts from the live
+        // page for support (Julia's use case). Everyone else 403s.
         $user = Auth::user();
-        if (!$user || $user->id !== $brand->user_id) {
+        $isOwner = $user && $user->id === $brand->user_id;
+        $isAdmin = $user && (bool) ($user->is_admin ?? false);
+        if (!$isOwner && !$isAdmin) {
             return response()->json(['error' => 'Not your brand.'], 403);
         }
 
         $field = (string) $request->input('field');
         $value = $request->input('value');
+
+        // Some inline editors are textareas even for fields backed by
+        // JSON arrays (why_choose_bullets is one-per-line). Split those
+        // into arrays before validation runs so array rules apply.
+        if (in_array($field, ['why_choose_bullets', 'usps', 'payment_methods'], true) && is_string($value)) {
+            $lines = preg_split('/\r\n|\r|\n/', $value);
+            $value = array_values(array_filter(array_map('trim', $lines), fn($s) => $s !== ''));
+            $request->merge(['value' => $value]);
+        }
 
         // Validate per-field. Simple whitelist + type check by field family.
         $rules = $this->rulesFor($field);
@@ -98,6 +115,12 @@ class StorefrontEditController extends Controller
             'shop_url', 'website',
             'trustpilot_url', 'google_reviews_url', 'reviews_io_url', 'pepreviewpro_url'
                                  => ['nullable', 'url:http,https', 'max:512'],
+            'founded_year'       => ['nullable', 'integer', 'min:1800', 'max:' . (int) date('Y')],
+            // Arrays — Inertia serializes these as JSON strings when
+            // sent via multipart, so accept either shape.
+            'payment_methods',
+            'why_choose_bullets',
+            'usps'               => ['nullable', 'array'],
             default              => null,
         };
     }
