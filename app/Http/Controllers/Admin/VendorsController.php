@@ -489,10 +489,13 @@ class VendorsController extends Controller
         if (array_key_exists('referral_url', $validated)) {
             $settings->referral_url = $validated['referral_url'];
         }
-        // Save email to contact_email field (use email if provided, otherwise contact_email, otherwise keep existing)
-        if (isset($validated['email'])) {
-            $settings->contact_email = $validated['email'];
-        } elseif (isset($validated['contact_email'])) {
+        // contact_email is the source of truth for the vendor's public
+        // contact address — it's the input Julia edits. The form ALSO carries
+        // a stale `email` value bound once at form init from the User row's
+        // login email, never updated afterward. Before this fix, `email`
+        // silently overrode contact_email on every save, wiping Julia's
+        // edits. Reported Aug 28 2026 by Julia w/ Peptiva vendor.
+        if (array_key_exists('contact_email', $validated)) {
             $settings->contact_email = $validated['contact_email'];
         }
         $settings->phone_number = $validated['phone_number'] ?? $settings->phone_number;
