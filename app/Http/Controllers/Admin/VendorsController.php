@@ -334,6 +334,13 @@ class VendorsController extends Controller
                 'coupon_discount_percent' => $brand->vendorSetting->coupon_discount_percent !== null
                     ? (float) $brand->vendorSetting->coupon_discount_percent
                     : null,
+                // Coupon boost — active promo state exposed to the admin
+                // form so Julia can see the current boost + cancel it early.
+                'coupon_boost_active' => $brand->vendorSetting->couponBoostActive(),
+                'coupon_boost_expires_at' => $brand->vendorSetting->coupon_boost_expires_at?->toIso8601String(),
+                'coupon_discount_previous_percent' => $brand->vendorSetting->coupon_discount_previous_percent !== null
+                    ? (float) $brand->vendorSetting->coupon_discount_previous_percent
+                    : null,
                 'shipping_info' => $brand->vendorSetting->shipping_info,
                 'return_policy' => $brand->vendorSetting->return_policy,
                 'business_hours' => $brand->vendorSetting->business_hours,
@@ -1557,5 +1564,49 @@ class VendorsController extends Controller
             $config->auth_credentials = $creds;
             $config->save();
         }
+    }
+
+    /**
+     * Apply a temporary coupon boost to a vendor. Julia uses this to
+     * launch limited-time promos (e.g. "END OF SUMMER SALE 35% OFF")
+     * without having to remember to change the % back afterward — the
+     * RevertExpiredCouponBoosts scheduler auto-restores when the
+     * expiry passes, and a Discord announcement fires when the boost
+     * begins. Backend logic lives in VendorSetting::applyCouponBoost.
+     */
+    public function applyCouponBoost(Request $request, int $id)
+    {
+        $brand = Brand::findOrFail($id);
+        $validated = $request->validate([
+            'boost_percent' => 'required|numeric|min:1|max:90',
+            'expires_at' => 'required|date|after:now',
+        ]);
+        $settings = $brand->vendorSetting;
+        if (!$settings) {
+            return back()->with('flash_error', 'This vendor has no settings row.');
+        }
+        $settings->applyCouponBoost(
+            (float) $validated['boost_percent'],
+            new \DateTimeImmutable($validated['expires_at'])
+        );
+        return back()->with('flash_success', 'Coupon boost applied — auto-reverts at ' . $validated['expires_at']);
+    }
+
+    /**
+     * Cancel an active coupon boost early — restores the previous %
+     * immediately and clears the expiry.
+     */
+    public function cancelCouponBoost(int $id)
+    {
+        $brand = Brand::findOrFail($id);
+        $settings = $brand->vendorSetting;
+        if (!$settings || !$settings->couponBoostActive()) {
+            return back()->with('flash_error', 'No active boost to cancel.');
+        }
+        $settings->coupon_discount_percent = $settings->coupon_discount_previous_percent;
+        $settings->coupon_discount_previous_percent = null;
+        $settings->coupon_boost_expires_at = null;
+        $settings->save();
+        return back()->with('flash_success', 'Coupon boost cancelled — % reverted.');
     }
 }

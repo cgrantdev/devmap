@@ -162,6 +162,49 @@
                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[color:var(--color-ink-subtle)] pointer-events-none">%</span>
               </div>
             </FormField>
+            <!-- Coupon boost — Julia's limited-time promo trigger. Sets
+                 the discount % to `boost_percent` until `expires_at`, then
+                 the RevertExpiredCouponBoosts scheduler restores the prior
+                 value. Discord announcement fires when the boost begins. -->
+            <div class="md:col-span-2 mt-2 p-4 rounded-lg bg-amber-50 border border-amber-200">
+              <div class="flex items-baseline justify-between mb-2">
+                <div>
+                  <div class="text-sm font-semibold text-amber-900">Limited-time promotion</div>
+                  <div class="text-[11px] text-amber-800/80">Temporarily bump the discount %. Auto-reverts on expiry, posts to Discord when live.</div>
+                </div>
+                <span v-if="editForm.coupon_boost_active" class="text-[10px] uppercase tracking-wider font-bold bg-red-600 text-white px-2 py-0.5 rounded-full">● Boost active</span>
+              </div>
+              <div v-if="editForm.coupon_boost_active" class="mb-3 p-3 rounded border border-amber-200 bg-white text-[12px]">
+                <div class="flex items-baseline justify-between gap-3 flex-wrap">
+                  <div class="text-amber-900">
+                    <span class="font-semibold">{{ editForm.coupon_discount_percent }}%</span> until
+                    <span class="ui-mono">{{ formatBoostExpiry(editForm.coupon_boost_expires_at) }}</span>
+                    <span class="text-amber-700"> · reverts to <span class="ui-mono">{{ editForm.coupon_discount_previous_percent }}%</span></span>
+                  </div>
+                  <button type="button" @click="cancelCouponBoost" class="text-[11px] font-semibold text-red-700 hover:text-red-900 underline">Cancel boost early</button>
+                </div>
+              </div>
+              <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-[11px] text-amber-900 mb-1">Boost %</label>
+                  <div class="relative">
+                    <input v-model.number="boostForm.percent" type="number" min="1" max="90" step="1" placeholder="e.g. 35" class="w-full h-9 pl-3 pr-8 text-sm border border-amber-300 rounded ui-mono focus:border-amber-500 focus:outline-none" />
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-amber-700 pointer-events-none">%</span>
+                  </div>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-[11px] text-amber-900 mb-1">Ends</label>
+                  <input v-model="boostForm.expires_at" type="datetime-local" class="w-full h-9 px-3 text-sm border border-amber-300 rounded ui-mono focus:border-amber-500 focus:outline-none" />
+                </div>
+                <div class="sm:col-span-3 flex items-center justify-between gap-3 flex-wrap">
+                  <div class="flex items-center gap-1">
+                    <button type="button" v-for="d in boostQuickDurations" :key="d.hours" @click="setBoostDuration(d.hours)" class="text-[11px] px-2 py-1 rounded border border-amber-300 bg-white hover:bg-amber-100 text-amber-900">{{ d.label }}</button>
+                  </div>
+                  <button type="button" @click="applyCouponBoost" :disabled="!boostForm.percent || !boostForm.expires_at" class="text-[12px] font-semibold text-white bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 disabled:cursor-not-allowed px-4 py-1.5 rounded">Launch boost →</button>
+                </div>
+              </div>
+            </div>
+
             <FormField label="Banner Image URL" class="md:col-span-2">
               <input v-model="editForm.banner_image_url" type="url" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
             </FormField>
@@ -347,7 +390,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useForm, usePage, Link, router } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import FormPage from '@/components/admin/FormPage.vue'
@@ -443,6 +486,11 @@ const editForm = useForm({
   founded_year: props.vendor?.settings?.founded_year || null,
   coupon_code: props.vendor?.settings?.coupon_code || '',
   coupon_discount_percent: props.vendor?.settings?.coupon_discount_percent ?? null,
+  // Boost state — mirrored from server. Not submitted with the main
+  // form; the boost has its own POST endpoint.
+  coupon_boost_active: props.vendor?.settings?.coupon_boost_active ?? false,
+  coupon_boost_expires_at: props.vendor?.settings?.coupon_boost_expires_at ?? null,
+  coupon_discount_previous_percent: props.vendor?.settings?.coupon_discount_previous_percent ?? null,
   referral_url: props.vendor?.settings?.referral_url || '',
   shipping_info: props.vendor?.settings?.shipping_info || '',
   return_policy: props.vendor?.settings?.return_policy || '',
@@ -505,6 +553,52 @@ function handleFileChange(event, field) {
     reader.readAsDataURL(file)
   }
 }
+
+// --- Coupon boost handlers ------------------------------------------
+const boostForm = reactive({ percent: null, expires_at: '' })
+const boostQuickDurations = [
+  { hours: 24,  label: '24h' },
+  { hours: 72,  label: '3 days' },
+  { hours: 168, label: '1 week' },
+  { hours: 336, label: '2 weeks' },
+]
+function setBoostDuration(hours) {
+  const d = new Date(Date.now() + hours * 3600 * 1000)
+  // Local-time formatted for <input type="datetime-local"> — YYYY-MM-DDTHH:MM
+  const pad = n => String(n).padStart(2, '0')
+  boostForm.expires_at = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+function formatBoostExpiry(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return d.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+}
+function applyCouponBoost() {
+  if (!props.vendor || !boostForm.percent || !boostForm.expires_at) return
+  const form = useForm({
+    _token: usePage().props.csrf_token,
+    boost_percent: boostForm.percent,
+    expires_at: boostForm.expires_at,
+  })
+  form.post(`/admin/vendors/${props.vendor.id}/coupon-boost`, {
+    preserveScroll: true,
+    onSuccess: () => {
+      boostForm.percent = null
+      boostForm.expires_at = ''
+    },
+    onError: () => toastError('Boost failed — check the form and try again.'),
+  })
+}
+function cancelCouponBoost() {
+  if (!props.vendor) return
+  if (!confirm('Cancel the active boost now and revert to the previous %?')) return
+  const form = useForm({ _token: usePage().props.csrf_token })
+  form.delete(`/admin/vendors/${props.vendor.id}/coupon-boost`, {
+    preserveScroll: true,
+    onError: () => toastError('Cancel failed.'),
+  })
+}
+// --------------------------------------------------------------------
 
 function submitEditVendor() {
   if (props.vendor) {

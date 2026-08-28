@@ -314,6 +314,13 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     Route::get('/vendors/{id}/edit', [VendorsController::class, 'edit'])->name('admin.vendors.edit');
     Route::post('/vendors/{id}', [VendorsController::class, 'update'])->name('admin.vendors.update');
     Route::delete('/vendors/{id}', [VendorsController::class, 'destroy'])->name('admin.vendors.destroy');
+    // Coupon boost — Julia launches limited-time promos without needing to
+    // remember to revert the % afterward. VendorSetting handles the state
+    // transitions + Discord post; auto-revert runs via RevertExpiredCouponBoosts.
+    Route::post('/vendors/{id}/coupon-boost', [VendorsController::class, 'applyCouponBoost'])
+        ->name('admin.vendors.coupon-boost.apply');
+    Route::delete('/vendors/{id}/coupon-boost', [VendorsController::class, 'cancelCouponBoost'])
+        ->name('admin.vendors.coupon-boost.cancel');
     Route::post('/vendors/{id}/toggle-status', [VendorsController::class, 'toggleStatus'])->name('admin.vendors.toggle-status');
     Route::post('/vendors/{id}/toggle-demo', [VendorsController::class, 'toggleDemo'])->name('admin.vendors.toggle-demo');
     Route::post('/vendors/{id}/approve', [VendorsController::class, 'approve'])->name('admin.vendors.approve');

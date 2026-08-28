@@ -97,8 +97,13 @@
         </div>
       </div> -->
 
-      <!-- Price -->
-      <div class="mb-3">
+      <!-- Price — min-h reserves the full 3-line discount block so a
+           mixed grid (some products discounted, some not) still has
+           buttons that start at the same Y. Undiscounted cards get
+           the big price bottom-aligned inside the reserved space so
+           the button below still sits at the same height.
+           Julia flagged mis-alignment on the /compare grid Aug 2026. -->
+      <div class="mb-3 min-h-[74px] flex flex-col justify-end">
         <template v-if="discountedPrice">
           <div class="flex items-baseline gap-2">
             <span class="text-[11px] uppercase tracking-wide text-gray-700 font-semibold leading-tight">Retail</span>
@@ -109,7 +114,7 @@
           </div>
           <div class="text-xl text-emerald-700 font-bold leading-tight">${{ discountedPrice }}</div>
         </template>
-        <div v-else class="text-lg text-gray-900 font-semibold">
+        <div v-else class="text-xl text-gray-900 font-semibold leading-tight">
           ${{ displayPrice }}
         </div>
       </div>
