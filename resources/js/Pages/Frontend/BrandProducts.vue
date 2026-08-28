@@ -56,6 +56,21 @@
                   {{ brand.contact_email }}
                 </span>
               </div>
+              <!-- Verified badges — cGMP / independent testing, only when
+                   the vendor has APPROVED claims. Managed via the
+                   admin certification queue; see docs/vendor-certifications.md. -->
+              <div v-if="brand.verified_badges && brand.verified_badges.length" class="flex flex-wrap gap-1.5 mt-2">
+                <span
+                  v-for="b in brand.verified_badges"
+                  :key="b.type"
+                  class="inline-flex items-center gap-1 text-[10px] lg:text-[11px] font-semibold uppercase tracking-wide text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full"
+                  :title="`Peptidemap-verified: ${b.label}`"
+                >
+                  <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                  {{ b.label }}
+                </span>
+              </div>
+
               <!-- Tagline — inline-editable one-liner. Sits BELOW the
                    reviews/location bar so it reads as a hook line rather
                    than a subtitle on the name. -->

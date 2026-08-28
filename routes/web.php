@@ -248,6 +248,10 @@ Route::get('/email/verify/{id?}/{hash?}', [EmailVerificationController::class, '
 // Vendor routes
 Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->group(function () {
     Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('vendor.dashboard');
+    // Certification claims (cGMP, independent testing) — vendor submits
+    // documentation, Julia verifies in admin queue. See docs/vendor-certifications.md.
+    Route::get('/certifications', [\App\Http\Controllers\Vendor\CertificationsController::class, 'index'])->name('vendor.certifications');
+    Route::post('/certifications', [\App\Http\Controllers\Vendor\CertificationsController::class, 'store'])->name('vendor.certifications.store');
     Route::get('/storefront-analytics', [VendorDashboardController::class, 'storefrontAnalytics'])->name('vendor.storefront-analytics');
     Route::get('/advertisement-analytics', [VendorDashboardController::class, 'advertisementAnalytics'])->name('vendor.advertisement-analytics');
     Route::get('/reviews', [VendorDashboardController::class, 'reviews'])->name('vendor.reviews');
@@ -321,6 +325,17 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
         ->name('admin.vendors.coupon-boost.apply');
     Route::delete('/vendors/{id}/coupon-boost', [VendorsController::class, 'cancelCouponBoost'])
         ->name('admin.vendors.coupon-boost.cancel');
+
+    // Certification claims (cGMP, independent testing). Julia reviews
+    // submitted docs + approves/rejects. See docs/vendor-certifications.md.
+    Route::get('/certifications', [\App\Http\Controllers\Admin\CertificationsController::class, 'index'])
+        ->name('admin.certifications');
+    Route::get('/certifications/{id}/document', [\App\Http\Controllers\Admin\CertificationsController::class, 'download'])
+        ->name('admin.certifications.document');
+    Route::post('/certifications/{id}/approve', [\App\Http\Controllers\Admin\CertificationsController::class, 'approve'])
+        ->name('admin.certifications.approve');
+    Route::post('/certifications/{id}/reject', [\App\Http\Controllers\Admin\CertificationsController::class, 'reject'])
+        ->name('admin.certifications.reject');
     Route::post('/vendors/{id}/toggle-status', [VendorsController::class, 'toggleStatus'])->name('admin.vendors.toggle-status');
     Route::post('/vendors/{id}/toggle-demo', [VendorsController::class, 'toggleDemo'])->name('admin.vendors.toggle-demo');
     Route::post('/vendors/{id}/approve', [VendorsController::class, 'approve'])->name('admin.vendors.approve');

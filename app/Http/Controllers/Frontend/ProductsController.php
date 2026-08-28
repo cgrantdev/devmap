@@ -1160,6 +1160,14 @@ class ProductsController extends Controller
                 // Per-vendor Why-Choose bullets. Frontend falls back to
                 // the generic default list when this is null/empty.
                 'why_choose_bullets' => $brand->vendorSetting->why_choose_bullets ?? null,
+                // Verified badges — only APPROVED certification claims
+                // show as trust signals on storefront + vendor cards.
+                // See docs/vendor-certifications.md for the workflow.
+                'verified_badges' => \App\Models\VendorCertificationClaim::where('brand_id', $brand->id)
+                    ->where('status', 'approved')
+                    ->get(['type'])
+                    ->map(fn($c) => ['type' => $c->type, 'label' => $c->label()])
+                    ->values(),
                 // Fields already on vendor_settings that we needed to
                 // expose for inline editing on /brand/{slug}.
                 'phone_number' => $brand->vendorSetting->phone_number ?? null,
