@@ -584,45 +584,54 @@
                     </div>
                   </div>
 
-                  <!-- 3-mockup preview grid: vendor card · storefront header · product-card badge -->
-                  <div class="p-4 bg-slate-50 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <!-- Mockup preview — vendor card is the hero (its own row
+                       so the 380×215 renders at real proportions), header +
+                       product badge sit below in a 2-col row. -->
+                  <div class="p-5 bg-slate-50 space-y-5">
                     <!-- 1) Vendor card (as on /brands grid, 380×215) -->
                     <div>
-                      <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mb-1.5">Vendor card · /brands</div>
-                      <div class="w-full border border-slate-200 rounded-lg bg-white overflow-hidden shadow-sm" style="aspect-ratio: 380/215;">
-                        <div class="w-full h-full flex items-center justify-center p-4">
+                      <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mb-2">Vendor card · /brands</div>
+                      <div class="mx-auto border border-slate-200 rounded-lg bg-white overflow-hidden shadow-sm" style="width: 380px; max-width: 100%;">
+                        <div class="p-5 bg-white flex items-center justify-center" style="height: 140px;">
                           <img :src="logoObjectUrl" :alt="formData.companyName || 'Logo'" class="max-w-full max-h-full object-contain" />
                         </div>
-                      </div>
-                      <div class="text-[11px] text-slate-600 mt-1.5 font-medium truncate">{{ formData.companyName || 'Your brand' }}</div>
-                    </div>
-
-                    <!-- 2) Storefront header (as on /brand/{slug}) -->
-                    <div>
-                      <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mb-1.5">Storefront header · /brand/{slug}</div>
-                      <div class="border border-slate-200 rounded-lg bg-white p-3 flex items-center gap-3">
-                        <div class="w-14 h-14 border border-slate-200 rounded flex items-center justify-center bg-white flex-shrink-0 overflow-hidden">
-                          <img :src="logoObjectUrl" :alt="formData.companyName || 'Logo'" class="max-w-full max-h-full object-contain p-1" />
-                        </div>
-                        <div class="min-w-0">
-                          <div class="text-sm font-semibold text-slate-900 truncate">{{ formData.companyName || 'Your brand' }}</div>
-                          <div class="text-[11px] text-slate-500">Rating shown after first review</div>
+                        <div class="border-t border-slate-100 px-4 py-3">
+                          <div class="text-[13px] font-semibold text-slate-900 truncate">{{ formData.companyName || 'Your brand' }}</div>
+                          <div class="text-[11px] text-slate-500 mt-0.5 truncate">{{ formData.country || 'Location shown after approval' }}</div>
                         </div>
                       </div>
                     </div>
 
-                    <!-- 3) Product-card brand badge (as on product listings) -->
-                    <div>
-                      <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mb-1.5">Product card badge</div>
-                      <div class="border border-slate-200 rounded-lg bg-white p-3">
-                        <div class="flex items-center gap-2 mb-2">
-                          <div class="w-6 h-6 border border-slate-200 rounded flex items-center justify-center bg-white flex-shrink-0 overflow-hidden">
-                            <img :src="logoObjectUrl" :alt="formData.companyName || 'Logo'" class="max-w-full max-h-full object-contain" />
+                    <!-- 2 & 3: storefront header + product-card badge side by side -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mb-2">Storefront header · /brand/{slug}</div>
+                        <div class="border border-slate-200 rounded-lg bg-white p-4 flex items-center gap-4 min-h-[92px]">
+                          <div class="w-16 h-16 border border-slate-200 rounded flex items-center justify-center bg-white flex-shrink-0 overflow-hidden">
+                            <img :src="logoObjectUrl" :alt="formData.companyName || 'Logo'" class="max-w-full max-h-full object-contain p-1" />
                           </div>
-                          <span class="text-[11px] text-slate-600 truncate">{{ formData.companyName || 'Your brand' }}</span>
+                          <div class="min-w-0 flex-1">
+                            <div class="text-base font-semibold text-slate-900 truncate">{{ formData.companyName || 'Your brand' }}</div>
+                            <div class="flex items-center gap-1 mt-0.5 flex-wrap">
+                              <svg v-for="n in 5" :key="n" class="w-3 h-3 text-slate-300" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                              <span class="text-[11px] text-slate-500 ml-1 whitespace-nowrap">0.0 · new</span>
+                            </div>
+                          </div>
                         </div>
-                        <div class="text-[12px] font-semibold text-slate-900 leading-tight">BPC-157 (5mg)</div>
-                        <div class="text-[13px] font-bold text-slate-900 mt-1">$29.99</div>
+                      </div>
+
+                      <div>
+                        <div class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 mb-2">Product card badge</div>
+                        <div class="border border-slate-200 rounded-lg bg-white p-4 min-h-[92px]">
+                          <div class="flex items-center gap-2 mb-2">
+                            <div class="w-7 h-7 border border-slate-200 rounded flex items-center justify-center bg-white flex-shrink-0 overflow-hidden">
+                              <img :src="logoObjectUrl" :alt="formData.companyName || 'Logo'" class="max-w-full max-h-full object-contain" />
+                            </div>
+                            <span class="text-[11px] font-medium text-slate-700 truncate">{{ formData.companyName || 'Your brand' }}</span>
+                          </div>
+                          <div class="text-[13px] font-semibold text-slate-900 leading-tight truncate">BPC-157 (5mg)</div>
+                          <div class="text-[14px] font-bold text-slate-900 mt-0.5">$29.99</div>
+                        </div>
                       </div>
                     </div>
                   </div>
