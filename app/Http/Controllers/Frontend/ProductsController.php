@@ -182,12 +182,42 @@ class ProductsController extends Controller
                 ) {
                     $image = \Illuminate\Support\Facades\Storage::url('categories/' . $category->image_url);
                 } else {
+                    // Prefer image URLs from hosts we know serve publicly
+                    // (Julia Sep 1: category tiles were rendering the SVG
+                    // placeholder because the arbitrary ->first() picked
+                    // products whose image_url was blocked / needed auth /
+                    // 403'd from outside the vendor's own site).
+                    $reliablePatterns = [
+                        '%certified-pep.com%',
+                        '%nurapeptide.com%',
+                        '%instantpeptides.com%',
+                        '%certapeptides.com%',
+                        '%peptidegiants.com%',
+                        '%cdn11.bigcommerce.com%',
+                        '%cdn.shopify.com%',
+                        '%/wp-content/uploads/%',
+                        '%.supabase.co%',
+                    ];
                     $sample = Product::visible()
                         ->where('status', 'active')
                         ->where('product_category_id', $category->id)
                         ->whereNotNull('image_url')
                         ->where('image_url', '!=', '')
+                        ->where(function ($q) use ($reliablePatterns) {
+                            foreach ($reliablePatterns as $p) $q->orWhere('image_url', 'like', $p);
+                        })
                         ->first();
+                    // Fall back to any visible product with an image if
+                    // no reliable-host match exists (e.g. small compound
+                    // category where every vendor's on their own domain).
+                    if (!$sample) {
+                        $sample = Product::visible()
+                            ->where('status', 'active')
+                            ->where('product_category_id', $category->id)
+                            ->whereNotNull('image_url')
+                            ->where('image_url', '!=', '')
+                            ->first();
+                    }
                     $image = $sample ? $sample->image_url : null;
                 }
                 

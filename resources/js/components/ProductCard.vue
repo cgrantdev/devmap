@@ -3,8 +3,12 @@
     @click="handleClick"
     class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group relative flex flex-col h-full"
   >
-    <!-- Top Section: Product Image -->
-    <div class="aspect-square bg-gradient-to-br from-blue-50 to-purple-50 p-6 border-b border-gray-200 flex items-center justify-center"> 
+    <!-- Top Section: Product Image. aspect-square + overflow-hidden
+         guarantees the container is exactly a square regardless of the
+         image's natural aspect ratio — some vendor product photos are
+         portrait/tall (Julia Sep 1: IDUN vial image was bursting the
+         card and forcing the whole grid row to double-height). -->
+    <div class="aspect-square bg-gradient-to-br from-blue-50 to-purple-50 p-6 border-b border-gray-200 flex items-center justify-center overflow-hidden">
       <img
         v-if="imageUrl && !hasError"
         :src="imageUrl"
