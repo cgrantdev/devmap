@@ -67,11 +67,15 @@ class HomeController extends Controller
                 if ($category->image_url) {
                     $image = Storage::url('categories/' . $category->image_url);
                 } else {
-                    // Get a sample product image for this category
+                    // Get a sample product image for this category. Skip
+                    // certified-pep.com — those images 403 externally
+                    // (hotlink protection). See ProductsController for
+                    // the fix and rationale.
                     $sampleProduct = Product::visible()
                         ->where('status', 'active')
                         ->where('product_category_id', $category->id)
                         ->whereNotNull('image_url')
+                        ->where('image_url', 'not like', '%certified-pep.com%')
                         ->first();
                     $image = $sampleProduct ? $sampleProduct->image_url : '/images/peptides/default.png';
                 }

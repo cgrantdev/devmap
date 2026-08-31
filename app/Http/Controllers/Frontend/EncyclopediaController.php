@@ -218,12 +218,16 @@ class EncyclopediaController extends Controller
             //  4. null — Vue card renders the themed SVG placeholder.
             $image = null;
 
+            // certified-pep.com images 403 externally (hotlink protection),
+            // so both branches skip that host. See ProductsController for
+            // the same fix and rationale.
             $flagged = Product::visible()
                 ->where('status', 'active')
                 ->where('product_category_id', $category->id)
                 ->where('is_encyclopedia_thumb', true)
                 ->whereNotNull('image_url')
                 ->where('image_url', '!=', '')
+                ->where('image_url', 'not like', '%certified-pep.com%')
                 ->first();
 
             if ($flagged) {
@@ -238,6 +242,7 @@ class EncyclopediaController extends Controller
                     ->where('product_category_id', $category->id)
                     ->whereNotNull('image_url')
                     ->where('image_url', '!=', '')
+                    ->where('image_url', 'not like', '%certified-pep.com%')
                     ->first();
                 $image = $sample ? $sample->image_url : null;
             }
