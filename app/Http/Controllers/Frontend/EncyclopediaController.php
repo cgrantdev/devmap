@@ -825,29 +825,33 @@ class EncyclopediaController extends Controller
                 'compare' => ['url' => url("/compare/{$category->slug}"), 'anchor' => "Compare {$category->name} prices across vendors"],
                 'shop' => ['url' => url("/products?category={$category->slug}"), 'anchor' => "Shop {$category->name} — all available products"],
             ],
+            // $educationPost may be null when a ProductCategory exists but
+            // no matching EducationPost row has been created yet. Every
+            // access below now uses the null-safe operator so the page
+            // still renders with empty defaults instead of throwing.
             'primaryResearch' => [
                 'institution' => 'University of Zagreb (Croatia)',
-                'url' => $educationPost->research_url ?? '#'
+                'url' => $educationPost?->research_url ?? '#'
             ],
             'molecularInfo' => [
-                'formula' => $educationPost->molecular_formula ?? '',
-                'molecularWeight' => $educationPost->molecular_weight ?? '',
-                'casNumber' => $educationPost->cas_registry_number ?? ''
+                'formula' => $educationPost?->molecular_formula ?? '',
+                'molecularWeight' => $educationPost?->molecular_weight ?? '',
+                'casNumber' => $educationPost?->cas_registry_number ?? ''
             ],
             'aminoAcidSequence' => [
-                'residueCount' => $educationPost->amino_acid_sequence ? count(explode('-', $educationPost->amino_acid_sequence)) : 0,
-                'sequence' => $educationPost->amino_acid_sequence ?? '',
+                'residueCount' => $educationPost?->amino_acid_sequence ? count(explode('-', $educationPost->amino_acid_sequence)) : 0,
+                'sequence' => $educationPost?->amino_acid_sequence ?? '',
                 'composition' => [],
                 'properties' => [
-                    'netCharge' => $educationPost->amino_acid_net_charge ?? '',
-                    'hydrophobic' => $educationPost->amino_acid_hydrophobic ?? '',
-                    'stability' => $educationPost->amino_acid_stability ?? '',
-                    'solubility' => $educationPost->amino_acid_solubility ?? ''
+                    'netCharge' => $educationPost?->amino_acid_net_charge ?? '',
+                    'hydrophobic' => $educationPost?->amino_acid_hydrophobic ?? '',
+                    'stability' => $educationPost?->amino_acid_stability ?? '',
+                    'solubility' => $educationPost?->amino_acid_solubility ?? ''
                 ]
             ],
             'keyPoints' => $educationPost && $educationPost->key_points ? (is_array($educationPost->key_points) ? $educationPost->key_points : json_decode($educationPost->key_points, true) ?? []) : [],
-            'overview' => $educationPost->overview ?? '',
-            'overviewShort' => $this->truncateToSentences($educationPost->overview ?? '', 450),
+            'overview' => $educationPost?->overview ?? '',
+            'overviewShort' => $this->truncateToSentences($educationPost?->overview ?? '', 450),
             // Clinical reference data (hardcoded for now, can be DB fields later)
             'drugStatus' => $this->getClinicalData($category->name, 'status'),
             'routes' => $this->getClinicalData($category->name, 'routes'),
@@ -858,21 +862,24 @@ class EncyclopediaController extends Controller
                 ->distinct('brand_id')
                 ->count('brand_id'),
             'areasOfResearch' => $educationPost && $educationPost->areas_of_research ? (is_array($educationPost->areas_of_research) ? $educationPost->areas_of_research : json_decode($educationPost->areas_of_research, true) ?? []) : [],
-            'areasOfResearchIntro' => $educationPost->areas_of_research_intro ?? '',
-            'background' => $educationPost->background ?? '',
-            'mechanismOfActionIntro' => $educationPost->mechanism_of_action_intro ?? '',
+            // All accesses null-safe — a ProductCategory with no EducationPost
+            // must still render (was throwing "Attempt to read property … on null"
+            // several times a day for compounds missing an education post).
+            'areasOfResearchIntro' => $educationPost?->areas_of_research_intro ?? '',
+            'background' => $educationPost?->background ?? '',
+            'mechanismOfActionIntro' => $educationPost?->mechanism_of_action_intro ?? '',
             'mechanismSubsections' => $educationPost && $educationPost->mechanism_subsections ? (is_array($educationPost->mechanism_subsections) ? $educationPost->mechanism_subsections : json_decode($educationPost->mechanism_subsections, true) ?? []) : [],
-            'preclinicalIntro' => $educationPost->preclinical_intro ?? '',
+            'preclinicalIntro' => $educationPost?->preclinical_intro ?? '',
             'preclinicalSubsections' => $educationPost && $educationPost->preclinical_subsections ? (is_array($educationPost->preclinical_subsections) ? $educationPost->preclinical_subsections : json_decode($educationPost->preclinical_subsections, true) ?? []) : [],
-            'preclinicalDisclaimer' => $educationPost->preclinical_disclaimer ?? '',
-            'humanUseIntro' => $educationPost->human_use_intro ?? '',
+            'preclinicalDisclaimer' => $educationPost?->preclinical_disclaimer ?? '',
+            'humanUseIntro' => $educationPost?->human_use_intro ?? '',
             'humanUseSubsections' => $educationPost && $educationPost->human_use_subsections ? (is_array($educationPost->human_use_subsections) ? $educationPost->human_use_subsections : json_decode($educationPost->human_use_subsections, true) ?? []) : [],
             'regulatorySubsections' => $educationPost && $educationPost->regulatory_subsections ? (is_array($educationPost->regulatory_subsections) ? $educationPost->regulatory_subsections : json_decode($educationPost->regulatory_subsections, true) ?? []) : [],
-            'regulatoryImportantNote' => $educationPost->regulatory_important_note ?? '',
-            'potentialApplicationsIntro' => $educationPost->potential_applications_intro ?? '',
+            'regulatoryImportantNote' => $educationPost?->regulatory_important_note ?? '',
+            'potentialApplicationsIntro' => $educationPost?->potential_applications_intro ?? '',
             'potentialApplications' => $educationPost && $educationPost->potential_applications ? (is_array($educationPost->potential_applications) ? $educationPost->potential_applications : json_decode($educationPost->potential_applications, true) ?? []) : [],
-            'potentialApplicationsImportantContext' => $educationPost->potential_applications_important_context ?? '',
-            'conclusion' => $educationPost->conclusion ?? '',
+            'potentialApplicationsImportantContext' => $educationPost?->potential_applications_important_context ?? '',
+            'conclusion' => $educationPost?->conclusion ?? '',
             'references' => $educationPost && $educationPost->references ? (is_array($educationPost->references) ? $educationPost->references : json_decode($educationPost->references, true) ?? []) : [],
             'products' => $products,
         ];
