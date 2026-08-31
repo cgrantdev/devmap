@@ -167,12 +167,16 @@ class ProductsController extends Controller
                 //  4. null — Vue card renders the themed SVG placeholder.
                 $image = null;
 
+                // Flagged pick — but skip when the image URL is on a host
+                // we know hotlink-blocks (certified-pep serves 403 to any
+                // request without a valid Referer from their own site).
                 $flagged = Product::visible()
                     ->where('status', 'active')
                     ->where('product_category_id', $category->id)
                     ->where('is_peptide_thumb', true)
                     ->whereNotNull('image_url')
                     ->where('image_url', '!=', '')
+                    ->where('image_url', 'not like', '%certified-pep.com%')
                     ->first();
 
                 if ($flagged) {
@@ -187,16 +191,21 @@ class ProductsController extends Controller
                     // placeholder because the arbitrary ->first() picked
                     // products whose image_url was blocked / needed auth /
                     // 403'd from outside the vendor's own site).
+                    // Reliable-host list — verified externally-serveable
+                    // as of Sep 1. NOTE: certified-pep.com images 403 to
+                    // external requests (hotlink protection) even though
+                    // they're on WordPress uploads paths, so we exclude
+                    // certified-pep here AND put /wp-content/uploads/
+                    // AFTER an explicit exclusion of that host.
                     $reliablePatterns = [
-                        '%certified-pep.com%',
                         '%nurapeptide.com%',
                         '%instantpeptides.com%',
                         '%certapeptides.com%',
                         '%peptidegiants.com%',
                         '%cdn11.bigcommerce.com%',
                         '%cdn.shopify.com%',
-                        '%/wp-content/uploads/%',
                         '%.supabase.co%',
+                        '%myoasislabs.com/wp-content/uploads/%',
                     ];
                     $sample = Product::visible()
                         ->where('status', 'active')
@@ -210,12 +219,14 @@ class ProductsController extends Controller
                     // Fall back to any visible product with an image if
                     // no reliable-host match exists (e.g. small compound
                     // category where every vendor's on their own domain).
+                    // Same certified-pep exclusion applies.
                     if (!$sample) {
                         $sample = Product::visible()
                             ->where('status', 'active')
                             ->where('product_category_id', $category->id)
                             ->whereNotNull('image_url')
                             ->where('image_url', '!=', '')
+                            ->where('image_url', 'not like', '%certified-pep.com%')
                             ->first();
                     }
                     $image = $sample ? $sample->image_url : null;
