@@ -255,20 +255,20 @@ class BecomeVendorController extends Controller
             // No email-verification flow for vendors — the admin verifies
             // them manually during the approval step instead.
 
-            // Send welcome / "application received" email
+            // Emails are QUEUED, not sent inline. Previously ->send() blocked
+            // the request on Sendlayer's HTTP round-trip x2 which could take
+            // 20-30s when their API was slow — long enough to time out nginx
+            // and leave applicants stuck on a "Creating…" spinner (JP@Alpha
+            // Peptides reported Aug 31 2026). Queue via database driver
+            // (QUEUE_CONNECTION=database) — the worker handles the mail
+            // seconds later without holding the response.
+            $locationName = isset($validated['country']) ? Location::find($validated['country'])?->name : null;
             try {
-                Mail::to($validated['email'])->send(new VendorWelcomeEmail(
+                Mail::to($validated['email'])->queue(new VendorWelcomeEmail(
                     companyName: $validated['companyName'],
                     email: $validated['email'],
                 ));
-            } catch (\Throwable $e) {
-                \Log::warning('Failed to send vendor welcome email', ['email' => $validated['email'], 'error' => $e->getMessage()]);
-            }
-
-            // Notify admin of new vendor signup
-            try {
-                $locationName = isset($validated['country']) ? Location::find($validated['country'])?->name : null;
-                Mail::to('info@peptidemap.com')->send(new NewVendorNotification(
+                Mail::to('info@peptidemap.com')->queue(new NewVendorNotification(
                     brand: $brand,
                     contactEmail: $validated['email'],
                     website: $validated['website'] ?? '',
@@ -277,7 +277,7 @@ class BecomeVendorController extends Controller
                     description: $validated['companyDescription'] ?? null,
                 ));
             } catch (\Throwable $e) {
-                \Log::warning('Failed to send admin vendor notification', ['brand' => $brand->id, 'error' => $e->getMessage()]);
+                \Log::warning('Failed to queue vendor signup emails', ['brand' => $brand->id, 'error' => $e->getMessage()]);
             }
 
             // Stash the brand details in session so the confirmation page
