@@ -1,6 +1,6 @@
 <template>
     <div
-      class="bg-white border border-gray-100 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all cursor-pointer overflow-hidden group relative"
+      class="bg-white border border-gray-100 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all cursor-pointer overflow-hidden group relative flex flex-col h-full"
       @click="handleClick"
     >
       <!-- Wishlist heart — top-right, layered above image -->
@@ -11,7 +11,7 @@
       <!-- Top Section: Product Image — object-contain so vials/boxes fit
            inside the card without cropping. Light bg so transparent PNGs
            don't disappear, with a gentle hover scale. -->
-      <div class="aspect-square bg-gray-50 p-3 flex items-center justify-center">
+      <div class="aspect-square bg-gray-50 p-3 flex items-center justify-center overflow-hidden">
         <img
           v-if="imageUrl && !hasError"
           :src="imageUrl"
@@ -20,7 +20,7 @@
           loading="lazy"
           @error="onError"
         />
-        <div v-else>
+        <div v-else class="w-full h-full flex items-center justify-center">
           <svg
             class="w-full h-full flex items-center justify-center"
             viewBox="0 0 200 200"
@@ -44,10 +44,14 @@
         </div>
       </div>
   
-      <!-- Bottom Section: Product Information -->
-      <div class="p-4">  
-        <!-- Product Title + Type chip -->
-        <div class="flex items-start gap-1.5 mb-2">
+      <!-- Bottom Section: Product Information. flex-col + flex-1 +
+           bottom-aligned price block keeps card heights consistent
+           across a mixed-discount grid (Julia flagged Sep 1: images
+           bursting card bounds + heights all over the place). -->
+      <div class="p-4 flex flex-col flex-1">
+        <!-- Product Title + Type chip. min-h reserves 2 lines even when
+             the title fits on one so cards line up. -->
+        <div class="flex items-start gap-1.5 mb-2 min-h-[2.5rem]">
           <h3 class="text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 min-w-0">
             {{ name }}
           </h3>
@@ -70,8 +74,11 @@
           </span>
         </div>
   
-        <!-- Price -->
-        <div>
+        <!-- Price — mt-auto pins to bottom + min-h reserves the full
+             3-line discount block so undiscounted cards get the price
+             bottom-aligned inside the reserved space. Buttons/prices
+             line up across a mixed-discount grid. -->
+        <div class="mt-auto min-h-[74px] flex flex-col justify-end">
           <template v-if="discountedPrice">
             <div class="flex items-baseline gap-2">
               <span class="text-[11px] uppercase tracking-wide text-gray-700 font-semibold leading-tight">Retail</span>
@@ -82,7 +89,7 @@
             </div>
             <div class="text-xl text-emerald-700 font-bold leading-tight">${{ discountedPrice }}</div>
           </template>
-          <div v-else class="text-lg text-gray-900">${{ displayPrice }}</div>
+          <div v-else class="text-xl text-gray-900 font-semibold leading-tight">${{ displayPrice }}</div>
         </div>
       </div>
     </div>
