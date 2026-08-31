@@ -1522,8 +1522,11 @@ const handleLogoUpload = async (event) => {
 
   try {
     const optimized = await compressLogo(file);
-    if (optimized.size > 3_500_000) {
-      alert('Logo is still too large after compression. Please use a simpler PNG under 3.5 MB.');
+    // Hard cap sits just under nginx's 5 MB client_max_body_size so a
+    // logo that would otherwise trigger a raw 413 gets caught here
+    // with a plain-English message instead.
+    if (optimized.size > 4_500_000) {
+      alert('That logo is too large to upload. Please export it at a smaller size (500 × 500 is plenty for our storefront) and try again.');
       event.target.value = '';
       formData.value.logoFile = null;
       return;
