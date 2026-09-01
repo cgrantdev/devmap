@@ -3,141 +3,70 @@
     @click="handleClick"
     class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group relative flex flex-col h-full"
   >
-    <!-- Top Section: Product Image. aspect-square + overflow-hidden
-         guarantees the container is exactly a square regardless of the
-         image's natural aspect ratio — some vendor product photos are
-         portrait/tall (Julia Sep 1: IDUN vial image was bursting the
-         card and forcing the whole grid row to double-height). -->
-    <div class="aspect-square bg-gradient-to-br from-blue-50 to-purple-50 p-6 border-b border-gray-200 flex items-center justify-center overflow-hidden">
+    <!-- Top Section: Product Image. aspect-[4/3] (was square) so cards
+         aren't dominated by empty gradient when images fail to load. -->
+    <div class="aspect-[4/3] bg-gradient-to-br from-blue-50 to-purple-50 p-4 border-b border-gray-200 flex items-center justify-center overflow-hidden">
       <img
         v-if="imageUrl && !hasError"
         :src="imageUrl"
         :alt="name"
-        class="w-full h-full object-contain rounded-lg flex items-center justify-center select-none"
+        class="w-full h-full object-contain select-none"
         loading="lazy"
         @error="onError"
       />
-      <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-        <svg
-          class="w-32 h-40"
-          viewBox="0 0 80 120"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <!-- Vial Body -->
-          <rect x="20" y="20" width="40" height="80" rx="2" fill="white" stroke="#9CA3AF" stroke-width="1.5"/>
-          
-          <!-- Vial Cap -->
-          <rect x="18" y="15" width="44" height="8" rx="1" fill="#4B5563"/>
-          
-          <!-- Liquid (fills ~2/3) -->
-          <rect x="22" y="60" width="36" height="36" rx="1" fill="#93C5FD"/>
-          
-          <!-- Label on vial -->
-          <rect x="26" y="70" width="28" height="16" rx="1" fill="white" opacity="0.9"/>
-          <line x1="28" y1="74" x2="52" y2="74" stroke="#9CA3AF" stroke-width="0.5"/>
-          <line x1="28" y1="78" x2="52" y2="78" stroke="#9CA3AF" stroke-width="0.5"/>
-          <line x1="28" y1="82" x2="52" y2="82" stroke="#9CA3AF" stroke-width="0.5"/>
-          
-          <!-- Volume tick marks on right side -->
-          <line x1="62" y1="30" x2="65" y2="30" stroke="#4B5563" stroke-width="1"/>
-          <line x1="62" y1="45" x2="65" y2="45" stroke="#4B5563" stroke-width="1"/>
-          <line x1="62" y1="60" x2="65" y2="60" stroke="#4B5563" stroke-width="1"/>
-          <line x1="62" y1="75" x2="65" y2="75" stroke="#4B5563" stroke-width="1"/>
-          <line x1="62" y1="90" x2="65" y2="90" stroke="#4B5563" stroke-width="1"/>
-        </svg>
-      </div>
+      <svg
+        v-else
+        class="w-20 h-24 text-gray-300"
+        viewBox="0 0 80 120"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect x="20" y="20" width="40" height="80" rx="2" fill="white" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="18" y="15" width="44" height="8" rx="1" fill="currentColor"/>
+        <rect x="22" y="60" width="36" height="36" rx="1" fill="#BFDBFE"/>
+        <rect x="26" y="70" width="28" height="16" rx="1" fill="white" opacity="0.9"/>
+      </svg>
     </div>
 
-    <!-- Bottom Section: Product Information. flex-col + flex-1 lets the
-         "View Product" button push to the bottom via mt-auto so buttons
-         align across a row regardless of product-name / price-block height. -->
-    <div class="p-4 flex flex-col flex-1">
-      <!-- Category Tag -->
-      <!-- <div class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs mb-2">
-        {{ categoryName }}
-      </div> -->
-
-      <!-- Product Title + Type chip. min-h reserves 2 lines even when the
-           title fits on one so cards line up in a grid. -->
-      <div class="flex items-start gap-1.5 mb-1 min-h-[2.5rem]">
-        <h3 class="text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 min-w-0">
+    <!-- Bottom Section: tighter padding + condensed price block. -->
+    <div class="p-3 flex flex-col flex-1">
+      <!-- Product name + optional type chip. min-h-[2.5rem] reserves 2
+           lines so cards line up when some names wrap and some don't. -->
+      <div class="flex items-start gap-1.5 min-h-[2.5rem]">
+        <h3 class="text-[13px] font-semibold text-gray-900 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors flex-1 min-w-0">
           {{ name }}
         </h3>
         <span
           v-if="typeChip"
-          :class="['flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold leading-tight mt-0.5', typeChip.classes]"
+          :class="['flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold leading-tight', typeChip.classes]"
         >{{ typeChip.label }}</span>
       </div>
 
-      <!-- Brand Name -->
-      <p class="text-xs text-gray-500 mb-2">
-        {{ brandName || 'Unknown Brand' }}
-      </p>
+      <p class="text-[11px] text-gray-500 mt-0.5 truncate">{{ brandName || 'Unknown Brand' }}</p>
 
-      <!-- Specification Tags -->
-      <!-- <div class="flex items-center gap-2 mb-2 text-xs text-gray-600">
-        <span v-if="purity" class="bg-green-50 text-green-700 px-2 py-0.5 rounded">
-          {{ purity }}% Pure
-        </span>
-        <span v-if="sizeDisplay" class="bg-gray-100 text-gray-700 px-2 py-0.5 rounded">
-          {{ sizeDisplay }}
-        </span>
-      </div> -->
-
-      <!-- Stock Status -->
-      <!-- <div class="mb-3">
-        <div
-          class="inline-flex items-center gap-1.5 bg-green-50 text-green-700 border-green-200 border rounded-full text-xs px-2 py-1"
-          :class="isInStock ? 'border-green-200 text-green-700' : 'border-red-200 text-red-700'"
-        >
-          <div 
-            class="bg-green-500 w-1.5 h-1.5 rounded-full animate-pulse"
-            :class="isInStock ? 'bg-green-500' : 'bg-red-500'"
-          ></div>
-          <span class="font-medium">
-            {{ stockStatus }}
-          </span>
-        </div>
-      </div> -->
-
-      <!-- Price — min-h reserves the full 3-line discount block so a
-           mixed grid (some products discounted, some not) still has
-           buttons that start at the same Y. Undiscounted cards get
-           the big price bottom-aligned inside the reserved space so
-           the button below still sits at the same height.
-           Julia flagged mis-alignment on the /compare grid Aug 2026. -->
-      <div class="mb-3 min-h-[74px] flex flex-col justify-end">
+      <!-- Price — condensed. Discount branch: big new price + strikethrough
+           retail inline + tiny 'with code PMAP' underline. Undiscounted:
+           just the price. min-h keeps buttons aligned across a mixed grid. -->
+      <div class="mt-2 mb-2 min-h-[46px] flex flex-col justify-end">
         <template v-if="discountedPrice">
-          <div class="flex items-baseline gap-2">
-            <span class="text-[11px] uppercase tracking-wide text-gray-700 font-semibold leading-tight">Retail</span>
-            <span class="text-base text-gray-700 line-through leading-tight">${{ displayPrice }}</span>
+          <div class="flex items-baseline gap-2 flex-wrap">
+            <span class="text-lg font-bold text-emerald-700 leading-none">${{ discountedPrice }}</span>
+            <span class="text-[12px] text-gray-400 line-through leading-none">${{ displayPrice }}</span>
           </div>
-          <div class="text-[11px] uppercase tracking-wide text-emerald-700 font-semibold mt-1.5 leading-tight">
-            Price with code <span class="ui-mono">{{ effectiveCouponCode }}</span>
+          <div class="text-[10px] uppercase tracking-wide text-emerald-700 font-semibold mt-1 leading-none">
+            with code <span class="ui-mono">{{ effectiveCouponCode }}</span>
           </div>
-          <div class="text-xl text-emerald-700 font-bold leading-tight">${{ discountedPrice }}</div>
         </template>
-        <div v-else class="text-xl text-gray-900 font-semibold leading-tight">
-          ${{ displayPrice }}
-        </div>
+        <div v-else class="text-lg font-bold text-gray-900 leading-none">${{ displayPrice }}</div>
       </div>
 
-      <!-- View Details Button — mt-auto pushes to bottom so it aligns
-           across cards in a grid regardless of price-block or title height. -->
-      <div class="flex gap-2 mt-auto">
-        <button
-          @click="handleClick"
-          class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm flex items-center justify-center gap-2 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart w-4 h-4 flex-shrink-0" aria-hidden="true">
-            <circle cx="8" cy="21" r="1"></circle>
-            <circle cx="19" cy="21" r="1"></circle>
-            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-          </svg>
-          View Product
-        </button>
-      </div>
+      <button
+        @click="handleClick"
+        class="mt-auto h-8 rounded bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
+      >
+        View Product
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </button>
     </div>
   </div>
 </template>
