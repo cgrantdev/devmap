@@ -9,7 +9,7 @@
           ? 'bg-white/10 border border-white/15 text-white hover:bg-white/15'
           : 'border border-[color:var(--color-hairline)] bg-white text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)]',
       ]"
-      :aria-label="location ? `Filtering by ${location}` : 'Filter by vendor location'"
+      :aria-label="location ? `Filtering by ships to ${location}` : 'Filter by shipping destination'"
     >
       <img
         v-if="selectedCode"
@@ -40,7 +40,7 @@
         class="absolute right-0 mt-2 w-64 rounded-[12px] bg-white border border-[color:var(--color-hairline)] shadow-[var(--shadow-lg)] overflow-hidden z-50"
       >
         <div class="px-3 py-2 border-b border-[color:var(--color-hairline)] text-[10px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">
-          Vendors based in
+          Ships to
         </div>
         <div class="max-h-80 overflow-y-auto py-1">
           <button

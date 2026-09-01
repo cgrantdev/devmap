@@ -262,7 +262,7 @@ class BecomeVendorController extends Controller
             // country appears in the header CountrySelector immediately
             // instead of waiting up to 10 min. Keyed to match
             // HandleInertiaRequests::share().
-            Cache::forget('site_locations_v1');
+            Cache::forget('site_locations_v2');
 
             // No email-verification flow for vendors — the admin verifies
             // them manually during the approval step instead.

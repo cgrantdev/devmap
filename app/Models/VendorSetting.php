@@ -15,7 +15,7 @@ class VendorSetting extends Model
     // HandleInertiaRequests::share().
     protected static function booted(): void
     {
-        $bust = fn () => Cache::forget('site_locations_v1');
+        $bust = fn () => Cache::forget('site_locations_v2');
         static::saved($bust);
         static::deleted($bust);
     }

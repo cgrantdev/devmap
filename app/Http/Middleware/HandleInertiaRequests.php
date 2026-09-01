@@ -97,11 +97,18 @@ class HandleInertiaRequests extends Middleware
             // Distinct vendor locations with live-inventory counts, powering the
             // global location dropdown in Header.vue. Cached 10min — this shape
             // rarely changes and the query joins products→brands→vendor_settings.
-            'site_locations' => fn () => Cache::remember('site_locations_v1', 600, function () {
+            // Ships-to counts (Sep 1 2026 — was HQ-location before). Uses
+            // the vendor_ships_to_locations pivot so a US-based vendor
+            // shipping to CA + UK counts in all three buckets. Falls back
+            // to HQ location for vendors that never set a ships-to list
+            // (migration backfilled from location_id so they should have one).
+            // Cache key bumped to v2 to force fresh compute post-schema change.
+            'site_locations' => fn () => Cache::remember('site_locations_v2', 600, function () {
                 return Product::visible()
                     ->join('brands', 'products.brand_id', '=', 'brands.id')
                     ->join('vendor_settings', 'vendor_settings.brand_id', '=', 'brands.id')
-                    ->join('locations', 'locations.id', '=', 'vendor_settings.location_id')
+                    ->join('vendor_ships_to_locations', 'vendor_ships_to_locations.vendor_setting_id', '=', 'vendor_settings.id')
+                    ->join('locations', 'locations.id', '=', 'vendor_ships_to_locations.location_id')
                     ->selectRaw('locations.name as name, COUNT(DISTINCT brands.id) as vendor_count')
                     ->groupBy('locations.name')
                     ->orderByDesc('vendor_count')
