@@ -447,11 +447,22 @@
                 ></textarea>
               </div>
 
-              <!-- Third-party review-platform fields removed 2026-08-27:
-                   we don't advertise competitor review sites during
-                   onboarding. Existing vendors keep their platform URLs
-                   in the DB; import commands (reviews:import-reviews-io,
-                   reviews:import-pepreviewpro) still work via admin. -->
+              <!-- Review platform URLs — compact reintroduction Sep 1.
+                   URLs are used ONLY to import reviews server-side; no
+                   badges, logos, or outbound links to these platforms
+                   appear anywhere on our site (removed 2026-08-27 for
+                   the same reason). -->
+              <details class="rounded-lg border border-slate-200 bg-slate-50">
+                <summary class="cursor-pointer px-4 py-2.5 text-[13px] font-medium text-slate-700 hover:text-slate-900 select-none">
+                  Review platform URLs <span class="text-slate-400 font-normal">— optional, we pull your reviews to display on our site</span>
+                </summary>
+                <div class="px-4 pb-3 pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input v-model="formData.trustpilotUrl" type="url" placeholder="Trustpilot URL" class="h-9 px-3 text-[12px] border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
+                  <input v-model="formData.googleReviewsUrl" type="url" placeholder="Google Reviews URL" class="h-9 px-3 text-[12px] border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
+                  <input v-model="formData.reviewsIoUrl" type="url" placeholder="Reviews.io URL" class="h-9 px-3 text-[12px] border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
+                  <input v-model="formData.pepreviewproUrl" type="url" placeholder="PepReviewPro URL" class="h-9 px-3 text-[12px] border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
+                </div>
+              </details>
 
               <!-- Payment Methods Accepted -->
               <div>

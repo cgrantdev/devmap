@@ -209,6 +209,23 @@
               <input v-model="editForm.banner_image_url" type="url" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
             </FormField>
           </FormSection>
+          <!-- Review platform URLs — same use as onboarding form. Server
+               imports reviews via these; no outbound links show on the
+               public site. -->
+          <FormSection title="Review Platforms" :columns="2">
+            <FormField label="Trustpilot URL" hint="For review import only — no link to Trustpilot shown on our site">
+              <input v-model="editForm.trustpilot_url" type="url" placeholder="https://www.trustpilot.com/review/…" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+            <FormField label="Google Reviews URL">
+              <input v-model="editForm.google_reviews_url" type="url" placeholder="https://www.google.com/…" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+            <FormField label="Reviews.io URL">
+              <input v-model="editForm.reviews_io_url" type="url" placeholder="https://www.reviews.io/company-reviews/store/…" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+            <FormField label="PepReviewPro URL">
+              <input v-model="editForm.pepreviewpro_url" type="url" placeholder="https://pepreviewpro.com/store/…" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
           <FormSection title="Affiliate Tracking" :columns="2">
             <FormField label="Affiliate URL Template" hint="Placeholders: {product_url}, {slug}, {id}, {affiliate_tag}">
               <input v-model="editForm.affiliate_url_template" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] ui-mono focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" placeholder="https://vendor.com/{slug}?ref={affiliate_tag}" />
@@ -486,6 +503,10 @@ const editForm = useForm({
   founded_year: props.vendor?.settings?.founded_year || null,
   coupon_code: props.vendor?.settings?.coupon_code || '',
   coupon_discount_percent: props.vendor?.settings?.coupon_discount_percent ?? null,
+  trustpilot_url: props.vendor?.settings?.trustpilot_url || '',
+  google_reviews_url: props.vendor?.settings?.google_reviews_url || '',
+  reviews_io_url: props.vendor?.settings?.reviews_io_url || '',
+  pepreviewpro_url: props.vendor?.settings?.pepreviewpro_url || '',
   // Boost state — mirrored from server. Not submitted with the main
   // form; the boost has its own POST endpoint.
   coupon_boost_active: props.vendor?.settings?.coupon_boost_active ?? false,

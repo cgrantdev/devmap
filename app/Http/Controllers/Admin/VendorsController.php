@@ -223,6 +223,12 @@ class VendorsController extends Controller
             'return_policy' => 'nullable|string|max:5000',
             'business_hours' => 'nullable|string|max:255',
             'banner_image_url' => 'nullable|url|max:500',
+            // Review platform URLs — used only to import external reviews;
+            // no outbound links to these platforms show on the public site.
+            'trustpilot_url' => 'nullable|url|max:512',
+            'google_reviews_url' => 'nullable|url|max:512',
+            'reviews_io_url' => 'nullable|url|max:512',
+            'pepreviewpro_url' => 'nullable|url|max:512',
             'top_vendor' => 'nullable|boolean',
             'featured' => 'nullable|boolean',
             'is_partner' => 'nullable|boolean',
@@ -341,6 +347,10 @@ class VendorsController extends Controller
                 'coupon_discount_previous_percent' => $brand->vendorSetting->coupon_discount_previous_percent !== null
                     ? (float) $brand->vendorSetting->coupon_discount_previous_percent
                     : null,
+                'trustpilot_url' => $brand->vendorSetting->trustpilot_url,
+                'google_reviews_url' => $brand->vendorSetting->google_reviews_url,
+                'reviews_io_url' => $brand->vendorSetting->reviews_io_url,
+                'pepreviewpro_url' => $brand->vendorSetting->pepreviewpro_url,
                 'shipping_info' => $brand->vendorSetting->shipping_info,
                 'return_policy' => $brand->vendorSetting->return_policy,
                 'business_hours' => $brand->vendorSetting->business_hours,
@@ -425,6 +435,12 @@ class VendorsController extends Controller
             'return_policy' => 'nullable|string|max:5000',
             'business_hours' => 'nullable|string|max:255',
             'banner_image_url' => 'nullable|url|max:500',
+            // Review platform URLs — used only to import external reviews;
+            // no outbound links to these platforms show on the public site.
+            'trustpilot_url' => 'nullable|url|max:512',
+            'google_reviews_url' => 'nullable|url|max:512',
+            'reviews_io_url' => 'nullable|url|max:512',
+            'pepreviewpro_url' => 'nullable|url|max:512',
             'top_vendor' => 'nullable|boolean',
             'featured' => 'nullable|boolean',
             'is_partner' => 'nullable|boolean',
@@ -528,6 +544,12 @@ class VendorsController extends Controller
         $settings->return_policy = $validated['return_policy'] ?? $settings->return_policy;
         $settings->business_hours = $validated['business_hours'] ?? $settings->business_hours;
         $settings->banner_image_url = $validated['banner_image_url'] ?? $settings->banner_image_url;
+        // Review URLs — array_key_exists so blanking the field clears the DB value.
+        foreach (['trustpilot_url', 'google_reviews_url', 'reviews_io_url', 'pepreviewpro_url'] as $rf) {
+            if (array_key_exists($rf, $validated)) {
+                $settings->$rf = $validated[$rf];
+            }
+        }
         $settings->top_vendor = $validated['top_vendor'] ?? $settings->top_vendor ?? false;
         $settings->featured = $validated['featured'] ?? $settings->featured ?? false;
         $settings->is_partner = $validated['is_partner'] ?? $settings->is_partner ?? false;

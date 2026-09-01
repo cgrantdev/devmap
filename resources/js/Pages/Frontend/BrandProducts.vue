@@ -375,24 +375,16 @@
                 <p class="text-gray-500">No reviews yet</p>
               </div>
 
-              <!-- External reviews. Sourced from Trustpilot, Reviews.io, etc.
-                   via the per-source import commands. Grouped visually so the
-                   "via Trustpilot" line matches what the reader clicks through
-                   to; per-source attribution required by both platforms' ToS. -->
-              <div v-for="grp in externalReviewGroups" :key="grp.source" class="mt-8">
-                <div class="flex items-center gap-2 mb-4">
-                  <h3 class="text-lg text-gray-900">More reviews from {{ grp.label }}</h3>
-                  <a
-                    v-if="grp.hubUrl"
-                    :href="grp.hubUrl"
-                    target="_blank"
-                    rel="noopener nofollow"
-                    class="text-[12px] text-blue-600 hover:underline"
-                  >View all on {{ grp.label }} ↗</a>
-                </div>
+              <!-- Imported reviews — merged into one block, no per-platform
+                   grouping, no outbound links. Colin Sep 1: don't give users
+                   any way to leave our site to view reviews elsewhere. Reviews
+                   are still imported from Trustpilot / Reviews.io / PepReviewPro
+                   for content, but attribution is stripped from the UI. -->
+              <div v-if="externalReviewsFlat.length" class="mt-8">
+                <h3 class="text-lg text-gray-900 mb-4">Verified customer reviews</h3>
                 <div class="space-y-4">
                   <div
-                    v-for="er in grp.reviews"
+                    v-for="er in externalReviewsFlat"
                     :key="`ext-${er.id}`"
                     class="bg-white border border-gray-200 rounded-lg p-5"
                   >
@@ -412,33 +404,7 @@
                     </div>
                     <div v-if="er.title" class="text-sm font-semibold text-gray-900 mb-1">{{ er.title }}</div>
                     <p v-if="er.body" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{{ er.body }}</p>
-                    <div class="mt-3 flex items-center gap-2 text-[11px] text-gray-400">
-                      <span>via {{ grp.label }}</span>
-                      <a
-                        v-if="er.source_url"
-                        :href="er.source_url"
-                        target="_blank"
-                        rel="noopener nofollow"
-                        class="text-blue-500 hover:underline"
-                      >source ↗</a>
-                    </div>
                   </div>
-                </div>
-                <!-- Under each source's review block: link-only footers for
-                     the sources we can't scrape reviews from directly
-                     (Google needs their Places API, PepReviewPro renders
-                     via JS widget). Users still get a click-through path. -->
-                <div v-if="linkOnlySources.length" class="mt-4 pt-4 border-t border-gray-200 text-[12px] text-gray-600">
-                  <span class="font-semibold">See more reviews on:</span>
-                  <template v-for="(s, i) in linkOnlySources" :key="s.key">
-                    <a
-                      :href="s.url"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="ml-2 text-blue-600 hover:underline"
-                    >{{ s.label }} ↗</a>
-                    <span v-if="i < linkOnlySources.length - 1" class="text-gray-400">·</span>
-                  </template>
                 </div>
               </div>
             </section>
@@ -1247,6 +1213,12 @@ const EXTERNAL_SOURCE_META = {
   google:       { label: 'Google Reviews', urlKey: 'google_reviews_url' },
   pepreviewpro: { label: 'PepReviewPro',  urlKey: 'pepreviewpro_url' },
 }
+// Flat, sorted merge of every imported review — no per-source grouping,
+// no outbound links (Colin Sep 1: keep users on our site).
+const externalReviewsFlat = computed(() => {
+  const rows = Array.isArray(props.externalReviews) ? [...props.externalReviews] : []
+  return rows.sort((a, b) => (String(b.published_at || '')).localeCompare(String(a.published_at || '')))
+})
 const externalReviewGroups = computed(() => {
   const buckets = {}
   for (const r of props.externalReviews || []) {
