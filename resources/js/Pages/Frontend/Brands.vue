@@ -77,6 +77,36 @@
             </svg>
             Top vendors
           </button>
+
+          <!-- Verified badge + USP filters — Sep 1. cGMP + Testing require
+               an approved VendorCertificationClaim; US Made is a self-declared
+               USP that vendors can toggle in their storefront. -->
+          <span class="text-[color:var(--color-hairline)] text-sm mx-1">|</span>
+          <button
+            v-for="f in verifiedFilters"
+            :key="f.value"
+            @click="toggleVerified(f.value)"
+            :class="[
+              'ui-focus h-8 px-3.5 rounded-full text-[12px] font-semibold transition-all duration-200 border flex items-center gap-1.5',
+              selectedFilters.verified === f.value
+                ? 'bg-emerald-600 text-white border-emerald-600'
+                : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-emerald-400 hover:text-[color:var(--color-ink)]',
+            ]"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            {{ f.label }}
+          </button>
+          <button
+            @click="toggleUsp('us_manufactured')"
+            :class="[
+              'ui-focus h-8 px-3.5 rounded-full text-[12px] font-semibold transition-all duration-200 border flex items-center gap-1.5',
+              selectedFilters.usp === 'us_manufactured'
+                ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
+                : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)]',
+            ]"
+          >
+            🇺🇸 US Made
+          </button>
         </div>
       </div>
     </section>
@@ -244,7 +274,17 @@ const selectedFilters = ref({
   location: props.filters?.location || '',
   minRating: props.filters?.min_rating || '',
   topVendorsOnly: props.filters?.top_vendors_only === '1',
+  verified: props.filters?.verified || '',
+  usp: props.filters?.usp || '',
 })
+
+// Verified filters — only exposed after certification claims exist for
+// that type. Colin: "US Made" stays a self-declared USP (no proof
+// process); cGMP + testing require verified upload.
+const verifiedFilters = [
+  { label: 'cGMP Verified', value: 'cgmp' },
+  { label: '7+ Tested', value: 'testing_7x' },
+]
 
 const locationFilters = [
   { label: 'All', value: '' },
@@ -273,7 +313,11 @@ const filteredBrands = computed(() => {
 })
 
 const hasActiveFilters = computed(() =>
-  searchQuery.value || selectedFilters.value.location || selectedFilters.value.topVendorsOnly
+  searchQuery.value
+  || selectedFilters.value.location
+  || selectedFilters.value.topVendorsOnly
+  || selectedFilters.value.verified
+  || selectedFilters.value.usp
 )
 
 function handleSortChange(e) {
@@ -297,9 +341,19 @@ function toggleTopVendors() {
   navigate({})
 }
 
+function toggleVerified(value) {
+  selectedFilters.value.verified = selectedFilters.value.verified === value ? '' : value
+  navigate({})
+}
+
+function toggleUsp(value) {
+  selectedFilters.value.usp = selectedFilters.value.usp === value ? '' : value
+  navigate({})
+}
+
 function clearFilters() {
   searchQuery.value = ''
-  selectedFilters.value = { location: '', minRating: '', topVendorsOnly: false }
+  selectedFilters.value = { location: '', minRating: '', topVendorsOnly: false, verified: '', usp: '' }
   router.visit('/brands', { preserveState: true, preserveScroll: true })
 }
 
@@ -316,6 +370,8 @@ function navigate(overrides = {}) {
   if (selectedFilters.value.location) params.set('location', selectedFilters.value.location)
   if (selectedFilters.value.minRating) params.set('min_rating', selectedFilters.value.minRating)
   if (selectedFilters.value.topVendorsOnly) params.set('top_vendors_only', '1')
+  if (selectedFilters.value.verified) params.set('verified', selectedFilters.value.verified)
+  if (selectedFilters.value.usp) params.set('usp', selectedFilters.value.usp)
 
   router.visit(`/brands?${params.toString()}`, { preserveState: true, preserveScroll: true })
 }

@@ -81,6 +81,30 @@ class BrandsController extends Controller
                 $vendorSettingQuery->where('top_vendor', true);
             });
         }
+
+        // USP filter — filter by a specific self-declared unique selling
+        // point. Matches on vendor_settings.usps JSON array containing
+        // the key. Only exposed for USPs whose meaning doesn't require
+        // verification (US made, ships internationally). Manufacturing
+        // and testing tags below have their own verified filter.
+        if ($request->has('usp') && is_string($request->usp) && $request->usp !== '') {
+            $uspKey = $request->usp;
+            $query->whereHas('vendorSetting', function ($vs) use ($uspKey) {
+                $vs->whereJsonContains('usps', $uspKey);
+            });
+        }
+
+        // Verified badge filter — cgmp / testing_7x. Only vendors with
+        // an APPROVED VendorCertificationClaim of that type qualify.
+        if ($request->has('verified') && in_array($request->verified, ['cgmp', 'testing_7x'], true)) {
+            $type = $request->verified;
+            $query->whereIn('id', function ($sub) use ($type) {
+                $sub->select('brand_id')
+                    ->from('vendor_certification_claims')
+                    ->where('type', $type)
+                    ->where('status', 'approved');
+            });
+        }
         
         // Apply sorting
         $sortBy = $request->get('sort', 'rating');
@@ -184,6 +208,8 @@ class BrandsController extends Controller
                 'location' => $request->get('location', ''),
                 'min_rating' => $request->get('min_rating', ''),
                 'top_vendors_only' => $request->get('top_vendors_only', '0'),
+                'verified' => $request->get('verified', ''),
+                'usp' => $request->get('usp', ''),
             ],
             'seo' => $seo,
         ]);
