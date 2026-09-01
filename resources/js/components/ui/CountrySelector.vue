@@ -153,6 +153,28 @@ function select(name) {
   applyLocation(name)
 }
 
+// Sync stored location → URL query on first load. Previously the header
+// showed 'Germany' from localStorage but the page URL had no ?location=
+// param, so filters didn't apply and the user saw all 34 vendors instead
+// of just the ones shipping to DE. Runs once per page load; skips if URL
+// already carries the correct value.
+onMounted(() => {
+  if (typeof window === 'undefined') return
+  const stored = (location.value || '').trim()
+  if (!stored) return
+  try {
+    const url = new URL(window.location.href)
+    if (url.searchParams.get('location') === stored) return
+    // Only auto-apply on pages where the server-side location filter runs.
+    // Vendor dashboard / admin pages ignore it, so don't force a reload there.
+    const path = url.pathname
+    const filteredPaths = ['/', '/brands', '/vendors', '/products', '/peptides', '/compare', '/search']
+    const applies = filteredPaths.some(p => path === p || path.startsWith(p + '/'))
+    if (!applies) return
+    applyLocation(stored)
+  } catch {}
+})
+
 function handleClickOutside(e) {
   if (open.value && rootEl.value && !rootEl.value.contains(e.target)) {
     open.value = false
