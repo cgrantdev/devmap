@@ -54,11 +54,31 @@
           </FormSection>
 
           <FormSection title="Location & Details" :columns="2">
-            <FormField label="Location">
+            <FormField label="HQ Location" hint="Vendor's physical location — where they're based.">
               <input v-model="editForm.location" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
             </FormField>
             <FormField label="Founded Year">
               <input v-model.number="editForm.founded_year" type="number" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+            <FormField label="Ships to" hint="Every country this vendor ships to. Drives the /brands location filter — vendors appear under each region they serve." class="md:col-span-2">
+              <div class="flex flex-wrap gap-1.5">
+                <button
+                  v-for="loc in (locations || [])"
+                  :key="loc.id"
+                  type="button"
+                  @click="toggleShipsTo(loc.id)"
+                  :class="[
+                    'inline-flex items-center gap-1 h-8 px-3 rounded-full text-[12px] font-medium border transition-colors',
+                    editForm.ships_to_ids.includes(loc.id)
+                      ? 'bg-slate-800 text-white border-slate-800'
+                      : 'bg-white text-slate-700 border-slate-300 hover:border-slate-500',
+                  ]"
+                >
+                  <svg v-if="editForm.ships_to_ids.includes(loc.id)" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                  {{ loc.name }}
+                </button>
+              </div>
+              <p v-if="!(locations && locations.length)" class="text-xs text-slate-500 italic">No locations configured — add via /admin/locations first.</p>
             </FormField>
           </FormSection>
 
@@ -499,6 +519,12 @@ const editForm = useForm({
   phone_number: props.vendor?.settings?.phone_number || '',
   location_id: props.vendor?.settings?.location_id || null,
   location: props.vendor?.location || '',
+  // Multi-select: which countries this vendor ships to. Backend syncs the
+  // vendor_ships_to_locations pivot on save. Backfilled from HQ location
+  // for existing vendors so no filter regressions.
+  ships_to_ids: Array.isArray(props.vendor?.settings?.ships_to_ids)
+    ? props.vendor.settings.ships_to_ids.slice()
+    : [],
   shop_url: props.vendor?.settings?.shop_url || '',
   founded_year: props.vendor?.settings?.founded_year || null,
   coupon_code: props.vendor?.settings?.coupon_code || '',
@@ -573,6 +599,12 @@ function handleFileChange(event, field) {
     }
     reader.readAsDataURL(file)
   }
+}
+
+function toggleShipsTo(id) {
+  const idx = editForm.ships_to_ids.indexOf(id)
+  if (idx >= 0) editForm.ships_to_ids.splice(idx, 1)
+  else editForm.ships_to_ids.push(id)
 }
 
 // --- Coupon boost handlers ------------------------------------------

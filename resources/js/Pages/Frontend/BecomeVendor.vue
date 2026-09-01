@@ -154,7 +154,8 @@
 
                 <div>
                   <label for="country" class="block text-sm text-slate-700 mb-2">
-                    Country *
+                    HQ Country *
+                    <span class="text-xs text-slate-500 font-normal">where you're based</span>
                   </label>
                   <div class="relative">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400">
@@ -175,9 +176,38 @@
                       >
                         {{ location.name }}
                       </option>
-                    </select>                    
+                    </select>
                   </div>
                 </div>
+              </div>
+
+              <!-- Ships to — multi-select. Different from HQ: a US-based
+                   vendor might ship worldwide; a UK-based vendor might
+                   only ship to UK + EU. Drives the /brands location
+                   filter so vendors show up under each region they serve. -->
+              <div class="mt-4">
+                <label class="block text-sm text-slate-700 mb-2">
+                  Ships to *
+                  <span class="text-xs text-slate-500 font-normal">— every country you can ship orders to. Multi-select.</span>
+                </label>
+                <div class="flex flex-wrap gap-1.5">
+                  <button
+                    v-for="loc in locations"
+                    :key="loc.id"
+                    type="button"
+                    @click="toggleShipsTo(loc.id)"
+                    :class="[
+                      'inline-flex items-center gap-1 h-8 px-3 rounded-full text-[12px] font-medium border transition-colors',
+                      formData.shipsToIds.includes(loc.id)
+                        ? 'bg-slate-800 text-white border-slate-800'
+                        : 'bg-white text-slate-700 border-slate-300 hover:border-slate-500',
+                    ]"
+                  >
+                    <svg v-if="formData.shipsToIds.includes(loc.id)" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                    {{ loc.name }}
+                  </button>
+                </div>
+                <p v-if="fieldErrors.shipsToIds" class="mt-1 text-xs text-rose-600">{{ fieldErrors.shipsToIds }}</p>
               </div>
 
               <!-- Navigation Buttons -->
@@ -1184,6 +1214,8 @@ const formData = ref({
   website: 'https://',
   yearEstablished: '',
   country: '',
+  // Multi-country ships-to. Separate from single-country HQ.
+  shipsToIds: [],
   fullName: '',
   email: '',
   phone: '',
@@ -1520,6 +1552,12 @@ function resetLogo() {
 }
 // ----------------------------------------------------------------------
 
+function toggleShipsTo(id) {
+  const idx = formData.value.shipsToIds.indexOf(id)
+  if (idx >= 0) formData.value.shipsToIds.splice(idx, 1)
+  else formData.value.shipsToIds.push(id)
+}
+
 const handleLogoUpload = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
@@ -1611,6 +1649,7 @@ const handleStep4Submit = () => {
     website: formData.value.website,
     yearEstablished: formData.value.yearEstablished || null,
     country: formData.value.country,
+    shipsToIds: formData.value.shipsToIds,
     
     // Step 2
     fullName: formData.value.fullName,

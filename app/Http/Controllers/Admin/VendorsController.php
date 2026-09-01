@@ -229,6 +229,9 @@ class VendorsController extends Controller
             'google_reviews_url' => 'nullable|url|max:512',
             'reviews_io_url' => 'nullable|url|max:512',
             'pepreviewpro_url' => 'nullable|url|max:512',
+            // Multi-country ships-to list. Syncs the pivot on save.
+            'ships_to_ids' => 'nullable|array',
+            'ships_to_ids.*' => 'integer|exists:locations,id',
             'top_vendor' => 'nullable|boolean',
             'featured' => 'nullable|boolean',
             'is_partner' => 'nullable|boolean',
@@ -351,6 +354,9 @@ class VendorsController extends Controller
                 'google_reviews_url' => $brand->vendorSetting->google_reviews_url,
                 'reviews_io_url' => $brand->vendorSetting->reviews_io_url,
                 'pepreviewpro_url' => $brand->vendorSetting->pepreviewpro_url,
+                'ships_to_ids' => $brand->vendorSetting
+                    ? $brand->vendorSetting->shipsToLocations()->pluck('locations.id')->values()->all()
+                    : [],
                 'shipping_info' => $brand->vendorSetting->shipping_info,
                 'return_policy' => $brand->vendorSetting->return_policy,
                 'business_hours' => $brand->vendorSetting->business_hours,
@@ -441,6 +447,9 @@ class VendorsController extends Controller
             'google_reviews_url' => 'nullable|url|max:512',
             'reviews_io_url' => 'nullable|url|max:512',
             'pepreviewpro_url' => 'nullable|url|max:512',
+            // Multi-country ships-to list. Syncs the pivot on save.
+            'ships_to_ids' => 'nullable|array',
+            'ships_to_ids.*' => 'integer|exists:locations,id',
             'top_vendor' => 'nullable|boolean',
             'featured' => 'nullable|boolean',
             'is_partner' => 'nullable|boolean',
@@ -549,6 +558,15 @@ class VendorsController extends Controller
             if (array_key_exists($rf, $validated)) {
                 $settings->$rf = $validated[$rf];
             }
+        }
+
+        // Sync ships-to pivot when the form submitted the field. Empty
+        // array is a valid state (vendor ships nowhere — hidden from
+        // location filters until they set one).
+        if (array_key_exists('ships_to_ids', $validated)) {
+            // Save the settings row first so it has an id if new
+            if (!$settings->exists) $settings->save();
+            $settings->shipsToLocations()->sync($validated['ships_to_ids'] ?? []);
         }
         $settings->top_vendor = $validated['top_vendor'] ?? $settings->top_vendor ?? false;
         $settings->featured = $validated['featured'] ?? $settings->featured ?? false;

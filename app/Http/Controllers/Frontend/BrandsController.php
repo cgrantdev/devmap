@@ -44,27 +44,24 @@ class BrandsController extends Controller
             });
         }
         
-        // Apply location filter
+        // Apply location filter — now filters on WHERE THE VENDOR SHIPS TO,
+        // not their HQ. Sep 1 2026: Colin: 'less about their location, more
+        // about where they ship too'. Falls back to matching HQ location
+        // for vendors that haven't yet set an explicit ships-to list.
         if ($request->has('location') && $request->location) {
             $locationName = $request->location;
-            // Normalize location names - treat "United States" and "USA" as the same
             $normalizedLocation = $this->normalizeLocationName($locationName);
-            
-            $query->where(function ($q) use ($normalizedLocation) {
-                $q->whereHas('vendorSetting.location', function ($locationQuery) use ($normalizedLocation) {
-                    $locationQuery->where(function ($locQ) use ($normalizedLocation) {
-                        $locQ->where('name', $normalizedLocation)
-                             ->orWhereIn('name', $this->getLocationAliases($normalizedLocation));
-                    });
-                })->orWhereHas('products', function ($productQuery) use ($normalizedLocation) {
-                    $productQuery->visible()
-                        ->where('status', 'active')
-                        ->whereHas('location', function ($locQuery) use ($normalizedLocation) {
-                            $locQuery->where(function ($locQ) use ($normalizedLocation) {
-                                $locQ->where('name', $normalizedLocation)
-                                     ->orWhereIn('name', $this->getLocationAliases($normalizedLocation));
-                            });
-                        });
+            $aliases = array_merge([$normalizedLocation], $this->getLocationAliases($normalizedLocation));
+
+            $query->where(function ($q) use ($aliases) {
+                // Match if the vendor's shipsToLocations includes this country
+                $q->whereHas('vendorSetting.shipsToLocations', function ($locQ) use ($aliases) {
+                    $locQ->whereIn('name', $aliases);
+                })
+                // OR if they still only have a single HQ location set and it matches
+                // (backfilled by the migration, so this is a redundancy safety net).
+                ->orWhereHas('vendorSetting.location', function ($locQ) use ($aliases) {
+                    $locQ->whereIn('name', $aliases);
                 });
             });
         }

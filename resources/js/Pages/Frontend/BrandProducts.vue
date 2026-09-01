@@ -482,8 +482,19 @@
                       <path d="m7.5 4.27 9 5.15"></path>
                     </svg>
                     <div>
-                      <div class="text-xs text-gray-500">Produts</div>
+                      <div class="text-xs text-gray-500">Products</div>
                       <div class="text-sm text-gray-900">{{ products.total }} listed</div>
+                    </div>
+                  </div>
+                  <!-- Ships to — vendor may serve more countries than
+                       just their HQ. Shows as a wrapping chip row. -->
+                  <div v-if="brand.ships_to && brand.ships_to.length" class="flex items-start gap-3">
+                    <svg class="w-4 h-4 text-gray-500 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    <div class="min-w-0 flex-1">
+                      <div class="text-xs text-gray-500 mb-1">Ships to</div>
+                      <div class="flex flex-wrap gap-1">
+                        <span v-for="c in brand.ships_to" :key="c" class="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">{{ c }}</span>
+                      </div>
                     </div>
                   </div>
                 </div>

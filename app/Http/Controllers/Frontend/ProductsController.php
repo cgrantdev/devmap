@@ -1179,6 +1179,11 @@ class ProductsController extends Controller
                 'banner' => $brand->vendorSetting && $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
                 'banner_image_url' => $brand->vendorSetting->banner_image_url ?? null,
                 'location' => $location ? $location->name : null,
+                // Countries the vendor ships to. Separate from `location`
+                // (their HQ). Frontend renders these as a chip row.
+                'ships_to' => $brand->vendorSetting
+                    ? $brand->vendorSetting->shipsToLocations()->pluck('name')->values()->all()
+                    : [],
                 'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
                 'founded_year' => $brand->vendorSetting && $brand->vendorSetting->founded_year ? $brand->vendorSetting->founded_year : null,
                 'tagline' => $brand->vendorSetting->tagline ?? null,

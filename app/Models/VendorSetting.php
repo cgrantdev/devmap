@@ -150,4 +150,20 @@ class VendorSetting extends Model
     {
         return $this->belongsTo(Location::class);
     }
+
+    /**
+     * Countries a vendor ships to (may include or extend beyond their
+     * physical HQ location). Used by the /brands location filter and
+     * the storefront "Ships to" chip row. Backfilled from location_id
+     * on migration so no vendor loses filter hits.
+     */
+    public function shipsToLocations()
+    {
+        return $this->belongsToMany(
+            Location::class,
+            'vendor_ships_to_locations',
+            'vendor_setting_id',
+            'location_id'
+        )->withTimestamps();
+    }
 }

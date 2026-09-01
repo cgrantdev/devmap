@@ -56,6 +56,8 @@ class BecomeVendorController extends Controller
             'website' => ['required', 'url:http,https', 'max:255'],
             'yearEstablished' => 'nullable|integer|min:1800|max:' . date('Y'),
             'country' => 'required|exists:locations,id',
+            'shipsToIds' => 'nullable|array',
+            'shipsToIds.*' => 'integer|exists:locations,id',
 
             // Step 2: Contact Details
             'fullName' => 'required|string|min:2|max:255',
@@ -225,6 +227,16 @@ class BecomeVendorController extends Controller
             }
 
             $settings->save();
+
+            // Sync ships-to pivot. Falls back to just the HQ country if
+            // the vendor didn't multi-select — a US-based vendor who
+            // ticked nothing still gets US in ships_to so /brands
+            // location filters find them.
+            $shipsToIds = $validated['shipsToIds'] ?? [];
+            if (empty($shipsToIds) && !empty($validated['country'])) {
+                $shipsToIds = [(int) $validated['country']];
+            }
+            $settings->shipsToLocations()->sync($shipsToIds);
 
             // Create ScrapingConfig if API keys provided
             if (!empty($validated['apiConsumerKey']) && !empty($validated['apiConsumerSecret'])) {
