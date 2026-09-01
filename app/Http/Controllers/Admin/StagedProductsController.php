@@ -87,6 +87,9 @@ class StagedProductsController extends Controller
     public function promote(ScrapedProduct $stagedProduct, IngestionService $ingestion)
     {
         $product = $ingestion->promote($stagedProduct);
+        if (!$product) {
+            return back()->with('error', 'Rejected by promote guards (no price, or URL is not a product page). See scraped_products status = rejected for the reason.');
+        }
         return back()->with('success', "Promoted to product #{$product->id}");
     }
 
@@ -107,11 +110,17 @@ class StagedProductsController extends Controller
         ]);
 
         $count = 0;
+        $rejected = 0;
         foreach (ScrapedProduct::whereIn('id', $validated['ids'])->get() as $row) {
-            $ingestion->promote($row);
-            $count++;
+            if ($ingestion->promote($row) !== null) {
+                $count++;
+            } else {
+                $rejected++;
+            }
         }
-        return back()->with('success', "Promoted {$count} products.");
+        $msg = "Promoted {$count} product" . ($count === 1 ? '' : 's') . '.';
+        if ($rejected > 0) $msg .= " {$rejected} rejected by pollution guards.";
+        return back()->with('success', $msg);
     }
 
     public function bulkReject(Request $request, IngestionService $ingestion)

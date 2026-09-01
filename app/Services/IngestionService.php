@@ -103,12 +103,52 @@ class IngestionService
     }
 
     /**
+     * URL path patterns we accept as real product pages. Reject anything
+     * else (homepages, /shop landings without a slug, /about, /blog,
+     * /collections roots) — those were the source of the 404 pollution
+     * rows Julia flagged Sep 1 (og:image = vendor logo, no price, name
+     * from og:title like "BPC-157 Capsules - Shop").
+     */
+    private const PRODUCT_URL_PATTERN = '#/(product|products|shop|store|item|p)/[^/?#]+#i';
+
+    public function looksLikeProductUrl(?string $url): bool
+    {
+        if (!$url) return false;
+        return (bool) preg_match(self::PRODUCT_URL_PATTERN, $url);
+    }
+
+    /**
      * Promote a staged product into the live products table.
      * If the staged row already has a product_id, updates the existing product.
      * Otherwise creates a new Product and links it.
+     *
+     * Returns null when the staged row fails a sanity check — it gets
+     * auto-rejected instead so it can't pollute the live products table.
+     * Callers must handle null (StagedProductsController + bulkPromote).
      */
-    public function promote(ScrapedProduct $staged): Product
+    public function promote(ScrapedProduct $staged): ?Product
     {
+        // --- Sanity checks — reject pollution before it lands live -----
+        // Colin Sep 1: "it needs a price for sure … and ya, it should
+        // probably be /products/ /product/ /shop/ that sorta stuff."
+        $hasPrice = ($staged->price !== null && (float) $staged->price > 0)
+            || ($staged->discount_price !== null && (float) $staged->discount_price > 0);
+
+        if (!$hasPrice) {
+            $this->reject($staged, 'No price — scrape pollution guard');
+            return null;
+        }
+
+        // Only accept URLs that look like a product detail page. Homepage,
+        // /shop landing, /about, /blog, etc. all fail this. Skip the check
+        // when the source_url is null (some feeds don't carry it — but that
+        // usually means the row came from an authenticated API where the
+        // shape is trustworthy, e.g. WooCommerce REST).
+        if ($staged->source_url && !$this->looksLikeProductUrl($staged->source_url)) {
+            $this->reject($staged, 'Source URL does not look like a product page: ' . $staged->source_url);
+            return null;
+        }
+
         return DB::transaction(function () use ($staged) {
             // Resolve product_category_id (used only for NEW products — see below):
             //   1. Use the scraping config's category if it pinned one (legacy single-category vendors)
