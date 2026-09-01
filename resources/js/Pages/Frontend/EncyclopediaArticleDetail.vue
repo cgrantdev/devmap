@@ -47,8 +47,11 @@
               <!-- Short TLDR intro — uses overview (the actual compound description) -->
               <p v-if="overviewShort || overview" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">{{ overviewShort || overview }}</p>
 
-              <!-- Vendor availability -->
-              <a v-if="vendorCount > 0" :href="`/compare#${slugify(categoryName || name)}`" class="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
+              <!-- Vendor availability — links to the dedicated per-compound
+                   compare page (/compare/{slug}) with the vendor pricing
+                   table. Previously used /compare#{slug} which just scrolled
+                   nowhere because the index page has no such anchors. -->
+              <a v-if="vendorCount > 0" :href="`/compare/${slug || slugify(categoryName || name)}`" class="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
                 Available from {{ vendorCount }} vendors <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
               </a>
             </div>
