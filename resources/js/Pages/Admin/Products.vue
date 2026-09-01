@@ -438,7 +438,8 @@ const sizeOptions = [
   '1oz', '2oz',
   // Common blend ratios from real vendor listings
   '250mcg/250mcg', '500mcg/500mcg',
-  '5mg/5mg', '10mg/10mg', '13mg/3mg', '50mg/10mg/10mg', '50mg/10mg/10mg/10mg',
+  '5mg/5mg', '10mg/3mg', '10mg/10mg', '12.5mg/2.5mg', '13mg/3mg',
+  '50mg/10mg/10mg', '50mg/10mg/10mg/10mg',
 ]
 
 /**
