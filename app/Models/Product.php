@@ -123,7 +123,15 @@ class Product extends Model
     {
         return $query
             ->where('hidden', false)
-            ->whereHas('brand', fn ($q) => $q->where('is_active', true));
+            ->whereHas('brand', fn ($q) => $q->where('is_active', true))
+            // Exclude $0 / unpriced rows — always scrape pollution
+            // (collection pages, "Shop" listings, blog banners
+            // treated as products). A product with no real price is
+            // useless on a comparison site anyway.
+            ->where(function ($q) {
+                $q->where('price', '>', 0)
+                  ->orWhere('discount_price', '>', 0);
+            });
     }
 
     /**
