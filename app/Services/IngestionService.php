@@ -109,7 +109,10 @@ class IngestionService
      * rows Julia flagged Sep 1 (og:image = vendor logo, no price, name
      * from og:title like "BPC-157 Capsules - Shop").
      */
-    private const PRODUCT_URL_PATTERN = '#/(product|products|shop|store|item|p)/[^/?#]+#i';
+    // Use ~ as the delimiter — the pattern's char class includes # (fragment
+    // separator), which collides with # as the delimiter and produces
+    // 'Unknown modifier' errors at runtime.
+    private const PRODUCT_URL_PATTERN = '~/(product|products|shop|store|item|p)/[^/?#]+~i';
 
     public function looksLikeProductUrl(?string $url): bool
     {
