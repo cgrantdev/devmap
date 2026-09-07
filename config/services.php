@@ -78,7 +78,12 @@ return [
         // Verified property URL. For a domain property, use the sc-domain:
         // form (e.g. "sc-domain:peptidemap.com"); for a URL-prefix property,
         // the exact URL including scheme + trailing slash.
-        'site_url' => env('GSC_SITE_URL', 'https://peptidemap.com/'),
+        // Two acceptable formats:
+        //   'sc-domain:example.com'    — Domain property (all subdomains)
+        //   'https://example.com/'      — URL-prefix property
+        // peptidemap.com is a Domain property (verified via gcloud) so the
+        // default matches. Override with GSC_SITE_URL if you migrate later.
+        'site_url' => env('GSC_SITE_URL', 'sc-domain:peptidemap.com'),
     ],
 
     'discord' => [

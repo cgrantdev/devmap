@@ -57,7 +57,16 @@ class GscClient
         $token = $this->accessToken();
         if (!$token) return null;
 
-        $site = rawurlencode(rtrim(config('services.gsc.site_url'), '/') . '/');
+        // Two GSC property formats: 'sc-domain:example.com' (Domain
+        // property) or 'https://example.com/' (URL-prefix property).
+        // Colin's peptidemap.com is a Domain property (confirmed Sep 6
+        // via gcloud listing) — we encode as-is. URL-prefix values still
+        // get the '/' padding they need. Wrong-format was rendering the
+        // CEO dashboard as all-zeros even after OAuth connect.
+        $raw = trim((string) config('services.gsc.site_url'));
+        $site = str_starts_with($raw, 'sc-domain:')
+            ? rawurlencode($raw)
+            : rawurlencode(rtrim($raw, '/') . '/');
         $url = self::API_BASE . "/sites/{$site}/searchAnalytics/query";
 
         try {
