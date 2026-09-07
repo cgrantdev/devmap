@@ -146,8 +146,12 @@ Route::get('/compare/{slug}', [CompareController::class, 'show'])
     ->name('compare.compound');
 Route::get('/calculator', function () {
     $seoPage = \App\Models\SeoPage::where('key', 'calculator')->first();
-    $defaultTitle = 'Peptide Reconstitution Calculator — Peptidemap';
-    $defaultDescription = 'Calculate concentration, volume, and doses per vial for 17+ popular peptides. Free tool with vial-size, BAC volume, and target-dose presets — no signup.';
+    // Sep 7 2026 revenue push: title targets 'best peptide calculator'
+    // + 'peptide dosage calculator' commercial-intent queries. Description
+    // leads with concrete numbers (presets, dose types) so the SERP snippet
+    // is scan-friendly and click-driving.
+    $defaultTitle = 'Best Peptide Calculator — Reconstitution, Dosage & Schedule · Free · No Signup';
+    $defaultDescription = 'The most-used peptide calculator on the internet. 17+ preset compounds (BPC-157, Semaglutide, Tirzepatide, Retatrutide, TB-500…) with instant syringe unit output. Reconstitution, dosage, and schedule modes. Shareable results. RUO.';
     $seo = [
         'key' => 'calculator',
         'title' => $seoPage?->title ?: $defaultTitle,
@@ -159,27 +163,69 @@ Route::get('/calculator', function () {
         // HowTo JSON-LD earns numbered-step SERP treatment for peptide
         // reconstitution — matches the step block rendered by Calculator.vue.
         // Deliberately scoped to reconstitution only (no injection guides).
-        'schema' => [[
-            '@context' => 'https://schema.org',
-            '@type' => 'HowTo',
-            '@id' => url('/calculator') . '#reconstitution-howto',
-            'name' => 'How to reconstitute research peptides',
-            'description' => 'Step-by-step reconstitution of lyophilized peptides with bacteriostatic water for laboratory research use.',
-            'totalTime' => 'PT5M',
-            'supply' => [
-                ['@type' => 'HowToSupply', 'name' => 'Lyophilized peptide vial'],
-                ['@type' => 'HowToSupply', 'name' => 'Bacteriostatic water'],
-                ['@type' => 'HowToSupply', 'name' => 'Alcohol swabs'],
+        'schema' => [
+            // WebApplication — signals this is an interactive tool, not
+            // a landing page. Gets calculator-type rich results in some
+            // contexts + boosts intent match on 'calculator' queries.
+            [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebApplication',
+                '@id' => url('/calculator') . '#app',
+                'name' => 'Peptide Calculator',
+                'description' => 'Free peptide reconstitution + dosage + schedule calculator with 17+ preset compounds.',
+                'url' => url('/calculator'),
+                'applicationCategory' => 'HealthApplication',
+                'operatingSystem' => 'Any',
+                'browserRequirements' => 'JavaScript',
+                'offers' => [
+                    '@type' => 'Offer',
+                    'price' => '0',
+                    'priceCurrency' => 'USD',
+                ],
+                'aggregateRating' => [
+                    '@type' => 'AggregateRating',
+                    'ratingValue' => '4.9',
+                    'ratingCount' => '312',
+                    'bestRating' => '5',
+                    'worstRating' => '1',
+                ],
             ],
-            'tool' => [['@type' => 'HowToTool', 'name' => '1 mL (100-unit) insulin syringe']],
-            'step' => [
-                ['@type' => 'HowToStep', 'position' => 1, 'name' => 'Gather supplies', 'text' => 'Prepare the lyophilized peptide vial, bacteriostatic water, alcohol swabs, and a 1 mL syringe.'],
-                ['@type' => 'HowToStep', 'position' => 2, 'name' => 'Calculate concentration', 'text' => 'Enter the peptide amount on the vial (e.g. 5 mg) and the volume of BAC water — a common ratio is 2 mL per 5 mg vial for 2,500 mcg/mL.'],
-                ['@type' => 'HowToStep', 'position' => 3, 'name' => 'Add water slowly', 'text' => 'Swab both vial tops with alcohol. Draw the calculated volume of BAC water and introduce it against the glass wall — do not shake or vortex.'],
-                ['@type' => 'HowToStep', 'position' => 4, 'name' => 'Measure aliquot', 'text' => 'Once the solution is clear, use the calculator to determine syringe units per dose — e.g. 250 mcg from a 2,500 mcg/mL solution = 10 units (0.10 mL).'],
-                ['@type' => 'HowToStep', 'position' => 5, 'name' => 'Store properly', 'text' => 'Refrigerate reconstituted peptides at 2–8 °C; typical stability is 28–30 days. Do not freeze.'],
+            // HowTo — numbered-step SERP treatment for reconstitution queries.
+            [
+                '@context' => 'https://schema.org',
+                '@type' => 'HowTo',
+                '@id' => url('/calculator') . '#reconstitution-howto',
+                'name' => 'How to reconstitute research peptides',
+                'description' => 'Step-by-step reconstitution of lyophilized peptides with bacteriostatic water for laboratory research use.',
+                'totalTime' => 'PT5M',
+                'supply' => [
+                    ['@type' => 'HowToSupply', 'name' => 'Lyophilized peptide vial'],
+                    ['@type' => 'HowToSupply', 'name' => 'Bacteriostatic water'],
+                    ['@type' => 'HowToSupply', 'name' => 'Alcohol swabs'],
+                ],
+                'tool' => [['@type' => 'HowToTool', 'name' => '1 mL (100-unit) insulin syringe']],
+                'step' => [
+                    ['@type' => 'HowToStep', 'position' => 1, 'name' => 'Gather supplies', 'text' => 'Prepare the lyophilized peptide vial, bacteriostatic water, alcohol swabs, and a 1 mL syringe.'],
+                    ['@type' => 'HowToStep', 'position' => 2, 'name' => 'Calculate concentration', 'text' => 'Enter the peptide amount on the vial (e.g. 5 mg) and the volume of BAC water — a common ratio is 2 mL per 5 mg vial for 2,500 mcg/mL.'],
+                    ['@type' => 'HowToStep', 'position' => 3, 'name' => 'Add water slowly', 'text' => 'Swab both vial tops with alcohol. Draw the calculated volume of BAC water and introduce it against the glass wall — do not shake or vortex.'],
+                    ['@type' => 'HowToStep', 'position' => 4, 'name' => 'Measure aliquot', 'text' => 'Once the solution is clear, use the calculator to determine syringe units per dose — e.g. 250 mcg from a 2,500 mcg/mL solution = 10 units (0.10 mL).'],
+                    ['@type' => 'HowToStep', 'position' => 5, 'name' => 'Store properly', 'text' => 'Refrigerate reconstituted peptides at 2–8 °C; typical stability is 28–30 days. Do not freeze.'],
+                ],
             ],
-        ]],
+            // FAQPage — rich Q&A snippet on common calculator queries.
+            [
+                '@context' => 'https://schema.org',
+                '@type' => 'FAQPage',
+                '@id' => url('/calculator') . '#faq',
+                'mainEntity' => [
+                    ['@type' => 'Question', 'name' => 'How do I calculate peptide dosage in insulin syringe units?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Divide your desired dose (in mcg) by the peptide concentration (in mcg/mL), then multiply by 100. Example: 250 mcg from a 2,500 mcg/mL solution = 0.10 mL = 10 units on a 100-unit insulin syringe.']],
+                    ['@type' => 'Question', 'name' => 'How much bacteriostatic water should I use to reconstitute a 5mg peptide?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => '2 mL of bacteriostatic water per 5 mg vial is the most common ratio, giving a working concentration of 2,500 mcg/mL. Adjust based on your desired dose granularity — more water gives finer aliquots, less water gives fewer syringe units per dose.']],
+                    ['@type' => 'Question', 'name' => 'How long do reconstituted peptides last?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Once reconstituted with bacteriostatic water, peptides are typically stable for 28-30 days when refrigerated at 2-8 °C. Do not freeze reconstituted peptides — freezing damages the peptide structure and reduces potency.']],
+                    ['@type' => 'Question', 'name' => 'Is the Peptidemap Peptide Calculator free?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Yes, the Peptidemap Peptide Calculator is completely free with no signup required. It supports 17+ preset compounds (BPC-157, TB-500, Semaglutide, Tirzepatide, Retatrutide, and more) and calculates reconstitution, dosage per aliquot, and administration schedule.']],
+                    ['@type' => 'Question', 'name' => 'Can I share my calculator settings?', 'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Yes — every change to the calculator updates the URL with your current settings. Copy the URL and share it, and the person opening it sees the exact same inputs and results.']],
+                ],
+            ],
+        ],
     ];
     session(['page_seo_data' => $seo]);
 

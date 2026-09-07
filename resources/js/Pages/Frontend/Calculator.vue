@@ -7,14 +7,21 @@
 
     <!-- Hero -->
     <section class="border-b border-[color:var(--color-hairline)] bg-gradient-to-b from-[color:var(--color-bg)] to-white">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-10">
-        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Research tool</div>
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-8">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Free · No signup · Instant results</div>
         <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">
-          Peptide Reconstitution Calculator
+          The Best Peptide Calculator
         </h1>
-        <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
-          Calculate reconstitution concentrations, aliquot volumes, and yields per vial for research peptide preparation.
+        <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-5">
+          Reconstitution, dosage, and schedule — all in one place. 17+ preset compounds (BPC-157, Semaglutide, Tirzepatide, Retatrutide, TB-500, and more) with instant insulin-syringe unit output.
         </p>
+        <!-- Trust chips: quantifies the "best" claim -->
+        <div class="flex flex-wrap items-center gap-2 text-[12px]">
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold">⚡ Instant results</span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 font-semibold">🧪 17+ presets</span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-800 font-semibold">🔗 Shareable results</span>
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 font-semibold">🆓 Free forever</span>
+        </div>
       </div>
     </section>
 
@@ -276,6 +283,57 @@
             </div>
           </div>
 
+          <!-- Share this calculation -->
+          <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-5 flex items-center justify-between gap-4 flex-wrap">
+            <div class="min-w-0 flex-1">
+              <div class="text-[13px] font-semibold text-[color:var(--color-ink)]">Share this calculation</div>
+              <div class="text-[12px] text-[color:var(--color-ink-muted)] mt-0.5">Your inputs are baked into the URL — copy it and send the exact same result to anyone.</div>
+            </div>
+            <button
+              @click="copyShareLink"
+              :class="[
+                'inline-flex items-center gap-2 h-9 px-4 rounded-[8px] text-[12px] font-semibold transition-all',
+                copiedShare
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-[color:var(--color-ink)] text-white hover:brightness-110'
+              ]"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <template v-if="copiedShare"><path d="M20 6L9 17l-5-5"/></template>
+                <template v-else><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></template>
+              </svg>
+              {{ copiedShare ? 'Copied' : 'Copy shareable link' }}
+            </button>
+          </div>
+
+          <!-- FAQ — visible mirror of the FAQPage schema, required for the
+               rich Q&A snippet to earn a SERP block. -->
+          <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
+            <h2 class="ui-display text-xl font-semibold text-[color:var(--color-ink)] mb-4">Frequently asked</h2>
+            <div class="space-y-5">
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">How do I calculate peptide dosage in insulin syringe units?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Divide your desired dose (in mcg) by the peptide concentration (in mcg/mL), then multiply by 100. Example: 250 mcg from a 2,500 mcg/mL solution = 0.10 mL = <strong class="ui-mono">10 units</strong> on a 100-unit insulin syringe. The calculator above does the math automatically.</p>
+              </div>
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">How much bacteriostatic water should I use to reconstitute a 5mg peptide?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">2 mL of bacteriostatic water per 5 mg vial is the most common ratio, giving a working concentration of 2,500 mcg/mL. Adjust based on your desired dose granularity — more water gives finer aliquots, less water gives fewer syringe units per dose.</p>
+              </div>
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">How long do reconstituted peptides last?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Once reconstituted with bacteriostatic water, peptides are typically stable for <strong>28-30 days</strong> when refrigerated at 2-8 °C. Do not freeze reconstituted peptides — freezing damages the peptide structure and reduces potency.</p>
+              </div>
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Is the Peptidemap Peptide Calculator really free?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — completely free, no signup, no email required, no paywall. Supports 17+ preset compounds and works in reconstitution, dosage, and schedule modes. Shareable results via URL parameters.</p>
+              </div>
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Can I share my calculator settings?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — every change to the calculator updates the URL with your current settings. Copy the URL (or click the "Copy shareable link" button above), and the person opening it sees the exact same inputs and results.</p>
+              </div>
+            </div>
+          </div>
+
           <!-- SEO content -->
           <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
             <h2 class="ui-display text-xl font-semibold text-[color:var(--color-ink)] mb-3">How to reconstitute research peptides</h2>
@@ -303,13 +361,27 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
 defineProps({
   seo: { type: Object, default: () => ({}) },
 })
+
+// --- Share-link support -----------------------------------------------
+// Every meaningful input syncs to URL query params so users can copy the
+// address bar and share their exact configuration. Hydrated on mount from
+// whatever's in the URL — Colin Sep 7 revenue push, calculator as an SEO
+// funnel + viral share vector.
+const copiedShare = ref(false)
+async function copyShareLink() {
+  try {
+    await navigator.clipboard.writeText(window.location.href)
+    copiedShare.value = true
+    setTimeout(() => (copiedShare.value = false), 2000)
+  } catch { /* clipboard blocked; user can still copy the URL manually */ }
+}
 
 // --- Modes ---
 const modes = [
@@ -389,6 +461,40 @@ const vialsPerMonth = computed(() => {
   if (vialDurationDays.value <= 0) return '—'
   const v = 30 / vialDurationDays.value
   return v < 1 ? '< 1' : v.toFixed(1)
+})
+
+// --- URL <-> state sync -----------------------------------------------
+// Hydrate from ?mode=&preset=&mg=&water=&dose=&syringe=&freq= on mount,
+// then whenever any of those inputs change, replaceState so the URL
+// mirrors what the user is looking at. Uses replaceState (not pushState)
+// so the browser history doesn't clog with every keystroke.
+onMounted(() => {
+  if (typeof window === 'undefined') return
+  const p = new URL(window.location.href).searchParams
+  const get = (k, cast) => (p.has(k) ? (cast ? cast(p.get(k)) : p.get(k)) : null)
+  const m = get('mode'); if (m && modes.some(x => x.key === m)) mode.value = m
+  const pr = get('preset'); if (pr) { preset.value = pr; applyPreset() }
+  const mg = get('mg', parseFloat); if (mg && mg > 0) peptideMg.value = mg
+  const w = get('water', parseFloat); if (w && w > 0) waterMl.value = w
+  const d = get('dose', parseFloat); if (d && d > 0) doseMcg.value = d
+  const s = get('syringe', parseInt); if (s && [30, 50, 100].includes(s)) syringeUnits.value = s
+  const f = get('freq'); if (f) frequency.value = f
+})
+
+watch([mode, preset, peptideMg, waterMl, doseMcg, syringeUnits, frequency], () => {
+  if (typeof window === 'undefined') return
+  const url = new URL(window.location.href)
+  const set = (k, v, def) => (v !== undefined && v !== null && v !== '' && v !== def
+    ? url.searchParams.set(k, String(v))
+    : url.searchParams.delete(k))
+  set('mode', mode.value, 'dosage')
+  set('preset', preset.value, '')
+  set('mg', peptideMg.value, 5)
+  set('water', waterMl.value, 2)
+  set('dose', doseMcg.value, 250)
+  set('syringe', syringeUnits.value, 100)
+  set('freq', frequency.value, 'daily')
+  window.history.replaceState({}, '', url.toString())
 })
 
 // Reconstitution table
