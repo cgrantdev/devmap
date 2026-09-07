@@ -883,11 +883,28 @@ class HomeController extends Controller
                   ->where('coupon_discount_percent', '<', 100);
             })
             ->with(['brand:id,name,slug', 'brand.vendorSetting'])
+            // Accessible price band: \$40-\$500 retail. Excludes low-AOV
+            // noise on the floor AND bulk/kit products on the ceiling
+            // (\$2K Teduglutide kits, 10-packs, etc.) that don't convert
+            // for a first-time homepage visitor. Colin Sep 7 flagged the
+            // 'wtf are these prices' problem — cards were dominated by
+            // bulk/kit products that price out the average buyer.
             ->where(function ($q) {
-                // Filter out low-AOV noise — a \$10 product 15% off
-                // makes us \$0.15 commission. Require at least \$40
-                // retail so every card is a meaningful click.
-                $q->where('price', '>=', 40)->orWhere('discount_price', '>=', 40);
+                $q->where(function ($qq) {
+                    $qq->whereNotNull('discount_price')
+                       ->where('discount_price', '>=', 40)
+                       ->where('discount_price', '<=', 500);
+                })->orWhere(function ($qq) {
+                    $qq->whereNull('discount_price')
+                       ->where('price', '>=', 40)
+                       ->where('price', '<=', 500);
+                });
+            })
+            // Exclude bulk/kit/pack SKUs by name pattern.
+            ->where(function ($q) {
+                foreach (['%kit%', '%pack%', '% packs%', '%bundle%', '%pcs%', '%bulk%', '% set %', '5/10%', '%vials%'] as $needle) {
+                    $q->where('name', 'not like', $needle);
+                }
             })
             ->orderByRaw('COALESCE(discount_price, price) DESC')
             ->limit(80)
