@@ -191,6 +191,25 @@
       </div>
     </section>
 
+    <!-- FAQ — must render VISIBLY on the page for the FAQPage schema
+         we emit server-side to earn a Google rich snippet. Answers pull
+         real data (vendor count, cheapest price, top vendor) so the
+         SERP snippet doubles as instant social proof for commercial-
+         intent queries like "cheap {compound}" / "buy {compound}". -->
+    <section v-if="compound.faqs && compound.faqs.length" class="border-t border-[color:var(--color-hairline)] bg-white">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">
+          {{ compound.name }} — frequently asked
+        </div>
+        <div class="max-w-3xl space-y-6">
+          <div v-for="(f, i) in compound.faqs" :key="i">
+            <h3 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-1.5">{{ f.q }}</h3>
+            <p class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">{{ f.a }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Related compounds (internal linking, strategist rec #16) -->
     <section v-if="related.length" class="border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">

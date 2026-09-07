@@ -441,9 +441,88 @@ class CompareController extends Controller
             'image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0),
             'url' => url("/compare/{$slug}"),
             'h1' => "Cheapest {$displayName}",
-            'schema' => [$itemList, $breadcrumb],
+            'schema' => array_values(array_filter([
+                $itemList,
+                $breadcrumb,
+                // Product + AggregateOffer — surfaces price range ($X-$Y)
+                // in the Google SERP snippet for high-commercial-intent
+                // queries like "cheap {compound}" / "buy {compound}".
+                // GSC data (Sep 2026) showed "cheap retatrutide" at 27% CTR
+                // — huge signal that price-forward snippets convert here.
+                $vendorCount > 0 && $cheapest ? [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'Product',
+                    '@id' => url("/compare/{$slug}") . '#product',
+                    'name' => $displayName,
+                    'description' => $summary ? mb_substr(strip_tags($summary), 0, 300) : "Compare {$displayName} prices across {$vendorCount} verified research-peptide vendors.",
+                    'offers' => [
+                        '@type' => 'AggregateOffer',
+                        'priceCurrency' => 'USD',
+                        'lowPrice' => number_format((float) $cheapest, 2, '.', ''),
+                        'highPrice' => number_format((float) ($priciest ?: $cheapest), 2, '.', ''),
+                        'offerCount' => $productCount,
+                        'availability' => 'https://schema.org/InStock',
+                    ],
+                ] : null,
+                // FAQPage — rich snippet on common commercial-intent
+                // questions. Answers pull real data from this page so
+                // the SERP snippet doubles as instant social proof.
+                $vendorCount > 0 && $cheapest ? [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'FAQPage',
+                    '@id' => url("/compare/{$slug}") . '#faq',
+                    'mainEntity' => [
+                        [
+                            '@type' => 'Question',
+                            'name' => "What is the cheapest {$displayName}?",
+                            'acceptedAnswer' => [
+                                '@type' => 'Answer',
+                                'text' => "The lowest {$displayName} price on Peptidemap is {$cheapestFmt} from " . ($products->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$displayName} listings across {$vendorCount} vendors and updates prices daily.",
+                            ],
+                        ],
+                        [
+                            '@type' => 'Question',
+                            'name' => "How many vendors sell {$displayName}?",
+                            'acceptedAnswer' => [
+                                '@type' => 'Answer',
+                                'text' => "{$vendorCount} verified research-peptide vendors currently stock {$displayName} on Peptidemap, with {$productCount} distinct product listings.",
+                            ],
+                        ],
+                        [
+                            '@type' => 'Question',
+                            'name' => "Is there a coupon code for {$displayName}?",
+                            'acceptedAnswer' => [
+                                '@type' => 'Answer',
+                                'text' => "Most vendors on Peptidemap offer a Peptidemap coupon code (usually 10–35% off). The exact code and discount for each vendor is listed in the pricing table on this page.",
+                            ],
+                        ],
+                        [
+                            '@type' => 'Question',
+                            'name' => "How does Peptidemap compare {$displayName} prices?",
+                            'acceptedAnswer' => [
+                                '@type' => 'Answer',
+                                'text' => "Peptidemap ingests each vendor's live catalog daily, applies their current Peptidemap coupon discount, and sorts by the price you actually pay after code. All listings are for research use only (RUO).",
+                            ],
+                        ],
+                    ],
+                ] : null,
+            ])),
         ];
         session(['page_seo_data' => $seo]);
+
+        // Same 4 questions we emit in FAQPage schema — passed to the Vue
+        // side so answers render VISIBLY on the page. Google requires
+        // visible FAQ content for the rich snippet to be valid.
+        $visibleFaqs = ($vendorCount > 0 && $cheapest) ? [
+            ['q' => "What is the cheapest {$displayName}?",
+             'a' => "The lowest {$displayName} price on Peptidemap is {$cheapestFmt} from " . ($products->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$displayName} listings across {$vendorCount} vendors and updates prices daily."],
+            ['q' => "How many vendors sell {$displayName}?",
+             'a' => "{$vendorCount} verified research-peptide vendors currently stock {$displayName} on Peptidemap, with {$productCount} distinct product listings."],
+            ['q' => "Is there a coupon code for {$displayName}?",
+             'a' => "Most vendors on Peptidemap offer a Peptidemap coupon code (usually 10–35% off). The exact code and discount for each vendor is listed in the pricing table on this page."],
+            ['q' => "How does Peptidemap compare {$displayName} prices?",
+             'a' => "Peptidemap ingests each vendor's live catalog daily, applies their current Peptidemap coupon discount, and sorts by the price you actually pay after code. All listings are for research use only (RUO)."],
+        ] : [];
 
         return Inertia::render('Frontend/CompareCompound', [
             'compound' => [
@@ -458,6 +537,7 @@ class CompareController extends Controller
                 'cheapest_price' => $cheapest,
                 'priciest_price' => $priciest,
                 'products' => $products,
+                'faqs' => $visibleFaqs,
             ],
             'related' => $related,
             'vsPairs' => collect($this->resolveFeaturedPairs())
