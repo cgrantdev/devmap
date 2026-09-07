@@ -866,6 +866,41 @@ class HomeController extends Controller
         ];
         session(['page_seo_data' => $seo]);
 
+        // Best Deals Right Now — direct-to-affiliate cards for the
+        // homepage above-the-fold slot. Boosted vendors first, then
+        // cheapest post-coupon final price. Each click fires the /go
+        // outbound redirect (logged + GA4 + UTM'd). Sep 6 revenue push.
+        $bestDeals = \App\Models\Product::visible()
+            ->where('status', 'active')
+            ->with(['brand:id,name,slug', 'brand.vendorSetting'])
+            ->orderByRaw('COALESCE(NULLIF(discount_price, 0), price) ASC')
+            ->limit(60)
+            ->get()
+            ->map(function ($p) {
+                $vs = $p->brand?->vendorSetting;
+                $retail = (float) ($p->discount_price && $p->discount_price < $p->price ? $p->discount_price : $p->price);
+                $pct = $vs && $vs->coupon_discount_percent && $vs->coupon_discount_percent > 0 && $vs->coupon_discount_percent < 100
+                    ? (float) $vs->coupon_discount_percent : null;
+                $final = $pct ? round($retail * (1 - $pct / 100), 2) : $retail;
+                return [
+                    'id' => $p->id,
+                    'name' => $p->display_name ?? $p->name,
+                    'brand_name' => $p->brand?->name,
+                    'brand_slug' => $p->brand?->slug,
+                    'retail' => $retail,
+                    'final_price' => $final,
+                    'coupon_code' => $vs?->coupon_code ?: 'PMAP',
+                    'coupon_pct' => $pct,
+                    'coupon_boost_active' => $vs?->couponBoostActive() ?? false,
+                    'go_url' => "/go/{$p->id}?src=homepage-best-deals",
+                ];
+            })
+            ->sortBy(function ($d) {
+                return ($d['coupon_boost_active'] ? 0 : 1) . '-' . str_pad(number_format($d['final_price'] * 100, 0, '.', ''), 12, '0', STR_PAD_LEFT);
+            })
+            ->take(10)
+            ->values();
+
         return Inertia::render('Frontend/WelcomeV2', [
             'stats' => $stats,
             'heroSlides' => $heroSlides,
@@ -876,6 +911,7 @@ class HomeController extends Controller
             'limitedDeals' => $limitedDeals,
             'encyclopediaCategories' => $encyclopediaCategories,
             'editorial' => $editorial,
+            'bestDeals' => $bestDeals,
             'seo' => $seo,
         ]);
     }
