@@ -42,7 +42,7 @@
         <!-- LEFT: Inputs -->
         <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-sm)] p-6 lg:sticky lg:top-24">
           <!-- Mode tabs -->
-          <div class="flex gap-1 p-1 rounded-[10px] bg-[color:var(--color-bg)] mb-6">
+          <div class="flex gap-1 p-1 rounded-[10px] bg-[color:var(--color-bg)] mb-2">
             <button
               v-for="m in modes"
               :key="m.key"
@@ -54,6 +54,12 @@
                   : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]',
               ]"
             >{{ m.label }}</button>
+          </div>
+          <!-- Inline mode hint — tells first-timers which tab is theirs. -->
+          <div class="text-[11px] text-[color:var(--color-ink-subtle)] mb-5 px-1">
+            <template v-if="mode === 'dosage'">Figure out how many syringe units to draw for a target dose.</template>
+            <template v-else-if="mode === 'reconstitution'">Just mixed a vial with BAC water? See what concentration you got.</template>
+            <template v-else-if="mode === 'schedule'">See how long each vial lasts at your dosing frequency.</template>
           </div>
 
           <!-- Peptide preset -->
@@ -123,57 +129,74 @@
         <!-- RIGHT: Results -->
         <div class="space-y-6">
 
-          <!-- Primary result cards -->
-          <div class="grid sm:grid-cols-2 gap-4">
-            <ResultCard
-              label="Concentration"
-              :value="concentration.toLocaleString('en-US', { maximumFractionDigits: 1 })"
-              unit="mcg/mL"
-            />
-            <ResultCard
-              v-if="mode !== 'reconstitution'"
-              label="Volume per aliquot"
-              :value="volumeMl"
-              unit="mL"
-              highlight
-            />
-            <ResultCard
-              v-if="mode !== 'reconstitution'"
-              label="Syringe units"
-              :value="String(syringeMarks)"
-              :unit="`of ${syringeUnits} units`"
-            />
-            <ResultCard
-              label="Aliquots per vial"
-              :value="mode !== 'reconstitution' ? String(dosesPerVial) : '—'"
-              unit="total"
-            />
-          </div>
-
-          <!-- Volume visual -->
-          <div v-if="mode !== 'reconstitution'" class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
-            <h3 class="text-[13px] font-semibold text-[color:var(--color-ink)] mb-4">Volume visualization</h3>
-            <div class="flex items-center gap-6">
-              <div class="relative w-full max-w-[360px] h-14 rounded-full border-2 border-[color:var(--color-ink)]/20 bg-[color:var(--color-bg)] overflow-hidden">
-                <div
-                  class="absolute left-0 top-0 bottom-0 rounded-full transition-all duration-500 ease-out"
-                  :class="fillPercent > 80 ? 'bg-[color:var(--color-danger)]/30' : 'bg-[color:var(--color-accent-500)]/25'"
-                  :style="{ width: Math.min(fillPercent, 100) + '%' }"
-                ></div>
-                <div v-for="tick in 10" :key="tick" class="absolute top-0 h-3 border-l border-[color:var(--color-ink)]/10" :style="{ left: (tick * 10) + '%' }"></div>
-                <div
-                  class="absolute top-1/2 -translate-y-1/2 w-0.5 h-10 bg-[color:var(--color-accent-600)] shadow-[0_0_6px_rgba(79,70,229,0.5)] transition-all duration-500 ease-out"
-                  :style="{ left: Math.min(fillPercent, 100) + '%' }"
-                ></div>
-              </div>
-              <div class="text-right flex-shrink-0 min-w-[80px]">
-                <div class="ui-mono text-2xl font-bold text-[color:var(--color-ink)]">{{ syringeMarks }}</div>
-                <div class="text-[11px] text-[color:var(--color-ink-subtle)]">units</div>
+          <!-- HERO RESULT — the actual answer. What the user came for.
+               Big syringe-unit number, integrated visual, one-click copy.
+               Everything else on the page is supporting detail. -->
+          <div v-if="mode !== 'reconstitution'" class="bg-gradient-to-b from-white to-[color:var(--color-bg)] rounded-[20px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-md)] p-6 lg:p-8">
+            <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+              <div class="text-[10px] uppercase tracking-[0.14em] font-bold text-[color:var(--color-accent-600)]">Draw · from {{ concentration.toLocaleString('en-US', { maximumFractionDigits: 0 }) }} mcg/mL solution</div>
+              <div class="flex items-center gap-2">
+                <button @click="copyResult" :class="['inline-flex items-center gap-1.5 h-8 px-3 rounded-[8px] text-[11px] font-semibold transition-all', copiedResult ? 'bg-emerald-600 text-white' : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]']">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><template v-if="copiedResult"><path d="M20 6L9 17l-5-5"/></template><template v-else><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></template></svg>
+                  {{ copiedResult ? 'Copied' : 'Copy result' }}
+                </button>
+                <button @click="copyShareLink" :class="['inline-flex items-center gap-1.5 h-8 px-3 rounded-[8px] text-[11px] font-semibold transition-all', copiedShare ? 'bg-emerald-600 text-white' : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]']">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><template v-if="copiedShare"><path d="M20 6L9 17l-5-5"/></template><template v-else><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></template></svg>
+                  {{ copiedShare ? 'Copied' : 'Copy link' }}
+                </button>
               </div>
             </div>
-            <div v-if="fillPercent > 100" class="mt-3 flex items-center gap-2 text-[12px] text-[color:var(--color-danger)] font-semibold">
+
+            <div class="flex items-baseline gap-3 mb-4">
+              <span class="ui-display text-[64px] lg:text-[88px] leading-none font-bold text-[color:var(--color-ink)] tracking-tight">{{ syringeMarks }}</span>
+              <span class="text-[color:var(--color-ink-muted)]">
+                <div class="text-lg font-semibold">units</div>
+                <div class="text-[13px]">on a {{ syringeUnits }}-unit syringe</div>
+              </span>
+            </div>
+
+            <!-- Integrated syringe visual — the visual anchor. -->
+            <div class="relative w-full h-12 rounded-full border-2 border-[color:var(--color-ink)]/15 bg-white overflow-hidden mb-4">
+              <div
+                class="absolute left-0 top-0 bottom-0 rounded-full transition-all duration-500 ease-out"
+                :class="fillPercent > 80 ? 'bg-[color:var(--color-danger)]/25' : 'bg-[color:var(--color-accent-500)]/30'"
+                :style="{ width: Math.min(fillPercent, 100) + '%' }"
+              ></div>
+              <div v-for="tick in 10" :key="tick" class="absolute top-0 h-3 border-l border-[color:var(--color-ink)]/15" :style="{ left: (tick * 10) + '%' }"></div>
+              <div class="absolute top-1/2 -translate-y-1/2 w-0.5 h-8 bg-[color:var(--color-accent-600)] shadow-[0_0_6px_rgba(79,70,229,0.5)] transition-all duration-500 ease-out" :style="{ left: Math.min(fillPercent, 100) + '%' }"></div>
+            </div>
+
+            <div class="flex items-center justify-between gap-4 text-[13px] flex-wrap">
+              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Volume</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ volumeMl }} mL</span></div>
+              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Dose</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ doseMcg }} mcg</span></div>
+              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Aliquots per vial</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ dosesPerVial }}</span></div>
+            </div>
+
+            <div v-if="fillPercent > 100" class="mt-4 flex items-center gap-2 text-[12px] text-[color:var(--color-danger)] font-semibold">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-              Volume exceeds syringe capacity. Use a larger syringe or increase reconstitution volume.
+              Volume exceeds syringe capacity — use a larger syringe or add more reconstitution water.
+            </div>
+          </div>
+
+          <!-- Reconstitution mode hero -->
+          <div v-else class="bg-gradient-to-b from-white to-[color:var(--color-bg)] rounded-[20px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-md)] p-6 lg:p-8">
+            <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+              <div class="text-[10px] uppercase tracking-[0.14em] font-bold text-[color:var(--color-accent-600)]">Reconstitution result</div>
+              <div class="flex items-center gap-2">
+                <button @click="copyResult" :class="['inline-flex items-center gap-1.5 h-8 px-3 rounded-[8px] text-[11px] font-semibold transition-all', copiedResult ? 'bg-emerald-600 text-white' : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]']">
+                  {{ copiedResult ? 'Copied' : 'Copy result' }}
+                </button>
+                <button @click="copyShareLink" :class="['inline-flex items-center gap-1.5 h-8 px-3 rounded-[8px] text-[11px] font-semibold transition-all', copiedShare ? 'bg-emerald-600 text-white' : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]']">
+                  {{ copiedShare ? 'Copied' : 'Copy link' }}
+                </button>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-3">
+              <span class="ui-display text-[56px] lg:text-[80px] leading-none font-bold text-[color:var(--color-ink)] tracking-tight">{{ concentration.toLocaleString('en-US', { maximumFractionDigits: 0 }) }}</span>
+              <span class="text-[color:var(--color-ink-muted)]">
+                <div class="text-lg font-semibold">mcg/mL</div>
+                <div class="text-[13px]">{{ peptideMg }}mg peptide in {{ waterMl }}mL BAC water</div>
+              </span>
             </div>
           </div>
 
@@ -283,28 +306,8 @@
             </div>
           </div>
 
-          <!-- Share this calculation -->
-          <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-5 flex items-center justify-between gap-4 flex-wrap">
-            <div class="min-w-0 flex-1">
-              <div class="text-[13px] font-semibold text-[color:var(--color-ink)]">Share this calculation</div>
-              <div class="text-[12px] text-[color:var(--color-ink-muted)] mt-0.5">Your inputs are baked into the URL — copy it and send the exact same result to anyone.</div>
-            </div>
-            <button
-              @click="copyShareLink"
-              :class="[
-                'inline-flex items-center gap-2 h-9 px-4 rounded-[8px] text-[12px] font-semibold transition-all',
-                copiedShare
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-[color:var(--color-ink)] text-white hover:brightness-110'
-              ]"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                <template v-if="copiedShare"><path d="M20 6L9 17l-5-5"/></template>
-                <template v-else><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></template>
-              </svg>
-              {{ copiedShare ? 'Copied' : 'Copy shareable link' }}
-            </button>
-          </div>
+          <!-- Standalone share section removed — Copy result + Copy link
+               buttons now live in the hero card at the top of results. -->
 
           <!-- FAQ — visible mirror of the FAQPage schema, required for the
                rich Q&A snippet to earn a SERP block. -->
@@ -375,12 +378,25 @@ defineProps({
 // whatever's in the URL — Colin Sep 7 revenue push, calculator as an SEO
 // funnel + viral share vector.
 const copiedShare = ref(false)
+const copiedResult = ref(false)
 async function copyShareLink() {
   try {
     await navigator.clipboard.writeText(window.location.href)
     copiedShare.value = true
     setTimeout(() => (copiedShare.value = false), 2000)
   } catch { /* clipboard blocked; user can still copy the URL manually */ }
+}
+// Copies the actual answer text — what people paste into group chats
+// and forums. More useful than a URL when someone just wants the number.
+async function copyResult() {
+  const text = mode.value === 'reconstitution'
+    ? `${peptideMg.value}mg peptide + ${waterMl.value}mL BAC water = ${concentration.value.toLocaleString('en-US', { maximumFractionDigits: 0 })} mcg/mL (via Peptidemap)`
+    : `Draw ${syringeMarks.value} units on a ${syringeUnits.value}-unit syringe (${volumeMl.value} mL) for a ${doseMcg.value} mcg dose from a ${concentration.value.toLocaleString('en-US', { maximumFractionDigits: 0 })} mcg/mL solution (via Peptidemap)`
+  try {
+    await navigator.clipboard.writeText(text)
+    copiedResult.value = true
+    setTimeout(() => (copiedResult.value = false), 2000)
+  } catch {}
 }
 
 // --- Modes ---
