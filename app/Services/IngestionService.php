@@ -159,7 +159,39 @@ class IngestionService
             $categoryId = $staged->scrapingConfig?->product_category_id
                 ?? $this->matchCategoryByName($staged->name);
 
-            if ($staged->product_id && $product = Product::find($staged->product_id)) {
+            $brandId = $staged->brand_id ?? $staged->scrapingConfig?->vendor_id;
+
+            // Find an existing Product to update instead of creating a
+            // duplicate. Priority:
+            //   1. staged->product_id (explicit link from a prior promote)
+            //   2. Same brand + same product_url (URL is the most stable
+            //      per-vendor identifier — different scraping_configs for
+            //      the same vendor will still land on the same URL)
+            //   3. Same brand + exact name match (fallback for feeds that
+            //      don't carry stable URLs, e.g. some JSON feeds)
+            //
+            // Colin Sep 7: 'why is our scrapes creating NEW products?' —
+            // previously this method fell straight through to Product::create
+            // whenever staged->product_id was null, which happens on every
+            // fresh scraping_config or when a config is recreated. Result:
+            // 140 duplicate live rows across Instant Peptides + Peptselect
+            // by the time we caught it.
+            $product = null;
+            if ($staged->product_id) {
+                $product = Product::find($staged->product_id);
+            }
+            if (!$product && $brandId && !empty($staged->source_url)) {
+                $product = Product::where('brand_id', $brandId)
+                    ->where('product_url', $staged->source_url)
+                    ->first();
+            }
+            if (!$product && $brandId && !empty($staged->name)) {
+                $product = Product::where('brand_id', $brandId)
+                    ->where('name', $staged->name)
+                    ->first();
+            }
+
+            if ($product) {
                 // Existing product — preserve everything a VA might have
                 // curated (name, category, type, size, slug) and only refresh
                 // upstream-owned fields (price, image, stock, description).
@@ -178,13 +210,18 @@ class IngestionService
                         'last_scraped_at' => $staged->last_scraped_at ?? now(),
                     ]);
                 }
+                // Backfill the link so subsequent promotes hit tier (1)
+                // directly and skip the URL/name lookups.
+                if (!$staged->product_id) {
+                    $staged->product_id = $product->id;
+                }
             } else {
-                // First-time import — accept everything the staged row carries.
+                // Truly new product — nothing matched.
                 $product = Product::create([
                     'name' => $staged->name,
                     'slug' => $this->uniqueSlug($staged->name),
                     'description' => $staged->description,
-                    'brand_id' => $staged->brand_id ?? $staged->scrapingConfig?->vendor_id,
+                    'brand_id' => $brandId,
                     'product_category_id' => $categoryId,
                     'price' => $staged->price,
                     'discount_price' => $staged->discount_price,
