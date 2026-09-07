@@ -21,6 +21,7 @@ class ProductClick extends Model
         'utm_source',
         'utm_medium',
         'utm_campaign',
+        'estimated_commission_usd',
     ];
 
     protected $casts = [

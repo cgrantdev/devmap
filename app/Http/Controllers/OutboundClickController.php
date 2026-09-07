@@ -55,6 +55,18 @@ class OutboundClickController extends Controller
             ? 'internal:' . $srcParam
             : $referrerHeader;
 
+        // Estimated commission this click could earn — vendor's commission
+        // rate × effective price. Doesn't factor conversion rate; that's
+        // reconciled against real affiliate-platform sales in the daily
+        // sync job. Useful as an upper-bound revenue estimate + for
+        // ranking vendors by click-value on the /admin/affiliates page.
+        $estCommission = null;
+        $pct = (float) ($product->brand?->vendorSetting?->commission_rate_pct ?? 0);
+        $effectivePrice = (float) ($product->discount_price ?: $product->price ?: 0);
+        if ($pct > 0 && $effectivePrice > 0 && !$isBot) {
+            $estCommission = round($effectivePrice * $pct / 100, 2);
+        }
+
         // Fire-and-forget log. Wrap in try to never block the redirect.
         try {
             ProductClick::create([
@@ -69,12 +81,22 @@ class OutboundClickController extends Controller
                 'utm_source' => $request->query('utm_source'),
                 'utm_medium' => $request->query('utm_medium'),
                 'utm_campaign' => $request->query('utm_campaign'),
+                'estimated_commission_usd' => $estCommission,
             ]);
         } catch (\Throwable $e) {
             \Log::warning('ProductClick logging failed', [
                 'product_id' => $product->id,
                 'error' => $e->getMessage(),
             ]);
+        }
+
+        // Server-side GA4 event via Measurement Protocol. Non-blocking;
+        // failure never breaks the redirect. Enabled only when the site
+        // is configured with GA4 measurement_id + api_secret in .env
+        // (services.ga4.*). Fires a 'select_item' event with product +
+        // brand + estimated value so GA4 can rank outbound performance.
+        if (!$isBot) {
+            $this->fireGa4Event($request, $product, $estCommission);
         }
 
         return redirect()->away($destination, 302);
@@ -227,6 +249,50 @@ class OutboundClickController extends Controller
         $joined = $existingQuery ? $existingQuery . '&' . $extra : $extra;
         return $parts['scheme'] . '://' . $parts['host'] . $path . '?' . $joined
             . (isset($parts['fragment']) ? '#' . $parts['fragment'] : '');
+    }
+
+    /**
+     * Fire a GA4 event via the Measurement Protocol so /go redirects
+     * (server-side, no JS runs on our redirect step) still show up in
+     * GA4 alongside pageview + session data. Best-effort; never blocks
+     * the redirect. Requires services.ga4.measurement_id +
+     * services.ga4.api_secret to be set — silently skips otherwise.
+     */
+    protected function fireGa4Event(Request $request, Product $product, ?float $estCommission): void
+    {
+        $mid = config('services.ga4.measurement_id');
+        $secret = config('services.ga4.api_secret');
+        if (!$mid || !$secret) return;
+
+        // Stable pseudonymous client id — hash of the IP so repeat
+        // clicks from the same visitor aggregate in GA4.
+        $seed = ($request->ip() ?: 'noip') . config('app.key');
+        $clientId = substr(hash('sha256', $seed), 0, 16) . '.' . substr(hash('sha256', $seed . 'salt'), 0, 16);
+
+        $body = [
+            'client_id' => $clientId,
+            'events' => [[
+                'name' => 'outbound_click',
+                'params' => [
+                    'brand_slug' => $product->brand?->slug,
+                    'brand_name' => $product->brand?->name,
+                    'product_id' => (string) $product->id,
+                    'product_name' => $product->display_name ?? $product->name,
+                    'value' => $estCommission,
+                    'currency' => 'USD',
+                    'engagement_time_msec' => 100,
+                ],
+            ]],
+        ];
+
+        try {
+            \Illuminate\Support\Facades\Http::timeout(2)->asJson()->post(
+                'https://www.google-analytics.com/mp/collect?measurement_id=' . urlencode($mid) . '&api_secret=' . urlencode($secret),
+                $body
+            );
+        } catch (\Throwable $e) {
+            // fire-and-forget — never let GA4 problems break a redirect
+        }
     }
 
     /**

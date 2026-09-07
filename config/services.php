@@ -57,6 +57,14 @@ return [
         'base_branch' => env('GITHUB_BASE_BRANCH', 'main'),
     ],
 
+    // GA4 Measurement Protocol — server-side event firing from
+    // OutboundClickController when /go redirects can't run client-side JS.
+    // Get the values from GA4 admin → Data Streams → Web → Measurement Protocol API secrets.
+    'ga4' => [
+        'measurement_id' => env('GA4_MEASUREMENT_ID'),
+        'api_secret' => env('GA4_API_SECRET'),
+    ],
+
     'gsc' => [
         // Preferred path: OAuth 2.0 user-consent flow. Colin runs
         // /admin/gsc/connect once, signs in with the Google account that

@@ -99,7 +99,47 @@
       </div>
     </section>
 
-    
+    <!-- Best Deals Right Now — direct-to-affiliate cards. Every card
+         click fires the /go/{id} outbound redirect which logs the
+         click + fires GA4 + tags with UTMs. Boosted vendors surface
+         first, then cheapest post-coupon price. -->
+    <section v-if="bestDeals && bestDeals.length" class="bg-gradient-to-b from-amber-50 to-white border-b border-amber-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <div class="text-[10px] uppercase tracking-[0.14em] font-bold text-amber-700 mb-1">🔥 Live prices — updated daily</div>
+            <h2 class="text-2xl sm:text-3xl font-semibold text-gray-900">Best deals right now</h2>
+          </div>
+          <a href="/products" class="text-[12px] font-semibold text-indigo-700 hover:text-indigo-900">All products →</a>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          <a
+            v-for="d in bestDeals"
+            :key="d.id"
+            :href="d.go_url"
+            target="_blank"
+            rel="noopener noreferrer nofollow sponsored"
+            class="group bg-white border border-gray-200 rounded-lg p-3 hover:border-amber-400 hover:shadow-lg transition-all relative"
+          >
+            <span v-if="d.coupon_boost_active" class="absolute top-2 right-2 text-[9px] uppercase tracking-wider font-bold bg-red-600 text-white px-1.5 py-0.5 rounded-full">boost</span>
+            <div class="text-[11px] text-gray-500 truncate">{{ d.brand_name }}</div>
+            <div class="text-[13px] font-semibold text-gray-900 leading-tight line-clamp-2 mt-0.5 min-h-[2.5em]">{{ d.name }}</div>
+            <div class="mt-2 flex items-baseline gap-2 flex-wrap">
+              <span class="text-lg font-bold text-emerald-700">${{ d.final_price.toFixed(2) }}</span>
+              <span v-if="d.coupon_pct" class="text-[11px] text-gray-400 line-through">${{ d.retail.toFixed(2) }}</span>
+            </div>
+            <div v-if="d.coupon_pct" class="mt-1 text-[10px] uppercase tracking-wide text-emerald-700 font-semibold">
+              with code <span class="ui-mono">{{ d.coupon_code }}</span>
+            </div>
+            <button type="button" class="mt-2 w-full h-8 rounded bg-indigo-600 text-white text-[11px] font-semibold group-hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1">
+              Buy at {{ d.brand_name }}
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+            </button>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- Top Rated Vendors Section -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
       <div class="mb-6 sm:mb-8">
@@ -380,6 +420,10 @@ const props = defineProps({
     default: () => []
   },
   discountDeals: {
+    type: Array,
+    default: () => []
+  },
+  bestDeals: {
     type: Array,
     default: () => []
   },

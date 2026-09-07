@@ -65,6 +65,11 @@ class VendorSetting extends Model
         'seo_og_image',
         'api_platform',
         'api_key',
+        'affiliate_platform',
+        'affiliate_credentials',
+        'affiliate_stats_json',
+        'affiliate_stats_updated_at',
+        'commission_rate_pct',
     ];
 
     protected $casts = [
@@ -81,6 +86,10 @@ class VendorSetting extends Model
         'business_hours_json' => 'array',
         'coupon_boost_expires_at' => 'datetime',
         'external_rating_avg' => 'float',
+        'affiliate_credentials' => 'encrypted',
+        'affiliate_stats_json' => 'array',
+        'affiliate_stats_updated_at' => 'datetime',
+        'commission_rate_pct' => 'float',
     ];
 
     /**

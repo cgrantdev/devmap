@@ -336,6 +336,15 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
         ->name('admin.certifications.approve');
     Route::post('/certifications/{id}/reject', [\App\Http\Controllers\Admin\CertificationsController::class, 'reject'])
         ->name('admin.certifications.reject');
+
+    // Affiliate management — unified dashboard for every vendor's affiliate
+    // program stats. See docs/affiliate-management.md.
+    Route::get('/affiliates', [\App\Http\Controllers\Admin\AffiliatesController::class, 'index'])
+        ->name('admin.affiliates');
+    Route::post('/affiliates/{brandId}/credentials', [\App\Http\Controllers\Admin\AffiliatesController::class, 'saveCredentials'])
+        ->name('admin.affiliates.credentials');
+    Route::post('/affiliates/{brandId}/sync', [\App\Http\Controllers\Admin\AffiliatesController::class, 'syncOne'])
+        ->name('admin.affiliates.sync');
     Route::post('/vendors/{id}/toggle-status', [VendorsController::class, 'toggleStatus'])->name('admin.vendors.toggle-status');
     Route::post('/vendors/{id}/toggle-demo', [VendorsController::class, 'toggleDemo'])->name('admin.vendors.toggle-demo');
     Route::post('/vendors/{id}/approve', [VendorsController::class, 'approve'])->name('admin.vendors.approve');
