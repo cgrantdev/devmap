@@ -1145,6 +1145,109 @@ class ProductsController extends Controller
             ],
         ];
 
+        // --- Vendor-page SEO uplift (Sep 6 2026) -------------------------
+        // GSC data + Colin: 'we need to get all our vendors more views'.
+        // Same schema push we did for /compare/{compound} applied to every
+        // /brand/{slug} page: AggregateRating stars in SERP + FAQPage rich
+        // Q&A block. Lifts branded-search CTR ('{vendor} reviews',
+        // '{vendor} coupon', 'is {vendor} legit') across all 40 vendors.
+
+        // AggregateRating — pulls from vendor_settings.external_rating_*
+        // which the reviews:refresh scheduler keeps current from imported
+        // reviews (Reviews.io / PepReviewPro / manual entries).
+        $vs = $brand->vendorSetting;
+        $ratingAvg = $vs?->external_rating_avg ? (float) $vs->external_rating_avg : null;
+        $ratingCount = (int) ($vs?->external_rating_count ?? 0);
+
+        $organizationSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            '@id' => $brandUrl . '#org',
+            'name' => $brand->name,
+            'url' => $brandUrl,
+            'logo' => $vs?->logo ? asset('storage/' . $vs->logo) : null,
+            'description' => $vs?->description ? mb_substr(strip_tags($vs->description), 0, 300) : null,
+        ];
+        if ($ratingAvg && $ratingCount > 0) {
+            $organizationSchema['aggregateRating'] = [
+                '@type' => 'AggregateRating',
+                'ratingValue' => number_format($ratingAvg, 2),
+                'reviewCount' => $ratingCount,
+                'bestRating' => 5,
+                'worstRating' => 1,
+            ];
+        }
+        // Drop nulls to keep the JSON tight.
+        $organizationSchema = array_filter($organizationSchema, fn ($v) => $v !== null);
+
+        // FAQPage — dynamic answers pulled from real vendor state so the
+        // SERP snippet doubles as social proof. Only rendered when there's
+        // enough data to give truthful answers.
+        $faqSchema = null;
+        $couponPct = $vs?->coupon_discount_percent ? (float) $vs->coupon_discount_percent : null;
+        $couponCode = $vs?->coupon_code ?: 'PMAP';
+        $shipsCount = $vs?->shipsToLocations()->count() ?? 0;
+        $productCount = $products->total();
+
+        if ($productCount > 0) {
+            $mainEntity = [];
+
+            if ($couponPct > 0) {
+                $mainEntity[] = [
+                    '@type' => 'Question',
+                    'name' => "Does {$brand->name} have a coupon code?",
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => "Yes — use code {$couponCode} at checkout for " . rtrim(rtrim(number_format($couponPct, 1), '0'), '.') . "% off {$brand->name}. The code and current discount is displayed at the top of every {$brand->name} product page on Peptidemap.",
+                    ],
+                ];
+            }
+
+            if ($shipsCount > 0) {
+                $shipsNames = $vs?->shipsToLocations()->pluck('name')->take(5)->all() ?? [];
+                $shipsListText = count($shipsNames) > 3
+                    ? implode(', ', array_slice($shipsNames, 0, 3)) . ", and " . ($shipsCount - 3) . " other" . (($shipsCount - 3) === 1 ? '' : 's')
+                    : implode(', ', $shipsNames);
+                $mainEntity[] = [
+                    '@type' => 'Question',
+                    'name' => "Where does {$brand->name} ship?",
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => "{$brand->name} ships to " . ($shipsCount === 1 ? $shipsListText : "{$shipsCount} countries including {$shipsListText}") . ".",
+                    ],
+                ];
+            }
+
+            $mainEntity[] = [
+                '@type' => 'Question',
+                'name' => "How many products does {$brand->name} sell?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => "{$productCount} distinct research-peptide products are currently listed on {$brand->name}'s Peptidemap storefront, updated from their live catalog daily.",
+                ],
+            ];
+
+            if ($ratingAvg && $ratingCount >= 5) {
+                $mainEntity[] = [
+                    '@type' => 'Question',
+                    'name' => "Is {$brand->name} reputable?",
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => "{$brand->name} holds a " . number_format($ratingAvg, 2) . "/5 average across " . number_format($ratingCount) . " customer reviews imported from third-party review platforms. All listings are for research use only.",
+                    ],
+                ];
+            }
+
+            if (!empty($mainEntity)) {
+                $faqSchema = [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'FAQPage',
+                    '@id' => $brandUrl . '#faq',
+                    'mainEntity' => $mainEntity,
+                ];
+            }
+        }
+
         // Build SEO array (same format as other pages)
         $seo = [
             'key' => 'brand',
@@ -1157,7 +1260,7 @@ class ProductsController extends Controller
             'image' => $seoOgImage,
             'url' => $brandUrl,
             'canonical' => $brandUrl,
-            'schema' => [$itemListSchema, $breadcrumbSchema],
+            'schema' => array_values(array_filter([$organizationSchema, $itemListSchema, $breadcrumbSchema, $faqSchema])),
         ];
 
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
