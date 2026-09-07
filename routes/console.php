@@ -48,3 +48,13 @@ Schedule::command('alerts:send-price-drops')
     ->dailyAt('09:00')
     ->withoutOverlapping()
     ->runInBackground();
+
+// Daily affiliate-stats pull. Hits each configured vendor's affiliate
+// program API (GoAffPro today; Refersion/Impact clients to add) and
+// caches the snapshot on vendor_settings.affiliate_stats_json. Powers
+// the /admin/affiliates dashboard without re-pulling on every load.
+// 04:00 UTC keeps it away from the scraper + digest windows.
+Schedule::command('affiliates:sync')
+    ->dailyAt('04:00')
+    ->withoutOverlapping()
+    ->runInBackground();

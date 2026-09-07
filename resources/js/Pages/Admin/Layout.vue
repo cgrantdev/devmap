@@ -27,6 +27,7 @@
           <NavItem href="/admin/products" icon="package" label="Products" />
           <NavItem href="/admin/categories" icon="folder" label="Categories" />
           <NavItem href="/admin/deals" icon="tag" label="Deals & Coupons" />
+          <NavItem href="/admin/affiliates" icon="dollar" label="Affiliates" />
         </div>
 
         <!-- Ingestion -->
