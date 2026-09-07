@@ -292,10 +292,11 @@
             <div class="text-[13px] font-semibold text-[color:var(--color-ink)] leading-tight line-clamp-2 mt-0.5 min-h-[2.5em]">{{ d.name }}</div>
             <div class="mt-2 flex items-baseline gap-2 flex-wrap">
               <span class="text-lg font-bold text-emerald-700">${{ d.final_price.toFixed(2) }}</span>
-              <span v-if="d.coupon_pct" class="text-[11px] text-gray-400 line-through">${{ d.retail.toFixed(2) }}</span>
+              <span class="text-[11px] text-gray-400 line-through">${{ d.retail.toFixed(2) }}</span>
             </div>
-            <div v-if="d.coupon_pct" class="mt-1 text-[10px] uppercase tracking-wide text-emerald-700 font-semibold">
-              with code <span class="ui-mono">{{ d.coupon_code }}</span>
+            <div class="mt-1 flex items-center gap-1.5 text-[10px] uppercase tracking-wide font-bold">
+              <span class="text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">Save ${{ d.savings.toFixed(0) }}</span>
+              <span class="text-emerald-700">code <span class="ui-mono">{{ d.coupon_code }}</span></span>
             </div>
             <button type="button" class="mt-2 w-full h-8 rounded bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] text-white text-[11px] font-semibold group-hover:brightness-110 transition-all flex items-center justify-center gap-1">
               Buy at {{ d.brand_name }}

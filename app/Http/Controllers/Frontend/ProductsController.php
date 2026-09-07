@@ -745,23 +745,29 @@ class ProductsController extends Controller
                   ->where('purity', '>=', $minPurity);
         }
 
-        // Apply sorting - default to price ascending
-        // When sorting by price, use discount_price if available, otherwise use price
-        $sortBy = $request->get('sort', 'price');
-        $sortDir = in_array(strtolower($request->get('sort_dir', 'asc')), ['asc', 'desc']) 
-            ? strtolower($request->get('sort_dir', 'asc')) 
-            : 'asc';
-        
-        if ($sortBy === 'price') {
+        // Sort default is 'featured' — is_peptide_thumb curated picks first,
+        // then popular (rating_count DESC), then higher effective price DESC
+        // as the tiebreak. Colin Sep 7: 'we need to focus on ways to sell
+        // the BEST products not cheapest, or we make less money'. Cheapest-
+        // first is revenue-hostile on an affiliate model — higher AOV means
+        // higher commission per outbound click. Users can still opt into
+        // cheapest via ?sort=price&sort_dir=asc.
+        $sortBy = $request->get('sort', 'featured');
+        $sortDir = in_array(strtolower($request->get('sort_dir', 'desc')), ['asc', 'desc'])
+            ? strtolower($request->get('sort_dir', 'desc'))
+            : 'desc';
+
+        if ($sortBy === 'featured') {
+            $query->orderByDesc('is_peptide_thumb')
+                  ->orderByDesc('rating_count')
+                  ->orderByRaw('COALESCE(discount_price, price) DESC');
+        } elseif ($sortBy === 'price') {
             $query->orderByRaw('COALESCE(discount_price, price) ' . $sortDir);
         } elseif ($sortBy === 'popular') {
-            // Sort by review count (rating_count) in descending order
-            $query->orderBy('rating_count', 'desc');
+            $query->orderByDesc('rating_count');
         } elseif ($sortBy === 'reviews') {
-            // Sort by review count (rating_count) in the specified direction
             $query->orderBy('rating_count', $sortDir);
         } elseif ($sortBy === 'rating') {
-            // Sort by rating average (rating_average) in the specified direction
             $query->orderBy('rating_average', $sortDir);
         } else {
             $query->orderBy($sortBy, $sortDir);
@@ -934,23 +940,29 @@ class ProductsController extends Controller
                   ->where('purity', '>=', $minPurity);
         }
 
-        // Apply sorting - default to price ascending
-        // When sorting by price, use discount_price if available, otherwise use price
-        $sortBy = $request->get('sort', 'price');
-        $sortDir = in_array(strtolower($request->get('sort_dir', 'asc')), ['asc', 'desc']) 
-            ? strtolower($request->get('sort_dir', 'asc')) 
-            : 'asc';
-        
-        if ($sortBy === 'price') {
+        // Sort default is 'featured' — is_peptide_thumb curated picks first,
+        // then popular (rating_count DESC), then higher effective price DESC
+        // as the tiebreak. Colin Sep 7: 'we need to focus on ways to sell
+        // the BEST products not cheapest, or we make less money'. Cheapest-
+        // first is revenue-hostile on an affiliate model — higher AOV means
+        // higher commission per outbound click. Users can still opt into
+        // cheapest via ?sort=price&sort_dir=asc.
+        $sortBy = $request->get('sort', 'featured');
+        $sortDir = in_array(strtolower($request->get('sort_dir', 'desc')), ['asc', 'desc'])
+            ? strtolower($request->get('sort_dir', 'desc'))
+            : 'desc';
+
+        if ($sortBy === 'featured') {
+            $query->orderByDesc('is_peptide_thumb')
+                  ->orderByDesc('rating_count')
+                  ->orderByRaw('COALESCE(discount_price, price) DESC');
+        } elseif ($sortBy === 'price') {
             $query->orderByRaw('COALESCE(discount_price, price) ' . $sortDir);
         } elseif ($sortBy === 'popular') {
-            // Sort by review count (rating_count) in descending order
-            $query->orderBy('rating_count', 'desc');
+            $query->orderByDesc('rating_count');
         } elseif ($sortBy === 'reviews') {
-            // Sort by review count (rating_count) in the specified direction
             $query->orderBy('rating_count', $sortDir);
         } elseif ($sortBy === 'rating') {
-            // Sort by rating average (rating_average) in the specified direction
             $query->orderBy('rating_average', $sortDir);
         } else {
             $query->orderBy($sortBy, $sortDir);

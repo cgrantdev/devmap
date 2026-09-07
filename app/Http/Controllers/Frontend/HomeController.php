@@ -866,22 +866,38 @@ class HomeController extends Controller
         ];
         session(['page_seo_data' => $seo]);
 
-        // Best Deals Right Now — direct-to-affiliate cards for the
-        // homepage above-the-fold slot. Boosted vendors first, then
-        // cheapest post-coupon final price. Each click fires the /go
-        // outbound redirect (logged + GA4 + UTM'd). Sep 6 revenue push.
+        // Best Deals Right Now — direct-to-affiliate cards. Ranking is
+        // BIGGEST SAVINGS $ + boosted vendors + higher retail price
+        // (not lowest absolute price — a \$500 product 30% off is a
+        // better 'deal' than a \$10 product at full price, AND yields
+        // higher commission per outbound click on an affiliate model).
+        // Colin Sep 7: 'we need to focus on ways to sell the BEST
+        // products not cheapest, or we make less money'.
+        //
+        // Only products with an actual discount (%-off applied) qualify
+        // — a full-price product isn't a 'deal'.
         $bestDeals = \App\Models\Product::visible()
             ->where('status', 'active')
+            ->whereHas('brand.vendorSetting', function ($q) {
+                $q->where('coupon_discount_percent', '>', 0)
+                  ->where('coupon_discount_percent', '<', 100);
+            })
             ->with(['brand:id,name,slug', 'brand.vendorSetting'])
-            ->orderByRaw('COALESCE(NULLIF(discount_price, 0), price) ASC')
-            ->limit(60)
+            ->where(function ($q) {
+                // Filter out low-AOV noise — a \$10 product 15% off
+                // makes us \$0.15 commission. Require at least \$40
+                // retail so every card is a meaningful click.
+                $q->where('price', '>=', 40)->orWhere('discount_price', '>=', 40);
+            })
+            ->orderByRaw('COALESCE(discount_price, price) DESC')
+            ->limit(80)
             ->get()
             ->map(function ($p) {
                 $vs = $p->brand?->vendorSetting;
                 $retail = (float) ($p->discount_price && $p->discount_price < $p->price ? $p->discount_price : $p->price);
-                $pct = $vs && $vs->coupon_discount_percent && $vs->coupon_discount_percent > 0 && $vs->coupon_discount_percent < 100
-                    ? (float) $vs->coupon_discount_percent : null;
-                $final = $pct ? round($retail * (1 - $pct / 100), 2) : $retail;
+                $pct = (float) $vs->coupon_discount_percent;
+                $final = round($retail * (1 - $pct / 100), 2);
+                $savings = round($retail - $final, 2);
                 return [
                     'id' => $p->id,
                     'name' => $p->display_name ?? $p->name,
@@ -889,14 +905,21 @@ class HomeController extends Controller
                     'brand_slug' => $p->brand?->slug,
                     'retail' => $retail,
                     'final_price' => $final,
+                    'savings' => $savings,
                     'coupon_code' => $vs?->coupon_code ?: 'PMAP',
                     'coupon_pct' => $pct,
                     'coupon_boost_active' => $vs?->couponBoostActive() ?? false,
                     'go_url' => "/go/{$p->id}?src=homepage-best-deals",
                 ];
             })
+            // Rank: boosted vendors first, then by absolute \$ savings desc.
+            // Absolute savings favors premium products, which are what
+            // drives affiliate revenue.
             ->sortBy(function ($d) {
-                return ($d['coupon_boost_active'] ? 0 : 1) . '-' . str_pad(number_format($d['final_price'] * 100, 0, '.', ''), 12, '0', STR_PAD_LEFT);
+                $boostFlag = $d['coupon_boost_active'] ? '0' : '1';
+                // Invert savings for ascending sort → biggest savings first
+                $invSavings = str_pad(number_format(999999 - $d['savings'], 2, '.', ''), 12, '0', STR_PAD_LEFT);
+                return $boostFlag . '-' . $invSavings;
             })
             ->take(10)
             ->values();
