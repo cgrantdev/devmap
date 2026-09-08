@@ -73,10 +73,8 @@
             </span>
           </div>
 
-          <!-- Mobile content — vertically centered instead of top-pinned so
-               the CTA row sits over the safe area of the image regardless of
-               where the product photography lands. -->
-          <div class="md:hidden relative h-full flex flex-col items-center justify-center text-center px-6 py-5 pointer-events-none">
+          <!-- Mobile content — top-aligned, vendor name only, center-justified -->
+          <div class="md:hidden relative h-full flex flex-col items-center text-center px-6 pt-7 pointer-events-none">
             <div
               v-if="slide.eyebrow"
               class="text-[10px] uppercase tracking-[0.14em] font-semibold text-white/60 mb-2"
