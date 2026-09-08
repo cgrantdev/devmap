@@ -10,7 +10,7 @@
         <div
           v-for="(slide, i) in slides"
           :key="i"
-          class="relative flex-[0_0_100%] min-w-0 h-[360px] md:h-[420px] lg:h-[460px]"
+          class="relative flex-[0_0_100%] min-w-0 h-[300px] md:h-[420px] lg:h-[460px]"
         >
           <!-- Background — mobile image (portrait), desktop image (landscape), or gradient -->
           <div
