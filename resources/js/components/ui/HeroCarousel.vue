@@ -93,7 +93,7 @@
             >
               {{ slide.eyebrow }}
             </div>
-            <h1 class="ui-display text-white text-[26px] font-semibold tracking-[-0.02em] leading-[1.05]" :style="slide.highlight_color ? `color: ${slide.highlight_color};` : ''">
+            <h1 class="ui-display text-white text-[26px] font-semibold tracking-[-0.02em] leading-[1.05]" :style="(slide.highlight_color_mobile || slide.highlight_color) ? `color: ${slide.highlight_color_mobile || slide.highlight_color};` : ''">
               {{ slide.title_highlight || slide.title }}
             </h1>
             <div class="relative z-20 mt-5 flex flex-wrap items-center justify-center gap-2 pointer-events-auto">

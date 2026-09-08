@@ -995,6 +995,7 @@ class HomeController extends Controller
                 'bg_size_mobile'   => $s['bg_size_mobile'] ?? null,
                 'bg_position_mobile' => $s['bg_position_mobile'] ?? null,
                 'highlight_color'  => $s['highlight_color'] ?? null,
+                'highlight_color_mobile' => $s['highlight_color_mobile'] ?? null,
                 'no_overlay'       => (bool) ($s['no_overlay'] ?? false),
             ])
             ->values();
