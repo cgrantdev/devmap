@@ -20,10 +20,11 @@
                at natural aspect instead of being cropped/stretched. -->
           <div
             v-if="slide.image_mobile"
-            class="md:hidden absolute inset-0 bg-center bg-no-repeat pointer-events-none"
+            class="md:hidden absolute inset-0 bg-no-repeat pointer-events-none"
             :style="{
               backgroundImage: `url(${slide.image_mobile})`,
               backgroundSize: slide.bg_size_mobile || slide.bg_size || 'cover',
+              backgroundPosition: slide.bg_position_mobile || 'center',
             }"
           />
           <div

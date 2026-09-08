@@ -38,7 +38,7 @@
       <div class="max-w-[1280px] mx-auto px-4 lg:px-10 h-14 lg:h-16 flex items-center gap-3 lg:gap-8">
         <!-- Logo -->
         <a href="/" class="ui-focus flex items-center flex-shrink-0 min-w-0">
-          <img :src="'/images/logo.png?v=2'" alt="Peptidemap" class="h-7 lg:h-9 brightness-0 translate-y-[1px]" />
+          <img :src="'/images/logo.png?v=2'" alt="Peptidemap" class="h-8 lg:h-9 brightness-0 translate-y-[1px]" />
         </a>
 
         <!-- Primary nav (desktop) -->
