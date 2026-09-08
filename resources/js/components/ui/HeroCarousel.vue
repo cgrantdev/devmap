@@ -10,18 +10,29 @@
         <div
           v-for="(slide, i) in slides"
           :key="i"
-          class="relative flex-[0_0_100%] min-w-0 h-[300px] md:h-[420px] lg:h-[460px]"
+          class="relative flex-[0_0_100%] min-w-0 h-[360px] md:h-[420px] lg:h-[460px]"
         >
-          <!-- Background — mobile image (portrait), desktop image (landscape), or gradient -->
+          <!-- Background — mobile image (portrait), desktop image (landscape),
+               or gradient. slide.bg_size lets a slide override the default
+               'cover' (fill + crop) with 'contain' (fit inside, no crop) or
+               an explicit size like 'auto 70%' for tighter product-shot
+               framing. Southern Aminos uses 'contain' so its vials render
+               at natural aspect instead of being cropped/stretched. -->
           <div
             v-if="slide.image_mobile"
-            class="md:hidden absolute inset-0 bg-cover bg-center pointer-events-none"
-            :style="{ backgroundImage: `url(${slide.image_mobile})` }"
+            class="md:hidden absolute inset-0 bg-center bg-no-repeat pointer-events-none"
+            :style="{
+              backgroundImage: `url(${slide.image_mobile})`,
+              backgroundSize: slide.bg_size_mobile || slide.bg_size || 'cover',
+            }"
           />
           <div
             v-if="slide.image"
-            :class="[slide.image_mobile ? 'hidden md:block' : '', 'absolute inset-0 bg-cover bg-center pointer-events-none']"
-            :style="{ backgroundImage: `url(${slide.image})` }"
+            :class="[slide.image_mobile ? 'hidden md:block' : '', 'absolute inset-0 bg-center bg-no-repeat pointer-events-none']"
+            :style="{
+              backgroundImage: `url(${slide.image})`,
+              backgroundSize: slide.bg_size || 'cover',
+            }"
           />
           <div
             v-if="!slide.image && !slide.image_mobile"
