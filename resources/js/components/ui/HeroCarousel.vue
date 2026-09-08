@@ -129,7 +129,7 @@
             <div class="w-[60%] max-w-[640px]">
               <div
                 v-if="slide.eyebrow"
-                class="text-[12px] uppercase tracking-[0.14em] font-semibold text-white/60 mb-3"
+                :class="['text-[12px] uppercase tracking-[0.14em] font-semibold mb-3', slide.dark_text ? 'text-slate-500' : 'text-white/60']"
               >
                 {{ slide.eyebrow }}
               </div>
@@ -137,17 +137,19 @@
               <!-- Title with optional highlighted vendor span. Each slide
                    can override the highlight color via slide.highlight_color
                    (e.g. Southern Aminos brand orange). Falls back to the
-                   indigo accent when nothing's set. -->
-              <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-[-0.02em] leading-[1.1]" style="color: #ffffff;">
+                   indigo accent when nothing's set. dark_text: true swaps
+                   the base word color to ink for slides sitting on a light
+                   product-shot background (e.g. Southern Aminos studio). -->
+              <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-[-0.02em] leading-[1.1]" :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">
                 <template v-if="slide.title_highlight && slide.title.includes(slide.title_highlight)">
-                  <span style="color: #ffffff;">{{ slide.title.split(slide.title_highlight)[0] }}</span><span :style="`color: ${slide.highlight_color || 'var(--color-accent-300, #a5b4fc)'};`">{{ slide.title_highlight }}</span><span style="color: #ffffff;">{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
+                  <span :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">{{ slide.title.split(slide.title_highlight)[0] }}</span><span :style="`color: ${slide.highlight_color || 'var(--color-accent-300, #a5b4fc)'};`">{{ slide.title_highlight }}</span><span :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
                 </template>
-                <template v-else><span style="color: #ffffff;">{{ slide.title }}</span></template>
+                <template v-else><span :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">{{ slide.title }}</span></template>
               </h1>
 
               <p
                 v-if="slide.subtitle"
-                class="mt-4 text-white/75 text-[15px] leading-relaxed line-clamp-3"
+                :class="['mt-4 text-[15px] leading-relaxed line-clamp-3', slide.dark_text ? 'text-slate-700' : 'text-white/75']"
               >
                 {{ slide.subtitle }}
               </p>

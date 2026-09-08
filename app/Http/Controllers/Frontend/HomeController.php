@@ -997,6 +997,7 @@ class HomeController extends Controller
                 'highlight_color'  => $s['highlight_color'] ?? null,
                 'highlight_color_mobile' => $s['highlight_color_mobile'] ?? null,
                 'no_overlay'       => (bool) ($s['no_overlay'] ?? false),
+                'dark_text'        => (bool) ($s['dark_text'] ?? false),
             ])
             ->values();
     }
