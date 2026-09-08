@@ -30,18 +30,10 @@
           />
 
           <!-- Overlays for legibility — softer than before so the product art breathes -->
-          <!-- Contrast overlay. Default: dark gradient for white text over
-               photography. Slides can opt into slide.theme='light' when the
-               image is bright (e.g. Southern Aminos white BG) — flips to a
-               white gradient so dark text on top stays readable. -->
-          <div
-            :class="[
-              'absolute inset-0 pointer-events-none',
-              slide.theme === 'light'
-                ? 'bg-gradient-to-b md:bg-gradient-to-r from-white/85 via-white/60 to-transparent md:from-white/85 md:via-white/40'
-                : 'bg-gradient-to-b md:bg-gradient-to-r from-black/60 via-black/30 to-transparent md:from-black/55 md:via-black/15',
-            ]"
-          />
+          <!-- Contrast overlay. Slides can opt out with slide.no_overlay
+               = true so the image renders clean (e.g. Southern Aminos
+               product shot where the image itself should be the visual). -->
+          <div v-if="!slide.no_overlay" class="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-black/60 via-black/30 to-transparent md:from-black/55 md:via-black/15 pointer-events-none" />
 
           <!-- Whole-slide clickable overlay. Sits above decorative layers but below the
                CTA/coupon action row (which uses z-20). The Embla drag handler still
@@ -83,16 +75,15 @@
 
           <!-- Mobile content — vertically centered instead of top-pinned so
                the CTA row sits over the safe area of the image regardless of
-               where the product photography lands. Theme-aware text colors
-               so light-theme slides stay readable. -->
+               where the product photography lands. -->
           <div class="md:hidden relative h-full flex flex-col items-center justify-center text-center px-6 py-5 pointer-events-none">
             <div
               v-if="slide.eyebrow"
-              :class="['text-[10px] uppercase tracking-[0.14em] font-semibold mb-2', slide.theme === 'light' ? 'text-[color:var(--color-ink)]/60' : 'text-white/60']"
+              class="text-[10px] uppercase tracking-[0.14em] font-semibold text-white/60 mb-2"
             >
               {{ slide.eyebrow }}
             </div>
-            <h1 :class="['ui-display text-[26px] font-semibold tracking-[-0.02em] leading-[1.05]', slide.theme === 'light' ? 'text-[color:var(--color-ink)]' : 'text-white']" :style="slide.highlight_color ? `color: ${slide.highlight_color};` : ''">
+            <h1 class="ui-display text-white text-[26px] font-semibold tracking-[-0.02em] leading-[1.05]" :style="slide.highlight_color ? `color: ${slide.highlight_color};` : ''">
               {{ slide.title_highlight || slide.title }}
             </h1>
             <div class="relative z-20 mt-5 flex flex-wrap items-center justify-center gap-2 pointer-events-auto">
@@ -128,28 +119,25 @@
             <div class="w-[60%] max-w-[640px]">
               <div
                 v-if="slide.eyebrow"
-                :class="['text-[12px] uppercase tracking-[0.14em] font-semibold mb-3', slide.theme === 'light' ? 'text-[color:var(--color-ink)]/60' : 'text-white/60']"
+                class="text-[12px] uppercase tracking-[0.14em] font-semibold text-white/60 mb-3"
               >
                 {{ slide.eyebrow }}
               </div>
 
-              <!-- Title with optional highlighted vendor span. Each slide can
-                   override the highlight color via slide.highlight_color
-                   (e.g. Southern Aminos brand orange #f97316). Base title
-                   color follows slide.theme so light-BG slides stay readable. -->
-              <h1
-                class="ui-display text-3xl lg:text-4xl font-semibold tracking-[-0.02em] leading-[1.1]"
-                :style="`color: ${slide.theme === 'light' ? '#0a0b0e' : '#ffffff'};`"
-              >
+              <!-- Title with optional highlighted vendor span. Each slide
+                   can override the highlight color via slide.highlight_color
+                   (e.g. Southern Aminos brand orange). Falls back to the
+                   indigo accent when nothing's set. -->
+              <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-[-0.02em] leading-[1.1]" style="color: #ffffff;">
                 <template v-if="slide.title_highlight && slide.title.includes(slide.title_highlight)">
-                  <span :style="`color: ${slide.theme === 'light' ? '#0a0b0e' : '#ffffff'};`">{{ slide.title.split(slide.title_highlight)[0] }}</span><span :style="`color: ${slide.highlight_color || 'var(--color-accent-300, #a5b4fc)'};`">{{ slide.title_highlight }}</span><span :style="`color: ${slide.theme === 'light' ? '#0a0b0e' : '#ffffff'};`">{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
+                  <span style="color: #ffffff;">{{ slide.title.split(slide.title_highlight)[0] }}</span><span :style="`color: ${slide.highlight_color || 'var(--color-accent-300, #a5b4fc)'};`">{{ slide.title_highlight }}</span><span style="color: #ffffff;">{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
                 </template>
-                <template v-else><span :style="`color: ${slide.theme === 'light' ? '#0a0b0e' : '#ffffff'};`">{{ slide.title }}</span></template>
+                <template v-else><span style="color: #ffffff;">{{ slide.title }}</span></template>
               </h1>
 
               <p
                 v-if="slide.subtitle"
-                :class="['mt-4 text-[15px] leading-relaxed line-clamp-3', slide.theme === 'light' ? 'text-[color:var(--color-ink)]/80' : 'text-white/75']"
+                class="mt-4 text-white/75 text-[15px] leading-relaxed line-clamp-3"
               >
                 {{ slide.subtitle }}
               </p>
