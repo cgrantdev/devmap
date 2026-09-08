@@ -119,10 +119,13 @@
                 {{ slide.eyebrow }}
               </div>
 
-              <!-- Title with optional highlighted vendor span -->
+              <!-- Title with optional highlighted vendor span. Each slide
+                   can override the highlight color via slide.highlight_color
+                   (e.g. Southern Aminos brand orange #f97316). Falls back to
+                   the indigo accent color when nothing's set. -->
               <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-[-0.02em] leading-[1.1]" style="color: #ffffff;">
                 <template v-if="slide.title_highlight && slide.title.includes(slide.title_highlight)">
-                  <span style="color: #ffffff;">{{ slide.title.split(slide.title_highlight)[0] }}</span><span style="color: var(--color-accent-300, #a5b4fc);">{{ slide.title_highlight }}</span><span style="color: #ffffff;">{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
+                  <span style="color: #ffffff;">{{ slide.title.split(slide.title_highlight)[0] }}</span><span :style="`color: ${slide.highlight_color || 'var(--color-accent-300, #a5b4fc)'};`">{{ slide.title_highlight }}</span><span style="color: #ffffff;">{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
                 </template>
                 <template v-else><span style="color: #ffffff;">{{ slide.title }}</span></template>
               </h1>
@@ -147,22 +150,25 @@
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
 
-                <!-- Coupon-code pill (refined: green-tint deal vibe, larger code, copy confirmation) -->
+                <!-- Coupon pill: bright, high-contrast, dashed-border 'deal
+                     ticket' look. Screams 'this is a code' next to the CTA.
+                     Solid emerald bg + white text = fully readable on any
+                     background image, unlike the previous low-opacity tint. -->
                 <button
                   v-if="slide.coupon_code"
                   type="button"
                   @click="copyCoupon(slide.coupon_code, i)"
-                  class="ui-focus inline-flex items-center gap-3 h-12 pl-3 pr-5 rounded-[12px] bg-gradient-to-b from-emerald-400/20 to-emerald-500/15 border border-emerald-300/40 text-white hover:from-emerald-400/30 hover:to-emerald-500/20 transition-colors shadow-sm"
+                  class="ui-focus group inline-flex items-center gap-3 h-12 pl-4 pr-5 rounded-[12px] bg-emerald-500 hover:bg-emerald-600 border-2 border-dashed border-emerald-200 text-white transition-all shadow-lg hover:shadow-xl hover:-translate-y-[1px]"
                   :title="`Click to copy ${slide.coupon_code}`"
                 >
-                  <span class="inline-flex items-center justify-center w-7 h-7 rounded-md bg-emerald-300/20">
-                    <svg v-if="copiedIndex !== i" class="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                    <svg v-else class="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  </span>
                   <div class="flex flex-col items-start leading-tight">
-                    <span class="text-emerald-100/70 text-[10px] uppercase tracking-[0.1em] font-semibold">Code</span>
-                    <span class="ui-mono font-bold tracking-wide text-[15px] text-emerald-50 uppercase">{{ slide.coupon_code }}</span>
+                    <span class="text-emerald-100 text-[10px] uppercase tracking-[0.14em] font-bold">Code</span>
+                    <span class="ui-mono font-black tracking-widest text-[17px] text-white uppercase">{{ slide.coupon_code }}</span>
                   </div>
+                  <span class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-white/15 group-hover:bg-white/25 transition-colors">
+                    <svg v-if="copiedIndex !== i" class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    <svg v-else class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </span>
                 </button>
               </div>
             </div>
