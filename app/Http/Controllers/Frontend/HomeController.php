@@ -991,6 +991,11 @@ class HomeController extends Controller
                 'image_mobile'     => $this->resolveHeroImage($s['image_mobile'] ?? null),
                 'coupon_code'      => $s['coupon_code'] ?? null,
                 'analytics_label'  => $s['analytics_label'] ?? null,
+                'bg_size'          => $s['bg_size'] ?? null,
+                'bg_size_mobile'   => $s['bg_size_mobile'] ?? null,
+                'bg_position_mobile' => $s['bg_position_mobile'] ?? null,
+                'highlight_color'  => $s['highlight_color'] ?? null,
+                'no_overlay'       => (bool) ($s['no_overlay'] ?? false),
             ])
             ->values();
     }
