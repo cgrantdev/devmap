@@ -44,6 +44,25 @@ class IngestionService
             return null;
         }
 
+        // Reject rows whose name is clearly an HTML <title> tag rather
+        // than a real product name — Julia flagged four such rows from
+        // CertaPeptides (Sep 12): the scraper hit /shop/{compound}
+        // archive pages, missed the product H1, and cached the
+        // browser-tab title (e.g. "Shop Research Peptides | CertaPeptides"
+        // or "Semax | CertaPeptides") with an empty price. Two signals
+        // that catch the pollution without touching real products:
+        //   (a) name begins with "Shop " — WooCommerce shop archive
+        //   (b) name ends with " | <VendorName>" AND price is missing —
+        //       WordPress default page-title format with no scrape data
+        if ($this->looksLikeHtmlPageTitle($data['name'], $config, $data['price'] ?? null)) {
+            Log::warning('IngestionService: rejecting HTML-title-shaped row', [
+                'config_id' => $config->id,
+                'name' => $data['name'],
+                'source_url' => $data['source_url'] ?? null,
+            ]);
+            return null;
+        }
+
         $matchKeys = [
             'scraping_config_id' => $config->id,
         ];
@@ -118,6 +137,30 @@ class IngestionService
     {
         if (!$url) return false;
         return (bool) preg_match(self::PRODUCT_URL_PATTERN, $url);
+    }
+
+    /**
+     * True when `name` is more plausibly an HTML <title> than a product
+     * name. Matches two documented pollution shapes:
+     *   - Starts with "Shop " (WooCommerce shop archive default title)
+     *   - Ends with " | VendorName" AND the row carries no price — the
+     *     WordPress `Post Title | Site Name` fallback picked up when the
+     *     scraper couldn't find the product H1. Requiring null price
+     *     avoids rejecting legitimate branded SKUs that use " | Vendor".
+     */
+    private function looksLikeHtmlPageTitle(string $name, ScrapingConfig $config, mixed $price): bool
+    {
+        if (preg_match('/^Shop\s+[A-Z]/', $name)) {
+            return true;
+        }
+        $hasPrice = $price !== null && $price !== '' && (float) $price > 0;
+        if ($hasPrice) return false;
+
+        $vendorName = $config->vendor_name ?? '';
+        if ($vendorName !== '' && preg_match('/\s\|\s' . preg_quote($vendorName, '/') . '\s*$/i', $name)) {
+            return true;
+        }
+        return false;
     }
 
     /**
