@@ -467,11 +467,15 @@ class HomeController extends Controller
                 $q->visible()->where('status', 'active');
             }])
             // Featured / partner vendors surface first (paid placement),
-            // then rating, then catalog depth.
-            ->leftJoin('vendor_settings as vs_sort', 'vs_sort.brand_id', '=', 'brands.id')
-            ->select('brands.*')
-            ->orderByRaw('GREATEST(COALESCE(vs_sort.is_partner, 0), COALESCE(vs_sort.featured, 0)) DESC')
-            ->orderByDesc('brands.rating_average')
+            // then rating, then catalog depth. Subquery avoids clashing
+            // with withCount()'s product_count alias.
+            ->orderByDesc(
+                \App\Models\VendorSetting::query()
+                    ->selectRaw('GREATEST(COALESCE(is_partner, 0), COALESCE(featured, 0))')
+                    ->whereColumn('brand_id', 'brands.id')
+                    ->limit(1)
+            )
+            ->orderByDesc('rating_average')
             ->orderByDesc('product_count')
             ->take(8)
             ->get()
