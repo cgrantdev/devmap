@@ -466,7 +466,12 @@ class HomeController extends Controller
             ->withCount(['products as product_count' => function ($q) {
                 $q->visible()->where('status', 'active');
             }])
-            ->orderByDesc('rating_average')
+            // Featured / partner vendors surface first (paid placement),
+            // then rating, then catalog depth.
+            ->leftJoin('vendor_settings as vs_sort', 'vs_sort.brand_id', '=', 'brands.id')
+            ->select('brands.*')
+            ->orderByRaw('GREATEST(COALESCE(vs_sort.is_partner, 0), COALESCE(vs_sort.featured, 0)) DESC')
+            ->orderByDesc('brands.rating_average')
             ->orderByDesc('product_count')
             ->take(8)
             ->get()
