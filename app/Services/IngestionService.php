@@ -63,6 +63,21 @@ class IngestionService
             return null;
         }
 
+        // Reject known non-product line items — checkout add-ons that
+        // WooCommerce feeds surface alongside real products. Julia
+        // flagged 100 "Ship-Safely Shipping Protection — X.XXmg" rows
+        // from Oneday Compounds (Sep 12): the Ship-Safely plugin
+        // creates a shipping-insurance variant for every $0.30 price
+        // band and each one gets its own product_id in the feed.
+        // Match on name substrings that never appear on a real peptide.
+        if ($this->looksLikeCheckoutAddon($data['name'])) {
+            Log::warning('IngestionService: rejecting checkout-addon row', [
+                'config_id' => $config->id,
+                'name' => $data['name'],
+            ]);
+            return null;
+        }
+
         $matchKeys = [
             'scraping_config_id' => $config->id,
         ];
@@ -148,6 +163,28 @@ class IngestionService
      *     scraper couldn't find the product H1. Requiring null price
      *     avoids rejecting legitimate branded SKUs that use " | Vendor".
      */
+    /**
+     * True when `name` is a WooCommerce checkout add-on (shipping
+     * insurance, gift wrap, tips) rather than a real product. These
+     * plugins create one product_id per price tier so a peptide feed
+     * of ~50 products can grow into ~150 with 100 add-on line items.
+     */
+    private function looksLikeCheckoutAddon(string $name): bool
+    {
+        static $patterns = [
+            'ship-safely',           // Ship-Safely Shipping Protection plugin
+            'shipping protection',   // generic shipping-insurance add-ons
+            'shipping insurance',
+            'route protection',      // Route.com shipping insurance
+            'seel protection',       // Seel shipping/returns coverage
+        ];
+        $lower = strtolower($name);
+        foreach ($patterns as $needle) {
+            if (str_contains($lower, $needle)) return true;
+        }
+        return false;
+    }
+
     private function looksLikeHtmlPageTitle(string $name, ScrapingConfig $config, mixed $price): bool
     {
         if (preg_match('/^Shop\s+[A-Z]/', $name)) {
