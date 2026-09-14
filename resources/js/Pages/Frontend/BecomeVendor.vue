@@ -490,7 +490,6 @@
                   <input v-model="formData.trustpilotUrl" type="url" placeholder="Trustpilot URL" class="h-9 px-3 text-[12px] border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
                   <input v-model="formData.googleReviewsUrl" type="url" placeholder="Google Reviews URL" class="h-9 px-3 text-[12px] border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
                   <input v-model="formData.reviewsIoUrl" type="url" placeholder="Reviews.io URL" class="h-9 px-3 text-[12px] border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
-                  <input v-model="formData.pepreviewproUrl" type="url" placeholder="PepReviewPro URL" class="h-9 px-3 text-[12px] border border-slate-300 rounded focus:border-slate-500 focus:outline-none" />
                 </div>
               </details>
 

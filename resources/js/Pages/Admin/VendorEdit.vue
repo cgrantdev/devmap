@@ -242,9 +242,6 @@
             <FormField label="Reviews.io URL">
               <input v-model="editForm.reviews_io_url" type="url" placeholder="https://www.reviews.io/company-reviews/store/…" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
             </FormField>
-            <FormField label="PepReviewPro URL">
-              <input v-model="editForm.pepreviewpro_url" type="url" placeholder="https://pepreviewpro.com/store/…" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
-            </FormField>
           </FormSection>
           <FormSection title="Affiliate Tracking" :columns="2">
             <FormField label="Affiliate URL Template" hint="Placeholders: {product_url}, {slug}, {id}, {affiliate_tag}">

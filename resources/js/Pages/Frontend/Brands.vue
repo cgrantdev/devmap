@@ -78,34 +78,47 @@
             Top vendors
           </button>
 
-          <!-- Verified badge + USP filters — Sep 1. cGMP + Testing require
-               an approved VendorCertificationClaim; US Made is a self-declared
-               USP that vendors can toggle in their storefront. -->
-          <span class="text-[color:var(--color-hairline)] text-sm mx-1">|</span>
+        </div>
+
+        <!-- Verified badge + USP filters — Sep 1. cGMP + Testing require
+             an approved VendorCertificationClaim; US Made is a self-declared
+             USP that vendors can toggle in their storefront. Broken onto
+             its own row (Colin Sep 14) with a "Trust filters:" label so
+             it's obviously a separate class of filter from location. -->
+        <div class="flex flex-wrap items-center gap-2 mt-3">
+          <span class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] pr-1">Trust filters</span>
           <button
             v-for="f in verifiedFilters"
             :key="f.value"
             @click="toggleVerified(f.value)"
             :class="[
-              'ui-focus h-8 px-3.5 rounded-full text-[12px] font-semibold transition-all duration-200 border flex items-center gap-1.5',
+              'ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm',
               selectedFilters.verified === f.value
                 ? 'bg-emerald-600 text-white border-emerald-600'
-                : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-emerald-400 hover:text-[color:var(--color-ink)]',
+                : 'bg-emerald-50/60 text-emerald-800 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50',
             ]"
           >
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             {{ f.label }}
           </button>
           <button
             @click="toggleUsp('us_manufactured')"
             :class="[
-              'ui-focus h-8 px-3.5 rounded-full text-[12px] font-semibold transition-all duration-200 border flex items-center gap-1.5',
+              'ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm',
               selectedFilters.usp === 'us_manufactured'
                 ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
-                : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)]',
+                : 'bg-blue-50/60 text-blue-900 border-blue-200 hover:border-blue-400 hover:bg-blue-50',
             ]"
           >
-            🇺🇸 US Made
+            <!-- Inline SVG US flag — 🇺🇸 emoji rendered as literal "us"
+                 text on some Windows/Chrome combos without a color emoji
+                 font. This is the same design as the emoji at 14x10 px. -->
+            <svg class="w-4 h-3 rounded-[1px]" viewBox="0 0 21 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect width="21" height="15" fill="#b22234"/>
+              <path stroke="#fff" stroke-width="1.15" d="M0 2.3h21M0 4.6h21M0 6.9h21M0 9.2h21M0 11.5h21M0 13.8h21"/>
+              <rect width="9" height="8" fill="#3c3b6e"/>
+            </svg>
+            US Made
           </button>
         </div>
       </div>
