@@ -189,6 +189,17 @@ class Product extends Model
             return $this->name ?? '';
         }
 
+        // Colin Sep 14 — vendors deliberately obfuscate the pharma names
+        // on GLP-1/2/3 products for regulator optics ("GLP-3 RT 10mg"
+        // instead of "Retatrutide 10mg"). Our normalizer was overwriting
+        // their careful labeling with the compound name, which is exactly
+        // what got Instant Peptides pinged. For these compounds, keep the
+        // vendor's raw name verbatim.
+        static $preserveVendorLabelFor = ['Semaglutide', 'Tirzepatide', 'Retatrutide'];
+        if (in_array($categoryName, $preserveVendorLabelFor, true) && !empty($this->name)) {
+            return $this->name;
+        }
+
         // Normalize size: if it's a bare number, append "mg"
         if (preg_match('/^\d+(\.\d+)?$/', $size)) {
             $size .= 'mg';
