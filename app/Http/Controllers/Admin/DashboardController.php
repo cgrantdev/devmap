@@ -54,9 +54,41 @@ class DashboardController extends Controller
                 ->toArray();
         }
 
+        // Live + scheduled coupon boosts across every vendor (Colin Sep 14
+        // — Julia's PMAP feedback: 'add a visual below this showing any
+        // active promotions with start and end dates / times'). Gives
+        // Julia one place to see what's running instead of clicking
+        // through every vendor edit page.
+        $now = now();
+        $activeBoosts = VendorSetting::with('brand')
+            ->whereNotNull('coupon_boost_expires_at')
+            ->where('coupon_boost_expires_at', '>', $now)
+            ->orderBy('coupon_boost_expires_at')
+            ->get()
+            ->map(function ($vs) use ($now) {
+                $isScheduled = $vs->coupon_boost_starts_at && $vs->coupon_boost_starts_at->isFuture();
+                return [
+                    'brand_id' => $vs->brand?->id,
+                    'brand_name' => $vs->brand?->name,
+                    'brand_slug' => $vs->brand?->slug,
+                    'status' => $isScheduled ? 'scheduled' : 'active',
+                    'percent' => $isScheduled
+                        ? (float) $vs->coupon_boost_percent
+                        : (float) $vs->coupon_discount_percent,
+                    'starts_at' => $vs->coupon_boost_starts_at?->toIso8601String(),
+                    'expires_at' => $vs->coupon_boost_expires_at?->toIso8601String(),
+                    'reverts_to_percent' => $vs->coupon_discount_previous_percent
+                        ? (float) $vs->coupon_discount_previous_percent
+                        : null,
+                    'coupon_code' => $vs->coupon_code,
+                ];
+            })
+            ->values();
+
         return Inertia::render('Admin/Dashboard', [
             'stats' => $stats,
-            'recentActivity' => $recentActivity
+            'recentActivity' => $recentActivity,
+            'activeBoosts' => $activeBoosts,
         ]);
     }
 } 

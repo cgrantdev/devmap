@@ -32,7 +32,7 @@
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
 
         <!-- Search Bar -->
-        <div class="bg-white rounded-[14px] shadow-[var(--shadow-sm)] border border-[color:var(--color-hairline)] p-5 mb-8">
+        <div class="bg-white rounded-[14px] shadow-[var(--shadow-sm)] border border-[color:var(--color-hairline)] p-5 mb-4">
           <div class="relative">
             <input
               v-model="searchQuery"
@@ -45,6 +45,40 @@
               <circle cx="11" cy="11" r="8"></circle>
             </svg>
           </div>
+        </div>
+
+        <!-- Trust filters — Colin Sep 14 (PMAP feedback). Chips mirror the
+             vendors page so the UX between /peptides and /vendors is
+             consistent. Clicking a chip navigates to the vendors page
+             pre-filtered on that certification, so users can find every
+             cGMP / 7+ Tested / US Made vendor across all compounds. -->
+        <div class="flex flex-wrap items-center gap-2 mb-8">
+          <span class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] pr-1">Trust filters</span>
+          <Link
+            href="/vendors?verified=cgmp"
+            class="ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm bg-emerald-50/60 text-emerald-800 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            cGMP Verified
+          </Link>
+          <Link
+            href="/vendors?verified=testing_7x"
+            class="ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm bg-emerald-50/60 text-emerald-800 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            7+ Tested
+          </Link>
+          <Link
+            href="/vendors?usp=us_manufactured"
+            class="ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm bg-blue-50/60 text-blue-900 border-blue-200 hover:border-blue-400 hover:bg-blue-50"
+          >
+            <svg class="w-4 h-3 rounded-[1px]" viewBox="0 0 21 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect width="21" height="15" fill="#b22234"/>
+              <path stroke="#fff" stroke-width="1.15" d="M0 2.3h21M0 4.6h21M0 6.9h21M0 9.2h21M0 11.5h21M0 13.8h21"/>
+              <rect width="9" height="8" fill="#3c3b6e"/>
+            </svg>
+            US Made
+          </Link>
         </div>
         
         <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
