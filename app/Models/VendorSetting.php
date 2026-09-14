@@ -39,6 +39,8 @@ class VendorSetting extends Model
         'coupon_discount_percent',
         'coupon_discount_previous_percent',
         'coupon_boost_expires_at',
+        'coupon_boost_starts_at',
+        'coupon_boost_percent',
         'referral_url',
         'trustpilot_url',
         'google_reviews_url',
@@ -85,6 +87,8 @@ class VendorSetting extends Model
         'why_choose_bullets' => 'array',
         'business_hours_json' => 'array',
         'coupon_boost_expires_at' => 'datetime',
+        'coupon_boost_starts_at' => 'datetime',
+        'coupon_boost_percent' => 'float',
         'external_rating_avg' => 'float',
         'affiliate_credentials' => 'encrypted',
         'affiliate_stats_json' => 'array',
@@ -93,36 +97,73 @@ class VendorSetting extends Model
     ];
 
     /**
-     * True while a temporary coupon boost is active. Used by the auto-revert
-     * scheduler + Discord post to detect state transitions.
+     * True while a temporary coupon boost is currently running —
+     * starts_at (if set) has passed and expires_at is still in the
+     * future. A boost whose starts_at is still ahead reads as
+     * "scheduled" (couponBoostScheduled) rather than active.
      */
     public function couponBoostActive(): bool
     {
-        return $this->coupon_boost_expires_at
-            && $this->coupon_boost_expires_at->isFuture()
-            && $this->coupon_discount_previous_percent !== null;
+        if (!$this->coupon_boost_expires_at || $this->coupon_boost_expires_at->isPast()) {
+            return false;
+        }
+        if ($this->coupon_discount_previous_percent === null) {
+            return false;
+        }
+        if ($this->coupon_boost_starts_at && $this->coupon_boost_starts_at->isFuture()) {
+            return false;
+        }
+        return true;
     }
 
     /**
-     * Apply a temporary coupon boost. Snapshots the current % as
-     * previous_percent so RevertExpiredCouponBoosts can put it back.
-     * Idempotent: re-applying while a boost is active updates the new
-     * percentage + expiry without losing the original previous_percent.
-     * Also posts to Discord when a NEW boost begins (not on re-apply).
+     * True when a boost is scheduled for the future — Julia set it up
+     * ahead of a launch and the start time hasn't hit yet. The nightly
+     * ActivateScheduledCouponBoosts command flips these to active.
      */
-    public function applyCouponBoost(float $newPercent, \DateTimeInterface $expiresAt): void
+    public function couponBoostScheduled(): bool
     {
-        $isNewBoost = !$this->couponBoostActive();
+        return $this->coupon_boost_percent !== null
+            && $this->coupon_boost_starts_at
+            && $this->coupon_boost_starts_at->isFuture()
+            && $this->coupon_boost_expires_at
+            && $this->coupon_boost_expires_at->isFuture();
+    }
+
+    /**
+     * Apply a temporary coupon boost. If $startsAt is null or in the
+     * past, the discount swap happens immediately and a Discord
+     * announcement fires. Otherwise the boost is stored as "scheduled"
+     * (coupon_boost_percent + coupon_boost_starts_at + expires_at) and
+     * ActivateScheduledCouponBoosts promotes it when the start time
+     * passes. Either way RevertExpiredCouponBoosts handles the end.
+     *
+     * Idempotent: re-applying while a boost is active or scheduled
+     * updates the new percentage + timing without losing the original
+     * previous_percent snapshot.
+     */
+    public function applyCouponBoost(float $newPercent, ?\DateTimeInterface $startsAt, \DateTimeInterface $expiresAt): void
+    {
+        $startsImmediately = !$startsAt || $startsAt <= new \DateTimeImmutable();
+        $isNewBoost = !$this->couponBoostActive() && !$this->couponBoostScheduled();
 
         if ($isNewBoost) {
             // Snapshot current standard % — this is where we revert to.
             $this->coupon_discount_previous_percent = $this->coupon_discount_percent;
         }
-        $this->coupon_discount_percent = $newPercent;
+
+        $this->coupon_boost_percent = $newPercent;
+        $this->coupon_boost_starts_at = $startsImmediately ? null : $startsAt;
         $this->coupon_boost_expires_at = $expiresAt;
+
+        if ($startsImmediately) {
+            // Live now — swap the discount % so vendor cards display
+            // the boosted rate immediately.
+            $this->coupon_discount_percent = $newPercent;
+        }
         $this->save();
 
-        if ($isNewBoost) {
+        if ($isNewBoost && $startsImmediately) {
             $this->postDiscordBoostStart($newPercent, $expiresAt);
         }
     }

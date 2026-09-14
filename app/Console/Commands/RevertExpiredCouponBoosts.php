@@ -51,6 +51,8 @@ class RevertExpiredCouponBoosts extends Command
                 'coupon_discount_percent' => $revertTo,
                 'coupon_discount_previous_percent' => null,
                 'coupon_boost_expires_at' => null,
+                'coupon_boost_starts_at' => null,
+                'coupon_boost_percent' => null,
             ])->save();
 
             $this->postDiscordExpiry($brand?->name ?? 'Unknown', $wasPercent, $revertTo);

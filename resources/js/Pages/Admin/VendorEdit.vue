@@ -193,6 +193,7 @@
                   <div class="text-[11px] text-amber-800/80">Temporarily bump the discount %. Auto-reverts on expiry, posts to Discord when live.</div>
                 </div>
                 <span v-if="editForm.coupon_boost_active" class="text-[10px] uppercase tracking-wider font-bold bg-red-600 text-white px-2 py-0.5 rounded-full">● Boost active</span>
+                <span v-else-if="editForm.coupon_boost_scheduled" class="text-[10px] uppercase tracking-wider font-bold bg-amber-600 text-white px-2 py-0.5 rounded-full">◷ Scheduled</span>
               </div>
               <div v-if="editForm.coupon_boost_active" class="mb-3 p-3 rounded border border-amber-200 bg-white text-[12px]">
                 <div class="flex items-baseline justify-between gap-3 flex-wrap">
@@ -204,6 +205,16 @@
                   <button type="button" @click="cancelCouponBoost" class="text-[11px] font-semibold text-red-700 hover:text-red-900 underline">Cancel boost early</button>
                 </div>
               </div>
+              <div v-else-if="editForm.coupon_boost_scheduled" class="mb-3 p-3 rounded border border-amber-200 bg-white text-[12px]">
+                <div class="flex items-baseline justify-between gap-3 flex-wrap">
+                  <div class="text-amber-900">
+                    <span class="font-semibold">{{ editForm.coupon_boost_percent }}%</span> boost scheduled —
+                    activates <span class="ui-mono">{{ formatBoostExpiry(editForm.coupon_boost_starts_at) }}</span>,
+                    ends <span class="ui-mono">{{ formatBoostExpiry(editForm.coupon_boost_expires_at) }}</span>
+                  </div>
+                  <button type="button" @click="cancelCouponBoost" class="text-[11px] font-semibold text-red-700 hover:text-red-900 underline">Cancel schedule</button>
+                </div>
+              </div>
               <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label class="block text-[11px] text-amber-900 mb-1">Boost %</label>
@@ -212,15 +223,20 @@
                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-amber-700 pointer-events-none">%</span>
                   </div>
                 </div>
-                <div class="sm:col-span-2">
+                <div>
+                  <label class="block text-[11px] text-amber-900 mb-1">Starts <span class="text-amber-700/70">(blank = now)</span></label>
+                  <input v-model="boostForm.starts_at" type="datetime-local" class="w-full h-9 px-3 text-sm border border-amber-300 rounded ui-mono focus:border-amber-500 focus:outline-none" />
+                </div>
+                <div>
                   <label class="block text-[11px] text-amber-900 mb-1">Ends</label>
                   <input v-model="boostForm.expires_at" type="datetime-local" class="w-full h-9 px-3 text-sm border border-amber-300 rounded ui-mono focus:border-amber-500 focus:outline-none" />
                 </div>
                 <div class="sm:col-span-3 flex items-center justify-between gap-3 flex-wrap">
                   <div class="flex items-center gap-1">
+                    <span class="text-[11px] text-amber-800/80 pr-1">End in:</span>
                     <button type="button" v-for="d in boostQuickDurations" :key="d.hours" @click="setBoostDuration(d.hours)" class="text-[11px] px-2 py-1 rounded border border-amber-300 bg-white hover:bg-amber-100 text-amber-900">{{ d.label }}</button>
                   </div>
-                  <button type="button" @click="applyCouponBoost" :disabled="!boostForm.percent || !boostForm.expires_at" class="text-[12px] font-semibold text-white bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 disabled:cursor-not-allowed px-4 py-1.5 rounded">Launch boost →</button>
+                  <button type="button" @click="applyCouponBoost" :disabled="!boostForm.percent || !boostForm.expires_at" class="text-[12px] font-semibold text-white bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 disabled:cursor-not-allowed px-4 py-1.5 rounded">{{ boostForm.starts_at ? 'Schedule boost →' : 'Launch boost →' }}</button>
                 </div>
               </div>
             </div>
@@ -533,6 +549,9 @@ const editForm = useForm({
   // Boost state — mirrored from server. Not submitted with the main
   // form; the boost has its own POST endpoint.
   coupon_boost_active: props.vendor?.settings?.coupon_boost_active ?? false,
+  coupon_boost_scheduled: props.vendor?.settings?.coupon_boost_scheduled ?? false,
+  coupon_boost_percent: props.vendor?.settings?.coupon_boost_percent ?? null,
+  coupon_boost_starts_at: props.vendor?.settings?.coupon_boost_starts_at ?? null,
   coupon_boost_expires_at: props.vendor?.settings?.coupon_boost_expires_at ?? null,
   coupon_discount_previous_percent: props.vendor?.settings?.coupon_discount_previous_percent ?? null,
   referral_url: props.vendor?.settings?.referral_url || '',
@@ -605,7 +624,7 @@ function toggleShipsTo(id) {
 }
 
 // --- Coupon boost handlers ------------------------------------------
-const boostForm = reactive({ percent: null, expires_at: '' })
+const boostForm = reactive({ percent: null, starts_at: '', expires_at: '' })
 const boostQuickDurations = [
   { hours: 24,  label: '24h' },
   { hours: 72,  label: '3 days' },
@@ -625,15 +644,34 @@ function formatBoostExpiry(iso) {
 }
 function applyCouponBoost() {
   if (!props.vendor || !boostForm.percent || !boostForm.expires_at) return
+  const willBeScheduled = !!boostForm.starts_at && new Date(boostForm.starts_at) > new Date()
   const form = useForm({
     _token: usePage().props.csrf_token,
     boost_percent: boostForm.percent,
+    starts_at: boostForm.starts_at || null,
     expires_at: boostForm.expires_at,
   })
   form.post(`/admin/vendors/${props.vendor.id}/coupon-boost`, {
     preserveScroll: true,
     onSuccess: () => {
+      // Sync local state so the panel flips to Active / Scheduled
+      // without waiting for a page reload — Julia's bug from Sep 14
+      // was that submit looked like it did nothing except bump the
+      // discount % field. Now the UI switches to the summary card.
+      if (willBeScheduled) {
+        editForm.coupon_boost_scheduled = true
+        editForm.coupon_boost_active = false
+      } else {
+        editForm.coupon_boost_active = true
+        editForm.coupon_boost_scheduled = false
+        editForm.coupon_discount_previous_percent = editForm.coupon_discount_previous_percent ?? editForm.coupon_discount_percent
+        editForm.coupon_discount_percent = boostForm.percent
+      }
+      editForm.coupon_boost_percent = boostForm.percent
+      editForm.coupon_boost_starts_at = boostForm.starts_at ? new Date(boostForm.starts_at).toISOString() : null
+      editForm.coupon_boost_expires_at = new Date(boostForm.expires_at).toISOString()
       boostForm.percent = null
+      boostForm.starts_at = ''
       boostForm.expires_at = ''
     },
     onError: () => toastError('Boost failed — check the form and try again.'),
@@ -641,10 +679,22 @@ function applyCouponBoost() {
 }
 function cancelCouponBoost() {
   if (!props.vendor) return
-  if (!confirm('Cancel the active boost now and revert to the previous %?')) return
+  if (!confirm('Cancel the boost now and revert to the previous %?')) return
   const form = useForm({ _token: usePage().props.csrf_token })
   form.delete(`/admin/vendors/${props.vendor.id}/coupon-boost`, {
     preserveScroll: true,
+    onSuccess: () => {
+      // Flip back to the input state locally.
+      if (editForm.coupon_boost_active && editForm.coupon_discount_previous_percent != null) {
+        editForm.coupon_discount_percent = editForm.coupon_discount_previous_percent
+      }
+      editForm.coupon_boost_active = false
+      editForm.coupon_boost_scheduled = false
+      editForm.coupon_boost_percent = null
+      editForm.coupon_boost_starts_at = null
+      editForm.coupon_boost_expires_at = null
+      editForm.coupon_discount_previous_percent = null
+    },
     onError: () => toastError('Cancel failed.'),
   })
 }

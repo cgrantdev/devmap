@@ -346,6 +346,9 @@ class VendorsController extends Controller
                 // Coupon boost — active promo state exposed to the admin
                 // form so Julia can see the current boost + cancel it early.
                 'coupon_boost_active' => $brand->vendorSetting->couponBoostActive(),
+                'coupon_boost_scheduled' => $brand->vendorSetting->couponBoostScheduled(),
+                'coupon_boost_percent' => $brand->vendorSetting->coupon_boost_percent,
+                'coupon_boost_starts_at' => $brand->vendorSetting->coupon_boost_starts_at?->toIso8601String(),
                 'coupon_boost_expires_at' => $brand->vendorSetting->coupon_boost_expires_at?->toIso8601String(),
                 'coupon_discount_previous_percent' => $brand->vendorSetting->coupon_discount_previous_percent !== null
                     ? (float) $brand->vendorSetting->coupon_discount_previous_percent
@@ -1619,17 +1622,33 @@ class VendorsController extends Controller
         $brand = Brand::findOrFail($id);
         $validated = $request->validate([
             'boost_percent' => 'required|numeric|min:1|max:90',
+            'starts_at' => 'nullable|date',
             'expires_at' => 'required|date|after:now',
         ]);
         $settings = $brand->vendorSetting;
         if (!$settings) {
             return back()->with('flash_error', 'This vendor has no settings row.');
         }
+
+        $startsAt = !empty($validated['starts_at'])
+            ? new \DateTimeImmutable($validated['starts_at'])
+            : null;
+        $expiresAt = new \DateTimeImmutable($validated['expires_at']);
+
+        if ($startsAt && $startsAt >= $expiresAt) {
+            return back()->withErrors(['starts_at' => 'Start must be before end.']);
+        }
+
         $settings->applyCouponBoost(
             (float) $validated['boost_percent'],
-            new \DateTimeImmutable($validated['expires_at'])
+            $startsAt,
+            $expiresAt
         );
-        return back()->with('flash_success', 'Coupon boost applied — auto-reverts at ' . $validated['expires_at']);
+
+        $msg = $startsAt && $startsAt > new \DateTimeImmutable()
+            ? 'Coupon boost scheduled — activates at ' . $validated['starts_at']
+            : 'Coupon boost active — auto-reverts at ' . $validated['expires_at'];
+        return back()->with('flash_success', $msg);
     }
 
     /**
@@ -1646,6 +1665,8 @@ class VendorsController extends Controller
         $settings->coupon_discount_percent = $settings->coupon_discount_previous_percent;
         $settings->coupon_discount_previous_percent = null;
         $settings->coupon_boost_expires_at = null;
+        $settings->coupon_boost_starts_at = null;
+        $settings->coupon_boost_percent = null;
         $settings->save();
         return back()->with('flash_success', 'Coupon boost cancelled — % reverted.');
     }

@@ -27,6 +27,13 @@ Schedule::command('coupons:revert-expired-boosts')
     ->everyFiveMinutes()
     ->withoutOverlapping();
 
+// Promote scheduled coupon boosts to active when their start time
+// hits. Every 5 minutes so a boost begins within 5 min of the
+// declared start. Colin Sep 14 — Julia's PMAP feedback.
+Schedule::command('coupons:activate-scheduled-boosts')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();
+
 // Refresh external review aggregates (Reviews.io, Trustpilot, PepReviewPro)
 // weekly. Ratings don't move day-to-day; hourly would be noisy scraping.
 Schedule::command('reviews:refresh')
