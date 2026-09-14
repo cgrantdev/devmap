@@ -234,7 +234,7 @@ class ProductsController extends Controller
                 
                 return [
                     'id' => $category->id,
-                    'name' => $category->name,
+                    'name' => \App\Support\CompoundDisplay::label($category->name),
                     'slug' => $category->slug,
                     'total_items' => $category->products_count,
                     'image' => $image,
@@ -624,7 +624,10 @@ class ProductsController extends Controller
                 'product_url' => $product->product_url,
                 'category' => $product->category ? [
                     'id' => $product->category->id,
-                    'name' => $product->category->name,
+                    // Visible label uses the compound pseudonym map
+                    // (Sep 14) — vendor-friendly optics. The raw name
+                    // is retained on the SEO side via slug + schema.
+                    'name' => \App\Support\CompoundDisplay::label($product->category->name),
                     'slug' => $product->category->slug,
                 ] : null,
             ],
@@ -848,14 +851,19 @@ class ProductsController extends Controller
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
 
+        // Visible label uses the compound pseudonym map (Sep 14) so
+        // the compound page shows "GLP1-S" instead of "Semaglutide"
+        // for vendor-safe optics. SEO title / meta description above
+        // still spell out the raw compound name for search.
+        $displayName = \App\Support\CompoundDisplay::label($category->name);
         return Inertia::render('Frontend/ProductListing', [
             'category' => [
                 'id' => $category->id,
-                'name' => strtoupper($category->name),
+                'name' => strtoupper($displayName),
                 'slug' => $category->slug,
                 'description' => $category->description,
             ],
-            'productName' => strtoupper($category->name), // Keep for backward compatibility
+            'productName' => strtoupper($displayName), // Keep for backward compatibility
             'slug' => $slug,
             'products' => $products,
             'filterOptions' => $filterOptions,

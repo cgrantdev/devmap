@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\SeoPage;
+use App\Support\CompoundDisplay;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -81,17 +82,12 @@ class CompareController extends Controller
         ['a' => 'cagrilintide',  'b' => 'semaglutide',   'tagline' => 'Newer weight-loss combo option'],
     ];
 
-    /**
-     * Display name overrides (so the page shows a friendlier label than the
-     * raw category name when it helps — blends especially benefit from
-     * spelling out their constituents).
-     */
-    private const DISPLAY_NAMES = [
-        'BPC-157 / TB-500' => 'BPC-157 / TB-500 Blend',
-        'CJC-1295 / Ipamorelin' => 'CJC-1295 / Ipamorelin Blend',
-        'GLOW' => 'GLOW — GHK-Cu/BPC-157/TB-500',
-        'KLOW' => 'KLOW — GHK-Cu/BPC-157/TB-500/KPV',
-    ];
+    // Display-name overrides live in App\Support\CompoundDisplay so
+    // ProductsController + CompareController stay in sync. Semaglutide,
+    // Tirzepatide, and Retatrutide map to GLP1-S / GLP2-T / GLP3-R for
+    // vendor-friendly optics; SEO stays intact because we split the
+    // display label from the raw compound name used in URLs, meta
+    // title, meta description, and schema.org fields.
 
     public function index(Request $request)
     {
@@ -200,7 +196,7 @@ class CompareController extends Controller
                 ->sortBy(fn ($p) => (float) $p['final_price'])
                 ->values();
 
-            $displayName = self::DISPLAY_NAMES[$catName] ?? $category->name;
+            $displayName = CompoundDisplay::label($category->name);
             $educationPost = $category->educationPost;
 
             // Freshness signal — max(last_scraped_at | updated_at) across
@@ -304,7 +300,7 @@ class CompareController extends Controller
             ->get(['id', 'slug', 'name'])
             ->keyBy(fn ($c) => strtolower($c->slug));
         $displayName = fn (string $slug) => isset($categories[$slug])
-            ? (self::DISPLAY_NAMES[$categories[$slug]->name] ?? $categories[$slug]->name)
+            ? (CompoundDisplay::label($categories[$slug]->name))
             : null;
 
         return collect(self::FEATURED_VS_PAIRS)
@@ -367,14 +363,18 @@ class CompareController extends Controller
             ->get()
             ->map(fn ($c) => [
                 'id' => $c->id,
-                'name' => self::DISPLAY_NAMES[$c->name] ?? $c->name,
+                'name' => CompoundDisplay::label($c->name),
                 'slug' => $c->slug,
                 'url' => "/compare/{$c->slug}",
                 'product_count' => $c->active_products,
             ])
             ->values();
 
-        $displayName = self::DISPLAY_NAMES[$category->name] ?? $category->name;
+        $displayName = CompoundDisplay::label($category->name);
+        // SEO/schema name — always the raw compound name, never the
+        // pseudonym. Google sees "Semaglutide" everywhere it matters
+        // for ranking; visitors see "GLP1-S" on the visible page.
+        $seoName = $category->name;
         $educationPost = $category->educationPost;
         $summary = $educationPost?->overview ?: $educationPost?->description;
         $summary = $summary ? strip_tags($summary) : null;
@@ -387,27 +387,27 @@ class CompareController extends Controller
         // SEO — title leads with buying intent, description names the numbers.
         $cheapestFmt = $cheapest ? '$' . number_format($cheapest, 2) : null;
         $priciestFmt = $priciest ? '$' . number_format($priciest, 2) : null;
-        $seoTitle = "Cheapest {$displayName} — {$vendorCount} Vendors Compared";
+        $seoTitle = "Cheapest {$seoName} — {$vendorCount} Vendors Compared";
         $seoDescription = $vendorCount > 0
-            ? "Compare {$productCount} {$displayName} product" . ($productCount === 1 ? '' : 's')
+            ? "Compare {$productCount} {$seoName} product" . ($productCount === 1 ? '' : 's')
               . " across {$vendorCount} verified vendor" . ($vendorCount === 1 ? '' : 's')
               . ($cheapestFmt ? ". Prices from {$cheapestFmt}" . ($priciestFmt && $priciestFmt !== $cheapestFmt ? " to {$priciestFmt}" : '') : '')
               . ". Coupon codes and lab-testing status on every listing."
-            : "Vendor comparison for {$displayName} — currently no in-stock listings on Peptidemap.";
+            : "Vendor comparison for {$seoName} — currently no in-stock listings on Peptidemap.";
 
         // ItemList + Offer schema — turns this from an informational page into
         // a commercial-intent page for search engines.
         $itemList = [
             '@context' => 'https://schema.org',
             '@type' => 'ItemList',
-            'name' => "{$displayName} vendor comparison",
+            'name' => "{$seoName} vendor comparison",
             'numberOfItems' => $productCount,
             'itemListElement' => $products->take(20)->values()->map(fn ($p, $i) => [
                 '@type' => 'ListItem',
                 'position' => $i + 1,
                 'item' => [
                     '@type' => 'Product',
-                    'name' => $p['name'] ?? $displayName,
+                    'name' => $p['name'] ?? $seoName,
                     'brand' => ['@type' => 'Brand', 'name' => $p['brand_name']],
                     'offers' => [
                         '@type' => 'Offer',
@@ -427,7 +427,7 @@ class CompareController extends Controller
             'itemListElement' => [
                 ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home',    'item' => url('/')],
                 ['@type' => 'ListItem', 'position' => 2, 'name' => 'Compare', 'item' => url('/compare')],
-                ['@type' => 'ListItem', 'position' => 3, 'name' => $displayName, 'item' => url("/compare/{$slug}")],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $seoName, 'item' => url("/compare/{$slug}")],
             ],
         ];
 
@@ -440,6 +440,8 @@ class CompareController extends Controller
             'og_image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0),
             'image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0),
             'url' => url("/compare/{$slug}"),
+            // Visible H1 uses the pseudonym for vendor-friendly optics.
+            // The meta title above still spells out the real name for SEO.
             'h1' => "Cheapest {$displayName}",
             'schema' => array_values(array_filter([
                 $itemList,
@@ -453,8 +455,8 @@ class CompareController extends Controller
                     '@context' => 'https://schema.org',
                     '@type' => 'Product',
                     '@id' => url("/compare/{$slug}") . '#product',
-                    'name' => $displayName,
-                    'description' => $summary ? mb_substr(strip_tags($summary), 0, 300) : "Compare {$displayName} prices across {$vendorCount} verified research-peptide vendors.",
+                    'name' => $seoName,
+                    'description' => $summary ? mb_substr(strip_tags($summary), 0, 300) : "Compare {$seoName} prices across {$vendorCount} verified research-peptide vendors.",
                     'offers' => [
                         '@type' => 'AggregateOffer',
                         'priceCurrency' => 'USD',
@@ -474,23 +476,23 @@ class CompareController extends Controller
                     'mainEntity' => [
                         [
                             '@type' => 'Question',
-                            'name' => "What is the cheapest {$displayName}?",
+                            'name' => "What is the cheapest {$seoName}?",
                             'acceptedAnswer' => [
                                 '@type' => 'Answer',
-                                'text' => "The lowest {$displayName} price on Peptidemap is {$cheapestFmt} from " . ($products->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$displayName} listings across {$vendorCount} vendors and updates prices daily.",
+                                'text' => "The lowest {$seoName} price on Peptidemap is {$cheapestFmt} from " . ($products->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
                             ],
                         ],
                         [
                             '@type' => 'Question',
-                            'name' => "How many vendors sell {$displayName}?",
+                            'name' => "How many vendors sell {$seoName}?",
                             'acceptedAnswer' => [
                                 '@type' => 'Answer',
-                                'text' => "{$vendorCount} verified research-peptide vendors currently stock {$displayName} on Peptidemap, with {$productCount} distinct product listings.",
+                                'text' => "{$vendorCount} verified research-peptide vendors currently stock {$seoName} on Peptidemap, with {$productCount} distinct product listings.",
                             ],
                         ],
                         [
                             '@type' => 'Question',
-                            'name' => "Is there a coupon code for {$displayName}?",
+                            'name' => "Is there a coupon code for {$seoName}?",
                             'acceptedAnswer' => [
                                 '@type' => 'Answer',
                                 'text' => "Most vendors on Peptidemap offer a Peptidemap coupon code (usually 10–35% off). The exact code and discount for each vendor is listed in the pricing table on this page.",
@@ -498,7 +500,7 @@ class CompareController extends Controller
                         ],
                         [
                             '@type' => 'Question',
-                            'name' => "How does Peptidemap compare {$displayName} prices?",
+                            'name' => "How does Peptidemap compare {$seoName} prices?",
                             'acceptedAnswer' => [
                                 '@type' => 'Answer',
                                 'text' => "Peptidemap ingests each vendor's live catalog daily, applies their current Peptidemap coupon discount, and sorts by the price you actually pay after code. All listings are for research use only (RUO).",
@@ -642,7 +644,7 @@ class CompareController extends Controller
     {
         $products = $this->productsForCategory($category);
         $ep = $category->educationPost;
-        $displayName = self::DISPLAY_NAMES[$category->name] ?? $category->name;
+        $displayName = CompoundDisplay::label($category->name);
 
         // These fields might be plain text, JSON array of subsections, or null.
         // Normalize to arrays of {heading, text} entries so the Vue can render
