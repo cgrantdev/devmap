@@ -204,6 +204,21 @@
               <span class="text-[color:var(--color-ink-subtle)]">({{ brandTotalReviews(brand).toLocaleString() }} reviews)</span>
             </div>
 
+            <!-- Approved verification badges (cGMP / 7+ Tested). Only
+                 rendered when Julia has approved a document upload;
+                 self-declared USPs like "US Made" stay a separate chip. -->
+            <div v-if="brand.verified_badges && brand.verified_badges.length" class="flex flex-wrap gap-1 mt-2">
+              <span
+                v-for="b in brand.verified_badges"
+                :key="b.type"
+                class="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full"
+                :title="`Peptidemap-verified: ${b.label}`"
+              >
+                <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                {{ b.label }}
+              </span>
+            </div>
+
             <!-- Stats row -->
             <div class="mt-auto pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-xs text-[color:var(--color-ink-muted)]">
               <span class="flex items-center gap-1">

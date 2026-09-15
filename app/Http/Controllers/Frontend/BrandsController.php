@@ -172,6 +172,14 @@ class BrandsController extends Controller
                     'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
                     'featured' => $brand->vendorSetting && $brand->vendorSetting->featured ? true : false,
                     'last_updated' => $brand->updated_at?->diffForHumans(null, true) ?? null,
+                    // Approved verification badges (cGMP / 7+ Tested)
+                    // for the storefront + card display. Julia approves
+                    // these via /admin/certifications.
+                    'verified_badges' => \App\Models\VendorCertificationClaim::where('brand_id', $brand->id)
+                        ->where('status', 'approved')
+                        ->get()
+                        ->map(fn ($c) => ['type' => $c->type, 'label' => $c->label()])
+                        ->values(),
                 ];
             });
         
