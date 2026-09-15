@@ -132,6 +132,21 @@
               <textarea v-model="editForm.return_policy" rows="3" class="w-full px-3 py-2 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
             </FormField>
           </FormSection>
+          <!-- Manufacturing + Independent Testing marketing copy —
+               Colin PMAP #7a. These are separate from the verified
+               cGMP / 7x-Tested BADGES (those are gated by the
+               vendor_certification_claims workflow). Vendors write
+               freeform prose here for their storefront. -->
+          <FormSection title="Manufacturing">
+            <FormField label="Manufacturing Notes" hint="Where + how the peptides are produced. Free-text — displays on the storefront.">
+              <textarea v-model="editForm.manufacturing_notes" rows="4" placeholder="e.g. Manufactured in an ISO-certified US facility using pharmaceutical-grade precursors…" class="w-full px-3 py-2 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
+          <FormSection title="Independent Testing">
+            <FormField label="Independent Testing Notes" hint="Which labs test each batch + where results are published.">
+              <textarea v-model="editForm.independent_testing_notes" rows="4" placeholder="e.g. Every batch is tested for purity, sterility, and endotoxins at an ISO/IEC 17025 lab. COAs available on each product page." class="w-full px-3 py-2 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+            </FormField>
+          </FormSection>
           <FormSection title="Payment Methods">
             <div class="flex flex-wrap gap-6">
               <label v-for="method in ['Credit Card', 'PayPal', 'Cryptocurrency', 'Bank Transfer']" :key="method" class="flex items-center gap-2 text-sm">
@@ -557,6 +572,8 @@ const editForm = useForm({
   referral_url: props.vendor?.settings?.referral_url || '',
   shipping_info: props.vendor?.settings?.shipping_info || '',
   return_policy: props.vendor?.settings?.return_policy || '',
+  manufacturing_notes: props.vendor?.settings?.manufacturing_notes || '',
+  independent_testing_notes: props.vendor?.settings?.independent_testing_notes || '',
   business_hours: props.vendor?.settings?.business_hours || '',
   banner_image_url: props.vendor?.settings?.banner_image_url || '',
   top_vendor: props.vendor?.settings?.top_vendor || false,

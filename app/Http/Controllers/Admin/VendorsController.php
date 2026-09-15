@@ -49,6 +49,8 @@ class VendorsController extends Controller
                     'country' => $settings?->location?->name,
                     'description' => $settings?->description,
                     'shipping_info' => $settings?->shipping_info,
+                    'manufacturing_notes' => $settings?->manufacturing_notes,
+                    'independent_testing_notes' => $settings?->independent_testing_notes,
                     'return_policy' => $settings?->return_policy,
                     'business_hours' => $settings?->business_hours,
                     'payment_methods' => $settings?->payment_methods ?? [],
@@ -117,6 +119,8 @@ class VendorsController extends Controller
                             ? (float) $brand->vendorSetting->coupon_discount_percent
                             : null,
                         'shipping_info' => $brand->vendorSetting->shipping_info ?? null,
+                        'manufacturing_notes' => $brand->vendorSetting->manufacturing_notes ?? null,
+                        'independent_testing_notes' => $brand->vendorSetting->independent_testing_notes ?? null,
                         'return_policy' => $brand->vendorSetting->return_policy ?? null,
                         'business_hours' => $brand->vendorSetting->business_hours ?? null,
                         'banner_image_url' => $brand->vendorSetting->banner_image_url ?? null,
@@ -220,6 +224,8 @@ class VendorsController extends Controller
             'coupon_code' => 'nullable|string|max:50',
             'coupon_discount_percent' => 'nullable|numeric|min:0|max:99',
             'shipping_info' => 'nullable|string|max:5000',
+            'manufacturing_notes' => 'nullable|string|max:5000',
+            'independent_testing_notes' => 'nullable|string|max:5000',
             'return_policy' => 'nullable|string|max:5000',
             'business_hours' => 'nullable|string|max:255',
             'banner_image_url' => 'nullable|url|max:500',
@@ -299,6 +305,8 @@ class VendorsController extends Controller
         $settings->coupon_code = $validated['coupon_code'] ?? null;
         $settings->coupon_discount_percent = $validated['coupon_discount_percent'] ?? null;
         $settings->shipping_info = $validated['shipping_info'] ?? null;
+        $settings->manufacturing_notes = $validated['manufacturing_notes'] ?? null;
+        $settings->independent_testing_notes = $validated['independent_testing_notes'] ?? null;
         $settings->return_policy = $validated['return_policy'] ?? null;
         $settings->business_hours = $validated['business_hours'] ?? null;
         $settings->banner_image_url = $validated['banner_image_url'] ?? null;
@@ -361,6 +369,8 @@ class VendorsController extends Controller
                     ? $brand->vendorSetting->shipsToLocations()->pluck('locations.id')->values()->all()
                     : [],
                 'shipping_info' => $brand->vendorSetting->shipping_info,
+                'manufacturing_notes' => $brand->vendorSetting->manufacturing_notes,
+                'independent_testing_notes' => $brand->vendorSetting->independent_testing_notes,
                 'return_policy' => $brand->vendorSetting->return_policy,
                 'business_hours' => $brand->vendorSetting->business_hours,
                 'banner_image_url' => $brand->vendorSetting->banner_image_url,
@@ -441,6 +451,8 @@ class VendorsController extends Controller
             'coupon_code' => 'nullable|string|max:50',
             'coupon_discount_percent' => 'nullable|numeric|min:0|max:99',
             'shipping_info' => 'nullable|string|max:5000',
+            'manufacturing_notes' => 'nullable|string|max:5000',
+            'independent_testing_notes' => 'nullable|string|max:5000',
             'return_policy' => 'nullable|string|max:5000',
             'business_hours' => 'nullable|string|max:255',
             'banner_image_url' => 'nullable|url|max:500',
@@ -553,6 +565,8 @@ class VendorsController extends Controller
             $settings->coupon_discount_percent = $validated['coupon_discount_percent'];
         }
         $settings->shipping_info = $validated['shipping_info'] ?? $settings->shipping_info;
+        $settings->manufacturing_notes = $validated['manufacturing_notes'] ?? $settings->manufacturing_notes;
+        $settings->independent_testing_notes = $validated['independent_testing_notes'] ?? $settings->independent_testing_notes;
         $settings->return_policy = $validated['return_policy'] ?? $settings->return_policy;
         $settings->business_hours = $validated['business_hours'] ?? $settings->business_hours;
         $settings->banner_image_url = $validated['banner_image_url'] ?? $settings->banner_image_url;

@@ -646,6 +646,72 @@
                   </li>
                 </ul>
               </div>
+
+              <!-- Manufacturing — Colin PMAP #7a. Free-text section for
+                   vendors to describe where + how their peptides are
+                   produced. Distinct from the verified cGMP badge (which
+                   is gated by document review). Only renders when the
+                   vendor has filled it in, unless the owner is editing. -->
+              <div
+                v-if="brand.is_owner || brand.manufacturing_notes"
+                class="bg-white border border-gray-200 rounded-lg p-6"
+              >
+                <div class="flex items-center gap-2 mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-emerald-600" aria-hidden="true">
+                    <path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/>
+                  </svg>
+                  <h3 class="text-base font-semibold text-gray-900">Manufacturing</h3>
+                </div>
+                <InlineEditField
+                  v-if="brand.is_owner"
+                  :model-value="brand.manufacturing_notes"
+                  field="manufacturing_notes"
+                  label="manufacturing notes"
+                  placeholder="Where and how your peptides are made — facility, precursors, quality controls."
+                  :owner="true"
+                  :brand-slug="brand.slug"
+                  :multiline="true"
+                  :rows="5"
+                  @update:model-value="brand.manufacturing_notes = $event"
+                >
+                  <template #default="{ value }">
+                    <p class="text-sm text-gray-700 whitespace-pre-line break-words">{{ value || 'Describe your manufacturing setup so buyers know what they\'re getting.' }}</p>
+                  </template>
+                </InlineEditField>
+                <p v-else class="text-sm text-gray-700 whitespace-pre-line break-words">{{ brand.manufacturing_notes }}</p>
+              </div>
+
+              <!-- Independent Testing — Colin PMAP #7a. Free-text section
+                   for the labs a vendor uses + where COAs live. Separate
+                   from the verified 7+ Tested badge (document-gated). -->
+              <div
+                v-if="brand.is_owner || brand.independent_testing_notes"
+                class="bg-white border border-gray-200 rounded-lg p-6"
+              >
+                <div class="flex items-center gap-2 mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-emerald-600" aria-hidden="true">
+                    <path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/>
+                  </svg>
+                  <h3 class="text-base font-semibold text-gray-900">Independent Testing</h3>
+                </div>
+                <InlineEditField
+                  v-if="brand.is_owner"
+                  :model-value="brand.independent_testing_notes"
+                  field="independent_testing_notes"
+                  label="independent testing notes"
+                  placeholder="Which labs test each batch + where results are published."
+                  :owner="true"
+                  :brand-slug="brand.slug"
+                  :multiline="true"
+                  :rows="5"
+                  @update:model-value="brand.independent_testing_notes = $event"
+                >
+                  <template #default="{ value }">
+                    <p class="text-sm text-gray-700 whitespace-pre-line break-words">{{ value || 'Describe your testing protocol so buyers know what independent labs verify each batch.' }}</p>
+                  </template>
+                </InlineEditField>
+                <p v-else class="text-sm text-gray-700 whitespace-pre-line break-words">{{ brand.independent_testing_notes }}</p>
+              </div>
             </div>
           </aside>
         </div>

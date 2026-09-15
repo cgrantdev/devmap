@@ -54,6 +54,8 @@ class VendorSetting extends Model
         'business_hours_json',
         'shipping_info',
         'return_policy',
+        'manufacturing_notes',
+        'independent_testing_notes',
         'business_hours',
         'banner_image_url',
         'top_vendor',

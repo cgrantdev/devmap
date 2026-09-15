@@ -1368,6 +1368,8 @@ class ProductsController extends Controller
                     return [];
                 })(),
                 'shipping_info' => $brand->vendorSetting && $brand->vendorSetting->shipping_info ? $brand->vendorSetting->shipping_info : null,
+                'manufacturing_notes' => $brand->vendorSetting?->manufacturing_notes,
+                'independent_testing_notes' => $brand->vendorSetting?->independent_testing_notes,
                 'return_policy' => $brand->vendorSetting && $brand->vendorSetting->return_policy ? $brand->vendorSetting->return_policy : null,
                 'payment_methods' => $brand->vendorSetting && $brand->vendorSetting->payment_methods ? $brand->vendorSetting->payment_methods : [],
                 'discount_code' => $discountCode,
