@@ -1370,6 +1370,24 @@ class ProductsController extends Controller
                 'shipping_info' => $brand->vendorSetting && $brand->vendorSetting->shipping_info ? $brand->vendorSetting->shipping_info : null,
                 'manufacturing_notes' => $brand->vendorSetting?->manufacturing_notes,
                 'independent_testing_notes' => $brand->vendorSetting?->independent_testing_notes,
+                // Stackable marketing promos (PMAP #3). Live rows only.
+                'live_promotions' => $brand->livePromotions()
+                    ->with('category:id,name,slug')
+                    ->get()
+                    ->map(fn ($p) => [
+                        'id' => $p->id,
+                        'promo_type' => $p->promo_type,
+                        'title' => $p->title,
+                        'description' => $p->description,
+                        'percent' => $p->percent !== null ? (float) $p->percent : null,
+                        'code' => $p->code,
+                        'terms' => $p->terms,
+                        'category_name' => $p->category?->name,
+                        'category_slug' => $p->category?->slug,
+                        'stacks_with_affiliate' => (bool) $p->stacks_with_affiliate,
+                        'ends_at' => $p->ends_at?->toIso8601String(),
+                    ])
+                    ->values(),
                 'return_policy' => $brand->vendorSetting && $brand->vendorSetting->return_policy ? $brand->vendorSetting->return_policy : null,
                 'payment_methods' => $brand->vendorSetting && $brand->vendorSetting->payment_methods ? $brand->vendorSetting->payment_methods : [],
                 'discount_code' => $discountCode,

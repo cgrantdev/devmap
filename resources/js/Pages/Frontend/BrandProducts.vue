@@ -162,6 +162,35 @@
         </div>
       </div>
 
+      <!-- Live stackable promotions (PMAP #3) — Julia's marketing
+           promos surface as banner pills below the hero. Only renders
+           when at least one is live. Each pill leads with the shape
+           (Sitewide / Coupon / BOGO / Category) so the value is
+           obvious in one glance. -->
+      <div v-if="brand.live_promotions && brand.live_promotions.length" class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-4">
+        <div class="flex flex-wrap items-stretch gap-2">
+          <div
+            v-for="promo in brand.live_promotions"
+            :key="promo.id"
+            class="flex-1 min-w-[260px] max-w-full rounded-lg border border-indigo-300 bg-gradient-to-r from-indigo-50 to-white p-3 flex items-center gap-3"
+          >
+            <div class="flex-shrink-0 w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-bold">
+              {{ promo.percent != null ? promo.percent + '%' : '★' }}
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-[13px] font-semibold text-indigo-900 truncate">{{ promo.title }}</div>
+              <div class="text-[11px] text-indigo-800/80 mt-0.5 truncate">
+                <span v-if="promo.code" class="ui-mono uppercase font-bold text-indigo-900">CODE {{ promo.code }}</span>
+                <span v-else-if="promo.promo_type === 'nocode_sitewide'">Applied automatically</span>
+                <span v-else-if="promo.promo_type === 'category' && promo.category_name">on {{ promo.category_name }}</span>
+                <span v-else-if="promo.promo_type === 'bogo'">Bundle offer</span>
+                <span v-if="promo.stacks_with_affiliate"> · stacks with affiliate code</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Product Listing Section -->
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-8 lg:py-12">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">

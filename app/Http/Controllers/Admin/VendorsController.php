@@ -407,11 +407,43 @@ class VendorsController extends Controller
             'staged_count' => \App\Models\ScrapedProduct::where('scraping_config_id', $scrapingConfig->id)->count(),
         ] : null;
 
+        // Stackable promos (PMAP #3). Julia manages sitewide sales,
+        // coupon codes, BOGOs, and category discounts from this page.
+        $promotions = $brand->promotions()
+            ->orderByDesc('is_active')
+            ->orderBy('ends_at')
+            ->orderBy('id')
+            ->get()
+            ->map(fn ($p) => [
+                'id' => $p->id,
+                'promo_type' => $p->promo_type,
+                'title' => $p->title,
+                'description' => $p->description,
+                'percent' => $p->percent,
+                'code' => $p->code,
+                'product_category_id' => $p->product_category_id,
+                'terms' => $p->terms,
+                'stacks_with_affiliate' => (bool) $p->stacks_with_affiliate,
+                'starts_at' => $p->starts_at?->toIso8601String(),
+                'ends_at' => $p->ends_at?->toIso8601String(),
+                'is_active' => (bool) $p->is_active,
+                'is_live' => $p->isLive(),
+                'is_scheduled' => $p->isScheduled(),
+            ]);
+
+        // Category dropdown for the 'category' promo type.
+        $categoryChoices = \App\Models\ProductCategory::orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn ($c) => ['id' => $c->id, 'name' => $c->name]);
+
         return Inertia::render('Admin/VendorEdit', [
             'vendor' => $vendorData,
             'products' => $products,
             'locations' => $locations,
             'scrapingStatus' => $scrapingStatus,
+            'promotions' => $promotions,
+            'promotionTypes' => \App\Models\VendorPromotion::TYPES,
+            'categoryChoices' => $categoryChoices,
         ]);
     }
 

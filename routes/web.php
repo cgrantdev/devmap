@@ -372,6 +372,17 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     Route::delete('/vendors/{id}/coupon-boost', [VendorsController::class, 'cancelCouponBoost'])
         ->name('admin.vendors.coupon-boost.cancel');
 
+    // Stackable marketing promos — Colin PMAP #3. Julia adds/edits/removes
+    // per-vendor promos from the vendor edit page. Distinct from the
+    // coupon-boost above: those are temporary bumps of the vendor's
+    // baseline discount %. These are separate marketing offers.
+    Route::post('/vendors/{brand}/promotions', [\App\Http\Controllers\Admin\VendorPromotionsController::class, 'store'])
+        ->name('admin.vendors.promotions.store');
+    Route::post('/vendors/{brand}/promotions/{id}', [\App\Http\Controllers\Admin\VendorPromotionsController::class, 'update'])
+        ->name('admin.vendors.promotions.update');
+    Route::delete('/vendors/{brand}/promotions/{id}', [\App\Http\Controllers\Admin\VendorPromotionsController::class, 'destroy'])
+        ->name('admin.vendors.promotions.destroy');
+
     // Certification claims (cGMP, independent testing). Julia reviews
     // submitted docs + approves/rejects. See docs/vendor-certifications.md.
     Route::get('/certifications', [\App\Http\Controllers\Admin\CertificationsController::class, 'index'])

@@ -256,6 +256,112 @@
               </div>
             </div>
 
+            <!-- Stackable promotions (PMAP #3). Sitewide sales, coupon
+                 codes, BOGOs, and category discounts. All stack with the
+                 affiliate code by default. -->
+            <div class="md:col-span-2 mt-4 p-4 rounded-lg bg-indigo-50 border border-indigo-200">
+              <div class="flex items-baseline justify-between mb-3">
+                <div>
+                  <div class="text-sm font-semibold text-indigo-900">Stackable promotions</div>
+                  <div class="text-[11px] text-indigo-800/80">Additional offers running alongside the base coupon. Stack with the affiliate code so referral credit isn't lost.</div>
+                </div>
+                <button type="button" @click="openPromoForm(null)" class="text-[12px] font-semibold text-indigo-900 bg-white border border-indigo-300 hover:bg-indigo-100 rounded px-3 py-1">+ Add promotion</button>
+              </div>
+
+              <!-- Existing promos -->
+              <div v-if="promotions && promotions.length" class="space-y-2 mb-3">
+                <div v-for="p in promotions" :key="p.id" class="p-3 rounded border border-indigo-200 bg-white text-[12px]">
+                  <div class="flex items-baseline justify-between gap-3 flex-wrap">
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-semibold text-indigo-900">{{ p.title }}</span>
+                        <span class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">{{ promotionTypes[p.promo_type] }}</span>
+                        <span v-if="p.is_live" class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-red-600 text-white">● Live</span>
+                        <span v-else-if="p.is_scheduled" class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-amber-600 text-white">◷ Scheduled</span>
+                        <span v-else-if="!p.is_active" class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-slate-300 text-slate-700">Paused</span>
+                        <span v-else class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-600">Ended</span>
+                      </div>
+                      <div class="text-slate-700 mt-1 ui-mono">
+                        <span v-if="p.percent != null">{{ p.percent }}%</span>
+                        <span v-if="p.code"> · code <span class="uppercase">{{ p.code }}</span></span>
+                        <span v-if="p.starts_at"> · starts {{ formatBoostExpiry(p.starts_at) }}</span>
+                        <span v-if="p.ends_at"> · ends {{ formatBoostExpiry(p.ends_at) }}</span>
+                        <span v-if="p.stacks_with_affiliate" class="text-emerald-700"> · stacks w/ affiliate</span>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                      <button type="button" @click="openPromoForm(p)" class="text-[11px] font-semibold text-indigo-700 hover:text-indigo-900 underline">Edit</button>
+                      <button type="button" @click="deletePromo(p)" class="text-[11px] font-semibold text-red-700 hover:text-red-900 underline">Remove</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Add/edit form -->
+              <div v-if="promoFormOpen" class="p-3 rounded border border-indigo-300 bg-white space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-[11px] text-indigo-900 mb-1">Type</label>
+                    <select v-model="promoForm.promo_type" class="w-full h-9 px-3 text-sm border border-indigo-300 rounded focus:border-indigo-500 focus:outline-none">
+                      <option v-for="(label, key) in promotionTypes" :key="key" :value="key">{{ label }}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] text-indigo-900 mb-1">Title</label>
+                    <input v-model="promoForm.title" type="text" placeholder="e.g. Labor Day Sale — 20% Off" class="w-full h-9 px-3 text-sm border border-indigo-300 rounded focus:border-indigo-500 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] text-indigo-900 mb-1">Description <span class="text-indigo-700/70">(optional)</span></label>
+                    <input v-model="promoForm.description" type="text" placeholder="Short blurb shown on the vendor card" class="w-full h-9 px-3 text-sm border border-indigo-300 rounded focus:border-indigo-500 focus:outline-none" />
+                  </div>
+                  <div v-if="promoForm.promo_type !== 'bogo'">
+                    <label class="block text-[11px] text-indigo-900 mb-1">Discount %</label>
+                    <div class="relative">
+                      <input v-model.number="promoForm.percent" type="number" min="0" max="100" step="1" class="w-full h-9 pl-3 pr-8 text-sm border border-indigo-300 rounded ui-mono focus:border-indigo-500 focus:outline-none" />
+                      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-indigo-700 pointer-events-none">%</span>
+                    </div>
+                  </div>
+                  <div v-if="promoForm.promo_type === 'coupon_sitewide'">
+                    <label class="block text-[11px] text-indigo-900 mb-1">Coupon code</label>
+                    <input v-model="promoForm.code" type="text" placeholder="LABORDAY20" class="w-full h-9 px-3 text-sm border border-indigo-300 rounded ui-mono uppercase focus:border-indigo-500 focus:outline-none" />
+                  </div>
+                  <div v-if="promoForm.promo_type === 'category'">
+                    <label class="block text-[11px] text-indigo-900 mb-1">Category</label>
+                    <select v-model="promoForm.product_category_id" class="w-full h-9 px-3 text-sm border border-indigo-300 rounded focus:border-indigo-500 focus:outline-none">
+                      <option :value="null">— pick a compound category —</option>
+                      <option v-for="c in categoryChoices" :key="c.id" :value="c.id">{{ c.name }}</option>
+                    </select>
+                  </div>
+                  <div v-if="promoForm.promo_type === 'bogo'" class="sm:col-span-2">
+                    <label class="block text-[11px] text-indigo-900 mb-1">BOGO terms</label>
+                    <textarea v-model="promoForm.terms" rows="2" placeholder="e.g. Buy 2 GLP-1 bottles, get 1 free. Automatic in cart." class="w-full px-3 py-2 text-sm border border-indigo-300 rounded focus:border-indigo-500 focus:outline-none"></textarea>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] text-indigo-900 mb-1">Starts <span class="text-indigo-700/70">(blank = now)</span></label>
+                    <input v-model="promoForm.starts_at" type="datetime-local" class="w-full h-9 px-3 text-sm border border-indigo-300 rounded ui-mono focus:border-indigo-500 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] text-indigo-900 mb-1">Ends <span class="text-indigo-700/70">(blank = ongoing)</span></label>
+                    <input v-model="promoForm.ends_at" type="datetime-local" class="w-full h-9 px-3 text-sm border border-indigo-300 rounded ui-mono focus:border-indigo-500 focus:outline-none" />
+                  </div>
+                </div>
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                  <label class="flex items-center gap-2 text-[12px] text-indigo-900">
+                    <input type="checkbox" v-model="promoForm.stacks_with_affiliate" class="w-4 h-4 accent-indigo-600" />
+                    Stacks with affiliate code
+                  </label>
+                  <label class="flex items-center gap-2 text-[12px] text-indigo-900">
+                    <input type="checkbox" v-model="promoForm.is_active" class="w-4 h-4 accent-indigo-600" />
+                    Active
+                  </label>
+                  <div class="flex items-center gap-2 ml-auto">
+                    <button type="button" @click="promoFormOpen = false" class="text-[12px] font-semibold text-indigo-800 hover:text-indigo-900 px-3 py-1.5">Cancel</button>
+                    <button type="button" @click="savePromo" :disabled="!promoForm.title || (promoForm.promo_type !== 'bogo' && promoForm.percent == null) || (promoForm.promo_type === 'coupon_sitewide' && !promoForm.code) || (promoForm.promo_type === 'category' && !promoForm.product_category_id)" class="text-[12px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed px-4 py-1.5 rounded">{{ promoForm.id ? 'Save' : 'Add promotion' }}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <FormField label="Banner Image URL" class="md:col-span-2">
               <input v-model="editForm.banner_image_url" type="url" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
             </FormField>
@@ -483,7 +589,118 @@ const props = defineProps({
     type: Object,
     default: null,
   },
+  promotions: {
+    type: Array,
+    default: () => [],
+  },
+  promotionTypes: {
+    type: Object,
+    default: () => ({}),
+  },
+  categoryChoices: {
+    type: Array,
+    default: () => [],
+  },
 })
+
+// --- Stackable promotions (PMAP #3) ---------------------------------
+const promotions = ref([...(props.promotions || [])])
+const promotionTypes = ref({ ...(props.promotionTypes || {}) })
+const categoryChoices = ref([...(props.categoryChoices || [])])
+const promoFormOpen = ref(false)
+const promoForm = reactive({
+  id: null,
+  promo_type: 'nocode_sitewide',
+  title: '',
+  description: '',
+  percent: null,
+  code: '',
+  product_category_id: null,
+  terms: '',
+  stacks_with_affiliate: true,
+  starts_at: '',
+  ends_at: '',
+  is_active: true,
+})
+
+function openPromoForm(existing) {
+  if (existing) {
+    // Editing — preload every field. Datetime inputs need the local
+    // YYYY-MM-DDTHH:MM shape, so trim the ISO string.
+    Object.assign(promoForm, {
+      id: existing.id,
+      promo_type: existing.promo_type,
+      title: existing.title ?? '',
+      description: existing.description ?? '',
+      percent: existing.percent,
+      code: existing.code ?? '',
+      product_category_id: existing.product_category_id,
+      terms: existing.terms ?? '',
+      stacks_with_affiliate: !!existing.stacks_with_affiliate,
+      starts_at: existing.starts_at ? existing.starts_at.slice(0, 16) : '',
+      ends_at: existing.ends_at ? existing.ends_at.slice(0, 16) : '',
+      is_active: !!existing.is_active,
+    })
+  } else {
+    Object.assign(promoForm, {
+      id: null,
+      promo_type: 'nocode_sitewide',
+      title: '',
+      description: '',
+      percent: null,
+      code: '',
+      product_category_id: null,
+      terms: '',
+      stacks_with_affiliate: true,
+      starts_at: '',
+      ends_at: '',
+      is_active: true,
+    })
+  }
+  promoFormOpen.value = true
+}
+
+function savePromo() {
+  if (!props.vendor) return
+  const form = useForm({
+    _token: usePage().props.csrf_token,
+    promo_type: promoForm.promo_type,
+    title: promoForm.title,
+    description: promoForm.description || null,
+    percent: promoForm.percent,
+    code: promoForm.code || null,
+    product_category_id: promoForm.product_category_id,
+    terms: promoForm.terms || null,
+    stacks_with_affiliate: promoForm.stacks_with_affiliate,
+    starts_at: promoForm.starts_at || null,
+    ends_at: promoForm.ends_at || null,
+    is_active: promoForm.is_active,
+  })
+  const url = promoForm.id
+    ? `/admin/vendors/${props.vendor.id}/promotions/${promoForm.id}`
+    : `/admin/vendors/${props.vendor.id}/promotions`
+  form.post(url, {
+    preserveScroll: true,
+    onSuccess: () => { promoFormOpen.value = false; router.reload({ only: ['promotions'] }) },
+    onError: () => toastError('Promotion save failed — check the form.'),
+  })
+}
+
+function deletePromo(p) {
+  if (!props.vendor || !p?.id) return
+  if (!confirm(`Remove promo "${p.title}"?`)) return
+  const form = useForm({ _token: usePage().props.csrf_token })
+  form.delete(`/admin/vendors/${props.vendor.id}/promotions/${p.id}`, {
+    preserveScroll: true,
+    onSuccess: () => { router.reload({ only: ['promotions'] }) },
+    onError: () => toastError('Promo delete failed.'),
+  })
+}
+
+// Keep local promotions ref in sync when props update after a reload.
+watch(() => props.promotions, (v) => { promotions.value = [...(v || [])] })
+// --------------------------------------------------------------------
+
 
 const activeTab = ref('general')
 const justSaved = ref(false)
