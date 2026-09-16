@@ -20,9 +20,17 @@
     <section class="border-b border-[color:var(--color-hairline)]">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6 pb-10">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Vendor comparison</div>
-        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">
+        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">
           Cheapest {{ compound.name }}
         </h1>
+        <div v-if="compound.alias" class="flex items-center gap-2 mb-3">
+          <span class="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)]">Also known as</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] text-[12px] font-semibold ui-mono text-[color:var(--color-ink)]">{{ compound.alias }}</span>
+        </div>
+        <!-- H2 explicitly targets "buy {compound}" + "{compound} price"
+             query patterns identified in GSC (Sep 16). Google reads this
+             as the page's secondary topic. -->
+        <h2 class="sr-only">Buy {{ compound.name }} — Compare {{ compound.vendor_count }} vendor prices</h2>
 
         <div v-if="compound.vendor_count > 0" class="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[color:var(--color-ink-muted)] mb-4">
           <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.vendor_count }}</strong> vendor{{ compound.vendor_count === 1 ? '' : 's' }}</span>

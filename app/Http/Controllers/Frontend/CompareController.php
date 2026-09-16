@@ -27,7 +27,7 @@ class CompareController extends Controller
      * additions here are safe even if the underlying category doesn't exist
      * yet.
      */
-    private const FEATURED_COMPOUND_NAMES = [
+    public const FEATURED_COMPOUND_NAMES = [
         // Top priority (in the order the user requested)
         'Retatrutide',
         'Tirzepatide',
@@ -55,6 +55,15 @@ class CompareController extends Controller
         'Kisspeptin',
         'SS-31',
         'Tesofensine',
+        // Colin Sep 16 — added from GSC "buy {compound}" bleed report:
+        //   buy epitalon (48 imp, pos 42.8)
+        //   buy kpv 10mg (58 imp, pos 59.4)
+        //   buy bremelanotide (30 imp, pos 61.5)
+        // Each has 60+ active products so /compare/{slug} lands with
+        // real data, not an empty shell.
+        'Epitalon',
+        'KPV',
+        'Bremelanotide',
     ];
 
     /**
@@ -529,7 +538,15 @@ class CompareController extends Controller
         return Inertia::render('Frontend/CompareCompound', [
             'compound' => [
                 'id' => $category->id,
-                'name' => $displayName,
+                // Colin Sep 16 — compare pages lead with the SEO name in
+                // the H1 to match "cheap {compound}" / "buy {compound}"
+                // search intent. The display pseudonym (e.g. GLP3-R for
+                // Retatrutide) rides as an `alias` subtitle chip so
+                // vendor-friendly optics stay intact without sacrificing
+                // rank. Product page + storefront still lead with the
+                // pseudonym as they did.
+                'name' => $seoName,
+                'alias' => $displayName !== $seoName ? $displayName : null,
                 'raw_name' => $category->name,
                 'slug' => $category->slug,
                 'summary' => $summary,

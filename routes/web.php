@@ -144,6 +144,13 @@ Route::get('/compare', [CompareController::class, 'index'])->name('compare');
 Route::get('/compare/{slug}', [CompareController::class, 'show'])
     ->where('slug', '[a-z0-9-]+')
     ->name('compare.compound');
+
+// Coupon-code landing pages — Colin Sep 16, targeting the
+// "{brand} coupon code" GSC cluster (glow aminos coupon = pos 9.3
+// with 74 imp/mo). Narrow-intent page: brand + code + click-through.
+Route::get('/coupon/{slug}', [\App\Http\Controllers\Frontend\CouponController::class, 'show'])
+    ->where('slug', '[a-z0-9-]+')
+    ->name('coupon.brand');
 Route::get('/calculator', function () {
     $seoPage = \App\Models\SeoPage::where('key', 'calculator')->first();
     // Sep 7 2026 revenue push: title targets 'best peptide calculator'

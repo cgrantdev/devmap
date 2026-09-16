@@ -60,9 +60,13 @@ class SitemapController extends Controller
             $urls[] = ['loc' => self::BASE_URL . $path, 'lastmod' => $today, 'changefreq' => $freq, 'priority' => $priority];
         }
 
-        // Brand storefronts.
+        // Brand storefronts + coupon landing pages. Coupon page only
+        // emitted when the brand actually has a coupon code — the
+        // controller 404s otherwise, and a sitemap URL to a 404
+        // wastes Google's crawl budget.
         Brand::where('is_active', true)
             ->whereNotNull('slug')
+            ->with('vendorSetting:brand_id,coupon_code')
             ->select('id', 'slug', 'updated_at')
             ->chunkById(500, function ($chunk) use (&$urls) {
                 foreach ($chunk as $b) {
@@ -72,6 +76,14 @@ class SitemapController extends Controller
                         'changefreq' => 'weekly',
                         'priority'   => '0.7',
                     ];
+                    if ($b->vendorSetting?->coupon_code) {
+                        $urls[] = [
+                            'loc'        => self::BASE_URL . '/coupon/' . $b->slug,
+                            'lastmod'    => $b->updated_at?->toDateString(),
+                            'changefreq' => 'weekly',
+                            'priority'   => '0.6',
+                        ];
+                    }
                 }
             });
 

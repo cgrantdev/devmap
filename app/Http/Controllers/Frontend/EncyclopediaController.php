@@ -786,6 +786,31 @@ class EncyclopediaController extends Controller
             ],
         ];
 
+        // Canonical consolidation (Colin Sep 16 — GSC data showed
+        // /encyclopedia/tirzepatide bleeding 1,070 imp/mo at pos 77
+        // while /compare/tirzepatide sits at pos 49 with better
+        // commercial signal). When a compound has an active compare
+        // page — meaning it's in FEATURED_COMPOUND_NAMES AND has
+        // priced products — canonicalize the encyclopedia article
+        // to the compare page so both URLs pool their authority
+        // instead of competing. Encyclopedia page still exists and
+        // serves informational intent; Google just picks compare as
+        // the primary for ranking purposes.
+        $comparePath = url("/encyclopedia/{$slug}");
+        if (in_array($category->name, \App\Http\Controllers\Frontend\CompareController::FEATURED_COMPOUND_NAMES, true)) {
+            $hasPricedProducts = \App\Models\Product::visible()
+                ->where('status', 'active')
+                ->where('product_category_id', $category->id)
+                ->where(function ($q) {
+                    $q->where('discount_price', '>', 0)
+                      ->orWhere(function ($qq) { $qq->whereNull('discount_price')->where('price', '>', 0); });
+                })
+                ->exists();
+            if ($hasPricedProducts) {
+                $comparePath = url("/compare/{$slug}");
+            }
+        }
+
         // Build SEO array (same format as products/brands pages)
         $seo = [
             'key' => 'encyclopedia',
@@ -797,7 +822,7 @@ class EncyclopediaController extends Controller
             // Backward-compatible field used by some pages
             'image' => $seoOgImage,
             'url' => url("/encyclopedia/{$slug}"),
-            'canonical' => url("/encyclopedia/{$slug}"),
+            'canonical' => $comparePath,
             'schema' => array_values(array_filter([
                 $definedTermSchema,
                 $breadcrumbSchema,
