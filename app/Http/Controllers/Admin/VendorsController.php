@@ -356,6 +356,8 @@ class VendorsController extends Controller
                 'coupon_boost_active' => $brand->vendorSetting->couponBoostActive(),
                 'coupon_boost_scheduled' => $brand->vendorSetting->couponBoostScheduled(),
                 'coupon_boost_percent' => $brand->vendorSetting->coupon_boost_percent,
+                'coupon_boost_code' => $brand->vendorSetting->coupon_boost_code,
+                'coupon_code_previous' => $brand->vendorSetting->coupon_code_previous,
                 'coupon_boost_starts_at' => $brand->vendorSetting->coupon_boost_starts_at?->toIso8601String(),
                 'coupon_boost_expires_at' => $brand->vendorSetting->coupon_boost_expires_at?->toIso8601String(),
                 'coupon_discount_previous_percent' => $brand->vendorSetting->coupon_discount_previous_percent !== null
@@ -1670,6 +1672,9 @@ class VendorsController extends Controller
             'boost_percent' => 'required|numeric|min:1|max:90',
             'starts_at' => 'nullable|date',
             'expires_at' => 'required|date|after:now',
+            // Optional code swap — Hydro Research's affiliate-only
+            // Monday code, per Julia Sep 18. Blank = keep the standard.
+            'boost_code' => 'nullable|string|max:64',
         ]);
         $settings = $brand->vendorSetting;
         if (!$settings) {
@@ -1688,7 +1693,8 @@ class VendorsController extends Controller
         $settings->applyCouponBoost(
             (float) $validated['boost_percent'],
             $startsAt,
-            $expiresAt
+            $expiresAt,
+            !empty($validated['boost_code']) ? strtoupper(trim($validated['boost_code'])) : null
         );
 
         $msg = $startsAt && $startsAt > new \DateTimeImmutable()
@@ -1710,6 +1716,12 @@ class VendorsController extends Controller
         }
         $settings->coupon_discount_percent = $settings->coupon_discount_previous_percent;
         $settings->coupon_discount_previous_percent = null;
+        // Only restore the code if we swapped it during the boost.
+        if ($settings->coupon_code_previous !== null) {
+            $settings->coupon_code = $settings->coupon_code_previous;
+        }
+        $settings->coupon_code_previous = null;
+        $settings->coupon_boost_code = null;
         $settings->coupon_boost_expires_at = null;
         $settings->coupon_boost_starts_at = null;
         $settings->coupon_boost_percent = null;

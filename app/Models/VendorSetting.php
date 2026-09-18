@@ -41,6 +41,8 @@ class VendorSetting extends Model
         'coupon_boost_expires_at',
         'coupon_boost_starts_at',
         'coupon_boost_percent',
+        'coupon_boost_code',
+        'coupon_code_previous',
         'referral_url',
         'trustpilot_url',
         'google_reviews_url',
@@ -144,24 +146,29 @@ class VendorSetting extends Model
      * updates the new percentage + timing without losing the original
      * previous_percent snapshot.
      */
-    public function applyCouponBoost(float $newPercent, ?\DateTimeInterface $startsAt, \DateTimeInterface $expiresAt): void
+    public function applyCouponBoost(float $newPercent, ?\DateTimeInterface $startsAt, \DateTimeInterface $expiresAt, ?string $boostCode = null): void
     {
         $startsImmediately = !$startsAt || $startsAt <= new \DateTimeImmutable();
         $isNewBoost = !$this->couponBoostActive() && !$this->couponBoostScheduled();
 
         if ($isNewBoost) {
-            // Snapshot current standard % — this is where we revert to.
+            // Snapshot current standard % + code — this is what we revert to.
             $this->coupon_discount_previous_percent = $this->coupon_discount_percent;
+            $this->coupon_code_previous = $boostCode ? $this->coupon_code : $this->coupon_code_previous;
         }
 
         $this->coupon_boost_percent = $newPercent;
+        $this->coupon_boost_code = $boostCode ?: null;
         $this->coupon_boost_starts_at = $startsImmediately ? null : $startsAt;
         $this->coupon_boost_expires_at = $expiresAt;
 
         if ($startsImmediately) {
-            // Live now — swap the discount % so vendor cards display
-            // the boosted rate immediately.
+            // Live now — swap the discount % (and code, if provided) so
+            // vendor cards display the boosted values immediately.
             $this->coupon_discount_percent = $newPercent;
+            if ($boostCode) {
+                $this->coupon_code = $boostCode;
+            }
         }
         $this->save();
 

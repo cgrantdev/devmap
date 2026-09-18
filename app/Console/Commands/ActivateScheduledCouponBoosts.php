@@ -46,10 +46,16 @@ class ActivateScheduledCouponBoosts extends Command
 
             if ($this->option('dry-run')) continue;
 
-            $vs->forceFill([
+            $updates = [
                 'coupon_discount_percent' => $newPct,
                 'coupon_boost_starts_at' => null,
-            ])->save();
+            ];
+            // Swap the code too if the boost carries one. previous_code
+            // was already snapshotted at applyCouponBoost time.
+            if (!empty($vs->coupon_boost_code)) {
+                $updates['coupon_code'] = $vs->coupon_boost_code;
+            }
+            $vs->forceFill($updates)->save();
 
             $this->postDiscordBoostStart($brand?->name ?? 'A vendor', $brand?->slug, $newPct, $vs->coupon_boost_expires_at);
         }

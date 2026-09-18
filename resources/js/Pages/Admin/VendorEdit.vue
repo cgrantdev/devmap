@@ -213,9 +213,11 @@
               <div v-if="editForm.coupon_boost_active" class="mb-3 p-3 rounded border border-amber-200 bg-white text-[12px]">
                 <div class="flex items-baseline justify-between gap-3 flex-wrap">
                   <div class="text-amber-900">
-                    <span class="font-semibold">{{ editForm.coupon_discount_percent }}%</span> until
-                    <span class="ui-mono">{{ formatBoostExpiry(editForm.coupon_boost_expires_at) }}</span>
+                    <span class="font-semibold">{{ editForm.coupon_discount_percent }}%</span>
+                    <span v-if="editForm.coupon_code_previous"> · code <span class="ui-mono uppercase font-semibold">{{ editForm.coupon_code }}</span></span>
+                    until <span class="ui-mono">{{ formatBoostExpiry(editForm.coupon_boost_expires_at) }}</span>
                     <span class="text-amber-700"> · reverts to <span class="ui-mono">{{ editForm.coupon_discount_previous_percent }}%</span></span>
+                    <span v-if="editForm.coupon_code_previous" class="text-amber-700"> / <span class="ui-mono uppercase">{{ editForm.coupon_code_previous }}</span></span>
                   </div>
                   <button type="button" @click="cancelCouponBoost" class="text-[11px] font-semibold text-red-700 hover:text-red-900 underline">Cancel boost early</button>
                 </div>
@@ -223,8 +225,9 @@
               <div v-else-if="editForm.coupon_boost_scheduled" class="mb-3 p-3 rounded border border-amber-200 bg-white text-[12px]">
                 <div class="flex items-baseline justify-between gap-3 flex-wrap">
                   <div class="text-amber-900">
-                    <span class="font-semibold">{{ editForm.coupon_boost_percent }}%</span> boost scheduled —
-                    activates <span class="ui-mono">{{ formatBoostExpiry(editForm.coupon_boost_starts_at) }}</span>,
+                    <span class="font-semibold">{{ editForm.coupon_boost_percent }}%</span>
+                    <span v-if="editForm.coupon_boost_code"> · code <span class="ui-mono uppercase font-semibold">{{ editForm.coupon_boost_code }}</span></span>
+                    boost scheduled — activates <span class="ui-mono">{{ formatBoostExpiry(editForm.coupon_boost_starts_at) }}</span>,
                     ends <span class="ui-mono">{{ formatBoostExpiry(editForm.coupon_boost_expires_at) }}</span>
                   </div>
                   <button type="button" @click="cancelCouponBoost" class="text-[11px] font-semibold text-red-700 hover:text-red-900 underline">Cancel schedule</button>
@@ -245,6 +248,10 @@
                 <div>
                   <label class="block text-[11px] text-amber-900 mb-1">Ends</label>
                   <input v-model="boostForm.expires_at" type="datetime-local" class="w-full h-9 px-3 text-sm border border-amber-300 rounded ui-mono focus:border-amber-500 focus:outline-none" />
+                </div>
+                <div class="sm:col-span-3">
+                  <label class="block text-[11px] text-amber-900 mb-1">Boost code <span class="text-amber-700/70">(blank = keep standard "{{ editForm.coupon_code || 'PMAP' }}")</span></label>
+                  <input v-model="boostForm.code" type="text" placeholder="e.g. MONDAY35" class="w-full h-9 px-3 text-sm border border-amber-300 rounded ui-mono uppercase focus:border-amber-500 focus:outline-none" />
                 </div>
                 <div class="sm:col-span-3 flex items-center justify-between gap-3 flex-wrap">
                   <div class="flex items-center gap-1">
@@ -783,6 +790,8 @@ const editForm = useForm({
   coupon_boost_active: props.vendor?.settings?.coupon_boost_active ?? false,
   coupon_boost_scheduled: props.vendor?.settings?.coupon_boost_scheduled ?? false,
   coupon_boost_percent: props.vendor?.settings?.coupon_boost_percent ?? null,
+  coupon_boost_code: props.vendor?.settings?.coupon_boost_code ?? null,
+  coupon_code_previous: props.vendor?.settings?.coupon_code_previous ?? null,
   coupon_boost_starts_at: props.vendor?.settings?.coupon_boost_starts_at ?? null,
   coupon_boost_expires_at: props.vendor?.settings?.coupon_boost_expires_at ?? null,
   coupon_discount_previous_percent: props.vendor?.settings?.coupon_discount_previous_percent ?? null,
@@ -858,7 +867,7 @@ function toggleShipsTo(id) {
 }
 
 // --- Coupon boost handlers ------------------------------------------
-const boostForm = reactive({ percent: null, starts_at: '', expires_at: '' })
+const boostForm = reactive({ percent: null, starts_at: '', expires_at: '', code: '' })
 const boostQuickDurations = [
   { hours: 24,  label: '24h' },
   { hours: 72,  label: '3 days' },
@@ -879,11 +888,13 @@ function formatBoostExpiry(iso) {
 function applyCouponBoost() {
   if (!props.vendor || !boostForm.percent || !boostForm.expires_at) return
   const willBeScheduled = !!boostForm.starts_at && new Date(boostForm.starts_at) > new Date()
+  const normalizedCode = boostForm.code ? boostForm.code.trim().toUpperCase() : ''
   const form = useForm({
     _token: usePage().props.csrf_token,
     boost_percent: boostForm.percent,
     starts_at: boostForm.starts_at || null,
     expires_at: boostForm.expires_at,
+    boost_code: normalizedCode || null,
   })
   form.post(`/admin/vendors/${props.vendor.id}/coupon-boost`, {
     preserveScroll: true,
@@ -900,13 +911,19 @@ function applyCouponBoost() {
         editForm.coupon_boost_scheduled = false
         editForm.coupon_discount_previous_percent = editForm.coupon_discount_previous_percent ?? editForm.coupon_discount_percent
         editForm.coupon_discount_percent = boostForm.percent
+        if (normalizedCode) {
+          editForm.coupon_code_previous = editForm.coupon_code_previous ?? editForm.coupon_code
+          editForm.coupon_code = normalizedCode
+        }
       }
       editForm.coupon_boost_percent = boostForm.percent
+      editForm.coupon_boost_code = normalizedCode || null
       editForm.coupon_boost_starts_at = boostForm.starts_at ? new Date(boostForm.starts_at).toISOString() : null
       editForm.coupon_boost_expires_at = new Date(boostForm.expires_at).toISOString()
       boostForm.percent = null
       boostForm.starts_at = ''
       boostForm.expires_at = ''
+      boostForm.code = ''
     },
     onError: () => toastError('Boost failed — check the form and try again.'),
   })
@@ -922,9 +939,14 @@ function cancelCouponBoost() {
       if (editForm.coupon_boost_active && editForm.coupon_discount_previous_percent != null) {
         editForm.coupon_discount_percent = editForm.coupon_discount_previous_percent
       }
+      if (editForm.coupon_code_previous) {
+        editForm.coupon_code = editForm.coupon_code_previous
+      }
       editForm.coupon_boost_active = false
       editForm.coupon_boost_scheduled = false
       editForm.coupon_boost_percent = null
+      editForm.coupon_boost_code = null
+      editForm.coupon_code_previous = null
       editForm.coupon_boost_starts_at = null
       editForm.coupon_boost_expires_at = null
       editForm.coupon_discount_previous_percent = null

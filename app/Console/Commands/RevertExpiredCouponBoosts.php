@@ -47,13 +47,23 @@ class RevertExpiredCouponBoosts extends Command
 
             if ($this->option('dry-run')) continue;
 
-            $vs->forceFill([
+            $revertCode = $vs->coupon_code_previous;
+            $updates = [
                 'coupon_discount_percent' => $revertTo,
                 'coupon_discount_previous_percent' => null,
                 'coupon_boost_expires_at' => null,
                 'coupon_boost_starts_at' => null,
                 'coupon_boost_percent' => null,
-            ])->save();
+                'coupon_boost_code' => null,
+                'coupon_code_previous' => null,
+            ];
+            // Only restore the code if we swapped it (previous was
+            // snapshotted). Leave alone otherwise so vendors whose
+            // boost didn't touch the code aren't unexpectedly reset.
+            if ($revertCode !== null) {
+                $updates['coupon_code'] = $revertCode;
+            }
+            $vs->forceFill($updates)->save();
 
             $this->postDiscordExpiry($brand?->name ?? 'Unknown', $wasPercent, $revertTo);
         }

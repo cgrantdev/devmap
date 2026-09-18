@@ -80,7 +80,10 @@ class DashboardController extends Controller
                     'reverts_to_percent' => $vs->coupon_discount_previous_percent
                         ? (float) $vs->coupon_discount_previous_percent
                         : null,
-                    'coupon_code' => $vs->coupon_code,
+                    'coupon_code' => $isScheduled && $vs->coupon_boost_code
+                        ? $vs->coupon_boost_code
+                        : $vs->coupon_code,
+                    'reverts_to_code' => $vs->coupon_code_previous,
                 ];
             })
             ->values();

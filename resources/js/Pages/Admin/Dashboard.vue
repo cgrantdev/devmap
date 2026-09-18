@@ -44,6 +44,7 @@
             <p class="text-xs text-[color:var(--color-ink-subtle)] mt-0.5 ui-mono">
               <span class="font-semibold text-amber-800">{{ b.percent }}%</span>
               <span v-if="b.coupon_code"> · code <span class="uppercase">{{ b.coupon_code }}</span></span>
+              <span v-if="b.reverts_to_code" class="text-emerald-700"> (was {{ b.reverts_to_code }})</span>
               <span v-if="b.status === 'scheduled' && b.starts_at"> · starts {{ formatTs(b.starts_at) }}</span>
               <span> · ends {{ formatTs(b.expires_at) }}</span>
               <span v-if="b.reverts_to_percent != null"> · reverts to {{ b.reverts_to_percent }}%</span>
