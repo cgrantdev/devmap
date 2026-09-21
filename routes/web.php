@@ -312,6 +312,7 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
     Route::post('/reviews/{id}/flag', [VendorDashboardController::class, 'flag'])->name('vendor.reviews.flag');
     Route::post('/reviews/{id}/unflag', [VendorDashboardController::class, 'unflag'])->name('vendor.reviews.unflag');
     Route::get('/import', [ImportController::class, 'index'])->name('vendor.import');
+    Route::get('/import/template.xml', [ImportController::class, 'template'])->name('vendor.import.template');
     Route::post('/import/file', [ImportController::class, 'importFromFile'])->name('vendor.import.file');
     Route::post('/import/url', [ImportController::class, 'importFromUrl'])->name('vendor.import.url');
     Route::get('/products', [VendorDashboardController::class, 'products'])->name('vendor.products');

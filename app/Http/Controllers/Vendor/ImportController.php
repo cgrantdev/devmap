@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use SimpleXMLElement;
@@ -18,6 +20,147 @@ class ImportController extends Controller
         // Remove currency symbols and extract numeric value
         $price = preg_replace('/[^0-9.]/', '', $priceString);
         return $price ?: '0.00';
+    }
+
+    /**
+     * Downloadable canonical XML template. Colin/Julia Sep 21 — Coastal
+     * Peptides (and others before) hit "imported 0 products" because
+     * their feed didn't match the expected shape. Serving a real
+     * template file gives Julia something concrete to send.
+     */
+    public function template()
+    {
+        $xml = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Peptidemap product-feed template.
+  Root element MUST be <products>. Each product MUST include:
+    name, price, url
+  Optional but recommended:
+    image, sku, size (mg or ml), stock (in_stock | out_of_stock),
+    description
+  Google Merchant (<rss>/<g:item>) and Shopify sitemap-style feeds
+  are also accepted — the importer normalizes them internally.
+-->
+<products>
+  <product>
+    <name>BPC-157 5mg</name>
+    <sku>BPC-5</sku>
+    <size>5mg</size>
+    <price>39.99</price>
+    <image>https://your-site.com/images/bpc-157-5mg.jpg</image>
+    <url>https://your-site.com/products/bpc-157-5mg</url>
+    <stock>in_stock</stock>
+    <description>Research-grade BPC-157 lyophilized peptide.</description>
+  </product>
+  <product>
+    <name>TB-500 5mg</name>
+    <sku>TB-5</sku>
+    <size>5mg</size>
+    <price>49.99</price>
+    <image>https://your-site.com/images/tb-500-5mg.jpg</image>
+    <url>https://your-site.com/products/tb-500-5mg</url>
+    <stock>in_stock</stock>
+  </product>
+</products>
+XML;
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml',
+            'Content-Disposition' => 'attachment; filename="peptidemap-feed-template.xml"',
+        ]);
+    }
+
+    /**
+     * Parses an XML feed into a normalized array of product rows,
+     * regardless of the root shape. Supports:
+     *   <products><product>...</product></products>       (native)
+     *   <items><item>...</item></items>                    (generic)
+     *   <rss><channel><item>...</g:*>...</item></channel>  (Google Merchant)
+     *   <feed><entry>...</entry></feed>                    (Atom)
+     * Returns [rows, diagnostic]. diagnostic describes what was seen
+     * so a 0-product import gives Julia something to act on.
+     */
+    private function parseFeed(string $xmlContent): array
+    {
+        libxml_use_internal_errors(true);
+        $xml = new SimpleXMLElement($xmlContent, LIBXML_NOCDATA);
+
+        $rows = [];
+        $rootName = strtolower($xml->getName());
+
+        // Track which shape matched so we can log/diagnose.
+        $shape = null;
+
+        // Native <products><product>
+        if (isset($xml->product) && $xml->product->count() > 0) {
+            $shape = 'native';
+            foreach ($xml->product as $p) {
+                $rows[] = [
+                    'name' => (string) ($p->name ?? $p->title ?? ''),
+                    'price' => (string) ($p->price ?? ''),
+                    'image_url' => (string) ($p->image ?? $p->image_url ?? ''),
+                    'product_url' => (string) ($p->url ?? $p->link ?? ''),
+                    'sku' => (string) ($p->sku ?? ''),
+                    'size' => (string) ($p->size ?? $p->dosage ?? ''),
+                    'stock_status' => (string) ($p->stock ?? $p->stock_status ?? ''),
+                    'description' => (string) ($p->description ?? ''),
+                ];
+            }
+        } elseif (isset($xml->item) && $xml->item->count() > 0) {
+            $shape = 'items';
+            foreach ($xml->item as $p) {
+                $rows[] = [
+                    'name' => (string) ($p->name ?? $p->title ?? ''),
+                    'price' => (string) ($p->price ?? ''),
+                    'image_url' => (string) ($p->image ?? $p->image_url ?? ''),
+                    'product_url' => (string) ($p->url ?? $p->link ?? ''),
+                    'sku' => (string) ($p->sku ?? ''),
+                    'size' => (string) ($p->size ?? ''),
+                    'stock_status' => (string) ($p->stock ?? ''),
+                    'description' => (string) ($p->description ?? ''),
+                ];
+            }
+        } elseif (isset($xml->channel->item) && $xml->channel->item->count() > 0) {
+            // Google Merchant / RSS 2.0 with <g:*> namespaced fields.
+            $shape = 'google-merchant';
+            foreach ($xml->channel->item as $p) {
+                $g = $p->children('g', true);
+                $rows[] = [
+                    'name' => (string) ($g->title ?? $p->title ?? ''),
+                    'price' => (string) ($g->price ?? ''),
+                    'image_url' => (string) ($g->image_link ?? ''),
+                    'product_url' => (string) ($g->link ?? $p->link ?? ''),
+                    'sku' => (string) ($g->id ?? ''),
+                    'size' => (string) ($g->product_detail ?? ''),
+                    'stock_status' => (string) ($g->availability ?? ''),
+                    'description' => (string) ($g->description ?? $p->description ?? ''),
+                ];
+            }
+        } elseif (isset($xml->entry) && $xml->entry->count() > 0) {
+            $shape = 'atom';
+            foreach ($xml->entry as $p) {
+                $rows[] = [
+                    'name' => (string) ($p->title ?? ''),
+                    'price' => (string) ($p->price ?? ''),
+                    'image_url' => '',
+                    'product_url' => (string) ($p->link['href'] ?? $p->link ?? ''),
+                    'sku' => (string) ($p->id ?? ''),
+                    'size' => '',
+                    'stock_status' => '',
+                    'description' => (string) ($p->summary ?? $p->content ?? ''),
+                ];
+            }
+        }
+
+        // Filter out rows missing the two required fields — name + price.
+        $rows = array_values(array_filter($rows, fn ($r) => $r['name'] !== '' && $r['price'] !== ''));
+
+        $diagnostic = $shape
+            ? "Detected shape: {$shape} (root <{$rootName}>)"
+            : "Could not detect a product feed shape. Root element was <{$rootName}> — expected <products> with <product> children. Download the template at /vendor/import/template.xml.";
+
+        return [$rows, $diagnostic];
     }
 
     public function index()
@@ -53,43 +196,52 @@ class ImportController extends Controller
 
         try {
             $xmlContent = file_get_contents($file->getPathname());
-            $xml = new SimpleXMLElement($xmlContent);
-
-            $importedCount = 0;
-            $skippedCount = 0;
-
-            if (isset($xml->product)) {
-                foreach ($xml->product as $productData) {
-                    $productUrl = (string) $productData->url;
-
-                    // Skip if product with same URL already exists for this brand.
-                    if ($productUrl && Product::where('brand_id', $brand->id)->where('product_url', $productUrl)->exists()) {
-                        $skippedCount++;
-                        continue;
-                    }
-
-                    $product = Product::create([
-                        'brand_id' => $brand->id,
-                        'name' => (string) $productData->name,
-                        'price' => $this->extractPrice((string) $productData->price),
-                        'image_url' => (string) $productData->image,
-                        'product_url' => $productUrl,
-                    ]);
-
-                    $importedCount++;
-                }
-            }
-            
-            $message = "Successfully imported {$importedCount} products.";
-            if ($skippedCount > 0) {
-                $message .= " Skipped {$skippedCount} duplicate products.";
-            }
-            
-            return redirect()->back()->with('success', $message);
-            
+            [$rows, $diagnostic] = $this->parseFeed($xmlContent);
+            return $this->ingestRows($brand->id, $rows, $diagnostic);
         } catch (\Exception $e) {
+            Log::warning('vendor xml file import failed', ['brand_id' => $brand->id, 'err' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Error parsing XML file: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Shared writer used by both file + URL importers. Returns the
+     * redirect with an accurate success/warn message so vendors know
+     * exactly what happened when 0 products come through.
+     */
+    private function ingestRows(int $brandId, array $rows, string $diagnostic)
+    {
+        if (empty($rows)) {
+            Log::info('vendor xml import: zero rows', ['brand_id' => $brandId, 'diagnostic' => $diagnostic]);
+            return redirect()->back()->with('error', 'Imported 0 products. ' . $diagnostic);
+        }
+
+        $importedCount = 0;
+        $skippedCount = 0;
+        foreach ($rows as $r) {
+            $productUrl = $r['product_url'] ?? '';
+            if ($productUrl && Product::where('brand_id', $brandId)->where('product_url', $productUrl)->exists()) {
+                $skippedCount++;
+                continue;
+            }
+            Product::create([
+                'brand_id' => $brandId,
+                'name' => $r['name'],
+                'price' => $this->extractPrice($r['price']),
+                'image_url' => $r['image_url'] ?? null,
+                'product_url' => $productUrl ?: null,
+                'dosage' => $r['size'] ?? null,
+                'stock_status' => $r['stock_status'] ?? null,
+                'description' => $r['description'] ?? null,
+            ]);
+            $importedCount++;
+        }
+
+        $message = "Imported {$importedCount} products. {$diagnostic}";
+        if ($skippedCount > 0) {
+            $message .= " Skipped {$skippedCount} duplicate URLs.";
+        }
+        return redirect()->back()->with('success', $message);
     }
 
     public function importFromUrl(Request $request)
@@ -108,44 +260,13 @@ class ImportController extends Controller
             $response = Http::timeout(30)->get($request->url);
 
             if (!$response->successful()) {
-                return redirect()->back()->with('error', 'Failed to fetch XML from URL.');
+                return redirect()->back()->with('error', 'Failed to fetch XML from URL — server returned ' . $response->status() . '.');
             }
 
-            $xmlContent = $response->body();
-            $xml = new SimpleXMLElement($xmlContent);
-
-            $importedCount = 0;
-            $skippedCount = 0;
-
-            if (isset($xml->product)) {
-                foreach ($xml->product as $productData) {
-                    $productUrl = (string) $productData->url;
-
-                    if ($productUrl && Product::where('brand_id', $brand->id)->where('product_url', $productUrl)->exists()) {
-                        $skippedCount++;
-                        continue;
-                    }
-
-                    $product = Product::create([
-                        'brand_id' => $brand->id,
-                        'name' => (string) $productData->name,
-                        'price' => $this->extractPrice((string) $productData->price),
-                        'image_url' => (string) $productData->image,
-                        'product_url' => $productUrl,
-                    ]);
-
-                    $importedCount++;
-                }
-            }
-            
-            $message = "Successfully imported {$importedCount} products from URL.";
-            if ($skippedCount > 0) {
-                $message .= " Skipped {$skippedCount} duplicate products.";
-            }
-            
-            return redirect()->back()->with('success', $message);
-            
+            [$rows, $diagnostic] = $this->parseFeed($response->body());
+            return $this->ingestRows($brand->id, $rows, $diagnostic);
         } catch (\Exception $e) {
+            Log::warning('vendor xml url import failed', ['brand_id' => $brand->id, 'err' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Error importing from URL: ' . $e->getMessage());
         }
     }

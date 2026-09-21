@@ -3,6 +3,14 @@
     <div class="mb-8">
       <h1 class="text-3xl font-bold">Import Products</h1>
       <p class="text-gray-600 mt-2">Import products from XML files or URLs</p>
+      <div class="mt-4 flex flex-wrap items-center gap-3 text-sm">
+        <a href="/vendor/import/template.xml" class="inline-flex items-center gap-1.5 text-blue-700 hover:text-blue-900 font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download XML template
+        </a>
+        <span class="text-gray-400">·</span>
+        <span class="text-gray-500">Also accepts Google Merchant (RSS) and Atom feeds.</span>
+      </div>
     </div>
 
     <!-- Success Message -->
