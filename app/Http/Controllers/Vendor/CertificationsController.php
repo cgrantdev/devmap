@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\VendorCertificationClaim;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -81,7 +83,33 @@ class CertificationsController extends Controller
         $claim->verified_by_user_id = null;
         $claim->save();
 
+        // Colin PMAP Sep 16 — notify Julia in Discord growth channel
+        // so she knows a doc's waiting in the admin queue. Same tone
+        // and flags:4 (suppress link preview) as the coupon-boost posts.
+        $this->announceSubmission($claim);
+
         return back()->with('flash_success', 'Submitted for review — we\'ll email you once it\'s approved.');
+    }
+
+    private function announceSubmission(VendorCertificationClaim $c): void
+    {
+        $token = config('services.discord.bot_token');
+        $channel = config('services.discord.growth_channel_id');
+        if (!$token || !$channel) return;
+
+        $brandName = $c->brand?->name ?? 'A vendor';
+        $line = "{$brandName} submitted a {$c->label()} verification claim — review at <https://peptidemap.com/admin/certifications>.";
+
+        try {
+            Http::withHeaders(['Authorization' => 'Bot ' . $token, 'Content-Type' => 'application/json'])
+                ->timeout(6)
+                ->post("https://discord.com/api/v10/channels/{$channel}/messages", [
+                    'content' => $line,
+                    'flags' => 4,
+                ]);
+        } catch (\Throwable $e) {
+            Log::warning('cert submission discord post failed', ['err' => $e->getMessage()]);
+        }
     }
 
     private function brandForUser(Request $request): ?Brand

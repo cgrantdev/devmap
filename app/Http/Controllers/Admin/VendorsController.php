@@ -409,6 +409,13 @@ class VendorsController extends Controller
             'staged_count' => \App\Models\ScrapedProduct::where('scraping_config_id', $scrapingConfig->id)->count(),
         ] : null;
 
+        // Approved trust-badge claims — used by the admin-force UI
+        // on VendorEdit so Julia can see current status and toggle.
+        $activeBadges = \App\Models\VendorCertificationClaim::where('brand_id', $brand->id)
+            ->where('status', 'approved')
+            ->pluck('type')
+            ->toArray();
+
         // Stackable promos (PMAP #3). Julia manages sitewide sales,
         // coupon codes, BOGOs, and category discounts from this page.
         $promotions = $brand->promotions()
@@ -446,6 +453,7 @@ class VendorsController extends Controller
             'promotions' => $promotions,
             'promotionTypes' => \App\Models\VendorPromotion::TYPES,
             'categoryChoices' => $categoryChoices,
+            'activeBadges' => $activeBadges,
         ]);
     }
 
@@ -1714,6 +1722,44 @@ class VendorsController extends Controller
      * Cancel an active coupon boost early — restores the previous %
      * immediately and clears the expiry.
      */
+    /**
+     * Colin PMAP Sep 16 — Julia needs to force-grant cGMP / 7x-Tested
+     * badges directly from the vendor edit page when she has proof
+     * out-of-band (email from vendor, phone verification, previous
+     * doc she already reviewed). Bypasses the vendor-upload flow —
+     * creates or approves a VendorCertificationClaim without a
+     * document.
+     */
+    public function setCertificationBadge(Request $request, int $id)
+    {
+        $brand = Brand::findOrFail($id);
+        $validated = $request->validate([
+            'type' => 'required|string|in:' . implode(',', \App\Models\VendorCertificationClaim::TYPES),
+            'granted' => 'required|boolean',
+        ]);
+
+        $claim = \App\Models\VendorCertificationClaim::firstOrNew([
+            'brand_id' => $brand->id,
+            'type' => $validated['type'],
+        ]);
+
+        if ($validated['granted']) {
+            $claim->status = \App\Models\VendorCertificationClaim::STATUS_APPROVED;
+            $claim->admin_notes = trim(($claim->admin_notes ? $claim->admin_notes . "\n" : '') . 'Admin-granted (no doc) at ' . now()->toIso8601String());
+            $claim->verified_at = now();
+            $claim->verified_by_user_id = $request->user()?->id;
+            $claim->save();
+            return back()->with('flash_success', "Granted {$claim->label()} for {$brand->name}.");
+        }
+
+        // Revoking. Delete the claim outright — vendor can re-submit
+        // via the upload flow if they still have it.
+        if ($claim->exists) {
+            $claim->delete();
+        }
+        return back()->with('flash_success', "Revoked {$validated['type']} for {$brand->name}.");
+    }
+
     public function cancelCouponBoost(int $id)
     {
         $brand = Brand::findOrFail($id);

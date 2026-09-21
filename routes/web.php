@@ -380,6 +380,11 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     Route::delete('/vendors/{id}/coupon-boost', [VendorsController::class, 'cancelCouponBoost'])
         ->name('admin.vendors.coupon-boost.cancel');
 
+    // Admin-force trust badges (Colin PMAP Sep 16) — bypasses vendor
+    // upload flow when Julia has proof out-of-band.
+    Route::post('/vendors/{id}/certification-badge', [VendorsController::class, 'setCertificationBadge'])
+        ->name('admin.vendors.certification-badge');
+
     // Stackable marketing promos — Colin PMAP #3. Julia adds/edits/removes
     // per-vendor promos from the vendor edit page. Distinct from the
     // coupon-boost above: those are temporary bumps of the vendor's

@@ -147,6 +147,44 @@
               <textarea v-model="editForm.independent_testing_notes" rows="4" placeholder="e.g. Every batch is tested for purity, sterility, and endotoxins at an ISO/IEC 17025 lab. COAs available on each product page." class="w-full px-3 py-2 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
             </FormField>
           </FormSection>
+
+          <!-- Admin-force trust badges — Colin PMAP Sep 16. Bypasses
+               the vendor doc-upload flow when Julia has proof out-of-
+               band (email, previous claim, phone verification). Grants
+               create an approved VendorCertificationClaim server-side;
+               revokes delete the claim. Vendor upload remains the
+               canonical path for self-serve submissions. -->
+          <FormSection title="Trust Badges (admin)">
+            <div class="md:col-span-2 flex flex-wrap gap-3">
+              <button
+                type="button"
+                @click="toggleBadge('cgmp')"
+                :class="[
+                  'ui-focus inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold border-[1.5px] transition-all',
+                  hasBadge('cgmp')
+                    ? 'bg-emerald-600 text-white border-emerald-600'
+                    : 'bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50',
+                ]"
+              >
+                <svg v-if="hasBadge('cgmp')" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                cGMP Verified {{ hasBadge('cgmp') ? '· click to revoke' : '· click to grant' }}
+              </button>
+              <button
+                type="button"
+                @click="toggleBadge('testing_7x')"
+                :class="[
+                  'ui-focus inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold border-[1.5px] transition-all',
+                  hasBadge('testing_7x')
+                    ? 'bg-emerald-600 text-white border-emerald-600'
+                    : 'bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50',
+                ]"
+              >
+                <svg v-if="hasBadge('testing_7x')" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                7+ Tested {{ hasBadge('testing_7x') ? '· click to revoke' : '· click to grant' }}
+              </button>
+            </div>
+            <p class="md:col-span-2 text-[12px] text-[color:var(--color-ink-muted)] mt-1">Grants an approved claim without requiring a document upload. Prefer the vendor upload flow (<a href="/admin/certifications" class="text-[color:var(--color-accent-600)] underline">certification queue</a>) when a document is available.</p>
+          </FormSection>
           <FormSection title="Payment Methods">
             <div class="flex flex-wrap gap-6">
               <label v-for="method in ['Credit Card', 'PayPal', 'Cryptocurrency', 'Bank Transfer']" :key="method" class="flex items-center gap-2 text-sm">
@@ -608,7 +646,37 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  activeBadges: {
+    type: Array,
+    default: () => [],
+  },
 })
+
+// --- Admin-force trust badges (Colin PMAP Sep 16) --------------------
+const activeBadgesLocal = ref([...(props.activeBadges || [])])
+function hasBadge(type) {
+  return activeBadgesLocal.value.includes(type)
+}
+function toggleBadge(type) {
+  if (!props.vendor) return
+  const isGranting = !hasBadge(type)
+  if (!isGranting && !confirm('Revoke this badge?')) return
+  const form = useForm({
+    _token: usePage().props.csrf_token,
+    type,
+    granted: isGranting,
+  })
+  form.post(`/admin/vendors/${props.vendor.id}/certification-badge`, {
+    preserveScroll: true,
+    onSuccess: () => {
+      if (isGranting) activeBadgesLocal.value.push(type)
+      else activeBadgesLocal.value = activeBadgesLocal.value.filter(t => t !== type)
+    },
+    onError: () => toastError('Badge toggle failed.'),
+  })
+}
+watch(() => props.activeBadges, (v) => { activeBadgesLocal.value = [...(v || [])] })
+// --------------------------------------------------------------------
 
 // --- Stackable promotions (PMAP #3) ---------------------------------
 const promotions = ref([...(props.promotions || [])])

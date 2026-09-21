@@ -30,9 +30,12 @@
 
     <!-- Bottom Section: tighter padding + condensed price block. -->
     <div class="p-3 flex flex-col flex-1">
-      <!-- Product name + optional type chip. min-h-[2.5rem] reserves 2
-           lines so cards line up when some names wrap and some don't. -->
-      <div class="flex items-start gap-1.5 min-h-[2.5rem]">
+      <!-- Product name + optional type chip. FIXED 2-line height so
+           the "View Product" button lines up across every card in the
+           grid regardless of name length. Colin PMAP Sep 16: min-h
+           allowed cards with a wrapping name + tall chip to grow taller
+           than one-line neighbours, misaligning the CTA row. -->
+      <div class="flex items-start gap-1.5 h-[2.5rem] overflow-hidden">
         <h3 class="text-[13px] font-semibold text-gray-900 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors flex-1 min-w-0">
           {{ name }}
         </h3>
@@ -42,12 +45,12 @@
         >{{ typeChip.label }}</span>
       </div>
 
-      <p class="text-[11px] text-gray-500 mt-0.5 truncate">{{ brandName || 'Unknown Brand' }}</p>
+      <p class="text-[11px] text-gray-500 mt-0.5 truncate h-[1rem]">{{ brandName || 'Unknown Brand' }}</p>
 
-      <!-- Price — condensed. Discount branch: big new price + strikethrough
-           retail inline + tiny 'with code PMAP' underline. Undiscounted:
-           just the price. min-h keeps buttons aligned across a mixed grid. -->
-      <div class="mt-2 mb-2 min-h-[46px] flex flex-col justify-end">
+      <!-- Price — FIXED 60px so every card gets the same block height
+           whether the row is discounted (retail + strikethrough + "with
+           code X" + big new price) or plain (just the price). -->
+      <div class="mt-2 mb-2 h-[60px] flex flex-col justify-end">
         <template v-if="discountedPrice">
           <div class="flex items-baseline gap-2 flex-wrap">
             <span class="text-lg font-bold text-emerald-700 leading-none">${{ discountedPrice }}</span>

@@ -49,9 +49,9 @@
            across a mixed-discount grid (Julia flagged Sep 1: images
            bursting card bounds + heights all over the place). -->
       <div class="p-4 flex flex-col flex-1">
-        <!-- Product Title + Type chip. min-h reserves 2 lines even when
-             the title fits on one so cards line up. -->
-        <div class="flex items-start gap-1.5 mb-2 min-h-[2.5rem]">
+        <!-- Product Title + Type chip. FIXED 2-line height so the card
+             CTA row lines up across the grid (Colin PMAP Sep 16). -->
+        <div class="flex items-start gap-1.5 mb-2 h-[2.5rem] overflow-hidden">
           <h3 class="text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 min-w-0">
             {{ name }}
           </h3>
@@ -78,7 +78,7 @@
              3-line discount block so undiscounted cards get the price
              bottom-aligned inside the reserved space. Buttons/prices
              line up across a mixed-discount grid. -->
-        <div class="mt-auto min-h-[74px] flex flex-col justify-end">
+        <div class="mt-auto h-[74px] flex flex-col justify-end">
           <template v-if="discountedPrice">
             <div class="flex items-baseline gap-2">
               <span class="text-[11px] uppercase tracking-wide text-gray-700 font-semibold leading-tight">Retail</span>
