@@ -662,8 +662,8 @@
                     class="block w-full text-sm text-slate-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600 file:cursor-pointer cursor-pointer"
                   />
                   <div class="mt-3 text-xs text-slate-600 leading-relaxed">
-                    <div><strong class="text-slate-800">Recommended:</strong> 500×500 transparent PNG. Under 500 KB.</div>
-                    <div class="text-slate-500 mt-0.5">Your logo will be displayed at 380×215 on vendor cards, smaller in the storefront header, and as a tiny badge on product cards — a centered design that reads at any size works best.</div>
+                    <div><strong class="text-slate-800">Recommended:</strong> 1000×1000 transparent PNG. Under 2 MB.</div>
+                    <div class="text-slate-500 mt-0.5">Displayed at 380×215 on vendor cards, smaller in the storefront header, and as a tiny badge on product cards — the higher-res source keeps every render crisp on retina. A centered design that reads at any size works best.</div>
                   </div>
                   <p v-if="fieldErrors.logoFile" class="mt-2 text-xs text-rose-600">{{ fieldErrors.logoFile }}</p>
                 </div>
@@ -1357,8 +1357,12 @@ const storefrontPreviewData = computed(() => {
     business_hours_json: formData.value.businessHoursJson,
     usps: formData.value.usps,
     payment_methods: formData.value.paymentMethods,
-    contact_email: formData.value.email,
-    phone: formData.value.phone,
+    // Public storefront contact — prefer the split-out support fields
+    // (Colin PMAP Sep 22 G) so vendors see exactly what will show on
+    // /brand/{slug}. Blank falls back to account values, matching the
+    // controller.
+    contact_email: formData.value.supportEmail || formData.value.email,
+    phone: formData.value.supportPhone || formData.value.phone,
     trustpilot_url: formData.value.trustpilotUrl,
     google_reviews_url: formData.value.googleReviewsUrl,
     reviews_io_url: formData.value.reviewsIoUrl,
@@ -1674,7 +1678,7 @@ const handleLogoUpload = async (event) => {
     // logo that would otherwise trigger a raw 413 gets caught here
     // with a plain-English message instead.
     if (optimized.size > 4_500_000) {
-      alert('That logo is too large to upload. Please export it at a smaller size (500 × 500 is plenty for our storefront) and try again.');
+      alert('That logo is too large to upload. Please export it at a smaller size (1000 × 1000 is our recommendation) and try again.');
       event.target.value = '';
       formData.value.logoFile = null;
       return;

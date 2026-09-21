@@ -536,6 +536,15 @@ class CompareController extends Controller
         ] : [];
 
         return Inertia::render('Frontend/CompareCompound', [
+            // Echo the active filter state back to the view so the chip
+            // row can render with the correct selection state.
+            'trustFilters' => [
+                'verified' => collect(explode(',', (string) request()->get('verified', '')))
+                    ->map(fn ($t) => trim($t))
+                    ->filter(fn ($t) => in_array($t, ['cgmp', 'testing_7x'], true))
+                    ->unique()->values()->all(),
+                'usp' => trim((string) request()->get('usp', '')) ?: null,
+            ],
             'compound' => [
                 'id' => $category->id,
                 // Colin Sep 16 — compare pages lead with the SEO name in
@@ -755,6 +764,19 @@ class CompareController extends Controller
         // shows relevant rows.
         $locationFilter = trim((string) request()->get('location', ''));
 
+        // Trust filters — Colin PMAP tab 1 asked for these on compare
+        // pages too. Same URL contract as /vendors: ?verified=cgmp,testing_7x
+        // (AND across selected badges) and ?usp=us_manufactured. Filter
+        // narrows to products whose BRAND holds the required trust
+        // signals — verified via approved VendorCertificationClaim rows
+        // and self-declared usps on vendor_settings.
+        $verifiedTypes = collect(explode(',', (string) request()->get('verified', '')))
+            ->map(fn ($t) => trim($t))
+            ->filter(fn ($t) => in_array($t, ['cgmp', 'testing_7x'], true))
+            ->unique()
+            ->values();
+        $uspFilter = trim((string) request()->get('usp', ''));
+
         return Product::visible()
             ->where('status', 'active')
             ->where('product_category_id', $category->id)
@@ -767,6 +789,20 @@ class CompareController extends Controller
             ->when($locationFilter, fn ($q) => $q->whereHas(
                 'brand.vendorSetting.location',
                 fn ($l) => $l->where('name', $locationFilter)
+            ))
+            ->when($verifiedTypes->isNotEmpty(), function ($q) use ($verifiedTypes) {
+                foreach ($verifiedTypes as $type) {
+                    $q->whereIn('brand_id', function ($sub) use ($type) {
+                        $sub->select('brand_id')
+                            ->from('vendor_certification_claims')
+                            ->where('type', $type)
+                            ->where('status', 'approved');
+                    });
+                }
+            })
+            ->when($uspFilter, fn ($q) => $q->whereHas(
+                'brand.vendorSetting',
+                fn ($vs) => $vs->whereJsonContains('usps', $uspFilter)
             ))
             ->with('brand.vendorSetting.location')
             ->get()

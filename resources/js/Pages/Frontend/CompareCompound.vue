@@ -66,6 +66,50 @@
           </a>
         </div>
 
+        <!-- Trust filters — Colin PMAP tab 1: same three toggles as
+             the vendors + peptides pages. cGMP + 7+ Tested combine
+             (both must have approved claims); US Made is a self-
+             declared USP. Toggle state persists in the URL as
+             ?verified=csv&usp=us_manufactured. -->
+        <div class="mt-5 flex flex-wrap items-center gap-2">
+          <span class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] pr-1">Trust filters</span>
+          <button
+            v-for="f in verifiedFilters"
+            :key="f.value"
+            @click="toggleVerified(f.value)"
+            :class="[
+              'ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm',
+              activeVerified.has(f.value)
+                ? 'bg-emerald-600 text-white border-emerald-600'
+                : 'bg-emerald-50/60 text-emerald-800 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50',
+            ]"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            {{ f.label }}
+          </button>
+          <button
+            @click="toggleUsp('us_manufactured')"
+            :class="[
+              'ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm',
+              activeUsp === 'us_manufactured'
+                ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
+                : 'bg-blue-50/60 text-blue-900 border-blue-200 hover:border-blue-400 hover:bg-blue-50',
+            ]"
+          >
+            <svg class="w-4 h-3 rounded-[1px]" viewBox="0 0 21 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect width="21" height="15" fill="#b22234"/>
+              <path stroke="#fff" stroke-width="1.15" d="M0 2.3h21M0 4.6h21M0 6.9h21M0 9.2h21M0 11.5h21M0 13.8h21"/>
+              <rect width="9" height="8" fill="#3c3b6e"/>
+            </svg>
+            US Made
+          </button>
+          <button
+            v-if="activeVerified.size > 0 || activeUsp"
+            @click="clearTrustFilters"
+            class="text-[11px] text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)] underline ml-1"
+          >clear</button>
+        </div>
+
         <div class="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] text-[11px] text-[color:var(--color-ink-subtle)]">
           <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
           All products listed are for <strong class="text-[color:var(--color-ink-muted)]">research use only</strong> (RUO). Not for human consumption.
@@ -245,18 +289,54 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
+import { Head, router } from '@inertiajs/vue3'
 import ModernLayout from '../Layouts/ModernLayout.vue'
 import BuyThroughModal from '@/components/BuyThroughModal.vue'
 import { withSrc } from '@/composables/useOutbound'
 
-defineProps({
+const props = defineProps({
   compound: { type: Object, required: true },
   related: { type: Array, default: () => [] },
   vsPairs: { type: Array, default: () => [] },
   seo: { type: Object, default: () => ({}) },
+  trustFilters: { type: Object, default: () => ({ verified: [], usp: null }) },
 })
+
+// Trust filter chips — Colin PMAP tab 1. Same URL contract as
+// /vendors (?verified=csv&usp=key) so the two surfaces stay
+// consistent and a shared bookmarked URL keeps its shape.
+const verifiedFilters = [
+  { label: 'cGMP Verified', value: 'cgmp' },
+  { label: '7+ Tested', value: 'testing_7x' },
+]
+const activeVerified = computed(() => new Set(props.trustFilters?.verified || []))
+const activeUsp = computed(() => props.trustFilters?.usp || null)
+
+function trustNavigate(nextVerified, nextUsp) {
+  const params = new URLSearchParams(window.location.search)
+  if (nextVerified.size > 0) params.set('verified', [...nextVerified].join(','))
+  else params.delete('verified')
+  if (nextUsp) params.set('usp', nextUsp)
+  else params.delete('usp')
+  const qs = params.toString()
+  router.visit(window.location.pathname + (qs ? '?' + qs : ''), {
+    preserveState: true,
+    preserveScroll: true,
+  })
+}
+function toggleVerified(value) {
+  const set = new Set(activeVerified.value)
+  if (set.has(value)) set.delete(value)
+  else set.add(value)
+  trustNavigate(set, activeUsp.value)
+}
+function toggleUsp(value) {
+  trustNavigate(activeVerified.value, activeUsp.value === value ? null : value)
+}
+function clearTrustFilters() {
+  trustNavigate(new Set(), null)
+}
 
 const buyModal = ref(null)
 function openBuy(ev, product) {
