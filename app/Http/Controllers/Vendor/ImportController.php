@@ -24,23 +24,36 @@ class ImportController extends Controller
     }
 
     /**
-     * Slugify the product name and guarantee uniqueness within the
-     * brand. Product slugs are scoped per brand (used in URLs like
-     * /product/{brand-slug}/{product-slug}/{id}) so different vendors
-     * can carry a "bpc-157-5mg" without collision, but the same
-     * vendor re-uploading the same product needs a bumped suffix.
+     * Generate a globally-unique product slug. products.slug is unique
+     * SITE-WIDE (not per brand), so two vendors both selling
+     * "AOD-9604 5mg" would collide (Rudy at Coastal Peptides Sep 22
+     * hit this on his second product). Strategy:
+     *   1. Try the raw slug from the name
+     *   2. On collision, append the brand's slug — keeps URLs meaningful
+     *   3. On further collision, append a numeric suffix
      */
     private function uniqueProductSlug(int $brandId, string $name): string
     {
         $base = Str::slug($name) ?: 'product';
         $base = substr($base, 0, 180);
-        $slug = $base;
-        $i = 2;
-        while (Product::where('brand_id', $brandId)->where('slug', $slug)->exists()) {
-            $slug = $base . '-' . $i++;
-            if ($i > 999) { $slug = $base . '-' . uniqid(); break; }
+
+        if (!Product::where('slug', $base)->exists()) {
+            return $base;
         }
-        return $slug;
+
+        $brand = \App\Models\Brand::find($brandId);
+        $brandSlug = $brand?->slug ? substr(Str::slug($brand->slug), 0, 60) : 'v' . $brandId;
+        $withBrand = substr($base, 0, 180 - strlen($brandSlug) - 1) . '-' . $brandSlug;
+
+        if (!Product::where('slug', $withBrand)->exists()) {
+            return $withBrand;
+        }
+
+        $i = 2;
+        while (Product::where('slug', $withBrand . '-' . $i)->exists()) {
+            if (++$i > 999) return $withBrand . '-' . uniqid();
+        }
+        return $withBrand . '-' . $i;
     }
 
     /**
@@ -237,36 +250,59 @@ XML;
             return redirect()->back()->with('error', 'Imported 0 products. ' . $diagnostic);
         }
 
+        // Colin/Rudy Sep 22 — importer now upserts on (brand_id,
+        // external_id) so re-syncs update existing rows instead of
+        // slamming into the (brand_id, external_id) composite unique.
+        // Falls back to (brand_id, product_url) for feeds that don't
+        // carry an id, then finally inserts as new.
         $importedCount = 0;
-        $skippedCount = 0;
+        $updatedCount = 0;
         foreach ($rows as $r) {
             $productUrl = $r['product_url'] ?? '';
-            if ($productUrl && Product::where('brand_id', $brandId)->where('product_url', $productUrl)->exists()) {
-                $skippedCount++;
-                continue;
+            $extId = $r['sku'] ?? '';
+
+            $existing = null;
+            if ($extId !== '') {
+                $existing = Product::where('brand_id', $brandId)
+                    ->where('external_id', $extId)
+                    ->first();
             }
-            Product::create([
-                'brand_id' => $brandId,
+            if (!$existing && $productUrl) {
+                $existing = Product::where('brand_id', $brandId)
+                    ->where('product_url', $productUrl)
+                    ->first();
+            }
+
+            $attrs = [
                 'name' => $r['name'],
-                // products.slug is NOT NULL with no default (per Coastal
-                // Peptides feed import Sep 22). Generate a unique slug
-                // per brand from the product name; append a numeric
-                // suffix on collision so re-uploads don't crash.
-                'slug' => $this->uniqueProductSlug($brandId, $r['name']),
                 'price' => $this->extractPrice($r['price']),
                 'image_url' => $r['image_url'] ?? null,
                 'product_url' => $productUrl ?: null,
-                'dosage' => $r['size'] ?? null,
+                'size_mg' => $r['size'] ?? null,
                 'stock_status' => $r['stock_status'] ?? null,
                 'description' => $r['description'] ?? null,
-            ]);
-            $importedCount++;
-        }
+                'external_id' => $extId ?: null,
+            ];
 
-        $message = "Imported {$importedCount} products. {$diagnostic}";
-        if ($skippedCount > 0) {
-            $message .= " Skipped {$skippedCount} duplicate URLs.";
+            if ($existing) {
+                // Preserve slug — it's already unique and cached in
+                // Google's index; changing it on every sync would
+                // churn URLs and break inbound links.
+                $existing->fill($attrs)->save();
+                $updatedCount++;
+            } else {
+                $attrs['brand_id'] = $brandId;
+                // Site-wide unique slug: name + numeric suffix, then
+                // append brand slug for collisions with other vendors'
+                // products (Rudy Sep 22: "aod-9604-5mg" duplicate).
+                $attrs['slug'] = $this->uniqueProductSlug($brandId, $r['name']);
+                Product::create($attrs);
+                $importedCount++;
+            }
         }
+        $skippedCount = 0;
+
+        $message = "Imported {$importedCount} new, updated {$updatedCount} existing. {$diagnostic}";
         return redirect()->back()->with('success', $message);
     }
 
