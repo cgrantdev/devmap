@@ -2,7 +2,7 @@
   <!-- Preview that mirrors the real /brand/{slug} layout tick-for-tick:
        same 3/4 grid, same header cluster (name → stars/rating/location →
        tagline → description), same sidebar order (Business Details →
-       Highlights → Policies). Vendors see exactly the storefront they get. -->
+       Why Choose → Policies). Vendors see exactly the storefront they get. -->
   <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
     <!-- Faux browser chrome so it reads unambiguously as a preview -->
     <div class="px-4 py-2 bg-slate-100 border-b border-slate-200 flex items-center gap-2">
@@ -117,7 +117,7 @@
           </section>
         </div>
 
-        <!-- Sidebar — order matches real page: Business Details → Highlights →
+        <!-- Sidebar — order matches real page: Business Details → Why Choose →
              Policies. -->
         <aside class="lg:col-span-1">
           <div class="space-y-6">
@@ -189,10 +189,11 @@
               </div>
             </div>
 
-            <!-- Highlights (USPs) — matches the sidebar's third-slot
-                 position on the live page. -->
+            <!-- Why Choose (USPs) — matches the sidebar's third-slot
+                 position on the live page. Renamed from "Highlights"
+                 Sep 22 per Colin PMAP. -->
             <div v-if="uspBadges.length" class="bg-white border border-slate-200 rounded-lg p-5">
-              <h3 class="text-lg text-slate-900 mb-3">Highlights</h3>
+              <h3 class="text-lg text-slate-900 mb-3">Why Choose {{ data.name || 'this vendor' }}?</h3>
               <div class="flex flex-wrap gap-1.5">
                 <div v-for="u in uspBadges" :key="u.key" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-100">
                   <span class="text-[14px] leading-none">{{ u.icon }}</span>

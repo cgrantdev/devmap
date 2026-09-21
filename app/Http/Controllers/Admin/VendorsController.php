@@ -54,6 +54,7 @@ class VendorsController extends Controller
                     'return_policy' => $settings?->return_policy,
                     'business_hours' => $settings?->business_hours,
                     'payment_methods' => $settings?->payment_methods ?? [],
+                    'usps' => $settings?->usps ?? [],
                     'founded_year' => $settings?->founded_year,
                     'logo_url' => $settings?->logo ? asset('storage/' . $settings->logo) : null,
                     'has_api_keys' => $hasApiKeys,
@@ -128,6 +129,7 @@ class VendorsController extends Controller
                         'featured' => $brand->vendorSetting->featured ?? false,
                         'is_partner' => $brand->vendorSetting->is_partner ?? false,
                         'payment_methods' => $brand->vendorSetting->payment_methods ?? [],
+                        'usps' => $brand->vendorSetting->usps ?? [],
                         'seo_page_title' => $brand->vendorSetting->seo_page_title ?? null,
                         'seo_description' => $brand->vendorSetting->seo_description ?? null,
                         'seo_og_title' => $brand->vendorSetting->seo_og_title ?? null,
@@ -243,6 +245,8 @@ class VendorsController extends Controller
             'is_partner' => 'nullable|boolean',
             'payment_methods' => 'nullable|array',
             'payment_methods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
+            'usps' => 'nullable|array',
+            'usps.*' => 'nullable|string|max:64',
             'seo_page_title' => 'nullable|string|max:255',
             'seo_description' => 'nullable|string|max:500',
             'seo_og_title' => 'nullable|string|max:255',
@@ -314,6 +318,7 @@ class VendorsController extends Controller
         $settings->featured = $validated['featured'] ?? false;
         $settings->is_partner = $validated['is_partner'] ?? false;
         $settings->payment_methods = $validated['payment_methods'] ?? null;
+        $settings->usps = $validated['usps'] ?? [];
         $settings->status = 1; // Active by default
         $settings->save();
 
@@ -380,6 +385,7 @@ class VendorsController extends Controller
                 'featured' => $brand->vendorSetting->featured ?? false,
                 'is_partner' => $brand->vendorSetting->is_partner ?? false,
                 'payment_methods' => $brand->vendorSetting->payment_methods ?? [],
+                'usps' => $brand->vendorSetting->usps ?? [],
                 'seo_page_title' => $brand->vendorSetting->seo_page_title ?? null,
                 'seo_description' => $brand->vendorSetting->seo_description ?? null,
                 'seo_og_title' => $brand->vendorSetting->seo_og_title ?? null,
@@ -512,6 +518,8 @@ class VendorsController extends Controller
             'is_partner' => 'nullable|boolean',
             'payment_methods' => 'nullable|array',
             'payment_methods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
+            'usps' => 'nullable|array',
+            'usps.*' => 'nullable|string|max:64',
             'seo_page_title' => 'nullable|string|max:255',
             'seo_description' => 'nullable|string|max:500',
             'seo_og_title' => 'nullable|string|max:255',
@@ -639,6 +647,9 @@ class VendorsController extends Controller
         $settings->is_partner = $validated['is_partner'] ?? $settings->is_partner ?? false;
         if (isset($validated['payment_methods'])) {
             $settings->payment_methods = $validated['payment_methods'];
+        }
+        if (isset($validated['usps'])) {
+            $settings->usps = $validated['usps'];
         }
         if (isset($validated['seo_page_title'])) {
             $settings->seo_page_title = $validated['seo_page_title'];

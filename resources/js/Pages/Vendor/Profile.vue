@@ -325,6 +325,23 @@
         </div>
       </div>
 
+      <!-- Why Choose Panel (USPs) — Colin PMAP Sep 16. Vendors need
+           to edit these after onboarding without hunting for the
+           inline editor on the storefront. -->
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Why Choose {{ vendor.name || 'your storefront' }}?</h2>
+        <div v-if="isEditing">
+          <UspPicker v-model="form.usps" />
+        </div>
+        <div v-else class="flex flex-wrap gap-1.5">
+          <div v-for="key in (vendor.settings?.usps || [])" :key="key" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-100">
+            <span class="text-[14px] leading-none">{{ USP_LOOKUP[key]?.icon }}</span>
+            <span class="text-[12px] font-medium text-indigo-900 leading-none">{{ USP_LOOKUP[key]?.label || key }}</span>
+          </div>
+          <span v-if="!(vendor.settings?.usps || []).length" class="text-sm text-gray-500">None selected — click Edit to add.</span>
+        </div>
+      </div>
+
       <!-- Account Status Section -->
       <div class="bg-white rounded-lg border border-gray-200 p-6">
         <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -381,6 +398,9 @@
 import Layout from './Layout.vue'
 import { useForm, usePage } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
+import UspPicker from '@/components/UspPicker.vue'
+import { USP_OPTIONS } from '@/data/uspOptions'
+const USP_LOOKUP = Object.fromEntries(USP_OPTIONS.map(o => [o.key, o]))
 
 const props = defineProps({
   vendor: {
@@ -408,6 +428,7 @@ const form = useForm({
   contact_email: props.vendor?.settings?.contact_email || props.vendor?.user?.email || '',
   phone_number: props.vendor?.settings?.phone_number || '',
   shipping_info: props.vendor?.settings?.shipping_info || '',
+  usps: props.vendor?.settings?.usps || [],
   return_policy: props.vendor?.settings?.return_policy || '',
   business_hours: props.vendor?.settings?.business_hours || '',
   payment_methods: props.vendor?.settings?.payment_methods || [],

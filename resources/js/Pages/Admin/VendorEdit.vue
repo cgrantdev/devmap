@@ -193,6 +193,17 @@
               </label>
             </div>
           </FormSection>
+
+          <!-- Why Choose (USPs) — Colin PMAP Sep 16: onboarding was
+               the only place to edit these, so Julia couldn't fix
+               them after a vendor went live. Admin-side picker plus
+               the vendor Profile picker close that loop. -->
+          <FormSection title="Why Choose (USPs)">
+            <div class="md:col-span-2">
+              <UspPicker v-model="editForm.usps" />
+              <p class="text-[12px] text-[color:var(--color-ink-muted)] mt-2">Shown on the storefront as the "Why Choose {{ props.vendor?.name || '{brand}' }}?" panel.</p>
+            </div>
+          </FormSection>
         </div>
 
         <!-- MARKETING TAB -->
@@ -612,6 +623,7 @@ import AdminLayout from './Layout.vue'
 import FormPage from '@/components/admin/FormPage.vue'
 import FormSection from '@/components/admin/FormSection.vue'
 import FormField from '@/components/admin/FormField.vue'
+import UspPicker from '@/components/UspPicker.vue'
 import { useAdminLoading } from '../../composables/useAdminLoading'
 import { useToast as useVueToastification } from 'vue-toastification'
 
@@ -874,6 +886,7 @@ const editForm = useForm({
   featured: props.vendor?.settings?.featured || false,
   is_partner: props.vendor?.settings?.is_partner || false,
   payment_methods: props.vendor?.settings?.payment_methods || [],
+  usps: props.vendor?.settings?.usps || [],
   banner: null,
   logo: null,
   is_active: props.vendor?.is_active ?? false,

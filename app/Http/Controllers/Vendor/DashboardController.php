@@ -624,6 +624,7 @@ class DashboardController extends Controller
                 'return_policy' => $settings->return_policy ?? null,
                 'business_hours' => $settings->business_hours ?? null,
                 'payment_methods' => $settings->payment_methods ?? [],
+                'usps' => $settings->usps ?? [],
                 'logo' => $settings->logo ? asset('storage/' . $settings->logo) : null,
                 'approval_status' => $settings->approval_status ?? 'pending',
             ];
@@ -659,6 +660,8 @@ class DashboardController extends Controller
             'business_hours' => 'nullable|string|max:255',
             'payment_methods' => 'nullable|array',
             'payment_methods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
+            'usps' => 'nullable|array',
+            'usps.*' => 'nullable|string|max:64',
             'logo' => 'nullable|mimes:png|max:2048',
         ]);
 
@@ -711,6 +714,7 @@ class DashboardController extends Controller
             $settings->return_policy = $validated['return_policy'] ?? null;
             $settings->business_hours = $validated['business_hours'] ?? null;
             $settings->payment_methods = $validated['payment_methods'] ?? [];
+            $settings->usps = $validated['usps'] ?? [];
 
             // Set status if this is a new settings record
             if (!$settings->exists) {

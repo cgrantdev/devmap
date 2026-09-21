@@ -56,6 +56,22 @@
                   {{ brand.contact_email }}
                 </span>
               </div>
+              <!-- Per-platform rating breakdown — Colin PMAP Sep 16:
+                   the aggregate star should show WHICH platforms feed
+                   it. Renders a compact chip row below the main star. -->
+              <div v-if="externalPlatformsList.length" class="flex flex-wrap items-center gap-1.5 mt-1.5">
+                <span class="text-[10px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] mr-0.5">Sources</span>
+                <span
+                  v-for="p in externalPlatformsList"
+                  :key="p.key"
+                  :class="['inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-medium', p.badgeClasses]"
+                  :title="p.platform"
+                >
+                  <span class="font-bold">{{ p.badgeText }}</span>
+                  <span v-if="p.hasNumbers" class="ui-mono">{{ Number(p.rating).toFixed(1) }}</span>
+                  <span v-if="p.hasNumbers" class="opacity-70">({{ p.count.toLocaleString() }})</span>
+                </span>
+              </div>
               <!-- Verified badges — cGMP / independent testing, only when
                    the vendor has APPROVED claims. Managed via the
                    admin certification queue; see docs/vendor-certifications.md. -->
@@ -529,11 +545,13 @@
                 </div>
               </div>
 
-              <!-- Highlights (structured USPs) — single wrapping chip bar
-                   directly below Business Details. Trust signals in one
-                   glance without stealing sidebar height. -->
+              <!-- Why Choose {brand} — structured USPs. Colin PMAP
+                   Sep 16: renamed from "Highlights" because that label
+                   was ambiguous and the free-text bullets panel below
+                   (zero vendors populated it, defaults for everyone)
+                   was redundant. USP picker is the single source. -->
               <div v-if="uspBadges.length" class="bg-white border border-gray-200 rounded-lg p-6">
-                <h3 class="text-lg text-gray-900 mb-3">Highlights</h3>
+                <h3 class="text-lg text-gray-900 mb-3">Why Choose {{ brand.name || 'this vendor' }}?</h3>
                 <div class="flex flex-wrap gap-1.5">
                   <div v-for="u in uspBadges" :key="u.key" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-100">
                     <span class="text-[14px] leading-none">{{ u.icon }}</span>
@@ -642,39 +660,15 @@
                 </div>
               </div>
 
-              <!-- Why Choose Panel — per-vendor bullets when configured,
-                   generic defaults otherwise. Owners edit the list inline
-                   as newline-separated lines. -->
-              <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                <h3 class="text-lg text-gray-900 mb-4">Why Choose {{ props.brand.name || 'this vendor' }}?</h3>
-                <InlineEditField
-                  v-if="brand.is_owner"
-                  :model-value="whyChooseEditableText"
-                  field="why_choose_bullets"
-                  label="why-choose bullets"
-                  placeholder="One reason per line…"
-                  :owner="true"
-                  :brand-slug="brand.slug"
-                  :multiline="true"
-                  :rows="5"
-                  @update:model-value="brand.why_choose_bullets = linesToArray($event)"
-                >
-                  <template #default>
-                    <ul class="space-y-2 text-sm text-gray-700">
-                      <li v-for="benefit in whyChooseBenefits" :key="benefit" class="flex items-start gap-2">
-                        <span class="text-gray-900 mt-0.5">✓</span>
-                        <span>{{ benefit }}</span>
-                      </li>
-                    </ul>
-                  </template>
-                </InlineEditField>
-                <ul v-else class="space-y-2 text-sm text-gray-700">
-                  <li v-for="benefit in whyChooseBenefits" :key="benefit" class="flex items-start gap-2">
-                    <span class="text-gray-900 mt-0.5">✓</span>
-                    <span>{{ benefit }}</span>
-                  </li>
-                </ul>
-              </div>
+              <!-- Free-text "Why Choose" bullets panel removed Sep 22 —
+                   Colin PMAP: the USP picker above serves the same
+                   purpose, and 0/41 vendors ever populated the free-text
+                   field. Every vendor was seeing the generic default
+                   ("Third-party lab tested" etc) as if it were their
+                   own claim. If a vendor's story genuinely needs prose,
+                   the Manufacturing / Independent Testing sections
+                   further down are the right home. -->
+
 
               <!-- Manufacturing — Colin PMAP #7a. Free-text section for
                    vendors to describe where + how their peptides are
