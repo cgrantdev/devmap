@@ -709,9 +709,19 @@ class ProductsController extends Controller
             $query->where('brand_id', $request->brand);
         }
 
-        // Dosage size filter — exact string match (size_mg is now varchar).
-        if ($request->has('size') && $request->size) {
-            $query->where('size_mg', (string) $request->size);
+        // Dosage size filter — multi-select. URL carries a
+        // comma-separated list (?size=10mg,10mg/2.5mg). Matches any
+        // product whose size_mg is in the set. Backwards-compatible
+        // with the older single-value ?size=X shape. Colin PMAP Sep 22.
+        if ($request->filled('size')) {
+            $sizes = collect(explode(',', $request->size))
+                ->map(fn ($s) => trim($s))
+                ->filter()
+                ->unique()
+                ->values();
+            if ($sizes->isNotEmpty()) {
+                $query->whereIn('size_mg', $sizes);
+            }
         }
 
         if ($request->has('cost_min') && $request->cost_min) {

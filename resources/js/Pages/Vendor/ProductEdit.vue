@@ -31,8 +31,22 @@
           </div>
 
           <div>
-            <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Size (e.g. "10mg", "5mg")</label>
-            <input v-model="form.size_mg" type="text" class="ui-input" placeholder="10mg" />
+            <label class="block text-[12px] font-medium text-[color:var(--color-ink-muted)] mb-1.5">Size</label>
+            <input v-model="form.size_mg" type="text" class="ui-input" placeholder="10mg" list="size-presets" />
+            <!-- Colin PMAP Sep 22 — datalist of standard singles + blends
+                 nudges vendors toward the same size vocabulary. Browser
+                 autocompletes as they type, but still allows free-text
+                 for weird one-offs. -->
+            <datalist id="size-presets">
+              <option value="10mg" />
+              <option value="10mg/2.5mg" />
+              <option value="30mg/5mg" />
+              <option value="50mg/10mg" />
+              <option value="10mg/5mg/5mg" />
+              <option value="10mg/10mg/10mg" />
+              <option value="100mg/10mg/10mg" />
+            </datalist>
+            <p class="text-[11px] text-[color:var(--color-ink-subtle)] mt-1">Blends use "/". Examples suggested below the field — free-text accepted for one-offs.</p>
           </div>
         </div>
 

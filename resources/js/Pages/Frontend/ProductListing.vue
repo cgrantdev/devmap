@@ -34,16 +34,34 @@
             <option value="popular|desc">Most Popular</option>
           </select>
 
-          <!-- Dosage size filter -->
-          <select
-            v-if="filterOptions.sizes && filterOptions.sizes.length > 1"
-            class="h-9 px-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none"
-            :value="selectedSize"
-            @change="handleSizeChange"
-          >
-            <option value="">All dosages</option>
-            <option v-for="size in filterOptions.sizes" :key="size" :value="size">{{ formatSize(size) }}</option>
-          </select>
+          <!-- Dosage size filter — multi-select chips (Colin PMAP
+               Sep 22). Blend presets always visible so vendors are
+               nudged toward the same size vocabulary; any additional
+               sizes actually in the DB for this compound get appended.
+               Toggle multiple to filter for any-of. -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] pr-0.5">Size</span>
+            <button
+              v-for="size in mergedSizes"
+              :key="size"
+              type="button"
+              @click="toggleSize(size)"
+              :class="[
+                'h-7 px-2.5 text-[12px] rounded-full border transition-colors ui-mono',
+                selectedSizes.has(size)
+                  ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
+                  : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)]',
+              ]"
+            >
+              {{ formatSize(size) }}
+            </button>
+            <button
+              v-if="selectedSizes.size > 0"
+              type="button"
+              @click="clearSizes"
+              class="text-[11px] text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)] underline ml-1"
+            >clear</button>
+          </div>
 
           <!-- Brand filter (if multiple) -->
           <select
@@ -220,8 +238,43 @@ const heroBgRef = ref(null)
 const heroBgLoaded = ref(false)
 
 const sortValue = computed(() => `${props.sort || 'price'}|${props.sortDir || 'asc'}`)
-const selectedSize = ref(new URLSearchParams(window.location.search).get('size') || '')
+// Preset blend/single sizes — Colin PMAP Sep 22. These chips
+// always appear so the size vocabulary stays consistent even for
+// compounds where no vendor has uploaded these yet.
+const PRESET_SIZES = ['10mg', '10mg/2.5mg', '30mg/5mg', '50mg/10mg', '10mg/5mg/5mg', '10mg/10mg/10mg', '100mg/10mg/10mg']
+
+// Multi-select via a Set. URL carries comma-separated ?size=A,B.
+const initialSizes = (new URLSearchParams(window.location.search).get('size') || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean)
+const selectedSizes = ref(new Set(initialSizes))
 const selectedBrand = ref(new URLSearchParams(window.location.search).get('brand') || '')
+
+// Merge preset order first, then any DB sizes not already in presets.
+const mergedSizes = computed(() => {
+  const seen = new Set()
+  const out = []
+  for (const s of PRESET_SIZES) { if (!seen.has(s)) { seen.add(s); out.push(s) } }
+  for (const s of (props.filterOptions?.sizes || [])) {
+    const k = String(s).trim()
+    if (k && !seen.has(k)) { seen.add(k); out.push(k) }
+  }
+  return out
+})
+
+function toggleSize(size) {
+  const set = selectedSizes.value
+  if (set.has(size)) set.delete(size)
+  else set.add(size)
+  selectedSizes.value = new Set(set)
+  applyFilters()
+}
+
+function clearSizes() {
+  selectedSizes.value = new Set()
+  applyFilters()
+}
 
 const handleSortChange = (event) => {
   const value = event?.target?.value || 'price|asc'
@@ -229,10 +282,6 @@ const handleSortChange = (event) => {
   applySort(sort, dir)
 }
 
-function handleSizeChange(event) {
-  selectedSize.value = event.target.value
-  applyFilters()
-}
 
 function handleBrandChange(event) {
   selectedBrand.value = event.target.value
@@ -336,7 +385,7 @@ const applyFilters = () => {
   const params = new URLSearchParams()
 
   if (searchQuery.value) params.set('search', searchQuery.value)
-  if (selectedSize.value) params.set('size', selectedSize.value)
+  if (selectedSizes.value.size > 0) params.set('size', [...selectedSizes.value].join(','))
   if (selectedBrand.value) params.set('brand', selectedBrand.value)
   if (props.sort) params.set('sort', props.sort)
   if (props.sortDir) params.set('sort_dir', props.sortDir)
@@ -368,7 +417,7 @@ const clearFilters = () => {
 const applySort = (sort, dir) => {
   const params = new URLSearchParams(window.location.search)
   if (searchQuery.value) params.set('search', searchQuery.value)
-  if (selectedSize.value) params.set('size', selectedSize.value)
+  if (selectedSizes.value.size > 0) params.set('size', [...selectedSizes.value].join(','))
   else params.delete('size')
   if (selectedBrand.value) params.set('brand', selectedBrand.value)
   else params.delete('brand')
