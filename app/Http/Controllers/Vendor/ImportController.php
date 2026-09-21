@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use SimpleXMLElement;
 use App\Models\Product;
@@ -20,6 +21,26 @@ class ImportController extends Controller
         // Remove currency symbols and extract numeric value
         $price = preg_replace('/[^0-9.]/', '', $priceString);
         return $price ?: '0.00';
+    }
+
+    /**
+     * Slugify the product name and guarantee uniqueness within the
+     * brand. Product slugs are scoped per brand (used in URLs like
+     * /product/{brand-slug}/{product-slug}/{id}) so different vendors
+     * can carry a "bpc-157-5mg" without collision, but the same
+     * vendor re-uploading the same product needs a bumped suffix.
+     */
+    private function uniqueProductSlug(int $brandId, string $name): string
+    {
+        $base = Str::slug($name) ?: 'product';
+        $base = substr($base, 0, 180);
+        $slug = $base;
+        $i = 2;
+        while (Product::where('brand_id', $brandId)->where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $i++;
+            if ($i > 999) { $slug = $base . '-' . uniqid(); break; }
+        }
+        return $slug;
     }
 
     /**
@@ -227,6 +248,11 @@ XML;
             Product::create([
                 'brand_id' => $brandId,
                 'name' => $r['name'],
+                // products.slug is NOT NULL with no default (per Coastal
+                // Peptides feed import Sep 22). Generate a unique slug
+                // per brand from the product name; append a numeric
+                // suffix on collision so re-uploads don't crash.
+                'slug' => $this->uniqueProductSlug($brandId, $r['name']),
                 'price' => $this->extractPrice($r['price']),
                 'image_url' => $r['image_url'] ?? null,
                 'product_url' => $productUrl ?: null,
