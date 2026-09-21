@@ -162,50 +162,83 @@
                       <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path>
                       <circle cx="12" cy="10" r="3"></circle>
                     </svg>
-                    <select
+                    <!-- Colin PMAP Sep 22: typing search over a 100+
+                         country list — <input list="…"> lets the
+                         browser combo-box the underlying <datalist>
+                         so the vendor can start typing "united" and
+                         narrow to the two US/UK options in one keystroke. -->
+                    <input
                       id="country"
-                      v-model="formData.country"
+                      v-model="hqCountrySearch"
+                      type="text"
+                      list="hq-country-list"
                       required
-                      class="w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 appearance-none"
-                    >
-                      <option value="">Select...</option>
-                      <option
-                        v-for="location in locations"
-                        :key="location.id"
-                        :value="location.id"
-                      >
-                        {{ location.name }}
-                      </option>
-                    </select>
+                      placeholder="Start typing…"
+                      autocomplete="off"
+                      class="w-full pl-11 pr-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    />
+                    <datalist id="hq-country-list">
+                      <option v-for="location in locations" :key="location.id" :value="location.name" />
+                    </datalist>
                   </div>
                 </div>
               </div>
 
-              <!-- Ships to — multi-select. Different from HQ: a US-based
-                   vendor might ship worldwide; a UK-based vendor might
-                   only ship to UK + EU. Drives the /brands location
-                   filter so vendors show up under each region they serve. -->
+              <!-- Ships to — multi-select. Colin PMAP Sep 22: 100+
+                   countries in a flat list was unnavigable. Grouped
+                   by region + search input at the top. Region headers
+                   have a "Select all" quick-toggle for the common
+                   "everywhere in Europe" case. Drives the /brands
+                   location filter so vendors show up under each
+                   region they serve. -->
               <div class="mt-4">
-                <label class="block text-sm text-slate-700 mb-2">
-                  Ships to *
-                  <span class="text-xs text-slate-500 font-normal">— every country you can ship orders to. Multi-select.</span>
-                </label>
-                <div class="flex flex-wrap gap-1.5">
-                  <button
-                    v-for="loc in locations"
-                    :key="loc.id"
-                    type="button"
-                    @click="toggleShipsTo(loc.id)"
-                    :class="[
-                      'inline-flex items-center gap-1 h-8 px-3 rounded-full text-[12px] font-medium border transition-colors',
-                      formData.shipsToIds.includes(loc.id)
-                        ? 'bg-slate-800 text-white border-slate-800'
-                        : 'bg-white text-slate-700 border-slate-300 hover:border-slate-500',
-                    ]"
-                  >
-                    <svg v-if="formData.shipsToIds.includes(loc.id)" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                    {{ loc.name }}
-                  </button>
+                <div class="flex items-baseline justify-between mb-2 flex-wrap gap-2">
+                  <label class="block text-sm text-slate-700">
+                    Ships to *
+                    <span class="text-xs text-slate-500 font-normal">— every country you can ship orders to. Multi-select.</span>
+                  </label>
+                  <span class="text-[11px] ui-mono text-slate-400">{{ formData.shipsToIds.length }} selected</span>
+                </div>
+                <div class="mb-3 relative">
+                  <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                  <input
+                    v-model="shipsToSearch"
+                    type="text"
+                    placeholder="Search countries…"
+                    class="w-full h-9 pl-9 pr-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  />
+                </div>
+                <div class="space-y-3 max-h-[420px] overflow-y-auto pr-1 border border-slate-200 rounded-lg p-3 bg-slate-50/40">
+                  <div v-for="group in shipsToGroups" :key="group.region">
+                    <div class="flex items-center justify-between mb-1.5">
+                      <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-slate-600">{{ group.region }}</div>
+                      <button
+                        type="button"
+                        @click="toggleShipsToRegion(group)"
+                        class="text-[11px] font-semibold text-slate-500 hover:text-slate-700 underline"
+                      >{{ regionAllSelected(group) ? 'Clear region' : 'Select all' }}</button>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                      <button
+                        v-for="loc in group.countries"
+                        :key="loc.id"
+                        type="button"
+                        @click="toggleShipsTo(loc.id)"
+                        :class="[
+                          'inline-flex items-center gap-1 h-8 px-3 rounded-full text-[12px] font-medium border transition-colors',
+                          formData.shipsToIds.includes(loc.id)
+                            ? 'bg-slate-800 text-white border-slate-800'
+                            : 'bg-white text-slate-700 border-slate-300 hover:border-slate-500',
+                        ]"
+                      >
+                        <svg v-if="formData.shipsToIds.includes(loc.id)" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                        {{ loc.name }}
+                      </button>
+                    </div>
+                  </div>
+                  <div v-if="!shipsToGroups.length" class="text-sm text-slate-500 text-center py-6">
+                    No countries match "{{ shipsToSearch }}"
+                  </div>
                 </div>
                 <p v-if="fieldErrors.shipsToIds" class="mt-1 text-xs text-rose-600">{{ fieldErrors.shipsToIds }}</p>
               </div>
@@ -242,6 +275,14 @@
             </div>
 
             <form @submit.prevent="handleStep2Submit" class="space-y-6">
+              <!-- Private account contact — Colin PMAP Sep 22: this
+                   step used to double as public contact display. Split
+                   into two clearly labelled sections. -->
+              <div class="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                <div class="flex items-baseline gap-2 mb-3">
+                  <span class="text-[10px] uppercase tracking-[0.12em] font-bold text-slate-700 px-2 py-0.5 rounded bg-slate-200">Private · admin only</span>
+                  <span class="text-[12px] text-slate-600">Your account login and how Peptidemap staff reach you.</span>
+                </div>
               <!-- Full Name -->
               <div>
                 <label for="full_name" class="block text-sm text-slate-700 mb-2">
@@ -373,6 +414,23 @@
                 <p v-if="passwordMismatch" class="mt-1 text-sm text-red-600">
                   Passwords do not match
                 </p>
+              </div>
+              </div>
+
+              <!-- Public support channels — shown on your storefront -->
+              <div class="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 space-y-4">
+                <div class="flex items-baseline gap-2">
+                  <span class="text-[10px] uppercase tracking-[0.12em] font-bold text-emerald-800 px-2 py-0.5 rounded bg-emerald-200/70">Public · shown on storefront</span>
+                  <span class="text-[12px] text-emerald-900">How customers reach your support team.</span>
+                </div>
+                <div>
+                  <label class="block text-sm text-slate-700 mb-2">Customer Support Email <span class="text-xs text-slate-500 font-normal">— blank uses your account email</span></label>
+                  <input v-model="formData.supportEmail" type="email" placeholder="support@yourcompany.com" class="w-full px-4 py-2.5 border border-emerald-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+                </div>
+                <div>
+                  <label class="block text-sm text-slate-700 mb-2">Customer Support Phone <span class="text-xs text-slate-500 font-normal">— blank hides on storefront</span></label>
+                  <input v-model="formData.supportPhone" type="tel" placeholder="+1 (555) 123-4567" class="w-full px-4 py-2.5 border border-emerald-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+                </div>
               </div>
 
               <p v-if="step2ErrorMessage" class="text-sm text-rose-600">{{ step2ErrorMessage }}</p>
@@ -1149,6 +1207,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import VendorStorefrontPreview from '@/components/VendorStorefrontPreview.vue';
 import BusinessHoursEditor from '@/components/BusinessHoursEditor.vue';
 import UspPicker from '@/components/UspPicker.vue';
+import { groupLocationsByRegion } from '@/data/locationRegions';
 import { router, useForm, usePage } from '@inertiajs/vue3';
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue';
 
@@ -1218,6 +1277,8 @@ const formData = ref({
   fullName: '',
   email: '',
   phone: '',
+  supportEmail: '',
+  supportPhone: '',
   password: '',
   confirmPassword: '',
   connectionMethod: 'api_key',
@@ -1557,6 +1618,45 @@ function toggleShipsTo(id) {
   else formData.value.shipsToIds.push(id)
 }
 
+// Region grouping + search for the 100+ country picker.
+// Colin PMAP Sep 22.
+const shipsToSearch = ref('')
+const shipsToGroups = computed(() =>
+  groupLocationsByRegion(props.locations || [], shipsToSearch.value)
+)
+function regionAllSelected(group) {
+  return group.countries.every((c) => formData.value.shipsToIds.includes(c.id))
+}
+function toggleShipsToRegion(group) {
+  const allSelected = regionAllSelected(group)
+  const ids = new Set(formData.value.shipsToIds)
+  for (const c of group.countries) {
+    if (allSelected) ids.delete(c.id)
+    else ids.add(c.id)
+  }
+  formData.value.shipsToIds = Array.from(ids)
+}
+
+// HQ country typing-search using <datalist>. formData.country
+// stores the location ID (server contract); the input binds to a
+// string name we resolve back to the ID on every change.
+const hqCountryNameById = computed(() => {
+  const m = {}
+  for (const l of props.locations || []) m[l.id] = l.name
+  return m
+})
+const hqCountrySearch = ref(hqCountryNameById.value[formData.value.country] || '')
+watch(hqCountrySearch, (name) => {
+  const match = (props.locations || []).find(
+    (l) => (l?.name || '').toLowerCase() === (name || '').toLowerCase()
+  )
+  formData.value.country = match ? match.id : ''
+})
+watch(() => formData.value.country, (id) => {
+  const name = hqCountryNameById.value[id]
+  if (name && hqCountrySearch.value !== name) hqCountrySearch.value = name
+})
+
 const handleLogoUpload = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
@@ -1654,6 +1754,8 @@ const handleStep4Submit = () => {
     fullName: formData.value.fullName,
     email: formData.value.email,
     phone: formData.value.phone || null,
+    supportEmail: formData.value.supportEmail || null,
+    supportPhone: formData.value.supportPhone || null,
     password: formData.value.password,
     password_confirmation: formData.value.confirmPassword,
     

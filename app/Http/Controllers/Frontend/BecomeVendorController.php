@@ -63,6 +63,13 @@ class BecomeVendorController extends Controller
             'fullName' => 'required|string|min:2|max:255',
             'email' => 'required|email:rfc,dns|max:255|unique:users,email',
             'phone' => 'nullable|string|max:50',
+            // Colin PMAP Sep 22 — split the Contact step into private
+            // (Julia's use: fullName/email/phone) and public customer
+            // support (storefront-facing). Fall back to the login email
+            // when the vendor leaves the support field blank.
+            'supportEmail' => 'nullable|email|max:255',
+            'supportPhone' => 'nullable|string|max:50',
+            'supportUrl' => 'nullable|url:http,https|max:512',
             'password' => [
                 'required',
                 'string',
@@ -167,8 +174,11 @@ class BecomeVendorController extends Controller
                 'brand_id' => $brand->id,
                 'location_id' => $validated['country'],
                 'description' => $description,
-                'contact_email' => $validated['email'],
-                'phone_number' => $validated['phone'] ?? null,
+                // Public storefront contact defaults to the account
+                // email when the vendor leaves the support-specific
+                // field blank (existing behaviour). PMAP Sep 22 split.
+                'contact_email' => !empty($validated['supportEmail']) ? $validated['supportEmail'] : $validated['email'],
+                'phone_number' => !empty($validated['supportPhone']) ? $validated['supportPhone'] : ($validated['phone'] ?? null),
                 'shop_url' => $validated['website'],
                 'website' => $validated['website'],
                 'founded_year' => !empty($validated['yearEstablished']) ? (int)$validated['yearEstablished'] : null,
