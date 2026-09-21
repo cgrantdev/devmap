@@ -71,12 +71,15 @@ class ActivateScheduledCouponBoosts extends Command
         if (!$token || !$channel) return;
 
         $link = $slug ? "https://peptidemap.com/brand/{$slug}" : 'https://peptidemap.com/deals';
-        $until = \Carbon\Carbon::parse($expiresAt)->format('M j g:i A T');
+        $until = \Carbon\Carbon::parse($expiresAt)->format('M j');
 
         try {
             Http::withHeaders(['Authorization' => 'Bot ' . $token, 'Content-Type' => 'application/json'])
                 ->post("https://discord.com/api/v10/channels/{$channel}/messages", [
-                    'content' => "🔥 **{$brandName}** is running a limited-time **{$newPct}% off** promo until {$until}. → {$link}",
+                    // Matched to VendorSetting::postDiscordBoostStart
+                    // (Colin Sep 21) — plain-tone + suppressed embed.
+                    'content' => "{$brandName} — {$newPct}% off through {$until}. <{$link}>",
+                    'flags' => 4,
                 ]);
         } catch (\Throwable $e) {
             Log::warning('scheduled coupon boost activation Discord post failed', ['err' => $e->getMessage()]);

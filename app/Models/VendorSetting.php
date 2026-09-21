@@ -186,14 +186,20 @@ class VendorSetting extends Model
         $brandName = $this->brand?->name ?? 'A vendor';
         $slug = $this->brand?->slug;
         $link = $slug ? "https://peptidemap.com/brand/{$slug}" : 'https://peptidemap.com/deals';
-        $until = \Carbon\Carbon::parse($expiresAt)->format('M j g:i A T');
+        $until = \Carbon\Carbon::parse($expiresAt)->format('M j');
 
         try {
             \Illuminate\Support\Facades\Http::withHeaders([
                 'Authorization' => 'Bot ' . $token,
                 'Content-Type' => 'application/json',
             ])->post("https://discord.com/api/v10/channels/{$channel}/messages", [
-                'content' => "🔥 **{$brandName}** is running a limited-time **{$newPct}% off** promo until {$until}. → {$link}",
+                // Colin Sep 21 — softened tone. Was "🔥 X is running
+                // a limited-time N% off promo until DATE." Now a plain
+                // one-liner. Suppresses the link preview embed too
+                // (flag 4 = SUPPRESS_EMBEDS) so the growth channel
+                // doesn't wall of card-preview noise.
+                'content' => "{$brandName} — {$newPct}% off through {$until}. <{$link}>",
+                'flags' => 4,
             ]);
         } catch (\Throwable $e) {
             \Log::warning('coupon boost start Discord post failed', ['err' => $e->getMessage()]);

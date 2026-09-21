@@ -81,7 +81,9 @@ class RevertExpiredCouponBoosts extends Command
         try {
             Http::withHeaders(['Authorization' => 'Bot ' . $token, 'Content-Type' => 'application/json'])
                 ->post("https://discord.com/api/v10/channels/{$channel}/messages", [
-                    'content' => "⏱ **{$brandName}** coupon boost expired — reverted from **{$wasPct}%** back to **{$nowPct}%**.",
+                    // Softer expiry note (Colin Sep 21).
+                    'content' => "{$brandName} — promo ended, back to {$nowPct}%.",
+                    'flags' => 4,
                 ]);
         } catch (\Throwable $e) {
             Log::warning('coupon boost expiry Discord post failed', ['err' => $e->getMessage()]);

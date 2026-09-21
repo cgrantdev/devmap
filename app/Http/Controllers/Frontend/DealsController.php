@@ -96,6 +96,16 @@ class DealsController extends Controller
                         $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
                     }
 
+                    // Colin Sep 21 — Deals page was hardcoding 15% and
+                    // missing every active coupon boost. Read the live
+                    // discount from vendor_settings so Julia's Limited-
+                    // Time Promos land here automatically (e.g. Hydro
+                    // Research at 35% for the promo window).
+                    $vs = $brand->vendorSetting;
+                    $liveDiscount = $vs?->coupon_discount_percent
+                        ? (int) round((float) $vs->coupon_discount_percent)
+                        : 15;
+                    $isBoosted = $vs && $vs->couponBoostActive();
                     return [
                         'id' => $brand->id,
                         'name' => $brand->name,
@@ -104,9 +114,11 @@ class DealsController extends Controller
                         'logo' => $logoUrl,
                         'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
                         'reviews' => (int) ($brand->rating_count ?? 0),
-                        'discount' => 15, // Default discount for coupon codes
-                        'code' => $brand->vendorSetting->coupon_code ?? 'PMAP',
-                        'description' => $brand->vendorSetting->description ?? 'Premium peptides and nootropics with exceptional quality control and customer service.',
+                        'discount' => $liveDiscount,
+                        'code' => $vs->coupon_code ?? 'PMAP',
+                        'is_boosted' => $isBoosted,
+                        'boost_ends_at' => $isBoosted ? $vs->coupon_boost_expires_at?->toIso8601String() : null,
+                        'description' => $vs->description ?? 'Premium peptides and nootropics with exceptional quality control and customer service.',
                     ];
                 })
                 ->values()
@@ -152,18 +164,22 @@ class DealsController extends Controller
                 ->toBase();
         }
 
-        // Apply sorting
+        // Apply sorting. Boosted (Limited-Time Promo) deals always
+        // surface first — they're the freshest, most time-sensitive
+        // offers on the page and answer Colin's Sep 21 question
+        // "shouldn't this be in deals?"
         $deals = $deals->sortBy(function ($deal) use ($sortBy) {
+            $boostRank = !empty($deal['is_boosted']) ? 0 : 1;
             switch ($sortBy) {
                 case 'top_rated':
-                    return -$deal['rating']; // Negative for descending
+                    return [$boostRank, -$deal['rating']];
                 case 'a_z':
-                    return $deal['name'];
+                    return [$boostRank, $deal['name']];
                 case 'best_discount':
                 default:
-                    return -$deal['discount']; // Negative for descending
+                    return [$boostRank, -$deal['discount']];
             }
-        })->values();
+        }, SORT_REGULAR)->values();
 
         // Generate SEO data
         $seoData = new SEOData(

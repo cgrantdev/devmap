@@ -106,6 +106,8 @@
             :discount="deal.discount"
             :code="deal.code"
             :description="deal.description"
+            :is-boosted="deal.is_boosted"
+            :boost-ends-at="deal.boost_ends_at"
           />
         </div>
         <div v-else class="text-center py-12">

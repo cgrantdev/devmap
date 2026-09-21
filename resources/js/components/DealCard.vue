@@ -14,6 +14,16 @@
       </div>
     </div>
 
+    <!-- Limited-Time badge — shown when the vendor's coupon is boosted.
+         Sits opposite the discount pill so both are readable. -->
+    <div
+      v-if="isBoosted"
+      class="absolute top-3 left-3 z-10 inline-flex items-center gap-1 bg-amber-500 text-white px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg"
+    >
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Limited time
+    </div>
+
     <!-- Logo/Icon Area -->
     <div class="aspect-square bg-gray-50 p-8 border-b border-gray-200 flex items-center justify-center">
       <template v-if="logo && !hasError">
@@ -116,7 +126,15 @@ const props = defineProps({
   description: {
     type: String,
     default: ''
-  }
+  },
+  isBoosted: {
+    type: Boolean,
+    default: false,
+  },
+  boostEndsAt: {
+    type: String,
+    default: null,
+  },
 })
 
 const hasError = ref(false)
