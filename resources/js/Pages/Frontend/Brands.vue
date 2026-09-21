@@ -93,7 +93,7 @@
             @click="toggleVerified(f.value)"
             :class="[
               'ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm',
-              selectedFilters.verified === f.value
+              selectedFilters.verified.has(f.value)
                 ? 'bg-emerald-600 text-white border-emerald-600'
                 : 'bg-emerald-50/60 text-emerald-800 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50',
             ]"
@@ -298,11 +298,18 @@ const ogImage = computed(() => props.seo?.og_image || null)
 watchEffect(() => { document.title = title.value })
 
 const searchQuery = ref(props.search || '')
+// verified is now a Set of badge keys so cGMP + 7x Tested can be
+// combined (Colin PMAP Sep 16). URL carries them as a comma-separated
+// list — `?verified=cgmp,testing_7x` — same shape for a single value.
+const initialVerified = (props.filters?.verified || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean)
 const selectedFilters = ref({
   location: props.filters?.location || '',
   minRating: props.filters?.min_rating || '',
   topVendorsOnly: props.filters?.top_vendors_only === '1',
-  verified: props.filters?.verified || '',
+  verified: new Set(initialVerified),
   usp: props.filters?.usp || '',
 })
 
@@ -344,7 +351,7 @@ const hasActiveFilters = computed(() =>
   searchQuery.value
   || selectedFilters.value.location
   || selectedFilters.value.topVendorsOnly
-  || selectedFilters.value.verified
+  || selectedFilters.value.verified.size > 0
   || selectedFilters.value.usp
 )
 
@@ -370,7 +377,11 @@ function toggleTopVendors() {
 }
 
 function toggleVerified(value) {
-  selectedFilters.value.verified = selectedFilters.value.verified === value ? '' : value
+  const set = selectedFilters.value.verified
+  if (set.has(value)) set.delete(value)
+  else set.add(value)
+  // Trigger reactivity on Set mutation.
+  selectedFilters.value.verified = new Set(set)
   navigate({})
 }
 
@@ -381,7 +392,7 @@ function toggleUsp(value) {
 
 function clearFilters() {
   searchQuery.value = ''
-  selectedFilters.value = { location: '', minRating: '', topVendorsOnly: false, verified: '', usp: '' }
+  selectedFilters.value = { location: '', minRating: '', topVendorsOnly: false, verified: new Set(), usp: '' }
   router.visit('/brands', { preserveState: true, preserveScroll: true })
 }
 
@@ -398,7 +409,7 @@ function navigate(overrides = {}) {
   if (selectedFilters.value.location) params.set('location', selectedFilters.value.location)
   if (selectedFilters.value.minRating) params.set('min_rating', selectedFilters.value.minRating)
   if (selectedFilters.value.topVendorsOnly) params.set('top_vendors_only', '1')
-  if (selectedFilters.value.verified) params.set('verified', selectedFilters.value.verified)
+  if (selectedFilters.value.verified.size > 0) params.set('verified', [...selectedFilters.value.verified].join(','))
   if (selectedFilters.value.usp) params.set('usp', selectedFilters.value.usp)
 
   router.visit(`/brands?${params.toString()}`, { preserveState: true, preserveScroll: true })

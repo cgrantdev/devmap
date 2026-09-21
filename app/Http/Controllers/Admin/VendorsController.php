@@ -579,7 +579,14 @@ class VendorsController extends Controller
         if (array_key_exists('contact_email', $validated)) {
             $settings->contact_email = $validated['contact_email'];
         }
-        $settings->phone_number = $validated['phone_number'] ?? $settings->phone_number;
+        // Colin Sep 21 — phone_number couldn't be cleared. `??` returns
+        // the existing value when Laravel's ConvertEmptyStringsToNull
+        // middleware normalizes the incoming blank to null, so the
+        // save silently restored the old number. Use array_key_exists
+        // so an explicit null / blank clears the field.
+        if (array_key_exists('phone_number', $validated)) {
+            $settings->phone_number = $validated['phone_number'];
+        }
         
         // Find or create location by name if provided
         if (!empty($validated['location'])) {

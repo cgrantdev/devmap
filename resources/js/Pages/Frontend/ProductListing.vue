@@ -240,8 +240,19 @@ function handleBrandChange(event) {
 }
 
 function formatSize(size) {
-  if (size >= 1000) return (size / 1000) + 'g'
-  return size + 'mg'
+  // size_mg is now a string column carrying blend shapes like
+  // "10mg/2.5mg" as well as plain "10". Only append the mg suffix
+  // when the DB value is a bare number; blend strings already
+  // carry their own units.
+  if (size == null || size === '') return ''
+  const s = String(size).trim()
+  if (/^[0-9.]+$/.test(s)) {
+    const n = parseFloat(s)
+    if (n >= 1000) return (n / 1000) + 'g'
+    return n + 'mg'
+  }
+  // Already-formatted blend / mixed-unit string — return verbatim.
+  return s
 }
 
 // Filter panel (hidden)

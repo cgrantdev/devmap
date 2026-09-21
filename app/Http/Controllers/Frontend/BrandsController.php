@@ -91,16 +91,25 @@ class BrandsController extends Controller
             });
         }
 
-        // Verified badge filter — cgmp / testing_7x. Only vendors with
-        // an APPROVED VendorCertificationClaim of that type qualify.
-        if ($request->has('verified') && in_array($request->verified, ['cgmp', 'testing_7x'], true)) {
-            $type = $request->verified;
-            $query->whereIn('id', function ($sub) use ($type) {
-                $sub->select('brand_id')
-                    ->from('vendor_certification_claims')
-                    ->where('type', $type)
-                    ->where('status', 'approved');
-            });
+        // Verified badge filter — cgmp / testing_7x. Colin PMAP Sep 16:
+        // vendors can hold both badges, so the filter is now multi-value.
+        // URL carries comma-separated types (?verified=cgmp,testing_7x)
+        // and every selected type must have an APPROVED claim (AND).
+        // Backwards-compatible with single-value ?verified=cgmp.
+        if ($request->filled('verified')) {
+            $types = collect(explode(',', $request->verified))
+                ->map(fn ($t) => trim($t))
+                ->filter(fn ($t) => in_array($t, ['cgmp', 'testing_7x'], true))
+                ->unique()
+                ->values();
+            foreach ($types as $type) {
+                $query->whereIn('id', function ($sub) use ($type) {
+                    $sub->select('brand_id')
+                        ->from('vendor_certification_claims')
+                        ->where('type', $type)
+                        ->where('status', 'approved');
+                });
+            }
         }
         
         // Apply sorting
