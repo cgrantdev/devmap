@@ -1707,10 +1707,16 @@ class VendorsController extends Controller
             return back()->with('flash_error', 'This vendor has no settings row.');
         }
 
+        // Colin/Julia Sep 22 — admin datetime-local inputs are parsed
+        // as America/New_York (EST/EDT auto-handled) so what Julia
+        // types matches what runs. Was: parsed as UTC because
+        // app.timezone = UTC, so a boost set to "11:59 PM" actually
+        // expired at 7:59 PM ET — 4 hours early.
+        $adminTz = new \DateTimeZone('America/New_York');
         $startsAt = !empty($validated['starts_at'])
-            ? new \DateTimeImmutable($validated['starts_at'])
+            ? new \DateTimeImmutable($validated['starts_at'], $adminTz)
             : null;
-        $expiresAt = new \DateTimeImmutable($validated['expires_at']);
+        $expiresAt = new \DateTimeImmutable($validated['expires_at'], $adminTz);
 
         if ($startsAt && $startsAt >= $expiresAt) {
             return back()->withErrors(['starts_at' => 'Start must be before end.']);

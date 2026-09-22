@@ -956,15 +956,27 @@ const boostQuickDurations = [
   { hours: 336, label: '2 weeks' },
 ]
 function setBoostDuration(hours) {
-  const d = new Date(Date.now() + hours * 3600 * 1000)
-  // Local-time formatted for <input type="datetime-local"> — YYYY-MM-DDTHH:MM
-  const pad = n => String(n).padStart(2, '0')
-  boostForm.expires_at = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+  // Format N-hours-from-now as ET wall-clock (Colin/Julia Sep 22) so
+  // the quick-duration buttons match the server's parse timezone
+  // regardless of what timezone the admin's browser is in.
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/New_York',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(new Date(Date.now() + hours * 3600 * 1000))
+  const g = (t) => parts.find(p => p.type === t)?.value || '00'
+  boostForm.expires_at = `${g('year')}-${g('month')}-${g('day')}T${g('hour')}:${g('minute')}`
 }
 function formatBoostExpiry(iso) {
   if (!iso) return ''
-  const d = new Date(iso)
-  return d.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+  // Colin/Julia Sep 22 — display in EST/EDT across the board, no
+  // matter where the admin is browsing from. Matches the server-side
+  // parse timezone so "typed 11:59 PM" reads back as "11:59 PM ET"
+  // in every panel.
+  return new Date(iso).toLocaleString('en-US', {
+    timeZone: 'America/New_York',
+    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+  })
 }
 function applyCouponBoost() {
   if (!props.vendor || !boostForm.percent || !boostForm.expires_at) return

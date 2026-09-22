@@ -133,6 +133,7 @@ XML;
                 $rows[] = [
                     'name' => (string) ($p->name ?? $p->title ?? ''),
                     'price' => (string) ($p->price ?? ''),
+                    'sale_price' => (string) ($p->sale_price ?? $p->discount_price ?? ''),
                     'image_url' => (string) ($p->image ?? $p->image_url ?? ''),
                     'product_url' => (string) ($p->url ?? $p->link ?? ''),
                     'sku' => (string) ($p->sku ?? ''),
@@ -147,6 +148,7 @@ XML;
                 $rows[] = [
                     'name' => (string) ($p->name ?? $p->title ?? ''),
                     'price' => (string) ($p->price ?? ''),
+                    'sale_price' => (string) ($p->sale_price ?? $p->discount_price ?? ''),
                     'image_url' => (string) ($p->image ?? $p->image_url ?? ''),
                     'product_url' => (string) ($p->url ?? $p->link ?? ''),
                     'sku' => (string) ($p->sku ?? ''),
@@ -157,12 +159,17 @@ XML;
             }
         } elseif (isset($xml->channel->item) && $xml->channel->item->count() > 0) {
             // Google Merchant / RSS 2.0 with <g:*> namespaced fields.
+            // Sale prices: <g:sale_price> takes precedence over <g:price>
+            // when present (Rudy Sep 22 — 5 Coastal products had
+            // g:sale_price set to the discounted rate; we were ignoring
+            // it and displaying regular price).
             $shape = 'google-merchant';
             foreach ($xml->channel->item as $p) {
                 $g = $p->children('g', true);
                 $rows[] = [
                     'name' => (string) ($g->title ?? $p->title ?? ''),
                     'price' => (string) ($g->price ?? ''),
+                    'sale_price' => (string) ($g->sale_price ?? ''),
                     'image_url' => (string) ($g->image_link ?? ''),
                     'product_url' => (string) ($g->link ?? $p->link ?? ''),
                     'sku' => (string) ($g->id ?? ''),
@@ -177,6 +184,7 @@ XML;
                 $rows[] = [
                     'name' => (string) ($p->title ?? ''),
                     'price' => (string) ($p->price ?? ''),
+                    'sale_price' => (string) ($p->sale_price ?? ''),
                     'image_url' => '',
                     'product_url' => (string) ($p->link['href'] ?? $p->link ?? ''),
                     'sku' => (string) ($p->id ?? ''),
@@ -205,13 +213,17 @@ XML;
         // which don't exist). Correct chain: brands.user_id → products.brand_id
         // (matches how DashboardController::index resolves the vendor's brand).
         $user = Auth::user();
-        $brand = \App\Models\Brand::where('user_id', $user->id)->first();
+        $brand = \App\Models\Brand::where('user_id', $user->id)->with('vendorSetting')->first();
         $products = $brand
             ? Product::where('brand_id', $brand->id)->latest()->get()
             : collect();
 
         return Inertia::render('Vendor/Import', [
-            'products' => $products
+            'products' => $products,
+            // Rudy Sep 22 — show the saved URL back so vendors can
+            // confirm the daily sync is pointed at the right feed.
+            'currentFeedUrl' => $brand?->vendorSetting?->feed_url,
+            'lastSyncedAt' => $brand?->vendorSetting?->feed_last_synced_at?->toIso8601String(),
         ]);
     }
 
@@ -273,9 +285,22 @@ XML;
                     ->first();
             }
 
+            // Sale price handling — Rudy Sep 22. When the feed carries
+            // sale_price separately from price, price stays the retail
+            // rate and discount_price holds the sale rate. Only accept
+            // sale prices strictly lower than retail so a mistake in
+            // the feed can't accidentally push prices UP.
+            $retail = $this->extractPrice($r['price']);
+            $saleRaw = trim((string) ($r['sale_price'] ?? ''));
+            $sale = $saleRaw !== '' ? $this->extractPrice($saleRaw) : null;
+            $discountPrice = ($sale !== null && (float) $sale > 0 && (float) $sale < (float) $retail)
+                ? $sale
+                : null;
+
             $attrs = [
                 'name' => $r['name'],
-                'price' => $this->extractPrice($r['price']),
+                'price' => $retail,
+                'discount_price' => $discountPrice,
                 'image_url' => $r['image_url'] ?? null,
                 'product_url' => $productUrl ?: null,
                 'size_mg' => $r['size'] ?? null,
@@ -324,6 +349,14 @@ XML;
             if (!$response->successful()) {
                 return redirect()->back()->with('error', 'Failed to fetch XML from URL — server returned ' . $response->status() . '.');
             }
+
+            // Persist the feed URL on success so the daily sync job
+            // can re-fetch, and vendors can confirm their current
+            // sync URL in the import UI (Rudy Sep 22).
+            $vs = $brand->vendorSetting ?: new \App\Models\VendorSetting(['brand_id' => $brand->id]);
+            $vs->feed_url = $request->url;
+            $vs->feed_last_synced_at = now();
+            $vs->save();
 
             [$rows, $diagnostic] = $this->parseFeed($response->body());
             return $this->ingestRows($brand->id, $rows, $diagnostic);

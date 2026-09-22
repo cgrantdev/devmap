@@ -11,6 +11,19 @@
         <span class="text-gray-400">·</span>
         <span class="text-gray-500">Also accepts Google Merchant (RSS) and Atom feeds.</span>
       </div>
+
+      <!-- Active sync banner — Rudy Sep 22 asked to confirm the URL is
+           saved and being pulled daily. -->
+      <div v-if="currentFeedUrl" class="mt-4 p-3 rounded-lg border border-emerald-200 bg-emerald-50 flex items-center gap-3">
+        <svg class="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        <div class="text-sm min-w-0 flex-1">
+          <div class="font-semibold text-emerald-900">Daily sync active</div>
+          <div class="text-emerald-800 text-[13px] mt-0.5 truncate">
+            Pulling from <span class="font-mono">{{ currentFeedUrl }}</span>
+          </div>
+          <div v-if="lastSyncedAt" class="text-emerald-700 text-[12px] mt-0.5">Last synced {{ humanTime(lastSyncedAt) }}. Next pull runs at 5:00 UTC daily.</div>
+        </div>
+      </div>
     </div>
 
     <!-- Success Message -->
@@ -137,8 +150,24 @@ const props = defineProps({
   products: {
     type: Array,
     default: () => []
-  }
+  },
+  currentFeedUrl: { type: String, default: null },
+  lastSyncedAt: { type: String, default: null },
 })
+const { currentFeedUrl, lastSyncedAt } = props
+
+function humanTime(iso) {
+  if (!iso) return ''
+  const then = new Date(iso).getTime()
+  const now = Date.now()
+  const mins = Math.round((now - then) / 60000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins} min ago`
+  const hrs = Math.round(mins / 60)
+  if (hrs < 24) return `${hrs} hr ago`
+  const days = Math.round(hrs / 24)
+  return `${days} day${days === 1 ? '' : 's'} ago`
+}
 
 const fileForm = useForm({
   file: null,

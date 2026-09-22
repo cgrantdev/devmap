@@ -56,6 +56,15 @@ Schedule::command('alerts:send-price-drops')
     ->withoutOverlapping()
     ->runInBackground();
 
+// Daily vendor feed sync — re-fetch every vendor's saved feed URL
+// and upsert products. Colin/Rudy Sep 22: without this the /vendor
+// import UI was one-shot and stock/pricing went stale silently.
+// 05:00 UTC (01:00 ET) — off-peak.
+Schedule::command('feeds:sync-vendors')
+    ->dailyAt('05:00')
+    ->withoutOverlapping()
+    ->runInBackground();
+
 // Daily affiliate-stats pull. Hits each configured vendor's affiliate
 // program API (GoAffPro today; Refersion/Impact clients to add) and
 // caches the snapshot on vendor_settings.affiliate_stats_json. Powers

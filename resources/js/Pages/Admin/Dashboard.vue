@@ -127,7 +127,12 @@ const props = defineProps({
 
 function formatTs(iso) {
   if (!iso) return ''
-  return new Date(iso).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+  // Colin/Julia Sep 22 — Live promos rail displays EST/EDT so what
+  // Julia typed in the admin datetime picker matches what shows here.
+  return new Date(iso).toLocaleString('en-US', {
+    timeZone: 'America/New_York',
+    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+  })
 }
 
 const statCards = computed(() => [
