@@ -183,7 +183,11 @@ class VendorSetting extends Model
     private function postDiscordBoostStart(float $newPct, \DateTimeInterface $expiresAt): void
     {
         $token = config('services.discord.bot_token');
-        $channel = config('services.discord.growth_channel_id');
+        // Colin Sep 23 — boost-live posts land in the deals channel
+        // (consumer-facing) instead of the admin growth channel.
+        // Falls back to growth if deals channel isn't configured yet.
+        $channel = config('services.discord.deals_channel_id')
+            ?: config('services.discord.growth_channel_id');
         if (!$token || !$channel) return;
 
         $brandName = $this->brand?->name ?? 'A vendor';

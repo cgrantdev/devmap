@@ -65,28 +65,13 @@ class RevertExpiredCouponBoosts extends Command
             }
             $vs->forceFill($updates)->save();
 
-            $this->postDiscordExpiry($brand?->name ?? 'Unknown', $wasPercent, $revertTo);
+            // Colin Sep 23 — "promo ended" post removed. Nobody in
+            // the deals channel cares that a promo ended; the boost
+            // pill just disappears from the site and that's enough.
+            // Kept the artisan log line so we can audit reversions.
         }
 
         $this->info("Reverted {$expired->count()} expired boost(s).");
         return self::SUCCESS;
-    }
-
-    private function postDiscordExpiry(string $brandName, $wasPct, $nowPct): void
-    {
-        $token = config('services.discord.bot_token');
-        $channel = config('services.discord.growth_channel_id');
-        if (!$token || !$channel) return;
-
-        try {
-            Http::withHeaders(['Authorization' => 'Bot ' . $token, 'Content-Type' => 'application/json'])
-                ->post("https://discord.com/api/v10/channels/{$channel}/messages", [
-                    // Softer expiry note (Colin Sep 21).
-                    'content' => "{$brandName} — promo ended, back to {$nowPct}%.",
-                    'flags' => 4,
-                ]);
-        } catch (\Throwable $e) {
-            Log::warning('coupon boost expiry Discord post failed', ['err' => $e->getMessage()]);
-        }
     }
 }

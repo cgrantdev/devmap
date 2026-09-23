@@ -91,9 +91,16 @@ return [
         'application_id' => env('DISCORD_APPLICATION_ID'),
         'public_key' => env('DISCORD_PUBLIC_KEY'),
         'guild_id' => env('DISCORD_GUILD_ID'),
-        // Channel that receives the weekly growth digest. Restrict its
-        // visibility in the Discord UI — the bot posts here regardless.
+        // Channel that receives the weekly growth digest, admin-side
+        // notifications (certification submissions, expiry notes).
+        // Restrict its visibility in the Discord UI — the bot posts
+        // here regardless.
         'growth_channel_id' => env('DISCORD_GROWTH_CHANNEL_ID', '1541364154093404171'),
+        // Consumer-facing deals + promo start alerts. Colin Sep 23 —
+        // was posting boost-live announcements into the admin (growth)
+        // channel; those belong in the public deals channel. Falls
+        // back to growth if not set so nothing goes silent.
+        'deals_channel_id' => env('DISCORD_DEALS_CHANNEL_ID'),
     ],
 
     'slack' => [

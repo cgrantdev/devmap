@@ -67,7 +67,10 @@ class ActivateScheduledCouponBoosts extends Command
     private function postDiscordBoostStart(string $brandName, ?string $slug, float $newPct, \DateTimeInterface $expiresAt): void
     {
         $token = config('services.discord.bot_token');
-        $channel = config('services.discord.growth_channel_id');
+        // Colin Sep 23 — scheduled-boost activations follow the same
+        // channel split as manual boosts (VendorSetting).
+        $channel = config('services.discord.deals_channel_id')
+            ?: config('services.discord.growth_channel_id');
         if (!$token || !$channel) return;
 
         $link = $slug ? "https://peptidemap.com/brand/{$slug}" : 'https://peptidemap.com/deals';
