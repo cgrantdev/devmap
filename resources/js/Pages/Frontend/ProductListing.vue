@@ -238,12 +238,11 @@ const heroBgRef = ref(null)
 const heroBgLoaded = ref(false)
 
 const sortValue = computed(() => `${props.sort || 'price'}|${props.sortDir || 'asc'}`)
-// Preset blend/single sizes — Colin PMAP Sep 22. These chips
-// always appear so the size vocabulary stays consistent even for
-// compounds where no vendor has uploaded these yet.
-const PRESET_SIZES = ['10mg', '10mg/2.5mg', '30mg/5mg', '50mg/10mg', '10mg/5mg/5mg', '10mg/10mg/10mg', '100mg/10mg/10mg']
-
 // Multi-select via a Set. URL carries comma-separated ?size=A,B.
+// Colin PMAP Sep 30 (#11): revert to strictly data-driven — show
+// only sizes that actually exist in the DB for this category, in
+// the sort order the controller returned. Prior preset chips were
+// polluting compound pages with unavailable sizes.
 const initialSizes = (new URLSearchParams(window.location.search).get('size') || '')
   .split(',')
   .map(s => s.trim())
@@ -251,17 +250,11 @@ const initialSizes = (new URLSearchParams(window.location.search).get('size') ||
 const selectedSizes = ref(new Set(initialSizes))
 const selectedBrand = ref(new URLSearchParams(window.location.search).get('brand') || '')
 
-// Merge preset order first, then any DB sizes not already in presets.
-const mergedSizes = computed(() => {
-  const seen = new Set()
-  const out = []
-  for (const s of PRESET_SIZES) { if (!seen.has(s)) { seen.add(s); out.push(s) } }
-  for (const s of (props.filterOptions?.sizes || [])) {
-    const k = String(s).trim()
-    if (k && !seen.has(k)) { seen.add(k); out.push(k) }
-  }
-  return out
-})
+const mergedSizes = computed(() =>
+  (props.filterOptions?.sizes || [])
+    .map((s) => String(s).trim())
+    .filter(Boolean)
+)
 
 function toggleSize(size) {
   const set = selectedSizes.value

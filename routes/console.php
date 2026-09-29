@@ -34,6 +34,15 @@ Schedule::command('coupons:activate-scheduled-boosts')
     ->everyFiveMinutes()
     ->withoutOverlapping();
 
+// Deactivate stackable VendorPromotion rows past their ends_at.
+// Colin/Julia PMAP Sep 30: Instant Peptides' BOGO stayed live past
+// its end date because is_active was never flipped. isLive() on
+// the model already excluded them from public queries, but the
+// admin view still counted them as active.
+Schedule::command('promotions:revert-expired')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();
+
 // Refresh external review aggregates (Reviews.io, Trustpilot, PepReviewPro)
 // weekly. Ratings don't move day-to-day; hourly would be noisy scraping.
 Schedule::command('reviews:refresh')

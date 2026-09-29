@@ -1270,11 +1270,13 @@ const PLATFORM_BADGES = {
   reviews_io:   { badgeText: 'Rio', badgeClasses: 'bg-blue-50 text-blue-700 border border-blue-200' },
   trustpilot:   { badgeText: 'TP',  badgeClasses: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
   google:       { badgeText: 'G',   badgeClasses: 'bg-red-50 text-red-700 border border-red-200' },
-  pepreviewpro: { badgeText: 'PRP', badgeClasses: 'bg-amber-50 text-amber-700 border border-amber-200' },
+  // PepReviewPro (PRP) removed Sep 30 per Colin — no longer surfaced
+  // anywhere on the storefront. Underlying data + admin commands stay
+  // so old imports aren't lost, but the badge and link go away.
 }
 const externalPlatformsList = computed(() => {
   const raw = props.brand?.external_ratings || {}
-  const keys = ['reviews_io', 'trustpilot', 'google', 'pepreviewpro']
+  const keys = ['reviews_io', 'trustpilot', 'google']
   return keys
     .filter(k => raw[k] && raw[k].url)
     .map(k => ({
@@ -1311,7 +1313,7 @@ const EXTERNAL_SOURCE_META = {
   trustpilot:   { label: 'Trustpilot',    urlKey: 'trustpilot_url' },
   reviews_io:   { label: 'Reviews.io',    urlKey: 'reviews_io_url' },
   google:       { label: 'Google Reviews', urlKey: 'google_reviews_url' },
-  pepreviewpro: { label: 'PepReviewPro',  urlKey: 'pepreviewpro_url' },
+  // pepreviewpro entry removed Sep 30 (Colin).
 }
 // Flat, sorted merge of every imported review — no per-source grouping,
 // no outbound links (Colin Sep 1: keep users on our site).
@@ -1342,17 +1344,14 @@ const totalReviewCount = computed(() => {
   return native + external
 })
 
-// Sources where we CAN'T scrape individual reviews (Google needs their paid
-// Places API, PepReviewPro renders via a JS widget) but we still have a URL.
-// Rendered as click-through links below the review blocks so users can
-// verify externally.
+// Sources where we CAN'T scrape individual reviews (Google needs
+// their paid Places API) but we still have a URL. Rendered as
+// click-through links below the review blocks so users can verify
+// externally. PepReviewPro removed Sep 30 (Colin).
 const linkOnlySources = computed(() => {
   const list = []
   if (props.brand?.google_reviews_url) {
     list.push({ key: 'google', label: 'Google', url: props.brand.google_reviews_url })
-  }
-  if (props.brand?.pepreviewpro_url) {
-    list.push({ key: 'pepreviewpro', label: 'PepReviewPro', url: props.brand.pepreviewpro_url })
   }
   return list
 })
