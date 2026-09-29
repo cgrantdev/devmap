@@ -147,9 +147,15 @@ Route::get('/guides/{slug}', [GuidesController::class, 'show'])
     ->name('guides.show');
 // Education posts removed — content now lives in Encyclopedia + Blog
 Route::get('/encyclopedia', [EncyclopediaController::class, 'index'])->name('encyclopedia');
-Route::get('/encyclopedia/{slug}', [EncyclopediaController::class, 'showArticle'])->name('encyclopedia.show');
-// Legacy /encyclopedia/article/{slug} redirects to clean URL
+// Legacy /encyclopedia/article/{slug} redirects to clean URL.
+// Registered before the catch-all so "article/..." is not swallowed.
 Route::get('/encyclopedia/article/{slug}', fn ($slug) => redirect("/encyclopedia/{$slug}", 301));
+// Permissive so historical sitemap slugs that contain "/" (Selank/Semax,
+// "BPC-157 / TB500 / Cartalax") reach the controller, which 301s them.
+// The route does not gain a new encyclopedia page for those blends.
+Route::get('/encyclopedia/{slug}', [EncyclopediaController::class, 'showArticle'])
+    ->where('slug', '.+')
+    ->name('encyclopedia.show');
 // Dedicated /bacteriostatic-water landing page — must come BEFORE the
 // /{slug} catch-all at the bottom of this file.
 Route::get('/bacteriostatic-water', [\App\Http\Controllers\Frontend\BacteriostaticWaterController::class, 'show'])

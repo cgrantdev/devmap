@@ -8,6 +8,7 @@ use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\SeoPage;
 use App\Support\CompareSlug;
+use App\Support\EncyclopediaSlug;
 use App\Support\CompoundDisplay;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -232,7 +233,7 @@ class CompareController extends Controller
                     ? Str::limit(strip_tags($educationPost->description), 200)
                     : null,
                 'encyclopedia_url' => ($educationPost && $educationPost->status === 'published')
-                    ? "/encyclopedia/{$category->slug}"
+                    ? EncyclopediaSlug::path($category->slug)
                     : null,
                 'product_count' => $products->count(),
                 // Use final_price (post-coupon) so the 'from $X' badge
@@ -589,7 +590,7 @@ class CompareController extends Controller
                 'raw_name' => $category->name,
                 'slug' => $category->slug,
                 'summary' => $summary,
-                'encyclopedia_url' => $educationPost ? "/encyclopedia/{$category->slug}" : null,
+                'encyclopedia_url' => $educationPost ? EncyclopediaSlug::path($category->slug) : null,
                 'product_count' => $productCount,
                 'vendor_count' => $vendorCount,
                 'cheapest_price' => $cheapest,
@@ -759,7 +760,7 @@ class CompareController extends Controller
             'name' => $displayName,
             'slug' => $category->slug,
             'compare_url' => '/compare/' . (CompareSlug::canonical($category->slug) ?? $category->slug),
-            'encyclopedia_url' => $ep ? "/encyclopedia/{$category->slug}" : null,
+            'encyclopedia_url' => $ep ? EncyclopediaSlug::path($category->slug) : null,
             'vendor_count' => $products->pluck('brand_name')->unique()->count(),
             'product_count' => $products->count(),
             'cheapest_price' => $products->first()['final_price'] ?? null,

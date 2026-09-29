@@ -669,6 +669,14 @@ class EncyclopediaController extends Controller
      */
     public function showArticle($slug)
     {
+        // Slash and otherwise-unresolvable slugs 404 on the single-segment
+        // route. Send them to the live page (encyclopedia slug, or the
+        // compare page when no encyclopedia page exists) instead of
+        // rendering a new stub.
+        if ($redirect = ProductCategory::encyclopediaRedirectPath($slug)) {
+            return redirect($redirect, 301);
+        }
+
         // Reuse the same logic as show() but render the new article detail page
         $category = ProductCategory::where('slug', $slug)
             ->where('is_active', true)

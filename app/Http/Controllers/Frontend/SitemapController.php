@@ -9,6 +9,7 @@ use App\Models\EducationalGuide;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Support\CompareSlug;
+use App\Support\EncyclopediaSlug;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
@@ -21,7 +22,7 @@ use Illuminate\Support\Facades\Cache;
  */
 class SitemapController extends Controller
 {
-    private const CACHE_KEY = 'sitemap.xml.v2';
+    private const CACHE_KEY = 'sitemap.xml.v3';
     private const CACHE_TTL = 21600; // 6h
     private const BASE_URL  = 'https://peptidemap.com';
 
@@ -119,8 +120,12 @@ class SitemapController extends Controller
             });
 
         // Encyclopedia = active ProductCategory rows served at /encyclopedia/{slug}.
-        // Same categories are also exposed as /compare/{slug} price-comparison
-        // pages. Compare locs must be the route-safe slug ([a-z0-9-]+): raw
+        // That route is one path segment, so a slug containing "/" 404s
+        // (Selank/Semax, "BPC-157 / TB500 / Cartalax"). Emit the loc only
+        // when the stored slug is resolvable. Those blends already have a
+        // live /compare/{canonical} page; the bad encyclopedia URL 301s there
+        // and is not listed here. Spaces ("Vitamin B12") stay — they 200.
+        // Compare locs must be the route-safe slug ([a-z0-9-]+): raw
         // values like "BPC-157" and "Vitamin B12" 404. Emit each compare URL
         // once, and only when that slug actually resolves.
         $emittedCompareSlugs = [];
@@ -130,12 +135,14 @@ class SitemapController extends Controller
             ->chunkById(500, function ($chunk) use (&$urls, &$emittedCompareSlugs) {
                 foreach ($chunk as $c) {
                     $lastmod = $c->updated_at?->toDateString();
-                    $urls[] = [
-                        'loc'        => self::BASE_URL . '/encyclopedia/' . $c->slug,
-                        'lastmod'    => $lastmod,
-                        'changefreq' => 'monthly',
-                        'priority'   => '0.6',
-                    ];
+                    if (EncyclopediaSlug::isResolvable($c->slug)) {
+                        $urls[] = [
+                            'loc'        => self::BASE_URL . '/encyclopedia/' . $c->slug,
+                            'lastmod'    => $lastmod,
+                            'changefreq' => 'monthly',
+                            'priority'   => '0.6',
+                        ];
+                    }
 
                     $compareSlug = CompareSlug::canonical($c->slug);
                     if (!$compareSlug || isset($emittedCompareSlugs[$compareSlug])) {
