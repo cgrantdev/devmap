@@ -11,6 +11,8 @@ use App\Models\Product;
 use App\Models\Location;
 use App\Models\Blog;
 use App\Models\Deal;
+use App\Support\CompareSlug;
+use App\Support\EncyclopediaSlug;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -746,7 +748,8 @@ class HomeController extends Controller
                         : ($category->description ? Str::limit(strip_tags($category->description), 140) : null),
                     'products_count' => (int) $category->products_count,
                     'image' => $image,
-                    'url' => '/encyclopedia/' . $category->slug,
+                    'url' => EncyclopediaSlug::path($category->slug)
+                        ?? '/compare/' . (CompareSlug::canonical($category->slug) ?? $category->slug),
                 ];
             });
 

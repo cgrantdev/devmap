@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\CompareSlug;
+use App\Support\EncyclopediaSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -107,6 +108,45 @@ class ProductCategory extends Model
 
         return $matches->first(fn (self $category) => $category->slug === $routeSlug)
             ?? $matches->first(fn (self $category) => strtolower((string) $category->slug) === strtolower($routeSlug));
+    }
+
+    /**
+     * Where a non-canonical encyclopedia request should 301, if anywhere.
+     *
+     * A stored slug the encyclopedia route can serve ("Vitamin B12",
+     * "BPC-157") is the target. Slash blends have no encyclopedia page;
+     * their live URL is the compare page at the canonical slug. Returns
+     * null when this request should be rendered or 404.
+     */
+    public static function encyclopediaRedirectPath(string $requestedSlug): ?string
+    {
+        if (EncyclopediaSlug::isResolvable($requestedSlug)) {
+            $exact = static::query()->where('is_active', true)->where('slug', $requestedSlug)->first();
+            if ($exact) {
+                return null;
+            }
+        }
+
+        $canonical = CompareSlug::canonical($requestedSlug);
+        if ($canonical === null) {
+            return null;
+        }
+
+        $category = static::findForCompareSlug($canonical);
+        if (!$category) {
+            return null;
+        }
+
+        $stored = (string) $category->slug;
+        if (EncyclopediaSlug::isResolvable($stored) && $stored !== $requestedSlug) {
+            return '/encyclopedia/' . $stored;
+        }
+
+        if (!EncyclopediaSlug::isResolvable($stored) && CompareSlug::canonical($stored) === $canonical) {
+            return '/compare/' . $canonical;
+        }
+
+        return null;
     }
 
     /**
