@@ -29,7 +29,7 @@ class SeoP0Test extends TestCase
         $this->assertStringContainsString('https://peptidemap.com/compare/vitamin-b12</loc>', $xml);
         $this->assertStringContainsString('https://peptidemap.com/compare/bpc-157-tb500-cartalax</loc>', $xml);
         $this->assertStringContainsString('https://peptidemap.com/compare/retatrutide</loc>', $xml);
-        $this->assertStringContainsString('https://peptidemap.com/encyclopedia/Vitamin%20B12</loc>', $xml);
+        $this->assertStringContainsString('https://peptidemap.com/encyclopedia/vitamin-b12</loc>', $xml);
 
         $this->assertStringNotContainsString('/compare/BPC-157', $xml);
         $this->assertStringNotContainsString('/compare/Vitamin', $xml);

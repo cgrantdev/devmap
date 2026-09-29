@@ -9,6 +9,9 @@ use App\Models\EducationPost;
 use App\Models\SeoPage;
 use App\Models\Setting;
 use App\Support\CompareSlug;
+use App\Support\EncyclopediaFraming;
+use App\Support\EncyclopediaSlug;
+use App\Support\FramingProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -248,18 +251,27 @@ class EncyclopediaController extends Controller
                 $image = $sample ? $sample->image_url : null;
             }
 
-            // Determine category tag - use education_tag from database, fallback to computed
-            $categoryTag = $educationPost && $educationPost->education_tag 
-                ? $educationPost->education_tag 
-                : $this->getCategoryTag($category->name, $category->description);
+            $profile = EncyclopediaFraming::match($category->slug, $category->name);
+
+            // Framed compounds must not inherit the peptide default ("Healing & Recovery").
+            if ($profile && !($educationPost && $educationPost->education_tag)) {
+                $categoryTag = $profile->educationTag();
+            } else {
+                $categoryTag = $educationPost && $educationPost->education_tag
+                    ? $educationPost->education_tag
+                    : $this->getCategoryTag($category->name, $category->description);
+            }
 
             // Get title - always use category name
             $title = $category->name;
 
-            // Get peptide full name - use from database, fallback to computed
-            $peptideFullName = $educationPost && $educationPost->peptide_full_name 
-                ? $educationPost->peptide_full_name 
-                : $this->getSubtitle($category->name);
+            // Get peptide full name - use from database, fallback to computed.
+            // SLU-PP-332 is a small molecule; never fall through to a peptide subtitle.
+            $peptideFullName = $educationPost && $educationPost->peptide_full_name
+                ? $educationPost->peptide_full_name
+                : ($profile
+                    ? $profile->subtitle()
+                    : $this->getSubtitle($category->name));
 
             // Get sample product for additional data
             $sampleProduct = Product::visible()
@@ -278,9 +290,13 @@ class EncyclopediaController extends Controller
             return [
                 'id' => $category->id,
                 'name' => $title,
-                'slug' => $category->slug,
+                'slug' => EncyclopediaSlug::publicSlug($category->slug) ?? $category->slug,
                 'subtitle' => $peptideFullName,
-                'description' => $educationPost ? $educationPost->description : $category->description,
+                'description' => ($educationPost && $educationPost->description)
+                    ? $educationPost->description
+                    : ($category->description ?: ($profile
+                        ? $profile->cardDescription()
+                        : $category->description)),
                 'image' => $image,
                 'categoryTag' => $categoryTag,
                 'safetyTag' => 'High Safety', // Default, can be enhanced later
@@ -631,9 +647,13 @@ class EncyclopediaController extends Controller
             : $category->name;
 
         // Generate SEO data for encyclopedia detail
+        $stubSeo = $this->stubEncyclopediaSeo($title, $slug, 'Peptidemap');
+        $detailDescription = ($educationPost ? $educationPost->description : $category->description)
+            ? $this->safeLimit($educationPost ? $educationPost->description : $category->description, 160)
+            : $stubSeo['description'];
         $seoData = new SEOData(
-            title: $title . ' - Peptide Encyclopedia | Peptidemap',
-            description: ($educationPost ? $educationPost->description : $category->description) ? $this->safeLimit($educationPost ? $educationPost->description : $category->description, 160) : 'Comprehensive guide to ' . $title . ' peptides.',
+            title: EncyclopediaFraming::match($slug, $title) ? $stubSeo['title'] : ($title . ' - Peptide Encyclopedia | Peptidemap'),
+            description: $detailDescription,
             image: $image,
             url: url("/encyclopedia/{$slug}"),
         );
@@ -677,14 +697,32 @@ class EncyclopediaController extends Controller
             return redirect($redirect, 301);
         }
 
-        // Reuse the same logic as show() but render the new article detail page
+        // Reuse the same logic as show() but render the new article detail page.
+        // Hyphen canonicals (vitamin-b12, hgh-191aa, and the other forced
+        // families) do not match the stored slug, so resolve those too.
         $category = ProductCategory::where('slug', $slug)
             ->where('is_active', true)
             ->with(['educationPost' => fn($q) => $q->where('status', 'published')])
-            ->firstOrFail();
+            ->first();
+
+        if (!$category) {
+            $category = ProductCategory::findForPublicSlug(EncyclopediaSlug::publicSlug($slug) ?? $slug);
+            if ($category) {
+                $category->load(['educationPost' => fn ($q) => $q->where('status', 'published')]);
+            }
+        }
+
+        if (!$category) {
+            abort(404);
+        }
 
         $educationPost = $category->educationPost;
-        
+        $profile = EncyclopediaFraming::match($category->slug, $category->name);
+        if ($profile && $educationPost) {
+            $this->applyProfilePhrases($educationPost, $profile);
+        }
+        $publicSlug = EncyclopediaSlug::publicSlug($category->slug) ?? $slug;
+
         // Get image - prioritize education post image, fallback to category image
         $image = null;
         if ($educationPost && $educationPost->image) {
@@ -730,27 +768,40 @@ class EncyclopediaController extends Controller
         if ($educationPost && $educationPost->tags) {
             $tags = is_array($educationPost->tags) ? $educationPost->tags : json_decode($educationPost->tags, true) ?? [];
         }
-        $categoryTag = !empty($tags) ? $tags[0] : ($category->education_tag ?? $this->getCategoryTag($category->name, $category->description));
+        if (empty($tags) && $profile) {
+            $tags = $profile->tags();
+        }
+        $categoryTag = !empty($tags) ? $tags[0] : ($category->education_tag ?? ($profile ? $profile->educationTag() : $this->getCategoryTag($category->name, $category->description)));
         
         // Get title and full name
         $title = $educationPost && $educationPost->title ? $educationPost->title : $category->name;
-        $peptideFullName = $educationPost && $educationPost->peptide_full_name ? $educationPost->peptide_full_name : ($category->description ?? '');
+        $peptideFullName = $educationPost && $educationPost->peptide_full_name
+            ? $educationPost->peptide_full_name
+            : ($profile ? $profile->subtitle() : ($category->description ?? ''));
 
-        // Generate SEO data - prioritize stored SEO data, otherwise auto-generate
+        // Generate SEO data - prioritize stored SEO data, otherwise auto-generate.
+        // Framed compounds must not inherit "Peptide Encyclopedia" stub copy.
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
+        $stubSeo = $this->stubEncyclopediaSeo($title, $category->slug, $siteName, $profile);
         
         // Check if stored SEO data exists
         $hasStoredSeo = $educationPost && (!empty($educationPost->seo_page_title) || !empty($educationPost->seo_description));
         
         if ($hasStoredSeo) {
-            // Use stored SEO data from database
-            $seoTitle = $educationPost->seo_page_title ?: ("What is {$title} - Peptide Encyclopedia - {$siteName}");
-            $seoDescription = $educationPost->seo_description 
-                ?: ($educationPost->overview 
-                    ? $this->safeLimit($educationPost->overview, 160) 
-                    : ($educationPost->description 
-                        ? $this->safeLimit($educationPost->description, 160) 
-                        : "Comprehensive guide to {$title} peptides."));
+            // Use stored SEO data from database. Stub peptide titles and
+            // descriptions still yield to the framing profile.
+            $seoTitle = (!empty($educationPost->seo_page_title) && !($profile && $this->isStubPeptideSeo($educationPost->seo_page_title)))
+                ? $educationPost->seo_page_title
+                : $stubSeo['title'];
+            $seoDescription = (!empty($educationPost->seo_description) && !($profile && $this->isStubPeptideSeo($educationPost->seo_description)))
+                ? $educationPost->seo_description
+                : ($profile
+                    ? $profile->seoDescription()
+                    : ($educationPost->overview
+                        ? $this->safeLimit($educationPost->overview, 160)
+                        : ($educationPost->description
+                            ? $this->safeLimit($educationPost->description, 160)
+                            : $stubSeo['description'])));
             $seoOgTitle = $educationPost->seo_og_title ?: $seoTitle;
             $seoOgDescription = $educationPost->seo_og_description ?: $seoDescription;
             $ogV = $educationPost?->updated_at?->timestamp ?? 0;
@@ -758,13 +809,15 @@ class EncyclopediaController extends Controller
                 ? (str_starts_with($educationPost->seo_og_image, 'http') ? $educationPost->seo_og_image : url($educationPost->seo_og_image))
                 : route('og.compound', ['slug' => $slug]) . '?v=' . $ogV;
         } else {
-            $seoTitle = "What is {$title} - Peptide Encyclopedia - {$siteName}";
-            if ($educationPost && $educationPost->overview) {
+            $seoTitle = $stubSeo['title'];
+            if ($profile) {
+                $seoDescription = $profile->seoDescription();
+            } elseif ($educationPost && $educationPost->overview) {
                 $seoDescription = $this->safeLimit($educationPost->overview, 160);
             } elseif ($educationPost && $educationPost->description) {
                 $seoDescription = $this->safeLimit($educationPost->description, 160);
             } else {
-                $seoDescription = "Comprehensive guide to {$title} peptides.";
+                $seoDescription = $stubSeo['description'];
             }
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
@@ -805,7 +858,7 @@ class EncyclopediaController extends Controller
         // instead of competing. Encyclopedia page still exists and
         // serves informational intent; Google just picks compare as
         // the primary for ranking purposes.
-        $comparePath = url("/encyclopedia/{$slug}");
+        $comparePath = url('/encyclopedia/'.$publicSlug);
         if (in_array($category->name, \App\Http\Controllers\Frontend\CompareController::FEATURED_COMPOUND_NAMES, true)) {
             $hasPricedProducts = \App\Models\Product::visible()
                 ->where('status', 'active')
@@ -828,12 +881,13 @@ class EncyclopediaController extends Controller
             'key' => 'encyclopedia',
             'title' => $seoTitle,
             'description' => $seoDescription,
+            'h1' => $profile?->h1(),
             'og_title' => $seoOgTitle,
             'og_description' => $seoOgDescription,
             'og_image' => $seoOgImage,
             // Backward-compatible field used by some pages
             'image' => $seoOgImage,
-            'url' => url("/encyclopedia/{$slug}"),
+            'url' => url('/encyclopedia/'.$publicSlug),
             'canonical' => $comparePath,
             'schema' => array_values(array_filter([
                 $definedTermSchema,
@@ -842,8 +896,8 @@ class EncyclopediaController extends Controller
                 // into rich-snippet candidates for "what is X" queries —
                 // Google renders the Q/A pairs directly under our SERP result.
                 $this->faqPageSchema(
-                    (is_array($educationPost?->faqs ?? null) ? $educationPost->faqs : []),
-                    $slug
+                    $this->faqsForSchema($educationPost, $profile),
+                    $publicSlug
                 ),
             ])),
         ];
@@ -856,24 +910,24 @@ class EncyclopediaController extends Controller
             'id' => $category->id,
             'name' => $title,
             'categoryName' => $category->name,
-            'slug' => $category->slug,
+            'slug' => $publicSlug,
             'subtitle' => $peptideFullName,
             'tags' => $tags,
-            // Related-page links — added 2026-08-27 to defuse the
-            // encyclopedia ↔ product-listing cannibalization risk (SEO rec #20).
-            // Frontend renders these with distinct anchor text so Google can
-            // see the three pages serve three intents: learn / compare / buy.
-            'relatedPages' => [
+            // Shop CTAs are omitted for framed compounds. Several of those
+            // /products/{slug} paths 404, and the query-string shop link
+            // is not a class-accurate call to action for this set.
+            'relatedPages' => array_filter([
                 'compare' => ['url' => url('/compare/' . (CompareSlug::canonical($category->slug) ?? $category->slug)), 'anchor' => "Compare {$category->name} prices across vendors"],
-                'shop' => ['url' => url("/products?category={$category->slug}"), 'anchor' => "Shop {$category->name} — all available products"],
-            ],
+                'shop' => $profile ? null : ['url' => url("/products?category={$category->slug}"), 'anchor' => "Shop {$category->name} — all available products"],
+            ]),
             // $educationPost may be null when a ProductCategory exists but
             // no matching EducationPost row has been created yet. Every
             // access below now uses the null-safe operator so the page
             // still renders with empty defaults instead of throwing.
             'primaryResearch' => [
-                'institution' => 'University of Zagreb (Croatia)',
-                'url' => $educationPost?->research_url ?? '#'
+                'institution' => $profile?->researchInstitution() ?: ($profile ? '' : 'University of Zagreb (Croatia)'),
+                'url' => $educationPost?->research_url
+                    ?: ($profile?->researchUrl() ?: '#'),
             ],
             'molecularInfo' => [
                 'formula' => $educationPost?->molecular_formula ?? '',
@@ -926,9 +980,113 @@ class EncyclopediaController extends Controller
             'products' => $products,
         ];
 
+        $peptideData = $this->applyStubNarrative($peptideData, $educationPost, $profile);
+
         return Inertia::render('Frontend/EncyclopediaArticleDetail', array_merge($peptideData, [
             'seo' => $seo,
         ]));
+    }
+
+    /**
+     * Default title/meta for an encyclopedia article that has no stored SEO.
+     * Framed compounds use class language. Other stubs stay on the peptide default.
+     */
+    private function stubEncyclopediaSeo(string $title, string $slug, string $siteName, ?FramingProfile $profile = null): array
+    {
+        $profile ??= EncyclopediaFraming::match($slug, $title);
+        if ($profile) {
+            return [
+                'title' => $profile->seoTitle(),
+                'description' => $profile->seoDescription(),
+            ];
+        }
+
+        return [
+            'title' => "What is {$title} - Peptide Encyclopedia - {$siteName}",
+            'description' => "Comprehensive guide to {$title} peptides.",
+        ];
+    }
+
+    private function isStubPeptideSeo(?string $text): bool
+    {
+        $text = strtolower(trim((string) $text));
+
+        return $text === ''
+            || str_contains($text, 'peptide encyclopedia')
+            || str_contains($text, ' peptides.');
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function faqsForSchema(?EducationPost $post, ?FramingProfile $profile): array
+    {
+        $faqs = is_array($post?->faqs ?? null) ? $post->faqs : [];
+        if ($faqs === [] && $profile && !$post) {
+            $faqs = $profile->articleAttributes()['faqs'] ?? [];
+        }
+
+        return $faqs;
+    }
+
+    /**
+     * Phrase-level corrections for a published article we do not replace,
+     * such as the existing NAD+ monograph.
+     */
+    private function applyProfilePhrases(EducationPost $post, FramingProfile $profile): void
+    {
+        $map = $profile->phraseReplacements();
+        if ($map === []) {
+            return;
+        }
+
+        foreach (['overview', 'conclusion', 'background', 'description', 'peptide_full_name'] as $field) {
+            if (is_string($post->{$field})) {
+                $post->{$field} = strtr($post->{$field}, $map);
+            }
+        }
+
+        if (is_array($post->faqs)) {
+            $faqs = $post->faqs;
+            foreach ($faqs as &$faq) {
+                if (isset($faq['answer']) && is_string($faq['answer'])) {
+                    $faq['answer'] = strtr($faq['answer'], $map);
+                }
+            }
+            unset($faq);
+            $post->faqs = $faqs;
+        }
+    }
+
+    /**
+     * When a framed category has no education post yet, fill the article
+     * body from the profile so the stub is not a blank peptide monograph.
+     */
+    private function applyStubNarrative(array $data, ?EducationPost $post, ?FramingProfile $profile): array
+    {
+        if ($post || !$profile) {
+            return $data;
+        }
+
+        foreach ($profile->stubNarrative() as $key => $value) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+            $current = $data[$key];
+            $blank = $current === '' || $current === [] || $current === null;
+            if (!$blank && $key === 'molecularInfo' && is_array($current)) {
+                $blank = trim(implode('', $current)) === '';
+            }
+            if ($blank) {
+                $data[$key] = $value;
+            }
+        }
+
+        if (!empty($data['overview'])) {
+            $data['overviewShort'] = $this->truncateToSentences($data['overview'], 450);
+        }
+
+        return $data;
     }
 
     /**

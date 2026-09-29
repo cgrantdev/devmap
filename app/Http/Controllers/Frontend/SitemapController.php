@@ -124,7 +124,8 @@ class SitemapController extends Controller
         // (Selank/Semax, "BPC-157 / TB500 / Cartalax"). Emit the loc only
         // when the stored slug is resolvable. Those blends already have a
         // live /compare/{canonical} page; the bad encyclopedia URL 301s there
-        // and is not listed here. Spaces ("Vitamin B12") stay — they 200.
+        // and is not listed here. Forced families emit the hyphen canonical
+        // (vitamin-b12, hgh-191aa, phosphate-buffered-saline, and the rest).
         // Compare locs must be the route-safe slug ([a-z0-9-]+): raw
         // values like "BPC-157" and "Vitamin B12" 404. Emit each compare URL
         // once, and only when that slug actually resolves.
@@ -135,9 +136,10 @@ class SitemapController extends Controller
             ->chunkById(500, function ($chunk) use (&$urls, &$emittedCompareSlugs) {
                 foreach ($chunk as $c) {
                     $lastmod = $c->updated_at?->toDateString();
-                    if (EncyclopediaSlug::isResolvable($c->slug)) {
+                    $encyclopediaPath = EncyclopediaSlug::path($c->slug);
+                    if ($encyclopediaPath) {
                         $urls[] = [
-                            'loc'        => self::BASE_URL . '/encyclopedia/' . $c->slug,
+                            'loc'        => self::BASE_URL . $encyclopediaPath,
                             'lastmod'    => $lastmod,
                             'changefreq' => 'monthly',
                             'priority'   => '0.6',

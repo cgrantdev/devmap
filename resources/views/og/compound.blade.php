@@ -130,7 +130,7 @@
     </div>
 
     <div class="content">
-      <div class="eyebrow">Peptide Compound Guide</div>
+      <div class="eyebrow">{{ $eyebrow ?? 'Peptide Compound Guide' }}</div>
       <div class="compound-name">{{ $category->name }}</div>
       @if($fullName)
       <div class="full-name">{{ $fullName }}</div>

@@ -111,15 +111,51 @@ class ProductCategory extends Model
     }
 
     /**
+     * Category row for a forced public encyclopedia slug (hyphen form),
+     * including short aliases such as PBS.
+     */
+    public static function findForPublicSlug(string $publicSlug): ?self
+    {
+        $found = static::findForCompareSlug($publicSlug);
+        if ($found) {
+            return $found;
+        }
+
+        $aliases = EncyclopediaSlug::aliasesFor($publicSlug);
+
+        return static::query()
+            ->where('is_active', true)
+            ->where(function ($query) use ($aliases) {
+                foreach ($aliases as $alias) {
+                    $query->orWhereRaw('LOWER(slug) = ?', [$alias])
+                        ->orWhereRaw('LOWER(name) = ?', [$alias]);
+                }
+            })
+            ->first();
+    }
+
+    /**
      * Where a non-canonical encyclopedia request should 301, if anywhere.
      *
-     * A stored slug the encyclopedia route can serve ("Vitamin B12",
-     * "BPC-157") is the target. Slash blends have no encyclopedia page;
-     * their live URL is the compare page at the canonical slug. Returns
-     * null when this request should be rendered or 404.
+     * Forced families (Vitamin B12, HGH 191AA, PBS, sterile water, and
+     * the other hyphen canonicals) render only at the hyphen URL. Other
+     * stored slugs still win when they are resolvable. Slash blends have
+     * no encyclopedia page; their live URL is the compare page.
      */
     public static function encyclopediaRedirectPath(string $requestedSlug): ?string
     {
+        $public = EncyclopediaSlug::publicSlug($requestedSlug);
+        if ($public !== null) {
+            if (! static::findForPublicSlug($public)) {
+                return null;
+            }
+            if (strtolower(trim($requestedSlug)) === $public) {
+                return null;
+            }
+
+            return '/encyclopedia/'.$public;
+        }
+
         if (EncyclopediaSlug::isResolvable($requestedSlug)) {
             $exact = static::query()->where('is_active', true)->where('slug', $requestedSlug)->first();
             if ($exact) {
