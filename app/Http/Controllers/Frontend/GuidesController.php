@@ -19,6 +19,7 @@ class GuidesController extends Controller
             ->whereNotNull('content')
             ->where('content', '!=', '')
             ->orderBy('published_at', 'desc')
+            ->orderBy('id', 'desc')
             ->get()
             ->map(fn (EducationalGuide $guide) => [
                 'title' => $guide->title,

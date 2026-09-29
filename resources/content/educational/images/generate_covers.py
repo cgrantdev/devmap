@@ -37,14 +37,31 @@ def text_width(draw, text, face) -> float:
     return box[2] - box[0]
 
 
-def fit_font(draw, text, weight, max_size, max_width):
+def fit_font(draw, text, weight, max_size, max_width, min_size=16):
     size = max_size
-    while size > 28:
+    while size > min_size:
         face = font(weight, size)
         if text_width(draw, text, face) <= max_width:
             return face
-        size -= 2
-    return font(weight, 28)
+        size -= 1
+    return font(weight, min_size)
+
+
+def wrap_text(draw, text, face, max_width):
+    words = text.split()
+    lines = []
+    current = ""
+    for word in words:
+        trial = word if not current else f"{current} {word}"
+        if text_width(draw, trial, face) <= max_width:
+            current = trial
+        else:
+            if current:
+                lines.append(current)
+            current = word
+    if current:
+        lines.append(current)
+    return lines or [""]
 
 
 def tracked(draw, text, y, face, fill, tracking=2.4):
@@ -96,33 +113,44 @@ def wordmark(draw, y):
 
 
 def row(draw, box, label, detail, accent):
-    rounded_rect(draw, box, 16, (255, 255, 255, 16), (255, 255, 255, 36), 1)
+    # Opaque dark chips. A translucent white fill is painted as solid white by
+    # PIL and leaves the light row titles unreadable.
+    rounded_rect(draw, box, 16, (15, 23, 42, 255), (51, 65, 85, 255), 1)
     draw.rounded_rectangle(
         [box[0], box[1], box[0] + 6, box[3]],
         radius=3,
         fill=accent + (255,),
     )
-    label_font = font("semibold", 26)
-    detail_font = font("regular", 18)
-    draw.text((box[0] + 28, box[1] + 16), label, font=label_font, fill=(248, 250, 252, 255))
-    draw.text((box[0] + 28, box[1] + 50), detail, font=detail_font, fill=(203, 213, 225, 230))
+    x = box[0] + 28
+    max_w = box[2] - x - 18
+    label_font = fit_font(draw, label, "semibold", 26, max_w, min_size=18)
+    detail_font = fit_font(draw, detail, "regular", 18, max_w, min_size=14)
+    draw.text((x + 1, box[1] + 17), label, font=label_font, fill=(2, 6, 23, 255))
+    draw.text((x, box[1] + 16), label, font=label_font, fill=(248, 250, 252, 255))
+    draw.text((x, box[1] + 50), detail, font=detail_font, fill=(203, 213, 225, 255))
 
 
 def cover(filename, eyebrow, title, subtitle, accent, rows):
     img = canvas(accent)
     draw = ImageDraw.Draw(img)
     panel = [300, 78, 900, 690]
-    rounded_rect(draw, panel, 28, (8, 12, 24, 168), (255, 255, 255, 28), 1)
+    rounded_rect(draw, panel, 28, (8, 12, 24, 255), (51, 65, 85, 255), 1)
 
     tracked(draw, eyebrow, 108, font("semibold", 18), accent + (255,), tracking=3.2)
 
     title_font = fit_font(draw, title, "bold", 54, 520)
     title_w = text_width(draw, title, title_font)
+    draw.text(((W - title_w) / 2 + 1, 149), title, font=title_font, fill=(2, 6, 23, 255))
     draw.text(((W - title_w) / 2, 148), title, font=title_font, fill=(255, 255, 255, 255))
 
-    sub_font = fit_font(draw, subtitle, "regular", 22, 520)
-    sub_w = text_width(draw, subtitle, sub_font)
-    draw.text(((W - sub_w) / 2, 214), subtitle, font=sub_font, fill=(203, 213, 225, 235))
+    # Keep subtitles inside the panel with padding. Long lines wrap.
+    subtitle_max = 480
+    sub_font = fit_font(draw, subtitle, "regular", 22, subtitle_max, min_size=16)
+    lines = wrap_text(draw, subtitle, sub_font, subtitle_max)
+    for index, line in enumerate(lines):
+        line_w = text_width(draw, line, sub_font)
+        y = 214 + index * 28
+        draw.text(((W - line_w) / 2, y), line, font=sub_font, fill=(226, 232, 240, 255))
 
     top = 280
     height = 78

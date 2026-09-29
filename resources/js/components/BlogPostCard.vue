@@ -3,9 +3,10 @@
     class="bg-white border border-gray-200 rounded-lg overflow-hidden flex flex-col transition-shadow duration-300 h-full cursor-pointer"
     @click="handleClick"
   >
-    <div class="w-full aspect-[325/404] overflow-hidden bg-gray-100 rounded-t-lg">
+    <div class="w-full aspect-[325/404] overflow-hidden bg-[#0B1424] rounded-t-lg">
       <img
-        :src="image && !hasError ? image : placeholder"
+        v-if="image && !hasError"
+        :src="image"
         :alt="title"
         class="w-full h-full object-cover object-center block"
         loading="lazy"
@@ -50,7 +51,6 @@ const props = defineProps({
 })
 
 const hasError = ref(false)
-const placeholder = '/images/blogs/1.jpg'
 
 const handleClick = () => {
   router.visit(props.to)

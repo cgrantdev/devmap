@@ -149,6 +149,8 @@ class EducationalContentTest extends TestCase
 
         $this->get('/guides')->assertOk()->assertInertia(fn ($page) => $page
             ->component('Frontend/GuideListing')
+            ->where('guides.0.slug', 'peptide-legality-fda-ruo-compounding')
+            ->where('guides.1.slug', 'beginners-guide-to-research-peptides')
             ->where('guides', function ($guides) {
                 $covers = collect($guides)->pluck('cover')->sort()->values()->all();
 
