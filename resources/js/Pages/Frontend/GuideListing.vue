@@ -22,20 +22,25 @@
         </p>
       </div>
 
-      <div v-if="guides.length" class="grid gap-4 max-w-3xl">
+      <div v-if="guides.length" class="grid gap-5 max-w-3xl">
         <a
           v-for="guide in guides"
           :key="guide.slug"
           :href="`/guides/${guide.slug}`"
-          class="block border border-[color:var(--color-hairline)] bg-white p-6 hover:border-[color:var(--color-accent-400)] transition-colors"
+          class="block overflow-hidden border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] transition-colors"
         >
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[color:var(--color-ink-subtle)] mb-2">
-            <span v-if="guide.tag" class="font-semibold uppercase tracking-wide text-[color:var(--color-accent-600)]">{{ guide.tag }}</span>
-            <span v-if="guide.readingTime">{{ guide.readingTime }}</span>
-            <span v-if="guide.date">{{ guide.date }}</span>
+          <div v-if="guide.cover" class="aspect-[16/9] bg-[#0B1424] overflow-hidden">
+            <img :src="guide.cover" :alt="guide.title" class="w-full h-full object-cover" loading="lazy" />
           </div>
-          <h2 class="text-[20px] font-semibold text-[color:var(--color-ink)] leading-snug mb-2">{{ guide.title }}</h2>
-          <p v-if="guide.description" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed line-clamp-3">{{ guide.description }}</p>
+          <div class="p-6">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[color:var(--color-ink-subtle)] mb-2">
+              <span v-if="guide.tag" class="font-semibold uppercase tracking-wide text-[color:var(--color-accent-600)]">{{ guide.tag }}</span>
+              <span v-if="guide.readingTime">{{ guide.readingTime }}</span>
+              <span v-if="guide.date">{{ guide.date }}</span>
+            </div>
+            <h2 class="text-[20px] font-semibold text-[color:var(--color-ink)] leading-snug mb-2">{{ guide.title }}</h2>
+            <p v-if="guide.description" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed line-clamp-3">{{ guide.description }}</p>
+          </div>
         </a>
       </div>
       <p v-else class="text-[color:var(--color-ink-muted)]">No guides published yet.</p>

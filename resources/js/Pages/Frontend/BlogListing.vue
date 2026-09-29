@@ -5,55 +5,10 @@
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10">
         <div class="border-b border-[color:var(--color-hairline)] pb-10 mb-12">
           <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Research & education</div>
-          <h2 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)]">Research Insights</h2>
+          <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)]">Research Insights</h1>
         </div>
 
-        <!-- Featured Article -->
-        <div v-if="featured" class="mb-16">
-          <div class="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col md:flex-row gap-6">
-            <!-- Left: Text Content -->
-            <div class="flex-1 p-8 flex flex-col justify-between">
-              <div>
-                <span class="inline-block bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-roboto font-medium mb-4">Featured Article</span>
-                <div class="flex items-center gap-4 mb-4 text-sm text-gray-500 font-roboto">
-                  <span class="flex items-center gap-1.5">
-                    <svg class="flex-shrink-0 text-gray-500 w-4 h-4" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    {{ featured.readTime }}
-                  </span>
-                  <span>{{ featured.date }}</span>
-                </div>
-                <h1 class="font-hv-muse font-normal text-4xl md:text-5xl leading-tight tracking-normal text-gray-800 m-0 mb-6">{{ featured.title }}</h1>
-                <p class="font-roboto font-normal text-base leading-relaxed text-gray-600 m-0 mb-4">{{ featured.outline || featured.description }}</p>
-                <p class="font-roboto font-normal text-base leading-relaxed text-gray-600 m-0">{{ featured.outline || featured.description }}</p>
-              </div>
-              <button 
-                @click="router.visit(`/blog/${featured.slug}`)"
-                class="w-fit mt-8 py-3 px-8 rounded-[500px] bg-gray-800 font-roboto font-medium text-base leading-none tracking-normal text-white border-none cursor-pointer transition-colors duration-300 hover:bg-gray-700"
-              >
-                Read More
-              </button>
-            </div>
-            <!-- Right: Image -->
-            <div class="flex-1">
-              <img 
-                v-if="featured.image"
-                :src="featured.image" 
-                :alt="featured.title"
-                class="w-full h-full object-cover"
-                loading="lazy"
-                @error="handleImageError($event)"
-              />
-              <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
-                <span>No Image</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Grid of Articles -->
+        <!-- Newest posts first. No featured carve-out. -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <BlogPostCard
             v-for="blog in blogs.data"
@@ -125,7 +80,6 @@ import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import BlogPostCard from '@/components/BlogPostCard.vue'
 
 const props = defineProps({
-  featured: Object,
   blogs: Object,
 })
 
@@ -178,20 +132,6 @@ const applyPerPage = () => {
     preserveState: true,
     preserveScroll: true,
   })
-}
-
-const handleImageError = (event) => {
-  if (event.target.dataset.failed) {
-    return
-  }
-  event.target.dataset.failed = 'true'
-  event.target.style.display = 'none'
-  if (event.target.parentElement) {
-    const placeholder = document.createElement('div')
-    placeholder.className = 'w-full h-full flex items-center justify-center text-gray-400'
-    placeholder.innerHTML = '<span class="text-sm">No Image</span>'
-    event.target.parentElement.appendChild(placeholder)
-  }
 }
 </script>
 

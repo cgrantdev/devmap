@@ -121,5 +121,30 @@ class ImageHelper
         
         return Storage::disk('public')->delete($directory . '/' . $filename);
     }
+
+    /**
+     * URL for a blog or guide listing image.
+     *
+     * Absolute URLs and root-relative public paths (for example
+     * /images/educational/article.png) are returned as stored. Bare filenames
+     * resolve to storage/app/public/{directory} when that file exists, otherwise
+     * to /images/{directory}/{filename}.
+     */
+    public static function listingImageUrl(?string $image, string $storageDirectory = 'blogs'): ?string
+    {
+        if ($image === null || trim($image) === '') {
+            return null;
+        }
+
+        if (preg_match('#^https?://#i', $image) === 1 || str_starts_with($image, '/')) {
+            return $image;
+        }
+
+        if (Storage::disk('public')->exists($storageDirectory.'/'.$image)) {
+            return Storage::url($storageDirectory.'/'.$image);
+        }
+
+        return '/images/'.$storageDirectory.'/'.$image;
+    }
 }
 

@@ -137,7 +137,7 @@
           <input v-model="form.is_featured" type="checkbox" class="w-4 h-4 text-[color:var(--color-accent-600)] border-[color:var(--color-hairline)] focus:ring-[color:var(--color-accent-500)]" />
           <span class="text-sm text-[color:var(--color-ink)]">Featured Post</span>
         </label>
-        <p class="text-[12px] text-[color:var(--color-ink-subtle)] mt-1">Featured posts appear prominently on the homepage.</p>
+        <p class="text-[12px] text-[color:var(--color-ink-subtle)] mt-1">Public blog and news listings are ordered by publish date.</p>
 
         <div v-if="blog?.published_at" class="mt-4 pt-4 border-t border-[color:var(--color-hairline)]">
           <span class="text-[12px] text-[color:var(--color-ink-subtle)]">Published:</span>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Research;
@@ -9,7 +10,6 @@ use App\Models\EducationalGuide;
 use App\Models\SeoPage;
 use App\Models\Setting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
@@ -74,24 +74,10 @@ class KnowledgeCenterController extends Controller
             });
         }
 
-        // Get featured blogs (3 for Featured Stories) - with filter applied
-        $featuredBlogs = (clone $filteredQuery)
-            ->where('is_featured', true)
-            ->orderBy('published_at', 'desc')            
-            ->get()
-            ->map(function ($blog) {
-                return $this->formatBlog($blog);
-            });
-
-        // Get latest blogs (excluding featured, for Latest Articles) - with filter applied
-        $latestQuery = (clone $filteredQuery);
-        if ($featuredBlogs->isNotEmpty()) {
-            $latestQuery->whereNotIn('id', $featuredBlogs->pluck('id'));
-        }
-
-        $latestBlogs = $latestQuery
+        // One chronological feed. Featured posts are not pulled out of date order.
+        $latestBlogs = (clone $filteredQuery)
             ->orderBy('published_at', 'desc')
-            ->take(10)
+            ->orderBy('id', 'desc')
             ->get()
             ->map(function ($blog) {
                 return $this->formatBlog($blog);
@@ -131,7 +117,6 @@ class KnowledgeCenterController extends Controller
         session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/KnowledgeCenter', [
-            'featuredBlogs' => $featuredBlogs,
             'latestBlogs' => $latestBlogs,
             'researchPapers' => $researchPapers,
             'educationalGuides' => $educationalGuides,
@@ -147,14 +132,7 @@ class KnowledgeCenterController extends Controller
      */
     private function formatBlog($blog)
     {
-        $imageUrl = null;
-        if ($blog->image) {
-            if (str_starts_with($blog->image, 'http://') || str_starts_with($blog->image, 'https://')) {
-                $imageUrl = $blog->image;
-            } else {
-                $imageUrl = Storage::url('blogs/' . $blog->image);
-            }
-        }
+        $imageUrl = ImageHelper::listingImageUrl($blog->image);
 
         // Use blog_type from database if available, otherwise determine from content
         $categoryTag = $blog->blog_type ?: $this->getCategoryTag($blog->title, $blog->description, $blog->content);
