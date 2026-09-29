@@ -241,7 +241,7 @@
           <FormSection title="Affiliate / Referral Link">
             <FormField
               label="Referral URL"
-              hint="Full URL from the vendor's affiliate program that credits us for the click. Every 'Buy' button and 'Visit website' link on this vendor's products goes here. Paste directly from the Master List spreadsheet."
+              hint="Affiliate entry link, usually the shop homepage plus a tracking code (?ref=, affid, …). Buy (/go) still sends shoppers to the product URL and copies same-site tracking parameters from this link onto it. Visit website opens this URL directly. Paste from the Master List."
             >
               <input
                 v-model="editForm.referral_url"
@@ -250,10 +250,10 @@
                 class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] ui-mono focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
               />
               <p v-if="editForm.referral_url" class="mt-1.5 text-[11px] text-[color:var(--color-ink-subtle)]">
-                Every outbound click on this vendor's products will redirect through <span class="ui-mono">{{ editForm.referral_url }}</span>.
+                Buy links go to each product's product URL. Same-site tracking parameters on <span class="ui-mono">{{ editForm.referral_url }}</span> are added to that product link. Visit website opens the referral URL itself. If a product has no product URL, Buy falls back to this link.
               </p>
               <p v-else class="mt-1.5 text-[11px] text-[color:var(--color-caution)]">
-                No referral URL set — outbound clicks fall back to the raw product URL with no tracking. Grab this vendor's link from the Master List and paste above.
+                No referral URL set. Buy links use the product URL plus PeptideMap UTMs. Visit website uses the shop URL.
               </p>
             </FormField>
           </FormSection>

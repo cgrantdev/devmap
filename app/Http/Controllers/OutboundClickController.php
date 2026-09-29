@@ -16,7 +16,7 @@ class OutboundClickController extends Controller
      */
     public function redirect(Request $request, Product $product)
     {
-        $product->loadMissing('brand');
+        $product->loadMissing(['brand.vendorSetting']);
 
         $destination = $this->resolveDestinationUrl($product);
 
@@ -126,61 +126,161 @@ class OutboundClickController extends Controller
 
         $parts['query'] = http_build_query($query);
 
-        $rebuilt = $parts['scheme'] . '://' . $parts['host']
-            . (isset($parts['port']) ? ':' . $parts['port'] : '')
-            . ($parts['path'] ?? '')
-            . '?' . $parts['query']
-            . (isset($parts['fragment']) ? '#' . $parts['fragment'] : '');
-
-        return $rebuilt;
+        return $this->rebuildUrl($parts);
     }
 
     /**
-     * Resolve the outbound URL. Priority order:
-     *   1. vendor_settings.referral_url — a single full URL per vendor,
-     *      typically their affiliate program's Referral Link. When set,
-     *      every outbound click goes there (matches how the affiliate
-     *      programs actually credit us — a single tracked entry point).
-     *   2. brands.affiliate_url_template — legacy per-product templating.
-     *   3. products.product_url — raw scraped URL, coupon-injected when
-     *      the brand has a configured PMAP discount.
+     * Resolve the outbound URL.
+     *
+     * When products.product_url is set, the hop lands on that product
+     * deep link. vendor_settings.referral_url is the affiliate program's
+     * entry link — in practice the vendor homepage or a program signup
+     * page, plus tracking params such as ?ref= or ?affid=. It must not
+     * replace the product path. Same-host referral query params are
+     * copied onto the product URL so the program still gets credit.
+     * brands.affiliate_url_template, when set, still builds the legacy
+     * per-product tracked URL (placeholders: {product_url}, {slug},
+     * {id}, {affiliate_tag}) and wins over the raw product URL.
+     *
+     * Fallback, only when product_url is empty:
+     *   1. referral_url (vendor affiliate landing, often the homepage)
+     *   2. affiliate_url_template, when it does not require {product_url}
+     *   3. null — the caller redirects to the internal product page
+     *
+     * Coupon injection runs on the product deep link inside this method.
+     * The caller appends PeptideMap UTMs afterward and does not overwrite
+     * UTM keys already present.
      */
     protected function resolveDestinationUrl(Product $product): ?string
     {
-        // 1. Vendor-wide referral URL wins if configured. Don't touch it —
-        //    affiliate landing pages carry their own tracking and can break
-        //    when unknown query params are appended.
-        $referral = $product->brand?->vendorSetting?->referral_url;
+        $template = $product->brand?->affiliate_url_template;
+        $productUrl = $product->product_url ?: null;
+        $referral = $product->brand?->vendorSetting?->referral_url ?: null;
+
+        if (!empty($productUrl)) {
+            if (!empty($template)) {
+                $resolved = $this->applyAffiliateTemplate($template, $product, $productUrl);
+                if (!empty($resolved)) {
+                    return $resolved;
+                }
+            }
+
+            $deepLink = $this->mergeSameHostReferralParams($productUrl, $referral);
+
+            return $this->injectCoupon($deepLink, $product);
+        }
+
         if (!empty($referral)) {
             return $referral;
         }
 
-        $template = $product->brand?->affiliate_url_template;
-        $productUrl = $product->product_url;
-
-        if (empty($template)) {
-            // Path 3: raw scraped URL. Try to inject the vendor's coupon
-            // via a platform-appropriate URL scheme so the discount
-            // pre-applies at the vendor's checkout without the user having
-            // to copy/paste PMAP manually.
-            return $this->injectCoupon($productUrl, $product);
+        if (!empty($template)) {
+            return $this->applyAffiliateTemplate($template, $product, null);
         }
 
-        $replacements = [
+        return null;
+    }
+
+    /**
+     * Substitute affiliate template placeholders. Returns null when the
+     * template needs {product_url} and none is stored, so the caller can
+     * fall through to referral_url or the internal product page.
+     */
+    protected function applyAffiliateTemplate(string $template, Product $product, ?string $productUrl): ?string
+    {
+        if (str_contains($template, '{product_url}') && empty($productUrl)) {
+            return null;
+        }
+
+        $resolved = strtr($template, [
             '{product_url}' => $productUrl ?? '',
             '{slug}' => $product->slug ?? '',
             '{id}' => (string) $product->id,
             '{affiliate_tag}' => (string) ($product->brand?->affiliate_tag ?? ''),
-        ];
+        ]);
 
-        $resolved = strtr($template, $replacements);
+        return $resolved !== '' ? $resolved : null;
+    }
 
-        // If the template required {product_url} but we had none, fall back.
-        if (str_contains($template, '{product_url}') && empty($productUrl)) {
+    /**
+     * Copy affiliate query params from the vendor referral URL onto the
+     * product deep link when both URLs share a host (www. ignored).
+     *
+     * referral_url is usually https://vendor.example/?ref=CODE — the
+     * shop root plus the program's tracking params. Using that URL as
+     * the hop destination drops the shopper on the homepage. The product
+     * path stays; the tracking query is merged onto it.
+     *
+     * Product query params win on collision (variant selectors such as
+     * attribute_quantity). A referral URL on a different host is left
+     * unused: those links are program landings or signup pages, not a
+     * product deep-link slot we can fill safely. PeptideMap UTMs are
+     * still added later by tagWithUtms.
+     */
+    protected function mergeSameHostReferralParams(string $productUrl, ?string $referral): string
+    {
+        if (empty($referral)) {
             return $productUrl;
         }
 
-        return $resolved;
+        $product = @parse_url($productUrl);
+        $ref = @parse_url($referral);
+        if (
+            !$product || !$ref
+            || empty($product['scheme']) || empty($product['host'])
+            || empty($ref['host'])
+            || !in_array($product['scheme'], ['http', 'https'], true)
+        ) {
+            return $productUrl;
+        }
+
+        if ($this->normalizeHost($product['host']) !== $this->normalizeHost($ref['host'])) {
+            return $productUrl;
+        }
+
+        parse_str($ref['query'] ?? '', $refQuery);
+        if ($refQuery === []) {
+            return $productUrl;
+        }
+
+        parse_str($product['query'] ?? '', $productQuery);
+        // Referral params first so product-specific keys overwrite them.
+        $merged = $refQuery;
+        foreach ($productQuery as $key => $value) {
+            $merged[$key] = $value;
+        }
+
+        $product['query'] = http_build_query($merged);
+
+        return $this->rebuildUrl($product);
+    }
+
+    protected function normalizeHost(string $host): string
+    {
+        $host = strtolower($host);
+
+        return str_starts_with($host, 'www.') ? substr($host, 4) : $host;
+    }
+
+    /**
+     * Rebuild a parse_url() array. Query is omitted when empty so a URL
+     * that had no query string is not given a trailing '?'.
+     */
+    protected function rebuildUrl(array $parts): string
+    {
+        $url = ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? '')
+            . (isset($parts['port']) ? ':' . $parts['port'] : '')
+            . ($parts['path'] ?? '');
+
+        if (isset($parts['query']) && $parts['query'] !== '') {
+            $url .= '?' . $parts['query'];
+        }
+
+        if (isset($parts['fragment'])) {
+            $url .= '#' . $parts['fragment'];
+        }
+
+        return $url;
     }
 
     /**
