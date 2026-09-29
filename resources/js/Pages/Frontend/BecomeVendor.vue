@@ -632,6 +632,33 @@
                 ></textarea>
               </div>
 
+              <!-- Manufacturing + Independent Testing — Colin PMAP
+                   Sep 30 (#7). Free-text sections that display on
+                   the storefront. Distinct from the verified cGMP
+                   and 7+ Tested badges (those need document review). -->
+              <div>
+                <label for="manufacturing_notes" class="block text-sm text-slate-700 mb-2">Manufacturing <span class="text-xs text-slate-500 font-normal">— where + how your peptides are produced</span></label>
+                <textarea
+                  id="manufacturing_notes"
+                  v-model="formData.manufacturingNotes"
+                  rows="4"
+                  maxlength="2000"
+                  placeholder="e.g. Manufactured in an ISO-certified US facility using pharmaceutical-grade precursors…"
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                ></textarea>
+              </div>
+              <div>
+                <label for="independent_testing_notes" class="block text-sm text-slate-700 mb-2">Independent Testing <span class="text-xs text-slate-500 font-normal">— which labs test each batch + where results are published</span></label>
+                <textarea
+                  id="independent_testing_notes"
+                  v-model="formData.independentTestingNotes"
+                  rows="4"
+                  maxlength="2000"
+                  placeholder="e.g. Every batch is tested for purity, sterility, and endotoxins at an ISO/IEC 17025 lab. COAs available on each product page."
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                ></textarea>
+              </div>
+
               <!-- Business Hours — structured per-day editor. Powers the
                    Open Now / Closed pill on the storefront. -->
               <BusinessHoursEditor v-model="formData.businessHoursJson" />
@@ -1290,6 +1317,8 @@ const formData = ref({
   paymentMethods: [],
   shippingInformation: '',
   returnPolicy: '',
+  manufacturingNotes: '',
+  independentTestingNotes: '',
   businessHours: '',
   uniqueSellingPoints: '',
   tagline: '',
@@ -1353,6 +1382,10 @@ const storefrontPreviewData = computed(() => {
     location: country?.name || null,
     shipping_info: formData.value.shippingInformation,
     return_policy: formData.value.returnPolicy,
+    manufacturing_notes: formData.value.manufacturingNotes,
+    independent_testing_notes: formData.value.independentTestingNotes,
+    manufacturing_notes: formData.value.manufacturingNotes,
+    independent_testing_notes: formData.value.independentTestingNotes,
     business_hours: formData.value.businessHours,
     business_hours_json: formData.value.businessHoursJson,
     usps: formData.value.usps,
@@ -1777,6 +1810,8 @@ const handleStep4Submit = () => {
     paymentMethods: formData.value.paymentMethods || [],
     shippingInformation: formData.value.shippingInformation || null,
     returnPolicy: formData.value.returnPolicy || null,
+    manufacturingNotes: formData.value.manufacturingNotes || null,
+    independentTestingNotes: formData.value.independentTestingNotes || null,
     businessHours: formData.value.businessHours || null,
     uniqueSellingPoints: formData.value.uniqueSellingPoints || null,
     tagline: formData.value.tagline || null,

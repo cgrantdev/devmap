@@ -98,6 +98,11 @@ class BecomeVendorController extends Controller
             'tagline' => 'nullable|string|max:160',
             'shippingInformation' => 'nullable|string|max:400',
             'returnPolicy' => 'nullable|string|max:400',
+            // Colin PMAP Sep 30 (#7): manufacturing + testing prose
+            // now collected in onboarding step 3 instead of only
+            // post-approval.
+            'manufacturingNotes' => 'nullable|string|max:2000',
+            'independentTestingNotes' => 'nullable|string|max:2000',
             'businessHours' => 'nullable|string|max:200',
             'businessHoursJson' => 'nullable|array',
             'usps' => 'nullable|array|max:12',
@@ -184,6 +189,8 @@ class BecomeVendorController extends Controller
                 'founded_year' => !empty($validated['yearEstablished']) ? (int)$validated['yearEstablished'] : null,
                 'shipping_info' => $validated['shippingInformation'] ?? null,
                 'return_policy' => $validated['returnPolicy'] ?? null,
+                'manufacturing_notes' => $validated['manufacturingNotes'] ?? null,
+                'independent_testing_notes' => $validated['independentTestingNotes'] ?? null,
                 'business_hours' => $validated['businessHours'] ?? null,
                 'business_hours_json' => $validated['businessHoursJson'] ?? null,
                 'usps' => $validated['usps'] ?? [],

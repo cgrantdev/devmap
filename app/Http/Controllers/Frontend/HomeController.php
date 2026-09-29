@@ -427,11 +427,23 @@ class HomeController extends Controller
         // Empty string = All locations. Applied to every brand + product query
         // below via when() so unfiltered visitors see the full catalog.
         $locationFilter = trim((string) $request->get('location', ''));
+        // Colin PMAP Sep 30 (#12): a vendor should appear under a
+        // country when either their HQ is there OR their ships_to
+        // list includes it. Certified-Pep is US-HQ but ships to
+        // Canada — the Canadian view used to hide them.
         $applyBrandLocation = fn ($q) => $locationFilter
-            ? $q->whereHas('vendorSetting.location', fn ($l) => $l->where('name', $locationFilter))
+            ? $q->where(function ($q) use ($locationFilter) {
+                $q->whereHas('vendorSetting.location', fn ($l) => $l->where('name', $locationFilter))
+                  ->orWhereHas('vendorSetting.shipsToLocations', fn ($l) => $l->where('name', $locationFilter));
+              })
             : $q;
         $applyProductLocation = fn ($q) => $locationFilter
-            ? $q->whereHas('brand.vendorSetting.location', fn ($l) => $l->where('name', $locationFilter))
+            ? $q->whereHas('brand', function ($b) use ($locationFilter) {
+                $b->where(function ($q) use ($locationFilter) {
+                    $q->whereHas('vendorSetting.location', fn ($l) => $l->where('name', $locationFilter))
+                      ->orWhereHas('vendorSetting.shipsToLocations', fn ($l) => $l->where('name', $locationFilter));
+                });
+              })
             : $q;
 
         // Headline stats for the hero trust row
