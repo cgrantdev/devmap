@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
+use App\Support\EncyclopediaFraming;
 use Database\Seeders\EncyclopediaFramingSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -201,5 +202,65 @@ class EncyclopediaFramingTest extends TestCase
             ->assertOk()
             ->assertSee('not a peptide', false)
             ->assertDontSee('Peptide Encyclopedia');
+    }
+
+    public function test_client_seo_fallback_does_not_invent_peptide_copy(): void
+    {
+        $vue = file_get_contents(resource_path('js/Pages/Frontend/EncyclopediaArticleDetail.vue'));
+        $this->assertIsString($vue);
+        $this->assertStringNotContainsString('framedAwayFromPeptide', $vue);
+        $this->assertStringNotContainsString('Comprehensive guide to', $vue);
+        $this->assertStringNotContainsString('this peptide', $vue);
+    }
+
+    public function test_protein_and_mixture_profiles_reject_peptide_identity(): void
+    {
+        $cases = [
+            'Cerebrolysin' => ['Cerebrolysin hydrolysate is sold as a research peptide.', 'not one peptide'],
+            'Alpha-Klotho LR' => ['Alpha-Klotho LR cas field is blank and vendors still call it a peptide.', 'not a peptide'],
+            'Cortexin' => ['Cortexin cas field is blank and the listing calls the fraction a peptide.', 'not one peptide'],
+        ];
+
+        foreach ($cases as $slug => [$overview, $marker]) {
+            $profile = EncyclopediaFraming::match($slug, $slug);
+            $this->assertNotNull($profile, $slug);
+            $this->assertTrue($profile->rejectsPeptideIdentity(), $slug);
+
+            $category = ProductCategory::create([
+                'name' => $slug,
+                'slug' => $slug,
+                'description' => $slug.' research peptide listing',
+                'is_active' => true,
+            ]);
+            EducationPost::create([
+                'title' => $slug,
+                'slug' => $slug,
+                'product_category_id' => $category->id,
+                'status' => 'published',
+                'show_in_encyclopedia' => true,
+                'overview' => $overview,
+                'seo_page_title' => 'What is '.$slug,
+                'seo_description' => 'Laboratory notes for '.$slug,
+            ]);
+        }
+
+        (new EncyclopediaFramingSeeder())->run();
+
+        foreach ($cases as $slug => [$overview, $marker]) {
+            $category = ProductCategory::where('slug', $slug)->first();
+            $profile = EncyclopediaFraming::match($slug, $slug);
+            $this->assertSame($profile->cardDescription(), $category->description, $slug);
+
+            $post = EducationPost::where('product_category_id', $category->id)->first();
+            $this->assertStringContainsString($marker, $post->overview, $slug);
+            $this->assertNotSame($overview, $post->overview, $slug);
+        }
+
+        (new EncyclopediaFramingSeeder())->run();
+
+        foreach ($cases as $slug => [$overview, $marker]) {
+            $post = EducationPost::where('slug', $slug)->first();
+            $this->assertStringContainsString($marker, $post->overview, $slug);
+        }
     }
 }

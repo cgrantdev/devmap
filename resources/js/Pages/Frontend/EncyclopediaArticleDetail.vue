@@ -1760,20 +1760,15 @@ function residueColor(letter) {
 
 // Computed values for reactive SEO updates
 const seoTitle = computed(() => {
-  // Use SEO title if provided, otherwise auto-generate
   if (props.seo?.title) {
     return props.seo.title
   }
   const siteName = page.props.site_name || 'Peptidemap'
   const articleTitle = props.name || props.categoryName || 'Article'
-  if (/slu-pp-332/i.test(articleTitle)) {
-    return 'What is SLU-PP-332? Small-Molecule ERR Agonist'
-  }
   return `What is ${articleTitle}? - Encyclopedia - ${siteName}`
 })
 
 const seoDescription = computed(() => {
-  // Use SEO description if provided, otherwise generate from overview
   if (props.seo?.description) {
     return props.seo.description
   }
@@ -1781,19 +1776,9 @@ const seoDescription = computed(() => {
     const desc = props.overview.replace(/\s+/g, ' ').trim()
     return desc.length > 160 ? desc.substring(0, 160) + '...' : desc
   }
-  const compoundName = props.name || props.categoryName || ''
-  if (/slu-pp-332/i.test(compoundName)) {
-    return 'SLU-PP-332 is a synthetic small-molecule pan-agonist of the estrogen-related receptors, studied in preclinical models as an exercise mimetic. Research use only.'
-  }
-  if (framedAwayFromPeptide(compoundName)) {
-    return `${compoundName} is not framed as a peptide on this page.`
-  }
-  return `Comprehensive guide to ${compoundName || 'this peptide'} peptides.`
+  const compoundName = props.name || props.categoryName || 'this compound'
+  return `Encyclopedia entry for ${compoundName}.`
 })
-
-function framedAwayFromPeptide(name) {
-  return /slu-pp-332|orforglipron|bacteriostatic|methylene|nmn|acetic|ibutamoren|mk-677|hgh|ace-031|tesofensine|carnitine|vitamin b12|phosphate|bam-?15|sterile water|9-me-bc|bromantane|salidroside|spermidine/i.test(String(name || ''))
-}
 
 const url = computed(() => {
   return props.seo?.url || page.url

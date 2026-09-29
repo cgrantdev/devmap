@@ -337,7 +337,7 @@ class CatalogFraming
                 'The preparation is a hydrolysate. Biological papers discuss that mixture, not a single synthetic sequence.',
                 [['question' => 'Is Cerebrolysin one peptide?', 'answer' => 'No. Cerebrolysin is a protein hydrolysate, a mixture. It is not one peptide.']],
                 ['hydrolysate'],
-                false,
+                true,
             ),
             self::peptide(
                 ['adalank'],
@@ -650,7 +650,7 @@ class CatalogFraming
                 'Alpha-Klotho is a protein. It is not a short synthetic peptide.',
                 [['question' => 'Is Alpha-Klotho LR a short peptide?', 'answer' => 'No. Alpha-Klotho is a protein. The CAS field is blank, and LR is not expanded into a structure on this page.']],
                 ['cas field is blank'],
-                false,
+                true,
             ),
             self::peptide(
                 ['n-acetyl larazotide', 'n-acetyl-larazotide', 'n acetyl larazotide'],
@@ -692,7 +692,7 @@ class CatalogFraming
                 'The material is a polypeptide fraction. It does not have one mechanism tied to one sequence on this page.',
                 [['question' => 'What is the CAS number for Cortexin?', 'answer' => 'The CAS field is blank. Cortexin is a polypeptide mixture, not one peptide with one registry number.']],
                 ['cas field is blank'],
-                false,
+                true,
             ),
             self::peptide(
                 ['hmg', 'human menopausal gonadotropin', 'menotropins'],
