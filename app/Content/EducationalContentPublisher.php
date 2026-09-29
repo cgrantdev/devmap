@@ -5,10 +5,17 @@ namespace App\Content;
 use App\Models\Blog;
 use App\Models\EducationalGuide;
 use App\Support\SimpleMarkdown;
+use Illuminate\Support\Facades\Schema;
+use RuntimeException;
 
 /**
  * Publishes the educational blog post, two guides, and the corrected
  * FDA reclassification note into the existing Blog and EducationalGuide tables.
+ *
+ * Listing cards read blogs.image and educational_guides.cover. Cover artwork
+ * ships in resources/content/educational/images and is copied to
+ * public/images/educational on sync. An existing blog image (the live FDA
+ * Unsplash cover) is left in place.
  */
 class EducationalContentPublisher
 {
@@ -72,6 +79,11 @@ class EducationalContentPublisher
     private static function upsertBlog(array $page, string $html): void
     {
         $existing = Blog::where('slug', $page['slug'])->first();
+        $coverPath = self::publishCover($page['image_file'] ?? null);
+        $keepExistingImage = $existing
+            && filled($existing->image)
+            && ! ListingImageGuard::isGenericPlaceholder((string) $existing->image);
+
         $payload = [
             'title' => $page['h1'],
             'slug' => $page['slug'],
@@ -90,48 +102,109 @@ class EducationalContentPublisher
             'seo_description' => $page['seo_description'],
             'seo_og_title' => $page['og_title'],
             'seo_og_description' => $page['og_description'],
-            'seo_og_image' => self::CANONICAL_HOST.'/images/og-default-v7.png',
+            'seo_og_image' => self::ogImageFor($keepExistingImage ? $existing->image : $coverPath),
             'seo_schema' => [$page['faq']],
         ];
 
-        if ($existing) {
-            $existing->fill($payload)->save();
-
-            return;
+        if (! $keepExistingImage && $coverPath) {
+            $payload['image'] = $coverPath;
         }
 
-        $payload['author_name'] = $page['author_name'] ?? 'Peptidemap';
-        $payload['author_job'] = $page['author_job'] ?? null;
-        $payload['published_at'] = $page['published_at'];
-        $payload['is_featured'] = $page['is_featured'] ?? false;
-        Blog::create($payload);
+        if ($existing) {
+            $existing->fill($payload)->save();
+            $blog = $existing->fresh();
+        } else {
+            $payload['author_name'] = $page['author_name'] ?? 'Peptidemap';
+            $payload['author_job'] = $page['author_job'] ?? null;
+            $payload['published_at'] = $page['published_at'];
+            $payload['is_featured'] = $page['is_featured'] ?? false;
+            $blog = Blog::create($payload);
+        }
+
+        ListingImageGuard::assertArticleSpecific('blog', $blog->slug, $blog->image);
     }
 
     private static function upsertGuide(array $page, string $html): void
     {
-        EducationalGuide::updateOrCreate(
+        $coverPath = self::publishCover($page['image_file'] ?? null);
+        $attributes = [
+            'title' => $page['h1'],
+            'slug' => $page['slug'],
+            'guide_type' => 'Literacy',
+            'tag' => $page['tag'],
+            'reading_time' => $page['read_time'],
+            'description' => $page['lede'],
+            'outline' => null,
+            'introduction' => null,
+            'content' => $html,
+            'status' => 'published',
+            'published_at' => $page['published_at'],
+            'is_featured' => false,
+            'seo_page_title' => $page['seo_title'],
+            'seo_description' => $page['seo_description'],
+            'seo_og_title' => $page['og_title'],
+            'seo_og_description' => $page['og_description'],
+            'seo_og_image' => $coverPath
+                ? self::CANONICAL_HOST.$coverPath
+                : self::CANONICAL_HOST.'/images/og-default-v7.png',
+            'seo_schema' => [$page['faq']],
+        ];
+
+        if ($coverPath && Schema::hasColumn('educational_guides', 'cover')) {
+            $attributes['cover'] = $coverPath;
+        }
+
+        $guide = EducationalGuide::updateOrCreate(
             ['slug' => $page['slug']],
-            [
-                'title' => $page['h1'],
-                'slug' => $page['slug'],
-                'guide_type' => 'Literacy',
-                'tag' => $page['tag'],
-                'reading_time' => $page['read_time'],
-                'description' => $page['lede'],
-                'outline' => null,
-                'introduction' => null,
-                'content' => $html,
-                'status' => 'published',
-                'published_at' => $page['published_at'],
-                'is_featured' => false,
-                'seo_page_title' => $page['seo_title'],
-                'seo_description' => $page['seo_description'],
-                'seo_og_title' => $page['og_title'],
-                'seo_og_description' => $page['og_description'],
-                'seo_og_image' => self::CANONICAL_HOST.'/images/og-default-v7.png',
-                'seo_schema' => [$page['faq']],
-            ]
+            $attributes
         );
+
+        if (Schema::hasColumn('educational_guides', 'cover')) {
+            ListingImageGuard::assertArticleSpecific('guide', $guide->slug, $guide->cover);
+        }
+    }
+
+    /**
+     * Copy a cover from the content directory into the public images path.
+     * Returns the root-relative URL stored on the listing record.
+     */
+    private static function publishCover(?string $filename): ?string
+    {
+        if ($filename === null || trim($filename) === '') {
+            return null;
+        }
+
+        $filename = basename($filename);
+        $source = resource_path('content/educational/images/'.$filename);
+        if (! is_file($source)) {
+            throw new RuntimeException(
+                "Educational cover asset missing: resources/content/educational/images/{$filename}"
+            );
+        }
+
+        $destDir = public_path('images/educational');
+        if (! is_dir($destDir) && ! mkdir($destDir, 0755, true) && ! is_dir($destDir)) {
+            throw new RuntimeException("Unable to create {$destDir}");
+        }
+
+        if (! copy($source, $destDir.'/'.$filename)) {
+            throw new RuntimeException("Unable to publish cover asset {$filename}");
+        }
+
+        return '/images/educational/'.$filename;
+    }
+
+    private static function ogImageFor(?string $image): string
+    {
+        if ($image && (str_starts_with($image, 'http://') || str_starts_with($image, 'https://'))) {
+            return $image;
+        }
+
+        if ($image && str_starts_with($image, '/images/educational/')) {
+            return self::CANONICAL_HOST.$image;
+        }
+
+        return self::CANONICAL_HOST.'/images/og-default-v7.png';
     }
 
     private static function faq(string $id, array $pairs): array
@@ -164,6 +237,7 @@ class EducationalContentPublisher
             [
                 'kind' => 'blog',
                 'file' => 'bpc-157-vs-tb-500-evidence.md',
+                'image_file' => 'bpc-157-vs-tb-500-evidence.png',
                 'slug' => 'bpc-157-vs-tb-500-evidence',
                 'h1' => 'BPC-157 vs TB-500: What the Evidence Actually Shows',
                 'lede' => 'BPC-157 and TB-500 are frequently discussed together online—often as a “healing stack”—but they are chemically unrelated molecules with separate research histories. Most of what is known about either compound comes from animal and cell studies, not from large, controlled human trials of injectable musculoskeletal use. This page compares what each peptide is, how researchers think they work, where the evidence stops, why stacking claims outrun the data, and how FDA and anti-doping rules currently treat them. It is educational only and is not medical advice.',
@@ -195,6 +269,7 @@ class EducationalContentPublisher
             [
                 'kind' => 'blog',
                 'file' => 'fda-peptide-reclassification-2026.md',
+                'image_file' => 'fda-peptide-reclassification-2026.png',
                 'slug' => 'fda-peptide-reclassification-2026-what-researchers-need-to-know',
                 'h1' => 'FDA Peptide Reclassification 2026: What Researchers Need to Know',
                 'lede' => 'Early 2026 coverage treated peptide Category 2 changes as if they were Category 1 status and as if pharmacies could compound the named peptides again. This correction separates those ideas. Leaving Category 2 is not Category 1, not the 503A Bulks List, and not compounding permission. Updated 2026-09-30.',
@@ -226,6 +301,7 @@ class EducationalContentPublisher
             [
                 'kind' => 'guide',
                 'file' => 'beginners-guide-to-research-peptides.md',
+                'image_file' => 'beginners-guide-to-research-peptides.png',
                 'slug' => 'beginners-guide-to-research-peptides',
                 'h1' => 'Beginner’s Guide to Research Peptides',
                 'lede' => '“Research peptides” is a marketplace phrase as much as a scientific one. Beginners often meet it as vials, certificates, and vendor claims before they know what a peptide is, how an RUO label differs from an approved drug, or how to tell a useful Certificate of Analysis (COA) from a decorative PDF. This guide covers those foundations. It is educational only—not medical advice, not a price guide, and not instructions for human use.',
@@ -248,6 +324,7 @@ class EducationalContentPublisher
             [
                 'kind' => 'guide',
                 'file' => 'peptide-legality-fda-ruo-compounding.md',
+                'image_file' => 'peptide-legality-fda-ruo-compounding.png',
                 'slug' => 'peptide-legality-fda-ruo-compounding',
                 'h1' => 'Are Research Peptides Legal? FDA, RUO & Compounding Explained',
                 'lede' => '“Is this peptide legal?” is usually the wrong shape of question. Under U.S. federal food-and-drug law, the better questions are: Is it an FDA-approved drug product? May a compounding pharmacy prepare it under section 503A or 503B? Is an online seller marketing it as a drug despite a research disclaimer? Do sport or workplace rules separately prohibit it? This guide is educational, not legal advice. Peptidemap is a vendor-comparison platform, not a pharmacy and not a law firm.',

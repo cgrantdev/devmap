@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Models\SeoPage;
@@ -105,7 +106,7 @@ class HomeController extends Controller
                     'title' => $blog->title,
                     'slug' => $blog->slug,
                     'description' => $blog->description,
-                    'image' => $blog->image ? (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/' . $blog->image)) : null,
+                    'image' => ImageHelper::listingImageUrl($blog->image),
                     'date' => $blog->published_at ? $blog->published_at->format('M d, Y') : null,
                     'readTime' => $blog->read_time ?? '5 min read',
                 ];
@@ -124,7 +125,7 @@ class HomeController extends Controller
                     'title' => $blog->title,
                     'slug' => $blog->slug,
                     'description' => $blog->description,
-                    'image' => $blog->image ? (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/' . $blog->image)) : null,
+                    'image' => ImageHelper::listingImageUrl($blog->image),
                     'date' => $blog->published_at ? $blog->published_at->format('M d, Y') : null,
                 ];
             });

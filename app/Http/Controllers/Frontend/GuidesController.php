@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\EducationalGuide;
 use App\Models\Setting;
@@ -26,6 +27,7 @@ class GuidesController extends Controller
                 'readingTime' => $guide->reading_time,
                 'tag' => $guide->tag ?: $guide->guide_type,
                 'date' => $guide->published_at?->format('F j, Y'),
+                'cover' => ImageHelper::listingImageUrl($guide->cover),
             ]);
 
         $seo = $this->seo(

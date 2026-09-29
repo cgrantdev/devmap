@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Content\ListingImageGuard;
 use App\Models\Blog;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -201,6 +202,8 @@ class BlogSeeder extends Seeder
         ];
 
         foreach ($blogs as $blogData) {
+            ListingImageGuard::assertPresent('blog', Str::slug($blogData['title']), $blogData['image'] ?? null);
+
             $blog = new Blog();
             $blog->title = $blogData['title'];
             $blog->slug = Str::slug($blogData['title']);

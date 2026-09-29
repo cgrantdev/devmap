@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use App\Helpers\ImageHelper;
@@ -25,7 +24,7 @@ class BlogManagementController extends Controller
                     'blog_type' => $blog->blog_type,
                     'author_name' => $blog->author_name,
                     'description' => $blog->description,
-                    'image' => $blog->image ? (Storage::disk('public')->exists('blogs/' . $blog->image) ? asset('storage/blogs/' . $blog->image) : '/images/blogs/' . $blog->image) : null,
+                    'image' => ImageHelper::listingImageUrl($blog->image),
                     'read_time' => $blog->read_time,
                     'published_at' => $blog->published_at ? $blog->published_at->format('M j, Y') : null,
                     'is_featured' => $blog->is_featured,
@@ -118,7 +117,7 @@ class BlogManagementController extends Controller
                 'conclusion' => $blog->conclusion,
                 'tags' => $blog->tags ?? [],
                 'content' => $blog->content,
-                'image' => $blog->image ? (Storage::disk('public')->exists('blogs/' . $blog->image) ? asset('storage/blogs/' . $blog->image) : '/images/blogs/' . $blog->image) : null,
+                'image' => ImageHelper::listingImageUrl($blog->image),
                 'read_time' => $blog->read_time,
                 'published_at' => $blog->published_at ? $blog->published_at->format('Y-m-d') : null,
                 'is_featured' => $blog->is_featured,

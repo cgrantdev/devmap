@@ -51,73 +51,36 @@
     <!-- Articles -->
     <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pb-16 lg:pb-20">
 
-      <!-- Featured -->
-      <div v-if="filteredFeaturedBlogs.length" class="mb-12">
-        <h2 class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">Featured</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          <a
-            v-for="blog in filteredFeaturedBlogs"
-            :key="blog.id"
-            :href="`/blog/${blog.slug}`"
-            class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
-          >
-            <div class="aspect-[16/9] bg-[#0F172A] border-b border-[color:var(--color-hairline)] overflow-hidden relative">
-              <img v-if="blog.image" :src="blog.image" :alt="blog.title" class="w-full h-full object-cover opacity-80 group-hover:opacity-90 group-hover:scale-[1.03] transition-all duration-500" loading="lazy" />
-              <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/40 via-transparent to-[#4F46E5]/20 pointer-events-none" />
-              <div v-if="blog.categoryTag" class="absolute top-3 left-3 px-2 py-0.5 bg-white/90 backdrop-blur-sm text-[10px] font-semibold text-[color:var(--color-accent-700)] uppercase tracking-wide">{{ blog.categoryTag }}</div>
-              <div v-if="!blog.image" class="absolute inset-0 flex items-center justify-center text-white/30">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
+      <div v-if="articles.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <a
+          v-for="blog in articles"
+          :key="blog.id"
+          :href="`/blog/${blog.slug}`"
+          class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
+        >
+          <div class="aspect-[16/9] bg-[#0F172A] border-b border-[color:var(--color-hairline)] overflow-hidden relative">
+            <img v-if="blog.image" :src="blog.image" :alt="blog.title" class="w-full h-full object-cover opacity-80 group-hover:opacity-90 group-hover:scale-[1.03] transition-all duration-500" loading="lazy" />
+            <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/40 via-transparent to-[#4F46E5]/20 pointer-events-none" />
+            <div v-if="blog.categoryTag" class="absolute top-3 left-3 px-2 py-0.5 bg-white/90 backdrop-blur-sm text-[10px] font-semibold text-[color:var(--color-accent-700)] uppercase tracking-wide">{{ blog.categoryTag }}</div>
+            <div v-if="!blog.image" class="absolute inset-0 flex items-center justify-center text-white/30">
+              <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
-            <div class="p-4 lg:p-5 flex-1 flex flex-col gap-2">
-              <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ blog.date }}</span>
-              <h3 class="ui-display text-[16px] font-semibold tracking-tight text-[color:var(--color-ink)] leading-snug group-hover:text-[color:var(--color-accent-600)] transition-colors">
-                {{ blog.title }}
-              </h3>
-              <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed line-clamp-2">{{ blog.description }}</p>
-              <div class="mt-auto pt-3 flex items-center gap-2 text-[12px] text-[color:var(--color-ink-subtle)]">
-                <span v-if="blog.author">{{ blog.author }}</span>
-                <span v-if="blog.readTime">· {{ blog.readTime }}</span>
-              </div>
+          </div>
+          <div class="p-4 lg:p-5 flex-1 flex flex-col gap-2">
+            <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ blog.date }}</span>
+            <h2 class="ui-display text-[16px] font-semibold tracking-tight text-[color:var(--color-ink)] leading-snug group-hover:text-[color:var(--color-accent-600)] transition-colors">
+              {{ blog.title }}
+            </h2>
+            <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed line-clamp-2">{{ blog.description }}</p>
+            <div class="mt-auto pt-3 flex items-center gap-2 text-[12px] text-[color:var(--color-ink-subtle)]">
+              <span v-if="blog.author">{{ blog.author }}</span>
+              <span v-if="blog.readTime">· {{ blog.readTime }}</span>
             </div>
-          </a>
-        </div>
+          </div>
+        </a>
       </div>
 
-      <!-- Latest -->
-      <div v-if="filteredLatestBlogs.length">
-        <h2 v-if="filteredFeaturedBlogs.length" class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">Latest</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          <a
-            v-for="blog in filteredLatestBlogs"
-            :key="blog.id"
-            :href="`/blog/${blog.slug}`"
-            class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
-          >
-            <div class="aspect-[16/9] bg-[#0F172A] border-b border-[color:var(--color-hairline)] overflow-hidden relative">
-              <img v-if="blog.image" :src="blog.image" :alt="blog.title" class="w-full h-full object-cover opacity-80 group-hover:opacity-90 group-hover:scale-[1.03] transition-all duration-500" loading="lazy" />
-              <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/40 via-transparent to-[#4F46E5]/20 pointer-events-none" />
-              <div v-if="blog.categoryTag" class="absolute top-3 left-3 px-2 py-0.5 bg-white/90 backdrop-blur-sm text-[10px] font-semibold text-[color:var(--color-accent-700)] uppercase tracking-wide">{{ blog.categoryTag }}</div>
-              <div v-if="!blog.image" class="absolute inset-0 flex items-center justify-center text-white/30">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </div>
-            </div>
-            <div class="p-4 lg:p-5 flex-1 flex flex-col gap-2">
-              <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ blog.date }}</span>
-              <h3 class="ui-display text-[16px] font-semibold tracking-tight text-[color:var(--color-ink)] leading-snug group-hover:text-[color:var(--color-accent-600)] transition-colors">
-                {{ blog.title }}
-              </h3>
-              <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed line-clamp-2">{{ blog.description }}</p>
-              <div class="mt-auto pt-3 flex items-center gap-2 text-[12px] text-[color:var(--color-ink-subtle)]">
-                <span v-if="blog.author">{{ blog.author }}</span>
-                <span v-if="blog.readTime">· {{ blog.readTime }}</span>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <div v-if="!filteredFeaturedBlogs.length && !filteredLatestBlogs.length" class="py-20 text-center">
+      <div v-if="!articles.length" class="py-20 text-center">
         <p class="text-[color:var(--color-ink-subtle)]">No articles found. Try a different search or filter.</p>
       </div>
     </div>
@@ -130,7 +93,6 @@ import { Head, router } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
 const props = defineProps({
-  featuredBlogs: { type: Array, default: () => [] },
   latestBlogs: { type: Array, default: () => [] },
   // Keep these props so the controller doesn't break, but we don't render them
   researchPapers: { type: Array, default: () => [] },
@@ -166,13 +128,7 @@ const currentBlogType = computed(() => {
   return filterToBlogType[currentFilter.value] || null
 })
 
-const filteredFeaturedBlogs = computed(() => {
-  let result = props.featuredBlogs || []
-  if (currentBlogType.value) result = result.filter(b => b.blogType === currentBlogType.value)
-  return result
-})
-
-const filteredLatestBlogs = computed(() => {
+const articles = computed(() => {
   let result = props.latestBlogs || []
   if (currentBlogType.value) result = result.filter(b => b.blogType === currentBlogType.value)
   return result

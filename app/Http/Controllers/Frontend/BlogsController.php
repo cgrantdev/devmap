@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Setting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
@@ -44,34 +44,18 @@ class BlogsController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 20);
-        $page = $request->get('page', 1);
 
-        // Get featured blog
-        $featured = Blog::where('status', 'published')
-            ->where('is_featured', true)
+        $blogs = Blog::where('status', 'published')
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
             ->orderBy('published_at', 'desc')
-            ->first();
-
-        // Get all blogs (excluding featured if it exists)
-        $query = Blog::where('status', 'published')
-            ->whereNotNull('published_at')
-            ->where('published_at', '<=', now())
-            ->orderBy('published_at', 'desc');
-
-        if ($featured) {
-            $query->where('id', '!=', $featured->id);
-        }
-
-        $blogs = $query->paginate($perPage)->withQueryString();
+            ->orderBy('id', 'desc')
+            ->paginate($perPage)
+            ->withQueryString();
 
         // Format blogs for frontend
         $formattedBlogs = $blogs->map(function ($blog) {
-            $imageUrl = null;
-            if ($blog->image) {
-                $imageUrl = (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/'.$blog->image));
-            }
+            $imageUrl = ImageHelper::listingImageUrl($blog->image);
 
             return [
                 'id' => $blog->id,
@@ -85,33 +69,16 @@ class BlogsController extends Controller
             ];
         });
 
-        $formattedFeatured = null;
-        if ($featured) {
-            $featuredImage = $featured->image ? (str_starts_with($featured->image, 'http') ? $featured->image : Storage::url('blogs/'.$featured->image)) : null;
-            $formattedFeatured = [
-                'id' => $featured->id,
-                'title' => $featured->title,
-                'slug' => $featured->slug,
-                'description' => $featured->description,
-                'outline' => $featured->outline,
-                'image' => $featuredImage,
-                'readTime' => $featured->read_time ?? '19 Min Read',
-                'date' => $featured->published_at ? $featured->published_at->format('d M Y') : null,
-            ];
-        }
-
-        // Generate SEO data
-        $featuredImage = $formattedFeatured ? $formattedFeatured['image'] : null;
+        $newest = $formattedBlogs->first();
         $seoData = new SEOData(
             title: 'Peptide Research News & Guides — Peptidemap',
             description: 'Stay updated with the latest peptide research, industry news, guides, and educational content. Expert insights and comprehensive information for researchers.',
-            image: $featuredImage,
+            image: is_array($newest) ? ($newest['image'] ?? null) : null,
             url: url('/blogs'),
         );
         session(['page_seo_data' => $seoData]);
 
         return Inertia::render('Frontend/BlogListing', [
-            'featured' => $formattedFeatured,
             'blogs' => [
                 'data' => $formattedBlogs,
                 'current_page' => $blogs->currentPage(),
@@ -146,13 +113,13 @@ class BlogsController extends Controller
                     'title' => $b->title,
                     'slug' => $b->slug,
                     'description' => $b->description,
-                    'image' => $b->image ? (str_starts_with($b->image, 'http') ? $b->image : Storage::url('blogs/'.$b->image)) : null,
+                    'image' => ImageHelper::listingImageUrl($b->image),
                     'readTime' => $b->read_time,
                     'date' => $b->published_at ? $b->published_at->format('M j, Y') : null,
                 ];
             });
 
-        $imageUrl = $blog->image ? (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/'.$blog->image)) : null;
+        $imageUrl = ImageHelper::listingImageUrl($blog->image);
 
         // Use blog_type for category tag, fallback to computed tag if not set
         $combinedContent = $blog->introduction.' '.$blog->detailed_analysis.' '.$blog->conclusion;

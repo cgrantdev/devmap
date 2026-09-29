@@ -17,6 +17,7 @@ class EducationalGuide extends Model
         'tag',
         'reading_time',
         'description',
+        'cover',
         'outline',
         'introduction',
         'overview_benefits',
