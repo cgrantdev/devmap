@@ -34,11 +34,37 @@
             <option value="popular|desc">Most Popular</option>
           </select>
 
+          <!-- Product Format filter — Colin PMAP Sep 30 (#13). Same
+               multi-select chip pattern as size. Peptide is the
+               implicit default so null product_type rows count under
+               it (see the backend). -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] pr-0.5">Format</span>
+            <button
+              v-for="fmt in FORMAT_OPTIONS"
+              :key="fmt"
+              type="button"
+              @click="toggleFormat(fmt)"
+              :class="[
+                'h-7 px-2.5 text-[12px] rounded-full border transition-colors',
+                selectedFormats.has(fmt)
+                  ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
+                  : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)]',
+              ]"
+            >
+              {{ fmt }}
+            </button>
+            <button
+              v-if="selectedFormats.size > 0"
+              type="button"
+              @click="clearFormats"
+              class="text-[11px] text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)] underline ml-1"
+            >clear</button>
+          </div>
+
           <!-- Dosage size filter — multi-select chips (Colin PMAP
-               Sep 22). Blend presets always visible so vendors are
-               nudged toward the same size vocabulary; any additional
-               sizes actually in the DB for this compound get appended.
-               Toggle multiple to filter for any-of. -->
+               Sep 22). Data-driven: only sizes actually present in
+               this compound's product set show. -->
           <div class="flex flex-wrap items-center gap-1.5">
             <span class="text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] pr-0.5">Size</span>
             <button
@@ -269,6 +295,23 @@ function clearSizes() {
   applyFilters()
 }
 
+// Product Format filter — Colin PMAP Sep 30 (#13).
+const FORMAT_OPTIONS = ['Peptide', 'Capsule', 'Nasal Spray', 'Topical', 'Kit']
+const initialFormats = (new URLSearchParams(window.location.search).get('format') || '')
+  .split(',').map(s => s.trim()).filter(Boolean)
+const selectedFormats = ref(new Set(initialFormats))
+function toggleFormat(fmt) {
+  const set = selectedFormats.value
+  if (set.has(fmt)) set.delete(fmt)
+  else set.add(fmt)
+  selectedFormats.value = new Set(set)
+  applyFilters()
+}
+function clearFormats() {
+  selectedFormats.value = new Set()
+  applyFilters()
+}
+
 const handleSortChange = (event) => {
   const value = event?.target?.value || 'price|asc'
   const [sort, dir] = value.split('|')
@@ -379,6 +422,7 @@ const applyFilters = () => {
 
   if (searchQuery.value) params.set('search', searchQuery.value)
   if (selectedSizes.value.size > 0) params.set('size', [...selectedSizes.value].join(','))
+  if (selectedFormats.value.size > 0) params.set('format', [...selectedFormats.value].join(','))
   if (selectedBrand.value) params.set('brand', selectedBrand.value)
   if (props.sort) params.set('sort', props.sort)
   if (props.sortDir) params.set('sort_dir', props.sortDir)
@@ -412,6 +456,8 @@ const applySort = (sort, dir) => {
   if (searchQuery.value) params.set('search', searchQuery.value)
   if (selectedSizes.value.size > 0) params.set('size', [...selectedSizes.value].join(','))
   else params.delete('size')
+  if (selectedFormats.value.size > 0) params.set('format', [...selectedFormats.value].join(','))
+  else params.delete('format')
   if (selectedBrand.value) params.set('brand', selectedBrand.value)
   else params.delete('brand')
   params.set('sort', sort)

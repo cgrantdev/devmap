@@ -88,10 +88,39 @@ class DashboardController extends Controller
             })
             ->values();
 
+        // Stackable promos live now — Colin PMAP Sep 30 (#4). Same
+        // widget as coupon boosts, so Julia sees both in one place.
+        $activePromotions = \App\Models\VendorPromotion::with('brand:id,name,slug', 'category:id,name')
+            ->where('is_active', true)
+            ->where(function ($q) use ($now) {
+                $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+            })
+            ->where(function ($q) use ($now) {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>', $now);
+            })
+            ->orderBy('ends_at')
+            ->get()
+            ->map(fn ($p) => [
+                'id' => $p->id,
+                'brand_id' => $p->brand_id,
+                'brand_name' => $p->brand?->name,
+                'brand_slug' => $p->brand?->slug,
+                'promo_type' => $p->promo_type,
+                'title' => $p->title,
+                'percent' => $p->percent !== null ? (float) $p->percent : null,
+                'code' => $p->code,
+                'category_name' => $p->category?->name,
+                'starts_at' => $p->starts_at?->toIso8601String(),
+                'ends_at' => $p->ends_at?->toIso8601String(),
+                'stacks_with_affiliate' => (bool) $p->stacks_with_affiliate,
+            ])
+            ->values();
+
         return Inertia::render('Admin/Dashboard', [
             'stats' => $stats,
             'recentActivity' => $recentActivity,
             'activeBoosts' => $activeBoosts,
+            'activePromotions' => $activePromotions,
         ]);
     }
 } 

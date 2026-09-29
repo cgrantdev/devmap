@@ -10,7 +10,10 @@ export const USP_OPTIONS = [
   { key: 'same_day_shipping', icon: '⚡', label: 'Same-day shipping' },
   { key: 'international',     icon: '🌍', label: 'Ships internationally' },
   { key: 'temp_controlled',   icon: '🥶', label: 'Temperature-controlled ship' },
-  { key: 'us_manufactured',   icon: '🇺🇸', label: 'US-manufactured' },
+  // Colin PMAP Sep 30 (#5): 🇺🇸 rendered as literal "us" on Windows
+  // Chrome / other systems without a color-emoji font. Marker sentinel
+  // gets special-cased in the display components (inline SVG flag).
+  { key: 'us_manufactured',   icon: '__US_FLAG__', label: 'US-manufactured' },
   { key: 'money_back',        icon: '💰', label: 'Money-back guarantee' },
   { key: 'bulk_discounts',    icon: '📦', label: 'Bulk discounts' },
   { key: 'subscription',      icon: '🔁', label: 'Subscription plans' },

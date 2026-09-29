@@ -25,7 +25,12 @@
             : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
         ]"
       >
-        <span class="text-[16px] leading-none flex-shrink-0">{{ opt.icon }}</span>
+        <svg v-if="opt.icon === '__US_FLAG__'" class="w-4 h-3 rounded-[1px] flex-shrink-0" viewBox="0 0 21 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="21" height="15" fill="#b22234"/>
+          <path stroke="#fff" stroke-width="1.15" d="M0 2.3h21M0 4.6h21M0 6.9h21M0 9.2h21M0 11.5h21M0 13.8h21"/>
+          <rect width="9" height="8" fill="#3c3b6e"/>
+        </svg>
+        <span v-else class="text-[16px] leading-none flex-shrink-0">{{ opt.icon }}</span>
         <span class="text-[12px] font-medium leading-tight">{{ opt.label }}</span>
       </button>
     </div>

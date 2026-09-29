@@ -724,6 +724,27 @@ class ProductsController extends Controller
             }
         }
 
+        // Product Format filter — Colin PMAP Sep 30 (#13). URL carries
+        // ?format=Peptide,Capsule,Nasal%20Spray,Topical,Kit as a
+        // comma-separated whitelist. NULL product_type reads as
+        // "Peptide" (the implicit default), so include NULL rows when
+        // "Peptide" is in the selection.
+        if ($request->filled('format')) {
+            $formats = collect(explode(',', $request->format))
+                ->map(fn ($f) => trim($f))
+                ->filter(fn ($f) => in_array($f, ['Peptide', 'Capsule', 'Nasal Spray', 'Topical', 'Kit'], true))
+                ->unique()
+                ->values();
+            if ($formats->isNotEmpty()) {
+                $query->where(function ($q) use ($formats) {
+                    $q->whereIn('product_type', $formats->all());
+                    if ($formats->contains('Peptide')) {
+                        $q->orWhereNull('product_type');
+                    }
+                });
+            }
+        }
+
         if ($request->has('cost_min') && $request->cost_min) {
             $query->where('price', '>=', $request->cost_min);
         }

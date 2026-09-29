@@ -17,7 +17,8 @@
     <!-- Live + scheduled coupon boosts. Colin Sep 14 — Julia's PMAP
          feedback: "add a visual … showing any 'active' promotions
          with start and end dates / times". One place to see what's
-         running platform-wide without touching every vendor edit page. -->
+         running platform-wide without touching every vendor edit page.
+         Stackable promotions render below in their own widget (Sep 30). -->
     <div v-if="activeBoosts && activeBoosts.length" class="bg-white border border-amber-200 p-6 mb-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="ui-display text-base font-semibold text-[color:var(--color-ink)]">Live promotions</h2>
@@ -48,6 +49,39 @@
               <span v-if="b.status === 'scheduled' && b.starts_at"> · starts {{ formatTs(b.starts_at) }}</span>
               <span> · ends {{ formatTs(b.expires_at) }}</span>
               <span v-if="b.reverts_to_percent != null"> · reverts to {{ b.reverts_to_percent }}%</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stackable promotions live now (Colin PMAP Sep 30 #4). Same
+         style as boosts, distinct indigo palette so Julia can tell
+         them apart at a glance. -->
+    <div v-if="activePromotions && activePromotions.length" class="bg-white border border-indigo-200 p-6 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="ui-display text-base font-semibold text-[color:var(--color-ink)]">Stackable promotions</h2>
+        <span class="text-[11px] uppercase tracking-[0.12em] font-semibold text-indigo-700">{{ activePromotions.length }} running</span>
+      </div>
+      <div class="space-y-0">
+        <div
+          v-for="p in activePromotions"
+          :key="p.id"
+          class="flex items-center gap-3 py-2.5 border-b border-[color:var(--color-hairline-soft)] last:border-0"
+        >
+          <span class="inline-flex items-center justify-center text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full flex-shrink-0 bg-indigo-600 text-white">
+            {{ formatPromoType(p.promo_type) }}
+          </span>
+          <div class="flex-1 min-w-0">
+            <Link :href="`/admin/vendors/${p.brand_id}/edit`" class="text-sm font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] truncate block">
+              {{ p.brand_name }} <span class="text-[color:var(--color-ink-muted)] font-normal">— {{ p.title }}</span>
+            </Link>
+            <p class="text-xs text-[color:var(--color-ink-subtle)] mt-0.5 ui-mono">
+              <span v-if="p.percent != null" class="font-semibold text-indigo-800">{{ p.percent }}%</span>
+              <span v-if="p.code"> · code <span class="uppercase">{{ p.code }}</span></span>
+              <span v-if="p.category_name"> · on {{ p.category_name }}</span>
+              <span v-if="p.ends_at"> · ends {{ formatTs(p.ends_at) }}</span>
+              <span v-if="p.stacks_with_affiliate" class="text-emerald-700"> · stacks w/ affiliate</span>
             </p>
           </div>
         </div>
@@ -122,8 +156,21 @@ const props = defineProps({
   activeBoosts: {
     type: Array,
     default: () => []
+  },
+  activePromotions: {
+    type: Array,
+    default: () => []
   }
 })
+
+function formatPromoType(t) {
+  return {
+    nocode_sitewide: 'Sitewide',
+    coupon_sitewide: 'Coupon',
+    bogo: 'BOGO',
+    category: 'Category',
+  }[t] || t
+}
 
 function formatTs(iso) {
   if (!iso) return ''

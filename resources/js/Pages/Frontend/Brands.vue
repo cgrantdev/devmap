@@ -179,13 +179,18 @@
             </span>
           </div>
 
-          <!-- Info -->
+          <!-- Info — Colin PMAP Sep 30 (#9): fixed heights so the
+               brand name row, location row, and stats row line up
+               across every card in the grid, regardless of whether
+               the card has ratings or verified badges. -->
           <div class="p-5 flex-1 flex flex-col gap-3">
             <div>
-              <h3 class="ui-display text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight">{{ brand.name }}</h3>
-              <div v-if="brand.location" class="flex items-center gap-1 mt-1 text-xs text-[color:var(--color-ink-muted)]">
-                <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
-                {{ brand.location }}
+              <h3 class="ui-display text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate">{{ brand.name }}</h3>
+              <div class="flex items-center gap-1 mt-1 text-xs text-[color:var(--color-ink-muted)] h-[16px]">
+                <template v-if="brand.location">
+                  <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span class="truncate">{{ brand.location }}</span>
+                </template>
               </div>
             </div>
 

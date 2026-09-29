@@ -196,7 +196,12 @@
               <h3 class="text-lg text-slate-900 mb-3">Why Choose {{ data.name || 'this vendor' }}?</h3>
               <div class="flex flex-wrap gap-1.5">
                 <div v-for="u in uspBadges" :key="u.key" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-100">
-                  <span class="text-[14px] leading-none">{{ u.icon }}</span>
+                  <svg v-if="u.icon === '__US_FLAG__'" class="w-4 h-3 rounded-[1px]" viewBox="0 0 21 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <rect width="21" height="15" fill="#b22234"/>
+                    <path stroke="#fff" stroke-width="1.15" d="M0 2.3h21M0 4.6h21M0 6.9h21M0 9.2h21M0 11.5h21M0 13.8h21"/>
+                    <rect width="9" height="8" fill="#3c3b6e"/>
+                  </svg>
+                  <span v-else class="text-[14px] leading-none">{{ u.icon }}</span>
                   <span class="text-[12px] font-medium text-indigo-900 leading-none">{{ u.label }}</span>
                 </div>
               </div>
