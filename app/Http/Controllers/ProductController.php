@@ -3,32 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class ProductController extends Controller
 {
+    /**
+     * Legacy id-first URL: /product/{id}/{slug}.
+     *
+     * The slug segment is ignored. Any string used to return 200 with a
+     * self-canonical, so /product/1089/not-the-real-slug was an indexable
+     * duplicate of the real product page. Send every variant to
+     * /product/{vendorSlug}/{productSlug}/{id}.
+     */
     public function show($id, $slug = null)
     {
-        $product = Product::with(['brand.vendorSetting'])->findOrFail($id);
-        $brand = $product->brand;
-        $banner_url = $brand && $brand->vendorSetting && $brand->vendorSetting->banner
-            ? asset('storage/' . $brand->vendorSetting->banner)
-            : null;
-        return Inertia::render('Product/Public', [
-            'product' => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => \Str::slug($product->name),
-                'price' => $product->price,
-                'image_url' => $product->image_url,
-                'description' => $product->description,
-                'product_url' => $product->product_url,
-            ],
-            'vendor' => [
-                'name' => $brand ? $brand->name : '-',
-                'banner_url' => $banner_url,
-            ]
-        ]);
+        $product = Product::with('brand')->findOrFail($id);
+        $brandSlug = $product->brand?->slug;
+        $productSlug = $product->slug;
+
+        if (!$brandSlug || !$productSlug) {
+            abort(404);
+        }
+
+        return redirect()->route('product.detail', [
+            'vendorSlug' => $brandSlug,
+            'productSlug' => $productSlug,
+            'id' => $product->id,
+        ], 301);
     }
-} 
+}

@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\SeoPage;
+use App\Support\CompareSlug;
 use App\Support\CompoundDisplay;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -223,7 +224,9 @@ class CompareController extends Controller
             $compounds->push([
                 'id' => $category->id,
                 'name' => $displayName,
-                'slug' => $category->slug,
+                // Hub cards link to /compare/{slug}. Use the route-safe slug
+                // so "BPC-157" and "Vitamin B12" don't point at 404s.
+                'slug' => CompareSlug::canonical($category->slug) ?? $category->slug,
                 'anchor' => Str::slug($displayName),
                 'description' => $educationPost?->description
                     ? Str::limit(strip_tags($educationPost->description), 200)
@@ -334,23 +337,49 @@ class CompareController extends Controller
      *
      * Emits ItemList + Offer schema so Google can treat this as a
      * commercial-intent page (matches strategist rec #10 for encyclopedia).
+     *
+     * Non-canonical slugs (mixed case, spaces, slashes) 301 to the
+     * [a-z0-9-]+ form so old sitemap locs resolve instead of 404ing.
      */
     public function show(Request $request, string $slug)
     {
+        $canonical = CompareSlug::canonical($slug);
+
         // X-vs-Y compare pages piggyback on the same route via the -vs-
         // separator. Since no legit compound slug contains '-vs-', a single
         // strpos check disambiguates cleanly.
-        if (str_contains($slug, '-vs-')) {
-            return $this->showVs($slug);
+        if ($canonical && str_contains($canonical, '-vs-')) {
+            // Case-fold and alphabetical order in one hop. Otherwise
+            // /compare/Tirzepatide-vs-Retatrutide 301s to the lowercase
+            // reverse pair, and showVs 301s again to the alpha URL.
+            $final = $this->canonicalVsSlug($canonical);
+            if (!$final) {
+                abort(404);
+            }
+            if ($final !== $slug) {
+                return redirect()->route('compare.compound', ['slug' => $final], 301);
+            }
+
+            return $this->showVs($final);
         }
 
-        $category = ProductCategory::where('slug', $slug)
-            ->where('is_active', true)
-            ->with(['educationPost' => function ($q) {
-                $q->where('status', 'published')
-                  ->select('id', 'product_category_id', 'slug', 'overview', 'description');
-            }])
-            ->firstOrFail();
+        if (!$canonical) {
+            abort(404);
+        }
+
+        $category = ProductCategory::findForCompareSlug($canonical);
+        if (!$category) {
+            abort(404);
+        }
+
+        if ($canonical !== $slug) {
+            return redirect()->route('compare.compound', ['slug' => $canonical], 301);
+        }
+
+        $category->load(['educationPost' => function ($q) {
+            $q->where('status', 'published')
+              ->select('id', 'product_category_id', 'slug', 'overview', 'description');
+        }]);
 
         $products = $this->productsForCategory($category);
 
@@ -373,8 +402,8 @@ class CompareController extends Controller
             ->map(fn ($c) => [
                 'id' => $c->id,
                 'name' => CompoundDisplay::label($c->name),
-                'slug' => $c->slug,
-                'url' => "/compare/{$c->slug}",
+                'slug' => CompareSlug::canonical($c->slug) ?? $c->slug,
+                'url' => '/compare/' . (CompareSlug::canonical($c->slug) ?? $c->slug),
                 'product_count' => $c->active_products,
             ])
             ->values();
@@ -449,9 +478,10 @@ class CompareController extends Controller
             'og_image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0),
             'image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0),
             'url' => url("/compare/{$slug}"),
-            // Visible H1 uses the pseudonym for vendor-friendly optics.
-            // The meta title above still spells out the real name for SEO.
-            'h1' => "Cheapest {$displayName}",
+            // SSR H1 matches the visible Vue H1 (compound.name is the raw
+            // compound). The GLP pseudonym stays on the alias chip — it was
+            // leaking into this hidden heading as "Cheapest GLP3-R".
+            'h1' => "Cheapest {$seoName}",
             'schema' => array_values(array_filter([
                 $itemList,
                 $breadcrumb,
@@ -584,6 +614,27 @@ class CompareController extends Controller
     }
 
     /**
+     * Lowercase hyphenated pair in alphabetical order: a-vs-b with a < b.
+     * Null when the slug is not a real pair (missing side, or a vs a).
+     */
+    private function canonicalVsSlug(string $slug): ?string
+    {
+        $pos = strpos($slug, '-vs-');
+        if ($pos === false) {
+            return null;
+        }
+        $a = substr($slug, 0, $pos);
+        $b = substr($slug, $pos + 4);
+        if ($a === '' || $b === '' || $a === $b) {
+            return null;
+        }
+        if (strcmp($a, $b) > 0) {
+            return $b . '-vs-' . $a;
+        }
+        return $a . '-vs-' . $b;
+    }
+
+    /**
      * X-vs-Y compare page: /compare/{a}-vs-{b}
      *
      * Head-to-head compound comparison. Two-column deep-dive using
@@ -595,21 +646,21 @@ class CompareController extends Controller
      */
     private function showVs(string $slug)
     {
-        $pos = strpos($slug, '-vs-');
-        $aSlug = substr($slug, 0, $pos);
-        $bSlug = substr($slug, $pos + 4);
-        if ($aSlug === '' || $bSlug === '' || $aSlug === $bSlug) abort(404);
-
-        // Alphabetical canonical — search engines see one page per pair.
-        if (strcmp($aSlug, $bSlug) > 0) {
-            return redirect("/compare/{$bSlug}-vs-{$aSlug}", 301);
+        $final = $this->canonicalVsSlug($slug);
+        if (!$final) abort(404);
+        if ($final !== $slug) {
+            return redirect()->route('compare.compound', ['slug' => $final], 301);
         }
 
-        $a = ProductCategory::where('slug', $aSlug)->where('is_active', true)
-            ->with(['educationPost' => fn ($q) => $q->where('status', 'published')])->first();
-        $b = ProductCategory::where('slug', $bSlug)->where('is_active', true)
-            ->with(['educationPost' => fn ($q) => $q->where('status', 'published')])->first();
+        $pos = strpos($final, '-vs-');
+        $aSlug = substr($final, 0, $pos);
+        $bSlug = substr($final, $pos + 4);
+
+        $a = ProductCategory::findForCompareSlug($aSlug);
+        $b = ProductCategory::findForCompareSlug($bSlug);
         if (!$a || !$b) abort(404);
+        $a->load(['educationPost' => fn ($q) => $q->where('status', 'published')]);
+        $b->load(['educationPost' => fn ($q) => $q->where('status', 'published')]);
 
         $aData = $this->buildVsCompoundData($a);
         $bData = $this->buildVsCompoundData($b);
@@ -701,7 +752,7 @@ class CompareController extends Controller
             'id' => $category->id,
             'name' => $displayName,
             'slug' => $category->slug,
-            'compare_url' => "/compare/{$category->slug}",
+            'compare_url' => '/compare/' . (CompareSlug::canonical($category->slug) ?? $category->slug),
             'encyclopedia_url' => $ep ? "/encyclopedia/{$category->slug}" : null,
             'vendor_count' => $products->pluck('brand_name')->unique()->count(),
             'product_count' => $products->count(),

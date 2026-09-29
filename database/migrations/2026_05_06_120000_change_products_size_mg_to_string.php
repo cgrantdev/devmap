@@ -15,7 +15,15 @@ return new class extends Migration
     public function up(): void
     {
         if (Schema::hasColumn('products', 'size_mg')) {
-            DB::statement('ALTER TABLE products MODIFY size_mg VARCHAR(50) NULL');
+            if (Schema::getConnection()->getDriverName() === 'sqlite') {
+                // phpunit uses sqlite, which has no MODIFY COLUMN.
+                DB::statement('ALTER TABLE products RENAME COLUMN size_mg TO size_mg_legacy');
+                DB::statement('ALTER TABLE products ADD COLUMN size_mg VARCHAR(50) NULL');
+                DB::statement('UPDATE products SET size_mg = CAST(size_mg_legacy AS TEXT)');
+                DB::statement('ALTER TABLE products DROP COLUMN size_mg_legacy');
+            } else {
+                DB::statement('ALTER TABLE products MODIFY size_mg VARCHAR(50) NULL');
+            }
 
             // Normalize existing decimal-as-string values: "10.00" → "10mg",
             // "9.50" → "9.5mg", etc. Bare nulls/empties stay as is.

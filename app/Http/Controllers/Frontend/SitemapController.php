@@ -7,6 +7,7 @@ use App\Models\Blog;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Support\CompareSlug;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Cache;
  */
 class SitemapController extends Controller
 {
-    private const CACHE_KEY = 'sitemap.xml.v1';
+    private const CACHE_KEY = 'sitemap.xml.v2';
     private const CACHE_TTL = 21600; // 6h
     private const BASE_URL  = 'https://peptidemap.com';
 
@@ -87,9 +88,9 @@ class SitemapController extends Controller
                 }
             });
 
-        // Product detail pages. Route is /product/{vendorSlug}/{productSlug}/{id}
-        // (product.detail — the working one that Vue-renders). The
-        // /product/{id}/{slug} route (product.public) exists but 404s.
+        // Product detail pages. Canonical route is
+        // /product/{vendorSlug}/{productSlug}/{id} (product.detail).
+        // /product/{id}/{slug} 301s there and is not listed.
         // Skip products with no real price (out-of-stock and $0-price rows).
         // These render as dead/thin pages in Google's index and dilute crawl
         // budget — the effective price fallback matches how the storefront
@@ -117,12 +118,14 @@ class SitemapController extends Controller
 
         // Encyclopedia = active ProductCategory rows served at /encyclopedia/{slug}.
         // Same categories are also exposed as /compare/{slug} price-comparison
-        // pages — emit both URLs per category in one pass so we don't run
-        // the query twice.
+        // pages. Compare locs must be the route-safe slug ([a-z0-9-]+): raw
+        // values like "BPC-157" and "Vitamin B12" 404. Emit each compare URL
+        // once, and only when that slug actually resolves.
+        $emittedCompareSlugs = [];
         ProductCategory::where('is_active', true)
             ->whereNotNull('slug')
             ->select('id', 'slug', 'updated_at')
-            ->chunkById(500, function ($chunk) use (&$urls) {
+            ->chunkById(500, function ($chunk) use (&$urls, &$emittedCompareSlugs) {
                 foreach ($chunk as $c) {
                     $lastmod = $c->updated_at?->toDateString();
                     $urls[] = [
@@ -131,9 +134,20 @@ class SitemapController extends Controller
                         'changefreq' => 'monthly',
                         'priority'   => '0.6',
                     ];
+
+                    $compareSlug = CompareSlug::canonical($c->slug);
+                    if (!$compareSlug || isset($emittedCompareSlugs[$compareSlug])) {
+                        continue;
+                    }
+                    $emittedCompareSlugs[$compareSlug] = true;
+
+                    $owner = ProductCategory::findForCompareSlug($compareSlug);
+                    if (!$owner) {
+                        continue;
+                    }
                     $urls[] = [
-                        'loc'        => self::BASE_URL . '/compare/' . $c->slug,
-                        'lastmod'    => $lastmod,
+                        'loc'        => self::BASE_URL . '/compare/' . $compareSlug,
+                        'lastmod'    => $owner->updated_at?->toDateString() ?? $lastmod,
                         'changefreq' => 'weekly',
                         'priority'   => '0.7',  // commercial intent > informational
                     ];
@@ -187,7 +201,7 @@ class SitemapController extends Controller
         $out .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
         foreach ($urls as $u) {
             $out .= "  <url>\n";
-            $out .= '    <loc>' . htmlspecialchars($u['loc'], ENT_XML1 | ENT_QUOTES, 'UTF-8') . "</loc>\n";
+            $out .= '    <loc>' . $this->escapeLoc($u['loc']) . "</loc>\n";
             if (!empty($u['lastmod']))    $out .= '    <lastmod>' . $u['lastmod'] . "</lastmod>\n";
             if (!empty($u['changefreq'])) $out .= '    <changefreq>' . $u['changefreq'] . "</changefreq>\n";
             if (!empty($u['priority']))   $out .= '    <priority>' . $u['priority'] . "</priority>\n";
@@ -195,5 +209,29 @@ class SitemapController extends Controller
         }
         $out .= '</urlset>' . "\n";
         return $out;
+    }
+
+    /**
+     * Percent-encode each path segment, then XML-escape the URL.
+     * htmlspecialchars() leaves spaces untouched, which makes a loc with
+     * "Vitamin B12" invalid sitemap XML.
+     */
+    private function escapeLoc(string $loc): string
+    {
+        $parts = parse_url($loc);
+        if ($parts === false) {
+            return htmlspecialchars($loc, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+        }
+
+        $path = implode('/', array_map(
+            'rawurlencode',
+            explode('/', $parts['path'] ?? '/')
+        ));
+        $url = ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? 'peptidemap.com') . $path;
+        if (isset($parts['query'])) {
+            $url .= '?' . $parts['query'];
+        }
+
+        return htmlspecialchars($url, ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }
 }

@@ -19,10 +19,6 @@
             && !str_starts_with($path, 'login')
             && !str_starts_with($path, 'logout');
     @endphp
-    @if($shouldNoindex)
-    <meta name="robots" content="noindex, nofollow" />
-    @endif
-
     @if($shouldTrackGa)
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1KQQ2ZE0S0"></script>
@@ -106,11 +102,20 @@
             if (empty(trim($seoH1))) $seoH1 = $siteName;
         }
 
+        // One robots tag. Subdomain noindex wins; otherwise honor a
+        // page-level value (search results set noindex, follow).
+        $pageRobots = $shouldNoindex
+            ? 'noindex, nofollow'
+            : (is_array($seoData) ? ($seoData['robots'] ?? null) : ($seoData?->robots ?? null));
+
         session()->forget('page_seo_data');
     @endphp
 
     <title>{{ $fullTitle }}</title>
     <meta name="description" content="{{ $seoDescription }}">
+    @if(!empty($pageRobots))
+    <meta name="robots" content="{{ $pageRobots }}" />
+    @endif
 
     <!-- Canonical -->
     <link rel="canonical" href="{{ $seoUrl }}" />
