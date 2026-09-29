@@ -28,6 +28,10 @@
         <p v-if="a.summary || b.summary" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl">
           Side-by-side vendor comparison, mechanism &amp; use-case differences, and current best prices.
         </p>
+        <p v-if="evidenceUrl" class="mt-4 max-w-3xl text-[15px] leading-relaxed">
+          <a :href="evidenceUrl" class="font-semibold text-[color:var(--color-accent-600)] underline underline-offset-2 hover:text-[color:var(--color-accent-700)]">Read the evidence comparison</a>
+          <span class="text-[color:var(--color-ink-muted)]"> — animal studies, human-evidence gaps, untested stacking claims, and FDA/WADA context. Vendor prices stay on this page.</span>
+        </p>
       </div>
     </section>
 
@@ -108,6 +112,7 @@ const props = defineProps({
   a: { type: Object, required: true },
   b: { type: Object, required: true },
   related: { type: Array, default: () => [] },
+  evidenceUrl: { type: String, default: null },
   seo: { type: Object, default: () => ({}) },
 })
 

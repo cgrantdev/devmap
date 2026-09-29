@@ -34,6 +34,7 @@ class Blog extends Model
         'seo_og_title',
         'seo_og_description',
         'seo_og_image',
+        'seo_schema',
     ];
 
     protected $casts = [
@@ -41,6 +42,7 @@ class Blog extends Model
         'is_featured' => 'boolean',
         'key_points' => 'array',
         'tags' => 'array',
+        'seo_schema' => 'array',
     ];
 
     public static function boot()

@@ -703,10 +703,16 @@ class CompareController extends Controller
         ];
         session(['page_seo_data' => $seo]);
 
+        $evidenceUrl = null;
+        if ($aSlug === 'bpc-157' && $bSlug === 'tb-500') {
+            $evidenceUrl = '/blog/bpc-157-vs-tb-500-evidence';
+        }
+
         return Inertia::render('Frontend/CompareCompoundVs', [
             'a' => $aData,
             'b' => $bData,
             'related' => $related,
+            'evidenceUrl' => $evidenceUrl,
             'seo' => $seo,
         ]);
     }

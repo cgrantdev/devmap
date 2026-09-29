@@ -20,9 +20,9 @@
       <div class="max-w-3xl mx-auto pt-8 lg:pt-12">
         <!-- Back + category -->
         <div class="flex items-center gap-3 mb-6">
-          <a href="/news" class="text-[13px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] transition-colors flex items-center gap-1">
+          <a href="/blogs" class="text-[13px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] transition-colors flex items-center gap-1">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            News
+            Blog
           </a>
           <span v-if="blog.categoryTag" class="text-[color:var(--color-hairline)]">/</span>
           <span v-if="blog.categoryTag" class="text-[11px] font-semibold text-[color:var(--color-accent-600)] uppercase tracking-wide">{{ blog.categoryTag }}</span>
@@ -88,7 +88,7 @@
         </div>
 
         <!-- HTML content fallback -->
-        <div v-if="!blog.introduction && !blog.detailed_analysis && blog.content" class="prose prose-lg max-w-none" v-html="blog.content"></div>
+        <div v-if="!blog.introduction && !blog.detailed_analysis && blog.content" class="edu-article" v-html="blog.content"></div>
 
         <!-- Disclaimer -->
         <div class="mt-10 p-5 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] text-[13px] text-[color:var(--color-ink-muted)]">
@@ -143,7 +143,7 @@ const props = defineProps({
 
 const page = usePage()
 
-const title = computed(() => props.seo?.title || `${props.blog?.title || 'News'} - ${page.props.site_name || 'PeptideMaps'}`)
+const title = computed(() => props.seo?.title || `${props.blog?.title || 'News'} - ${page.props.site_name || 'Peptidemap'}`)
 const description = computed(() => props.seo?.description || props.blog?.description?.substring(0, 160) || '')
 const url = computed(() => props.seo?.url || page.url)
 const ogTitle = computed(() => props.seo?.og_title || title.value)

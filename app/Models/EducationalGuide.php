@@ -41,11 +41,14 @@ class EducationalGuide extends Model
         'seo_og_title',
         'seo_og_description',
         'seo_og_image',
+        'content',
+        'seo_schema',
     ];
 
     protected $casts = [
         'published_at' => 'date',
         'is_featured' => 'boolean',
+        'seo_schema' => 'array',
         'peptides' => 'array',
         'overview_benefits' => 'array',
         'dosage_recommendation' => 'array',
