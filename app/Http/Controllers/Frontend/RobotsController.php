@@ -25,6 +25,7 @@ use Illuminate\Http\Response;
 class RobotsController extends Controller
 {
     private const CANONICAL_HOSTS = ['peptidemap.com', 'www.peptidemap.com'];
+
     private const NOINDEX_ALLOW_CRAWL_HOSTS = ['demo.peptidemap.com', 'join.peptidemap.com'];
 
     public function show(Request $request): Response
@@ -32,29 +33,37 @@ class RobotsController extends Controller
         $host = strtolower($request->getHost());
 
         if (in_array($host, self::CANONICAL_HOSTS, true)) {
+            // Real robots directives only. Do not emit Cloudflare's
+            // content-signals comment block here — crawlers ignore it, and
+            // it is not a substitute for User-agent / Sitemap rules.
+            // Allow: / keeps public marketplace pages crawlable (compare,
+            // encyclopedia, blogs, news, guides). Disallow is limited to
+            // auth, admin, vendor dashboard, and account surfaces.
             $body = "User-agent: *\n"
-                  . "Disallow: /admin/\n"
-                  . "Disallow: /vendor/\n"
-                  . "Disallow: /login\n"
-                  . "Disallow: /logout\n"
-                  . "Disallow: /register\n"
-                  . "Disallow: /password/\n"
-                  . "Disallow: /email/\n"
-                  . "Disallow: /api/\n"
-                  . "Disallow: /sanctum/\n"
-                  . "Allow: /\n\n"
-                  . "Sitemap: https://peptidemap.com/sitemap.xml\n";
+                  ."Disallow: /admin/\n"
+                  ."Disallow: /vendor/\n"
+                  ."Disallow: /account/\n"
+                  ."Disallow: /login\n"
+                  ."Disallow: /logout\n"
+                  ."Disallow: /register\n"
+                  ."Disallow: /password/\n"
+                  ."Disallow: /email/\n"
+                  ."Disallow: /api/\n"
+                  ."Disallow: /sanctum/\n"
+                  ."Allow: /\n\n"
+                  ."Sitemap: https://peptidemap.com/sitemap.xml\n";
         } elseif (in_array($host, self::NOINDEX_ALLOW_CRAWL_HOSTS, true)) {
             // Deliberately permissive: pair with X-Robots-Tag: noindex header.
             $body = "User-agent: *\n"
-                  . "Disallow: /admin/\n"
-                  . "Disallow: /vendor/\n"
-                  . "Disallow: /api/\n"
-                  . "Disallow: /sanctum/\n"
-                  . "Allow: /\n";
+                  ."Disallow: /admin/\n"
+                  ."Disallow: /vendor/\n"
+                  ."Disallow: /account/\n"
+                  ."Disallow: /api/\n"
+                  ."Disallow: /sanctum/\n"
+                  ."Allow: /\n";
         } else {
             $body = "User-agent: *\n"
-                  . "Disallow: /\n";
+                  ."Disallow: /\n";
         }
 
         return response($body, 200)

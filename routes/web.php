@@ -53,9 +53,21 @@ Route::domain('join.peptidemap.com')->group(function () {
 });
 
 // Modern 2026 homepage is now the default
-// SEO — sitemap + host-aware robots.txt. Both are cached at the controller layer.
+// SEO — sitemap (cached in the controller) + host-aware robots.txt.
+// robots.txt is a crawler document: skip the session / cookie / Inertia
+// middleware so the origin response is text/plain with no XSRF-TOKEN,
+// session cookie, or Vary: X-Inertia.
 Route::get('/sitemap.xml', [\App\Http\Controllers\Frontend\SitemapController::class, 'index']);
-Route::get('/robots.txt', [\App\Http\Controllers\Frontend\RobotsController::class, 'show']);
+Route::get('/robots.txt', [\App\Http\Controllers\Frontend\RobotsController::class, 'show'])
+    ->withoutMiddleware([
+        \Illuminate\Cookie\Middleware\EncryptCookies::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        \App\Http\Middleware\HandleInertiaRequests::class,
+        \App\Http\Middleware\LogPageView::class,
+    ]);
 
 // Per-URL OG images (server-rendered via headless Chromium, disk-cached).
 Route::get('/og/product/{id}.png', [\App\Http\Controllers\Frontend\ProductOgImageController::class, 'show'])
