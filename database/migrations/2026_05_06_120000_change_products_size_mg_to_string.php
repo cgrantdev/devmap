@@ -65,7 +65,9 @@ return new class extends Migration
                     }
                 });
 
-            DB::statement('ALTER TABLE products MODIFY size_mg DECIMAL(10,2) NULL');
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                DB::statement('ALTER TABLE products MODIFY size_mg DECIMAL(10,2) NULL');
+            }
         }
     }
 };

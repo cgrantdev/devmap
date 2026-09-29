@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Brand;
+use App\Models\EducationalGuide;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Support\CompareSlug;
@@ -57,6 +58,7 @@ class SitemapController extends Controller
             ['/vendors/integration',  'monthly', '0.5'],
             ['/encyclopedia',  'weekly',  '0.8'],
             ['/blogs',         'weekly',  '0.6'],
+            ['/guides',        'weekly',  '0.6'],
         ] as [$path, $freq, $priority]) {
             $urls[] = ['loc' => self::BASE_URL . $path, 'lastmod' => $today, 'changefreq' => $freq, 'priority' => $priority];
         }
@@ -173,6 +175,24 @@ class SitemapController extends Controller
                 'changefreq' => 'weekly',
                 'priority'   => '0.6',
             ];
+        }
+
+        if (\Schema::hasTable('educational_guides') && \Schema::hasColumn('educational_guides', 'content')) {
+            EducationalGuide::where('status', 'published')
+                ->whereNotNull('slug')
+                ->whereNotNull('content')
+                ->where('content', '!=', '')
+                ->select('id', 'slug', 'updated_at')
+                ->chunkById(200, function ($chunk) use (&$urls) {
+                    foreach ($chunk as $guide) {
+                        $urls[] = [
+                            'loc'        => self::BASE_URL . '/guides/' . $guide->slug,
+                            'lastmod'    => $guide->updated_at?->toDateString(),
+                            'changefreq' => 'monthly',
+                            'priority'   => '0.6',
+                        ];
+                    }
+                });
         }
 
         // Blog posts.

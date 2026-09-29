@@ -67,7 +67,10 @@ return new class extends Migration
         if (Schema::hasColumn('products', 'slug')) {
             Schema::table('products', function (Blueprint $table) {
                 // First ensure all products have slugs
-                DB::statement('UPDATE products SET slug = CONCAT("product-", id) WHERE slug IS NULL OR slug = ""');
+                $slugExpr = Schema::getConnection()->getDriverName() === 'sqlite'
+                    ? "'product-' || id"
+                    : 'CONCAT("product-", id)';
+                DB::statement('UPDATE products SET slug = '.$slugExpr.' WHERE slug IS NULL OR slug = ""');
                 
                 $table->string('slug', 191)->unique()->nullable(false)->change();
             });

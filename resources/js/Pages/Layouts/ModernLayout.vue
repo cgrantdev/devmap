@@ -490,6 +490,7 @@ const footerColumns = [
       { href: '/encyclopedia', label: 'Encyclopedia' },
       { href: '/news', label: 'Research' },
       { href: '/blogs', label: 'Blog' },
+      { href: '/guides', label: 'Guides' },
       { href: '/calculator', label: 'Peptide calculator' },
     ],
   },

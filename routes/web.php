@@ -31,6 +31,7 @@ use App\Http\Controllers\Frontend\ProductsController;
 use App\Http\Controllers\Frontend\BrandsController;
 // Note: BrandsController also serves /vendors (see route below)
 use App\Http\Controllers\Frontend\BlogsController;
+use App\Http\Controllers\Frontend\GuidesController;
 // EducationController removed
 use App\Http\Controllers\Frontend\EncyclopediaController;
 use App\Http\Controllers\Frontend\CompareController;
@@ -125,8 +126,13 @@ Route::get('/brand/{slug}/products', function ($slug) {
     return redirect()->route('brand.products', ['slug' => $slug], 301);
 })->name('brand.products.legacy');
 Route::get('/brands', [BrandsController::class, 'index'])->name('brands');
+Route::redirect('/blog', '/blogs', 301);
 Route::get('/blogs', [BlogsController::class, 'index'])->name('blogs');
 Route::get('/blog/{slug}', [BlogsController::class, 'show'])->name('blog.show');
+Route::get('/guides', [GuidesController::class, 'index'])->name('guides.index');
+Route::get('/guides/{slug}', [GuidesController::class, 'show'])
+    ->where('slug', '[a-z0-9-]+')
+    ->name('guides.show');
 // Education posts removed — content now lives in Encyclopedia + Blog
 Route::get('/encyclopedia', [EncyclopediaController::class, 'index'])->name('encyclopedia');
 Route::get('/encyclopedia/{slug}', [EncyclopediaController::class, 'showArticle'])->name('encyclopedia.show');

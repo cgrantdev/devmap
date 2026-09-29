@@ -883,3 +883,66 @@ textarea.ui-input { resize: vertical; }
     flex: 1;
     min-height: 100%;
 }
+
+/* Long-form educational articles (blog HTML body + guides). */
+.edu-article {
+    color: var(--color-ink);
+    font-size: 16px;
+    line-height: 1.8;
+}
+.edu-article h2 {
+    margin: 2.25rem 0 0.75rem;
+    font-size: 1.5rem;
+    line-height: 1.25;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+}
+.edu-article h3 {
+    margin: 1.75rem 0 0.5rem;
+    font-size: 1.15rem;
+    line-height: 1.35;
+    font-weight: 650;
+}
+.edu-article p,
+.edu-article ul,
+.edu-article ol {
+    margin: 0 0 1rem;
+}
+.edu-article ul,
+.edu-article ol {
+    padding-left: 1.25rem;
+}
+.edu-article li {
+    margin: 0.35rem 0;
+}
+.edu-article a {
+    color: var(--color-accent-700);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.edu-article hr {
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px solid var(--color-hairline);
+}
+.edu-table-wrap {
+    overflow-x: auto;
+    margin: 0 0 1.25rem;
+}
+.edu-article table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.edu-article th,
+.edu-article td {
+    border: 1px solid var(--color-hairline);
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+}
+.edu-article th {
+    background: var(--color-hairline-soft);
+    font-weight: 650;
+}

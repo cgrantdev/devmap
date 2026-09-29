@@ -6,9 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Setting;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use Inertia\Inertia;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class BlogsController extends Controller
@@ -24,20 +23,22 @@ class BlogsController extends Controller
         }
 
         $value = strip_tags($value);
-        
+
         // If mbstring is available, use it
         if (function_exists('mb_strlen') && function_exists('mb_substr')) {
             if (mb_strlen($value) <= $limit) {
                 return $value;
             }
-            return mb_substr($value, 0, $limit) . $end;
+
+            return mb_substr($value, 0, $limit).$end;
         }
-        
+
         // Fallback to regular string functions
         if (strlen($value) <= $limit) {
             return $value;
         }
-        return substr($value, 0, $limit) . $end;
+
+        return substr($value, 0, $limit).$end;
     }
 
     public function index(Request $request)
@@ -69,8 +70,9 @@ class BlogsController extends Controller
         $formattedBlogs = $blogs->map(function ($blog) {
             $imageUrl = null;
             if ($blog->image) {
-                $imageUrl = (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/' . $blog->image));
+                $imageUrl = (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/'.$blog->image));
             }
+
             return [
                 'id' => $blog->id,
                 'title' => $blog->title,
@@ -85,7 +87,7 @@ class BlogsController extends Controller
 
         $formattedFeatured = null;
         if ($featured) {
-            $featuredImage = $featured->image ? (str_starts_with($featured->image, 'http') ? $featured->image : Storage::url('blogs/' . $featured->image)) : null;
+            $featuredImage = $featured->image ? (str_starts_with($featured->image, 'http') ? $featured->image : Storage::url('blogs/'.$featured->image)) : null;
             $formattedFeatured = [
                 'id' => $featured->id,
                 'title' => $featured->title,
@@ -144,23 +146,23 @@ class BlogsController extends Controller
                     'title' => $b->title,
                     'slug' => $b->slug,
                     'description' => $b->description,
-                    'image' => $b->image ? (str_starts_with($b->image, 'http') ? $b->image : Storage::url('blogs/' . $b->image)) : null,
+                    'image' => $b->image ? (str_starts_with($b->image, 'http') ? $b->image : Storage::url('blogs/'.$b->image)) : null,
                     'readTime' => $b->read_time,
                     'date' => $b->published_at ? $b->published_at->format('M j, Y') : null,
                 ];
             });
 
-        $imageUrl = $blog->image ? (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/' . $blog->image)) : null;
-        
+        $imageUrl = $blog->image ? (str_starts_with($blog->image, 'http') ? $blog->image : Storage::url('blogs/'.$blog->image)) : null;
+
         // Use blog_type for category tag, fallback to computed tag if not set
-        $combinedContent = $blog->introduction . ' ' . $blog->detailed_analysis . ' ' . $blog->conclusion;
+        $combinedContent = $blog->introduction.' '.$blog->detailed_analysis.' '.$blog->conclusion;
         $categoryTag = $blog->blog_type ?: $this->getCategoryTag($blog->title, $blog->description, $combinedContent);
-        
+
         // Generate SEO data for blog detail
         // Priority: Use stored SEO data from database, fallback to auto-generated
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
-        $blogUrl = url("/blog/{$blog->slug}");
-        
+        $blogUrl = 'https://peptidemap.com/blog/'.$blog->slug;
+
         // Build blog image URL - handle both absolute URLs and relative paths
         $blogImage = null;
         if ($imageUrl) {
@@ -170,52 +172,54 @@ class BlogsController extends Controller
                 $blogImage = url($imageUrl);
             }
         }
-        
+
         // Check if stored SEO data exists
-        $hasStoredSeo = !empty($blog->seo_page_title) || !empty($blog->seo_description);
-        
+        $hasStoredSeo = ! empty($blog->seo_page_title) || ! empty($blog->seo_description);
+
         if ($hasStoredSeo) {
             // Use stored SEO data from database
-            $seoTitle = $blog->seo_page_title ?: ($blog->title . ' - ' . $siteName);
-            $seoDescription = $blog->seo_description 
-                ?: ($blog->description 
-                    ? $this->safeLimit($blog->description, 160) 
-                    : 'Read the latest article about ' . $blog->title . ' on ' . $siteName . '.');
+            $seoTitle = $blog->seo_page_title ?: ($blog->title.' - '.$siteName);
+            $seoDescription = $blog->seo_description
+                ?: ($blog->description
+                    ? $this->safeLimit($blog->description, 160)
+                    : 'Read the latest article about '.$blog->title.' on '.$siteName.'.');
             $seoOgTitle = $blog->seo_og_title ?: $seoTitle;
             $seoOgDescription = $blog->seo_og_description ?: $seoDescription;
-            $seoOgImage = $blog->seo_og_image 
+            $seoOgImage = $blog->seo_og_image
                 ? (str_starts_with($blog->seo_og_image, 'http') ? $blog->seo_og_image : url($blog->seo_og_image))
                 : $blogImage;
         } else {
             // Auto-generate SEO from blog fields
-            $seoTitle = $blog->title . ' - ' . $siteName;
-            $seoDescription = $blog->description 
-                ? $this->safeLimit($blog->description, 160) 
-                : 'Read the latest article about ' . $blog->title . ' on ' . $siteName . '.';
+            $seoTitle = $blog->title.' - '.$siteName;
+            $seoDescription = $blog->description
+                ? $this->safeLimit($blog->description, 160)
+                : 'Read the latest article about '.$blog->title.' on '.$siteName.'.';
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
             $seoOgImage = $blogImage;
         }
-        
+
         // Article + BreadcrumbList JSON-LD (rendered by app.blade.php)
         $articleSchema = [
             '@context' => 'https://schema.org',
             '@type' => 'Article',
             'headline' => $blog->title,
             'description' => $seoDescription,
-            'image' => $blogImage ? [$blogImage] : null,
+            'image' => [$seoOgImage ?: $blogImage ?: 'https://peptidemap.com/images/og-default-v7.png'],
             'datePublished' => $blog->published_at ? $blog->published_at->toIso8601String() : null,
             'dateModified' => $blog->updated_at ? $blog->updated_at->toIso8601String() : ($blog->published_at ? $blog->published_at->toIso8601String() : null),
             'author' => [
-                '@type' => 'Person',
+                '@type' => ($blog->author_name && $blog->author_name !== 'Peptidemap') ? 'Person' : 'Organization',
                 'name' => $blog->author_name ?: $siteName,
+                'url' => 'https://peptidemap.com',
             ],
+            'keywords' => $blog->tags ?: null,
             'publisher' => [
                 '@type' => 'Organization',
                 'name' => $siteName,
                 'logo' => [
                     '@type' => 'ImageObject',
-                    'url' => url('/images/logo.png'),
+                    'url' => 'https://peptidemap.com/images/logo.png',
                 ],
             ],
             'mainEntityOfPage' => [
@@ -230,9 +234,25 @@ class BlogsController extends Controller
             'itemListElement' => [
                 ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://peptidemap.com/'],
                 ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => 'https://peptidemap.com/blogs'],
-                ['@type' => 'ListItem', 'position' => 3, 'name' => $blog->title],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $blog->title, 'item' => $blogUrl],
             ],
         ];
+
+        $schemas = [$articleSchema, $breadcrumbSchema];
+        $extra = $blog->seo_schema;
+        if (is_string($extra)) {
+            $extra = json_decode($extra, true);
+        }
+        if (is_array($extra)) {
+            if (isset($extra['@type'])) {
+                $extra = [$extra];
+            }
+            foreach ($extra as $block) {
+                if (is_array($block)) {
+                    $schemas[] = $block;
+                }
+            }
+        }
 
         // Build SEO array (same format as products/brands pages)
         $seo = [
@@ -241,17 +261,19 @@ class BlogsController extends Controller
             'description' => $seoDescription,
             'og_title' => $seoOgTitle,
             'og_description' => $seoOgDescription,
-            'og_image' => $seoOgImage,
+            'og_image' => $seoOgImage ?: 'https://peptidemap.com/images/og-default-v7.png',
+            'og_type' => 'article',
             // Backward-compatible field used by some pages
             'image' => $seoOgImage,
             'url' => $blogUrl,
             'canonical' => $blogUrl,
-            'schema' => [$articleSchema, $breadcrumbSchema],
+            'h1' => $blog->title,
+            'schema' => $schemas,
         ];
 
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
-        
+
         return Inertia::render('Frontend/BlogDetail', [
             'blog' => [
                 'id' => $blog->id,
@@ -263,6 +285,7 @@ class BlogsController extends Controller
                 'key_points' => $blog->key_points ?? [],
                 'detailed_analysis' => $blog->detailed_analysis,
                 'conclusion' => $blog->conclusion,
+                'content' => $blog->content,
                 'tags' => $blog->tags ?? [],
                 'author_name' => $blog->author_name,
                 'author_job' => $blog->author_job,
@@ -283,30 +306,30 @@ class BlogsController extends Controller
      */
     private function getCategoryTag($title, $description, $content = '')
     {
-        $combined = strtolower($title . ' ' . $description . ' ' . $content);
+        $combined = strtolower($title.' '.$description.' '.$content);
 
-        if (stripos($combined, 'fda') !== false || stripos($combined, 'regulation') !== false || 
+        if (stripos($combined, 'fda') !== false || stripos($combined, 'regulation') !== false ||
             stripos($combined, 'regulatory') !== false || stripos($combined, 'compounding') !== false) {
             return 'Regulation';
         }
 
-        if (stripos($combined, 'study') !== false || stripos($combined, 'research') !== false || 
+        if (stripos($combined, 'study') !== false || stripos($combined, 'research') !== false ||
             stripos($combined, 'clinical') !== false || stripos($combined, 'trial') !== false) {
             return 'Research';
         }
 
-        if (stripos($combined, 'market') !== false || stripos($combined, 'industry') !== false || 
+        if (stripos($combined, 'market') !== false || stripos($combined, 'industry') !== false ||
             stripos($combined, 'price') !== false || stripos($combined, 'pricing') !== false) {
             return 'Industry';
         }
 
-        if (stripos($combined, 'guide') !== false || stripos($combined, 'how to') !== false || 
+        if (stripos($combined, 'guide') !== false || stripos($combined, 'how to') !== false ||
             stripos($combined, 'tutorial') !== false || stripos($combined, 'education') !== false ||
             stripos($combined, 'coa') !== false || stripos($combined, 'purity') !== false) {
             return 'Guides';
         }
 
-        if (stripos($combined, 'success') !== false || stripos($combined, 'story') !== false || 
+        if (stripos($combined, 'success') !== false || stripos($combined, 'story') !== false ||
             stripos($combined, 'experience') !== false || stripos($combined, 'user') !== false ||
             stripos($combined, 'community') !== false) {
             return 'Community';
