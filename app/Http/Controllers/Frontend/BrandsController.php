@@ -213,6 +213,14 @@ class BrandsController extends Controller
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
 
+        // Every distinct location any vendor lists — powers the
+        // region-grouped location dropdown on the frontend (Colin
+        // PMAP Sep 30 #10). Hardcoded 4-chip row was too narrow —
+        // Certified-Pep ships to Canada, IDUN to Sweden, etc.
+        $locationsList = Location::whereIn('id', function ($q) {
+            $q->select('location_id')->from('vendor_settings')->whereNotNull('location_id');
+        })->orderBy('name')->get(['id', 'name'])->values();
+
         return Inertia::render('Frontend/Brands', [
             'brands' => $brands,
             'search' => $request->get('search', ''),
@@ -225,6 +233,7 @@ class BrandsController extends Controller
                 'verified' => $request->get('verified', ''),
                 'usp' => $request->get('usp', ''),
             ],
+            'locations' => $locationsList,
             'seo' => $seo,
         ]);
     }

@@ -47,21 +47,25 @@
           </select>
         </div>
 
-        <!-- Filter chips -->
+        <!-- Filter chips. Colin PMAP Sep 30 (#10): the hardcoded
+             4-chip row (US/Canada/UK/Australia) missed every other
+             location vendors actually list from. Replaced with a
+             region-grouped native <select> so all countries surface
+             without a bespoke dropdown widget. -->
         <div class="flex flex-wrap items-center gap-2 mt-4">
-          <button
-            v-for="loc in locationFilters"
-            :key="loc.value"
-            @click="toggleLocation(loc.value)"
-            :class="[
-              'ui-focus h-8 px-3.5 rounded-full text-[12px] font-semibold transition-all duration-200 border',
-              selectedFilters.location === loc.value
-                ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
-                : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)]',
-            ]"
-          >
-            {{ loc.label }}
-          </button>
+          <label class="flex items-center gap-2 text-[12px] text-[color:var(--color-ink-muted)]">
+            <span class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)]">Location</span>
+            <select
+              :value="selectedFilters.location"
+              @change="handleLocationSelect($event.target.value)"
+              class="ui-focus h-8 pl-3 pr-8 rounded-full text-[12px] font-semibold border bg-white text-[color:var(--color-ink)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)]"
+            >
+              <option value="">All locations</option>
+              <optgroup v-for="group in locationGroups" :key="group.region" :label="group.region">
+                <option v-for="loc in group.countries" :key="loc.id" :value="loc.name">{{ loc.name }}</option>
+              </optgroup>
+            </select>
+          </label>
           <span class="text-[color:var(--color-hairline)] text-sm mx-1">|</span>
           <button
             @click="toggleTopVendors"
@@ -262,6 +266,7 @@
 import { ref, computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import { groupLocationsByRegion } from '@/data/locationRegions'
 
 const props = defineProps({
   seo: { type: Object, default: () => ({}) },
@@ -270,6 +275,7 @@ const props = defineProps({
   sort: String,
   sortDir: String,
   filters: Object,
+  locations: { type: Array, default: () => [] },
 })
 
 // Combined review helpers. Blend native peptidemap reviews with any
@@ -326,13 +332,13 @@ const verifiedFilters = [
   { label: '7+ Tested', value: 'testing_7x' },
 ]
 
-const locationFilters = [
-  { label: 'All', value: '' },
-  { label: 'United States', value: 'United States' },
-  { label: 'Canada', value: 'Canada' },
-  { label: 'United Kingdom', value: 'United Kingdom' },
-  { label: 'Australia', value: 'Australia' },
-]
+// Region-grouped location dropdown — Colin PMAP Sep 30 (#10).
+// Uses the shared helper from onboarding so both surfaces match.
+const locationGroups = computed(() => groupLocationsByRegion(props.locations || []))
+function handleLocationSelect(value) {
+  selectedFilters.value.location = value || ''
+  navigate({})
+}
 
 const sortValue = computed(() => `${props.sort || 'rating'}|${props.sortDir || 'desc'}`)
 // Featured / partner vendors float to the top of whatever order the

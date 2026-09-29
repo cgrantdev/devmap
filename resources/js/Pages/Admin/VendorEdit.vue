@@ -61,24 +61,54 @@
               <input v-model.number="editForm.founded_year" type="number" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
             </FormField>
             <FormField label="Ships to" hint="Every country this vendor ships to. Drives the /brands location filter — vendors appear under each region they serve." class="md:col-span-2">
-              <div class="flex flex-wrap gap-1.5">
-                <button
-                  v-for="loc in (locations || [])"
-                  :key="loc.id"
-                  type="button"
-                  @click="toggleShipsTo(loc.id)"
-                  :class="[
-                    'inline-flex items-center gap-1 h-8 px-3 rounded-full text-[12px] font-medium border transition-colors',
-                    editForm.ships_to_ids.includes(loc.id)
-                      ? 'bg-slate-800 text-white border-slate-800'
-                      : 'bg-white text-slate-700 border-slate-300 hover:border-slate-500',
-                  ]"
-                >
-                  <svg v-if="editForm.ships_to_ids.includes(loc.id)" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                  {{ loc.name }}
-                </button>
+              <!-- Region-grouped picker + search — Colin PMAP Sep 30
+                   (#10a). Same shape as onboarding, so admin + vendor
+                   view the same UX for a 100+-country list. -->
+              <div class="mb-2 flex items-center justify-between gap-2 flex-wrap">
+                <div class="relative flex-1 max-w-sm">
+                  <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                  <input
+                    v-model="shipsToSearch"
+                    type="text"
+                    placeholder="Search countries…"
+                    class="w-full h-9 pl-9 pr-3 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  />
+                </div>
+                <span class="text-[11px] ui-mono text-slate-400">{{ editForm.ships_to_ids.length }} selected</span>
               </div>
-              <p v-if="!(locations && locations.length)" class="text-xs text-slate-500 italic">No locations configured — add via /admin/locations first.</p>
+              <div class="space-y-3 max-h-[380px] overflow-y-auto pr-1 border border-slate-200 rounded-lg p-3 bg-slate-50/40">
+                <div v-for="group in shipsToGroups" :key="group.region">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-slate-600">{{ group.region }}</div>
+                    <button
+                      type="button"
+                      @click="toggleShipsToRegion(group)"
+                      class="text-[11px] font-semibold text-slate-500 hover:text-slate-700 underline"
+                    >{{ regionAllSelected(group) ? 'Clear region' : 'Select all' }}</button>
+                  </div>
+                  <div class="flex flex-wrap gap-1.5">
+                    <button
+                      v-for="loc in group.countries"
+                      :key="loc.id"
+                      type="button"
+                      @click="toggleShipsTo(loc.id)"
+                      :class="[
+                        'inline-flex items-center gap-1 h-8 px-3 rounded-full text-[12px] font-medium border transition-colors',
+                        editForm.ships_to_ids.includes(loc.id)
+                          ? 'bg-slate-800 text-white border-slate-800'
+                          : 'bg-white text-slate-700 border-slate-300 hover:border-slate-500',
+                      ]"
+                    >
+                      <svg v-if="editForm.ships_to_ids.includes(loc.id)" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                      {{ loc.name }}
+                    </button>
+                  </div>
+                </div>
+                <div v-if="!shipsToGroups.length" class="text-sm text-slate-500 text-center py-4">
+                  No countries match "{{ shipsToSearch }}"
+                </div>
+              </div>
+              <p v-if="!(locations && locations.length)" class="text-xs text-slate-500 italic mt-1">No locations configured — add via /admin/locations first.</p>
             </FormField>
           </FormSection>
 
@@ -624,6 +654,7 @@ import FormPage from '@/components/admin/FormPage.vue'
 import FormSection from '@/components/admin/FormSection.vue'
 import FormField from '@/components/admin/FormField.vue'
 import UspPicker from '@/components/UspPicker.vue'
+import { groupLocationsByRegion } from '@/data/locationRegions'
 import { useAdminLoading } from '../../composables/useAdminLoading'
 import { useToast as useVueToastification } from 'vue-toastification'
 
@@ -945,6 +976,24 @@ function toggleShipsTo(id) {
   const idx = editForm.ships_to_ids.indexOf(id)
   if (idx >= 0) editForm.ships_to_ids.splice(idx, 1)
   else editForm.ships_to_ids.push(id)
+}
+
+// Region grouping + search — Colin PMAP Sep 30 (#10a).
+const shipsToSearch = ref('')
+const shipsToGroups = computed(() =>
+  groupLocationsByRegion(props.locations || [], shipsToSearch.value)
+)
+function regionAllSelected(group) {
+  return group.countries.every((c) => editForm.ships_to_ids.includes(c.id))
+}
+function toggleShipsToRegion(group) {
+  const allSelected = regionAllSelected(group)
+  const set = new Set(editForm.ships_to_ids)
+  for (const c of group.countries) {
+    if (allSelected) set.delete(c.id)
+    else set.add(c.id)
+  }
+  editForm.ships_to_ids = Array.from(set)
 }
 
 // --- Coupon boost handlers ------------------------------------------
