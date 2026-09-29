@@ -27,6 +27,19 @@ class SendGrowthDigest extends Command
     public function handle(GrowthMetrics $metrics): int
     {
         $snap = $metrics->snapshot();
+
+        // Colin Sep 30 — skip the post entirely on quiet weeks so the
+        // digest doesn't chew Discord attention when nothing moved.
+        // A "quiet" week has zero clicks, zero new signups, and zero
+        // new products. Under that bar it's not worth a message.
+        $quiet = ((int) ($snap['clicks_7d'] ?? 0)) === 0
+              && ((int) ($snap['new_vendors_7d'] ?? 0)) === 0
+              && ((int) ($snap['new_products_7d'] ?? 0)) === 0;
+        if ($quiet) {
+            $this->info('Quiet week — skipping digest post.');
+            return self::SUCCESS;
+        }
+
         $body = $this->buildMessage($snap);
 
         if ($this->option('dry-run')) {

@@ -190,6 +190,13 @@ class VendorSetting extends Model
             ?: config('services.discord.growth_channel_id');
         if (!$token || !$channel) return;
 
+        // Colin Sep 30 — dedup within 6h so Julia editing/re-applying
+        // a boost doesn't chain-fire the same "X% off through DATE"
+        // post repeatedly. Also blocks noisy retries.
+        $dedupKey = 'discord.boost-start.' . ($this->brand_id ?? 'x') . '.' . (int) $newPct;
+        if (\Illuminate\Support\Facades\Cache::has($dedupKey)) return;
+        \Illuminate\Support\Facades\Cache::put($dedupKey, 1, now()->addHours(6));
+
         $brandName = $this->brand?->name ?? 'A vendor';
         $slug = $this->brand?->slug;
         $link = $slug ? "https://peptidemap.com/brand/{$slug}" : 'https://peptidemap.com/deals';

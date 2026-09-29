@@ -73,6 +73,11 @@ class ActivateScheduledCouponBoosts extends Command
             ?: config('services.discord.growth_channel_id');
         if (!$token || !$channel) return;
 
+        // Same 6h dedup as manual boost-start posts (Colin Sep 30).
+        $dedupKey = 'discord.boost-start.' . ($slug ?: 'x') . '.' . (int) $newPct;
+        if (\Illuminate\Support\Facades\Cache::has($dedupKey)) return;
+        \Illuminate\Support\Facades\Cache::put($dedupKey, 1, now()->addHours(6));
+
         $link = $slug ? "https://peptidemap.com/brand/{$slug}" : 'https://peptidemap.com/deals';
         $until = \Carbon\Carbon::parse($expiresAt)->format('M j');
 
