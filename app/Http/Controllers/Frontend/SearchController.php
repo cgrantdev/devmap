@@ -220,10 +220,20 @@ class SearchController extends Controller
         $searchDescription = !empty($query) 
             ? "Search results for '{$query}' - Find peptides, vendors, products, and research information."
             : 'Search for peptides, vendors, products, encyclopedia entries, and news articles.';
+        // url('/search', ['q' => $query]) appends $query as a path segment
+        // (/search/retatrutide), which 404s. Canonical must be the real
+        // /search URL. Search result pages are not landing pages — noindex
+        // them so query variants are not indexable duplicates.
+        $searchUrl = url('/search');
+        $queryString = $request->getQueryString();
+        if ($queryString) {
+            $searchUrl .= '?' . $queryString;
+        }
         $seoData = new SEOData(
             title: $searchTitle . ' | Peptidemap',
             description: $searchDescription,
-            url: url('/search', ['q' => $query]),
+            url: $searchUrl,
+            robots: 'noindex, follow',
         );
         session(['page_seo_data' => $seoData]);
 

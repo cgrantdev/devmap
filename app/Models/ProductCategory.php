@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\CompareSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -59,6 +60,53 @@ class ProductCategory extends Model
     public function educationPost()
     {
         return $this->hasOne(EducationPost::class, 'product_category_id');
+    }
+
+    /**
+     * Resolve the category a /compare/{slug} URL should serve.
+     *
+     * Prefers an exact stored slug, then a case-insensitive match
+     * (MySQL's collation already does this; SQLite and binary collations
+     * do not), then a unique normalized match so "Vitamin B12" is reachable
+     * at /compare/vitamin-b12. Ambiguous normalizations return null.
+     */
+    public static function findForCompareSlug(string $routeSlug): ?self
+    {
+        $routeSlug = trim($routeSlug);
+        if ($routeSlug === '') {
+            return null;
+        }
+
+        $exact = static::query()->where('is_active', true)->where('slug', $routeSlug)->first();
+        if ($exact) {
+            return $exact;
+        }
+
+        $lower = static::query()
+            ->where('is_active', true)
+            ->whereRaw('LOWER(slug) = ?', [strtolower($routeSlug)])
+            ->first();
+        if ($lower) {
+            return $lower;
+        }
+
+        $canonical = CompareSlug::canonical($routeSlug);
+        if ($canonical === null) {
+            return null;
+        }
+
+        $matches = static::query()
+            ->where('is_active', true)
+            ->get()
+            ->filter(fn (self $category) => CompareSlug::canonical($category->slug) === $canonical)
+            ->values();
+
+        if ($matches->count() === 1) {
+            return $matches->first();
+        }
+
+        return $matches->first(fn (self $category) => $category->slug === $routeSlug)
+            ?? $matches->first(fn (self $category) => strtolower((string) $category->slug) === strtolower($routeSlug));
     }
 
     /**

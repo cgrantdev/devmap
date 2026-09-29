@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\EducationPost;
 use App\Models\SeoPage;
 use App\Models\Setting;
+use App\Support\CompareSlug;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -807,7 +808,10 @@ class EncyclopediaController extends Controller
                 })
                 ->exists();
             if ($hasPricedProducts) {
-                $comparePath = url("/compare/{$slug}");
+                $compareSlug = CompareSlug::canonical($category->slug);
+                if ($compareSlug) {
+                    $comparePath = url("/compare/{$compareSlug}");
+                }
             }
         }
 
@@ -852,7 +856,7 @@ class EncyclopediaController extends Controller
             // Frontend renders these with distinct anchor text so Google can
             // see the three pages serve three intents: learn / compare / buy.
             'relatedPages' => [
-                'compare' => ['url' => url("/compare/{$category->slug}"), 'anchor' => "Compare {$category->name} prices across vendors"],
+                'compare' => ['url' => url('/compare/' . (CompareSlug::canonical($category->slug) ?? $category->slug)), 'anchor' => "Compare {$category->name} prices across vendors"],
                 'shop' => ['url' => url("/products?category={$category->slug}"), 'anchor' => "Shop {$category->name} — all available products"],
             ],
             // $educationPost may be null when a ProductCategory exists but

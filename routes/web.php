@@ -139,10 +139,12 @@ Route::get('/bacteriostatic-water', [\App\Http\Controllers\Frontend\Bacteriostat
 
 Route::get('/compare', [CompareController::class, 'index'])->name('compare');
 // Per-compound compare pages — /compare/bpc-157, /compare/semaglutide, etc.
-// Placed AFTER /compare (specific) but constrained to [a-z0-9-]+ so it
-// doesn't shadow future /compare/{action}-style additions.
+// Placed AFTER /compare (specific). The pattern is permissive so historical
+// sitemap slugs (BPC-157, "Vitamin B12", slash blends) reach the controller,
+// which 301s them to the canonical [a-z0-9-]+ URL. A second route with the
+// same URI cannot coexist — Laravel's route collection replaces it.
 Route::get('/compare/{slug}', [CompareController::class, 'show'])
-    ->where('slug', '[a-z0-9-]+')
+    ->where('slug', '.+')
     ->name('compare.compound');
 
 // Coupon-code landing pages — Colin Sep 16, targeting the
@@ -633,7 +635,9 @@ Route::get('/vendors', [BrandsController::class, 'index'])->name('vendors.public
 Route::get('/shop/{vendor_name}', function ($vendor_name) {
     return redirect("/brand/{$vendor_name}", 301);
 })->name('shop.public');
-Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])->name('product.public');
+Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])
+    ->whereNumber('id')
+    ->name('product.public');
 
 // Banner-slot analytics — generic; any slot can be tracked whether or not it maps to a Banner row.
 Route::post('/api/banner-events/impressions', [\App\Http\Controllers\Api\BannerEventController::class, 'impressions']);

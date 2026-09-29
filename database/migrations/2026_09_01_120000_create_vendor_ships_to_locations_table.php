@@ -33,7 +33,7 @@ return new class extends Migration
         // (Safe if a vendor already has no location_id — inserts skip nulls.)
         \DB::statement("
             INSERT INTO vendor_ships_to_locations (vendor_setting_id, location_id, created_at, updated_at)
-            SELECT id, location_id, NOW(), NOW()
+            SELECT id, location_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
             FROM vendor_settings
             WHERE location_id IS NOT NULL
         ");
