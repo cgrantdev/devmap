@@ -1478,10 +1478,10 @@ class ProductsController extends Controller
     }
 
     /**
-     * Build an affiliate-tagged URL for the 'Visit website' button.
-     * Priority order matches OutboundClickController::resolveDestinationUrl:
-     *   1. vendor_settings.referral_url (the affiliate program's canonical
-     *      tracked URL — single source of truth per vendor)
+     * Build an affiliate-tagged URL for the brand-level 'Visit website'
+     * button. This is the vendor root, not a product hop — /go/{id}
+     * resolves the product deep link separately.
+     *   1. vendor_settings.referral_url (affiliate entry link)
      *   2. brands.affiliate_url_template applied to shop_url
      *   3. raw shop_url
      */
