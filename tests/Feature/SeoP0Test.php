@@ -76,6 +76,23 @@ class SeoP0Test extends TestCase
             ->assertDontSee('<h1 class="ssr-seo-h1">Cheapest GLP3-R</h1>', false);
     }
 
+    public function test_vs_case_and_order_redirect_in_one_hop(): void
+    {
+        ProductCategory::create(['name' => 'Retatrutide', 'slug' => 'Retatrutide', 'is_active' => true]);
+        ProductCategory::create(['name' => 'Tirzepatide', 'slug' => 'Tirzepatide', 'is_active' => true]);
+
+        $this->get('/compare/Tirzepatide-vs-Retatrutide')
+            ->assertStatus(301)
+            ->assertRedirect('/compare/retatrutide-vs-tirzepatide');
+
+        $this->get('/compare/tirzepatide-vs-retatrutide')
+            ->assertStatus(301)
+            ->assertRedirect('/compare/retatrutide-vs-tirzepatide');
+
+        $this->withoutVite();
+        $this->get('/compare/retatrutide-vs-tirzepatide')->assertOk();
+    }
+
     public function test_legacy_product_id_slug_redirects_to_canonical_url(): void
     {
         $brand = Brand::create([
@@ -111,13 +128,13 @@ class SeoP0Test extends TestCase
     {
         $this->withoutVite();
 
-        $this->get('/search?q=retatrutide')
+        $this->get('/search?q=retatrutide&tab=products&utm_source=newsletter')
             ->assertOk()
             ->assertSee('<link rel="canonical" href="https://peptidemap.com/search?q=retatrutide" />', false)
             ->assertSee('<meta name="robots" content="noindex, follow" />', false)
             ->assertDontSee('/search/retatrutide', false);
 
-        $this->get('/search')
+        $this->get('/search?tab=vendors')
             ->assertOk()
             ->assertSee('<link rel="canonical" href="https://peptidemap.com/search" />', false)
             ->assertSee('<meta name="robots" content="noindex, follow" />', false);

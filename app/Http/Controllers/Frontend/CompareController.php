@@ -349,11 +349,18 @@ class CompareController extends Controller
         // separator. Since no legit compound slug contains '-vs-', a single
         // strpos check disambiguates cleanly.
         if ($canonical && str_contains($canonical, '-vs-')) {
-            if ($canonical !== $slug) {
-                return redirect()->route('compare.compound', ['slug' => $canonical], 301);
+            // Case-fold and alphabetical order in one hop. Otherwise
+            // /compare/Tirzepatide-vs-Retatrutide 301s to the lowercase
+            // reverse pair, and showVs 301s again to the alpha URL.
+            $final = $this->canonicalVsSlug($canonical);
+            if (!$final) {
+                abort(404);
+            }
+            if ($final !== $slug) {
+                return redirect()->route('compare.compound', ['slug' => $final], 301);
             }
 
-            return $this->showVs($canonical);
+            return $this->showVs($final);
         }
 
         if (!$canonical) {
@@ -607,6 +614,27 @@ class CompareController extends Controller
     }
 
     /**
+     * Lowercase hyphenated pair in alphabetical order: a-vs-b with a < b.
+     * Null when the slug is not a real pair (missing side, or a vs a).
+     */
+    private function canonicalVsSlug(string $slug): ?string
+    {
+        $pos = strpos($slug, '-vs-');
+        if ($pos === false) {
+            return null;
+        }
+        $a = substr($slug, 0, $pos);
+        $b = substr($slug, $pos + 4);
+        if ($a === '' || $b === '' || $a === $b) {
+            return null;
+        }
+        if (strcmp($a, $b) > 0) {
+            return $b . '-vs-' . $a;
+        }
+        return $a . '-vs-' . $b;
+    }
+
+    /**
      * X-vs-Y compare page: /compare/{a}-vs-{b}
      *
      * Head-to-head compound comparison. Two-column deep-dive using
@@ -618,15 +646,15 @@ class CompareController extends Controller
      */
     private function showVs(string $slug)
     {
-        $pos = strpos($slug, '-vs-');
-        $aSlug = substr($slug, 0, $pos);
-        $bSlug = substr($slug, $pos + 4);
-        if ($aSlug === '' || $bSlug === '' || $aSlug === $bSlug) abort(404);
-
-        // Alphabetical canonical — search engines see one page per pair.
-        if (strcmp($aSlug, $bSlug) > 0) {
-            return redirect("/compare/{$bSlug}-vs-{$aSlug}", 301);
+        $final = $this->canonicalVsSlug($slug);
+        if (!$final) abort(404);
+        if ($final !== $slug) {
+            return redirect()->route('compare.compound', ['slug' => $final], 301);
         }
+
+        $pos = strpos($final, '-vs-');
+        $aSlug = substr($final, 0, $pos);
+        $bSlug = substr($final, $pos + 4);
 
         $a = ProductCategory::findForCompareSlug($aSlug);
         $b = ProductCategory::findForCompareSlug($bSlug);
