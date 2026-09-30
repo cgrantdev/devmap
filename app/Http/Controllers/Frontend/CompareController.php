@@ -411,10 +411,11 @@ class CompareController extends Controller
 
         $displayName = CompoundDisplay::label($category->name);
         // Compare pages use the raw category name for the H1, visible
-        // FAQs, and FAQPage schema. CompoundDisplay pseudonyms (GLP3-R,
-        // GLP1-S, …) stay secondary: the alias chip, plus a fifth FAQ
-        // only when that alias differs. Product and storefront pages
-        // still lead with the pseudonym.
+        // FAQs, and FAQPage schema. CompoundDisplay labels stay
+        // secondary: the alias chip, plus a fifth FAQ when the label
+        // differs. That map mixes GLP codes with descriptive expansions
+        // (Blend, GLOW, KLOW), so the extra FAQ stays neutrally worded.
+        // Product and storefront pages still lead with the display label.
         $seoName = $category->name;
         $alias = $displayName !== $seoName ? $displayName : null;
         $educationPost = $category->educationPost;
@@ -438,8 +439,9 @@ class CompareController extends Controller
             : "Vendor comparison for {$seoName} — currently no in-stock listings on Peptidemap.";
 
         // One source for visible FAQs and FAQPage schema. Always $seoName
-        // — never the CompoundDisplay pseudonym — so on-page copy matches
-        // the rich result. The alias question is added only when it differs.
+        // — never the CompoundDisplay label — so on-page copy matches the
+        // rich result. The alias question is added only when the label
+        // differs, and it does not call that label a vendor synonym.
         $faqPairs = ($vendorCount > 0 && $cheapest) ? [
             [
                 'q' => "What is the cheapest {$seoName}?",
@@ -461,7 +463,7 @@ class CompareController extends Controller
         if ($alias && $faqPairs) {
             $faqPairs[] = [
                 'q' => "Is {$alias} the same as {$seoName}?",
-                'a' => "{$alias} is a common research-vendor synonym for {$seoName}. PeptideMap lists {$seoName} as the primary name; {$alias} appears as an alias for search/catalog matching. Listings are research use only (RUO).",
+                'a' => "{$alias} is an alternate label PeptideMap uses for {$seoName}. PeptideMap lists {$seoName} as the primary name; {$alias} appears as an alias for search and catalog matching. Listings are research use only (RUO).",
             ];
         }
 

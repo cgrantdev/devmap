@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Support\CompoundDisplay;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -91,6 +92,11 @@ class SeoP0Test extends TestCase
             'slug' => 'bpc-157',
             'is_active' => true,
         ]);
+        $glow = ProductCategory::create([
+            'name' => 'GLOW',
+            'slug' => 'glow',
+            'is_active' => true,
+        ]);
         $brand = Brand::create([
             'name' => 'Example Research',
             'slug' => 'example-research',
@@ -114,10 +120,21 @@ class SeoP0Test extends TestCase
             'status' => 'active',
             'hidden' => false,
         ]);
+        Product::create([
+            'name' => 'GLOW blend',
+            'slug' => 'glow-blend',
+            'brand_id' => $brand->id,
+            'product_category_id' => $glow->id,
+            'price' => 40,
+            'status' => 'active',
+            'hidden' => false,
+        ]);
 
         $this->withoutVite();
 
-        $aliasAnswer = 'GLP3-R is a common research-vendor synonym for Retatrutide. PeptideMap lists Retatrutide as the primary name; GLP3-R appears as an alias for search/catalog matching. Listings are research use only (RUO).';
+        $aliasAnswer = 'GLP3-R is an alternate label PeptideMap uses for Retatrutide. PeptideMap lists Retatrutide as the primary name; GLP3-R appears as an alias for search and catalog matching. Listings are research use only (RUO).';
+        $glowAlias = CompoundDisplay::label('GLOW');
+        $glowAnswer = "{$glowAlias} is an alternate label PeptideMap uses for GLOW. PeptideMap lists GLOW as the primary name; {$glowAlias} appears as an alias for search and catalog matching. Listings are research use only (RUO).";
 
         $this->get('/compare/retatrutide')
             ->assertOk()
@@ -127,6 +144,8 @@ class SeoP0Test extends TestCase
             ->assertSee('What is the cheapest Retatrutide?', false)
             ->assertSee('Is GLP3-R the same as Retatrutide?', false)
             ->assertSee($aliasAnswer, false)
+            ->assertDontSee('research-vendor synonym', false)
+            ->assertDontSee('Peptidemap lists Retatrutide', false)
             ->assertDontSee('What is the cheapest GLP3-R?', false)
             ->assertDontSee('How many vendors sell GLP3-R?', false)
             ->assertInertia(fn ($page) => $page
@@ -156,6 +175,19 @@ class SeoP0Test extends TestCase
                 ->where('compound.alias', null)
                 ->has('compound.faqs', 4)
                 ->has('seo.schema.3.mainEntity', 4)
+            );
+
+        $this->get('/compare/glow')
+            ->assertOk()
+            ->assertDontSee('research-vendor synonym', false)
+            ->assertInertia(fn ($page) => $page
+                ->where('compound.name', 'GLOW')
+                ->where('compound.alias', $glowAlias)
+                ->has('compound.faqs', 5)
+                ->where('compound.faqs.4.q', "Is {$glowAlias} the same as GLOW?")
+                ->where('compound.faqs.4.a', $glowAnswer)
+                ->where('seo.schema.3.mainEntity.4.name', "Is {$glowAlias} the same as GLOW?")
+                ->where('seo.schema.3.mainEntity.4.acceptedAnswer.text', $glowAnswer)
             );
     }
 
