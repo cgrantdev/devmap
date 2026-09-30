@@ -410,10 +410,14 @@ class CompareController extends Controller
             ->values();
 
         $displayName = CompoundDisplay::label($category->name);
-        // SEO/schema name — always the raw compound name, never the
-        // pseudonym. Google sees "Semaglutide" everywhere it matters
-        // for ranking; visitors see "GLP1-S" on the visible page.
+        // Compare pages use the raw category name for the H1, visible
+        // FAQs, and FAQPage schema. CompoundDisplay labels stay
+        // secondary: the alias chip, plus a fifth FAQ when the label
+        // differs. That map mixes GLP codes with descriptive expansions
+        // (Blend, GLOW, KLOW), so the extra FAQ stays neutrally worded.
+        // Product and storefront pages still lead with the display label.
         $seoName = $category->name;
+        $alias = $displayName !== $seoName ? $displayName : null;
         $educationPost = $category->educationPost;
         $summary = $educationPost?->overview ?: $educationPost?->description;
         $summary = $summary ? strip_tags($summary) : null;
@@ -433,6 +437,35 @@ class CompareController extends Controller
               . ($cheapestFmt ? ". Prices from {$cheapestFmt}" . ($priciestFmt && $priciestFmt !== $cheapestFmt ? " to {$priciestFmt}" : '') : '')
               . ". Coupon codes and lab-testing status on every listing."
             : "Vendor comparison for {$seoName} — currently no in-stock listings on Peptidemap.";
+
+        // One source for visible FAQs and FAQPage schema. Always $seoName
+        // — never the CompoundDisplay label — so on-page copy matches the
+        // rich result. The alias question is added only when the label
+        // differs, and it does not call that label a vendor synonym.
+        $faqPairs = ($vendorCount > 0 && $cheapest) ? [
+            [
+                'q' => "What is the cheapest {$seoName}?",
+                'a' => "The lowest {$seoName} price on Peptidemap is {$cheapestFmt} from " . ($products->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
+            ],
+            [
+                'q' => "How many vendors sell {$seoName}?",
+                'a' => "{$vendorCount} verified research-peptide vendors currently stock {$seoName} on Peptidemap, with {$productCount} distinct product listings.",
+            ],
+            [
+                'q' => "Is there a coupon code for {$seoName}?",
+                'a' => "Most vendors on Peptidemap offer a Peptidemap coupon code (usually 10–35% off). The exact code and discount for each vendor is listed in the pricing table on this page.",
+            ],
+            [
+                'q' => "How does Peptidemap compare {$seoName} prices?",
+                'a' => "Peptidemap ingests each vendor's live catalog daily, applies their current Peptidemap coupon discount, and sorts by the price you actually pay after code. All listings are for research use only (RUO).",
+            ],
+        ] : [];
+        if ($alias && $faqPairs) {
+            $faqPairs[] = [
+                'q' => "Is {$alias} the same as {$seoName}?",
+                'a' => "{$alias} is an alternate label PeptideMap uses for {$seoName}. PeptideMap lists {$seoName} as the primary name; {$alias} appears as an alias for search and catalog matching. Listings are research use only (RUO).",
+            ];
+        }
 
         // ItemList + Offer schema — turns this from an informational page into
         // a commercial-intent page for search engines.
@@ -479,10 +512,10 @@ class CompareController extends Controller
             'og_image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0),
             'image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0),
             'url' => url("/compare/{$slug}"),
-            // SSR H1 matches the visible Vue H1 (compound.name is the raw
-            // compound). The GLP pseudonym stays on the alias chip — it was
-            // leaking into this hidden heading as "Cheapest GLP3-R".
-            'h1' => "Cheapest {$seoName}",
+            // SSR H1 matches the visible Vue H1: primary compound name only.
+            // Commercial "Cheapest …" stays in title and og_title. The GLP
+            // pseudonym stays on the alias chip — it must not appear in H1.
+            'h1' => $seoName,
             'schema' => array_values(array_filter([
                 $itemList,
                 $breadcrumb,
@@ -506,65 +539,25 @@ class CompareController extends Controller
                         'availability' => 'https://schema.org/InStock',
                     ],
                 ] : null,
-                // FAQPage — rich snippet on common commercial-intent
-                // questions. Answers pull real data from this page so
-                // the SERP snippet doubles as instant social proof.
-                $vendorCount > 0 && $cheapest ? [
+                // FAQPage — same question/answer strings as the visible
+                // FAQs ($faqPairs). $seoName on both sides so the rich
+                // result matches on-page copy.
+                $faqPairs ? [
                     '@context' => 'https://schema.org',
                     '@type' => 'FAQPage',
                     '@id' => url("/compare/{$slug}") . '#faq',
-                    'mainEntity' => [
-                        [
-                            '@type' => 'Question',
-                            'name' => "What is the cheapest {$seoName}?",
-                            'acceptedAnswer' => [
-                                '@type' => 'Answer',
-                                'text' => "The lowest {$seoName} price on Peptidemap is {$cheapestFmt} from " . ($products->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
-                            ],
+                    'mainEntity' => array_map(fn (array $faq) => [
+                        '@type' => 'Question',
+                        'name' => $faq['q'],
+                        'acceptedAnswer' => [
+                            '@type' => 'Answer',
+                            'text' => $faq['a'],
                         ],
-                        [
-                            '@type' => 'Question',
-                            'name' => "How many vendors sell {$seoName}?",
-                            'acceptedAnswer' => [
-                                '@type' => 'Answer',
-                                'text' => "{$vendorCount} verified research-peptide vendors currently stock {$seoName} on Peptidemap, with {$productCount} distinct product listings.",
-                            ],
-                        ],
-                        [
-                            '@type' => 'Question',
-                            'name' => "Is there a coupon code for {$seoName}?",
-                            'acceptedAnswer' => [
-                                '@type' => 'Answer',
-                                'text' => "Most vendors on Peptidemap offer a Peptidemap coupon code (usually 10–35% off). The exact code and discount for each vendor is listed in the pricing table on this page.",
-                            ],
-                        ],
-                        [
-                            '@type' => 'Question',
-                            'name' => "How does Peptidemap compare {$seoName} prices?",
-                            'acceptedAnswer' => [
-                                '@type' => 'Answer',
-                                'text' => "Peptidemap ingests each vendor's live catalog daily, applies their current Peptidemap coupon discount, and sorts by the price you actually pay after code. All listings are for research use only (RUO).",
-                            ],
-                        ],
-                    ],
+                    ], $faqPairs),
                 ] : null,
             ])),
         ];
         session(['page_seo_data' => $seo]);
-
-        // Same 4 questions we emit in FAQPage schema — passed to the Vue
-        // side so answers render VISIBLY on the page. Google requires
-        // visible FAQ content for the rich snippet to be valid.
-        $visibleFaqs = ($vendorCount > 0 && $cheapest) ? [
-            ['q' => "What is the cheapest {$displayName}?",
-             'a' => "The lowest {$displayName} price on Peptidemap is {$cheapestFmt} from " . ($products->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$displayName} listings across {$vendorCount} vendors and updates prices daily."],
-            ['q' => "How many vendors sell {$displayName}?",
-             'a' => "{$vendorCount} verified research-peptide vendors currently stock {$displayName} on Peptidemap, with {$productCount} distinct product listings."],
-            ['q' => "Is there a coupon code for {$displayName}?",
-             'a' => "Most vendors on Peptidemap offer a Peptidemap coupon code (usually 10–35% off). The exact code and discount for each vendor is listed in the pricing table on this page."],
-            ['q' => "How does Peptidemap compare {$displayName} prices?",
-             'a' => "Peptidemap ingests each vendor's live catalog daily, applies their current Peptidemap coupon discount, and sorts by the price you actually pay after code. All listings are for research use only (RUO)."],
-        ] : [];
 
         return Inertia::render('Frontend/CompareCompound', [
             // Echo the active filter state back to the view so the chip
@@ -586,7 +579,7 @@ class CompareController extends Controller
                 // rank. Product page + storefront still lead with the
                 // pseudonym as they did.
                 'name' => $seoName,
-                'alias' => $displayName !== $seoName ? $displayName : null,
+                'alias' => $alias,
                 'raw_name' => $category->name,
                 'slug' => $category->slug,
                 'summary' => $summary,
@@ -596,7 +589,7 @@ class CompareController extends Controller
                 'cheapest_price' => $cheapest,
                 'priciest_price' => $priciest,
                 'products' => $products,
-                'faqs' => $visibleFaqs,
+                'faqs' => $faqPairs,
             ],
             'related' => $related,
             'vsPairs' => collect($this->resolveFeaturedPairs())

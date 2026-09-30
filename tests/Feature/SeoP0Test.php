@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Support\CompoundDisplay;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -72,8 +73,122 @@ class SeoP0Test extends TestCase
 
         $this->get('/compare/retatrutide')
             ->assertOk()
-            ->assertSee('<h1 class="ssr-seo-h1">Cheapest Retatrutide</h1>', false)
+            ->assertSee('<h1 class="ssr-seo-h1">Retatrutide</h1>', false)
+            ->assertSee('<title>Cheapest Retatrutide — 0 Vendors Compared — Peptidemap</title>', false)
+            ->assertDontSee('<h1 class="ssr-seo-h1">Cheapest Retatrutide</h1>', false)
+            ->assertDontSee('<h1 class="ssr-seo-h1">GLP3-R</h1>', false)
             ->assertDontSee('<h1 class="ssr-seo-h1">Cheapest GLP3-R</h1>', false);
+    }
+
+    public function test_compare_faqs_use_primary_name_and_keep_alias_secondary(): void
+    {
+        $retatrutide = ProductCategory::create([
+            'name' => 'Retatrutide',
+            'slug' => 'retatrutide',
+            'is_active' => true,
+        ]);
+        $bpc = ProductCategory::create([
+            'name' => 'BPC-157',
+            'slug' => 'bpc-157',
+            'is_active' => true,
+        ]);
+        $glow = ProductCategory::create([
+            'name' => 'GLOW',
+            'slug' => 'glow',
+            'is_active' => true,
+        ]);
+        $brand = Brand::create([
+            'name' => 'Example Research',
+            'slug' => 'example-research',
+            'is_active' => true,
+        ]);
+        Product::create([
+            'name' => 'Retatrutide 10mg',
+            'slug' => 'retatrutide-10mg',
+            'brand_id' => $brand->id,
+            'product_category_id' => $retatrutide->id,
+            'price' => 49.50,
+            'status' => 'active',
+            'hidden' => false,
+        ]);
+        Product::create([
+            'name' => 'BPC-157 5mg',
+            'slug' => 'bpc-157-5mg',
+            'brand_id' => $brand->id,
+            'product_category_id' => $bpc->id,
+            'price' => 30,
+            'status' => 'active',
+            'hidden' => false,
+        ]);
+        Product::create([
+            'name' => 'GLOW blend',
+            'slug' => 'glow-blend',
+            'brand_id' => $brand->id,
+            'product_category_id' => $glow->id,
+            'price' => 40,
+            'status' => 'active',
+            'hidden' => false,
+        ]);
+
+        $this->withoutVite();
+
+        $aliasAnswer = 'GLP3-R is an alternate label PeptideMap uses for Retatrutide. PeptideMap lists Retatrutide as the primary name; GLP3-R appears as an alias for search and catalog matching. Listings are research use only (RUO).';
+        $glowAlias = CompoundDisplay::label('GLOW');
+        $glowAnswer = "{$glowAlias} is an alternate label PeptideMap uses for GLOW. PeptideMap lists GLOW as the primary name; {$glowAlias} appears as an alias for search and catalog matching. Listings are research use only (RUO).";
+
+        $this->get('/compare/retatrutide')
+            ->assertOk()
+            ->assertSee('<h1 class="ssr-seo-h1">Retatrutide</h1>', false)
+            ->assertSee('<title>Cheapest Retatrutide — 1 Vendors Compared — Peptidemap</title>', false)
+            ->assertSee('property="og:title" content="Cheapest Retatrutide — 1 Vendors Compared"', false)
+            ->assertSee('What is the cheapest Retatrutide?', false)
+            ->assertSee('Is GLP3-R the same as Retatrutide?', false)
+            ->assertSee($aliasAnswer, false)
+            ->assertDontSee('research-vendor synonym', false)
+            ->assertDontSee('Peptidemap lists Retatrutide', false)
+            ->assertDontSee('What is the cheapest GLP3-R?', false)
+            ->assertDontSee('How many vendors sell GLP3-R?', false)
+            ->assertInertia(fn ($page) => $page
+                ->component('Frontend/CompareCompound')
+                ->where('compound.name', 'Retatrutide')
+                ->where('compound.alias', 'GLP3-R')
+                ->where('seo.h1', 'Retatrutide')
+                ->where('seo.title', 'Cheapest Retatrutide — 1 Vendors Compared')
+                ->where('seo.og_title', 'Cheapest Retatrutide — 1 Vendors Compared')
+                ->has('compound.faqs', 5)
+                ->where('compound.faqs.0.q', 'What is the cheapest Retatrutide?')
+                ->where('compound.faqs.0.a', 'The lowest Retatrutide price on Peptidemap is $49.50 from Example Research. Peptidemap tracks 1 Retatrutide listings across 1 vendors and updates prices daily.')
+                ->where('compound.faqs.4.q', 'Is GLP3-R the same as Retatrutide?')
+                ->where('compound.faqs.4.a', $aliasAnswer)
+                ->where('seo.schema.3.mainEntity.0.name', 'What is the cheapest Retatrutide?')
+                ->where('seo.schema.3.mainEntity.4.name', 'Is GLP3-R the same as Retatrutide?')
+                ->where('seo.schema.3.mainEntity.4.acceptedAnswer.text', $aliasAnswer)
+            );
+
+        $this->get('/compare/bpc-157')
+            ->assertOk()
+            ->assertSee('<h1 class="ssr-seo-h1">BPC-157</h1>', false)
+            ->assertSee('What is the cheapest BPC-157?', false)
+            ->assertDontSee('Is BPC-157 the same as BPC-157?', false)
+            ->assertInertia(fn ($page) => $page
+                ->where('compound.name', 'BPC-157')
+                ->where('compound.alias', null)
+                ->has('compound.faqs', 4)
+                ->has('seo.schema.3.mainEntity', 4)
+            );
+
+        $this->get('/compare/glow')
+            ->assertOk()
+            ->assertDontSee('research-vendor synonym', false)
+            ->assertInertia(fn ($page) => $page
+                ->where('compound.name', 'GLOW')
+                ->where('compound.alias', $glowAlias)
+                ->has('compound.faqs', 5)
+                ->where('compound.faqs.4.q', "Is {$glowAlias} the same as GLOW?")
+                ->where('compound.faqs.4.a', $glowAnswer)
+                ->where('seo.schema.3.mainEntity.4.name', "Is {$glowAlias} the same as GLOW?")
+                ->where('seo.schema.3.mainEntity.4.acceptedAnswer.text', $glowAnswer)
+            );
     }
 
     public function test_vs_case_and_order_redirect_in_one_hop(): void
