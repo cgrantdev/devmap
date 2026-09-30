@@ -152,8 +152,9 @@ class BlogsController extends Controller
                     : 'Read the latest article about '.$blog->title.' on '.$siteName.'.');
             $seoOgTitle = $blog->seo_og_title ?: $seoTitle;
             $seoOgDescription = $blog->seo_og_description ?: $seoDescription;
-            $seoOgImage = $blog->seo_og_image
-                ? (str_starts_with($blog->seo_og_image, 'http') ? $blog->seo_og_image : url($blog->seo_og_image))
+            $storedOg = ImageHelper::listingImageUrl($blog->seo_og_image);
+            $seoOgImage = $storedOg
+                ? (str_starts_with($storedOg, 'http') ? $storedOg : url($storedOg))
                 : $blogImage;
         } else {
             // Auto-generate SEO from blog fields

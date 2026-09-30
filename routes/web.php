@@ -698,6 +698,33 @@ Route::middleware(['vendor.api', 'throttle:60,1'])->prefix('api/vendor')->group(
         ->where('external_id', '.*');
 });
 
+// Bare slash-blend aliases. /encyclopedia/Selank/Semax already 301s to
+// compare; /Selank/Semax (no prefix) did not match a route and 404ed.
+// Registered after every real two- and three-segment route. Unknown
+// pairs still 404 — this does not invent encyclopedia pages.
+$bareBlend = function (string $a, string $b, ?string $c = null) {
+    $segments = [$a, $b];
+    if ($c !== null && $c !== '') {
+        $segments[] = $c;
+    }
+    $target = \App\Models\ProductCategory::bareBlendRedirectPath($segments);
+    if (! $target) {
+        abort(404);
+    }
+
+    return redirect($target, 301);
+};
+// Segments keep leading/trailing spaces. "BPC-157 / TB500 / Cartalax"
+// arrives as three path pieces, and trimming them stops the stored slug
+// from matching. Anything that is not a known blend still 404s.
+$blendSegment = '[^/]+';
+Route::get('/{a}/{b}', $bareBlend)
+    ->where(['a' => $blendSegment, 'b' => $blendSegment])
+    ->name('blend.bare');
+Route::get('/{a}/{b}/{c}', $bareBlend)
+    ->where(['a' => $blendSegment, 'b' => $blendSegment, 'c' => $blendSegment])
+    ->name('blend.bare.triple');
+
 // Catch-all route for any other page slugs (must be last to avoid conflicts with other routes)
 // This allows creating new pages dynamically without adding routes
 Route::get('/{slug}', [FrontendPagesController::class, 'show'])->name('page.show')->where('slug', '[a-z0-9-]+');

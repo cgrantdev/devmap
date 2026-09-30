@@ -181,11 +181,7 @@ class CompareController extends Controller
                         'discount_price' => $product->discount_price !== null ? (float) $product->discount_price : null,
                         'effective_price' => $retail,
                         'final_price' => $finalPrice,
-                        'pmap_price' => $pmapPrice,
-                        'currency_code' => \App\Support\Currency::codeFor($product->brand?->vendorSetting?->location?->name),
                         'currency_symbol' => \App\Support\Currency::symbolFor($product->brand?->vendorSetting?->location?->name),
-                        'image_url' => $product->image_url,
-                        'product_url' => $product->product_url,
                         'go_url' => "/go/{$product->id}",
                         'brand_name' => $product->brand?->name,
                         'brand_slug' => $product->brand?->slug,
@@ -218,9 +214,13 @@ class CompareController extends Controller
             $freshRow = Product::visible()
                 ->where('status', 'active')
                 ->where('product_category_id', $category->id)
-                ->selectRaw('GREATEST(COALESCE(MAX(last_scraped_at), 0), COALESCE(MAX(updated_at), 0)) as latest')
+                ->selectRaw('MAX(last_scraped_at) as latest_scraped, MAX(updated_at) as latest_updated')
                 ->first();
-            $latestTs = $freshRow?->latest ? \Carbon\Carbon::parse($freshRow->latest) : null;
+            $latestRaw = collect([$freshRow?->latest_scraped, $freshRow?->latest_updated])
+                ->filter(fn ($value) => $value !== null && $value !== '')
+                ->sort()
+                ->last();
+            $latestTs = $latestRaw ? \Carbon\Carbon::parse($latestRaw) : null;
 
             $compounds->push([
                 'id' => $category->id,
@@ -383,6 +383,13 @@ class CompareController extends Controller
         }]);
 
         $products = $this->productsForCategory($category);
+        // Filtered URLs canonical to the clean compare page. Title, H1 source
+        // counts, description, and FAQ schema stay on the unfiltered catalog
+        // so ?location= / ?verified= cannot retitle the document to
+        // "0 Vendors Compared". The table below still uses $products.
+        $documentProducts = $this->compareListingIsFiltered()
+            ? $this->productsForCategory($category, false)
+            : $products;
 
         // Related compounds — up to 8 other featured compounds by product count.
         // Gives the reader natural next-clicks; also builds the internal-link
@@ -422,10 +429,10 @@ class CompareController extends Controller
         $summary = $educationPost?->overview ?: $educationPost?->description;
         $summary = $summary ? strip_tags($summary) : null;
 
-        $vendorCount = $products->pluck('brand_name')->unique()->count();
-        $productCount = $products->count();
-        $cheapest = $products->first()['final_price'] ?? null;
-        $priciest = $products->last()['final_price'] ?? null;
+        $vendorCount = $documentProducts->pluck('brand_name')->unique()->count();
+        $productCount = $documentProducts->count();
+        $cheapest = $documentProducts->first()['final_price'] ?? null;
+        $priciest = $documentProducts->last()['final_price'] ?? null;
 
         // SEO — title leads with buying intent, description names the numbers.
         $cheapestFmt = $cheapest ? '$' . number_format($cheapest, 2) : null;
@@ -445,7 +452,7 @@ class CompareController extends Controller
         $faqPairs = ($vendorCount > 0 && $cheapest) ? [
             [
                 'q' => "What is the cheapest {$seoName}?",
-                'a' => "The lowest {$seoName} price on Peptidemap is {$cheapestFmt} from " . ($products->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
+                'a' => "The lowest {$seoName} price on Peptidemap is {$cheapestFmt} from " . ($documentProducts->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
             ],
             [
                 'q' => "How many vendors sell {$seoName}?",
@@ -474,7 +481,7 @@ class CompareController extends Controller
             '@type' => 'ItemList',
             'name' => "{$seoName} vendor comparison",
             'numberOfItems' => $productCount,
-            'itemListElement' => $products->take(20)->values()->map(fn ($p, $i) => [
+            'itemListElement' => $documentProducts->take(20)->values()->map(fn ($p, $i) => [
                 '@type' => 'ListItem',
                 'position' => $i + 1,
                 'item' => [
@@ -804,29 +811,57 @@ class CompareController extends Controller
     }
 
     /**
+     * True when the compare URL is a filtered view (location, verified
+     * badges, or USP). Empty query values do not count.
+     */
+    private function compareListingIsFiltered(): bool
+    {
+        if (trim((string) request()->get('location', '')) !== '') {
+            return true;
+        }
+        if (trim((string) request()->get('usp', '')) !== '') {
+            return true;
+        }
+
+        return collect(explode(',', (string) request()->get('verified', '')))
+            ->map(fn ($t) => trim($t))
+            ->filter(fn ($t) => in_array($t, ['cgmp', 'testing_7x'], true))
+            ->isNotEmpty();
+    }
+
+    /**
      * Shared product-mapping used by /compare (index) and /compare/{slug} (show).
      * Returns the vendor rows for one category, cheapest final_price first,
      * priced only ($0 excluded), with brand + coupon info attached.
+     *
+     * Pass $applyRequestFilters false when building the canonical document
+     * (title, description, FAQ schema) for a filtered URL.
      */
-    private function productsForCategory(ProductCategory $category)
+    private function productsForCategory(ProductCategory $category, bool $applyRequestFilters = true)
     {
-        // Site-wide header location filter (?location=Country). When set,
-        // scope to vendors based in that country so the compare table only
-        // shows relevant rows.
-        $locationFilter = trim((string) request()->get('location', ''));
+        $locationFilter = '';
+        $verifiedTypes = collect();
+        $uspFilter = '';
 
-        // Trust filters — Colin PMAP tab 1 asked for these on compare
-        // pages too. Same URL contract as /vendors: ?verified=cgmp,testing_7x
-        // (AND across selected badges) and ?usp=us_manufactured. Filter
-        // narrows to products whose BRAND holds the required trust
-        // signals — verified via approved VendorCertificationClaim rows
-        // and self-declared usps on vendor_settings.
-        $verifiedTypes = collect(explode(',', (string) request()->get('verified', '')))
-            ->map(fn ($t) => trim($t))
-            ->filter(fn ($t) => in_array($t, ['cgmp', 'testing_7x'], true))
-            ->unique()
-            ->values();
-        $uspFilter = trim((string) request()->get('usp', ''));
+        if ($applyRequestFilters) {
+            // Site-wide header location filter (?location=Country). When set,
+            // scope to vendors based in that country so the compare table only
+            // shows relevant rows.
+            $locationFilter = trim((string) request()->get('location', ''));
+
+            // Trust filters — Colin PMAP tab 1 asked for these on compare
+            // pages too. Same URL contract as /vendors: ?verified=cgmp,testing_7x
+            // (AND across selected badges) and ?usp=us_manufactured. Filter
+            // narrows to products whose BRAND holds the required trust
+            // signals — verified via approved VendorCertificationClaim rows
+            // and self-declared usps on vendor_settings.
+            $verifiedTypes = collect(explode(',', (string) request()->get('verified', '')))
+                ->map(fn ($t) => trim($t))
+                ->filter(fn ($t) => in_array($t, ['cgmp', 'testing_7x'], true))
+                ->unique()
+                ->values();
+            $uspFilter = trim((string) request()->get('usp', ''));
+        }
 
         return Product::visible()
             ->where('status', 'active')

@@ -402,24 +402,6 @@ class HomeController extends Controller
     }
 
     /**
-     * Resolve an image URL, falling back to a deterministic picsum.photos
-     * placeholder when the real file is missing/unavailable. Temporary until
-     * the production storage tree is rsync'd across.
-     */
-    private function resolveImage(?string $path, string $folder, string $seed, int $w, int $h): ?string
-    {
-        if ($path) {
-            $full = storage_path('app/public/' . $folder . '/' . $path);
-            if (file_exists($full)) {
-                return asset('storage/' . $folder . '/' . $path);
-            }
-        }
-        // Fallback: picsum.photos with a deterministic seed so each blog/product
-        // always gets the same placeholder across reloads.
-        return "https://picsum.photos/seed/{$seed}/{$w}/{$h}";
-    }
-
-    /**
      * Preview of the redesigned homepage at /home-v2.
      * Independent data-fetching from index() so the live site stays untouched
      * while we iterate on the new design.
@@ -486,7 +468,7 @@ class HomeController extends Controller
             // with withCount()'s product_count alias.
             ->orderByDesc(
                 \App\Models\VendorSetting::query()
-                    ->selectRaw('GREATEST(COALESCE(is_partner, 0), COALESCE(featured, 0))')
+                    ->selectRaw('CASE WHEN COALESCE(is_partner, 0) >= COALESCE(featured, 0) THEN COALESCE(is_partner, 0) ELSE COALESCE(featured, 0) END')
                     ->whereColumn('brand_id', 'brands.id')
                     ->limit(1)
             )
@@ -553,8 +535,9 @@ class HomeController extends Controller
                     $full = storage_path('app/public/' . $imageUrl);
                     $imageUrl = file_exists($full) ? asset('storage/' . $imageUrl) : null;
                 }
-                // Fallback placeholder keyed to product id
-                $placeholder = "https://picsum.photos/seed/pmap-prod-{$product->id}/600/600";
+                if (ImageHelper::isStockPlaceholder($imageUrl)) {
+                    $imageUrl = null;
+                }
 
                 return [
                     'id' => $product->id,
@@ -562,7 +545,7 @@ class HomeController extends Controller
                     'product_type' => $product->product_type,
                     'brand_discount_percent' => $product->brand_discount_percent,
                     'brand_coupon_code' => $product->brand_coupon_code,
-                    'image_url' => $imageUrl ?: $placeholder,
+                    'image_url' => $imageUrl,
                     'url' => $product->brand && $product->brand->slug
                         ? '/product/' . $product->brand->slug . '/' . ($product->slug ?? 'product') . '/' . $product->id
                         : '/product/' . ($product->slug ?? 'product') . '/' . $product->id,
@@ -596,13 +579,12 @@ class HomeController extends Controller
             ->take(4)
             ->get()
             ->map(function ($blog) {
-                $image = $this->resolveImage($blog->image, 'blogs', "pmap-blog-{$blog->id}", 800, 500);
                 return [
                     'id' => $blog->id,
                     'title' => $blog->title,
                     'slug' => $blog->slug,
                     'excerpt' => $blog->description,
-                    'image' => $image,
+                    'image' => ImageHelper::listingImageUrl($blog->image),
                     'date' => $blog->published_at ? $blog->published_at->format('M d, Y') : null,
                     'read_time' => $blog->read_time ?? '5 min read',
                 ];
@@ -739,7 +721,10 @@ class HomeController extends Controller
             ->get()
             ->map(function ($category) {
                 $post = $category->educationPost;
-                $image = $this->resolveImage($category->image_url, 'categories', "pmap-cat-{$category->id}", 800, 500);
+                $rawImage = is_string($category->image_url) ? $category->image_url : null;
+                $image = ($rawImage && (str_starts_with($rawImage, 'http') || str_starts_with($rawImage, '/')))
+                    ? ImageHelper::listingImageUrl($rawImage)
+                    : null;
                 return [
                     'id' => $category->id,
                     'name' => $category->name,

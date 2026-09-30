@@ -848,33 +848,10 @@ class EncyclopediaController extends Controller
             ],
         ];
 
-        // Canonical consolidation (Colin Sep 16 — GSC data showed
-        // /encyclopedia/tirzepatide bleeding 1,070 imp/mo at pos 77
-        // while /compare/tirzepatide sits at pos 49 with better
-        // commercial signal). When a compound has an active compare
-        // page — meaning it's in FEATURED_COMPOUND_NAMES AND has
-        // priced products — canonicalize the encyclopedia article
-        // to the compare page so both URLs pool their authority
-        // instead of competing. Encyclopedia page still exists and
-        // serves informational intent; Google just picks compare as
-        // the primary for ranking purposes.
-        $comparePath = url('/encyclopedia/'.$publicSlug);
-        if (in_array($category->name, \App\Http\Controllers\Frontend\CompareController::FEATURED_COMPOUND_NAMES, true)) {
-            $hasPricedProducts = \App\Models\Product::visible()
-                ->where('status', 'active')
-                ->where('product_category_id', $category->id)
-                ->where(function ($q) {
-                    $q->where('discount_price', '>', 0)
-                      ->orWhere(function ($qq) { $qq->whereNull('discount_price')->where('price', '>', 0); });
-                })
-                ->exists();
-            if ($hasPricedProducts) {
-                $compareSlug = CompareSlug::canonical($category->slug);
-                if ($compareSlug) {
-                    $comparePath = url("/compare/{$compareSlug}");
-                }
-            }
-        }
+        // Encyclopedia articles self-canonical. Compare stays a body/CTA
+        // link (relatedPages below), not rel=canonical — pointing the
+        // encyclopedia document at /compare splits the informational URL.
+        $encyclopediaUrl = url('/encyclopedia/'.$publicSlug);
 
         // Build SEO array (same format as products/brands pages)
         $seo = [
@@ -887,8 +864,8 @@ class EncyclopediaController extends Controller
             'og_image' => $seoOgImage,
             // Backward-compatible field used by some pages
             'image' => $seoOgImage,
-            'url' => url('/encyclopedia/'.$publicSlug),
-            'canonical' => $comparePath,
+            'url' => $encyclopediaUrl,
+            'canonical' => $encyclopediaUrl,
             'schema' => array_values(array_filter([
                 $definedTermSchema,
                 $breadcrumbSchema,
@@ -924,11 +901,7 @@ class EncyclopediaController extends Controller
             // no matching EducationPost row has been created yet. Every
             // access below now uses the null-safe operator so the page
             // still renders with empty defaults instead of throwing.
-            'primaryResearch' => [
-                'institution' => $profile?->researchInstitution() ?: ($profile ? '' : 'University of Zagreb (Croatia)'),
-                'url' => $educationPost?->research_url
-                    ?: ($profile?->researchUrl() ?: '#'),
-            ],
+            'primaryResearch' => $this->primaryResearch($educationPost, $profile),
             'molecularInfo' => [
                 'formula' => $educationPost?->molecular_formula ?? '',
                 'molecularWeight' => $educationPost?->molecular_weight ?? '',
@@ -985,6 +958,29 @@ class EncyclopediaController extends Controller
         return Inertia::render('Frontend/EncyclopediaArticleDetail', array_merge($peptideData, [
             'seo' => $seo,
         ]));
+    }
+
+    /**
+     * Real primary-research citation only. Empty entries omit the block
+     * rather than inventing an institution or a "#" link.
+     *
+     * @return array{institution: ?string, url: ?string}|null
+     */
+    private function primaryResearch(?EducationPost $post, ?FramingProfile $profile): ?array
+    {
+        $institution = trim((string) ($profile?->researchInstitution() ?? ''));
+        $url = trim((string) ($post?->research_url ?: ($profile?->researchUrl() ?? '')));
+        if ($url === '' || $url === '#' || str_starts_with($url, '#')) {
+            $url = '';
+        }
+        if ($institution === '' && $url === '') {
+            return null;
+        }
+
+        return [
+            'institution' => $institution !== '' ? $institution : null,
+            'url' => $url !== '' ? $url : null,
+        ];
     }
 
     /**

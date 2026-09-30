@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Append-only for actually-new middleware. Configure CSRF exceptions
         // via the framework helper instead of subclassing VerifyCsrfToken.
         $middleware->web(append: [
+            \App\Http\Middleware\RedirectCompareTrailingSlash::class,
             \App\Http\Middleware\ComingSoon::class,
             \App\Http\Middleware\BindDemoMode::class,
             \App\Http\Middleware\HandleInertiaRequests::class,

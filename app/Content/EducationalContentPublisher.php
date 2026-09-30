@@ -14,8 +14,8 @@ use RuntimeException;
  *
  * Listing cards read blogs.image and educational_guides.cover. Cover artwork
  * ships in resources/content/educational/images and is copied to
- * public/images/educational on sync. An existing blog image (the live FDA
- * Unsplash cover) is left in place.
+ * public/images/educational on sync. A stored stock-CDN image (Unsplash,
+ * picsum, and the other lorem hosts) is replaced by the article cover.
  */
 class EducationalContentPublisher
 {
