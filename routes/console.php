@@ -74,6 +74,14 @@ Schedule::command('feeds:sync-vendors')
     ->withoutOverlapping()
     ->runInBackground();
 
+// Purgo Labs targeted scraper — no feed URL, no Woo, so the generic
+// pipeline undercounts. JSON-LD walk of purgolabs.com/products.
+// 05:30 UTC (01:30 ET) — after the generic feed sync.
+Schedule::command('purgo:sync')
+    ->dailyAt('05:30')
+    ->withoutOverlapping()
+    ->runInBackground();
+
 // Daily affiliate-stats pull. Hits each configured vendor's affiliate
 // program API (GoAffPro today; Refersion/Impact clients to add) and
 // caches the snapshot on vendor_settings.affiliate_stats_json. Powers
