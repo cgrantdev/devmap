@@ -42,7 +42,8 @@ class EncyclopediaBlendSitemapTest extends TestCase
         $xml = $this->get('/sitemap.xml')->assertOk()->getContent();
         $locs = $this->locs($xml);
 
-        $this->assertStringContainsString('https://peptidemap.com/encyclopedia/Vitamin%20B12', $locs);
+        $this->assertStringContainsString('https://peptidemap.com/encyclopedia/vitamin-b12', $locs);
+        $this->assertStringNotContainsString('encyclopedia/Vitamin%20B12', $locs);
         $this->assertStringContainsString('https://peptidemap.com/encyclopedia/BPC-157', $locs);
         $this->assertStringContainsString('https://peptidemap.com/encyclopedia/BPC-157-TB-500', $locs);
 
@@ -80,20 +81,20 @@ class EncyclopediaBlendSitemapTest extends TestCase
         $this->get('/encyclopedia/Nope/Thing')->assertNotFound();
     }
 
-    public function test_spaced_encyclopedia_slug_still_resolves_and_hyphen_form_redirects(): void
+    public function test_vitamin_b12_space_slug_redirects_to_the_hyphen_canonical(): void
     {
         ProductCategory::create(['name' => 'Vitamin B12', 'slug' => 'Vitamin B12', 'is_active' => true]);
 
-        $this->get('/encyclopedia/vitamin-b12')
+        $this->get('/encyclopedia/Vitamin%20B12')
             ->assertStatus(301)
-            ->assertRedirect('/encyclopedia/Vitamin B12');
+            ->assertRedirect('/encyclopedia/vitamin-b12');
 
         $this->get('/encyclopedia/article/Vitamin%20B12')
             ->assertStatus(301)
-            ->assertRedirect('/encyclopedia/Vitamin B12');
+            ->assertRedirect('/encyclopedia/vitamin-b12');
 
         $this->withoutVite();
-        $this->get('/encyclopedia/Vitamin%20B12')->assertOk();
+        $this->get('/encyclopedia/vitamin-b12')->assertOk();
     }
 
     private function sitemapPath(string $slug): string

@@ -149,7 +149,13 @@ Route::get('/guides/{slug}', [GuidesController::class, 'show'])
 Route::get('/encyclopedia', [EncyclopediaController::class, 'index'])->name('encyclopedia');
 // Legacy /encyclopedia/article/{slug} redirects to clean URL.
 // Registered before the catch-all so "article/..." is not swallowed.
-Route::get('/encyclopedia/article/{slug}', fn ($slug) => redirect("/encyclopedia/{$slug}", 301));
+Route::get('/encyclopedia/article/{slug}', function ($slug) {
+    $target = \App\Models\ProductCategory::encyclopediaRedirectPath($slug)
+        ?? \App\Support\EncyclopediaSlug::path($slug)
+        ?? '/encyclopedia/'.$slug;
+
+    return redirect($target, 301);
+});
 // Permissive so historical sitemap slugs that contain "/" (Selank/Semax,
 // "BPC-157 / TB500 / Cartalax") reach the controller, which 301s them.
 // The route does not gain a new encyclopedia page for those blends.

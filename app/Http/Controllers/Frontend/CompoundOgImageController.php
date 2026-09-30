@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Frontend\Concerns\RendersOgImage;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Support\EncyclopediaFraming;
+use App\Support\EncyclopediaSlug;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
@@ -28,9 +30,16 @@ class CompoundOgImageController extends Controller
             ->where('slug', $slug)
             ->where('is_active', true)
             ->first();
+        if (!$category) {
+            $category = ProductCategory::findForPublicSlug(EncyclopediaSlug::publicSlug($slug) ?? $slug);
+            if ($category) {
+                $category->load('educationPost');
+            }
+        }
         if (!$category) return $this->fallbackOg(self::FALLBACK_PNG);
 
         $ep = $category->educationPost;
+        $profile = EncyclopediaFraming::match($category->slug, $category->name);
         $mtime = max(
             $category->updated_at?->timestamp ?? 0,
             $ep?->updated_at?->timestamp ?? 0,
@@ -43,17 +52,21 @@ class CompoundOgImageController extends Controller
             self::FALLBACK_PNG,
             fn () => View::make('og.compound', [
                 'category'    => $category,
-                'fullName'    => $ep?->peptide_full_name,
-                'tagline'     => $this->tagline($ep, $category),
+                'fullName'    => $ep?->peptide_full_name ?: $profile?->subtitle(),
+                'tagline'     => $this->tagline($ep, $category, $profile),
+                'eyebrow'     => $profile?->ogEyebrow() ?? 'Peptide Compound Guide',
                 'vendorCount' => $this->vendorCount($category),
                 'fromPrice'   => $this->fromPrice($category),
             ])->render()
         );
     }
 
-    private function tagline($educationPost, ProductCategory $category): ?string
+    private function tagline($educationPost, ProductCategory $category, $profile = null): ?string
     {
         $raw = $educationPost?->description ?? $category->description;
+        if (!$raw && $profile) {
+            $raw = $profile->cardDescription();
+        }
         if (!$raw) return null;
         return Str::limit(strip_tags($raw), 180);
     }

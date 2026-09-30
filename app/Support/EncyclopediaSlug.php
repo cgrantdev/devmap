@@ -6,15 +6,68 @@ namespace App\Support;
  * /encyclopedia/{slug} is one path segment. A category slug that contains
  * "/" ("Selank/Semax", "BPC-157 / TB500 / Cartalax") is split by the router
  * and 404s, so it must not be advertised as an encyclopedia loc.
- * Spaces are fine: "Vitamin B12" is one segment and already returns 200.
+ *
+ * A few stored slugs keep spaces or mixed case in the database. Their
+ * public encyclopedia URL is the hyphen form, and the space, mixed-case,
+ * and short aliases 301 there. Other space slugs are unchanged.
  */
 class EncyclopediaSlug
 {
+    /**
+     * Public hyphen slug => accepted request aliases (already normalized).
+     *
+     * @var array<string, list<string>>
+     */
+    private const FAMILIES = [
+        'hgh-191aa' => ['hgh-191aa', 'hgh 191aa'],
+        'vitamin-b12' => ['vitamin-b12', 'vitamin b12'],
+        'phosphate-buffered-saline' => ['phosphate-buffered-saline', 'phosphate buffered saline', 'pbs'],
+        'sterile-water' => ['sterile-water', 'sterile water'],
+        'thymosin-beta-4-fragment-1-4' => [
+            'thymosin-beta-4-fragment-1-4',
+            'thymosin beta-4 fragment 1-4',
+            'thymosin beta 4 fragment 1-4',
+        ],
+        'alpha-klotho-lr' => ['alpha-klotho-lr', 'alpha-klotho lr', 'alpha klotho lr'],
+        'n-acetyl-larazotide' => ['n-acetyl-larazotide', 'n-acetyl larazotide', 'n acetyl larazotide'],
+    ];
+
     public static function isResolvable(?string $slug): bool
     {
         $slug = (string) $slug;
 
         return $slug !== '' && ! str_contains($slug, '/');
+    }
+
+    /**
+     * Hyphen canonical for a forced family, or null when this slug is not
+     * one of those aliases.
+     */
+    public static function publicSlug(?string $slug): ?string
+    {
+        $key = self::normalize($slug);
+        if ($key === '') {
+            return null;
+        }
+
+        foreach (self::FAMILIES as $canonical => $aliases) {
+            if (in_array($key, $aliases, true)) {
+                return $canonical;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Stored-slug aliases that should resolve to a public hyphen URL,
+     * including the public slug itself.
+     *
+     * @return list<string>
+     */
+    public static function aliasesFor(string $publicSlug): array
+    {
+        return self::FAMILIES[$publicSlug] ?? [$publicSlug];
     }
 
     /**
@@ -27,6 +80,17 @@ class EncyclopediaSlug
             return null;
         }
 
-        return '/encyclopedia/'.$slug;
+        $public = self::publicSlug($slug);
+
+        return '/encyclopedia/'.($public ?? $slug);
+    }
+
+    public static function normalize(?string $slug): string
+    {
+        $slug = strtolower(trim((string) $slug));
+        $slug = str_replace('_', ' ', $slug);
+        $slug = preg_replace('/\s+/', ' ', $slug) ?? $slug;
+
+        return $slug;
     }
 }

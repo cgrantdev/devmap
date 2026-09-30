@@ -1760,7 +1760,6 @@ function residueColor(letter) {
 
 // Computed values for reactive SEO updates
 const seoTitle = computed(() => {
-  // Use SEO title if provided, otherwise auto-generate
   if (props.seo?.title) {
     return props.seo.title
   }
@@ -1770,7 +1769,6 @@ const seoTitle = computed(() => {
 })
 
 const seoDescription = computed(() => {
-  // Use SEO description if provided, otherwise generate from overview
   if (props.seo?.description) {
     return props.seo.description
   }
@@ -1778,7 +1776,8 @@ const seoDescription = computed(() => {
     const desc = props.overview.replace(/\s+/g, ' ').trim()
     return desc.length > 160 ? desc.substring(0, 160) + '...' : desc
   }
-  return `Comprehensive guide to ${props.name || props.categoryName || 'this peptide'} peptides.`
+  const compoundName = props.name || props.categoryName || 'this compound'
+  return `Encyclopedia entry for ${compoundName}.`
 })
 
 const url = computed(() => {
