@@ -364,8 +364,8 @@
                         <span class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800">{{ promotionTypes[p.promo_type] }}</span>
                         <span v-if="p.is_live" class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-red-600 text-white">● Live</span>
                         <span v-else-if="p.is_scheduled" class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-amber-600 text-white">◷ Scheduled</span>
-                        <span v-else-if="!p.is_active" class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-slate-300 text-slate-700">Paused</span>
-                        <span v-else class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-600">Ended</span>
+                        <span v-else-if="promoStatus(p) === 'ended'" class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-600">Ended</span>
+                        <span v-else class="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-slate-300 text-slate-700">Paused</span>
                       </div>
                       <div class="text-slate-700 mt-1 ui-mono">
                         <span v-if="p.percent != null">{{ p.percent }}%</span>
@@ -1016,6 +1016,16 @@ function setBoostDuration(hours) {
   const g = (t) => parts.find(p => p.type === t)?.value || '00'
   boostForm.expires_at = `${g('year')}-${g('month')}-${g('day')}T${g('hour')}:${g('minute')}`
 }
+// Distinguish auto-expired ("Ended") from manually deactivated
+// ("Paused") — Julia Sep 30 flagged that expired promos were
+// showing as "Paused". Ended = past ends_at. Paused = manually
+// flipped off (still-future or open-ended end).
+function promoStatus(p) {
+  if (!p || p.is_active) return 'active'
+  if (p.ends_at && new Date(p.ends_at) <= new Date()) return 'ended'
+  return 'paused'
+}
+
 function formatBoostExpiry(iso) {
   if (!iso) return ''
   // Colin/Julia Sep 22 — display in EST/EDT across the board, no
