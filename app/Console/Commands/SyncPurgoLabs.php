@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Brand;
 use App\Models\Product;
+use App\Models\ProductCategory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -183,6 +184,13 @@ class SyncPurgoLabs extends Command
             'stock_status' => 'in_stock',
             'description' => $p['description'],
             'external_id' => $extId,
+            // Julia 10/2: scraped Purgo rows kept landing hidden because
+            // DiscoverProductsJob's auto-hide for uncategorized rows set
+            // hidden=true and this scraper never cleared it. Purgo is an
+            // approved vendor — unhide + status active on every sync.
+            'hidden' => false,
+            'status' => 'active',
+            'product_category_id' => $this->categorize($slug, $p['name']),
         ];
 
         if ($existing) {
@@ -194,6 +202,61 @@ class SyncPurgoLabs extends Command
         $attrs['slug'] = $this->uniqueSlug($brandId, $p['name'], $slug);
         Product::create($attrs);
         return 'new';
+    }
+
+    /**
+     * Map a Purgo slug/name to a ProductCategory id, falling back to
+     * the uncategorized bucket if nothing matches. Purgo's catalog uses
+     * in-house pseudonyms ("Glp 2 T" → Tirzepatide, "Klow" → KLOW blend,
+     * "AHK Cu" → AHK-Cu copper peptide) that the generic matcher misses.
+     */
+    private function categorize(string $slug, string $name): ?int
+    {
+        static $cache = [];
+        $key = strtolower($slug);
+        if (array_key_exists($key, $cache)) return $cache[$key];
+
+        // slug-based pseudonym map (keys match the URL token on purgolabs.com)
+        $pseudonyms = [
+            'glp-1-s' => 'Semaglutide',
+            'glp-2-t' => 'Tirzepatide',
+            'glp-3-r' => 'Retatrutide',
+            'glp-4-metatrutide' => 'Retatrutide', // closest match until metatrutide has its own category
+            'klow' => 'KLOW',
+            'glow-complex' => 'GLOW',
+            'glow-caps' => 'GLOW',
+            'ahk-cu' => 'AHK-Cu',
+            'ghkcu' => 'GHK-Cu',
+            'ghk-cu-spray' => 'GHK-Cu',
+            'ghk-cu-copper-peptide-shampoo' => 'GHK-Cu',
+            'ghk-cu-copper-peptide-capsule-cream' => 'GHK-Cu',
+            'ghk-cu-lift-cream' => 'GHK-Cu',
+            'ghk-cu-whipped-tallow-honey-balm' => 'GHK-Cu',
+            'cjc-ipamorelin-no-dac' => 'CJC-1295 / Ipamorelin',
+            'ipamorlin' => 'Ipamorelin',
+            'melanoton-1' => 'Melanotan',
+            'tesamorlin' => 'Tesamorelin',
+            'selank-semax-blend' => 'Selank',
+            'semax-selank-spray' => 'Semax',
+            'pt-141-oxytocin-xo-spray' => 'PT-141',
+            'pt-141-spray' => 'PT-141',
+            'nad-plus' => 'NAD+',
+            'nad-plus-spray' => 'NAD+',
+            'dsip-pinealon-zzz-spray' => 'DSIP',
+            'adamax-research-spray' => 'Adamax',
+        ];
+
+        $target = $pseudonyms[$key] ?? null;
+
+        // Fallback: match on normalized name (strip size suffix, lowercase)
+        if (!$target) {
+            $normalized = strtolower(preg_replace('/\s*\(.*?\)|\s*\d+(?:mcg|mg|g|ml|oz|iu).*$/i', '', $name));
+            $cat = ProductCategory::whereRaw('LOWER(name) = ?', [trim($normalized)])->first();
+            return $cache[$key] = $cat?->id;
+        }
+
+        $cat = ProductCategory::where('name', $target)->first();
+        return $cache[$key] = $cat?->id;
     }
 
     private function uniqueSlug(int $brandId, string $name, string $fallback): string
