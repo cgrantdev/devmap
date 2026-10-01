@@ -21,6 +21,7 @@ class VendorPromotionsController extends Controller
     {
         $brand = Brand::findOrFail($brandId);
         $validated = $this->validated($request);
+        $validated = $this->normalizeTimestamps($validated);
 
         $validated['brand_id'] = $brand->id;
         VendorPromotion::create($validated);
@@ -33,6 +34,7 @@ class VendorPromotionsController extends Controller
         $brand = Brand::findOrFail($brandId);
         $promo = VendorPromotion::where('brand_id', $brand->id)->findOrFail($id);
         $validated = $this->validated($request);
+        $validated = $this->normalizeTimestamps($validated);
 
         $promo->update($validated);
 
@@ -46,6 +48,29 @@ class VendorPromotionsController extends Controller
         $promo->delete();
 
         return back()->with('flash_success', 'Promotion removed.');
+    }
+
+    /**
+     * The admin UI uses <input type="datetime-local">, which submits a
+     * naive "YYYY-MM-DDTHH:MM" string with no zone. Laravel's `date`
+     * validator + the model's datetime cast then treat that string as
+     * the app timezone (UTC), so "11:59 PM" becomes 23:59 UTC = 7:59
+     * PM EDT — the exact 4-hour shift Julia flagged on Oct 2.
+     *
+     * Julia enters times in ET (America/New_York handles the EDT/EST
+     * swap). Re-parse in that zone, convert to UTC, hand Carbon
+     * instances back so the cast stores them correctly. Mirrors
+     * VendorsController::applyCouponBoost's handling.
+     */
+    private function normalizeTimestamps(array $validated): array
+    {
+        $tz = new \DateTimeZone('America/New_York');
+        foreach (['starts_at', 'ends_at'] as $k) {
+            if (!empty($validated[$k])) {
+                $validated[$k] = \Carbon\Carbon::parse($validated[$k], $tz)->utc();
+            }
+        }
+        return $validated;
     }
 
     private function validated(Request $request): array
