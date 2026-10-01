@@ -272,14 +272,19 @@
               </select>
             </td>
             <td class="px-5 py-3.5" @click.stop>
-              <select
-                :value="sizeOptions.includes(normalizedSize(product.size_mg)) ? normalizedSize(product.size_mg) : ''"
-                @change="updateField(product.id, 'size_mg', $event.target.value || null)"
+              <!-- Datalist, not select: Julia 10/2 flagged that new sizes
+                   (10mcg, 20mg/2.5mg etc.) weren't selectable from the
+                   fixed dropdown. Combobox lets her type any valid size
+                   while still surfacing suggestions. onChange fires on
+                   blur / Enter, matching the former select UX. -->
+              <input
+                type="text"
+                :value="normalizedSize(product.size_mg)"
+                @change="updateField(product.id, 'size_mg', $event.target.value.trim() || null)"
+                list="admin-product-sizes"
+                placeholder="—"
                 class="w-full px-2 py-1.5 text-[12px] border border-[color:var(--color-hairline)] rounded bg-white text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] focus:outline-none focus:ring-1 focus:ring-[color:var(--color-accent-400)] ui-mono"
-              >
-                <option value="">—</option>
-                <option v-for="size in sizeOptions" :key="size" :value="size">{{ size }}</option>
-              </select>
+              />
             </td>
             <td class="px-5 py-3.5">
               <span class="ui-mono text-[13px] text-[color:var(--color-ink)]">${{ product.price || '0.00' }}</span>
@@ -372,6 +377,13 @@
         >Next</button>
       </div>
     </div>
+
+    <!-- Shared datalist for the inline size combobox on every row.
+         Keeps the row <input list="admin-product-sizes"> free-text while
+         still offering sizeOptions as suggestions. -->
+    <datalist id="admin-product-sizes">
+      <option v-for="size in sizeOptions" :key="size" :value="size" />
+    </datalist>
   </AdminLayout>
 </template>
 
@@ -418,8 +430,8 @@ const typeOptions = ['Peptide', 'Capsule', 'Nasal Spray', 'Topical', 'Kit', 'Bio
 // Common research peptide vial sizes + blend ratios.
 // Each option is the literal string stored in size_mg.
 const sizeOptions = [
-  // Microgram singles (GHK-Cu, oxytocin, sermorelin variants, etc.)
-  '50mcg', '100mcg', '250mcg', '300mcg', '500mcg', '1000mcg',
+  // Microgram singles (GHK-Cu, oxytocin, sermorelin, alphaKlothoLR, etc.)
+  '10mcg', '20mcg', '30mcg', '50mcg', '100mcg', '250mcg', '300mcg', '500mcg', '1000mcg',
   // Singles 0.5–100mg (granular at the small end where peptides actually vary)
   '0.5mg', '1mg', '2mg', '2.5mg', '3mg', '5mg', '6mg', '8mg', '10mg',
   '13mg', '15mg', '16mg', '20mg', '25mg', '30mg', '35mg', '40mg', '45mg',
@@ -436,10 +448,12 @@ const sizeOptions = [
   '1mL', '2mL', '3mL', '5mL', '7mL', '10mL', '20mL', '30mL',
   // Fluid-ounce sizes (topical carriers, some sprays)
   '1oz', '2oz',
-  // Common blend ratios from real vendor listings
+  // Common blend ratios from real vendor listings. Julia 10/2 added the
+  // mg/mg GLP + 2-way blends and the 3-way NAD/MOTS/5-amino-1MQ shape.
   '250mcg/250mcg', '500mcg/500mcg',
   '5mg/5mg', '10mg/3mg', '10mg/10mg', '12.5mg/2.5mg', '13mg/3mg',
-  '50mg/10mg/10mg', '50mg/10mg/10mg/10mg',
+  '20mg/2.5mg', '30mg/5mg', '50mg/10mg',
+  '5mg/5mg/10mg', '50mg/10mg/10mg', '50mg/10mg/10mg/10mg', '100mg/10mg/10mg',
 ]
 
 /**
