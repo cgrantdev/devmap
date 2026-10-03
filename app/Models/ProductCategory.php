@@ -135,6 +135,22 @@ class ProductCategory extends Model
     }
 
     /**
+     * Bare /Name/Name (and three-segment) blend paths have no route of
+     * their own. Reuse the encyclopedia redirect so a known slash blend
+     * 301s to its compare or encyclopedia URL, and unknown pairs 404.
+     *
+     * @param  list<string>  $segments
+     */
+    public static function bareBlendRedirectPath(array $segments): ?string
+    {
+        if (count($segments) < 2) {
+            return null;
+        }
+
+        return static::encyclopediaRedirectPath(implode('/', $segments));
+    }
+
+    /**
      * Where a non-canonical encyclopedia request should 301, if anywhere.
      *
      * Forced families (Vitamin B12, HGH 191AA, PBS, sterile water, and

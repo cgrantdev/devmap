@@ -136,6 +136,10 @@ class ImageHelper
             return null;
         }
 
+        if (self::isStockPlaceholder($image)) {
+            return null;
+        }
+
         if (preg_match('#^https?://#i', $image) === 1 || str_starts_with($image, '/')) {
             return $image;
         }
@@ -145,6 +149,35 @@ class ImageHelper
         }
 
         return '/images/'.$storageDirectory.'/'.$image;
+    }
+
+    /**
+     * Hotlinked lorem/stock CDNs are not listing art. Callers should omit
+     * the image instead of rendering these.
+     */
+    public static function isStockPlaceholder(?string $image): bool
+    {
+        $value = strtolower(trim((string) $image));
+        if ($value === '') {
+            return false;
+        }
+
+        foreach ([
+            'picsum.photos',
+            'unsplash.com',
+            'placehold.co',
+            'placeholder.com',
+            'dummyimage.com',
+            'loremflickr.com',
+            'placekitten.com',
+            'lorem.space',
+        ] as $host) {
+            if (str_contains($value, $host)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

@@ -83,8 +83,11 @@ class EducationalContentTest extends TestCase
         $this->assertSame('Dr. Sarah Chen', $blog->author_name);
         $this->assertSame('Regulatory Affairs Editor', $blog->author_job);
         $this->assertTrue((bool) $blog->is_featured);
-        $this->assertSame('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b', $blog->image);
-        $this->assertSame('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b', $blog->seo_og_image);
+        $this->assertSame('/images/educational/fda-peptide-reclassification-2026.png', $blog->image);
+        $this->assertSame(
+            'https://peptidemap.com/images/educational/fda-peptide-reclassification-2026.png',
+            $blog->seo_og_image
+        );
         $this->assertSame('2026-04-04', $blog->published_at->toDateString());
         $this->assertStringNotContainsString('back to Category 1', (string) $blog->content);
         $this->assertNull($blog->introduction);
@@ -170,6 +173,8 @@ class EducationalContentTest extends TestCase
             ['blog', 'bpc-157-vs-tb-500-evidence', '1.jpg'],
             ['blog', 'bpc-157-vs-tb-500-evidence', '/images/blogs/1.jpg'],
             ['blog', 'bpc-157-vs-tb-500-evidence', 'https://peptidemap.com/images/og-default-v7.png'],
+            ['blog', 'bpc-157-vs-tb-500-evidence', 'https://images.unsplash.com/photo-1'],
+            ['blog', 'bpc-157-vs-tb-500-evidence', 'https://picsum.photos/seed/x/800/500'],
             ['guide', 'beginners-guide-to-research-peptides', null],
             ['guide', 'peptide-legality-fda-ruo-compounding', '/images/og-default-v7.png'],
         ];

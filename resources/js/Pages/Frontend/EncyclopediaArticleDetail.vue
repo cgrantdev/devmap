@@ -128,7 +128,7 @@
                 </h3>
                 <nav class="space-y-1">
                   <a 
-                    v-for="(item, index) in contents" 
+                    v-for="(item, index) in visibleContents" 
                     :key="index"
                     :href="`#${item.id}`"
                     class="block w-full text-left text-sm py-1.5 px-2 rounded transition-colors text-slate-600 hover:bg-slate-100"
@@ -845,8 +845,8 @@
                   </template>
                 </section>
 
-                <!-- References -->
-                <section id="references" class="mb-8">
+                <!-- References — omitted when the entry has no citations. -->
+                <section v-if="references && references.length" id="references" class="mb-8">
                   <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
                     <div class="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5 text-white" aria-hidden="true">
@@ -1798,6 +1798,12 @@ const ogImage = computed(() => {
 
 const canonical = computed(() => {
   return props.seo?.canonical || url.value
+})
+
+const visibleContents = computed(() => {
+  const items = props.contents || []
+  const hasReferences = Array.isArray(props.references) && props.references.length > 0
+  return items.filter((item) => item.id !== 'references' || hasReferences)
 })
 
 // Watch for SEO changes and update document meta tags

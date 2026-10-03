@@ -2,6 +2,7 @@
 
 namespace App\Content;
 
+use App\Helpers\ImageHelper;
 use RuntimeException;
 
 /**
@@ -42,6 +43,10 @@ class ListingImageGuard
 
     public static function isGenericPlaceholder(string $image): bool
     {
+        if (ImageHelper::isStockPlaceholder($image)) {
+            return true;
+        }
+
         $value = strtolower(trim($image));
 
         return str_contains($value, 'og-default')
