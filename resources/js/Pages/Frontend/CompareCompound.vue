@@ -46,7 +46,7 @@
         </div>
 
         <p v-if="compound.summary" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl mb-4">
-          {{ truncate(compound.summary, 320) }}
+          {{ compound.research ? compound.summary : truncate(compound.summary, 320) }}
         </p>
 
         <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -214,6 +214,32 @@
         <a href="/compare" class="ui-focus inline-flex items-center gap-1 h-10 px-4 rounded-md bg-[color:var(--color-ink)] text-white text-[13px] font-semibold hover:opacity-90 transition-opacity">
           Browse other compounds
         </a>
+      </div>
+    </section>
+
+    <!-- Cited trial readout. Retatrutide only; other compounds omit this block. -->
+    <section v-if="compound.research" class="border-t border-[color:var(--color-hairline)] bg-white">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">
+          Published trial readouts
+        </div>
+        <div class="max-w-3xl space-y-4 text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">
+          <p v-for="(paragraph, i) in compound.research.paragraphs" :key="'p'+i">{{ paragraph }}</p>
+          <ul v-if="compound.research.key_points?.length" class="list-disc pl-5 space-y-1">
+            <li v-for="(point, i) in compound.research.key_points" :key="'k'+i">{{ point }}</li>
+          </ul>
+          <div v-for="(section, i) in compound.research.sections" :key="'s'+i" class="space-y-2">
+            <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)]">{{ section.title }}</h2>
+            <p v-for="(paragraph, j) in section.paragraphs" :key="'sp'+i+'-'+j">{{ paragraph }}</p>
+          </div>
+          <p v-if="compound.research.conclusion">{{ compound.research.conclusion }}</p>
+          <p v-if="compound.research.regulatory_note">{{ compound.research.regulatory_note }}</p>
+          <ul v-if="compound.research.references?.length" class="space-y-2">
+            <li v-for="(ref, i) in compound.research.references" :key="'r'+i">
+              <a :href="ref.url" class="text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]" rel="noopener noreferrer" target="_blank">{{ ref.title }}</a>
+            </li>
+          </ul>
+        </div>
       </div>
     </section>
 

@@ -858,7 +858,7 @@ class EncyclopediaController extends Controller
             'key' => 'encyclopedia',
             'title' => $seoTitle,
             'description' => $seoDescription,
-            'h1' => $profile?->h1(),
+            'h1' => filled($educationPost?->seo_h1) ? $educationPost->seo_h1 : $profile?->h1(),
             'og_title' => $seoOgTitle,
             'og_description' => $seoOgDescription,
             'og_image' => $seoOgImage,
@@ -951,6 +951,9 @@ class EncyclopediaController extends Controller
             'conclusion' => $educationPost?->conclusion ?? '',
             'references' => $educationPost && $educationPost->references ? (is_array($educationPost->references) ? $educationPost->references : json_decode($educationPost->references, true) ?? []) : [],
             'products' => $products,
+            // Same-origin featured art only. PubChem stays the structure
+            // fallback when this path is empty.
+            'featuredImage' => $this->localEncyclopediaImage($educationPost?->seo_og_image),
         ];
 
         $peptideData = $this->applyStubNarrative($peptideData, $educationPost, $profile);
@@ -958,6 +961,25 @@ class EncyclopediaController extends Controller
         return Inertia::render('Frontend/EncyclopediaArticleDetail', array_merge($peptideData, [
             'seo' => $seo,
         ]));
+    }
+
+    /**
+     * Featured image committed under public/images/encyclopedia.
+     * Relative paths are what url() turns into this app's origin.
+     */
+    private function localEncyclopediaImage(?string $path): ?string
+    {
+        if (!is_string($path) || !str_starts_with($path, '/images/encyclopedia/')) {
+            return null;
+        }
+        if (str_contains($path, '..')) {
+            return null;
+        }
+        if (!is_file(public_path(ltrim($path, '/')))) {
+            return null;
+        }
+
+        return $path;
     }
 
     /**

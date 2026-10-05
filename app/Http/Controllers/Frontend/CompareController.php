@@ -10,6 +10,7 @@ use App\Models\SeoPage;
 use App\Support\CompareSlug;
 use App\Support\EncyclopediaSlug;
 use App\Support\CompoundDisplay;
+use App\Support\RetatrutideCompareNarrative;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -426,8 +427,14 @@ class CompareController extends Controller
         $seoName = $category->name;
         $alias = $displayName !== $seoName ? $displayName : null;
         $educationPost = $category->educationPost;
-        $summary = $educationPost?->overview ?: $educationPost?->description;
-        $summary = $summary ? strip_tags($summary) : null;
+        $research = RetatrutideCompareNarrative::forSlug($canonical);
+        // Compare copy for retatrutide lives in code so the encyclopedia
+        // overview is never overwritten by the TRIUMPH refresh.
+        $summary = is_array($research) ? ($research['lead'] ?? null) : null;
+        if (!$summary) {
+            $summary = $educationPost?->overview ?: $educationPost?->description;
+            $summary = $summary ? strip_tags($summary) : null;
+        }
 
         $vendorCount = $documentProducts->pluck('brand_name')->unique()->count();
         $productCount = $documentProducts->count();
@@ -590,6 +597,7 @@ class CompareController extends Controller
                 'raw_name' => $category->name,
                 'slug' => $category->slug,
                 'summary' => $summary,
+                'research' => $research,
                 'encyclopedia_url' => $educationPost ? EncyclopediaSlug::path($category->slug) : null,
                 'product_count' => $productCount,
                 'vendor_count' => $vendorCount,
@@ -729,6 +737,7 @@ class CompareController extends Controller
         $products = $this->productsForCategory($category);
         $ep = $category->educationPost;
         $displayName = CompoundDisplay::label($category->name);
+        $vsNarrative = RetatrutideCompareNarrative::forSlug($category->slug);
 
         // These fields might be plain text, JSON array of subsections, or null.
         // Normalize to arrays of {heading, text} entries so the Vue can render
@@ -765,7 +774,8 @@ class CompareController extends Controller
             'product_count' => $products->count(),
             'cheapest_price' => $products->first()['final_price'] ?? null,
             'top_vendors' => $products->take(5)->values(),
-            'summary' => $ep?->overview ? strip_tags($ep->overview) : ($ep?->description ? strip_tags($ep->description) : null),
+            'summary' => (is_array($vsNarrative) ? ($vsNarrative['lead'] ?? null) : null)
+                ?: ($ep?->overview ? strip_tags($ep->overview) : ($ep?->description ? strip_tags($ep->description) : null)),
             'mechanism' => $ep?->mechanism_of_action_intro ? strip_tags($ep->mechanism_of_action_intro) : null,
             'half_life' => $ep?->half_life,
             'administration' => $ep?->administration,

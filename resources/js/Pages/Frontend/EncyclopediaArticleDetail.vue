@@ -56,11 +56,18 @@
               </a>
             </div>
 
-            <!-- Structure image -->
+            <!-- Featured image from this app, otherwise the PubChem structure -->
             <div class="lg:w-52 flex-shrink-0 self-start bg-white border border-[color:var(--color-hairline)] overflow-hidden">
               <div class="p-1 bg-white">
                 <img
-                  v-if="!structureImageFailed"
+                  v-if="featuredImage"
+                  :src="featuredImage"
+                  :alt="`${categoryName || name}`"
+                  class="w-full h-auto"
+                  loading="lazy"
+                />
+                <img
+                  v-else-if="!structureImageFailed"
                   :src="`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(categoryName || name)}/PNG?image_size=200x200`"
                   :alt="`${categoryName || name} structure`"
                   class="w-full h-auto"
@@ -79,7 +86,7 @@
               </div>
               <div class="px-2 py-1 border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] text-[8px] text-[color:var(--color-ink-subtle)] flex justify-between">
                 <span class="ui-mono uppercase tracking-wider">{{ categoryName || name }}</span>
-                <span>PubChem</span>
+                <span>{{ featuredImage ? 'Featured' : 'PubChem' }}</span>
               </div>
             </div>
           </div>
@@ -1485,6 +1492,10 @@ const props = defineProps({
   slug: {
     type: String,
     required: true
+  },
+  featuredImage: {
+    type: String,
+    default: ''
   },
   subtitle: {
     type: String,
