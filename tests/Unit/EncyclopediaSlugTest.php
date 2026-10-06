@@ -28,5 +28,10 @@ class EncyclopediaSlugTest extends TestCase
         $this->assertSame('/encyclopedia/thymosin-beta-4-fragment-1-4', EncyclopediaSlug::path('Thymosin Beta-4 Fragment 1-4'));
         $this->assertSame('/encyclopedia/alpha-klotho-lr', EncyclopediaSlug::path('Alpha-Klotho LR'));
         $this->assertSame('/encyclopedia/n-acetyl-larazotide', EncyclopediaSlug::path('N-Acetyl Larazotide'));
+        $this->assertSame('elamipretide', EncyclopediaSlug::publicSlug('SS-31'));
+        $this->assertSame('elamipretide', EncyclopediaSlug::publicSlug('ss-31'));
+        $this->assertSame('elamipretide', EncyclopediaSlug::publicSlug('ss31'));
+        $this->assertSame('/encyclopedia/elamipretide', EncyclopediaSlug::path('SS-31'));
+        $this->assertSame('/encyclopedia/elamipretide', EncyclopediaSlug::path('elamipretide'));
     }
 }

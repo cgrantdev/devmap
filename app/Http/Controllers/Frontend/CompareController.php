@@ -624,7 +624,9 @@ class CompareController extends Controller
 
     /**
      * Lowercase hyphenated pair in alphabetical order: a-vs-b with a < b.
-     * Null when the slug is not a real pair (missing side, or a vs a).
+     * Encyclopedia aliases (ss-31 / ss31 → elamipretide) are rewritten on
+     * each side before ordering, so both directions 301 once to the live
+     * pair. Null when the slug is not a real pair (missing side, or a vs a).
      */
     private function canonicalVsSlug(string $slug): ?string
     {
@@ -632,8 +634,8 @@ class CompareController extends Controller
         if ($pos === false) {
             return null;
         }
-        $a = substr($slug, 0, $pos);
-        $b = substr($slug, $pos + 4);
+        $a = $this->canonicalCompareSide(substr($slug, 0, $pos));
+        $b = $this->canonicalCompareSide(substr($slug, $pos + 4));
         if ($a === '' || $b === '' || $a === $b) {
             return null;
         }
@@ -641,6 +643,18 @@ class CompareController extends Controller
             return $b . '-vs-' . $a;
         }
         return $a . '-vs-' . $b;
+    }
+
+    /**
+     * SS-31 is the research alias for the live elamipretide slug. Other
+     * encyclopedia families stay put: their aliases are space or case
+     * forms that CompareSlug::canonical already folds.
+     */
+    private function canonicalCompareSide(string $slug): string
+    {
+        $public = EncyclopediaSlug::publicSlug($slug);
+
+        return $public === 'elamipretide' ? $public : $slug;
     }
 
     /**
