@@ -83,6 +83,25 @@
       </div>
     </section>
 
+    <section v-if="faqs.length" class="border-t border-[color:var(--color-hairline)] bg-white">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">
+          Frequently asked
+        </div>
+        <div class="max-w-3xl space-y-6">
+          <div v-for="(f, i) in faqs" :key="i">
+            <h3 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-1.5">{{ f.q }}</h3>
+            <p class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">{{ f.a }}</p>
+          </div>
+        </div>
+        <ol v-if="references.length" class="max-w-3xl mt-8 space-y-2 text-[13px] text-[color:var(--color-ink-muted)] list-decimal pl-5">
+          <li v-for="ref in references" :key="ref.url">
+            <a :href="ref.url" class="underline underline-offset-2 hover:text-[color:var(--color-ink)]" target="_blank" rel="noopener noreferrer">{{ ref.title }}</a>
+          </li>
+        </ol>
+      </div>
+    </section>
+
     <!-- Related pairs -->
     <section v-if="related.length" class="border-t border-[color:var(--color-hairline)]">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
@@ -113,6 +132,8 @@ const props = defineProps({
   b: { type: Object, required: true },
   related: { type: Array, default: () => [] },
   evidenceUrl: { type: String, default: null },
+  faqs: { type: Array, default: () => [] },
+  references: { type: Array, default: () => [] },
   seo: { type: Object, default: () => ({}) },
 })
 

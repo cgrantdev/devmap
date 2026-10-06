@@ -239,7 +239,10 @@
                   </div>
                   <div>
                     <h3 class="font-semibold text-amber-900 mb-1">Research Use Only</h3>
-                    <p class="text-sm text-amber-800 leading-relaxed">
+                    <p v-if="researchUseNotice" class="text-sm text-amber-800 leading-relaxed">
+                      {{ researchUseNotice }}
+                    </p>
+                    <p v-else class="text-sm text-amber-800 leading-relaxed">
                       {{ name }} is an experimental compound not approved for human use by any regulatory agency. This article is for informational and educational purposes only and does not constitute medical advice. Peptidemaps does not provide recommendations on safety, usage, or dosages.
                     </p>
                   </div>
@@ -1470,6 +1473,10 @@ const props = defineProps({
     default: ''
   },
   overviewShort: {
+    type: String,
+    default: ''
+  },
+  researchUseNotice: {
     type: String,
     default: ''
   },

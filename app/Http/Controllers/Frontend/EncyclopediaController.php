@@ -115,6 +115,22 @@ class EncyclopediaController extends Controller
         return $compound[$field] ?? ($field === 'routes' ? [] : '');
     }
 
+    /**
+     * The shared encyclopedia banner says every compound is unapproved.
+     * Forzinity has accelerated approval, so that sentence is false here.
+     * Research-use listings are still not the approved product.
+     */
+    private function researchUseNotice(ProductCategory $category): ?string
+    {
+        $slug = mb_strtolower((string) $category->slug);
+        $name = mb_strtolower((string) $category->name);
+        if ($slug !== 'elamipretide' && $name !== 'elamipretide') {
+            return null;
+        }
+
+        return 'Forzinity (elamipretide) injection has accelerated FDA approval (19 September 2025) for Barth syndrome in patients weighing at least 30 kg. Research-use-only listings sold as elamipretide or SS-31 are not Forzinity. This page is publisher comparison only. It is not medical advice and does not give dosing, administration, or treatment guidance.';
+    }
+
     private function truncateToSentences($text, $maxChars = 350)
     {
         if (empty($text) || strlen($text) <= $maxChars) return $text;
@@ -954,6 +970,7 @@ class EncyclopediaController extends Controller
             // Same-origin featured art only. PubChem stays the structure
             // fallback when this path is empty.
             'featuredImage' => $this->localEncyclopediaImage($educationPost?->seo_og_image),
+            'researchUseNotice' => $this->researchUseNotice($category),
         ];
 
         $peptideData = $this->applyStubNarrative($peptideData, $educationPost, $profile);
