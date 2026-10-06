@@ -9,12 +9,14 @@ namespace App\Support;
  *
  * A few stored slugs keep spaces or mixed case in the database. Their
  * public encyclopedia URL is the hyphen form, and the space, mixed-case,
- * and short aliases 301 there. Other space slugs are unchanged.
+ * and short aliases 301 there. Research aliases use the same map
+ * (ss-31 / ss31 → elamipretide). Other space slugs are unchanged.
  */
 class EncyclopediaSlug
 {
     /**
      * Public hyphen slug => accepted request aliases (already normalized).
+     * Case variants are folded by normalize() before lookup.
      *
      * @var array<string, list<string>>
      */
@@ -30,6 +32,9 @@ class EncyclopediaSlug
         ],
         'alpha-klotho-lr' => ['alpha-klotho-lr', 'alpha-klotho lr', 'alpha klotho lr'],
         'n-acetyl-larazotide' => ['n-acetyl-larazotide', 'n-acetyl larazotide', 'n acetyl larazotide'],
+        // Live encyclopedia slug is lowercase elamipretide. SS-31 is the
+        // research alias; do not advertise a separate encyclopedia page.
+        'elamipretide' => ['elamipretide', 'ss-31', 'ss31'],
     ];
 
     public static function isResolvable(?string $slug): bool
