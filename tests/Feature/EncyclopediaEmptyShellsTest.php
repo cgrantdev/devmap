@@ -64,13 +64,13 @@ class EncyclopediaEmptyShellsTest extends TestCase
         ]);
 
         $categoryCount = ProductCategory::count();
-        $seeder = new EncyclopediaEmptyShellsSeeder();
+        $seeder = new EncyclopediaEmptyShellsSeeder;
         $seeder->run();
 
         $this->assertSame(EncyclopediaEmptyShellsSeeder::SLUGS, $seeder->report['filled']);
         $this->assertSame([], $seeder->report['missing_category']);
         $this->assertSame([], $seeder->report['missing_draft']);
-        $this->assertSame([], $seeder->report['skipped_case_mismatch']);
+        $this->assertSame([], $seeder->report['skipped_slug_collision']);
         $this->assertNotContains('kpv', $seeder->report['created_posts']);
         $this->assertContains('glow', $seeder->report['created_posts']);
         $this->assertSame($categoryCount, ProductCategory::count());
@@ -128,7 +128,7 @@ class EncyclopediaEmptyShellsTest extends TestCase
             ->mapWithKeys(fn (EducationPost $post) => [$post->slug => [$post->overview, $post->updated_at?->toJSON(), $post->seo_og_image]])
             ->all();
 
-        $again = new EncyclopediaEmptyShellsSeeder();
+        $again = new EncyclopediaEmptyShellsSeeder;
         $again->run();
         $this->assertSame([], $again->report['filled']);
         $this->assertEqualsCanonicalizing(EncyclopediaEmptyShellsSeeder::SLUGS, $again->report['skipped_already_filled']);
@@ -186,11 +186,21 @@ class EncyclopediaEmptyShellsTest extends TestCase
             ->assertDontSee('10.1056/NEJMoa2604169', false);
     }
 
-    public function test_seeder_skips_filled_overviews_case_mismatches_missing_categories_and_taken_slugs(): void
+    public function test_seeder_skips_filled_overviews_missing_categories_taken_slugs_and_collisions(): void
     {
         ProductCategory::create([
             'name' => 'KPV',
             'slug' => 'KPV',
+            'is_active' => true,
+        ]);
+        ProductCategory::create([
+            'name' => 'GHRP-2',
+            'slug' => 'ghrp-2',
+            'is_active' => true,
+        ]);
+        ProductCategory::create([
+            'name' => 'GHRP-2 alt',
+            'slug' => 'GHRP-2',
             'is_active' => true,
         ]);
         $snap = ProductCategory::create([
@@ -228,21 +238,86 @@ class EncyclopediaEmptyShellsTest extends TestCase
         ]);
 
         $before = ProductCategory::count();
-        $seeder = new EncyclopediaEmptyShellsSeeder();
+        $seeder = new EncyclopediaEmptyShellsSeeder;
         $seeder->run();
 
         $this->assertSame($before, ProductCategory::count());
-        $this->assertTrue(collect($seeder->report['skipped_case_mismatch'])->contains(fn ($row) => str_starts_with($row, 'kpv ')));
+        $this->assertContains('kpv', $seeder->report['filled']);
+        $this->assertTrue(collect($seeder->report['skipped_slug_collision'])->contains(fn ($row) => str_starts_with($row, 'ghrp-2 ')));
         $this->assertContains('snap-8', $seeder->report['skipped_already_filled']);
         $this->assertContains('dihexa', $seeder->report['missing_category']);
         $this->assertContains('ll-37', $seeder->report['skipped_slug_taken']);
-        $this->assertNull(EducationPost::query()->where('product_category_id', ProductCategory::where('slug', 'KPV')->value('id'))->first());
+        $kpv = EducationPost::query()->where('product_category_id', ProductCategory::where('slug', 'KPV')->value('id'))->firstOrFail();
+        $this->assertSame('KPV', $kpv->slug);
+        $this->assertSame('67727-97-3', $kpv->cas_registry_number);
+        $this->assertSame('KPV', ProductCategory::query()->where('id', $kpv->product_category_id)->value('slug'));
+        $this->assertNull(EducationPost::query()->where('product_category_id', ProductCategory::where('slug', 'ghrp-2')->value('id'))->first());
+        $this->assertNull(EducationPost::query()->where('product_category_id', ProductCategory::where('slug', 'GHRP-2')->value('id'))->first());
         $this->assertNull(ProductCategory::query()->where('slug', 'dihexa')->first());
         $this->assertSame($filled, EducationPost::query()->where('slug', 'snap-8')->firstOrFail()->overview);
         $this->assertNull(EducationPost::query()->where('slug', 'snap-8')->firstOrFail()->seo_og_image);
         $this->assertSame('A real catalog description that should stay.', $snap->fresh()->description);
         $this->assertSame($other->id, EducationPost::query()->where('slug', 'll-37')->firstOrFail()->product_category_id);
         $this->assertNull(EducationPost::query()->where('product_category_id', ProductCategory::where('slug', 'll-37')->value('id'))->first());
+    }
+
+    public function test_seeder_fills_elamipretide_from_title_case_draft_when_category_slug_is_lowercase(): void
+    {
+        $this->assertDirectoryExists(database_path('seeders/data/encyclopedia-shells/Elamipretide'));
+
+        $category = ProductCategory::create([
+            'name' => 'Elamipretide',
+            'slug' => 'elamipretide',
+            'description' => 'peptide encyclopedia stub.',
+            'is_active' => true,
+        ]);
+        $categoryCount = ProductCategory::count();
+
+        $seeder = new EncyclopediaEmptyShellsSeeder;
+        $seeder->run();
+
+        $this->assertSame(['Elamipretide'], $seeder->report['filled']);
+        $this->assertSame(['Elamipretide'], $seeder->report['created_posts']);
+        $this->assertSame([], $seeder->report['skipped_slug_collision']);
+        $this->assertNotContains('Elamipretide', $seeder->report['missing_category']);
+        $this->assertSame($categoryCount, ProductCategory::count());
+        $this->assertSame('elamipretide', $category->fresh()->slug);
+
+        $post = EducationPost::query()->where('product_category_id', $category->id)->firstOrFail();
+        $this->assertSame('elamipretide', $post->slug);
+        $this->assertSame('published', $post->status);
+        $this->assertTrue($post->show_in_encyclopedia);
+        $this->assertSame('Elamipretide', $post->seo_h1);
+        $this->assertSame('C32H49N9O5', $post->molecular_formula);
+        $this->assertSame('736992-21-5', $post->cas_registry_number);
+        $this->assertStringContainsString('Forzinity', (string) $post->overview);
+        $this->assertStringContainsString('research-chemical listings', (string) $post->overview);
+        $this->assertGreaterThanOrEqual(20, mb_strlen(trim(strip_tags((string) $post->overview))));
+        $this->assertSame('/images/encyclopedia/elamipretide-featured.png', $post->seo_og_image);
+        $this->assertSame(1, EducationPost::query()->where('product_category_id', $category->id)->count());
+
+        $again = new EncyclopediaEmptyShellsSeeder;
+        $again->run();
+        $this->assertSame([], $again->report['filled']);
+        $this->assertContains('Elamipretide', $again->report['skipped_already_filled']);
+        $this->assertSame($categoryCount, ProductCategory::count());
+        $this->assertSame('elamipretide', $category->fresh()->slug);
+        $post->refresh();
+        $this->assertSame('736992-21-5', $post->cas_registry_number);
+        $this->assertSame(1, EducationPost::query()->where('slug', 'elamipretide')->count());
+
+        $this->get('/encyclopedia/elamipretide')
+            ->assertOk()
+            ->assertSee('736992-21-5', false)
+            ->assertSee('Forzinity', false)
+            ->assertSee('/images/encyclopedia/elamipretide-featured.png', false)
+            ->assertInertia(fn ($page) => $page
+                ->where('slug', 'elamipretide')
+                ->where('seo.h1', 'Elamipretide')
+                ->where('molecularInfo.casNumber', '736992-21-5')
+                ->where('molecularInfo.formula', 'C32H49N9O5')
+                ->where('featuredImage', '/images/encyclopedia/elamipretide-featured.png')
+            );
     }
 
     public function test_retatrutide_compare_leads_with_triumph_1_treatment_regimen(): void
@@ -316,7 +391,7 @@ class EncyclopediaEmptyShellsTest extends TestCase
 
     public function test_parser_rejects_forbidden_kpv_cas_and_stock_images(): void
     {
-        $parser = new EncyclopediaShellParser();
+        $parser = new EncyclopediaShellParser;
         $this->expectException(\RuntimeException::class);
         $parser->enforceLocks('kpv', [
             'overview' => 'KPV',
