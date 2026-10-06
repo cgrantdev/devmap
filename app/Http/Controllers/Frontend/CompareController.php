@@ -8,6 +8,7 @@ use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\SeoPage;
 use App\Support\CompareSlug;
+use App\Support\ElamipretideMotsCCompareFaqs;
 use App\Support\EncyclopediaSlug;
 use App\Support\CompoundDisplay;
 use App\Support\RetatrutideCompareNarrative;
@@ -712,6 +713,26 @@ class CompareController extends Controller
             ],
         ];
 
+        $pairCopy = ElamipretideMotsCCompareFaqs::forSlug($final);
+        $pairFaqs = $pairCopy['faqs'] ?? [];
+        $pairReferences = $pairCopy['references'] ?? [];
+        $schema = [$breadcrumb];
+        if ($pairFaqs !== []) {
+            $schema[] = [
+                '@context' => 'https://schema.org',
+                '@type' => 'FAQPage',
+                '@id' => url("/compare/{$final}").'#faq',
+                'mainEntity' => array_map(fn (array $faq) => [
+                    '@type' => 'Question',
+                    'name' => $faq['q'],
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => $faq['a'],
+                    ],
+                ], $pairFaqs),
+            ];
+        }
+
         $seo = [
             'key' => 'compare-vs',
             'title' => $seoTitle,
@@ -722,7 +743,7 @@ class CompareController extends Controller
             'image' => null,
             'url' => url("/compare/{$aSlug}-vs-{$bSlug}"),
             'h1' => "{$displayA} vs {$displayB}",
-            'schema' => [$breadcrumb],
+            'schema' => $schema,
         ];
         session(['page_seo_data' => $seo]);
 
@@ -736,6 +757,8 @@ class CompareController extends Controller
             'b' => $bData,
             'related' => $related,
             'evidenceUrl' => $evidenceUrl,
+            'faqs' => $pairFaqs,
+            'references' => $pairReferences,
             'seo' => $seo,
         ]);
     }
