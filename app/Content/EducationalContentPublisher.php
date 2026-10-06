@@ -47,6 +47,7 @@ class EducationalContentPublisher
     public static function prepare(string $markdown): string
     {
         $markdown = str_replace(["\r\n", "\r"], "\n", $markdown);
+        $markdown = preg_replace('/<!--.*?-->/s', '', $markdown) ?? $markdown;
         $markdown = preg_replace('/\A---\n.*?\n---\n+/s', '', $markdown) ?? $markdown;
         $markdown = preg_replace('/\n## Note for Meta Optimizer\b.*\z/s', '', $markdown) ?? $markdown;
 
@@ -65,6 +66,7 @@ class EducationalContentPublisher
                 || str_contains($lower, 'competitor awareness')
                 || str_contains($lower, 'competitor beginner')
                 || str_contains($lower, 'formblends-style')
+                || str_contains($lower, '/workspace/')
             ) {
                 $drop = true;
             }
@@ -233,7 +235,7 @@ class EducationalContentPublisher
     {
         $host = self::CANONICAL_HOST;
 
-        return [
+        return array_merge([
             [
                 'kind' => 'blog',
                 'file' => 'bpc-157-vs-tb-500-evidence.md',
@@ -342,6 +344,206 @@ class EducationalContentPublisher
                     ['Is compounding the same as FDA approval?', 'No. Compounding is a limited pharmacy pathway. Approval is a separate product authorization process.'],
                     ['Does WADA ban mean something is illegal for everyone?', 'No. WADA governs athletes in anti-doping programs. It is separate from FDA compounding and general consumer law—though the same substance can be constrained in multiple systems at once.'],
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
+                ]),
+            ],
+        ], self::evidenceNotes($host));
+    }
+
+    /**
+     * Six RUO evidence notes that companion existing /compare price pages.
+     * Bodies live in resources/content/educational. Content QA passed the drafts on 2026-10-05.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function evidenceNotes(string $host): array
+    {
+        $published = '2026-10-05';
+
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'glow-vs-klow.md',
+                'image_file' => 'glow-vs-klow.png',
+                'slug' => 'glow-vs-klow',
+                'h1' => 'GLOW vs KLOW: What the Blend Labels Contain',
+                'lede' => 'GLOW versus KLOW research blends: KLOW adds KPV, not extra GHK-Cu, to GHK-Cu, BPC-157, and TB-500. A contents comparison, not a clinical ranking or dose guide.',
+                'seo_title' => 'GLOW vs KLOW: What the Blend Labels Contain',
+                'seo_description' => 'GLOW versus KLOW research blends: KLOW adds KPV, not extra GHK-Cu, to GHK-Cu, BPC-157, and TB-500. A contents comparison, not a clinical ranking or dose guide.',
+                'og_title' => 'GLOW vs KLOW: What the Blend Labels Contain',
+                'og_description' => 'GLOW versus KLOW research blends: KLOW adds KPV, not extra GHK-Cu, to GHK-Cu, BPC-157, and TB-500. A contents comparison, not a clinical ranking or dose guide.',
+                'blog_type' => 'Research',
+                'read_time' => '8 Min Read',
+                'published_at' => $published,
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['GLOW', 'KLOW', 'KPV', 'RUO', 'Blend labels'],
+                'key_points' => [
+                    'On Peptidemap’s labels, GLOW names GHK-Cu, BPC-157, and TB-500. KLOW is that set plus KPV.',
+                    'KPV is Lys-Pro-Val, CAS 67727-97-3. It is not extra GHK-Cu.',
+                    'A paper on one component is not a trial of the blend. No human trial of the product names GLOW or KLOW was identified.',
+                    'GHK-Cu alone is not GLOW or KLOW, and KPV alone is not KLOW.',
+                    'This is a contents comparison. It does not rank the blends and it is not medical advice.',
+                ],
+                'faq' => self::faq($host.'/blog/glow-vs-klow#faq', [
+                    ['What is the difference between GLOW and KLOW?', 'On Peptidemap’s catalog labels, GLOW is GHK-Cu, BPC-157, and TB-500. KLOW is that same named set plus KPV (Lys-Pro-Val). The added piece is KPV, not a higher GHK-Cu amount.'],
+                    ['Is KPV the same as GHK-Cu?', 'No. KPV is the tripeptide Lys-Pro-Val, described as the C-terminal fragment of alpha-MSH. Wikipedia and PubChem list CAS 67727-97-3. It is not a copper peptide and not a fragment of GHK.'],
+                    ['Does a study of one ingredient show what the blend does?', 'No. Work on GHK-Cu, BPC-157, TB-500, or KPV stays attached to the molecule studied. A PubMed check on 5 October 2026 did not find the commercial blend names as indexed phrases. No human trial of those product names was identified.'],
+                    ['Does this page say which blend is better?', 'No. It is a contents comparison and a limit on blend evidence. It does not rank healing, skin, gut, or recovery, and it is not medical advice.'],
+                ]),
+            ],
+            [
+                'kind' => 'blog',
+                'file' => 'orforglipron-vs-tirzepatide.md',
+                'image_file' => 'orforglipron-vs-tirzepatide.png',
+                'slug' => 'orforglipron-vs-tirzepatide',
+                'h1' => 'Orforglipron vs Tirzepatide: Two Molecules, Two Programs',
+                'lede' => 'Orforglipron is an oral small molecule, not a peptide. Tirzepatide is injectable. This evidence note keeps their trials, populations, and estimands apart.',
+                'seo_title' => 'Orforglipron vs Tirzepatide: Two Molecules, Two Programs',
+                'seo_description' => 'Orforglipron is an oral small molecule, not a peptide. Tirzepatide is injectable. This evidence note keeps their trials, populations, and estimands apart.',
+                'og_title' => 'Orforglipron vs Tirzepatide: Two Molecules, Two Programs',
+                'og_description' => 'Orforglipron is an oral small molecule, not a peptide. Tirzepatide is injectable. This evidence note keeps their trials, populations, and estimands apart.',
+                'blog_type' => 'Research',
+                'read_time' => '8 Min Read',
+                'published_at' => $published,
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Orforglipron', 'Tirzepatide', 'ATTAIN', 'SURMOUNT', 'Estimands'],
+                'key_points' => [
+                    'Orforglipron is an oral nonpeptide GLP-1 receptor agonist. Tirzepatide is an injectable GIP and GLP-1 peptide.',
+                    'ATTAIN-1’s primary treatment-regimen result at 36 mg was −11.2% at week 72. The −12.4% figure is that trial’s efficacy estimand.',
+                    'SURMOUNT-1’s treatment-regimen result at tirzepatide 15 mg was −20.9%. The −22.5% figure is that trial’s efficacy estimand, not orforglipron.',
+                    'ATTAIN-2’s treatment-regimen result at 36 mg was −9.6% in type 2 diabetes. It is not the ATTAIN-1 −12.4% and not SURMOUNT-1.',
+                    'Lilly’s 9 April 2026 release says FDA approved Foundayo (orforglipron) tablets on 1 April 2026. A research-use listing is not that tablet.',
+                ],
+                'faq' => self::faq($host.'/blog/orforglipron-vs-tirzepatide#faq', [
+                    ['Is orforglipron a peptide?', 'No. Orforglipron is a small-molecule, nonpeptide GLP-1 receptor agonist taken by mouth. Tirzepatide is a peptide dual agonist at the GIP and GLP-1 receptors, given once weekly by subcutaneous injection.'],
+                    ['What did ATTAIN-1 report for orforglipron?', 'ATTAIN-1’s primary treatment-regimen estimand at week 72 was −7.5% at 6 mg, −8.4% at 12 mg, and −11.2% at 36 mg, versus −2.1% with placebo. The −12.4% figure is the 36 mg efficacy estimand in that trial, not the primary −11.2%. Those milligram figures are trial assignments, not use instructions.'],
+                    ['Are the SURMOUNT-1 percents orforglipron results?', 'No. SURMOUNT-1 is a tirzepatide trial without diabetes. Its treatment-regimen change at 15 mg was −20.9% versus −3.1% with placebo. The −22.5% figure is that trial’s 15 mg efficacy estimand.'],
+                    ['Does Foundayo approval make a research-use listing the labeled tablet?', 'No. Lilly’s 9 April 2026 release says the FDA approved Foundayo (orforglipron) tablets on 1 April 2026, and DailyMed lists initial U.S. approval in 2026 for a labeled weight-management use with diet and activity. A research-use powder, capsule, or vial is not a Foundayo tablet. This note is not medical advice.'],
+                ]),
+            ],
+            [
+                'kind' => 'blog',
+                'file' => 'retatrutide-vs-tirzepatide.md',
+                'image_file' => 'retatrutide-vs-tirzepatide.png',
+                'slug' => 'retatrutide-vs-tirzepatide',
+                'h1' => 'Retatrutide vs Tirzepatide: Triple Agonist, Dual Agonist',
+                'lede' => 'Retatrutide is an investigational triple agonist. Tirzepatide is an approved dual agonist. This note keeps their own trials, weeks, and estimands apart.',
+                'seo_title' => 'Retatrutide vs Tirzepatide: Triple Agonist, Dual Agonist',
+                'seo_description' => 'Retatrutide is an investigational triple agonist. Tirzepatide is an approved dual agonist. This note keeps their own trials, weeks, and estimands apart.',
+                'og_title' => 'Retatrutide vs Tirzepatide: Triple Agonist, Dual Agonist',
+                'og_description' => 'Retatrutide is an investigational triple agonist. Tirzepatide is an approved dual agonist. This note keeps their own trials, weeks, and estimands apart.',
+                'blog_type' => 'Research',
+                'read_time' => '8 Min Read',
+                'published_at' => $published,
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Retatrutide', 'Tirzepatide', 'TRIUMPH', 'SURMOUNT', 'Estimands'],
+                'key_points' => [
+                    'Retatrutide is an investigational GIP, GLP-1, and glucagon agonist. Tirzepatide is a dual GIP and GLP-1 agonist.',
+                    'TRIUMPH-1 at 12 mg and 80 weeks: treatment-regimen −25.0%, efficacy estimand −28.3%. Those are two estimands of one trial.',
+                    'TRIUMPH-2, in type 2 diabetes, reported treatment-regimen −18.8% and efficacy −20.8% at 12 mg. It is not TRIUMPH-1.',
+                    'SURMOUNT-1 studied tirzepatide to 72 weeks. Its 15 mg treatment-regimen result was −20.9%; −22.5% is the efficacy estimand.',
+                    'TRIUMPH-5 is a registered retatrutide-versus-tirzepatide trial with no results in the record checked on 5 October 2026.',
+                ],
+                'faq' => self::faq($host.'/blog/retatrutide-vs-tirzepatide#faq', [
+                    ['How do retatrutide and tirzepatide differ?', 'Retatrutide (LY3437943) is one investigational molecule with agonist activity at GIP, GLP-1, and glucagon receptors. Tirzepatide is a dual GIP and GLP-1 agonist and does not add glucagon-receptor agonism. Retatrutide is not an approved medicine.'],
+                    ['Why can TRIUMPH-1 show both −25.0% and −28.3%?', 'They are two estimands of the same 80-week trial at 12 mg. −25.0% is the treatment-regimen estimand. −28.3% is the efficacy estimand. They are not two trials.'],
+                    ['Is TRIUMPH-2 the same result as TRIUMPH-1?', 'No. TRIUMPH-2 enrolled adults with type 2 diabetes. At 12 mg the treatment-regimen change was −18.8% versus −5.1% with placebo, and the efficacy estimand was −20.8% versus −4.0% with placebo. That is not the TRIUMPH-1 treatment-regimen −25.0%.'],
+                    ['Has TRIUMPH-5 already compared retatrutide with tirzepatide?', 'TRIUMPH-5 (NCT06662383) is a registered phase 3 trial of retatrutide versus tirzepatide. The ClinicalTrials.gov record retrieved on 5 October 2026 was active, not recruiting, and had no results. No TRIUMPH-5 percent is used in this note.'],
+                ]),
+            ],
+            [
+                'kind' => 'blog',
+                'file' => 'retatrutide-cagrilintide-blend.md',
+                'image_file' => 'retatrutide-cagrilintide-blend.png',
+                'slug' => 'retatrutide-cagrilintide-blend',
+                'h1' => 'Retatrutide–Cagrilintide Blend: Catalog Name, Not a Published Trial',
+                'lede' => 'A research blend named retatrutide plus cagrilintide is not a published trial. This note separates TRIUMPH, REDEFINE/CagriSema evidence from that label.',
+                'seo_title' => 'Retatrutide–Cagrilintide Blend: Catalog Name, Not a Published Trial',
+                'seo_description' => 'A research blend named retatrutide plus cagrilintide is not a published trial. This note separates TRIUMPH, REDEFINE/CagriSema evidence from that label.',
+                'og_title' => 'Retatrutide–Cagrilintide Blend: Catalog Name, Not a Published Trial',
+                'og_description' => 'A research blend named retatrutide plus cagrilintide is not a published trial. This note separates TRIUMPH, REDEFINE/CagriSema evidence from that label.',
+                'blog_type' => 'Research',
+                'read_time' => '7 Min Read',
+                'published_at' => $published,
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Retatrutide', 'Cagrilintide', 'RUO', 'TRIUMPH', 'REDEFINE'],
+                'key_points' => [
+                    'A vial named retatrutide plus cagrilintide is a catalog label, not a published trial and not CagriSema.',
+                    'TRIUMPH-1 and TRIUMPH-2 studied retatrutide alone. Their percents are not blend results.',
+                    'REDEFINE-1’s −20.4% (treatment-policy) and −22.7% (trial-product) are cagrilintide with semaglutide.',
+                    'Cagrilintide alone in REDEFINE-1 was −11.5% (treatment-policy) and −11.8% (trial-product).',
+                    'TRIUMPH-5 compares retatrutide with tirzepatide. It does not list cagrilintide, and the checked record had no results.',
+                ],
+                'faq' => self::faq($host.'/blog/retatrutide-cagrilintide-blend#faq', [
+                    ['Is a retatrutide–cagrilintide vial a published trial?', 'No. The product name is a catalog label. TRIUMPH studies retatrutide alone. REDEFINE’s combination, CagriSema, is cagrilintide with semaglutide, not retatrutide.'],
+                    ['What did TRIUMPH-1 report for retatrutide alone?', 'At week 80 the treatment-regimen change was −17.6% at 4 mg, −23.7% at 9 mg, and −25.0% at 12 mg, versus −3.9% with placebo. The efficacy estimand at 12 mg was −28.3%. Those rows are retatrutide monotherapy, not a blend result.'],
+                    ['Is TRIUMPH-5 the blend trial?', 'No. TRIUMPH-5 (NCT06662383) compares retatrutide with tirzepatide in adults with obesity. The record checked on 5 October 2026 did not list cagrilintide as an intervention, and HasResults was false. This note invents no outcome percent for TRIUMPH-5.'],
+                    ['Can CagriSema’s −20.4% be applied to this blend?', 'No. REDEFINE-1’s −20.4% (treatment-policy) and −22.7% (trial-product) are cagrilintide with semaglutide at 68 weeks. The cagrilintide-only arms were −11.5% and −11.8%. None of those percents is a retatrutide–cagrilintide blend.'],
+                ]),
+            ],
+            [
+                'kind' => 'blog',
+                'file' => 'cagrilintide-vs-eloralintide.md',
+                'image_file' => 'cagrilintide-vs-eloralintide.png',
+                'slug' => 'cagrilintide-vs-eloralintide',
+                'h1' => 'Cagrilintide vs Eloralintide: Two Amylin-Pathway Compounds, Not One Trial',
+                'lede' => 'Cagrilintide is not eloralintide. This note separates the published trials, estimands, and populations behind the price comparison, without any winner.',
+                'seo_title' => 'Cagrilintide vs Eloralintide: Two Amylin-Pathway Compounds, Not One Trial',
+                'seo_description' => 'Cagrilintide is not eloralintide. This note separates the published trials, estimands, and populations behind the price comparison, without any winner.',
+                'og_title' => 'Cagrilintide vs Eloralintide: Two Amylin-Pathway Compounds, Not One Trial',
+                'og_description' => 'Cagrilintide is not eloralintide. This note separates the published trials, estimands, and populations behind the price comparison, without any winner.',
+                'blog_type' => 'Research',
+                'read_time' => '8 Min Read',
+                'published_at' => $published,
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Cagrilintide', 'Eloralintide', 'REDEFINE', 'EloraTZP', 'Estimands'],
+                'key_points' => [
+                    'Cagrilintide and eloralintide are different molecules. No head-to-head was identified in the primaries checked here.',
+                    'REDEFINE-1’s cagrilintide-only arm was −11.5% on the treatment-policy estimand. −20.4% is cagrilintide plus semaglutide.',
+                    'REDEFINE-2’s −13.7% is CagriSema in type 2 diabetes. That trial had no cagrilintide-only arm.',
+                    'Eloralintide monotherapy efficacy-estimand results ran from −9.5% at 1 mg to −20.1% at 9 mg, versus −0.4% with placebo, at 48 weeks.',
+                    'EloraTZP’s −23.3% is eloralintide 9 mg plus tirzepatide 15 mg on the efficacy estimand. It is not a cagrilintide result.',
+                ],
+                'faq' => self::faq($host.'/blog/cagrilintide-vs-eloralintide#faq', [
+                    ['Are cagrilintide and eloralintide the same molecule?', 'No. Cagrilintide is Novo Nordisk’s long-acting amylin analogue. Eloralintide (LY3841136) is Eli Lilly’s investigational once-weekly selective amylin receptor agonist. No randomized comparison of the two was identified in the primaries checked for this note.'],
+                    ['What is the cagrilintide-only result in REDEFINE-1?', 'On the treatment-policy estimand at week 68, cagrilintide 2.4 mg alone was −11.5%, and the trial-product row was −11.8%. The −20.4% and −22.7% figures are cagrilintide plus semaglutide, not cagrilintide alone.'],
+                    ['What did eloralintide monotherapy report?', 'Lilly’s phase 2 release gives an efficacy-estimand range from −9.5% at 1 mg to −20.1% at 9 mg, versus −0.4% with placebo, at 48 weeks in adults without type 2 diabetes. Those percents are eloralintide alone. They are not CagriSema.'],
+                    ['Is the −23.3% figure a cagrilintide result?', 'No. −23.3% is the EloraTZP efficacy estimand for eloralintide 9 mg plus tirzepatide 15 mg at 48 weeks in adults with type 2 diabetes, versus −14.8% for tirzepatide 15 mg alone and −3.0% for placebo. It is not a REDEFINE comparison.'],
+                ]),
+            ],
+            [
+                'kind' => 'blog',
+                'file' => 'eloralintide-tirzepatide-vs-retatrutide.md',
+                'image_file' => 'eloralintide-tirzepatide-vs-retatrutide.png',
+                'slug' => 'eloralintide-tirzepatide-vs-retatrutide',
+                'h1' => 'Eloralintide + Tirzepatide vs Retatrutide: What the Published Data Actually Show',
+                'lede' => 'Eloralintide plus tirzepatide vs retatrutide: published trial figures, why TRIUMPH-1\'s 25.0% and 28.3% both fit, and why combo data are not head-to-heads.',
+                'seo_title' => 'Eloralintide + Tirzepatide vs Retatrutide: What the Published Data Actually Show',
+                'seo_description' => 'Eloralintide plus tirzepatide vs retatrutide: published trial figures, why TRIUMPH-1\'s 25.0% and 28.3% both fit, and why combo data are not head-to-heads.',
+                'og_title' => 'Eloralintide + Tirzepatide vs Retatrutide: What the Published Data Actually Show',
+                'og_description' => 'Eloralintide plus tirzepatide vs retatrutide: published trial figures, why TRIUMPH-1\'s 25.0% and 28.3% both fit, and why combo data are not head-to-heads.',
+                'blog_type' => 'Research',
+                'read_time' => '7 Min Read',
+                'published_at' => $published,
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Eloralintide', 'Tirzepatide', 'Retatrutide', 'EloraTZP', 'TRIUMPH'],
+                'key_points' => [
+                    'EloraTZP’s efficacy estimand for eloralintide 9 mg plus tirzepatide 15 mg was −23.3% at 48 weeks in type 2 diabetes.',
+                    'TRIUMPH-1 at 12 mg and 80 weeks, without diabetes: treatment-regimen −25.0% and efficacy estimand −28.3%. Both can be true.',
+                    'TRIUMPH-2, with type 2 diabetes, was −18.8% treatment-regimen and −20.8% efficacy estimand at 12 mg. It is not TRIUMPH-1.',
+                    'The programs differ in population, duration, phase, intervention, and estimand. No published head-to-head was identified.',
+                    'An unverified early-combo slide figure is not printed. This note does not rank a winner.',
+                ],
+                'faq' => self::faq($host.'/blog/eloralintide-tirzepatide-vs-retatrutide#faq', [
+                    ['Why can TRIUMPH-1 list both −25.0% and −28.3%?', 'They are two estimands of one trial at 12 mg and 80 weeks in adults without type 2 diabetes. −25.0% is the treatment-regimen estimand. −28.3% is the efficacy estimand. Lead with −25.0% when comparing programs. −28.3% is the efficacy-estimand companion, not a second trial.'],
+                    ['What did EloraTZP report for eloralintide plus tirzepatide?', 'Lilly’s 30 September 2026 release reports an efficacy estimand of −23.3% for eloralintide 9 mg plus tirzepatide 15 mg at 48 weeks, versus −14.8% for tirzepatide 15 mg alone and −3.0% for placebo, in 367 adults with obesity or overweight and type 2 diabetes.'],
+                    ['Is that combination result a head-to-head with TRIUMPH-1?', 'No. EloraTZP phase 2b included type 2 diabetes, ran 48 weeks, and its table is an efficacy estimand. TRIUMPH-1 excluded diabetes, ran 80 weeks, and its lead figure is a treatment-regimen estimand. No published head-to-head of the combination versus retatrutide was identified.'],
+                    ['What did TRIUMPH-2 report?', 'TRIUMPH-2 enrolled adults with type 2 diabetes, a closer population match for EloraTZP and still a different study. At 80 weeks the 12 mg treatment-regimen change was −18.8% (placebo −5.1%). The efficacy estimand at 12 mg was −20.8% (placebo −4.0% on Lilly Medical).'],
                 ]),
             ],
         ];
