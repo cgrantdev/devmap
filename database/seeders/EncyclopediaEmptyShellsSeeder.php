@@ -10,7 +10,11 @@ use Illuminate\Database\Seeder;
 /**
  * Fills existing empty encyclopedia shells from the CMS draft pack.
  *
- * Matches the live category slug exactly. Does not create categories.
+ * A category matches when LOWER(stored slug) equals LOWER(seeder key) and
+ * exactly one row matches. Case-only differences still fill. Two rows that
+ * fold to the same slug are skipped. Does not create categories and does
+ * not rename ProductCategory.slug. EducationPost.slug is the stored
+ * category slug. Draft files stay in the seeder-key folder.
  * Skips a shell whose overview is already filled (20+ characters of text).
  * Does not write the retatrutide encyclopedia page. Safe to run twice.
  */
@@ -73,7 +77,7 @@ class EncyclopediaEmptyShellsSeeder extends Seeder
         'filled' => [],
         'created_posts' => [],
         'skipped_already_filled' => [],
-        'skipped_case_mismatch' => [],
+        'skipped_slug_collision' => [],
         'skipped_slug_taken' => [],
         'missing_category' => [],
         'missing_draft' => [],
@@ -81,7 +85,7 @@ class EncyclopediaEmptyShellsSeeder extends Seeder
 
     public function run(): void
     {
-        $parser = new EncyclopediaShellParser();
+        $parser = new EncyclopediaShellParser;
 
         foreach (self::SLUGS as $slug) {
             if (strtolower($slug) === 'retatrutide') {
@@ -91,10 +95,10 @@ class EncyclopediaEmptyShellsSeeder extends Seeder
         }
 
         $this->command?->info(sprintf(
-            'Encyclopedia shells: filled %d, already filled %d, case mismatch %d, missing category %d, slug taken %d, missing draft %d.',
+            'Encyclopedia shells: filled %d, already filled %d, slug collision %d, missing category %d, slug taken %d, missing draft %d.',
             count($this->report['filled']),
             count($this->report['skipped_already_filled']),
-            count($this->report['skipped_case_mismatch']),
+            count($this->report['skipped_slug_collision']),
             count($this->report['missing_category']),
             count($this->report['skipped_slug_taken']),
             count($this->report['missing_draft'])
@@ -105,7 +109,7 @@ class EncyclopediaEmptyShellsSeeder extends Seeder
     {
         $bodyPath = $this->dataPath($slug, 'body.md');
         $metaPath = $this->dataPath($slug, 'meta.md');
-        if (!is_file($bodyPath) || !is_file($metaPath)) {
+        if (! is_file($bodyPath) || ! is_file($metaPath)) {
             $this->report['missing_draft'][] = $slug;
 
             return;
@@ -117,13 +121,15 @@ class EncyclopediaEmptyShellsSeeder extends Seeder
 
             return;
         }
-        if ($match['status'] !== 'exact' || !$match['category'] instanceof ProductCategory) {
-            $this->report['skipped_case_mismatch'][] = $slug.' (stored: '.($match['category']->slug ?? 'none').')';
+        if ($match['status'] === 'collision' || ! $match['category'] instanceof ProductCategory) {
+            $stored = implode(', ', $match['stored']);
+            $this->report['skipped_slug_collision'][] = $slug.($stored !== '' ? ' (stored: '.$stored.')' : '');
 
             return;
         }
 
         $category = $match['category'];
+        $storedSlug = (string) $category->slug;
         $post = EducationPost::query()->where('product_category_id', $category->id)->first();
         if ($post && $this->overviewIsFilled($post->overview)) {
             $this->report['skipped_already_filled'][] = $slug;
@@ -132,18 +138,22 @@ class EncyclopediaEmptyShellsSeeder extends Seeder
         }
 
         $created = false;
-        if (!$post) {
-            if (EducationPost::query()->where('slug', $slug)->exists()) {
+        if (! $post) {
+            if ($this->educationSlugTaken($storedSlug)) {
                 $this->report['skipped_slug_taken'][] = $slug;
 
                 return;
             }
             $post = new EducationPost([
                 'product_category_id' => $category->id,
-                'slug' => $slug,
+                'slug' => $storedSlug,
                 'published_at' => now(),
             ]);
             $created = true;
+        } elseif ($post->slug !== $storedSlug && $this->educationSlugTaken($storedSlug, $post->id)) {
+            $this->report['skipped_slug_taken'][] = $slug;
+
+            return;
         }
 
         $attributes = $parser->parse(
@@ -155,7 +165,7 @@ class EncyclopediaEmptyShellsSeeder extends Seeder
 
         $post->fill($attributes);
         $post->product_category_id = $category->id;
-        $post->slug = $slug;
+        $post->slug = $storedSlug;
         $post->status = 'published';
         $post->show_in_encyclopedia = true;
         $post->published_at = $post->published_at ?? now();
@@ -166,7 +176,7 @@ class EncyclopediaEmptyShellsSeeder extends Seeder
         }
 
         $keywords = $post->tags;
-        if (!$post->education_tag && is_array($keywords) && isset($keywords[0]) && is_string($keywords[0]) && $keywords[0] !== '') {
+        if (! $post->education_tag && is_array($keywords) && isset($keywords[0]) && is_string($keywords[0]) && $keywords[0] !== '') {
             $post->education_tag = mb_substr($keywords[0], 0, 255);
         }
 
@@ -180,31 +190,40 @@ class EncyclopediaEmptyShellsSeeder extends Seeder
     }
 
     /**
-     * @return array{status: string, category: ?ProductCategory}
+     * One stored category whose slug matches the seeder key ignoring case.
+     * Draft folders stay under the seeder key; callers write the stored slug.
+     *
+     * @return array{status: string, category: ?ProductCategory, stored: list<string>}
      */
     private function matchCategory(string $slug): array
     {
-        $rows = ProductCategory::query()->where('slug', $slug)->get();
-        $exact = $rows->first(fn (ProductCategory $category) => $category->slug === $slug);
-        if ($exact) {
-            return ['status' => 'exact', 'category' => $exact];
-        }
-        if ($rows->isNotEmpty()) {
-            return ['status' => 'case', 'category' => $rows->first()];
-        }
-
         $folded = ProductCategory::query()
             ->whereRaw('LOWER(slug) = ?', [mb_strtolower($slug)])
+            ->orderBy('id')
             ->get();
-        $exactFold = $folded->first(fn (ProductCategory $category) => $category->slug === $slug);
-        if ($exactFold) {
-            return ['status' => 'exact', 'category' => $exactFold];
+        $stored = $folded
+            ->map(fn (ProductCategory $category) => (string) $category->slug)
+            ->values()
+            ->all();
+
+        if ($folded->count() > 1) {
+            return ['status' => 'collision', 'category' => null, 'stored' => $stored];
         }
-        if ($folded->isNotEmpty()) {
-            return ['status' => 'case', 'category' => $folded->first()];
+        if ($folded->count() === 1) {
+            return ['status' => 'match', 'category' => $folded->first(), 'stored' => $stored];
         }
 
-        return ['status' => 'missing', 'category' => null];
+        return ['status' => 'missing', 'category' => null, 'stored' => []];
+    }
+
+    private function educationSlugTaken(string $storedSlug, ?int $exceptId = null): bool
+    {
+        $query = EducationPost::query()->whereRaw('LOWER(slug) = ?', [mb_strtolower($storedSlug)]);
+        if ($exceptId !== null) {
+            $query->where('id', '!=', $exceptId);
+        }
+
+        return $query->exists();
     }
 
     private function overviewIsFilled(?string $overview): bool
@@ -222,7 +241,7 @@ class EncyclopediaEmptyShellsSeeder extends Seeder
         $replace = $description === ''
             || str_contains($description, 'peptide encyclopedia')
             || str_contains($description, ' peptides.');
-        if (!$replace) {
+        if (! $replace) {
             return;
         }
         $category->description = $short;
@@ -232,11 +251,11 @@ class EncyclopediaEmptyShellsSeeder extends Seeder
     private function imageWebPath(string $slug): ?string
     {
         $file = self::IMAGES[$slug] ?? null;
-        if (!$file) {
+        if (! $file) {
             return null;
         }
         $relative = '/images/encyclopedia/'.$file;
-        if (!is_file(public_path(ltrim($relative, '/')))) {
+        if (! is_file(public_path(ltrim($relative, '/')))) {
             return null;
         }
 
