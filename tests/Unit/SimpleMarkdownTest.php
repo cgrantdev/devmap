@@ -59,4 +59,22 @@ MD);
         $this->assertStringContainsString('fda.gov', $clean);
         $this->assertStringContainsString('# Visible', $clean);
     }
+
+    public function test_prepare_strips_cms_comments_and_workspace_paths(): void
+    {
+        $clean = EducationalContentPublisher::prepare(<<<'MD'
+<!-- CMS paste: body only. Upload featured PNG separately. Do not paste YAML or the box file path. -->
+
+# Visible title
+
+Body stays.
+
+Featured image present: /workspace/drafts/images/example-featured.png
+MD);
+
+        $this->assertStringNotContainsString('CMS paste', $clean);
+        $this->assertStringNotContainsString('/workspace/', $clean);
+        $this->assertStringContainsString('# Visible title', $clean);
+        $this->assertStringContainsString('Body stays.', $clean);
+    }
 }

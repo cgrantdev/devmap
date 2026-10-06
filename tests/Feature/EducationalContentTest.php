@@ -61,10 +61,142 @@ class EducationalContentTest extends TestCase
         $legality->assertDontSee('FormBlends', false);
         $legality->assertDontSee('Note for Meta Optimizer', false);
 
-        $this->get('/sitemap.xml')->assertOk()
-            ->assertSee('https://peptidemap.com/guides/beginners-guide-to-research-peptides', false)
-            ->assertSee('https://peptidemap.com/blog/bpc-157-vs-tb-500-evidence', false)
-            ->assertSee('https://peptidemap.com/guides', false);
+        $sitemap = $this->get('/sitemap.xml')->assertOk();
+        $sitemap->assertSee('https://peptidemap.com/guides/beginners-guide-to-research-peptides', false);
+        $sitemap->assertSee('https://peptidemap.com/blog/bpc-157-vs-tb-500-evidence', false);
+        $sitemap->assertSee('https://peptidemap.com/guides', false);
+        foreach ([
+            'glow-vs-klow',
+            'orforglipron-vs-tirzepatide',
+            'retatrutide-vs-tirzepatide',
+            'retatrutide-cagrilintide-blend',
+            'cagrilintide-vs-eloralintide',
+            'eloralintide-tirzepatide-vs-retatrutide',
+        ] as $slug) {
+            $sitemap->assertSee('https://peptidemap.com/blog/'.$slug, false);
+        }
+    }
+
+    public function test_six_evidence_notes_are_published_once_with_same_origin_covers(): void
+    {
+        $slugs = [
+            'glow-vs-klow',
+            'orforglipron-vs-tirzepatide',
+            'retatrutide-vs-tirzepatide',
+            'retatrutide-cagrilintide-blend',
+            'cagrilintide-vs-eloralintide',
+            'eloralintide-tirzepatide-vs-retatrutide',
+        ];
+
+        $ids = [];
+        foreach ($slugs as $slug) {
+            $blog = Blog::where('slug', $slug)->firstOrFail();
+            $this->assertSame(1, Blog::where('slug', $slug)->count());
+            $this->assertSame('/images/educational/'.$slug.'.png', $blog->image);
+            $this->assertSame('https://peptidemap.com/images/educational/'.$slug.'.png', $blog->seo_og_image);
+            $this->assertSame('2026-10-05', $blog->published_at->toDateString());
+            $this->assertFalse((bool) $blog->is_featured);
+            $this->assertSame('Research', $blog->blog_type);
+            $this->assertSame('published', $blog->status);
+            $this->assertStringNotContainsString('/workspace/', (string) $blog->content);
+            $this->assertStringNotContainsString('/workspace/', (string) $blog->image);
+            $this->assertStringNotContainsString('CMS paste', (string) $blog->content);
+            $this->assertStringNotContainsString('67724-34-9', (string) $blog->content);
+            $this->assertStringNotContainsString('picsum.photos', (string) $blog->image);
+            $this->assertStringNotContainsString('unsplash.com', (string) $blog->image);
+            $this->assertFileExists(public_path('images/educational/'.$slug.'.png'));
+            $this->assertFileExists(resource_path('content/educational/'.$slug.'.md'));
+            $ids[$slug] = $blog->id;
+        }
+
+        $before = Blog::count();
+        EducationalContentPublisher::sync();
+
+        $this->assertSame($before, Blog::count());
+        foreach ($slugs as $slug) {
+            $blog = Blog::where('slug', $slug)->firstOrFail();
+            $this->assertSame($ids[$slug], $blog->id);
+            $this->assertSame('/images/educational/'.$slug.'.png', $blog->image);
+            $this->assertSame('2026-10-05', $blog->published_at->toDateString());
+            $this->assertFalse((bool) $blog->is_featured);
+        }
+
+        $glow = $this->get('/blog/glow-vs-klow');
+        $glow->assertOk();
+        $glow->assertSee('GLOW vs KLOW: What the Blend Labels Contain', false);
+        $glow->assertSee('67727-97-3', false);
+        $glow->assertSee('/images/educational/glow-vs-klow.png', false);
+        $glow->assertDontSee('67724-34-9', false);
+        $glow->assertDontSee('/workspace/', false);
+        $glow->assertDontSee('CMS paste', false);
+        $glow->assertDontSee('picsum.photos', false);
+        $glow->assertDontSee('unsplash.com', false);
+
+        $orforBlog = Blog::where('slug', 'orforglipron-vs-tirzepatide')->firstOrFail();
+        $this->assertStringContainsString('−11.2%', $orforBlog->content);
+        $this->assertStringContainsString('−12.4%', $orforBlog->content);
+        $this->assertStringContainsString('−20.9%', $orforBlog->content);
+        $this->assertStringContainsString('−22.5%', $orforBlog->content);
+        $this->assertStringContainsString('Foundayo', $orforBlog->content);
+        $orfor = $this->get('/blog/orforglipron-vs-tirzepatide');
+        $orfor->assertOk();
+        $orfor->assertSee('Foundayo', false);
+        $orfor->assertSee('\u221211.2%', false);
+        $orfor->assertSee('\u221212.4%', false);
+        $orfor->assertSee('\u221220.9%', false);
+        $orfor->assertSee('\u221222.5%', false);
+        $orfor->assertDontSee('/workspace/', false);
+
+        $retaBlog = Blog::where('slug', 'retatrutide-vs-tirzepatide')->firstOrFail();
+        $this->assertStringContainsString('−25.0%', $retaBlog->content);
+        $this->assertStringContainsString('−28.3%', $retaBlog->content);
+        $this->assertStringContainsString('−18.8%', $retaBlog->content);
+        $reta = $this->get('/blog/retatrutide-vs-tirzepatide');
+        $reta->assertOk();
+        $reta->assertSee('\u221225.0%', false);
+        $reta->assertSee('\u221228.3%', false);
+        $reta->assertSee('\u221218.8%', false);
+        $reta->assertSee('TRIUMPH-5', false);
+        $reta->assertDontSee('/workspace/', false);
+
+        $blendBlog = Blog::where('slug', 'retatrutide-cagrilintide-blend')->firstOrFail();
+        $this->assertStringContainsString('−20.4%', $blendBlog->content);
+        $this->assertStringContainsString('−22.7%', $blendBlog->content);
+        $blend = $this->get('/blog/retatrutide-cagrilintide-blend');
+        $blend->assertOk();
+        $blend->assertSee('\u221220.4%', false);
+        $blend->assertSee('\u221222.7%', false);
+        $blend->assertSee('not a published clinical trial', false);
+        $blend->assertDontSee('/workspace/', false);
+
+        $amylinBlog = Blog::where('slug', 'cagrilintide-vs-eloralintide')->firstOrFail();
+        $this->assertStringContainsString('−11.5%', $amylinBlog->content);
+        $this->assertStringContainsString('−23.3%', $amylinBlog->content);
+        $this->assertStringContainsString('−20.1%', $amylinBlog->content);
+        $amylin = $this->get('/blog/cagrilintide-vs-eloralintide');
+        $amylin->assertOk();
+        $amylin->assertSee('\u221211.5%', false);
+        $amylin->assertSee('\u221223.3%', false);
+        $amylin->assertSee('\u221220.1%', false);
+        $amylin->assertDontSee('/workspace/', false);
+
+        $comboBlog = Blog::where('slug', 'eloralintide-tirzepatide-vs-retatrutide')->firstOrFail();
+        $this->assertStringContainsString('−23.3%', $comboBlog->content);
+        $this->assertStringContainsString('−25.0%', $comboBlog->content);
+        $this->assertStringContainsString('−28.3%', $comboBlog->content);
+        $this->assertStringContainsString('−18.8%', $comboBlog->content);
+        $this->assertStringContainsString('−20.8%', $comboBlog->content);
+        $combo = $this->get('/blog/eloralintide-tirzepatide-vs-retatrutide');
+        $combo->assertOk();
+        $combo->assertSee('\u221223.3%', false);
+        $combo->assertSee('\u221225.0%', false);
+        $combo->assertSee('\u221228.3%', false);
+        $combo->assertSee('\u221218.8%', false);
+        $combo->assertSee('\u221220.8%', false);
+        $combo->assertSee('images\\/educational\\/eloralintide-tirzepatide-vs-retatrutide.png', false);
+        $combo->assertDontSee('/workspace/', false);
+        $combo->assertDontSee('CMS paste', false);
+        $combo->assertDontSee('67724-34-9', false);
     }
 
     public function test_fda_correction_preserves_an_existing_byline(): void
@@ -134,20 +266,28 @@ class EducationalContentTest extends TestCase
         $this->assertFileExists(public_path(ltrim($beginner->cover, '/')));
         $this->assertFileExists(public_path(ltrim($legality->cover, '/')));
 
+        $newestSlug = 'eloralintide-tirzepatide-vs-retatrutide';
+        $newestImage = '/images/educational/'.$newestSlug.'.png';
+
         $this->get('/blogs')->assertOk()->assertInertia(fn ($page) => $page
             ->component('Frontend/BlogListing')
             ->missing('featured')
-            ->where('blogs.data.0.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('blogs.data.0.image', $evidencePath)
-            ->where('blogs.data.1.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('blogs.data.0.slug', $newestSlug)
+            ->where('blogs.data.0.image', $newestImage)
+            ->where('blogs.data.1.slug', 'cagrilintide-vs-eloralintide')
+            ->where('blogs.data.6.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('blogs.data.6.image', $evidencePath)
+            ->where('blogs.data.7.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/news')->assertOk()->assertInertia(fn ($page) => $page
             ->component('Frontend/KnowledgeCenter')
             ->missing('featuredBlogs')
-            ->where('latestBlogs.0.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('latestBlogs.0.image', $evidencePath)
-            ->where('latestBlogs.1.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('latestBlogs.0.slug', $newestSlug)
+            ->where('latestBlogs.0.image', $newestImage)
+            ->where('latestBlogs.1.slug', 'cagrilintide-vs-eloralintide')
+            ->where('latestBlogs.6.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('latestBlogs.7.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/guides')->assertOk()->assertInertia(fn ($page) => $page
