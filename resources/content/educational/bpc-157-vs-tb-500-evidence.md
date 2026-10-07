@@ -8,7 +8,7 @@ Neither the U.S. FDA nor other major drug regulators have approved BPC-157 as a 
 
 ### TB-500
 
-“TB-500” is a marketplace name most often used for a short synthetic fragment of thymosin beta-4 (Tβ4)—commonly the actin-binding region sequence LKKTETQ—rather than for the full 43-amino-acid natural protein. Full-length thymosin beta-4 is an endogenous peptide present in many mammalian cells and has been studied for wound healing, cell migration, and actin regulation. Vendors sometimes blur the label, so a vial sold as “TB-500” may not match full-length Tβ4 used in pharmaceutical programs.
+“TB-500” is a marketplace name. For chemical identity, this page treats the U.S. FDA Pharmacy Compounding Advisory Committee briefing for 23–24 July 2026 as the source of record ([FDA PCAC briefing, media/193349](https://www.fda.gov/media/193349/download)). That briefing describes TB-500 (free base) as “a seven amino acid synthetic fragment of thymosin beta-4 (β4) from amino acids 17 to 23,” with an N-terminal acetyl: Ac-Leu-Lys-Lys-Thr-Glu-Thr-Gln-OH (Ac-LKKTETQ). It also calls TB-500 “a synthetic N-acetylated heptapeptide containing the amino acid sequence 17 through 23 (LKKTETQ) of the full-length (43-amino acid) peptide thymosin β4,” and states that “thymosin beta-4 and TB-500 are not the same substance.” Full-length thymosin beta-4 is the endogenous 43-amino-acid peptide, present in many mammalian cells, and has been studied for wound healing, cell migration, and actin regulation. It is not TB-500. Vendors sometimes blur the label, so a vial sold as “TB-500” may not match the acetylated 17–23 fragment in the FDA briefing, and it may not match full-length Tβ4 used in pharmaceutical programs.
 
 TB-500 (the fragment) is not an FDA-approved drug for injury recovery or any other indication. Human clinical programs that do exist in this family have largely studied topical full-length Tβ4 (for example, ophthalmic formulations), which is a different product, route, and use case from injectable TB-500 marketed for tendons or muscle.
 
@@ -16,7 +16,7 @@ TB-500 (the fragment) is not an FDA-approved drug for injury recovery or any oth
 
 | | BPC-157 | TB-500 (typical market meaning) |
 | --- | --- | --- |
-| Chemical identity | Synthetic 15-aa pentadecapeptide | Synthetic fragment of thymosin β4 (often LKKTETQ); not the full 43-aa protein |
+| Chemical identity | Synthetic 15-aa pentadecapeptide | N-acetylated heptapeptide Ac-LKKTETQ (Tβ4 residues 17–23) per the July 2026 FDA PCAC briefing; not the 43-aa protein |
 | Main research tradition | Gastric cytoprotection → musculoskeletal & GI animal models | Actin regulation / cell migration → wound & tissue-repair biology |
 | Human evidence for injectable MSK use | Very limited (small uncontrolled reports; no robust RCTs) | Essentially none identified for the injected fragment in tendon/muscle/ligament trials |
 | FDA-approved drug? | No | No |
@@ -92,11 +92,15 @@ BPC-157 and TB-500 are often sold as a pre-mixed blend or recommended together o
 
 **What is actually published about combining them?**
 
-As of this article’s research date (2026-09-30), we did **not** identify peer-reviewed human studies that prospectively test co-administration of BPC-157 and TB-500 for safety, pharmacokinetics, interactions, or musculoskeletal efficacy. Mechanistic complementarity is speculation until combination data exist. Blend calculators and timing schedules circulating online are not derived from clinical trials of the pair.
+A peer-reviewed rat study is now on the record. Biçer and colleagues compared BPC-157, TB-500, and the combination in an Achilles tendon healing model (histopathology and biomechanics): Biçer O, et al. *Jt Dis Relat Surg* 2026;37(3):822–837 ([full text](https://www.jointdrs.org/full-text/1851); DOI 10.52312/jdrs.2026.2951; PMID 42542926). The abstract states: “Combined BPC-157 and TB-500 treatment did not confer additional benefits compared to either agent alone.” On the outcomes named in that results paragraph—maximum load to failure, total Bonar score, and total Movin score—the combination did not add benefit versus either agent alone. The discussion states that the combination “did not demonstrate superior biomechanical or histopathological outcomes compared to monotherapy.”
+
+This is a rat histopathology and biomechanics study, not a human trial. It is not a protocol, and it is not a reason to stack. We still did **not** identify peer-reviewed human studies that prospectively test co-administration of BPC-157 and TB-500 for safety, pharmacokinetics, interactions, or musculoskeletal efficacy. Mechanistic complementarity in people remains speculation. Blend calculators and timing schedules circulating online are not derived from clinical trials of the pair.
+
+The Achilles paper calls the TB-500 material “synthetic thymosin beta-4 (TB-500).” It was **not** verified that the vial was the 7-residue Ac-LKKTETQ fragment rather than full-length thymosin β4. Do not read the rat result as a test of the FDA briefing’s heptapeptide specifically.
 
 One small retrospective clinic series of knee injections included some patients who received BPC-157 with thymosin β4; that kind of uncontrolled observation cannot validate a stack protocol.
 
-**Educational takeaway:** Treat stacking claims as **untested hypotheses**, not as evidence-based regimens. This page intentionally does not provide combination ratios, schedules, or administration guidance.
+**Educational takeaway:** Treat human stacking claims as **untested hypotheses**, not as evidence-based regimens. This page intentionally does not provide combination ratios, schedules, or administration guidance.
 
 ## FDA / sport context
 
@@ -151,7 +155,7 @@ No. Animal and cell studies can be scientifically interesting and still fail to 
 
 ### Is there research on stacking BPC-157 with TB-500?
 
-We did not find published human combination trials establishing safety or efficacy of the pair. Stacking narratives are mostly mechanistic reasoning and anecdote.
+A 2026 rat Achilles study (Biçer et al., *Jt Dis Relat Surg*) reported that combined BPC-157 and TB-500 did not confer additional benefit compared with either agent alone on maximum load to failure, total Bonar score, and total Movin score. That result is animal histopathology and biomechanics, not evidence for a human stack. We did not identify published human combination trials establishing safety or efficacy of the pair. Stacking narratives remain mostly mechanistic reasoning and anecdote.
 
 ### Are these substances banned in sport?
 
@@ -175,6 +179,8 @@ Primary and review sources consulted for this article (fetched or verified via p
 8. DoD Operation Supplement Safety (OPSS). BPC-157: A Prohibited Peptide and an Unapproved Drug… https://www.opss.org/article/bpc-157-prohibited-peptide-and-unapproved-drug-found-health-and-wellness-products
 9. BMJ news reporting on July 2026 PCAC peptide recommendations: https://www.bmj.com/content/394/bmj-2026-100422
 10. Peptidemap live pages reviewed for on-site tools (not for efficacy claims): https://peptidemap.com/ · https://peptidemap.com/compare/bpc-157-vs-tb-500 · https://peptidemap.com/encyclopedia/BPC-157-TB-500
+11. Biçer O, Adanir O, Güleryüz Y, Balci EC, Dinçel YM, Yenigün MY, Aydin C, Bayrak BY. Effects of BPC-157 and TB-500 on Achilles tendon healing in rats: A histopathological and biomechanical study. *Jt Dis Relat Surg* 2026;37(3):822-837. DOI 10.52312/jdrs.2026.2951. PMID 42542926. https://www.jointdrs.org/full-text/1851
+12. U.S. FDA. Pharmacy Compounding Advisory Committee briefing materials, 23–24 July 2026 (TB-500 free base described as the N-acetylated heptapeptide Ac-LKKTETQ, thymosin β4 residues 17–23; “thymosin beta-4 and TB-500 are not the same substance”). https://www.fda.gov/media/193349/download
 
 ## Disclaimer
 

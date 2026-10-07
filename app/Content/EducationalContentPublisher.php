@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
 /**
- * Publishes the educational blog post, two guides, and the corrected
- * FDA reclassification note into the existing Blog and EducationalGuide tables.
+ * Publishes educational blogs and guides into the existing Blog and
+ * EducationalGuide tables. Sync is idempotent: rows are upserted by slug.
  *
  * Listing cards read blogs.image and educational_guides.cover. Cover artwork
  * ships in resources/content/educational/images and is copied to
@@ -255,7 +255,7 @@ class EducationalContentPublisher
                 'key_points' => [
                     'BPC-157 and TB-500 are chemically unrelated peptides.',
                     'Most of the published record is preclinical; robust human efficacy trials for injectable injury use are lacking.',
-                    'No published human combination trials were identified for stacking the pair.',
+                    'A 2026 rat Achilles study found no added combination benefit on three named scores. That paper’s “TB-500” was not verified as Ac-LKKTETQ, and no human combination trials were identified.',
                     'Neither is an FDA-approved drug. A PCAC recommendation is not approval or a final bulks-list rule.',
                     'Both are prohibited in sport under the WADA 2026 Prohibited List.',
                 ],
@@ -263,7 +263,7 @@ class EducationalContentPublisher
                     ['Are BPC-157 and TB-500 the same peptide?', 'No. BPC-157 is a synthetic 15-amino-acid peptide from the gastric-cytoprotection research line. TB-500 usually refers to a short synthetic fragment of thymosin beta-4, a different endogenous protein involved in actin binding and cell migration. They are chemically unrelated.'],
                     ['Is either one FDA-approved for healing injuries?', 'No. Neither is an FDA-approved drug for musculoskeletal healing or any other indication. Compounding-list discussions (including PCAC recommendations) are not the same as drug approval.'],
                     ['Does animal evidence mean they work in humans?', 'No. Animal and cell studies can be scientifically interesting and still fail to predict human outcomes. For injectable injury recovery claims, both peptides still lack robust randomized human efficacy evidence.'],
-                    ['Is there research on stacking BPC-157 with TB-500?', 'We did not find published human combination trials establishing safety or efficacy of the pair. Stacking narratives are mostly mechanistic reasoning and anecdote.'],
+                    ['Is there research on stacking BPC-157 with TB-500?', 'A 2026 rat Achilles study (Biçer et al.) reported that combined BPC-157 and TB-500 did not confer additional benefit versus either agent alone on maximum load to failure, total Bonar score, and total Movin score. That is animal histopathology and biomechanics, not a human stack. No published human combination trials were identified. The paper’s “TB-500” was not verified as the 7-residue Ac-LKKTETQ fragment.'],
                     ['Are these substances banned in sport?', 'Yes under WADA rules as of the 2026 Prohibited List: BPC-157 is named in S0; thymosin-β4 and derivatives including TB-500 are named in S2.3. Both classes are prohibited at all times. Check your sport’s governing body as well.'],
                     ['Why do so many sites recommend them together?', 'They are marketed together, share overlapping online recovery audiences, and have complementary-sounding proposed mechanisms. Marketing frequency is not the same as clinical validation.'],
                 ]),
@@ -346,7 +346,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host));
     }
 
     /**
@@ -544,6 +544,73 @@ class EducationalContentPublisher
                     ['What did EloraTZP report for eloralintide plus tirzepatide?', 'Lilly’s 30 September 2026 release reports an efficacy estimand of −23.3% for eloralintide 9 mg plus tirzepatide 15 mg at 48 weeks, versus −14.8% for tirzepatide 15 mg alone and −3.0% for placebo, in 367 adults with obesity or overweight and type 2 diabetes.'],
                     ['Is that combination result a head-to-head with TRIUMPH-1?', 'No. EloraTZP phase 2b included type 2 diabetes, ran 48 weeks, and its table is an efficacy estimand. TRIUMPH-1 excluded diabetes, ran 80 weeks, and its lead figure is a treatment-regimen estimand. No published head-to-head of the combination versus retatrutide was identified.'],
                     ['What did TRIUMPH-2 report?', 'TRIUMPH-2 enrolled adults with type 2 diabetes, a closer population match for EloraTZP and still a different study. At 80 weeks the 12 mg treatment-regimen change was −18.8% (placebo −5.1%). The efficacy estimand at 12 mg was −20.8% (placebo −4.0% on Lilly Medical).'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Content-QA pieces cleared after the six evidence notes: one GHRH comparison,
+     * one diluent-literacy guide. Bodies live in resources/content/educational.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function octoberQaPieces(string $host): array
+    {
+        $published = '2026-09-30';
+
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'tesamorelin-vs-sermorelin.md',
+                'image_file' => 'tesamorelin-vs-sermorelin.png',
+                'slug' => 'tesamorelin-vs-sermorelin',
+                'h1' => 'Tesamorelin vs Sermorelin: How These GHRH Analogs Differ',
+                'lede' => 'Tesamorelin and sermorelin both act on the growth hormone–releasing hormone (GHRH / GHRF) pathway, so they are often grouped together online. They are not interchangeable. They differ in structure, U.S. regulatory history, and labeled study populations. This page is an educational head-to-head of what each compound is and how approval (and discontinuation) records treat them—not a shopping guide, not a beginner primer, and not medical advice.',
+                'seo_title' => 'Tesamorelin vs Sermorelin: GHRH Analog Differences',
+                'seo_description' => 'Educational tesamorelin vs sermorelin comparison: GHRH chemistry, EGRIFTA vs GEREF approval history, studied populations, and why RUO vials are not the same.',
+                'og_title' => 'Tesamorelin vs Sermorelin: GHRH Analog Differences',
+                'og_description' => 'How tesamorelin and sermorelin differ: chemistry, EGRIFTA vs GEREF history, and who was studied. Educational only, not a price guide.',
+                'blog_type' => 'Research',
+                'read_time' => '7 Min Read',
+                'published_at' => $published,
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Tesamorelin', 'Sermorelin', 'EGRIFTA', 'GEREF', 'GHRH'],
+                'key_points' => [
+                    'Tesamorelin is a 44-amino-acid GRF analog plus an N-terminal hexenoyl moiety (EGRIFTA). Sermorelin is synthetic GHRH(1-29)-amide (historical brand GEREF).',
+                    'EGRIFTA is labeled for excess abdominal fat in HIV-associated lipodystrophy. It is not indicated for weight-loss management.',
+                    'GEREF NDAs were withdrawn effective June 18, 2009 after the sponsor discontinued marketing. FDA later found that withdrawal was not for safety or effectiveness.',
+                    'A research-use vial that shares a peptide name is not the approved finished drug.',
+                    'This page does not give dosing, reconstitution, stacking, or a recommendation of which compound to take.',
+                ],
+                'faq' => self::faq($host.'/blog/tesamorelin-vs-sermorelin#faq', [
+                    ['Are tesamorelin and sermorelin the same?', 'No. Both are GHRH-pathway analogs, but tesamorelin is a modified full-length GRF analog (44 amino acids plus an N-terminal hexenoyl moiety), while sermorelin is the shorter GHRH(1-29)-amide fragment. Brand histories (EGRIFTA vs GEREF) and labeled uses also differ.'],
+                    ['Is either FDA-approved?', 'Tesamorelin is FDA-approved as specific EGRIFTA finished products for reduction of excess abdominal fat in HIV-infected adults with lipodystrophy (initial U.S. approval 2010). Sermorelin (GEREF) was approved historically for diagnostic pituitary GH testing (1990) and for idiopathic growth hormone deficiency in children with growth failure (1997). The sponsor discontinued GEREF; FDA withdrew those NDA approvals effective June 18, 2009, and later determined the withdrawal was not for safety or effectiveness. A research-use vial is not an FDA-approved drug merely because it shares a peptide name.'],
+                    ['Is this medical advice?', 'No. This is an educational comparison from a research-use peptide comparison publisher. It is not medical advice, not a prescription decision aid, and not an instruction to use a research product as treatment.'],
+                    ['Which one should someone take?', 'This page does not answer that. It does not give dosing, reconstitution, stacking, or product-selection guidance. Therapy decisions belong with licensed clinicians and approved labeling, not with a blog or a research catalog.'],
+                ]),
+            ],
+            [
+                'kind' => 'guide',
+                'file' => 'bacteriostatic-water-literacy.md',
+                'image_file' => 'bacteriostatic-water-literacy.png',
+                'slug' => 'bacteriostatic-water-literacy',
+                'h1' => 'Bacteriostatic Water Literacy Guide',
+                'lede' => '“Bac water” shows up constantly next to research-peptide listings. Shoppers often treat every clear diluent as the same thing—or assume a multi-dose vial label is a reconstitution recipe. This guide is diluent literacy only: what bacteriostatic water is, how the preservative relates to multi-puncture containers, how it differs from sterile water, and how to read storage and population warnings on real labels. It is educational only—not medical advice, not a price guide, and not instructions for reconstituting research chemicals.',
+                'seo_title' => 'Bacteriostatic Water Literacy Guide',
+                'seo_description' => 'What bacteriostatic water is, why benzyl alcohol matters for multi-dose vials, how it differs from sterile water, and RUO framing—no reconstitution recipes.',
+                'og_title' => 'Bacteriostatic Water Literacy Guide',
+                'og_description' => 'BAC water vs sterile water, benzyl alcohol multi-dose role, and label literacy—educational only; prices live on a separate Peptidemap page.',
+                'tag' => 'Diluent',
+                'read_time' => '6 Min Read',
+                'published_at' => $published,
+                'faq' => self::faq($host.'/guides/bacteriostatic-water-literacy#faq', [
+                    ['Is bacteriostatic water a peptide?', 'No. It is a preserved sterile diluent (USP concept / labeled sterile product)—not an active peptide drug.'],
+                    ['Is bacteriostatic water the same as sterile water?', 'No. Sterile Water for Injection typically has no antimicrobial preservative and is handled as a single-dose container concept. Bacteriostatic water includes a preservative (often benzyl alcohol about 0.9%) for a multi-dose paradigm when labeled as such.'],
+                    ['Why does Peptidemap refuse reconstitution charts?', 'Site policy: diluent and peptide literacy without dosing math or reconstitution recipes for research chemicals. That keeps educational pages from doubling as protocols.'],
+                    ['Can neonates receive bacteriostatic water?', 'Typical product labeling contraindicates benzyl alcohol–preserved bacteriostatic water in neonates. Follow current inserts—not informal summaries.'],
+                    ['Where do I compare vendors or prices?', 'On the separate product page at https://peptidemap.com/bacteriostatic-water. This guide does not restate prices or stock.'],
                 ]),
             ],
         ];

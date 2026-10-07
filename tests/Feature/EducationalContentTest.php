@@ -55,7 +55,7 @@ class EducationalContentTest extends TestCase
         $legality = $this->get('/guides/peptide-legality-fda-ruo-compounding');
         $legality->assertOk();
         $legality->assertSee('Are Research Peptides Legal? FDA &amp; RUO Basics', false);
-        $legality->assertSee('Last verified against FDA: 2026-09-30', false);
+        $legality->assertSee('Last verified against FDA: 2026-10-03', false);
         $legality->assertSee('https://peptidemap.com/guides/peptide-legality-fda-ruo-compounding', false);
         $legality->assertDontSee('formblends', false);
         $legality->assertDontSee('FormBlends', false);
@@ -275,9 +275,11 @@ class EducationalContentTest extends TestCase
             ->where('blogs.data.0.slug', $newestSlug)
             ->where('blogs.data.0.image', $newestImage)
             ->where('blogs.data.1.slug', 'cagrilintide-vs-eloralintide')
-            ->where('blogs.data.6.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('blogs.data.6.image', $evidencePath)
-            ->where('blogs.data.7.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('blogs.data.6.slug', 'tesamorelin-vs-sermorelin')
+            ->where('blogs.data.6.image', '/images/educational/tesamorelin-vs-sermorelin.png')
+            ->where('blogs.data.7.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('blogs.data.7.image', $evidencePath)
+            ->where('blogs.data.8.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/news')->assertOk()->assertInertia(fn ($page) => $page
@@ -286,18 +288,21 @@ class EducationalContentTest extends TestCase
             ->where('latestBlogs.0.slug', $newestSlug)
             ->where('latestBlogs.0.image', $newestImage)
             ->where('latestBlogs.1.slug', 'cagrilintide-vs-eloralintide')
-            ->where('latestBlogs.6.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('latestBlogs.7.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('latestBlogs.6.slug', 'tesamorelin-vs-sermorelin')
+            ->where('latestBlogs.7.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('latestBlogs.8.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/guides')->assertOk()->assertInertia(fn ($page) => $page
             ->component('Frontend/GuideListing')
-            ->where('guides.0.slug', 'peptide-legality-fda-ruo-compounding')
-            ->where('guides.1.slug', 'beginners-guide-to-research-peptides')
+            ->where('guides.0.slug', 'bacteriostatic-water-literacy')
+            ->where('guides.1.slug', 'peptide-legality-fda-ruo-compounding')
+            ->where('guides.2.slug', 'beginners-guide-to-research-peptides')
             ->where('guides', function ($guides) {
                 $covers = collect($guides)->pluck('cover')->sort()->values()->all();
 
                 return $covers === [
+                    '/images/educational/bacteriostatic-water-literacy.png',
                     '/images/educational/beginners-guide-to-research-peptides.png',
                     '/images/educational/peptide-legality-fda-ruo-compounding.png',
                 ];
@@ -344,5 +349,140 @@ class EducationalContentTest extends TestCase
         $this->get('/compare/bpc-157-vs-tb-500')
             ->assertOk()
             ->assertSee('blog\\/bpc-157-vs-tb-500-evidence', false);
+    }
+
+    public function test_four_content_qa_pieces_publish_once_with_required_phrases(): void
+    {
+        $tesamorelin = Blog::where('slug', 'tesamorelin-vs-sermorelin')->firstOrFail();
+        $bac = EducationalGuide::where('slug', 'bacteriostatic-water-literacy')->firstOrFail();
+        $bpc = Blog::where('slug', 'bpc-157-vs-tb-500-evidence')->firstOrFail();
+        $legality = EducationalGuide::where('slug', 'peptide-legality-fda-ruo-compounding')->firstOrFail();
+
+        $this->assertSame(1, Blog::where('slug', 'tesamorelin-vs-sermorelin')->count());
+        $this->assertSame(1, EducationalGuide::where('slug', 'bacteriostatic-water-literacy')->count());
+        $this->assertSame(1, Blog::where('slug', 'bpc-157-vs-tb-500-evidence')->count());
+        $this->assertSame(1, EducationalGuide::where('slug', 'peptide-legality-fda-ruo-compounding')->count());
+
+        $this->assertSame('/images/educational/tesamorelin-vs-sermorelin.png', $tesamorelin->image);
+        $this->assertSame('https://peptidemap.com/images/educational/tesamorelin-vs-sermorelin.png', $tesamorelin->seo_og_image);
+        $this->assertSame('2026-09-30', $tesamorelin->published_at->toDateString());
+        $this->assertSame('published', $tesamorelin->status);
+        $this->assertFileExists(public_path('images/educational/tesamorelin-vs-sermorelin.png'));
+        $this->assertStringContainsString('EGRIFTA', $tesamorelin->content);
+        $this->assertStringContainsString('GEREF', $tesamorelin->content);
+        $this->assertStringContainsString('June 18, 2009', $tesamorelin->content);
+        $this->assertStringContainsString('Not indicated for weight-loss management', $tesamorelin->content);
+        $this->assertStringContainsString('hexenoyl', $tesamorelin->content);
+        $this->assertStringNotContainsString('Note for Meta Optimizer', $tesamorelin->content);
+        $this->assertStringNotContainsString('suggested_slug', $tesamorelin->content);
+        $this->assertStringNotContainsString('/workspace/', $tesamorelin->content);
+
+        $this->assertSame('/images/educational/bacteriostatic-water-literacy.png', $bac->cover);
+        $this->assertSame('https://peptidemap.com'.$bac->cover, $bac->seo_og_image);
+        $this->assertSame('2026-09-30', $bac->published_at->toDateString());
+        $this->assertSame('published', $bac->status);
+        $this->assertSame('Literacy', $bac->guide_type);
+        $this->assertFileExists(public_path('images/educational/bacteriostatic-water-literacy.png'));
+        $this->assertStringContainsString('benzyl alcohol', $bac->content);
+        $this->assertStringContainsString('not an active peptide', $bac->content);
+        $this->assertStringContainsString('neonates', $bac->content);
+        $this->assertStringContainsString('not instructions for reconstituting research chemicals', $bac->description);
+        $this->assertStringContainsString('without dosing math or reconstitution recipes', $bac->content);
+        $this->assertStringNotContainsString('Note for Meta Optimizer', $bac->content);
+        $this->assertStringNotContainsString('/workspace/', $bac->content);
+
+        $this->assertSame('/images/educational/bpc-157-vs-tb-500-evidence.png', $bpc->image);
+        $this->assertSame('2026-09-29', $bpc->published_at->toDateString());
+        $this->assertStringContainsString('Ac-LKKTETQ', $bpc->content);
+        $this->assertStringContainsString('not the 43-aa protein', $bpc->content);
+        $this->assertStringContainsString('did not confer additional benefits', $bpc->content);
+        $this->assertStringContainsString('Biçer', $bpc->content);
+        $this->assertStringContainsString('not</strong> verified', $bpc->content);
+        $this->assertStringContainsString('full-length thymosin', $bpc->content);
+        $this->assertStringContainsString('https://www.jointdrs.org/full-text/1851', $bpc->content);
+        $this->assertStringContainsString('https://www.fda.gov/media/193349/download', $bpc->content);
+        $this->assertStringNotContainsString('thin placeholder', $bpc->content);
+        $this->assertStringNotContainsString('Note for Meta Optimizer', $bpc->content);
+
+        $this->assertStringContainsString('has not yet announced if it will accept or reject', $legality->content);
+        $this->assertStringContainsString('before the end of February 2027', $legality->content);
+        $this->assertStringContainsString('dihexa acetate', $legality->content);
+        $this->assertStringContainsString('PEG-MGF', $legality->content);
+        $this->assertStringContainsString('non-pegylated MGF', $legality->content);
+        $this->assertStringContainsString('Peptide Partners', $legality->content);
+        $this->assertStringContainsString('for research use only', $legality->content);
+        $this->assertStringContainsString('not permission to compound', $legality->content);
+        $this->assertStringContainsString('Last verified against FDA: 2026-10-03', $legality->content);
+        $this->assertStringContainsString('not, by itself, a license to compound', $legality->content);
+        $this->assertStringNotContainsString('formblends', strtolower($legality->content));
+        $this->assertStringNotContainsString('Note for Meta Optimizer', $legality->content);
+
+        $ids = [
+            'tesamorelin' => $tesamorelin->id,
+            'bac' => $bac->id,
+            'bpc' => $bpc->id,
+            'legality' => $legality->id,
+        ];
+        $blogCount = Blog::count();
+        $guideCount = EducationalGuide::count();
+
+        EducationalContentPublisher::sync();
+
+        $this->assertSame($blogCount, Blog::count());
+        $this->assertSame($guideCount, EducationalGuide::count());
+        $this->assertSame($ids['tesamorelin'], Blog::where('slug', 'tesamorelin-vs-sermorelin')->firstOrFail()->id);
+        $this->assertSame($ids['bac'], EducationalGuide::where('slug', 'bacteriostatic-water-literacy')->firstOrFail()->id);
+        $this->assertSame($ids['bpc'], Blog::where('slug', 'bpc-157-vs-tb-500-evidence')->firstOrFail()->id);
+        $this->assertSame($ids['legality'], EducationalGuide::where('slug', 'peptide-legality-fda-ruo-compounding')->firstOrFail()->id);
+        $this->assertSame(1, Blog::where('slug', 'tesamorelin-vs-sermorelin')->count());
+        $this->assertSame(1, EducationalGuide::where('slug', 'bacteriostatic-water-literacy')->count());
+
+        $ghrh = $this->get('/blog/tesamorelin-vs-sermorelin');
+        $ghrh->assertOk();
+        $ghrh->assertSee('Tesamorelin vs Sermorelin: GHRH Analog Differences', false);
+        $ghrh->assertSee('How These GHRH Analogs Differ', false);
+        $ghrh->assertSee('https://peptidemap.com/blog/tesamorelin-vs-sermorelin', false);
+        $ghrh->assertSee('EGRIFTA', false);
+        $ghrh->assertSee('June 18, 2009', false);
+        $ghrh->assertSee('Not indicated for weight-loss management', false);
+        $ghrh->assertSee('/images/educational/tesamorelin-vs-sermorelin.png', false);
+        $ghrh->assertDontSee('Note for Meta Optimizer', false);
+        $ghrh->assertDontSee('suggested_slug', false);
+        $ghrh->assertDontSee('/workspace/', false);
+
+        $water = $this->get('/guides/bacteriostatic-water-literacy');
+        $water->assertOk();
+        $water->assertSee('Bacteriostatic Water Literacy Guide', false);
+        $water->assertSee('https://peptidemap.com/guides/bacteriostatic-water-literacy', false);
+        $water->assertSee('benzyl alcohol', false);
+        $water->assertSee('not an active peptide', false);
+        $water->assertSee('neonates', false);
+        $water->assertSee('/images/educational/bacteriostatic-water-literacy.png', false);
+        $water->assertDontSee('Note for Meta Optimizer', false);
+        $water->assertDontSee('/workspace/', false);
+
+        $evidence = $this->get('/blog/bpc-157-vs-tb-500-evidence');
+        $evidence->assertOk();
+        $evidence->assertSee('Ac-LKKTETQ', false);
+        $evidence->assertSee('not the 43-aa protein', false);
+        $evidence->assertSee('did not confer additional benefits', false);
+        $evidence->assertSee('jointdrs.org\\/full-text\\/1851', false);
+        $evidence->assertSee('fda.gov\\/media\\/193349\\/download', false);
+        $evidence->assertDontSee('thin placeholder', false);
+
+        $pathway = $this->get('/guides/peptide-legality-fda-ruo-compounding');
+        $pathway->assertOk();
+        $pathway->assertSee('has not yet announced if it will accept or reject', false);
+        $pathway->assertSee('before the end of February 2027', false);
+        $pathway->assertSee('dihexa acetate', false);
+        $pathway->assertSee('PEG-MGF', false);
+        $pathway->assertSee('Peptide Partners', false);
+        $pathway->assertSee('for research use only', false);
+        $pathway->assertSee('not permission to compound', false);
+        $pathway->assertDontSee('formblends', false);
+
+        $this->get('/sitemap.xml')->assertOk()
+            ->assertSee('https://peptidemap.com/blog/tesamorelin-vs-sermorelin', false)
+            ->assertSee('https://peptidemap.com/guides/bacteriostatic-water-literacy', false);
     }
 }
