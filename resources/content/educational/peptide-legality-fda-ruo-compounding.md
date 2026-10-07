@@ -1,4 +1,4 @@
-**Last verified against FDA: 2026-09-30.** Federal compounding lists, advisory votes, and enforcement priorities change. This guide is educational pathway literacy, not legal advice.
+**Last verified against FDA: 2026-10-03.** Federal compounding lists, advisory votes, and enforcement priorities change. This guide is educational pathway literacy, not legal advice.
 
 ## The short version
 
@@ -62,6 +62,10 @@ Critical literacy points:
 - A favorable vote is **not** marketing approval as a drug
 - A favorable vote is **not**, by itself, a green light to compound
 
+**Status note (Harvard Chan, 1 October 2026).** Harvard T.H. Chan School of Public Health reported that FDA “has not yet announced if it will accept or reject the committee’s recommendation” from the July Pharmacy Compounding Advisory Committee vote on allowing compounders to manufacture and sell several synthetic peptides. That sentence is a status report, not a legal conclusion and not permission to compound. A PCAC vote is still advisory. It is not a final FDA rule, not FDA drug approval, and not placement on the 503A Bulks List. Removal from Category 2 remains not permission to compound. Source: Karen Feldscher, “Peptides are all over social media and the news. Here’s what to know about them,” Harvard T.H. Chan School of Public Health, 1 October 2026, https://hsph.harvard.edu/news/peptides-are-all-over-social-media-and-the-news-heres-what-to-know-about-them/
+
+**Next PCAC discussion (FDA page, read 3 October 2026).** FDA’s Pharmacy Compounding Advisory Committee meeting page states that FDA “will host an advisory committee meeting before the end of February 2027.” The agenda on that page lists these bulk drug substances for discussion for possible inclusion on the 503A Bulks List: cathelicidin (LL-37), GHK-Cu, dihexa acetate, melanotan II, and mechano growth factor, pegylated (PEG-MGF). The same page says advisory-committee recommendations are non-binding. A scheduled discussion is not a Bulks List listing and is not permission to compound. The page does not list non-pegylated MGF as a separate substance, and it says a Federal Register notice and public-comment docket are still forthcoming. Source: https://www.fda.gov/advisory-committees/pharmacy-compounding-advisory-committee/meeting-pharmacy-compounding-advisory-committee
+
 Until a substance actually appears on the applicable final list (or otherwise qualifies under the statute), educational status trackers have summarized many of these peptides as **not currently compoundable** under 503A—regardless of supplier or clinic marketing.
 
 ## Example: BPC-157 and similar peptides (primary-supported only)
@@ -103,6 +107,8 @@ What RUO does **not** automatically do:
 - Erase FDA’s ability to evaluate **intended use** from the totality of marketing
 
 Under **21 CFR 201.128**, “intended uses” are based on objective intent—expressions, design/composition, and circumstances of distribution—including labeling claims and advertising. FDA warning letters to peptide sellers have treated website disease/structure-function style claims as evidence that products are being marketed as **drugs**, and then as **unapproved new drugs** when no approval is in effect—regardless of research branding.
+
+The **24 August 2026** FDA warning letter to Peptide Partners LLC says this directly about that firm’s labeled products: despite statements marketing them “for research use only” and “not for human or veterinary use,” website evidence established that the products were intended to be drugs for human use. RUO wording on those products did not prevent the unapproved-new-drug finding in that letter. This is an enforcement example, not a complete list of every August 2026 letter and not legal advice about any other seller.
 
 **High-level takeaway:** legality depends on pathway and marketing context, not on a disclaimer sticker. Static “legal or illegal” charts go stale quickly; prefer FDA primary pages and dated trackers over slogans.
 
@@ -157,10 +163,14 @@ Primary / regulatory:
 1. U.S. FDA. Bulk Drug Substances Used in Compounding: https://www.fda.gov/drugs/human-drug-compounding/bulk-drug-substances-used-compounding
 2. U.S. FDA. Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks: https://www.fda.gov/drugs/human-drug-compounding/certain-bulk-drug-substances-use-compounding-may-present-significant-safety-risks
 3. 21 CFR 201.128 — Meaning of “intended uses”: https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-201/subpart-D/section-201.128
-4. Example FDA warning letter pattern (peptide website claims → unapproved new drugs), Aug 2026: https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/peptide-partners-llc-735063-08242026
+4. U.S. FDA warning letter, Peptide Partners LLC (MARCS-CMS 735063), 24 August 2026. Footnote: “for research use only” and “not for human or veterinary use” labeling did not control intended use where website evidence showed human-drug intent: https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/peptide-partners-llc-735063-08242026
 5. WADA Prohibited List 2026 (PDF): https://www.wada-ama.org/sites/default/files/2025-09/2026list_en_final_clean_september_2025.pdf
 6. DoD OPSS — BPC-157 advisory: https://www.opss.org/article/bpc-157-prohibited-peptide-and-unapproved-drug-found-health-and-wellness-products
 7. BMJ reporting on July 2026 PCAC peptide recommendations: https://www.bmj.com/content/394/bmj-2026-100422
+
+7a. Harvard T.H. Chan School of Public Health (Karen Feldscher), 1 October 2026, “Peptides are all over social media and the news. Here’s what to know about them.” Reports that FDA had not yet announced whether it will accept or reject the July PCAC recommendation. Does not list the next-meeting substance slate and does not discuss the 24 August 2026 warning letters: https://hsph.harvard.edu/news/peptides-are-all-over-social-media-and-the-news-heres-what-to-know-about-them/
+
+7b. U.S. FDA, Meeting of the Pharmacy Compounding Advisory Committee (page read 3 October 2026). States FDA will host a meeting before the end of February 2027 and lists cathelicidin (LL-37), GHK-Cu, dihexa acetate, melanotan II, and mechano growth factor, pegylated (PEG-MGF). Does not list non-pegylated MGF separately: https://www.fda.gov/advisory-committees/pharmacy-compounding-advisory-committee/meeting-pharmacy-compounding-advisory-committee
 
 Educational structure reference (model for Category 2 ≠ permission / PCAC ≠ rule; verify dates):
 
