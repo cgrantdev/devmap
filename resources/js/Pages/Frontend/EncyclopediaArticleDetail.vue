@@ -568,40 +568,13 @@
                   </p>                
                 </section>
 
-                <!-- Human Use & Evidence -->
-                <section v-if="humanUseIntro || (humanUseSubsections && humanUseSubsections.length > 0)" id="human-use-evidence" class="mb-12">
-                  <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
-                    <div class="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users w-5 h-5 text-white" aria-hidden="true">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                        <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
-                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                      </svg>
-                    </div>
-                    <h2 class="text-2xl font-semibold text-slate-900 m-0">Human Use and Evidence</h2>
-                  </div>
-    
-                  <!-- Introductory Paragraph -->
-                  <p v-if="humanUseIntro" class="text-slate-700 leading-relaxed mb-4" v-html="humanUseIntro.replace(/\n/g, '<br>')"></p>                
-    
-                  <!-- Subsections -->
-                  <template v-for="(subsection, index) in humanUseSubsections" :key="index">
-                    <h3 v-if="subsection.title" class="text-xl font-semibold text-slate-900 mb-3 mt-6">{{ subsection.title }}</h3>
-                    <div v-if="subsection.entries && subsection.entries.length > 0" class="mb-4">
-                      <template v-for="(processedEntry, entryIndex) in processEntries(subsection.entries)" :key="entryIndex">
-                        <!-- Render grouped items as a list -->
-                        <ul v-if="processedEntry.type === 'item-group'" class="list-disc pl-6 mb-4 space-y-2 text-slate-700">
-                          <li v-for="(item, itemIndex) in processedEntry.items" :key="itemIndex" v-html="item.replace(/\n/g, '<br>')"></li>
-                  </ul>
-                        <!-- Render content as paragraph -->
-                        <p v-else-if="processedEntry.type === 'content'" class="text-slate-700 leading-relaxed mb-4" v-html="processedEntry.value.replace(/\n/g, '<br>')"></p>
-                        <!-- Fallback for entries without type -->
-                        <p v-else-if="processedEntry.value" class="text-slate-700 leading-relaxed mb-4" v-html="processedEntry.value.replace(/\n/g, '<br>')"></p>
-                      </template>
-                    </div>
-                  </template>
-                </section>
+                <!-- "Human Use & Evidence" removed site-wide (Colin 10/7) —
+                     RUO compliance: these are research-use-only products,
+                     and even "no human trials yet" framing implies humans
+                     could use them. The data model keeps humanUseIntro /
+                     humanUseSubsections for legacy content but nothing
+                     renders them. Delete when the DB cleanup lands. -->
+
 
                 <!-- Regulatory Status -->
                 <section v-if="regulatorySubsections && regulatorySubsections.length > 0" id="regulatory-status" class="mb-12">
@@ -1535,7 +1508,9 @@ const props = defineProps({
       { id: 'background', label: 'Background' },
       { id: 'mechanism-of-action', label: 'Mechanism of Action' },
       { id: 'preclinical-research', label: 'Preclinical Research' },
-      { id: 'human-use-evidence', label: 'Human Use & Evidence' },
+      // 'human-use-evidence' nav entry removed with its section
+      // (Colin 10/7, RUO). Preclinical Research covers the research
+      // findings; nothing on the page frames human use at all.
       { id: 'regulatory-status', label: 'Regulatory Status' },
       { id: 'potential-applications', label: 'Potential Applications' },
       { id: 'references', label: 'References' }
