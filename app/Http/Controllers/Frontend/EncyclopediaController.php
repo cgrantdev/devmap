@@ -116,6 +116,14 @@ class EncyclopediaController extends Controller
                 'routes' => [],
                 'halfLife' => 'No numeric half-life is reported in the primary sources cited on this page. The sponsor attributes its once-weekly trial schedule to the lipidated EuPort domain. Not a dosing guide.',
             ],
+            // Plain drugStatus / halfLife text from
+            // database/seeders/data/encyclopedia-shells/hexarelin/body.md.
+            // That draft does not state a route list, so routes stays empty.
+            'Hexarelin' => [
+                'status' => 'Not approved. No FDA approval (Drugs@FDA) or EU marketing authorization (EMA medicines database) was found, and ClinicalTrials.gov lists no registered studies. Prohibited at all times in sport (WADA 2026 and 2027 Prohibited Lists, S2.2.4).',
+                'routes' => [],
+                'halfLife' => 'No human plasma half-life for hexarelin was found in the primary sources cited here. Animal studies report an intravenous half-life of about 76 minutes in rats and a terminal half-life of about 120 minutes in dogs. Not a dosing guide.',
+            ],
         ];
 
         $compound = $data[$compoundName] ?? null;

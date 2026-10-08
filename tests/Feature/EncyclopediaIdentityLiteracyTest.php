@@ -417,16 +417,16 @@ class EncyclopediaIdentityLiteracyTest extends TestCase
             $this->assertTrue($seeder->report['missing_category']);
             $this->assertFalse($seeder->report['updated']);
         }
-        // The pemvidutide migration seeds one category and post into every test database.
-        $this->assertSame(0, ProductCategory::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
-        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
+        // Create-seeder migrations seed pemvidutide and hexarelin into every test database.
+        $this->assertSame(0, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
+        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
 
         $cjc = $this->category('CJC-1295', 'cjc-1295');
         $noPost = new Cjc1295DacIdentitySeeder;
         $noPost->run();
         $this->assertTrue($noPost->report['missing_post']);
         $this->assertFalse($noPost->report['updated']);
-        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
+        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
 
         $this->category('CJC-1295 duplicate', 'CJC-1295');
         $marker = 'Collision marker that must survive.';
@@ -437,7 +437,7 @@ class EncyclopediaIdentityLiteracyTest extends TestCase
         $this->assertFalse($collision->report['updated']);
         $this->assertSame($marker, $post->fresh()->overview);
         $this->assertSame('KEEP', $post->fresh()->molecular_formula);
-        $this->assertSame(2, ProductCategory::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
+        $this->assertSame(2, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
 
         $lower = $this->category('Retatrutide', 'retatrutide');
         $this->category('Retatrutide duplicate', 'Retatrutide');
