@@ -104,8 +104,10 @@ class DiscoverProductsJob implements ShouldQueue
                 'description' => $p['description'] ?? null,
                 'status' => 'active',
                 'availability' => 'in_stock',
-                'purity' => 99.0,
-                'lab_tested' => true,
+                // Store pages do not include a COA. Leave purity empty and
+                // lab_tested false until a person records real evidence.
+                'purity' => null,
+                'lab_tested' => false,
                 'hidden' => $isUncategorized, // Hide uncategorized products from frontend
                 'auto_scraped' => true,
             ]);
