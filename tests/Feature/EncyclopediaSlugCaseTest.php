@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\ProductCategory;
+use App\Support\OgImageRevision;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -84,6 +85,11 @@ class EncyclopediaSlugCaseTest extends TestCase
             ->where('seo.canonical', url('/encyclopedia/retatrutide'))
             ->where('seo.url', url('/encyclopedia/retatrutide'))
             ->where('slug', 'retatrutide')
+            ->where('seo.og_image', function ($image) {
+                return is_string($image)
+                    && str_contains($image, '/og/compound/retatrutide.png?v=')
+                    && str_ends_with($image, '-'.OgImageRevision::COPY);
+            })
         );
 
         $this->get('/encyclopedia/CJC-1295')

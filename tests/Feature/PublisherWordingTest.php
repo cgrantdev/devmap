@@ -281,9 +281,7 @@ class PublisherWordingTest extends TestCase
             ],
             'resources/js/Pages/Frontend/Coupon.vue' => [
                 'Peptidemap code',
-                'is the code',
-                'supplied to Peptidemap',
-                'Peptidemap does not test codes',
+                '{{ coupon.code }} is the code {{ brand.name }} supplied to Peptidemap. Peptidemap does not test codes — confirm the discount at checkout.',
             ],
             'app/Http/Controllers/Frontend/CouponController.php' => [
                 'Peptidemap code',
@@ -302,7 +300,7 @@ class PublisherWordingTest extends TestCase
                 'Paid placement — not a quality rating',
             ],
             'resources/js/Pages/Frontend/BrandProducts.vue' => [
-                "Not specified — check",
+                'Not specified — check',
             ],
             'database/seeders/PagesSeeder.php' => [
                 'research-peptide vendors',
@@ -331,13 +329,13 @@ class PublisherWordingTest extends TestCase
                 'published COAs',
             ],
             'app/Http/Controllers/Frontend/BrandsController.php' => [
-                'compare vendors for your research needs',
+                'Browse and compare peptide vendors and brands. Read reviews and compare prices for your research needs.',
             ],
             'resources/views/emails/vendor-welcome.blade.php' => [
                 'once your store is approved',
             ],
             'resources/js/Pages/Auth/Register.vue' => [
-                "bought from",
+                'bought from',
             ],
             'resources/js/Pages/Frontend/Deals.vue' => [
                 'Use code PMAP at checkout',
@@ -403,6 +401,10 @@ class PublisherWordingTest extends TestCase
             'resources/js/components/ui/SearchPalette.vue' => [
                 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
             ],
+            'resources/js/Pages/Frontend/BrandProducts.vue' => [
+                '30-day satisfaction guarantee',
+                'Free shipping on orders over $150',
+            ],
             'resources/js/Pages/Frontend/ProductListing.vue' => [
                 '>Lab tested<',
                 'Min purity',
@@ -430,7 +432,12 @@ class PublisherWordingTest extends TestCase
         $this->assertStringNotContainsString('min purity', strtolower($template));
 
         $this->assertFileDoesNotExist(base_path('resources/js/Pages/Product/Public.vue'));
-        $this->assertFileDoesNotExist(base_path('public/images/og-default-v7.png'));
+        $this->assertFileExists(base_path('public/images/og-default-v7.png'));
         $this->assertFileExists(base_path('public/images/og-default-v8.png'));
+        $this->assertSame(
+            file_get_contents(base_path('public/images/og-default-v8.png')),
+            file_get_contents(base_path('public/images/og-default-v7.png')),
+            'og-default-v7.png must stay a byte copy of og-default-v8.png'
+        );
     }
 }

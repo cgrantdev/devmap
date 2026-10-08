@@ -11,7 +11,7 @@
       <div class="max-w-[900px] mx-auto px-6 lg:px-10 py-12">
         <h1 class="ui-display text-3xl md:text-4xl font-semibold text-[color:var(--color-ink)] mb-3">Vendor Badges</h1>
         <p class="text-[color:var(--color-ink-muted)] leading-relaxed mb-6 max-w-2xl">
-          Drop a live Peptidemap badge on your site. Shows your current rating, links back to your listing, and gives your visitors third-party social proof — the same signal reviews.io and Trustpilot widgets provide, backed by our verified-vendor and coupon database.
+          Drop a live Peptidemap badge on your site. Shows your current rating, links back to your listing, and gives your visitors third-party social proof — the same signal reviews.io and Trustpilot widgets provide, backed by our vendor listings and coupon database.
         </p>
 
         <div class="mb-6">

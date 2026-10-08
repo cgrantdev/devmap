@@ -513,35 +513,15 @@ class ProductsController extends Controller
                 'seller' => $brand ? ['@type' => 'Organization', 'name' => $brand->name] : null,
             ],
         ];
-        // AggregateRating: prefer product-level when we have it, otherwise
-        // fall back to the vendor's combined native + external aggregate
-        // (SEO rec #4 — "even if seeded from vendor-level reviews"). Missing
-        // schema was the biggest gap keeping our products off SERP star
-        // snippets even for vendors like Certified Pep with 1,492 Reviews.io
-        // reviews already imported.
+        // Product aggregateRating only when this listing has its own reviews.
+        // A vendor-level score (native, Trustpilot, or Reviews.io) describes
+        // the store, not this product, so it is not attached here.
         $productRatingCount = (int) ($product->rating_count ?? 0);
-        $vs = $brand?->vendorSetting;
-        $vendorRatingAvg = $vs ? (float) ($vs->external_rating_avg ?? 0) : 0;
-        $vendorRatingCount = $vs ? (int) ($vs->external_rating_count ?? 0) : 0;
-        $vendorNativeCount = (int) ($brand->rating_count ?? 0);
-        $vendorNativeAvg = (float) ($brand->rating_average ?? 0);
-        // Weighted mean across native + external, weighted by count.
-        $combinedVendorCount = $vendorNativeCount + $vendorRatingCount;
-        $combinedVendorAvg = $combinedVendorCount > 0
-            ? (($vendorNativeAvg * $vendorNativeCount) + ($vendorRatingAvg * $vendorRatingCount)) / $combinedVendorCount
-            : 0;
-
         if ($productRatingCount > 0) {
             $productSchema['aggregateRating'] = [
                 '@type' => 'AggregateRating',
                 'ratingValue' => round((float) $product->rating_average, 1),
                 'reviewCount' => $productRatingCount,
-            ];
-        } elseif ($combinedVendorCount > 0 && $combinedVendorAvg > 0) {
-            $productSchema['aggregateRating'] = [
-                '@type' => 'AggregateRating',
-                'ratingValue' => round($combinedVendorAvg, 1),
-                'reviewCount' => $combinedVendorCount,
             ];
         }
 
@@ -731,21 +711,13 @@ class ProductsController extends Controller
             $query->whereNotNull('discount_price');
         }
 
-        // Lab Tested filter
-        if ($request->has('lab_tested') && $request->lab_tested === '1') {
-            $query->where('lab_tested', true);
-        }
+        // lab_tested and min_purity are ignored. Scraped rows no longer
+        // carry invented flags, so honoring old URLs would hide almost
+        // every listing. The catalog UI no longer sends these params.
 
         // First-Timer Deals filter
         if ($request->has('first_timer_deals') && $request->first_timer_deals === '1') {
             $query->where('first_timer_deals', true);
-        }
-
-        if ($request->has('min_purity') && $request->min_purity) {
-            $minPurity = (float) $request->min_purity;
-            // Use real purity column from database
-            $query->whereNotNull('purity')
-                  ->where('purity', '>=', $minPurity);
         }
 
         // Sort default is 'featured' — is_peptide_thumb curated picks first,
@@ -941,12 +913,8 @@ class ProductsController extends Controller
             $query->where('availability', 'in_stock');
         }
 
-        if ($request->has('min_purity') && $request->min_purity) {
-            $minPurity = (float) $request->min_purity;
-            // Use real purity column from database
-            $query->whereNotNull('purity')
-                  ->where('purity', '>=', $minPurity);
-        }
+        // min_purity is ignored for the same reason as the catalog index:
+        // old brand URLs must not hide listings that no longer carry a purity.
 
         // Sort default is 'featured' — is_peptide_thumb curated picks first,
         // then popular (rating_count DESC), then higher effective price DESC

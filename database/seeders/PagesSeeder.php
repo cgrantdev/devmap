@@ -19,7 +19,7 @@ class PagesSeeder extends Seeder
                 'slug' => 'about',
                 'title' => 'About Peptidemap',
                 'content' => '<h2>Our Mission</h2>
-<p>Peptidemap is dedicated to advancing peptide research by connecting scientists, researchers, and laboratory professionals with research-peptide vendors. Our platform serves as a comprehensive resource hub, providing access to high-quality peptides, educational content, and research tools to support the scientific community in their pursuit of groundbreaking discoveries.</p>
+<p>Peptidemap is dedicated to advancing peptide research by connecting scientists, researchers, and laboratory professionals with research-peptide vendors. Our platform serves as a comprehensive resource hub, providing access to educational content and research tools to support the scientific community in their pursuit of groundbreaking discoveries.</p>
 
 <h2>What We Do</h2>
 <p>Peptidemap operates as an innovative aggregator platform that brings together multiple research-peptide vendors, making it easier for researchers to:</p>
@@ -32,7 +32,7 @@ class PagesSeeder extends Seeder
 </ul>
 
 <h2>Our Commitment to Research</h2>
-<p>All products listed on Peptidemap are intended exclusively for research purposes in laboratory settings. We are committed to supporting legitimate scientific research and do not promote or endorse the use of peptides for human consumption or therapeutic purposes. Our platform strictly adheres to research-only guidelines and works exclusively with suppliers who share this commitment to scientific integrity.</p>
+<p>All products listed on Peptidemap are intended exclusively for research purposes in laboratory settings. We are committed to supporting legitimate scientific research and do not promote or endorse the use of peptides for human consumption or therapeutic purposes. Our platform strictly adheres to research-only guidelines.</p>
 
 <h2>Listings</h2>
 <p>Peptidemap lists vendors and prices. We do not test products or verify vendors.</p>
@@ -42,7 +42,7 @@ class PagesSeeder extends Seeder
 
 <h2>Contact Us</h2>
 <p>If you have questions about our platform, need assistance, or are interested in becoming a supplier partner, please visit our <a href="/contact">Contact</a> page. We\'re here to support the research community and welcome your feedback, suggestions, and collaboration opportunities.</p>',
-                'meta_title' => 'About Us - Peptidemap | Connecting Researchers with research-peptide vendors',
+                'meta_title' => 'About Us - Peptidemap | Connecting Researchers with Research-Peptide Vendors',
                 'meta_description' => 'Learn about Peptidemap and our mission to connect researchers with research-peptide vendors. Discover our commitment to advancing peptide research through quality products and educational resources.',
             ],
             [

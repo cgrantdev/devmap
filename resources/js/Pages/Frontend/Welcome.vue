@@ -252,7 +252,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6 sm:mb-8">
         <div>
           <h2 class="text-2xl sm:text-3xl text-gray-900 mb-1">Limited Time Discounts</h2>
-          <p class="text-sm sm:text-base text-gray-600">Save up to 25% with exclusive coupon codes</p>
+          <p class="text-sm sm:text-base text-gray-600">Save up to 25% with Peptidemap coupon codes</p>
         </div>
         <Link
           href="/deals"
@@ -435,7 +435,7 @@ const props = defineProps({
     type: Object,
     default: () => ({
       title: 'Compare research-peptide vendors',
-      description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with exclusive coupon codes.',
+      description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with Peptidemap coupon codes.',
       og_title: null,
       og_description: null,
       og_image: null,
@@ -455,7 +455,7 @@ const description = computed(() => {
   return (
     props.seo?.description ||
     page.props.site_description ||
-    'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with exclusive coupon codes.'
+    'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with Peptidemap coupon codes.'
   )
 })
 
