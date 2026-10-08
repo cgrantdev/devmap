@@ -5,7 +5,7 @@
       <div class="border-b border-slate-200 pb-4">
         <h1 class="text-2xl font-semibold text-slate-900">Certifications & Testing</h1>
         <p class="text-[13px] text-slate-600 mt-1">
-          Submit proof of cGMP-compliant manufacturing or independent lab-testing to earn a verified badge on your storefront + product cards. Approved by our team within 3 business days.
+          Submit proof of cGMP-compliant manufacturing or independent lab-testing to earn a cGMP (vendor-reported) or 7+ Tested badge on your storefront + product cards. Approved by our team within 3 business days.
         </p>
       </div>
 
@@ -16,7 +16,7 @@
         </div>
 
         <div v-if="claims[type]?.status === 'approved'" class="mt-2 text-[13px] text-emerald-700">
-          Verified on {{ formatDate(claims[type].verified_at) }}. The badge is now live on your storefront.
+          Approved on {{ formatDate(claims[type].verified_at) }}. The badge is now live on your storefront.
         </div>
         <div v-else-if="claims[type]?.status === 'pending'" class="mt-2 text-[13px] text-amber-800">
           Submitted {{ formatDate(claims[type].submitted_at) }} — under review.

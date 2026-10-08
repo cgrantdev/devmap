@@ -102,7 +102,7 @@
                 : 'bg-emerald-50/60 text-emerald-800 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50',
             ]"
           >
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            <svg v-if="f.value !== 'cgmp'" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             {{ f.label }}
           </button>
           <button
@@ -221,7 +221,7 @@
                 v-for="b in brand.verified_badges"
                 :key="b.type"
                 class="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full"
-                :title="`Peptidemap-verified: ${b.label}`"
+                :title="b.type === 'cgmp' ? 'cGMP (vendor-reported)' : `${b.label} (vendor-submitted)`"
               >
                 <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
                 {{ b.label }}
@@ -328,7 +328,7 @@ const selectedFilters = ref({
 // that type. Colin: "US Made" stays a self-declared USP (no proof
 // process); cGMP + testing require verified upload.
 const verifiedFilters = [
-  { label: 'cGMP Verified', value: 'cgmp' },
+  { label: 'cGMP (vendor-reported)', value: 'cgmp' },
   { label: '7+ Tested', value: 'testing_7x' },
 ]
 

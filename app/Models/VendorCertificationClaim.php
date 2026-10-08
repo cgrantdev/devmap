@@ -20,7 +20,9 @@ class VendorCertificationClaim extends Model
     public const TYPES = [self::TYPE_CGMP, self::TYPE_TESTING_7X];
 
     public const TYPE_LABELS = [
-        self::TYPE_CGMP => 'cGMP Compliant Manufacturing',
+        // Public copy must not say we verified the vendor. The filter
+        // key stays "cgmp" (?verified=cgmp). This string is the badge.
+        self::TYPE_CGMP => 'cGMP (vendor-reported)',
         self::TYPE_TESTING_7X => '7+ Compound Independent Testing',
     ];
 

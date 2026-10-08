@@ -101,7 +101,7 @@ class CertificationsController extends Controller
 
         $brandName = $c->brand?->name ?? 'A vendor';
         $slug = $c->brand?->slug;
-        $line = "🏅 **{$brandName}** verified: **{$c->label()}**";
+        $line = "🏅 **{$brandName}** badge approved: **{$c->label()}**";
         if ($slug) $line .= " — https://peptidemap.com/brand/{$slug}";
 
         try {
