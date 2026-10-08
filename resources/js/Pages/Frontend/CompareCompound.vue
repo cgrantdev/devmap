@@ -21,18 +21,22 @@
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6 pb-10">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Vendor comparison</div>
         <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">
-          {{ compound.name }}
+          {{ seo.h1 || compound.name }}
         </h1>
         <div v-if="compound.alias" class="flex items-center gap-2 mb-3">
           <span class="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)]">Also known as</span>
           <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] text-[12px] font-semibold ui-mono text-[color:var(--color-ink)]">{{ compound.alias }}</span>
         </div>
-        <!-- H2 explicitly targets "buy {compound}" + "{compound} price"
-             query patterns identified in GSC (Sep 16). Google reads this
-             as the page's secondary topic. -->
-        <h2 v-if="compound.vendor_count > 0" class="sr-only">Buy {{ compound.name }} — Compare {{ compound.vendor_count }} vendor prices</h2>
+        <!-- H2 targets "buy {compound}" queries. Retatrutide uses price_intro
+             instead. An empty catalog omits the Buy heading. -->
+        <h2 v-if="compound.vendor_count > 0 && !compound.price_intro" class="sr-only">Buy {{ compound.name }} — Compare {{ compound.vendor_count }} vendor prices</h2>
 
-        <div v-if="compound.vendor_count > 0" class="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[color:var(--color-ink-muted)] mb-4">
+        <p v-if="compound.price_intro" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl">
+          {{ compound.price_intro }}
+        </p>
+        <ComparePriceSummary v-if="compound.price_stats" :stats="compound.price_stats" />
+
+        <div v-if="compound.vendor_count > 0 && !compound.price_stats" class="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[color:var(--color-ink-muted)] mb-4">
           <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.vendor_count }}</strong> vendor{{ compound.vendor_count === 1 ? '' : 's' }}</span>
           <span class="text-[color:var(--color-ink-subtle)]">·</span>
           <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.product_count }}</strong> product{{ compound.product_count === 1 ? '' : 's' }}</span>
@@ -45,7 +49,7 @@
           </span>
         </div>
 
-        <p v-if="compound.summary" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl mb-4">
+        <p v-if="!compound.price_intro && compound.summary" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl mb-4">
           {{ compound.research ? compound.summary : truncate(compound.summary, 320) }}
         </p>
 
@@ -84,7 +88,7 @@
                 : 'bg-emerald-50/60 text-emerald-800 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50',
             ]"
           >
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            <svg v-if="f.value !== 'cgmp'" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             {{ f.label }}
           </button>
           <button
@@ -138,7 +142,7 @@
                 :key="product.id"
                 :class="[
                   'border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] transition-colors',
-                  pidx === 0 ? 'bg-[color:var(--color-verified-bg)]' : '',
+                  pidx === 0 && !compound.price_stats ? 'bg-[color:var(--color-verified-bg)]' : '',
                 ]"
               >
                 <td class="px-5 py-4">
@@ -159,7 +163,7 @@
                       >
                         {{ product.brand_name }}
                       </a>
-                      <div v-if="pidx === 0" class="flex items-center gap-1 mt-0.5">
+                      <div v-if="pidx === 0 && !compound.price_stats" class="flex items-center gap-1 mt-0.5">
                         <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Best price</span>
                       </div>
                     </div>
@@ -178,12 +182,12 @@
                 </td>
                 <td class="px-5 py-4 text-right ui-mono text-[color:var(--color-ink)]">
                   <span :class="product.pmap_price ? 'text-[color:var(--color-ink-subtle)] line-through' : ''">
-                    ${{ formatPrice(product.effective_price) }}
+                    {{ formatMoney(product, product.effective_price) }}
                   </span>
                 </td>
                 <td class="px-5 py-4 text-right bg-emerald-50/30">
                   <template v-if="product.pmap_price">
-                    <div class="ui-mono font-semibold text-emerald-700">${{ formatPrice(product.pmap_price) }}</div>
+                    <div class="ui-mono font-semibold text-emerald-700">{{ formatMoney(product, product.pmap_price) }}</div>
                     <div class="text-[10px] uppercase tracking-wide text-emerald-600 mt-0.5">
                       code <span class="ui-mono">{{ product.brand_coupon_code || 'PMAP' }}</span>
                     </div>
@@ -217,6 +221,75 @@
       </div>
     </section>
 
+    <section v-if="compound.price_stats" class="border-t border-[color:var(--color-hairline)] bg-white">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+        <h2 class="text-[22px] font-semibold tracking-[-0.01em] text-[color:var(--color-ink)] mb-3">{{ compound.per_mg_title }}</h2>
+        <p class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl mb-5">{{ compound.per_mg_intro }}</p>
+        <PricePerMgTable
+          :rows="compound.price_stats.per_mg.rows"
+          :footer="compound.price_stats.per_mg.footer"
+        />
+      </div>
+    </section>
+
+    <section v-if="compound.code_names" class="border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+        <h2 class="text-[22px] font-semibold tracking-[-0.01em] text-[color:var(--color-ink)] mb-3">{{ compound.code_names.title }}</h2>
+        <p class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl mb-5">
+          <template v-for="(part, i) in compound.code_names.intro" :key="'cn'+i">
+            <a v-if="part.href" :href="part.href" class="text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">{{ part.text }}</a>
+            <template v-else>{{ part.text }}</template>
+          </template>
+        </p>
+        <div v-if="compound.code_names.rows?.length" class="bg-white rounded-[14px] border border-[color:var(--color-hairline)] overflow-hidden mb-5">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-[color:var(--color-hairline)] bg-white">
+                  <th scope="col" class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Catalog name</th>
+                  <th scope="col" class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Listed by</th>
+                  <th scope="col" class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Example catalog listing</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="row in compound.code_names.rows" :key="row.url" class="border-b border-[color:var(--color-hairline-soft)]">
+                  <td class="px-5 py-4 text-[color:var(--color-ink)]">{{ row.label }}</td>
+                  <td class="px-5 py-4 text-[color:var(--color-ink-muted)]">{{ row.listed_by }}</td>
+                  <td class="px-5 py-4">
+                    <a :href="row.url" class="text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">{{ row.link_label }}</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p v-if="compound.code_names.blend" class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl mb-4">
+          <strong class="text-[color:var(--color-ink)]">{{ compound.code_names.blend.lead }}</strong>
+          <a :href="compound.code_names.blend.url" class="text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">{{ compound.code_names.blend.link_label }}</a>{{ compound.code_names.blend.after }}
+        </p>
+        <p class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl">{{ compound.code_names.outro }}</p>
+      </div>
+    </section>
+
+    <section v-if="compound.why_prices" class="border-t border-[color:var(--color-hairline)] bg-white">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+        <h2 class="text-[22px] font-semibold tracking-[-0.01em] text-[color:var(--color-ink)] mb-3">{{ compound.why_prices.title }}</h2>
+        <div class="max-w-3xl space-y-4 text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">
+          <p>{{ compound.why_prices.intro }}</p>
+          <ul class="list-disc pl-5 space-y-2">
+            <li v-for="(bullet, i) in compound.why_prices.bullets" :key="'w'+i">
+              <strong class="text-[color:var(--color-ink)]">{{ bullet.title }}</strong>
+              <template v-for="(part, j) in bullet.parts" :key="'wp'+i+'-'+j">
+                <a v-if="part.href" :href="part.href" class="text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">{{ part.text }}</a>
+                <template v-else>{{ part.text }}</template>
+              </template>
+            </li>
+          </ul>
+          <p>{{ compound.why_prices.closing }}</p>
+        </div>
+      </div>
+    </section>
+
     <!-- Cited trial readout. Retatrutide only; other compounds omit this block. -->
     <section v-if="compound.research" class="border-t border-[color:var(--color-hairline)] bg-white">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
@@ -224,6 +297,7 @@
           Published trial readouts
         </div>
         <div class="max-w-3xl space-y-4 text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">
+          <p v-if="compound.price_intro && compound.research.lead">{{ compound.research.lead }}</p>
           <p v-for="(paragraph, i) in compound.research.paragraphs" :key="'p'+i">{{ paragraph }}</p>
           <ul v-if="compound.research.key_points?.length" class="list-disc pl-5 space-y-1">
             <li v-for="(point, i) in compound.research.key_points" :key="'k'+i">{{ point }}</li>
@@ -288,6 +362,18 @@
       </div>
     </section>
 
+    <section v-if="compound.related_reading?.length" class="border-t border-[color:var(--color-hairline)] bg-white">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
+        <p class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">
+          Related reading:
+          <template v-for="(link, i) in compound.related_reading" :key="link.href">
+            <span v-if="i"> · </span>
+            <a :href="link.href" class="text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">{{ link.label }}</a>
+          </template>
+        </p>
+      </div>
+    </section>
+
     <!-- Related compounds (internal linking, strategist rec #16) -->
     <section v-if="related.length" class="border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
@@ -319,6 +405,8 @@ import { ref, computed } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import ModernLayout from '../Layouts/ModernLayout.vue'
 import BuyThroughModal from '@/components/BuyThroughModal.vue'
+import ComparePriceSummary from '@/components/ComparePriceSummary.vue'
+import PricePerMgTable from '@/components/PricePerMgTable.vue'
 import { withSrc } from '@/composables/useOutbound'
 
 const props = defineProps({
@@ -333,7 +421,7 @@ const props = defineProps({
 // /vendors (?verified=csv&usp=key) so the two surfaces stay
 // consistent and a shared bookmarked URL keeps its shape.
 const verifiedFilters = [
-  { label: 'cGMP Verified', value: 'cgmp' },
+  { label: 'cGMP (vendor-reported)', value: 'cgmp' },
   { label: '7+ Tested', value: 'testing_7x' },
 ]
 const activeVerified = computed(() => new Set(props.trustFilters?.verified || []))
@@ -383,6 +471,11 @@ function formatPrice(v) {
   if (v == null) return '—'
   const n = Number(v)
   return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+function formatMoney(product, amount) {
+  const symbol = product?.currency_symbol || '$'
+  const gap = /[A-Za-z]$/.test(symbol) ? ' ' : ''
+  return symbol + gap + formatPrice(amount)
 }
 function truncate(s, max) {
   if (!s) return ''

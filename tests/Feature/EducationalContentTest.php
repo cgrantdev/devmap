@@ -266,7 +266,7 @@ class EducationalContentTest extends TestCase
         $this->assertFileExists(public_path(ltrim($beginner->cover, '/')));
         $this->assertFileExists(public_path(ltrim($legality->cover, '/')));
 
-        $newestSlug = 'eloralintide-tirzepatide-vs-retatrutide';
+        $newestSlug = 'retatrutide-testing-coa-limits';
         $newestImage = '/images/educational/'.$newestSlug.'.png';
 
         $this->get('/blogs')->assertOk()->assertInertia(fn ($page) => $page
@@ -274,12 +274,16 @@ class EducationalContentTest extends TestCase
             ->missing('featured')
             ->where('blogs.data.0.slug', $newestSlug)
             ->where('blogs.data.0.image', $newestImage)
-            ->where('blogs.data.1.slug', 'cagrilintide-vs-eloralintide')
-            ->where('blogs.data.6.slug', 'tesamorelin-vs-sermorelin')
-            ->where('blogs.data.6.image', '/images/educational/tesamorelin-vs-sermorelin.png')
-            ->where('blogs.data.7.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('blogs.data.7.image', $evidencePath)
-            ->where('blogs.data.8.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('blogs.data.1.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('blogs.data.1.image', '/images/educational/cjc-1295-dac-vs-no-dac.png')
+            ->where('blogs.data.2.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('blogs.data.8.slug', 'tesamorelin-vs-sermorelin')
+            ->where('blogs.data.8.image', '/images/educational/tesamorelin-vs-sermorelin.png')
+            ->where('blogs.data.9.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('blogs.data.9.image', $evidencePath)
+            ->where('blogs.data.10.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('blogs.data.10.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
+            ->where('blogs.data.11.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/news')->assertOk()->assertInertia(fn ($page) => $page
@@ -287,10 +291,12 @@ class EducationalContentTest extends TestCase
             ->missing('featuredBlogs')
             ->where('latestBlogs.0.slug', $newestSlug)
             ->where('latestBlogs.0.image', $newestImage)
-            ->where('latestBlogs.1.slug', 'cagrilintide-vs-eloralintide')
-            ->where('latestBlogs.6.slug', 'tesamorelin-vs-sermorelin')
-            ->where('latestBlogs.7.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('latestBlogs.8.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('latestBlogs.1.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('latestBlogs.2.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('latestBlogs.8.slug', 'tesamorelin-vs-sermorelin')
+            ->where('latestBlogs.9.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('latestBlogs.10.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('latestBlogs.11.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/guides')->assertOk()->assertInertia(fn ($page) => $page
@@ -484,5 +490,197 @@ class EducationalContentTest extends TestCase
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee('https://peptidemap.com/blog/tesamorelin-vs-sermorelin', false)
             ->assertSee('https://peptidemap.com/guides/bacteriostatic-water-literacy', false);
+    }
+
+    public function test_coa_cjc_and_retatrutide_testing_notes_publish_once_with_covers(): void
+    {
+        $slugs = [
+            'how-to-verify-a-peptide-vendor-certificate-of-analysis',
+            'cjc-1295-dac-vs-no-dac',
+            'retatrutide-testing-coa-limits',
+        ];
+
+        foreach ($slugs as $slug) {
+            $this->assertSame(1, Blog::where('slug', $slug)->count());
+            $blog = Blog::where('slug', $slug)->firstOrFail();
+            $this->assertSame('/images/educational/'.$slug.'.png', $blog->image);
+            $this->assertSame('https://peptidemap.com/images/educational/'.$slug.'.png', $blog->seo_og_image);
+            $this->assertSame('published', $blog->status);
+            $this->assertNull($blog->introduction);
+            $this->assertNull($blog->detailed_analysis);
+            $this->assertNull($blog->conclusion);
+            $this->assertFileExists(public_path('images/educational/'.$slug.'.png'));
+            $this->assertFileExists(resource_path('content/educational/'.$slug.'.md'));
+            $this->assertFileExists(resource_path('content/educational/images/'.$slug.'.png'));
+            $this->assertStringNotContainsString('/workspace/', (string) $blog->content);
+            $this->assertStringNotContainsString('/workspace/', (string) $blog->image);
+            $this->assertStringNotContainsString('/workspace/', (string) $blog->description);
+            $this->assertStringNotContainsString('/workspace/', (string) $blog->seo_og_image);
+            $this->assertStringNotContainsString('CMS paste', (string) $blog->content);
+            $this->assertStringNotContainsString('CHANGES', (string) $blog->content);
+            $this->assertStringNotContainsString('Note for Meta Optimizer', (string) $blog->content);
+            $this->assertStringNotContainsString('PeptideMaps', (string) $blog->content);
+            $lowerContent = strtolower((string) $blog->content);
+            $this->assertStringNotContainsString('forthcoming', $lowerContent);
+            $this->assertStringNotContainsString('when shipped', $lowerContent);
+            $this->assertStringNotContainsString('deepen', $lowerContent);
+            $this->assertStringNotContainsString('todo', $lowerContent);
+            $this->assertStringNotContainsString('picsum.photos', (string) $blog->image);
+            $this->assertStringNotContainsString('unsplash.com', (string) $blog->image);
+        }
+
+        $coa = Blog::where('slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')->firstOrFail();
+        $this->assertSame('2026-04-06', $coa->published_at->toDateString());
+        $this->assertSame('Guides', $coa->blog_type);
+        $this->assertStringContainsString('shared COA', $coa->content);
+        $this->assertStringContainsString('janoshik.com/verify', $coa->content);
+        $this->assertStringContainsString('does not endorse Janoshik', $coa->content);
+        $this->assertStringContainsString('/blog/retatrutide-testing-coa-limits', $coa->content);
+        $this->assertStringContainsString('/testing-labs', $coa->content);
+        $this->assertStringNotContainsString('minimum research grade', $coa->content);
+        $this->assertStringNotContainsString('96%', $coa->content);
+        $joinedPoints = implode(' ', $coa->key_points ?? []);
+        $this->assertStringNotContainsString('96%', $joinedPoints);
+        $this->assertStringNotContainsString('PeptideMaps', $joinedPoints);
+
+        $cjc = Blog::where('slug', 'cjc-1295-dac-vs-no-dac')->firstOrFail();
+        $this->assertSame('2026-10-07', $cjc->published_at->toDateString());
+        $this->assertSame('Research', $cjc->blog_type);
+        $this->assertFalse((bool) $cjc->is_featured);
+        $this->assertStringContainsString('Modified GRF 1-29', $cjc->content);
+        $this->assertStringContainsString('5.8–8.1 days', $cjc->content);
+        $this->assertStringContainsString('16352683', $cjc->content);
+        $this->assertStringContainsString('446262-90-4', $cjc->content);
+        $this->assertStringContainsString('863288-34-0', $cjc->content);
+        $this->assertStringContainsString('3647.2', $cjc->content);
+        $this->assertStringContainsString('3367.9', $cjc->content);
+        $this->assertStringContainsString('C165H269N47O46', $cjc->content);
+        $this->assertStringContainsString('does not transfer', $cjc->content);
+        $this->assertStringContainsString('/encyclopedia/CJC-1295', $cjc->content);
+        $this->assertStringContainsString('/compare/cjc-1295-vs-ipamorelin', $cjc->content);
+        $this->assertStringContainsString('/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis', $cjc->content);
+
+        $reta = Blog::where('slug', 'retatrutide-testing-coa-limits')->firstOrFail();
+        $this->assertSame('2026-10-07', $reta->published_at->toDateString());
+        $this->assertSame('Research', $reta->blog_type);
+        $this->assertFalse((bool) $reta->is_featured);
+        $this->assertStringContainsString('six cases of acute liver', $reta->content);
+        $this->assertStringContainsString('R-10', $reta->content);
+        $this->assertStringContainsString('R-20', $reta->content);
+        $this->assertStringContainsString('Investigations are ongoing', $reta->content);
+        $this->assertStringContainsString('possibly associated with a contaminant', $reta->content);
+        $this->assertStringContainsString('does not prove', $reta->content);
+        $this->assertStringContainsString('A 99% COA does not make a vial safe', $reta->content);
+        $this->assertStringContainsString('does not</strong> reprint', $reta->content);
+        $this->assertStringContainsString('/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis', $reta->content);
+        $this->assertStringContainsString('/encyclopedia/retatrutide', $reta->content);
+        $this->assertStringNotContainsString('long-term', $reta->content);
+        $this->assertStringContainsString('see the companion post:', $coa->content);
+        $this->assertStringContainsString('This guide covers the basics plus shared-lot reuse', $coa->content);
+        $this->assertStringContainsString('COA verification guide', $reta->content);
+
+        foreach ([$coa, $cjc, $reta] as $blog) {
+            $plain = html_entity_decode(strip_tags((string) $blog->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $faq = $blog->seo_schema[0] ?? null;
+            $this->assertSame('FAQPage', $faq['@type'] ?? null);
+            $this->assertNotEmpty($faq['mainEntity'] ?? null);
+            foreach ($faq['mainEntity'] as $entity) {
+                $this->assertStringContainsString($entity['name'], $plain);
+                $this->assertStringContainsString($entity['acceptedAnswer']['text'], $plain);
+            }
+        }
+
+        // Live row has no cover and an existing byline. Sync fills the cover
+        // and replaces the body without inserting a second row or moving the date.
+        $coa->author_name = 'Dr. Michael Torres';
+        $coa->author_job = 'Quality Assurance Analyst';
+        $coa->is_featured = true;
+        $coa->published_at = '2026-04-06';
+        $coa->image = null;
+        $coa->introduction = 'HPLC purity of 96% or above is considered minimum research grade.';
+        $coa->detailed_analysis = 'PeptideMaps vendor listings surface COA and testing information.';
+        $coa->conclusion = 'Old conclusion.';
+        $coa->save();
+
+        $ids = [];
+        foreach ($slugs as $slug) {
+            $ids[$slug] = Blog::where('slug', $slug)->firstOrFail()->id;
+        }
+        $before = Blog::count();
+
+        EducationalContentPublisher::sync();
+
+        $this->assertSame($before, Blog::count());
+        foreach ($slugs as $slug) {
+            $this->assertSame(1, Blog::where('slug', $slug)->count());
+            $again = Blog::where('slug', $slug)->firstOrFail();
+            $this->assertSame($ids[$slug], $again->id);
+            $this->assertSame('/images/educational/'.$slug.'.png', $again->image);
+        }
+
+        $coa = Blog::where('slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')->firstOrFail();
+        $this->assertSame('Dr. Michael Torres', $coa->author_name);
+        $this->assertSame('Quality Assurance Analyst', $coa->author_job);
+        $this->assertTrue((bool) $coa->is_featured);
+        $this->assertSame('2026-04-06', $coa->published_at->toDateString());
+        $this->assertNull($coa->introduction);
+        $this->assertNull($coa->detailed_analysis);
+        $this->assertNull($coa->conclusion);
+        $this->assertStringContainsString('shared COA', $coa->content);
+        $this->assertStringNotContainsString('minimum research grade', (string) $coa->content);
+        $this->assertStringNotContainsString('PeptideMaps', (string) $coa->content);
+
+        $page = $this->get('/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis');
+        $page->assertOk();
+        $page->assertSee('How to Verify a Peptide Vendor Certificate of Analysis', false);
+        $page->assertSee('https://peptidemap.com/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis', false);
+        $page->assertSee('janoshik.com\\/verify', false);
+        $page->assertSee('blog\\/retatrutide-testing-coa-limits', false);
+        $page->assertSee('/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png', false);
+        $page->assertSee('Does Peptidemap endorse Janoshik?', false);
+        $page->assertDontSee('/workspace/', false);
+        $page->assertDontSee('CMS paste', false);
+        $page->assertDontSee('PeptideMaps', false);
+        $page->assertDontSee('minimum research grade', false);
+        $page->assertDontSee('forthcoming', false);
+        $page->assertSee('see the companion post:', false);
+        $page->assertSee('This guide covers the basics plus shared-lot reuse', false);
+
+        $cjcPage = $this->get('/blog/cjc-1295-dac-vs-no-dac');
+        $cjcPage->assertOk();
+        $cjcPage->assertSee('CJC-1295 DAC vs No DAC: Naming Map, Half-Life Limits, and Blend-Vial Identity', false);
+        $cjcPage->assertSee('https://peptidemap.com/blog/cjc-1295-dac-vs-no-dac', false);
+        $cjcPage->assertSee('5.8\u20138.1 days', false);
+        $cjcPage->assertSee('446262-90-4', false);
+        $cjcPage->assertSee('863288-34-0', false);
+        $cjcPage->assertSee('Modified GRF 1-29', false);
+        $cjcPage->assertSee('/images/educational/cjc-1295-dac-vs-no-dac.png', false);
+        $cjcPage->assertDontSee('/workspace/', false);
+        $cjcPage->assertDontSee('which should you take', false);
+
+        $retaPage = $this->get('/blog/retatrutide-testing-coa-limits');
+        $retaPage->assertOk();
+        $retaPage->assertSee('Retatrutide Testing and COA Limits: Grey-Market Labels, Buyer Tests, and Victoria’s Alert', false);
+        $retaPage->assertSee('https://peptidemap.com/blog/retatrutide-testing-coa-limits', false);
+        $retaPage->assertSee('six cases of acute liver', false);
+        $retaPage->assertSee('A 99% COA does not make a vial safe', false);
+        $retaPage->assertSee('blog\\/how-to-verify-a-peptide-vendor-certificate-of-analysis', false);
+        $retaPage->assertSee('/images/educational/retatrutide-testing-coa-limits.png', false);
+        $retaPage->assertDontSee('/workspace/', false);
+        $retaPage->assertDontSee('long-term', false);
+        $retaPage->assertSee('COA verification guide', false);
+
+        foreach ([$page, $cjcPage, $retaPage] as $rendered) {
+            $renderedLower = strtolower($rendered->getContent());
+            $this->assertStringNotContainsString('when shipped', $renderedLower);
+            $this->assertStringNotContainsString('deepen', $renderedLower);
+            $this->assertStringNotContainsString('forthcoming', $renderedLower);
+            $this->assertStringNotContainsString('/workspace/', $renderedLower);
+        }
+
+        $this->get('/sitemap.xml')->assertOk()
+            ->assertSee('https://peptidemap.com/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis', false)
+            ->assertSee('https://peptidemap.com/blog/cjc-1295-dac-vs-no-dac', false)
+            ->assertSee('https://peptidemap.com/blog/retatrutide-testing-coa-limits', false);
     }
 }

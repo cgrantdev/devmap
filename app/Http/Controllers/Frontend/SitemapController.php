@@ -124,8 +124,9 @@ class SitemapController extends Controller
         // (Selank/Semax, "BPC-157 / TB500 / Cartalax"). Emit the loc only
         // when the stored slug is resolvable. Those blends already have a
         // live /compare/{canonical} page; the bad encyclopedia URL 301s there
-        // and is not listed here. Forced families emit the hyphen canonical
-        // (vitamin-b12, hgh-191aa, phosphate-buffered-saline, and the rest).
+        // and is not listed here. The loc keeps the stored slug's letter
+        // case (CJC-1295, 5-Amino-1MQ). Forced families emit the hyphen
+        // canonical (vitamin-b12, hgh-191aa, phosphate-buffered-saline).
         // Compare locs must be the route-safe slug ([a-z0-9-]+): raw
         // values like "BPC-157" and "Vitamin B12" 404. Emit each compare URL
         // once, and only when that slug actually resolves. A compare page

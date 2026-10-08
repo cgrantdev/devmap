@@ -154,8 +154,11 @@ class ProductCategory extends Model
      * Where a non-canonical encyclopedia request should 301, if anywhere.
      *
      * Forced families (Vitamin B12, HGH 191AA, PBS, sterile water, and
-     * the other hyphen canonicals) render only at the hyphen URL. Other
-     * stored slugs still win when they are resolvable. Slash blends have
+     * the other hyphen canonicals) render only at the exact hyphen URL.
+     * Letter case counts: /encyclopedia/VITAMIN-B12 is not that URL.
+     * Every other resolvable entry renders only at its stored slug.
+     * MySQL's case-insensitive collation must not treat a different case
+     * as an exact match — the comparison is in PHP. Slash blends have
      * no encyclopedia page; their live URL is the compare page.
      */
     public static function encyclopediaRedirectPath(string $requestedSlug): ?string
@@ -165,7 +168,7 @@ class ProductCategory extends Model
             if (! static::findForPublicSlug($public)) {
                 return null;
             }
-            if (strtolower(trim($requestedSlug)) === $public) {
+            if ($requestedSlug === $public) {
                 return null;
             }
 
@@ -173,9 +176,20 @@ class ProductCategory extends Model
         }
 
         if (EncyclopediaSlug::isResolvable($requestedSlug)) {
-            $exact = static::query()->where('is_active', true)->where('slug', $requestedSlug)->first();
-            if ($exact) {
+            $matches = static::query()
+                ->where('is_active', true)
+                ->whereRaw('LOWER(slug) = ?', [strtolower($requestedSlug)])
+                ->get();
+
+            if ($matches->contains(fn (self $category) => (string) $category->slug === $requestedSlug)) {
                 return null;
+            }
+
+            if ($matches->count() === 1) {
+                $stored = (string) $matches->first()->slug;
+                if (EncyclopediaSlug::isResolvable($stored) && $stored !== $requestedSlug) {
+                    return '/encyclopedia/'.$stored;
+                }
             }
         }
 
@@ -185,17 +199,17 @@ class ProductCategory extends Model
         }
 
         $category = static::findForCompareSlug($canonical);
-        if (!$category) {
+        if (! $category) {
             return null;
         }
 
         $stored = (string) $category->slug;
         if (EncyclopediaSlug::isResolvable($stored) && $stored !== $requestedSlug) {
-            return '/encyclopedia/' . $stored;
+            return '/encyclopedia/'.$stored;
         }
 
-        if (!EncyclopediaSlug::isResolvable($stored) && CompareSlug::canonical($stored) === $canonical) {
-            return '/compare/' . $canonical;
+        if (! EncyclopediaSlug::isResolvable($stored) && CompareSlug::canonical($stored) === $canonical) {
+            return '/compare/'.$canonical;
         }
 
         return null;
@@ -212,4 +226,3 @@ class ProductCategory extends Model
         return html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 }
-
