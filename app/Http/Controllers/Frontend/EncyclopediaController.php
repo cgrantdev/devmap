@@ -353,8 +353,10 @@ class EncyclopediaController extends Controller
                 }
                 $categoryTag = !empty($tags) ? $tags[0] : ($entry->education_tag ?? 'Research Review');
 
-                // Use category slug for the route
-                $slug = $category ? $category->slug : ($entry->slug ?? '');
+                // Same public slug the cards and the sitemap advertise.
+                $slug = $category
+                    ? (EncyclopediaSlug::publicSlug($category->slug) ?? (string) $category->slug)
+                    : (string) ($entry->slug ?? '');
 
                 return [
                     'id' => $entry->id,
@@ -732,12 +734,19 @@ class EncyclopediaController extends Controller
             abort(404);
         }
 
+        // Canonical is the stored slug (or the forced hyphen form), never
+        // the request's letter case. A case variant that reached this far
+        // still 301s, so it cannot emit a self-referencing canonical tag.
+        $publicSlug = EncyclopediaSlug::publicSlug($category->slug) ?? (string) $category->slug;
+        if ($publicSlug !== $slug) {
+            return redirect('/encyclopedia/'.$publicSlug, 301);
+        }
+
         $educationPost = $category->educationPost;
         $profile = EncyclopediaFraming::match($category->slug, $category->name);
         if ($profile && $educationPost) {
             $this->applyProfilePhrases($educationPost, $profile);
         }
-        $publicSlug = EncyclopediaSlug::publicSlug($category->slug) ?? $slug;
 
         // Get image - prioritize education post image, fallback to category image
         $image = null;
@@ -823,7 +832,7 @@ class EncyclopediaController extends Controller
             $ogV = $educationPost?->updated_at?->timestamp ?? 0;
             $seoOgImage = $educationPost->seo_og_image
                 ? (str_starts_with($educationPost->seo_og_image, 'http') ? $educationPost->seo_og_image : url($educationPost->seo_og_image))
-                : route('og.compound', ['slug' => $slug]) . '?v=' . $ogV;
+                : route('og.compound', ['slug' => $publicSlug]) . '?v=' . $ogV;
         } else {
             $seoTitle = $stubSeo['title'];
             if ($profile) {
@@ -838,7 +847,7 @@ class EncyclopediaController extends Controller
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
             $ogV = $educationPost?->updated_at?->timestamp ?? 0;
-            $seoOgImage = route('og.compound', ['slug' => $slug]) . '?v=' . $ogV;
+            $seoOgImage = route('og.compound', ['slug' => $publicSlug]) . '?v=' . $ogV;
         }
         
         // DefinedTerm + BreadcrumbList JSON-LD (rendered by app.blade.php)
