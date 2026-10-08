@@ -20,9 +20,6 @@ use Inertia\Inertia;
 
 class CompareController extends Controller
 {
-    /** @var array<string, bool> */
-    private array $publishedBlogCache = [];
-
     /**
      * The ordered list of featured compound category IDs for the compare page.
      * Maintained manually to match the product team's priority list.
@@ -864,14 +861,10 @@ class CompareController extends Controller
 
     private function publishedBlogExists(string $slug): bool
     {
-        if (!array_key_exists($slug, $this->publishedBlogCache)) {
-            $this->publishedBlogCache[$slug] = Blog::query()
-                ->where('slug', $slug)
-                ->where('status', 'published')
-                ->exists();
-        }
-
-        return $this->publishedBlogCache[$slug];
+        return Blog::query()
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->exists();
     }
 
     /**

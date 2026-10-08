@@ -228,32 +228,36 @@ class RetatrutideComparePriceTest extends TestCase
 
         $testing = '/blog/retatrutide-testing-coa-limits';
         $coa = '/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis';
+        $prefix = 'Some vendors publish a certificate of analysis (CoA) from an independent lab. Others publish an in-house sheet or nothing. A CoA only tells you something if it matches the lot, names the lab, and can be checked. ';
+        $short = $prefix.'Our guides cover how to verify a peptide CoA and which vendors use which testing labs.';
+        $full = $prefix."Our guides cover how to verify a peptide CoA, what retatrutide testing can and can't show, and which vendors use which testing labs.";
 
         $live = $this->get('/compare/retatrutide');
         $live->assertOk();
-        $live->assertSee($testing, false);
-        $live->assertSee($coa, false);
-        $live->assertSee('/testing-labs', false);
-        $live->assertDontSee('/blog/retatrutide-vs-tirzepatide', false);
         $this->assertTrue($this->hrefsInclude($live, $testing));
+        $this->assertTrue($this->hrefsInclude($live, $coa));
+        $this->assertTrue($this->hrefsInclude($live, '/testing-labs'));
+        $this->assertTrue($this->hrefsInclude($live, '/compare/retatrutide-vs-tirzepatide'));
+        $this->assertFalse($this->hrefsInclude($live, '/blog/retatrutide-vs-tirzepatide'));
+        $this->assertSame($full, $this->testingBulletText($live));
 
         Blog::where('slug', 'retatrutide-testing-coa-limits')->update(['status' => 'draft']);
 
         $draft = $this->get('/compare/retatrutide');
         $draft->assertOk();
-        $draft->assertDontSee($testing, false);
-        $draft->assertSee($coa, false);
-        $draft->assertSee('/testing-labs', false);
-        $draft->assertSee('/compare/retatrutide-vs-tirzepatide', false);
-        $draft->assertDontSee('/blog/retatrutide-vs-tirzepatide', false);
         $this->assertFalse($this->hrefsInclude($draft, $testing));
+        $this->assertTrue($this->hrefsInclude($draft, $coa));
+        $this->assertTrue($this->hrefsInclude($draft, '/testing-labs'));
+        $this->assertTrue($this->hrefsInclude($draft, '/compare/retatrutide-vs-tirzepatide'));
+        $this->assertFalse($this->hrefsInclude($draft, '/blog/retatrutide-vs-tirzepatide'));
+        $this->assertSame($short, $this->testingBulletText($draft));
 
         Blog::where('slug', 'retatrutide-testing-coa-limits')->delete();
 
         $missing = $this->get('/compare/retatrutide');
         $missing->assertOk();
-        $missing->assertDontSee($testing, false);
         $this->assertFalse($this->hrefsInclude($missing, $testing));
+        $this->assertSame($short, $this->testingBulletText($missing));
     }
 
     private function catalogProduct(Brand $brand, ProductCategory $category, int $id, string $name, string $slug, string $size = '10mg'): void
@@ -302,5 +306,25 @@ class RetatrutideComparePriceTest extends TestCase
         $walk($props['compound']['related_reading']);
 
         return $found;
+    }
+
+    private function testingBulletText(\Illuminate\Testing\TestResponse $response): string
+    {
+        $props = null;
+        $response->assertInertia(function ($page) use (&$props) {
+            $props = $page->toArray()['props'];
+
+            return $page;
+        });
+
+        foreach ($props['compound']['why_prices']['bullets'] as $bullet) {
+            if ($bullet['title'] !== 'Third-party testing and CoA availability.') {
+                continue;
+            }
+
+            return implode('', array_column($bullet['parts'], 'text'));
+        }
+
+        $this->fail('Missing the third-party testing bullet.');
     }
 }
