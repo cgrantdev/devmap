@@ -18,7 +18,7 @@ class ProductOgImageController extends Controller
     use RendersOgImage;
 
     private const CACHE_DIR = 'og/product';
-    private const FALLBACK_PNG = 'images/og-default-v7.png';
+    private const FALLBACK_PNG = 'images/og-default-v8.png';
 
     public function show(int $id): Response|BinaryFileResponse
     {
@@ -27,7 +27,7 @@ class ProductOgImageController extends Controller
 
         return $this->serveOgImage(
             self::CACHE_DIR,
-            (string) $id,
+            $id.'-'.\App\Support\OgImageRevision::COPY,
             $product->updated_at?->timestamp ?? 0,
             self::FALLBACK_PNG,
             fn () => View::make('og.product', [

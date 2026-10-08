@@ -19,10 +19,10 @@ class PagesSeeder extends Seeder
                 'slug' => 'about',
                 'title' => 'About Peptidemap',
                 'content' => '<h2>Our Mission</h2>
-<p>Peptidemap is dedicated to advancing peptide research by connecting scientists, researchers, and laboratory professionals with trusted peptide suppliers. Our platform serves as a comprehensive resource hub, providing access to high-quality peptides, educational content, and research tools to support the scientific community in their pursuit of groundbreaking discoveries.</p>
+<p>Peptidemap is dedicated to advancing peptide research by connecting scientists, researchers, and laboratory professionals with research-peptide vendors. Our platform serves as a comprehensive resource hub, providing access to educational content and research tools to support the scientific community in their pursuit of groundbreaking discoveries.</p>
 
 <h2>What We Do</h2>
-<p>Peptidemap operates as an innovative aggregator platform that brings together multiple verified peptide suppliers, making it easier for researchers to:</p>
+<p>Peptidemap operates as an innovative aggregator platform that brings together multiple research-peptide vendors, making it easier for researchers to:</p>
 <ul>
 <li>Compare products and prices from various suppliers in one centralized location</li>
 <li>Access comprehensive educational resources about peptide research, protocols, and best practices</li>
@@ -32,18 +32,18 @@ class PagesSeeder extends Seeder
 </ul>
 
 <h2>Our Commitment to Research</h2>
-<p>All products listed on Peptidemap are intended exclusively for research purposes in laboratory settings. We are committed to supporting legitimate scientific research and do not promote or endorse the use of peptides for human consumption or therapeutic purposes. Our platform strictly adheres to research-only guidelines and works exclusively with suppliers who share this commitment to scientific integrity.</p>
+<p>All products listed on Peptidemap are intended exclusively for research purposes in laboratory settings. We are committed to supporting legitimate scientific research and do not promote or endorse the use of peptides for human consumption or therapeutic purposes. Our platform strictly adheres to research-only guidelines.</p>
 
-<h2>Quality and Verification</h2>
-<p>We work diligently to ensure that all suppliers featured on our platform meet high standards of quality and reliability. While we provide a platform for comparison and information, we encourage researchers to conduct their own due diligence when selecting suppliers and to verify product specifications, purity, and documentation before making purchases. Our goal is to facilitate connections between researchers and quality suppliers while maintaining transparency throughout the process.</p>
+<h2>Listings</h2>
+<p>Peptidemap lists vendors and prices. We do not test products or verify vendors.</p>
 
 <h2>Educational Resources</h2>
 <p>Beyond product listings, Peptidemap provides extensive educational content including research articles, dosage guidelines, storage protocols, and safety information. Our goal is to empower researchers with the knowledge they need to conduct safe and effective peptide research. We believe that well-informed researchers make better decisions and contribute more meaningfully to scientific advancement.</p>
 
 <h2>Contact Us</h2>
 <p>If you have questions about our platform, need assistance, or are interested in becoming a supplier partner, please visit our <a href="/contact">Contact</a> page. We\'re here to support the research community and welcome your feedback, suggestions, and collaboration opportunities.</p>',
-                'meta_title' => 'About Us - Peptidemap | Connecting Researchers with Trusted Peptide Suppliers',
-                'meta_description' => 'Learn about Peptidemap and our mission to connect researchers with trusted peptide suppliers. Discover our commitment to advancing peptide research through quality products and educational resources.',
+                'meta_title' => 'About Us - Peptidemap | Connecting Researchers with Research-Peptide Vendors',
+                'meta_description' => 'Learn about Peptidemap and our mission to connect researchers with research-peptide vendors. Discover our commitment to advancing peptide research through quality products and educational resources.',
             ],
             [
                 'slug' => 'disclaimer',
@@ -302,8 +302,8 @@ class PagesSeeder extends Seeder
                     'is_active' => true,
                 ],
                 [
-                    'title' => 'Trusted Vendors',
-                    'subtitle' => 'Connect with verified vendors in the peptide research community.',
+                    'title' => 'Vendor directory',
+                    'subtitle' => 'Connect with listed vendors in the peptide research community.',
                     'cta_text' => 'View Vendors',
                     'cta_url' => '/brands',
                     'image' => null,

@@ -9,13 +9,13 @@
     <section class="border-b border-[color:var(--color-hairline)]">
       <div class="max-w-[1000px] mx-auto px-6 lg:px-10 py-10">
         <div class="text-[11px] uppercase tracking-wider font-semibold text-[color:var(--color-accent-600)] mb-2">
-          Trust & Verification
+          Vendor-named labs
         </div>
         <h1 class="ui-display text-3xl md:text-4xl font-semibold text-[color:var(--color-ink)] mb-3">
           Third-Party Testing Labs
         </h1>
         <p class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl text-[15px]">
-          Not every vendor tests their peptides — and among those who do, the lab they use matters. This page groups our verified vendors by which third-party analytical lab issues their COAs, so you can verify purity claims before you buy.
+          Not every vendor publishes testing. This page groups listed vendors by the third-party lab they name on their storefront. Peptidemap does not test products.
         </p>
       </div>
     </section>

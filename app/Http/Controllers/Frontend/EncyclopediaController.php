@@ -740,7 +740,6 @@ class EncyclopediaController extends Controller
             'safetyInfo' => $safetyInfo,
             'stackingRecommendations' => $stackingRecommendations,
             'faqs' => $faqs,
-            'userExperiences' => $this->getUserExperiences($category->name), // Keep mock data for now
             'products' => $products,
             'researchStudies' => rand(30, 60), // Mock data
         ];
@@ -875,7 +874,7 @@ class EncyclopediaController extends Controller
                             : $stubSeo['description'])));
             $seoOgTitle = $educationPost->seo_og_title ?: $seoTitle;
             $seoOgDescription = $educationPost->seo_og_description ?: $seoDescription;
-            $ogV = $educationPost?->updated_at?->timestamp ?? 0;
+            $ogV = ($educationPost?->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = $educationPost->seo_og_image
                 ? (str_starts_with($educationPost->seo_og_image, 'http') ? $educationPost->seo_og_image : url($educationPost->seo_og_image))
                 : route('og.compound', ['slug' => $publicSlug]) . '?v=' . $ogV;
@@ -892,7 +891,7 @@ class EncyclopediaController extends Controller
             }
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
-            $ogV = $educationPost?->updated_at?->timestamp ?? 0;
+            $ogV = ($educationPost?->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = route('og.compound', ['slug' => $publicSlug]) . '?v=' . $ogV;
         }
         
@@ -1385,24 +1384,4 @@ class EncyclopediaController extends Controller
         ];
     }
 
-    /**
-     * Get user experiences (mock data)
-     */
-    private function getUserExperiences($name)
-    {
-        return [
-            [
-                'rating' => 5,
-                'review' => 'Excellent product! Helped with my tendonitis significantly. Shipping was fast and product quality is top-notch.',
-                'verified' => true,
-                'author' => 'John D.',
-            ],
-            [
-                'rating' => 5,
-                'review' => 'Great results after 3 weeks of use. Highly recommend for anyone dealing with joint issues.',
-                'verified' => true,
-                'author' => 'Sarah M.',
-            ],
-        ];
-    }
 }

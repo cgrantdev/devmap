@@ -5,7 +5,7 @@
       <!-- Header -->
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-8 lg:pt-12 pb-6">
         <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-2">{{ productName }}</h1>
-        <p class="text-[15px] text-[color:var(--color-ink-muted)]">Compare prices across verified vendors</p>
+        <p class="text-[15px] text-[color:var(--color-ink-muted)]">Compare prices across listed vendors</p>
       </div>
 
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pb-8">
@@ -380,9 +380,7 @@ const selectedFilters = ref({
   cost_max: props.filters?.cost_max || '',
   inStock: props.filters?.in_stock === '1' || false,
   onSale: props.filters?.on_sale === '1' || false,
-  labTested: props.filters?.lab_tested === '1' || false,
   firstTimerDeals: props.filters?.first_timer_deals === '1' || false,
-  minPurity: props.filters?.min_purity ? parseInt(props.filters.min_purity) : 0,
 })
 
 // Current sort label
@@ -397,10 +395,8 @@ const currentSortLabel = computed(() => {
 
 // Check if there are active filters
 const hasActiveFilters = computed(() => {
-  return selectedFilters.value.minPurity > 0 ||
-    selectedFilters.value.inStock ||
+  return selectedFilters.value.inStock ||
     selectedFilters.value.onSale ||
-    selectedFilters.value.labTested ||
     selectedFilters.value.firstTimerDeals ||
     selectedFilters.value.cost_min ||
     selectedFilters.value.cost_max ||
@@ -410,12 +406,6 @@ const hasActiveFilters = computed(() => {
     selectedFilters.value.verification !== '' ||
     selectedFilters.value.brand !== null
 })
-
-// Remove purity filter
-const removePurityFilter = () => {
-  selectedFilters.value.minPurity = 0
-  applyFilters()
-}
 
 const applyFilters = () => {
   const params = new URLSearchParams()
@@ -444,9 +434,7 @@ const clearFilters = () => {
     cost_max: '',
     inStock: false,
     onSale: false,
-    labTested: false,
     firstTimerDeals: false,
-    minPurity: 0,
   }
   applyFilters()
 }
@@ -515,14 +503,8 @@ const applySearch = () => {
   if (selectedFilters.value.onSale) {
     params.set('on_sale', '1')
   }
-  if (selectedFilters.value.labTested) {
-    params.set('lab_tested', '1')
-  }
   if (selectedFilters.value.firstTimerDeals) {
     params.set('first_timer_deals', '1')
-  }
-  if (selectedFilters.value.minPurity > 0) {
-    params.set('min_purity', selectedFilters.value.minPurity)
   }
   if (props.sort) {
     params.set('sort', props.sort)

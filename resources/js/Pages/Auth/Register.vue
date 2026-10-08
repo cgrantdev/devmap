@@ -9,10 +9,10 @@
           <img :src="'/images/logo.png?v=2'" alt="Peptidemap" class="h-12 brightness-0 invert" />
         </a>
         <h2 class="text-white text-3xl font-semibold tracking-tight leading-tight mb-4" style="font-family: 'Inter Tight', sans-serif;">
-          Compare verified peptide vendors — on your side.
+          Compare research-peptide vendors — on your side.
         </h2>
         <p class="text-white/50 text-[15px] leading-relaxed mb-8">
-          Free account to leave verified reviews, save vendors, and unlock PMAP coupons across the directory.
+          Free account to save vendors and unlock PMAP coupons across the directory.
         </p>
         <ul class="space-y-3 text-white/70 text-[14px]">
           <li class="flex items-start gap-3">
@@ -21,7 +21,7 @@
           </li>
           <li class="flex items-start gap-3">
             <svg class="w-4 h-4 mt-0.5 text-[#34d399] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Leave <strong class="text-white/90">verified reviews</strong> after purchasing from any vendor</span>
+            <span>Leave a review of a vendor you've <strong class="text-white/90">bought from</strong></span>
           </li>
           <li class="flex items-start gap-3">
             <svg class="w-4 h-4 mt-0.5 text-[#34d399] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>

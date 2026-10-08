@@ -12,7 +12,7 @@
           The definitive platform for research peptide vendors.
         </h2>
         <p class="text-white/50 text-[15px] leading-relaxed">
-          Compare verified suppliers, inspect lab testing, and discover new compounds — all in one place.
+          Compare listed vendors, prices, coupons, and vendor-published COAs.
         </p>
       </div>
     </div>

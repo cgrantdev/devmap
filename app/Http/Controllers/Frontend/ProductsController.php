@@ -33,9 +33,9 @@ class ProductsController extends Controller
      *
      * Format examples (150-160 chars, always <= 160):
      *   "SELANK 10mg from Certified Pep — $50.00. Compare 12 vendors on
-     *    Peptidemap, verified COAs, save 10% with code PMAP. Research use only."
+     *    Peptidemap, coupon codes, save 10% with code PMAP. Research use only."
      *   "BPC-157 (10mg) from Amino Club — $39.99 (was $49.99). Compare 25
-     *    vendors, verified COAs, PMAP coupons. Research use only."
+     *    vendors, coupon codes, PMAP coupons. Research use only."
      */
     /**
      * Buying-hook-first product SEO title. Leads with "Buy" verb (SEO
@@ -50,7 +50,7 @@ class ProductsController extends Controller
     private function buildProductSeoTitle($product, $brand, string $siteName): string
     {
         $productLabel = $product->display_name ?? $product->name;
-        $vendorName = $brand?->name ?? 'verified vendors';
+        $vendorName = $brand?->name ?? 'listed vendors';
 
         // Effective price = discount when it's a real sale, else list.
         $effective = ($product->discount_price && $product->discount_price < $product->price)
@@ -69,7 +69,7 @@ class ProductsController extends Controller
 
     private function buildProductMetaDescription($product, $brand): string
     {
-        $vendorName = $brand?->name ?? 'verified vendors';
+        $vendorName = $brand?->name ?? 'listed vendors';
         $productLabel = $product->display_name ?? $product->name;
         $vs = $brand?->vendorSetting;
 
@@ -96,7 +96,7 @@ class ProductsController extends Controller
             }
         }
         if (!$compareSegment) {
-            $compareSegment = ' Compare verified peptide vendors on Peptidemap,';
+            $compareSegment = ' Compare listed peptide vendors on Peptidemap,';
         }
 
         // Coupon segment (PMAP savings)
@@ -108,7 +108,8 @@ class ProductsController extends Controller
             $pctLabel = ((float) $pct == (int) $pct) ? (int) $pct : rtrim(rtrim(number_format((float) $pct, 2), '0'), '.');
             $couponSegment = " save {$pctLabel}% with code " . strtoupper($code) . '.';
         } else {
-            $couponSegment = ' verified COAs, PMAP coupons.';
+            $compareSegment = rtrim($compareSegment, ',') . '.';
+            $couponSegment = " Live prices and coupon codes. Check each vendor's site for COAs.";
         }
 
         // Compose
@@ -481,7 +482,7 @@ class ProductsController extends Controller
             // busts every downstream cache (Cloudflare edge + Discord/FB/X/
             // LinkedIn OG scrapers that key on URL). Without this, a shared
             // link's preview never updates after the first scrape.
-            $ogV = $product->updated_at?->timestamp ?? 0;
+            $ogV = ($product->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = $product->seo_og_image
                 ? (str_starts_with($product->seo_og_image, 'http') ? $product->seo_og_image : url($product->seo_og_image))
                 : route('og.product', ['id' => $product->id]) . '?v=' . $ogV;
@@ -490,7 +491,7 @@ class ProductsController extends Controller
             $seoDescription = $autoSeoDescription;
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
-            $ogV = $product->updated_at?->timestamp ?? 0;
+            $ogV = ($product->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = route('og.product', ['id' => $product->id]) . '?v=' . $ogV;
         }
         
@@ -512,68 +513,16 @@ class ProductsController extends Controller
                 'seller' => $brand ? ['@type' => 'Organization', 'name' => $brand->name] : null,
             ],
         ];
-        // AggregateRating: prefer product-level when we have it, otherwise
-        // fall back to the vendor's combined native + external aggregate
-        // (SEO rec #4 — "even if seeded from vendor-level reviews"). Missing
-        // schema was the biggest gap keeping our products off SERP star
-        // snippets even for vendors like Certified Pep with 1,492 Reviews.io
-        // reviews already imported.
+        // Product aggregateRating only when this listing has its own reviews.
+        // A vendor-level score (native, Trustpilot, or Reviews.io) describes
+        // the store, not this product, so it is not attached here.
         $productRatingCount = (int) ($product->rating_count ?? 0);
-        $vs = $brand?->vendorSetting;
-        $vendorRatingAvg = $vs ? (float) ($vs->external_rating_avg ?? 0) : 0;
-        $vendorRatingCount = $vs ? (int) ($vs->external_rating_count ?? 0) : 0;
-        $vendorNativeCount = (int) ($brand->rating_count ?? 0);
-        $vendorNativeAvg = (float) ($brand->rating_average ?? 0);
-        // Weighted mean across native + external, weighted by count.
-        $combinedVendorCount = $vendorNativeCount + $vendorRatingCount;
-        $combinedVendorAvg = $combinedVendorCount > 0
-            ? (($vendorNativeAvg * $vendorNativeCount) + ($vendorRatingAvg * $vendorRatingCount)) / $combinedVendorCount
-            : 0;
-
         if ($productRatingCount > 0) {
             $productSchema['aggregateRating'] = [
                 '@type' => 'AggregateRating',
                 'ratingValue' => round((float) $product->rating_average, 1),
                 'reviewCount' => $productRatingCount,
             ];
-        } elseif ($combinedVendorCount > 0 && $combinedVendorAvg > 0) {
-            $productSchema['aggregateRating'] = [
-                '@type' => 'AggregateRating',
-                'ratingValue' => round($combinedVendorAvg, 1),
-                'reviewCount' => $combinedVendorCount,
-            ];
-        }
-
-        // Sample Review nodes — up to 5 recent imported reviews for this
-        // vendor. Attaching vendor-level Review objects to the Product is a
-        // schema stretch but honest (buyer's trust is with the vendor).
-        // Trustpilot + Reviews.io both allow re-display with attribution.
-        if ($brand) {
-            $sampleReviews = \App\Models\ExternalReview::where('brand_id', $brand->id)
-                ->whereNotNull('rating')
-                ->whereNotNull('body')
-                ->orderByDesc('published_at')
-                ->limit(5)
-                ->get(['author', 'rating', 'body', 'published_at', 'source', 'source_url']);
-            if ($sampleReviews->isNotEmpty()) {
-                $productSchema['review'] = $sampleReviews->map(fn ($r) => [
-                    '@type' => 'Review',
-                    'author' => ['@type' => 'Person', 'name' => $r->author ?: 'Verified customer'],
-                    'reviewRating' => [
-                        '@type' => 'Rating',
-                        'ratingValue' => (int) $r->rating,
-                        'bestRating' => 5,
-                    ],
-                    'reviewBody' => \Illuminate\Support\Str::limit((string) $r->body, 500),
-                    'datePublished' => optional($r->published_at)->toIso8601String(),
-                    'publisher' => ['@type' => 'Organization', 'name' => match ($r->source) {
-                        'trustpilot' => 'Trustpilot',
-                        'reviews_io' => 'Reviews.io',
-                        'google' => 'Google Reviews',
-                        default => 'Third-party review platform',
-                    }],
-                ])->values()->all();
-            }
         }
 
         $breadcrumbSchema = [
@@ -762,21 +711,13 @@ class ProductsController extends Controller
             $query->whereNotNull('discount_price');
         }
 
-        // Lab Tested filter
-        if ($request->has('lab_tested') && $request->lab_tested === '1') {
-            $query->where('lab_tested', true);
-        }
+        // lab_tested and min_purity are ignored. Scraped rows no longer
+        // carry invented flags, so honoring old URLs would hide almost
+        // every listing. The catalog UI no longer sends these params.
 
         // First-Timer Deals filter
         if ($request->has('first_timer_deals') && $request->first_timer_deals === '1') {
             $query->where('first_timer_deals', true);
-        }
-
-        if ($request->has('min_purity') && $request->min_purity) {
-            $minPurity = (float) $request->min_purity;
-            // Use real purity column from database
-            $query->whereNotNull('purity')
-                  ->where('purity', '>=', $minPurity);
         }
 
         // Sort default is 'featured' — is_peptide_thumb curated picks first,
@@ -972,12 +913,8 @@ class ProductsController extends Controller
             $query->where('availability', 'in_stock');
         }
 
-        if ($request->has('min_purity') && $request->min_purity) {
-            $minPurity = (float) $request->min_purity;
-            // Use real purity column from database
-            $query->whereNotNull('purity')
-                  ->where('purity', '>=', $minPurity);
-        }
+        // min_purity is ignored for the same reason as the catalog index:
+        // old brand URLs must not hide listings that no longer carry a purity.
 
         // Sort default is 'featured' — is_peptide_thumb curated picks first,
         // then popular (rating_count DESC), then higher effective price DESC
@@ -1149,7 +1086,7 @@ class ProductsController extends Controller
         $couponClause = ($vendorSetting && !empty($vendorSetting->coupon_code))
             ? "Coupon code {$vendorSetting->coupon_code}, "
             : '';
-        $defaultBrandDescription = "{$couponClause}real customer reviews, and live prices for {$brandProductCount} peptides from {$brand->name}. Compare against {$otherVendorCount} other verified vendors on Peptidemap.";
+        $defaultBrandDescription = "{$couponClause}real customer reviews, and live prices for {$brandProductCount} peptides from {$brand->name}. Compare against {$otherVendorCount} other listed vendors on Peptidemap.";
 
         if ($hasStoredSeo) {
             // Use stored SEO data from database

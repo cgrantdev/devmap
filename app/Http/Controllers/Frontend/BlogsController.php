@@ -173,7 +173,7 @@ class BlogsController extends Controller
             '@type' => 'Article',
             'headline' => $blog->title,
             'description' => $seoDescription,
-            'image' => [$seoOgImage ?: $blogImage ?: 'https://peptidemap.com/images/og-default-v7.png'],
+            'image' => [$seoOgImage ?: $blogImage ?: 'https://peptidemap.com/images/og-default-v8.png'],
             'datePublished' => $blog->published_at ? $blog->published_at->toIso8601String() : null,
             'dateModified' => $blog->updated_at ? $blog->updated_at->toIso8601String() : ($blog->published_at ? $blog->published_at->toIso8601String() : null),
             'author' => [
@@ -229,7 +229,7 @@ class BlogsController extends Controller
             'description' => $seoDescription,
             'og_title' => $seoOgTitle,
             'og_description' => $seoOgDescription,
-            'og_image' => $seoOgImage ?: 'https://peptidemap.com/images/og-default-v7.png',
+            'og_image' => $seoOgImage ?: 'https://peptidemap.com/images/og-default-v8.png',
             'og_type' => 'article',
             // Backward-compatible field used by some pages
             'image' => $seoOgImage,

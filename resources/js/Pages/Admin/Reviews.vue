@@ -282,7 +282,7 @@ const ReviewCard = defineComponent({
         h('div', { class: 'flex-1 min-w-0' }, [
           h('div', { class: 'flex flex-wrap items-center gap-2 mb-2' }, [
             h('div', { class: 'text-lg text-slate-900' }, cardProps.review.user_name || 'Anonymous'),
-            cardProps.review.verified ? h('span', { class: 'rounded-full bg-emerald-100 px-2.5 py-1 text-xs text-emerald-700' }, 'Verified purchase') : null,
+            cardProps.review.verified ? h('span', { class: 'rounded-full bg-emerald-100 px-2.5 py-1 text-xs text-emerald-700' }, 'Visited via Peptidemap') : null,
             cardProps.review.flagged ? h('span', { class: 'rounded-full bg-amber-100 px-2.5 py-1 text-xs text-amber-800' }, 'Flagged by vendor') : null,
             h('span', { class: `rounded-full px-2.5 py-1 text-xs ${badgeClass.value}` }, cardProps.review.status),
             ...auditBadges.value.map(b => h('span', { class: `rounded-full px-2.5 py-1 text-xs ${b.class}` }, b.label)),

@@ -261,7 +261,7 @@
             <div>
               <img :src="'/images/logo.png?v=2'" alt="Peptidemap" class="h-10 brightness-0 invert mb-5" />
               <p class="text-[15px] text-white/45 leading-relaxed mb-8 max-w-md">
-                The definitive platform for research peptide discovery. Verified vendors, lab-tested compounds, transparent data.
+                Compare research-peptide vendors, prices, coupons and vendor-published COAs.
               </p>
               <div>
                 <h4 class="text-[13px] font-semibold text-white mb-3">Get research updates</h4>

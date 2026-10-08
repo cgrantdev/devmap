@@ -30,7 +30,7 @@
         </h1>
 
         <p class="text-base sm:text-lg text-slate-600 max-w-xl mx-auto leading-relaxed mb-8">
-          We're hand-selecting peptide vendors with verifiable quality, transparent COAs, and competitive pricing for our launch cohort.
+          We're hand-selecting peptide vendors with published COAs and competitive pricing for our launch cohort.
         </p>
 
         <a href="https://demo.peptidemap.com" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">

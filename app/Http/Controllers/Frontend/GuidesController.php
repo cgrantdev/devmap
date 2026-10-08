@@ -62,7 +62,7 @@ class GuidesController extends Controller
         $url = 'https://peptidemap.com'.$path;
         $seoTitle = $guide->seo_page_title ?: $guide->title;
         $seoDescription = $guide->seo_description ?: ($guide->description ?: $guide->title);
-        $image = $guide->seo_og_image ?: 'https://peptidemap.com/images/og-default-v7.png';
+        $image = $guide->seo_og_image ?: 'https://peptidemap.com/images/og-default-v8.png';
 
         $articleSchema = [
             '@context' => 'https://schema.org',

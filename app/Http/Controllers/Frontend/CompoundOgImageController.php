@@ -22,7 +22,7 @@ class CompoundOgImageController extends Controller
     use RendersOgImage;
 
     private const CACHE_DIR = 'og/compound';
-    private const FALLBACK_PNG = 'images/og-default-v7.png';
+    private const FALLBACK_PNG = 'images/og-default-v8.png';
 
     public function show(string $slug): Response|BinaryFileResponse
     {
@@ -47,7 +47,7 @@ class CompoundOgImageController extends Controller
 
         return $this->serveOgImage(
             self::CACHE_DIR,
-            $slug,
+            $slug.'-'.\App\Support\OgImageRevision::COPY,
             $mtime,
             self::FALLBACK_PNG,
             fn () => View::make('og.compound', [

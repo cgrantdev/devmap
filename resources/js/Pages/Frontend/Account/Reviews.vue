@@ -50,7 +50,7 @@
                   >{{ statusBadge(review.status).label }}</span>
                   <span v-if="review.verified" class="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.06em] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l8 4v6c0 5.5-3.4 9.9-8 11-4.6-1.1-8-5.5-8-11V5l8-4z"/></svg>
-                    Verified via PMAP
+                    Visited via Peptidemap
                   </span>
                 </div>
                 <span class="text-[12px] text-[color:var(--color-ink-subtle)]">{{ formatDate(review.created_at) }}</span>

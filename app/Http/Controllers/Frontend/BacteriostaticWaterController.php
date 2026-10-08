@@ -114,7 +114,7 @@ class BacteriostaticWaterController extends Controller
         $seoTitle = 'Cheapest Bacteriostatic Water — Compare '
             . $vendorCount . ' Vendors';
         $seoDescription = 'Compare bacteriostatic water prices across '
-            . $vendorCount . ' verified vendors on Peptidemap. '
+            . $vendorCount . ' listed vendors on Peptidemap. '
             . ($cheapest ? 'From $' . number_format($cheapest, 2) . '. ' : '')
             . '3mL, 5mL, 10mL, 30mL sizes. Per-mL price sorted cheapest first, '
             . 'coupon codes included.';
@@ -172,9 +172,9 @@ class BacteriostaticWaterController extends Controller
             'og_title' => $seoTitle,
             'og_description' => $seoDescription,
             'og_image' => route('og.compound', ['slug' => 'bacteriostatic-water'])
-                . '?v=' . ($category->updated_at?->timestamp ?? 0),
+                . '?v=' . ($category->updated_at?->timestamp ?? 0) . '-' . \App\Support\OgImageRevision::COPY,
             'image' => route('og.compound', ['slug' => 'bacteriostatic-water'])
-                . '?v=' . ($category->updated_at?->timestamp ?? 0),
+                . '?v=' . ($category->updated_at?->timestamp ?? 0) . '-' . \App\Support\OgImageRevision::COPY,
             'url' => url('/bacteriostatic-water'),
             'h1' => 'Cheapest Bacteriostatic Water',
             'schema' => [$itemList, $faqSchema, $breadcrumb],

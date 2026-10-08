@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\VendorSetting;
+use App\Support\OgImageRevision;
 use App\Support\RetatrutideCompareNarrative;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -133,6 +134,15 @@ class RetatrutideComparePriceTest extends TestCase
             $this->assertSame(['Example — 10mg'], $ids);
             $this->assertSame(1, $props['compound']['price_stats']['per_mg']['excluded_reasons']['non_usd']);
             $this->assertSame(1, $props['compound']['price_stats']['per_mg']['excluded_reasons']['no_mg_in_name']);
+
+            $this->assertSame('Retatrutide Price per mg: 2 Vendors Compared', $props['seo']['title']);
+            $this->assertSame('Retatrutide Price per mg: 2 Vendors Compared', $props['seo']['og_title']);
+            $this->assertSame(
+                'Retatrutide listings from 2 vendors, compared by vial price and price per mg. Catalog data only: Peptidemap sells nothing and endorses no vendor.',
+                $props['seo']['og_description']
+            );
+            $this->assertStringContainsString('?v=', $props['seo']['og_image']);
+            $this->assertStringEndsWith('-'.OgImageRevision::COPY, $props['seo']['og_image']);
 
             $gbp = collect($props['compound']['products'])->firstWhere('brand_slug', 'uk-research');
             $this->assertSame('GBP', $gbp['currency_code']);

@@ -42,7 +42,7 @@
           v-if="product.lab_tested"
           class="ui-mono text-[9px] uppercase tracking-[0.1em] px-1.5 py-0.5 rounded bg-black/60 backdrop-blur text-white font-semibold"
         >
-          Tested
+          Tested (vendor-reported)
         </span>
       </div>
     </div>

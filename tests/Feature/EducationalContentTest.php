@@ -337,11 +337,11 @@ class EducationalContentTest extends TestCase
             ['blog', 'bpc-157-vs-tb-500-evidence', ''],
             ['blog', 'bpc-157-vs-tb-500-evidence', '1.jpg'],
             ['blog', 'bpc-157-vs-tb-500-evidence', '/images/blogs/1.jpg'],
-            ['blog', 'bpc-157-vs-tb-500-evidence', 'https://peptidemap.com/images/og-default-v7.png'],
+            ['blog', 'bpc-157-vs-tb-500-evidence', 'https://peptidemap.com/images/og-default-v8.png'],
             ['blog', 'bpc-157-vs-tb-500-evidence', 'https://images.unsplash.com/photo-1'],
             ['blog', 'bpc-157-vs-tb-500-evidence', 'https://picsum.photos/seed/x/800/500'],
             ['guide', 'beginners-guide-to-research-peptides', null],
-            ['guide', 'peptide-legality-fda-ruo-compounding', '/images/og-default-v7.png'],
+            ['guide', 'peptide-legality-fda-ruo-compounding', '/images/og-default-v8.png'],
         ];
 
         foreach ($rejected as [$kind, $slug, $image]) {

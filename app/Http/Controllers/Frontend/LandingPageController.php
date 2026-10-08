@@ -26,7 +26,7 @@ class LandingPageController extends Controller
             'title' => 'Peptide Blends — Compare Multi-Compound Vials',
             'h1' => 'Peptide Blends',
             'subtitle' => 'Every multi-compound blend across our tracked vendors — sorted cheapest first per blend ratio.',
-            'meta_description' => 'Compare peptide blend prices across verified vendors — BPC-157/TB-500, CJC-1295/Ipamorelin, KLOW blends, and more. Live prices, per-mL sorted, coupon codes.',
+            'meta_description' => 'Compare peptide blend prices across listed vendors — BPC-157/TB-500, CJC-1295/Ipamorelin, KLOW blends, and more. Live prices, per-mL sorted, coupon codes.',
             'intro' => 'Blends combine two or more peptides in a single vial — often at a lower per-mg cost than buying each compound separately. This page indexes every blend across our tracked vendors so you can compare like-for-like ratios (e.g. 5mg BPC-157 / 5mg TB-500) instead of hunting through individual product pages.',
             'query' => fn ($q) => $q->where('size_mg', 'like', '%/%'),
             'empty_message' => 'No blend products currently indexed.',
@@ -47,7 +47,7 @@ class LandingPageController extends Controller
             'title' => 'Skincare Peptides — Cosmetic Peptide Vendor Comparison',
             'h1' => 'Skincare Peptides',
             'subtitle' => 'Cosmetic peptides for topical and injectable use — GHK-Cu, Argireline, Matrixyl, and more.',
-            'meta_description' => 'Compare cosmetic peptide prices across verified vendors. GHK-Cu, Argireline, Matrixyl, Melanotan, and every skincare-adjacent compound our vendors carry.',
+            'meta_description' => 'Compare cosmetic peptide prices across listed vendors. GHK-Cu, Argireline, Matrixyl, Melanotan, and every skincare-adjacent compound our vendors carry.',
             'intro' => 'Cosmetic peptides — GHK-Cu for wound healing and skin firmness, Argireline and Matrixyl for expression lines, copper-peptide complexes for hair — trade on very different vendor pricing than injectable research peptides. This page filters to the compounds and topical formulations used in that space.',
             'query' => fn ($q) => $q->where(function ($qq) use ($skincareCategoryIds) {
                 $qq->where('product_type', 'Topical');
@@ -66,7 +66,7 @@ class LandingPageController extends Controller
             'title' => 'Bulk Peptides — Compare Gram + High-mg Vendor Prices',
             'h1' => 'Bulk Peptides',
             'subtitle' => 'Gram-scale and hundred-mg-plus vials across our tracked vendors — for labs, high-dose protocols, and long-cycle research.',
-            'meta_description' => 'Compare bulk peptide prices. Gram-scale and 200mg+ vials across verified vendors — for research labs, long-cycle protocols, and cost-per-mg optimization.',
+            'meta_description' => 'Compare bulk peptide prices. Gram-scale and 200mg+ vials across listed vendors — for research labs, long-cycle protocols, and cost-per-mg optimization.',
             'intro' => 'Larger vials nearly always beat small-vial pricing on a per-mg basis. This page filters to gram-scale (1g and up) and larger single-vial sizes (200mg+) so you can compare bulk-tier vendor pricing directly instead of digging through the main catalog.',
             'query' => fn ($q) => $q->where(function ($qq) {
                 $qq->where('size_mg', 'regexp', '^[0-9]+g$')          // 1g, 2g, 5g, 10g, 50g, 100g
@@ -141,7 +141,7 @@ class LandingPageController extends Controller
 
         $seo = [
             'title' => 'Third-Party Testing Labs — Which Peptide Vendors Use Which Lab',
-            'description' => 'Independently-tested peptide vendors grouped by which third-party analytical lab (Janoshik, Certara, KryoLabs) verifies their COAs. Verify before you buy.',
+            'description' => 'Listed vendors grouped by the third-party lab named on their storefront (Janoshik, Certara, KryoLabs). Peptidemap does not test products.',
             'canonical' => url('/testing-labs'),
         ];
         session(['page_seo_data' => $seo]);

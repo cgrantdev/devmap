@@ -7,7 +7,7 @@
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-caution)] mb-3">Limited time</div>
         <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">Active Discount Codes</h1>
         <p class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-3">
-          Save up to 25% on premium research peptides. All discounts verified and updated regularly.
+          Save up to 25% on research peptides. Codes are supplied by vendors.
         </p>
         <div class="flex items-center gap-2 text-[color:var(--color-ink-subtle)] text-sm">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -28,11 +28,8 @@
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
           </svg>
           <div>
-            <h3 class="text-slate-900 mb-1">Verified Exclusive Discounts</h3>
             <p class="text-sm text-slate-700">
-              All discount codes and pricing are verified by our team. Use coupon code 
-              <span class="font-mono bg-slate-700 text-white px-2 py-0.5 rounded">PMAP</span>
-              at checkout for the displayed discount percentage on your entire order.
+              Codes are supplied by vendors; prices refresh from vendor sites — confirm at checkout. Use code PMAP at checkout.
             </p>
           </div>
         </div>

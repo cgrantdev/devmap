@@ -385,7 +385,7 @@
                         <span class="text-gray-900 font-medium">{{ review.user_name }}</span>
                         <span v-if="review.verified" class="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l8 4v6c0 5.5-3.4 9.9-8 11-4.6-1.1-8-5.5-8-11V5l8-4z"/></svg>
-                          Verified via PMAP
+                          Visited via Peptidemap
                         </span>
                       </div>
                       <div class="flex items-center gap-1">
@@ -420,13 +420,10 @@
                 <p class="text-gray-500">No reviews yet</p>
               </div>
 
-              <!-- Imported reviews — merged into one block, no per-platform
-                   grouping, no outbound links. Colin Sep 1: don't give users
-                   any way to leave our site to view reviews elsewhere. Reviews
-                   are still imported from Trustpilot / Reviews.io / PepReviewPro
-                   for content, but attribution is stripped from the UI. -->
+              <!-- Imported reviews stay on this page. The source name is shown
+                   so a Trustpilot or Reviews.io row is not presented as ours. -->
               <div v-if="externalReviewsFlat.length" class="mt-8">
-                <h3 class="text-lg text-gray-900 mb-4">Verified customer reviews</h3>
+                <h3 class="text-lg text-gray-900 mb-4">Customer reviews from other platforms</h3>
                 <div class="space-y-4">
                   <div
                     v-for="er in externalReviewsFlat"
@@ -437,7 +434,10 @@
                       <div>
                         <div class="text-sm font-semibold text-gray-900">{{ er.author || 'Anonymous' }}</div>
                         <div class="text-[11px] text-gray-500">
-                          <span v-if="er.author_location">{{ er.author_location }} · </span>
+                          <span v-if="reviewSourceLabel(er.source)">{{ reviewSourceLabel(er.source) }}</span>
+                          <span v-if="reviewSourceLabel(er.source) && (er.author_location || er.published_at)"> · </span>
+                          <span v-if="er.author_location">{{ er.author_location }}</span>
+                          <span v-if="er.author_location && er.published_at"> · </span>
                           <span v-if="er.published_at">{{ er.published_at }}</span>
                         </div>
                       </div>
@@ -615,10 +615,10 @@
                         @update:model-value="brand.shipping_info = $event"
                       >
                         <template #default="{ value }">
-                          <p class="text-sm text-gray-600 break-words">{{ value || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
+                          <p class="text-sm text-gray-600 break-words">{{ value || `Not specified — check ${brand.name}'s site` }}</p>
                         </template>
                       </InlineEditField>
-                      <p v-else class="text-sm text-gray-600 break-words">{{ props.brand.shipping_info || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
+                      <p v-else class="text-sm text-gray-600 break-words">{{ props.brand.shipping_info || `Not specified — check ${props.brand.name}'s site` }}</p>
                     </div>
                   </div>
                   <div>
@@ -643,10 +643,10 @@
                         @update:model-value="brand.return_policy = $event"
                       >
                         <template #default="{ value }">
-                          <p class="text-sm text-gray-600 break-words">{{ value || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
+                          <p class="text-sm text-gray-600 break-words">{{ value || `Not specified — check ${brand.name}'s site` }}</p>
                         </template>
                       </InlineEditField>
-                      <p v-else class="text-sm text-gray-600 break-words">{{ props.brand.return_policy || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
+                      <p v-else class="text-sm text-gray-600 break-words">{{ props.brand.return_policy || `Not specified — check ${props.brand.name}'s site` }}</p>
                     </div>
                   </div>
                   <div>
@@ -957,50 +957,6 @@
             </div>
           </div>
 
-          <!-- Verification Filter -->
-          <div>
-            <button 
-              @click="expandedFilters.verification = !expandedFilters.verification"
-              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
-            >
-              <span>Verification</span>
-              <svg class="w-5 h-5" :class="expandedFilters.verification ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div v-if="expandedFilters.verification" class="mt-2 space-y-2">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="radio"
-                  value=""
-                  v-model="selectedFilters.verification"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">All</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="radio"
-                  value="1"
-                  v-model="selectedFilters.verification"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">Verified</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="radio"
-                  value="0"
-                  v-model="selectedFilters.verification"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">Not Verified</span>
-              </label>
-            </div>
-          </div>
         </div>
         <div class="p-6 border-t border-gray-200 flex gap-4">
           <button 
@@ -1311,9 +1267,6 @@ const hoursHuman = computed(() => humanizeHours(props.brand?.business_hours_json
 const openPill = computed(() => openStatus(props.brand?.business_hours_json))
 const hoursTz = computed(() => hoursDays.value[0]?.tz || '')
 
-// Group individual imported reviews by source so each block gets its own
-// "More reviews from X" header + correct attribution + correct 'View all
-// on X' link. externalReviews is a flat mixed array from the controller.
 const EXTERNAL_SOURCE_META = {
   trustpilot:   { label: 'Trustpilot',    urlKey: 'trustpilot_url' },
   reviews_io:   { label: 'Reviews.io',    urlKey: 'reviews_io_url' },
@@ -1322,6 +1275,10 @@ const EXTERNAL_SOURCE_META = {
 }
 // Flat, sorted merge of every imported review — no per-source grouping,
 // no outbound links (Colin Sep 1: keep users on our site).
+function reviewSourceLabel(source) {
+  return EXTERNAL_SOURCE_META[source]?.label || ''
+}
+
 const externalReviewsFlat = computed(() => {
   const rows = Array.isArray(props.externalReviews) ? [...props.externalReviews] : []
   return rows.sort((a, b) => (String(b.published_at || '')).localeCompare(String(a.published_at || '')))
@@ -1428,48 +1385,6 @@ const paymentMethods = computed(() => {
   return props.brand?.payment_methods || []
 })
 
-// Tenure label from founded_year. Returns null when we don't know or when
-// the vendor was founded this year — previously fell back to "1+" or "13+"
-// which read as an unearned credibility claim (flagged by IDUN in Aug 2026).
-const tenureLabel = computed(() => {
-  const foundedYear = parseInt(props.brand?.founded_year)
-  if (isNaN(foundedYear) || foundedYear <= 0) return null
-  const years = new Date().getFullYear() - foundedYear
-  if (years < 0) return null
-  if (years === 0) return `Founded ${foundedYear}`
-  if (years === 1) return '1 year in business'
-  return `${years}+ years in business`
-})
-
-// Why Choose Benefits — vendor-specific bullets when they've set them,
-// generic defaults otherwise. Tenure line auto-appends when we can prove it.
-const whyChooseBenefits = computed(() => {
-  const custom = Array.isArray(props.brand?.why_choose_bullets)
-    ? props.brand.why_choose_bullets.filter(x => typeof x === 'string' && x.trim())
-    : []
-  const base = custom.length ? custom.slice() : [
-    'Third-party lab tested products',
-    'Fast & reliable shipping',
-    'Responsive customer service',
-    'Verified customer reviews',
-  ]
-  if (tenureLabel.value) base.push(tenureLabel.value)
-  return base
-})
-
-// Owners edit the list as one-per-line text. Empty lines are dropped
-// on save. serialize prop on InlineEditField converts back to array.
-const whyChooseEditableText = computed(() => {
-  const arr = Array.isArray(props.brand?.why_choose_bullets)
-    ? props.brand.why_choose_bullets.filter(x => typeof x === 'string' && x.trim())
-    : []
-  return arr.join('\n')
-})
-const linesToArray = (text) => (text || '')
-  .split(/\r?\n/)
-  .map(s => s.trim())
-  .filter(Boolean)
-
 // Formatted overall rating
 const formattedOverallRating = computed(() => {
   if (!props.reviews || props.reviews.length === 0) {
@@ -1549,7 +1464,6 @@ const expandedFilters = ref({
   type: false,
   cost: false,
   location: props.filters?.location ? true : false,
-  verification: false,
 })
 
 // Selected filters (no brand filter since we're already filtering by brand)
@@ -1557,7 +1471,6 @@ const selectedFilters = ref({
   use: props.filters?.use ? parseInt(props.filters.use) : null,
   type: props.filters?.type ? parseInt(props.filters.type) : null,
   location: props.filters?.location ? parseInt(props.filters.location) : null,
-  verification: props.filters?.verification || '',
   cost_min: props.filters?.cost_min || '',
   cost_max: props.filters?.cost_max || '',
 })
@@ -1568,7 +1481,6 @@ const quickFilters = [
   { key: 'type', label: 'Type' },
   { key: 'cost', label: 'Cost' },
   { key: 'location', label: 'Location' },
-  { key: 'verification', label: 'Verification' },
 ]
 
 // Active filters for quick filter buttons
@@ -1578,7 +1490,6 @@ const activeFilters = computed(() => {
     type: selectedFilters.value.type !== null,
     cost: selectedFilters.value.cost_min || selectedFilters.value.cost_max,
     location: selectedFilters.value.location !== null,
-    verification: selectedFilters.value.verification !== '',
   }
 })
 
@@ -1586,14 +1497,13 @@ const getFilterCount = (key) => {
   if (key === 'use') return selectedFilters.value.use !== null ? 1 : 0
   if (key === 'type') return selectedFilters.value.type !== null ? 1 : 0
   if (key === 'location') return selectedFilters.value.location !== null ? 1 : 0
-  if (key === 'verification') return selectedFilters.value.verification !== '' ? 1 : 0
   if (key === 'cost') return (selectedFilters.value.cost_min || selectedFilters.value.cost_max) ? 1 : 0
   return 0
 }
 
 const toggleQuickFilter = (key) => {
   showSidebar.value = true
-  if (key === 'use' || key === 'type' || key === 'location' || key === 'verification' || key === 'cost') {
+  if (key === 'use' || key === 'type' || key === 'location' || key === 'cost') {
     expandedFilters.value[key] = true
   }
 }
@@ -1614,9 +1524,6 @@ const applyFilters = () => {
   }
   if (selectedFilters.value.location !== null) {
     params.set('location', selectedFilters.value.location)
-  }
-  if (selectedFilters.value.verification) {
-    params.set('verification', selectedFilters.value.verification)
   }
   if (selectedFilters.value.cost_min) {
     params.set('cost_min', selectedFilters.value.cost_min)
@@ -1645,7 +1552,6 @@ const clearFilters = () => {
     use: null,
     type: null,
     location: null,
-    verification: '',
     cost_min: '',
     cost_max: '',
   }
@@ -1671,9 +1577,6 @@ const applySort = (sort, dir) => {
   }
   if (selectedFilters.value.location !== null) {
     params.set('location', selectedFilters.value.location)
-  }
-  if (selectedFilters.value.verification) {
-    params.set('verification', selectedFilters.value.verification)
   }
   if (selectedFilters.value.cost_min) {
     params.set('cost_min', selectedFilters.value.cost_min)
@@ -1726,9 +1629,6 @@ const applySearch = () => {
   }
   if (selectedFilters.value.location !== null) {
     params.set('location', selectedFilters.value.location)
-  }
-  if (selectedFilters.value.verification) {
-    params.set('verification', selectedFilters.value.verification)
   }
   if (selectedFilters.value.cost_min) {
     params.set('cost_min', selectedFilters.value.cost_min)

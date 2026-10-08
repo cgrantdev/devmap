@@ -67,11 +67,7 @@
                 </span>
                 <span v-if="product.lab_tested" class="inline-flex items-center gap-1 px-2 py-1 rounded-[6px] bg-[color:var(--color-verified-bg)] text-[color:var(--color-verified)] text-[11px] font-semibold">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  Lab tested
-                </span>
-                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-[6px] bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-semibold">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6l-4 7c-1 1.8 0 4 2 4h10c2 0 3-2.2 2-4l-4-7V2"/><path d="M8 2h8"/></svg>
-                  COA available
+                  Tested (vendor-reported)
                 </span>
                 <span v-if="product.purity" class="inline-flex items-center gap-1 px-2 py-1 rounded-[6px] bg-[color:var(--color-hairline-soft)] text-[color:var(--color-ink-muted)] text-[11px] font-semibold ui-mono">
                   {{ product.purity }}% purity
@@ -246,7 +242,7 @@
                 {{ product.name }} from {{ brand?.name || 'our store' }} is a research peptide designed for scientific and research purposes only.
               </p>
               <p>
-                This product undergoes third-party testing to ensure quality. Each batch comes with a certificate of analysis (COA) available upon request.
+                Peptidemap does not test this product. Any certificate of analysis is published by the vendor.
               </p>
               <div class="bg-slate-50 rounded-lg p-6 mt-6">
                 <h3 class="text-lg text-gray-900 mb-4">Product Information</h3>
@@ -293,7 +289,7 @@
                         <span class="text-gray-900 font-medium">{{ review.user_name }}</span>
                         <span v-if="review.verified" class="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l8 4v6c0 5.5-3.4 9.9-8 11-4.6-1.1-8-5.5-8-11V5l8-4z"/></svg>
-                          Verified via PMAP
+                          Visited via Peptidemap
                         </span>
                       </div>
                       <div class="flex items-center gap-1">

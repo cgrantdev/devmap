@@ -58,7 +58,7 @@
                     {{ slide.title || 'Peptide Sciences' }}
                   </h2>
                   <p class="text-sm sm:text-base md:text-lg lg:text-xl mb-4 sm:mb-6 text-gray-200">
-                    {{ slide.subtitle || '99%+ purity guaranteed. Third-party tested with COAs available for every batch.' }}
+                    {{ slide.subtitle || 'Compare prices and vendor-published coupons. Research use only.' }}
                   </p>
 
                   <div class="inline-flex items-center gap-2 sm:gap-3 bg-white/10 backdrop-blur-sm border border-white/30 px-3 sm:px-5 py-2 sm:py-3 rounded-lg mb-4 sm:mb-6">
@@ -144,7 +144,7 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
       <div class="mb-6 sm:mb-8">
         <h2 class="text-2xl sm:text-3xl text-gray-900 mb-1">Top Rated Vendors</h2>
-        <p class="text-sm sm:text-base text-gray-600">Browse the most trusted peptide suppliers.</p>
+        <p class="text-sm sm:text-base text-gray-600">Browse top-rated vendors.</p>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         <TopRatedVendorCard
@@ -252,7 +252,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6 sm:mb-8">
         <div>
           <h2 class="text-2xl sm:text-3xl text-gray-900 mb-1">Limited Time Discounts</h2>
-          <p class="text-sm sm:text-base text-gray-600">Save up to 25% with verified discount codes</p>
+          <p class="text-sm sm:text-base text-gray-600">Save up to 25% with Peptidemap coupon codes</p>
         </div>
         <Link
           href="/deals"
@@ -434,8 +434,8 @@ const props = defineProps({
   seo: {
     type: Object,
     default: () => ({
-      title: 'Peptidemap - Your Trusted Source for Peptides',
-      description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with verified discount codes.',
+      title: 'Compare research-peptide vendors',
+      description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with Peptidemap coupon codes.',
       og_title: null,
       og_description: null,
       og_image: null,
@@ -455,7 +455,7 @@ const description = computed(() => {
   return (
     props.seo?.description ||
     page.props.site_description ||
-    'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with verified discount codes.'
+    'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with Peptidemap coupon codes.'
   )
 })
 
@@ -489,13 +489,13 @@ const processSlides = (slides) => {
   // Headings for each slide in order
   const headings = [
     'PREMIUM RESEARCH PEPTIDES',
-    'Lab-Tested Excellence',
-    'Trusted Since 2018'
+    'Compare live prices',
+    'Coupon codes included'
   ]
 
   return slides.map((slide, index) => ({
     title: slide.title || 'Peptide Sciences',
-    subtitle: slide.subtitle || '99%+ purity guaranteed. Third-party tested with COAs available for every batch.',
+    subtitle: slide.subtitle || 'Compare prices and vendor-published coupons. Research use only.',
     heading: slide.heading || headings[index] || headings[0],
     ctaText: slide.ctaText || 'Shop Now',
     ctaUrl: slide.ctaUrl || '#',

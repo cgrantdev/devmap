@@ -19,7 +19,7 @@ class BrandOgImageController extends Controller
     use RendersOgImage;
 
     private const CACHE_DIR = 'og/brand';
-    private const FALLBACK_PNG = 'images/og-default-v7.png';
+    private const FALLBACK_PNG = 'images/og-default-v8.png';
 
     public function show(string $slug): Response|BinaryFileResponse
     {

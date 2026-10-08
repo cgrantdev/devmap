@@ -15,7 +15,7 @@ class BannersController extends Controller
     {
         // Get hero slides from settings. If the setting has never been
         // saved, seed it with the same Certified Peptides slide the live
-        // homepage falls back to â€” otherwise the admin sees an empty form
+        // homepage falls back to — otherwise the admin sees an empty form
         // even though the homepage clearly has a banner rendering.
         $heroSlidesSetting = Setting::where('key', 'hero_slides')->first();
         if (!$heroSlidesSetting) {
@@ -24,9 +24,9 @@ class BannersController extends Controller
                 'value' => json_encode([[
                     'eyebrow' => 'Featured Partner',
                     'badge' => null,
-                    'title' => 'Lab-tested research peptides from Certified Peptides',
+                    'title' => 'Research peptides from Certified Peptides',
                     'title_highlight' => 'Certified Peptides',
-                    'subtitle' => '99% HPLC-verified COAs on every batch â€” BPC-157, TB-500, GHK-Cu, and the full catalog.',
+                    'subtitle' => 'Sponsored — vendor states HPLC COAs are published per batch',
                     'cta_text' => 'Browse catalog',
                     'cta_url' => '/brand/certified-pep/products',
                     'coupon_code' => 'pmap',
@@ -65,10 +65,10 @@ class BannersController extends Controller
     /**
      * Turn a stored image reference into a URL the browser can load.
      * Accepts three shapes:
-     *  - null / empty        â†’ null
-     *  - starts with http(s) â†’ returned as-is (external CDN URL)
-     *  - starts with '/'     â†’ returned as-is (bundled asset like /images/banners/foo.png)
-     *  - anything else       â†’ treated as a filename in storage/app/public/hero_slides/
+     *  - null / empty        → null
+     *  - starts with http(s) → returned as-is (external CDN URL)
+     *  - starts with '/'     → returned as-is (bundled asset like /images/banners/foo.png)
+     *  - anything else       → treated as a filename in storage/app/public/hero_slides/
      */
     private function resolveHeroImageUrl(?string $image): ?string
     {
@@ -224,7 +224,7 @@ class BannersController extends Controller
             $slide['is_active'] = $toBool($slide['is_active'] ?? true);
             $slide['sponsored'] = $toBool($slide['sponsored'] ?? false);
 
-            // Optional string fields â€” normalize to string or null so JSON stays clean.
+            // Optional string fields — normalize to string or null so JSON stays clean.
             foreach (['analytics_label', 'title_highlight', 'eyebrow', 'badge', 'subtitle', 'cta_text', 'cta_url', 'coupon_code', 'target'] as $k) {
                 $slide[$k] = isset($slide[$k]) && $slide[$k] !== '' ? (string) $slide[$k] : null;
             }

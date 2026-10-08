@@ -53,14 +53,9 @@ class SearchController extends Controller
                 }
 
                 if ($verifiedOnly) {
-                    // Consider vendors with reviews as verified, or use featured/top_vendor flags
-                    $vendorsQuery->where(function ($q) {
-                        $q->where('rating_count', '>', 0)
-                          ->orWhereHas('vendorSetting', function ($vsQuery) {
-                              $vsQuery->where('featured', true)
-                                      ->orWhere('top_vendor', true);
-                          });
-                    });
+                    // ?verified= stays the query key. The checkbox is "Has reviews",
+                    // so it filters on rating_count. Featured is a separate badge.
+                    $vendorsQuery->where('rating_count', '>', 0);
                 }
 
                 if ($usaBased) {
@@ -86,7 +81,9 @@ class SearchController extends Controller
                         'reviews_count' => (int) ($brand->rating_count ?? 0),
                         'location' => $location,
                         'products_count' => $brand->products_count ?? 0,
-                        'verified' => ($brand->rating_count > 0) || ($brand->vendorSetting && ($brand->vendorSetting->featured || $brand->vendorSetting->top_vendor)),
+                        'has_reviews' => (int) ($brand->rating_count ?? 0) > 0,
+                        'featured' => (bool) ($brand->vendorSetting && ($brand->vendorSetting->featured || $brand->vendorSetting->top_vendor)),
+                        'verified' => (int) ($brand->rating_count ?? 0) > 0,
                         'icon' => $this->getVendorIcon($brand->name),
                     ];
                 });

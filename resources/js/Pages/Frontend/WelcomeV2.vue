@@ -23,7 +23,7 @@
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-3">
             <h2 class="text-[13px] lg:text-[14px] font-semibold text-[color:var(--color-ink)] tracking-tight">Top-rated vendors</h2>
-            <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ verifiedVendors.length }}+ verified</span>
+            <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ verifiedVendors.length }}+ listed</span>
           </div>
           <a href="/vendors" class="text-[12px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors flex items-center gap-1">
             All vendors

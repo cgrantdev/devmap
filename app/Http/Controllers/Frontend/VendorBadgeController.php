@@ -168,7 +168,7 @@ HTML;
 
         $rating = $stats['has_rating'] ? number_format($stats['rating'], 1) : '—';
         $count = $stats['rating_count'];
-        $countLabel = $count === 1 ? '1 review' : ($count > 0 ? "{$count} reviews" : 'Verified vendor');
+        $countLabel = $count === 1 ? '1 review' : ($count > 0 ? "{$count} reviews" : 'No reviews yet');
 
         // Escape brand name for XML (< > & ' " → entities)
         $name = htmlspecialchars($brand->name, ENT_XML1 | ENT_QUOTES, 'UTF-8');
@@ -226,7 +226,7 @@ SVG;
   <text x="42" y="42" fill="{$muted}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif" font-size="10">{$countLabel}</text>
   <line x1="128" y1="14" x2="128" y2="46" stroke="#E2E8F0" stroke-width="1"/>
   <text x="140" y="27" fill="{$accent}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="0.5">PEPTIDEMAP</text>
-  <text x="140" y="42" fill="{$muted}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif" font-size="9">Verified vendor</text>
+  <text x="140" y="42" fill="{$muted}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif" font-size="9">Listed on Peptidemap</text>
 </svg>
 SVG;
     }

@@ -83,7 +83,7 @@ class VsCompetitorController extends Controller
                 'Only 5 vendors tracked (we track 33+)',
                 'Fewer total indexed pages (974 vs 3,387)',
                 'No coupon-code integration',
-                'No verified customer reviews on brand pages',
+                'No customer reviews on brand pages',
             ],
         ],
     ];
@@ -110,7 +110,7 @@ class VsCompetitorController extends Controller
             'strengths' => [
                 'Largest indexed footprint of any peptide comparison site',
                 'Per-compound compare tables with coupon codes',
-                'Verified customer reviews + imported Trustpilot',
+                'Customer reviews from other platforms, including Trustpilot',
                 'Live currency indicators per vendor country',
                 'Public API for vendors to push catalog updates',
                 'Discord bot + free deal alerts',
