@@ -652,7 +652,7 @@ class EducationalContentPublisher
                     'A purity percentage is not sterility, not safety, and not a Peptidemap pass rate.',
                 ],
                 'faq' => self::faq($host.'/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis#faq', [
-                    ['Why do several vendors show the same COA?', 'Shared lot paperwork or copied PDFs. Shared paperwork is not proof your purchase matches the tested sample. Lot match plus lab verification are.'],
+                    ['Why do several vendors show the same COA?', 'Shared lot paperwork or copied PDFs. Shared paperwork is not proof your purchase matches the tested sample—lot match plus lab verification are.'],
                     ['The unique key is redacted. Is the COA fake?', 'Not necessarily. Supplier names are often redacted. If verification identifiers are missing and the report will not resolve on the lab tool, treat it as unverified.'],
                     ['Is a PDF enough if it looks professional?', 'No. Prefer independent lookup on the issuing lab’s site and field-by-field comparison.'],
                     ['Vial lot ≠ COA lot — can I use the purity number?', 'Not as documentation for that vial. A genuine report for another lot answers another question.'],
@@ -684,10 +684,10 @@ class EducationalContentPublisher
                     'This page does not rank the forms and does not give dosing or reconstitution steps.',
                 ],
                 'faq' => self::faq($host.'/blog/cjc-1295-dac-vs-no-dac#faq', [
-                    ['Is “CJC-1295 no DAC” the same molecule as literature CJC-1295?', 'No. Literature CJC-1295 in the Teichman-era pharmacokinetic work is the DAC construct. Catalog “no DAC” is the Modified GRF 1-29 nickname lane.'],
-                    ['Can the 5.8–8.1-day half-life be quoted for Mod GRF?', 'No. That estimate is from Teichman et al. 2006 for the DAC construct. It does not transfer to no-DAC material.'],
+                    ['Is “CJC-1295 no DAC” the same molecule as literature CJC-1295?', 'No. Literature CJC-1295 in the Teichman-era PK work is the DAC construct. Catalog “no DAC” is the Modified GRF 1-29 nickname lane.'],
+                    ['Can I quote the 5.8–8.1-day half-life for Mod GRF?', 'No. That estimate is from Teichman et al. 2006 for the DAC construct. It does not transfer to no-DAC material.'],
                     ['Does a blend COA only need one peptide name?', 'Ideally no. If two peptides are in the vial, documentation should make clear which analytes were identified and how. Ambiguous “CJC” labeling is a documentation gap.'],
-                    ['Which form is better?', 'This page does not rank them. They differ in identity, evidence depth, and analytical mass. The page does not give dosing, reconstitution, or a recommendation of which form to take.'],
+                    ['Which form is better?', 'This page does not rank them. Different identity, different evidence depth, different analytical mass. Research design depends on the hypothesis and the exact material on the certificate—not on a forum winner.'],
                 ]),
             ],
             [
@@ -715,11 +715,11 @@ class EducationalContentPublisher
                     'That alert does not prove the pharmaceutical retatrutide molecule studied by Lilly is hepatotoxic.',
                 ],
                 'faq' => self::faq($host.'/blog/retatrutide-testing-coa-limits#faq', [
-                    ['Does a 99% COA make a retatrutide-labeled vial safe?', 'No. Purity or identity of one sample is not sterility, not a contaminant clearance, not next-lot assurance, and not clinical safety.'],
-                    ['Does Victoria prove retatrutide is hepatotoxic?', 'No. The CHO alert associates six acute liver injury cases with unapproved products labelled Retatrutide, Reta, R-10, or R-20, notes possible contaminants, and states investigations are ongoing. That is not proof that the trial molecule causes the injuries.'],
-                    ['Are buyer-submitted test dashboards a market quality score?', 'No. Sampling and publication are chosen by people with incentives. They are scattered data points, not an audit.'],
-                    ['Is a grey-market vial the same as Lilly trial material?', 'No. Lilly states no retatrutide medicine is approved anywhere. Grey-market labels are outside that accountability chain.'],
-                    ['Where are the general COA verification steps?', 'The companion post on how to verify a peptide vendor Certificate of Analysis covers shared-lot skepticism and verify-on-lab-site habits.'],
+                    ['Does a 99% COA make a retatrutide-labeled vial safe?', 'No. Purity/identity of one sample is not sterility, not a contaminant clearance, not next-lot assurance, and not clinical safety.'],
+                    ['Does Victoria prove retatrutide is hepatotoxic?', 'No. The CHO alert associates six acute liver injury cases with unapproved products labelled Retatrutide / Reta / R-10 / R-20, notes possible contaminants, and states investigations are ongoing. That is not a completed proof that the trial molecule causes the injuries.'],
+                    ['Are buyer-submitted test dashboards a market quality score?', 'No. Sampling and publication are chosen by people with incentives. Useful as scattered data points; not as an audit.'],
+                    ['Is a grey-market vial the same as Lilly trial material?', 'No. Lilly states no retatrutide medicine is approved anywhere; grey-market labels are outside that accountability chain.'],
+                    ['Where should I read general COA verification steps?', 'How to verify a peptide vendor Certificate of Analysis — including shared-lot skepticism and verify-on-lab-site habits.'],
                 ]),
             ],
         ];

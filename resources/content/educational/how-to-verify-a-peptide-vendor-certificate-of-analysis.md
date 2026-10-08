@@ -2,7 +2,7 @@ A Certificate of Analysis (COA) is often the strongest paperwork a research-use 
 
 Peptidemap is a RUO / grey-area peptide comparison publisher. This guide is educational literacy about documents and labs. It is **not** medical advice, a dose, a reconstitution recipe, a treatment claim, or a vendor ranking. Peptidemap does not endorse any single testing laboratory.
 
-This deepen revises the live post. Core basics stay: third-party vs in-house, minimum fields, method literacy, and common red flags. New sections cover shared-lot / shared-COA reuse, verifying on the lab’s site instead of trusting a PDF alone, redacted report fields, and what a COA proves versus what it does not.
+This guide covers the basics plus shared-lot reuse, lab-site verification, redaction, and what a COA does not prove.
 
 ## Why third-party testing matters
 
@@ -95,7 +95,7 @@ A verified, lot-matched COA is evidence about **the sample the laboratory receiv
 - Safety, efficacy, or suitability for any human use.
 - That a grey-market label equals clinical-trial or approved drug substance.
 
-A high purity percentage does not make a research vial “safe.” It does not convert an unapproved product into a medicine. For retatrutide-labeled grey-market products and public-health alerts that sit beside COA literacy, use the companion post when shipped: [Retatrutide testing and COA limits](/blog/retatrutide-testing-coa-limits).
+A high purity percentage does not make a research vial “safe.” It does not convert an unapproved product into a medicine. For retatrutide-labeled grey-market products and public-health alerts that sit beside COA literacy, see the companion post: [Retatrutide testing and COA limits](/blog/retatrutide-testing-coa-limits).
 
 ## Purity figures without inventing pass rates
 

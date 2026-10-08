@@ -520,7 +520,11 @@ class EducationalContentTest extends TestCase
             $this->assertStringNotContainsString('CHANGES', (string) $blog->content);
             $this->assertStringNotContainsString('Note for Meta Optimizer', (string) $blog->content);
             $this->assertStringNotContainsString('PeptideMaps', (string) $blog->content);
-            $this->assertStringNotContainsString('forthcoming', strtolower((string) $blog->content));
+            $lowerContent = strtolower((string) $blog->content);
+            $this->assertStringNotContainsString('forthcoming', $lowerContent);
+            $this->assertStringNotContainsString('when shipped', $lowerContent);
+            $this->assertStringNotContainsString('deepen', $lowerContent);
+            $this->assertStringNotContainsString('todo', $lowerContent);
             $this->assertStringNotContainsString('picsum.photos', (string) $blog->image);
             $this->assertStringNotContainsString('unsplash.com', (string) $blog->image);
         }
@@ -571,6 +575,20 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis', $reta->content);
         $this->assertStringContainsString('/encyclopedia/retatrutide', $reta->content);
         $this->assertStringNotContainsString('long-term', $reta->content);
+        $this->assertStringContainsString('see the companion post:', $coa->content);
+        $this->assertStringContainsString('This guide covers the basics plus shared-lot reuse', $coa->content);
+        $this->assertStringContainsString('COA verification guide', $reta->content);
+
+        foreach ([$coa, $cjc, $reta] as $blog) {
+            $plain = html_entity_decode(strip_tags((string) $blog->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $faq = $blog->seo_schema[0] ?? null;
+            $this->assertSame('FAQPage', $faq['@type'] ?? null);
+            $this->assertNotEmpty($faq['mainEntity'] ?? null);
+            foreach ($faq['mainEntity'] as $entity) {
+                $this->assertStringContainsString($entity['name'], $plain);
+                $this->assertStringContainsString($entity['acceptedAnswer']['text'], $plain);
+            }
+        }
 
         // Live row has no cover and an existing byline. Sync fills the cover
         // and replaces the body without inserting a second row or moving the date.
@@ -625,6 +643,8 @@ class EducationalContentTest extends TestCase
         $page->assertDontSee('PeptideMaps', false);
         $page->assertDontSee('minimum research grade', false);
         $page->assertDontSee('forthcoming', false);
+        $page->assertSee('see the companion post:', false);
+        $page->assertSee('This guide covers the basics plus shared-lot reuse', false);
 
         $cjcPage = $this->get('/blog/cjc-1295-dac-vs-no-dac');
         $cjcPage->assertOk();
@@ -648,6 +668,15 @@ class EducationalContentTest extends TestCase
         $retaPage->assertSee('/images/educational/retatrutide-testing-coa-limits.png', false);
         $retaPage->assertDontSee('/workspace/', false);
         $retaPage->assertDontSee('long-term', false);
+        $retaPage->assertSee('COA verification guide', false);
+
+        foreach ([$page, $cjcPage, $retaPage] as $rendered) {
+            $renderedLower = strtolower($rendered->getContent());
+            $this->assertStringNotContainsString('when shipped', $renderedLower);
+            $this->assertStringNotContainsString('deepen', $renderedLower);
+            $this->assertStringNotContainsString('forthcoming', $renderedLower);
+            $this->assertStringNotContainsString('/workspace/', $renderedLower);
+        }
 
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee('https://peptidemap.com/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis', false)

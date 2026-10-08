@@ -43,7 +43,7 @@ Unless the report separately includes them, that paperwork usually does **not** 
 - That the next shipment matches.
 - That a 99% figure equals clinical safety.
 
-**A 99% COA does not make a vial safe.** It does not convert an unapproved labeled product into Lilly trial material. Shared COAs across many “Reta” storefronts raise the same shared-lot skepticism described in the CoA deepen: one PDF is not a purchase-specific guarantee.
+**A 99% COA does not make a vial safe.** It does not convert an unapproved labeled product into Lilly trial material. Shared COAs across many “Reta” storefronts raise the same shared-lot skepticism described in the [COA verification guide](/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis): one PDF is not a purchase-specific guarantee.
 
 ## Victoria Chief Health Officer alert (quote carefully)
 
