@@ -45,7 +45,7 @@
               </div>
             </Link>
             <p class="text-sm text-gray-400 mb-6">
-              Your trusted marketplace for comparing peptide brands, prices, and reviews. Make informed decisions with verified vendors and transparent information.
+              Compare research-peptide vendors, prices, coupons and vendor-published COAs.
             </p>
             <!-- Social Media Icons -->
             <div class="flex gap-3">

@@ -65,10 +65,10 @@ class CouponController extends Controller
             ? "{$brand->name} Coupon Code {$couponCode} — {$percentOff}% Off"
             : "{$brand->name} Coupon Code {$couponCode}";
         $seoDescription = $percentOff
-            ? "Save {$percentOff}% at {$brand->name} with coupon code {$couponCode}. "
-              . "Verified discount across {$productCount} products — click to reveal + copy."
-            : "Get the {$brand->name} coupon code {$couponCode} — verified and up-to-date. "
-              . "Applies across {$productCount} products.";
+            ? "Exclusive Peptidemap code {$couponCode}. Save {$percentOff}% at {$brand->name}. "
+              . "Code supplied by {$brand->name}. Applies across {$productCount} products."
+            : "Exclusive Peptidemap code {$couponCode}. "
+              . "Code supplied by {$brand->name}. Applies across {$productCount} products.";
 
         // Schema.org DiscountOffer + Organization — signals to Google
         // this page is a legitimate coupon listing, not affiliate spam.

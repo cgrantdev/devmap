@@ -27,7 +27,7 @@
           <img :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain" />
         </div>
         <div class="min-w-0">
-          <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-emerald-700 mb-1">Verified coupon</div>
+          <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-emerald-700 mb-1">Exclusive Peptidemap code</div>
           <h1 class="ui-display text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] leading-[1.1]">
             {{ brand.name }} Coupon Code
           </h1>

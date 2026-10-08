@@ -356,7 +356,7 @@
         <span class="sep">·</span>
         <span>PMAP coupons</span>
         <span class="sep">·</span>
-        <span>Lab verified</span>
+        <span>Live prices · Coupons</span>
       </div>
       <div class="url">View on Peptidemap <span class="arrow">→</span></div>
     </div>

@@ -240,48 +240,6 @@
               </div>
             </section>
 
-            <!-- User Experiences -->
-            <section class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 class="text-2xl text-gray-900 mb-4 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users w-6 h-6 text-blue-600" aria-hidden="true">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                  <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
-                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                </svg>                
-                User Experiences
-              </h2>
-              <div class="space-y-4">
-                <div 
-                  v-for="(experience, index) in userExperiences" 
-                  :key="index"
-                  class="border-b border-gray-200 last:border-b-0 pb-4 last:pb-0"
-                >
-                  <div class="flex items-center gap-2 mb-2">
-                    <div class="flex items-center">
-                      <svg 
-                        v-for="i in 5" 
-                        :key="i"
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="16" 
-                        height="16" 
-                        viewBox="0 0 24 24" 
-                        fill="currentColor" 
-                        :class="i <= experience.rating ? 'text-yellow-400' : 'text-gray-300'"
-                      >
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                      </svg>
-                    </div>
-                    <span class="text-sm text-gray-600">{{ experience.author }}</span>
-                    <span v-if="experience.verified" class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded">
-                      Verified Purchase
-                    </span>
-                  </div>
-                  <p class="text-gray-700">{{ experience.review }}</p>
-                  <div class="text-xs text-gray-500 mt-2">12/9/2024</div>
-                </div>
-              </div>
-            </section>
           </div>
 
           <!-- Right Column: Sidebar -->
@@ -330,7 +288,7 @@
             <div class="bg-gradient-to-br from-blue-600 to-purple-700 text-white rounded-lg p-6">
               <h3 class="text-lg mb-2">Shop {{ name }}</h3>
               <p class="text-sm text-blue-100 mb-4">
-                Compare prices from {{ products.length }} verified vendors
+                Compare prices from {{ products.length }} listed vendors
               </p>
               <button 
                 @click="router.visit(`/products?category=${slug}`)"
@@ -456,10 +414,6 @@ defineProps({
     default: () => []
   },
   faqs: {
-    type: Array,
-    default: () => []
-  },
-  userExperiences: {
     type: Array,
     default: () => []
   },

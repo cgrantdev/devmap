@@ -103,7 +103,7 @@
                     @change="applyFilters"
                     class="w-4 h-4 text-slate-700 border-slate-300 rounded focus:ring-slate-400"
                   />
-                  <span class="text-sm text-slate-700">Verified Only</span>
+                  <span class="text-sm text-slate-700">Has reviews</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input
@@ -163,8 +163,11 @@
                     <div class="flex-1 min-w-0">
                       <div class="flex items-center gap-2 mb-1">
                         <h3 class="text-slate-900">{{ vendor.name }}</h3>
-                        <span v-if="vendor.verified" class="px-2 py-0.5 bg-slate-700 text-white text-xs rounded">
-                          Verified
+                        <span v-if="vendor.reviews_count > 0" class="px-2 py-0.5 bg-slate-700 text-white text-xs rounded">
+                          Has reviews
+                        </span>
+                        <span v-if="vendor.featured" class="px-2 py-0.5 bg-slate-700 text-white text-xs rounded">
+                          Featured
                         </span>
                       </div>
                       <div class="flex items-center gap-4 text-sm text-slate-600 mb-3">

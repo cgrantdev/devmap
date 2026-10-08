@@ -33,7 +33,7 @@ class JoinController extends Controller
 
         $seoData = new SEOData(
             title: 'Private Invitation | PeptideMap',
-            description: 'You\'ve been invited to join PeptideMap as a verified vendor partner.',
+            description: 'You\'ve been invited to join PeptideMap as a listed vendor.',
             url: url('/join'),
         );
         session(['page_seo_data' => $seoData]);

@@ -5,7 +5,7 @@
       <!-- Header -->
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-8 lg:pt-12 pb-6">
         <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-2">{{ productName }}</h1>
-        <p class="text-[15px] text-[color:var(--color-ink-muted)]">Compare prices across verified vendors</p>
+        <p class="text-[15px] text-[color:var(--color-ink-muted)]">Compare prices across listed vendors</p>
       </div>
 
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pb-8">

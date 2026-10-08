@@ -27,7 +27,7 @@ class ProductOgImageController extends Controller
 
         return $this->serveOgImage(
             self::CACHE_DIR,
-            (string) $id,
+            $id.'-'.\App\Support\OgImageRevision::COPY,
             $product->updated_at?->timestamp ?? 0,
             self::FALLBACK_PNG,
             fn () => View::make('og.product', [

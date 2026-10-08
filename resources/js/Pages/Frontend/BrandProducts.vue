@@ -385,7 +385,7 @@
                         <span class="text-gray-900 font-medium">{{ review.user_name }}</span>
                         <span v-if="review.verified" class="inline-flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
                           <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l8 4v6c0 5.5-3.4 9.9-8 11-4.6-1.1-8-5.5-8-11V5l8-4z"/></svg>
-                          Verified via PMAP
+                          Visited via Peptidemap
                         </span>
                       </div>
                       <div class="flex items-center gap-1">
@@ -420,13 +420,10 @@
                 <p class="text-gray-500">No reviews yet</p>
               </div>
 
-              <!-- Imported reviews — merged into one block, no per-platform
-                   grouping, no outbound links. Colin Sep 1: don't give users
-                   any way to leave our site to view reviews elsewhere. Reviews
-                   are still imported from Trustpilot / Reviews.io / PepReviewPro
-                   for content, but attribution is stripped from the UI. -->
+              <!-- Imported reviews stay on this page. The source name is shown
+                   so a Trustpilot or Reviews.io row is not presented as ours. -->
               <div v-if="externalReviewsFlat.length" class="mt-8">
-                <h3 class="text-lg text-gray-900 mb-4">Verified customer reviews</h3>
+                <h3 class="text-lg text-gray-900 mb-4">Customer reviews from other platforms</h3>
                 <div class="space-y-4">
                   <div
                     v-for="er in externalReviewsFlat"
@@ -437,7 +434,10 @@
                       <div>
                         <div class="text-sm font-semibold text-gray-900">{{ er.author || 'Anonymous' }}</div>
                         <div class="text-[11px] text-gray-500">
-                          <span v-if="er.author_location">{{ er.author_location }} · </span>
+                          <span v-if="reviewSourceLabel(er.source)">{{ reviewSourceLabel(er.source) }}</span>
+                          <span v-if="reviewSourceLabel(er.source) && (er.author_location || er.published_at)"> · </span>
+                          <span v-if="er.author_location">{{ er.author_location }}</span>
+                          <span v-if="er.author_location && er.published_at"> · </span>
                           <span v-if="er.published_at">{{ er.published_at }}</span>
                         </div>
                       </div>
@@ -957,50 +957,6 @@
             </div>
           </div>
 
-          <!-- Verification Filter -->
-          <div>
-            <button 
-              @click="expandedFilters.verification = !expandedFilters.verification"
-              class="w-full flex items-center justify-between py-2 font-roboto font-medium text-base leading-normal tracking-normal text-gray-800"
-            >
-              <span>Verification</span>
-              <svg class="w-5 h-5" :class="expandedFilters.verification ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div v-if="expandedFilters.verification" class="mt-2 space-y-2">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="radio"
-                  value=""
-                  v-model="selectedFilters.verification"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">All</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="radio"
-                  value="1"
-                  v-model="selectedFilters.verification"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">Verified</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="radio"
-                  value="0"
-                  v-model="selectedFilters.verification"
-                  @change="applyFilters"
-                  class="rounded border-gray-300"
-                />
-                <span class="font-roboto font-normal text-sm leading-normal tracking-normal text-gray-700">Not Verified</span>
-              </label>
-            </div>
-          </div>
         </div>
         <div class="p-6 border-t border-gray-200 flex gap-4">
           <button 
@@ -1322,6 +1278,10 @@ const EXTERNAL_SOURCE_META = {
 }
 // Flat, sorted merge of every imported review — no per-source grouping,
 // no outbound links (Colin Sep 1: keep users on our site).
+function reviewSourceLabel(source) {
+  return EXTERNAL_SOURCE_META[source]?.label || ''
+}
+
 const externalReviewsFlat = computed(() => {
   const rows = Array.isArray(props.externalReviews) ? [...props.externalReviews] : []
   return rows.sort((a, b) => (String(b.published_at || '')).localeCompare(String(a.published_at || '')))
@@ -1451,7 +1411,7 @@ const whyChooseBenefits = computed(() => {
     'Third-party lab tested products',
     'Fast & reliable shipping',
     'Responsive customer service',
-    'Verified customer reviews',
+    'Customer reviews from other platforms',
   ]
   if (tenureLabel.value) base.push(tenureLabel.value)
   return base

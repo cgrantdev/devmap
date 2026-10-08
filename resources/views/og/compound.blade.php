@@ -150,7 +150,7 @@
         <span>From <span class="num">${{ number_format($fromPrice, 2) }}</span></span>
         @endif
         <span class="sep">·</span>
-        <span>Lab verified</span>
+        <span>Live prices · Coupons</span>
       </div>
       <div class="url"><span class="dot"></span>peptidemap.com</div>
     </div>

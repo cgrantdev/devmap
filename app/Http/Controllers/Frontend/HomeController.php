@@ -319,7 +319,7 @@ class HomeController extends Controller
 
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "home")
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
-        $defaultDescription = Setting::where('key', 'site_description')->value('value') ?? 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with verified discount codes.';
+        $defaultDescription = Setting::where('key', 'site_description')->value('value') ?? 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with exclusive coupon codes.';
         $defaultImage = $heroSlides[0]['image'] ?? null;
 
         $seoPage = SeoPage::where('key', 'home')->first();
@@ -762,9 +762,9 @@ class HomeController extends Controller
         if ($heroSlides->isEmpty()) {
             $heroSlides->push([
                 'eyebrow' => 'Featured Partner',
-                'title' => 'Lab-tested research peptides from Certified Peptides',
+                'title' => 'Research peptides from Certified Peptides',
                 'title_highlight' => 'Certified Peptides',
-                'subtitle' => '99% HPLC-verified COAs on every batch — BPC-157, TB-500, GHK-Cu, and the full catalog.',
+                'subtitle' => 'Sponsored — vendor states HPLC COAs are published per batch',
                 'cta' => 'Browse catalog',
                 'url' => '/brand/certified-pep',
                 'image' => '/images/banners/certified-peptides-3.png',
@@ -778,7 +778,7 @@ class HomeController extends Controller
                 $heroSlides->push([
                     'eyebrow' => 'Featured partner',
                     'title' => $v['name'],
-                    'subtitle' => $v['description'] ?? 'Research-grade peptides. Lab tested. Verified on PeptideMap.',
+                    'subtitle' => $v['description'] ?? 'Listed on Peptidemap.',
                     'cta' => 'Visit vendor',
                     'url' => $v['url'],
                     'image' => null,
@@ -867,11 +867,11 @@ class HomeController extends Controller
         // render the correct <title>, canonical, and OG/Twitter tags.
         $seo = [
             'key'            => 'home',
-            'title'          => 'Peptidemap — Compare peptide vendors, prices, coupons & lab testing',
-            'description'    => 'The definitive peptide directory. Compare 40+ verified vendors, inspect COAs, and unlock exclusive coupons on 2,500+ products — all in one place.',
+            'title'          => 'Peptidemap — Compare research-peptide vendors, prices and coupons',
+            'description'    => 'Compare 40+ research-peptide vendors, vendor-published COAs and coupons',
             'url'            => 'https://peptidemap.com/',
             'og_title'       => 'Compare every peptide vendor — Peptidemap',
-            'og_description' => '40+ verified vendors · 2,500+ products · lab-tested · coupons included. The definitive peptide directory.',
+            'og_description' => 'Compare 40+ research-peptide vendors, vendor-published COAs and coupons',
             'og_image'       => 'https://peptidemap.com/images/og-default-v7.png',
         ];
         session(['page_seo_data' => $seo]);

@@ -303,7 +303,7 @@ class PagesSeeder extends Seeder
                 ],
                 [
                     'title' => 'Trusted Vendors',
-                    'subtitle' => 'Connect with verified vendors in the peptide research community.',
+                    'subtitle' => 'Connect with listed vendors in the peptide research community.',
                     'cta_text' => 'View Vendors',
                     'cta_url' => '/brands',
                     'image' => null,

@@ -492,9 +492,9 @@ class CompareController extends Controller
             $seoTitle = "Cheapest {$seoName} — {$vendorCount} Vendors Compared";
             $seoDescription = $vendorCount > 0
                 ? "Compare {$productCount} {$seoName} product" . ($productCount === 1 ? '' : 's')
-                  . " across {$vendorCount} verified vendor" . ($vendorCount === 1 ? '' : 's')
+                  . " across {$vendorCount} vendor" . ($vendorCount === 1 ? '' : 's')
                   . ($cheapestFmt ? ". Prices from {$cheapestFmt}" . ($priciestFmt && $priciestFmt !== $cheapestFmt ? " to {$priciestFmt}" : '') : '')
-                  . ". Coupon codes and lab-testing status on every listing."
+                  . ". Live prices and coupon codes. Check each vendor's site for COAs."
                 : "Vendor comparison for {$seoName} — currently no in-stock listings on Peptidemap.";
             $ogTitle = $seoTitle;
             $ogDescription = $seoDescription;
@@ -521,11 +521,11 @@ class CompareController extends Controller
             $faqPairs = [
                 [
                     'q' => "What is the cheapest {$seoName}?",
-                    'a' => "The lowest {$seoName} price on Peptidemap is {$cheapestFmt} from " . ($documentProducts->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
+                    'a' => "The lowest {$seoName} price on Peptidemap is {$cheapestFmt} from " . ($documentProducts->first()['brand_name'] ?? 'a listed vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
                 ],
                 [
                     'q' => "How many vendors sell {$seoName}?",
-                    'a' => "{$vendorCount} verified research-peptide vendors currently stock {$seoName} on Peptidemap, with {$productCount} distinct product listings.",
+                    'a' => "{$vendorCount} research-peptide vendors currently stock {$seoName} on Peptidemap, with {$productCount} distinct product listings.",
                 ],
                 [
                     'q' => "Is there a coupon code for {$seoName}?",
@@ -586,8 +586,8 @@ class CompareController extends Controller
             'description' => $seoDescription,
             'og_title' => $ogTitle,
             'og_description' => $ogDescription,
-            'og_image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0),
-            'image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0),
+            'og_image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0) . '-' . \App\Support\OgImageRevision::COPY,
+            'image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0) . '-' . \App\Support\OgImageRevision::COPY,
             'url' => url("/compare/{$slug}"),
             // SSR H1 matches the visible Vue H1. Retatrutide uses the
             // narrative H1; other compounds keep the bare category name.
@@ -603,7 +603,7 @@ class CompareController extends Controller
                         '@type' => 'Product',
                         '@id' => url("/compare/{$slug}") . '#product',
                         'name' => $seoName,
-                        'description' => $summary ? mb_substr(strip_tags($summary), 0, 300) : "Compare {$seoName} prices across {$vendorCount} verified research-peptide vendors.",
+                        'description' => $summary ? mb_substr(strip_tags($summary), 0, 300) : "Compare {$seoName} prices across {$vendorCount} research-peptide vendors.",
                         'offers' => [
                             '@type' => 'AggregateOffer',
                             'priceCurrency' => 'USD',

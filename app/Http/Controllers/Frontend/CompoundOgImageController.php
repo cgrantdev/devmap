@@ -47,7 +47,7 @@ class CompoundOgImageController extends Controller
 
         return $this->serveOgImage(
             self::CACHE_DIR,
-            $slug,
+            $slug.'-'.\App\Support\OgImageRevision::COPY,
             $mtime,
             self::FALLBACK_PNG,
             fn () => View::make('og.compound', [

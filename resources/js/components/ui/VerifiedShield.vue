@@ -41,7 +41,7 @@ const props = defineProps({
     type: String,
     default: 'md', // 'xs' | 'sm' | 'md' | 'lg'
   },
-  label: { type: String, default: 'Verified' },
+  label: { type: String, default: 'Approved listing' },
   showLabel: { type: Boolean, default: false },
   animate: { type: Boolean, default: true },
 })

@@ -33,9 +33,9 @@ class ProductsController extends Controller
      *
      * Format examples (150-160 chars, always <= 160):
      *   "SELANK 10mg from Certified Pep — $50.00. Compare 12 vendors on
-     *    Peptidemap, verified COAs, save 10% with code PMAP. Research use only."
+     *    Peptidemap, coupon codes, save 10% with code PMAP. Research use only."
      *   "BPC-157 (10mg) from Amino Club — $39.99 (was $49.99). Compare 25
-     *    vendors, verified COAs, PMAP coupons. Research use only."
+     *    vendors, coupon codes, PMAP coupons. Research use only."
      */
     /**
      * Buying-hook-first product SEO title. Leads with "Buy" verb (SEO
@@ -50,7 +50,7 @@ class ProductsController extends Controller
     private function buildProductSeoTitle($product, $brand, string $siteName): string
     {
         $productLabel = $product->display_name ?? $product->name;
-        $vendorName = $brand?->name ?? 'verified vendors';
+        $vendorName = $brand?->name ?? 'listed vendors';
 
         // Effective price = discount when it's a real sale, else list.
         $effective = ($product->discount_price && $product->discount_price < $product->price)
@@ -69,7 +69,7 @@ class ProductsController extends Controller
 
     private function buildProductMetaDescription($product, $brand): string
     {
-        $vendorName = $brand?->name ?? 'verified vendors';
+        $vendorName = $brand?->name ?? 'listed vendors';
         $productLabel = $product->display_name ?? $product->name;
         $vs = $brand?->vendorSetting;
 
@@ -96,7 +96,7 @@ class ProductsController extends Controller
             }
         }
         if (!$compareSegment) {
-            $compareSegment = ' Compare verified peptide vendors on Peptidemap,';
+            $compareSegment = ' Compare listed peptide vendors on Peptidemap,';
         }
 
         // Coupon segment (PMAP savings)
@@ -108,7 +108,7 @@ class ProductsController extends Controller
             $pctLabel = ((float) $pct == (int) $pct) ? (int) $pct : rtrim(rtrim(number_format((float) $pct, 2), '0'), '.');
             $couponSegment = " save {$pctLabel}% with code " . strtoupper($code) . '.';
         } else {
-            $couponSegment = ' verified COAs, PMAP coupons.';
+            $couponSegment = ' coupon codes and vendor-published COA links where available.';
         }
 
         // Compose
@@ -481,7 +481,7 @@ class ProductsController extends Controller
             // busts every downstream cache (Cloudflare edge + Discord/FB/X/
             // LinkedIn OG scrapers that key on URL). Without this, a shared
             // link's preview never updates after the first scrape.
-            $ogV = $product->updated_at?->timestamp ?? 0;
+            $ogV = ($product->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = $product->seo_og_image
                 ? (str_starts_with($product->seo_og_image, 'http') ? $product->seo_og_image : url($product->seo_og_image))
                 : route('og.product', ['id' => $product->id]) . '?v=' . $ogV;
@@ -490,7 +490,7 @@ class ProductsController extends Controller
             $seoDescription = $autoSeoDescription;
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
-            $ogV = $product->updated_at?->timestamp ?? 0;
+            $ogV = ($product->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = route('og.product', ['id' => $product->id]) . '?v=' . $ogV;
         }
         
@@ -558,7 +558,7 @@ class ProductsController extends Controller
             if ($sampleReviews->isNotEmpty()) {
                 $productSchema['review'] = $sampleReviews->map(fn ($r) => [
                     '@type' => 'Review',
-                    'author' => ['@type' => 'Person', 'name' => $r->author ?: 'Verified customer'],
+                    'author' => ['@type' => 'Person', 'name' => $r->author ?: 'Anonymous'],
                     'reviewRating' => [
                         '@type' => 'Rating',
                         'ratingValue' => (int) $r->rating,
@@ -1149,7 +1149,7 @@ class ProductsController extends Controller
         $couponClause = ($vendorSetting && !empty($vendorSetting->coupon_code))
             ? "Coupon code {$vendorSetting->coupon_code}, "
             : '';
-        $defaultBrandDescription = "{$couponClause}real customer reviews, and live prices for {$brandProductCount} peptides from {$brand->name}. Compare against {$otherVendorCount} other verified vendors on Peptidemap.";
+        $defaultBrandDescription = "{$couponClause}real customer reviews, and live prices for {$brandProductCount} peptides from {$brand->name}. Compare against {$otherVendorCount} other listed vendors on Peptidemap.";
 
         if ($hasStoredSeo) {
             // Use stored SEO data from database
