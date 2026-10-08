@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Blog;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\SeoPage;
+use App\Support\ComparePriceStats;
 use App\Support\CompareSlug;
 use App\Support\ElamipretideMotsCCompareFaqs;
 use App\Support\EncyclopediaSlug;
@@ -442,39 +444,99 @@ class CompareController extends Controller
         $cheapest = $documentProducts->first()['final_price'] ?? null;
         $priciest = $documentProducts->last()['final_price'] ?? null;
 
-        // SEO — title leads with buying intent, description names the numbers.
-        $cheapestFmt = $cheapest ? '$' . number_format($cheapest, 2) : null;
-        $priciestFmt = $priciest ? '$' . number_format($priciest, 2) : null;
-        $seoTitle = "Cheapest {$seoName} — {$vendorCount} Vendors Compared";
-        $seoDescription = $vendorCount > 0
-            ? "Compare {$productCount} {$seoName} product" . ($productCount === 1 ? '' : 's')
-              . " across {$vendorCount} verified vendor" . ($vendorCount === 1 ? '' : 's')
-              . ($cheapestFmt ? ". Prices from {$cheapestFmt}" . ($priciestFmt && $priciestFmt !== $cheapestFmt ? " to {$priciestFmt}" : '') : '')
-              . ". Coupon codes and lab-testing status on every listing."
-            : "Vendor comparison for {$seoName} — currently no in-stock listings on Peptidemap.";
+        // Retatrutide opts into the price-per-mg page. Title and meta are
+        // built from the vendor count only — never from $cheapest / $priciest.
+        $priceUpgrade = is_array($research) && isset($research['h1']);
+        $priceIntro = null;
+        $priceStats = null;
+        $codeNames = null;
+        $whyPrices = null;
+        $relatedReading = null;
+        $perMgTitle = null;
+        $perMgIntro = null;
+        $viewResearch = $research;
+        $tokens = [];
+
+        if ($priceUpgrade) {
+            [$pricesUpdatedIso, $pricesUpdatedHuman] = $this->categoryPricesUpdated($category);
+            $checked = $pricesUpdatedHuman ?: 'not yet recorded';
+            $priceStats = ComparePriceStats::fromProducts($documentProducts);
+            $priceStats['prices_updated_iso'] = $pricesUpdatedIso;
+            $priceStats['prices_updated_human'] = $checked;
+            $notes = ComparePriceStats::footnotes($priceStats, $checked);
+            $priceStats['summary_footnote'] = $notes['summary'];
+            $priceStats['per_mg']['footer'] = $notes['table'];
+            $tokens = [
+                '{listing_count}' => (string) $productCount,
+                '{vendor_count}' => (string) $vendorCount,
+                '{prices_updated_human}' => $checked,
+            ];
+            $priceIntro = strtr((string) $research['price_intro'], $tokens);
+            $perMgTitle = $research['per_mg_title'] ?? null;
+            $perMgIntro = $research['per_mg_intro'] ?? null;
+            $codeNames = $this->resolveCodeNames($research['code_names'] ?? null);
+            $whyPrices = $this->presentWhyPrices($research['why_prices'] ?? null);
+            $relatedReading = $this->presentRelatedReading($research['related_reading'] ?? []);
+            foreach (['h1', 'price_intro', 'per_mg_title', 'per_mg_intro', 'code_names', 'why_prices', 'faqs', 'related_reading'] as $drop) {
+                unset($viewResearch[$drop]);
+            }
+
+            $seoTitle = "Retatrutide Price per mg: {$vendorCount} Vendors Compared";
+            $seoDescription = "Compare retatrutide listings from {$vendorCount} vendors by vial price and price per mg, incl. catalog codes like SA-3R. Not FDA-approved. RUO only; we sell nothing.";
+            $ogTitle = $seoTitle;
+            $ogDescription = "Retatrutide listings from {$vendorCount} vendors, compared by vial price and price per mg. Catalog data only: Peptidemap sells nothing and endorses no vendor.";
+            $h1 = $research['h1'];
+        } else {
+            $cheapestFmt = $cheapest ? '$' . number_format($cheapest, 2) : null;
+            $priciestFmt = $priciest ? '$' . number_format($priciest, 2) : null;
+            $seoTitle = "Cheapest {$seoName} — {$vendorCount} Vendors Compared";
+            $seoDescription = $vendorCount > 0
+                ? "Compare {$productCount} {$seoName} product" . ($productCount === 1 ? '' : 's')
+                  . " across {$vendorCount} verified vendor" . ($vendorCount === 1 ? '' : 's')
+                  . ($cheapestFmt ? ". Prices from {$cheapestFmt}" . ($priciestFmt && $priciestFmt !== $cheapestFmt ? " to {$priciestFmt}" : '') : '')
+                  . ". Coupon codes and lab-testing status on every listing."
+                : "Vendor comparison for {$seoName} — currently no in-stock listings on Peptidemap.";
+            $ogTitle = $seoTitle;
+            $ogDescription = $seoDescription;
+            $h1 = $seoName;
+        }
 
         // One source for visible FAQs and FAQPage schema. Always $seoName
         // — never the CompoundDisplay label — so on-page copy matches the
         // rich result. The alias question is added only when the label
         // differs, and it does not call that label a vendor synonym.
-        $faqPairs = ($vendorCount > 0 && $cheapest) ? [
-            [
-                'q' => "What is the cheapest {$seoName}?",
-                'a' => "The lowest {$seoName} price on Peptidemap is {$cheapestFmt} from " . ($documentProducts->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
-            ],
-            [
-                'q' => "How many vendors sell {$seoName}?",
-                'a' => "{$vendorCount} verified research-peptide vendors currently stock {$seoName} on Peptidemap, with {$productCount} distinct product listings.",
-            ],
-            [
-                'q' => "Is there a coupon code for {$seoName}?",
-                'a' => "Most vendors on Peptidemap offer a Peptidemap coupon code (usually 10–35% off). The exact code and discount for each vendor is listed in the pricing table on this page.",
-            ],
-            [
-                'q' => "How does Peptidemap compare {$seoName} prices?",
-                'a' => "Peptidemap ingests each vendor's live catalog daily, applies their current Peptidemap coupon discount, and sorts by the price you actually pay after code. All listings are for research use only (RUO).",
-            ],
-        ] : [];
+        // Retatrutide replaces the generic set with the narrative FAQs and
+        // reuses this alias string unchanged.
+        $faqPairs = [];
+        if ($priceUpgrade) {
+            if ($vendorCount > 0) {
+                foreach ($research['faqs'] as $faq) {
+                    $faqPairs[] = [
+                        'q' => strtr($faq['q'], $tokens),
+                        'a' => strtr($faq['a'], $tokens),
+                    ];
+                }
+            }
+        } elseif ($vendorCount > 0 && $cheapest) {
+            $faqPairs = [
+                [
+                    'q' => "What is the cheapest {$seoName}?",
+                    'a' => "The lowest {$seoName} price on Peptidemap is {$cheapestFmt} from " . ($documentProducts->first()['brand_name'] ?? 'a verified vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
+                ],
+                [
+                    'q' => "How many vendors sell {$seoName}?",
+                    'a' => "{$vendorCount} verified research-peptide vendors currently stock {$seoName} on Peptidemap, with {$productCount} distinct product listings.",
+                ],
+                [
+                    'q' => "Is there a coupon code for {$seoName}?",
+                    'a' => "Most vendors on Peptidemap offer a Peptidemap coupon code (usually 10–35% off). The exact code and discount for each vendor is listed in the pricing table on this page.",
+                ],
+                [
+                    'q' => "How does Peptidemap compare {$seoName} prices?",
+                    'a' => "Peptidemap ingests each vendor's live catalog daily, applies their current Peptidemap coupon discount, and sorts by the price you actually pay after code. All listings are for research use only (RUO).",
+                ],
+            ];
+        }
         if ($alias && $faqPairs) {
             $faqPairs[] = [
                 'q' => "Is {$alias} the same as {$seoName}?",
@@ -499,7 +561,7 @@ class CompareController extends Controller
                     'offers' => [
                         '@type' => 'Offer',
                         'price' => number_format($p['final_price'] ?? 0, 2, '.', ''),
-                        'priceCurrency' => 'USD',
+                        'priceCurrency' => $p['currency_code'] ?? 'USD',
                         'availability' => 'https://schema.org/InStock',
                         'url' => url("/product/{$p['brand_slug']}/{$p['slug']}/{$p['id']}"),
                         'seller' => ['@type' => 'Organization', 'name' => $p['brand_name']],
@@ -522,38 +584,35 @@ class CompareController extends Controller
             'key' => 'compare-compound',
             'title' => $seoTitle,
             'description' => $seoDescription,
-            'og_title' => $seoTitle,
-            'og_description' => $seoDescription,
+            'og_title' => $ogTitle,
+            'og_description' => $ogDescription,
             'og_image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0),
             'image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0),
             'url' => url("/compare/{$slug}"),
-            // SSR H1 matches the visible Vue H1: primary compound name only.
-            // Commercial "Cheapest …" stays in title and og_title. The GLP
-            // pseudonym stays on the alias chip — it must not appear in H1.
-            'h1' => $seoName,
+            // SSR H1 matches the visible Vue H1. Retatrutide uses the
+            // narrative H1; other compounds keep the bare category name.
+            // The GLP pseudonym stays on the alias chip.
+            'h1' => $h1,
             'schema' => array_values(array_filter([
                 $itemList,
                 $breadcrumb,
-                // Product + AggregateOffer — surfaces price range ($X-$Y)
-                // in the Google SERP snippet for high-commercial-intent
-                // queries like "cheap {compound}" / "buy {compound}".
-                // GSC data (Sep 2026) showed "cheap retatrutide" at 27% CTR
-                // — huge signal that price-forward snippets convert here.
-                $vendorCount > 0 && $cheapest ? [
-                    '@context' => 'https://schema.org',
-                    '@type' => 'Product',
-                    '@id' => url("/compare/{$slug}") . '#product',
-                    'name' => $seoName,
-                    'description' => $summary ? mb_substr(strip_tags($summary), 0, 300) : "Compare {$seoName} prices across {$vendorCount} verified research-peptide vendors.",
-                    'offers' => [
-                        '@type' => 'AggregateOffer',
-                        'priceCurrency' => 'USD',
-                        'lowPrice' => number_format((float) $cheapest, 2, '.', ''),
-                        'highPrice' => number_format((float) ($priciest ?: $cheapest), 2, '.', ''),
-                        'offerCount' => $productCount,
-                        'availability' => 'https://schema.org/InStock',
-                    ],
-                ] : null,
+                $priceUpgrade
+                    ? $this->priceUpgradeProductSchema($slug, $seoName, $priceIntro, $priceStats)
+                    : ($vendorCount > 0 && $cheapest ? [
+                        '@context' => 'https://schema.org',
+                        '@type' => 'Product',
+                        '@id' => url("/compare/{$slug}") . '#product',
+                        'name' => $seoName,
+                        'description' => $summary ? mb_substr(strip_tags($summary), 0, 300) : "Compare {$seoName} prices across {$vendorCount} verified research-peptide vendors.",
+                        'offers' => [
+                            '@type' => 'AggregateOffer',
+                            'priceCurrency' => 'USD',
+                            'lowPrice' => number_format((float) $cheapest, 2, '.', ''),
+                            'highPrice' => number_format((float) ($priciest ?: $cheapest), 2, '.', ''),
+                            'offerCount' => $productCount,
+                            'availability' => 'https://schema.org/InStock',
+                        ],
+                    ] : null),
                 // FAQPage — same question/answer strings as the visible
                 // FAQs ($faqPairs). $seoName on both sides so the rich
                 // result matches on-page copy.
@@ -598,7 +657,7 @@ class CompareController extends Controller
                 'raw_name' => $category->name,
                 'slug' => $category->slug,
                 'summary' => $summary,
-                'research' => $research,
+                'research' => $viewResearch,
                 'encyclopedia_url' => $educationPost ? EncyclopediaSlug::path($category->slug) : null,
                 'product_count' => $productCount,
                 'vendor_count' => $vendorCount,
@@ -606,6 +665,13 @@ class CompareController extends Controller
                 'priciest_price' => $priciest,
                 'products' => $products,
                 'faqs' => $faqPairs,
+                'price_intro' => $priceIntro,
+                'price_stats' => $priceStats,
+                'per_mg_title' => $perMgTitle,
+                'per_mg_intro' => $perMgIntro,
+                'code_names' => $codeNames,
+                'why_prices' => $whyPrices,
+                'related_reading' => $relatedReading,
             ],
             'related' => $related,
             'vsPairs' => collect($this->resolveFeaturedPairs())
@@ -621,6 +687,184 @@ class CompareController extends Controller
                 ->all(),
             'seo' => $seo,
         ]);
+    }
+
+    /**
+     * Product schema for the retatrutide price page. AggregateOffer uses
+     * USD single vials with a confirmed size. Rows that fail those rules
+     * stay out of lowPrice and highPrice. No offer is emitted when none qualify.
+     *
+     * @param  array<string, mixed>|null  $priceStats
+     * @return array<string, mixed>|null
+     */
+    private function priceUpgradeProductSchema(string $slug, string $seoName, ?string $priceIntro, ?array $priceStats): ?array
+    {
+        $rows = $priceStats['per_mg']['rows'] ?? [];
+        if ($rows === [] || $priceIntro === null) {
+            return null;
+        }
+
+        $listed = array_map(static fn (array $row): float => (float) $row['listed_usd'], $rows);
+
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
+            '@id' => url("/compare/{$slug}") . '#product',
+            'name' => $seoName,
+            'description' => $priceIntro,
+            'offers' => [
+                '@type' => 'AggregateOffer',
+                'priceCurrency' => (string) ($rows[0]['currency_code'] ?? 'USD'),
+                'lowPrice' => number_format(min($listed), 2, '.', ''),
+                'highPrice' => number_format(max($listed), 2, '.', ''),
+                'offerCount' => count($rows),
+                'availability' => 'https://schema.org/InStock',
+            ],
+        ];
+    }
+
+    /**
+     * @return array{0: ?string, 1: ?string}
+     */
+    private function categoryPricesUpdated(ProductCategory $category): array
+    {
+        $freshRow = Product::visible()
+            ->where('status', 'active')
+            ->where('product_category_id', $category->id)
+            ->selectRaw('MAX(last_scraped_at) as latest_scraped, MAX(updated_at) as latest_updated')
+            ->first();
+        $latestRaw = collect([$freshRow?->latest_scraped, $freshRow?->latest_updated])
+            ->filter(fn ($value) => $value !== null && $value !== '')
+            ->sort()
+            ->last();
+        $latestTs = $latestRaw ? \Carbon\Carbon::parse($latestRaw) : null;
+
+        return [$latestTs?->toIso8601String(), $latestTs?->diffForHumans()];
+    }
+
+    /**
+     * Resolve catalog-code example links by product id across categories.
+     * Blend 1065 is not in the retatrutide category, so this must not go
+     * through productsForCategory(). Missing or inactive products are dropped.
+     *
+     * @param  array<string, mixed>|null  $block
+     * @return array<string, mixed>|null
+     */
+    private function resolveCodeNames(?array $block): ?array
+    {
+        if (!$block) {
+            return null;
+        }
+
+        $ids = [];
+        foreach ($block['rows'] ?? [] as $row) {
+            $ids[] = (int) $row['product_id'];
+        }
+        if (!empty($block['blend']['product_id'])) {
+            $ids[] = (int) $block['blend']['product_id'];
+        }
+
+        $products = Product::visible()
+            ->where('status', 'active')
+            ->whereIn('id', $ids)
+            ->with('brand')
+            ->get()
+            ->keyBy('id');
+
+        $rows = [];
+        foreach ($block['rows'] ?? [] as $row) {
+            $product = $products->get((int) $row['product_id']);
+            if (!$product || !$product->brand) {
+                continue;
+            }
+            $rows[] = [
+                'label' => $row['label'],
+                'listed_by' => $row['listed_by'],
+                'link_label' => $row['link_label'],
+                'url' => '/product/'.$product->brand->slug.'/'.$product->slug.'/'.$product->id,
+            ];
+        }
+
+        $blend = null;
+        if (!empty($block['blend']['product_id'])) {
+            $product = $products->get((int) $block['blend']['product_id']);
+            if ($product && $product->brand) {
+                $blend = [
+                    'lead' => $block['blend']['lead'],
+                    'link_label' => $block['blend']['link_label'],
+                    'url' => '/product/'.$product->brand->slug.'/'.$product->slug.'/'.$product->id,
+                    'after' => $block['blend']['after'],
+                ];
+            }
+        }
+
+        return [
+            'title' => $block['title'],
+            'intro' => $block['intro'],
+            'rows' => $rows,
+            'blend' => $blend,
+            'outro' => $block['outro'],
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $why
+     * @return array<string, mixed>|null
+     */
+    private function presentWhyPrices(?array $why): ?array
+    {
+        if (!$why) {
+            return null;
+        }
+
+        $bullets = [];
+        foreach ($why['bullets'] as $bullet) {
+            $slug = $bullet['requires_published_slug'] ?? null;
+            $live = $slug && $this->publishedBlogExists($slug);
+            $parts = ($live && isset($bullet['parts_when_testing_post_live']))
+                ? $bullet['parts_when_testing_post_live']
+                : $bullet['parts'];
+            $bullets[] = [
+                'title' => $bullet['title'],
+                'parts' => $parts,
+            ];
+        }
+
+        return [
+            'title' => $why['title'],
+            'intro' => $why['intro'],
+            'bullets' => $bullets,
+            'closing' => $why['closing'],
+        ];
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $links
+     * @return list<array{label: string, href: string}>
+     */
+    private function presentRelatedReading(array $links): array
+    {
+        $out = [];
+        foreach ($links as $link) {
+            $slug = $link['requires_published_slug'] ?? null;
+            if ($slug && !$this->publishedBlogExists($slug)) {
+                continue;
+            }
+            $out[] = [
+                'label' => $link['label'],
+                'href' => $link['href'],
+            ];
+        }
+
+        return $out;
+    }
+
+    private function publishedBlogExists(string $slug): bool
+    {
+        return Blog::query()
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->exists();
     }
 
     /**
