@@ -28,8 +28,16 @@ class ScraperDefaultLabClaims
      *
      * Kept (not this bug):
      * - auto_scraped is false. Vendor API pushes, admin creates, XML/feed
-     *   imports, and the demo seeder never set auto_scraped, so a purity
+     *   imports, and the demo seeder leave auto_scraped false, so a purity
      *   on those rows was supplied by that other path.
+     *   IngestionService::promote also sets auto_scraped true on an existing
+     *   product when auto_update is on, or when the staged row is
+     *   manual_override. That update refreshes price, image, and description
+     *   and leaves purity and lab_tested alone. A later ingest that flips
+     *   auto_scraped true on a row that already has the 99.00 / lab_tested
+     *   pair still matches here and is cleared. A row whose purity is
+     *   anything else, or whose lab_tested flag is already false, stays.
+     *   Clearing the invented pair is the safe direction.
      * - purity is anything other than 99.00, including null. Only the
      *   discovery job hardcoded 99.0. A different number was typed later.
      * - lab_tested is false. The discovery job always wrote the pair. If
@@ -47,6 +55,38 @@ class ScraperDefaultLabClaims
      */
     public static function matchingQuery(): Builder
     {
+        return self::pairQuery()
+            ->where(function ($query) {
+                $query->where('manual_override', false)->orWhereNull('manual_override');
+            })
+            ->where(function ($query) {
+                $query->where('verified', false)->orWhereNull('verified');
+            })
+            ->where(function ($query) {
+                $query->where('is_demo', false)->orWhereNull('is_demo');
+            });
+    }
+
+    /**
+     * Rows that still have the scraper pair but are left alone because
+     * verified or manual_override is set. Null on either flag counts as
+     * unset and is not included here.
+     */
+    public static function skippedCount(): int
+    {
+        return self::pairQuery()
+            ->where(function ($query) {
+                $query->where('verified', true)
+                    ->orWhere('manual_override', true);
+            })
+            ->count();
+    }
+
+    /**
+     * auto_scraped rows that still carry purity 99.00 and lab_tested.
+     */
+    private static function pairQuery(): Builder
+    {
         return DB::table('products')
             ->where('auto_scraped', true)
             ->where('lab_tested', true)
@@ -58,15 +98,6 @@ class ScraperDefaultLabClaims
                 $query->where('purity', (int) self::DEFAULT_PURITY)
                     ->orWhere('purity', number_format(self::DEFAULT_PURITY, 2, '.', ''))
                     ->orWhere('purity', number_format(self::DEFAULT_PURITY, 1, '.', ''));
-            })
-            ->where(function ($query) {
-                $query->where('manual_override', false)->orWhereNull('manual_override');
-            })
-            ->where(function ($query) {
-                $query->where('verified', false)->orWhereNull('verified');
-            })
-            ->where(function ($query) {
-                $query->where('is_demo', false)->orWhereNull('is_demo');
             });
     }
 
