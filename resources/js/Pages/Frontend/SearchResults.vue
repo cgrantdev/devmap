@@ -166,8 +166,12 @@
                         <span v-if="vendor.reviews_count > 0" class="px-2 py-0.5 bg-slate-700 text-white text-xs rounded">
                           Has reviews
                         </span>
-                        <span v-if="vendor.featured" class="px-2 py-0.5 bg-slate-700 text-white text-xs rounded">
-                          Featured
+                        <span
+                          v-if="vendor.featured"
+                          class="px-2 py-0.5 bg-amber-50 text-amber-900 border border-amber-400 text-xs rounded"
+                          title="Paid placement — not a quality rating"
+                        >
+                          Sponsored
                         </span>
                       </div>
                       <div class="flex items-center gap-4 text-sm text-slate-600 mb-3">

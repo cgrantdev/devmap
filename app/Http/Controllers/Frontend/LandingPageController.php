@@ -141,7 +141,7 @@ class LandingPageController extends Controller
 
         $seo = [
             'title' => 'Third-Party Testing Labs — Which Peptide Vendors Use Which Lab',
-            'description' => 'Independently-tested peptide vendors grouped by which third-party analytical lab (Janoshik, Certara, KryoLabs) verifies their COAs. Verify before you buy.',
+            'description' => 'Listed vendors grouped by the third-party lab named on their storefront (Janoshik, Certara, KryoLabs). Peptidemap does not test products.',
             'canonical' => url('/testing-labs'),
         ];
         session(['page_seo_data' => $seo]);

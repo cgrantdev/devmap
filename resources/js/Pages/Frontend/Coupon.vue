@@ -27,7 +27,7 @@
           <img :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain" />
         </div>
         <div class="min-w-0">
-          <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-emerald-700 mb-1">Exclusive Peptidemap code</div>
+          <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-emerald-700 mb-1">Peptidemap code</div>
           <h1 class="ui-display text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] leading-[1.1]">
             {{ brand.name }} Coupon Code
           </h1>
@@ -99,7 +99,7 @@
         <div>
           <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-2">Is the {{ brand.name }} coupon code {{ coupon.code }} legit?</h2>
           <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
-            Yes — {{ coupon.code }} is the verified Peptidemap code for {{ brand.name }}. We're a partner, and every code on Peptidemap is tested by the vendor before it goes live.
+            {{ coupon.code }} is the code {{ brand.name }} supplied to Peptidemap. Peptidemap does not test codes — confirm the discount at checkout.
             <span v-if="coupon.percent_off">It gives you {{ coupon.percent_off }}% off at checkout.</span>
           </p>
         </div>

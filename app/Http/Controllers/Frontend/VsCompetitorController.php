@@ -83,7 +83,7 @@ class VsCompetitorController extends Controller
                 'Only 5 vendors tracked (we track 33+)',
                 'Fewer total indexed pages (974 vs 3,387)',
                 'No coupon-code integration',
-                'No verified customer reviews on brand pages',
+                'No customer reviews on brand pages',
             ],
         ],
     ];

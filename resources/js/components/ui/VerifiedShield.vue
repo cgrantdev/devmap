@@ -1,33 +1,15 @@
 <template>
-  <span :class="['inline-flex items-center justify-center', sizeClasses]" :title="label">
-    <span :class="['relative inline-flex', { 'ui-breathe': animate }]">
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        class="w-full h-full"
-        aria-hidden="true"
-      >
-        <defs>
-          <linearGradient :id="gradId" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="var(--color-accent-500)" />
-            <stop offset="100%" stop-color="var(--color-biotech-500)" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M12 2L4 5v6c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V5l-8-3z"
-          :fill="`url(#${gradId})`"
-        />
-        <path
-          d="M9.5 12.5l2 2 4-4.5"
-          stroke="white"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          fill="none"
-        />
-      </svg>
-    </span>
-    <span v-if="showLabel" class="ml-1.5 text-xs font-medium text-[color:var(--color-verified)]">
+  <span :class="['inline-flex items-center justify-center text-[color:var(--color-ink-muted)]', sizeClasses]" :title="label">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      class="w-full h-full"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.75" />
+      <circle cx="12" cy="12" r="2.25" fill="currentColor" />
+    </svg>
+    <span v-if="showLabel" class="ml-1.5 text-xs font-medium text-[color:var(--color-ink-muted)]">
       {{ label }}
     </span>
   </span>
@@ -41,13 +23,10 @@ const props = defineProps({
     type: String,
     default: 'md', // 'xs' | 'sm' | 'md' | 'lg'
   },
-  label: { type: String, default: 'Approved listing' },
+  label: { type: String, default: 'Listed on Peptidemap' },
   showLabel: { type: Boolean, default: false },
-  animate: { type: Boolean, default: true },
+  animate: { type: Boolean, default: false },
 })
-
-// Unique gradient id so multiple instances on one page don't collide
-const gradId = `ui-shield-grad-${Math.random().toString(36).slice(2, 9)}`
 
 const sizeClasses = computed(() => ({
   xs: 'w-3.5 h-3.5',

@@ -29,7 +29,7 @@
           </svg>
           <div>
             <p class="text-sm text-slate-700">
-              Codes are supplied by vendors; prices refresh from vendor sites — confirm at checkout.
+              Codes are supplied by vendors; prices refresh from vendor sites — confirm at checkout. Use code PMAP at checkout.
             </p>
           </div>
         </div>

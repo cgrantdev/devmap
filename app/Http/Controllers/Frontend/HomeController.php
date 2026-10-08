@@ -333,6 +333,7 @@ class HomeController extends Controller
             // Backward-compatible field used by some pages
             'image' => $seoPage?->og_image ?: $defaultImage,
             'url' => url('/'),
+            'robots' => 'noindex, follow',
         ];
 
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
@@ -868,11 +869,11 @@ class HomeController extends Controller
         $seo = [
             'key'            => 'home',
             'title'          => 'Peptidemap — Compare research-peptide vendors, prices and coupons',
-            'description'    => 'Compare 40+ research-peptide vendors, vendor-published COAs and coupons',
+            'description'    => "Live prices and coupon codes. Check each vendor's site for COAs.",
             'url'            => 'https://peptidemap.com/',
             'og_title'       => 'Compare every peptide vendor — Peptidemap',
-            'og_description' => 'Compare 40+ research-peptide vendors, vendor-published COAs and coupons',
-            'og_image'       => 'https://peptidemap.com/images/og-default-v7.png',
+            'og_description' => "Live prices and coupon codes. Check each vendor's site for COAs.",
+            'og_image'       => 'https://peptidemap.com/images/og-default-v8.png',
         ];
         session(['page_seo_data' => $seo]);
 

@@ -108,7 +108,8 @@ class ProductsController extends Controller
             $pctLabel = ((float) $pct == (int) $pct) ? (int) $pct : rtrim(rtrim(number_format((float) $pct, 2), '0'), '.');
             $couponSegment = " save {$pctLabel}% with code " . strtoupper($code) . '.';
         } else {
-            $couponSegment = ' coupon codes and vendor-published COA links where available.';
+            $compareSegment = rtrim($compareSegment, ',') . '.';
+            $couponSegment = " Live prices and coupon codes. Check each vendor's site for COAs.";
         }
 
         // Compose
@@ -542,38 +543,6 @@ class ProductsController extends Controller
                 'ratingValue' => round($combinedVendorAvg, 1),
                 'reviewCount' => $combinedVendorCount,
             ];
-        }
-
-        // Sample Review nodes — up to 5 recent imported reviews for this
-        // vendor. Attaching vendor-level Review objects to the Product is a
-        // schema stretch but honest (buyer's trust is with the vendor).
-        // Trustpilot + Reviews.io both allow re-display with attribution.
-        if ($brand) {
-            $sampleReviews = \App\Models\ExternalReview::where('brand_id', $brand->id)
-                ->whereNotNull('rating')
-                ->whereNotNull('body')
-                ->orderByDesc('published_at')
-                ->limit(5)
-                ->get(['author', 'rating', 'body', 'published_at', 'source', 'source_url']);
-            if ($sampleReviews->isNotEmpty()) {
-                $productSchema['review'] = $sampleReviews->map(fn ($r) => [
-                    '@type' => 'Review',
-                    'author' => ['@type' => 'Person', 'name' => $r->author ?: 'Anonymous'],
-                    'reviewRating' => [
-                        '@type' => 'Rating',
-                        'ratingValue' => (int) $r->rating,
-                        'bestRating' => 5,
-                    ],
-                    'reviewBody' => \Illuminate\Support\Str::limit((string) $r->body, 500),
-                    'datePublished' => optional($r->published_at)->toIso8601String(),
-                    'publisher' => ['@type' => 'Organization', 'name' => match ($r->source) {
-                        'trustpilot' => 'Trustpilot',
-                        'reviews_io' => 'Reviews.io',
-                        'google' => 'Google Reviews',
-                        default => 'Third-party review platform',
-                    }],
-                ])->values()->all();
-            }
         }
 
         $breadcrumbSchema = [

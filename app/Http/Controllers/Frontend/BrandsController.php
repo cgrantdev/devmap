@@ -195,7 +195,7 @@ class BrandsController extends Controller
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "brands")
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
         $defaultTitle = 'Top Rated Peptide Vendors & Brands';
-        $defaultDescription = 'Browse and compare top-rated peptide vendors and brands. Read reviews, compare prices, and find trusted suppliers for your research needs.';
+        $defaultDescription = 'Browse and compare top-rated peptide vendors and brands. Read reviews, compare prices, and compare vendors for your research needs.';
 
         $seoPage = SeoPage::where('key', 'brands')->first();
         $seo = [

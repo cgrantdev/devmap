@@ -144,7 +144,7 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
       <div class="mb-6 sm:mb-8">
         <h2 class="text-2xl sm:text-3xl text-gray-900 mb-1">Top Rated Vendors</h2>
-        <p class="text-sm sm:text-base text-gray-600">Browse the most trusted peptide suppliers.</p>
+        <p class="text-sm sm:text-base text-gray-600">Browse top-rated vendors.</p>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         <TopRatedVendorCard
@@ -434,7 +434,7 @@ const props = defineProps({
   seo: {
     type: Object,
     default: () => ({
-      title: 'Peptidemap - Your Trusted Source for Peptides',
+      title: 'Compare research-peptide vendors',
       description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with exclusive coupon codes.',
       og_title: null,
       og_description: null,
@@ -489,8 +489,8 @@ const processSlides = (slides) => {
   // Headings for each slide in order
   const headings = [
     'PREMIUM RESEARCH PEPTIDES',
-    'Lab-Tested Excellence',
-    'Trusted Since 2018'
+    'Compare live prices',
+    'Coupon codes included'
   ]
 
   return slides.map((slide, index) => ({

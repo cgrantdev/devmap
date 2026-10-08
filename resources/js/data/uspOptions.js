@@ -3,8 +3,8 @@
 // page) can import the same list without triggering Vue's "script setup
 // can't export" rule.
 export const USP_OPTIONS = [
-  { key: 'lab_tested',        icon: '🧪', label: '3rd-party lab tested' },
-  { key: 'coa_per_batch',     icon: '📋', label: 'Full COA per batch' },
+  { key: 'lab_tested',        icon: '🧪', label: '3rd-party lab tested (vendor-stated)' },
+  { key: 'coa_per_batch',     icon: '📋', label: 'Full COA per batch (vendor-stated)' },
   { key: 'high_purity',       icon: '🎯', label: '99%+ purity (vendor-stated)' },
   { key: 'cgmp',              icon: '🏭', label: 'cGMP facility' },
   { key: 'same_day_shipping', icon: '⚡', label: 'Same-day shipping' },

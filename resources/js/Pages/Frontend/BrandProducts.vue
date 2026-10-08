@@ -615,10 +615,10 @@
                         @update:model-value="brand.shipping_info = $event"
                       >
                         <template #default="{ value }">
-                          <p class="text-sm text-gray-600 break-words">{{ value || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
+                          <p class="text-sm text-gray-600 break-words">{{ value || `Not specified — check ${brand.name}'s site` }}</p>
                         </template>
                       </InlineEditField>
-                      <p v-else class="text-sm text-gray-600 break-words">{{ props.brand.shipping_info || 'Free shipping on orders over $150. Same-day processing for orders before 2PM EST.' }}</p>
+                      <p v-else class="text-sm text-gray-600 break-words">{{ props.brand.shipping_info || `Not specified — check ${props.brand.name}'s site` }}</p>
                     </div>
                   </div>
                   <div>
@@ -643,10 +643,10 @@
                         @update:model-value="brand.return_policy = $event"
                       >
                         <template #default="{ value }">
-                          <p class="text-sm text-gray-600 break-words">{{ value || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
+                          <p class="text-sm text-gray-600 break-words">{{ value || `Not specified — check ${brand.name}'s site` }}</p>
                         </template>
                       </InlineEditField>
-                      <p v-else class="text-sm text-gray-600 break-words">{{ props.brand.return_policy || '30-day satisfaction guarantee. Unopened products eligible for return.' }}</p>
+                      <p v-else class="text-sm text-gray-600 break-words">{{ props.brand.return_policy || `Not specified — check ${props.brand.name}'s site` }}</p>
                     </div>
                   </div>
                   <div>
@@ -1267,9 +1267,6 @@ const hoursHuman = computed(() => humanizeHours(props.brand?.business_hours_json
 const openPill = computed(() => openStatus(props.brand?.business_hours_json))
 const hoursTz = computed(() => hoursDays.value[0]?.tz || '')
 
-// Group individual imported reviews by source so each block gets its own
-// "More reviews from X" header + correct attribution + correct 'View all
-// on X' link. externalReviews is a flat mixed array from the controller.
 const EXTERNAL_SOURCE_META = {
   trustpilot:   { label: 'Trustpilot',    urlKey: 'trustpilot_url' },
   reviews_io:   { label: 'Reviews.io',    urlKey: 'reviews_io_url' },
@@ -1388,48 +1385,6 @@ const paymentMethods = computed(() => {
   return props.brand?.payment_methods || []
 })
 
-// Tenure label from founded_year. Returns null when we don't know or when
-// the vendor was founded this year — previously fell back to "1+" or "13+"
-// which read as an unearned credibility claim (flagged by IDUN in Aug 2026).
-const tenureLabel = computed(() => {
-  const foundedYear = parseInt(props.brand?.founded_year)
-  if (isNaN(foundedYear) || foundedYear <= 0) return null
-  const years = new Date().getFullYear() - foundedYear
-  if (years < 0) return null
-  if (years === 0) return `Founded ${foundedYear}`
-  if (years === 1) return '1 year in business'
-  return `${years}+ years in business`
-})
-
-// Why Choose Benefits — vendor-specific bullets when they've set them,
-// generic defaults otherwise. Tenure line auto-appends when we can prove it.
-const whyChooseBenefits = computed(() => {
-  const custom = Array.isArray(props.brand?.why_choose_bullets)
-    ? props.brand.why_choose_bullets.filter(x => typeof x === 'string' && x.trim())
-    : []
-  const base = custom.length ? custom.slice() : [
-    'Third-party lab tested products',
-    'Fast & reliable shipping',
-    'Responsive customer service',
-    'Customer reviews from other platforms',
-  ]
-  if (tenureLabel.value) base.push(tenureLabel.value)
-  return base
-})
-
-// Owners edit the list as one-per-line text. Empty lines are dropped
-// on save. serialize prop on InlineEditField converts back to array.
-const whyChooseEditableText = computed(() => {
-  const arr = Array.isArray(props.brand?.why_choose_bullets)
-    ? props.brand.why_choose_bullets.filter(x => typeof x === 'string' && x.trim())
-    : []
-  return arr.join('\n')
-})
-const linesToArray = (text) => (text || '')
-  .split(/\r?\n/)
-  .map(s => s.trim())
-  .filter(Boolean)
-
 // Formatted overall rating
 const formattedOverallRating = computed(() => {
   if (!props.reviews || props.reviews.length === 0) {
@@ -1509,7 +1464,6 @@ const expandedFilters = ref({
   type: false,
   cost: false,
   location: props.filters?.location ? true : false,
-  verification: false,
 })
 
 // Selected filters (no brand filter since we're already filtering by brand)
@@ -1517,7 +1471,6 @@ const selectedFilters = ref({
   use: props.filters?.use ? parseInt(props.filters.use) : null,
   type: props.filters?.type ? parseInt(props.filters.type) : null,
   location: props.filters?.location ? parseInt(props.filters.location) : null,
-  verification: props.filters?.verification || '',
   cost_min: props.filters?.cost_min || '',
   cost_max: props.filters?.cost_max || '',
 })
@@ -1528,7 +1481,6 @@ const quickFilters = [
   { key: 'type', label: 'Type' },
   { key: 'cost', label: 'Cost' },
   { key: 'location', label: 'Location' },
-  { key: 'verification', label: 'Verification' },
 ]
 
 // Active filters for quick filter buttons
@@ -1538,7 +1490,6 @@ const activeFilters = computed(() => {
     type: selectedFilters.value.type !== null,
     cost: selectedFilters.value.cost_min || selectedFilters.value.cost_max,
     location: selectedFilters.value.location !== null,
-    verification: selectedFilters.value.verification !== '',
   }
 })
 
@@ -1546,14 +1497,13 @@ const getFilterCount = (key) => {
   if (key === 'use') return selectedFilters.value.use !== null ? 1 : 0
   if (key === 'type') return selectedFilters.value.type !== null ? 1 : 0
   if (key === 'location') return selectedFilters.value.location !== null ? 1 : 0
-  if (key === 'verification') return selectedFilters.value.verification !== '' ? 1 : 0
   if (key === 'cost') return (selectedFilters.value.cost_min || selectedFilters.value.cost_max) ? 1 : 0
   return 0
 }
 
 const toggleQuickFilter = (key) => {
   showSidebar.value = true
-  if (key === 'use' || key === 'type' || key === 'location' || key === 'verification' || key === 'cost') {
+  if (key === 'use' || key === 'type' || key === 'location' || key === 'cost') {
     expandedFilters.value[key] = true
   }
 }
@@ -1574,9 +1524,6 @@ const applyFilters = () => {
   }
   if (selectedFilters.value.location !== null) {
     params.set('location', selectedFilters.value.location)
-  }
-  if (selectedFilters.value.verification) {
-    params.set('verification', selectedFilters.value.verification)
   }
   if (selectedFilters.value.cost_min) {
     params.set('cost_min', selectedFilters.value.cost_min)
@@ -1605,7 +1552,6 @@ const clearFilters = () => {
     use: null,
     type: null,
     location: null,
-    verification: '',
     cost_min: '',
     cost_max: '',
   }
@@ -1631,9 +1577,6 @@ const applySort = (sort, dir) => {
   }
   if (selectedFilters.value.location !== null) {
     params.set('location', selectedFilters.value.location)
-  }
-  if (selectedFilters.value.verification) {
-    params.set('verification', selectedFilters.value.verification)
   }
   if (selectedFilters.value.cost_min) {
     params.set('cost_min', selectedFilters.value.cost_min)
@@ -1686,9 +1629,6 @@ const applySearch = () => {
   }
   if (selectedFilters.value.location !== null) {
     params.set('location', selectedFilters.value.location)
-  }
-  if (selectedFilters.value.verification) {
-    params.set('verification', selectedFilters.value.verification)
   }
   if (selectedFilters.value.cost_min) {
     params.set('cost_min', selectedFilters.value.cost_min)

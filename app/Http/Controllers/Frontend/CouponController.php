@@ -65,9 +65,9 @@ class CouponController extends Controller
             ? "{$brand->name} Coupon Code {$couponCode} — {$percentOff}% Off"
             : "{$brand->name} Coupon Code {$couponCode}";
         $seoDescription = $percentOff
-            ? "Exclusive Peptidemap code {$couponCode}. Save {$percentOff}% at {$brand->name}. "
+            ? "Peptidemap code {$couponCode}. Save {$percentOff}% at {$brand->name}. "
               . "Code supplied by {$brand->name}. Applies across {$productCount} products."
-            : "Exclusive Peptidemap code {$couponCode}. "
+            : "Peptidemap code {$couponCode}. "
               . "Code supplied by {$brand->name}. Applies across {$productCount} products.";
 
         // Schema.org DiscountOffer + Organization — signals to Google

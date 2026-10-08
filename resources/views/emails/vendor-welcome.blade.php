@@ -44,7 +44,7 @@
                             <h2 style="margin:32px 0 12px;font-size:16px;font-weight:600;color:#0A0B0E;">What happens next?</h2>
                             <ol style="margin:0 0 24px;padding-left:20px;font-size:15px;line-height:1.7;color:#52525B;">
                                 <li style="margin-bottom:8px;"><strong>Review</strong> — our team reviews your application and tests your REST API connection</li>
-                                <li style="margin-bottom:8px;"><strong>Approval</strong> — once your store is verified, we'll activate your account and email you with your dashboard access</li>
+                                <li style="margin-bottom:8px;"><strong>Approval</strong> — once your store is approved, we'll activate your account and email you with your dashboard access</li>
                                 <li style="margin-bottom:8px;"><strong>Go live</strong> — your products are imported and you're listed on Peptidemap</li>
                             </ol>
 

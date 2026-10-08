@@ -148,7 +148,7 @@ class EducationalContentPublisher
             'seo_og_description' => $page['og_description'],
             'seo_og_image' => $coverPath
                 ? self::CANONICAL_HOST.$coverPath
-                : self::CANONICAL_HOST.'/images/og-default-v7.png',
+                : self::CANONICAL_HOST.'/images/og-default-v8.png',
             'seo_schema' => [$page['faq']],
         ];
 
@@ -206,7 +206,7 @@ class EducationalContentPublisher
             return self::CANONICAL_HOST.$image;
         }
 
-        return self::CANONICAL_HOST.'/images/og-default-v7.png';
+        return self::CANONICAL_HOST.'/images/og-default-v8.png';
     }
 
     private static function faq(string $id, array $pairs): array

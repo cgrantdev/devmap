@@ -8,7 +8,7 @@
           <div class="flex-1 text-center lg:text-left">
             <h2 class="text-3xl mb-3">Are you a peptide vendor?</h2>
             <p class="text-blue-100 text-lg">
-              Join hundreds of brands reaching thousands of customers. Get verified, listed, and start growing your business today.
+              Join hundreds of brands reaching thousands of customers. Get listed, and start growing your business today.
             </p>
           </div>
           <!-- Right Buttons -->
