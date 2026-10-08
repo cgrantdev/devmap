@@ -84,7 +84,7 @@
                 : 'bg-emerald-50/60 text-emerald-800 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50',
             ]"
           >
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            <svg v-if="f.value !== 'cgmp'" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             {{ f.label }}
           </button>
           <button

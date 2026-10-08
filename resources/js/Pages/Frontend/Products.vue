@@ -58,7 +58,6 @@
             href="/vendors?verified=cgmp"
             class="ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm bg-emerald-50/60 text-emerald-800 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50"
           >
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             cGMP (vendor-reported)
           </Link>
           <Link

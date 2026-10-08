@@ -80,7 +80,7 @@
                   v-for="b in brand.verified_badges"
                   :key="b.type"
                   class="inline-flex items-center gap-1 text-[10px] lg:text-[11px] font-semibold uppercase tracking-wide text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full"
-                  :title="b.type === 'cgmp' ? 'cGMP (vendor-reported)' : `Peptidemap-verified: ${b.label}`"
+                  :title="b.type === 'cgmp' ? 'cGMP (vendor-reported)' : `${b.label} (vendor-submitted)`"
                 >
                   <svg class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
                   {{ b.label }}
