@@ -15,14 +15,30 @@ class SeoP0Test extends TestCase
 
     public function test_compare_sitemap_locs_are_route_safe(): void
     {
-        ProductCategory::create(['name' => 'BPC-157', 'slug' => 'BPC-157', 'is_active' => true]);
-        ProductCategory::create(['name' => 'Vitamin B12', 'slug' => 'Vitamin B12', 'is_active' => true]);
-        ProductCategory::create([
+        $bpc = ProductCategory::create(['name' => 'BPC-157', 'slug' => 'BPC-157', 'is_active' => true]);
+        $b12 = ProductCategory::create(['name' => 'Vitamin B12', 'slug' => 'Vitamin B12', 'is_active' => true]);
+        $blend = ProductCategory::create([
             'name' => 'BPC blend',
             'slug' => 'BPC-157 / TB500 / Cartalax',
             'is_active' => true,
         ]);
-        ProductCategory::create(['name' => 'Retatrutide', 'slug' => 'retatrutide', 'is_active' => true]);
+        $reta = ProductCategory::create(['name' => 'Retatrutide', 'slug' => 'retatrutide', 'is_active' => true]);
+        $brand = Brand::create([
+            'name' => 'Example Research',
+            'slug' => 'example-research',
+            'is_active' => true,
+        ]);
+        foreach ([$bpc, $b12, $blend, $reta] as $category) {
+            Product::create([
+                'name' => $category->name.' listing',
+                'slug' => 'listing-'.$category->id,
+                'brand_id' => $brand->id,
+                'product_category_id' => $category->id,
+                'price' => 25,
+                'status' => 'active',
+                'hidden' => false,
+            ]);
+        }
 
         $xml = $this->get('/sitemap.xml')->assertOk()->getContent();
 

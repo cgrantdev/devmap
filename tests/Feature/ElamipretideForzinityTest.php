@@ -199,8 +199,9 @@ class ElamipretideForzinityTest extends TestCase
         $missing->run();
         $this->assertTrue($missing->report['missing_category']);
         $this->assertFalse($missing->report['updated']);
-        $this->assertSame(0, ProductCategory::query()->count());
-        $this->assertSame(0, EducationPost::query()->count());
+        // The pemvidutide migration seeds one category and post into every test database.
+        $this->assertSame(0, ProductCategory::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
+        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
 
         $category = ProductCategory::create([
             'name' => 'Elamipretide',
@@ -211,7 +212,7 @@ class ElamipretideForzinityTest extends TestCase
         $noPost->run();
         $this->assertTrue($noPost->report['missing_post']);
         $this->assertFalse($noPost->report['updated']);
-        $this->assertSame(0, EducationPost::query()->count());
+        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
 
         ProductCategory::create([
             'name' => 'Elamipretide duplicate',
@@ -230,7 +231,7 @@ class ElamipretideForzinityTest extends TestCase
         $collision->run();
         $this->assertTrue($collision->report['skipped_slug_collision']);
         $this->assertFalse($collision->report['updated']);
-        $this->assertSame(2, ProductCategory::query()->count());
+        $this->assertSame(2, ProductCategory::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
         $this->assertSame($note, EducationPost::query()->where('slug', 'elamipretide')->firstOrFail()->regulatory_important_note);
     }
 

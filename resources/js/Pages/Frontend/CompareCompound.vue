@@ -30,7 +30,7 @@
         <!-- H2 explicitly targets "buy {compound}" + "{compound} price"
              query patterns identified in GSC (Sep 16). Google reads this
              as the page's secondary topic. -->
-        <h2 class="sr-only">Buy {{ compound.name }} — Compare {{ compound.vendor_count }} vendor prices</h2>
+        <h2 v-if="compound.vendor_count > 0" class="sr-only">Buy {{ compound.name }} — Compare {{ compound.vendor_count }} vendor prices</h2>
 
         <div v-if="compound.vendor_count > 0" class="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[color:var(--color-ink-muted)] mb-4">
           <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.vendor_count }}</strong> vendor{{ compound.vendor_count === 1 ? '' : 's' }}</span>
@@ -209,8 +209,8 @@
       </div>
 
       <div v-else class="bg-white rounded-[14px] border border-dashed border-[color:var(--color-hairline)] p-12 text-center text-[color:var(--color-ink-subtle)]">
-        <p class="text-lg font-medium text-[color:var(--color-ink)] mb-2">No in-stock listings right now</p>
-        <p class="text-sm mb-6">None of the {{ 40 }}+ vendors on Peptidemap currently stock {{ compound.name }} with a live price.</p>
+        <p class="text-lg font-medium text-[color:var(--color-ink)] mb-2">No priced listings to compare</p>
+        <p class="text-sm mb-6">Peptidemap has no vendor listing with a live price for {{ compound.name }}.</p>
         <a href="/compare" class="ui-focus inline-flex items-center gap-1 h-10 px-4 rounded-md bg-[color:var(--color-ink)] text-white text-[13px] font-semibold hover:opacity-90 transition-opacity">
           Browse other compounds
         </a>

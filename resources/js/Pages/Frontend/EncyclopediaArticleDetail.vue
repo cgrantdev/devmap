@@ -114,6 +114,16 @@
               <div class="ui-mono text-sm font-semibold text-[color:var(--color-ink)]">{{ aminoAcidSequence.residueCount }}</div>
             </div>
           </div>
+          <div v-if="drugStatus || halfLife" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+            <div v-if="drugStatus">
+              <div class="text-[10px] uppercase tracking-[0.1em] text-[color:var(--color-ink-subtle)] font-semibold mb-1">Status</div>
+              <div class="text-sm text-[color:var(--color-ink)] leading-relaxed">{{ drugStatus }}</div>
+            </div>
+            <div v-if="halfLife">
+              <div class="text-[10px] uppercase tracking-[0.1em] text-[color:var(--color-ink-subtle)] font-semibold mb-1">Half-life</div>
+              <div class="text-sm text-[color:var(--color-ink)] leading-relaxed">{{ halfLife }}</div>
+            </div>
+          </div>
 
         </div>
       </div>

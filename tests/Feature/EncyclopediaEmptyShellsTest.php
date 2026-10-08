@@ -6,6 +6,7 @@ use App\Models\EducationPost;
 use App\Models\ProductCategory;
 use App\Support\EncyclopediaShellParser;
 use App\Support\RetatrutideCompareNarrative;
+use Database\Seeders\EncyclopediaCategoryCreateSeeder;
 use Database\Seeders\EncyclopediaEmptyShellsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -22,10 +23,10 @@ class EncyclopediaEmptyShellsTest extends TestCase
 
     public function test_seeder_fills_empty_shells_once_and_leaves_retatrutide_encyclopedia_alone(): void
     {
-        $this->assertSame(
-            EncyclopediaEmptyShellsSeeder::SLUGS,
+        $this->assertEqualsCanonicalizing(
+            array_merge(EncyclopediaEmptyShellsSeeder::SLUGS, EncyclopediaCategoryCreateSeeder::SLUGS),
             $this->draftDirectories(),
-            'Draft folders must match the 22 queue slugs.'
+            'Draft folders must be the 22 empty-shell slugs plus create-seeder slugs.'
         );
 
         foreach (EncyclopediaEmptyShellsSeeder::SLUGS as $slug) {
@@ -409,9 +410,7 @@ class EncyclopediaEmptyShellsTest extends TestCase
             return $name !== '.' && $name !== '..' && is_dir($root.'/'.$name);
         }));
         sort($dirs);
-        $expected = EncyclopediaEmptyShellsSeeder::SLUGS;
-        sort($expected);
 
-        return $expected === $dirs ? EncyclopediaEmptyShellsSeeder::SLUGS : $dirs;
+        return $dirs;
     }
 }

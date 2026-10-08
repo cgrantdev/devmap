@@ -108,11 +108,57 @@ class EncyclopediaController extends Controller
                 'routes' => ['Topical', 'Subcutaneous'],
                 'halfLife' => '',
             ],
+            // Plain drugStatus / halfLife text from
+            // database/seeders/data/encyclopedia-shells/pemvidutide/body.md.
+            // That draft does not state a route, so routes stays empty.
+            'Pemvidutide' => [
+                'status' => 'Investigational. Not approved by the FDA or by any other regulator found in the sources checked. FDA Fast Track (MASH; AUD) and Breakthrough Therapy (MASH) designations have been announced by the sponsor. Phase 3 (PERFORMA) is enrolling.',
+                'routes' => [],
+                'halfLife' => 'No numeric half-life is reported in the primary sources cited on this page. The sponsor attributes its once-weekly trial schedule to the lipidated EuPort domain. Not a dosing guide.',
+            ],
         ];
 
         $compound = $data[$compoundName] ?? null;
+        if (!$compound) {
+            foreach ($data as $key => $row) {
+                if (strcasecmp((string) $key, (string) $compoundName) === 0) {
+                    $compound = $row;
+                    break;
+                }
+            }
+        }
         if (!$compound) return $field === 'routes' ? [] : '';
         return $compound[$field] ?? ($field === 'routes' ? [] : '');
+    }
+
+    /**
+     * Drug status has no education_posts column, so it still comes from
+     * getClinicalData(). Match the category name, then the slug.
+     */
+    private function clinicalLabel(ProductCategory $category, string $field): string
+    {
+        foreach ([$category->name, $category->slug] as $key) {
+            $value = $this->getClinicalData($key, $field);
+            if (is_string($value) && $value !== '') {
+                return $value;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Prefer the stored education_posts.half_life text. Fall back to the
+     * clinical map only when that column is empty.
+     */
+    private function clinicalHalfLife(ProductCategory $category, ?EducationPost $post): string
+    {
+        $stored = trim((string) ($post?->half_life ?? ''));
+        if ($stored !== '') {
+            return $stored;
+        }
+
+        return $this->clinicalLabel($category, 'halfLife');
     }
 
     /**
@@ -898,6 +944,12 @@ class EncyclopediaController extends Controller
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
 
+        $vendorCount = (int) Product::visible()
+            ->where('status', 'active')
+            ->where('product_category_id', $category->id)
+            ->distinct('brand_id')
+            ->count('brand_id');
+
         // Get comprehensive data for article detail page from database
         $peptideData = [
             'id' => $category->id,
@@ -909,10 +961,13 @@ class EncyclopediaController extends Controller
             // Shop CTAs are omitted for framed compounds. Several of those
             // /products/{slug} paths 404, and the query-string shop link
             // is not a class-accurate call to action for this set.
-            'relatedPages' => array_filter([
+            // Shop and compare links are also omitted when the category
+            // has no vendor listings, so an empty catalog does not render
+            // a buy or shop button.
+            'relatedPages' => $vendorCount > 0 ? array_filter([
                 'compare' => ['url' => url('/compare/' . (CompareSlug::canonical($category->slug) ?? $category->slug)), 'anchor' => "Compare {$category->name} prices across vendors"],
                 'shop' => $profile ? null : ['url' => url("/products?category={$category->slug}"), 'anchor' => "Shop {$category->name} — all available products"],
-            ]),
+            ]) : [],
             // $educationPost may be null when a ProductCategory exists but
             // no matching EducationPost row has been created yet. Every
             // access below now uses the null-safe operator so the page
@@ -937,15 +992,12 @@ class EncyclopediaController extends Controller
             'keyPoints' => $educationPost && $educationPost->key_points ? (is_array($educationPost->key_points) ? $educationPost->key_points : json_decode($educationPost->key_points, true) ?? []) : [],
             'overview' => $educationPost?->overview ?? '',
             'overviewShort' => $this->truncateToSentences($educationPost?->overview ?? '', 450),
-            // Clinical reference data (hardcoded for now, can be DB fields later)
-            'drugStatus' => $this->getClinicalData($category->name, 'status'),
+            // drugStatus has no education_posts column, so it still comes
+            // from getClinicalData(). halfLife prefers the stored column.
+            'drugStatus' => $this->clinicalLabel($category, 'status'),
             'routes' => $this->getClinicalData($category->name, 'routes'),
-            'halfLife' => $this->getClinicalData($category->name, 'halfLife'),
-            'vendorCount' => Product::visible()
-                ->where('status', 'active')
-                ->where('product_category_id', $category->id)
-                ->distinct('brand_id')
-                ->count('brand_id'),
+            'halfLife' => $this->clinicalHalfLife($category, $educationPost),
+            'vendorCount' => $vendorCount,
             'areasOfResearch' => $educationPost && $educationPost->areas_of_research ? (is_array($educationPost->areas_of_research) ? $educationPost->areas_of_research : json_decode($educationPost->areas_of_research, true) ?? []) : [],
             // All accesses null-safe — a ProductCategory with no EducationPost
             // must still render (was throwing "Attempt to read property … on null"

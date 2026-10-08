@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Cache;
  */
 class SitemapController extends Controller
 {
-    private const CACHE_KEY = 'sitemap.xml.v3';
+    private const CACHE_KEY = 'sitemap.xml.v4';
     private const CACHE_TTL = 21600; // 6h
     private const BASE_URL  = 'https://peptidemap.com';
 
@@ -128,12 +128,15 @@ class SitemapController extends Controller
         // (vitamin-b12, hgh-191aa, phosphate-buffered-saline, and the rest).
         // Compare locs must be the route-safe slug ([a-z0-9-]+): raw
         // values like "BPC-157" and "Vitamin B12" 404. Emit each compare URL
-        // once, and only when that slug actually resolves.
+        // once, and only when that slug actually resolves. A compare page
+        // with zero priced vendor listings stays out of the sitemap until
+        // a listing exists. Encyclopedia locs are unaffected.
+        $listedCategoryIds = array_fill_keys($this->categoryIdsWithCompareListings(), true);
         $emittedCompareSlugs = [];
         ProductCategory::where('is_active', true)
             ->whereNotNull('slug')
             ->select('id', 'slug', 'updated_at')
-            ->chunkById(500, function ($chunk) use (&$urls, &$emittedCompareSlugs) {
+            ->chunkById(500, function ($chunk) use (&$urls, &$emittedCompareSlugs, $listedCategoryIds) {
                 foreach ($chunk as $c) {
                     $lastmod = $c->updated_at?->toDateString();
                     $encyclopediaPath = EncyclopediaSlug::path($c->slug);
@@ -153,7 +156,7 @@ class SitemapController extends Controller
                     $emittedCompareSlugs[$compareSlug] = true;
 
                     $owner = ProductCategory::findForCompareSlug($compareSlug);
-                    if (!$owner) {
+                    if (!$owner || !isset($listedCategoryIds[$owner->id])) {
                         continue;
                     }
                     $urls[] = [
@@ -222,6 +225,30 @@ class SitemapController extends Controller
         }
 
         return $this->render($urls);
+    }
+
+    /**
+     * Categories with at least one priced, visible, active product.
+     * Same price rule as CompareController::productsForCategory(), so a
+     * compare URL is listed only when that page has a vendor row.
+     *
+     * @return list<int>
+     */
+    private function categoryIdsWithCompareListings(): array
+    {
+        return Product::visible()
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->where('discount_price', '>', 0)
+                    ->orWhere(function ($qq) {
+                        $qq->whereNull('discount_price')->where('price', '>', 0);
+                    });
+            })
+            ->whereNotNull('product_category_id')
+            ->distinct()
+            ->pluck('product_category_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
     }
 
     private function render(array $urls): string
