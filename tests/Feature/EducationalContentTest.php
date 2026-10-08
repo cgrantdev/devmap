@@ -133,6 +133,11 @@ class EducationalContentTest extends TestCase
         $glow->assertDontSee('unsplash.com', false);
 
         $orforBlog = Blog::where('slug', 'orforglipron-vs-tirzepatide')->firstOrFail();
+        $this->assertStringContainsString('/encyclopedia/orforglipron', $orforBlog->content);
+        $this->assertStringContainsString('/encyclopedia/tirzepatide', $orforBlog->content);
+        $this->assertStringNotContainsString('/encyclopedia/Orforglipron', $orforBlog->content);
+        $this->assertStringNotContainsString('/encyclopedia/Tirzepatide', $orforBlog->content);
+        $this->assertStringNotContainsString('returned HTTP 200', $orforBlog->content);
         $this->assertStringContainsString('−11.2%', $orforBlog->content);
         $this->assertStringContainsString('−12.4%', $orforBlog->content);
         $this->assertStringContainsString('−20.9%', $orforBlog->content);
@@ -148,9 +153,14 @@ class EducationalContentTest extends TestCase
         $orfor->assertDontSee('/workspace/', false);
 
         $retaBlog = Blog::where('slug', 'retatrutide-vs-tirzepatide')->firstOrFail();
+        $this->assertStringContainsString('/encyclopedia/retatrutide', $retaBlog->content);
+        $this->assertStringContainsString('/encyclopedia/tirzepatide', $retaBlog->content);
+        $this->assertStringNotContainsString('/encyclopedia/Retatrutide', $retaBlog->content);
+        $this->assertStringNotContainsString('/encyclopedia/Tirzepatide', $retaBlog->content);
         $this->assertStringContainsString('−25.0%', $retaBlog->content);
         $this->assertStringContainsString('−28.3%', $retaBlog->content);
         $this->assertStringContainsString('−18.8%', $retaBlog->content);
+        $this->assertStringNotContainsString('still says', $retaBlog->content);
         $reta = $this->get('/blog/retatrutide-vs-tirzepatide');
         $reta->assertOk();
         $reta->assertSee('\u221225.0%', false);
@@ -160,6 +170,10 @@ class EducationalContentTest extends TestCase
         $reta->assertDontSee('/workspace/', false);
 
         $blendBlog = Blog::where('slug', 'retatrutide-cagrilintide-blend')->firstOrFail();
+        $this->assertStringContainsString('/encyclopedia/retatrutide', $blendBlog->content);
+        $this->assertStringContainsString('/encyclopedia/Cagrilintide', $blendBlog->content);
+        $this->assertStringNotContainsString('/encyclopedia/Retatrutide', $blendBlog->content);
+        $this->assertStringNotContainsString('/encyclopedia/cagrilintide', $blendBlog->content);
         $this->assertStringContainsString('−20.4%', $blendBlog->content);
         $this->assertStringContainsString('−22.7%', $blendBlog->content);
         $blend = $this->get('/blog/retatrutide-cagrilintide-blend');

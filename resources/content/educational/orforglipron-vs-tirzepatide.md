@@ -2,7 +2,7 @@ Orforglipron and tirzepatide are stacked online as if one trial had measured bot
 
 This note is a companion to the live price page. It does not copy vendor tables, rank a winner, or tell anyone what to take. Peptidemap publishes research-use and grey-area comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice, a dose, or a mixing instruction.
 
-Vendor listings stay on the compare page: [Orforglipron vs tirzepatide](https://peptidemap.com/compare/orforglipron-vs-tirzepatide). That page’s title uses the shop label “GLP2-T” for the tirzepatide side. GLP2-T is not a third molecule and not a trial name. Identity pages that returned HTTP 200 with article text on 5 October 2026: [orforglipron](https://peptidemap.com/encyclopedia/Orforglipron) and [tirzepatide](https://peptidemap.com/encyclopedia/Tirzepatide).
+Vendor listings stay on the compare page: [Orforglipron vs tirzepatide](https://peptidemap.com/compare/orforglipron-vs-tirzepatide). That page’s title uses the shop label “GLP2-T” for the tirzepatide side. GLP2-T is not a third molecule and not a trial name. Identity pages: [orforglipron](https://peptidemap.com/encyclopedia/orforglipron) and [tirzepatide](https://peptidemap.com/encyclopedia/tirzepatide).
 
 ## Not the same kind of drug
 

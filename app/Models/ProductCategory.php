@@ -86,6 +86,7 @@ class ProductCategory extends Model
         $lower = static::query()
             ->where('is_active', true)
             ->whereRaw('LOWER(slug) = ?', [strtolower($routeSlug)])
+            ->orderBy('id')
             ->first();
         if ($lower) {
             return $lower;
@@ -98,6 +99,7 @@ class ProductCategory extends Model
 
         $matches = static::query()
             ->where('is_active', true)
+            ->orderBy('id')
             ->get()
             ->filter(fn (self $category) => CompareSlug::canonical($category->slug) === $canonical)
             ->values();
@@ -179,6 +181,7 @@ class ProductCategory extends Model
             $matches = static::query()
                 ->where('is_active', true)
                 ->whereRaw('LOWER(slug) = ?', [strtolower($requestedSlug)])
+                ->orderBy('id')
                 ->get();
 
             if ($matches->contains(fn (self $category) => (string) $category->slug === $requestedSlug)) {
@@ -186,9 +189,9 @@ class ProductCategory extends Model
             }
 
             if ($matches->count() === 1) {
-                $stored = (string) $matches->first()->slug;
-                if (EncyclopediaSlug::isResolvable($stored) && $stored !== $requestedSlug) {
-                    return '/encyclopedia/'.$stored;
+                $path = EncyclopediaSlug::path((string) $matches->first()->slug);
+                if ($path !== null && $path !== '/encyclopedia/'.$requestedSlug) {
+                    return $path;
                 }
             }
         }
@@ -204,8 +207,9 @@ class ProductCategory extends Model
         }
 
         $stored = (string) $category->slug;
-        if (EncyclopediaSlug::isResolvable($stored) && $stored !== $requestedSlug) {
-            return '/encyclopedia/'.$stored;
+        $path = EncyclopediaSlug::path($stored);
+        if ($path !== null && $path !== '/encyclopedia/'.$requestedSlug) {
+            return $path;
         }
 
         if (! EncyclopediaSlug::isResolvable($stored) && CompareSlug::canonical($stored) === $canonical) {

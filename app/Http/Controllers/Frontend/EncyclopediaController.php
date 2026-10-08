@@ -712,7 +712,7 @@ class EncyclopediaController extends Controller
         // compare page when no encyclopedia page exists) instead of
         // rendering a new stub.
         if ($redirect = ProductCategory::encyclopediaRedirectPath($slug)) {
-            return redirect($redirect, 301);
+            return redirect(EncyclopediaSlug::withRequestQuery($redirect), 301);
         }
 
         // Reuse the same logic as show() but render the new article detail page.
@@ -739,7 +739,7 @@ class EncyclopediaController extends Controller
         // still 301s, so it cannot emit a self-referencing canonical tag.
         $publicSlug = EncyclopediaSlug::publicSlug($category->slug) ?? (string) $category->slug;
         if ($publicSlug !== $slug) {
-            return redirect('/encyclopedia/'.$publicSlug, 301);
+            return redirect(EncyclopediaSlug::withRequestQuery('/encyclopedia/'.$publicSlug), 301);
         }
 
         $educationPost = $category->educationPost;

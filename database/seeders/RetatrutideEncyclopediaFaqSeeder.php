@@ -10,13 +10,15 @@ use Illuminate\Database\Seeder;
  * Refreshes the Retatrutide encyclopedia FAQ and approval-status copy after
  * TRIUMPH-1 (NEJM) and TRIUMPH-2 (Lancet) published on 29 Sep 2026.
  *
- * Matches the case-sensitive category slug "Retatrutide" only. Does not
- * create a category, does not write /compare/retatrutide, and does not
- * rewrite an existing TRIUMPH-2 subsection. Safe to run twice.
+ * Matches LOWER(slug) = retatrutide and exactly one category. Production
+ * stores the slug as lowercase retatrutide. Does not create a category,
+ * does not rewrite ProductCategory.slug, does not write
+ * /compare/retatrutide, and does not rewrite an existing TRIUMPH-2
+ * subsection. Safe to run twice.
  */
 class RetatrutideEncyclopediaFaqSeeder extends Seeder
 {
-    public const SLUG = 'Retatrutide';
+    public const SLUG = 'retatrutide';
 
     public const FDA_ANSWER = 'No. Retatrutide is still not FDA-approved. Phase 3 TRIUMPH results are published, including TRIUMPH-1 in The New England Journal of Medicine (29 Sep 2026) and TRIUMPH-2 in The Lancet (29 Sep 2026). Eli Lilly has stated a planned U.S. biologics license application in Q1 2027. That filing plan is not FDA approval. PeptideMap is a research-use (RUO) comparison publisher, not a clinic or pharmacy. This is trial reporting, not medical advice and not a dose.';
 
@@ -83,7 +85,7 @@ class RetatrutideEncyclopediaFaqSeeder extends Seeder
         'updated' => false,
         'missing_category' => false,
         'missing_post' => false,
-        'skipped_case_mismatch' => false,
+        'skipped_slug_collision' => false,
     ];
 
     public function run(): void
@@ -143,30 +145,13 @@ class RetatrutideEncyclopediaFaqSeeder extends Seeder
         $post->references = $this->appendReferences(is_array($post->references) ? $post->references : []);
     }
 
-    /**
-     * @return array{status: string, category: ?ProductCategory}
-     */
     private function exactCategory(): ?ProductCategory
     {
-        $rows = ProductCategory::query()
-            ->whereRaw('LOWER(slug) = ?', ['retatrutide'])
-            ->get();
+        $match = EncyclopediaCategoryMatch::find(self::SLUG, $this->command, 'Retatrutide encyclopedia FAQ refresh');
+        $this->report['missing_category'] = $match->missingCategory;
+        $this->report['skipped_slug_collision'] = $match->skippedSlugCollision;
 
-        $exact = $rows->first(fn (ProductCategory $category) => $category->slug === self::SLUG);
-        if ($exact) {
-            return $exact;
-        }
-
-        if ($rows->isNotEmpty()) {
-            $this->report['skipped_case_mismatch'] = true;
-            $this->command?->warn('Retatrutide encyclopedia FAQ refresh: skipped case mismatch (stored slug '.$rows->first()->slug.').');
-
-            return null;
-        }
-
-        $this->report['missing_category'] = true;
-
-        return null;
+        return $match->category;
     }
 
     /**
