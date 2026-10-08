@@ -631,6 +631,13 @@ class CompareController extends Controller
                 ] : null,
             ])),
         ];
+        // An empty vendor comparison stays reachable, and it is noindex
+        // until at least one priced listing exists. Filtered URLs use the
+        // unfiltered vendor count above, so ?location= cannot noindex a
+        // page that already has listings.
+        if ($vendorCount < 1) {
+            $seo['robots'] = 'noindex, follow';
+        }
         session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/CompareCompound', [

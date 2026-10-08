@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Brand;
+use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -28,11 +30,25 @@ class EncyclopediaBlendSitemapTest extends TestCase
 
     public function test_sitemap_omits_slash_blend_encyclopedia_locs(): void
     {
+        $brand = Brand::create([
+            'name' => 'Example Research',
+            'slug' => 'example-research',
+            'is_active' => true,
+        ]);
         foreach (array_keys(self::BLENDS) as $slug) {
-            ProductCategory::create([
+            $category = ProductCategory::create([
                 'name' => $slug,
                 'slug' => $slug,
                 'is_active' => true,
+            ]);
+            Product::create([
+                'name' => $slug.' listing',
+                'slug' => 'listing-'.$category->id,
+                'brand_id' => $brand->id,
+                'product_category_id' => $category->id,
+                'price' => 25,
+                'status' => 'active',
+                'hidden' => false,
             ]);
         }
         ProductCategory::create(['name' => 'Vitamin B12', 'slug' => 'Vitamin B12', 'is_active' => true]);

@@ -153,7 +153,7 @@ class EncyclopediaFramingTest extends TestCase
         $this->get('/encyclopedia/BPC-157')
             ->assertOk()
             ->assertSee('Peptide Encyclopedia', false)
-            ->assertSee('products?category=', false);
+            ->assertDontSee('products?category=', false);
     }
 
     public function test_nad_phrases_are_patched_and_kpv_is_not_republished(): void
@@ -186,7 +186,7 @@ class EncyclopediaFramingTest extends TestCase
             'seo_page_title' => 'Custom KPV title',
         ]);
 
-        (new EncyclopediaFramingSeeder())->run();
+        (new EncyclopediaFramingSeeder)->run();
 
         $nadPost = EducationPost::where('product_category_id', $nad->id)->first();
         $this->assertStringNotContainsString('peptide therapy protocols', $nadPost->overview);
@@ -244,7 +244,7 @@ class EncyclopediaFramingTest extends TestCase
             ]);
         }
 
-        (new EncyclopediaFramingSeeder())->run();
+        (new EncyclopediaFramingSeeder)->run();
 
         foreach ($cases as $slug => [$overview, $marker]) {
             $category = ProductCategory::where('slug', $slug)->first();
@@ -256,7 +256,7 @@ class EncyclopediaFramingTest extends TestCase
             $this->assertNotSame($overview, $post->overview, $slug);
         }
 
-        (new EncyclopediaFramingSeeder())->run();
+        (new EncyclopediaFramingSeeder)->run();
 
         foreach ($cases as $slug => [$overview, $marker]) {
             $post = EducationPost::where('slug', $slug)->first();
