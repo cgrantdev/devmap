@@ -24,14 +24,18 @@ use Illuminate\Support\Facades\Schema;
  * More than one distinct category across those checks is a collision:
  * skip and log. Exactly one match is reused unchanged (no rename, and a
  * non-stub description is left alone) and the post is filled only when
- * its overview is empty. No match creates the category. No product,
- * vendor, or price rows are written. Safe to run twice.
+ * its overview is empty. is_active on an existing row is never written.
+ * preserve_active also leaves a stub description alone. No match creates
+ * the category. create_inactive inserts that new row with is_active false;
+ * every other create stays active. No product, vendor, or price rows are
+ * written. Safe to run twice.
  */
 class EncyclopediaCategoryCreateSeeder extends Seeder
 {
     /** @var list<string> */
     public const SLUGS = [
         'pemvidutide',
+        'hexarelin',
     ];
 
     /**
@@ -41,7 +45,9 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
      *     image: string,
      *     cas: string,
      *     copy_research_area_from: string,
-     *     blank_chemistry: bool
+     *     blank_chemistry: bool,
+     *     create_inactive?: bool,
+     *     preserve_active?: bool
      * }>
      */
     private const DETAILS = [
@@ -53,6 +59,20 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
             'copy_research_area_from' => 'Survodutide',
             // Public formula and molecular-weight sources disagree, so both stay empty.
             'blank_chemistry' => true,
+        ],
+        // Live product pages already use slug hexarelin. That row may be
+        // inactive on purpose. Reuse it without touching is_active. A
+        // database with no match gets an inactive category so the public
+        // page stays 404 until someone activates it.
+        'hexarelin' => [
+            'name' => 'Hexarelin',
+            'aliases' => ['hexarelin', 'examorelin'],
+            'image' => 'hexarelin-featured.png',
+            'cas' => '140703-51-1',
+            'copy_research_area_from' => '',
+            'blank_chemistry' => false,
+            'create_inactive' => true,
+            'preserve_active' => true,
         ],
     ];
 
@@ -190,7 +210,7 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
         }
 
         $post->save();
-        if (! $createdCategory) {
+        if (! $createdCategory && ($entry['preserve_active'] ?? false) !== true) {
             $this->replaceStubDescription($category, $post->description);
         }
 
@@ -265,7 +285,7 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
     }
 
     /**
-     * @param  array{name: string, aliases: list<string>, image: string, cas: string, copy_research_area_from: string, blank_chemistry: bool}  $entry
+     * @param  array{name: string, aliases: list<string>, image: string, cas: string, copy_research_area_from: string, blank_chemistry: bool, create_inactive?: bool, preserve_active?: bool}  $entry
      * @param  array<string, mixed>  $attributes
      */
     private function createCategory(string $slug, array $entry, array $attributes): ProductCategory
@@ -273,11 +293,13 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
         $category = new ProductCategory;
         $category->name = $entry['name'];
         $category->slug = $slug;
-        $category->is_active = true;
+        $category->is_active = ($entry['create_inactive'] ?? false) === true ? false : true;
         $category->description = is_string($attributes['description'] ?? null) ? $attributes['description'] : null;
         $category->meta_title = is_string($attributes['seo_page_title'] ?? null) ? $attributes['seo_page_title'] : null;
         $category->meta_description = is_string($attributes['seo_description'] ?? null) ? $attributes['seo_description'] : null;
-        $this->copySiblingClassification($category, $entry['copy_research_area_from']);
+        if (($entry['copy_research_area_from'] ?? '') !== '') {
+            $this->copySiblingClassification($category, $entry['copy_research_area_from']);
+        }
         $category->save();
 
         return $category;

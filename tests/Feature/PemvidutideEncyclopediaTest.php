@@ -105,7 +105,7 @@ class PemvidutideEncyclopediaTest extends TestCase
 
         $this->assertSame([], $again->report['created_categories']);
         $this->assertSame([], $again->report['filled']);
-        $this->assertSame(['pemvidutide'], $again->report['skipped_already_filled']);
+        $this->assertSame(['pemvidutide', 'hexarelin'], $again->report['skipped_already_filled']);
         $this->assertSame($categories, ProductCategory::count());
         $this->assertSame($posts, EducationPost::count());
         $this->assertSame($products, Product::count());
@@ -160,7 +160,7 @@ class PemvidutideEncyclopediaTest extends TestCase
         $this->travel(5)->seconds();
         $again = new EncyclopediaCategoryCreateSeeder;
         $again->run();
-        $this->assertSame(['pemvidutide'], $again->report['skipped_already_filled']);
+        $this->assertSame(['pemvidutide', 'hexarelin'], $again->report['skipped_already_filled']);
         $this->assertSame([], $again->report['created_categories']);
         $this->assertSame([], $again->report['filled']);
         $this->assertSame(1, ProductCategory::query()->whereRaw('LOWER(slug) = ?', ['pemvidutide'])->count());
@@ -202,7 +202,7 @@ class PemvidutideEncyclopediaTest extends TestCase
         $seeder = new EncyclopediaCategoryCreateSeeder;
         $seeder->run();
 
-        $this->assertSame(['pemvidutide'], $seeder->report['reused_categories']);
+        $this->assertSame(['pemvidutide', 'hexarelin'], $seeder->report['reused_categories']);
         $this->assertSame(['pemvidutide'], $seeder->report['filled']);
         $this->assertNull(ProductCategory::query()->where('slug', 'pemvidutide')->first());
         $holding->refresh();
@@ -218,7 +218,7 @@ class PemvidutideEncyclopediaTest extends TestCase
         $this->travel(5)->seconds();
         $again = new EncyclopediaCategoryCreateSeeder;
         $again->run();
-        $this->assertSame(['pemvidutide'], $again->report['skipped_already_filled']);
+        $this->assertSame(['pemvidutide', 'hexarelin'], $again->report['skipped_already_filled']);
         $this->assertSame('Holding', $holding->fresh()->name);
         $this->assertSame('alt-holding', $post->fresh()->slug);
     }
@@ -271,7 +271,7 @@ class PemvidutideEncyclopediaTest extends TestCase
         $seeder = new EncyclopediaCategoryCreateSeeder;
         $seeder->run();
 
-        $this->assertSame(['pemvidutide'], $seeder->report['skipped_already_filled']);
+        $this->assertSame(['pemvidutide', 'hexarelin'], $seeder->report['skipped_already_filled']);
         $this->assertSame([], $seeder->report['filled']);
         $category->refresh();
         $this->assertSame('PEMVIDUTIDE', $category->name);
