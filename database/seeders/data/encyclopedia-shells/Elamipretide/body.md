@@ -7,7 +7,7 @@ subtitle: SS-31 / MTP-131 · Forzinity (Barth) vs research vials
 page_type: single
 seo_title: What is Elamipretide? SS-31 & Forzinity Basics
 meta_description: Elamipretide (SS-31) is a mitochondria-targeted peptide. Forzinity has accelerated FDA approval for Barth syndrome—research vials are not that product.
-live_url: https://peptidemap.com/encyclopedia/Elamipretide
+live_url: https://peptidemap.com/encyclopedia/elamipretide
 featured_image: /workspace/drafts/encyclopedia/images/elamipretide-featured.png
 og_image: /workspace/drafts/encyclopedia/images/elamipretide-featured.png
 ---
@@ -182,9 +182,9 @@ This approval covers **one product, one indication, and one weight threshold**. 
 
 ## Cite this page
 
-**APA (suggested):** Peptidemap. (2026). *Elamipretide*. Peptidemap Encyclopedia. https://peptidemap.com/encyclopedia/Elamipretide
+**APA (suggested):** Peptidemap. (2026). *Elamipretide*. Peptidemap Encyclopedia. https://peptidemap.com/encyclopedia/elamipretide
 
-**Chicago (suggested):** Peptidemap. "Elamipretide." *Peptidemap Encyclopedia*. 2026. https://peptidemap.com/encyclopedia/Elamipretide.
+**Chicago (suggested):** Peptidemap. "Elamipretide." *Peptidemap Encyclopedia*. 2026. https://peptidemap.com/encyclopedia/elamipretide.
 
 **Access note:** Educational research overview; not a clinical guideline. Verify primary sources before scholarly citation.
 

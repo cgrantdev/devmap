@@ -154,7 +154,7 @@ Route::get('/encyclopedia/article/{slug}', function ($slug) {
         ?? \App\Support\EncyclopediaSlug::path($slug)
         ?? '/encyclopedia/'.$slug;
 
-    return redirect($target, 301);
+    return redirect(\App\Support\EncyclopediaSlug::withRequestQuery($target), 301);
 });
 // Permissive so historical sitemap slugs that contain "/" (Selank/Semax,
 // "BPC-157 / TB500 / Cartalax") reach the controller, which 301s them.

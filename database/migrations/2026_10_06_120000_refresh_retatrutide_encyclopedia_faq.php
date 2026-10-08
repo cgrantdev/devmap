@@ -6,8 +6,10 @@ use Illuminate\Database\Migrations\Migration;
 /**
  * Replaces the Retatrutide encyclopedia FAQ that still said Phase 3 results
  * were "expected in 2025-2026" after TRIUMPH-1 and TRIUMPH-2 published on
- * 29 Sep 2026. The seeder no-ops when the Retatrutide category or post is
- * absent, and a second migrate does not write again.
+ * 29 Sep 2026. The seeder matches LOWER(slug) = retatrutide, including the
+ * lowercase slug production stores. It no-ops when that category or post
+ * is absent, skips when more than one category shares the lowercase slug,
+ * and a second migrate does not write again.
  */
 return new class extends Migration
 {

@@ -10,7 +10,7 @@
 
 **SEO:** see glutathione-meta.md recommended title/description.
 
-**Internal:** /encyclopedia/NAD and /guides/peptide-legality-fda-ruo-compounding
+**Internal:** /encyclopedia/nad and /guides/peptide-legality-fda-ruo-compounding
 
 ---
 

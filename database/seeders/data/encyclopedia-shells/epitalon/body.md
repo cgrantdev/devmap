@@ -98,7 +98,7 @@ Strongest mechanistic thread is in vitro telomere/telomerase biology. Human long
 
 ### conclusion
 
-Epitalon sits at the intersection of intriguing cell biology and overextended consumer longevity marketing. Encyclopedia tone should keep that gap visible. Educational only. See also the live [MOTS-c](https://peptidemap.com/encyclopedia/MOTS-c) encyclopedia entry.
+Epitalon sits at the intersection of intriguing cell biology and overextended consumer longevity marketing. Encyclopedia tone should keep that gap visible. Educational only. See also the live [MOTS-c](https://peptidemap.com/encyclopedia/mots-c) encyclopedia entry.
 
 ### molecularInfo
 

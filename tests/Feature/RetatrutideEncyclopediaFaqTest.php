@@ -47,18 +47,49 @@ class RetatrutideEncyclopediaFaqTest extends TestCase
             ]],
         ]);
 
-        $skipped = new RetatrutideEncyclopediaFaqSeeder;
-        $skipped->run();
-        $this->assertTrue($skipped->report['skipped_case_mismatch']);
-        $this->assertFalse($skipped->report['updated']);
+        $lowerSeeder = new RetatrutideEncyclopediaFaqSeeder;
+        $lowerSeeder->run();
+        $this->assertTrue($lowerSeeder->report['updated']);
+        $this->assertFalse($lowerSeeder->report['skipped_slug_collision']);
+        $lower->refresh();
         $lowerPost->refresh();
-        $this->assertSame(
-            'Not yet. It is in Phase 3 clinical trials with results expected in 2025-2026.',
-            $lowerPost->faqs[0]['answer']
-        );
+        $this->assertSame('retatrutide', $lower->slug);
+        $this->assertSame('Lowercase slug must stay untouched.', $lower->description);
+        $this->assertSame('Lowercase overview that must survive.', $lowerPost->overview);
+        $this->assertStringNotContainsString('expected in 2025-2026', $lowerPost->faqs[0]['answer']);
+        $this->assertStringContainsString('Q1 2027', $lowerPost->faqs[0]['answer']);
+        $this->assertNotNull(collect($lowerPost->faqs)->first(
+            fn ($faq) => is_array($faq) && str_contains((string) ($faq['question'] ?? ''), 'TRIUMPH-1')
+        ));
+        $this->get('/encyclopedia/retatrutide')
+            ->assertOk()
+            ->assertSee('Q1 2027', false)
+            ->assertSee('TRIUMPH-1', false)
+            ->assertDontSee('expected in 2025-2026', false)
+            ->assertDontSee('expected in 2025', false);
+        $this->get('/encyclopedia/Retatrutide')
+            ->assertStatus(301)
+            ->assertRedirect('/encyclopedia/retatrutide');
 
-        $lower->delete();
+        $lowerAgain = new RetatrutideEncyclopediaFaqSeeder;
+        $lowerAgain->run();
+        $this->assertFalse($lowerAgain->report['updated']);
+
+        ProductCategory::create([
+            'name' => 'Retatrutide duplicate',
+            'slug' => 'Retatrutide',
+            'is_active' => true,
+        ]);
+        $collision = new RetatrutideEncyclopediaFaqSeeder;
+        $collision->run();
+        $this->assertTrue($collision->report['skipped_slug_collision']);
+        $this->assertFalse($collision->report['updated']);
+        $lowerPost->refresh();
+        $this->assertStringContainsString('Q1 2027', $lowerPost->faqs[0]['answer']);
+
+        ProductCategory::query()->where('slug', 'Retatrutide')->delete();
         $lowerPost->delete();
+        $lower->delete();
 
         $other = ProductCategory::create([
             'name' => 'Semaglutide',

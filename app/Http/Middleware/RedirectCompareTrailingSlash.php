@@ -2,14 +2,17 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\ProductCategory;
+use App\Support\EncyclopediaSlug;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Compare URLs are canonical without a trailing slash. Nginx does not apply
- * the Apache rewrite in public/.htaccess, so /compare/ and /compare/{slug}/
- * were returning 200 alongside the slash-free URL.
+ * Compare and encyclopedia URLs are canonical without a trailing slash.
+ * Nginx does not apply the Apache rewrite in public/.htaccess, so a
+ * slash-suffixed path was returning 200 alongside the slash-free URL.
+ * Encyclopedia aliases 301 to the final canonical path in that same hop.
  */
 class RedirectCompareTrailingSlash
 {
@@ -25,12 +28,42 @@ class RedirectCompareTrailingSlash
         }
 
         $trimmed = rtrim($path, '/') ?: '/';
-        if ($trimmed !== '/compare' && ! str_starts_with($trimmed, '/compare/')) {
+        $target = $this->canonicalTarget($trimmed);
+        if ($target === null) {
             return $next($request);
         }
 
         $query = $request->getQueryString();
 
-        return redirect($trimmed.($query ? '?'.$query : ''), 301);
+        return redirect($target.($query ? '?'.$query : ''), 301);
+    }
+
+    /**
+     * Trailing-slash requests 301 straight to the final canonical URL.
+     * Encyclopedia case aliases must not stop on an intermediate slug
+     * (Elamipretide/ → elamipretide, VITAMIN--B12/ → vitamin-b12).
+     */
+    private function canonicalTarget(string $trimmed): ?string
+    {
+        if ($trimmed === '/compare' || str_starts_with($trimmed, '/compare/')) {
+            return $trimmed;
+        }
+
+        if ($trimmed !== '/encyclopedia' && ! str_starts_with($trimmed, '/encyclopedia/')) {
+            return null;
+        }
+
+        if ($trimmed === '/encyclopedia') {
+            return '/encyclopedia';
+        }
+
+        $slug = rawurldecode(substr($trimmed, strlen('/encyclopedia/')));
+        if (str_starts_with($slug, 'article/')) {
+            $slug = substr($slug, strlen('article/'));
+        }
+
+        return ProductCategory::encyclopediaRedirectPath($slug)
+            ?? EncyclopediaSlug::path($slug)
+            ?? '/encyclopedia/'.$slug;
     }
 }

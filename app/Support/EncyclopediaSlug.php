@@ -7,10 +7,11 @@ namespace App\Support;
  * "/" ("Selank/Semax", "BPC-157 / TB500 / Cartalax") is split by the router
  * and 404s, so it must not be advertised as an encyclopedia loc.
  *
- * Canonical form is the stored ProductCategory.slug, byte for byte,
- * including mixed case (CJC-1295, 5-Amino-1MQ). The sitemap and internal
- * links already emit that string. A request that differs only by letter
- * case is not a second page; it 301s to the stored slug.
+ * Canonical form is the stored ProductCategory.slug, byte for byte.
+ * Production encyclopedia slugs are lowercase (retatrutide, 5-amino-1mq,
+ * slu-pp-332). The sitemap and internal links emit that stored string.
+ * A request that differs only by letter case is not a second page; it
+ * 301s to the stored slug. Stored slugs are not rewritten.
  *
  * The families below are the exception. Their public URL is the hyphen
  * slug, and the space, short, and letter-case aliases 301 there. Research
@@ -93,6 +94,20 @@ class EncyclopediaSlug
         $public = self::publicSlug($slug);
 
         return '/encyclopedia/'.($public ?? $slug);
+    }
+
+    /**
+     * Append the current request query string so a 301 keeps utm and
+     * filter parameters. An empty query is left off.
+     */
+    public static function withRequestQuery(string $path): string
+    {
+        $query = request()->getQueryString();
+        if (! is_string($query) || $query === '') {
+            return $path;
+        }
+
+        return $path.(str_contains($path, '?') ? '&' : '?').$query;
     }
 
     public static function normalize(?string $slug): string
