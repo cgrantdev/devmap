@@ -6,6 +6,7 @@ use App\Models\EducationPost;
 use App\Models\ProductCategory;
 use App\Support\RetatrutideCompareNarrative;
 use Database\Seeders\RetatrutideEncyclopediaFaqSeeder;
+use Database\Seeders\RetatrutideTimelineLiteracySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -311,5 +312,70 @@ class RetatrutideEncyclopediaFaqTest extends TestCase
             ->assertDontSee('expected in 2025', false)
             ->assertDontSee('cardiovascular benefit', false)
             ->assertDontSee('condorresearch.com', false);
+    }
+
+    public function test_faq_and_timeline_seeders_converge_in_either_production_order(): void
+    {
+        $this->assertFaqAndTimelineConverge(true);
+        EducationPost::query()->delete();
+        ProductCategory::query()->delete();
+        $this->assertFaqAndTimelineConverge(false);
+    }
+
+    private function assertFaqAndTimelineConverge(bool $faqFirst): void
+    {
+        $category = ProductCategory::create([
+            'name' => 'Retatrutide',
+            'slug' => 'retatrutide',
+            'is_active' => true,
+        ]);
+        $post = EducationPost::create([
+            'title' => 'Retatrutide',
+            'slug' => 'retatrutide',
+            'product_category_id' => $category->id,
+            'status' => 'published',
+            'show_in_encyclopedia' => true,
+            'faqs' => [
+                ['question' => 'How does retatrutide differ from tirzepatide?', 'answer' => 'Adds glucagon receptor agonism.'],
+                ['question' => 'Is retatrutide FDA-approved?', 'answer' => 'Not yet. Results expected in 2025-2026.'],
+                ['question' => 'Why add glucagon if it raises blood sugar?', 'answer' => 'The GLP-1 component offsets it.'],
+            ],
+            'key_points' => ['Point 1', 'Point 2', 'Point 3', 'Point 4', 'Point 5', 'Point 6'],
+            'regulatory_subsections' => [[
+                'title' => 'Development Status',
+                'entries' => [[
+                    'type' => 'content',
+                    'value' => 'Phase 3 clinical trials with results expected in 2025-2026.',
+                ]],
+            ]],
+            'references' => [
+                ['title' => 'TRIUMPH-2', 'citation' => 'DOI 10.1016/S0140-6736(26)01861-1', 'links' => [['url' => 'https://doi.org/10.1016/S0140-6736(26)01861-1']]],
+                ['title' => 'Ref 2', 'links' => [['url' => 'https://example.test/ref-2']]],
+                ['title' => 'Ref 3', 'links' => [['url' => 'https://example.test/ref-3']]],
+                ['title' => 'Ref 4', 'links' => [['url' => 'https://example.test/ref-4']]],
+                ['title' => 'Ref 5', 'links' => [['url' => 'https://example.test/ref-5']]],
+                ['title' => 'Ref 6', 'links' => [['url' => 'https://example.test/ref-6']]],
+            ],
+        ]);
+
+        $first = $faqFirst ? new RetatrutideEncyclopediaFaqSeeder : new RetatrutideTimelineLiteracySeeder;
+        $second = $faqFirst ? new RetatrutideTimelineLiteracySeeder : new RetatrutideEncyclopediaFaqSeeder;
+        $third = $faqFirst ? new RetatrutideEncyclopediaFaqSeeder : new RetatrutideTimelineLiteracySeeder;
+        $first->run();
+        $second->run();
+
+        $post->refresh();
+        $blob = json_encode($post->only(['faqs', 'key_points', 'regulatory_subsections', 'references']), JSON_UNESCAPED_UNICODE);
+        $this->assertCount(9, $post->faqs);
+        $this->assertCount(12, $post->key_points);
+        $this->assertCount(5, $post->regulatory_subsections);
+        $this->assertCount(11, $post->references);
+        $this->assertStringNotContainsString('expected in 2025', (string) $blob);
+        $this->assertSame('retatrutide', $category->fresh()->slug);
+
+        EducationPost::query()->where('id', $post->id)->update(['updated_at' => '2020-01-01 00:00:00']);
+        $third->run();
+        $this->assertFalse($third->report['updated']);
+        $this->assertSame('2020-01-01 00:00:00', $post->fresh()->updated_at->format('Y-m-d H:i:s'));
     }
 }

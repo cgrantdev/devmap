@@ -125,8 +125,10 @@ class SitemapController extends Controller
         // when the stored slug is resolvable. Those blends already have a
         // live /compare/{canonical} page; the bad encyclopedia URL 301s there
         // and is not listed here. The loc is the stored slug. Production
-        // stores those lowercase (retatrutide, 5-amino-1mq, slu-pp-332).
-        // Forced families emit the hyphen canonical (vitamin-b12,
+        // is not all lowercase: retatrutide, 5-amino-1mq, and slu-pp-332
+        // are lowercase; CJC-1295, BPC-157, TB-500, Cagrilintide, and
+        // Survodutide keep mixed case. Forced families emit the hyphen
+        // canonical (vitamin-b12,
         // hgh-191aa, phosphate-buffered-saline).
         // Compare locs must be the route-safe slug ([a-z0-9-]+): raw
         // values like "BPC-157" and "Vitamin B12" 404. Emit each compare URL
@@ -171,9 +173,10 @@ class SitemapController extends Controller
         // resolve to active categories — otherwise we'd emit 404 URLs to
         // Google after retiring a compound.
         // Lowercase both sides — MySQL matches case-insensitively but PHP
-        // array-key lookups are case-sensitive. Production slugs are
-        // already lowercase (retatrutide, 5-amino-1mq, slu-pp-332); folding
-        // here still keeps a mixed-case stored slug from dropping a pair.
+        // array-key lookups are case-sensitive. Production is not all
+        // lowercase (CJC-1295, BPC-157, TB-500, Cagrilintide, Survodutide),
+        // so folding both sides keeps a mixed-case stored slug from
+        // dropping a pair that names the lowercase form.
         $activeSlugs = ProductCategory::where('is_active', true)
             ->whereNotNull('slug')
             ->pluck('slug')

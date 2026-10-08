@@ -26,7 +26,7 @@ class LowercaseEncyclopediaLinksTest extends TestCase
             'status' => 'published',
             'show_in_encyclopedia' => true,
             'conclusion' => 'See the live [MOTS-c](https://peptidemap.com/encyclopedia/MOTS-c) entry.',
-            'overview' => 'Internal notes point at /encyclopedia/NAD and leave /encyclopedia/NAD+ alone.',
+            'overview' => 'Internal notes point at /encyclopedia/NAD and leave /encyclopedia/NAD+ and /encyclopedia/Cagrilintide alone.',
             'references' => [[
                 'url' => 'https://peptidemap.com/encyclopedia/Elamipretide',
             ]],
@@ -44,6 +44,8 @@ class LowercaseEncyclopediaLinksTest extends TestCase
         $this->assertStringNotContainsString('/encyclopedia/MOTS-c', $post->conclusion);
         $this->assertStringContainsString('/encyclopedia/nad', $post->overview);
         $this->assertStringContainsString('/encyclopedia/NAD+', $post->overview);
+        $this->assertStringContainsString('/encyclopedia/Cagrilintide', $post->overview);
+        $this->assertStringNotContainsString('/encyclopedia/cagrilintide', $post->overview);
         $this->assertSame('https://peptidemap.com/encyclopedia/elamipretide', $post->references[0]['url']);
 
         EducationPost::query()->where('id', $post->id)->update(['updated_at' => '2020-01-01 00:00:00']);

@@ -8,9 +8,10 @@ use Tests\TestCase;
 
 /**
  * One encyclopedia entry, one URL. The canonical form is the stored slug.
- * Production stores those lowercase (retatrutide, 5-amino-1mq, slu-pp-332).
- * Forced families stay on their hyphen URL (vitamin-b12). Any other
- * letter case 301s there and must not publish its own canonical tag.
+ * Production is mixed: retatrutide, 5-amino-1mq, and slu-pp-332 are
+ * lowercase, and CJC-1295 stays mixed-case. Forced families stay on
+ * their hyphen URL (vitamin-b12). Any other letter case 301s there and
+ * must not publish its own canonical tag.
  */
 class EncyclopediaSlugCaseTest extends TestCase
 {
@@ -25,7 +26,7 @@ class EncyclopediaSlugCaseTest extends TestCase
     public function test_case_variants_redirect_to_the_stored_slug(): void
     {
         ProductCategory::create(['name' => 'Retatrutide', 'slug' => 'retatrutide', 'is_active' => true]);
-        ProductCategory::create(['name' => 'CJC-1295', 'slug' => 'cjc-1295', 'is_active' => true]);
+        ProductCategory::create(['name' => 'CJC-1295', 'slug' => 'CJC-1295', 'is_active' => true]);
         ProductCategory::create(['name' => '5-Amino-1MQ', 'slug' => '5-amino-1mq', 'is_active' => true]);
         ProductCategory::create(['name' => 'SLU-PP-332', 'slug' => 'slu-pp-332', 'is_active' => true]);
         ProductCategory::create(['name' => 'BPC-157', 'slug' => 'bpc-157', 'is_active' => true]);
@@ -38,13 +39,13 @@ class EncyclopediaSlugCaseTest extends TestCase
             ->assertStatus(301)
             ->assertRedirect('/encyclopedia/retatrutide');
 
-        $this->get('/encyclopedia/cjc-1295')->assertOk();
-        $this->get('/encyclopedia/CJC-1295')
+        $this->get('/encyclopedia/CJC-1295')->assertOk();
+        $this->get('/encyclopedia/cjc-1295')
             ->assertStatus(301)
-            ->assertRedirect('/encyclopedia/cjc-1295');
+            ->assertRedirect('/encyclopedia/CJC-1295');
         $this->get('/encyclopedia/Cjc-1295')
             ->assertStatus(301)
-            ->assertRedirect('/encyclopedia/cjc-1295');
+            ->assertRedirect('/encyclopedia/CJC-1295');
 
         $this->get('/encyclopedia/5-amino-1mq')->assertOk();
         $this->get('/encyclopedia/5-Amino-1MQ')
@@ -70,7 +71,7 @@ class EncyclopediaSlugCaseTest extends TestCase
     public function test_canonical_request_is_self_referencing_and_sitemap_and_index_agree(): void
     {
         ProductCategory::create(['name' => 'Retatrutide', 'slug' => 'retatrutide', 'is_active' => true]);
-        ProductCategory::create(['name' => 'CJC-1295', 'slug' => 'cjc-1295', 'is_active' => true]);
+        ProductCategory::create(['name' => 'CJC-1295', 'slug' => 'CJC-1295', 'is_active' => true]);
         ProductCategory::create(['name' => '5-Amino-1MQ', 'slug' => '5-amino-1mq', 'is_active' => true]);
         ProductCategory::create(['name' => 'SLU-PP-332', 'slug' => 'slu-pp-332', 'is_active' => true]);
         ProductCategory::create(['name' => 'Vitamin B12', 'slug' => 'Vitamin B12', 'is_active' => true]);
@@ -85,10 +86,10 @@ class EncyclopediaSlugCaseTest extends TestCase
             ->where('slug', 'retatrutide')
         );
 
-        $this->get('/encyclopedia/cjc-1295')
+        $this->get('/encyclopedia/CJC-1295')
             ->assertOk()
-            ->assertSee('<link rel="canonical" href="https://peptidemap.com/encyclopedia/cjc-1295" />', false)
-            ->assertInertia(fn ($view) => $view->where('slug', 'cjc-1295'));
+            ->assertSee('<link rel="canonical" href="https://peptidemap.com/encyclopedia/CJC-1295" />', false)
+            ->assertInertia(fn ($view) => $view->where('slug', 'CJC-1295'));
 
         $this->get('/encyclopedia/5-amino-1mq')
             ->assertOk()
@@ -110,12 +111,12 @@ class EncyclopediaSlugCaseTest extends TestCase
                 $slugs = collect($peptides)->pluck('slug')->all();
 
                 return in_array('retatrutide', $slugs, true)
-                    && in_array('cjc-1295', $slugs, true)
+                    && in_array('CJC-1295', $slugs, true)
                     && in_array('5-amino-1mq', $slugs, true)
                     && in_array('slu-pp-332', $slugs, true)
                     && in_array('vitamin-b12', $slugs, true)
                     && ! in_array('Retatrutide', $slugs, true)
-                    && ! in_array('CJC-1295', $slugs, true)
+                    && ! in_array('cjc-1295', $slugs, true)
                     && ! in_array('5-Amino-1MQ', $slugs, true)
                     && ! in_array('Vitamin B12', $slugs, true);
             }));
@@ -125,12 +126,12 @@ class EncyclopediaSlugCaseTest extends TestCase
         $locs = $matches[1];
 
         $this->assertContains('retatrutide', $locs);
-        $this->assertContains('cjc-1295', $locs);
+        $this->assertContains('CJC-1295', $locs);
         $this->assertContains('5-amino-1mq', $locs);
         $this->assertContains('slu-pp-332', $locs);
         $this->assertContains('vitamin-b12', $locs);
         $this->assertNotContains('Retatrutide', $locs);
-        $this->assertNotContains('CJC-1295', $locs);
+        $this->assertNotContains('cjc-1295', $locs);
         $this->assertNotContains('5-Amino-1MQ', $locs);
         $this->assertNotContains('SLU-PP-332', $locs);
         $this->assertNotContains('Vitamin%20B12', $locs);

@@ -160,6 +160,7 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('−25.0%', $retaBlog->content);
         $this->assertStringContainsString('−28.3%', $retaBlog->content);
         $this->assertStringContainsString('−18.8%', $retaBlog->content);
+        $this->assertStringNotContainsString('still says', $retaBlog->content);
         $reta = $this->get('/blog/retatrutide-vs-tirzepatide');
         $reta->assertOk();
         $reta->assertSee('\u221225.0%', false);
@@ -170,9 +171,9 @@ class EducationalContentTest extends TestCase
 
         $blendBlog = Blog::where('slug', 'retatrutide-cagrilintide-blend')->firstOrFail();
         $this->assertStringContainsString('/encyclopedia/retatrutide', $blendBlog->content);
-        $this->assertStringContainsString('/encyclopedia/cagrilintide', $blendBlog->content);
+        $this->assertStringContainsString('/encyclopedia/Cagrilintide', $blendBlog->content);
         $this->assertStringNotContainsString('/encyclopedia/Retatrutide', $blendBlog->content);
-        $this->assertStringNotContainsString('/encyclopedia/Cagrilintide', $blendBlog->content);
+        $this->assertStringNotContainsString('/encyclopedia/cagrilintide', $blendBlog->content);
         $this->assertStringContainsString('−20.4%', $blendBlog->content);
         $this->assertStringContainsString('−22.7%', $blendBlog->content);
         $blend = $this->get('/blog/retatrutide-cagrilintide-blend');

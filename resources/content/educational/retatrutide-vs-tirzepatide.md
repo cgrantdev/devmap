@@ -2,7 +2,7 @@ Retatrutide and tirzepatide are stacked in shop listings as if one study had mea
 
 This note is a companion to the live price page. It does not copy vendor tables, rank a winner, or tell anyone what to take. Peptidemap publishes research-use and grey-area comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice, a dose, or a mixing instruction.
 
-Vendor listings stay on [Retatrutide vs tirzepatide](https://peptidemap.com/compare/retatrutide-vs-tirzepatide). That page’s title uses the shop labels “GLP3-R” and “GLP2-T.” Those labels are not trial names. Identity pages that returned HTTP 200 on 5 October 2026: [retatrutide](https://peptidemap.com/encyclopedia/retatrutide) and [tirzepatide](https://peptidemap.com/encyclopedia/tirzepatide). The retatrutide approval FAQ still says phase 3 results are “expected in 2025-2026.” TRIUMPH-1 and TRIUMPH-2 were published on 29 September 2026. This note does not rewrite that page, and it does not use the encyclopedia’s summary percents.
+Vendor listings stay on [Retatrutide vs tirzepatide](https://peptidemap.com/compare/retatrutide-vs-tirzepatide). That page’s title uses the shop labels “GLP3-R” and “GLP2-T.” Those labels are not trial names. Identity pages that returned HTTP 200 on 5 October 2026: [retatrutide](https://peptidemap.com/encyclopedia/retatrutide) and [tirzepatide](https://peptidemap.com/encyclopedia/tirzepatide). TRIUMPH-1 and TRIUMPH-2 were published on 29 September 2026. This note does not use the encyclopedia’s summary percents.
 
 ## One molecule each, not the branded pen
 

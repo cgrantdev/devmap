@@ -6,10 +6,10 @@ use App\Models\EducationPost;
 use Illuminate\Database\Seeder;
 
 /**
- * Lowercases encyclopedia links that 301 after the stored slug is the
- * canonical URL. Production slugs are lowercase. Does not create posts
- * and does not change ProductCategory.slug or EducationPost.slug.
- * A second run writes nothing.
+ * Lowercases encyclopedia links whose production slug is lowercase.
+ * Mixed-case stored slugs (CJC-1295, BPC-157, TB-500, Cagrilintide,
+ * Survodutide) are left alone. Does not create posts and does not change
+ * ProductCategory.slug or EducationPost.slug. A second run writes nothing.
  */
 class LowercaseEncyclopediaLinksSeeder extends Seeder
 {
@@ -75,7 +75,6 @@ class LowercaseEncyclopediaLinksSeeder extends Seeder
                     '/encyclopedia/Retatrutide',
                     '/encyclopedia/Tirzepatide',
                     '/encyclopedia/Orforglipron',
-                    '/encyclopedia/Cagrilintide',
                 ],
                 [
                     '/encyclopedia/mots-c',
@@ -83,7 +82,6 @@ class LowercaseEncyclopediaLinksSeeder extends Seeder
                     '/encyclopedia/retatrutide',
                     '/encyclopedia/tirzepatide',
                     '/encyclopedia/orforglipron',
-                    '/encyclopedia/cagrilintide',
                 ],
                 $value
             );

@@ -64,6 +64,6 @@ class RedirectCompareTrailingSlash
 
         return ProductCategory::encyclopediaRedirectPath($slug)
             ?? EncyclopediaSlug::path($slug)
-            ?? '/encyclopedia/'.$slug;
+            ?? $trimmed;
     }
 }

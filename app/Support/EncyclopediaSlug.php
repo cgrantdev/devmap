@@ -8,8 +8,10 @@ namespace App\Support;
  * and 404s, so it must not be advertised as an encyclopedia loc.
  *
  * Canonical form is the stored ProductCategory.slug, byte for byte.
- * Production encyclopedia slugs are lowercase (retatrutide, 5-amino-1mq,
- * slu-pp-332). The sitemap and internal links emit that stored string.
+ * Production is not all lowercase: retatrutide, 5-amino-1mq, and
+ * slu-pp-332 are lowercase, while CJC-1295, BPC-157, TB-500, Cagrilintide,
+ * and Survodutide keep mixed case. The sitemap and internal links emit
+ * that stored string.
  * A request that differs only by letter case is not a second page; it
  * 301s to the stored slug. Stored slugs are not rewritten.
  *
