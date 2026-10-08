@@ -333,7 +333,7 @@ const props = defineProps({
 // /vendors (?verified=csv&usp=key) so the two surfaces stay
 // consistent and a shared bookmarked URL keeps its shape.
 const verifiedFilters = [
-  { label: 'cGMP Verified', value: 'cgmp' },
+  { label: 'cGMP (vendor-reported)', value: 'cgmp' },
   { label: '7+ Tested', value: 'testing_7x' },
 ]
 const activeVerified = computed(() => new Set(props.trustFilters?.verified || []))

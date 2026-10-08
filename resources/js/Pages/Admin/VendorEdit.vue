@@ -197,7 +197,7 @@
                 ]"
               >
                 <svg v-if="hasBadge('cgmp')" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                cGMP Verified {{ hasBadge('cgmp') ? '· click to revoke' : '· click to grant' }}
+                cGMP (vendor-reported) {{ hasBadge('cgmp') ? '· click to revoke' : '· click to grant' }}
               </button>
               <button
                 type="button"
