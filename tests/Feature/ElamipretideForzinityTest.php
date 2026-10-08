@@ -199,9 +199,9 @@ class ElamipretideForzinityTest extends TestCase
         $missing->run();
         $this->assertTrue($missing->report['missing_category']);
         $this->assertFalse($missing->report['updated']);
-        // The pemvidutide migration seeds one category and post into every test database.
-        $this->assertSame(0, ProductCategory::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
-        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
+        // Create-seeder migrations seed pemvidutide and hexarelin into every test database.
+        $this->assertSame(0, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
+        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
 
         $category = ProductCategory::create([
             'name' => 'Elamipretide',
@@ -212,7 +212,7 @@ class ElamipretideForzinityTest extends TestCase
         $noPost->run();
         $this->assertTrue($noPost->report['missing_post']);
         $this->assertFalse($noPost->report['updated']);
-        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
+        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
 
         ProductCategory::create([
             'name' => 'Elamipretide duplicate',
@@ -231,7 +231,7 @@ class ElamipretideForzinityTest extends TestCase
         $collision->run();
         $this->assertTrue($collision->report['skipped_slug_collision']);
         $this->assertFalse($collision->report['updated']);
-        $this->assertSame(2, ProductCategory::query()->whereRaw('LOWER(slug) != ?', ['pemvidutide'])->count());
+        $this->assertSame(2, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
         $this->assertSame($note, EducationPost::query()->where('slug', 'elamipretide')->firstOrFail()->regulatory_important_note);
     }
 
