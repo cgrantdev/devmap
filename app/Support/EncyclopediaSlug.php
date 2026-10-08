@@ -7,10 +7,15 @@ namespace App\Support;
  * "/" ("Selank/Semax", "BPC-157 / TB500 / Cartalax") is split by the router
  * and 404s, so it must not be advertised as an encyclopedia loc.
  *
- * A few stored slugs keep spaces or mixed case in the database. Their
- * public encyclopedia URL is the hyphen form, and the space, mixed-case,
- * and short aliases 301 there. Research aliases use the same map
- * (ss-31 / ss31 → elamipretide). Other space slugs are unchanged.
+ * Canonical form is the stored ProductCategory.slug, byte for byte,
+ * including mixed case (CJC-1295, 5-Amino-1MQ). The sitemap and internal
+ * links already emit that string. A request that differs only by letter
+ * case is not a second page; it 301s to the stored slug.
+ *
+ * The families below are the exception. Their public URL is the hyphen
+ * slug, and the space, short, and letter-case aliases 301 there. Research
+ * aliases use the same map (ss-31 / ss31 → elamipretide). Stored slugs
+ * are not rewritten. Other space slugs stay as stored.
  */
 class EncyclopediaSlug
 {
