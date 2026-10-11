@@ -346,7 +346,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host));
     }
 
     /**
@@ -720,6 +720,52 @@ class EducationalContentPublisher
                     ['Are buyer-submitted test dashboards a market quality score?', 'No. Sampling and publication are chosen by people with incentives. Useful as scattered data points; not as an audit.'],
                     ['Is a grey-market vial the same as Lilly trial material?', 'No. Lilly states no retatrutide medicine is approved anywhere; grey-market labels are outside that accountability chain.'],
                     ['Where should I read general COA verification steps?', 'How to verify a peptide vendor Certificate of Analysis — including shared-lot skepticism and verify-on-lab-site habits.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Content QA passed this BPC-157 vs GHK-Cu comparison on 2026-10-11.
+     * The body lives in resources/content/educational. The publisher reads
+     * this catalog, not the draft YAML.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function bpc157VsGhkCu(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'bpc-157-vs-ghk-cu.md',
+                'image_file' => 'bpc-157-vs-ghk-cu.png',
+                'slug' => 'bpc-157-vs-ghk-cu',
+                'h1' => 'BPC-157 vs GHK-Cu: Identity, Evidence Levels, and Regulatory Status',
+                'lede' => 'BPC-157 and GHK-Cu share a skin-and-recovery shelf but not a molecule or an evidence base. Identity, mechanisms as hypotheses, topical vs injectable evidence, FDA and WADA status, and CoA limits.',
+                'seo_title' => 'BPC-157 vs GHK-Cu: Identity, Evidence, and FDA Status',
+                'seo_description' => 'BPC-157 is mostly rodent data; GHK-Cu human data are mostly topical. Compare identity, evidence, FDA compounding, and WADA status. Educational only.',
+                'og_title' => 'BPC-157 vs GHK-Cu: Identity, Evidence, and FDA Status',
+                'og_description' => 'BPC-157 is mostly rodent data; GHK-Cu human data are mostly topical. Compare identity, evidence, FDA compounding, and WADA status. Educational only.',
+                'blog_type' => 'Research',
+                'read_time' => '10 Min Read',
+                'published_at' => '2026-10-11',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['BPC-157', 'GHK-Cu', 'Evidence', 'WADA', 'FDA compounding'],
+                'key_points' => [
+                    'BPC-157 is a synthetic 15-amino-acid peptide. GHK-Cu is the copper complex of Gly-His-Lys. They are unrelated molecules.',
+                    'Most published BPC-157 evidence is preclinical. Human reports are a few small uncontrolled pilots, and a 2025 review found no clinical safety data.',
+                    'GHK-Cu human data are mostly topical cosmetic studies with mixed results. Those studies do not establish what injection does.',
+                    'Neither is an FDA-approved drug. A withdrawn Category 2 nomination is not compounding permission. Category 1 for non-injectable GHK-Cu is interim review status, not a 503A Bulks List listing.',
+                    'BPC-157 is named under WADA S0. GHK-Cu is not named. S0 still covers unapproved substances, and the 2027 List adds peptides to its examples.',
+                ],
+                'faq' => self::faq($host.'/blog/bpc-157-vs-ghk-cu#faq', [
+                    ['Are BPC-157 and GHK-Cu related?', 'No. BPC-157 is a synthetic 15-amino-acid peptide. GHK-Cu is the copper complex of the naturally occurring tripeptide Gly-His-Lys. They have different sequences, sizes, and research histories.'],
+                    ['How does the human evidence differ?', 'They have different kinds of human evidence. GHK-Cu has small topical cosmetic studies with mixed results. BPC-157 has a few small uncontrolled pilot reports. Neither has controlled trials establishing efficacy for injected use.'],
+                    ['Do GHK-Cu skin cream studies apply to injected GHK-Cu?', 'No. Topical studies test a specific formulation on skin. They do not establish safety or effects for injection, and FDA notes limited human data for injectable GHK-Cu.'],
+                    ['Is BPC-157 still on FDA\'s Category 2 list?', 'FDA\'s page now lists BPC-157 among nominations withdrawn from Category 2, with its safety concerns kept. A July 2026 advisory committee recommended it for the 503A Bulks List, but as of October 2026 no final FDA listing was identified.'],
+                    ['Is GHK-Cu legal because it is in cosmetics?', 'Cosmetic ingredients do not need FDA premarket approval, but intended use decides whether a product is a cosmetic or a drug. A cosmetic serum\'s status does not make an injectable vial an approved drug.'],
+                    ['Are they banned in sport?', 'BPC-157 is named under S0 on the WADA 2026 Prohibited List and remains named on the 2027 List. GHK-Cu is not named on either, but S0 covers unapproved substances generally, and the 2027 List adds peptides to its examples, so athletes should check with their anti-doping organization.'],
                 ]),
             ],
         ];
