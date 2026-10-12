@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\VendorSetting;
 use App\Support\ComparePageSeo;
+use App\Support\VsPageSeo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -228,9 +229,15 @@ class SeoHygieneTest extends TestCase
         $vs = $this->get('/compare/bpc-157-vs-tb-500')->assertOk()->getContent();
         $vsTitle = $this->headContent($vs, '/<title>(.*?)<\/title>/s');
         $vsDescription = $this->headContent($vs, '/<meta name="description" content="(.*?)"/s');
+        $vsOgDescription = $this->headContent($vs, '/property="og:description" content="(.*?)"/s');
+        $this->assertLessThanOrEqual(60, mb_strlen($vsTitle), $vsTitle);
+        $this->assertSame(VsPageSeo::renderedTitle('BPC-157', 'TB-500'), $vsTitle);
+        $this->assertSame(VsPageSeo::description('BPC-157', 'TB-500'), $vsDescription);
+        $this->assertSame($vsDescription, $vsOgDescription);
         $this->assertStringNotContainsString('Cheapest', $vsTitle);
         $this->assertStringNotContainsString('$', $vsTitle);
         $this->assertStringNotContainsString('Cheapest', $vsDescription);
+        $this->assertStringNotContainsString('best', strtolower($vsDescription));
         $this->assertStringNotContainsString('$', $vsDescription);
     }
 

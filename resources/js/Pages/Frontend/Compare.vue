@@ -13,7 +13,7 @@
           Compare Peptide Prices
         </h1>
         <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
-          Every vendor, every price, sorted cheapest-first. Click any compound to jump to its vendor pricing table.
+          Compare research peptide listings and prices across vendors. Open a compound for its vendor table.
         </p>
         <div class="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] text-[11px] text-[color:var(--color-ink-subtle)]">
           <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
@@ -66,7 +66,7 @@
             Looking for bacteriostatic water?
           </div>
           <div class="text-[12px] text-[color:var(--color-ink-muted)] mt-0.5">
-            51 vendors, sorted by per-mL price · size filter, coupon codes, FAQ
+            Sorted by per-mL price · size filter · FAQ
           </div>
         </div>
         <div class="flex-shrink-0 hidden sm:flex items-center gap-1 text-[13px] font-semibold text-sky-700 group-hover:text-sky-800 transition-colors">
@@ -249,7 +249,7 @@
                         <!-- Mobile-only: surface the product name since the Product column is hidden <md -->
                         <div class="md:hidden text-[11px] text-[color:var(--color-ink-subtle)] truncate">{{ product.name }}</div>
                         <div v-if="pidx === 0" class="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Best price</span>
+                          <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Lowest listed</span>
                           <span
                             v-if="percentCheaper(getFilteredProducts(compound, idx))"
                             class="ml-1 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-[color:var(--color-verified-bg)] border border-[#A7F3D0] text-[10px] font-bold text-[#065F46]"

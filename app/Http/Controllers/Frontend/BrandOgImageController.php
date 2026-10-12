@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Frontend\Concerns\RendersOgImage;
 use App\Models\Brand;
 use App\Models\Product;
+use App\Support\OgImageRevision;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,7 +47,7 @@ class BrandOgImageController extends Controller
 
         return $this->serveOgImage(
             self::CACHE_DIR,
-            $slug,
+            $slug.'-'.OgImageRevision::COPY,
             $mtime,
             self::FALLBACK_PNG,
             fn () => View::make('og.brand', [
@@ -54,8 +55,6 @@ class BrandOgImageController extends Controller
                 'vendorLogo'   => $this->resolveStorageUrl($vs?->logo),
                 'tagline'      => $this->tagline($brand),
                 'productCount' => $this->productCount($brand),
-                'fromPrice'    => $this->fromPrice($brand),
-                'couponCode'   => $vs?->coupon_code,
             ])->render()
         );
     }
@@ -73,21 +72,5 @@ class BrandOgImageController extends Controller
             ->where('status', 'active')
             ->where('brand_id', $brand->id)
             ->count();
-    }
-
-    private function fromPrice(Brand $brand): ?float
-    {
-        $min = Product::visible()
-            ->where('status', 'active')
-            ->where('brand_id', $brand->id)
-            ->where(function ($q) {
-                $q->where('discount_price', '>', 0)
-                  ->orWhere(function ($qq) {
-                      $qq->whereNull('discount_price')->where('price', '>', 0);
-                  });
-            })
-            ->selectRaw('MIN(COALESCE(NULLIF(discount_price, 0), price)) as min_price')
-            ->value('min_price');
-        return $min ? (float) $min : null;
     }
 }

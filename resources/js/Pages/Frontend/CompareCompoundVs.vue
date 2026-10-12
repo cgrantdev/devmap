@@ -72,7 +72,7 @@
       </div>
     </section>
 
-    <!-- Cheapest vendors side-by-side — short tables, not walls -->
+    <!-- Lowest listed vendors side-by-side — short tables, not walls -->
     <section class="border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">Top vendors right now</div>
@@ -155,7 +155,7 @@ const snapshotRows = computed(() => {
   const cheapestClasses = betterClass(props.a.cheapest_price, props.b.cheapest_price, true)
   const vendorClasses = betterClass(props.a.vendor_count, props.b.vendor_count, false)
   return [
-    { label: 'Cheapest', a: fmtPrice(props.a.cheapest_price), b: fmtPrice(props.b.cheapest_price), aClass: cheapestClasses.a, bClass: cheapestClasses.b },
+    { label: 'Lowest listed', a: fmtPrice(props.a.cheapest_price), b: fmtPrice(props.b.cheapest_price), aClass: cheapestClasses.a, bClass: cheapestClasses.b },
     { label: 'Vendors', a: props.a.vendor_count, b: props.b.vendor_count, aClass: vendorClasses.a, bClass: vendorClasses.b },
     { label: 'Products', a: props.a.product_count, b: props.b.product_count },
     { label: 'Half-life', a: props.a.half_life || null, b: props.b.half_life || null },
@@ -277,7 +277,7 @@ const VendorMiniTable = defineComponent({
           h('div', {}, [
             h('div', { class: `text-[14px] font-semibold ${accentText}` }, c.name),
             h('div', { class: 'text-[11px] text-[color:var(--color-ink-subtle)] mt-0.5' },
-              `${c.vendor_count} vendors, cheapest ${fmtPrice(c.cheapest_price) || '—'}`),
+              `${c.vendor_count} ${c.vendor_count === 1 ? 'vendor' : 'vendors'} · lowest listed ${fmtPrice(c.cheapest_price) || '—'}`),
           ]),
           c.compare_url ? h('a', {
             href: c.compare_url,
@@ -291,7 +291,7 @@ const VendorMiniTable = defineComponent({
           }, [
             h('td', { class: 'pl-5 pr-3 py-3' }, [
               h('a', { href: `/brand/${p.brand_slug}`, class: 'text-[13px] font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)]' }, p.brand_name),
-              i === 0 ? h('div', { class: 'text-[10px] uppercase tracking-wide font-bold text-[color:var(--color-verified)] mt-0.5' }, 'Best price') : null,
+              i === 0 ? h('div', { class: 'text-[10px] uppercase tracking-wide font-bold text-[color:var(--color-verified)] mt-0.5' }, 'Lowest listed') : null,
             ]),
             h('td', { class: 'px-3 py-3 text-right ui-mono text-[13px] whitespace-nowrap' },
               p.pmap_price

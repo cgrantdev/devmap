@@ -41,12 +41,7 @@
           <span class="text-[color:var(--color-ink-subtle)]">·</span>
           <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.product_count }}</strong> product{{ compound.product_count === 1 ? '' : 's' }}</span>
           <span v-if="compound.cheapest_price" class="text-[color:var(--color-ink-subtle)]">·</span>
-          <span v-if="compound.cheapest_price">
-            prices from <strong class="ui-mono text-[color:var(--color-verified)]">${{ formatPrice(compound.cheapest_price) }}</strong>
-            <template v-if="compound.priciest_price && compound.priciest_price !== compound.cheapest_price">
-              &nbsp;to <strong class="ui-mono text-[color:var(--color-ink)]">${{ formatPrice(compound.priciest_price) }}</strong>
-            </template>
-          </span>
+          <span v-if="compound.cheapest_price">listed prices vary by vendor</span>
         </div>
 
         <p v-if="!compound.price_intro && compound.summary" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl mb-4">
@@ -164,7 +159,7 @@
                         {{ product.brand_name }}
                       </a>
                       <div v-if="pidx === 0 && !compound.price_stats" class="flex items-center gap-1 mt-0.5">
-                        <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Best price</span>
+                        <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Lowest listed</span>
                       </div>
                     </div>
                   </div>

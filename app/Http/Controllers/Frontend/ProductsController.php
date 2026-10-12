@@ -1094,8 +1094,8 @@ class ProductsController extends Controller
             $seoDescription = $vendorSetting->seo_description ?: $defaultBrandDescription;
             $seoOgTitle = $vendorSetting->seo_og_title ?: $seoTitle;
             $seoOgDescription = $vendorSetting->seo_og_description ?: $seoDescription;
-            // updated_at cache-buster so social platforms refetch when the brand changes.
-            $ogV = ($brand->updated_at?->timestamp) ?: ($vendorSetting->updated_at?->timestamp ?? 0);
+            // updated_at plus the copy revision so social platforms refetch when the card changes.
+            $ogV = (($brand->updated_at?->timestamp) ?: ($vendorSetting->updated_at?->timestamp ?? 0)).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = $vendorSetting->seo_og_image
                 ? \App\Support\OgImageUrl::fold(str_starts_with($vendorSetting->seo_og_image, 'http') ? $vendorSetting->seo_og_image : url($vendorSetting->seo_og_image))
                 : \App\Support\OgImageUrl::brand((string) $brand->slug, (string) $ogV);
@@ -1104,7 +1104,7 @@ class ProductsController extends Controller
             $seoDescription = $defaultBrandDescription;
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
-            $ogV = ($brand->updated_at?->timestamp) ?: ($vendorSetting->updated_at?->timestamp ?? 0);
+            $ogV = (($brand->updated_at?->timestamp) ?: ($vendorSetting->updated_at?->timestamp ?? 0)).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = \App\Support\OgImageUrl::brand((string) $brand->slug, (string) $ogV);
         }
         
