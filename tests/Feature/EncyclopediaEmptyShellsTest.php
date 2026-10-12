@@ -360,7 +360,7 @@ class EncyclopediaEmptyShellsTest extends TestCase
         $this->get('/compare/retatrutide')
             ->assertOk()
             ->assertSee('<h1 class="ssr-seo-h1">Retatrutide Price Comparison</h1>', false)
-            ->assertSee('<title>Retatrutide Price per mg: 0 Vendors Compared — Peptidemap</title>', false)
+            ->assertSee('<title>Retatrutide Vendor Comparison — Peptidemap</title>', false)
             ->assertSee('efficacy estimand', false)
             ->assertSee('treatment-regimen', false)
             ->assertSee('29 Sep 2026', false)
@@ -369,7 +369,7 @@ class EncyclopediaEmptyShellsTest extends TestCase
             ->assertDontSee('research-vendor synonym', false)
             ->assertInertia(fn ($page) => $page
                 ->where('seo.h1', 'Retatrutide Price Comparison')
-                ->where('seo.title', 'Retatrutide Price per mg: 0 Vendors Compared')
+                ->where('seo.title', 'Retatrutide Vendor Comparison')
                 ->where('compound.summary', $lead)
                 ->where('compound.research.lead', $lead)
                 ->where('compound.research.references.0.url', 'https://doi.org/10.1056/NEJMoa2604169')

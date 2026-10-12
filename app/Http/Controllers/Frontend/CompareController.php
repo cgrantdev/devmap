@@ -445,19 +445,17 @@ class CompareController extends Controller
         $cheapest = $documentProducts->first()['final_price'] ?? null;
         $priciest = $documentProducts->last()['final_price'] ?? null;
 
-        // Every compare page, including retatrutide, uses the same neutral
-        // title and meta. $cheapest / $priciest are the first and last
-        // catalog rows and include kits and parent rows, so they stay out
-        // of the title, meta, and social tags.
-        $seoCopy = ComparePageSeo::forCompound($seoName, $vendorCount);
+        // Retatrutide opts into the price-per-mg page body. Only that
+        // page may say "price per mg" in the title and meta. $cheapest /
+        // $priciest are the first and last catalog rows and include kits
+        // and parent rows, so they stay out of the title, meta, and
+        // social tags.
+        $priceUpgrade = is_array($research) && isset($research['h1']);
+        $seoCopy = ComparePageSeo::forCompound($seoName, $vendorCount, $priceUpgrade);
         $seoTitle = $seoCopy['title'];
         $seoDescription = $seoCopy['description'];
         $ogTitle = $seoCopy['og_title'];
         $ogDescription = $seoCopy['og_description'];
-
-        // Retatrutide opts into the price-per-mg page body. The H1 comes
-        // from that narrative; other compounds keep the category name.
-        $priceUpgrade = is_array($research) && isset($research['h1']);
         $priceIntro = null;
         $priceStats = null;
         $codeNames = null;

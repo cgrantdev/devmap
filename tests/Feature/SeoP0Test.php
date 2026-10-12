@@ -90,7 +90,7 @@ class SeoP0Test extends TestCase
         $this->get('/compare/retatrutide')
             ->assertOk()
             ->assertSee('<h1 class="ssr-seo-h1">Retatrutide Price Comparison</h1>', false)
-            ->assertSee('<title>Retatrutide Price per mg: 0 Vendors Compared — Peptidemap</title>', false)
+            ->assertSee('<title>Retatrutide Vendor Comparison — Peptidemap</title>', false)
             ->assertDontSee('<h1 class="ssr-seo-h1">Cheapest Retatrutide</h1>', false)
             ->assertDontSee('<h1 class="ssr-seo-h1">Retatrutide</h1>', false)
             ->assertDontSee('<h1 class="ssr-seo-h1">GLP3-R</h1>', false)

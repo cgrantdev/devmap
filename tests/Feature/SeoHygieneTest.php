@@ -154,10 +154,10 @@ class SeoHygieneTest extends TestCase
         ]);
 
         $pages = [
-            ['name' => 'GHK-Cu', 'slug' => 'ghk-cu', 'vendors' => 1],
-            ['name' => 'BPC-157', 'slug' => 'bpc-157', 'vendors' => 2],
-            ['name' => 'Retatrutide', 'slug' => 'retatrutide', 'vendors' => 1],
-            ['name' => 'Thymosin Beta-4 Fragment 1-4', 'slug' => 'thymosin-beta-4-fragment-1-4', 'vendors' => 2],
+            ['name' => 'GHK-Cu', 'slug' => 'ghk-cu', 'vendors' => 1, 'per_mg' => false],
+            ['name' => 'BPC-157', 'slug' => 'bpc-157', 'vendors' => 2, 'per_mg' => false],
+            ['name' => 'Retatrutide', 'slug' => 'retatrutide', 'vendors' => 1, 'per_mg' => true],
+            ['name' => 'Thymosin Beta-4 Fragment 1-4', 'slug' => 'thymosin-beta-4-fragment-1-4', 'vendors' => 2, 'per_mg' => false],
         ];
 
         foreach ($pages as $index => $page) {
@@ -210,9 +210,14 @@ class SeoHygieneTest extends TestCase
             $this->assertDoesNotMatchRegularExpression('/verified/i', $description);
             $this->assertStringNotContainsString('$', $description);
 
-            $this->assertSame(ComparePageSeo::renderedTitle($page['name'], $page['vendors']), $title);
-            $this->assertSame(ComparePageSeo::description($page['name'], $page['vendors']), $description);
-            $this->assertSame(ComparePageSeo::title($page['name'], $page['vendors']), $ogTitle);
+            $perMg = $page['per_mg'];
+            $this->assertSame(ComparePageSeo::renderedTitle($page['name'], $page['vendors'], $perMg), $title);
+            $this->assertSame(ComparePageSeo::description($page['name'], $page['vendors'], $perMg), $description);
+            $this->assertSame(ComparePageSeo::title($page['name'], $page['vendors'], $perMg), $ogTitle);
+            if (! $perMg) {
+                $this->assertStringNotContainsString('per mg', $title);
+                $this->assertStringNotContainsString('per mg', $description);
+            }
             $this->assertSame($description, $ogDescription);
             $this->assertSame($ogTitle, $twitterTitle);
             $this->assertSame($description, $twitterDescription);
