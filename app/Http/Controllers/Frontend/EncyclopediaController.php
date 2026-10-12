@@ -884,8 +884,8 @@ class EncyclopediaController extends Controller
             $seoOgDescription = $educationPost->seo_og_description ?: $seoDescription;
             $ogV = ($educationPost?->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = $educationPost->seo_og_image
-                ? (str_starts_with($educationPost->seo_og_image, 'http') ? $educationPost->seo_og_image : url($educationPost->seo_og_image))
-                : route('og.compound', ['slug' => $publicSlug]) . '?v=' . $ogV;
+                ? \App\Support\OgImageUrl::fold(str_starts_with($educationPost->seo_og_image, 'http') ? $educationPost->seo_og_image : url($educationPost->seo_og_image))
+                : \App\Support\OgImageUrl::compound($publicSlug, $ogV);
         } else {
             $seoTitle = $stubSeo['title'];
             if ($profile) {
@@ -900,7 +900,7 @@ class EncyclopediaController extends Controller
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
             $ogV = ($educationPost?->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
-            $seoOgImage = route('og.compound', ['slug' => $publicSlug]) . '?v=' . $ogV;
+            $seoOgImage = \App\Support\OgImageUrl::compound($publicSlug, $ogV);
         }
         
         // DefinedTerm + BreadcrumbList JSON-LD (rendered by app.blade.php)

@@ -171,10 +171,8 @@ class BacteriostaticWaterController extends Controller
             'description' => $seoDescription,
             'og_title' => $seoTitle,
             'og_description' => $seoDescription,
-            'og_image' => route('og.compound', ['slug' => 'bacteriostatic-water'])
-                . '?v=' . ($category->updated_at?->timestamp ?? 0) . '-' . \App\Support\OgImageRevision::COPY,
-            'image' => route('og.compound', ['slug' => 'bacteriostatic-water'])
-                . '?v=' . ($category->updated_at?->timestamp ?? 0) . '-' . \App\Support\OgImageRevision::COPY,
+            'og_image' => \App\Support\OgImageUrl::compound('bacteriostatic-water', ($category->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY),
+            'image' => \App\Support\OgImageUrl::compound('bacteriostatic-water', ($category->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY),
             'url' => url('/bacteriostatic-water'),
             'h1' => 'Cheapest Bacteriostatic Water',
             'schema' => [$itemList, $faqSchema, $breadcrumb],

@@ -321,7 +321,7 @@ class EncyclopediaEmptyShellsTest extends TestCase
             );
     }
 
-    public function test_retatrutide_compare_leads_with_triumph_1_treatment_regimen(): void
+    public function test_retatrutide_compare_omits_per_dose_efficacy_figures(): void
     {
         $lead = RetatrutideCompareNarrative::payload()['lead'];
         $this->assertLessThanOrEqual(260, mb_strlen($lead));
@@ -357,24 +357,32 @@ class EncyclopediaEmptyShellsTest extends TestCase
             'overview' => $overview,
         ]);
 
+        $vsSummary = 'Retatrutide is an investigational compound and is not FDA-approved. Trial context is in the encyclopedia entry.';
+
         $this->get('/compare/retatrutide')
             ->assertOk()
             ->assertSee('<h1 class="ssr-seo-h1">Retatrutide Price Comparison</h1>', false)
             ->assertSee('<title>Retatrutide Vendor Comparison — Peptidemap</title>', false)
-            ->assertSee('efficacy estimand', false)
-            ->assertSee('treatment-regimen', false)
-            ->assertSee('29 Sep 2026', false)
+            ->assertSee('Retatrutide is an investigational compound.', false)
+            ->assertSee('Trial context is in the encyclopedia entry.', false)
+            ->assertDontSee('Published trial readouts', false)
+            ->assertDontSee('−25.0%', false)
+            ->assertDontSee('−28.3%', false)
+            ->assertDontSee('−17.6%', false)
+            ->assertDontSee('efficacy estimand', false)
+            ->assertDontSee('treatment-regimen', false)
+            ->assertDontSee('NEJMoa2604169', false)
             ->assertDontSee('Condor', false)
             ->assertDontSee('Peptidemap lists Retatrutide', false)
             ->assertDontSee('research-vendor synonym', false)
             ->assertInertia(fn ($page) => $page
                 ->where('seo.h1', 'Retatrutide Price Comparison')
                 ->where('seo.title', 'Retatrutide Vendor Comparison')
-                ->where('compound.summary', $lead)
-                ->where('compound.research.lead', $lead)
-                ->where('compound.research.references.0.url', 'https://doi.org/10.1056/NEJMoa2604169')
-                ->where('compound.research.references.1.url', 'https://www.prnewswire.com/news-releases/lillys-triple-agonist-retatrutide-delivered-substantial-weight-loss-and-a1c-reduction-underscoring-its-potential-promise-for-people-with-obesity-and-type-2-diabetes-302891798.html')
-                ->where('compound.research.references.2.url', 'https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(26)01861-1/abstract')
+                ->where('compound.summary', null)
+                ->where('compound.research', null)
+                ->where('compound.trial_context.line', 'Retatrutide is an investigational compound.')
+                ->where('compound.trial_context.href', '/encyclopedia/retatrutide')
+                ->where('compound.trial_context.link', 'Trial context is in the encyclopedia entry.')
                 ->has('compound.faqs', 0)
             );
 
@@ -386,8 +394,13 @@ class EncyclopediaEmptyShellsTest extends TestCase
         ProductCategory::create(['name' => 'Tirzepatide', 'slug' => 'tirzepatide', 'is_active' => true]);
         $this->get('/compare/retatrutide-vs-tirzepatide')
             ->assertOk()
-            ->assertSee('efficacy estimand', false)
-            ->assertInertia(fn ($page) => $page->where('a.summary', $lead));
+            ->assertSee($vsSummary, false)
+            ->assertDontSee('−25.0%', false)
+            ->assertDontSee('efficacy estimand', false)
+            ->assertInertia(fn ($page) => $page
+                ->where('a.summary', $vsSummary)
+                ->where('a.encyclopedia_url', '/encyclopedia/retatrutide')
+            );
     }
 
     public function test_parser_rejects_forbidden_kpv_cas_and_stock_images(): void

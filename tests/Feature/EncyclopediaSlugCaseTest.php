@@ -95,7 +95,15 @@ class EncyclopediaSlugCaseTest extends TestCase
         $this->get('/encyclopedia/CJC-1295')
             ->assertOk()
             ->assertSee('<link rel="canonical" href="https://peptidemap.com/encyclopedia/CJC-1295" />', false)
-            ->assertInertia(fn ($view) => $view->where('slug', 'CJC-1295'));
+            ->assertInertia(fn ($view) => $view
+                ->where('slug', 'CJC-1295')
+                ->where('seo.og_image', function ($image) {
+                    return is_string($image)
+                        && str_contains($image, '/og/compound/cjc-1295.png?v=')
+                        && ! str_contains($image, '/og/compound/CJC-1295.png')
+                        && str_ends_with($image, '-'.OgImageRevision::COPY);
+                })
+            );
 
         $this->get('/encyclopedia/5-amino-1mq')
             ->assertOk()
@@ -146,6 +154,55 @@ class EncyclopediaSlugCaseTest extends TestCase
         $this->assertSame(1, count(array_filter($locs, fn ($slug) => strcasecmp($slug, 'cjc-1295') === 0)));
         $this->assertSame(1, count(array_filter($locs, fn ($slug) => strcasecmp($slug, 'slu-pp-332') === 0)));
         $this->assertSame(1, count(array_filter($locs, fn ($slug) => strcasecmp($slug, 'vitamin-b12') === 0)));
+    }
+
+    public function test_mixed_case_compound_og_image_is_lowercase_and_the_route_redirects(): void
+    {
+        ProductCategory::create(['name' => 'TB-500', 'slug' => 'TB-500', 'is_active' => true]);
+        ProductCategory::create(['name' => 'BPC-157', 'slug' => 'BPC-157', 'is_active' => true]);
+
+        $version = '99-'.OgImageRevision::COPY;
+
+        $this->get('/encyclopedia/TB-500')
+            ->assertOk()
+            ->assertInertia(fn ($view) => $view
+                ->where('seo.og_image', function ($image) use ($version) {
+                    return is_string($image)
+                        && str_contains($image, '/og/compound/tb-500.png?v=')
+                        && ! str_contains($image, '/og/compound/TB-500.png')
+                        && str_ends_with($image, '-'.OgImageRevision::COPY);
+                })
+            );
+
+        $this->get('/encyclopedia/BPC-157')
+            ->assertOk()
+            ->assertSee('/og/compound/bpc-157.png?v=', false)
+            ->assertDontSee('/og/compound/BPC-157.png', false);
+
+        $this->get('/og/compound/TB-500.png?v='.$version)
+            ->assertStatus(301)
+            ->assertRedirect('/og/compound/tb-500.png?v='.$version);
+
+        $this->get('/og/compound/BPC-157.png?v='.$version)
+            ->assertStatus(301)
+            ->assertRedirect('/og/compound/bpc-157.png?v='.$version);
+
+        $this->get('/og/compound/tb-500.png?v='.$version)
+            ->assertOk()
+            ->assertHeaderMissing('Location');
+    }
+
+    public function test_mixed_case_brand_og_image_redirects_to_lowercase(): void
+    {
+        $version = '99-'.OgImageRevision::COPY;
+
+        $this->get('/og/brand/Southern-Aminos.png?v='.$version)
+            ->assertStatus(301)
+            ->assertRedirect('/og/brand/southern-aminos.png?v='.$version);
+
+        $this->get('/og/brand/southern-aminos.png?v='.$version)
+            ->assertOk()
+            ->assertHeaderMissing('Location');
     }
 
     public function test_forced_family_letter_case_redirects_to_the_hyphen_slug(): void

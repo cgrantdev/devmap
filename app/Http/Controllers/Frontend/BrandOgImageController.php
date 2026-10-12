@@ -6,10 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Frontend\Concerns\RendersOgImage;
 use App\Models\Brand;
 use App\Models\Product;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Per-brand storefront OG image: GET /og/brand/{slug}.png
@@ -21,9 +20,20 @@ class BrandOgImageController extends Controller
     private const CACHE_DIR = 'og/brand';
     private const FALLBACK_PNG = 'images/og-default-v8.png';
 
-    public function show(string $slug): Response|BinaryFileResponse
+    public function show(string $slug): Response
     {
+        if ($redirect = $this->redirectMixedCaseSlug('og.brand', $slug)) {
+            return $redirect;
+        }
+
         $brand = Brand::with('vendorSetting')->where('slug', $slug)->where('is_active', true)->first();
+        if (!$brand) {
+            $brand = Brand::with('vendorSetting')
+                ->where('is_active', true)
+                ->whereRaw('LOWER(slug) = ?', [strtolower($slug)])
+                ->orderBy('id')
+                ->first();
+        }
         if (!$brand) return $this->fallbackOg(self::FALLBACK_PNG);
 
         $vs = $brand->vendorSetting;

@@ -183,9 +183,9 @@ class SeoP0Test extends TestCase
                 ->where('compound.faqs.1.q', 'Is the cheapest retatrutide per mg the same as the cheapest vial?')
                 ->where('compound.faqs.7.q', 'Is GLP3-R the same as Retatrutide?')
                 ->where('compound.faqs.7.a', $aliasAnswer)
-                ->where('seo.schema.2.mainEntity.0.name', 'Why is one retatrutide listing cheaper than another?')
-                ->where('seo.schema.2.mainEntity.7.name', 'Is GLP3-R the same as Retatrutide?')
-                ->where('seo.schema.2.mainEntity.7.acceptedAnswer.text', $aliasAnswer)
+                ->where('seo.schema.1.mainEntity.0.name', 'Why is one retatrutide listing cheaper than another?')
+                ->where('seo.schema.1.mainEntity.7.name', 'Is GLP3-R the same as Retatrutide?')
+                ->where('seo.schema.1.mainEntity.7.acceptedAnswer.text', $aliasAnswer)
             );
 
         $this->get('/compare/bpc-157')
@@ -197,7 +197,7 @@ class SeoP0Test extends TestCase
                 ->where('compound.name', 'BPC-157')
                 ->where('compound.alias', null)
                 ->has('compound.faqs', 4)
-                ->has('seo.schema.3.mainEntity', 4)
+                ->has('seo.schema.1.mainEntity', 4)
             );
 
         $this->get('/compare/glow')
@@ -209,8 +209,8 @@ class SeoP0Test extends TestCase
                 ->has('compound.faqs', 5)
                 ->where('compound.faqs.4.q', "Is {$glowAlias} the same as GLOW?")
                 ->where('compound.faqs.4.a', $glowAnswer)
-                ->where('seo.schema.3.mainEntity.4.name', "Is {$glowAlias} the same as GLOW?")
-                ->where('seo.schema.3.mainEntity.4.acceptedAnswer.text', $glowAnswer)
+                ->where('seo.schema.1.mainEntity.4.name', "Is {$glowAlias} the same as GLOW?")
+                ->where('seo.schema.1.mainEntity.4.acceptedAnswer.text', $glowAnswer)
             );
     }
 

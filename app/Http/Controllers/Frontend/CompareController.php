@@ -169,6 +169,8 @@ class CompareController extends Controller
                     // actually pays. Falls back to retail when there's no
                     // PeptideMap discount configured for this vendor.
                     $finalPrice = $pmapPrice ?? $retail;
+                    $countryName = $product->brand?->vendorSetting?->location?->name;
+                    [$currencyCode, $currencySymbol] = \App\Support\Currency::forCountry($countryName);
 
                     return [
                         'id' => $product->id,
@@ -186,7 +188,9 @@ class CompareController extends Controller
                         'discount_price' => $product->discount_price !== null ? (float) $product->discount_price : null,
                         'effective_price' => $retail,
                         'final_price' => $finalPrice,
-                        'currency_symbol' => \App\Support\Currency::symbolFor($product->brand?->vendorSetting?->location?->name),
+                        'currency_code' => $currencyCode,
+                        'currency_symbol' => $currencySymbol,
+                        'product_url' => $product->product_url,
                         'go_url' => "/go/{$product->id}",
                         'brand_name' => $product->brand?->name,
                         'brand_slug' => $product->brand?->slug,
@@ -207,6 +211,16 @@ class CompareController extends Controller
                 // reintroduces mixed types.
                 ->sortBy(fn ($p) => (float) $p['final_price'])
                 ->values();
+
+            // "from $X" uses the same eligibility rules as per-mg stats.
+            // product_url is only an input to that dedupe key; the hub
+            // payload does not ship vendor URLs or vial images.
+            $claim = $this->listedPriceClaim($products);
+            $products = $products->map(function ($row) {
+                unset($row['product_url']);
+
+                return $row;
+            })->values();
 
             $displayName = CompoundDisplay::label($category->name);
             $educationPost = $category->educationPost;
@@ -241,13 +255,11 @@ class CompareController extends Controller
                     ? EncyclopediaSlug::path($category->slug)
                     : null,
                 'product_count' => $products->count(),
-                // Use final_price (post-coupon) so the 'from $X' badge
-                // shown on the compound header matches what visitors actually
-                // pay — same metric as the row sort below.
-                'cheapest_price' => $products->first()['final_price'] ?? null,
-                // Symbol of the cheapest row so "from £39" reads honestly
-                // when the leading vendor is UK-based.
-                'cheapest_currency_symbol' => $products->first()['currency_symbol'] ?? '$',
+                // Listed price (effective_price) of the eligible set, same rules
+                // as per-mg stats. A coupon price stays in the table and
+                // cannot set this badge.
+                'cheapest_price' => $claim['low'],
+                'cheapest_currency_symbol' => $claim['symbol'],
                 'vendor_count' => $products->pluck('brand_name')->unique()->count(),
                 'prices_updated_iso' => $latestTs?->toIso8601String(),
                 'prices_updated_human' => $latestTs?->diffForHumans(),
@@ -396,6 +408,12 @@ class CompareController extends Controller
             ? $this->productsForCategory($category, false)
             : $products;
 
+        // Headline "from $X" and ItemList share the per-mg / AggregateOffer
+        // eligibility rules, and both quote the listed price. The vendor
+        // table still uses $products, including after-code prices.
+        $claim = $this->listedPriceClaim($documentProducts);
+        $claimProducts = $claim['products'];
+
         // Related compounds — up to 8 other featured compounds by product count.
         // Gives the reader natural next-clicks; also builds the internal-link
         // graph the strategist recommended (rec #16).
@@ -434,22 +452,26 @@ class CompareController extends Controller
         $research = RetatrutideCompareNarrative::forSlug($canonical);
         // Compare copy for retatrutide lives in code so the encyclopedia
         // overview is never overwritten by the TRIUMPH refresh.
-        $summary = is_array($research) ? ($research['lead'] ?? null) : null;
-        if (!$summary) {
+        // The TRIUMPH lead carries per-dose weight-loss figures. Those stay
+        // off this page. Other compounds can still use the encyclopedia blurb.
+        $summary = null;
+        if (!is_array($research)) {
             $summary = $educationPost?->overview ?: $educationPost?->description;
             $summary = $summary ? strip_tags($summary) : null;
         }
 
         $vendorCount = $documentProducts->pluck('brand_name')->unique()->count();
         $productCount = $documentProducts->count();
-        $cheapest = $documentProducts->first()['final_price'] ?? null;
-        $priciest = $documentProducts->last()['final_price'] ?? null;
+        // Headline range is the min/max listed price in the eligible set.
+        // FAQs still use the first catalog row; a follow-up owns that copy.
+        $cheapest = $claim['low'];
+        $priciest = $claim['high'];
+        $faqCheapest = data_get($documentProducts->first(), 'final_price');
+        $faqCheapestFmt = $faqCheapest ? '$'.number_format((float) $faqCheapest, 2) : null;
 
         // Retatrutide opts into the price-per-mg page body. Only that
-        // page may say "price per mg" in the title and meta. $cheapest /
-        // $priciest are the first and last catalog rows and include kits
-        // and parent rows, so they stay out of the title, meta, and
-        // social tags.
+        // page may say "price per mg" in the title and meta. Dollar
+        // amounts stay out of the title, meta, and social tags.
         $priceUpgrade = is_array($research) && isset($research['h1']);
         $seoCopy = ComparePageSeo::forCompound($seoName, $vendorCount, $priceUpgrade);
         $seoTitle = $seoCopy['title'];
@@ -463,7 +485,6 @@ class CompareController extends Controller
         $relatedReading = null;
         $perMgTitle = null;
         $perMgIntro = null;
-        $viewResearch = $research;
         $tokens = [];
 
         if ($priceUpgrade) {
@@ -486,13 +507,9 @@ class CompareController extends Controller
             $codeNames = $this->resolveCodeNames($research['code_names'] ?? null);
             $whyPrices = $this->presentWhyPrices($research['why_prices'] ?? null);
             $relatedReading = $this->presentRelatedReading($research['related_reading'] ?? []);
-            foreach (['h1', 'price_intro', 'per_mg_title', 'per_mg_intro', 'code_names', 'why_prices', 'faqs', 'related_reading'] as $drop) {
-                unset($viewResearch[$drop]);
-            }
 
             $h1 = $research['h1'];
         } else {
-            $cheapestFmt = $cheapest ? '$' . number_format($cheapest, 2) : null;
             $h1 = $seoName;
         }
 
@@ -512,11 +529,11 @@ class CompareController extends Controller
                     ];
                 }
             }
-        } elseif ($vendorCount > 0 && $cheapest) {
+        } elseif ($vendorCount > 0 && $faqCheapest) {
             $faqPairs = [
                 [
                     'q' => "What is the cheapest {$seoName}?",
-                    'a' => "The lowest {$seoName} price on Peptidemap is {$cheapestFmt} from " . ($documentProducts->first()['brand_name'] ?? 'a listed vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
+                    'a' => "The lowest {$seoName} price on Peptidemap is {$faqCheapestFmt} from " . ($documentProducts->first()['brand_name'] ?? 'a listed vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
                 ],
                 [
                     'q' => "How many vendors sell {$seoName}?",
@@ -539,14 +556,16 @@ class CompareController extends Controller
             ];
         }
 
-        // ItemList + Offer schema — turns this from an informational page into
-        // a commercial-intent page for search engines.
-        $itemList = [
+        // ItemList only when at least one listing passes the same rules as
+        // the headline. An all-ineligible catalog (for example a blend
+        // category) omits the list rather than emitting numberOfItems: 0.
+        // Offer price is the listed price, not the after-code price.
+        $itemList = $claimProducts->isEmpty() ? null : [
             '@context' => 'https://schema.org',
             '@type' => 'ItemList',
             'name' => "{$seoName} vendor comparison",
-            'numberOfItems' => $productCount,
-            'itemListElement' => $documentProducts->take(20)->values()->map(fn ($p, $i) => [
+            'numberOfItems' => $claimProducts->count(),
+            'itemListElement' => $claimProducts->take(20)->values()->map(fn ($p, $i) => [
                 '@type' => 'ListItem',
                 'position' => $i + 1,
                 'item' => [
@@ -555,7 +574,7 @@ class CompareController extends Controller
                     'brand' => ['@type' => 'Brand', 'name' => $p['brand_name']],
                     'offers' => [
                         '@type' => 'Offer',
-                        'price' => number_format($p['final_price'] ?? 0, 2, '.', ''),
+                        'price' => number_format((float) ($p['effective_price'] ?? 0), 2, '.', ''),
                         'priceCurrency' => $p['currency_code'] ?? 'USD',
                         'availability' => 'https://schema.org/InStock',
                         'url' => url("/product/{$p['brand_slug']}/{$p['slug']}/{$p['id']}"),
@@ -575,14 +594,15 @@ class CompareController extends Controller
             ],
         ];
 
+        $ogImage = \App\Support\OgImageUrl::compound($slug, ($category->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY);
         $seo = [
             'key' => 'compare-compound',
             'title' => $seoTitle,
             'description' => $seoDescription,
             'og_title' => $ogTitle,
             'og_description' => $ogDescription,
-            'og_image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0) . '-' . \App\Support\OgImageRevision::COPY,
-            'image' => route('og.compound', ['slug' => $slug]) . '?v=' . ($category->updated_at?->timestamp ?? 0) . '-' . \App\Support\OgImageRevision::COPY,
+            'og_image' => $ogImage,
+            'image' => $ogImage,
             'url' => url("/compare/{$slug}"),
             // SSR H1 matches the visible Vue H1. Retatrutide uses the
             // narrative H1; other compounds keep the bare category name.
@@ -593,7 +613,7 @@ class CompareController extends Controller
                 $breadcrumb,
                 $priceUpgrade
                     ? $this->priceUpgradeProductSchema($slug, $seoName, $priceIntro, $priceStats)
-                    : ($vendorCount > 0 && $cheapest ? [
+                    : ($claimProducts->isNotEmpty() && $cheapest ? [
                         '@context' => 'https://schema.org',
                         '@type' => 'Product',
                         '@id' => url("/compare/{$slug}") . '#product',
@@ -604,7 +624,7 @@ class CompareController extends Controller
                             'priceCurrency' => 'USD',
                             'lowPrice' => number_format((float) $cheapest, 2, '.', ''),
                             'highPrice' => number_format((float) ($priciest ?: $cheapest), 2, '.', ''),
-                            'offerCount' => $productCount,
+                            'offerCount' => $claimProducts->count(),
                             'availability' => 'https://schema.org/InStock',
                         ],
                     ] : null),
@@ -659,7 +679,12 @@ class CompareController extends Controller
                 'raw_name' => $category->name,
                 'slug' => $category->slug,
                 'summary' => $summary,
-                'research' => $viewResearch,
+                'research' => null,
+                'trial_context' => $canonical === 'retatrutide' ? [
+                    'line' => 'Retatrutide is an investigational compound.',
+                    'href' => '/encyclopedia/retatrutide',
+                    'link' => 'Trial context is in the encyclopedia entry.',
+                ] : null,
                 'encyclopedia_url' => $educationPost ? EncyclopediaSlug::path($category->slug) : null,
                 'product_count' => $productCount,
                 'vendor_count' => $vendorCount,
@@ -1055,10 +1080,9 @@ class CompareController extends Controller
             'encyclopedia_url' => $ep ? EncyclopediaSlug::path($category->slug) : null,
             'vendor_count' => $products->pluck('brand_name')->unique()->count(),
             'product_count' => $products->count(),
-            'cheapest_price' => $products->first()['final_price'] ?? null,
+            'cheapest_price' => $this->listedPriceClaim($products)['low'],
             'top_vendors' => $products->take(5)->values(),
-            'summary' => (is_array($vsNarrative) ? ($vsNarrative['lead'] ?? null) : null)
-                ?: ($ep?->overview ? strip_tags($ep->overview) : ($ep?->description ? strip_tags($ep->description) : null)),
+            'summary' => $this->vsSummary($category, $vsNarrative, $ep),
             'mechanism' => $ep?->mechanism_of_action_intro ? strip_tags($ep->mechanism_of_action_intro) : null,
             'half_life' => $ep?->half_life,
             'administration' => $ep?->administration,
@@ -1120,6 +1144,77 @@ class CompareController extends Controller
             ->map(fn ($t) => trim($t))
             ->filter(fn ($t) => in_array($t, ['cgmp', 'testing_7x'], true))
             ->isNotEmpty();
+    }
+
+    /**
+     * Listings that pass ComparePriceStats: USD single vials with a confirmed
+     * size, above the median floor, and the other per-mg rules.
+     *
+     * @param  \Illuminate\Support\Collection<int, array<string, mixed>>|array<int, array<string, mixed>>  $products
+     * @return \Illuminate\Support\Collection<int, array<string, mixed>>
+     */
+    private function priceClaimProducts($products)
+    {
+        $eligible = array_fill_keys(
+            array_map(
+                static fn ($id): string => (string) $id,
+                array_column(ComparePriceStats::fromProducts($products)['per_mg']['rows'], 'id')
+            ),
+            true
+        );
+
+        return collect($products)
+            ->filter(fn ($product) => isset($eligible[(string) ($product['id'] ?? '')]))
+            ->values();
+    }
+
+    /**
+     * Eligible listings ordered by listed price (effective_price). Headline
+     * "from $X", the vs "Cheapest" cell, and ItemList use low/high from
+     * this set. After-code prices stay on the vendor table.
+     *
+     * @param  \Illuminate\Support\Collection<int, array<string, mixed>>|array<int, array<string, mixed>>  $products
+     * @return array{products: \Illuminate\Support\Collection<int, array<string, mixed>>, low: float|null, high: float|null, symbol: string}
+     */
+    private function listedPriceClaim($products): array
+    {
+        $claim = $this->priceClaimProducts($products)
+            ->sortBy(fn ($product) => (float) ($product['effective_price'] ?? INF))
+            ->values();
+
+        if ($claim->isEmpty()) {
+            return ['products' => $claim, 'low' => null, 'high' => null, 'symbol' => '$'];
+        }
+
+        $low = round((float) $claim->first()['effective_price'], 2);
+        $high = round((float) $claim->max(fn ($product) => (float) ($product['effective_price'] ?? 0)), 2);
+
+        return [
+            'products' => $claim,
+            'low' => $low,
+            'high' => $high,
+            'symbol' => $claim->first()['currency_symbol'] ?? '$',
+        ];
+    }
+
+    /**
+     * Vs-page overview. Retatrutide's narrative lead quotes per-dose trial
+     * figures, so that page gets the investigational line instead. Other
+     * compounds keep the narrative lead or the encyclopedia blurb.
+     */
+    private function vsSummary(ProductCategory $category, ?array $vsNarrative, $ep): ?string
+    {
+        if (strtolower((string) $category->slug) === 'retatrutide') {
+            return 'Retatrutide is an investigational compound and is not FDA-approved. Trial context is in the encyclopedia entry.';
+        }
+
+        if (is_array($vsNarrative) && filled($vsNarrative['lead'] ?? null)) {
+            return $vsNarrative['lead'];
+        }
+
+        $summary = $ep?->overview ?: $ep?->description;
+
+        return $summary ? strip_tags($summary) : null;
     }
 
     /**
