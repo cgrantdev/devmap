@@ -143,14 +143,12 @@
     <div class="footer">
       <div class="stats">
         @if($vendorCount)
-        <span><span class="num">{{ $vendorCount }}</span>Vendors</span>
-        @endif
-        @if($fromPrice)
+        <span><span class="num">{{ $vendorCount }}</span>{{ $vendorCount === 1 ? 'Vendor' : 'Vendors' }}</span>
         <span class="sep">·</span>
-        <span>From <span class="num">${{ number_format($fromPrice, 2) }}</span></span>
         @endif
+        <span>Catalog data</span>
         <span class="sep">·</span>
-        <span>Live prices · Coupons</span>
+        <span>RUO</span>
       </div>
       <div class="url"><span class="dot"></span>peptidemap.com</div>
     </div>

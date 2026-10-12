@@ -27,9 +27,9 @@
           <span class="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)]">Also known as</span>
           <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] text-[12px] font-semibold ui-mono text-[color:var(--color-ink)]">{{ compound.alias }}</span>
         </div>
-        <!-- H2 targets "buy {compound}" queries. Retatrutide uses price_intro
-             instead. An empty catalog omits the Buy heading. -->
-        <h2 v-if="compound.vendor_count > 0 && !compound.price_intro" class="sr-only">Buy {{ compound.name }} — Compare {{ compound.vendor_count }} vendor prices</h2>
+        <!-- Screen-reader heading for the comparison. Retatrutide uses
+             price_intro instead. An empty catalog omits the heading. -->
+        <h2 v-if="compound.vendor_count > 0 && !compound.price_intro" class="sr-only">{{ compound.name }} — compare listings from {{ compound.vendor_count }} {{ compound.vendor_count === 1 ? 'vendor' : 'vendors' }}</h2>
 
         <p v-if="compound.price_intro" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl">
           {{ compound.price_intro }}
@@ -326,11 +326,8 @@
       </div>
     </section>
 
-    <!-- FAQ — must render VISIBLY on the page for the FAQPage schema
-         we emit server-side to earn a Google rich snippet. Answers pull
-         real data (vendor count, cheapest price, top vendor) so the
-         SERP snippet doubles as instant social proof for commercial-
-         intent queries like "cheap {compound}" / "buy {compound}". -->
+    <!-- FAQ — rendered visibly so it matches the FAQPage schema.
+         Answers are catalog counts. They do not name a price or a vendor. -->
     <section v-if="compound.faqs && compound.faqs.length" class="border-t border-[color:var(--color-hairline)] bg-white">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">

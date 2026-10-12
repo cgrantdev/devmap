@@ -157,9 +157,49 @@ class ComparePriceClaimTest extends TestCase
 
         $this->assertNull($props['compound']['cheapest_price']);
         $this->assertNotEmpty($props['compound']['faqs']);
+        foreach ($props['compound']['faqs'] as $faq) {
+            $this->assertStringNotContainsString('$', $faq['q']);
+            $this->assertStringNotContainsString('$', $faq['a']);
+        }
         $types = array_column($props['seo']['schema'], '@type');
         $this->assertNotContains('ItemList', $types);
         $this->assertNotContains('Product', $types);
+    }
+
+    public function test_product_schema_fallback_is_singular_for_one_vendor(): void
+    {
+        $category = ProductCategory::create([
+            'name' => 'BPC-157',
+            'slug' => 'bpc-157',
+            'is_active' => true,
+        ]);
+        $us = Location::create(['name' => 'United States']);
+        $brand = Brand::create([
+            'name' => 'Solo Research',
+            'slug' => 'solo-research',
+            'is_active' => true,
+        ]);
+        VendorSetting::create([
+            'brand_id' => $brand->id,
+            'location_id' => $us->id,
+        ]);
+        $this->product($brand, $category, 'Solo — 10mg', 'solo-10mg', 40);
+
+        $response = $this->get('/compare/bpc-157');
+        $response->assertOk();
+
+        $props = null;
+        $response->assertInertia(function ($page) use (&$props) {
+            $props = $page->toArray()['props'];
+
+            return $page;
+        });
+
+        $aggregate = collect($props['seo']['schema'])->firstWhere('@type', 'Product');
+        $this->assertSame(
+            'Compare BPC-157 prices across 1 research-peptide vendor.',
+            $aggregate['description']
+        );
     }
 
     private function product(Brand $brand, ProductCategory $category, string $name, string $slug, float $price): void

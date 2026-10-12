@@ -59,7 +59,6 @@ class CompoundOgImageController extends Controller
                 'tagline'     => $this->tagline($ep, $category, $profile),
                 'eyebrow'     => $profile?->ogEyebrow() ?? 'Peptide Compound Guide',
                 'vendorCount' => $this->vendorCount($category),
-                'fromPrice'   => $this->fromPrice($category),
             ])->render()
         );
     }
@@ -74,18 +73,13 @@ class CompoundOgImageController extends Controller
         return Str::limit(strip_tags($raw), 180);
     }
 
+    /**
+     * Same priced-row rule as the compare page, so the card cannot
+     * count a vendor the page leaves out.
+     */
     private function vendorCount(ProductCategory $category): int
     {
         return Product::visible()
-            ->where('status', 'active')
-            ->where('product_category_id', $category->id)
-            ->distinct('brand_id')
-            ->count('brand_id');
-    }
-
-    private function fromPrice(ProductCategory $category): ?float
-    {
-        $min = Product::visible()
             ->where('status', 'active')
             ->where('product_category_id', $category->id)
             ->where(function ($q) {
@@ -94,8 +88,7 @@ class CompoundOgImageController extends Controller
                       $qq->whereNull('discount_price')->where('price', '>', 0);
                   });
             })
-            ->selectRaw('MIN(COALESCE(NULLIF(discount_price, 0), price)) as min_price')
-            ->value('min_price');
-        return $min ? (float) $min : null;
+            ->distinct('brand_id')
+            ->count('brand_id');
     }
 }

@@ -8,5 +8,5 @@ namespace App\Support;
  */
 class OgImageRevision
 {
-    public const COPY = '20261008';
+    public const COPY = '20261012';
 }
