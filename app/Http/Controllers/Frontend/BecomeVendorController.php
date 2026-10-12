@@ -88,7 +88,7 @@ class BecomeVendorController extends Controller
             'apiConsumerKey' => ['nullable', 'required_without:refuseApiAccess', 'string', 'min:10', 'max:255', 'starts_with:ck_'],
             'apiConsumerSecret' => ['nullable', 'required_without:refuseApiAccess', 'string', 'min:10', 'max:255', 'starts_with:cs_'],
             'productCount' => 'nullable|string|max:50',
-            'companyDescription' => 'nullable|string|max:1200',
+            'companyDescription' => 'nullable|string|max:2000',
             'paymentMethods' => 'nullable|array',
             'paymentMethods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
             // Character limits mirror the client-side counters in

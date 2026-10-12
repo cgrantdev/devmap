@@ -218,7 +218,7 @@ class VendorsController extends Controller
             'shop_url' => 'required|url|max:255',
             'referral_url' => 'nullable|url|max:2000',
             'email' => 'nullable|email|max:255',
-            'description' => 'nullable|string|max:1000',
+            'description' => 'nullable|string|max:2000',
             'contact_email' => 'nullable|email|max:255',
             'phone_number' => 'nullable|string|max:50',
             'location' => 'required|string|max:255',
@@ -491,7 +491,7 @@ class VendorsController extends Controller
             // Reported Aug 2026 via video attachment.
             'referral_url' => 'nullable|url|max:2048',
             'email' => 'nullable|email|max:255',
-            'description' => 'nullable|string|max:1000',
+            'description' => 'nullable|string|max:2000',
             'contact_email' => 'nullable|email|max:255',
             'phone_number' => 'nullable|string|max:50',
             'location' => 'nullable|string|max:255',
