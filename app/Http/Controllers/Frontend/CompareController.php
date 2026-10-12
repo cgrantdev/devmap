@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\SeoPage;
+use App\Support\ComparePageSeo;
 use App\Support\ComparePriceStats;
 use App\Support\CompareSlug;
 use App\Support\ElamipretideMotsCCompareFaqs;
@@ -444,8 +445,18 @@ class CompareController extends Controller
         $cheapest = $documentProducts->first()['final_price'] ?? null;
         $priciest = $documentProducts->last()['final_price'] ?? null;
 
-        // Retatrutide opts into the price-per-mg page. Title and meta are
-        // built from the vendor count only — never from $cheapest / $priciest.
+        // Every compare page, including retatrutide, uses the same neutral
+        // title and meta. $cheapest / $priciest are the first and last
+        // catalog rows and include kits and parent rows, so they stay out
+        // of the title, meta, and social tags.
+        $seoCopy = ComparePageSeo::forCompound($seoName, $vendorCount);
+        $seoTitle = $seoCopy['title'];
+        $seoDescription = $seoCopy['description'];
+        $ogTitle = $seoCopy['og_title'];
+        $ogDescription = $seoCopy['og_description'];
+
+        // Retatrutide opts into the price-per-mg page body. The H1 comes
+        // from that narrative; other compounds keep the category name.
         $priceUpgrade = is_array($research) && isset($research['h1']);
         $priceIntro = null;
         $priceStats = null;
@@ -481,23 +492,9 @@ class CompareController extends Controller
                 unset($viewResearch[$drop]);
             }
 
-            $seoTitle = "Retatrutide Price per mg: {$vendorCount} Vendors Compared";
-            $seoDescription = "Compare retatrutide listings from {$vendorCount} vendors by vial price and price per mg, incl. catalog codes like SA-3R. Not FDA-approved. RUO only; we sell nothing.";
-            $ogTitle = $seoTitle;
-            $ogDescription = "Retatrutide listings from {$vendorCount} vendors, compared by vial price and price per mg. Catalog data only: Peptidemap sells nothing and endorses no vendor.";
             $h1 = $research['h1'];
         } else {
             $cheapestFmt = $cheapest ? '$' . number_format($cheapest, 2) : null;
-            $priciestFmt = $priciest ? '$' . number_format($priciest, 2) : null;
-            $seoTitle = "Cheapest {$seoName} — {$vendorCount} Vendors Compared";
-            $seoDescription = $vendorCount > 0
-                ? "Compare {$productCount} {$seoName} product" . ($productCount === 1 ? '' : 's')
-                  . " across {$vendorCount} vendor" . ($vendorCount === 1 ? '' : 's')
-                  . ($cheapestFmt ? ". Prices from {$cheapestFmt}" . ($priciestFmt && $priciestFmt !== $cheapestFmt ? " to {$priciestFmt}" : '') : '')
-                  . ". Live prices and coupon codes. Check each vendor's site for COAs."
-                : "Vendor comparison for {$seoName} — currently no in-stock listings on Peptidemap.";
-            $ogTitle = $seoTitle;
-            $ogDescription = $seoDescription;
             $h1 = $seoName;
         }
 
@@ -947,12 +944,12 @@ class CompareController extends Controller
 
         $displayA = $aData['name'];
         $displayB = $bData['name'];
-        $cheapestA = $aData['cheapest_price'] ? '$' . number_format($aData['cheapest_price'], 2) : null;
-        $cheapestB = $bData['cheapest_price'] ? '$' . number_format($bData['cheapest_price'], 2) : null;
 
+        // The vs title is not the compound "Cheapest {name}" template, so
+        // it stays. The old meta appended cheapest dollar amounts from the
+        // same junk-inclusive rows the compound pages no longer quote.
         $seoTitle = "{$displayA} vs {$displayB} — Vendor & Price Comparison";
-        $seoDescription = "{$displayA} vs {$displayB} side-by-side: mechanism, half-life, use cases, best vendors and current prices."
-            . ($cheapestA && $cheapestB ? " Cheapest {$displayA} {$cheapestA}, cheapest {$displayB} {$cheapestB}." : '');
+        $seoDescription = "{$displayA} vs {$displayB} side-by-side: mechanism, half-life, use cases, best vendors and current prices.";
 
         $breadcrumb = [
             '@context' => 'https://schema.org',
