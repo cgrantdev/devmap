@@ -463,11 +463,10 @@ class CompareController extends Controller
         $vendorCount = $documentProducts->pluck('brand_name')->unique()->count();
         $productCount = $documentProducts->count();
         // Headline range is the min/max listed price in the eligible set.
-        // FAQs still use the first catalog row; a follow-up owns that copy.
+        // Generic FAQs do not quote it: blends, kits, and non-USD rows
+        // can have vendors and still have no eligible low price.
         $cheapest = $claim['low'];
         $priciest = $claim['high'];
-        $faqCheapest = data_get($documentProducts->first(), 'final_price');
-        $faqCheapestFmt = $faqCheapest ? '$'.number_format((float) $faqCheapest, 2) : null;
 
         // Retatrutide opts into the price-per-mg page body. Only that
         // page may say "price per mg" in the title and meta. Dollar
@@ -529,23 +528,30 @@ class CompareController extends Controller
                     ];
                 }
             }
-        } elseif ($vendorCount > 0 && $faqCheapest) {
+        } elseif ($vendorCount > 0) {
+            $listingWord = $productCount === 1 ? 'listing' : 'listings';
+            $vendorWord = $vendorCount === 1 ? 'vendor' : 'vendors';
+            // Neutral catalog FAQs. No dollar figure, no named vendor,
+            // and no coupon or discount claim. The same strings feed
+            // the visible FAQ and the FAQPage schema below. The gate
+            // is vendor count only, so an ineligible catalog still
+            // gets the block.
             $faqPairs = [
                 [
-                    'q' => "What is the cheapest {$seoName}?",
-                    'a' => "The lowest {$seoName} price on Peptidemap is {$faqCheapestFmt} from " . ($documentProducts->first()['brand_name'] ?? 'a listed vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
+                    'q' => "How do {$seoName} listings compare across vendors?",
+                    'a' => "Peptidemap lists {$productCount} {$seoName} research {$listingWord} from {$vendorCount} {$vendorWord}. Rows show vial size and listed price. Catalog data only: RUO, and Peptidemap sells nothing and endorses no vendor.",
                 ],
                 [
                     'q' => "How many vendors sell {$seoName}?",
-                    'a' => "{$vendorCount} research-peptide vendors currently stock {$seoName} on Peptidemap, with {$productCount} distinct product listings.",
+                    'a' => "Peptidemap lists {$seoName} from {$vendorCount} research-peptide {$vendorWord}, with {$productCount} distinct product {$listingWord}.",
                 ],
                 [
-                    'q' => "Is there a coupon code for {$seoName}?",
-                    'a' => "Most vendors on Peptidemap offer a Peptidemap coupon code (usually 10–35% off). The exact code and discount for each vendor is listed in the pricing table on this page.",
+                    'q' => "Does Peptidemap sell {$seoName}?",
+                    'a' => "No. Peptidemap publishes catalog data for research use only and sells nothing. Confirm vial size, price, and availability on the vendor's site.",
                 ],
                 [
-                    'q' => "How does Peptidemap compare {$seoName} prices?",
-                    'a' => "Peptidemap ingests each vendor's live catalog daily, applies their current Peptidemap coupon discount, and sorts by the price you actually pay after code. All listings are for research use only (RUO).",
+                    'q' => "How does Peptidemap compare {$seoName} listings?",
+                    'a' => "Peptidemap reads each vendor's catalog and shows vial size and listed price side by side. Listings are for research use only (RUO).",
                 ],
             ];
         }

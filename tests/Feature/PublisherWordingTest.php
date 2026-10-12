@@ -22,6 +22,9 @@ class PublisherWordingTest extends TestCase
                 'verified vendor',
                 'lab-testing status',
                 'verified research-peptide',
+                'What is the cheapest',
+                'usually 10–35% off',
+                'a listed vendor',
             ],
             'app/Http/Controllers/Frontend/HomeController.php' => [
                 '99% HPLC-verified',
@@ -175,7 +178,7 @@ class PublisherWordingTest extends TestCase
             ],
             'app/Http/Controllers/Frontend/CompareController.php' => [
                 'ComparePageSeo::forCompound',
-                'a listed vendor',
+                'How do {$seoName} listings compare across vendors?',
             ],
             'app/Support/ComparePageSeo.php' => [
                 'Catalog data only: RUO, and Peptidemap sells nothing.',
