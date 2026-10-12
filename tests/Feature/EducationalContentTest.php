@@ -280,7 +280,7 @@ class EducationalContentTest extends TestCase
         $this->assertFileExists(public_path(ltrim($beginner->cover, '/')));
         $this->assertFileExists(public_path(ltrim($legality->cover, '/')));
 
-        $newestSlug = 'bpc-157-vs-ghk-cu';
+        $newestSlug = 'aod-9604-vs-tesamorelin';
         $newestImage = '/images/educational/'.$newestSlug.'.png';
 
         $this->get('/blogs')->assertOk()->assertInertia(fn ($page) => $page
@@ -288,17 +288,19 @@ class EducationalContentTest extends TestCase
             ->missing('featured')
             ->where('blogs.data.0.slug', $newestSlug)
             ->where('blogs.data.0.image', $newestImage)
-            ->where('blogs.data.1.slug', 'retatrutide-testing-coa-limits')
-            ->where('blogs.data.1.image', '/images/educational/retatrutide-testing-coa-limits.png')
-            ->where('blogs.data.2.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('blogs.data.3.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('blogs.data.9.slug', 'tesamorelin-vs-sermorelin')
-            ->where('blogs.data.9.image', '/images/educational/tesamorelin-vs-sermorelin.png')
-            ->where('blogs.data.10.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('blogs.data.10.image', $evidencePath)
-            ->where('blogs.data.11.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('blogs.data.11.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
-            ->where('blogs.data.12.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('blogs.data.1.slug', 'bpc-157-vs-ghk-cu')
+            ->where('blogs.data.1.image', '/images/educational/bpc-157-vs-ghk-cu.png')
+            ->where('blogs.data.2.slug', 'retatrutide-testing-coa-limits')
+            ->where('blogs.data.2.image', '/images/educational/retatrutide-testing-coa-limits.png')
+            ->where('blogs.data.3.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('blogs.data.4.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('blogs.data.10.slug', 'tesamorelin-vs-sermorelin')
+            ->where('blogs.data.10.image', '/images/educational/tesamorelin-vs-sermorelin.png')
+            ->where('blogs.data.11.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('blogs.data.11.image', $evidencePath)
+            ->where('blogs.data.12.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('blogs.data.12.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
+            ->where('blogs.data.13.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/news')->assertOk()->assertInertia(fn ($page) => $page
@@ -306,13 +308,14 @@ class EducationalContentTest extends TestCase
             ->missing('featuredBlogs')
             ->where('latestBlogs.0.slug', $newestSlug)
             ->where('latestBlogs.0.image', $newestImage)
-            ->where('latestBlogs.1.slug', 'retatrutide-testing-coa-limits')
-            ->where('latestBlogs.2.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('latestBlogs.3.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('latestBlogs.9.slug', 'tesamorelin-vs-sermorelin')
-            ->where('latestBlogs.10.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('latestBlogs.11.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('latestBlogs.12.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('latestBlogs.1.slug', 'bpc-157-vs-ghk-cu')
+            ->where('latestBlogs.2.slug', 'retatrutide-testing-coa-limits')
+            ->where('latestBlogs.3.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('latestBlogs.4.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('latestBlogs.10.slug', 'tesamorelin-vs-sermorelin')
+            ->where('latestBlogs.11.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('latestBlogs.12.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('latestBlogs.13.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/guides')->assertOk()->assertInertia(fn ($page) => $page
@@ -789,6 +792,98 @@ class EducationalContentTest extends TestCase
 
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee('https://peptidemap.com/blog/bpc-157-vs-ghk-cu', false);
+    }
+
+    public function test_aod_9604_vs_tesamorelin_publishes_once_with_cover_and_matching_faq(): void
+    {
+        $slug = 'aod-9604-vs-tesamorelin';
+        $cover = '/images/educational/'.$slug.'.png';
+
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $blog = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame('AOD-9604 vs Tesamorelin: GH Fragment vs GHRH Analog, Evidence, and Status', $blog->title);
+        $this->assertSame('AOD-9604 and tesamorelin share a "fat loss" shelf but not a class or an evidence tier. An hGH fragment vs a GHRH analog: identity, proposed mechanisms, human trials, FDA, compounding, WADA status, and CoA limits.', $blog->description);
+        $this->assertSame('AOD-9604 vs Tesamorelin: Class, Evidence, and FDA Status', $blog->seo_page_title);
+        $this->assertSame('AOD-9604 is an hGH fragment whose obesity program ended; tesamorelin is a GHRH analog with one FDA-labeled use. Compare evidence, FDA, and WADA status.', $blog->seo_description);
+        $this->assertSame(151, strlen((string) $blog->seo_description));
+        $this->assertSame($blog->seo_page_title, $blog->seo_og_title);
+        $this->assertSame($blog->seo_description, $blog->seo_og_description);
+        $this->assertSame($cover, $blog->image);
+        $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
+        $this->assertSame('2026-10-12', $blog->published_at->toDateString());
+        $this->assertSame('Research', $blog->blog_type);
+        $this->assertSame('11 Min Read', $blog->read_time);
+        $this->assertSame('Peptidemap', $blog->author_name);
+        $this->assertFalse((bool) $blog->is_featured);
+        $this->assertSame('published', $blog->status);
+        $this->assertNull($blog->introduction);
+        $this->assertNull($blog->detailed_analysis);
+        $this->assertNull($blog->conclusion);
+        $this->assertFileExists(public_path('images/educational/'.$slug.'.png'));
+        $this->assertFileExists(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertFileExists(resource_path('content/educational/images/'.$slug.'.png'));
+
+        $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertStringNotContainsString('<!--', $markdown);
+        $this->assertStringNotContainsString('/workspace', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/\A---\n/', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/^# [^#]/m', $markdown);
+
+        $this->assertStringNotContainsString('<!--', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->description);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->image);
+        $this->assertStringNotContainsString('CMS paste', (string) $blog->content);
+        $this->assertStringNotContainsString('CHANGES', (string) $blog->content);
+        $this->assertStringNotContainsString('Note for Meta Optimizer', (string) $blog->content);
+
+        $plain = html_entity_decode(strip_tags((string) $blog->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $faq = $blog->seo_schema[0] ?? null;
+        $this->assertSame('FAQPage', $faq['@type'] ?? null);
+        $this->assertSame('https://peptidemap.com/blog/aod-9604-vs-tesamorelin#faq', $faq['@id'] ?? null);
+        $this->assertCount(6, $faq['mainEntity'] ?? []);
+        foreach ($faq['mainEntity'] as $entity) {
+            $this->assertStringContainsString($entity['name'], $plain);
+            $this->assertSame(
+                $entity['acceptedAnswer']['text'],
+                $this->visibleFaqAnswer($plain, $entity['name'])
+            );
+        }
+
+        $id = $blog->id;
+        $before = Blog::count();
+        EducationalContentPublisher::sync();
+        $this->assertSame($before, Blog::count());
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $again = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame($id, $again->id);
+        $this->assertSame($cover, $again->image);
+        $this->assertSame('2026-10-12', $again->published_at->toDateString());
+        $this->assertFalse((bool) $again->is_featured);
+
+        $page = $this->get('/blog/'.$slug);
+        $page->assertOk();
+        $page->assertSee('AOD-9604 vs Tesamorelin: Class, Evidence, and FDA Status', false);
+        $page->assertSee('GH Fragment vs GHRH Analog, Evidence, and Status', false);
+        $page->assertSee('https://peptidemap.com/blog/aod-9604-vs-tesamorelin', false);
+        $page->assertSee($cover, false);
+        $page->assertSee('Are AOD-9604 and tesamorelin the same kind of peptide?', false);
+        $page->assertSee('Is either FDA-approved?', false);
+        $page->assertDontSee('/workspace', false);
+        $page->assertDontSee('CMS paste', false);
+        $page->assertDontSee('CHANGES', false);
+        $page->assertInertia(fn ($inertia) => $inertia
+            ->where('blog.slug', $slug)
+            ->where('blog.image', $cover)
+            ->where('blog.content', function ($html) {
+                return is_string($html)
+                    && ! str_contains($html, '<!--')
+                    && ! str_contains($html, '/workspace');
+            })
+        );
+
+        $this->get('/sitemap.xml')->assertOk()
+            ->assertSee('https://peptidemap.com/blog/aod-9604-vs-tesamorelin', false);
     }
 
     private function visibleFaqAnswer(string $plain, string $question): string
