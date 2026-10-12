@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend\Concerns;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -18,6 +19,26 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 trait RendersOgImage
 {
     private const CHROMIUM_TIMEOUT_SECONDS = 20;
+
+    /**
+     * Mixed-case /og/{type}/{Slug}.png 301s to the lowercase URL.
+     * The ?v= cache revision (and any other query) is kept.
+     */
+    protected function redirectMixedCaseSlug(string $routeName, string $slug): ?RedirectResponse
+    {
+        $lower = strtolower($slug);
+        if ($lower === $slug) {
+            return null;
+        }
+
+        $target = route($routeName, ['slug' => $lower]);
+        $query = request()->getQueryString();
+        if (is_string($query) && $query !== '') {
+            $target .= '?'.$query;
+        }
+
+        return redirect($target, 301);
+    }
 
     /**
      * Serve a cached PNG or generate it on cache miss.

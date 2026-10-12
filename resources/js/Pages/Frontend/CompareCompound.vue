@@ -50,7 +50,7 @@
         </div>
 
         <p v-if="!compound.price_intro && compound.summary" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl mb-4">
-          {{ compound.research ? compound.summary : truncate(compound.summary, 320) }}
+          {{ truncate(compound.summary, 320) }}
         </p>
 
         <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -290,30 +290,13 @@
       </div>
     </section>
 
-    <!-- Cited trial readout. Retatrutide only; other compounds omit this block. -->
-    <section v-if="compound.research" class="border-t border-[color:var(--color-hairline)] bg-white">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
-        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">
-          Published trial readouts
-        </div>
-        <div class="max-w-3xl space-y-4 text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">
-          <p v-if="compound.price_intro && compound.research.lead">{{ compound.research.lead }}</p>
-          <p v-for="(paragraph, i) in compound.research.paragraphs" :key="'p'+i">{{ paragraph }}</p>
-          <ul v-if="compound.research.key_points?.length" class="list-disc pl-5 space-y-1">
-            <li v-for="(point, i) in compound.research.key_points" :key="'k'+i">{{ point }}</li>
-          </ul>
-          <div v-for="(section, i) in compound.research.sections" :key="'s'+i" class="space-y-2">
-            <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)]">{{ section.title }}</h2>
-            <p v-for="(paragraph, j) in section.paragraphs" :key="'sp'+i+'-'+j">{{ paragraph }}</p>
-          </div>
-          <p v-if="compound.research.conclusion">{{ compound.research.conclusion }}</p>
-          <p v-if="compound.research.regulatory_note">{{ compound.research.regulatory_note }}</p>
-          <ul v-if="compound.research.references?.length" class="space-y-2">
-            <li v-for="(ref, i) in compound.research.references" :key="'r'+i">
-              <a :href="ref.url" class="text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]" rel="noopener noreferrer" target="_blank">{{ ref.title }}</a>
-            </li>
-          </ul>
-        </div>
+    <!-- Retatrutide only. Trial dose outcomes stay on the encyclopedia page. -->
+    <section v-if="compound.trial_context" class="border-t border-[color:var(--color-hairline)] bg-white">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
+        <p class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl">
+          {{ compound.trial_context.line }}
+          <a :href="compound.trial_context.href" class="text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">{{ compound.trial_context.link }}</a>
+        </p>
       </div>
     </section>
 

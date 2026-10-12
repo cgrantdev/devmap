@@ -8,10 +8,9 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Support\EncyclopediaFraming;
 use App\Support\EncyclopediaSlug;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Per-compound OG image: GET /og/compound/{slug}.png
@@ -24,8 +23,12 @@ class CompoundOgImageController extends Controller
     private const CACHE_DIR = 'og/compound';
     private const FALLBACK_PNG = 'images/og-default-v8.png';
 
-    public function show(string $slug): Response|BinaryFileResponse
+    public function show(string $slug): Response
     {
+        if ($redirect = $this->redirectMixedCaseSlug('og.compound', $slug)) {
+            return $redirect;
+        }
+
         $category = ProductCategory::with('educationPost')
             ->where('slug', $slug)
             ->where('is_active', true)

@@ -126,6 +126,18 @@ class RetatrutideComparePriceTest extends TestCase
             $product = collect($props['seo']['schema'])->firstWhere('@type', 'Product');
             $this->assertSame('40.00', $product['offers']['lowPrice']);
             $this->assertSame('USD', $product['offers']['priceCurrency']);
+
+            $this->assertEquals(40.0, $props['compound']['cheapest_price']);
+            $itemList = collect($props['seo']['schema'])->firstWhere('@type', 'ItemList');
+            $this->assertNotNull($itemList);
+            $this->assertSame(1, $itemList['numberOfItems']);
+            $this->assertSame('Example — 10mg', $itemList['itemListElement'][0]['item']['name']);
+            $this->assertSame('40.00', $itemList['itemListElement'][0]['item']['offers']['price']);
+            $listedNames = array_map(fn ($el) => $el['item']['name'], $itemList['itemListElement']);
+            $this->assertNotContains('SA-3R', $listedNames);
+            $this->assertSame('Retatrutide is an investigational compound.', $props['compound']['trial_context']['line']);
+            $this->assertSame('/encyclopedia/retatrutide', $props['compound']['trial_context']['href']);
+            $this->assertNull($props['compound']['research']);
             $this->assertSame($props['compound']['price_intro'], $product['description']);
             $this->assertStringNotContainsString('4.21', $product['description']);
             $this->assertStringNotContainsString('$', $product['description']);

@@ -78,6 +78,7 @@
         // Always emit an og:image — fall back to the site default so social
         // previews never break on pages that forgot to supply one.
         if (empty($seoOgImage)) $seoOgImage = $defaultOgImage;
+        $seoOgImage = \App\Support\OgImageUrl::fold($seoOgImage);
 
         // Full browser title: append site name unless it's the home page OR the
         // controller-supplied title already contains the site name (older controllers
