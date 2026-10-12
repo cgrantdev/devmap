@@ -462,8 +462,8 @@ class CompareController extends Controller
 
         $vendorCount = $documentProducts->pluck('brand_name')->unique()->count();
         $productCount = $documentProducts->count();
-        // Headline range is the min/max listed price in the eligible set.
-        // FAQs still use the first catalog row; a follow-up owns that copy.
+        // Eligible listed min/max. Not the first and last catalog rows:
+        // kits, blends, and other ineligible rows stay out of this range.
         $cheapest = $claim['low'];
         $priciest = $claim['high'];
         $faqCheapest = data_get($documentProducts->first(), 'final_price');
@@ -529,12 +529,18 @@ class CompareController extends Controller
                     ];
                 }
             }
-        } elseif ($vendorCount > 0 && $faqCheapest) {
-            $faqPairs = [
-                [
+        } elseif ($vendorCount > 0) {
+            // Price-free questions whenever a vendor is listed. The dollar
+            // answer is separate, so a blend with no eligible price still
+            // gets the rest of the FAQ.
+            $faqPairs = [];
+            if ($faqCheapest) {
+                $faqPairs[] = [
                     'q' => "What is the cheapest {$seoName}?",
                     'a' => "The lowest {$seoName} price on Peptidemap is {$faqCheapestFmt} from " . ($documentProducts->first()['brand_name'] ?? 'a listed vendor') . ". Peptidemap tracks {$productCount} {$seoName} listings across {$vendorCount} vendors and updates prices daily.",
-                ],
+                ];
+            }
+            array_push($faqPairs,
                 [
                     'q' => "How many vendors sell {$seoName}?",
                     'a' => "{$vendorCount} research-peptide vendors currently stock {$seoName} on Peptidemap, with {$productCount} distinct product listings.",
@@ -547,7 +553,7 @@ class CompareController extends Controller
                     'q' => "How does Peptidemap compare {$seoName} prices?",
                     'a' => "Peptidemap ingests each vendor's live catalog daily, applies their current Peptidemap coupon discount, and sorts by the price you actually pay after code. All listings are for research use only (RUO).",
                 ],
-            ];
+            );
         }
         if ($alias && $faqPairs) {
             $faqPairs[] = [
