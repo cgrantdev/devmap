@@ -174,8 +174,11 @@ class PublisherWordingTest extends TestCase
                 'No reviews yet',
             ],
             'app/Http/Controllers/Frontend/CompareController.php' => [
-                'Live prices and coupon codes. Check each vendor\'s site for COAs.',
+                'ComparePageSeo::forCompound',
                 'a listed vendor',
+            ],
+            'app/Support/ComparePageSeo.php' => [
+                'Catalog data only: RUO, and Peptidemap sells nothing.',
             ],
             'app/Http/Controllers/Frontend/HomeController.php' => [
                 'Live prices and coupon codes. Check each vendor\'s site for COAs.',
@@ -249,8 +252,11 @@ class PublisherWordingTest extends TestCase
     {
         $required = [
             'app/Http/Controllers/Frontend/CompareController.php' => [
-                'Live prices and coupon codes. Check each vendor\'s site for COAs.',
+                'ComparePageSeo::forCompound',
                 'OgImageRevision::COPY',
+            ],
+            'app/Support/ComparePageSeo.php' => [
+                'Catalog data only: RUO, and Peptidemap sells nothing.',
             ],
             'app/Http/Controllers/Frontend/ProductsController.php' => [
                 'Live prices and coupon codes. Check each vendor\'s site for COAs.',

@@ -138,9 +138,10 @@ class RetatrutideComparePriceTest extends TestCase
             $this->assertSame('Retatrutide Price per mg: 2 Vendors Compared', $props['seo']['title']);
             $this->assertSame('Retatrutide Price per mg: 2 Vendors Compared', $props['seo']['og_title']);
             $this->assertSame(
-                'Retatrutide listings from 2 vendors, compared by vial price and price per mg. Catalog data only: Peptidemap sells nothing and endorses no vendor.',
-                $props['seo']['og_description']
+                'Compare Retatrutide research listings from 2 vendors by vial price and price per mg. Catalog data only: RUO, and Peptidemap sells nothing.',
+                $props['seo']['description']
             );
+            $this->assertSame($props['seo']['description'], $props['seo']['og_description']);
             $this->assertStringContainsString('?v=', $props['seo']['og_image']);
             $this->assertStringEndsWith('-'.OgImageRevision::COPY, $props['seo']['og_image']);
 
