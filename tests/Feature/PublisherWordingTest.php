@@ -26,6 +26,10 @@ class PublisherWordingTest extends TestCase
                 'usually 10–35% off',
                 'a listed vendor',
             ],
+            'resources/views/og/compound.blade.php' => [
+                'Live prices · Coupons',
+                'From <span class="num">$',
+            ],
             'app/Http/Controllers/Frontend/HomeController.php' => [
                 '99% HPLC-verified',
                 'Verified on PeptideMap',
@@ -202,14 +206,15 @@ class PublisherWordingTest extends TestCase
                 'Vendor directory',
             ],
             'resources/views/og/compound.blade.php' => [
-                'Live prices · Coupons',
+                'Catalog data',
+                '>RUO<',
             ],
             'resources/views/og/product.blade.php' => [
                 'Live prices',
                 'PMAP coupons',
             ],
             'app/Support/OgImageRevision.php' => [
-                "public const COPY = '20261008'",
+                "public const COPY = '20261012'",
             ],
             'app/Http/Controllers/Frontend/ProductOgImageController.php' => [
                 'OgImageRevision::COPY',
