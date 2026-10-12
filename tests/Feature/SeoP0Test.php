@@ -186,6 +186,8 @@ class SeoP0Test extends TestCase
                 ->where('seo.schema.1.mainEntity.0.name', 'Why is one retatrutide listing cheaper than another?')
                 ->where('seo.schema.1.mainEntity.7.name', 'Is GLP3-R the same as Retatrutide?')
                 ->where('seo.schema.1.mainEntity.7.acceptedAnswer.text', $aliasAnswer)
+                ->where('compound.faqs', fn ($faqs) => $this->faqCopyHasNoDollar($faqs))
+                ->where('seo.schema', fn ($schema) => $this->faqSchemaHasNoDollar($schema))
             );
 
         $bpcCompare = 'Peptidemap lists 1 BPC-157 research listing from 1 vendor. Rows show vial size and listed price. Catalog data only: RUO, and Peptidemap sells nothing and endorses no vendor.';
@@ -215,20 +217,54 @@ class SeoP0Test extends TestCase
                 ->where('seo.schema.1.mainEntity.1.acceptedAnswer.text', 'Peptidemap lists BPC-157 from 1 research-peptide vendor, with 1 distinct product listing.')
                 ->where('seo.schema.1.mainEntity.2.acceptedAnswer.text', 'No. Peptidemap publishes catalog data for research use only and sells nothing. Confirm vial size, price, and availability on the vendor\'s site.')
                 ->where('seo.schema.1.mainEntity.3.acceptedAnswer.text', 'Peptidemap reads each vendor\'s catalog and shows vial size and listed price side by side. Listings are for research use only (RUO).')
+                ->where('compound.faqs', fn ($faqs) => $this->faqCopyHasNoDollar($faqs))
+                ->where('seo.schema', fn ($schema) => $this->faqSchemaHasNoDollar($schema))
             );
 
         $this->get('/compare/glow')
             ->assertOk()
+            ->assertSee('How do GLOW listings compare across vendors?', false)
             ->assertDontSee('research-vendor synonym', false)
             ->assertInertia(fn ($page) => $page
                 ->where('compound.name', 'GLOW')
                 ->where('compound.alias', $glowAlias)
                 ->has('compound.faqs', 5)
+                ->where('compound.faqs.0.q', 'How do GLOW listings compare across vendors?')
                 ->where('compound.faqs.4.q', "Is {$glowAlias} the same as GLOW?")
                 ->where('compound.faqs.4.a', $glowAnswer)
+                ->where('seo.schema.1.@type', 'FAQPage')
+                ->has('seo.schema.1.mainEntity', 5)
+                ->where('seo.schema.1.mainEntity.0.name', 'How do GLOW listings compare across vendors?')
                 ->where('seo.schema.1.mainEntity.4.name', "Is {$glowAlias} the same as GLOW?")
                 ->where('seo.schema.1.mainEntity.4.acceptedAnswer.text', $glowAnswer)
+                ->where('compound.faqs', fn ($faqs) => $this->faqCopyHasNoDollar($faqs))
+                ->where('seo.schema', fn ($schema) => $this->faqSchemaHasNoDollar($schema))
             );
+    }
+
+    private function faqCopyHasNoDollar(iterable $faqs): bool
+    {
+        foreach ($faqs as $faq) {
+            $this->assertStringNotContainsString('$', $faq['q']);
+            $this->assertStringNotContainsString('$', $faq['a']);
+        }
+
+        return true;
+    }
+
+    private function faqSchemaHasNoDollar(iterable $schema): bool
+    {
+        foreach ($schema as $block) {
+            if (($block['@type'] ?? '') !== 'FAQPage') {
+                continue;
+            }
+            foreach ($block['mainEntity'] as $entity) {
+                $this->assertStringNotContainsString('$', $entity['name']);
+                $this->assertStringNotContainsString('$', $entity['acceptedAnswer']['text']);
+            }
+        }
+
+        return true;
     }
 
     public function test_vs_case_and_order_redirect_in_one_hop(): void

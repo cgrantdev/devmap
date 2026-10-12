@@ -348,10 +348,9 @@ class CompareController extends Controller
     /**
      * Per-compound compare page: /compare/{slug}
      *
-     * Focused destination for "cheapest {compound}" / "{compound} vendor
-     * comparison" queries. Shows every visible priced vendor for one
-     * compound, cheapest first, with the compound's encyclopedia summary
-     * and cross-links to related compare pages.
+     * Focused destination for "{compound} vendor comparison" queries.
+     * Shows the visible priced listings for one compound, with the
+     * encyclopedia summary and cross-links to related compare pages.
      *
      * Emits ItemList + Offer schema so Google can treat this as a
      * commercial-intent page (matches strategist rec #10 for encyclopedia).
@@ -462,9 +461,10 @@ class CompareController extends Controller
 
         $vendorCount = $documentProducts->pluck('brand_name')->unique()->count();
         $productCount = $documentProducts->count();
-        // Headline range is the min/max listed price in the eligible set.
-        // Generic FAQs do not quote it: blends, kits, and non-USD rows
-        // can have vendors and still have no eligible low price.
+        // $cheapest and $priciest are the eligible listed min and max,
+        // the same eligible set as the per-mg stats and AggregateOffer.
+        // Generic FAQs do not quote them. A blend can have vendors and
+        // still have no eligible low price.
         $cheapest = $claim['low'];
         $priciest = $claim['high'];
 
@@ -624,7 +624,9 @@ class CompareController extends Controller
                         '@type' => 'Product',
                         '@id' => url("/compare/{$slug}") . '#product',
                         'name' => $seoName,
-                        'description' => $summary ? mb_substr(strip_tags($summary), 0, 300) : "Compare {$seoName} prices across {$vendorCount} research-peptide vendors.",
+                        'description' => $summary
+                            ? mb_substr(strip_tags($summary), 0, 300)
+                            : 'Compare '.$seoName.' prices across '.$vendorCount.' research-peptide '.($vendorCount === 1 ? 'vendor' : 'vendors').'.',
                         'offers' => [
                             '@type' => 'AggregateOffer',
                             'priceCurrency' => 'USD',

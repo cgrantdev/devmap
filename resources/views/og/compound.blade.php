@@ -143,7 +143,7 @@
     <div class="footer">
       <div class="stats">
         @if($vendorCount)
-        <span><span class="num">{{ $vendorCount }}</span>Vendors</span>
+        <span><span class="num">{{ $vendorCount }}</span>{{ $vendorCount === 1 ? 'Vendor' : 'Vendors' }}</span>
         <span class="sep">·</span>
         @endif
         <span>Catalog data</span>

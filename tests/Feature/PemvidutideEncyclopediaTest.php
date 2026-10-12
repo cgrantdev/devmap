@@ -360,7 +360,7 @@ class PemvidutideEncyclopediaTest extends TestCase
         );
 
         $vue = (string) file_get_contents(resource_path('js/Pages/Frontend/CompareCompound.vue'));
-        $this->assertStringContainsString('v-if="compound.vendor_count > 0 && !compound.price_intro" class="sr-only">{{ compound.name }} — compare {{ compound.vendor_count }} vendor listings', $vue);
+        $this->assertStringContainsString('v-if="compound.vendor_count > 0 && !compound.price_intro" class="sr-only">{{ compound.name }} — compare listings from {{ compound.vendor_count }} {{ compound.vendor_count === 1 ? \'vendor\' : \'vendors\' }}', $vue);
         $this->assertStringContainsString('v-if="compound.products.length"', $vue);
 
         $xml = $this->get('/sitemap.xml')->assertOk()->getContent();
