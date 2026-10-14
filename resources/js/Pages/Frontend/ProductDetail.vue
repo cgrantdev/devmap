@@ -434,9 +434,13 @@ const title = computed(() => {
   if (props.seo?.title) {
     return props.seo.title
   }
-  const siteName = page.props.site_name || 'PeptideMap'
-  const vendorName = props.brand?.name || 'our store'
-  return `Buy ${props.product?.name || 'Product'} from ${vendorName} - ${siteName}`
+  const siteName = page.props.site_name || 'Peptidemap'
+  const vendorName = props.brand?.name || ''
+  const productName = props.product?.name || 'Product'
+  const withVendor = vendorName ? `${productName} — ${vendorName} Listing — ${siteName}` : `${productName} Listing — ${siteName}`
+  if (withVendor.length <= 60) return withVendor
+  const shorter = vendorName ? `${productName} — ${vendorName}` : productName
+  return shorter.length <= 60 ? shorter : productName
 })
 
 const description = computed(() => {

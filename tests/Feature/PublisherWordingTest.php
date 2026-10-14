@@ -267,7 +267,7 @@ class PublisherWordingTest extends TestCase
                 'Catalog data only: RUO, and Peptidemap sells nothing.',
             ],
             'app/Http/Controllers/Frontend/ProductsController.php' => [
-                'Live prices and coupon codes. Check each vendor\'s site for COAs.',
+                'ProductPageSeo::',
             ],
             'app/Http/Controllers/Frontend/HomeController.php' => [
                 'Live prices and coupon codes. Check each vendor\'s site for COAs.',

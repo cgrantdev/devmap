@@ -27,59 +27,17 @@ class ProductOgImageController extends Controller
 
         return $this->serveOgImage(
             self::CACHE_DIR,
-            $id.'-'.\App\Support\OgImageRevision::COPY,
+            $id.'-'.\App\Support\OgImageRevision::COPY.'-'.\App\Support\OgImageRevision::PRODUCT,
             $product->updated_at?->timestamp ?? 0,
             self::FALLBACK_PNG,
             fn () => View::make('og.product', [
                 'product' => $product,
                 'productImage' => $this->resolveStorageUrl($product->image_url),
                 'vendorLogo' => $this->resolveStorageUrl($product->brand?->vendorSetting?->logo),
-                'displayPrice' => $this->displayPrice($product),
-                'strikePrice' => $this->strikePrice($product),
-                'discountPct' => $this->discountPct($product),
                 'couponCode' => $product->brand?->vendorSetting?->coupon_code,
-                'couponPct' => $this->couponPct($product),
-                'couponPctLabel' => $this->couponPctLabel($product),
                 'vendorCount' => $this->vendorCount($product),
             ])->render()
         );
-    }
-
-    private function displayPrice(Product $product): ?float
-    {
-        $d = (float) ($product->discount_price ?? 0);
-        $r = (float) ($product->price ?? 0);
-        if ($d > 0 && $d < $r) return $d;
-        return $r > 0 ? $r : null;
-    }
-
-    private function strikePrice(Product $product): ?float
-    {
-        $d = (float) ($product->discount_price ?? 0);
-        $r = (float) ($product->price ?? 0);
-        return ($d > 0 && $d < $r) ? $r : null;
-    }
-
-    private function discountPct(Product $product): ?int
-    {
-        $strike = $this->strikePrice($product);
-        $display = $this->displayPrice($product);
-        if (!$strike || !$display || $strike <= $display) return null;
-        return (int) round((1 - $display / $strike) * 100);
-    }
-
-    private function couponPct(Product $product): ?float
-    {
-        $pct = $product->brand?->vendorSetting?->coupon_discount_percent;
-        return ($pct && $pct > 0 && $pct < 100) ? (float) $pct : null;
-    }
-
-    private function couponPctLabel(Product $product): ?string
-    {
-        $pct = $this->couponPct($product);
-        if ($pct === null) return null;
-        // "15.00" → "15", "12.5" → "12.5"
-        return ((float) $pct == (int) $pct) ? (string) (int) $pct : rtrim(rtrim(number_format($pct, 2), '0'), '.');
     }
 
     private function vendorCount(Product $product): ?int

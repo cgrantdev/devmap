@@ -9,4 +9,10 @@ namespace App\Support;
 class OgImageRevision
 {
     public const COPY = '20261012';
+
+    /**
+     * Product-card copy only. Compound and brand cards stay on COPY so
+     * a product-card wording change does not refetch those images.
+     */
+    public const PRODUCT = '20261014';
 }

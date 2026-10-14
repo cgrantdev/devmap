@@ -106,8 +106,8 @@
     font-size: 14px; font-weight: 600; color: #fff; letter-spacing: -0.01em;
   }
 
-  /* "Buy {product} from {vendor}" style headline — commerce-forward, matches the
-     page's <title>. Sized so ~5-7 words fit on 2 lines within 700px. */
+  /* "{product} · {vendor} listing · RUO" headline. Sized so a long name
+     wraps within three lines inside 700px. */
   .headline {
     font-size: 54px; font-weight: 700; letter-spacing: -0.028em; line-height: 1.05;
     color: #fff;
@@ -307,31 +307,17 @@
         <span class="name">{{ $product->brand->name }}</span>
       </div>
       <div class="headline">
-        Buy {{ $product->display_name ?? $product->name }}
-        @if($product->brand)
-        <span class="from">from</span> <span class="vendor">{{ $product->brand->name }}</span>
-        @endif
+        {{ $product->display_name ?? $product->name }}
+        <span class="from">·</span> <span class="vendor">{{ $product->brand->name }}</span> listing · RUO
       </div>
       @else
-      <div class="headline">{{ $product->display_name ?? $product->name }}</div>
-      @endif
-      @if($displayPrice)
-      <div class="price-row">
-        <span class="price">${{ number_format($displayPrice, 2) }}</span>
-        @if($strikePrice)
-        <span class="price-strike">${{ number_format($strikePrice, 2) }}</span>
-        <span class="price-badge">{{ $discountPct }}% Off</span>
-        @endif
-      </div>
+      <div class="headline">{{ $product->display_name ?? $product->name }} · listing · RUO</div>
       @endif
 
-      {{-- Prominent CTA — coupon savings if we have them, else compare-shopping badge --}}
-      @if($couponCode && $couponPct)
+      {{-- A vendor-supplied code is named without a percent or the code itself. --}}
+      @if($couponCode)
       <div class="cta-chip">
-        <span class="savings">Save {{ $couponPctLabel }}%</span>
-        <span class="divider"></span>
-        <span class="code-label">Code</span>
-        <span class="code">{{ strtoupper($couponCode) }}</span>
+        <span class="savings">Vendor-listed code</span>
       </div>
       @elseif($vendorCount && $vendorCount >= 2)
       <div class="cta-chip compare">

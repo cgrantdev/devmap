@@ -12,6 +12,7 @@ use App\Models\Puse;
 use App\Models\Brand;
 use App\Models\Location;
 use App\Models\Deal;
+use App\Support\ProductPageSeo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
@@ -22,106 +23,41 @@ use RalphJSmit\Laravel\SEO\Support\SEOData;
 class ProductsController extends Controller
 {
     /**
-     * Safely truncate a string to a given length
-     * Works without mbstring extension
+     * Full product <title>, already including " — Peptidemap". Long names
+     * fall back to a shorter pattern inside ProductPageSeo. The meta names
+     * the vendor and, when known, how many vendors list the compound. It
+     * does not quote a price or a coupon percentage.
      */
-    /**
-     * Peptidemap-branded product meta description. Every product page gets
-     * something unique (vendor + price + comparison-shopping angle) instead
-     * of the raw vendor description that would compete against the vendor's
-     * own SERP result.
-     *
-     * Format examples (150-160 chars, always <= 160):
-     *   "SELANK 10mg from Certified Pep — $50.00. Compare 12 vendors on
-     *    Peptidemap, coupon codes, save 10% with code PMAP. Research use only."
-     *   "BPC-157 (10mg) from Amino Club — $39.99 (was $49.99). Compare 25
-     *    vendors, coupon codes, PMAP coupons. Research use only."
-     */
-    /**
-     * Buying-hook-first product SEO title. Leads with "Buy" verb (SEO
-     * rec #5), pairs product with vendor, appends effective price when
-     * we have one. Keeps under 60 chars for Google's SERP truncation
-     * by dropping the site suffix on long names.
-     *
-     * Examples:
-     *   "Buy Tirzepatide 10mg from Amino Club — $89 · Peptidemap"
-     *   "Buy BPC-157 (5mg) from Certified Pep · Peptidemap"
-     */
-    private function buildProductSeoTitle($product, $brand, string $siteName): string
+    private function buildProductSeoTitle($product, $brand): string
     {
-        $productLabel = $product->display_name ?? $product->name;
-        $vendorName = $brand?->name ?? 'listed vendors';
-
-        // Effective price = discount when it's a real sale, else list.
-        $effective = ($product->discount_price && $product->discount_price < $product->price)
-            ? (float) $product->discount_price
-            : (float) $product->price;
-        $priceFragment = $effective > 0 ? ' — $' . rtrim(rtrim(number_format($effective, 2, '.', ''), '0'), '.') : '';
-
-        $core = "Buy {$productLabel} from {$vendorName}{$priceFragment}";
-        $withSite = "{$core} · {$siteName}";
-
-        // Google typically truncates SERP titles at ~60 chars. Drop the
-        // site suffix when the core alone is already long — better to
-        // show the whole hook than have "Peptidemap" get truncated to "…".
-        return mb_strlen($withSite) > 65 ? $core : $withSite;
+        return ProductPageSeo::title(
+            (string) ($product->display_name ?? $product->name),
+            $brand?->name
+        );
     }
 
     private function buildProductMetaDescription($product, $brand): string
     {
-        $vendorName = $brand?->name ?? 'listed vendors';
-        $productLabel = $product->display_name ?? $product->name;
-        $vs = $brand?->vendorSetting;
-
-        // Price segment
-        $priceSegment = '';
-        $retail = (float) ($product->price ?? 0);
-        $discount = (float) ($product->discount_price ?? 0);
-        if ($discount > 0 && $discount < $retail) {
-            $priceSegment = ' — $' . number_format($discount, 2) . ' (was $' . number_format($retail, 2) . ')';
-        } elseif ($retail > 0) {
-            $priceSegment = ' — $' . number_format($retail, 2);
-        }
-
-        // Comparison-shopping angle: how many other vendors carry this compound
-        $compareSegment = '';
+        $vendorCount = 0;
         if ($product->product_category_id) {
-            $vendorCount = \App\Models\Product::visible()
+            $vendorCount = Product::visible()
                 ->where('status', 'active')
                 ->where('product_category_id', $product->product_category_id)
                 ->distinct('brand_id')
                 ->count('brand_id');
-            if ($vendorCount >= 2) {
-                $compareSegment = " Compare {$vendorCount} vendors on Peptidemap,";
-            }
-        }
-        if (!$compareSegment) {
-            $compareSegment = ' Compare listed peptide vendors on Peptidemap,';
         }
 
-        // Coupon segment (PMAP savings)
-        $couponSegment = '';
-        $pct = $vs?->coupon_discount_percent;
-        $code = $vs?->coupon_code;
-        if ($pct && $pct > 0 && $pct < 100 && $code) {
-            // Store may keep pct as decimal ("15.00"). Show whole number when possible.
-            $pctLabel = ((float) $pct == (int) $pct) ? (int) $pct : rtrim(rtrim(number_format((float) $pct, 2), '0'), '.');
-            $couponSegment = " save {$pctLabel}% with code " . strtoupper($code) . '.';
-        } else {
-            $compareSegment = rtrim($compareSegment, ',') . '.';
-            $couponSegment = " Live prices and coupon codes. Check each vendor's site for COAs.";
-        }
-
-        // Compose
-        $desc = "{$productLabel} from {$vendorName}{$priceSegment}.{$compareSegment}{$couponSegment} Research use only.";
-
-        // Safety trim to 158 chars (Google truncates around 155-160)
-        if (function_exists('mb_strlen') && mb_strlen($desc) > 158) {
-            $desc = mb_substr($desc, 0, 155) . '…';
-        }
-        return $desc;
+        return ProductPageSeo::description(
+            (string) ($product->display_name ?? $product->name),
+            $brand?->name,
+            (int) $vendorCount
+        );
     }
 
+    /**
+     * Safely truncate a string to a given length
+     * Works without mbstring extension
+     */
     private function safeLimit($value, $limit = 100, $end = '...')
     {
         if (empty($value)) {
@@ -438,9 +374,8 @@ class ProductsController extends Controller
             }
         }
 
-        // Generate SEO data for product detail
-        // Priority: Use stored SEO data from database, fallback to auto-generated from product fields
-        $siteName = Setting::where('key', 'site_name')->value('value') ?? 'PeptideMap';
+        // Generate SEO data for product detail.
+        // Priority: stored SEO from the database, otherwise the neutral auto title.
         $productSlugForUrl = $product->slug ?: Str::slug($product->display_name ?? $product->name ?? 'product');
         $productUrl = $brand && $brand->slug
             ? url("/product/{$brand->slug}/{$productSlugForUrl}/{$product->id}")
@@ -459,16 +394,8 @@ class ProductsController extends Controller
         // Check if stored SEO data exists
         $hasStoredSeo = !empty($product->seo_page_title) || !empty($product->seo_description);
 
-        // Auto-build a Peptidemap-flavored meta description with vendor + price +
-        // comparison-shopping angle. Beats "Research Peptide (Selank) — 10 MG Key
-        // Features…" scraped verbatim from the vendor's own page (identical to
-        // their SERP result → Google will just prefer the vendor's, not ours).
         $autoSeoDescription = $this->buildProductMetaDescription($product, $brand);
-
-        // Buying-hook-first title (SEO rec #5). Leads with "Buy", includes the
-        // effective price when we have one, and always cites the vendor. Sits
-        // under Google's ~60-char SERP cap for common vendor names.
-        $autoSeoTitle = $this->buildProductSeoTitle($product, $brand, $siteName);
+        $autoSeoTitle = $this->buildProductSeoTitle($product, $brand);
 
         if ($hasStoredSeo) {
             // Admin override wins if they typed a custom title. Otherwise use
@@ -482,7 +409,7 @@ class ProductsController extends Controller
             // busts every downstream cache (Cloudflare edge + Discord/FB/X/
             // LinkedIn OG scrapers that key on URL). Without this, a shared
             // link's preview never updates after the first scrape.
-            $ogV = ($product->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
+            $ogV = ($product->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY.'-'.\App\Support\OgImageRevision::PRODUCT;
             $seoOgImage = $product->seo_og_image
                 ? (str_starts_with($product->seo_og_image, 'http') ? $product->seo_og_image : url($product->seo_og_image))
                 : route('og.product', ['id' => $product->id]) . '?v=' . $ogV;
@@ -491,7 +418,7 @@ class ProductsController extends Controller
             $seoDescription = $autoSeoDescription;
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
-            $ogV = ($product->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
+            $ogV = ($product->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY.'-'.\App\Support\OgImageRevision::PRODUCT;
             $seoOgImage = route('og.product', ['id' => $product->id]) . '?v=' . $ogV;
         }
         
@@ -1186,7 +1113,7 @@ class ProductsController extends Controller
                     'name' => "Does {$brand->name} have a coupon code?",
                     'acceptedAnswer' => [
                         '@type' => 'Answer',
-                        'text' => "Yes — use code {$couponCode} at checkout for " . rtrim(rtrim(number_format($couponPct, 1), '0'), '.') . "% off {$brand->name}. The code and current discount is displayed at the top of every {$brand->name} product page on Peptidemap.",
+                        'text' => "{$brand->name} supplied code {$couponCode} to Peptidemap. Confirm the discount at checkout. Catalog data only: RUO, and Peptidemap sells nothing.",
                     ],
                 ];
             }
