@@ -108,7 +108,7 @@ class BacteriostaticWaterController extends Controller
         $availableSizes = $withVolume->pluck('volume_ml')->unique()->sort()->values()->all();
 
         $vCount = $rows->count();
-        $seoCopy = ComparePageSeo::forCompound('Bacteriostatic Water', $vendorCount);
+        $seoCopy = ComparePageSeo::forCompound('Bacteriostatic Water', $vendorCount, false, true);
         $seoTitle = $seoCopy['title'];
         $seoDescription = $seoCopy['description'];
 

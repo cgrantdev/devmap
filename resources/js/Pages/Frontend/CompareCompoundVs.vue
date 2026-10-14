@@ -26,7 +26,7 @@
           <span class="text-emerald-700">{{ b.name }}</span>
         </h1>
         <p v-if="a.summary || b.summary" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl">
-          Side-by-side vendor comparison, mechanism &amp; use-case differences, and current best prices.
+          Side-by-side vendor comparison, mechanism &amp; use-case differences, and listed prices.
         </p>
         <p v-if="evidenceUrl" class="mt-4 max-w-3xl text-[15px] leading-relaxed">
           <a :href="evidenceUrl" class="font-semibold text-[color:var(--color-accent-600)] underline underline-offset-2 hover:text-[color:var(--color-accent-700)]">Read the evidence comparison</a>

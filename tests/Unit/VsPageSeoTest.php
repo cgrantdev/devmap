@@ -47,6 +47,7 @@ class VsPageSeoTest extends TestCase
             $label = "{$a} vs {$b}";
 
             $this->assertLessThanOrEqual(60, mb_strlen($title), $title);
+            $this->assertGreaterThanOrEqual(140, mb_strlen($description), $description);
             $this->assertLessThanOrEqual(155, mb_strlen($description), $description);
             $this->assertStringNotContainsString('$', $title, $label);
             $this->assertStringNotContainsString('$', $description, $label);

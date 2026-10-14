@@ -246,12 +246,12 @@
       </div>
     </section>
 
-    <!-- Limited Time Discounts Section -->
+    <!-- Vendor-listed discounts -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6 sm:mb-8">
         <div>
-          <h2 class="text-2xl sm:text-3xl text-gray-900 mb-1">Limited Time Discounts</h2>
+          <h2 class="text-2xl sm:text-3xl text-gray-900 mb-1">Vendor-listed discounts</h2>
           <p class="text-sm sm:text-base text-gray-600">Vendor-listed discounts. Confirm the price on the vendor site.</p>
         </div>
         <Link
@@ -358,8 +358,8 @@
             icon="graph"
           />
           <ResourcesToolsSimpleCard
-            title="Best Deals"
-            description="Find the best prices on peptides"
+            title="Discount codes"
+            description="Vendor-supplied codes and sale prices"
             icon="ribbon"
           />
           <ResourcesToolsSimpleCard
@@ -571,7 +571,7 @@ const displayedEncyclopediaPeptides = computed(() => {
   })
 })
 
-// Limited Time Discounts
+// Vendor-listed discounts
 const discountDeals = computed(() => props.discountDeals || [])
 
 // Latest from Our Blog

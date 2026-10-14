@@ -25,7 +25,7 @@ class LandingPageController extends Controller
             'slug' => 'blends',
             'title' => 'Peptide Blends — Compare Multi-Compound Vials',
             'h1' => 'Peptide Blends',
-            'subtitle' => 'Every multi-compound blend across our tracked vendors — sorted cheapest first per blend ratio.',
+            'subtitle' => 'Every multi-compound blend across our tracked vendors — sorted by listed price per blend ratio.',
             'meta_description' => 'Compare peptide blend prices across listed vendors — BPC-157/TB-500, CJC-1295/Ipamorelin, KLOW blends, and more. Live prices, per-mL sorted, coupon codes.',
             'intro' => 'Blends combine two or more peptides in a single vial — often at a lower per-mg cost than buying each compound separately. This page indexes every blend across our tracked vendors so you can compare like-for-like ratios (e.g. 5mg BPC-157 / 5mg TB-500) instead of hunting through individual product pages.',
             'query' => fn ($q) => $q->where('size_mg', 'like', '%/%'),

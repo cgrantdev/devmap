@@ -50,7 +50,8 @@ class BacteriostaticWaterSeoTest extends TestCase
 
         $this->assertSame(ComparePageSeo::renderedTitle('Bacteriostatic Water', 1), $title);
         $this->assertLessThanOrEqual(60, mb_strlen($title), $title);
-        $this->assertSame(ComparePageSeo::description('Bacteriostatic Water', 1), $description);
+        $this->assertSame(ComparePageSeo::description('Bacteriostatic Water', 1, false, true), $description);
+        $this->assertStringContainsString('per mL', $description);
         $this->assertSame($description, $ogDescription);
         $this->assertLessThanOrEqual(155, mb_strlen($description), $description);
         $this->assertStringNotContainsString('Cheapest', $title);
@@ -65,6 +66,7 @@ class BacteriostaticWaterSeoTest extends TestCase
             $page->component('Frontend/BacteriostaticWater')
                 ->where('seo.h1', 'Bacteriostatic Water')
                 ->where('seo.title', ComparePageSeo::title('Bacteriostatic Water', 1))
+                ->where('seo.description', ComparePageSeo::description('Bacteriostatic Water', 1, false, true))
                 ->has('faqs', 7);
 
             $faqs = $page->toArray()['props']['faqs'];

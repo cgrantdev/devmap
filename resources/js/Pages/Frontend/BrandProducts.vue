@@ -1133,7 +1133,7 @@ const description = computed(() => {
     const desc = props.brand.description.replace(/\s+/g, ' ').trim()
     return desc.length > 155 ? desc.substring(0, 155) + '...' : desc
   }
-  return 'Browse products from ' + (props.brand?.name || 'this vendor') + '. Read reviews, compare prices, and find the best deals.'
+  return 'Browse products from ' + (props.brand?.name || 'this vendor') + '. Compare listed prices across vendors. Catalog data only: RUO.'
 })
 
 const url = computed(() => {

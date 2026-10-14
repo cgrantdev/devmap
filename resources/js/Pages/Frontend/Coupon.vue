@@ -100,7 +100,7 @@
           <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-2">Is the {{ brand.name }} coupon code {{ coupon.code }} legit?</h2>
           <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
             {{ coupon.code }} is the code {{ brand.name }} supplied to Peptidemap. Peptidemap does not test codes — confirm the discount at checkout.
-            <span v-if="coupon.percent_off">It gives you {{ coupon.percent_off }}% off at checkout.</span>
+            <span v-if="coupon.percent_off">The vendor lists it as {{ coupon.percent_off }}% off; confirm at checkout.</span>
           </p>
         </div>
         <div>
@@ -110,7 +110,7 @@
           </p>
         </div>
         <div v-if="coupon.lowest_price">
-          <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-2">What's the cheapest product at {{ brand.name }}?</h2>
+          <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-2">Which {{ brand.name }} listings have the lowest listed price?</h2>
           <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
             The lowest-priced active product from {{ brand.name }} on Peptidemap is <strong class="ui-mono text-[color:var(--color-ink)]">${{ coupon.lowest_price.toFixed(2) }}</strong> — code {{ coupon.code }} applies on top.
           </p>

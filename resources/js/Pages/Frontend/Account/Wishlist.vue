@@ -108,7 +108,7 @@
         </h2>
 
         <div v-if="watchedCompounds.length === 0" class="text-center py-14 border border-dashed border-[color:var(--color-hairline)] bg-white rounded-[12px]">
-          <p class="text-[color:var(--color-ink-muted)] text-sm">Watch a compound on the Compare page to see every vendor and get notified of the best price.</p>
+          <p class="text-[color:var(--color-ink-muted)] text-sm">Watch a compound on the Compare page to see every vendor and get notified of price changes.</p>
           <Link href="/compare" class="inline-block mt-3 text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">Browse compounds →</Link>
         </div>
 

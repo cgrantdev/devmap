@@ -109,7 +109,7 @@
               <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ compound.vendor_count }}</span> vendors
             </span>
             <span v-if="compound.from_price" class="ui-mono text-[color:var(--color-verified)]">
-              from ${{ compound.from_price }}
+              lowest listed ${{ compound.from_price }}
             </span>
           </div>
         </a>

@@ -11,8 +11,8 @@ namespace App\Support;
  *
  * app.blade.php appends " — Peptidemap" to the document <title> only.
  * The stored title omits that suffix. The rendered title stays within
- * 60 characters. The meta stays within 155 and does not name a dollar
- * amount, a coupon, or a best vendor.
+ * 60 characters. Featured-pair metas land between 140 and 155
+ * characters and do not name a dollar amount, a coupon, or a best vendor.
  */
 class VsPageSeo
 {
@@ -68,6 +68,7 @@ class VsPageSeo
     {
         $pair = self::pair($a, $b);
         $candidates = [
+            "{$pair} side-by-side: mechanism, half-life, and use cases. Compare vendor listings. Catalog data only: RUO, and Peptidemap sells nothing.",
             "{$pair} side-by-side: mechanism, half-life, and use cases. Catalog data only: RUO, and Peptidemap sells nothing.",
             "{$pair} side-by-side: mechanism, half-life, and use cases. RUO only. Peptidemap sells nothing.",
             "Compare {$pair} listings. Catalog data only: RUO, and Peptidemap sells nothing.",
