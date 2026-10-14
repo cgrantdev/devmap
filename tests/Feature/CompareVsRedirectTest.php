@@ -109,7 +109,7 @@ class CompareVsRedirectTest extends TestCase
         $target->assertDontSee('Retatrutide vs', false);
     }
 
-    public function test_every_featured_vs_pair_returns_200_or_one_redirect_to_200(): void
+    public function test_every_featured_vs_pair_returns_200(): void
     {
         $slugs = collect(CompareController::FEATURED_VS_PAIRS)
             ->flatMap(fn (array $pair) => [$pair['a'], $pair['b']])
@@ -123,8 +123,10 @@ class CompareVsRedirectTest extends TestCase
             ]);
         }
 
+        $this->assertNotEmpty(CompareController::FEATURED_VS_PAIRS);
+
         foreach (CompareController::FEATURED_VS_PAIRS as $pair) {
-            $this->assertCanonicalCompareResolves('/compare/'.$pair['a'].'-vs-'.$pair['b']);
+            $this->get('/compare/'.$pair['a'].'-vs-'.$pair['b'])->assertOk()->assertHeaderMissing('Location');
         }
     }
 
@@ -205,24 +207,6 @@ class CompareVsRedirectTest extends TestCase
         $this->get('/compare/ss-31')
             ->assertNotFound()
             ->assertHeaderMissing('Location');
-    }
-
-    private function assertCanonicalCompareResolves(string $path): void
-    {
-        $response = $this->get($path);
-
-        if ($response->status() === 301) {
-            $location = $response->headers->get('Location');
-            $this->assertNotNull($location, $path.' redirected without a Location header');
-            $target = $this->get($location);
-            $target->assertOk();
-            $target->assertHeaderMissing('Location');
-
-            return;
-        }
-
-        $response->assertOk();
-        $response->assertHeaderMissing('Location');
     }
 
     private function assertOneHop(string $from, string $to): TestResponse

@@ -97,7 +97,7 @@ class CompareController extends Controller
         ['a' => '5-amino-1mq',   'b' => 'mots-c',        'tagline' => 'Metabolic peptides'],
         ['a' => 'bpc-157',       'b' => 'ipamorelin',    'tagline' => 'Recovery vs. growth'],
         // PT-141 is the research code. The active category slug is bremelanotide.
-        ['a' => 'bremelanotide', 'b' => 'kisspeptin',    'tagline' => 'Libido & fertility'],
+        ['a' => 'bremelanotide', 'b' => 'kisspeptin',    'tagline' => 'Melanocortin vs. kisspeptin research'],
         ['a' => 'cagrilintide',  'b' => 'semaglutide',   'tagline' => 'Newer weight-loss combo option'],
     ];
 
@@ -110,6 +110,7 @@ class CompareController extends Controller
      */
     private const VS_SIDE_ALIASES = [
         'reta' => 'retatrutide',
+        // Revisit if a PT-141 category is ever reactivated.
         'pt-141' => 'bremelanotide',
         'pt141' => 'bremelanotide',
     ];
