@@ -96,18 +96,23 @@ class CompareController extends Controller
         ['a' => 'ghk-cu',        'b' => 'tb-500',        'tagline' => 'Regeneration alternatives'],
         ['a' => '5-amino-1mq',   'b' => 'mots-c',        'tagline' => 'Metabolic peptides'],
         ['a' => 'bpc-157',       'b' => 'ipamorelin',    'tagline' => 'Recovery vs. growth'],
-        ['a' => 'kisspeptin',    'b' => 'pt-141',        'tagline' => 'Libido & fertility'],
+        // PT-141 is the research code. The active category slug is bremelanotide.
+        ['a' => 'bremelanotide', 'b' => 'kisspeptin',    'tagline' => 'Melanocortin vs. kisspeptin research'],
         ['a' => 'cagrilintide',  'b' => 'semaglutide',   'tagline' => 'Newer weight-loss combo option'],
     ];
 
     /**
      * Short compare-side spellings rewritten before alphabetical order,
-     * so /compare/cagrilintide-vs-reta 301s once to the live pair.
+     * so /compare/cagrilintide-vs-reta and /compare/kisspeptin-vs-pt-141
+     * each 301 once to the live pair.
      *
      * @var array<string, string>
      */
     private const VS_SIDE_ALIASES = [
         'reta' => 'retatrutide',
+        // Revisit if a PT-141 category is ever reactivated.
+        'pt-141' => 'bremelanotide',
+        'pt141' => 'bremelanotide',
     ];
 
     // Display-name overrides live in App\Support\CompoundDisplay so
@@ -398,13 +403,17 @@ class CompareController extends Controller
             abort(404);
         }
 
-        $category = ProductCategory::findForCompareSlug($canonical);
+        // Research aliases (ss-31 → elamipretide, pt-141 → bremelanotide)
+        // and letter case fold in one hop. A missing target 404s here
+        // instead of 301ing to a URL that would 404.
+        $resolved = $this->canonicalCompareSide($canonical);
+        $category = ProductCategory::findForCompareSlug($resolved);
         if (!$category) {
             abort(404);
         }
 
-        if ($canonical !== $slug) {
-            return redirect()->route('compare.compound', ['slug' => $canonical], 301);
+        if ($resolved !== $slug) {
+            return $this->redirectToCompareSlug($resolved);
         }
 
         $category->load(['educationPost' => function ($q) {
@@ -919,9 +928,9 @@ class CompareController extends Controller
     /**
      * Lowercase hyphenated pair in alphabetical order: a-vs-b with a < b.
      * Encyclopedia aliases (ss-31 / ss31 → elamipretide) and short names
-     * (reta → retatrutide) are rewritten on each side before ordering, so
-     * both directions 301 once to the live pair. Null when the slug is
-     * not a real pair (missing side, or a vs a).
+     * (reta → retatrutide, pt-141 / pt141 → bremelanotide) are rewritten
+     * on each side before ordering, so both directions 301 once to the
+     * live pair. Null when the slug is not a real pair (missing side, or a vs a).
      */
     private function canonicalVsSlug(string $slug): ?string
     {
@@ -943,8 +952,9 @@ class CompareController extends Controller
     /**
      * SS-31 is the research alias for the live elamipretide slug. Other
      * encyclopedia families stay put: their aliases are space or case
-     * forms that CompareSlug::canonical already folds. "reta" is a
-     * compare-only short name for retatrutide.
+     * forms that CompareSlug::canonical already folds. "reta" and
+     * "pt-141" / "pt141" are compare-only names for retatrutide and
+     * bremelanotide.
      */
     private function canonicalCompareSide(string $slug): string
     {
@@ -975,10 +985,21 @@ class CompareController extends Controller
         }
 
         if ($final !== $requested) {
-            return redirect()->route('compare.compound', ['slug' => $final], 301);
+            return $this->redirectToCompareSlug($final);
         }
 
         return null;
+    }
+
+    /**
+     * 301 to a compare slug, keeping the request query string (utm, filters).
+     */
+    private function redirectToCompareSlug(string $slug): RedirectResponse
+    {
+        return redirect(
+            EncyclopediaSlug::withRequestQuery(route('compare.compound', ['slug' => $slug])),
+            301
+        );
     }
 
     /**
