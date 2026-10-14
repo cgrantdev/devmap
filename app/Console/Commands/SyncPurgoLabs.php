@@ -175,6 +175,10 @@ class SyncPurgoLabs extends Command
             })
             ->first();
 
+        // Base update payload — safe to overwrite on every sync.
+        // Price, stock, image, size can change on Purgo's site; we keep
+        // our copy in step. hidden/status stay sync-controlled because
+        // Purgo is an approved vendor — anything they list is live.
         $attrs = [
             'name' => $p['name'],
             'price' => $p['price'],
@@ -184,22 +188,23 @@ class SyncPurgoLabs extends Command
             'stock_status' => 'in_stock',
             'description' => $p['description'],
             'external_id' => $extId,
-            // Julia 10/2: scraped Purgo rows kept landing hidden because
-            // DiscoverProductsJob's auto-hide for uncategorized rows set
-            // hidden=true and this scraper never cleared it. Purgo is an
-            // approved vendor — unhide + status active on every sync.
             'hidden' => false,
             'status' => 'active',
-            'product_category_id' => $this->categorize($slug, $p['name']),
         ];
 
         if ($existing) {
+            // Julia 10/15 — manual category edits in /admin/products were
+            // reverting to Uncategorized every day. Cause: this sync set
+            // product_category_id on every write, overwriting whatever
+            // she just picked. Only categorize on INSERT; on UPDATE,
+            // Julia's manual choice is the source of truth.
             $existing->fill($attrs)->save();
             return 'updated';
         }
 
         $attrs['brand_id'] = $brandId;
         $attrs['slug'] = $this->uniqueSlug($brandId, $p['name'], $slug);
+        $attrs['product_category_id'] = $this->categorize($slug, $p['name']);
         Product::create($attrs);
         return 'new';
     }
