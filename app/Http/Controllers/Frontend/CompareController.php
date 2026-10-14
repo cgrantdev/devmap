@@ -16,6 +16,7 @@ use App\Support\ElamipretideMotsCCompareFaqs;
 use App\Support\EncyclopediaSlug;
 use App\Support\CompoundDisplay;
 use App\Support\RetatrutideCompareNarrative;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -97,6 +98,16 @@ class CompareController extends Controller
         ['a' => 'bpc-157',       'b' => 'ipamorelin',    'tagline' => 'Recovery vs. growth'],
         ['a' => 'kisspeptin',    'b' => 'pt-141',        'tagline' => 'Libido & fertility'],
         ['a' => 'cagrilintide',  'b' => 'semaglutide',   'tagline' => 'Newer weight-loss combo option'],
+    ];
+
+    /**
+     * Short compare-side spellings rewritten before alphabetical order,
+     * so /compare/cagrilintide-vs-reta 301s once to the live pair.
+     *
+     * @var array<string, string>
+     */
+    private const VS_SIDE_ALIASES = [
+        'reta' => 'retatrutide',
     ];
 
     // Display-name overrides live in App\Support\CompoundDisplay so
@@ -369,12 +380,15 @@ class CompareController extends Controller
             // Case-fold and alphabetical order in one hop. Otherwise
             // /compare/Tirzepatide-vs-Retatrutide 301s to the lowercase
             // reverse pair, and showVs 301s again to the alpha URL.
+            // A pair with no live page 404s here instead of 301ing to
+            // that reordered URL (tesamorelin-vs-hgh used to land on
+            // hgh-vs-tesamorelin, which 404s).
             $final = $this->canonicalVsSlug($canonical);
             if (!$final) {
                 abort(404);
             }
-            if ($final !== $slug) {
-                return redirect()->route('compare.compound', ['slug' => $final], 301);
+            if ($redirect = $this->redirectVsIfNeeded($slug, $final)) {
+                return $redirect;
             }
 
             return $this->showVs($final);
@@ -904,9 +918,10 @@ class CompareController extends Controller
 
     /**
      * Lowercase hyphenated pair in alphabetical order: a-vs-b with a < b.
-     * Encyclopedia aliases (ss-31 / ss31 → elamipretide) are rewritten on
-     * each side before ordering, so both directions 301 once to the live
-     * pair. Null when the slug is not a real pair (missing side, or a vs a).
+     * Encyclopedia aliases (ss-31 / ss31 → elamipretide) and short names
+     * (reta → retatrutide) are rewritten on each side before ordering, so
+     * both directions 301 once to the live pair. Null when the slug is
+     * not a real pair (missing side, or a vs a).
      */
     private function canonicalVsSlug(string $slug): ?string
     {
@@ -928,13 +943,78 @@ class CompareController extends Controller
     /**
      * SS-31 is the research alias for the live elamipretide slug. Other
      * encyclopedia families stay put: their aliases are space or case
-     * forms that CompareSlug::canonical already folds.
+     * forms that CompareSlug::canonical already folds. "reta" is a
+     * compare-only short name for retatrutide.
      */
     private function canonicalCompareSide(string $slug): string
     {
+        if (isset(self::VS_SIDE_ALIASES[$slug])) {
+            return self::VS_SIDE_ALIASES[$slug];
+        }
+
         $public = EncyclopediaSlug::publicSlug($slug);
 
         return $public === 'elamipretide' ? $public : $slug;
+    }
+
+    /**
+     * 301 when this pair should not render. HGH vs tesamorelin has no
+     * compare page (HGH scope is undecided), so both orders go to the
+     * live tesamorelin encyclopedia entry — the stored slug, which is
+     * /encyclopedia/Tesamorelin. A lowercase encyclopedia path would
+     * 301 again. Any other pair that would 404 is not reordered first.
+     */
+    private function redirectVsIfNeeded(string $requested, string $final): ?RedirectResponse
+    {
+        if ($fallback = $this->vsFallbackRedirect($final)) {
+            return redirect($fallback, 301);
+        }
+
+        if ($final !== $requested && !$this->vsPairResolves($final)) {
+            abort(404);
+        }
+
+        if ($final !== $requested) {
+            return redirect()->route('compare.compound', ['slug' => $final], 301);
+        }
+
+        return null;
+    }
+
+    /**
+     * Live destination for a pair that must not render a compare page.
+     * Null leaves the request on the normal vs path (200 or 404).
+     */
+    private function vsFallbackRedirect(string $canonicalPair): ?string
+    {
+        if ($canonicalPair !== 'hgh-vs-tesamorelin') {
+            return null;
+        }
+
+        $category = ProductCategory::findForCompareSlug('tesamorelin');
+        if (!$category) {
+            return null;
+        }
+
+        $path = EncyclopediaSlug::path($category->slug);
+
+        return $path ? EncyclopediaSlug::withRequestQuery($path) : null;
+    }
+
+    /**
+     * True when both sides are active categories, which is what showVs
+     * needs before it will return 200. Checked before a canonical-order
+     * 301 so a missing pair cannot redirect to its own 404.
+     */
+    private function vsPairResolves(string $slug): bool
+    {
+        $pos = strpos($slug, '-vs-');
+        if ($pos === false) {
+            return false;
+        }
+
+        return ProductCategory::findForCompareSlug(substr($slug, 0, $pos)) !== null
+            && ProductCategory::findForCompareSlug(substr($slug, $pos + 4)) !== null;
     }
 
     /**
@@ -951,8 +1031,8 @@ class CompareController extends Controller
     {
         $final = $this->canonicalVsSlug($slug);
         if (!$final) abort(404);
-        if ($final !== $slug) {
-            return redirect()->route('compare.compound', ['slug' => $final], 301);
+        if ($redirect = $this->redirectVsIfNeeded($slug, $final)) {
+            return $redirect;
         }
 
         $pos = strpos($final, '-vs-');
