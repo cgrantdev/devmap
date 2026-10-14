@@ -10,6 +10,7 @@ use App\Models\Brand;
 use App\Models\SeoPage;
 use App\Support\ComparePageSeo;
 use App\Support\ComparePriceStats;
+use App\Support\VsPageSeo;
 use App\Support\CompareSlug;
 use App\Support\ElamipretideMotsCCompareFaqs;
 use App\Support\EncyclopediaSlug;
@@ -204,11 +205,10 @@ class CompareController extends Controller
                         'size_mg' => $product->size_mg,
                     ];
                 })
-                // Sort cheapest-first within this compound based on what the
-                // visitor will actually pay (PMAP price when applicable,
-                // retail otherwise). Numeric sort enforced even though
-                // every final_price is now a float, in case a future change
-                // reintroduces mixed types.
+                // Sort by the price the visitor will actually pay (PMAP price
+                // when applicable, retail otherwise). Numeric sort is
+                // enforced even though every final_price is now a float,
+                // in case a future change reintroduces mixed types.
                 ->sortBy(fn ($p) => (float) $p['final_price'])
                 ->values();
 
@@ -269,7 +269,7 @@ class CompareController extends Controller
 
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "compare")
         $defaultTitle = 'Compare Peptide Vendors Side-by-Side — Peptidemap';
-        $defaultDescription = 'Every vendor, every price, sorted cheapest-first. Compare peptide suppliers on GLP-1s, BPC-157, GHK-Cu, TB-500 and 100+ more compounds.';
+        $defaultDescription = 'Compare research peptide listings and prices across vendors, including GLP-1s, BPC-157, GHK-Cu, and TB-500. Catalog data only: RUO.';
 
         $seoPage = SeoPage::where('key', 'compare')->first();
         $seo = [
@@ -976,11 +976,11 @@ class CompareController extends Controller
         $displayA = $aData['name'];
         $displayB = $bData['name'];
 
-        // The vs title is not the compound "Cheapest {name}" template, so
-        // it stays. The old meta appended cheapest dollar amounts from the
-        // same junk-inclusive rows the compound pages no longer quote.
-        $seoTitle = "{$displayA} vs {$displayB} — Vendor & Price Comparison";
-        $seoDescription = "{$displayA} vs {$displayB} side-by-side: mechanism, half-life, use cases, best vendors and current prices.";
+        // Display names are already CompoundDisplay labels, so GLP vs
+        // pages keep GLP3-R / GLP2-T / GLP1-S. VsPageSeo only shortens.
+        $seoCopy = VsPageSeo::forPair($displayA, $displayB);
+        $seoTitle = $seoCopy['title'];
+        $seoDescription = $seoCopy['description'];
 
         $breadcrumb = [
             '@context' => 'https://schema.org',
@@ -1177,9 +1177,9 @@ class CompareController extends Controller
     }
 
     /**
-     * Eligible listings ordered by listed price (effective_price). Headline
-     * "from $X", the vs "Cheapest" cell, and ItemList use low/high from
-     * this set. After-code prices stay on the vendor table.
+     * Eligible listings ordered by listed price (effective_price). The
+     * headline low, the vs "Lowest listed" cell, and ItemList use low/high
+     * from this set. After-code prices stay on the vendor table.
      *
      * @param  \Illuminate\Support\Collection<int, array<string, mixed>>|array<int, array<string, mixed>>  $products
      * @return array{products: \Illuminate\Support\Collection<int, array<string, mixed>>, low: float|null, high: float|null, symbol: string}

@@ -319,7 +319,7 @@ class HomeController extends Controller
 
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "home")
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
-        $defaultDescription = Setting::where('key', 'site_description')->value('value') ?? 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with Peptidemap coupon codes.';
+        $defaultDescription = Setting::where('key', 'site_description')->value('value') ?? 'Compare research peptide listings and prices across vendors. Catalog data only: RUO, and Peptidemap sells nothing.';
         $defaultImage = $heroSlides[0]['image'] ?? null;
 
         $seoPage = SeoPage::where('key', 'home')->first();
@@ -339,7 +339,7 @@ class HomeController extends Controller
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
 
-        // "Best Deals Right Now" — top 10 cheapest post-coupon prices
+        // Listed prices — top 10 post-coupon prices
         // across the whole catalog, biased toward vendors with an active
         // coupon boost. Homepage above-the-fold slot: every visitor
         // sees an actionable buy-now card, driving outbound clicks to
@@ -877,7 +877,7 @@ class HomeController extends Controller
         ];
         session(['page_seo_data' => $seo]);
 
-        // Best Deals Right Now — direct-to-affiliate cards. Ranking is
+        // Listed prices — direct-to-affiliate cards. Ranking is
         // BIGGEST SAVINGS $ + boosted vendors + higher retail price
         // (not lowest absolute price — a \$500 product 30% off is a
         // better 'deal' than a \$10 product at full price, AND yields

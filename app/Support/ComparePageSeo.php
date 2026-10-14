@@ -10,7 +10,9 @@ namespace App\Support;
  * descriptions match the meta description.
  *
  * $perMg is true only when the page actually shows a price-per-mg table
- * (retatrutide). Other compounds compare vial size and listed price.
+ * (retatrutide). $perMl is true only for bacteriostatic water, which
+ * compares vial size and listed price per mL. Other compounds compare
+ * vial size and listed price.
  * An empty catalog uses "{Compound} Vendor Comparison" and does not
  * promise a per-mg figure.
  *
@@ -37,10 +39,10 @@ class ComparePageSeo
     /**
      * @return array{title: string, description: string, og_title: string, og_description: string}
      */
-    public static function forCompound(string $compound, int $vendorCount, bool $perMg = false): array
+    public static function forCompound(string $compound, int $vendorCount, bool $perMg = false, bool $perMl = false): array
     {
         $title = self::title($compound, $vendorCount, $perMg);
-        $description = self::description($compound, $vendorCount, $perMg);
+        $description = self::description($compound, $vendorCount, $perMg, $perMl);
 
         return [
             'title' => $title,
@@ -88,7 +90,7 @@ class ComparePageSeo
         return self::title($compound, $vendorCount, $perMg).self::SITE_SUFFIX;
     }
 
-    public static function description(string $compound, int $vendorCount, bool $perMg = false): string
+    public static function description(string $compound, int $vendorCount, bool $perMg = false, bool $perMl = false): string
     {
         $compound = trim($compound);
         $count = max(0, $vendorCount);
@@ -99,7 +101,9 @@ class ComparePageSeo
 
         $n = (string) $count;
         $vendors = self::vendorLabel($count, false);
-        $basis = $perMg ? 'vial price and price per mg' : 'vial size and listed price';
+        $basis = $perMl
+            ? 'vial size and listed price per mL'
+            : ($perMg ? 'vial price and price per mg' : 'vial size and listed price');
 
         $candidates = [
             "Compare {$compound} research listings from {$n} {$vendors} by {$basis}. Catalog data only: RUO, and Peptidemap sells nothing.",
@@ -113,7 +117,7 @@ class ComparePageSeo
             }
         }
 
-        return self::fitDescription($compound, $n, $vendors, $basis, $perMg);
+        return self::fitDescription($compound, $n, $vendors, $basis, $perMg, $perMl);
     }
 
     private static function emptyDescription(string $compound): string
@@ -136,12 +140,14 @@ class ComparePageSeo
         return $prefix.self::shortenTo($compound, $budget).$tail;
     }
 
-    private static function fitDescription(string $compound, string $countLabel, string $vendors, string $basis, bool $perMg): string
+    private static function fitDescription(string $compound, string $countLabel, string $vendors, string $basis, bool $perMg, bool $perMl = false): string
     {
         $prefix = 'Compare ';
-        $bases = $perMg
-            ? [$basis, 'price per mg']
-            : [$basis, 'listed price'];
+        $bases = $perMl
+            ? [$basis, 'price per mL']
+            : ($perMg
+                ? [$basis, 'price per mg']
+                : [$basis, 'listed price']);
 
         foreach ($bases as $shortBasis) {
             $tail = " listings from {$countLabel} {$vendors} by {$shortBasis}. RUO. Peptidemap sells nothing.";

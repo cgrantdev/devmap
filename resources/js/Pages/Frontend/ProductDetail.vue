@@ -449,7 +449,7 @@ const description = computed(() => {
     const desc = props.product.description.replace(/\s+/g, ' ').trim()
     return desc.length > 155 ? desc.substring(0, 155) + '...' : desc
   }
-  return 'View detailed information about ' + (props.product?.name || 'this product') + '. Compare prices, read reviews, and find the best deals.'
+  return 'View detailed information about ' + (props.product?.name || 'this product') + '. Compare listed prices across vendors. Catalog data only: RUO.'
 })
 
 const url = computed(() => {

@@ -109,7 +109,7 @@
               <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ compound.vendor_count }}</span> vendors
             </span>
             <span v-if="compound.from_price" class="ui-mono text-[color:var(--color-verified)]">
-              from ${{ compound.from_price }}
+              lowest listed ${{ compound.from_price }}
             </span>
           </div>
         </a>
@@ -128,7 +128,7 @@
             See every vendor's price, side by side
           </h2>
           <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
-            {{ formatNumber(stats.compounds) }} compounds across {{ formatNumber(stats.total_vendors) }} vendors. Sorted cheapest-first.
+            {{ formatNumber(stats.compounds) }} compounds across {{ formatNumber(stats.total_vendors) }} vendors. Compare listings and prices.
           </p>
           <div class="mt-auto pt-2">
             <Button as="a" href="/compare" variant="primary">
@@ -265,7 +265,7 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- Best Deals — direct-to-affiliate cards. Moved DOWN from      -->
+    <!-- Listed prices — direct-to-affiliate cards. Moved DOWN from    -->
     <!-- above-the-fold (Colin Sep 7: vendors at the top). Each card  -->
     <!-- = /go/{id} outbound (logged + GA4 + UTM'd).                 -->
     <!-- ========================================================= -->
@@ -274,7 +274,7 @@
         <div class="flex items-baseline justify-between mb-5 flex-wrap gap-2">
           <div>
             <div class="text-[10px] uppercase tracking-[0.14em] font-bold text-amber-700 mb-1">🔥 Live prices — updated daily</div>
-            <h2 class="ui-display text-2xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">Best deals right now</h2>
+            <h2 class="ui-display text-2xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">Listed prices</h2>
           </div>
           <a href="/products" class="text-[12px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">All products →</a>
         </div>

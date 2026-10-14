@@ -139,11 +139,6 @@
   }
   .stats .num { color: #fff; font-weight: 700; margin-right: 6px; letter-spacing: 0.05em; }
   .stats .sep { color: rgba(255,255,255,0.22); }
-  .stats .coupon {
-    padding: 6px 10px; border-radius: 8px;
-    background: rgba(52,211,153,0.14); border: 1px solid rgba(52,211,153,0.4);
-    color: #6ee7b7;
-  }
   .url {
     display: flex; align-items: center; gap: 8px;
     font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
@@ -183,16 +178,12 @@
     <div class="footer">
       <div class="stats">
         @if($productCount)
-        <span><span class="num">{{ $productCount }}</span>Products</span>
-        @endif
-        @if($fromPrice)
+        <span><span class="num">{{ $productCount }}</span>{{ $productCount === 1 ? 'Product' : 'Products' }}</span>
         <span class="sep">·</span>
-        <span>From <span class="num">${{ number_format($fromPrice, 2) }}</span></span>
         @endif
-        @if($couponCode)
+        <span>Catalog data</span>
         <span class="sep">·</span>
-        <span class="coupon">Code {{ strtoupper($couponCode) }}</span>
-        @endif
+        <span>RUO</span>
       </div>
       <div class="url"><span class="dot"></span>peptidemap.com</div>
     </div>

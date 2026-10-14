@@ -5,18 +5,16 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Support\ComparePageSeo;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 /**
- * Dedicated /bacteriostatic-water landing page.
+ * Dedicated /bacteriostatic-water listing page.
  *
- * BAC water is a huge search-volume query for research-peptide buyers
- * (it's what every peptide is reconstituted with). The generic
- * /compare/{slug} template didn't earn "cheapest bac water" ranking
- * because URL, H1, and content didn't say the exact phrase. This
- * controller powers a purpose-built landing page: exact-match URL,
- * per-mL comparison, size filter, educational content, FAQPage schema.
+ * Per-mL comparison of bacteriostatic water listings: exact-match URL,
+ * size filter, educational content, and FAQPage schema. Title and meta
+ * use the same neutral ComparePageSeo patterns as /compare/{slug}.
  */
 class BacteriostaticWaterController extends Controller
 {
@@ -109,15 +107,10 @@ class BacteriostaticWaterController extends Controller
 
         $availableSizes = $withVolume->pluck('volume_ml')->unique()->sort()->values()->all();
 
-        // SEO — exact phrase in title + description.
         $vCount = $rows->count();
-        $seoTitle = 'Cheapest Bacteriostatic Water — Compare '
-            . $vendorCount . ' Vendors';
-        $seoDescription = 'Compare bacteriostatic water prices across '
-            . $vendorCount . ' listed vendors on Peptidemap. '
-            . ($cheapest ? 'From $' . number_format($cheapest, 2) . '. ' : '')
-            . '3mL, 5mL, 10mL, 30mL sizes. Per-mL price sorted cheapest first, '
-            . 'coupon codes included.';
+        $seoCopy = ComparePageSeo::forCompound('Bacteriostatic Water', $vendorCount, false, true);
+        $seoTitle = $seoCopy['title'];
+        $seoDescription = $seoCopy['description'];
 
         $faqs = $this->faqs();
 
@@ -174,7 +167,7 @@ class BacteriostaticWaterController extends Controller
             'og_image' => \App\Support\OgImageUrl::compound('bacteriostatic-water', ($category->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY),
             'image' => \App\Support\OgImageUrl::compound('bacteriostatic-water', ($category->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY),
             'url' => url('/bacteriostatic-water'),
-            'h1' => 'Cheapest Bacteriostatic Water',
+            'h1' => 'Bacteriostatic Water',
             'schema' => [$itemList, $faqSchema, $breadcrumb],
         ];
         session(['page_seo_data' => $seo]);
@@ -186,7 +179,7 @@ class BacteriostaticWaterController extends Controller
                 'product_count' => $vCount,
                 'cheapest_price' => $cheapest,
                 // Mixed-currency page — pull the leading row's symbol so the
-                // "Cheapest" stat card reads as its actual currency, not
+                // lowest-listed stat card reads as its actual currency, not
                 // an implied USD.
                 'cheapest_currency_symbol' => $rows->first()['currency_symbol'] ?? '$',
                 'priciest_price' => $priciest,
@@ -227,20 +220,20 @@ class BacteriostaticWaterController extends Controller
                 'a' => 'Bacteriostatic water is sterile water containing 0.9% benzyl alcohol, which prevents bacterial growth after the vial is punctured. Researchers use it to reconstitute lyophilized peptides, so a single vial can be drawn from multiple times without contamination.',
             ],
             [
-                'q' => 'How much bacteriostatic water do I need?',
-                'a' => 'Typical peptide vials require 1–3 mL of BAC water each. Most researchers buy 10 mL vials and use one BAC vial for several peptides over 3–4 weeks. A 30 mL vial covers a longer research cycle at a better per-mL price.',
+                'q' => 'Why is bacteriostatic water listed with research peptides?',
+                'a' => 'Lyophilized research peptides are sold as dry powder. Bacteriostatic water is the diluent vendors list alongside them. Peptidemap compares vial sizes and listed prices and does not provide reconstitution or dosing guidance.',
             ],
             [
                 'q' => "What's the difference between bacteriostatic water and sterile water?",
-                'a' => 'Sterile water has nothing added; it goes bad quickly once opened. Bacteriostatic water contains 0.9% benzyl alcohol as a preservative, letting a punctured vial be reused for up to 28 days. Only bacteriostatic water is appropriate for reconstituting research peptides used across multiple sessions.',
+                'a' => 'Sterile water has nothing added; it goes bad quickly once opened. Bacteriostatic water contains 0.9% benzyl alcohol as a preservative, so a punctured vial is labeled for reuse for up to 28 days. Peptidemap lists both as catalog data and does not recommend a protocol.',
             ],
             [
-                'q' => "What's the cheapest bacteriostatic water per mL right now?",
-                'a' => 'Prices update daily as vendor scrapes refresh. This page ranks every listing by per-mL price so the top row is always the current best deal — usually a 10 mL or 30 mL vial from an established vendor.',
+                'q' => 'How does this page compare bacteriostatic water listings?',
+                'a' => 'Listings are sorted by per-mL price so vial sizes can be compared across vendors. Prices refresh as vendor listings update. Catalog data only: RUO, and Peptidemap sells nothing.',
             ],
             [
                 'q' => 'Is bacteriostatic water available in different sizes?',
-                'a' => 'Yes. Common sizes are 3 mL, 5 mL, 10 mL, and 30 mL. 10 mL is the most common single-vial size for research use; 30 mL is generally the best per-mL value if you have a running research program.',
+                'a' => 'Yes. Common sizes are 3 mL, 5 mL, 10 mL, and 30 mL. 10 mL is the most common single-vial size on this page. Larger vials list more volume; the per-mL column shows how those listings differ.',
             ],
             [
                 'q' => 'Where is bacteriostatic water shipped from?',

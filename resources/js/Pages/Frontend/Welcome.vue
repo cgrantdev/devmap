@@ -99,16 +99,16 @@
       </div>
     </section>
 
-    <!-- Best Deals Right Now — direct-to-affiliate cards. Every card
+    <!-- Listed prices — direct-to-affiliate cards. Every card
          click fires the /go/{id} outbound redirect which logs the
          click + fires GA4 + tags with UTMs. Boosted vendors surface
-         first, then cheapest post-coupon price. -->
+         first, then the lower post-coupon price. -->
     <section v-if="bestDeals && bestDeals.length" class="bg-gradient-to-b from-amber-50 to-white border-b border-amber-100">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
           <div>
             <div class="text-[10px] uppercase tracking-[0.14em] font-bold text-amber-700 mb-1">🔥 Live prices — updated daily</div>
-            <h2 class="text-2xl sm:text-3xl font-semibold text-gray-900">Best deals right now</h2>
+            <h2 class="text-2xl sm:text-3xl font-semibold text-gray-900">Listed prices</h2>
           </div>
           <a href="/products" class="text-[12px] font-semibold text-indigo-700 hover:text-indigo-900">All products →</a>
         </div>
@@ -246,13 +246,13 @@
       </div>
     </section>
 
-    <!-- Limited Time Discounts Section -->
+    <!-- Vendor-listed discounts -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-6 sm:mb-8">
         <div>
-          <h2 class="text-2xl sm:text-3xl text-gray-900 mb-1">Limited Time Discounts</h2>
-          <p class="text-sm sm:text-base text-gray-600">Save up to 25% with Peptidemap coupon codes</p>
+          <h2 class="text-2xl sm:text-3xl text-gray-900 mb-1">Vendor-listed discounts</h2>
+          <p class="text-sm sm:text-base text-gray-600">Vendor-listed discounts. Confirm the price on the vendor site.</p>
         </div>
         <Link
           href="/deals"
@@ -308,14 +308,14 @@
           />
           <ResourcesToolsCard
             title="Product Comparison"
-            description="Compare products side-by-side to find the best option for your research"
+            description="Compare products side by side across research peptide listings"
             href="/compare"
             cta-text="Compare"
             icon="graph"
           />
           <ResourcesToolsCard
             title="Price Comparison"
-            description="Compare prices across vendors to find the best deals on peptides"
+            description="Compare research peptide listings and prices across vendors"
             href="/compare"
             cta-text="Compare"
             icon="ribbon"
@@ -358,8 +358,8 @@
             icon="graph"
           />
           <ResourcesToolsSimpleCard
-            title="Best Deals"
-            description="Find the best prices on peptides"
+            title="Discount codes"
+            description="Vendor-supplied codes and sale prices"
             icon="ribbon"
           />
           <ResourcesToolsSimpleCard
@@ -435,7 +435,7 @@ const props = defineProps({
     type: Object,
     default: () => ({
       title: 'Compare research-peptide vendors',
-      description: 'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with Peptidemap coupon codes.',
+      description: 'Compare research peptide listings and prices across vendors. Catalog data only: RUO, and Peptidemap sells nothing.',
       og_title: null,
       og_description: null,
       og_image: null,
@@ -455,7 +455,7 @@ const description = computed(() => {
   return (
     props.seo?.description ||
     page.props.site_description ||
-    'Discover top-rated peptide vendors, compare products, and access comprehensive research information. Find the best deals on premium peptides with Peptidemap coupon codes.'
+    'Compare research peptide listings and prices across vendors. Catalog data only: RUO, and Peptidemap sells nothing.'
   )
 })
 
@@ -571,7 +571,7 @@ const displayedEncyclopediaPeptides = computed(() => {
   })
 })
 
-// Limited Time Discounts
+// Vendor-listed discounts
 const discountDeals = computed(() => props.discountDeals || [])
 
 // Latest from Our Blog

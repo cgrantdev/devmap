@@ -18,13 +18,13 @@
     <section class="border-b border-[color:var(--color-hairline)]">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6 pb-10">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">
-          Cheapest per-mL · updated daily
+          Per-mL comparison · updated daily
         </div>
         <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">
-          Cheapest Bacteriostatic Water
+          Bacteriostatic Water
         </h1>
         <p class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl text-lg">
-          Every US vendor stocking BAC water, sorted by <strong class="text-[color:var(--color-ink)]">per-mL price</strong> so a 30 mL vial can beat a smaller cheaper one on the metric that matters. Coupon codes applied automatically.
+          US vendor listings for bacteriostatic water, sorted by <strong class="text-[color:var(--color-ink)]">per-mL price</strong> so vial sizes can be compared. Catalog data only: RUO.
         </p>
       </div>
     </section>
@@ -35,15 +35,15 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard label="Vendors" :value="stats.vendor_count" />
           <StatCard label="Products" :value="stats.product_count" />
-          <StatCard label="Cheapest" :value="stats.cheapest_price ? (stats.cheapest_currency_symbol || '$') + fmt(stats.cheapest_price) : '—'" accent="emerald" />
+          <StatCard label="Lowest listed" :value="stats.cheapest_price ? (stats.cheapest_currency_symbol || '$') + fmt(stats.cheapest_price) : '—'" accent="emerald" />
           <StatCard
             v-if="stats.best_per_ml"
-            label="Best per-mL"
+            label="Lowest listed per mL"
             :value="(stats.best_per_ml.currency_symbol || '$') + stats.best_per_ml.per_ml_price.toFixed(2) + '/mL'"
             :sub="`${stats.best_per_ml.brand_name} · ${stats.best_per_ml.volume_ml} mL`"
             accent="emerald"
           />
-          <StatCard v-else label="Best per-mL" value="—" />
+          <StatCard v-else label="Lowest listed per mL" value="—" />
         </div>
       </div>
     </section>
@@ -95,7 +95,7 @@
                       <a :href="`/brand/${r.brand_slug}`" class="font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors">
                         {{ r.brand_name }}
                       </a>
-                      <div v-if="idx === 0 && !selectedSize" class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)] mt-0.5">Cheapest overall</div>
+                      <div v-if="idx === 0 && !selectedSize" class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)] mt-0.5">Lowest listed</div>
                     </div>
                   </div>
                 </td>
@@ -182,11 +182,11 @@
           </a>
           <a href="/compare" class="p-4 rounded-[10px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all">
             <div class="text-[14px] font-semibold text-[color:var(--color-ink)]">Compare all peptides</div>
-            <div class="text-[11px] text-[color:var(--color-ink-muted)] mt-1">40+ vendors, cheapest first</div>
+            <div class="text-[11px] text-[color:var(--color-ink-muted)] mt-1">Compare research peptide listings</div>
           </a>
           <a href="/vendors" class="p-4 rounded-[10px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all">
             <div class="text-[14px] font-semibold text-[color:var(--color-ink)]">All vendors</div>
-            <div class="text-[11px] text-[color:var(--color-ink-muted)] mt-1">Prices, reviews, COAs, coupon codes</div>
+            <div class="text-[11px] text-[color:var(--color-ink-muted)] mt-1">Vendor listings, prices, and COAs</div>
           </a>
         </div>
       </div>

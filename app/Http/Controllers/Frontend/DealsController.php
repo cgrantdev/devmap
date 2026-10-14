@@ -184,7 +184,7 @@ class DealsController extends Controller
         // Generate SEO data
         $seoData = new SEOData(
             title: 'Peptide Deals & Discount Codes | Peptidemap',
-            description: 'Find the best deals and discount codes for peptides. Save money on top-rated peptide vendors with Peptidemap coupon codes.',
+            description: 'Discount codes and sale prices supplied by vendors. Confirm the price on the vendor site. Catalog data only: RUO, and Peptidemap sells nothing.',
             url: url('/deals'),
         );
         session(['page_seo_data' => $seoData]);

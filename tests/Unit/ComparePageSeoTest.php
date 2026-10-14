@@ -187,4 +187,14 @@ class ComparePageSeoTest extends TestCase
             }
         }
     }
+
+    public function test_bacteriostatic_water_meta_uses_a_per_ml_basis(): void
+    {
+        $description = ComparePageSeo::description('Bacteriostatic Water', 42, false, true);
+
+        $this->assertLessThanOrEqual(155, mb_strlen($description), $description);
+        $this->assertStringContainsString('listed price per mL', $description);
+        $this->assertStringNotContainsString('$', $description);
+        $this->assertStringNotContainsString('per mg', $description);
+    }
 }
