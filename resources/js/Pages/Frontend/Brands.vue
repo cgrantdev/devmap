@@ -170,7 +170,7 @@
               v-if="brand.logo"
               :src="brand.logo"
               :alt="brand.name"
-              class="max-h-full max-w-[75%] object-contain"
+              class="max-h-[55%] max-w-[75%] object-contain"
               loading="lazy"
             />
             <span v-else class="ui-display text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ brand.initials }}</span>
