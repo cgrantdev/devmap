@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Support\CompareSlug;
 use App\Support\EncyclopediaSlug;
+use App\Support\VsPairIndexing;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
@@ -22,7 +23,8 @@ use Illuminate\Support\Facades\Cache;
  */
 class SitemapController extends Controller
 {
-    private const CACHE_KEY = 'sitemap.xml.v4';
+    // v5 adds the vs allowlist. Featured pairs stay. Thin pairs stay out.
+    public const CACHE_KEY = 'sitemap.xml.v5';
     private const CACHE_TTL = 21600; // 6h
     private const BASE_URL  = 'https://peptidemap.com';
 
@@ -172,23 +174,12 @@ class SitemapController extends Controller
                 }
             });
 
-        // Curated X-vs-Y comparison pages. Filter to pairs whose both slugs
-        // resolve to active categories — otherwise we'd emit 404 URLs to
-        // Google after retiring a compound.
-        // Lowercase both sides — MySQL matches case-insensitively but PHP
-        // array-key lookups are case-sensitive. Production is not all
-        // lowercase (CJC-1295, BPC-157, TB-500, Cagrilintide, Survodutide),
-        // so folding both sides keeps a mixed-case stored slug from
-        // dropping a pair that names the lowercase form.
-        $activeSlugs = ProductCategory::where('is_active', true)
-            ->whereNotNull('slug')
-            ->pluck('slug')
-            ->map(fn ($s) => strtolower($s))
-            ->flip();
-        foreach (\App\Http\Controllers\Frontend\CompareController::FEATURED_VS_PAIRS as $p) {
-            if (!isset($activeSlugs[$p['a']]) || !isset($activeSlugs[$p['b']])) continue;
+        // X-vs-Y pages: allowlist union FEATURED_VS_PAIRS. Both category
+        // slugs must be active or the URL is omitted, and each pair is
+        // emitted once. Thin long-tail pairs stay out. See VsPairIndexing.
+        foreach (VsPairIndexing::sitemapSlugs() as $slug) {
             $urls[] = [
-                'loc'        => self::BASE_URL . "/compare/{$p['a']}-vs-{$p['b']}",
+                'loc'        => self::BASE_URL . '/compare/' . $slug,
                 'lastmod'    => $today,
                 'changefreq' => 'weekly',
                 'priority'   => '0.6',

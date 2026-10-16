@@ -119,4 +119,48 @@ return [
          */
         '@username' => null,
     ],
+
+    /**
+     * Canonical /compare/{a}-vs-{b} slugs (a < b) that belong in sitemap.xml
+     * together with CompareController::FEATURED_VS_PAIRS. Alphabetical.
+     * A pair is omitted unless both category slugs are active.
+     *
+     * Starts with selank-vs-semax, elamipretide-vs-mots-c,
+     * mazdutide-vs-tirzepatide, and retatrutide-vs-survodutide, then every
+     * pair with real editorial content. Featured pairs count, so they are
+     * listed here as well as read from FEATURED_VS_PAIRS. Duplicates are
+     * emitted once. See App\Support\VsPairIndexing.
+     */
+    'vs_sitemap_allowlist' => [
+        '5-amino-1mq-vs-mots-c',
+        'aod-9604-vs-tesamorelin',
+        'bpc-157-vs-ghk-cu',
+        'bpc-157-vs-ipamorelin',
+        'bpc-157-vs-tb-500',
+        'bremelanotide-vs-kisspeptin',
+        'cagrilintide-vs-eloralintide',
+        'cagrilintide-vs-semaglutide',
+        'cjc-1295-vs-ipamorelin',
+        'elamipretide-vs-mots-c',
+        'ghk-cu-vs-tb-500',
+        'ipamorelin-vs-sermorelin',
+        'ipamorelin-vs-tesamorelin',
+        'mazdutide-vs-tirzepatide',
+        'mots-c-vs-nad',
+        'orforglipron-vs-tirzepatide',
+        'retatrutide-vs-semaglutide',
+        'retatrutide-vs-survodutide',
+        'retatrutide-vs-tirzepatide',
+        'selank-vs-semax',
+        'semaglutide-vs-tirzepatide',
+        'sermorelin-vs-tesamorelin',
+    ],
+
+    /**
+     * When true, a vs page that is not allowlisted, not featured, and not
+     * backed by editorial content gets noindex,follow. Its self-canonical
+     * stays, and it stays out of the sitemap. Set false to index those
+     * pages again without changing the sitemap.
+     */
+    'vs_noindex_thin' => true,
 ];

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Controllers\Frontend\CompareController;
+use App\Http\Controllers\Frontend\SitemapController;
 use App\Models\Brand;
 use App\Models\CategoryAlias;
 use App\Models\EducationPost;
@@ -344,7 +345,7 @@ class HexarelinEncyclopediaTest extends TestCase
             'hidden' => false,
         ]);
 
-        Cache::forget('sitemap.xml.v4');
+        Cache::forget(SitemapController::CACHE_KEY);
 
         $this->get('/encyclopedia/hexarelin')
             ->assertOk()
