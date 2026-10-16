@@ -11,6 +11,7 @@ use App\Models\SeoPage;
 use App\Support\ComparePageSeo;
 use App\Support\ComparePriceStats;
 use App\Support\VsPageSeo;
+use App\Support\VsPairIndexing;
 use App\Support\CompareSlug;
 use App\Support\ElamipretideMotsCCompareFaqs;
 use App\Support\EncyclopediaSlug;
@@ -1125,6 +1126,13 @@ class CompareController extends Controller
             'h1' => "{$displayA} vs {$displayB}",
             'schema' => $schema,
         ];
+        // Thin long-tail pairs are noindex,follow when the kill switch is
+        // on. Allowlisted, featured, and editorial pairs stay indexable.
+        // The self-canonical URL above is unchanged either way.
+        $robots = VsPairIndexing::robotsDirective($final);
+        if ($robots !== null) {
+            $seo['robots'] = $robots;
+        }
         session(['page_seo_data' => $seo]);
 
         $evidenceUrl = null;
