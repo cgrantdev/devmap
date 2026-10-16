@@ -164,13 +164,16 @@
               : 'border border-[color:var(--color-hairline)] hover:border-[color:var(--color-accent-400)]',
           ]"
         >
-          <!-- Big logo area -->
+          <!-- Big logo area. Fixed inner slot (not percentage) so tall
+               square marks like Vertex Labs can't dominate the card
+               next to wide marks like Pinnacle. Everything renders
+               inside the same ~72x180 box, object-contain. -->
           <div class="aspect-[16/9] bg-white border-b border-[color:var(--color-hairline)] flex items-center justify-center p-8 relative">
             <img
               v-if="brand.logo"
               :src="brand.logo"
               :alt="brand.name"
-              class="max-h-[55%] max-w-[75%] object-contain"
+              class="h-[72px] w-[180px] object-contain"
               loading="lazy"
             />
             <span v-else class="ui-display text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ brand.initials }}</span>
