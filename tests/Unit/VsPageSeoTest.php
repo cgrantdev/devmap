@@ -29,7 +29,8 @@ class VsPageSeoTest extends TestCase
         'aod-9604' => 'AOD-9604',
         '5-amino-1mq' => '5-AMINO-1MQ',
         'kisspeptin' => 'Kisspeptin',
-        'pt-141' => 'PT-141',
+        // PR #37 moved this featured slug off pt-141 onto the live category.
+        'bremelanotide' => 'Bremelanotide',
         'cagrilintide' => 'Cagrilintide',
     ];
 
@@ -75,6 +76,16 @@ class VsPageSeoTest extends TestCase
         );
         $this->assertStringContainsString('GLP1-S', $sema);
         $this->assertStringNotContainsString('Semaglutide', $sema);
+
+        $melanocortin = VsPageSeo::renderedTitle(
+            CompoundDisplay::label('Bremelanotide'),
+            CompoundDisplay::label('Kisspeptin')
+        );
+        $this->assertSame(
+            'Bremelanotide vs Kisspeptin — Price Comparison — Peptidemap',
+            $melanocortin
+        );
+        $this->assertStringNotContainsString('PT-141', $melanocortin);
 
         $long = 'Ipamorelin vs Tesamorelin — Vendor & Price Comparison — Peptidemap';
         $this->assertSame(66, mb_strlen($long));

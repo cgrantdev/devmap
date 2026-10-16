@@ -152,21 +152,49 @@ class VsSitemapIndexTest extends TestCase
     public function test_kill_switch_restores_indexing_and_leaves_the_thin_pair_out_of_the_sitemap(): void
     {
         $this->activatePair('epitalon', 'kpv');
+        $this->activatePair('selank', 'semax');
+        $this->activatePair('bpc-157', 'tb-500');
 
         $this->get('/compare/epitalon-vs-kpv')
             ->assertOk()
             ->assertSee('<meta name="robots" content="noindex,follow" />', false);
 
-        config(['seo.vs_noindex_thin' => false]);
+        $this->get('/compare/selank-vs-semax')->assertOk()->assertDontSee('noindex', false);
+        $this->get('/compare/bpc-157-vs-tb-500')->assertOk()->assertDontSee('noindex', false);
 
-        $this->get('/compare/epitalon-vs-kpv')
-            ->assertOk()
-            ->assertDontSee('noindex', false)
-            ->assertDontSee('<meta name="robots"', false)
-            ->assertSee(
-                '<link rel="canonical" href="https://peptidemap.com/compare/epitalon-vs-kpv" />',
-                false
-            );
+        // Boolean false and the env string "false" both turn the switch off.
+        foreach ([false, 'false'] as $off) {
+            config(['seo.vs_noindex_thin' => $off]);
+
+            $this->assertTrue(VsPairIndexing::isIndexable('epitalon-vs-kpv'));
+            $this->assertTrue(VsPairIndexing::isIndexable('selank-vs-semax'));
+            $this->assertTrue(VsPairIndexing::isIndexable('bpc-157-vs-tb-500'));
+
+            $this->get('/compare/epitalon-vs-kpv')
+                ->assertOk()
+                ->assertDontSee('noindex', false)
+                ->assertDontSee('<meta name="robots"', false)
+                ->assertSee(
+                    '<link rel="canonical" href="https://peptidemap.com/compare/epitalon-vs-kpv" />',
+                    false
+                );
+
+            $this->get('/compare/selank-vs-semax')
+                ->assertOk()
+                ->assertDontSee('noindex', false)
+                ->assertSee(
+                    '<link rel="canonical" href="https://peptidemap.com/compare/selank-vs-semax" />',
+                    false
+                );
+
+            $this->get('/compare/bpc-157-vs-tb-500')
+                ->assertOk()
+                ->assertDontSee('noindex', false)
+                ->assertSee(
+                    '<link rel="canonical" href="https://peptidemap.com/compare/bpc-157-vs-tb-500" />',
+                    false
+                );
+        }
 
         $this->assertStringNotContainsString(
             'https://peptidemap.com/compare/epitalon-vs-kpv',
