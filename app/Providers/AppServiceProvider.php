@@ -28,6 +28,20 @@ class AppServiceProvider extends ServiceProvider
 
         Schema::defaultStringLength(191);
 
+        // Frontend cache busting — any write to a model that drives
+        // public-facing content increments FrontendCache's version
+        // counter so cached brand lists / compare pages / homepage
+        // widgets drop stale state within one request.
+        foreach ([
+            \App\Models\Brand::class,
+            \App\Models\Product::class,
+            \App\Models\VendorSetting::class,
+            \App\Models\VendorPromotion::class,
+            \App\Models\VendorCertificationClaim::class,
+        ] as $model) {
+            $model::observe(\App\Observers\FrontendCacheBuster::class);
+        }
+
         // Register SendLayer HTTP API mail transport
         Mail::extend('sendlayer', function (array $config = []) {
             return new SendLayerTransport(

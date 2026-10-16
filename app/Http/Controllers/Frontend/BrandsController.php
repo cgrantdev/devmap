@@ -130,7 +130,15 @@ class BrandsController extends Controller
             $query->orderBy('name', 'asc');
         }
         
-        $brands = $query->get()->map(function ($brand) {
+        // Cache the fully-shaped brand payload per filter combination so
+        // anonymous pageloads don't re-run the brands + vendor_settings +
+        // locations join + per-brand verified-badges query. 5 min TTL;
+        // FrontendCacheBuster invalidates on any brand/vendor_setting/
+        // product/promotion write, so admin edits reflect immediately.
+        $cacheKey = 'brands.index.' . md5(serialize($request->only([
+            'search', 'location', 'verified', 'usp', 'sort', 'sortDir',
+        ])));
+        $brands = \App\Support\FrontendCache::remember($cacheKey, 300, fn () => $query->get()->map(function ($brand) {
                 // Prefer vendor setting location if set; otherwise derive from products
                 $location = null;
                 if ($brand->vendorSetting && $brand->vendorSetting->location) {
@@ -190,7 +198,7 @@ class BrandsController extends Controller
                         ->map(fn ($c) => ['type' => $c->type, 'label' => $c->label()])
                         ->values(),
                 ];
-            });
+            }));
         
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "brands")
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
