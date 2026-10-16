@@ -61,7 +61,10 @@ class VsPairIndexing
             return true;
         }
 
-        if (config('seo.vs_noindex_thin', true) === false) {
+        // Env and config caches often store booleans as the strings
+        // "true" and "false". A strict === false leaves the string "false"
+        // on, so thin pages stay noindexed when the kill switch was turned off.
+        if (! filter_var(config('seo.vs_noindex_thin', true), FILTER_VALIDATE_BOOLEAN)) {
             return true;
         }
 
