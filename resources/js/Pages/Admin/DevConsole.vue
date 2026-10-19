@@ -85,7 +85,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import AdminLayout from '@/Layouts/AdminLayout.vue'
+import AdminLayout from './Layout.vue'
 
 const props = defineProps({ commands: { type: Array, required: true } })
 
