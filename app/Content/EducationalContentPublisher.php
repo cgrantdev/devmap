@@ -349,7 +349,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host));
     }
 
     /**
@@ -863,6 +863,54 @@ class EducationalContentPublisher
                     ['How is CagriSema different from tirzepatide?', 'CagriSema is a fixed-dose combination of two molecules: cagrilintide, a long-acting amylin analogue, and semaglutide, a GLP-1 receptor agonist. Tirzepatide is a single peptide that activates both GIP and GLP-1 receptors. The two products reach appetite pathways by different routes.'],
                     ['What were the main side effects reported?', 'In REDEFINE 4, Novo Nordisk said the most common adverse events with CagriSema were gastrointestinal and mostly mild to moderate, but it has not published arm-level adverse event or discontinuation figures. In REDEFINE 1, gastrointestinal adverse events were reported in 79.6% of the CagriSema group vs 39.9% with placebo, and 5.9% vs 3.5% stopped treatment permanently because of adverse events.'],
                     ['Is research-labelled cagrilintide the same as CagriSema?', 'No. Research-labelled cagrilintide vials or blends sold online are not CagriSema, are not the product studied in the REDEFINE trials, and are not FDA-approved. This article is educational and is not medical advice.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Content QA passed this orforglipron vs oral semaglutide comparison on 2026-10-19.
+     * The body lives in resources/content/educational. The publisher reads
+     * this catalog, not the draft YAML.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function orforglipronVsOralSemaglutide(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'orforglipron-vs-oral-semaglutide.md',
+                'image_file' => 'orforglipron-vs-oral-semaglutide.png',
+                'slug' => 'orforglipron-vs-oral-semaglutide',
+                'h1' => 'Orforglipron vs Oral Semaglutide: What the ACHIEVE-3 Head-to-Head Trial Reported',
+                'lede' => 'Orforglipron is a non-peptide small-molecule GLP-1 pill; oral semaglutide is a peptide tablet made with the absorption enhancer SNAC. ACHIEVE-3 compared them for 52 weeks in type 2 diabetes. Estimand-labelled HbA1c and weight results, tolerability as published, and FDA status. Educational only.',
+                'seo_title' => 'Orforglipron vs Oral Semaglutide: ACHIEVE-3 and FDA Status',
+                'seo_description' => 'ACHIEVE-3 compared orforglipron with oral semaglutide in type 2 diabetes for 52 weeks. HbA1c and weight by estimand, GI events, and FDA status.',
+                'og_title' => 'Orforglipron vs Oral Semaglutide: ACHIEVE-3 and FDA Status',
+                'og_description' => 'Orforglipron vs oral semaglutide in the 52-week ACHIEVE-3 trial: estimand-labelled HbA1c and weight results, tolerability, and US FDA status.',
+                'blog_type' => 'Research',
+                'read_time' => '13 Min Read',
+                'published_at' => '2026-10-19',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Orforglipron', 'Oral Semaglutide', 'Rybelsus', 'Foundayo', 'ACHIEVE-3', 'Estimands'],
+                'key_points' => [
+                    'Orforglipron is a non-peptide small-molecule GLP-1 receptor agonist taken with or without food. Oral semaglutide is a peptide GLP-1 receptor agonist co-formulated with the absorption enhancer SNAC and taken fasting.',
+                    'ACHIEVE-3 was a 52-week, open-label phase 3 trial in 1,698 adults with type 2 diabetes on metformin. Oral semaglutide was tested only at the two Rybelsus maintenance doses for type 2 diabetes.',
+                    'HbA1c change, treatment-regimen estimand (Lancet primary): −1.71% and −1.91% with orforglipron vs −1.23% and −1.47% with oral semaglutide. Non-inferiority was met and both orforglipron arms were superior to both semaglutide arms.',
+                    'Lilly headlines use the efficacy estimand: HbA1c −1.9% and −2.2% vs −1.1% and −1.4%; weight −6.7% and −9.2% vs −3.7% and −5.3%. Treatment-regimen weight (company-reported): −6.1% and −8.2% vs −3.9% and −5.3%.',
+                    'Gastrointestinal adverse events: 59% and 58% with orforglipron vs 37% and 45%. Discontinuation due to adverse events: 8.7% and 9.7% vs 4.5% and 4.9%. The study was not powered for safety comparisons.',
+                    'Rybelsus was FDA-approved for type 2 diabetes on 20 September 2019. Orforglipron was approved as Foundayo for weight management on 1 April 2026; its US type 2 diabetes submission is pending.',
+                ],
+                'faq' => self::faq($host.'/blog/orforglipron-vs-oral-semaglutide#faq', [
+                    ['What did ACHIEVE-3 compare?', 'ACHIEVE-3 was a 52-week, open-label, randomized phase 3 trial in 1,698 adults with type 2 diabetes not controlled on metformin. It compared two once-daily orforglipron dose arms with two once-daily oral semaglutide dose arms. Oral semaglutide was tested only at the two Rybelsus maintenance doses for type 2 diabetes.'],
+                    ['Was orforglipron non-inferior or superior on HbA1c?', 'Both. The Lancet paper reports that the primary non-inferiority objective was met and that both orforglipron arms were superior to both oral semaglutide arms on HbA1c change at week 52. Under the treatment-regimen estimand, HbA1c fell by 1.71% and 1.91% with orforglipron vs 1.23% and 1.47% with oral semaglutide.'],
+                    ['Why do Lilly\'s numbers differ from the Lancet abstract?', 'They use different estimands. The Lancet paper\'s primary estimand is the treatment-regimen estimand, which counts all randomized participants regardless of stopping treatment. Lilly\'s headline figures use the efficacy estimand, which estimates the effect had everyone stayed on treatment. For example, the higher orforglipron arm\'s HbA1c change is 1.91% under the treatment-regimen estimand and 2.2% under the efficacy estimand.'],
+                    ['How much weight change was reported?', 'Under the efficacy estimand, mean weight change was 6.7% and 9.2% with orforglipron vs 3.7% and 5.3% with oral semaglutide. Under the treatment-regimen estimand, company-reported by Lilly, the figures were 6.1% and 8.2% vs 3.9% and 5.3%. Baseline weight averaged 97.0 kg.'],
+                    ['Did orforglipron have more side effects?', 'Yes, in this trial. Gastrointestinal adverse events were reported in 59% and 58% of the orforglipron arms vs 37% and 45% of the oral semaglutide arms. Discontinuation due to adverse events was 8.7% and 9.7% vs 4.5% and 4.9%, roughly twice as high. Mean pulse rate rose more with orforglipron.'],
+                    ['How do the two drugs differ chemically?', 'Orforglipron is a non-peptide small-molecule GLP-1 receptor agonist taken once daily with or without food. Oral semaglutide is a peptide GLP-1 receptor agonist formulated with the absorption enhancer SNAC, and its label requires it to be taken on an empty stomach with a little water and a wait before eating.'],
+                    ['Are both FDA-approved?', 'Rybelsus (oral semaglutide) was approved on 20 September 2019 for type 2 diabetes. Orforglipron was approved as Foundayo on 1 April 2026 for weight management only. Lilly reported submitting it to the FDA for type 2 diabetes in the second quarter of 2026, and as of 19 October 2026 no FDA diabetes approval was found. Research-labelled orforglipron sold online is not Foundayo and is not FDA-approved.'],
                 ]),
             ],
         ];
