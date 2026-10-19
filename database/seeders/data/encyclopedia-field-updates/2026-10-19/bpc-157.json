@@ -1,0 +1,118 @@
+{
+ "slug_match": "LOWER(slug) = 'bpc-157'; skip if match count != 1; no-op if 0",
+ "depends_on": "Bpc157RetatrutideOctober2026Seeder / migration 2026_10_16_120000 (PR #39, merge commit e3124b2e08939375b3a033bc37c2d305476b465e). Every old value below is the exact value that PR writes. If a column does not hold that exact value (for example #39 has not run yet, or the copy was edited by hand), skip that column and log it; do not fall back to partial string replacement.",
+ "as_of": "19 October 2026 (Asia/Bangkok). reginfo.gov eoDetails?rrid=1568964 and the EO 12866 meeting record (meetingId 1586023) were loaded live on 19 Oct 2026.",
+ "columns": {
+  "regulatory_subsections": {
+   "camelCase_prop": "regulatorySubsections",
+   "op": "(a) in the subsection titled exactly 'United States', replace entries[0].value only if it exactly equals old_united_states_value; (b) replace the subsection whose title is exactly old_compounding_subsection.title with new_compounding_subsection, only if the whole subsection (title + every entry type and value, same order) exactly equals old_compounding_subsection; keep its array position. Skip (a) and (b) entirely if any subsection title equals new_compounding_subsection.title (already applied). Leave all other subsections untouched.",
+   "old_united_states_value": "The U.S. Food and Drug Administration (FDA) has taken action against companies marketing BPC-157 as a dietary supplement, stating it does not meet the definition of a legal supplement ingredient. As of 16 October 2026, BPC-157 is not on the 503A Bulks List (21 CFR 216.23), and no FDA policy permitting its use in compounding has been published. FDA has also found some clinics compounding it. See \"U.S. regulatory status — compounding review\" below for the July 2026 advisory committee meeting and the October 2026 interim policy submitted for OIRA review.\n\nProducts sold as \"research chemicals\" are not FDA-regulated drugs. Many websites sell BPC-157 with disclaimers that it is not for human use. This grey market means quality control is questionable: products might not contain the stated amount or could have impurities.",
+   "new_united_states_value": "The U.S. Food and Drug Administration (FDA) has taken action against companies marketing BPC-157 as a dietary supplement, stating it does not meet the definition of a legal supplement ingredient. As of 19 October 2026, BPC-157 is not on the 503A Bulks List (21 CFR 216.23), and no FDA policy permitting its use in compounding has been published. FDA has also found some clinics compounding it. See \"U.S. regulatory status — compounding review\" below for the July 2026 advisory committee meeting and the October 2026 interim policy submitted for OIRA review.\n\nProducts sold as \"research chemicals\" are not FDA-regulated drugs. Many websites sell BPC-157 with disclaimers that it is not for human use. This grey market means quality control is questionable: products might not contain the stated amount or could have impurities.",
+   "old_compounding_subsection": {
+    "title": "U.S. regulatory status — compounding review (as of 16 October 2026)",
+    "entries": [
+     {
+      "type": "content",
+      "value": "BPC-157 is not an FDA-approved drug, and no FDA policy permitting its use in compounding has been published as of 16 October 2026. In 2026 two separate U.S. steps concerned BPC-157 and compounding: an advisory committee vote in July and an interim policy sent for White House review in October. Neither one approves BPC-157 or makes it lawful to compound."
+     },
+     {
+      "type": "content",
+      "value": "Pharmacy Compounding Advisory Committee (23 July 2026). FDA's Pharmacy Compounding Advisory Committee (PCAC) met on 23–24 July 2026. On 23 July it considered BPC-157 (free base) and BPC-157 acetate for the list of bulk drug substances that may be used in compounding under section 503A of the FD&C Act (the \"503A Bulks List\"). FDA evaluated both forms for ulcerative colitis. FDA's published voting questions were: \"Should BPC-157 (free base) be placed on the list?\" and \"Should BPC-157 acetate be placed on the list?\" In its briefing document, FDA proposed that neither BPC-157 (free base) nor BPC-157 acetate be included on the 503A Bulks List. FDA states that advisory committee recommendations are non-binding. Reuters reported on 15 October 2026 that the advisers had recommended FDA loosen restrictions on six of the seven peptides reviewed in July, including BPC-157. As of 16 October 2026, FDA has not posted official minutes or vote tallies on the meeting page, so this entry gives no vote counts. The 503A Bulks List (21 CFR 216.23) has not been amended to include BPC-157."
+     },
+     {
+      "type": "content",
+      "value": "Interim access policy under OIRA review (received 14 October 2026). OMB's Office of Information and Regulatory Affairs (OIRA) lists a pending Executive Order 12866 review with these details. Title: \"Interim Access Policy for Compounding Using Certain Peptides\". Agency/Subagency: HHS / FDA. RIN: 0910-ZD94. Stage: Notice. Received Date: 10/14/2026. Legal Deadline: None. Economically Significant: No (OIRA listing as indexed; live page unavailable 16 Oct 2026). The listing does not name any peptides and does not include the policy text. As of 16 October 2026, no matching Federal Register document and no FDA press announcement were found. Reuters, citing an Associated Press report based on two unnamed people, reported that the policy would allow some popular peptides, including BPC-157, to be compounded. That is a press report and has not been confirmed in any published text."
+     },
+     {
+      "type": "item",
+      "value": "Not an approval: neither the PCAC vote nor the OIRA submission is FDA approval of BPC-157 for any use."
+     },
+     {
+      "type": "item",
+      "value": "No published text: the policy text has not been released, and no Federal Register notice has been located."
+     },
+     {
+      "type": "item",
+      "value": "No effective or start date: none has been announced."
+     },
+     {
+      "type": "item",
+      "value": "Scope unknown: the OIRA listing does not say which peptides would be covered."
+     },
+     {
+      "type": "item",
+      "value": "Review is not a final policy: an OIRA review is a step before publication. The policy may be changed, withdrawn, or published in a different form."
+     },
+     {
+      "type": "item",
+      "value": "Other status lines are unchanged: on FDA's \"Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks\" page (content current as of 22 April 2026), BPC-157 is listed as nominated but withdrawn. BPC-157 remains on WADA's S0 (non-approved substances) list."
+     }
+    ]
+   },
+   "new_compounding_subsection": {
+    "title": "U.S. regulatory status — compounding review (as of 19 October 2026)",
+    "entries": [
+     {
+      "type": "content",
+      "value": "BPC-157 is not an FDA-approved drug, and no FDA policy permitting its use in compounding has been published as of 19 October 2026. In 2026 two separate U.S. steps concerned BPC-157 and compounding: an advisory committee vote in July and an interim policy sent for White House review in October. Neither one approves BPC-157 or makes it lawful to compound."
+     },
+     {
+      "type": "content",
+      "value": "Pharmacy Compounding Advisory Committee (23 July 2026). FDA's Pharmacy Compounding Advisory Committee (PCAC) met on 23–24 July 2026. On 23 July it considered BPC-157 (free base) and BPC-157 acetate for the list of bulk drug substances that may be used in compounding under section 503A of the FD&C Act (the \"503A Bulks List\"). FDA evaluated both forms for ulcerative colitis. FDA's published voting questions were: \"Should BPC-157 (free base) be placed on the list?\" and \"Should BPC-157 acetate be placed on the list?\" In its briefing document, FDA proposed that neither BPC-157 (free base) nor BPC-157 acetate be included on the 503A Bulks List. FDA states that advisory committee recommendations are non-binding. Reuters reported on 15 October 2026 that the advisers had recommended FDA loosen restrictions on six of the seven peptides reviewed in July, including BPC-157. As of 19 October 2026, FDA has not posted official minutes or vote tallies on the meeting page, so this entry gives no vote counts. The 503A Bulks List (21 CFR 216.23) has not been amended to include BPC-157."
+     },
+     {
+      "type": "content",
+      "value": "Interim access policy under OIRA review (received 14 October 2026). OMB's Office of Information and Regulatory Affairs (OIRA) lists a pending Executive Order 12866 review with these details (reginfo.gov, checked 19 October 2026; status \"Pending EO 12866 Regulatory Review\"). Title: \"Interim Access Policy for Compounding Using Certain Peptides\". Agency/Subagency: HHS / FDA. RIN: 0910-ZD94. Stage: Notice. Received Date: 10/14/2026. Legal Deadline: None. Economically Significant: No. The listing does not name any peptides and does not include the policy text. As of 19 October 2026, no matching Federal Register document and no FDA press announcement were found. Reuters, citing an Associated Press report based on two unnamed people, reported that the policy would allow some popular peptides, including BPC-157, to be compounded. That is a press report and has not been confirmed in any published text. Reginfo.gov also lists one EO 12866 meeting on this review, scheduled for 21 October 2026 and requested by the American Academy of Peptide Medicine. EO 12866 meetings let outside parties present their views to OIRA while a review is pending; a scheduled meeting is not a decision and does not indicate the outcome."
+     },
+     {
+      "type": "item",
+      "value": "Not an approval: neither the PCAC vote nor the OIRA submission is FDA approval of BPC-157 for any use."
+     },
+     {
+      "type": "item",
+      "value": "No published text: the policy text has not been released, and no Federal Register notice has been located."
+     },
+     {
+      "type": "item",
+      "value": "No effective or start date: none has been announced."
+     },
+     {
+      "type": "item",
+      "value": "Scope unknown: the OIRA listing does not say which peptides would be covered."
+     },
+     {
+      "type": "item",
+      "value": "Review is not a final policy: an OIRA review is a step before publication. The policy may be changed, withdrawn, or published in a different form."
+     },
+     {
+      "type": "item",
+      "value": "Other status lines are unchanged: on FDA's \"Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks\" page (content current as of 22 April 2026), BPC-157 is listed as nominated but withdrawn. BPC-157 remains on WADA's S0 (non-approved substances) list."
+     }
+    ]
+   }
+  },
+  "regulatory_important_note": {
+   "camelCase_prop": "regulatoryImportantNote",
+   "op": "write only if current value exactly equals old_value; skip if current contains 'Regulatory status (as of 19 October 2026)'",
+   "old_value": "\"Absence of evidence is not evidence of absence\" when it comes to safety. Because BPC-157 has not been extensively studied in people, there could be side effects that haven't been observed in small samples. Minor side effects like headaches, dizziness, or injection site reactions might not show up in tiny studies but could in larger populations.\n\nRegulatory status (as of 16 October 2026): BPC-157 is not approved by FDA. A July 2026 advisory committee vote is non-binding. The \"Interim Access Policy for Compounding Using Certain Peptides\" (RIN 0910-ZD94) has been under OIRA review since 14 October 2026. Its text has not been published, it has no effective date, and the peptides it covers are not known. PeptideMap does not predict outcomes.",
+   "new_value": "\"Absence of evidence is not evidence of absence\" when it comes to safety. Because BPC-157 has not been extensively studied in people, there could be side effects that haven't been observed in small samples. Minor side effects like headaches, dizziness, or injection site reactions might not show up in tiny studies but could in larger populations.\n\nRegulatory status (as of 19 October 2026): BPC-157 is not approved by FDA. A July 2026 advisory committee vote is non-binding. The \"Interim Access Policy for Compounding Using Certain Peptides\" (RIN 0910-ZD94) has been under OIRA review since 14 October 2026. Its text has not been published, it has no effective date, and the peptides it covers are not known. PeptideMap does not predict outcomes."
+  },
+  "key_points": {
+   "camelCase_prop": "keyPoints",
+   "op": "In order: (1) if any item exactly equals new_item, skip (already applied). (2) Otherwise, if an item exactly equals old_item, replace it in place with new_item. (3) Otherwise skip and log (for example 'bpc-157 key_points: old item not found; skipped'). Never append.",
+   "old_item": "Regulatory status (as of 16 Oct 2026): FDA's Pharmacy Compounding Advisory Committee voted on BPC-157 on 23 July 2026; the vote is non-binding. HHS/FDA sent an \"Interim Access Policy for Compounding Using Certain Peptides\" to OIRA on 14 Oct 2026. No text has been published, no effective date has been set, and coverage is unknown. This is not an approval.",
+   "new_item": "Regulatory status (as of 19 Oct 2026): FDA's Pharmacy Compounding Advisory Committee voted on BPC-157 on 23 July 2026; the vote is non-binding. HHS/FDA sent an \"Interim Access Policy for Compounding Using Certain Peptides\" to OIRA on 14 Oct 2026. No text has been published, no effective date has been set, and coverage is unknown. This is not an approval."
+  }
+ },
+ "do_not_touch": "any other column or subsection; the retatrutide post; the #39 migration file; the #39 seeder, except BPC_KEY_POINT_PREFIX → 'Regulatory status (as of '",
+ "pr_notes": {
+  "bpc_39_key_point_guard": "Change Bpc157RetatrutideOctober2026Seeder::BPC_KEY_POINT_PREFIX from 'Regulatory status (as of 16 Oct 2026)' to 'Regulatory status (as of '. This is the only change to the #39 seeder. withKeyPoint() appends the 16 Oct item only when no item starts with the prefix, so after the rename to 19 Oct a re-run no longer appends a stale item. Bpc157RetatrutideOctober2026Test L208 (assertSame(['Regulatory status (as of 16 Oct 2026): already written in shorter form.'], $bpc->key_points)) still passes: that item starts with the loosened prefix, so nothing is appended. The self-check at seeder L360 (str_starts_with(bpcKeyPoint(), BPC_KEY_POINT_PREFIX)) also still holds.",
+  "bpc_39_migration_one_shot": "Confirmed one-shot under normal deploys: migration 2026_10_16_120000 only calls (new Bpc157RetatrutideOctober2026Seeder)->run() in up(); Laravel records it in the migrations table, and DatabaseSeeder (main) calls only BlogSeeder and EducationPostSeeder, not this seeder. The re-run risk exists only for a manual `db:seed --class=Bpc157RetatrutideOctober2026Seeder`, `migrate:fresh` or `migrate:refresh` followed by this migration being skipped; loosening the constant removes it.",
+  "ordering": "New migration 2026_10_19_130000 (field replaces) runs after 2026_10_16_120000; CagriSema create is 2026_10_19_140000."
+ },
+ "migration": {
+  "timestamp": "2026_10_19_130000",
+  "suggested_file": "database/migrations/2026_10_19_130000_update_encyclopedia_fields_october_19_2026.php",
+  "note": "One migration applies all three field files (cagrilintide, GHK-Cu, BPC-157). It sorts after 2026_10_16_120000 (#39) and after 2026_10_19_120000_refresh_peptide_legality_interim_access.php, the latest migration on origin/main at 4ff6708. No 2026_10_19_130000 or 2026_10_19_140000 file exists at 4ff6708 (checked 19 Oct 2026)."
+ }
+}

@@ -116,7 +116,7 @@ class HexarelinEncyclopediaTest extends TestCase
 
         $this->assertSame([], $again->report['created_categories']);
         $this->assertSame([], $again->report['filled']);
-        $this->assertSame(['pemvidutide', 'hexarelin'], $again->report['skipped_already_filled']);
+        $this->assertSame(EncyclopediaCategoryCreateSeeder::SLUGS, $again->report['skipped_already_filled']);
         $this->assertSame($categories, ProductCategory::count());
         $this->assertSame($posts, EducationPost::count());
         $this->assertSame($products, Product::count());
@@ -148,7 +148,7 @@ class HexarelinEncyclopediaTest extends TestCase
         $seeder = new EncyclopediaCategoryCreateSeeder;
         $seeder->run();
 
-        $this->assertSame(['pemvidutide', 'hexarelin'], $seeder->report['reused_categories']);
+        $this->assertSame(EncyclopediaCategoryCreateSeeder::SLUGS, $seeder->report['reused_categories']);
         $this->assertSame(['hexarelin'], $seeder->report['filled']);
         $this->assertSame(['hexarelin'], $seeder->report['created_posts']);
         $this->assertSame([], $seeder->report['created_categories']);
@@ -168,7 +168,7 @@ class HexarelinEncyclopediaTest extends TestCase
         $this->travel(5)->seconds();
         $again = new EncyclopediaCategoryCreateSeeder;
         $again->run();
-        $this->assertSame(['pemvidutide', 'hexarelin'], $again->report['skipped_already_filled']);
+        $this->assertSame(EncyclopediaCategoryCreateSeeder::SLUGS, $again->report['skipped_already_filled']);
         $this->assertSame([], $again->report['filled']);
         $this->assertSame($stamp, $post->fresh()->updated_at?->toJSON());
         $this->assertFalse($category->fresh()->is_active);
@@ -216,7 +216,7 @@ class HexarelinEncyclopediaTest extends TestCase
         $seeder = new EncyclopediaCategoryCreateSeeder;
         $seeder->run();
 
-        $this->assertSame(['pemvidutide', 'hexarelin'], $seeder->report['reused_categories']);
+        $this->assertSame(EncyclopediaCategoryCreateSeeder::SLUGS, $seeder->report['reused_categories']);
         $this->assertSame(['hexarelin'], $seeder->report['filled']);
         $this->assertNull(ProductCategory::query()->where('slug', 'hexarelin')->first());
         $holding->refresh();

@@ -1,0 +1,382 @@
+{
+ "slug_match": "LOWER(slug) = 'ghk-cu'; skip if match count != 1; no-op if 0 (stored slug 'GHK-Cu'; post id 51)",
+ "as_of": "19 October 2026 (Asia/Bangkok). Old values copied from live Inertia props of https://peptidemap.com/encyclopedia/GHK-Cu on 19 Oct 2026. Compare decoded JSON values.",
+ "columns": {
+  "human_use_subsections": {
+   "camelCase_prop": "humanUseSubsections",
+   "op": "(a) replace the subsection titled exactly 'Injectable Research' only if it exactly equals old_injectable_subsection; skip (a) if its first entry contains 'has not been tested on its own'. (b) replace the subsection titled exactly 'Dermatological Studies' only if it exactly equals old_dermatological_subsection (removes the unsourced vitamin C / retinoic acid comparison); skip (b) if no entry of that subsection contains 'vitamin C'. (c) append new_subsection at END unless any subsection title starts with 'Evidence limits (as of'. Paragraph breaks inside humanUseSubsections entry values use the literal two-character sequence backslash-n, matching the live data; do not convert. Each part is independent; a skipped part does not block the others.",
+   "old_injectable_subsection": {
+    "title": "Injectable Research",
+    "entries": [
+     {
+      "type": "content",
+      "value": "Injectable (subcutaneous) GHK-Cu research is earlier-stage. The distinction between topical and systemic administration is significant — topical delivers the compound to skin, while injectable potentially delivers systemic gene expression effects.\\n\\nSafety data from injectable use shows a favorable profile: transient injection site erythema (4.2%) and mild pruritus (2.8%) are the most commonly reported events."
+     }
+    ]
+   },
+   "new_injectable_subsection": {
+    "title": "Injectable Research",
+    "entries": [
+     {
+      "type": "content",
+      "value": "Injectable (subcutaneous) GHK-Cu has not been tested on its own in any published human study found (PubMed and ClinicalTrials.gov, 19 Oct 2026). The distinction between topical and systemic administration is significant: topical products deliver the compound to skin, and skin findings do not show what an injection does.\\n\\nNo human safety data for injected GHK-Cu given on its own were found. The only published human reports of injection involve multi-ingredient scalp formulations, so they cannot attribute any effect or adverse event to GHK-Cu. FDA states that \"There are limited data in humans to inform safety-related considerations\" for compounded injectable GHK-Cu."
+     }
+    ]
+   },
+   "new_subsection": {
+    "title": "Evidence limits (as of 19 Oct 2026)",
+    "entries": [
+     {
+      "type": "content",
+      "value": "Topical and injected evidence are different and must be kept separate. The published human studies of GHK-Cu itself are of topical cosmetic or wound-care products. No published human study of injected GHK-Cu given on its own was found in PubMed or ClinicalTrials.gov (searched 19 Oct 2026). Results from creams or serums do not show what an injection does, and results for injections cannot be inferred from skin studies."
+     },
+     {
+      "type": "content",
+      "value": "**Pattern hair loss (androgenetic alopecia):** no completed, published randomised controlled trial of GHK-Cu itself was found, and ClinicalTrials.gov lists no GHK-Cu alopecia trial. The closest randomised trial tested a different substance, ALAVAX, a copper-free conjugate of 5-aminolevulinic acid and GHK. It was sprayed on the scalp in a double-blind, placebo-controlled 6-month study in men with male pattern hair loss (45 patients in the abstract). Mean hair count rose by 52.6 and 71.5 in the two active groups versus 9.6 with placebo; the only between-group difference reported as statistically significant was for the lower-concentration group versus placebo (Ann Dermatol 2016)."
+     },
+     {
+      "type": "content",
+      "value": "**Combination hair products:** other human hair reports tested multi-ingredient treatments in which copper peptide was only one component. These were an open-label, single-arm study of intradermal injections of a growth-factor formulation that included copper tripeptide-1 (J Cosmet Laser Ther 2018), and an uncontrolled clinic case series of 18,918 men given combination treatment that included an injected multi-ingredient solution containing copper tripeptide, alongside finasteride and minoxidil (J Clin Aesthet Dermatol 2018). Also in this group are a retrospective report of 7 men treated with minoxidil, dutasteride and copper peptides delivered by scalp micro-infusion (JAAD Int 2025) and four case reports of laser-assisted delivery combined with finasteride, growth factors and copper peptide (J Cosmet Laser Ther 2018). None of these isolates the effect of GHK-Cu, and none had a placebo group."
+     },
+     {
+      "type": "content",
+      "value": "**Laboratory and animal hair studies:** a copper-binding peptide (PC1031) enlarged hair follicles in fuzzy rats (J Invest Dermatol 1993). A different copper tripeptide, AHK-Cu (not GHK-Cu), promoted the growth of human hair follicles in culture (Arch Pharm Res 2007). These findings do not show an effect in people."
+     },
+     {
+      "type": "content",
+      "value": "**Skin:** in a study in which 13 patients completed after CO2 laser resurfacing, a topical GHK-Cu skin-care regimen made no significant objective difference to redness, wrinkles or overall skin quality, although patient-rated satisfaction was higher (Arch Facial Plast Surg 2006). A 2026 review concluded that \"the clinical evidence remains sparse\" (Pharmaceutics 2026). A phase 2 trial of a topical GHK-Cu gel for acute wounds (NCT07437586) is recruiting and has no posted results."
+     },
+     {
+      "type": "item",
+      "value": "For injectable GHK-Cu, FDA states: \"There are limited data in humans to inform safety-related considerations.\" See \"FDA compounding status (as of 19 Oct 2026)\"."
+     }
+    ]
+   },
+   "old_dermatological_subsection": {
+    "title": "Dermatological Studies",
+    "entries": [
+     {
+      "type": "content",
+      "value": "Multiple controlled clinical studies have evaluated topical GHK-Cu formulations for anti-aging applications. 12-week studies demonstrated significant improvements in skin firmness, elasticity, and density measurements compared to placebo.\\n\\nIn comparative studies, GHK-Cu outperformed both vitamin C serum and retinoic acid (tretinoin) in collagen synthesis stimulation — a notable finding given that these are considered gold-standard skincare actives."
+     }
+    ]
+   },
+   "new_dermatological_subsection": {
+    "title": "Dermatological Studies",
+    "entries": [
+     {
+      "type": "content",
+      "value": "Multiple controlled clinical studies have evaluated topical GHK-Cu formulations for anti-aging applications. 12-week studies demonstrated significant improvements in skin firmness, elasticity, and density measurements compared to placebo."
+     }
+    ]
+   }
+  },
+  "regulatory_subsections": {
+   "camelCase_prop": "regulatorySubsections",
+   "op": "append new_subsection at END unless any subsection title starts with 'FDA compounding status (as of'; leave 'Current Status' unchanged",
+   "current_value_for_reference": [
+    {
+     "title": "Current Status",
+     "entries": [
+      {
+       "type": "content",
+       "value": "GHK-Cu is not FDA-approved as a drug. Topical formulations are widely available as cosmetic products. Injectable forms are classified as research peptides. The compound's natural occurrence in human plasma provides inherent safety rationale but does not constitute regulatory approval."
+      }
+     ]
+    }
+   ],
+   "new_subsection": {
+    "title": "FDA compounding status (as of 19 Oct 2026)",
+    "entries": [
+     {
+      "type": "content",
+      "value": "GHK-Cu is not an FDA-approved drug. FDA's list of bulk drug substances nominated for compounding under section 503A (document updated 14 May 2026) places \"GHK-Cu (except for injectable routes of administration)\" in Category 1, \"Bulk Drug Substances Under Evaluation\". FDA explains that GHK-Cu was removed from Category 1 on 22 April 2026 after the nominations were withdrawn. It was added back for non-injectable routes after one nominator clarified on 5 May 2026 that it meant to withdraw only the injectable route. Under FDA's interim policy, FDA generally does not intend to take action against 503A compounding with a Category 1 substance while the nomination is evaluated, if other conditions are met. This is enforcement discretion, not placement on the 503A bulks list and not an approval."
+     },
+     {
+      "type": "content",
+      "value": "**Injectable routes:** FDA's page \"Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks\" (content current as of 22 April 2026) lists \"GHK-Cu (for injectable routes of administration)\" under \"Bulk drug substances nominated but withdrawn\". FDA's text reads: \"Compounded injectable drugs containing GHK-Cu may pose risk for immunogenicity due to the potential for aggregation and peptide-related impurities. There are limited data in humans to inform safety-related considerations.\""
+     },
+     {
+      "type": "content",
+      "value": "**Advisory committee:** FDA states that it intends to consult the Pharmacy Compounding Advisory Committee (PCAC) \"before the end of February 2027\" on whether GHK-Cu could be included on the 503A bulks list. The PCAC meeting page (content current as of 15 April 2026) lists GHK-Cu on the agenda with LL-37, dihexa acetate, melanotan II and PEG-MGF, and says the meeting time and location will be scheduled. No date was posted as of 19 Oct 2026."
+     },
+     {
+      "type": "item",
+      "value": "None of these listings is an approval. Advisory committee advice is non-binding, and Peptidemap does not predict the outcome."
+     }
+    ]
+   }
+  },
+  "potential_applications": {
+   "camelCase_prop": "potentialApplications",
+   "op": "apply each replacement independently: replace the item at index only if it exactly equals old_item; skip that replacement if skip_if holds. Leave item [1] unchanged.",
+   "replacements": [
+    {
+     "index": 0,
+     "old_item": {
+      "title": "Systemic Anti-Aging",
+      "description": "If the gene expression effects observed in vitro translate to systemic administration, GHK-Cu could represent a broad-spectrum anti-aging intervention targeting 4,000+ genes simultaneously."
+     },
+     "new_item": {
+      "title": "Gene-expression research",
+      "description": "Connectivity Map analyses summarised by Pickart and colleagues, who are affiliated with Skin Biology, report that GHK can raise or lower expression of thousands of human genes in cell data. These are computational and laboratory findings; no systemic anti-ageing effect has been shown in people."
+     },
+     "skip_if": "any item title equals 'Gene-expression research'"
+    },
+    {
+     "index": 2,
+     "old_item": {
+      "title": "Hair Restoration",
+      "description": "Published research showing enlarged hair follicles and increased follicular proliferation markers suggests potential applications in hair loss research."
+     },
+     "new_item": {
+      "title": "Hair research (evidence limited)",
+      "description": "Hair-follicle findings come from animal and cell studies, including studies of related copper peptides rather than GHK-Cu. No completed, published randomised trial of GHK-Cu itself for pattern hair loss was found (as of 19 Oct 2026). Human hair reports tested multi-ingredient products."
+     },
+     "skip_if": "any item title starts with 'Hair research (evidence limited)'"
+    }
+   ]
+  },
+  "key_points": {
+   "camelCase_prop": "keyPoints",
+   "op": "append new_item only if no existing item starts with 'Evidence limits (as of '",
+   "new_item": "Evidence limits (as of 19 Oct 2026): no completed, published RCT of GHK-Cu itself for pattern hair loss and no published human study of injected GHK-Cu alone were found. Topical and injected evidence are not interchangeable. FDA lists GHK-Cu in 503A Category 1 for non-injectable routes only, and plans a PCAC meeting before the end of February 2027."
+  },
+  "faqs": {
+   "camelCase_prop": "faqs (FAQPage JSON-LD is generated from this column)",
+   "op": "write new_value (6 FAQs) only if current value exactly equals old_value; skip if any question equals new_value[3].question. FAQ 1 answer replaced (Connectivity Map wording, Skin Biology affiliation disclosed); FAQ 2 answer replaced (no dose information); FAQ 3 (protocol wording) replaced by an evidence question; FAQs 4-6 appended",
+   "old_value": [
+    {
+     "question": "How does GHK-Cu modulate gene expression?",
+     "answer": "GHK-Cu resets the expression of over 4,000 human genes, suppressing genes associated with disease while activating genes for tissue repair and regeneration."
+    },
+    {
+     "question": "Is copper supplementation necessary with GHK-Cu?",
+     "answer": "No. The copper content per dose is negligible. The copper serves as a structural component for receptor binding, not as a nutritional supplement."
+    },
+    {
+     "question": "Can GHK-Cu be combined with retinoids?",
+     "answer": "They target complementary pathways. Some protocols alternate application times to avoid interaction."
+    }
+   ],
+   "new_value": [
+    {
+     "question": "How does GHK-Cu modulate gene expression?",
+     "answer": "Gene-expression (Connectivity Map) analyses summarised by Pickart and colleagues, who are affiliated with Skin Biology, report that GHK can raise or lower expression of thousands of human genes in cell data. These are computational and laboratory findings, not evidence of effects in people."
+    },
+    {
+     "question": "Is copper supplementation necessary with GHK-Cu?",
+     "answer": "GHK-Cu is a copper complex of the tripeptide GHK; the copper ion is part of the complex. It is not studied or sold as a copper supplement, and this page gives no dose information."
+    },
+    {
+     "question": "Is there good human evidence for topical GHK-Cu on skin?",
+     "answer": "Limited. Published human studies are small and mostly test cosmetic formulations. In a study in which 13 patients completed after CO2 laser resurfacing, a topical GHK-Cu regimen showed no significant objective difference in redness, wrinkles or skin quality, although patient satisfaction was higher (Arch Facial Plast Surg 2006). A 2026 review described the clinical evidence as sparse."
+    },
+    {
+     "question": "Is there a clinical trial of GHK-Cu for hair loss?",
+     "answer": "No completed, published randomised controlled trial of GHK-Cu itself for pattern hair loss was found as of 19 Oct 2026. The closest randomised trial tested a copper-free 5-aminolevulinic acid–GHK conjugate, and other human hair reports used multi-ingredient products."
+    },
+    {
+     "question": "Has injected GHK-Cu been studied in humans?",
+     "answer": "No published human study of injected GHK-Cu given on its own was found as of 19 Oct 2026. FDA states that there are limited data in humans to inform safety-related considerations for compounded injectable GHK-Cu."
+    },
+    {
+     "question": "What is GHK-Cu's FDA compounding status?",
+     "answer": "GHK-Cu is not FDA-approved. FDA's 503A list (updated 14 May 2026) places GHK-Cu in Category 1 for non-injectable routes only; injectable GHK-Cu is listed as nominated but withdrawn on FDA's safety-risk page. FDA intends to consult its Pharmacy Compounding Advisory Committee before the end of February 2027. Under FDA's interim policy, FDA generally does not intend to take action against 503A compounding with a Category 1 substance while the nomination is evaluated, if other conditions are met. This is enforcement discretion, not placement on the 503A bulks list and not an approval."
+    }
+   ]
+  },
+  "references": {
+   "camelCase_prop": "references",
+   "op": "write new_value only if current value exactly equals old_value; skip if any reference citation contains 'PMID 27489425'. Item 1 (mislabelled 'International Journal of Molecular Sciences (2015)') becomes the matching PubMed record (Biomed Res Int 2015, PMID 26236730) with the authors' Skin Biology affiliation disclosed; item 2 (Matalka, 'Molecules (2020)', no PubMed record found) is removed; 13 sources appended",
+   "old_value": [
+    {
+     "title": "International Journal of Molecular Sciences (2015)",
+     "authors": "Pickart et al.",
+     "description": "GHK peptide as a natural modulator of multiple cellular pathways."
+    },
+    {
+     "title": "Molecules (2020)",
+     "authors": "Matalka et al.",
+     "description": "Copper peptide GHK-Cu: comprehensive review of biological activities."
+    }
+   ],
+   "new_value": [
+    {
+     "title": "GHK Peptide as a Natural Modulator of Multiple Cellular Pathways in Skin Regeneration",
+     "authors": "Pickart L, Vasquez-Soltero JM, Margolina A",
+     "citation": "Biomed Res Int. 2015;2015:648108. doi:10.1155/2015/648108. PMID 26236730",
+     "description": "Review of GHK and GHK-Cu activity in skin regeneration (laboratory, animal and gene-expression data). Authors' affiliation: Skin Biology (Bellevue, WA), a company associated with copper-peptide products.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/26236730/"
+     ]
+    },
+    {
+     "title": "Efficacy of a Complex of 5-Aminolevulinic Acid and Glycyl-Histidyl-Lysine Peptide on Hair Growth",
+     "authors": "Lee WJ, Sim HB, Jang YH, Lee SJ, Kim DW, Yim SH",
+     "citation": "Ann Dermatol. 2016;28(4):438-443. doi:10.5021/ad.2016.28.4.438. PMID 27489425",
+     "description": "Randomised, double-blind, placebo-controlled scalp spray study of a copper-free 5-ALA–GHK conjugate (ALAVAX) in men.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/27489425/"
+     ]
+    },
+    {
+     "title": "Intradermal injections of a hair growth factor formulation for enhancement of human hair regrowth - safety and efficacy evaluation in a first-in-man pilot clinical study",
+     "authors": "Kapoor R, Shome D",
+     "citation": "J Cosmet Laser Ther. 2018;20(6):369-379. doi:10.1080/14764172.2018.1439965. PMID 29482481",
+     "description": "Open-label single-arm study; multi-ingredient formulation including copper tripeptide-1.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/29482481/"
+     ]
+    },
+    {
+     "title": "Androgenetic Alopecia Treatment in Asian Men",
+     "authors": "Tanaka Y, Aso T, Ono J, Hosoi R, Kaneko T",
+     "citation": "J Clin Aesthet Dermatol. 2018;11(7):32-35. PMID 30057663",
+     "description": "Uncontrolled clinic case series (18,918 men); multi-ingredient combination treatment.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/30057663/"
+     ]
+    },
+    {
+     "title": "Enhanced hair regrowth with five monthly sessions of minoxidil-dutasteride-copper peptides tattooing for androgenetic alopecia assessed by artificial intelligence and blinded evaluators",
+     "authors": "Kuceki G, Coppinger AJ, Ragi SD, et al.",
+     "citation": "JAAD Int. 2025;20:38-40. doi:10.1016/j.jdin.2025.01.012. PMID 40225275",
+     "description": "Retrospective report of 7 men; combination micro-infusion.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/40225275/"
+     ]
+    },
+    {
+     "title": "Fractional non-ablative laser-assisted drug delivery leads to improvement in male and female pattern hair loss",
+     "authors": "Bertin ACJ, Vilarinho A, Junqueira ALA",
+     "citation": "J Cosmet Laser Ther. 2018;20(7-8):391-394. doi:10.1080/14764172.2017.1418516. PMID 29452017",
+     "description": "Four case reports; combination treatment.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/29452017/"
+     ]
+    },
+    {
+     "title": "Chemical agents and peptides affect hair growth",
+     "authors": "Uno H, Kurata S",
+     "citation": "J Invest Dermatol. 1993;101(1 Suppl):143S-147S. doi:10.1111/1523-1747.ep12363275. PMID 8326148",
+     "description": "Animal data; copper-binding peptide PC1031.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/8326148/"
+     ]
+    },
+    {
+     "title": "The effect of tripeptide-copper complex on human hair growth in vitro",
+     "authors": "Pyo HK, Yoo HG, Won CH, et al.",
+     "citation": "Arch Pharm Res. 2007;30(7):834-839. doi:10.1007/BF02978833. PMID 17703734",
+     "description": "AHK-Cu (not GHK-Cu) on cultured human hair follicles.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/17703734/"
+     ]
+    },
+    {
+     "title": "Effects of topical copper tripeptide complex on CO2 laser-resurfaced skin",
+     "authors": "Miller TR, Wagner JD, Baack BR, Eisbach KJ",
+     "citation": "Arch Facial Plast Surg. 2006;8(4):252-259. doi:10.1001/archfaci.8.4.252. PMID 16847171",
+     "description": "Study in which 13 patients completed; no significant objective differences.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/16847171/"
+     ]
+    },
+    {
+     "title": "GHK-Cu as a Bioactive Metallopeptide and Drug-Delivery Cargo: Coordination Chemistry, Formulation Science, Therapeutic Evidence, and a Translational Roadmap",
+     "authors": "Mateescu DM, Gavrilescu DM, Mincioaga RI, et al.",
+     "citation": "Pharmaceutics. 2026;18(9):1077. doi:10.3390/pharmaceutics18091077. PMID 42797253",
+     "description": "Review; clinical evidence described as sparse.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/42797253/"
+     ]
+    },
+    {
+     "title": "Bulk Drug Substances Nominated for Use in Compounding Under Section 503A of the Federal Food, Drug, and Cosmetic Act",
+     "authors": "U.S. Food and Drug Administration",
+     "citation": "Updated May 14, 2026",
+     "description": "Category 1 entry \"GHK-Cu (except for injectable routes of administration)\"; PCAC consultation planned before end of February 2027.",
+     "links": [
+      "https://www.fda.gov/media/94155/download"
+     ]
+    },
+    {
+     "title": "Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks",
+     "authors": "U.S. Food and Drug Administration",
+     "citation": "Content current as of 04/22/2026",
+     "description": "\"GHK-Cu (for injectable routes of administration)\" under nominated but withdrawn, with FDA safety text.",
+     "links": [
+      "https://www.fda.gov/drugs/human-drug-compounding/certain-bulk-drug-substances-use-compounding-may-present-significant-safety-risks"
+     ]
+    },
+    {
+     "title": "Meeting of the Pharmacy Compounding Advisory Committee",
+     "authors": "U.S. Food and Drug Administration",
+     "citation": "Content current as of 04/15/2026",
+     "description": "Planned meeting before the end of February 2027; GHK-Cu on agenda.",
+     "links": [
+      "https://www.fda.gov/advisory-committees/pharmacy-compounding-advisory-committee/meeting-pharmacy-compounding-advisory-committee"
+     ]
+    },
+    {
+     "title": "Topical GHK-Cu Gel for Acute Skin Wound Healing",
+     "authors": "ClinicalTrials.gov",
+     "citation": "NCT07437586 (record last updated 27 Feb 2026)",
+     "description": "Phase 2; recruiting; no results posted.",
+     "links": [
+      "https://clinicaltrials.gov/study/NCT07437586"
+     ]
+    }
+   ]
+  },
+  "conclusion": {
+   "camelCase_prop": "conclusion",
+   "op": "write only if current value exactly equals old_value; skip if current contains 'Topical and injected evidence should be kept separate'. Removes vendor/pricing/COA sentence, 'GLOW and KLOW stacks', the unverified '4,000 human genes' and '~200 ng/mL to ~80 ng/mL' claims, and 'strong clinical data'",
+   "old_value": "GHK-Cu stands apart in the peptide research landscape for the breadth of its biological activity. No other single compound has been shown to modulate the expression of over 4,000 human genes, spanning DNA repair, antioxidant defense, inflammation, and tissue remodeling.\n\nThe compound's natural occurrence in human plasma, its decades of published research, and its established dermatological efficacy provide a foundation of evidence that is unusual for a research peptide. The age-related decline from ~200 ng/mL to ~80 ng/mL provides a clear biological rationale for supplementation research.\n\nFor researchers, GHK-Cu offers the rare combination of a well-characterized compound with both strong clinical data (dermatology) and an emerging systemic research frontier (injectable administration). Its complementary mechanism to other repair peptides explains its inclusion in multi-peptide protocols like the GLOW and KLOW stacks.\n\nPeptideMaps provides verified vendor listings with pricing and COA documentation for GHK-Cu across multiple dosage options.",
+   "new_value": "GHK-Cu is a copper complex of the tripeptide GHK, which occurs naturally in human plasma. Laboratory, animal and gene-expression studies report effects on extracellular-matrix remodelling, inflammation and antioxidant pathways. These findings have not been confirmed in controlled human trials of systemic use.\n\nThe human evidence that exists concerns topical cosmetic and wound-care products, and a 2026 review described it as sparse (Pharmaceutics 2026). No published human study of injected GHK-Cu on its own was found, and FDA states that there are limited data in humans to inform safety-related considerations for compounded injectable GHK-Cu (as of 19 Oct 2026). Topical and injected evidence should be kept separate.\n\nFor researchers, GHK-Cu remains a well-characterised research compound with open questions about copper delivery, skin-repair mechanisms and whether any systemic effect exists in people. Readers should check the primary sources linked below before relying on any figure."
+  },
+  "research_url": {
+   "camelCase_prop": "primaryResearch.url (PrimaryResearch = education_posts.research_url; GHK-Cu has no FramingProfile, so institution stays null)",
+   "op": "write only if current value exactly equals old_value",
+   "old_value": "https://example.com",
+   "new_value": "https://pubmed.ncbi.nlm.nih.gov/16847171/",
+   "note": "Miller TR et al., Arch Facial Plast Surg 2006 (human study of topical GHK-Cu in which 13 patients completed). Alternative if Colin prefers a regulator source: https://www.fda.gov/media/94155/download"
+  },
+  "molecular_formula": {
+   "camelCase_prop": "molecularInfo.formula",
+   "op": "write only if current value exactly equals old_value",
+   "old_value": "C₁₄H₂₄CuN₆O₄",
+   "new_value": "C14H22N6O4.Cu",
+   "source": "FDA GSRS, PREZATIDE COPPER, UNII 6BJQ43T1I9 (formula as listed by GSRS)"
+  },
+  "molecular_weight": {
+   "camelCase_prop": "molecularInfo.molecularWeight",
+   "op": "write only if current value exactly equals old_value",
+   "old_value": "401~404 g/mol",
+   "new_value": "401.91 g/mol",
+   "source": "FDA GSRS calculated MW 401.9085"
+  },
+  "cas_registry_number": {
+   "camelCase_prop": "molecularInfo.casNumber",
+   "op": "write only if current value exactly equals old_value",
+   "old_value": "49557-75-7",
+   "new_value": "89030-95-5",
+   "source": "FDA GSRS PRIMARY CAS for prezatide copper. The old 49557-75-7 resolves in PubChem to copper-free GHK (glycyl-L-histidyl-L-lysine, CID 73587, C14H24N6O4); there is no identity-note column, so this is recorded here and in CHANGES only."
+  },
+  "half_life": {
+   "camelCase_prop": "halfLife",
+   "op": "write only if current value is NULL or empty string; skip otherwise",
+   "old_value": "",
+   "new_value": "Human: no plasma half-life for GHK-Cu was found in the primary sources cited here. Not a dosing guide."
+  }
+ },
+ "code_changes_for_pr": {
+  "routes": "GHK-Cu routes come from the hardcoded getClinicalData() map in app/Http/Controllers/Frontend/EncyclopediaController.php ('GHK-Cu' => ['status' => 'Cosmetic / Research', 'routes' => ['Topical', 'Subcutaneous'], ...]); there is no routes column. PR change: set routes to ['Topical'] (Subcutaneous is not studied in published human trials of GHK-Cu alone). If the route list must keep Subcutaneous, the renderer needs a caveat label such as 'Subcutaneous (not studied in published human trials)'."
+ },
+ "do_not_touch": "overview, background, mechanism_*, preclinical_* (the preclinical 'Broad Institute Data' 4,000-genes text and the 'Dermal Repair' vitamin C / retinoic acid comparison are flagged, not changed), regulatory_important_note, potential_applications[1]",
+ "migration": {
+  "timestamp": "2026_10_19_130000",
+  "note": "Applied by the shared field-replace migration 2026_10_19_130000 (with the BPC-157 and other field file); see PR-brief-2026-10-19.md."
+ }
+}

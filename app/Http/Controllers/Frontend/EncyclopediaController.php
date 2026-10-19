@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\ProductCategory;
-use App\Models\Product;
 use App\Models\EducationPost;
+use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\SeoPage;
 use App\Models\Setting;
 use App\Support\CompareSlug;
@@ -15,7 +15,6 @@ use App\Support\FramingProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use Illuminate\Support\Str;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class EncyclopediaController extends Controller
@@ -44,14 +43,19 @@ class EncyclopediaController extends Controller
         foreach ($faqs as $f) {
             $q = trim((string) ($f['question'] ?? ''));
             $a = trim((string) ($f['answer'] ?? ''));
-            if ($q === '' || $a === '') continue;
+            if ($q === '' || $a === '') {
+                continue;
+            }
             $mainEntity[] = [
                 '@type' => 'Question',
                 'name' => $q,
                 'acceptedAnswer' => ['@type' => 'Answer', 'text' => strip_tags($a)],
             ];
         }
-        if (empty($mainEntity)) return null;
+        if (empty($mainEntity)) {
+            return null;
+        }
+
         return [
             '@context' => 'https://schema.org',
             '@type' => 'FAQPage',
@@ -105,7 +109,18 @@ class EncyclopediaController extends Controller
             ],
             'GHK-Cu' => [
                 'status' => 'Cosmetic / Research',
-                'routes' => ['Topical', 'Subcutaneous'],
+                // Subcutaneous use has not been studied in published human trials of GHK-Cu alone.
+                'routes' => ['Topical'],
+                'halfLife' => '',
+            ],
+            'CagriSema' => [
+                'status' => 'Investigational; not approved (as of 19 Oct 2026)',
+                'routes' => [],
+                'halfLife' => '',
+            ],
+            'Cagrilintide' => [
+                'status' => 'Investigational; not approved (as of 19 Oct 2026)',
+                'routes' => [],
                 'halfLife' => '',
             ],
             // Plain drugStatus / halfLife text from
@@ -127,7 +142,7 @@ class EncyclopediaController extends Controller
         ];
 
         $compound = $data[$compoundName] ?? null;
-        if (!$compound) {
+        if (! $compound) {
             foreach ($data as $key => $row) {
                 if (strcasecmp((string) $key, (string) $compoundName) === 0) {
                     $compound = $row;
@@ -135,7 +150,10 @@ class EncyclopediaController extends Controller
                 }
             }
         }
-        if (!$compound) return $field === 'routes' ? [] : '';
+        if (! $compound) {
+            return $field === 'routes' ? [] : '';
+        }
+
         return $compound[$field] ?? ($field === 'routes' ? [] : '');
     }
 
@@ -170,6 +188,21 @@ class EncyclopediaController extends Controller
     }
 
     /**
+     * Count residues only for a hyphen-separated residue-code sequence
+     * such as Gly-His-Lys. Prose that happens to contain hyphens is not a
+     * sequence, and the UI hides a zero count.
+     */
+    private function residueCount(?string $sequence): int
+    {
+        $sequence = trim((string) $sequence);
+        if ($sequence === '' || ! preg_match('/^[A-Z][a-z]{2}(-[A-Z][a-z]{2})+$/', $sequence)) {
+            return 0;
+        }
+
+        return count(explode('-', $sequence));
+    }
+
+    /**
      * The shared encyclopedia banner says every compound is unapproved.
      * Forzinity has accelerated approval, so that sentence is false here.
      * Research-use listings are still not the approved product.
@@ -187,7 +220,9 @@ class EncyclopediaController extends Controller
 
     private function truncateToSentences($text, $maxChars = 350)
     {
-        if (empty($text) || strlen($text) <= $maxChars) return $text;
+        if (empty($text) || strlen($text) <= $maxChars) {
+            return $text;
+        }
 
         $text = strip_tags($text);
         $cut = substr($text, 0, $maxChars);
@@ -205,6 +240,7 @@ class EncyclopediaController extends Controller
 
         // Fallback: cut at last space
         $lastSpace = strrpos($cut, ' ');
+
         return $lastSpace ? substr($text, 0, $lastSpace) : $cut;
     }
 
@@ -215,20 +251,22 @@ class EncyclopediaController extends Controller
         }
 
         $value = strip_tags($value);
-        
+
         // If mbstring is available, use it
         if (function_exists('mb_strlen') && function_exists('mb_substr')) {
             if (mb_strlen($value) <= $limit) {
                 return $value;
             }
-            return mb_substr($value, 0, $limit) . $end;
+
+            return mb_substr($value, 0, $limit).$end;
         }
-        
+
         // Fallback to regular string functions
         if (strlen($value) <= $limit) {
             return $value;
         }
-        return substr($value, 0, $limit) . $end;
+
+        return substr($value, 0, $limit).$end;
     }
 
     public function index(Request $request)
@@ -248,7 +286,7 @@ class EncyclopediaController extends Controller
             ->withCount([
                 'products as products_count' => function ($q) {
                     $q->visible()->where('status', 'active');
-                }
+                },
             ])
             ->with(['educationPost' => function ($q) {
                 // Eagerly load the education post if it exists (published or not)
@@ -264,11 +302,11 @@ class EncyclopediaController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhereHas('educationPost', function ($epQuery) use ($search) {
-                      $epQuery->where('title', 'like', "%{$search}%")
-                              ->orWhere('description', 'like', "%{$search}%");
-                  });
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('educationPost', function ($epQuery) use ($search) {
+                        $epQuery->where('title', 'like', "%{$search}%")
+                            ->orWhere('description', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -281,7 +319,7 @@ class EncyclopediaController extends Controller
 
         $categories = $query->orderBy('name')->get()->map(function ($category) {
             $educationPost = $category->educationPost;
-            
+
             // Priority order:
             //  1. Product explicitly flagged is_encyclopedia_thumb for
             //     this category — the VA's deliberate pick wins.
@@ -307,9 +345,9 @@ class EncyclopediaController extends Controller
             if ($flagged) {
                 $image = $flagged->image_url;
             } elseif ($category->image_url
-                && Storage::disk('public')->exists('categories/' . $category->image_url)
+                && Storage::disk('public')->exists('categories/'.$category->image_url)
             ) {
-                $image = Storage::url('categories/' . $category->image_url);
+                $image = Storage::url('categories/'.$category->image_url);
             } else {
                 $sample = Product::visible()
                     ->where('status', 'active')
@@ -324,7 +362,7 @@ class EncyclopediaController extends Controller
             $profile = EncyclopediaFraming::match($category->slug, $category->name);
 
             // Framed compounds must not inherit the peptide default ("Healing & Recovery").
-            if ($profile && !($educationPost && $educationPost->education_tag)) {
+            if ($profile && ! ($educationPost && $educationPost->education_tag)) {
                 $categoryTag = $profile->educationTag();
             } else {
                 $categoryTag = $educationPost && $educationPost->education_tag
@@ -351,7 +389,7 @@ class EncyclopediaController extends Controller
 
             // Get key effects from education post if available, otherwise use fallback method
             $keyEffects = [];
-            if ($educationPost && !empty($educationPost->key_effects) && is_array($educationPost->key_effects)) {
+            if ($educationPost && ! empty($educationPost->key_effects) && is_array($educationPost->key_effects)) {
                 $keyEffects = $educationPost->key_effects;
             } else {
                 $keyEffects = $this->getKeyBenefits($category->name);
@@ -385,9 +423,15 @@ class EncyclopediaController extends Controller
             })->values();
         }
 
-        // Get all published encyclopedia entries (EducationPost)
+        // Published posts under inactive categories stay out of the listing.
+        // Bacteriostatic Water is an active category, so the same name list
+        // that already hides it from the peptide cards applies here too.
         $encyclopediaEntries = EducationPost::where('status', 'published')
             ->where('show_in_encyclopedia', true)
+            ->whereHas('category', function ($q) use ($excludeNames) {
+                $q->where('is_active', true)
+                    ->whereNotIn('name', $excludeNames);
+            })
             ->with('category')
             ->orderBy('title')
             ->get()
@@ -397,7 +441,7 @@ class EncyclopediaController extends Controller
             })
             ->map(function ($entry) {
                 $category = $entry->category;
-                
+
                 // Get tags - use entry tags if available, otherwise use education_tag
                 $tags = [];
                 if ($entry->tags && is_array($entry->tags)) {
@@ -405,7 +449,7 @@ class EncyclopediaController extends Controller
                 } elseif ($entry->tags) {
                     $tags = json_decode($entry->tags, true) ?? [];
                 }
-                $categoryTag = !empty($tags) ? $tags[0] : ($entry->education_tag ?? 'Research Review');
+                $categoryTag = ! empty($tags) ? $tags[0] : ($entry->education_tag ?? 'Research Review');
 
                 // Same public slug the cards and the sitemap advertise.
                 $slug = $category
@@ -462,14 +506,14 @@ class EncyclopediaController extends Controller
     {
         $nameLower = strtolower($name ?? '');
         $descLower = strtolower($description ?? '');
-        $combined = $nameLower . ' ' . $descLower;
+        $combined = $nameLower.' '.$descLower;
 
-        if (strpos($combined, 'bpc') !== false || strpos($combined, 'tb-500') !== false || 
+        if (strpos($combined, 'bpc') !== false || strpos($combined, 'tb-500') !== false ||
             strpos($combined, 'healing') !== false || strpos($combined, 'recovery') !== false) {
             return 'Healing & Recovery';
         }
 
-        if (strpos($combined, 'cjc') !== false || strpos($combined, 'ipamorelin') !== false || 
+        if (strpos($combined, 'cjc') !== false || strpos($combined, 'ipamorelin') !== false ||
             strpos($combined, 'ghrp') !== false || strpos($combined, 'growth') !== false) {
             return 'Growth & Recovery';
         }
@@ -519,7 +563,7 @@ class EncyclopediaController extends Controller
             return [
                 'Accelerates tendon and ligament healing',
                 'Reduces inflammation',
-                'Promotes gut health and repairs intestinal damage'
+                'Promotes gut health and repairs intestinal damage',
             ];
         }
 
@@ -527,7 +571,7 @@ class EncyclopediaController extends Controller
             return [
                 'Accelerates healing of muscle injuries',
                 'Promotes flexibility and reduces inflammation',
-                'Improves hair growth (topical use)'
+                'Improves hair growth (topical use)',
             ];
         }
 
@@ -535,7 +579,7 @@ class EncyclopediaController extends Controller
             return [
                 'Increases lean muscle mass',
                 'Promotes fat loss',
-                'Improves sleep quality'
+                'Improves sleep quality',
             ];
         }
 
@@ -543,7 +587,7 @@ class EncyclopediaController extends Controller
             return [
                 'Increases growth hormone levels',
                 'Boosts IGF-1 production',
-                'Enhances muscle growth'
+                'Enhances muscle growth',
             ];
         }
 
@@ -551,7 +595,7 @@ class EncyclopediaController extends Controller
             return [
                 'Increases sexual desire and arousal',
                 'Improves erectile function',
-                'Enhances sexual satisfaction'
+                'Enhances sexual satisfaction',
             ];
         }
 
@@ -559,7 +603,7 @@ class EncyclopediaController extends Controller
         return [
             'Supports research applications',
             'Well-documented in scientific literature',
-            'Multiple potential benefits'
+            'Multiple potential benefits',
         ];
     }
 
@@ -570,17 +614,17 @@ class EncyclopediaController extends Controller
     {
         $category = ProductCategory::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['educationPost' => fn($q) => $q->where('status', 'published')])
+            ->with(['educationPost' => fn ($q) => $q->where('status', 'published')])
             ->firstOrFail();
 
         $educationPost = $category->educationPost;
-        
+
         // Get image - prioritize education post image, fallback to category image
         $image = null;
         if ($educationPost && $educationPost->image) {
-            $image = Storage::url('education_posts/' . $educationPost->image);
+            $image = Storage::url('education_posts/'.$educationPost->image);
         } elseif ($category->image_url) {
-            $image = Storage::url('categories/' . $category->image_url);
+            $image = Storage::url('categories/'.$category->image_url);
         }
 
         // Get products for this category
@@ -616,21 +660,21 @@ class EncyclopediaController extends Controller
             });
 
         // Determine category tag - use education_tag from database, fallback to computed
-        $categoryTag = $educationPost && $educationPost->education_tag 
-            ? $educationPost->education_tag 
+        $categoryTag = $educationPost && $educationPost->education_tag
+            ? $educationPost->education_tag
             : $this->getCategoryTag($category->name, $category->description);
 
         // Get key effects from education post if available, otherwise use fallback method
         $keyBenefits = [];
-        if ($educationPost && !empty($educationPost->key_effects) && is_array($educationPost->key_effects)) {
+        if ($educationPost && ! empty($educationPost->key_effects) && is_array($educationPost->key_effects)) {
             $keyBenefits = $educationPost->key_effects;
         } else {
             $keyBenefits = $this->getKeyBenefits($category->name);
         }
 
         // Get peptide full name - use from database, fallback to computed
-        $peptideFullName = $educationPost && $educationPost->peptide_full_name 
-            ? $educationPost->peptide_full_name 
+        $peptideFullName = $educationPost && $educationPost->peptide_full_name
+            ? $educationPost->peptide_full_name
             : $this->getSubtitle($category->name);
 
         // Get quick facts from database
@@ -643,15 +687,15 @@ class EncyclopediaController extends Controller
 
         // Get common use cases from database
         $commonUseCases = [];
-        if ($educationPost && !empty($educationPost->common_use_cases) && is_array($educationPost->common_use_cases)) {
+        if ($educationPost && ! empty($educationPost->common_use_cases) && is_array($educationPost->common_use_cases)) {
             $commonUseCases = $educationPost->common_use_cases;
         } else {
             $commonUseCases = $this->getCommonUseCases($category->name);
         }
 
         // Get how it works from database (text field)
-        $howItWorks = $educationPost && $educationPost->how_it_works 
-            ? $educationPost->how_it_works 
+        $howItWorks = $educationPost && $educationPost->how_it_works
+            ? $educationPost->how_it_works
             : 'Mechanism of action varies by peptide type. Research continues to uncover specific pathways.';
 
         // Get dosage information from database
@@ -664,10 +708,10 @@ class EncyclopediaController extends Controller
 
         // Get safety information from database
         $safetyInfo = [
-            'sideEffects' => $educationPost && !empty($educationPost->possible_side_effects) && is_array($educationPost->possible_side_effects)
+            'sideEffects' => $educationPost && ! empty($educationPost->possible_side_effects) && is_array($educationPost->possible_side_effects)
                 ? $educationPost->possible_side_effects
                 : ['Generally well-tolerated'],
-            'contraindications' => $educationPost && !empty($educationPost->contraindications) && is_array($educationPost->contraindications)
+            'contraindications' => $educationPost && ! empty($educationPost->contraindications) && is_array($educationPost->contraindications)
                 ? $educationPost->contraindications
                 : ['Consult doctor before use'],
         ];
@@ -675,20 +719,20 @@ class EncyclopediaController extends Controller
         // Get stacking recommendations from database (array of category IDs)
         $stackingRecommendations = [];
         $hasStackingData = false;
-        
-        if ($educationPost && !empty($educationPost->stacking_recommendations) && is_array($educationPost->stacking_recommendations)) {
+
+        if ($educationPost && ! empty($educationPost->stacking_recommendations) && is_array($educationPost->stacking_recommendations)) {
             $hasStackingData = true; // We have data from database (even if it's just [null])
-            
+
             // Filter out null values
-            $stackingCategoryIds = array_filter($educationPost->stacking_recommendations, function($id) {
+            $stackingCategoryIds = array_filter($educationPost->stacking_recommendations, function ($id) {
                 return $id !== null;
             });
-            
-            if (!empty($stackingCategoryIds)) {
+
+            if (! empty($stackingCategoryIds)) {
                 $stackingCategories = ProductCategory::whereIn('id', $stackingCategoryIds)
                     ->where('is_active', true)
                     ->get();
-                
+
                 $stackingRecommendations = $stackingCategories->map(function ($cat) {
                     return [
                         'name' => $cat->name,
@@ -701,21 +745,21 @@ class EncyclopediaController extends Controller
         }
 
         // Only use fallback if we don't have any stacking data from database
-        if (!$hasStackingData && empty($stackingRecommendations)) {
+        if (! $hasStackingData && empty($stackingRecommendations)) {
             $stackingRecommendations = $this->getStackingRecommendations($category->name);
         }
 
         // Get FAQs from database
         $faqs = [];
-        if ($educationPost && !empty($educationPost->faqs) && is_array($educationPost->faqs)) {
+        if ($educationPost && ! empty($educationPost->faqs) && is_array($educationPost->faqs)) {
             $faqs = $educationPost->faqs;
         } else {
             $faqs = $this->getFAQs($category->name);
         }
 
         // Get title - use education post title if available, fallback to category name
-        $title = $educationPost && $educationPost->title 
-            ? $educationPost->title 
+        $title = $educationPost && $educationPost->title
+            ? $educationPost->title
             : $category->name;
 
         // Generate SEO data for encyclopedia detail
@@ -724,7 +768,7 @@ class EncyclopediaController extends Controller
             ? $this->safeLimit($educationPost ? $educationPost->description : $category->description, 160)
             : $stubSeo['description'];
         $seoData = new SEOData(
-            title: EncyclopediaFraming::match($slug, $title) ? $stubSeo['title'] : ($title . ' - Peptide Encyclopedia | Peptidemap'),
+            title: EncyclopediaFraming::match($slug, $title) ? $stubSeo['title'] : ($title.' - Peptide Encyclopedia | Peptidemap'),
             description: $detailDescription,
             image: $image,
             url: url("/encyclopedia/{$slug}"),
@@ -773,17 +817,17 @@ class EncyclopediaController extends Controller
         // families) do not match the stored slug, so resolve those too.
         $category = ProductCategory::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['educationPost' => fn($q) => $q->where('status', 'published')])
+            ->with(['educationPost' => fn ($q) => $q->where('status', 'published')])
             ->first();
 
-        if (!$category) {
+        if (! $category) {
             $category = ProductCategory::findForPublicSlug(EncyclopediaSlug::publicSlug($slug) ?? $slug);
             if ($category) {
                 $category->load(['educationPost' => fn ($q) => $q->where('status', 'published')]);
             }
         }
 
-        if (!$category) {
+        if (! $category) {
             abort(404);
         }
 
@@ -804,9 +848,9 @@ class EncyclopediaController extends Controller
         // Get image - prioritize education post image, fallback to category image
         $image = null;
         if ($educationPost && $educationPost->image) {
-            $image = Storage::url('education_posts/' . $educationPost->image);
+            $image = Storage::url('education_posts/'.$educationPost->image);
         } elseif ($category->image_url) {
-            $image = Storage::url('categories/' . $category->image_url);
+            $image = Storage::url('categories/'.$category->image_url);
         }
 
         // Get products for this category
@@ -849,8 +893,8 @@ class EncyclopediaController extends Controller
         if (empty($tags) && $profile) {
             $tags = $profile->tags();
         }
-        $categoryTag = !empty($tags) ? $tags[0] : ($category->education_tag ?? ($profile ? $profile->educationTag() : $this->getCategoryTag($category->name, $category->description)));
-        
+        $categoryTag = ! empty($tags) ? $tags[0] : ($category->education_tag ?? ($profile ? $profile->educationTag() : $this->getCategoryTag($category->name, $category->description)));
+
         // Get title and full name
         $title = $educationPost && $educationPost->title ? $educationPost->title : $category->name;
         $peptideFullName = $educationPost && $educationPost->peptide_full_name
@@ -861,17 +905,17 @@ class EncyclopediaController extends Controller
         // Framed compounds must not inherit "Peptide Encyclopedia" stub copy.
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
         $stubSeo = $this->stubEncyclopediaSeo($title, $category->slug, $siteName, $profile);
-        
+
         // Check if stored SEO data exists
-        $hasStoredSeo = $educationPost && (!empty($educationPost->seo_page_title) || !empty($educationPost->seo_description));
-        
+        $hasStoredSeo = $educationPost && (! empty($educationPost->seo_page_title) || ! empty($educationPost->seo_description));
+
         if ($hasStoredSeo) {
             // Use stored SEO data from database. Stub peptide titles and
             // descriptions still yield to the framing profile.
-            $seoTitle = (!empty($educationPost->seo_page_title) && !($profile && $this->isStubPeptideSeo($educationPost->seo_page_title)))
+            $seoTitle = (! empty($educationPost->seo_page_title) && ! ($profile && $this->isStubPeptideSeo($educationPost->seo_page_title)))
                 ? $educationPost->seo_page_title
                 : $stubSeo['title'];
-            $seoDescription = (!empty($educationPost->seo_description) && !($profile && $this->isStubPeptideSeo($educationPost->seo_description)))
+            $seoDescription = (! empty($educationPost->seo_description) && ! ($profile && $this->isStubPeptideSeo($educationPost->seo_description)))
                 ? $educationPost->seo_description
                 : ($profile
                     ? $profile->seoDescription()
@@ -902,7 +946,7 @@ class EncyclopediaController extends Controller
             $ogV = ($educationPost?->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = \App\Support\OgImageUrl::compound($publicSlug, $ogV);
         }
-        
+
         // DefinedTerm + BreadcrumbList JSON-LD (rendered by app.blade.php)
         $definedTermSchema = [
             '@context' => 'https://schema.org',
@@ -981,7 +1025,7 @@ class EncyclopediaController extends Controller
             // has no vendor listings, so an empty catalog does not render
             // a buy or shop button.
             'relatedPages' => $vendorCount > 0 ? array_filter([
-                'compare' => ['url' => url('/compare/' . (CompareSlug::canonical($category->slug) ?? $category->slug)), 'anchor' => "Compare {$category->name} prices across vendors"],
+                'compare' => ['url' => url('/compare/'.(CompareSlug::canonical($category->slug) ?? $category->slug)), 'anchor' => "Compare {$category->name} prices across vendors"],
                 'shop' => $profile ? null : ['url' => url("/products?category={$category->slug}"), 'anchor' => "Shop {$category->name} — all available products"],
             ]) : [],
             // $educationPost may be null when a ProductCategory exists but
@@ -992,18 +1036,18 @@ class EncyclopediaController extends Controller
             'molecularInfo' => [
                 'formula' => $educationPost?->molecular_formula ?? '',
                 'molecularWeight' => $educationPost?->molecular_weight ?? '',
-                'casNumber' => $educationPost?->cas_registry_number ?? ''
+                'casNumber' => $educationPost?->cas_registry_number ?? '',
             ],
             'aminoAcidSequence' => [
-                'residueCount' => $educationPost?->amino_acid_sequence ? count(explode('-', $educationPost->amino_acid_sequence)) : 0,
+                'residueCount' => $this->residueCount($educationPost?->amino_acid_sequence),
                 'sequence' => $educationPost?->amino_acid_sequence ?? '',
                 'composition' => [],
                 'properties' => [
                     'netCharge' => $educationPost?->amino_acid_net_charge ?? '',
                     'hydrophobic' => $educationPost?->amino_acid_hydrophobic ?? '',
                     'stability' => $educationPost?->amino_acid_stability ?? '',
-                    'solubility' => $educationPost?->amino_acid_solubility ?? ''
-                ]
+                    'solubility' => $educationPost?->amino_acid_solubility ?? '',
+                ],
             ],
             'keyPoints' => $educationPost && $educationPost->key_points ? (is_array($educationPost->key_points) ? $educationPost->key_points : json_decode($educationPost->key_points, true) ?? []) : [],
             'overview' => $educationPost?->overview ?? '',
@@ -1054,13 +1098,13 @@ class EncyclopediaController extends Controller
      */
     private function localEncyclopediaImage(?string $path): ?string
     {
-        if (!is_string($path) || !str_starts_with($path, '/images/encyclopedia/')) {
+        if (! is_string($path) || ! str_starts_with($path, '/images/encyclopedia/')) {
             return null;
         }
         if (str_contains($path, '..')) {
             return null;
         }
-        if (!is_file(public_path(ltrim($path, '/')))) {
+        if (! is_file(public_path(ltrim($path, '/')))) {
             return null;
         }
 
@@ -1125,7 +1169,7 @@ class EncyclopediaController extends Controller
     private function faqsForSchema(?EducationPost $post, ?FramingProfile $profile): array
     {
         $faqs = is_array($post?->faqs ?? null) ? $post->faqs : [];
-        if ($faqs === [] && $profile && !$post) {
+        if ($faqs === [] && $profile && ! $post) {
             $faqs = $profile->articleAttributes()['faqs'] ?? [];
         }
 
@@ -1167,17 +1211,17 @@ class EncyclopediaController extends Controller
      */
     private function applyStubNarrative(array $data, ?EducationPost $post, ?FramingProfile $profile): array
     {
-        if ($post || !$profile) {
+        if ($post || ! $profile) {
             return $data;
         }
 
         foreach ($profile->stubNarrative() as $key => $value) {
-            if (!array_key_exists($key, $data)) {
+            if (! array_key_exists($key, $data)) {
                 continue;
             }
             $current = $data[$key];
             $blank = $current === '' || $current === [] || $current === null;
-            if (!$blank && $key === 'molecularInfo' && is_array($current)) {
+            if (! $blank && $key === 'molecularInfo' && is_array($current)) {
                 $blank = trim(implode('', $current)) === '';
             }
             if ($blank) {
@@ -1185,7 +1229,7 @@ class EncyclopediaController extends Controller
             }
         }
 
-        if (!empty($data['overview'])) {
+        if (! empty($data['overview'])) {
             $data['overviewShort'] = $this->truncateToSentences($data['overview'], 450);
         }
 
@@ -1198,7 +1242,7 @@ class EncyclopediaController extends Controller
     private function getKeyBenefits($name)
     {
         $nameLower = strtolower($name ?? '');
-        
+
         if (stripos($nameLower, 'bpc-157') !== false) {
             return [
                 'Accelerates tendon and ligament healing',
@@ -1225,7 +1269,7 @@ class EncyclopediaController extends Controller
     private function getQuickFacts($name)
     {
         $nameLower = strtolower($name ?? '');
-        
+
         if (stripos($nameLower, 'bpc-157') !== false) {
             return [
                 'halfLife' => '~4 hours',
@@ -1249,7 +1293,7 @@ class EncyclopediaController extends Controller
     private function getCommonUseCases($name)
     {
         $nameLower = strtolower($name ?? '');
-        
+
         if (stripos($nameLower, 'bpc-157') !== false) {
             return [
                 'Sports injuries (tendonitis, sprains, strains)',
@@ -1274,7 +1318,7 @@ class EncyclopediaController extends Controller
     private function getHowItWorks($name)
     {
         $nameLower = strtolower($name ?? '');
-        
+
         if (stripos($nameLower, 'bpc-157') !== false) {
             return [
                 'Promotes angiogenesis (formation of new blood vessels)',
@@ -1296,7 +1340,7 @@ class EncyclopediaController extends Controller
     private function getDosage($name)
     {
         $nameLower = strtolower($name ?? '');
-        
+
         if (stripos($nameLower, 'bpc-157') !== false) {
             return [
                 'typicalDosage' => '250-500 mcg',
@@ -1345,7 +1389,7 @@ class EncyclopediaController extends Controller
     private function getStackingRecommendations($name)
     {
         $nameLower = strtolower($name ?? '');
-        
+
         if (stripos($nameLower, 'bpc-157') !== false) {
             return [
                 [
@@ -1366,7 +1410,7 @@ class EncyclopediaController extends Controller
     private function getFAQs($name)
     {
         $nameLower = strtolower($name ?? '');
-        
+
         if (stripos($nameLower, 'bpc-157') !== false) {
             return [
                 [
@@ -1391,5 +1435,4 @@ class EncyclopediaController extends Controller
             ],
         ];
     }
-
 }
