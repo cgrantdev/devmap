@@ -349,7 +349,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host));
     }
 
     /**
@@ -1056,6 +1056,56 @@ class EducationalContentPublisher
                     ['What is NAD+\'s compounding status?', 'FDA\'s 503A categories list, updated 14 May 2026, places NAD and NADH in Category 1, meaning under evaluation. Category 1 is an interim enforcement policy for 503A compounders, not FDA approval and not a listing on the 503A Bulks List. No FDA-approved drug with NAD+ as its active ingredient was found.'],
                     ['Has anyone studied MOTS-c and NAD+ together?', 'We found no interventional study combining or comparing them in searches of PubMed and ClinicalTrials.gov as of 19 October 2026. Claims that they work together or should be stacked are not based on a direct test.'],
                     ['Is research-labelled MOTS-c or NAD+ the same as a compounded or approved product?', 'No. A research-use-only label is not a compounding pathway, a dietary supplement status or an FDA approval. Research-labelled vials are not the NR or NMN products used in most human trials. This article is educational and is not medical advice.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Ipamorelin vs sermorelin evidence and FDA-status comparison. Drafted 2026-10-19;
+     * sources checked 2026-10-19. Companions /compare/ipamorelin-vs-sermorelin.
+     * The body lives in resources/content/educational. The publisher reads
+     * this catalog, not the draft YAML.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function ipamorelinVsSermorelin(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'ipamorelin-vs-sermorelin.md',
+                'image_file' => 'ipamorelin-vs-sermorelin.png',
+                'slug' => 'ipamorelin-vs-sermorelin',
+                'h1' => 'Ipamorelin vs Sermorelin: Receptors, Evidence and FDA Status',
+                'lede' => 'Sermorelin is a GHRH(1-29) analogue FDA once approved as GEREF. Ipamorelin is a ghrelin-receptor agonist that stopped at phase 2. Mechanism, trials, evidence grades and dated FDA compounding status, from primary sources. Educational only.',
+                'seo_title' => 'Ipamorelin vs Sermorelin: Mechanism, Evidence, FDA Status',
+                'seo_description' => 'Sermorelin is a GHRH(1-29) analogue once approved as GEREF; ipamorelin is a ghrelin-receptor agonist never approved. Trials and FDA status compared.',
+                'og_title' => 'Ipamorelin vs Sermorelin: Mechanism, Evidence, FDA Status',
+                'og_description' => 'GHRH receptor vs ghrelin receptor: GEREF approval and 2009 withdrawal, ipamorelin ileus trials and PCAC votes, and the evidence grades for each.',
+                'blog_type' => 'Research',
+                'read_time' => '20 Min Read',
+                'published_at' => '2026-10-19',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Ipamorelin', 'Sermorelin', 'GEREF', 'GHRH', 'Ghrelin receptor', 'Compounding'],
+                'key_points' => [
+                    'Sermorelin is GHRH(1-29)-amide and acts at the GHRH receptor. Ipamorelin is a synthetic pentapeptide that acts at the ghrelin receptor, GHS-R1a.',
+                    'Raun et al. 1998 reported that ipamorelin did not raise ACTH or cortisol to levels significantly different from those after GHRH in swine, unlike GHRP-6 and GHRP-2. That selectivity is an animal finding.',
+                    'GEREF was approved on 28 December 1990 (NDA 19-863) and 26 September 1997 (NDA 20-443). Approvals were withdrawn effective 18 June 2009, and FDA found in 2013 they were not withdrawn for safety or effectiveness.',
+                    'The published ipamorelin ileus trial (NCT00672074) found no significant difference from placebo. A second phase 2 trial (NCT01280344) has no posted or published results.',
+                    'Ipamorelin acetate has been in 503B Category 2 since 29 September 2023, and PCAC voted against 503A bulks listing on 29 October 2024. Sermorelin acetate is in 503B Category 1, marked as a component of an approved drug.',
+                    'Neither compound was on the July 2026 PCAC agenda. No head-to-head human trial was found, and this page does not rank them.',
+                ],
+                'faq' => self::faq($host.'/blog/ipamorelin-vs-sermorelin#faq', [
+                    ['Are ipamorelin and sermorelin the same kind of peptide?', 'No. Sermorelin is GHRH(1-29)-amide, the first 29 amino acids of human growth hormone-releasing hormone, and it acts at the GHRH receptor. Ipamorelin is a synthetic five-residue peptide that acts at the ghrelin receptor, GHS-R1a. Both lead to growth hormone release from the pituitary, but through different receptors.'],
+                    ['Is sermorelin FDA-approved?', 'Not currently. FDA approved GEREF (sermorelin acetate) under NDA 19-863 on 28 December 1990 for diagnostic pituitary testing and under NDA 20-443 on 26 September 1997 for idiopathic growth hormone deficiency in children with growth failure. EMD Serono discontinued both products in 2008. FDA withdrew the approvals effective 18 June 2009. In 2013 FDA determined they were not withdrawn for reasons of safety or effectiveness. No approved sermorelin generic was found in Drugs@FDA.'],
+                    ['Has ipamorelin ever been FDA-approved?', 'No. Ipamorelin reached phase 2 trials for postoperative ileus. The published trial, NCT00672074, found no significant difference from placebo on its key and secondary efficacy endpoints. A second phase 2 trial, NCT01280344, was completed in 2014 but has no posted or published results.'],
+                    ['What does "selective" mean for ipamorelin?', 'It comes from a 1998 study in rats and swine. Ipamorelin released growth hormone about as potently as GHRP-6. Unlike GHRP-6 and GHRP-2, it did not raise ACTH or cortisol to levels significantly different from those after GHRH, even at doses more than 200-fold above the ED50 for GH release. This was selectivity compared with older GHRPs, in animals. It was not tested against sermorelin in humans.'],
+                    ['Can ipamorelin be compounded?', 'FDA lists ipamorelin acetate in 503B Category 2 for significant safety risks, effective 29 September 2023. On 29 October 2024, FDA\'s Pharmacy Compounding Advisory Committee voted 0 yes, 12 no and 1 abstain on adding each of ipamorelin free base and ipamorelin acetate to the 503A bulks list, after FDA proposed against it. It is not on the 503A bulks list. Ipamorelin was not on the July 2026 PCAC agenda.'],
+                    ['Where does sermorelin stand for compounding?', 'Sermorelin is not on the 503A bulks list and does not appear in FDA\'s 503A category list. FDA\'s 503B list places sermorelin acetate in Category 1 and marks it as a component of an FDA-approved drug. FDA\'s 503A page lists components of FDA-approved drug products as one permitted source of bulk drug substances. FDA has not published a sermorelin-specific statement on how this applies to a drug whose approval was withdrawn, and absence from FDA\'s 503A lists is not, by itself, an FDA statement either way. Whether a specific compounded product qualifies is a legal question this article does not answer.'],
+                    ['Which one is better?', 'This page does not rank them. They act on different receptors, were studied in different populations for different uses, and have no head-to-head human trial. Neither has controlled human evidence for the anti-ageing or recovery uses common in marketing.'],
+                    ['Is a research-use-only vial the same as GEREF or a trial drug?', 'No. GEREF was a specific FDA-approved finished product, now discontinued, and the ipamorelin trial material was a sponsor\'s investigational drug used under a protocol. A research-use-only vial is neither, and none of the data on this page describe its identity, purity or sterility.'],
                 ]),
             ],
         ];
