@@ -47,13 +47,18 @@ class DevConsoleController extends Controller
             'args' => [],
         ],
         'products:generate-descriptions' => [
-            'label' => 'AI-generate unique descriptions for products missing a vendor one',
+            'label' => 'AI-generate unique descriptions (queue-dispatched by default)',
             'args' => [
                 '--dry-run' => true,
                 '--limit' => 'int',
                 '--brand' => 'string',
                 '--force' => true,
+                '--inline' => true,
             ],
+        ],
+        'descriptions:progress' => [
+            'label' => 'Show how many products have unique descriptions + queue depth',
+            'args' => [],
         ],
         'brands:ensure-generated-desc-column' => [
             'label' => 'Add generated_description to vendor_settings (schema)',

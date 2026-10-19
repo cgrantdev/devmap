@@ -26,7 +26,8 @@ class GenerateProductDescriptions extends Command
                             {--limit= : Cap number of products}
                             {--brand= : Only process one brand slug}
                             {--force : Regenerate even if generated_description already set}
-                            {--dry-run : Build prompts + skip API calls}';
+                            {--dry-run : Build prompts + skip API calls}
+                            {--inline : Run inline (slow, hits timeout past ~30). Default is queue dispatch.}';
 
     protected $description = 'Fill vendor_description gaps with Claude-generated unique copy.';
 
@@ -60,6 +61,24 @@ class GenerateProductDescriptions extends Command
         $total = $query->count();
         if ($total === 0) {
             $this->info('No products to generate for.');
+            return self::SUCCESS;
+        }
+
+        // Default path (Colin 10/20): queue-dispatch each product as a
+        // standalone job. Returns in <5s even for the full catalog;
+        // Laravel's queue worker processes in the background without
+        // the HTTP / PHP timeout killing anything. --inline keeps the
+        // old inline-loop behavior for small-batch testing + --dry-run.
+        if (!$this->option('inline') && !$this->option('dry-run')) {
+            $dispatched = 0;
+            $query->chunk(100, function ($chunk) use (&$dispatched) {
+                foreach ($chunk as $product) {
+                    \App\Jobs\GenerateProductDescriptionJob::dispatch($product->id);
+                    $dispatched++;
+                }
+            });
+            $this->info("Queued {$dispatched} description-generation job(s). Worker will process in the background.");
+            $this->line("Monitor progress: SELECT COUNT(*) FROM products WHERE generated_description IS NOT NULL;");
             return self::SUCCESS;
         }
 
