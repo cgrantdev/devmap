@@ -1,6 +1,6 @@
 GLOW and KLOW are marketplace names for multi-peptide research blends. They are not single molecules, and they are not approved medicines. Readers often treat KLOW as “more GLOW,” or treat a vial of GHK-Cu alone, or of KPV alone, as the same product. Those are different listings. On Peptidemap’s catalog, GLOW is the three-part label GHK-Cu, BPC-157, and TB-500. KLOW is that same named set plus a fourth component, KPV (Lys-Pro-Val). The added piece is KPV, not a higher GHK-Cu dose. This page is a contents comparison, and a limit on blend evidence. It is not a shopping guide, not a beginner primer, and not medical advice.
 
-Vendor and price listings stay on their own pages: [GLOW](https://peptidemap.com/compare/glow) and [KLOW — GHK-Cu/BPC-157/TB-500/KPV](https://peptidemap.com/compare/klow-blend-ghk-cu-bpc-157-tb-500-kpv). A head-to-head price URL, `/compare/glow-vs-klow`, returned 404 when checked on 5 October 2026. This article does not copy vendor tables, coupon codes, or prices. Listings on those compare pages are framed as research use only (RUO).
+Vendor and price listings stay on their own pages: [GLOW](https://peptidemap.com/compare/glow) and [KLOW — GHK-Cu/BPC-157/TB-500/KPV](https://peptidemap.com/compare/klow-blend-ghk-cu-bpc-157-tb-500-kpv). Head-to-head listings are at [GLOW vs KLOW](https://peptidemap.com/compare/glow-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv). This article does not copy vendor tables, coupon codes, or prices. Listings on those compare pages are framed as research use only (RUO).
 
 ## What each catalog label names
 

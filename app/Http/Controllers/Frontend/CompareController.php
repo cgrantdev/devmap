@@ -19,6 +19,7 @@ use App\Support\CompoundDisplay;
 use App\Support\RetatrutideCompareNarrative;
 use App\Support\RetatrutideTirzepatideCompareCopy;
 use App\Support\BpcTb500CompareCopy;
+use App\Support\KlowCompareCopy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -106,8 +107,10 @@ class CompareController extends Controller
 
     /**
      * Short compare-side spellings rewritten before alphabetical order,
-     * so /compare/cagrilintide-vs-reta and /compare/kisspeptin-vs-pt-141
-     * each 301 once to the live pair.
+     * so /compare/cagrilintide-vs-reta, /compare/kisspeptin-vs-pt-141,
+     * and /compare/glow-vs-klow each 301 once to the live pair and keep
+     * the query string. "klow" is the short side for the category
+     * klow-blend-ghk-cu-bpc-157-tb-500-kpv.
      *
      * @var array<string, string>
      */
@@ -116,6 +119,7 @@ class CompareController extends Controller
         // Revisit if a PT-141 category is ever reactivated.
         'pt-141' => 'bremelanotide',
         'pt141' => 'bremelanotide',
+        'klow' => 'klow-blend-ghk-cu-bpc-157-tb-500-kpv',
     ];
 
     // Display-name overrides live in App\Support\CompoundDisplay so
@@ -931,7 +935,8 @@ class CompareController extends Controller
     /**
      * Lowercase hyphenated pair in alphabetical order: a-vs-b with a < b.
      * Encyclopedia aliases (ss-31 / ss31 → elamipretide) and short names
-     * (reta → retatrutide, pt-141 / pt141 → bremelanotide) are rewritten
+     * (reta → retatrutide, pt-141 / pt141 → bremelanotide,
+     * klow → klow-blend-ghk-cu-bpc-157-tb-500-kpv) are rewritten
      * on each side before ordering, so both directions 301 once to the
      * live pair. Null when the slug is not a real pair (missing side, or a vs a).
      */
@@ -955,9 +960,10 @@ class CompareController extends Controller
     /**
      * SS-31 is the research alias for the live elamipretide slug. Other
      * encyclopedia families stay put: their aliases are space or case
-     * forms that CompareSlug::canonical already folds. "reta" and
-     * "pt-141" / "pt141" are compare-only names for retatrutide and
-     * bremelanotide.
+     * forms that CompareSlug::canonical already folds. "reta",
+     * "pt-141" / "pt141", and "klow" are compare-only names for
+     * retatrutide, bremelanotide, and
+     * klow-blend-ghk-cu-bpc-157-tb-500-kpv.
      */
     private function canonicalCompareSide(string $slug): string
     {
@@ -1082,7 +1088,9 @@ class CompareController extends Controller
 
         // Display names are already CompoundDisplay labels, so GLP vs
         // pages keep GLP3-R / GLP2-T / GLP1-S. VsPageSeo only shortens.
-        $seoCopy = VsPageSeo::forPair($displayA, $displayB);
+        // $final is the alias-resolved canonical slug, so a pair override
+        // in KlowCompareCopy is keyed on the long KLOW slug.
+        $seoCopy = VsPageSeo::forPair($displayA, $displayB, $final);
         $seoTitle = $seoCopy['title'];
         $seoDescription = $seoCopy['description'];
 
@@ -1098,7 +1106,8 @@ class CompareController extends Controller
 
         $pairCopy = ElamipretideMotsCCompareFaqs::forSlug($final)
             ?? RetatrutideTirzepatideCompareCopy::forSlug($final)
-            ?? BpcTb500CompareCopy::forSlug($final);
+            ?? BpcTb500CompareCopy::forSlug($final)
+            ?? KlowCompareCopy::forSlug($final);
         $pairEvidence = $pairCopy['evidence'] ?? null;
         $pairEvidenceLink = $pairCopy['link'] ?? null;
         $pairFaqs = $pairCopy['faqs'] ?? [];
@@ -1129,7 +1138,7 @@ class CompareController extends Controller
             'og_image' => null,
             'image' => null,
             'url' => url("/compare/{$aSlug}-vs-{$bSlug}"),
-            'h1' => "{$displayA} vs {$displayB}",
+            'h1' => $seoCopy['h1'],
             'schema' => $schema,
         ];
         // Thin long-tail pairs are noindex,follow when the kill switch is

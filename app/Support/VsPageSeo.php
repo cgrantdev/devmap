@@ -13,6 +13,9 @@ namespace App\Support;
  * The stored title omits that suffix. The rendered title stays within
  * 60 characters. Featured-pair metas land between 140 and 155
  * characters and do not name a dollar amount, a coupon, or a best vendor.
+ *
+ * KlowCompareCopy::seoOverride replaces title, H1, and description for
+ * a canonical pair slug when the display labels would not fit.
  */
 class VsPageSeo
 {
@@ -25,18 +28,21 @@ class VsPageSeo
     private const TRIM_CHARS = " \t-/+&,|·";
 
     /**
-     * @return array{title: string, description: string, og_title: string, og_description: string}
+     * @return array{title: string, description: string, og_title: string, og_description: string, h1: string}
      */
-    public static function forPair(string $a, string $b): array
+    public static function forPair(string $a, string $b, ?string $slug = null): array
     {
-        $title = self::title($a, $b);
-        $description = self::description($a, $b);
+        $override = KlowCompareCopy::seoOverride($slug);
+        $title = $override['title'] ?? self::title($a, $b);
+        $description = $override['description'] ?? self::description($a, $b);
+        $h1 = $override['h1'] ?? self::pair($a, $b);
 
         return [
             'title' => $title,
             'description' => $description,
             'og_title' => $title,
             'og_description' => $description,
+            'h1' => $h1,
         ];
     }
 
