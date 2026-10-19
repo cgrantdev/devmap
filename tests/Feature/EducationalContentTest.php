@@ -280,7 +280,7 @@ class EducationalContentTest extends TestCase
         $this->assertFileExists(public_path(ltrim($beginner->cover, '/')));
         $this->assertFileExists(public_path(ltrim($legality->cover, '/')));
 
-        $newestSlug = 'ipamorelin-vs-sermorelin';
+        $newestSlug = 'retatrutide-vs-semaglutide';
         $newestImage = '/images/educational/'.$newestSlug.'.png';
 
         $this->get('/blogs')->assertOk()->assertInertia(fn ($page) => $page
@@ -288,31 +288,32 @@ class EducationalContentTest extends TestCase
             ->missing('featured')
             ->where('blogs.data.0.slug', $newestSlug)
             ->where('blogs.data.0.image', $newestImage)
-            ->where('blogs.data.1.slug', 'mots-c-vs-nad')
-            ->where('blogs.data.1.image', '/images/educational/mots-c-vs-nad.png')
-            ->where('blogs.data.2.slug', 'retatrutide-side-effects-trial-data')
-            ->where('blogs.data.2.image', '/images/educational/retatrutide-side-effects-trial-data.png')
-            ->where('blogs.data.3.slug', 'compounded-glp-1-status')
-            ->where('blogs.data.3.image', '/images/educational/compounded-glp-1-status.png')
-            ->where('blogs.data.4.slug', 'orforglipron-vs-oral-semaglutide')
-            ->where('blogs.data.4.image', '/images/educational/orforglipron-vs-oral-semaglutide.png')
-            ->where('blogs.data.5.slug', 'cagrisema-vs-tirzepatide')
-            ->where('blogs.data.5.image', '/images/educational/cagrisema-vs-tirzepatide.png')
-            ->where('blogs.data.6.slug', 'aod-9604-vs-tesamorelin')
-            ->where('blogs.data.6.image', '/images/educational/aod-9604-vs-tesamorelin.png')
-            ->where('blogs.data.7.slug', 'bpc-157-vs-ghk-cu')
-            ->where('blogs.data.7.image', '/images/educational/bpc-157-vs-ghk-cu.png')
-            ->where('blogs.data.8.slug', 'retatrutide-testing-coa-limits')
-            ->where('blogs.data.8.image', '/images/educational/retatrutide-testing-coa-limits.png')
-            ->where('blogs.data.9.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('blogs.data.10.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('blogs.data.16.slug', 'tesamorelin-vs-sermorelin')
-            ->where('blogs.data.16.image', '/images/educational/tesamorelin-vs-sermorelin.png')
-            ->where('blogs.data.17.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('blogs.data.17.image', $evidencePath)
-            ->where('blogs.data.18.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('blogs.data.18.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
-            ->where('blogs.data.19.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('blogs.data.1.slug', 'ipamorelin-vs-sermorelin')
+            ->where('blogs.data.1.image', '/images/educational/ipamorelin-vs-sermorelin.png')
+            ->where('blogs.data.2.slug', 'mots-c-vs-nad')
+            ->where('blogs.data.2.image', '/images/educational/mots-c-vs-nad.png')
+            ->where('blogs.data.3.slug', 'retatrutide-side-effects-trial-data')
+            ->where('blogs.data.3.image', '/images/educational/retatrutide-side-effects-trial-data.png')
+            ->where('blogs.data.4.slug', 'compounded-glp-1-status')
+            ->where('blogs.data.4.image', '/images/educational/compounded-glp-1-status.png')
+            ->where('blogs.data.5.slug', 'orforglipron-vs-oral-semaglutide')
+            ->where('blogs.data.5.image', '/images/educational/orforglipron-vs-oral-semaglutide.png')
+            ->where('blogs.data.6.slug', 'cagrisema-vs-tirzepatide')
+            ->where('blogs.data.6.image', '/images/educational/cagrisema-vs-tirzepatide.png')
+            ->where('blogs.data.7.slug', 'aod-9604-vs-tesamorelin')
+            ->where('blogs.data.7.image', '/images/educational/aod-9604-vs-tesamorelin.png')
+            ->where('blogs.data.8.slug', 'bpc-157-vs-ghk-cu')
+            ->where('blogs.data.8.image', '/images/educational/bpc-157-vs-ghk-cu.png')
+            ->where('blogs.data.9.slug', 'retatrutide-testing-coa-limits')
+            ->where('blogs.data.9.image', '/images/educational/retatrutide-testing-coa-limits.png')
+            ->where('blogs.data.10.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('blogs.data.11.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('blogs.data.17.slug', 'tesamorelin-vs-sermorelin')
+            ->where('blogs.data.17.image', '/images/educational/tesamorelin-vs-sermorelin.png')
+            ->where('blogs.data.18.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('blogs.data.18.image', $evidencePath)
+            ->where('blogs.data.19.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('blogs.data.19.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
         );
 
         $this->get('/news')->assertOk()->assertInertia(fn ($page) => $page
@@ -320,20 +321,21 @@ class EducationalContentTest extends TestCase
             ->missing('featuredBlogs')
             ->where('latestBlogs.0.slug', $newestSlug)
             ->where('latestBlogs.0.image', $newestImage)
-            ->where('latestBlogs.1.slug', 'mots-c-vs-nad')
-            ->where('latestBlogs.2.slug', 'retatrutide-side-effects-trial-data')
-            ->where('latestBlogs.3.slug', 'compounded-glp-1-status')
-            ->where('latestBlogs.4.slug', 'orforglipron-vs-oral-semaglutide')
-            ->where('latestBlogs.5.slug', 'cagrisema-vs-tirzepatide')
-            ->where('latestBlogs.6.slug', 'aod-9604-vs-tesamorelin')
-            ->where('latestBlogs.7.slug', 'bpc-157-vs-ghk-cu')
-            ->where('latestBlogs.8.slug', 'retatrutide-testing-coa-limits')
-            ->where('latestBlogs.9.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('latestBlogs.10.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('latestBlogs.16.slug', 'tesamorelin-vs-sermorelin')
-            ->where('latestBlogs.17.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('latestBlogs.18.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('latestBlogs.19.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('latestBlogs.1.slug', 'ipamorelin-vs-sermorelin')
+            ->where('latestBlogs.2.slug', 'mots-c-vs-nad')
+            ->where('latestBlogs.3.slug', 'retatrutide-side-effects-trial-data')
+            ->where('latestBlogs.4.slug', 'compounded-glp-1-status')
+            ->where('latestBlogs.5.slug', 'orforglipron-vs-oral-semaglutide')
+            ->where('latestBlogs.6.slug', 'cagrisema-vs-tirzepatide')
+            ->where('latestBlogs.7.slug', 'aod-9604-vs-tesamorelin')
+            ->where('latestBlogs.8.slug', 'bpc-157-vs-ghk-cu')
+            ->where('latestBlogs.9.slug', 'retatrutide-testing-coa-limits')
+            ->where('latestBlogs.10.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('latestBlogs.11.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('latestBlogs.17.slug', 'tesamorelin-vs-sermorelin')
+            ->where('latestBlogs.18.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('latestBlogs.19.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('latestBlogs.20.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/guides')->assertOk()->assertInertia(fn ($page) => $page
@@ -1558,7 +1560,6 @@ class EducationalContentTest extends TestCase
         $catalog = (new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null);
         $entry = collect($catalog)->firstWhere('slug', $slug);
         $this->assertIsArray($entry);
-        $this->assertSame($slug, $catalog[array_key_last($catalog)]['slug'] ?? null);
         $this->assertSame('ipamorelin-vs-sermorelin.md', $entry['file']);
         $this->assertSame('ipamorelin-vs-sermorelin.png', $entry['image_file']);
         $this->assertSame('20 Min Read', $entry['read_time']);
@@ -1704,6 +1705,170 @@ class EducationalContentTest extends TestCase
 
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee('https://peptidemap.com/blog/ipamorelin-vs-sermorelin', false);
+    }
+
+    public function test_retatrutide_vs_semaglutide_publishes_once_with_cover_and_matching_faq(): void
+    {
+        $slug = 'retatrutide-vs-semaglutide';
+        $cover = '/images/educational/'.$slug.'.png';
+        $h1 = 'Retatrutide vs Semaglutide: Mechanism, Trial Data and Regulatory Status';
+        $seoTitle = 'Retatrutide vs Semaglutide: Trials, Side Effects, FDA Status';
+        $seoDescription = 'Retatrutide vs semaglutide: triple vs single receptor agonist, TRIUMPH and STEP results by estimand, side effects as reported, and FDA status.';
+        $ogTitle = 'Retatrutide vs Semaglutide: Trials, Side Effects, FDA Status';
+        $ogDescription = 'No head-to-head trial has reported yet. Retatrutide and semaglutide compared on mechanism, trial data by estimand, side effects and FDA status.';
+
+        $catalog = (new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null);
+        $entry = collect($catalog)->firstWhere('slug', $slug);
+        $this->assertIsArray($entry);
+        $this->assertSame($slug, $catalog[array_key_last($catalog)]['slug'] ?? null);
+        $this->assertSame('retatrutide-vs-semaglutide.md', $entry['file']);
+        $this->assertSame('retatrutide-vs-semaglutide.png', $entry['image_file']);
+        $this->assertSame('18 Min Read', $entry['read_time']);
+        $this->assertCount(8, $entry['faq']['mainEntity'] ?? []);
+        $this->assertSame('https://peptidemap.com/blog/retatrutide-vs-semaglutide#faq', $entry['faq']['@id'] ?? null);
+
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $blog = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame($h1, $blog->title);
+        $this->assertSame(71, strlen($h1));
+        $this->assertSame($entry['lede'], $blog->description);
+        $this->assertSame(315, strlen($blog->description));
+        $this->assertSame($seoTitle, $blog->seo_page_title);
+        $this->assertSame($seoDescription, $blog->seo_description);
+        $this->assertSame(60, strlen($seoTitle));
+        $this->assertSame(142, strlen($seoDescription));
+        $this->assertSame($ogTitle, $blog->seo_og_title);
+        $this->assertSame(60, strlen($ogTitle));
+        $this->assertSame($ogDescription, $blog->seo_og_description);
+        $this->assertSame(143, strlen($ogDescription));
+        $this->assertSame($cover, $blog->image);
+        $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
+        $this->assertSame('2026-10-19', $blog->published_at->toDateString());
+        $this->assertSame('Research', $blog->blog_type);
+        $this->assertSame('18 Min Read', $blog->read_time);
+        $this->assertSame('Peptidemap', $blog->author_name);
+        $this->assertFalse((bool) $blog->is_featured);
+        $this->assertSame('published', $blog->status);
+        $this->assertNull($blog->introduction);
+        $this->assertNull($blog->detailed_analysis);
+        $this->assertNull($blog->conclusion);
+        $this->assertSame(
+            ['Retatrutide', 'Semaglutide', 'Wegovy', 'Ozempic', 'TRIUMPH', 'Estimands'],
+            $blog->tags
+        );
+        $this->assertSame($entry['key_points'], $blog->key_points);
+        $this->assertSame($entry['faq'], $blog->seo_schema[0] ?? null);
+        $this->assertFileExists(public_path('images/educational/'.$slug.'.png'));
+        $this->assertFileExists(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertFileExists(resource_path('content/educational/images/'.$slug.'.png'));
+
+        $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertStringNotContainsString('<!--', $markdown);
+        $this->assertStringNotContainsString('/workspace', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/\A---\n/', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/^# [^#]/m', $markdown);
+        $this->assertStringContainsString('## FAQ', $markdown);
+        $this->assertStringContainsString('/encyclopedia/retatrutide', $markdown);
+        $this->assertStringContainsString('/encyclopedia/semaglutide', $markdown);
+        $this->assertStringContainsString('/compare/retatrutide-vs-semaglutide', $markdown);
+        $this->assertStringContainsString('/compare/retatrutide-vs-tirzepatide', $markdown);
+        $this->assertStringContainsString('/guides/peptide-legality-fda-ruo-compounding', $markdown);
+        $this->assertStringContainsString('/blog/retatrutide-side-effects-trial-data', $markdown);
+        $this->assertStringContainsString('/blog/orforglipron-vs-oral-semaglutide', $markdown);
+        foreach (EducationalContentPublisher::COMPETITOR_HOSTS as $host) {
+            $this->assertStringNotContainsString($host, $markdown);
+        }
+
+        $this->assertStringNotContainsString('<!--', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->content);
+        $this->assertStringNotContainsString('<h1', (string) $blog->content);
+        $this->assertDoesNotMatchRegularExpression('/\A---\n/', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->description);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->image);
+        $this->assertStringNotContainsString('CMS paste', (string) $blog->content);
+        $this->assertStringNotContainsString('CHANGES', (string) $blog->content);
+        $this->assertStringNotContainsString('Note for Meta Optimizer', (string) $blog->content);
+        foreach (EducationalContentPublisher::COMPETITOR_HOSTS as $host) {
+            $this->assertStringNotContainsString($host, (string) $blog->content);
+        }
+
+        $plain = html_entity_decode(strip_tags((string) $blog->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $faq = $blog->seo_schema[0] ?? null;
+        $this->assertSame('FAQPage', $faq['@type'] ?? null);
+        $this->assertSame('https://schema.org', $faq['@context'] ?? null);
+        $this->assertSame('https://peptidemap.com/blog/retatrutide-vs-semaglutide#faq', $faq['@id'] ?? null);
+        $this->assertCount(8, $faq['mainEntity'] ?? []);
+        $this->assertSame($entry['faq'], $faq);
+        foreach ($faq['mainEntity'] as $entity) {
+            $this->assertStringContainsString($entity['name'], $plain);
+            $this->assertSame(
+                $entity['acceptedAnswer']['text'],
+                $this->visibleFaqAnswer($plain, $entity['name'])
+            );
+        }
+        $this->assertSame(
+            'Not with results. TRANSCEND-T2D-2 (NCT06260722) is a phase 3, open-label trial comparing two retatrutide dose arms with once-weekly semaglutide in about 1,250 adults with type 2 diabetes, with HbA1c change at week 80 as the primary endpoint. As of 19 October 2026 it was active, not recruiting, with no results posted or published.',
+            $faq['mainEntity'][0]['acceptedAnswer']['text'] ?? null
+        );
+        $this->assertSame(
+            'No. Products sold online as research-use-only retatrutide or semaglutide are not the material used in these trials and are not FDA-approved products. The FDA says retatrutide cannot be used in compounding and has warned companies selling GLP-1 drugs falsely labelled for research purposes. This article is educational and is not medical advice.',
+            $faq['mainEntity'][7]['acceptedAnswer']['text'] ?? null
+        );
+
+        $id = $blog->id;
+        $before = Blog::count();
+        EducationalContentPublisher::sync();
+        $this->assertSame($before, Blog::count());
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $again = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame($id, $again->id);
+        $this->assertSame($cover, $again->image);
+        $this->assertSame('2026-10-19', $again->published_at->toDateString());
+        $this->assertFalse((bool) $again->is_featured);
+
+        $page = $this->get('/blog/'.$slug);
+        $page->assertOk();
+        $page->assertSee($h1, false);
+        $page->assertSee($seoTitle, false);
+        $page->assertSee('https://peptidemap.com/blog/retatrutide-vs-semaglutide#faq', false);
+        $page->assertSee('https://peptidemap.com/blog/retatrutide-vs-semaglutide', false);
+        $page->assertSee($cover, false);
+        $page->assertSee('Has retatrutide been compared head to head with semaglutide?', false);
+        $page->assertSee('Is research-labelled retatrutide or semaglutide the same as the trial drugs?', false);
+        $page->assertSee('18 Min Read', false);
+        $page->assertDontSee('/workspace', false);
+        $page->assertDontSee('CMS paste', false);
+        $page->assertDontSee('CHANGES', false);
+        foreach (EducationalContentPublisher::COMPETITOR_HOSTS as $host) {
+            $page->assertDontSee($host, false);
+        }
+        $page->assertInertia(fn ($inertia) => $inertia
+            ->where('blog.slug', $slug)
+            ->where('blog.title', $h1)
+            ->where('blog.image', $cover)
+            ->where('blog.readTime', '18 Min Read')
+            ->where('blog.content', function ($html) {
+                return is_string($html)
+                    && ! str_contains($html, '<!--')
+                    && ! str_contains($html, '/workspace')
+                    && ! str_contains($html, '<h1')
+                    && ! str_starts_with($html, "---\n")
+                    && str_contains($html, 'Why these tables are not a ranking')
+                    && str_contains($html, 'NCT06260722')
+                    && str_contains($html, 'NDA 215256/S-031')
+                    && ! str_contains($html, 'formblends.com')
+                    && ! str_contains($html, 'peptides.so')
+                    && ! str_contains($html, 'peptidemethods.com')
+                    && ! str_contains($html, 'kinetixatx.com');
+            })
+        );
+
+        $schema = json_encode($faq, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->assertIsString($schema);
+        $page->assertSee($schema, false);
+
+        $this->get('/sitemap.xml')->assertOk()
+            ->assertSee('https://peptidemap.com/blog/retatrutide-vs-semaglutide', false);
     }
 
     private function visibleFaqAnswer(string $plain, string $question): string
