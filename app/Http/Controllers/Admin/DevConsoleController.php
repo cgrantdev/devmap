@@ -34,6 +34,10 @@ class DevConsoleController extends Controller
             'label' => 'Run pending migrations',
             'args' => ['--force' => true],
         ],
+        'migrate:status' => [
+            'label' => 'Show migration status (read-only)',
+            'args' => [],
+        ],
         'products:fetch-vendor-descriptions' => [
             'label' => 'Backfill vendor product descriptions',
             'args' => [
