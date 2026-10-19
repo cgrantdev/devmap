@@ -347,7 +347,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host));
     }
 
     /**
@@ -813,6 +813,54 @@ class EducationalContentPublisher
                     ['How does the human evidence differ?', 'Tesamorelin has two published phase 3 trials in adults with HIV and excess abdominal fat, which led to FDA approval. AOD-9604 has developer-run trials in obese adults, and its larger weight-loss trial did not reach statistical significance.'],
                     ['Are they banned in sport?', 'Yes. Both are named on the WADA 2026 Prohibited List and remain on the 2027 List: AOD-9604 as a growth hormone fragment and tesamorelin as a GHRH analog. Both are prohibited at all times.'],
                     ['Is this medical advice?', 'No. This is educational comparison content from an RUO peptide publisher. It does not give dosing, protocols, or product recommendations, and decisions about treatment belong with a licensed clinician.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Content QA passed this CagriSema vs tirzepatide comparison on 2026-10-19.
+     * The body lives in resources/content/educational. The publisher reads
+     * this catalog, not the draft YAML.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function cagrisemaVsTirzepatide(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'cagrisema-vs-tirzepatide.md',
+                'image_file' => 'cagrisema-vs-tirzepatide.png',
+                'slug' => 'cagrisema-vs-tirzepatide',
+                'h1' => 'CagriSema vs Tirzepatide: What REDEFINE 4 Showed, and What It Didn’t',
+                'lede' => 'CagriSema pairs an amylin analogue with semaglutide; tirzepatide is a single GIP/GLP-1 agonist. In the open-label REDEFINE 4 trial, CagriSema missed its non-inferiority endpoint vs tirzepatide. Estimand-labelled results, REDEFINE 1 context, safety as published, and FDA status. Educational only.',
+                'seo_title' => 'CagriSema vs Tirzepatide: REDEFINE 4 Results and FDA Status',
+                'seo_description' => 'Company-reported REDEFINE 4: CagriSema missed non-inferiority vs tirzepatide (23.0% vs 25.5%, efficacy estimand). REDEFINE 1 context, safety, FDA status.',
+                'og_title' => 'CagriSema vs Tirzepatide: REDEFINE 4 Results and FDA Status',
+                'og_description' => 'CagriSema missed non-inferiority vs tirzepatide in REDEFINE 4 (company-reported). Estimand-labelled results, REDEFINE 1 context, and FDA status.',
+                'blog_type' => 'Research',
+                'read_time' => '12 Min Read',
+                'published_at' => '2026-10-19',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['CagriSema', 'Tirzepatide', 'Cagrilintide', 'REDEFINE 4', 'Estimands'],
+                'key_points' => [
+                    'CagriSema is a fixed-dose combination of cagrilintide, a long-acting amylin analogue, and semaglutide, a GLP-1 receptor agonist. Tirzepatide is a single GIP and GLP-1 receptor agonist.',
+                    'REDEFINE 4 was open-label, ran 84 weeks and randomized 809 adults with obesity. CagriSema did not achieve its primary non-inferiority endpoint vs tirzepatide at its highest maintenance dose.',
+                    'REDEFINE 4 at week 84 (company-reported): efficacy estimand 23.0% vs 25.5%; treatment-regimen estimand 20.2% vs 23.6% (CagriSema vs tirzepatide). Arm-level safety and discontinuation data have not been published.',
+                    'REDEFINE 1 at week 68, treatment-policy estimand: CagriSema −20.4%, semaglutide alone −14.9%, cagrilintide alone −11.5%, placebo −3.0%. Gastrointestinal adverse events: 79.6% vs 39.9% with placebo.',
+                    'CagriSema is not FDA-approved. Novo submitted an NDA on 18 December 2025 and expects an FDA decision in Q4 2026. Tirzepatide is approved as Mounjaro (13 May 2022) and Zepbound (8 November 2023).',
+                    'Research-labelled cagrilintide or blends sold online are not CagriSema and are not FDA-approved.',
+                ],
+                'faq' => self::faq($host.'/blog/cagrisema-vs-tirzepatide#faq', [
+                    ['Is CagriSema FDA-approved?', 'No. As of 19 October 2026, CagriSema is investigational and not FDA-approved. Novo Nordisk submitted a New Drug Application for weight management on 18 December 2025, and its 21 September 2026 announcement says an FDA decision is expected in the fourth quarter of 2026. That is an expected timeframe, not an outcome.'],
+                    ['What did REDEFINE 4 compare?', 'REDEFINE 4 was an open-label, 84-week phase 3 trial that randomized 809 adults with obesity and at least one comorbidity to once-weekly CagriSema or once-weekly tirzepatide at its highest maintenance dose. The primary endpoint was non-inferiority of CagriSema on percent weight change at week 84.'],
+                    ['Did CagriSema meet its primary endpoint against tirzepatide?', 'No. In company-reported headline results, Novo Nordisk said non-inferiority was not achieved. Mean weight reduction was 23.0% with CagriSema vs 25.5% with tirzepatide under the efficacy estimand, and 20.2% vs 23.6% under the treatment-regimen estimand. Those figures are from one head-to-head trial and should not be compared with numbers from other trials.'],
+                    ['Why are there two sets of numbers for each trial?', 'They answer different questions. In REDEFINE 4, the efficacy estimand estimates the effect if everyone had stayed on treatment, and the treatment-regimen estimand counts everyone regardless of adherence. REDEFINE 1 uses the names trial-product and treatment-policy for two analogous questions. A number without its estimand label is easy to misread.'],
+                    ['How is CagriSema different from tirzepatide?', 'CagriSema is a fixed-dose combination of two molecules: cagrilintide, a long-acting amylin analogue, and semaglutide, a GLP-1 receptor agonist. Tirzepatide is a single peptide that activates both GIP and GLP-1 receptors. The two products reach appetite pathways by different routes.'],
+                    ['What were the main side effects reported?', 'In REDEFINE 4, Novo Nordisk said the most common adverse events with CagriSema were gastrointestinal and mostly mild to moderate, but it has not published arm-level adverse event or discontinuation figures. In REDEFINE 1, gastrointestinal adverse events were reported in 79.6% of the CagriSema group vs 39.9% with placebo, and 5.9% vs 3.5% stopped treatment permanently because of adverse events.'],
+                    ['Is research-labelled cagrilintide the same as CagriSema?', 'No. Research-labelled cagrilintide vials or blends sold online are not CagriSema, are not the product studied in the REDEFINE trials, and are not FDA-approved. This article is educational and is not medical advice.'],
                 ]),
             ],
         ];
