@@ -280,7 +280,7 @@ class EducationalContentTest extends TestCase
         $this->assertFileExists(public_path(ltrim($beginner->cover, '/')));
         $this->assertFileExists(public_path(ltrim($legality->cover, '/')));
 
-        $newestSlug = 'orforglipron-vs-oral-semaglutide';
+        $newestSlug = 'compounded-glp-1-status';
         $newestImage = '/images/educational/'.$newestSlug.'.png';
 
         $this->get('/blogs')->assertOk()->assertInertia(fn ($page) => $page
@@ -288,23 +288,25 @@ class EducationalContentTest extends TestCase
             ->missing('featured')
             ->where('blogs.data.0.slug', $newestSlug)
             ->where('blogs.data.0.image', $newestImage)
-            ->where('blogs.data.1.slug', 'cagrisema-vs-tirzepatide')
-            ->where('blogs.data.1.image', '/images/educational/cagrisema-vs-tirzepatide.png')
-            ->where('blogs.data.2.slug', 'aod-9604-vs-tesamorelin')
-            ->where('blogs.data.2.image', '/images/educational/aod-9604-vs-tesamorelin.png')
-            ->where('blogs.data.3.slug', 'bpc-157-vs-ghk-cu')
-            ->where('blogs.data.3.image', '/images/educational/bpc-157-vs-ghk-cu.png')
-            ->where('blogs.data.4.slug', 'retatrutide-testing-coa-limits')
-            ->where('blogs.data.4.image', '/images/educational/retatrutide-testing-coa-limits.png')
-            ->where('blogs.data.5.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('blogs.data.6.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('blogs.data.12.slug', 'tesamorelin-vs-sermorelin')
-            ->where('blogs.data.12.image', '/images/educational/tesamorelin-vs-sermorelin.png')
-            ->where('blogs.data.13.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('blogs.data.13.image', $evidencePath)
-            ->where('blogs.data.14.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('blogs.data.14.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
-            ->where('blogs.data.15.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('blogs.data.1.slug', 'orforglipron-vs-oral-semaglutide')
+            ->where('blogs.data.1.image', '/images/educational/orforglipron-vs-oral-semaglutide.png')
+            ->where('blogs.data.2.slug', 'cagrisema-vs-tirzepatide')
+            ->where('blogs.data.2.image', '/images/educational/cagrisema-vs-tirzepatide.png')
+            ->where('blogs.data.3.slug', 'aod-9604-vs-tesamorelin')
+            ->where('blogs.data.3.image', '/images/educational/aod-9604-vs-tesamorelin.png')
+            ->where('blogs.data.4.slug', 'bpc-157-vs-ghk-cu')
+            ->where('blogs.data.4.image', '/images/educational/bpc-157-vs-ghk-cu.png')
+            ->where('blogs.data.5.slug', 'retatrutide-testing-coa-limits')
+            ->where('blogs.data.5.image', '/images/educational/retatrutide-testing-coa-limits.png')
+            ->where('blogs.data.6.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('blogs.data.7.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('blogs.data.13.slug', 'tesamorelin-vs-sermorelin')
+            ->where('blogs.data.13.image', '/images/educational/tesamorelin-vs-sermorelin.png')
+            ->where('blogs.data.14.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('blogs.data.14.image', $evidencePath)
+            ->where('blogs.data.15.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('blogs.data.15.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
+            ->where('blogs.data.16.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/news')->assertOk()->assertInertia(fn ($page) => $page
@@ -312,16 +314,17 @@ class EducationalContentTest extends TestCase
             ->missing('featuredBlogs')
             ->where('latestBlogs.0.slug', $newestSlug)
             ->where('latestBlogs.0.image', $newestImage)
-            ->where('latestBlogs.1.slug', 'cagrisema-vs-tirzepatide')
-            ->where('latestBlogs.2.slug', 'aod-9604-vs-tesamorelin')
-            ->where('latestBlogs.3.slug', 'bpc-157-vs-ghk-cu')
-            ->where('latestBlogs.4.slug', 'retatrutide-testing-coa-limits')
-            ->where('latestBlogs.5.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('latestBlogs.6.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('latestBlogs.12.slug', 'tesamorelin-vs-sermorelin')
-            ->where('latestBlogs.13.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('latestBlogs.14.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('latestBlogs.15.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('latestBlogs.1.slug', 'orforglipron-vs-oral-semaglutide')
+            ->where('latestBlogs.2.slug', 'cagrisema-vs-tirzepatide')
+            ->where('latestBlogs.3.slug', 'aod-9604-vs-tesamorelin')
+            ->where('latestBlogs.4.slug', 'bpc-157-vs-ghk-cu')
+            ->where('latestBlogs.5.slug', 'retatrutide-testing-coa-limits')
+            ->where('latestBlogs.6.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('latestBlogs.7.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('latestBlogs.13.slug', 'tesamorelin-vs-sermorelin')
+            ->where('latestBlogs.14.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('latestBlogs.15.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('latestBlogs.16.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/guides')->assertOk()->assertInertia(fn ($page) => $page
@@ -1118,6 +1121,134 @@ class EducationalContentTest extends TestCase
 
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee('https://peptidemap.com/blog/cagrisema-vs-tirzepatide', false);
+    }
+
+    public function test_compounded_glp_1_status_publishes_once_with_cover_and_matching_faq(): void
+    {
+        $slug = 'compounded-glp-1-status';
+        $cover = '/images/educational/'.$slug.'.png';
+        $h1 = 'Compounded GLP-1 Status: Shortage Resolution, Grace Periods and What FDA Did Next';
+        $seoTitle = 'Compounded GLP-1 Status: Shortages, Courts, 2026 FDA Moves';
+        $seoDescription = 'Dated timeline of FDA’s tirzepatide and semaglutide shortage decisions, 503A/503B grace periods, OFA v. FDA rulings and 2026 GLP-1 compounding actions.';
+        $ogDescription = 'How the tirzepatide and semaglutide shortages ended, the 503A and 503B wind-down dates, the court rulings, and FDA’s 2026 GLP-1 compounding actions.';
+
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $blog = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame($h1, $blog->title);
+        $this->assertSame('FDA resolved the tirzepatide shortage on 19 December 2024 and the semaglutide shortage on 21 February 2025. The dated 503A and 503B grace periods, the essentially-a-copy and bulks rules, the OFA v. FDA rulings, and FDA’s 2026 actions, from primary sources. Educational only.', $blog->description);
+        $this->assertSame($seoTitle, $blog->seo_page_title);
+        $this->assertSame($seoDescription, $blog->seo_description);
+        $this->assertSame(58, strlen($seoTitle));
+        $this->assertSame($blog->seo_page_title, $blog->seo_og_title);
+        $this->assertSame($ogDescription, $blog->seo_og_description);
+        $this->assertSame($cover, $blog->image);
+        $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
+        $this->assertSame('2026-10-19', $blog->published_at->toDateString());
+        $this->assertSame('Research', $blog->blog_type);
+        $this->assertSame('14 Min Read', $blog->read_time);
+        $this->assertSame('Peptidemap', $blog->author_name);
+        $this->assertFalse((bool) $blog->is_featured);
+        $this->assertSame('published', $blog->status);
+        $this->assertNull($blog->introduction);
+        $this->assertNull($blog->detailed_analysis);
+        $this->assertNull($blog->conclusion);
+        $this->assertSame(
+            ['Compounding', 'GLP-1', 'Semaglutide', 'Tirzepatide', 'FDA', '503A', '503B'],
+            $blog->tags
+        );
+        $this->assertSame(
+            'The Fifth Circuit affirmed judgment for FDA in both OFA v. FDA cases on 27 August 2026, in unpublished opinions.',
+            $blog->key_points[3] ?? null
+        );
+        $this->assertFileExists(public_path('images/educational/'.$slug.'.png'));
+        $this->assertFileExists(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertFileExists(resource_path('content/educational/images/'.$slug.'.png'));
+
+        $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertStringNotContainsString('<!--', $markdown);
+        $this->assertStringNotContainsString('/workspace', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/\A---\n/', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/^# [^#]/m', $markdown);
+        $this->assertStringNotContainsString('/compare/tirzepatide', $markdown);
+        $this->assertStringNotContainsString('/compare/semaglutide', $markdown);
+        $this->assertStringContainsString('## FAQ', $markdown);
+        $this->assertStringContainsString('Status: proposed, not final.', $markdown);
+
+        $this->assertStringNotContainsString('<!--', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->description);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->image);
+        $this->assertStringNotContainsString('CMS paste', (string) $blog->content);
+        $this->assertStringNotContainsString('CHANGES', (string) $blog->content);
+        $this->assertStringNotContainsString('Note for Meta Optimizer', (string) $blog->content);
+        $this->assertStringNotContainsString('/compare/tirzepatide', (string) $blog->content);
+        $this->assertStringNotContainsString('/compare/semaglutide', (string) $blog->content);
+
+        $plain = html_entity_decode(strip_tags((string) $blog->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $faq = $blog->seo_schema[0] ?? null;
+        $this->assertSame('FAQPage', $faq['@type'] ?? null);
+        $this->assertSame('https://schema.org', $faq['@context'] ?? null);
+        $this->assertSame('https://peptidemap.com/blog/compounded-glp-1-status#faq', $faq['@id'] ?? null);
+        $this->assertCount(7, $faq['mainEntity'] ?? []);
+        foreach ($faq['mainEntity'] as $entity) {
+            $this->assertStringContainsString($entity['name'], $plain);
+            $this->assertSame(
+                $entity['acceptedAnswer']['text'],
+                $this->visibleFaqAnswer($plain, $entity['name'])
+            );
+        }
+        $this->assertSame(
+            'Not entirely, but it removes the shortage pathway. Under 503A, a pharmacy may not compound essentially a copy of a commercially available drug regularly or in inordinate amounts, and FDA generally treats a drug as commercially available once its shortage is resolved. Under 503B, outsourcing facilities cannot compound from bulk substances unless the substance is on the 503B bulks list or the drug is on the shortage list, and FDA says tirzepatide and semaglutide are on neither.',
+            $faq['mainEntity'][2]['acceptedAnswer']['text'] ?? null
+        );
+
+        $id = $blog->id;
+        $before = Blog::count();
+        EducationalContentPublisher::sync();
+        $this->assertSame($before, Blog::count());
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $again = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame($id, $again->id);
+        $this->assertSame($cover, $again->image);
+        $this->assertSame('2026-10-19', $again->published_at->toDateString());
+        $this->assertFalse((bool) $again->is_featured);
+
+        $page = $this->get('/blog/'.$slug);
+        $page->assertOk();
+        $page->assertSee($h1, false);
+        $page->assertSee($seoTitle, false);
+        $page->assertSee('https://peptidemap.com/blog/compounded-glp-1-status#faq', false);
+        $page->assertSee('https://peptidemap.com/blog/compounded-glp-1-status', false);
+        $page->assertSee($cover, false);
+        $page->assertSee('When did FDA resolve the tirzepatide and semaglutide shortages?', false);
+        $page->assertSee('Is research-labelled semaglutide or tirzepatide the same as compounded?', false);
+        $page->assertSee('14 Min Read', false);
+        $page->assertDontSee('/workspace', false);
+        $page->assertDontSee('CMS paste', false);
+        $page->assertDontSee('CHANGES', false);
+        $page->assertDontSee('/compare/tirzepatide', false);
+        $page->assertDontSee('/compare/semaglutide', false);
+        $page->assertInertia(fn ($inertia) => $inertia
+            ->where('blog.slug', $slug)
+            ->where('blog.title', $h1)
+            ->where('blog.image', $cover)
+            ->where('blog.readTime', '14 Min Read')
+            ->where('blog.content', function ($html) {
+                return is_string($html)
+                    && ! str_contains($html, '<!--')
+                    && ! str_contains($html, '/workspace')
+                    && ! str_contains($html, '/compare/tirzepatide')
+                    && ! str_contains($html, '/compare/semaglutide')
+                    && str_contains($html, 'Status: proposed, not final.');
+            })
+        );
+
+        $schema = json_encode($faq, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->assertIsString($schema);
+        $page->assertSee($schema, false);
+
+        $this->get('/sitemap.xml')->assertOk()
+            ->assertSee('https://peptidemap.com/blog/compounded-glp-1-status', false);
     }
 
     private function visibleFaqAnswer(string $plain, string $question): string
