@@ -349,7 +349,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host), self::retatrutideVsSemaglutide($host));
     }
 
     /**
@@ -1106,6 +1106,54 @@ class EducationalContentPublisher
                     ['Where does sermorelin stand for compounding?', 'Sermorelin is not on the 503A bulks list and does not appear in FDA\'s 503A category list. FDA\'s 503B list places sermorelin acetate in Category 1 and marks it as a component of an FDA-approved drug. FDA\'s 503A page lists components of FDA-approved drug products as one permitted source of bulk drug substances. FDA has not published a sermorelin-specific statement on how this applies to a drug whose approval was withdrawn, and absence from FDA\'s 503A lists is not, by itself, an FDA statement either way. Whether a specific compounded product qualifies is a legal question this article does not answer.'],
                     ['Which one is better?', 'This page does not rank them. They act on different receptors, were studied in different populations for different uses, and have no head-to-head human trial. Neither has controlled human evidence for the anti-ageing or recovery uses common in marketing.'],
                     ['Is a research-use-only vial the same as GEREF or a trial drug?', 'No. GEREF was a specific FDA-approved finished product, now discontinued, and the ipamorelin trial material was a sponsor\'s investigational drug used under a protocol. A research-use-only vial is neither, and none of the data on this page describe its identity, purity or sterility.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Retatrutide vs semaglutide comparison (mechanism, trial data by estimand, side effects, regulatory status).
+     * Body lives in resources/content/educational/retatrutide-vs-semaglutide.md.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function retatrutideVsSemaglutide(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'retatrutide-vs-semaglutide.md',
+                'image_file' => 'retatrutide-vs-semaglutide.png',
+                'slug' => 'retatrutide-vs-semaglutide',
+                'h1' => 'Retatrutide vs Semaglutide: Mechanism, Trial Data and Regulatory Status',
+                'lede' => 'Retatrutide is an investigational GIP, GLP-1 and glucagon receptor agonist; semaglutide is an FDA-approved GLP-1 receptor agonist sold as Ozempic, Wegovy and Rybelsus. No head-to-head trial has reported. Estimand-labelled TRIUMPH and STEP results, side effects as published, and regulatory status. Educational only.',
+                'seo_title' => 'Retatrutide vs Semaglutide: Trials, Side Effects, FDA Status',
+                'seo_description' => 'Retatrutide vs semaglutide: triple vs single receptor agonist, TRIUMPH and STEP results by estimand, side effects as reported, and FDA status.',
+                'og_title' => 'Retatrutide vs Semaglutide: Trials, Side Effects, FDA Status',
+                'og_description' => 'No head-to-head trial has reported yet. Retatrutide and semaglutide compared on mechanism, trial data by estimand, side effects and FDA status.',
+                'blog_type' => 'Research',
+                'read_time' => '18 Min Read',
+                'published_at' => '2026-10-19',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Retatrutide', 'Semaglutide', 'Wegovy', 'Ozempic', 'TRIUMPH', 'Estimands'],
+                'key_points' => [
+                    'Retatrutide is an investigational single peptide that activates GIP, GLP-1 and glucagon receptors. Semaglutide is a GLP-1 receptor agonist approved as Ozempic (injection and tablets), Rybelsus and Wegovy.',
+                    'No head-to-head trial has reported. TRANSCEND-T2D-2 (NCT06260722), an open-label phase 3 trial vs once-weekly semaglutide in type 2 diabetes, was active, not recruiting, with no results as of 19 October 2026.',
+                    'TRIUMPH-1 (NEJM 2026), treatment-regimen estimand at week 80: −17.6%, −23.7% and −25.0% vs −3.9% with placebo. Lilly reports −28.3% for the highest dose arm under the efficacy estimand (company-reported).',
+                    'STEP 1 (NEJM 2021) at week 68: −14.9% vs −2.4% (treatment-policy estimand) and −16.9% vs −2.4% (trial-product estimand). SELECT showed fewer major cardiovascular events with semaglutide (HR 0.80).',
+                    'Trials differ in population, duration and estimand and were not head to head, so figures from different trials are not ranked. Gastrointestinal events were the most common adverse events for both drugs.',
+                    'Retatrutide is not FDA- or EMA-approved; Lilly plans a US submission in Q1 2027. Research-labelled retatrutide or semaglutide is not the trial drug or an approved product.',
+                ],
+                'faq' => self::faq($host.'/blog/retatrutide-vs-semaglutide#faq', [
+                    ['Has retatrutide been compared head to head with semaglutide?', 'Not with results. TRANSCEND-T2D-2 (NCT06260722) is a phase 3, open-label trial comparing two retatrutide dose arms with once-weekly semaglutide in about 1,250 adults with type 2 diabetes, with HbA1c change at week 80 as the primary endpoint. As of 19 October 2026 it was active, not recruiting, with no results posted or published.'],
+                    ['How do retatrutide and semaglutide work differently?', 'Semaglutide is a modified GLP-1 analogue that activates the GLP-1 receptor only. Retatrutide is a single peptide that activates GIP, GLP-1 and glucagon receptors. Researchers have proposed that the glucagon component may add effects on energy intake or energy expenditure, but this has not been established in humans, and a different mechanism does not by itself make a drug more effective or safer.'],
+                    ['Can the TRIUMPH and STEP weight results be compared directly?', 'No. They are separate placebo-controlled trials that differ in population, duration, era, dose escalation and estimand definitions, and none compared the two drugs with each other. This article reports results within each trial only and does not rank the two drugs.'],
+                    ['Why do some retatrutide figures look higher in news coverage?', 'They usually use a different estimand. In TRIUMPH-1, mean weight change in the highest dose arm was 25.0% under the treatment-regimen estimand in the NEJM paper and 28.3% under the efficacy estimand in Lilly\'s release. The first counts everyone randomized. The second estimates the effect had everyone stayed on treatment.'],
+                    ['What side effects were reported in the trials?', 'For both drugs, gastrointestinal events such as nausea, diarrhoea, vomiting and constipation were the most common. In the TRIUMPH-2 paper, diarrhoea was reported in 27% to 34% of the retatrutide arms vs 13% with placebo, and dysesthesia and hypotension were more frequent than with placebo. In STEP 1, gastrointestinal disorders were reported in 74.2% of the semaglutide group vs 47.9% with placebo.'],
+                    ['Is retatrutide FDA-approved?', 'No. As of 19 October 2026, retatrutide is investigational and not approved by the FDA or the EMA. Lilly says it plans to submit it for US approval in the first quarter of 2027. The FDA has determined that retatrutide is a drug rather than a biological product, a classification Lilly is challenging in court.'],
+                    ['What is semaglutide approved for?', 'In the US, Ozempic (injection and tablets) and Rybelsus are approved for type 2 diabetes, with cardiovascular risk-reduction indications and, for Ozempic injection, a kidney-outcomes indication. Wegovy injection is approved for weight management in adults and adolescents aged 12 and older, cardiovascular risk reduction in adults with established cardiovascular disease and obesity or overweight, and MASH with moderate to advanced fibrosis. Wegovy tablets were approved on 22 December 2025.'],
+                    ['Is research-labelled retatrutide or semaglutide the same as the trial drugs?', 'No. Products sold online as research-use-only retatrutide or semaglutide are not the material used in these trials and are not FDA-approved products. The FDA says retatrutide cannot be used in compounding and has warned companies selling GLP-1 drugs falsely labelled for research purposes. This article is educational and is not medical advice.'],
                 ]),
             ],
         ];
