@@ -82,6 +82,46 @@
         </div>
       </div>
     </section>
+    <section v-if="evidence" id="evidence" class="border-t border-[color:var(--color-hairline)] bg-white">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-2">Evidence</div>
+        <h2 class="text-[20px] font-semibold text-[color:var(--color-ink)] mb-3">{{ evidence.title }}</h2>
+        <div class="max-w-3xl space-y-3">
+          <p v-for="(p, i) in evidence.paragraphs || []" :key="'p' + i" class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">{{ p }}</p>
+        </div>
+        <div v-if="evidence.table" class="max-w-3xl mt-5 overflow-x-auto">
+          <table class="w-full text-[13px] border-collapse">
+            <caption class="text-left text-[12px] text-[color:var(--color-ink-subtle)] mb-2">{{ evidence.table.caption }}</caption>
+            <thead>
+              <tr>
+                <th v-for="(hd, i) in evidence.table.head" :key="'h' + i" scope="col" class="text-left font-semibold text-[color:var(--color-ink)] border-b border-[color:var(--color-hairline)] py-2 pr-3">{{ hd }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, r) in evidence.table.rows" :key="'r' + r">
+                <td v-for="(cell, c) in row" :key="'c' + c" class="border-b border-[color:var(--color-hairline)] py-2 pr-3 text-[color:var(--color-ink-muted)]">{{ cell }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ul v-if="(evidence.grades || []).length" class="max-w-3xl mt-5 space-y-3">
+          <li v-for="g in evidence.grades" :key="g.label" class="text-[14px] leading-relaxed">
+            <span class="font-semibold text-[color:var(--color-ink)]">{{ g.label }}:</span>
+            <span class="font-semibold text-[color:var(--color-ink)]"> {{ g.grade }}.</span>
+            <span class="text-[color:var(--color-ink-muted)]"> {{ g.rationale }}</span>
+          </li>
+        </ul>
+        <div v-if="(evidence.notes || []).length" class="max-w-3xl mt-5 space-y-3">
+          <p v-for="(n, i) in evidence.notes" :key="'n' + i" class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">{{ n }}</p>
+        </div>
+        <p v-if="evidenceLink" class="max-w-3xl mt-4 text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">{{ evidenceLink.before }}<a :href="evidenceLink.href" class="underline underline-offset-2 text-[color:var(--color-accent-600)]">{{ evidenceLink.text }}</a>{{ evidenceLink.after }}</p>
+        <ol v-if="(evidence.sources || []).length" class="max-w-3xl mt-6 space-y-2 text-[12px] text-[color:var(--color-ink-muted)] list-decimal pl-5">
+          <li v-for="s in evidence.sources" :key="s.url">
+            <a :href="s.url" class="underline underline-offset-2 hover:text-[color:var(--color-ink)]" target="_blank" rel="noopener noreferrer">{{ s.title }}</a>
+          </li>
+        </ol>
+      </div>
+    </section>
 
     <section v-if="faqs.length" class="border-t border-[color:var(--color-hairline)] bg-white">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
@@ -134,6 +174,8 @@ const props = defineProps({
   evidenceUrl: { type: String, default: null },
   faqs: { type: Array, default: () => [] },
   references: { type: Array, default: () => [] },
+  evidence: { type: Object, default: null },
+  evidenceLink: { type: Object, default: null },
   seo: { type: Object, default: () => ({}) },
 })
 
