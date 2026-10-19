@@ -280,7 +280,7 @@ class EducationalContentTest extends TestCase
         $this->assertFileExists(public_path(ltrim($beginner->cover, '/')));
         $this->assertFileExists(public_path(ltrim($legality->cover, '/')));
 
-        $newestSlug = 'aod-9604-vs-tesamorelin';
+        $newestSlug = 'orforglipron-vs-oral-semaglutide';
         $newestImage = '/images/educational/'.$newestSlug.'.png';
 
         $this->get('/blogs')->assertOk()->assertInertia(fn ($page) => $page
@@ -288,19 +288,21 @@ class EducationalContentTest extends TestCase
             ->missing('featured')
             ->where('blogs.data.0.slug', $newestSlug)
             ->where('blogs.data.0.image', $newestImage)
-            ->where('blogs.data.1.slug', 'bpc-157-vs-ghk-cu')
-            ->where('blogs.data.1.image', '/images/educational/bpc-157-vs-ghk-cu.png')
-            ->where('blogs.data.2.slug', 'retatrutide-testing-coa-limits')
-            ->where('blogs.data.2.image', '/images/educational/retatrutide-testing-coa-limits.png')
-            ->where('blogs.data.3.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('blogs.data.4.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('blogs.data.10.slug', 'tesamorelin-vs-sermorelin')
-            ->where('blogs.data.10.image', '/images/educational/tesamorelin-vs-sermorelin.png')
-            ->where('blogs.data.11.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('blogs.data.11.image', $evidencePath)
-            ->where('blogs.data.12.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('blogs.data.12.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
-            ->where('blogs.data.13.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('blogs.data.1.slug', 'aod-9604-vs-tesamorelin')
+            ->where('blogs.data.1.image', '/images/educational/aod-9604-vs-tesamorelin.png')
+            ->where('blogs.data.2.slug', 'bpc-157-vs-ghk-cu')
+            ->where('blogs.data.2.image', '/images/educational/bpc-157-vs-ghk-cu.png')
+            ->where('blogs.data.3.slug', 'retatrutide-testing-coa-limits')
+            ->where('blogs.data.3.image', '/images/educational/retatrutide-testing-coa-limits.png')
+            ->where('blogs.data.4.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('blogs.data.5.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('blogs.data.11.slug', 'tesamorelin-vs-sermorelin')
+            ->where('blogs.data.11.image', '/images/educational/tesamorelin-vs-sermorelin.png')
+            ->where('blogs.data.12.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('blogs.data.12.image', $evidencePath)
+            ->where('blogs.data.13.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('blogs.data.13.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
+            ->where('blogs.data.14.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/news')->assertOk()->assertInertia(fn ($page) => $page
@@ -308,14 +310,15 @@ class EducationalContentTest extends TestCase
             ->missing('featuredBlogs')
             ->where('latestBlogs.0.slug', $newestSlug)
             ->where('latestBlogs.0.image', $newestImage)
-            ->where('latestBlogs.1.slug', 'bpc-157-vs-ghk-cu')
-            ->where('latestBlogs.2.slug', 'retatrutide-testing-coa-limits')
-            ->where('latestBlogs.3.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('latestBlogs.4.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('latestBlogs.10.slug', 'tesamorelin-vs-sermorelin')
-            ->where('latestBlogs.11.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('latestBlogs.12.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('latestBlogs.13.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('latestBlogs.1.slug', 'aod-9604-vs-tesamorelin')
+            ->where('latestBlogs.2.slug', 'bpc-157-vs-ghk-cu')
+            ->where('latestBlogs.3.slug', 'retatrutide-testing-coa-limits')
+            ->where('latestBlogs.4.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('latestBlogs.5.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('latestBlogs.11.slug', 'tesamorelin-vs-sermorelin')
+            ->where('latestBlogs.12.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('latestBlogs.13.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('latestBlogs.14.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/guides')->assertOk()->assertInertia(fn ($page) => $page
@@ -884,6 +887,115 @@ class EducationalContentTest extends TestCase
 
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee('https://peptidemap.com/blog/aod-9604-vs-tesamorelin', false);
+    }
+
+    public function test_orforglipron_vs_oral_semaglutide_publishes_once_with_cover_and_matching_faq(): void
+    {
+        $slug = 'orforglipron-vs-oral-semaglutide';
+        $cover = '/images/educational/'.$slug.'.png';
+
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $blog = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame('Orforglipron vs Oral Semaglutide: What the ACHIEVE-3 Head-to-Head Trial Reported', $blog->title);
+        $this->assertSame('Orforglipron is a non-peptide small-molecule GLP-1 pill; oral semaglutide is a peptide tablet made with the absorption enhancer SNAC. ACHIEVE-3 compared them for 52 weeks in type 2 diabetes. Estimand-labelled HbA1c and weight results, tolerability as published, and FDA status. Educational only.', $blog->description);
+        $this->assertSame('Orforglipron vs Oral Semaglutide: ACHIEVE-3 and FDA Status', $blog->seo_page_title);
+        $this->assertSame('ACHIEVE-3 compared orforglipron with oral semaglutide in type 2 diabetes for 52 weeks. HbA1c and weight by estimand, GI events, and FDA status.', $blog->seo_description);
+        $this->assertSame('Orforglipron vs Oral Semaglutide: ACHIEVE-3 and FDA Status', $blog->seo_og_title);
+        $this->assertSame('Orforglipron vs oral semaglutide in the 52-week ACHIEVE-3 trial: estimand-labelled HbA1c and weight results, tolerability, and US FDA status.', $blog->seo_og_description);
+        $this->assertSame($cover, $blog->image);
+        $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
+        $this->assertSame('2026-10-19', $blog->published_at->toDateString());
+        $this->assertSame('Research', $blog->blog_type);
+        $this->assertSame('13 Min Read', $blog->read_time);
+        $this->assertSame('Peptidemap', $blog->author_name);
+        $this->assertFalse((bool) $blog->is_featured);
+        $this->assertSame('published', $blog->status);
+        $this->assertNull($blog->introduction);
+        $this->assertNull($blog->detailed_analysis);
+        $this->assertNull($blog->conclusion);
+        $this->assertFileExists(public_path('images/educational/'.$slug.'.png'));
+        $this->assertFileExists(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertFileExists(resource_path('content/educational/images/'.$slug.'.png'));
+
+        $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertStringNotContainsString('<!--', $markdown);
+        $this->assertStringNotContainsString('/workspace', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/\A---\n/', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/^# [^#]/m', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?\s*mg/', $markdown);
+        $this->assertStringContainsString('treatment-regimen estimand (company-reported)', $markdown);
+        $this->assertStringContainsString('Lilly, 26 February 2026 (company-reported)', $markdown);
+        $this->assertStringContainsString('On the efficacy-estimand (on-treatment) data posted on ClinicalTrials.gov, at least 10% weight loss was reached by', $markdown);
+        $this->assertStringContainsString('Lancet abstract (counts; percentages computed, matching Lilly)', $markdown);
+        $this->assertStringContainsString('the European Commission decision is pending', $markdown);
+        $this->assertStringContainsString('not substitutable on a mg-to-mg basis', $markdown);
+        $this->assertStringContainsString('https://www.ema.europa.eu/en/medicines/human/EPAR/foundayo', $markdown);
+
+        $this->assertStringNotContainsString('<!--', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->description);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->image);
+        $this->assertStringNotContainsString('CMS paste', (string) $blog->content);
+        $this->assertStringNotContainsString('CHANGES', (string) $blog->content);
+        $this->assertStringNotContainsString('Note for Meta Optimizer', (string) $blog->content);
+
+        $plain = html_entity_decode(strip_tags((string) $blog->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $faq = $blog->seo_schema[0] ?? null;
+        $this->assertSame('FAQPage', $faq['@type'] ?? null);
+        $this->assertSame('https://peptidemap.com/blog/orforglipron-vs-oral-semaglutide#faq', $faq['@id'] ?? null);
+        $this->assertCount(7, $faq['mainEntity'] ?? []);
+        foreach ($faq['mainEntity'] as $entity) {
+            $this->assertStringContainsString($entity['name'], $plain);
+            $this->assertSame(
+                $entity['acceptedAnswer']['text'],
+                $this->visibleFaqAnswer($plain, $entity['name'])
+            );
+        }
+        $weight = collect($faq['mainEntity'])->firstWhere('name', 'How much weight change was reported?');
+        $this->assertSame(
+            'Under the efficacy estimand, mean weight change was 6.7% and 9.2% with orforglipron vs 3.7% and 5.3% with oral semaglutide. Under the treatment-regimen estimand, company-reported by Lilly, the figures were 6.1% and 8.2% vs 3.9% and 5.3%. Baseline weight averaged 97.0 kg.',
+            $weight['acceptedAnswer']['text'] ?? null
+        );
+        $this->assertStringContainsString(
+            'Treatment-regimen weight (company-reported): −6.1% and −8.2% vs −3.9% and −5.3%.',
+            implode("\n", $blog->key_points)
+        );
+
+        $id = $blog->id;
+        $before = Blog::count();
+        EducationalContentPublisher::sync();
+        $this->assertSame($before, Blog::count());
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $again = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame($id, $again->id);
+        $this->assertSame($cover, $again->image);
+        $this->assertSame('2026-10-19', $again->published_at->toDateString());
+        $this->assertFalse((bool) $again->is_featured);
+
+        $page = $this->get('/blog/'.$slug);
+        $page->assertOk();
+        $page->assertSee('Orforglipron vs Oral Semaglutide: ACHIEVE-3 and FDA Status', false);
+        $page->assertSee('What the ACHIEVE-3 Head-to-Head Trial Reported', false);
+        $page->assertSee('https://peptidemap.com/blog/orforglipron-vs-oral-semaglutide', false);
+        $page->assertSee($cover, false);
+        $page->assertSee('What did ACHIEVE-3 compare?', false);
+        $page->assertSee('Are both FDA-approved?', false);
+        $page->assertSee('company-reported by Lilly, the figures were 6.1% and 8.2% vs 3.9% and 5.3%', false);
+        $page->assertDontSee('/workspace', false);
+        $page->assertDontSee('CMS paste', false);
+        $page->assertDontSee('CHANGES', false);
+        $page->assertInertia(fn ($inertia) => $inertia
+            ->where('blog.slug', $slug)
+            ->where('blog.image', $cover)
+            ->where('blog.content', function ($html) {
+                return is_string($html)
+                    && ! str_contains($html, '<!--')
+                    && ! str_contains($html, '/workspace');
+            })
+        );
+
+        $this->get('/sitemap.xml')->assertOk()
+            ->assertSee('https://peptidemap.com/blog/orforglipron-vs-oral-semaglutide', false);
     }
 
     private function visibleFaqAnswer(string $plain, string $question): string
