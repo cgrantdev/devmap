@@ -19,9 +19,13 @@ use Illuminate\Support\Facades\Schema;
  * A pair has real editorial content when any of these is true:
  *
  * 1. It is a FEATURED_VS_PAIRS entry. Those curated pairs count.
- * 2. Pair-specific copy is rendered on the compare page. Today that is
- *    ElamipretideMotsCCompareFaqs (FAQs and references live in code, not
- *    on a CMS row) for elamipretide-vs-mots-c.
+ * 2. Pair-specific copy is rendered on the compare page. That is
+ *    ElamipretideMotsCCompareFaqs for elamipretide-vs-mots-c, and
+ *    KlowCompareCopy for
+ *    glow-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv and
+ *    ghk-cu-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv. canonicalPair does
+ *    not resolve compare-side aliases, so the copy class is keyed on
+ *    those long slugs. The short side "klow" 301s in CompareController.
  * 3. A published blog or educational guide has a non-empty body and a
  *    slug of {a}-vs-{b}, the reversed {b}-vs-{a}, or either form plus
  *    the "-evidence" suffix. Those notes are markdown in
@@ -33,10 +37,12 @@ use Illuminate\Support\Facades\Schema;
  * Per-compound education_posts (mechanism, half-life, overview) do not
  * count. Every auto-generated vs page can pull those in.
  *
- * Not on the allowlist: glow-vs-klow (the note says that price URL was
- * 404 and points at the blend compare pages), cjc-1295-dac-vs-no-dac
- * (one compound's DAC construct), and eloralintide-tirzepatide-vs-retatrutide
- * (a combination note; it does not back eloralintide-vs-retatrutide).
+ * The short spelling glow-vs-klow is not an allowlist entry. It 301s
+ * to glow-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv, which is allowlisted
+ * with ghk-cu-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv. Also not on the
+ * allowlist: cjc-1295-dac-vs-no-dac (one compound's DAC construct), and
+ * eloralintide-tirzepatide-vs-retatrutide (a combination note; it does
+ * not back eloralintide-vs-retatrutide).
  * A published article whose slug does match a reachable pair still
  * keeps that pair indexable. Sitemap membership stays allowlist union
  * featured.
@@ -103,6 +109,11 @@ class VsPairIndexing
         }
 
         if (ElamipretideMotsCCompareFaqs::forSlug($canonical) !== null) {
+            return true;
+        }
+
+        // Long slugs only. canonicalPair does not rewrite "klow".
+        if (KlowCompareCopy::forSlug($canonical) !== null) {
             return true;
         }
 
@@ -193,7 +204,7 @@ class VsPairIndexing
 
     /**
      * Lowercase a-vs-b with a < b. Does not rewrite compare aliases
-     * (reta, pt-141, ss-31); those redirects stay in CompareController.
+     * (reta, pt-141, ss-31, klow); those redirects stay in CompareController.
      */
     public static function canonicalPair(string $slug): ?string
     {
