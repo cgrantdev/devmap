@@ -396,6 +396,13 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     Route::middleware('ceo.only')->group(function () {
         Route::get('/seo-wip', [\App\Http\Controllers\Admin\SeoWipController::class, 'index'])->name('admin.seo-wip');
         Route::post('/seo-wip/notes', [\App\Http\Controllers\Admin\SeoWipController::class, 'saveNotes'])->name('admin.seo-wip.notes');
+
+        // Dev console — whitelisted artisan runner so Colin / Claude
+        // can trigger scrapers + maintenance from the browser instead
+        // of Forge SSH. CEO-only; whitelist in the controller is the
+        // entire interface. See DevConsoleController.
+        Route::get('/dev/console', [\App\Http\Controllers\Admin\DevConsoleController::class, 'index'])->name('admin.dev.console');
+        Route::post('/dev/console/run', [\App\Http\Controllers\Admin\DevConsoleController::class, 'run'])->name('admin.dev.console.run');
     });
     Route::get('/vendors', [VendorsController::class, 'index'])->name('admin.vendors');
     Route::get('/applicants', [VendorsController::class, 'applicants'])->name('admin.applicants');
