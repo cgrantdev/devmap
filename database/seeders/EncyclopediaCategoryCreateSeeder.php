@@ -36,6 +36,7 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
     public const SLUGS = [
         'pemvidutide',
         'hexarelin',
+        'cagrisema',
     ];
 
     /**
@@ -71,6 +72,21 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
             'cas' => '140703-51-1',
             'copy_research_area_from' => '',
             'blank_chemistry' => false,
+            'create_inactive' => true,
+            'preserve_active' => true,
+        ],
+        // New content-only page. Created inactive so /encyclopedia/cagrisema stays
+        // 404 until someone activates it. No aliases: a "CagriSema" alias could
+        // resolve to active category 592 (Semaglutide / Cagrilintide Blend) or 437
+        // (Cagrilintide) through CategoryAlias, and the seeder would reuse that row.
+        'cagrisema' => [
+            'name' => 'CagriSema',
+            'aliases' => [],
+            'image' => 'cagrisema-featured.png',
+            'cas' => '',
+            'copy_research_area_from' => '',
+            // Fixed-dose combination of two molecules: no single formula, MW or CAS.
+            'blank_chemistry' => true,
             'create_inactive' => true,
             'preserve_active' => true,
         ],

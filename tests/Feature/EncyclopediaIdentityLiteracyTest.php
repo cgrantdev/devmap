@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
 use Database\Seeders\Cjc1295DacIdentitySeeder;
+use Database\Seeders\EncyclopediaCategoryCreateSeeder;
 use Database\Seeders\FiveAmino1mqNotAPeptideSeeder;
 use Database\Seeders\RetatrutideTimelineLiteracySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -417,16 +418,20 @@ class EncyclopediaIdentityLiteracyTest extends TestCase
             $this->assertTrue($seeder->report['missing_category']);
             $this->assertFalse($seeder->report['updated']);
         }
-        // Create-seeder migrations seed pemvidutide and hexarelin into every test database.
-        $this->assertSame(0, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
-        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
+        // Create-seeder migrations seed pemvidutide, hexarelin, and cagrisema into every test database.
+        $seeded = EncyclopediaCategoryCreateSeeder::SLUGS;
+        $marks = implode(', ', array_fill(0, count($seeded), '?'));
+        $this->assertSame(0, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN ('.$marks.')', $seeded)->count());
+        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN ('.$marks.')', $seeded)->count());
 
         $cjc = $this->category('CJC-1295', 'cjc-1295');
         $noPost = new Cjc1295DacIdentitySeeder;
         $noPost->run();
         $this->assertTrue($noPost->report['missing_post']);
         $this->assertFalse($noPost->report['updated']);
-        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
+        $seeded = EncyclopediaCategoryCreateSeeder::SLUGS;
+        $marks = implode(', ', array_fill(0, count($seeded), '?'));
+        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN ('.$marks.')', $seeded)->count());
 
         $this->category('CJC-1295 duplicate', 'CJC-1295');
         $marker = 'Collision marker that must survive.';
@@ -437,7 +442,9 @@ class EncyclopediaIdentityLiteracyTest extends TestCase
         $this->assertFalse($collision->report['updated']);
         $this->assertSame($marker, $post->fresh()->overview);
         $this->assertSame('KEEP', $post->fresh()->molecular_formula);
-        $this->assertSame(2, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
+        $seeded = EncyclopediaCategoryCreateSeeder::SLUGS;
+        $marks = implode(', ', array_fill(0, count($seeded), '?'));
+        $this->assertSame(2, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN ('.$marks.')', $seeded)->count());
 
         $lower = $this->category('Retatrutide', 'retatrutide');
         $this->category('Retatrutide duplicate', 'Retatrutide');

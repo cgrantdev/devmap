@@ -7,6 +7,7 @@ use App\Models\ProductCategory;
 use App\Support\ElamipretideMotsCCompareFaqs;
 use App\Support\EncyclopediaShellParser;
 use Database\Seeders\ElamipretideForzinitySeeder;
+use Database\Seeders\EncyclopediaCategoryCreateSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -199,9 +200,11 @@ class ElamipretideForzinityTest extends TestCase
         $missing->run();
         $this->assertTrue($missing->report['missing_category']);
         $this->assertFalse($missing->report['updated']);
-        // Create-seeder migrations seed pemvidutide and hexarelin into every test database.
-        $this->assertSame(0, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
-        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
+        // Create-seeder migrations seed pemvidutide, hexarelin, and cagrisema into every test database.
+        $seeded = EncyclopediaCategoryCreateSeeder::SLUGS;
+        $marks = implode(', ', array_fill(0, count($seeded), '?'));
+        $this->assertSame(0, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN ('.$marks.')', $seeded)->count());
+        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN ('.$marks.')', $seeded)->count());
 
         $category = ProductCategory::create([
             'name' => 'Elamipretide',
@@ -212,7 +215,9 @@ class ElamipretideForzinityTest extends TestCase
         $noPost->run();
         $this->assertTrue($noPost->report['missing_post']);
         $this->assertFalse($noPost->report['updated']);
-        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
+        $seeded = EncyclopediaCategoryCreateSeeder::SLUGS;
+        $marks = implode(', ', array_fill(0, count($seeded), '?'));
+        $this->assertSame(0, EducationPost::query()->whereRaw('LOWER(slug) NOT IN ('.$marks.')', $seeded)->count());
 
         ProductCategory::create([
             'name' => 'Elamipretide duplicate',
@@ -231,7 +236,9 @@ class ElamipretideForzinityTest extends TestCase
         $collision->run();
         $this->assertTrue($collision->report['skipped_slug_collision']);
         $this->assertFalse($collision->report['updated']);
-        $this->assertSame(2, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN (?, ?)', ['pemvidutide', 'hexarelin'])->count());
+        $seeded = EncyclopediaCategoryCreateSeeder::SLUGS;
+        $marks = implode(', ', array_fill(0, count($seeded), '?'));
+        $this->assertSame(2, ProductCategory::query()->whereRaw('LOWER(slug) NOT IN ('.$marks.')', $seeded)->count());
         $this->assertSame($note, EducationPost::query()->where('slug', 'elamipretide')->firstOrFail()->regulatory_important_note);
     }
 

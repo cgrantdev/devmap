@@ -1,0 +1,415 @@
+{
+ "slug_match": "LOWER(slug) = 'cagrilintide'; skip if match count != 1; no-op if 0 (stored slug is 'Cagrilintide'; post id 437 on the live page)",
+ "as_of": "19 October 2026 (Asia/Bangkok). Old values copied from the live Inertia props of https://peptidemap.com/encyclopedia/Cagrilintide on 19 Oct 2026. Compare decoded JSON values, not raw JSON text.",
+ "columns": {
+  "overview": {
+   "camelCase_prop": "overview (overviewShort is derived; no column)",
+   "op": "write only if current value exactly equals old_value; skip if current contains 'Status as of 19 Oct 2026'",
+   "old_value": "Cagrilintide is a long-acting analog of amylin, a peptide hormone co-secreted with insulin from pancreatic beta cells. Novo Nordisk developed it as a complement to semaglutide, and the combination (CagriSema) has emerged as a leading next-generation obesity treatment.\n\nThe REDEFINE Phase 3 trial program showed CagriSema achieving up to 25% body weight reduction — positioning the amylin + GLP-1 combination as potentially the most effective peptide-based weight management approach.",
+   "new_value": "Cagrilintide is an investigational long-acting amylin analogue from Novo Nordisk. It is not approved in the US or EU, alone or in CagriSema (as of 19 Oct 2026). It is a lipidated analogue of amylin, a peptide hormone co-secreted with insulin from pancreatic beta cells (J Med Chem 2021). Novo Nordisk is developing it on its own and as part of CagriSema, a fixed-dose combination with the GLP-1 receptor agonist semaglutide.\n\nIn the 68-week phase 3 REDEFINE 1 trial, adults with overweight or obesity assigned to CagriSema lost a mean 20.4% of body weight, compared with 3.0% on placebo (NEJM 2025). In REDEFINE 4, an 84-week open-label comparison, CagriSema did not meet its primary endpoint of non-inferiority to tirzepatide on weight loss (Novo Nordisk, 23 Feb 2026). Status as of 19 Oct 2026: Novo Nordisk submitted an NDA for CagriSema on 18 Dec 2025 and expects an FDA decision by late 2026. Cagrilintide alone is in phase 3 (the RENEW programme)."
+  },
+  "background": {
+   "camelCase_prop": "background",
+   "op": "write only if current value exactly equals old_value; skip if current contains '159–195 hours'",
+   "old_value": "Amylin was discovered in 1987 as a peptide co-secreted with insulin from pancreatic beta cells. Natural amylin has a half-life of only ~15 minutes. Pramlintide (Symlin), a first-generation amylin analog, was FDA-approved for diabetes but required three daily injections.\n\nCagrilintide was engineered with fatty acid acylation for albumin binding, extending half-life to approximately one week for once-weekly dosing. The strategic insight was combining amylin-pathway satiety with GLP-1-pathway appetite suppression.",
+   "new_value": "Amylin is a 37-amino-acid peptide hormone co-secreted with insulin from pancreatic beta cells (Pharmacol Rev 2015). Pramlintide (Symlin), a first-generation amylin analog, was FDA-approved for diabetes but has a short half-life (J Med Chem 2021).\n\nCagrilintide was developed by Novo Nordisk as a stable, lipidated amylin analogue designed for a long duration of action (J Med Chem 2021). In a phase 1b trial its human half-life was 159–195 hours (Lancet 2021). The development rationale was to pair amylin-pathway satiety signalling with GLP-1-pathway effects, which led to the CagriSema combination."
+  },
+  "half_life": {
+   "camelCase_prop": "halfLife",
+   "op": "write only if current value exactly equals old_value; skip if current starts with 'Human:'",
+   "old_value": "~7 days (albumin binding)",
+   "new_value": "Human: 159–195 hours (cagrilintide given with semaglutide in a phase 1b trial; Lancet 2021). Not a dosing guide."
+  },
+  "molecular_formula": {
+   "camelCase_prop": "molecularInfo.formula",
+   "op": "write only if current value exactly equals old_value; skip if current equals new_value",
+   "old_value": "C₁₇₆H₂₇₂N₅₀O₅₃S₃",
+   "new_value": "C194H312N54O59S2"
+  },
+  "molecular_weight": {
+   "camelCase_prop": "molecularInfo.molecularWeight",
+   "op": "write only if current value exactly equals old_value; skip if current equals new_value",
+   "old_value": "3,990.5 g/mol",
+   "new_value": "4409 g/mol"
+  },
+  "cas_registry_number": {
+   "camelCase_prop": "molecularInfo.casNumber",
+   "op": "write only if current value exactly equals old_value; skip if current equals new_value",
+   "old_value": "2196967-89-4",
+   "new_value": "1415456-99-3"
+  },
+  "human_use_intro": {
+   "camelCase_prop": "humanUseIntro",
+   "op": "write only if current value exactly equals old_value; skip if current contains 'This page gives no dose'",
+   "old_value": "Cagrilintide is in advanced clinical development with encouraging Phase 2 and Phase 3 data.",
+   "new_value": "Cagrilintide has been tested in humans on its own and, mostly, as part of CagriSema. The results below come from peer-reviewed trial reports and Novo Nordisk company announcements, and each is labelled with its source. Figures from different trials are not directly comparable. This page gives no dose or schedule information."
+  },
+  "human_use_subsections": {
+   "camelCase_prop": "humanUseSubsections",
+   "op": "write only if current value exactly equals old_value; skip if any subsection title starts with 'Clinical program (as of'",
+   "old_value": [
+    {
+     "title": "Clinical Program",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Phase 2 trials of standalone cagrilintide showed meaningful weight reduction. The CagriSema combination (cagrilintide + semaglutide) achieved approximately 25% body weight reduction in the REDEFINE Phase 3 program — potentially the highest pharmacological weight loss recorded.\\n\\nThe combination was generally well-tolerated with GI side effects (nausea, vomiting, diarrhea) consistent with the individual compound profiles."
+      }
+     ]
+    }
+   ],
+   "new_value": [
+    {
+     "title": "Clinical program (as of 19 Oct 2026)",
+     "entries": [
+      {
+       "type": "content",
+       "value": "**Cagrilintide alone (phase 2; Lancet 2021, PMID 34798060):** in a 26-week dose-finding trial in 706 adults with overweight or obesity, mean weight loss ranged from 6.0% to 10.8% across cagrilintide dose groups, compared with 3.0% on placebo (trial product estimand). Gastrointestinal adverse events were the most frequent."
+      },
+      {
+       "type": "content",
+       "value": "**REDEFINE 1 (phase 3; NEJM 2025, PMID 40544433; NCT05567796):** 3,417 adults with overweight or obesity and without diabetes were randomised. At 68 weeks the mean change in body weight was −20.4% with CagriSema and −3.0% with placebo (estimated difference −17.3 percentage points; 95% CI −18.1 to −16.6; treatment-policy estimand). Gastrointestinal adverse events affected 79.6% of the CagriSema group and 39.9% of the placebo group and were mainly transient and mild to moderate."
+      },
+      {
+       "type": "content",
+       "value": "**REDEFINE 2 (phase 3; NEJM 2025, PMID 40544432; NCT05394519):** in 1,206 adults with overweight or obesity and type 2 diabetes, the mean change in body weight at 68 weeks was −13.7% with CagriSema and −3.4% with placebo (estimated difference −10.4 percentage points; 95% CI −11.2 to −9.5)."
+      },
+      {
+       "type": "content",
+       "value": "**REDEFINE 4 vs tirzepatide (phase 3, open-label; Novo Nordisk company announcement No 13/2026, 23 Feb 2026; NCT06131437):** in 809 adults with obesity, Novo Nordisk reported that \"The trial did not achieve its primary endpoint of demonstrating non-inferiority on weight loss for CagriSema compared to tirzepatide after 84 weeks.\" Mean weight loss was 23.0% with CagriSema and 25.5% with tirzepatide if all people adhered to treatment, and 20.2% and 23.6% with the treatment-regimen estimand. These results come from a company announcement, not a peer-reviewed paper."
+      },
+      {
+       "type": "content",
+       "value": "**Cagrilintide monotherapy in phase 3 (RENEW):** Novo Nordisk started a dedicated phase 3 programme for cagrilintide alone in Q4 2025. RENEW 1 (NCT07220642; placebo-controlled; about 300 participants) is listed on ClinicalTrials.gov as active, not recruiting, with primary completion expected in May 2027. No RENEW results have been published."
+      },
+      {
+       "type": "item",
+       "value": "No REDEFINE or RENEW trial result is an approval. Long-term outcomes, including the REDEFINE 3 cardiovascular outcomes trial, are not yet reported."
+      }
+     ]
+    }
+   ]
+  },
+  "regulatory_subsections": {
+   "camelCase_prop": "regulatorySubsections",
+   "op": "write only if current value exactly equals old_value; skip if any subsection title starts with 'Development and regulatory status (as of'",
+   "old_value": [
+    {
+     "title": "Development Status",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Cagrilintide is not yet FDA-approved. Phase 3 trials (REDEFINE program) are ongoing. Novo Nordisk is developing both standalone cagrilintide and the CagriSema fixed-dose combination. Research-grade cagrilintide is available through peptide vendors."
+      }
+     ]
+    }
+   ],
+   "new_value": [
+    {
+     "title": "Development and regulatory status (as of 19 Oct 2026)",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Status as of 19 Oct 2026: cagrilintide is not approved by the FDA, the EMA or any other regulator found in the sources checked, either alone or as part of CagriSema. Novo Nordisk states that \"CagriSema is not approved in the US or EU\" (18 Dec 2025)."
+      },
+      {
+       "type": "content",
+       "value": "**United States:** on 18 Dec 2025 Novo Nordisk announced the submission of a New Drug Application (NDA) to the FDA for CagriSema \"to reduce excess body weight and maintain weight reduction long term in adults with obesity or overweight in the presence of at least one weight-related comorbid condition\", based on REDEFINE 1 and REDEFINE 2. Novo Nordisk said on 23 Feb 2026 that \"an FDA decision is anticipated by late 2026\", and its H1 2026 report lists the CagriSema US decision for Q4 2026. Optum Rx's 13 Oct 2026 drug-pipeline report lists an expected FDA decision date of 18 December 2026; neither the FDA nor Novo Nordisk has published that date. Peptidemap does not predict regulatory outcomes."
+      },
+      {
+       "type": "content",
+       "value": "**European Union:** no EU marketing authorisation application for CagriSema or cagrilintide was found. The EMA list of applications under evaluation dated 5 Oct 2026 does not include either. EMA has agreed a paediatric investigation plan for cagrilintide/semaglutide in obesity (EMA/PE/0000240529). In its Q2 2026 investor presentation, Novo Nordisk describes the EU regulatory pathway for CagriSema as \"pending REDEFINE 3\", the cardiovascular outcomes trial, which it expects to read out in H2 2027."
+      },
+      {
+       "type": "content",
+       "value": "**Cagrilintide alone:** in phase 3 (RENEW programme, started Q4 2025). No regulatory submission for cagrilintide monotherapy has been announced."
+      },
+      {
+       "type": "content",
+       "value": "Any product sold online under this name, including vials labelled \"research use only\", is not Novo Nordisk trial supply. Its identity, purity, content and sterility are unverified."
+      },
+      {
+       "type": "item",
+       "value": "Peptidemap is a publisher, not a pharmacy, clinic or supplier, and makes no supply, availability, vendor or price claims."
+      }
+     ]
+    }
+   ]
+  },
+  "regulatory_important_note": {
+   "camelCase_prop": "regulatoryImportantNote",
+   "op": "write only if current value exactly equals old_value; skip if current contains 'not Novo Nordisk trial supply'",
+   "old_value": "Cagrilintide is investigational. Not approved for any indication. Phase 3 trials ongoing.",
+   "new_value": "Cagrilintide is investigational and is not approved for any indication, alone or in CagriSema (status as of 19 Oct 2026). An NDA for CagriSema was submitted to the FDA on 18 Dec 2025; a submission is not an approval. Any product sold online under this name, including vials labelled \"research use only\", is not Novo Nordisk trial supply. Its identity, purity, content and sterility are unverified."
+  },
+  "potential_applications_important_context": {
+   "camelCase_prop": "potentialApplicationsImportantContext",
+   "op": "write only if current value exactly equals old_value; skip if current contains 'does not predict'",
+   "old_value": "Cagrilintide is investigational. Regulatory approval will depend on Phase 3 outcomes.",
+   "new_value": "Cagrilintide is investigational. The applications below are research contexts, not approved uses. Peptidemap does not predict regulatory outcomes."
+  },
+  "potential_applications": {
+   "camelCase_prop": "potentialApplications",
+   "op": "apply each replacement independently: replace the item at index only if it exactly equals old_item; skip that replacement if skip_if holds. Leave item [1] unchanged.",
+   "replacements": [
+    {
+     "index": 0,
+     "old_item": {
+      "title": "Maximum Weight Reduction",
+      "description": "CagriSema's ~25% weight loss may approach bariatric surgery outcomes pharmacologically."
+     },
+     "new_item": {
+      "title": "Weight management (CagriSema)",
+      "description": "Studied in the REDEFINE phase 3 programme; in REDEFINE 1, mean weight loss at 68 weeks was 20.4% with CagriSema vs 3.0% with placebo (NEJM 2025). Not approved."
+     },
+     "skip_if": "any item title equals new_item.title"
+    },
+    {
+     "index": 2,
+     "old_item": {
+      "title": "Combination Therapeutics",
+      "description": "Proving that distinct satiety pathways can be combined for synergistic metabolic effects."
+     },
+     "new_item": {
+      "title": "Combination Therapeutics",
+      "description": "Studied with semaglutide in the CagriSema combination; Novo Nordisk reports an additive effect on weight loss (company-reported)."
+     },
+     "skip_if": "item [2].description equals new_item.description"
+    }
+   ]
+  },
+  "areas_of_research": {
+   "camelCase_prop": "areasOfResearch",
+   "op": "replace item [0] only if it exactly equals old_item; skip if item [0].description contains 'NDA submitted'; leave other items unchanged",
+   "old_item": {
+    "name": "Obesity (CagriSema)",
+    "description": "Combined with semaglutide for up to 25% weight reduction in Phase 3"
+   },
+   "new_item": {
+    "name": "Obesity (CagriSema)",
+    "description": "Combined with semaglutide in the REDEFINE phase 3 programme; NDA submitted to the FDA on 18 Dec 2025"
+   }
+  },
+  "conclusion": {
+   "camelCase_prop": "conclusion",
+   "op": "write only if current value exactly equals old_value; skip if current contains 'As of 19 Oct 2026'",
+   "old_value": "Cagrilintide and the CagriSema combination represent the most promising near-term advance in obesity pharmacotherapy. By combining amylin and GLP-1 pathway activation, these compounds achieve a level of weight reduction that was previously only possible through surgical intervention.\n\nThe scientific contribution is the validation of pathway complementarity — demonstrating that targeting distinct satiety circuits in the brain produces genuinely synergistic effects rather than simple additive ones.\n\nFor researchers, cagrilintide offers insight into amylin biology, which has been understudied relative to GLP-1 despite amylin's critical role in post-meal satiety and glucose regulation.",
+   "new_value": "Cagrilintide is a long-acting amylin analogue whose main clinical programme is the CagriSema combination with semaglutide. Peer-reviewed phase 3 trials (REDEFINE 1 and 2, NEJM 2025) reported weight loss well beyond placebo. In REDEFINE 4, CagriSema did not show non-inferiority to tirzepatide (company-reported, 23 Feb 2026). As of 19 Oct 2026, neither CagriSema nor cagrilintide is approved. Novo Nordisk submitted an NDA for CagriSema on 18 Dec 2025 and expects an FDA decision by late 2026. No EU application was found, and cagrilintide alone is in phase 3.\n\nFor researchers, cagrilintide offers insight into amylin biology, which has been understudied relative to GLP-1 despite amylin's role in post-meal satiety and glucose regulation. Readers should check the primary sources linked below before relying on any figure."
+  },
+  "references": {
+   "camelCase_prop": "references",
+   "op": "write only if current value exactly equals old_value; skip if any reference citation contains 'PMID 40544433'",
+   "old_value": [
+    {
+     "title": "The Lancet (2021)",
+     "authors": "Lau et al.",
+     "description": "Phase 2 trial of cagrilintide for weight management in obesity."
+    },
+    {
+     "title": "Nature Medicine (2023)",
+     "authors": "Frias et al.",
+     "description": "CagriSema Phase 2: combined amylin and GLP-1 agonism for obesity."
+    }
+   ],
+   "new_value": [
+    {
+     "title": "Amylin: Pharmacology, Physiology, and Clinical Potential",
+     "authors": "Hay DL, Chen S, Lutz TA, Parkes DG, Roth JD",
+     "citation": "Pharmacol Rev. 2015;67(3):564-600. doi:10.1124/pr.115.010629. PMID 26071095",
+     "description": "Review of amylin receptors and physiology.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/26071095/"
+     ]
+    },
+    {
+     "title": "Once-weekly cagrilintide for weight management in people with overweight and obesity: a multicentre, randomised, double-blind, placebo-controlled and active-controlled, dose-finding phase 2 trial",
+     "authors": "Lau DCW, Erichsen L, Francisco AM, et al.",
+     "citation": "Lancet. 2021;398(10317):2160-2172. doi:10.1016/S0140-6736(21)01751-7. PMID 34798060",
+     "description": "Phase 2, 26 weeks, 706 participants on cagrilintide; NCT03856047.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/34798060/"
+     ]
+    },
+    {
+     "title": "Efficacy and safety of co-administered once-weekly cagrilintide 2·4 mg with once-weekly semaglutide 2·4 mg in type 2 diabetes: a multicentre, randomised, double-blind, active-controlled, phase 2 trial",
+     "authors": "Frias JP, Deenadayalan S, Erichsen L, et al.",
+     "citation": "Lancet. 2023;402(10403):720-730. doi:10.1016/S0140-6736(23)01163-7. PMID 37364590",
+     "description": "Phase 2 in type 2 diabetes, 92 participants; NCT04982575. (Replaces the earlier \"Nature Medicine (2023)\" label, which was incorrect.)",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/37364590/"
+     ]
+    },
+    {
+     "title": "Safety, tolerability, pharmacokinetics, and pharmacodynamics of concomitant administration of multiple doses of cagrilintide with semaglutide 2·4 mg for weight management: a randomised, controlled, phase 1b trial",
+     "authors": "Enebo LB, Berthelsen KK, Kankam M, et al.",
+     "citation": "Lancet. 2021;397(10286):1736-1748. doi:10.1016/S0140-6736(21)00845-X. PMID 33894838",
+     "description": "Phase 1b; source of the human half-life figures; NCT03600480.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/33894838/"
+     ]
+    },
+    {
+     "title": "Development of Cagrilintide, a Long-Acting Amylin Analogue",
+     "authors": "Kruse T, Hansen JL, Dahl K, et al.",
+     "citation": "J Med Chem. 2021;64(15):11183-11194. doi:10.1021/acs.jmedchem.1c00565. PMID 34288673",
+     "description": "Medicinal chemistry of cagrilintide (stable, lipidated amylin analogue).",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/34288673/"
+     ]
+    },
+    {
+     "title": "Coadministered Cagrilintide and Semaglutide in Adults with Overweight or Obesity",
+     "authors": "Garvey WT, Blüher M, Osorto Contreras CK, et al.; REDEFINE 1 Study Group",
+     "citation": "N Engl J Med. 2025;393(7):635-647. doi:10.1056/NEJMoa2502081. PMID 40544433",
+     "description": "REDEFINE 1; 68 weeks; 3,417 randomised; NCT05567796.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/40544433/"
+     ]
+    },
+    {
+     "title": "Cagrilintide-Semaglutide in Adults with Overweight or Obesity and Type 2 Diabetes",
+     "authors": "Davies MJ, Bajaj HS, Broholm C, et al.; REDEFINE 2 Study Group",
+     "citation": "N Engl J Med. 2025;393(7):648-659. doi:10.1056/NEJMoa2502082. PMID 40544432",
+     "description": "REDEFINE 2; 68 weeks; 1,206 randomised; NCT05394519.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/40544432/"
+     ]
+    },
+    {
+     "title": "CagriSema demonstrated 23% weight loss in an open-label head-to-head REDEFINE 4 trial in people with obesity, the primary endpoint was not achieved",
+     "authors": "Novo Nordisk A/S",
+     "citation": "Company announcement No 13/2026, 23 February 2026 (filed with the US SEC on Form 6-K)",
+     "description": "REDEFINE 4 headline results; FDA decision \"anticipated by late 2026\".",
+     "links": [
+      "https://www.sec.gov/Archives/edgar/data/353278/000117184326000996/f6k_022326.htm"
+     ]
+    },
+    {
+     "title": "CagriSema FDA Filing for Weight Loss",
+     "authors": "Novo Nordisk A/S (Novo Nordisk U.S. press release)",
+     "citation": "Press release, 18 December 2025",
+     "description": "NDA submission for weight management; \"CagriSema is not approved in the US or EU.\"",
+     "links": [
+      "https://www.novonordisk-us.com/media/press-releases/novo-nordisk-cagrisema-fda-nda-submission.html"
+     ]
+    },
+    {
+     "title": "A Research Study to See How Well CagriSema Compared to Tirzepatide Helps People With Obesity Lose Weight",
+     "authors": "ClinicalTrials.gov",
+     "citation": "NCT06131437 (record last updated 6 Feb 2026)",
+     "description": "Registration of the trial Novo Nordisk reports as REDEFINE 4; status completed.",
+     "links": [
+      "https://clinicaltrials.gov/study/NCT06131437"
+     ]
+    },
+    {
+     "title": "Weight Loss in People Living With Overweight or Obesity Following Treatment With Cagrilintide ",
+     "authors": "ClinicalTrials.gov",
+     "citation": "NCT07220642 (record last updated 6 Aug 2026)",
+     "description": "RENEW 1; phase 3 cagrilintide monotherapy; active, not recruiting.",
+     "links": [
+      "https://clinicaltrials.gov/study/NCT07220642"
+     ]
+    },
+    {
+     "title": "A Busy End To 2026 For New Drug Approvals",
+     "authors": "Optum Rx",
+     "citation": "Report, 13 October 2026",
+     "description": "Attributed report only: lists an expected FDA decision date for CagriSema of 18 December 2026. Not an FDA or Novo Nordisk source.",
+     "links": [
+      "https://business.optum.com/en/insights/notable-new-drugs-report-fall-2026.html"
+     ]
+    }
+   ]
+  },
+  "faqs": {
+   "camelCase_prop": "faqs (FAQPage JSON-LD is generated from this column)",
+   "op": "write only if current value exactly equals old_value; skip if any question equals 'Did CagriSema match tirzepatide in REDEFINE 4?'",
+   "old_value": [
+    {
+     "question": "What is CagriSema?",
+     "answer": "CagriSema is the fixed-dose combination of cagrilintide (amylin analog) and semaglutide (GLP-1 agonist) in a single weekly injection, currently in Phase 3 trials."
+    },
+    {
+     "question": "How does cagrilintide differ from GLP-1 agonists?",
+     "answer": "Cagrilintide targets amylin receptors in different brain regions than GLP-1 agonists, providing complementary satiety signaling through distinct neural pathways."
+    },
+    {
+     "question": "Is cagrilintide FDA-approved?",
+     "answer": "Not yet. It is in Phase 3 clinical trials as both a standalone agent and in the CagriSema combination."
+    }
+   ],
+   "new_value": [
+    {
+     "question": "What is CagriSema?",
+     "answer": "CagriSema is Novo Nordisk's investigational fixed-dose combination of cagrilintide, a long-acting amylin analogue, and semaglutide, a GLP-1 receptor agonist. As of 19 Oct 2026 it is not approved; an NDA was submitted to the FDA on 18 Dec 2025."
+    },
+    {
+     "question": "How does cagrilintide differ from GLP-1 agonists?",
+     "answer": "Cagrilintide acts on amylin receptors, which are calcitonin receptor complexes with receptor activity-modifying proteins (RAMPs), while GLP-1 agonists act on the GLP-1 receptor (Pharmacol Rev 2015). Novo Nordisk describes the effect of adding cagrilintide to semaglutide as additive (company statement)."
+    },
+    {
+     "question": "Is cagrilintide FDA-approved?",
+     "answer": "No. As of 19 Oct 2026 cagrilintide is not approved alone or as part of CagriSema. Novo Nordisk submitted an NDA for CagriSema on 18 Dec 2025 and says an FDA decision is anticipated by late 2026. Cagrilintide alone is in phase 3."
+    },
+    {
+     "question": "What did REDEFINE 1 show?",
+     "answer": "In REDEFINE 1, a 68-week phase 3 trial in 3,417 adults with overweight or obesity, mean body weight changed by −20.4% with CagriSema and −3.0% with placebo (NEJM 2025)."
+    },
+    {
+     "question": "Did CagriSema match tirzepatide in REDEFINE 4?",
+     "answer": "No. Novo Nordisk reported on 23 Feb 2026 that REDEFINE 4 did not achieve its primary endpoint of demonstrating non-inferiority on weight loss for CagriSema compared to tirzepatide after 84 weeks."
+    },
+    {
+     "question": "Are research peptides sold as cagrilintide the same as the trial drug?",
+     "answer": "Any product sold online under this name, including vials labelled \"research use only\", is not Novo Nordisk trial supply. Its identity, purity, content and sterility are unverified."
+    }
+   ]
+  },
+  "key_points": {
+   "camelCase_prop": "keyPoints",
+   "op": "apply both operations independently, in order. (1) replace_in_place: if any item exactly equals new_item, skip; else if an item exactly equals old_item, replace it in place with new_item; else skip and log (never append). (2) append: append new_item at the end only if no existing item starts with the prefix 'Status (as of '.",
+   "operations": [
+    {
+     "type": "replace_in_place",
+     "old_item": "Synergistic with GLP-1 agonists",
+     "new_item": "Studied with semaglutide as CagriSema; Novo Nordisk describes the effect as additive (company statement)."
+    },
+    {
+     "type": "append",
+     "skip_if_any_item_starts_with": "Status (as of ",
+     "new_item": "Status (as of 19 Oct 2026): not approved alone or in CagriSema. Novo Nordisk submitted an NDA for CagriSema on 18 Dec 2025 and expects an FDA decision by late 2026. In REDEFINE 4, CagriSema did not show non-inferiority to tirzepatide (company-reported, 23 Feb 2026). Cagrilintide alone is in phase 3 (RENEW)."
+    }
+   ]
+  },
+  "description": {
+   "camelCase_prop": "encyclopedia index/search card 'description' (EncyclopediaController::index uses education_posts.description when non-empty, else product_categories.description)",
+   "op": "(1) if education_posts.description (this post) exactly equals old_value, write new_value there; (2) else if education_posts.description is NULL or empty AND product_categories.description for category id 437 (LOWER(slug)='cagrilintide', exactly one row) exactly equals old_value, write new_value to product_categories.description; (3) otherwise skip. Skip entirely if either column already contains 'REDEFINE 1'. Do not touch category 592.",
+   "old_value": "Cagrilintide is a long-acting amylin analog being developed by Novo Nordisk as a complement to GLP-1 agonists. The combination with semaglutide (CagriSema) showed up to 25% weight reduction.",
+   "new_value": "Cagrilintide is a long-acting amylin analogue developed by Novo Nordisk. With semaglutide (as CagriSema), mean weight change was −20.4% vs −3.0% with placebo over 68 weeks in REDEFINE 1 (NEJM 2025). Not approved as of 19 Oct 2026.",
+   "note": "Live index props (19 Oct 2026) show this text as the Cagrilintide card description; public responses cannot tell which of the two columns holds it. The page SEO/meta description is derived from overview (safeLimit 160) and changes with the overview write; no separate seo_description write is needed."
+  },
+  "preclinical_subsections": {
+   "camelCase_prop": "preclinicalSubsections",
+   "op": "in subsection [0] (title exactly 'Metabolic Effects'), replace findings[1] in place only if it exactly equals old_finding; skip if any finding content equals new_finding.content; otherwise skip and log. Leave all other subsections and findings unchanged.",
+   "old_finding": {
+    "title": "CagriSema Synergy",
+    "content": "The fixed-dose combination of cagrilintide and semaglutide (CagriSema) demonstrated synergistic effects that exceeded the mathematical sum of each compound's individual activity, suggesting genuine pathway interaction rather than simple additive effects."
+   },
+   "new_finding": {
+    "title": "Combined amylin and GLP-1 agonism (preclinical)",
+    "content": "In rodent studies, combined amylin and GLP-1 agonism produced greater weight loss than either alone (preclinical; not a human result)."
+   },
+   "note": "Title 'CagriSema Synergy' also retitled, since it repeats the unsupported synergy claim."
+  }
+ },
+ "code_changes_for_pr": {
+  "residue_count": "aminoAcidSequence.residueCount is computed in app/Http/Controllers/Frontend/EncyclopediaController.php as count(explode('-', $educationPost->amino_acid_sequence)). For Cagrilintide the stored value is prose ('Modified 37-amino-acid amylin analog with fatty acid acylation'), so it counts 3. PR fix (code only, no DB write): count residues only when the value matches a hyphenated residue-code pattern (e.g. /^[A-Z][a-z]{2}(-[A-Z][a-z]{2})+$/) and return null/0 otherwise; or add an explicit residue_count. Cagrilintide has 37 residues (GSRS sequence KCNTATCATQRLAEFLRHSSNNFGPILPPTNVGSNTP).",
+  "drug_status": "getClinicalData() has no 'Cagrilintide' key, so drugStatus renders empty; optional PR addition: 'Cagrilintide' => ['status' => 'Investigational; not approved (as of 19 Oct 2026)', 'routes' => [], 'halfLife' => '']."
+ },
+ "do_not_touch": "mechanism_*, preclinical_subsections other than [0].findings[1], preclinical_intro, preclinical_disclaimer, mechanism_of_action_intro, areas_of_research_intro, potential_applications_intro, seo_description (not written; the SEO description derives from overview), seo_og_image, amino_acid_sequence (residue-count bug is code; see code_changes_for_pr), getClinicalData() map (code), product category 592",
+ "migration": {
+  "timestamp": "2026_10_19_130000",
+  "note": "Applied by the shared field-replace migration 2026_10_19_130000 (with the BPC-157 and other field file); see PR-brief-2026-10-19.md."
+ }
+}

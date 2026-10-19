@@ -31,7 +31,7 @@ class Bpc157RetatrutideOctober2026Seeder extends Seeder
 
     public const BPC_NOTE_GUARD = 'RIN 0910-ZD94';
 
-    public const BPC_KEY_POINT_PREFIX = 'Regulatory status (as of 16 Oct 2026)';
+    public const BPC_KEY_POINT_PREFIX = 'Regulatory status (as of ';
 
     public const RETA_SUBSECTION_TITLE_PREFIX = 'Reported safety signals outside clinical trials';
 
