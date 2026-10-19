@@ -422,10 +422,10 @@ class EducationalContentTest extends TestCase
         $this->assertSame('/images/educational/bpc-157-vs-tb-500-evidence.png', $bpc->image);
         $this->assertSame('2026-09-29', $bpc->published_at->toDateString());
         $this->assertStringContainsString('Ac-LKKTETQ', $bpc->content);
-        $this->assertStringContainsString('not the 43-aa protein', $bpc->content);
+        $this->assertStringContainsString('are not the same substance', $bpc->content);
         $this->assertStringContainsString('did not confer additional benefits', $bpc->content);
         $this->assertStringContainsString('Biçer', $bpc->content);
-        $this->assertStringContainsString('not</strong> verified', $bpc->content);
+        $this->assertStringContainsString('not</strong> confirmed', $bpc->content);
         $this->assertStringContainsString('full-length thymosin', $bpc->content);
         $this->assertStringContainsString('https://www.jointdrs.org/full-text/1851', $bpc->content);
         $this->assertStringContainsString('https://www.fda.gov/media/193349/download', $bpc->content);
@@ -492,7 +492,7 @@ class EducationalContentTest extends TestCase
         $evidence = $this->get('/blog/bpc-157-vs-tb-500-evidence');
         $evidence->assertOk();
         $evidence->assertSee('Ac-LKKTETQ', false);
-        $evidence->assertSee('not the 43-aa protein', false);
+        $evidence->assertSee('are not the same substance', false);
         $evidence->assertSee('did not confer additional benefits', false);
         $evidence->assertSee('jointdrs.org\\/full-text\\/1851', false);
         $evidence->assertSee('fda.gov\\/media\\/193349\\/download', false);
