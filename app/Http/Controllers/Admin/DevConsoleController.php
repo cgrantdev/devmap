@@ -38,6 +38,10 @@ class DevConsoleController extends Controller
             'label' => 'Show migration status (read-only)',
             'args' => [],
         ],
+        'products:ensure-vendor-desc-column' => [
+            'label' => 'Add vendor_description column directly (bypasses migrate chain)',
+            'args' => [],
+        ],
         'products:fetch-vendor-descriptions' => [
             'label' => 'Backfill vendor product descriptions',
             'args' => [
