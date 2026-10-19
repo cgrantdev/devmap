@@ -1,4 +1,4 @@
-**Last verified against FDA: 2026-10-03.** Federal compounding lists, advisory votes, and enforcement priorities change. This guide is educational pathway literacy, not legal advice.
+**Last verified against FDA: 2026-10-19.** Federal compounding lists, advisory votes, and enforcement priorities change. This guide is educational pathway literacy, not legal advice.
 
 ## The short version
 
@@ -7,7 +7,47 @@
 3. While that Bulks List is developed, FDA has used **interim categories**. **Category 1** is the interim bucket associated with practical enforcement discretion for compounding evaluation. **Category 2** flags significant safety-risk concerns (do-not-compound posture under the interim policy framing).
 4. **Removal from Category 2 is not permission to compound.** It does not place a substance on the Bulks List and does not equal Category 1.
 5. A **Pharmacy Compounding Advisory Committee (PCAC) recommendation** is **advisory**. It is **not** a final FDA rule and does **not** by itself authorize compounding.
-6. As of late summer 2026 educational trackers summarizing FDA action, peptides reviewed at the **July 2026 PCAC** meeting (including BPC-157 and TB-500) had been **recommended by the committee for 503A Bulks List inclusion** but **had not been added by final FDA rulemaking**. Treat any “now legal to compound” claim with extreme skepticism unless it cites a final listing.
+6. As of **19 October 2026**, peptides reviewed at the **July 2026 PCAC** meeting (including BPC-157 and TB-500) had been **recommended by the committee for 503A Bulks List inclusion** but **had not been added by FDA rulemaking**. The codified 503A Bulks List does not name them, and no proposed rule to add them has appeared in the Federal Register. Treat any “now legal to compound” claim with extreme skepticism unless it cites a final listing.
+7. On **14 October 2026**, HHS/FDA sent an **“Interim Access Policy for Compounding Using Certain Peptides”** to the White House Office of Management and Budget (OMB) for review. As of 19 October 2026 it is **under OMB review, not yet issued, and its text is not public**. It is not FDA approval of any peptide. See the dated update below.
+
+## Update, October 2026: proposed interim access policy (pending, not in force)
+
+**As of 19 October 2026.** This section records a pending federal action. It does not change anything in force today, and it will be revised when the record changes.
+
+### What the public record shows
+
+- **OMB review listing.** The Office of Information and Regulatory Affairs (OIRA) at OMB lists a pending EO 12866 regulatory review with these fields: **Title:** “Interim Access Policy for Compounding Using Certain Peptides.” **RIN:** 0910-ZD94. **Agency:** HHS / FDA. **Stage:** Notice. **Received date:** 14 October 2026. **Legal deadline:** None. **Economically significant:** No. **International impacts:** No. The listing carries no description of the policy, no list of covered peptides, and no effective date.
+- **Meeting on the log.** The EO 12866 meetings search on reginfo.gov returns one meeting for RIN 0910-ZD94: **21 October 2026, 3:00 p.m.** (time as listed; reginfo shows no time zone), status **Scheduled**, Notice stage. The meeting record names the requestor as the American Academy of Peptide Medicine. A meeting with OMB is part of the review process. It is not a decision, and a scheduled meeting is not a record that it took place.
+- **No public text.** The draft has not been published by OMB, FDA, or HHS. As of 19 October 2026 no Federal Register document on it has appeared, and no FDA or HHS announcement of its contents was found.
+
+### What it is not
+
+- **Not issued and not final.** A document under OMB review has no effect until the agency issues it.
+- **Not an FDA approval.** No peptide becomes an FDA-approved drug through an interim compounding policy.
+- **Not a 503A Bulks List listing.** Adding a substance to the Bulks List requires notice-and-comment rulemaking.
+- **Not a change to RUO status.** Nothing on the public record says the policy addresses research-use-only sales.
+
+### What has been reported, and by whom
+
+- **Washington Post, 7 October 2026.** Rachel Roubein reported, citing two people familiar with the matter who spoke on condition of anonymity, that the administration was crafting plans to allow the temporary sale of certain previously restricted peptides through some compounding pharmacies while regulations are developed. The Post reported that the plan had not been announced, that timing was unclear and it could still change, and that it was not clear which peptides would be covered. HHS did not comment.
+- **Holland & Knight, 16 October 2026.** In a client alert, the law firm Holland & Knight (Sarah Starling Crossan and Shalyn Watkins) wrote that “the most likely approach of the policy is interim enforcement discretion,” such as moving the peptides into Category 1 of FDA’s interim bulks policy. In the firm’s reading, that approach “would not approve any product, would not cover research-use-only, supplement or 503B outsourcing facility channels, and could be withdrawn without formal rulemaking,” and covered peptides “would remain unapproved drugs.” The firm also wrote that, absent publication of an interim policy, none of FDA’s procedural steps “yet authorizes the compounding of these peptides.” This is one law firm’s analysis of an unpublished document, not FDA’s description of it.
+
+The contents of the policy will not be known until it is issued. Until then, any claim about which peptides it covers, which routes, or what conditions apply is ahead of the public record.
+
+### Pending vs in force (as of 19 October 2026)
+
+| Item | Current status (law or FDA policy) | Source |
+| --- | --- | --- |
+| 503A Bulks List (21 CFR 216.23(a)) | **In force.** Names six substances. None of the July 2026 PCAC peptides is on it. | eCFR, 21 CFR 216.23 |
+| 503A interim categories | **In force.** FDA’s 503A categories list, updated 14 May 2026, does not place BPC-157, TB-500, KPV, MOTS-c, Epitalon, or Semax in Category 1 or Category 2. They appear in FDA’s withdrawn-nomination table instead. Off Category 2 is not permission to compound. | FDA 503A categories list (updated 14 May 2026); FDA safety-risk page |
+| FDA drug approval | **In force.** None of these peptides is an FDA-approved drug. Neither a PCAC vote nor an interim compounding policy is an approval. | Drugs@FDA; BPC-157 and TB-500 sections below |
+| RUO labeling | **In force.** “Research use only” wording does not control intended use under 21 CFR 201.128. FDA’s August 2026 warning letters treated RUO-labeled peptides as unapproved new drugs where website evidence showed human-use intent. | 21 CFR 201.128; FDA warning letter, 24 August 2026 |
+| July 2026 PCAC recommendations | **Advisory only.** FDA has not publicly announced whether it accepts them. No proposed rule has been published. | Harvard Chan Q&A, 1 October 2026; Federal Register |
+| Interim Access Policy (RIN 0910-ZD94) | **Proposed and pending.** Under OMB review since 14 October 2026. Not yet issued. Text not public. | reginfo.gov, OIRA listing |
+| EO 12866 meeting on RIN 0910-ZD94 | **Scheduled** for 21 October 2026. | reginfo.gov, EO 12866 meetings search |
+| Next PCAC meeting (LL-37, GHK-Cu, dihexa acetate, melanotan II, PEG-MGF) | **Scheduled discussion only,** before the end of February 2027. Date not yet set. | FDA PCAC meeting page |
+
+**What would change the in-force column:** FDA issuing the interim policy (and its actual terms), FDA moving a specific substance into an interim category, or a final rule adding a substance to 21 CFR 216.23. A news report, a law-firm alert, or an OMB listing does not.
 
 ## Three lanes: approved, compounded, research-labeled
 
@@ -38,6 +78,8 @@ While formal bulks lists are developed, FDA has sorted nominated substances into
 - **Category 3** — nominations lacking adequate supporting information (where that category is used)
 - **Withdrawn nominations** — a separate posture: nominators withdrew a nomination. **Being “withdrawn” / off Category 2 is not permission**
 
+Two details from FDA’s 503A pages (503A page content current as of 14 May 2026) matter for the October 2026 news. First, FDA’s guidance “does not intend to place bulk drug substances nominated on or after January 7, 2025, into these categories.” Second, FDA’s 503A categories list, updated 14 May 2026, shows GHK-Cu (except for injectable routes of administration) added back to Category 1 after a nominator clarified its withdrawal. That is an interim enforcement-discretion posture with conditions, not FDA approval and not a Bulks List listing. Injectable GHK-Cu remains in the withdrawn-nomination table.
+
 FDA also publishes a page on bulk substances that may present significant safety risks, including substances still listed under Category 2 and a table of substances whose nominations were withdrawn (with narrative safety concerns retained for context)—including entries such as **BPC-157** and **thymosin beta-4 fragment (LKKTETQ), also known as TB-500**.
 
 ## The distinction almost everyone gets wrong
@@ -62,9 +104,9 @@ Critical literacy points:
 - A favorable vote is **not** marketing approval as a drug
 - A favorable vote is **not**, by itself, a green light to compound
 
-**Status note (Harvard Chan, 1 October 2026).** Harvard T.H. Chan School of Public Health reported that FDA “has not yet announced if it will accept or reject the committee’s recommendation” from the July Pharmacy Compounding Advisory Committee vote on allowing compounders to manufacture and sell several synthetic peptides. That sentence is a status report, not a legal conclusion and not permission to compound. A PCAC vote is still advisory. It is not a final FDA rule, not FDA drug approval, and not placement on the 503A Bulks List. Removal from Category 2 remains not permission to compound. Source: Karen Feldscher, “Peptides are all over social media and the news. Here’s what to know about them,” Harvard T.H. Chan School of Public Health, 1 October 2026, https://hsph.harvard.edu/news/peptides-are-all-over-social-media-and-the-news-heres-what-to-know-about-them/
+**Status note (Harvard Chan, 1 October 2026; rechecked 19 October 2026).** In a Q&A published by Harvard T.H. Chan School of Public Health, Professor S. Bryn Austin said FDA “has not yet announced if it will accept or reject the committee’s recommendation” from the July Pharmacy Compounding Advisory Committee vote on allowing compounders to manufacture and sell several synthetic peptides. As of 19 October 2026, no FDA announcement accepting or rejecting the recommendations was found, and no proposed rule to add any of these peptides to the Bulks List has appeared in the Federal Register. The interim access policy now under OMB review (see the October 2026 update above) is a separate, unpublished document, not an FDA response that has been issued. Austin’s statement is a status report, not a legal conclusion and not permission to compound. A PCAC vote is still advisory. It is not a final FDA rule, not FDA drug approval, and not placement on the 503A Bulks List. Removal from Category 2 remains not permission to compound. Source: Karen Feldscher, “Peptides are all over social media and the news. Here’s what to know about them,” Harvard T.H. Chan School of Public Health, 1 October 2026, https://hsph.harvard.edu/news/peptides-are-all-over-social-media-and-the-news-heres-what-to-know-about-them/
 
-**Next PCAC discussion (FDA page, read 3 October 2026).** FDA’s Pharmacy Compounding Advisory Committee meeting page states that FDA “will host an advisory committee meeting before the end of February 2027.” The agenda on that page lists these bulk drug substances for discussion for possible inclusion on the 503A Bulks List: cathelicidin (LL-37), GHK-Cu, dihexa acetate, melanotan II, and mechano growth factor, pegylated (PEG-MGF). The same page says advisory-committee recommendations are non-binding. A scheduled discussion is not a Bulks List listing and is not permission to compound. The page does not list non-pegylated MGF as a separate substance, and it says a Federal Register notice and public-comment docket are still forthcoming. Source: https://www.fda.gov/advisory-committees/pharmacy-compounding-advisory-committee/meeting-pharmacy-compounding-advisory-committee
+**Next PCAC discussion (FDA page, read 3 October 2026; unchanged when rechecked 19 October 2026).** FDA’s Pharmacy Compounding Advisory Committee meeting page states that FDA “will host an advisory committee meeting before the end of February 2027.” The agenda on that page lists these bulk drug substances for discussion for possible inclusion on the 503A Bulks List: cathelicidin (LL-37), GHK-Cu, dihexa acetate, melanotan II, and mechano growth factor, pegylated (PEG-MGF). The same page says advisory-committee recommendations are non-binding. A scheduled discussion is not a Bulks List listing and is not permission to compound. The page does not list non-pegylated MGF as a separate substance, and it says a Federal Register notice and public-comment docket are still forthcoming. Source: https://www.fda.gov/advisory-committees/pharmacy-compounding-advisory-committee/meeting-pharmacy-compounding-advisory-committee
 
 Until a substance actually appears on the applicable final list (or otherwise qualifies under the statute), educational status trackers have summarized many of these peptides as **not currently compoundable** under 503A—regardless of supplier or clinic marketing.
 
@@ -93,7 +135,7 @@ Use these as **illustrations of pathway confusion**, not as a complete legality 
 
 It is not a green light, a ban list for personal possession in every jurisdiction, or legal advice about buying/selling. It shows why **RUO websites**, **compounding clinics**, and **approved drugs** are different conversations.
 
-For evidence (not law) on BPC-157 vs TB-500, see [what the evidence actually shows](/blog/bpc-157-vs-tb-500-evidence). Vendor and price tools, which are not a legal-status page, live at [BPC-157 vs TB-500 compare](/compare/bpc-157-vs-tb-500).
+For evidence (not law) on BPC-157 vs TB-500, see [what the evidence actually shows](/blog/bpc-157-vs-tb-500-evidence). A side-by-side comparison lives at [BPC-157 vs TB-500 compare](/compare/bpc-157-vs-tb-500).
 
 ## What “research use only” means—and does not
 
@@ -124,7 +166,7 @@ A blend containing a prohibited substance is still a sport risk. Check the curre
 ## Practical literacy checklist (not legal advice)
 
 1. Is there an **FDA-approved finished drug** for this exact product/use?
-2. If compounded: does it qualify under **503A/503B** pathways **today** (monograph, approved-drug component, or final bulks listing / Category 1 interim posture—not vibes)?
+2. If compounded: does it qualify under **503A/503B** pathways **today** (monograph, approved-drug component, or final bulks listing—not vibes)? Category 1 is interim enforcement discretion, not a qualifying pathway or a listing.
 3. Was a headline about **Category 2 removal** or a **PCAC vote** being treated as if it were a final rule?
 4. Is an online seller making **drug claims** while waving an RUO disclaimer?
 5. Do **sport / DoD / employer** rules separately restrict the substance?
@@ -143,6 +185,10 @@ No. Removal from Category 2 is not placement on the 503A Bulks List and is not C
 ### Did PCAC “approve” BPC-157 or TB-500 in July 2026?
 
 PCAC recommended inclusion on the 503A Bulks List for several peptides (per contemporaneous reporting). That is not FDA drug approval and not a final bulks-list rule.
+
+### Did FDA approve compounded peptides in October 2026?
+
+No. On 14 October 2026 HHS/FDA sent an “Interim Access Policy for Compounding Using Certain Peptides” to OMB for review. As of 19 October 2026 it is under OMB review, not yet issued, and its text is not public. A policy under review is not FDA drug approval and does not place any peptide on the 503A Bulks List.
 
 ### Is compounding the same as FDA approval?
 
@@ -166,15 +212,28 @@ Primary / regulatory:
 4. U.S. FDA warning letter, Peptide Partners LLC (MARCS-CMS 735063), 24 August 2026. Footnote: “for research use only” and “not for human or veterinary use” labeling did not control intended use where website evidence showed human-drug intent: https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/peptide-partners-llc-735063-08242026
 5. WADA Prohibited List 2026 (PDF): https://www.wada-ama.org/sites/default/files/2025-09/2026list_en_final_clean_september_2025.pdf
 6. DoD OPSS — BPC-157 advisory: https://www.opss.org/article/bpc-157-prohibited-peptide-and-unapproved-drug-found-health-and-wellness-products
-7. BMJ reporting on July 2026 PCAC peptide recommendations: https://www.bmj.com/content/394/bmj-2026-100422
+7. Leslie Liang, “Peptides: US advisory committee recommends six for FDA ‘compounding list’,” BMJ 2026;394:e100422, 28 July 2026 (reporting): https://www.bmj.com/content/394/bmj-2026-100422
 
 7a. Harvard T.H. Chan School of Public Health (Karen Feldscher), 1 October 2026, “Peptides are all over social media and the news. Here’s what to know about them.” Reports that FDA had not yet announced whether it will accept or reject the July PCAC recommendation. Does not list the next-meeting substance slate and does not discuss the 24 August 2026 warning letters: https://hsph.harvard.edu/news/peptides-are-all-over-social-media-and-the-news-heres-what-to-know-about-them/
 
 7b. U.S. FDA, Meeting of the Pharmacy Compounding Advisory Committee (page read 3 October 2026). States FDA will host a meeting before the end of February 2027 and lists cathelicidin (LL-37), GHK-Cu, dihexa acetate, melanotan II, and mechano growth factor, pegylated (PEG-MGF). Does not list non-pegylated MGF separately: https://www.fda.gov/advisory-committees/pharmacy-compounding-advisory-committee/meeting-pharmacy-compounding-advisory-committee
 
-Educational structure reference (model for Category 2 ≠ permission / PCAC ≠ rule; verify dates):
+October 2026 interim access policy (pending, checked 19 October 2026):
 
-8. PrescribedRX — Peptides and US Compounding Law: Current Status Tracker: https://prescribedrx.com/peptides/
+7c. Office of Information and Regulatory Affairs (OMB), Pending EO 12866 Regulatory Review, “Interim Access Policy for Compounding Using Certain Peptides,” RIN 0910-ZD94, HHS/FDA, Stage: Notice, received 14 October 2026 (read 19 October 2026): https://www.reginfo.gov/public/do/eoDetails?rrid=1568964
+
+7d. reginfo.gov, EO 12866 meeting record for RIN 0910-ZD94: 21 October 2026, 3:00 p.m., Notice stage, requestor American Academy of Peptide Medicine (read 19 October 2026): https://www.reginfo.gov/public/do/viewEO12866Meeting?meetingId=1586023&viewRule=true
+
+7e. Holland & Knight (Sarah Starling Crossan, Shalyn Watkins), “Peptides at a Crossroads: What Wellness Providers Need to Know About HHS and FDA Actions,” 16 October 2026. One law firm’s analysis: https://www.hklaw.com/en/insights/publications/2026/10/peptides-at-a-crossroads-what-wellness-providers-need-to-know
+
+7f. Rachel Roubein, “Trump administration paving way for temporary sale of some unapproved peptides,” The Washington Post, 7 October 2026. Anonymous-source report: https://www.washingtonpost.com/health/2026/10/07/trump-administration-paving-way-temporary-sale-some-unapproved-peptides/
+
+7g. U.S. FDA, Bulk Drug Substances Nominated for Use in Compounding Under Section 503A (categories list, updated 14 May 2026): https://www.fda.gov/media/94155/download
+
+7h. U.S. FDA, Bulk Drug Substances Used in Compounding Under Section 503A of the FD&C Act (content current as of 14 May 2026): https://www.fda.gov/drugs/human-drug-compounding/bulk-drug-substances-used-compounding-under-section-503a-fdc-act
+
+7i. 21 CFR 216.23, Bulk drug substances that can be used to compound drug products in accordance with section 503A (read 19 October 2026): https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
+
 
 ## Disclaimer
 
