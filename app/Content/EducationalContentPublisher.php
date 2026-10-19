@@ -349,7 +349,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host));
     }
 
     /**
@@ -911,6 +911,54 @@ class EducationalContentPublisher
                     ['Did orforglipron have more side effects?', 'Yes, in this trial. Gastrointestinal adverse events were reported in 59% and 58% of the orforglipron arms vs 37% and 45% of the oral semaglutide arms. Discontinuation due to adverse events was 8.7% and 9.7% vs 4.5% and 4.9%, roughly twice as high. Mean pulse rate rose more with orforglipron.'],
                     ['How do the two drugs differ chemically?', 'Orforglipron is a non-peptide small-molecule GLP-1 receptor agonist taken once daily with or without food. Oral semaglutide is a peptide GLP-1 receptor agonist formulated with the absorption enhancer SNAC, and its label requires it to be taken on an empty stomach with a little water and a wait before eating.'],
                     ['Are both FDA-approved?', 'Rybelsus (oral semaglutide) was approved on 20 September 2019 for type 2 diabetes. Orforglipron was approved as Foundayo on 1 April 2026 for weight management only. Lilly reported submitting it to the FDA for type 2 diabetes in the second quarter of 2026, and as of 19 October 2026 no FDA diabetes approval was found. Research-labelled orforglipron sold online is not Foundayo and is not FDA-approved.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Content QA passed this compounded GLP-1 status note on 2026-10-19.
+     * The body lives in resources/content/educational. The publisher reads
+     * this catalog, not the draft YAML.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function compoundedGlp1Status(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'compounded-glp-1-status.md',
+                'image_file' => 'compounded-glp-1-status.png',
+                'slug' => 'compounded-glp-1-status',
+                'h1' => 'Compounded GLP-1 Status: Shortage Resolution, Grace Periods and What FDA Did Next',
+                'lede' => 'FDA resolved the tirzepatide shortage on 19 December 2024 and the semaglutide shortage on 21 February 2025. The dated 503A and 503B grace periods, the essentially-a-copy and bulks rules, the OFA v. FDA rulings, and FDA’s 2026 actions, from primary sources. Educational only.',
+                'seo_title' => 'Compounded GLP-1 Status: Shortages, Courts, 2026 FDA Moves',
+                'seo_description' => 'Dated timeline of FDA’s tirzepatide and semaglutide shortage decisions, 503A/503B grace periods, OFA v. FDA rulings and 2026 GLP-1 compounding actions.',
+                'og_title' => 'Compounded GLP-1 Status: Shortages, Courts, 2026 FDA Moves',
+                'og_description' => 'How the tirzepatide and semaglutide shortages ended, the 503A and 503B wind-down dates, the court rulings, and FDA’s 2026 GLP-1 compounding actions.',
+                'blog_type' => 'Research',
+                'read_time' => '14 Min Read',
+                'published_at' => '2026-10-19',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Compounding', 'GLP-1', 'Semaglutide', 'Tirzepatide', 'FDA', '503A', '503B'],
+                'key_points' => [
+                    'FDA found the tirzepatide injection shortage resolved on 2 October 2024, re-evaluated on remand, and confirmed it in a declaratory order on 19 December 2024. The semaglutide injection shortage was resolved on 21 February 2025.',
+                    'Tirzepatide grace periods: 503A ended when a preliminary injunction was denied on 5 March 2025; 503B ended 19 March 2025. Semaglutide: 503A ended when an injunction was denied on 24 April 2025; 503B ended 22 May 2025.',
+                    'After a shortage ends, 503A bars compounding essentially copies of a commercially available drug regularly or in inordinate amounts. 503B requires the bulks list or the shortage list, and FDA says tirzepatide and semaglutide are on neither.',
+                    'The Fifth Circuit affirmed judgment for FDA in both OFA v. FDA cases on 27 August 2026, in unpublished opinions.',
+                    'In 2026 FDA announced intent to restrict GLP-1 APIs for mass-marketed compounded drugs (6 Feb), issued 30 telehealth warning letters (3 Mar), and proposed excluding semaglutide, tirzepatide and liraglutide from the 503B bulks list (30 Apr), which is not yet final.',
+                    'Compounded drugs are not FDA-approved, and a research-use-only label is neither an approval nor a compounding pathway.',
+                ],
+                'faq' => self::faq($host.'/blog/compounded-glp-1-status#faq', [
+                    ['When did FDA resolve the tirzepatide and semaglutide shortages?', 'FDA first announced the tirzepatide injection shortage resolved on 2 October 2024. After litigation, it re-evaluated that decision and issued a declaratory order on 19 December 2024 confirming the shortage was resolved. FDA determined the semaglutide injection shortage resolved on 21 February 2025.'],
+                    ['What grace periods did FDA give compounders?', 'For tirzepatide, FDA said it would not act on shortage-dependent violations until 18 February 2025 for 503A pharmacies and physicians and 19 March 2025 for 503B outsourcing facilities, later tied to a court ruling. The 503A period ended when the court denied a preliminary injunction on 5 March 2025. For semaglutide, the dates were 22 April 2025 for 503A and 22 May 2025 for 503B. The 503A period ended when a preliminary injunction was denied on 24 April 2025.'],
+                    ['Does the end of a shortage end all compounding of these drugs?', 'Not entirely, but it removes the shortage pathway. Under 503A, a pharmacy may not compound essentially a copy of a commercially available drug regularly or in inordinate amounts, and FDA generally treats a drug as commercially available once its shortage is resolved. Under 503B, outsourcing facilities cannot compound from bulk substances unless the substance is on the 503B bulks list or the drug is on the shortage list, and FDA says tirzepatide and semaglutide are on neither.'],
+                    ['What happened in the OFA v. FDA lawsuits?', 'Compounders challenged both delisting decisions in the Northern District of Texas. The court denied preliminary injunctions in the tirzepatide case on 5 March 2025 and the semaglutide case on 24 April 2025, then entered summary judgment for FDA and the manufacturers. On 27 August 2026 the Fifth Circuit affirmed both judgments in unpublished opinions.'],
+                    ['What has FDA done on GLP-1 compounding in 2026?', 'On 6 February 2026 FDA announced its intent to restrict GLP-1 active ingredients intended for mass-marketed compounded drugs. On 3 March 2026 it announced 30 warning letters to telehealth companies over compounded GLP-1 claims. On 30 April 2026 it proposed not to include semaglutide, tirzepatide and liraglutide on the 503B bulks list; the comment period closed on 30 July 2026 and no final determination was found as of 19 October 2026.'],
+                    ['What does FDA say about dosing errors and adverse events?', 'FDA\'s page on unapproved GLP-1 drugs says it received adverse event reports, some involving hospitalization, that may be related to dosing errors with compounded injectable semaglutide, and reports tied to doses beyond the approved labels. As of 31 May 2026 it had received 990 reports for compounded semaglutide and more than 730 for compounded tirzepatide. FDA notes these are likely underreported and causation is not always clear.'],
+                    ['Is research-labelled semaglutide or tirzepatide the same as compounded?', 'No. Compounding is a legal pathway with conditions under sections 503A and 503B. A research-use-only label is not a compounding pathway or an approval. FDA says it has warned companies that sold semaglutide, tirzepatide and other GLP-1 drugs falsely labelled for research purposes or not for human consumption. This article is educational and is not medical or legal advice.'],
                 ]),
             ],
         ];
