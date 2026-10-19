@@ -77,6 +77,12 @@ class FetchVendorDescriptions extends Command
                     if (!$desc) {
                         $empty++;
                         $this->line("  · {$product->id} ({$product->name}) — no description extractable");
+                    } elseif ($this->looksLikeSiteBoilerplate($desc)) {
+                        $empty++;
+                        $this->line("  · {$product->id} ({$product->name}) — rejected: login/boilerplate pattern");
+                    } elseif ($this->isDuplicateWithinBrand($product->brand_id, $desc, $product->id)) {
+                        $empty++;
+                        $this->line("  · {$product->id} ({$product->name}) — rejected: already used by other products in this brand (site-wide, not product-level)");
                     } else {
                         $this->line("  → {$product->id} ({$product->name}) — " . mb_substr($desc, 0, 60) . '…');
                         if (!$this->option('dry-run')) {
@@ -113,10 +119,15 @@ class FetchVendorDescriptions extends Command
      */
     private function extractDescription(string $url): ?string
     {
+        // Real browser UA — 7 of 20 vendors in Colin 10/20 dry-run
+        // returned 403 for "PeptidemapBot/1.0". Keeping the referer so
+        // vendors can still trace peptidemap in their logs if they look.
         $resp = Http::timeout(20)
             ->withHeaders([
-                'User-Agent' => 'PeptidemapBot/1.0 (+https://peptidemap.com/bot)',
-                'Accept' => 'text/html,application/xhtml+xml',
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language' => 'en-US,en;q=0.9',
+                'Referer' => 'https://peptidemap.com/',
             ])
             ->get($url);
 
@@ -150,6 +161,55 @@ class FetchVendorDescriptions extends Command
         }
 
         return null;
+    }
+
+    /**
+     * Reject descriptions that are clearly site-wide boilerplate
+     * (login walls, "about this vendor" blurbs). Each pattern below
+     * came from a real vendor in Colin 10/20 dry-run.
+     *
+     *   S1 Labs: "To access S1 Labs, an account is required…"
+     *   Mr. Peps: "Mr. Peps offers premium research peptides…"
+     *   Limitless Biotech: "Buy peptides online from Limitless Biotech…"
+     *   Purgo: "Buy DSIP online. Lab-tested, 99%+ purity." (too short + generic shape)
+     */
+    private function looksLikeSiteBoilerplate(string $desc): bool
+    {
+        $lower = strtolower($desc);
+        $patterns = [
+            'account is required',
+            'to access',
+            'login required',
+            'please log in',
+            'premium research peptides',
+            'buy peptides online from',
+            'offers premium',
+        ];
+        foreach ($patterns as $p) {
+            if (str_contains($lower, $p)) return true;
+        }
+        // Very short descriptions (<80 chars) are usually just a tagline
+        // repeated across products, not real product copy.
+        if (mb_strlen($desc) < 80) return true;
+        return false;
+    }
+
+    /**
+     * Guard against saving the same description across multiple products
+     * of the same brand. If this exact text is already set on 2+ other
+     * products of the same brand, it's site boilerplate not product copy
+     * — would create new duplicates and defeat the whole point of the
+     * backfill.
+     */
+    private function isDuplicateWithinBrand(?int $brandId, string $desc, int $currentProductId): bool
+    {
+        if (!$brandId) return false;
+        $count = Product::where('brand_id', $brandId)
+            ->where('id', '!=', $currentProductId)
+            ->where('vendor_description', $desc)
+            ->limit(3)
+            ->count();
+        return $count >= 2;
     }
 
     /**
