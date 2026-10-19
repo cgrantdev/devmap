@@ -349,7 +349,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host));
     }
 
     /**
@@ -1007,6 +1007,55 @@ class EducationalContentPublisher
                     ['Were pancreatitis, gallbladder or hypoglycaemia events reported?', 'In the phase 2 papers these events were few. The obesity trial reported one acute pancreatitis, three biliary events and no clinically significant hypoglycaemia. The type 2 diabetes trial reported two adjudicated pancreatitis events and three participants with hypoglycaemia below 54 mg/dL, none severe. Phase 3 rates for these events were not available in the published abstracts reviewed.'],
                     ['Is research-labelled retatrutide the same as the trial drug?', 'No. Retatrutide is investigational and not approved anywhere. Lilly states it cannot be legally sold or marketed for human use. Products sold online as research-labelled retatrutide are not the material used in these trials, and the trial safety data do not describe them.'],
                     ['Can these trials be compared with trials of other drugs?', 'Not reliably. The trials differ in population, duration, dose escalation and how events were defined and counted. This article reports results within each trial only and does not rank retatrutide against other drugs.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * MOTS-c vs NAD+ evidence and regulatory comparison, drafted 2026-10-19.
+     * The body lives in resources/content/educational. The publisher reads
+     * this catalog, not the draft YAML. Companion to /compare/mots-c-vs-nad.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function motsCVsNad(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'mots-c-vs-nad.md',
+                'image_file' => 'mots-c-vs-nad.png',
+                'slug' => 'mots-c-vs-nad',
+                'h1' => 'MOTS-c vs NAD+: A Mitochondrial Peptide and a Coenzyme, Compared on the Evidence',
+                'lede' => 'MOTS-c is a 16-amino-acid mitochondrial-derived peptide; NAD+ is a coenzyme, not a peptide. Mechanisms, evidence graded from human RCTs to animal-only work, NR and NMN vs direct NAD+, and dated FDA compounding status. Educational only.',
+                'seo_title' => 'MOTS-c vs NAD+: Evidence, Mechanisms and FDA Status',
+                'seo_description' => 'MOTS-c has animal data and no published human trials; NAD+ precursors have RCTs with mostly null outcomes. Mechanisms, evidence grades and FDA status.',
+                'og_title' => 'MOTS-c vs NAD+: What Human and Animal Studies Show',
+                'og_description' => 'A mitochondrial peptide vs a coenzyme: graded evidence, NR and NMN trials including NOPARK, and dated FDA Category 1 and 2 compounding status.',
+                'blog_type' => 'Research',
+                'read_time' => '20 Min Read',
+                'published_at' => '2026-10-19',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['MOTS-c', 'NAD+', 'Nicotinamide Riboside', 'NMN', 'Mitochondrial-Derived Peptides', 'FDA compounding', 'Category 2'],
+                'key_points' => [
+                    'MOTS-c is a 16-amino-acid peptide encoded in mitochondrial DNA. NAD+ is a coenzyme made from vitamin B3 forms and tryptophan; it is not a peptide.',
+                    'Every proposed MOTS-c effect, from insulin sensitivity to exercise capacity (plus a non-significant lifespan trend), comes from mouse, rat or cell studies (animal-only). FDA identified no published human trials of MOTS-c; one phase 2a trial (NCT07505745) is recruiting.',
+                    'Most human NAD+ research gives the precursors NR or NMN, not NAD+ itself. Oral precursors consistently raise NAD+ metabolites, but clinical outcomes are mixed and mostly null.',
+                    'In the phase 3 NOPARK trial of nicotinamide riboside (JAMA, 8 October 2026), the primary Parkinson disease score at 52 weeks modestly favoured placebo, by 2.72 points, less than the trial\'s prespecified clinically important worsening of 5.2 points. NR is a precursor, not NAD+ itself.',
+                    'MOTS-c entered 503A Category 2 on 29 September 2023; the nomination was later withdrawn. FDA staff proposed not adding it to the 503A Bulks List, and the July 2026 PCAC recommended it anyway. No final listing as of 19 October 2026.',
+                    'NAD and NADH sit in 503A Category 1 (under evaluation), which is enforcement discretion, not approval. Research-labelled vials of either are not compounded, supplement or approved products.',
+                ],
+                'faq' => self::faq($host.'/blog/mots-c-vs-nad#faq', [
+                    ['Is NAD+ a peptide like MOTS-c?', 'No. NAD+ (nicotinamide adenine dinucleotide) is a coenzyme made from vitamin B3 forms and tryptophan, used by hundreds of enzymes in every cell. MOTS-c is a 16-amino-acid peptide encoded in mitochondrial DNA. They are often listed together, but they are different kinds of molecule.'],
+                    ['Has MOTS-c been tested in human clinical trials?', 'No published trial has given MOTS-c to people. FDA\'s May 2026 evaluation identified no clinical studies or human exposure data. A phase 2a placebo-controlled trial in adults with prediabetes (NCT07505745) is registered on ClinicalTrials.gov as recruiting, with no results posted. Human MOTS-c data so far measure the body\'s own peptide, for example after exercise.'],
+                    ['Do NR and NMN raise NAD+ in people?', 'Yes, as a biomarker. Randomized trials of nicotinamide riboside and nicotinamide mononucleotide consistently show higher NAD+ metabolites in blood or muscle. A 2026 systematic review of 33 human intervention studies described this as consistent target engagement. Raising a biomarker is not the same as improving a health outcome.'],
+                    ['Did NAD+ precursors improve health outcomes in trials?', 'Results are mixed and mostly null. NR did not improve insulin sensitivity in obese men, while one small trial found NMN improved muscle insulin sensitivity in women with prediabetes. In the phase 3 NOPARK trial, published in October 2026, the primary Parkinson disease score at 52 weeks modestly favoured placebo over NR, by 2.72 points, less than the trial\'s prespecified clinically important worsening of 5.2 points. A 2025 meta-analysis found no benefit of NMN for muscle mass or strength in older adults.'],
+                    ['Is MOTS-c on FDA\'s Category 2 list?', 'Not any more. FDA added MOTS-c to 503A Category 2 on 29 September 2023. After the nominator withdrew its nomination, FDA listed it among withdrawn substances previously in Category 2 and kept its safety concerns. FDA staff proposed not adding MOTS-c to the 503A Bulks List. The July 2026 advisory committee recommended it anyway, but as of 19 October 2026 no final FDA listing was identified. Leaving Category 2 is not permission to compound.'],
+                    ['What is NAD+\'s compounding status?', 'FDA\'s 503A categories list, updated 14 May 2026, places NAD and NADH in Category 1, meaning under evaluation. Category 1 is an interim enforcement policy for 503A compounders, not FDA approval and not a listing on the 503A Bulks List. No FDA-approved drug with NAD+ as its active ingredient was found.'],
+                    ['Has anyone studied MOTS-c and NAD+ together?', 'We found no interventional study combining or comparing them in searches of PubMed and ClinicalTrials.gov as of 19 October 2026. Claims that they work together or should be stacked are not based on a direct test.'],
+                    ['Is research-labelled MOTS-c or NAD+ the same as a compounded or approved product?', 'No. A research-use-only label is not a compounding pathway, a dietary supplement status or an FDA approval. Research-labelled vials are not the NR or NMN products used in most human trials. This article is educational and is not medical advice.'],
                 ]),
             ],
         ];

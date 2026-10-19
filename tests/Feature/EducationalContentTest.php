@@ -280,7 +280,7 @@ class EducationalContentTest extends TestCase
         $this->assertFileExists(public_path(ltrim($beginner->cover, '/')));
         $this->assertFileExists(public_path(ltrim($legality->cover, '/')));
 
-        $newestSlug = 'retatrutide-side-effects-trial-data';
+        $newestSlug = 'mots-c-vs-nad';
         $newestImage = '/images/educational/'.$newestSlug.'.png';
 
         $this->get('/blogs')->assertOk()->assertInertia(fn ($page) => $page
@@ -288,27 +288,29 @@ class EducationalContentTest extends TestCase
             ->missing('featured')
             ->where('blogs.data.0.slug', $newestSlug)
             ->where('blogs.data.0.image', $newestImage)
-            ->where('blogs.data.1.slug', 'compounded-glp-1-status')
-            ->where('blogs.data.1.image', '/images/educational/compounded-glp-1-status.png')
-            ->where('blogs.data.2.slug', 'orforglipron-vs-oral-semaglutide')
-            ->where('blogs.data.2.image', '/images/educational/orforglipron-vs-oral-semaglutide.png')
-            ->where('blogs.data.3.slug', 'cagrisema-vs-tirzepatide')
-            ->where('blogs.data.3.image', '/images/educational/cagrisema-vs-tirzepatide.png')
-            ->where('blogs.data.4.slug', 'aod-9604-vs-tesamorelin')
-            ->where('blogs.data.4.image', '/images/educational/aod-9604-vs-tesamorelin.png')
-            ->where('blogs.data.5.slug', 'bpc-157-vs-ghk-cu')
-            ->where('blogs.data.5.image', '/images/educational/bpc-157-vs-ghk-cu.png')
-            ->where('blogs.data.6.slug', 'retatrutide-testing-coa-limits')
-            ->where('blogs.data.6.image', '/images/educational/retatrutide-testing-coa-limits.png')
-            ->where('blogs.data.7.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('blogs.data.8.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('blogs.data.14.slug', 'tesamorelin-vs-sermorelin')
-            ->where('blogs.data.14.image', '/images/educational/tesamorelin-vs-sermorelin.png')
-            ->where('blogs.data.15.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('blogs.data.15.image', $evidencePath)
-            ->where('blogs.data.16.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('blogs.data.16.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
-            ->where('blogs.data.17.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('blogs.data.1.slug', 'retatrutide-side-effects-trial-data')
+            ->where('blogs.data.1.image', '/images/educational/retatrutide-side-effects-trial-data.png')
+            ->where('blogs.data.2.slug', 'compounded-glp-1-status')
+            ->where('blogs.data.2.image', '/images/educational/compounded-glp-1-status.png')
+            ->where('blogs.data.3.slug', 'orforglipron-vs-oral-semaglutide')
+            ->where('blogs.data.3.image', '/images/educational/orforglipron-vs-oral-semaglutide.png')
+            ->where('blogs.data.4.slug', 'cagrisema-vs-tirzepatide')
+            ->where('blogs.data.4.image', '/images/educational/cagrisema-vs-tirzepatide.png')
+            ->where('blogs.data.5.slug', 'aod-9604-vs-tesamorelin')
+            ->where('blogs.data.5.image', '/images/educational/aod-9604-vs-tesamorelin.png')
+            ->where('blogs.data.6.slug', 'bpc-157-vs-ghk-cu')
+            ->where('blogs.data.6.image', '/images/educational/bpc-157-vs-ghk-cu.png')
+            ->where('blogs.data.7.slug', 'retatrutide-testing-coa-limits')
+            ->where('blogs.data.7.image', '/images/educational/retatrutide-testing-coa-limits.png')
+            ->where('blogs.data.8.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('blogs.data.9.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('blogs.data.15.slug', 'tesamorelin-vs-sermorelin')
+            ->where('blogs.data.15.image', '/images/educational/tesamorelin-vs-sermorelin.png')
+            ->where('blogs.data.16.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('blogs.data.16.image', $evidencePath)
+            ->where('blogs.data.17.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('blogs.data.17.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
+            ->where('blogs.data.18.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/news')->assertOk()->assertInertia(fn ($page) => $page
@@ -316,18 +318,19 @@ class EducationalContentTest extends TestCase
             ->missing('featuredBlogs')
             ->where('latestBlogs.0.slug', $newestSlug)
             ->where('latestBlogs.0.image', $newestImage)
-            ->where('latestBlogs.1.slug', 'compounded-glp-1-status')
-            ->where('latestBlogs.2.slug', 'orforglipron-vs-oral-semaglutide')
-            ->where('latestBlogs.3.slug', 'cagrisema-vs-tirzepatide')
-            ->where('latestBlogs.4.slug', 'aod-9604-vs-tesamorelin')
-            ->where('latestBlogs.5.slug', 'bpc-157-vs-ghk-cu')
-            ->where('latestBlogs.6.slug', 'retatrutide-testing-coa-limits')
-            ->where('latestBlogs.7.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('latestBlogs.8.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('latestBlogs.14.slug', 'tesamorelin-vs-sermorelin')
-            ->where('latestBlogs.15.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('latestBlogs.16.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('latestBlogs.17.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('latestBlogs.1.slug', 'retatrutide-side-effects-trial-data')
+            ->where('latestBlogs.2.slug', 'compounded-glp-1-status')
+            ->where('latestBlogs.3.slug', 'orforglipron-vs-oral-semaglutide')
+            ->where('latestBlogs.4.slug', 'cagrisema-vs-tirzepatide')
+            ->where('latestBlogs.5.slug', 'aod-9604-vs-tesamorelin')
+            ->where('latestBlogs.6.slug', 'bpc-157-vs-ghk-cu')
+            ->where('latestBlogs.7.slug', 'retatrutide-testing-coa-limits')
+            ->where('latestBlogs.8.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('latestBlogs.9.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('latestBlogs.15.slug', 'tesamorelin-vs-sermorelin')
+            ->where('latestBlogs.16.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('latestBlogs.17.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('latestBlogs.18.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/guides')->assertOk()->assertInertia(fn ($page) => $page
@@ -1383,6 +1386,161 @@ class EducationalContentTest extends TestCase
 
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee('https://peptidemap.com/blog/retatrutide-side-effects-trial-data', false);
+    }
+
+    public function test_mots_c_vs_nad_publishes_once_with_cover_and_matching_faq(): void
+    {
+        $slug = 'mots-c-vs-nad';
+        $cover = '/images/educational/'.$slug.'.png';
+        $h1 = 'MOTS-c vs NAD+: A Mitochondrial Peptide and a Coenzyme, Compared on the Evidence';
+        $seoTitle = 'MOTS-c vs NAD+: Evidence, Mechanisms and FDA Status';
+        $seoDescription = 'MOTS-c has animal data and no published human trials; NAD+ precursors have RCTs with mostly null outcomes. Mechanisms, evidence grades and FDA status.';
+        $ogTitle = 'MOTS-c vs NAD+: What Human and Animal Studies Show';
+        $ogDescription = 'A mitochondrial peptide vs a coenzyme: graded evidence, NR and NMN trials including NOPARK, and dated FDA Category 1 and 2 compounding status.';
+
+        $catalog = (new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null);
+        $entry = collect($catalog)->firstWhere('slug', $slug);
+        $this->assertIsArray($entry);
+        $this->assertSame($slug, $catalog[array_key_last($catalog)]['slug'] ?? null);
+        $this->assertSame('mots-c-vs-nad.md', $entry['file']);
+        $this->assertSame('mots-c-vs-nad.png', $entry['image_file']);
+        $this->assertSame('20 Min Read', $entry['read_time']);
+        $this->assertCount(8, $entry['faq']['mainEntity'] ?? []);
+
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $blog = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame($h1, $blog->title);
+        $this->assertSame($entry['lede'], $blog->description);
+        $this->assertSame($seoTitle, $blog->seo_page_title);
+        $this->assertSame($seoDescription, $blog->seo_description);
+        $this->assertSame(51, strlen($seoTitle));
+        $this->assertSame($ogTitle, $blog->seo_og_title);
+        $this->assertSame(50, strlen($ogTitle));
+        $this->assertSame($ogDescription, $blog->seo_og_description);
+        $this->assertSame($cover, $blog->image);
+        $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
+        $this->assertSame('2026-10-19', $blog->published_at->toDateString());
+        $this->assertSame('Research', $blog->blog_type);
+        $this->assertSame('20 Min Read', $blog->read_time);
+        $this->assertSame('Peptidemap', $blog->author_name);
+        $this->assertFalse((bool) $blog->is_featured);
+        $this->assertSame('published', $blog->status);
+        $this->assertNull($blog->introduction);
+        $this->assertNull($blog->detailed_analysis);
+        $this->assertNull($blog->conclusion);
+        $this->assertSame(
+            ['MOTS-c', 'NAD+', 'Nicotinamide Riboside', 'NMN', 'Mitochondrial-Derived Peptides', 'FDA compounding', 'Category 2'],
+            $blog->tags
+        );
+        $this->assertSame($entry['key_points'], $blog->key_points);
+        $this->assertSame($entry['faq'], $blog->seo_schema[0] ?? null);
+        $this->assertFileExists(public_path('images/educational/'.$slug.'.png'));
+        $this->assertFileExists(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertFileExists(resource_path('content/educational/images/'.$slug.'.png'));
+
+        $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertStringNotContainsString('<!--', $markdown);
+        $this->assertStringNotContainsString('/workspace', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/\A---\n/', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/^# [^#]/m', $markdown);
+        $this->assertStringContainsString('## FAQ', $markdown);
+        $this->assertStringContainsString('/encyclopedia/mots-c', $markdown);
+        $this->assertStringContainsString('/encyclopedia/nad', $markdown);
+        $this->assertStringContainsString('/compare/mots-c-vs-nad', $markdown);
+        $this->assertStringContainsString('/guides/peptide-legality-fda-ruo-compounding', $markdown);
+        foreach (EducationalContentPublisher::COMPETITOR_HOSTS as $host) {
+            $this->assertStringNotContainsString($host, $markdown);
+        }
+
+        $this->assertStringNotContainsString('<!--', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->content);
+        $this->assertStringNotContainsString('<h1', (string) $blog->content);
+        $this->assertDoesNotMatchRegularExpression('/\A---\n/', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->description);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->image);
+        $this->assertStringNotContainsString('CMS paste', (string) $blog->content);
+        $this->assertStringNotContainsString('CHANGES', (string) $blog->content);
+        $this->assertStringNotContainsString('Note for Meta Optimizer', (string) $blog->content);
+        foreach (EducationalContentPublisher::COMPETITOR_HOSTS as $host) {
+            $this->assertStringNotContainsString($host, (string) $blog->content);
+        }
+
+        $plain = html_entity_decode(strip_tags((string) $blog->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $faq = $blog->seo_schema[0] ?? null;
+        $this->assertSame('FAQPage', $faq['@type'] ?? null);
+        $this->assertSame('https://schema.org', $faq['@context'] ?? null);
+        $this->assertSame('https://peptidemap.com/blog/mots-c-vs-nad#faq', $faq['@id'] ?? null);
+        $this->assertCount(8, $faq['mainEntity'] ?? []);
+        $this->assertSame($entry['faq'], $faq);
+        foreach ($faq['mainEntity'] as $entity) {
+            $this->assertStringContainsString($entity['name'], $plain);
+            $this->assertSame(
+                $entity['acceptedAnswer']['text'],
+                $this->visibleFaqAnswer($plain, $entity['name'])
+            );
+        }
+        $this->assertSame(
+            'No. NAD+ (nicotinamide adenine dinucleotide) is a coenzyme made from vitamin B3 forms and tryptophan, used by hundreds of enzymes in every cell. MOTS-c is a 16-amino-acid peptide encoded in mitochondrial DNA. They are often listed together, but they are different kinds of molecule.',
+            $faq['mainEntity'][0]['acceptedAnswer']['text'] ?? null
+        );
+        $this->assertSame(
+            'No. A research-use-only label is not a compounding pathway, a dietary supplement status or an FDA approval. Research-labelled vials are not the NR or NMN products used in most human trials. This article is educational and is not medical advice.',
+            $faq['mainEntity'][7]['acceptedAnswer']['text'] ?? null
+        );
+
+        $id = $blog->id;
+        $before = Blog::count();
+        EducationalContentPublisher::sync();
+        $this->assertSame($before, Blog::count());
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $again = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame($id, $again->id);
+        $this->assertSame($cover, $again->image);
+        $this->assertSame('2026-10-19', $again->published_at->toDateString());
+        $this->assertFalse((bool) $again->is_featured);
+
+        $page = $this->get('/blog/'.$slug);
+        $page->assertOk();
+        $page->assertSee($h1, false);
+        $page->assertSee($seoTitle, false);
+        $page->assertSee('https://peptidemap.com/blog/mots-c-vs-nad#faq', false);
+        $page->assertSee('https://peptidemap.com/blog/mots-c-vs-nad', false);
+        $page->assertSee($cover, false);
+        $page->assertSee('Is NAD+ a peptide like MOTS-c?', false);
+        $page->assertSee('Is research-labelled MOTS-c or NAD+ the same as a compounded or approved product?', false);
+        $page->assertSee('20 Min Read', false);
+        $page->assertDontSee('/workspace', false);
+        $page->assertDontSee('CMS paste', false);
+        $page->assertDontSee('CHANGES', false);
+        foreach (EducationalContentPublisher::COMPETITOR_HOSTS as $host) {
+            $page->assertDontSee($host, false);
+        }
+        $page->assertInertia(fn ($inertia) => $inertia
+            ->where('blog.slug', $slug)
+            ->where('blog.title', $h1)
+            ->where('blog.image', $cover)
+            ->where('blog.readTime', '20 Min Read')
+            ->where('blog.content', function ($html) {
+                return is_string($html)
+                    && ! str_contains($html, '<!--')
+                    && ! str_contains($html, '/workspace')
+                    && ! str_contains($html, '<h1')
+                    && ! str_starts_with($html, "---\n")
+                    && str_contains($html, 'How the evidence is graded here')
+                    && str_contains($html, 'NCT07505745')
+                    && ! str_contains($html, 'formblends.com')
+                    && ! str_contains($html, 'peptides.so')
+                    && ! str_contains($html, 'peptidemethods.com')
+                    && ! str_contains($html, 'kinetixatx.com');
+            })
+        );
+
+        $schema = json_encode($faq, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->assertIsString($schema);
+        $page->assertSee($schema, false);
+
+        $this->get('/sitemap.xml')->assertOk()
+            ->assertSee('https://peptidemap.com/blog/mots-c-vs-nad', false);
     }
 
     private function visibleFaqAnswer(string $plain, string $question): string
