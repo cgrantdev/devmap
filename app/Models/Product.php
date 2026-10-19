@@ -20,6 +20,8 @@ class Product extends Model
         'slug',
         'external_id',
         'description',
+        'vendor_description',
+        'vendor_description_fetched_at',
         'price',
         'discount_price',
         'second_price',

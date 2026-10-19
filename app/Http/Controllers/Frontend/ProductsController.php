@@ -488,7 +488,10 @@ class ProductsController extends Controller
                 'original_name' => $product->getRawOriginal('name'),
                 'product_type' => $product->product_type,
                 'slug' => $product->slug,
-                'description' => $product->description,
+                // Prefer the vendor's own scraped description when we have
+                // it (Colin 10/20 — dedup fix). Falls back to our stored
+                // description otherwise. See products:fetch-vendor-descriptions.
+                'description' => $product->vendor_description ?: $product->description,
                 'price' => $product->price,
                 'discount_price' => $product->discount_price,
                 'size_mg' => $product->size_mg,
