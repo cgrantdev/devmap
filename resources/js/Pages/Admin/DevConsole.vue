@@ -96,6 +96,18 @@ const argValues = reactive(Object.fromEntries(
 const running = reactive({})
 const results = reactive({})
 
+// Laravel's standard CSRF for AJAX: send the XSRF-TOKEN cookie value
+// URL-decoded as the X-XSRF-TOKEN header. Fallback to a meta tag if
+// present. Without this, the POST comes back as a 419 HTML page and
+// response.json() blows up on "<!DOCTYPE…" (Colin 10/20).
+function xsrfToken() {
+  const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/)
+  if (match) {
+    try { return decodeURIComponent(match[1]) } catch { return match[1] }
+  }
+  return document.querySelector('meta[name="csrf-token"]')?.content || ''
+}
+
 async function run(cmd) {
   running[cmd.signature] = true
   const payload = {
@@ -107,13 +119,26 @@ async function run(cmd) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
-          || document.querySelector('input[name="_token"]')?.value,
         'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-XSRF-TOKEN': xsrfToken(),
       },
       credentials: 'same-origin',
       body: JSON.stringify(payload),
     })
+    const ct = resp.headers.get('content-type') || ''
+    if (!ct.includes('application/json')) {
+      // Session expired / CSRF mismatch — surface the raw body so the
+      // operator can see what the server actually sent back.
+      const text = await resp.text()
+      results[cmd.signature] = {
+        ok: false,
+        exit_code: resp.status,
+        output: '',
+        error: `Non-JSON response (${resp.status}): ${text.slice(0, 400)}`,
+      }
+      return
+    }
     results[cmd.signature] = await resp.json()
   } catch (e) {
     results[cmd.signature] = { ok: false, error: String(e) }
