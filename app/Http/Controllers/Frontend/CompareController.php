@@ -17,6 +17,8 @@ use App\Support\ElamipretideMotsCCompareFaqs;
 use App\Support\EncyclopediaSlug;
 use App\Support\CompoundDisplay;
 use App\Support\RetatrutideCompareNarrative;
+use App\Support\RetatrutideTirzepatideCompareCopy;
+use App\Support\BpcTb500CompareCopy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -1094,7 +1096,11 @@ class CompareController extends Controller
             ],
         ];
 
-        $pairCopy = ElamipretideMotsCCompareFaqs::forSlug($final);
+        $pairCopy = ElamipretideMotsCCompareFaqs::forSlug($final)
+            ?? RetatrutideTirzepatideCompareCopy::forSlug($final)
+            ?? BpcTb500CompareCopy::forSlug($final);
+        $pairEvidence = $pairCopy['evidence'] ?? null;
+        $pairEvidenceLink = $pairCopy['link'] ?? null;
         $pairFaqs = $pairCopy['faqs'] ?? [];
         $pairReferences = $pairCopy['references'] ?? [];
         $schema = [$breadcrumb];
@@ -1147,6 +1153,8 @@ class CompareController extends Controller
             'evidenceUrl' => $evidenceUrl,
             'faqs' => $pairFaqs,
             'references' => $pairReferences,
+            'evidence' => $pairEvidence,
+            'evidenceLink' => $pairEvidenceLink,
             'seo' => $seo,
         ]);
     }

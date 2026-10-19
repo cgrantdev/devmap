@@ -288,21 +288,23 @@ class EducationalContentTest extends TestCase
             ->missing('featured')
             ->where('blogs.data.0.slug', $newestSlug)
             ->where('blogs.data.0.image', $newestImage)
-            ->where('blogs.data.1.slug', 'aod-9604-vs-tesamorelin')
-            ->where('blogs.data.1.image', '/images/educational/aod-9604-vs-tesamorelin.png')
-            ->where('blogs.data.2.slug', 'bpc-157-vs-ghk-cu')
-            ->where('blogs.data.2.image', '/images/educational/bpc-157-vs-ghk-cu.png')
-            ->where('blogs.data.3.slug', 'retatrutide-testing-coa-limits')
-            ->where('blogs.data.3.image', '/images/educational/retatrutide-testing-coa-limits.png')
-            ->where('blogs.data.4.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('blogs.data.5.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('blogs.data.11.slug', 'tesamorelin-vs-sermorelin')
-            ->where('blogs.data.11.image', '/images/educational/tesamorelin-vs-sermorelin.png')
-            ->where('blogs.data.12.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('blogs.data.12.image', $evidencePath)
-            ->where('blogs.data.13.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('blogs.data.13.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
-            ->where('blogs.data.14.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('blogs.data.1.slug', 'cagrisema-vs-tirzepatide')
+            ->where('blogs.data.1.image', '/images/educational/cagrisema-vs-tirzepatide.png')
+            ->where('blogs.data.2.slug', 'aod-9604-vs-tesamorelin')
+            ->where('blogs.data.2.image', '/images/educational/aod-9604-vs-tesamorelin.png')
+            ->where('blogs.data.3.slug', 'bpc-157-vs-ghk-cu')
+            ->where('blogs.data.3.image', '/images/educational/bpc-157-vs-ghk-cu.png')
+            ->where('blogs.data.4.slug', 'retatrutide-testing-coa-limits')
+            ->where('blogs.data.4.image', '/images/educational/retatrutide-testing-coa-limits.png')
+            ->where('blogs.data.5.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('blogs.data.6.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('blogs.data.12.slug', 'tesamorelin-vs-sermorelin')
+            ->where('blogs.data.12.image', '/images/educational/tesamorelin-vs-sermorelin.png')
+            ->where('blogs.data.13.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('blogs.data.13.image', $evidencePath)
+            ->where('blogs.data.14.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('blogs.data.14.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
+            ->where('blogs.data.15.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/news')->assertOk()->assertInertia(fn ($page) => $page
@@ -310,15 +312,16 @@ class EducationalContentTest extends TestCase
             ->missing('featuredBlogs')
             ->where('latestBlogs.0.slug', $newestSlug)
             ->where('latestBlogs.0.image', $newestImage)
-            ->where('latestBlogs.1.slug', 'aod-9604-vs-tesamorelin')
-            ->where('latestBlogs.2.slug', 'bpc-157-vs-ghk-cu')
-            ->where('latestBlogs.3.slug', 'retatrutide-testing-coa-limits')
-            ->where('latestBlogs.4.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('latestBlogs.5.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('latestBlogs.11.slug', 'tesamorelin-vs-sermorelin')
-            ->where('latestBlogs.12.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('latestBlogs.13.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('latestBlogs.14.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('latestBlogs.1.slug', 'cagrisema-vs-tirzepatide')
+            ->where('latestBlogs.2.slug', 'aod-9604-vs-tesamorelin')
+            ->where('latestBlogs.3.slug', 'bpc-157-vs-ghk-cu')
+            ->where('latestBlogs.4.slug', 'retatrutide-testing-coa-limits')
+            ->where('latestBlogs.5.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('latestBlogs.6.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('latestBlogs.12.slug', 'tesamorelin-vs-sermorelin')
+            ->where('latestBlogs.13.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('latestBlogs.14.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('latestBlogs.15.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/guides')->assertOk()->assertInertia(fn ($page) => $page
@@ -422,10 +425,10 @@ class EducationalContentTest extends TestCase
         $this->assertSame('/images/educational/bpc-157-vs-tb-500-evidence.png', $bpc->image);
         $this->assertSame('2026-09-29', $bpc->published_at->toDateString());
         $this->assertStringContainsString('Ac-LKKTETQ', $bpc->content);
-        $this->assertStringContainsString('not the 43-aa protein', $bpc->content);
+        $this->assertStringContainsString('are not the same substance', $bpc->content);
         $this->assertStringContainsString('did not confer additional benefits', $bpc->content);
         $this->assertStringContainsString('Biçer', $bpc->content);
-        $this->assertStringContainsString('not</strong> verified', $bpc->content);
+        $this->assertStringContainsString('not</strong> confirmed', $bpc->content);
         $this->assertStringContainsString('full-length thymosin', $bpc->content);
         $this->assertStringContainsString('https://www.jointdrs.org/full-text/1851', $bpc->content);
         $this->assertStringContainsString('https://www.fda.gov/media/193349/download', $bpc->content);
@@ -492,7 +495,7 @@ class EducationalContentTest extends TestCase
         $evidence = $this->get('/blog/bpc-157-vs-tb-500-evidence');
         $evidence->assertOk();
         $evidence->assertSee('Ac-LKKTETQ', false);
-        $evidence->assertSee('not the 43-aa protein', false);
+        $evidence->assertSee('are not the same substance', false);
         $evidence->assertSee('did not confer additional benefits', false);
         $evidence->assertSee('jointdrs.org\\/full-text\\/1851', false);
         $evidence->assertSee('fda.gov\\/media\\/193349\\/download', false);
@@ -996,6 +999,125 @@ class EducationalContentTest extends TestCase
 
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee('https://peptidemap.com/blog/orforglipron-vs-oral-semaglutide', false);
+    }
+
+    public function test_cagrisema_vs_tirzepatide_publishes_once_with_cover_and_matching_faq(): void
+    {
+        $slug = 'cagrisema-vs-tirzepatide';
+        $cover = '/images/educational/'.$slug.'.png';
+        $seoDescription = 'Company-reported REDEFINE 4: CagriSema missed non-inferiority vs tirzepatide (23.0% vs 25.5%, efficacy estimand). REDEFINE 1 context, safety, FDA status.';
+        $ogDescription = 'CagriSema missed non-inferiority vs tirzepatide in REDEFINE 4 (company-reported). Estimand-labelled results, REDEFINE 1 context, and FDA status.';
+
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $blog = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame('CagriSema vs Tirzepatide: What REDEFINE 4 Showed, and What It Didn’t', $blog->title);
+        $this->assertSame('CagriSema pairs an amylin analogue with semaglutide; tirzepatide is a single GIP/GLP-1 agonist. In the open-label REDEFINE 4 trial, CagriSema missed its non-inferiority endpoint vs tirzepatide. Estimand-labelled results, REDEFINE 1 context, safety as published, and FDA status. Educational only.', $blog->description);
+        $this->assertSame('CagriSema vs Tirzepatide: REDEFINE 4 Results and FDA Status', $blog->seo_page_title);
+        $this->assertSame($seoDescription, $blog->seo_description);
+        $this->assertSame(153, strlen((string) $blog->seo_description));
+        $this->assertSame($blog->seo_page_title, $blog->seo_og_title);
+        $this->assertSame($ogDescription, $blog->seo_og_description);
+        $this->assertSame(144, strlen((string) $blog->seo_og_description));
+        $this->assertSame($cover, $blog->image);
+        $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
+        $this->assertSame('2026-10-19', $blog->published_at->toDateString());
+        $this->assertSame('Research', $blog->blog_type);
+        $this->assertSame('12 Min Read', $blog->read_time);
+        $this->assertSame('Peptidemap', $blog->author_name);
+        $this->assertFalse((bool) $blog->is_featured);
+        $this->assertSame('published', $blog->status);
+        $this->assertNull($blog->introduction);
+        $this->assertNull($blog->detailed_analysis);
+        $this->assertNull($blog->conclusion);
+        $this->assertSame(
+            'REDEFINE 4 at week 84 (company-reported): efficacy estimand 23.0% vs 25.5%; treatment-regimen estimand 20.2% vs 23.6% (CagriSema vs tirzepatide). Arm-level safety and discontinuation data have not been published.',
+            $blog->key_points[2] ?? null
+        );
+        $this->assertFileExists(public_path('images/educational/'.$slug.'.png'));
+        $this->assertFileExists(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertFileExists(resource_path('content/educational/images/'.$slug.'.png'));
+
+        $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertStringNotContainsString('<!--', $markdown);
+        $this->assertStringNotContainsString('/workspace', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/\A---\n/', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/^# [^#]/m', $markdown);
+        $this->assertStringContainsString('Novo Nordisk announced company-reported headline results on 23 February 2026. They have not been peer-reviewed.', $markdown);
+        $this->assertStringContainsString('| REDEFINE 4, week 84 (company-reported) |', $markdown);
+        $this->assertStringContainsString('809 randomized adults without diabetes, with obesity and at least one comorbidity', $markdown);
+        $this->assertStringContainsString('the full combination dose tested in REDEFINE 1 and 2 (the dose in the US filing)', $markdown);
+        $this->assertStringContainsString("tirzepatide's highest maintenance dose", $markdown);
+        $this->assertStringContainsString('Novo said CagriSema met weight superiority and HbA1c non-inferiority in REIMAGINE 5.', $markdown);
+        $this->assertStringContainsString('Form 6-K, 4 August 2026', $markdown);
+        $this->assertStringNotContainsString('globenewswire.com/de/', $markdown);
+        $this->assertStringNotContainsString('/compare/retatrutide-vs-tirzepatide', $markdown);
+        $this->assertStringNotContainsString('Retatrutide listings', $markdown);
+
+        $this->assertStringNotContainsString('<!--', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->description);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->image);
+        $this->assertStringNotContainsString('CMS paste', (string) $blog->content);
+        $this->assertStringNotContainsString('CHANGES', (string) $blog->content);
+        $this->assertStringNotContainsString('Note for Meta Optimizer', (string) $blog->content);
+
+        $plain = html_entity_decode(strip_tags((string) $blog->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $faq = $blog->seo_schema[0] ?? null;
+        $this->assertSame('FAQPage', $faq['@type'] ?? null);
+        $this->assertSame('https://peptidemap.com/blog/cagrisema-vs-tirzepatide#faq', $faq['@id'] ?? null);
+        $this->assertCount(7, $faq['mainEntity'] ?? []);
+        foreach ($faq['mainEntity'] as $entity) {
+            $this->assertStringContainsString($entity['name'], $plain);
+            $this->assertSame(
+                $entity['acceptedAnswer']['text'],
+                $this->visibleFaqAnswer($plain, $entity['name'])
+            );
+        }
+        $this->assertSame(
+            'No. In company-reported headline results, Novo Nordisk said non-inferiority was not achieved. Mean weight reduction was 23.0% with CagriSema vs 25.5% with tirzepatide under the efficacy estimand, and 20.2% vs 23.6% under the treatment-regimen estimand. Those figures are from one head-to-head trial and should not be compared with numbers from other trials.',
+            $faq['mainEntity'][2]['acceptedAnswer']['text'] ?? null
+        );
+
+        $id = $blog->id;
+        $before = Blog::count();
+        EducationalContentPublisher::sync();
+        $this->assertSame($before, Blog::count());
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $again = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame($id, $again->id);
+        $this->assertSame($cover, $again->image);
+        $this->assertSame('2026-10-19', $again->published_at->toDateString());
+        $this->assertFalse((bool) $again->is_featured);
+
+        $page = $this->get('/blog/'.$slug);
+        $page->assertOk();
+        $page->assertSee('CagriSema vs Tirzepatide: REDEFINE 4 Results and FDA Status', false);
+        $page->assertSee('What REDEFINE 4 Showed', false);
+        $page->assertSee('https://peptidemap.com/blog/cagrisema-vs-tirzepatide', false);
+        $page->assertSee($cover, false);
+        $page->assertSee('Is CagriSema FDA-approved?', false);
+        $page->assertSee('Did CagriSema meet its primary endpoint against tirzepatide?', false);
+        $page->assertSee('company-reported headline results', false);
+        $page->assertDontSee('/workspace', false);
+        $page->assertDontSee('CMS paste', false);
+        $page->assertDontSee('CHANGES', false);
+        $page->assertDontSee('globenewswire.com/de/', false);
+        $page->assertDontSee('/compare/retatrutide-vs-tirzepatide', false);
+        $page->assertInertia(fn ($inertia) => $inertia
+            ->where('blog.slug', $slug)
+            ->where('blog.image', $cover)
+            ->where('blog.readTime', '12 Min Read')
+            ->where('blog.content', function ($html) {
+                return is_string($html)
+                    && ! str_contains($html, '<!--')
+                    && ! str_contains($html, '/workspace')
+                    && str_contains($html, 'company-reported')
+                    && str_contains($html, 'REIMAGINE 4');
+            })
+        );
+
+        $this->get('/sitemap.xml')->assertOk()
+            ->assertSee('https://peptidemap.com/blog/cagrisema-vs-tirzepatide', false);
     }
 
     private function visibleFaqAnswer(string $plain, string $question): string
