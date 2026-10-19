@@ -139,7 +139,7 @@ No. Tools help compare vendors and documentation. Personal treatment decisions a
 
 ### Where do I check if something can be compounded?
 
-Not on this beginner page. Use the companion legality guide and current FDA compounding sources (and educational trackers such as PrescribedRX’s status page) because interim categories and advisory votes change.
+Not on this beginner page. Use the companion legality guide and current FDA compounding sources (and educational trackers) because interim categories and advisory votes change.
 
 ### Why do vendors differ so much?
 

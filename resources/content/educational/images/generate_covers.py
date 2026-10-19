@@ -9,7 +9,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-W, H = 1200, 800
+W, H = 1280, 720
 FONT_DIR = Path("/usr/share/fonts/truetype/macos")
 ROOT = Path(__file__).resolve().parents[4]
 OUT_DIRS = [
@@ -130,6 +130,14 @@ def row(draw, box, label, detail, accent):
     draw.text((x, box[1] + 50), detail, font=detail_font, fill=(203, 213, 225, 255))
 
 
+def abstract_cover(filename, accent):
+    """Corner glows and a dot grid only. No type, wordmark, or pictograms."""
+    img = canvas(accent)
+    for directory in OUT_DIRS:
+        directory.mkdir(parents=True, exist_ok=True)
+        img.convert("RGB").save(directory / filename, "PNG", optimize=True)
+
+
 def cover(filename, eyebrow, title, subtitle, accent, rows):
     img = canvas(accent)
     draw = ImageDraw.Draw(img)
@@ -196,18 +204,7 @@ def main():
             ("03  ·  COA", "Match the lot, then verify the lab"),
         ],
     )
-    cover(
-        "peptide-legality-fda-ruo-compounding.png",
-        "REGULATION",
-        "FDA, RUO & Compounding",
-        "Three questions. Not one answer.",
-        amber,
-        [
-            ("FDA approval", "A finished drug product authorization"),
-            ("503A compounding", "A limited pharmacy pathway"),
-            ("RUO listing", "Not the same as either of the above"),
-        ],
-    )
+    abstract_cover("peptide-legality-fda-ruo-compounding.png", amber)
     cover(
         "fda-peptide-reclassification-2026.png",
         "FDA 2026",
