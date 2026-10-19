@@ -349,7 +349,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host));
     }
 
     /**
@@ -959,6 +959,54 @@ class EducationalContentPublisher
                     ['What has FDA done on GLP-1 compounding in 2026?', 'On 6 February 2026 FDA announced its intent to restrict GLP-1 active ingredients intended for mass-marketed compounded drugs. On 3 March 2026 it announced 30 warning letters to telehealth companies over compounded GLP-1 claims. On 30 April 2026 it proposed not to include semaglutide, tirzepatide and liraglutide on the 503B bulks list; the comment period closed on 30 July 2026 and no final determination was found as of 19 October 2026.'],
                     ['What does FDA say about dosing errors and adverse events?', 'FDA\'s page on unapproved GLP-1 drugs says it received adverse event reports, some involving hospitalization, that may be related to dosing errors with compounded injectable semaglutide, and reports tied to doses beyond the approved labels. As of 31 May 2026 it had received 990 reports for compounded semaglutide and more than 730 for compounded tirzepatide. FDA notes these are likely underreported and causation is not always clear.'],
                     ['Is research-labelled semaglutide or tirzepatide the same as compounded?', 'No. Compounding is a legal pathway with conditions under sections 503A and 503B. A research-use-only label is not a compounding pathway or an approval. FDA says it has warned companies that sold semaglutide, tirzepatide and other GLP-1 drugs falsely labelled for research purposes or not for human consumption. This article is educational and is not medical or legal advice.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Content QA passed this retatrutide side-effects trial-data note on 2026-10-19.
+     * The body lives in resources/content/educational. The publisher reads
+     * this catalog, not the draft YAML.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function retatrutideSideEffectsTrialData(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'retatrutide-side-effects-trial-data.md',
+                'image_file' => 'retatrutide-side-effects-trial-data.png',
+                'slug' => 'retatrutide-side-effects-trial-data',
+                'h1' => 'Retatrutide Side Effects: What the Trial Publications Report',
+                'lede' => 'Adverse events from the retatrutide phase 2 papers, TRIUMPH-2 and company-reported TRIUMPH data: GI events, discontinuation, heart rate and dysesthesia.',
+                'seo_title' => 'Retatrutide Side Effects: GI, Heart Rate, Dysesthesia Data',
+                'seo_description' => 'Retatrutide adverse events as reported in phase 2 papers, TRIUMPH-2 and Lilly data: GI events, discontinuation, heart rate, dysesthesia. Educational only.',
+                'og_title' => 'Retatrutide Side Effects: GI, Heart Rate, Dysesthesia Data',
+                'og_description' => 'Retatrutide adverse events as reported in phase 2 papers, TRIUMPH-2 and Lilly data: GI events, discontinuation, heart rate, dysesthesia. Educational only.',
+                'blog_type' => 'Research',
+                'read_time' => '19 Min Read',
+                'published_at' => '2026-10-19',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Retatrutide', 'Adverse events', 'TRIUMPH', 'Clinical trials', 'RUO'],
+                'key_points' => [
+                    'Gastrointestinal events were the most common adverse events in every retatrutide trial reviewed, and were dose-related in the phase 2 papers.',
+                    'Discontinuation due to adverse events in the TRIUMPH-2 paper was 4%, 12% and 8% across the lowest, middle and highest dose arms vs 5% with placebo.',
+                    'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; phase 3 heart-rate data were not in the sources reviewed.',
+                    'Phase 3 trials report dysesthesia, which Lilly defines as skin burning sensation and related events; mechanism, onset and duration are not characterized.',
+                    'Several phase 3 figures are company-reported, not peer reviewed, and are labelled that way.',
+                    'Research-labelled retatrutide is not the trial drug, is not approved, and is not described by these data.',
+                ],
+                'faq' => self::faq($host.'/blog/retatrutide-side-effects-trial-data#faq', [
+                    ['What were the most common side effects in the retatrutide trials?', 'Gastrointestinal events: nausea, diarrhoea, vomiting, constipation and decreased appetite. In both phase 2 papers they were dose-related and mostly mild to moderate, and the obesity paper says they occurred mainly during dose escalation. In the TRIUMPH-2 paper, diarrhoea was reported in 27% to 34% of the retatrutide arms vs 13% with placebo, and nausea in 14% to 28% vs 8%.'],
+                    ['How many people stopped retatrutide because of adverse events?', 'In the phase 2 obesity trial, 6% to 16% of the retatrutide arms vs none on placebo. In the phase 2 type 2 diabetes trial, 16 of 190 retatrutide participants (8%) vs 2 of 45 on placebo (4%). In the TRIUMPH-2 paper, permanent discontinuation due to adverse events or death was 4%, 12% and 8% in the lowest, middle and highest dose arms vs 5% with placebo. Company-reported TRIUMPH-1 figures were 4.1% to 11.3% vs 4.9%.'],
+                    ['Does retatrutide raise heart rate?', 'In the phase 2 obesity paper, heart rate rose in a dose-dependent manner, peaked at 24 weeks and declined at 36 and 48 weeks. In the phase 2 type 2 diabetes paper, pulse rose by up to about 7 beats per minute early in treatment and had decreased by 36 weeks. Heart-rate time courses for the phase 3 TRIUMPH trials were not available in the sources reviewed.'],
+                    ['What is the dysesthesia reported in the TRIUMPH trials?', 'Lilly defines it as a skin burning sensation and related adverse events. In the TRIUMPH-2 paper it was reported in 4% to 7% of the retatrutide arms vs 1% with placebo. Company-reported rates were up to 12.5% in TRIUMPH-1 and up to 20.9% in TRIUMPH-4. Lilly says events were generally mild to moderate and most resolved during treatment. The cause, timing and duration have not been characterized in the sources reviewed.'],
+                    ['Were pancreatitis, gallbladder or hypoglycaemia events reported?', 'In the phase 2 papers these events were few. The obesity trial reported one acute pancreatitis, three biliary events and no clinically significant hypoglycaemia. The type 2 diabetes trial reported two adjudicated pancreatitis events and three participants with hypoglycaemia below 54 mg/dL, none severe. Phase 3 rates for these events were not available in the published abstracts reviewed.'],
+                    ['Is research-labelled retatrutide the same as the trial drug?', 'No. Retatrutide is investigational and not approved anywhere. Lilly states it cannot be legally sold or marketed for human use. Products sold online as research-labelled retatrutide are not the material used in these trials, and the trial safety data do not describe them.'],
+                    ['Can these trials be compared with trials of other drugs?', 'Not reliably. The trials differ in population, duration, dose escalation and how events were defined and counted. This article reports results within each trial only and does not rank retatrutide against other drugs.'],
                 ]),
             ],
         ];

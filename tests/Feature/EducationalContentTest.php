@@ -280,7 +280,7 @@ class EducationalContentTest extends TestCase
         $this->assertFileExists(public_path(ltrim($beginner->cover, '/')));
         $this->assertFileExists(public_path(ltrim($legality->cover, '/')));
 
-        $newestSlug = 'compounded-glp-1-status';
+        $newestSlug = 'retatrutide-side-effects-trial-data';
         $newestImage = '/images/educational/'.$newestSlug.'.png';
 
         $this->get('/blogs')->assertOk()->assertInertia(fn ($page) => $page
@@ -288,25 +288,27 @@ class EducationalContentTest extends TestCase
             ->missing('featured')
             ->where('blogs.data.0.slug', $newestSlug)
             ->where('blogs.data.0.image', $newestImage)
-            ->where('blogs.data.1.slug', 'orforglipron-vs-oral-semaglutide')
-            ->where('blogs.data.1.image', '/images/educational/orforglipron-vs-oral-semaglutide.png')
-            ->where('blogs.data.2.slug', 'cagrisema-vs-tirzepatide')
-            ->where('blogs.data.2.image', '/images/educational/cagrisema-vs-tirzepatide.png')
-            ->where('blogs.data.3.slug', 'aod-9604-vs-tesamorelin')
-            ->where('blogs.data.3.image', '/images/educational/aod-9604-vs-tesamorelin.png')
-            ->where('blogs.data.4.slug', 'bpc-157-vs-ghk-cu')
-            ->where('blogs.data.4.image', '/images/educational/bpc-157-vs-ghk-cu.png')
-            ->where('blogs.data.5.slug', 'retatrutide-testing-coa-limits')
-            ->where('blogs.data.5.image', '/images/educational/retatrutide-testing-coa-limits.png')
-            ->where('blogs.data.6.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('blogs.data.7.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('blogs.data.13.slug', 'tesamorelin-vs-sermorelin')
-            ->where('blogs.data.13.image', '/images/educational/tesamorelin-vs-sermorelin.png')
-            ->where('blogs.data.14.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('blogs.data.14.image', $evidencePath)
-            ->where('blogs.data.15.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('blogs.data.15.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
-            ->where('blogs.data.16.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('blogs.data.1.slug', 'compounded-glp-1-status')
+            ->where('blogs.data.1.image', '/images/educational/compounded-glp-1-status.png')
+            ->where('blogs.data.2.slug', 'orforglipron-vs-oral-semaglutide')
+            ->where('blogs.data.2.image', '/images/educational/orforglipron-vs-oral-semaglutide.png')
+            ->where('blogs.data.3.slug', 'cagrisema-vs-tirzepatide')
+            ->where('blogs.data.3.image', '/images/educational/cagrisema-vs-tirzepatide.png')
+            ->where('blogs.data.4.slug', 'aod-9604-vs-tesamorelin')
+            ->where('blogs.data.4.image', '/images/educational/aod-9604-vs-tesamorelin.png')
+            ->where('blogs.data.5.slug', 'bpc-157-vs-ghk-cu')
+            ->where('blogs.data.5.image', '/images/educational/bpc-157-vs-ghk-cu.png')
+            ->where('blogs.data.6.slug', 'retatrutide-testing-coa-limits')
+            ->where('blogs.data.6.image', '/images/educational/retatrutide-testing-coa-limits.png')
+            ->where('blogs.data.7.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('blogs.data.8.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('blogs.data.14.slug', 'tesamorelin-vs-sermorelin')
+            ->where('blogs.data.14.image', '/images/educational/tesamorelin-vs-sermorelin.png')
+            ->where('blogs.data.15.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('blogs.data.15.image', $evidencePath)
+            ->where('blogs.data.16.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('blogs.data.16.image', '/images/educational/how-to-verify-a-peptide-vendor-certificate-of-analysis.png')
+            ->where('blogs.data.17.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/news')->assertOk()->assertInertia(fn ($page) => $page
@@ -314,17 +316,18 @@ class EducationalContentTest extends TestCase
             ->missing('featuredBlogs')
             ->where('latestBlogs.0.slug', $newestSlug)
             ->where('latestBlogs.0.image', $newestImage)
-            ->where('latestBlogs.1.slug', 'orforglipron-vs-oral-semaglutide')
-            ->where('latestBlogs.2.slug', 'cagrisema-vs-tirzepatide')
-            ->where('latestBlogs.3.slug', 'aod-9604-vs-tesamorelin')
-            ->where('latestBlogs.4.slug', 'bpc-157-vs-ghk-cu')
-            ->where('latestBlogs.5.slug', 'retatrutide-testing-coa-limits')
-            ->where('latestBlogs.6.slug', 'cjc-1295-dac-vs-no-dac')
-            ->where('latestBlogs.7.slug', 'eloralintide-tirzepatide-vs-retatrutide')
-            ->where('latestBlogs.13.slug', 'tesamorelin-vs-sermorelin')
-            ->where('latestBlogs.14.slug', 'bpc-157-vs-tb-500-evidence')
-            ->where('latestBlogs.15.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
-            ->where('latestBlogs.16.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
+            ->where('latestBlogs.1.slug', 'compounded-glp-1-status')
+            ->where('latestBlogs.2.slug', 'orforglipron-vs-oral-semaglutide')
+            ->where('latestBlogs.3.slug', 'cagrisema-vs-tirzepatide')
+            ->where('latestBlogs.4.slug', 'aod-9604-vs-tesamorelin')
+            ->where('latestBlogs.5.slug', 'bpc-157-vs-ghk-cu')
+            ->where('latestBlogs.6.slug', 'retatrutide-testing-coa-limits')
+            ->where('latestBlogs.7.slug', 'cjc-1295-dac-vs-no-dac')
+            ->where('latestBlogs.8.slug', 'eloralintide-tirzepatide-vs-retatrutide')
+            ->where('latestBlogs.14.slug', 'tesamorelin-vs-sermorelin')
+            ->where('latestBlogs.15.slug', 'bpc-157-vs-tb-500-evidence')
+            ->where('latestBlogs.16.slug', 'how-to-verify-a-peptide-vendor-certificate-of-analysis')
+            ->where('latestBlogs.17.slug', 'fda-peptide-reclassification-2026-what-researchers-need-to-know')
         );
 
         $this->get('/guides')->assertOk()->assertInertia(fn ($page) => $page
@@ -1249,6 +1252,137 @@ class EducationalContentTest extends TestCase
 
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee('https://peptidemap.com/blog/compounded-glp-1-status', false);
+    }
+
+    public function test_retatrutide_side_effects_trial_data_publishes_once_with_cover_and_matching_faq(): void
+    {
+        $slug = 'retatrutide-side-effects-trial-data';
+        $cover = '/images/educational/'.$slug.'.png';
+        $h1 = 'Retatrutide Side Effects: What the Trial Publications Report';
+        $seoTitle = 'Retatrutide Side Effects: GI, Heart Rate, Dysesthesia Data';
+        $seoDescription = 'Retatrutide adverse events as reported in phase 2 papers, TRIUMPH-2 and Lilly data: GI events, discontinuation, heart rate, dysesthesia. Educational only.';
+
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $blog = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame($h1, $blog->title);
+        $this->assertSame('Adverse events from the retatrutide phase 2 papers, TRIUMPH-2 and company-reported TRIUMPH data: GI events, discontinuation, heart rate and dysesthesia.', $blog->description);
+        $this->assertSame($seoTitle, $blog->seo_page_title);
+        $this->assertSame($seoDescription, $blog->seo_description);
+        $this->assertSame(58, strlen($seoTitle));
+        $this->assertSame($blog->seo_page_title, $blog->seo_og_title);
+        $this->assertSame($seoDescription, $blog->seo_og_description);
+        $this->assertSame($cover, $blog->image);
+        $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
+        $this->assertSame('2026-10-19', $blog->published_at->toDateString());
+        $this->assertSame('Research', $blog->blog_type);
+        $this->assertSame('19 Min Read', $blog->read_time);
+        $this->assertSame('Peptidemap', $blog->author_name);
+        $this->assertFalse((bool) $blog->is_featured);
+        $this->assertSame('published', $blog->status);
+        $this->assertNull($blog->introduction);
+        $this->assertNull($blog->detailed_analysis);
+        $this->assertNull($blog->conclusion);
+        $this->assertSame(
+            ['Retatrutide', 'Adverse events', 'TRIUMPH', 'Clinical trials', 'RUO'],
+            $blog->tags
+        );
+        $this->assertSame([
+            'Gastrointestinal events were the most common adverse events in every retatrutide trial reviewed, and were dose-related in the phase 2 papers.',
+            'Discontinuation due to adverse events in the TRIUMPH-2 paper was 4%, 12% and 8% across the lowest, middle and highest dose arms vs 5% with placebo.',
+            'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; phase 3 heart-rate data were not in the sources reviewed.',
+            'Phase 3 trials report dysesthesia, which Lilly defines as skin burning sensation and related events; mechanism, onset and duration are not characterized.',
+            'Several phase 3 figures are company-reported, not peer reviewed, and are labelled that way.',
+            'Research-labelled retatrutide is not the trial drug, is not approved, and is not described by these data.',
+        ], $blog->key_points);
+        $this->assertFileExists(public_path('images/educational/'.$slug.'.png'));
+        $this->assertFileExists(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertFileExists(resource_path('content/educational/images/'.$slug.'.png'));
+
+        $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
+        $this->assertStringNotContainsString('<!--', $markdown);
+        $this->assertStringNotContainsString('/workspace', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/\A---\n/', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/^# [^#]/m', $markdown);
+        $this->assertStringContainsString('## FAQ', $markdown);
+        $this->assertStringContainsString('/encyclopedia/retatrutide', $markdown);
+        $this->assertStringContainsString('/compare/retatrutide-vs-tirzepatide', $markdown);
+        $this->assertStringContainsString('/guides/peptide-legality-fda-ruo-compounding', $markdown);
+        $this->assertStringContainsString('/blog/retatrutide-testing-coa-limits', $markdown);
+
+        $this->assertStringNotContainsString('<!--', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->content);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->description);
+        $this->assertStringNotContainsString('/workspace', (string) $blog->image);
+        $this->assertStringNotContainsString('CMS paste', (string) $blog->content);
+        $this->assertStringNotContainsString('CHANGES', (string) $blog->content);
+        $this->assertStringNotContainsString('Note for Meta Optimizer', (string) $blog->content);
+
+        $plain = html_entity_decode(strip_tags((string) $blog->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $faq = $blog->seo_schema[0] ?? null;
+        $this->assertSame('FAQPage', $faq['@type'] ?? null);
+        $this->assertSame('https://schema.org', $faq['@context'] ?? null);
+        $this->assertSame('https://peptidemap.com/blog/retatrutide-side-effects-trial-data#faq', $faq['@id'] ?? null);
+        $this->assertCount(7, $faq['mainEntity'] ?? []);
+        foreach ($faq['mainEntity'] as $entity) {
+            $this->assertStringContainsString($entity['name'], $plain);
+            $this->assertSame(
+                $entity['acceptedAnswer']['text'],
+                $this->visibleFaqAnswer($plain, $entity['name'])
+            );
+        }
+        $this->assertSame(
+            'Gastrointestinal events: nausea, diarrhoea, vomiting, constipation and decreased appetite. In both phase 2 papers they were dose-related and mostly mild to moderate, and the obesity paper says they occurred mainly during dose escalation. In the TRIUMPH-2 paper, diarrhoea was reported in 27% to 34% of the retatrutide arms vs 13% with placebo, and nausea in 14% to 28% vs 8%.',
+            $faq['mainEntity'][0]['acceptedAnswer']['text'] ?? null
+        );
+        $this->assertSame(
+            'Not reliably. The trials differ in population, duration, dose escalation and how events were defined and counted. This article reports results within each trial only and does not rank retatrutide against other drugs.',
+            $faq['mainEntity'][6]['acceptedAnswer']['text'] ?? null
+        );
+
+        $id = $blog->id;
+        $before = Blog::count();
+        EducationalContentPublisher::sync();
+        $this->assertSame($before, Blog::count());
+        $this->assertSame(1, Blog::where('slug', $slug)->count());
+        $again = Blog::where('slug', $slug)->firstOrFail();
+        $this->assertSame($id, $again->id);
+        $this->assertSame($cover, $again->image);
+        $this->assertSame('2026-10-19', $again->published_at->toDateString());
+        $this->assertFalse((bool) $again->is_featured);
+
+        $page = $this->get('/blog/'.$slug);
+        $page->assertOk();
+        $page->assertSee($h1, false);
+        $page->assertSee($seoTitle, false);
+        $page->assertSee('https://peptidemap.com/blog/retatrutide-side-effects-trial-data#faq', false);
+        $page->assertSee('https://peptidemap.com/blog/retatrutide-side-effects-trial-data', false);
+        $page->assertSee($cover, false);
+        $page->assertSee('What were the most common side effects in the retatrutide trials?', false);
+        $page->assertSee('Can these trials be compared with trials of other drugs?', false);
+        $page->assertSee('19 Min Read', false);
+        $page->assertDontSee('/workspace', false);
+        $page->assertDontSee('CMS paste', false);
+        $page->assertDontSee('CHANGES', false);
+        $page->assertInertia(fn ($inertia) => $inertia
+            ->where('blog.slug', $slug)
+            ->where('blog.title', $h1)
+            ->where('blog.image', $cover)
+            ->where('blog.readTime', '19 Min Read')
+            ->where('blog.content', function ($html) {
+                return is_string($html)
+                    && ! str_contains($html, '<!--')
+                    && ! str_contains($html, '/workspace')
+                    && str_contains($html, 'How to read the numbers on this page')
+                    && str_contains($html, '54 mg/dL');
+            })
+        );
+
+        $schema = json_encode($faq, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->assertIsString($schema);
+        $page->assertSee($schema, false);
+
+        $this->get('/sitemap.xml')->assertOk()
+            ->assertSee('https://peptidemap.com/blog/retatrutide-side-effects-trial-data', false);
     }
 
     private function visibleFaqAnswer(string $plain, string $question): string
