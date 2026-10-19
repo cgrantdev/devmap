@@ -488,10 +488,16 @@ class ProductsController extends Controller
                 'original_name' => $product->getRawOriginal('name'),
                 'product_type' => $product->product_type,
                 'slug' => $product->slug,
-                // Prefer the vendor's own scraped description when we have
-                // it (Colin 10/20 — dedup fix). Falls back to our stored
-                // description otherwise. See products:fetch-vendor-descriptions.
-                'description' => $product->vendor_description ?: $product->description,
+                // Fallback chain (Colin 10/20 — Google dedup fix):
+                //   1. vendor_description (scraped from vendor site)
+                //   2. generated_description (Claude AI gap-filler)
+                //   3. description (original stored boilerplate)
+                // Each layer is more fallback-y than the last; every one
+                // is strictly more unique than our old approach of showing
+                // the same boilerplate on every page.
+                'description' => $product->vendor_description
+                    ?: $product->generated_description
+                    ?: $product->description,
                 'price' => $product->price,
                 'discount_price' => $product->discount_price,
                 'size_mg' => $product->size_mg,

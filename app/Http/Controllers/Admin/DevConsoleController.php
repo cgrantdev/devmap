@@ -42,6 +42,19 @@ class DevConsoleController extends Controller
             'label' => 'Add vendor_description column directly (bypasses migrate chain)',
             'args' => [],
         ],
+        'products:ensure-generated-desc-column' => [
+            'label' => 'Add generated_description column (AI gap-filler schema)',
+            'args' => [],
+        ],
+        'products:generate-descriptions' => [
+            'label' => 'AI-generate unique descriptions for products missing a vendor one',
+            'args' => [
+                '--dry-run' => true,
+                '--limit' => 'int',
+                '--brand' => 'string',
+                '--force' => true,
+            ],
+        ],
         'products:fetch-vendor-descriptions' => [
             'label' => 'Backfill vendor product descriptions',
             'args' => [

@@ -22,6 +22,8 @@ class Product extends Model
         'description',
         'vendor_description',
         'vendor_description_fetched_at',
+        'generated_description',
+        'generated_description_at',
         'price',
         'discount_price',
         'second_price',
