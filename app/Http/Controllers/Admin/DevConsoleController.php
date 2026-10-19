@@ -55,6 +55,19 @@ class DevConsoleController extends Controller
                 '--force' => true,
             ],
         ],
+        'brands:ensure-generated-desc-column' => [
+            'label' => 'Add generated_description to vendor_settings (schema)',
+            'args' => [],
+        ],
+        'brands:generate-descriptions' => [
+            'label' => 'AI-generate unique "about" copy for vendors',
+            'args' => [
+                '--dry-run' => true,
+                '--limit' => 'int',
+                '--brand' => 'string',
+                '--force' => true,
+            ],
+        ],
         'products:fetch-vendor-descriptions' => [
             'label' => 'Backfill vendor product descriptions',
             'args' => [

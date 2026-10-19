@@ -138,6 +138,9 @@ class BrandsController extends Controller
         $cacheKey = 'brands.index.' . md5(serialize($request->only([
             'search', 'location', 'verified', 'usp', 'sort', 'sortDir',
         ])));
+        // Frontend precedence (Colin 10/20 — dedup fix): the vendor's own
+        // description always wins. generated_description is the AI gap-
+        // filler for brands without authored copy.
         $brands = \App\Support\FrontendCache::remember($cacheKey, 300, fn () => $query->get()->map(function ($brand) {
                 // Prefer vendor setting location if set; otherwise derive from products
                 $location = null;
