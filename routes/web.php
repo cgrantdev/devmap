@@ -365,6 +365,15 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
     Route::delete('/integrations/woo', [\App\Http\Controllers\Vendor\IntegrationsController::class, 'destroy'])->name('vendor.integrations.woo.destroy');
 });
 
+// Dev-console runner with bearer-token auth — Claude's out-of-session
+// trigger point. The route lives OUTSIDE the admin middleware group
+// because it carries its own auth via the DEV_CONSOLE_TOKEN env var
+// (checked in controller). Set that env var in Forge to a long random
+// string; leave unset to disable the token path entirely (session-authed
+// /admin/dev/console/run keeps working regardless).
+Route::post('/api/dev-console/run', [\App\Http\Controllers\Admin\DevConsoleController::class, 'runWithToken'])
+    ->name('api.dev-console.run');
+
 // Admin routes
 Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.viewer.writes'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');

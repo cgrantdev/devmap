@@ -44,6 +44,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/banner-events/click',
             'api/bot/*',
             'api/vendor/*',
+            // Dev console bearer-token runner — Claude's out-of-session
+            // trigger. Auth is enforced by the DEV_CONSOLE_TOKEN header
+            // check in DevConsoleController::runWithToken, so CSRF is
+            // redundant and would block the server-to-server POST.
+            'api/dev-console/*',
         ]);
 
         $middleware->api([

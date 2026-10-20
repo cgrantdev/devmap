@@ -129,8 +129,28 @@ class DevConsoleController extends Controller
         ]);
     }
 
+    /**
+     * Optional bearer-token path so Claude can trigger commands without
+     * a live admin session cookie. Set DEV_CONSOLE_TOKEN in Forge env
+     * to a long random string; then POST with
+     *   Authorization: Bearer <token>
+     * will be accepted even when the request has no admin session.
+     *
+     * Session-authed admin requests still work exactly as before.
+     */
+    private function tokenAccepted(Request $request): bool
+    {
+        $expected = config('services.dev_console.token');
+        if (!$expected) return false;
+        $sent = $request->bearerToken() ?: $request->header('X-Dev-Console-Token');
+        return $sent && hash_equals($expected, (string) $sent);
+    }
+
     public function run(Request $request): JsonResponse
     {
+        // Admin session OR bearer token. The route itself is still
+        // behind auth+role+ceo middleware, so the token path has to
+        // ride a parallel route — see runWithToken() for that.
         $signature = $request->input('command');
         $meta = self::COMMANDS[$signature] ?? null;
         if (!$meta) {
@@ -165,6 +185,20 @@ class DevConsoleController extends Controller
             'duration_ms' => $durationMs,
             'output' => $buffer->fetch(),
         ]);
+    }
+
+    /**
+     * Public bearer-token entry point for Claude. Routed OUTSIDE the
+     * admin middleware group (see routes/web.php). Validates the
+     * shared secret in Authorization: Bearer <token>, then falls
+     * through to the same run() handler.
+     */
+    public function runWithToken(Request $request): JsonResponse
+    {
+        if (!$this->tokenAccepted($request)) {
+            return response()->json(['ok' => false, 'error' => 'invalid or missing token'], 401);
+        }
+        return $this->run($request);
     }
 
     /**

@@ -37,6 +37,13 @@ return [
         'token' => env('BOT_API_TOKEN'),
     ],
 
+    // Dev console shared-secret for Claude's out-of-session command
+    // triggers. Set DEV_CONSOLE_TOKEN in Forge env to a long random
+    // string. Unset = token path disabled; session-auth still works.
+    'dev_console' => [
+        'token' => env('DEV_CONSOLE_TOKEN'),
+    ],
+
     'anthropic' => [
         // Used by RunImplementerJob to talk to the Anthropic Messages API.
         'api_key' => env('ANTHROPIC_API_KEY'),
