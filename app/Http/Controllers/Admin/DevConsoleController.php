@@ -192,21 +192,6 @@ class DevConsoleController extends Controller
     }
 
     /**
-     * Read the .env file directly and return just the DEV_CONSOLE_TOKEN
-     * line (prefix+suffix only) to confirm it's physically in the file
-     * — bypasses any config cache or Dotenv weirdness.
-     */
-    private function envFileLine(): string
-    {
-        $path = base_path('.env');
-        if (!is_readable($path)) return 'unreadable';
-        $content = file_get_contents($path);
-        if (!preg_match('/^DEV_CONSOLE_TOKEN=(.*)$/m', $content, $m)) return 'not present';
-        $val = trim($m[1]);
-        return 'present (len ' . strlen($val) . ', ' . substr($val, 0, 4) . '…' . substr($val, -4) . ')';
-    }
-
-    /**
      * Public bearer-token entry point for Claude. Routed OUTSIDE the
      * admin middleware group (see routes/web.php). Validates the
      * shared secret in Authorization: Bearer <token>, then falls
@@ -215,28 +200,7 @@ class DevConsoleController extends Controller
     public function runWithToken(Request $request): JsonResponse
     {
         if (!$this->tokenAccepted($request)) {
-            $expected = (string) config('services.dev_console.token');
-            $sent = (string) ($request->bearerToken() ?: $request->header('X-Dev-Console-Token'));
-            return response()->json([
-                'ok' => false,
-                'error' => 'invalid or missing token',
-                'diag' => [
-                    'expected_set' => $expected !== '',
-                    'expected_len' => strlen($expected),
-                    'sent_set' => $sent !== '',
-                    'sent_len' => strlen($sent),
-                    'expected_prefix' => $expected ? substr($expected, 0, 4) . '…' . substr($expected, -4) : null,
-                    'sent_prefix' => $sent ? substr($sent, 0, 4) . '…' . substr($sent, -4) : null,
-                    // Deeper diag — is the env var reachable at all?
-                    'env_direct' => env('DEV_CONSOLE_TOKEN') ? 'set (len ' . strlen(env('DEV_CONSOLE_TOKEN')) . ')' : 'null',
-                    'env_getenv' => getenv('DEV_CONSOLE_TOKEN') ? 'set (len ' . strlen((string) getenv('DEV_CONSOLE_TOKEN')) . ')' : 'null',
-                    'env_server' => isset($_SERVER['DEV_CONSOLE_TOKEN']) ? 'set' : 'null',
-                    'env_env' => isset($_ENV['DEV_CONSOLE_TOKEN']) ? 'set' : 'null',
-                    'env_file_line' => $this->envFileLine(),
-                    'config_cached' => app()->configurationIsCached(),
-                    'app_env' => config('app.env'),
-                ],
-            ], 401);
+            return response()->json(['ok' => false, 'error' => 'invalid or missing token'], 401);
         }
         return $this->run($request);
     }
