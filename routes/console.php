@@ -89,6 +89,13 @@ Schedule::command('arp:sync')
     ->withoutOverlapping()
     ->runInBackground();
 
+// Zenith Bioscience — public REST catalog (PRICETOOL_CATALOG_API_CONTRACT),
+// Bearer-auth. Contract polls 1-4x/day; we align with that cadence.
+Schedule::command('zenith:sync')
+    ->dailyAt('06:00')
+    ->withoutOverlapping()
+    ->runInBackground();
+
 // Daily affiliate-stats pull. Hits each configured vendor's affiliate
 // program API (GoAffPro today; Refersion/Impact clients to add) and
 // caches the snapshot on vendor_settings.affiliate_stats_json. Powers

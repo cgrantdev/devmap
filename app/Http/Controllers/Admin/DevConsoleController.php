@@ -90,6 +90,10 @@ class DevConsoleController extends Controller
             'label' => 'Scrape Australian Research Peptides via /llms.txt',
             'args' => ['--dry-run' => true, '--limit' => 'int'],
         ],
+        'zenith:sync' => [
+            'label' => 'Pull Zenith Bioscience catalog (needs API key on vendor row)',
+            'args' => ['--dry-run' => true, '--limit' => 'int'],
+        ],
         'feeds:sync-vendors' => [
             'label' => 'Re-pull every vendor XML feed',
             'args' => ['--dry-run' => true, '--brand' => 'string'],
