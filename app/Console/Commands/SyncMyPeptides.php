@@ -35,14 +35,17 @@ class SyncMyPeptides extends Command
     protected $description = 'Pull My Peptides UK catalog via api.my-peptides.co.uk.';
 
     private const BASE = 'https://api.my-peptides.co.uk';
-    private const BRAND_SLUG = 'my-peptides';
+    // Fallback through a few plausible slugs — the brand row happens to
+    // be 'my-longevity' in the DB.
+    private const BRAND_SLUGS = ['my-longevity', 'my-peptides', 'my-peptides-uk'];
+    private const BRAND_SLUG = 'my-longevity';
     private const PAGE_SIZE = 100;
 
     public function handle(): int
     {
-        $brand = Brand::where('slug', self::BRAND_SLUG)->first();
+        $brand = Brand::whereIn('slug', self::BRAND_SLUGS)->first();
         if (!$brand) {
-            $this->error("Brand '" . self::BRAND_SLUG . "' not found. Create it in /admin/vendors first.");
+            $this->error('My Peptides brand not found. Tried slugs: ' . implode(', ', self::BRAND_SLUGS));
             return self::FAILURE;
         }
 

@@ -36,13 +36,16 @@ class SyncAustralianResearchPeptides extends Command
     protected $description = 'Scrape australianresearchpeptides.au via /llms.txt + text.md mirrors.';
 
     private const BASE = 'https://www.australianresearchpeptides.au';
-    private const BRAND_SLUG = 'australian-research-peptides';
+    // Fallback through a few plausible slugs — the brand row happens to
+    // be 'australian-research-peptides-pty-ltd' in the DB.
+    private const BRAND_SLUGS = ['australian-research-peptides-pty-ltd', 'australian-research-peptides', 'arp'];
+    private const BRAND_SLUG = 'australian-research-peptides-pty-ltd';
 
     public function handle(): int
     {
-        $brand = Brand::where('slug', self::BRAND_SLUG)->first();
+        $brand = Brand::whereIn('slug', self::BRAND_SLUGS)->first();
         if (!$brand) {
-            $this->error("Brand '" . self::BRAND_SLUG . "' not found. Create it in /admin/vendors first.");
+            $this->error('ARP brand not found. Tried slugs: ' . implode(', ', self::BRAND_SLUGS));
             return self::FAILURE;
         }
 
