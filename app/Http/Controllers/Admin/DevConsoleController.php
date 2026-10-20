@@ -200,7 +200,22 @@ class DevConsoleController extends Controller
     public function runWithToken(Request $request): JsonResponse
     {
         if (!$this->tokenAccepted($request)) {
-            return response()->json(['ok' => false, 'error' => 'invalid or missing token'], 401);
+            $expected = (string) config('services.dev_console.token');
+            $sent = (string) ($request->bearerToken() ?: $request->header('X-Dev-Console-Token'));
+            return response()->json([
+                'ok' => false,
+                'error' => 'invalid or missing token',
+                'diag' => [
+                    'expected_set' => $expected !== '',
+                    'expected_len' => strlen($expected),
+                    'sent_set' => $sent !== '',
+                    'sent_len' => strlen($sent),
+                    // First + last 4 chars to spot mismatches without
+                    // exposing the full secret
+                    'expected_prefix' => $expected ? substr($expected, 0, 4) . '…' . substr($expected, -4) : null,
+                    'sent_prefix' => $sent ? substr($sent, 0, 4) . '…' . substr($sent, -4) : null,
+                ],
+            ], 401);
         }
         return $this->run($request);
     }
