@@ -173,11 +173,29 @@ class SyncPurgoLabs extends Command
             })
             ->first();
 
-        // Base update payload — safe to overwrite on every sync.
-        // Price, stock, image, size can change on Purgo's site; we keep
-        // our copy in step. hidden/status stay sync-controlled because
-        // Purgo is an approved vendor — anything they list is live.
-        $attrs = [
+        if ($existing) {
+            // Colin 10/21 — admin curation is sacred. Once an existing
+            // row exists, we ONLY refresh the fields Purgo actually owns
+            // (price, discount, stock state, image, url). Everything
+            // else — name, size, type, category, hidden/status flag,
+            // description — belongs to whoever last touched it in the
+            // admin (Julia / Alec / Colin). The sync never overwrites
+            // human curation.
+            $existing->fill([
+                'price' => $p['price'],
+                'image_url' => $p['image'],
+                'product_url' => $productUrl,
+                'stock_status' => 'in_stock',
+                'external_id' => $extId,
+            ])->save();
+            return 'updated';
+        }
+
+        // Insert path — Purgo is the source of truth for every field
+        // because no admin has touched it yet.
+        Product::create([
+            'brand_id' => $brandId,
+            'slug' => $this->uniqueSlug($brandId, $p['name'], $slug),
             'name' => $p['name'],
             'price' => $p['price'],
             'image_url' => $p['image'],
@@ -188,27 +206,9 @@ class SyncPurgoLabs extends Command
             'external_id' => $extId,
             'hidden' => false,
             'status' => 'active',
-        ];
-
-        if ($existing) {
-            // Julia 10/15 — manual category edits in /admin/products were
-            // reverting to Uncategorized every day. Cause: this sync set
-            // product_category_id on every write, overwriting whatever
-            // she just picked. Only categorize on INSERT; on UPDATE,
-            // Julia's manual choice is the source of truth.
-            $existing->fill($attrs)->save();
-            return 'updated';
-        }
-
-        $attrs['brand_id'] = $brandId;
-        $attrs['slug'] = $this->uniqueSlug($brandId, $p['name'], $slug);
-        $attrs['product_category_id'] = $this->categorize($slug, $p['name']);
-        // Infer type on insert so Julia doesn't have to set it for every
-        // new topical / recon / strip (Julia 10/21). Only on insert; on
-        // update we leave her manual choice alone — same pattern as
-        // product_category_id.
-        $attrs['product_type'] = $this->inferType($slug, $p['name']);
-        Product::create($attrs);
+            'product_category_id' => $this->categorize($slug, $p['name']),
+            'product_type' => $this->inferType($slug, $p['name']),
+        ]);
         return 'new';
     }
 
