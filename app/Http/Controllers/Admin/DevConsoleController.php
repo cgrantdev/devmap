@@ -60,6 +60,10 @@ class DevConsoleController extends Controller
             'label' => 'Show how many products have unique descriptions + queue depth',
             'args' => [],
         ],
+        'brands:slug-lookup' => [
+            'label' => 'Show brand slugs (optional substring filter)',
+            'args' => [],
+        ],
         'brands:ensure-generated-desc-column' => [
             'label' => 'Add generated_description to vendor_settings (schema)',
             'args' => [],
