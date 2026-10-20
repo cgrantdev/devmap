@@ -96,6 +96,13 @@ Schedule::command('zenith:sync')
     ->withoutOverlapping()
     ->runInBackground();
 
+// My Peptides UK — public paginated JSON API, no auth. Skip
+// is_unlisted products per their note.
+Schedule::command('mypeptides:sync')
+    ->dailyAt('06:15')
+    ->withoutOverlapping()
+    ->runInBackground();
+
 // Daily affiliate-stats pull. Hits each configured vendor's affiliate
 // program API (GoAffPro today; Refersion/Impact clients to add) and
 // caches the snapshot on vendor_settings.affiliate_stats_json. Powers

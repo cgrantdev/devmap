@@ -94,6 +94,10 @@ class DevConsoleController extends Controller
             'label' => 'Pull Zenith Bioscience catalog (needs API key on vendor row)',
             'args' => ['--dry-run' => true, '--limit' => 'int'],
         ],
+        'mypeptides:sync' => [
+            'label' => 'Pull My Peptides UK catalog (public API, no key)',
+            'args' => ['--dry-run' => true, '--limit' => 'int'],
+        ],
         'feeds:sync-vendors' => [
             'label' => 'Re-pull every vendor XML feed',
             'args' => ['--dry-run' => true, '--brand' => 'string'],
