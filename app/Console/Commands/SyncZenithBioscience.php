@@ -166,13 +166,14 @@ class SyncZenithBioscience extends Command
         $inStock = (bool) ($p['inStock'] ?? false);
 
         if ($existing) {
-            // Admin-field lock (Colin 10/21). Only touch what Zenith owns.
+            // Colin 10/21 — auto-refresh is strictly price, sale price,
+            // and stock. Everything else (name, size, url, type, category,
+            // description, hidden, status) is admin-curated and never
+            // touched by sync. Zenith's contract has no image field.
             $existing->fill([
                 'price' => $regularPrice,
                 'discount_price' => $salePrice,
-                'product_url' => $productUrl,
                 'stock_status' => $inStock ? 'in_stock' : 'out_of_stock',
-                'external_id' => $sku,
             ])->save();
             return 'updated';
         }

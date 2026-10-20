@@ -174,19 +174,15 @@ class SyncPurgoLabs extends Command
             ->first();
 
         if ($existing) {
-            // Colin 10/21 — admin curation is sacred. Once an existing
-            // row exists, we ONLY refresh the fields Purgo actually owns
-            // (price, discount, stock state, image, url). Everything
-            // else — name, size, type, category, hidden/status flag,
-            // description — belongs to whoever last touched it in the
-            // admin (Julia / Alec / Colin). The sync never overwrites
-            // human curation.
+            // Colin 10/21 — auto-refresh is price, image, stock only.
+            // Everything else (name, size, type, category, description,
+            // hidden, status, url, sku) is admin-curated and never
+            // touched by sync. Purgo doesn't return a per-product
+            // discount price so we leave that alone too.
             $existing->fill([
                 'price' => $p['price'],
                 'image_url' => $p['image'],
-                'product_url' => $productUrl,
                 'stock_status' => 'in_stock',
-                'external_id' => $extId,
             ])->save();
             return 'updated';
         }

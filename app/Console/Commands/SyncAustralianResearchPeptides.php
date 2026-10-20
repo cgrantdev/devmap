@@ -197,7 +197,14 @@ class SyncAustralianResearchPeptides extends Command
         }
 
         if ($existing) {
-            $existing->fill($attrs)->save();
+            // Colin 10/21 — auto-refresh is price + stock only. ARP's
+            // text.md mirrors don't include images, so there's nothing
+            // else to touch. Admin curation on name/size/type/category/
+            // hidden/status/description stays locked.
+            $existing->fill([
+                'price' => $variant['price_aud'],
+                'stock_status' => $variant['in_stock'] ? 'in_stock' : 'out_of_stock',
+            ])->save();
             return 'updated';
         }
 

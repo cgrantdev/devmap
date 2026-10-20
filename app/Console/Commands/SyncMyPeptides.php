@@ -137,13 +137,12 @@ class SyncMyPeptides extends Command
         $inStock = ($p['stock_status'] ?? 'in_stock') === 'in_stock' && ((int) ($p['stock_quantity'] ?? 0) > 0);
 
         if ($existing) {
-            // Admin-field lock — only touch what My Peptides owns.
+            // Colin 10/21 — only price / sale / stock on auto-refresh.
+            // Everything else admin-curated.
             $existing->fill([
                 'price' => $retail,
                 'discount_price' => $discountPrice,
-                'product_url' => $productUrl,
                 'stock_status' => $inStock ? 'in_stock' : 'out_of_stock',
-                'external_id' => $sku,
             ])->save();
             return 'updated';
         }
