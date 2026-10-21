@@ -406,6 +406,9 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     // in and work directly. Overview + Playbook sections live here; the
     // internal /admin/seo-wip stays CEO-only for the ops inventory.
     Route::get('/seo', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'index'])->name('admin.seo');
+    Route::get('/seo/pages', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'pages'])->name('admin.seo.pages');
+    Route::post('/seo/pages', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'savePage'])->name('admin.seo.pages.save');
+    Route::delete('/seo/pages/{seoPage}', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'deletePage'])->name('admin.seo.pages.delete');
     Route::get('/seo/playbook', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'playbook'])->name('admin.seo.playbook');
 
     Route::middleware('ceo.only')->group(function () {

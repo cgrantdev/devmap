@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\SeoPage;
 use App\Services\SeoMetrics;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -45,12 +48,96 @@ class SeoDashboardController extends Controller
         ]);
     }
 
+    public function pages(): Response
+    {
+        return Inertia::render('Admin/SeoDashboard', [
+            'tab' => 'pages',
+            'seo_pages' => SeoPage::orderBy('key')->get()->map(fn ($p) => [
+                'id' => $p->id,
+                'key' => $p->key,
+                'title' => $p->title,
+                'description' => $p->description,
+                'og_title' => $p->og_title,
+                'og_description' => $p->og_description,
+                'og_image' => $p->og_image,
+                'updated_at' => $p->updated_at?->toIso8601String(),
+            ])->values(),
+            'suggested_keys' => $this->suggestedKeys(),
+        ]);
+    }
+
+    /**
+     * Upsert a single SeoPage. Mirrors SettingsController::upsertSeoPage
+     * but routed through the SEO dashboard so the agency's workflow
+     * stays on one tab.
+     */
+    public function savePage(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'id' => 'nullable|integer|exists:seo_pages,id',
+            'key' => 'required|string|max:100|regex:/^[a-z0-9_-]+$/|unique:seo_pages,key,' . ($request->input('id') ?? 'NULL') . ',id',
+            'title' => 'nullable|string|max:70',
+            'description' => 'nullable|string|max:200',
+            'og_title' => 'nullable|string|max:120',
+            'og_description' => 'nullable|string|max:300',
+            'og_image' => 'nullable|string|max:500',
+        ]);
+
+        $data = collect($validated)->except('id')->toArray();
+        if (!empty($validated['id'])) {
+            SeoPage::findOrFail($validated['id'])->update($data);
+        } else {
+            SeoPage::create($data);
+        }
+        return back()->with('flash_success', 'SEO page saved.');
+    }
+
+    public function deletePage(SeoPage $seoPage): RedirectResponse
+    {
+        $seoPage->delete();
+        return back()->with('flash_success', 'SEO page removed.');
+    }
+
     public function playbook(): Response
     {
         return Inertia::render('Admin/SeoDashboard', [
             'tab' => 'playbook',
             'playbook' => $this->playbookMarkdown(),
         ]);
+    }
+
+    /**
+     * Keys we expect the agency to want overrides for. Hints the UI
+     * so they don't have to memorize our page-naming conventions.
+     */
+    private function suggestedKeys(): array
+    {
+        $existing = SeoPage::pluck('key')->all();
+        $candidates = [
+            'home' => 'Homepage',
+            'brands' => '/brands directory',
+            'products' => '/products catalog',
+            'compare' => '/compare index',
+            'encyclopedia' => '/encyclopedia index',
+            'blogs' => '/blogs index',
+            'guides' => '/guides index',
+            'bacteriostatic-water' => '/bacteriostatic-water landing',
+            'blends' => '/blends landing',
+            'skincare' => '/skincare landing',
+            'bulk' => '/bulk landing',
+            'testing-labs' => '/testing-labs landing',
+            'become-vendor' => '/become-a-vendor',
+            'for-vendors-badge' => '/for-vendors/badge',
+        ];
+        $out = [];
+        foreach ($candidates as $k => $label) {
+            $out[] = [
+                'key' => $k,
+                'label' => $label,
+                'exists' => in_array($k, $existing, true),
+            ];
+        }
+        return $out;
     }
 
     /**

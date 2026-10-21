@@ -14,6 +14,13 @@
               : 'border-transparent text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]']">
           Overview
         </a>
+        <a href="/admin/seo/pages"
+          :class="['px-4 py-2 text-sm font-medium border-b-2 -mb-px',
+            tab === 'pages'
+              ? 'border-indigo-600 text-indigo-600'
+              : 'border-transparent text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]']">
+          Pages
+        </a>
         <a href="/admin/seo/playbook"
           :class="['px-4 py-2 text-sm font-medium border-b-2 -mb-px',
             tab === 'playbook'
@@ -135,6 +142,109 @@
         </section>
       </div>
 
+      <!-- PAGES -->
+      <div v-else-if="tab === 'pages'" class="space-y-6">
+        <section>
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-lg font-semibold">SEO page overrides</h2>
+              <p class="text-sm text-[color:var(--color-ink-muted)]">
+                Per-URL title + description + OG. Admin override wins over the auto-generated default.
+                Keyed by page slug ({{ "{" }}home{{ "}" }}, {{ "{" }}brands{{ "}" }}, etc).
+              </p>
+            </div>
+            <button @click="startNew" class="h-9 px-4 text-[13px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded">
+              + New override
+            </button>
+          </div>
+          <div v-if="(seo_pages || []).length === 0" class="rounded-lg border border-dashed border-[color:var(--color-hairline)] p-8 text-center">
+            <p class="text-sm text-[color:var(--color-ink-muted)]">No SEO overrides yet. Click "+ New override" to add one.</p>
+          </div>
+          <table v-else class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-[color:var(--color-hairline)] text-[12px] text-[color:var(--color-ink-muted)] uppercase tracking-wider">
+                <th class="text-left py-2 font-medium">Key</th>
+                <th class="text-left py-2 font-medium">Title</th>
+                <th class="text-left py-2 font-medium">Description</th>
+                <th class="text-right py-2 font-medium">Updated</th>
+                <th class="text-right py-2 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in seo_pages" :key="row.id" class="border-b border-[color:var(--color-hairline-soft)]">
+                <td class="py-3 ui-mono text-[12px]">{{ row.key }}</td>
+                <td class="py-3 text-[13px] truncate max-w-[260px]">{{ row.title || '—' }}</td>
+                <td class="py-3 text-[12px] text-[color:var(--color-ink-muted)] truncate max-w-[320px]">{{ row.description || '—' }}</td>
+                <td class="py-3 text-right text-[11px] text-[color:var(--color-ink-subtle)]">{{ formatTs(row.updated_at) }}</td>
+                <td class="py-3 text-right">
+                  <button @click="startEdit(row)" class="text-[12px] text-indigo-600 hover:underline mr-3">Edit</button>
+                  <button @click="deletePage(row)" class="text-[12px] text-red-600 hover:underline">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section v-if="suggested_keys">
+          <h3 class="text-sm font-semibold mb-2">Suggested keys to override</h3>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="s in suggested_keys" :key="s.key"
+              @click="startNewWith(s.key)"
+              :disabled="s.exists"
+              :class="['text-[12px] px-3 py-1 rounded-full border',
+                s.exists
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200 cursor-default'
+                  : 'bg-white text-[color:var(--color-ink)] border-[color:var(--color-hairline)] hover:border-indigo-400 hover:text-indigo-700']">
+              {{ s.exists ? '✓ ' : '+ ' }}{{ s.key }}
+              <span class="text-[10px] text-[color:var(--color-ink-muted)] ml-1">— {{ s.label }}</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Edit modal (inline) -->
+        <div v-if="editing" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" @click.self="editing = null">
+          <div class="bg-white rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-lg font-semibold mb-4">{{ editing.id ? 'Edit' : 'New' }} SEO override</h3>
+            <div class="space-y-3">
+              <label class="block">
+                <span class="block text-[12px] font-semibold mb-1">Key</span>
+                <input v-model="editing.key" type="text" :disabled="editing.id" class="w-full h-9 px-3 text-sm border border-[color:var(--color-hairline)] rounded ui-mono" placeholder="home" />
+                <span class="text-[11px] text-[color:var(--color-ink-muted)]">Lowercase, no spaces. Matches the page slug.</span>
+              </label>
+              <label class="block">
+                <span class="block text-[12px] font-semibold mb-1">Title <span class="text-[color:var(--color-ink-subtle)]">(max 70)</span></span>
+                <input v-model="editing.title" type="text" maxlength="70" class="w-full h-9 px-3 text-sm border border-[color:var(--color-hairline)] rounded" />
+                <span class="text-[11px] text-[color:var(--color-ink-muted)]">{{ (editing.title || '').length }}/70</span>
+              </label>
+              <label class="block">
+                <span class="block text-[12px] font-semibold mb-1">Meta description <span class="text-[color:var(--color-ink-subtle)]">(max 200)</span></span>
+                <textarea v-model="editing.description" maxlength="200" rows="3" class="w-full px-3 py-2 text-sm border border-[color:var(--color-hairline)] rounded"></textarea>
+                <span class="text-[11px] text-[color:var(--color-ink-muted)]">{{ (editing.description || '').length }}/200</span>
+              </label>
+              <label class="block">
+                <span class="block text-[12px] font-semibold mb-1">OG title <span class="text-[color:var(--color-ink-subtle)]">(optional)</span></span>
+                <input v-model="editing.og_title" type="text" maxlength="120" class="w-full h-9 px-3 text-sm border border-[color:var(--color-hairline)] rounded" />
+              </label>
+              <label class="block">
+                <span class="block text-[12px] font-semibold mb-1">OG description <span class="text-[color:var(--color-ink-subtle)]">(optional)</span></span>
+                <textarea v-model="editing.og_description" maxlength="300" rows="2" class="w-full px-3 py-2 text-sm border border-[color:var(--color-hairline)] rounded"></textarea>
+              </label>
+              <label class="block">
+                <span class="block text-[12px] font-semibold mb-1">OG image URL <span class="text-[color:var(--color-ink-subtle)]">(optional)</span></span>
+                <input v-model="editing.og_image" type="url" class="w-full h-9 px-3 text-sm border border-[color:var(--color-hairline)] rounded" placeholder="https://..." />
+              </label>
+            </div>
+            <div class="flex justify-end gap-2 mt-5">
+              <button @click="editing = null" class="h-9 px-4 text-[13px] font-medium bg-slate-100 hover:bg-slate-200 rounded">Cancel</button>
+              <button @click="savePage" :disabled="saving" class="h-9 px-4 text-[13px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded disabled:opacity-50">
+                {{ saving ? 'Saving…' : 'Save' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- PLAYBOOK -->
       <div v-else-if="tab === 'playbook'" class="prose prose-sm max-w-none">
         <div v-html="rendered_playbook" class="seo-playbook" />
@@ -144,7 +254,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { router } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 
 const props = defineProps({
@@ -154,7 +265,35 @@ const props = defineProps({
   index_coverage: { type: Object, default: null },
   recovery_context: { type: Object, default: null },
   playbook: { type: String, default: '' },
+  seo_pages: { type: Array, default: () => [] },
+  suggested_keys: { type: Array, default: () => [] },
 })
+
+// Pages tab state
+const editing = ref(null)
+const saving = ref(false)
+function startNew() {
+  editing.value = { id: null, key: '', title: '', description: '', og_title: '', og_description: '', og_image: '' }
+}
+function startNewWith(key) {
+  editing.value = { id: null, key, title: '', description: '', og_title: '', og_description: '', og_image: '' }
+}
+function startEdit(row) { editing.value = { ...row } }
+function savePage() {
+  saving.value = true
+  router.post('/admin/seo/pages', editing.value, {
+    preserveScroll: true,
+    onFinish: () => { saving.value = false; editing.value = null },
+  })
+}
+function deletePage(row) {
+  if (!confirm(`Remove SEO override for "${row.key}"? Default auto-generated meta takes over.`)) return
+  router.delete(`/admin/seo/pages/${row.id}`, { preserveScroll: true })
+}
+function formatTs(iso) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
 
 // Minimal markdown -> HTML. Not using a library since the playbook
 // is hand-authored by us; this covers the elements we actually use.
