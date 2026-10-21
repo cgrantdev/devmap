@@ -402,6 +402,12 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     // Internal SEO inventory + notes scratchpad. Same ceo.only gate as
     // /admin/ceo. Excluded from sitemap; noindex header on the response;
     // /admin/* already disallowed in robots.txt.
+    // SEO dashboard — agency-facing. NOT ceo.only so the agency can log
+    // in and work directly. Overview + Playbook sections live here; the
+    // internal /admin/seo-wip stays CEO-only for the ops inventory.
+    Route::get('/seo', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'index'])->name('admin.seo');
+    Route::get('/seo/playbook', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'playbook'])->name('admin.seo.playbook');
+
     Route::middleware('ceo.only')->group(function () {
         Route::get('/seo-wip', [\App\Http\Controllers\Admin\SeoWipController::class, 'index'])->name('admin.seo-wip');
         Route::post('/seo-wip/notes', [\App\Http\Controllers\Admin\SeoWipController::class, 'saveNotes'])->name('admin.seo-wip.notes');
