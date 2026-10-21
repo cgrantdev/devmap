@@ -41,11 +41,18 @@ class BlogImageBackfill extends Command
             ->get();
         foreach ($eps as $ep) {
             $cat = ProductCategory::find($ep->product_category_id);
-            if (!$cat || !$cat->slug) {
+            // Prefer the per-compound OG card. Fall back to the default
+            // site OG when the article has no linked category slug (new
+            // articles, deleted-category orphans, pseudonym-only entries).
+            // Something is strictly better than nothing — a blank
+            // seo_og_image means social scrapers pick whatever random
+            // image they find on the page.
+            if ($cat && $cat->slug) {
+                $url = $base . '/og/compound/' . $cat->slug . '.png';
+            } else {
+                $url = $default;
                 $epSkipped++;
-                continue;
             }
-            $url = $base . '/og/compound/' . $cat->slug . '.png';
             if (!$isDry) $ep->forceFill(['seo_og_image' => $url])->save();
             $epFixed++;
         }
