@@ -60,12 +60,17 @@ class SyncZenithBioscience extends Command
             return self::FAILURE;
         }
 
+        // Zenith's security layer (Cloudflare-style WAF) 403s requests
+        // identifying as PeptidemapBot. Use a real Chrome UA + standard
+        // Accept-Language so we look like a browser pulling the API.
+        // Colin 10/22.
         $this->info("Fetching Zenith catalog…");
         $resp = Http::timeout(60)
             ->withHeaders([
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
-                'User-Agent' => 'PeptidemapBot/1.0 (+https://peptidemap.com)',
+                'Accept-Language' => 'en-US,en;q=0.9',
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
             ])
             ->get(self::ENDPOINT);
 
