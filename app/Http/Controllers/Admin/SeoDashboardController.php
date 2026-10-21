@@ -162,10 +162,12 @@ class SeoDashboardController extends Controller
 ## Tools you'll use
 
 - `/admin/seo` — this page (overview + playbook)
-- `/admin/seo-pages` — bulk SEO overrides per URL key
-- `/admin/encyclopedia-entries` — long-form content editor
-- `/admin/vendors/{id}/edit` → SEO tab — per-vendor overrides
+- `/admin/settings` — site-wide SEO Pages section — overrides for the key pages (home, brands, products, compare, encyclopedia) keyed by URL slug
+- `/admin/encyclopedia-entries` — long-form encyclopedia content editor
+- `/admin/vendors/{id}/edit` → SEO tab — per-vendor title/description/OG overrides
+- `/admin/products/{id}/edit` → SEO tab — per-product overrides (rare — AI generation handles the baseline)
 - `/admin/ceo` — GSC dashboard with top queries, pages, opportunities
+- `/admin/dev/console` — artisan command runner (for Claude; agency rarely needs this)
 
 ## Who to ask
 
