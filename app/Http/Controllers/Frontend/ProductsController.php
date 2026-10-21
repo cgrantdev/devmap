@@ -1229,7 +1229,14 @@ class ProductsController extends Controller
                 'initials' => $initials,
                 'rating' => (float) ($brand->rating_average ?? 0),
                 'reviews' => (int) ($brand->rating_count ?? 0),
-                'description' => $brand->vendorSetting->description ?? 'Premium quality peptides for research purposes.',
+                // Colin 10/21 SEO push — fall back through the dedup
+                // chain so every /brand/{slug} has a unique body
+                // description instead of the "Premium quality peptides
+                // for research purposes." boilerplate that was shared
+                // across ~40 vendors with no manual description.
+                'description' => $brand->vendorSetting->description
+                    ?: $brand->vendorSetting->generated_description
+                    ?: 'Research peptide supplier listed on Peptidemap.',
                 'shop_url' => $brand->vendorSetting->shop_url ?? null,
                 'contact_email' => $brand->vendorSetting->contact_email ?? null,
                 'phone_number' => $brand->vendorSetting->phone_number ?? null,
