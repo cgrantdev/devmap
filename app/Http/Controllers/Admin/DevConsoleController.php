@@ -60,6 +60,10 @@ class DevConsoleController extends Controller
             'label' => 'Show how many products have unique descriptions + queue depth',
             'args' => [],
         ],
+        'blogs:image-audit' => [
+            'label' => 'Report blog + encyclopedia article image coverage',
+            'args' => [],
+        ],
         'brands:slug-lookup' => [
             'label' => 'Show brand slugs (optional substring filter)',
             'args' => [],
