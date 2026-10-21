@@ -38,6 +38,37 @@ class ProductsController extends Controller
 
     private function buildProductMetaDescription($product, $brand): string
     {
+        // Colin 10/21 SEO work: Google was collapsing product pages as
+        // near-duplicates partly because the meta description was
+        // templated identically across every product ("X from Y.
+        // Compare listings from N vendors..."). We now have genuinely
+        // unique AI-generated descriptions per product (or scraped
+        // vendor copy). Use the first sentence of that as the meta —
+        // ~150 chars of truly distinct text per URL.
+        $source = $product->vendor_description
+            ?: $product->generated_description
+            ?: null;
+
+        if ($source) {
+            // First sentence, trimmed to the SEO limit.
+            $firstSentence = preg_split('/(?<=[.!?])\s+/', trim($source), 2)[0] ?? '';
+            $firstSentence = trim($firstSentence);
+            if (mb_strlen($firstSentence) >= 60 && mb_strlen($firstSentence) <= 155) {
+                return $firstSentence;
+            }
+            // Too short? Grab the first 150 chars at word boundary.
+            if (mb_strlen($source) > 60) {
+                $snippet = mb_substr($source, 0, 150);
+                $lastSpace = mb_strrpos($snippet, ' ');
+                if ($lastSpace !== false && $lastSpace >= 100) {
+                    return mb_substr($snippet, 0, $lastSpace) . '…';
+                }
+                return $snippet . '…';
+            }
+        }
+
+        // Fallback: the old generic template. Keeps things working on
+        // the 1 straggler product that didn't get a description.
         $vendorCount = 0;
         if ($product->product_category_id) {
             $vendorCount = Product::visible()
