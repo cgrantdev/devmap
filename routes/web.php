@@ -411,6 +411,10 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     Route::delete('/seo/pages/{seoPage}', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'deletePage'])->name('admin.seo.pages.delete');
     Route::get('/seo/playbook', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'playbook'])->name('admin.seo.playbook');
 
+    // Per-page analytics — GSC + internal signals for any one URL.
+    // Deep-linked from the frontend AdminBar's "Analytics" button.
+    Route::get('/analytics/page', [\App\Http\Controllers\Admin\PageAnalyticsController::class, 'show'])->name('admin.analytics.page');
+
     Route::middleware('ceo.only')->group(function () {
         Route::get('/seo-wip', [\App\Http\Controllers\Admin\SeoWipController::class, 'index'])->name('admin.seo-wip');
         Route::post('/seo-wip/notes', [\App\Http\Controllers\Admin\SeoWipController::class, 'saveNotes'])->name('admin.seo-wip.notes');

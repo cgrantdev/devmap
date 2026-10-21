@@ -19,6 +19,7 @@
 
     <span class="text-white/30">·</span>
 
+    <a :href="analyticsHref" class="text-white/90 hover:text-amber-300 font-medium">Analytics</a>
     <a href="/admin/seo" class="text-white/90 hover:text-amber-300 font-medium">SEO</a>
     <a href="/admin/dev/console" class="text-white/90 hover:text-amber-300 font-medium hidden sm:inline">Dev Console</a>
 
@@ -39,4 +40,10 @@ import { usePage } from '@inertiajs/vue3'
 const page = usePage()
 const bar = computed(() => page.props.admin_bar || null)
 const csrfToken = computed(() => page.props.csrf_token || '')
+// Analytics link always deep-links to the current URL path so the
+// admin lands on the per-page view, not the generic dashboard.
+const analyticsHref = computed(() => {
+  const path = typeof window !== 'undefined' ? window.location.pathname : '/'
+  return '/admin/analytics/page?url=' + encodeURIComponent(path)
+})
 </script>
