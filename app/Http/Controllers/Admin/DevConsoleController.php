@@ -132,6 +132,14 @@ class DevConsoleController extends Controller
             'label' => 'Clear compiled views',
             'args' => [],
         ],
+        'route:clear' => [
+            'label' => 'Clear route cache (useful after new route deploy)',
+            'args' => [],
+        ],
+        'optimize:clear' => [
+            'label' => 'Clear all compiled caches (config/route/view/events)',
+            'args' => [],
+        ],
     ];
 
     public function index()
