@@ -98,6 +98,11 @@ class DevConsoleController extends Controller
             'label' => 'Pull Zenith Bioscience catalog (needs API key on vendor row)',
             'args' => ['--dry-run' => true, '--limit' => 'int'],
         ],
+        'zenith:set-token' => [
+            'label' => 'Set Zenith bearer token (positional arg: token)',
+            'args' => [],
+            'positional' => ['token' => 'string'],
+        ],
         'mypeptides:sync' => [
             'label' => 'Pull My Peptides UK catalog (public API, no key)',
             'args' => ['--dry-run' => true, '--limit' => 'int'],
@@ -169,6 +174,19 @@ class DevConsoleController extends Controller
         }
 
         $args = $this->sanitizeArgs($request->input('args', []), $meta['args']);
+
+        // Positional args — artisan accepts them as unnamed array
+        // entries at the start. Whitelist-defined, same sanitization
+        // rules as flag args.
+        if (!empty($meta['positional'])) {
+            foreach ($meta['positional'] as $name => $type) {
+                $v = $request->input('positional.' . $name) ?? $request->input('args.' . $name);
+                if ($v === null || $v === '') continue;
+                if ($type === 'int') $v = (int) $v;
+                else $v = (string) $v;
+                $args[$name] = $v;
+            }
+        }
 
         $buffer = new BufferedOutput();
         $started = microtime(true);
