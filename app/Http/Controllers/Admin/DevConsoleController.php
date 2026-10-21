@@ -69,6 +69,11 @@ class DevConsoleController extends Controller
             'args' => [],
             'positional' => ['brand' => 'string'],
         ],
+        'vendor:discover' => [
+            'label' => 'Dispatch page-scraper discovery for one brand',
+            'args' => [],
+            'positional' => ['brand' => 'string'],
+        ],
         'brands:ensure-generated-desc-column' => [
             'label' => 'Add generated_description to vendor_settings (schema)',
             'args' => [],
