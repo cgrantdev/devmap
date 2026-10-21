@@ -27,6 +27,43 @@ class ProductsController extends Controller
         ]);
     }
 
+    /**
+     * Compute the currently-live SEO (title / description / OG / image)
+     * for a product so the admin edit SEO tab can show it next to the
+     * override inputs. Mirrors the fallback chain in
+     * Frontend/ProductsController::showProduct so admin sees exactly
+     * what Google sees.
+     */
+    private function buildLiveSeoPreview(Product $product): array
+    {
+        $brand = $product->brand;
+        $displayName = (string) ($product->display_name ?? $product->name);
+        $autoTitle = \App\Support\ProductPageSeo::title($displayName, $brand?->name);
+        // Meta description: prefer vendor_description, then generated,
+        // then template. Same chain as frontend.
+        $source = $product->vendor_description ?: $product->generated_description;
+        if ($source) {
+            $first = preg_split('/(?<=[.!?])\s+/', trim($source), 2)[0] ?? '';
+            $autoDesc = mb_strlen($first) <= 155 && mb_strlen($first) >= 60
+                ? trim($first)
+                : (mb_substr($source, 0, 150) . '…');
+        } else {
+            $vendorCount = $product->product_category_id
+                ? Product::visible()->where('status', 'active')
+                    ->where('product_category_id', $product->product_category_id)
+                    ->distinct('brand_id')->count('brand_id')
+                : 0;
+            $autoDesc = \App\Support\ProductPageSeo::description($displayName, $brand?->name, $vendorCount);
+        }
+        return [
+            'title' => $autoTitle,
+            'description' => $autoDesc,
+            'og_title' => $autoTitle,
+            'og_description' => $autoDesc,
+            'og_image' => url("/og/product/{$product->id}.png"),
+        ];
+    }
+
     public function edit($id)
     {
         $product = Product::with(['category', 'brand'])->findOrFail($id);
@@ -70,6 +107,12 @@ class ProductsController extends Controller
                 'seo_og_title' => $product->seo_og_title,
                 'seo_og_description' => $product->seo_og_description,
                 'seo_og_image' => $product->seo_og_image,
+                // Colin 10/22 — show currently-live auto-generated SEO
+                // next to the override fields so the agency sees what
+                // Google receives today, instead of staring at an
+                // empty form and guessing. Read-only; empty override
+                // keeps the auto-generation live and self-refreshing.
+                'live_seo' => $this->buildLiveSeoPreview($product),
             ],
             'categories' => $categories,
             'brands' => $brands,

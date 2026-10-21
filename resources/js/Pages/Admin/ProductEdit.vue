@@ -141,25 +141,37 @@
 
     <!-- SEO tab -->
     <template v-if="activeTab === 'seo'">
+      <div v-if="product?.live_seo" class="mb-5 p-4 rounded-lg border border-indigo-100 bg-indigo-50/40">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-[11px] uppercase tracking-wider font-semibold text-indigo-700">Currently live on Google</span>
+          <span class="text-[11px] text-[color:var(--color-ink-muted)]">— auto-generated. Fill fields below only to override.</span>
+        </div>
+        <div class="space-y-1.5 text-[12px] text-[color:var(--color-ink-muted)]">
+          <div><strong class="text-[color:var(--color-ink)]">Title:</strong> {{ product.live_seo.title }}</div>
+          <div><strong class="text-[color:var(--color-ink)]">Description:</strong> {{ product.live_seo.description }}</div>
+          <div><strong class="text-[color:var(--color-ink)]">OG image:</strong> <a :href="product.live_seo.og_image" target="_blank" class="text-indigo-600 hover:underline ui-mono text-[11px]">{{ product.live_seo.og_image }}</a></div>
+        </div>
+      </div>
+
       <FormSection title="Search Engine Optimization">
-        <FormField label="Page Title" :error="form.errors.seo_page_title" hint="Override the default page title">
-          <input v-model="form.seo_page_title" type="text" class="ui-input" placeholder="SEO page title..." />
+        <FormField label="Page Title" :error="form.errors.seo_page_title" hint="Override the default page title. Leave blank to keep the auto-generated title above.">
+          <input v-model="form.seo_page_title" type="text" class="ui-input" :placeholder="product?.live_seo?.title || 'SEO page title...'" />
         </FormField>
-        <FormField label="Meta Description" :error="form.errors.seo_description" hint="155 characters recommended">
-          <textarea v-model="form.seo_description" class="ui-input" rows="3" placeholder="Meta description..."></textarea>
+        <FormField label="Meta Description" :error="form.errors.seo_description" hint="155 characters recommended. Leave blank to keep the auto-generated description.">
+          <textarea v-model="form.seo_description" class="ui-input" rows="3" :placeholder="product?.live_seo?.description || 'Meta description...'"></textarea>
         </FormField>
       </FormSection>
 
       <FormSection title="Open Graph" :columns="2">
-        <FormField label="OG Title" :error="form.errors.seo_og_title">
-          <input v-model="form.seo_og_title" type="text" class="ui-input" placeholder="Open Graph title..." />
+        <FormField label="OG Title" :error="form.errors.seo_og_title" hint="Falls back to Page Title">
+          <input v-model="form.seo_og_title" type="text" class="ui-input" :placeholder="product?.live_seo?.og_title || 'Open Graph title...'" />
         </FormField>
-        <FormField label="OG Image URL" :error="form.errors.seo_og_image">
-          <input v-model="form.seo_og_image" type="url" class="ui-input" placeholder="https://..." />
+        <FormField label="OG Image URL" :error="form.errors.seo_og_image" hint="Falls back to the auto-rendered product card">
+          <input v-model="form.seo_og_image" type="url" class="ui-input" :placeholder="product?.live_seo?.og_image || 'https://...'" />
         </FormField>
         <div class="md:col-span-2">
-          <FormField label="OG Description" :error="form.errors.seo_og_description">
-            <textarea v-model="form.seo_og_description" class="ui-input" rows="3" placeholder="Open Graph description..."></textarea>
+          <FormField label="OG Description" :error="form.errors.seo_og_description" hint="Falls back to Meta Description">
+            <textarea v-model="form.seo_og_description" class="ui-input" rows="3" :placeholder="product?.live_seo?.og_description || 'Open Graph description...'"></textarea>
           </FormField>
         </div>
       </FormSection>
