@@ -64,6 +64,10 @@ class DevConsoleController extends Controller
             'label' => 'Report blog + encyclopedia article image coverage',
             'args' => [],
         ],
+        'blogs:recent' => [
+            'label' => 'List recent blog posts with authorship signals',
+            'args' => [],
+        ],
         'blogs:backfill-images' => [
             'label' => 'Set seo_og_image + hero image on blogs/encyclopedia missing one',
             'args' => ['--dry-run' => true],
