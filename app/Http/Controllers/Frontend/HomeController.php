@@ -340,7 +340,10 @@ class HomeController extends Controller
             // Backward-compatible field used by some pages
             'image' => $seoPage?->og_image ?: $defaultImage,
             'url' => url('/'),
-            'robots' => 'noindex, follow',
+            // Colin 10/21 — was 'noindex, follow'. Not currently
+            // rendered to <meta robots>, but one layout wire-up away
+            // from catastrophe. Dropping entirely so the homepage
+            // defaults to Google's standard (index, follow).
         ];
 
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
