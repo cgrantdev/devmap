@@ -64,6 +64,11 @@ class DevConsoleController extends Controller
             'label' => 'Show brand slugs (optional substring filter)',
             'args' => [],
         ],
+        'vendor:inspect' => [
+            'label' => 'Dump integration fields for one brand',
+            'args' => [],
+            'positional' => ['brand' => 'string'],
+        ],
         'brands:ensure-generated-desc-column' => [
             'label' => 'Add generated_description to vendor_settings (schema)',
             'args' => [],
