@@ -56,6 +56,29 @@ class CompareHubBlurb
             return $limited;
         }
 
+        return self::replacement($slug);
+    }
+
+    /**
+     * Full compare-page summary or OG tagline. A claim anywhere in the
+     * source is replaced with the class line. Clean copy is left intact.
+     */
+    public static function guard(?string $slug, ?string $raw): ?string
+    {
+        $plain = trim(strip_tags((string) $raw));
+        if ($plain === '') {
+            return null;
+        }
+
+        if (! self::hasOutcomeClaim($plain)) {
+            return $plain;
+        }
+
+        return self::replacement($slug);
+    }
+
+    private static function replacement(?string $slug): string
+    {
         $key = strtolower(trim((string) $slug));
 
         return self::NEUTRAL[$key] ?? self::FALLBACK;

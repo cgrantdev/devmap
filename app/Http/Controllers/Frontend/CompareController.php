@@ -502,8 +502,12 @@ class CompareController extends Controller
         // off this page. Other compounds can still use the encyclopedia blurb.
         $summary = null;
         if (!is_array($research)) {
-            $summary = $educationPost?->overview ?: $educationPost?->description;
-            $summary = $summary ? strip_tags($summary) : null;
+            // The encyclopedia overview sits beside listed prices. Outcome
+            // lines become the same class sentence the hub card uses.
+            $summary = CompareHubBlurb::guard(
+                $category->slug,
+                $educationPost?->overview ?: $educationPost?->description
+            );
         }
 
         $vendorCount = $documentProducts->pluck('brand_name')->unique()->count();
@@ -1407,12 +1411,10 @@ class CompareController extends Controller
         }
 
         if (is_array($vsNarrative) && filled($vsNarrative['lead'] ?? null)) {
-            return $vsNarrative['lead'];
+            return CompareHubBlurb::guard($category->slug, (string) $vsNarrative['lead']);
         }
 
-        $summary = $ep?->overview ?: $ep?->description;
-
-        return $summary ? strip_tags($summary) : null;
+        return CompareHubBlurb::guard($category->slug, $ep?->overview ?: $ep?->description);
     }
 
     /**

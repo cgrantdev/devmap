@@ -79,6 +79,22 @@ class CompareHubBlurbTest extends TestCase
         );
     }
 
+    public function test_guard_replaces_a_claim_and_keeps_clean_copy_intact(): void
+    {
+        $clean = 'Tesofensine is a small-molecule inhibitor of serotonin, norepinephrine, and dopamine reuptake. It is not a peptide. '.str_repeat('Catalog identity only. ', 12);
+
+        $this->assertGreaterThan(200, mb_strlen($clean));
+        $this->assertSame(trim($clean), CompareHubBlurb::guard('tesofensine', $clean));
+        $this->assertSame(
+            'Cagrilintide is an amylin analog studied in obesity research. Research use only.',
+            CompareHubBlurb::guard('cagrilintide', 'The combination showed up to 25% body weight reduction in a later paragraph. '.str_repeat('More context. ', 30))
+        );
+        $this->assertSame(
+            'Ipamorelin is a growth hormone secretagogue studied in endocrine research. Research use only.',
+            CompareHubBlurb::guard('ipamorelin', 'Ipamorelin is the most selective GHS.')
+        );
+    }
+
     public function test_outcome_words_match_and_neutral_lines_do_not(): void
     {
         foreach ([
