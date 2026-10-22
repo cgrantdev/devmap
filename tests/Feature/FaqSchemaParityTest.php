@@ -6,6 +6,7 @@ use App\Content\EducationalContentPublisher;
 use App\Models\Blog;
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
+use App\Support\OrforglipronOralSemaglutideComparePage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -122,7 +123,10 @@ HTML,
         }
 
         foreach ($slugs as $slug) {
-            $response = $this->get('/blog/'.$slug)->assertOk();
+            $path = $slug === OrforglipronOralSemaglutideComparePage::BLOG_SLUG
+                ? OrforglipronOralSemaglutideComparePage::PUBLIC_PATH
+                : '/blog/'.$slug;
+            $response = $this->get($path)->assertOk();
             $faqPage = $this->faqPage($response->getContent());
             $this->assertNotNull($faqPage, $slug);
 

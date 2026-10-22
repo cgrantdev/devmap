@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Setting;
 use App\Support\FaqPage;
+use App\Support\OrforglipronOralSemaglutideComparePage;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
@@ -94,6 +95,13 @@ class BlogsController extends Controller
 
     public function show($slug)
     {
+        if (
+            OrforglipronOralSemaglutideComparePage::isBlogSlug($slug)
+            && ! request()->is('compare/*')
+        ) {
+            return redirect(OrforglipronOralSemaglutideComparePage::PUBLIC_PATH, 301);
+        }
+
         $blog = Blog::where('slug', $slug)
             ->where('status', 'published')
             ->whereNotNull('published_at')
@@ -129,7 +137,10 @@ class BlogsController extends Controller
         // Generate SEO data for blog detail
         // Priority: Use stored SEO data from database, fallback to auto-generated
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
-        $blogUrl = 'https://peptidemap.com/blog/'.$blog->slug;
+        $onCompare = OrforglipronOralSemaglutideComparePage::isBlogSlug($blog->slug);
+        $blogUrl = $onCompare
+            ? OrforglipronOralSemaglutideComparePage::canonicalUrl()
+            : 'https://peptidemap.com/blog/'.$blog->slug;
 
         // Build blog image URL - handle both absolute URLs and relative paths
         $blogImage = null;
@@ -202,7 +213,7 @@ class BlogsController extends Controller
             '@type' => 'BreadcrumbList',
             'itemListElement' => [
                 ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://peptidemap.com/'],
-                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Blog', 'item' => 'https://peptidemap.com/blogs'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => $onCompare ? 'Compare' : 'Blog', 'item' => $onCompare ? 'https://peptidemap.com/compare' : 'https://peptidemap.com/blogs'],
                 ['@type' => 'ListItem', 'position' => 3, 'name' => $blog->title, 'item' => $blogUrl],
             ],
         ];

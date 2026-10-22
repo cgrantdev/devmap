@@ -23,6 +23,7 @@ use App\Support\RetatrutideTirzepatideCompareCopy;
 use App\Support\EloralintideTirzepatideCompareCopy;
 use App\Support\BpcTb500CompareCopy;
 use App\Support\KlowCompareCopy;
+use App\Support\OrforglipronOralSemaglutideComparePage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -390,6 +391,16 @@ class CompareController extends Controller
     public function show(Request $request, string $slug)
     {
         $canonical = CompareSlug::canonical($slug);
+
+        // Educational article, not a vendor pair. Oral semaglutide is not
+        // a product category, so the alphabetical reorder would 404.
+        if (OrforglipronOralSemaglutideComparePage::matchesRequestSlug($canonical)) {
+            if (! OrforglipronOralSemaglutideComparePage::isCanonicalPublicSlug($canonical)) {
+                return $this->redirectToCompareSlug(OrforglipronOralSemaglutideComparePage::PUBLIC_SLUG);
+            }
+
+            return app(BlogsController::class)->show(OrforglipronOralSemaglutideComparePage::BLOG_SLUG);
+        }
 
         // X-vs-Y compare pages piggyback on the same route via the -vs-
         // separator. Since no legit compound slug contains '-vs-', a single

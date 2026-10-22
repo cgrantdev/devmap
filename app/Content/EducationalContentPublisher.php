@@ -374,7 +374,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host), self::retatrutideVsSemaglutide($host), self::selankVsSemax($host), self::eloralintideVsPetrelintide($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host), self::retatrutideVsSemaglutide($host), self::selankVsSemax($host), self::eloralintideVsPetrelintide($host), self::orforglipronVsOralSemaglutideCompare($host));
     }
 
     /**
@@ -1278,6 +1278,54 @@ class EducationalContentPublisher
                     ['Have petrelintide results been reported?', 'Yes, and this page does not repeat the per-arm percentages. Roche announced company-reported ZUPREME-1 Phase 2 results on 5 March 2026. A developer-affiliated American Diabetes Association abstract (DOI 10.2337/db26-3083-lb) and a developer-affiliated paper in The Lancet Diabetes & Endocrinology (PMID 42810355, published online 29 September 2026) also report that trial. Zealand Pharma announced company-reported ZUPREME-2 topline results on 7 October 2026. Phase 3 results were not posted on the registry records checked that day.'],
                     ['What did eloralintide\'s Phase 2 trial report?', 'In a developer-affiliated paper (funded by Eli Lilly, with Lilly employees among the authors), Billings and colleagues reported a 48-week, once-weekly Phase 2 trial of eloralintide alone in 263 adults with obesity or overweight and without type 2 diabetes (The Lancet; PMID 41207310; NCT06230523). The abstract reports dose-dependent reductions in body weight versus placebo on the efficacy estimand. Per-arm percentages are not repeated here, and these are not petrelintide results or a comparison with petrelintide.'],
                     ['Is a research-use vial the same as the trial drug?', 'No. A research-use-only vial is not the investigational material used in these trials and is not an approved medicine. Peptidemap compares research-use and grey-area peptide listings. It is not a clinic, a pharmacy, or a seller. See the peptide legality guide for FDA, RUO, and compounding status. This page is not medical advice and does not give a dose.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Educational compare page for /compare/orforglipron-vs-oral-semaglutide.
+     * The row is stored under a distinct blog slug so it does not overwrite
+     * the ACHIEVE-3 article at /blog/orforglipron-vs-oral-semaglutide.
+     * Sources checked 22 October 2026. The body lives in
+     * resources/content/educational. The publisher reads this catalog.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function orforglipronVsOralSemaglutideCompare(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'orforglipron-vs-oral-semaglutide-compare.md',
+                'image_file' => 'orforglipron-vs-oral-semaglutide-compare.png',
+                'slug' => 'orforglipron-vs-oral-semaglutide-compare',
+                'h1' => 'Orforglipron vs Oral Semaglutide Tablets: Labels, US/EU/UK',
+                'lede' => 'Orforglipron is Lilly\'s oral small-molecule nonpeptide GLP-1 receptor agonist. Oral semaglutide is Novo Nordisk\'s peptide tablet. US and EU status as of 22 October 2026, label conditions for food and water, and what ACHIEVE, ATTAIN, PIONEER, and OASIS studied. Educational only.',
+                'seo_title' => 'Orforglipron vs Oral Semaglutide Tablets: Labels, US/EU/UK',
+                'seo_description' => 'Orforglipron vs oral semaglutide: molecule type, US and EU status on 22 October 2026, label food and water conditions, and trial design. Educational only.',
+                'og_title' => 'Orforglipron vs Oral Semaglutide Tablets: Labels, US/EU/UK',
+                'og_description' => 'Small-molecule orforglipron versus Novo\'s peptide tablet: US and EU status on 22 October 2026, label food and water conditions, and trial designs.',
+                'blog_type' => 'Research',
+                'read_time' => '14 Min Read',
+                'published_at' => '2026-10-22',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Orforglipron', 'Oral semaglutide', 'Foundayo', 'Rybelsus', 'Wegovy', 'RUO'],
+                'key_points' => [
+                    'Orforglipron is a small-molecule, nonpeptide oral GLP-1 receptor agonist. Oral semaglutide is a peptide tablet co-formulated with the absorption enhancer SNAC.',
+                    'As of 22 October 2026, FDA-approved Foundayo is a US weight-management tablet. The CHMP positive opinion of 15 October 2026 is pending a European Commission decision and is not an EU authorisation.',
+                    'US labels for the oral semaglutide tablets state an empty-stomach condition and a water limit. The Foundayo label says with or without food and does not state that water limit.',
+                    'ACHIEVE-3 compared the two in type 2 diabetes. ATTAIN, PIONEER, and OASIS are separate programmes. This page does not rank them and does not repeat per-arm weight-change percentages.',
+                    'A research-use listing is not Foundayo, Rybelsus, an Ozempic tablet, or a Wegovy tablet.',
+                ],
+                'faq' => self::faq($host.'/compare/orforglipron-vs-oral-semaglutide#faq', [
+                    ['Is orforglipron a peptide?', 'No. The ATTAIN-1 paper in the New England Journal of Medicine, which is developer-affiliated, describes orforglipron as a small-molecule, nonpeptide oral GLP-1 receptor agonist, and a phase 2 paper in the same journal, also developer-affiliated, calls it a nonpeptide GLP-1 receptor agonist. Oral semaglutide is a peptide. The US label says its peptide backbone is produced by yeast fermentation and that the tablets contain salcaprozate sodium (SNAC), an absorption enhancer.'],
+                    ['What is oral semaglutide on the current labels?', 'Oral semaglutide is Novo Nordisk\'s peptide GLP-1 receptor agonist in a tablet. On the US labels checked on 22 October 2026, Rybelsus tablets and Ozempic tablets are indicated for type 2 diabetes, and Wegovy tablets are indicated for adult weight management and for cardiovascular risk reduction in adults with established cardiovascular disease and obesity or overweight. In the EU, Rybelsus has been authorised for type 2 diabetes since 3 April 2020, and the Wegovy authorisation includes tablets for adult weight management.'],
+                    ['Is Foundayo approved in the United States and the European Union as of 22 October 2026?', 'In the United States, yes, for weight management. The FDA approved Foundayo (orforglipron) tablets on 1 April 2026 for adults with obesity, or overweight with at least one weight-related condition, together with diet and activity. The US label indication checked on 22 October 2026 is that use. It does not list type 2 diabetes. In the European Union, not yet as a granted authorisation. The CHMP adopted a positive opinion on 15 October 2026 recommending a marketing authorisation for type 2 diabetes and weight management. EMA\'s meeting highlights, published on 16 October 2026, list that opinion as pending a European Commission decision. A positive opinion is not a granted EU authorisation.'],
+                    ['How do the labels differ on food and water?', 'The US labels for Rybelsus tablets, Ozempic tablets, and Wegovy tablets state an empty-stomach morning condition, water up to 4 ounces, no other liquids, and a wait of at least 30 minutes before food, drink, or other oral medicines. Those sentences are label conditions, not instructions from this page. The Foundayo label states that the tablet is taken once daily with or without food, and it does not state an empty-stomach condition or a water-volume limit. A phase 2 trial, reported in a developer-affiliated paper, gave orforglipron once daily without meal-timing restrictions. Lilly\'s 1 April 2026 press release, which is company-reported, says Foundayo can be taken any time of day without food or water restrictions.'],
+                    ['Did a trial compare orforglipron with oral semaglutide, and does this page rank the programmes?', 'ACHIEVE-3 compared them in adults with type 2 diabetes who were taking metformin. It was a 52-week, open-label, randomized phase 3 trial, reported in a developer-affiliated Lancet paper. This page does not repeat its outcome figures. Those figures, with the estimand labelled, are on the orforglipron versus oral semaglutide blog. ATTAIN-1, PIONEER 6, OASIS 1, and OASIS 4 enrolled different populations and used different designs. This page does not rank one programme against another.'],
+                    ['Is a research-use listing the same as the approved tablet?', 'No. A research-use-only product sold under one of these names is not Foundayo, not Rybelsus, not an Ozempic tablet, and not a Wegovy tablet. Peptidemap is a comparison publisher for research-use and grey-area peptide listings. It is not a clinic, a pharmacy, or a seller. The peptide legality guide separates FDA approval, research-use labelling, and compounding. This page is not medical advice and does not give a dose.'],
                 ]),
             ],
         ];
