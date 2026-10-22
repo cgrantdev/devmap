@@ -49,11 +49,19 @@ class ComparePriceStats
     private const MULTI_UNIT_PATTERN = '#(pack|kit|vials|bundle|box|×|\bx\s*\d|\d\s*x\s*\d|mgx|pen\b|blend|/|mix|tablet|bulk)#iu';
 
     /**
-     * Whole-word blend markers. Boundaries keep "cag" from matching
+     * Whole-word blend markers. Boundaries keep these from matching
      * inside "cagrilintide" or "glucagon". Separators cover Cagri-Sema,
      * Cagri Sema, and Cagrilintide Semaglutide, not only CagriSema.
+     * Bare "cag" is not in this pattern: "CAG 5mg" is a single compound.
      */
-    private const BLEND_TOKEN_PATTERN = '#\b(?:cag|cagri[\s_-]*sema(?:glutide)?|cagrilintide[\s_-]*sema(?:glutide)?)\b#iu';
+    private const BLEND_TOKEN_PATTERN = '#\b(?:cagri[\s_-]*sema(?:glutide)?|cagrilintide[\s_-]*sema(?:glutide)?)\b#iu';
+
+    /**
+     * "cag" is a blend only when it sits next to another compound
+     * ("Reta Cag", "Cag/Sema", "Reta + Cag"). "CAG 5mg" and "Cag 10mg"
+     * have no neighbor compound, so they stay single vials.
+     */
+    private const CAG_BESIDE_COMPOUND_PATTERN = '#\b(?:reta(?:trutide)?|sema(?:glutide)?|tirz(?:epatide)?|glp\d*r?)\b[\s_+&./-]*\bcag(?:ri)?\b|\bcag(?:ri)?\b[\s_+&./-]*\b(?:reta(?:trutide)?|sema(?:glutide)?|tirz(?:epatide)?|glp\d*r?)\b#iu';
 
     /**
      * Two compounds joined by +, &, or "and". The character after the
@@ -71,12 +79,10 @@ class ComparePriceStats
     private const GLUCAGON_BLEND_PATTERN = '#gip[\s_-]*glucagon|\b(?:glp|gip)\b[\w\s().+\-]*\bglucagon\b|\bglucagon\b[\w\s().+\-]*\b(?:glp|gip)\b#iu';
 
     /**
-     * BAC water bundled with one peptide is an accessory, not a second
-     * compound. Strip every spelling (+ BAC, +BAC, & BAC, and BAC water,
-     * w/ BAC) before the blend check so display name, raw name, and slug
-     * agree. A real second peptide written next to it still matches.
+     * One accessory rule, on the display name, the raw name, and the slug:
+     * "+ BAC" or "+BAC" is a bacteriostatic-water bundle and is excluded.
      */
-    private const BAC_ACCESSORY_PATTERN = '#(?:\s*(?:\+|\&|\band\b|w/|/)\s*|\s+)\+?\s*bac(?:[\s_-]*water)?\b#iu';
+    private const BAC_ACCESSORY_PATTERN = '#\+\s*bac\b#iu';
 
     private const SIZE_PATTERN = '/^\s*(\d+(?:\.\d+)?)\s*mg\s*$/i';
 
@@ -286,12 +292,12 @@ class ComparePriceStats
 
     private static function isMultiUnitOrBlend(string $name): bool
     {
-        $name = trim(preg_replace(self::BAC_ACCESSORY_PATTERN, ' ', $name) ?? $name);
-
         return preg_match(self::MULTI_UNIT_PATTERN, $name) === 1
             || preg_match(self::BLEND_TOKEN_PATTERN, $name) === 1
+            || preg_match(self::CAG_BESIDE_COMPOUND_PATTERN, $name) === 1
             || preg_match(self::COMPOUND_JOIN_PATTERN, $name) === 1
-            || preg_match(self::GLUCAGON_BLEND_PATTERN, $name) === 1;
+            || preg_match(self::GLUCAGON_BLEND_PATTERN, $name) === 1
+            || preg_match(self::BAC_ACCESSORY_PATTERN, $name) === 1;
     }
 
     /**

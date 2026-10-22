@@ -232,18 +232,15 @@ class ComparePriceStatsTest extends TestCase
         $this->assertSame(1, $byVials['per_mg']['excluded_reasons']['multi_unit_or_blend']);
     }
 
-    public function test_bac_water_accessory_spellings_stay_single_vial(): void
+    public function test_plus_bac_accessory_is_excluded_on_display_and_raw_name(): void
     {
-        $single = [
+        $bundles = [
             'BPC-157 10mg + BAC',
             'BPC-157 10mg +BAC',
             'NAD+ (500mg) + BAC',
-            'BPC-157 10mg & BAC water',
-            'BPC-157 10mg and BAC water',
-            'BPC-157 10mg w/ BAC',
         ];
 
-        foreach ($single as $i => $name) {
+        foreach ($bundles as $i => $name) {
             $size = str_contains($name, '500mg') ? '500mg' : '10mg';
             $stats = ComparePriceStats::fromProducts([
                 $this->row([
@@ -254,44 +251,99 @@ class ComparePriceStatsTest extends TestCase
                 ]),
             ]);
 
-            $this->assertSame(1, $stats['per_mg']['eligible_count'], $name);
-            $this->assertSame(0, $stats['per_mg']['excluded_reasons']['multi_unit_or_blend'], $name);
+            $this->assertSame(0, $stats['per_mg']['eligible_count'], $name);
+            $this->assertSame(1, $stats['per_mg']['excluded_reasons']['multi_unit_or_blend'], $name);
         }
 
-        $slug = ComparePriceStats::fromProducts([
+        $rawOnly = ComparePriceStats::fromProducts([
             $this->row([
                 'id' => 30,
                 'name' => 'BPC-157 (10mg)',
-                'raw_name' => 'BPC-157 10mg + BAC water',
-                'slug' => 'bpc-157-10mg-and-bac-water',
+                'raw_name' => 'BPC-157 10mg + BAC',
+                'slug' => 'bpc-157-10mg',
                 'size_mg' => '10mg',
                 'effective_price' => 50,
             ]),
         ]);
-        $this->assertSame(1, $slug['per_mg']['eligible_count']);
-        $this->assertSame(0, $slug['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+        $this->assertSame(0, $rawOnly['per_mg']['eligible_count']);
+        $this->assertSame(1, $rawOnly['per_mg']['excluded_reasons']['multi_unit_or_blend']);
 
-        $stillBlend = ComparePriceStats::fromProducts([
+        $displayOnly = ComparePriceStats::fromProducts([
             $this->row([
                 'id' => 31,
-                'name' => 'BPC-157 + TB-500 + BAC',
+                'name' => 'BPC-157 (10mg) + BAC',
+                'raw_name' => 'BPC-157 10mg',
+                'slug' => 'bpc-157-10mg',
                 'size_mg' => '10mg',
                 'effective_price' => 50,
             ]),
         ]);
-        $this->assertSame(0, $stillBlend['per_mg']['eligible_count']);
-        $this->assertSame(1, $stillBlend['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+        $this->assertSame(0, $displayOnly['per_mg']['eligible_count']);
+        $this->assertSame(1, $displayOnly['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+    }
 
-        $loneGlucagon = ComparePriceStats::fromProducts([
+    public function test_bare_cag_is_a_single_compound_and_cag_beside_another_compound_is_a_blend(): void
+    {
+        $single = ComparePriceStats::fromProducts([
+            $this->row(['id' => 1, 'name' => 'CAG 5mg', 'size_mg' => '5mg', 'effective_price' => 40]),
+            $this->row(['id' => 2, 'name' => 'Cag 10mg', 'size_mg' => '10mg', 'effective_price' => 44]),
             $this->row([
-                'id' => 32,
-                'name' => 'Glucagon 10mg',
+                'id' => 3,
+                'name' => 'Cagrilintide (10mg)',
+                'raw_name' => 'IDN-CAG',
+                'slug' => 'idn-cag-idun-peptides',
                 'size_mg' => '10mg',
-                'effective_price' => 40,
+                'effective_price' => 49.99,
             ]),
         ]);
-        $this->assertSame(1, $loneGlucagon['per_mg']['eligible_count']);
-        $this->assertSame(0, $loneGlucagon['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+        $this->assertEqualsCanonicalizing([1, 2, 3], array_column($single['per_mg']['rows'], 'id'));
+        $this->assertSame(0, $single['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+
+        $glucagon = ComparePriceStats::fromProducts([
+            $this->row(['id' => 4, 'name' => 'Glucagon 10mg', 'size_mg' => '10mg', 'effective_price' => 40]),
+        ]);
+        $this->assertSame(1, $glucagon['per_mg']['eligible_count']);
+        $this->assertSame(0, $glucagon['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+
+        $blend = ComparePriceStats::fromProducts([
+            $this->row(['id' => 10, 'name' => 'Reta + Cag 10mg', 'size_mg' => '10mg', 'effective_price' => 80]),
+        ]);
+        $this->assertSame(0, $blend['per_mg']['eligible_count']);
+        $this->assertSame(1, $blend['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+
+        $beside = ComparePriceStats::fromProducts([
+            $this->row(['id' => 11, 'name' => 'Reta Cag 10mg', 'size_mg' => '10mg', 'effective_price' => 80]),
+        ]);
+        $this->assertSame(0, $beside['per_mg']['eligible_count']);
+        $this->assertSame(1, $beside['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+    }
+
+    public function test_glow_and_klow_rows_drop_out_of_bpc_eligibility(): void
+    {
+        $rows = [
+            [
+                'id' => 4431,
+                'name' => 'BPC-157 (50mg)',
+                'raw_name' => '"GLOW" - BPC-157/TB-500/GHK-Cu',
+                'slug' => 'glow-bpc-157tb-500ghk-cu',
+                'size_mg' => '50mg',
+                'effective_price' => 135,
+            ],
+            [
+                'id' => 4432,
+                'name' => 'BPC-157 (80mg)',
+                'raw_name' => '"KLOW" - BPC-157/TB-500/GHK-Cu/KPV',
+                'slug' => 'klow-bpc-157tb-500ghk-cukpv',
+                'size_mg' => '80mg',
+                'effective_price' => 195,
+            ],
+        ];
+
+        foreach ($rows as $row) {
+            $stats = ComparePriceStats::fromProducts([$this->row($row)]);
+            $this->assertSame(0, $stats['per_mg']['eligible_count'], (string) $row['id']);
+            $this->assertSame(1, $stats['per_mg']['excluded_reasons']['multi_unit_or_blend'], (string) $row['id']);
+        }
     }
 
     public function test_other_compound_eligibility_is_unchanged(): void
