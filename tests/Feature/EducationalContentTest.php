@@ -2214,9 +2214,9 @@ class EducationalContentTest extends TestCase
     {
         $pattern = '/\b\d+(\.\d+)?\s?mg\b(?!\/dL)/i';
         $expected = [
-            'orforglipron-vs-tirzepatide' => [1518, '7 Min Read'],
-            'cagrilintide-vs-eloralintide' => [1497, '7 Min Read'],
-            'eloralintide-tirzepatide-vs-retatrutide' => [1320, '6 Min Read'],
+            'orforglipron-vs-tirzepatide' => [1515, '7 Min Read'],
+            'cagrilintide-vs-eloralintide' => [1488, '7 Min Read'],
+            'eloralintide-tirzepatide-vs-retatrutide' => [1306, '6 Min Read'],
         ];
 
         foreach ($expected as $slug => [$words, $readTime]) {

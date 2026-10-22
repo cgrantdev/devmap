@@ -20,7 +20,7 @@ Phase 2 [NCT06230523](https://clinicaltrials.gov/study/NCT06230523) (*Lancet*; L
 
 ### Eloralintide + tirzepatide (EloraTZP)
 
-The combination package tied to a primary Lilly / EASD release is phase 2b [NCT06603571](https://clinicaltrials.gov/study/NCT06603571): 367 adults with obesity or overweight **and type 2 diabetes**, 48 weeks. Lilly’s 30 Sep 2026 release (also via EASD / EurekAlert) reports an **efficacy estimand** table: highest listed combo arm (eloralintide plus tirzepatide) **−23.3%**, versus **−14.8%** for tirzepatide alone at the approved tirzepatide dose used in that comparison and **−3.0%** placebo. Eloralintide-alone arms in that T2D trial were lower than the top combo. GI events and discontinuations were more frequent in combo arms; Lilly plans phase 3 of a co-formulation with optimized escalation.
+The combination package tied to a primary Lilly / EASD release is phase 2b [NCT06603571](https://clinicaltrials.gov/study/NCT06603571): 367 adults with obesity or overweight **and type 2 diabetes**, 48 weeks. Lilly’s 30 Sep 2026 release (also via EASD / EurekAlert) reports an **efficacy estimand** table: highest listed combo arm (eloralintide plus tirzepatide) **−23.3%**, versus **−14.8%** for tirzepatide alone and **−3.0%** placebo. Eloralintide-alone arms in that T2D trial were lower than the top combo. GI events and discontinuations were more frequent in combo arms; Lilly plans phase 3 of a co-formulation with optimized escalation.
 
 Smaller early co-administration cohorts (including [NCT06345066](https://clinicaltrials.gov/study/NCT06345066) and related phase 1b work) circulate in congress talk and secondary blogs. Those readouts remain **preliminary**—small arms, shorter follow-up, incomplete evaluable counts in secondary reports. This page does **not** print an unverified viral percent from that slide-level discussion. Without a checkable Lilly, journal, registry-results, or official congress primary for a specific figure, treat phase 1b combo numbers as exploratory—not a TRIUMPH-1 comparator.
 
@@ -75,7 +75,7 @@ They are two estimands of one trial in the highest dose arm at 80 weeks in adult
 
 ### What did EloraTZP report for eloralintide plus tirzepatide?
 
-Lilly’s 30 September 2026 release reports an efficacy estimand of −23.3% for the highest listed combination of eloralintide plus tirzepatide at 48 weeks, versus −14.8% for tirzepatide alone at the approved tirzepatide dose used in that comparison and −3.0% for placebo, in 367 adults with obesity or overweight and type 2 diabetes.
+Lilly’s 30 September 2026 release (company-reported, not peer reviewed) reports an efficacy estimand of −23.3% for the highest listed combination of eloralintide plus tirzepatide at 48 weeks, versus −14.8% for tirzepatide alone and −3.0% for placebo, in 367 adults with obesity or overweight and type 2 diabetes.
 
 ### Is that combination result a head-to-head with TRIUMPH-1?
 

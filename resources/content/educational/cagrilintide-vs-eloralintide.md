@@ -38,7 +38,7 @@ Those percents are eloralintide alone, without type 2 diabetes, at 48 weeks, on 
 
 Phase 2b NCT06603571 tested eloralintide, tirzepatide, and the combination EloraTZP in 367 adults with obesity or overweight and type 2 diabetes. Lilly’s 30 September 2026 release reports 48-week efficacy-estimand results. The primary comparison was the combination versus placebo.
 
-The highest listed combination, eloralintide plus tirzepatide, was −23.3%. Tirzepatide alone, at the approved tirzepatide dose used in that comparison, was −14.8%. Placebo was −3.0%. Other dose rows in that release are not repeated here. The −23.3% figure includes tirzepatide, in people with type 2 diabetes, at 48 weeks. It is not a cagrilintide result and not a REDEFINE comparison. An unverified early-combo slide figure is not printed.
+The highest listed combination, eloralintide plus tirzepatide, was −23.3%. Tirzepatide alone was −14.8%. Placebo was −3.0%. Other dose rows in that release are not repeated here. The −23.3% figure includes tirzepatide, in people with type 2 diabetes, at 48 weeks. It is not a cagrilintide result and not a REDEFINE comparison. An unverified early-combo slide figure is not printed.
 
 ## Why these percents cannot be ranked
 
@@ -74,7 +74,7 @@ Lilly’s phase 2 release gives an efficacy-estimand range from −9.5% in the l
 
 ### Is the −23.3% figure a cagrilintide result?
 
-No. −23.3% is the EloraTZP efficacy estimand for the highest listed combination of eloralintide plus tirzepatide at 48 weeks in adults with type 2 diabetes, versus −14.8% for tirzepatide alone at the approved tirzepatide dose used in that comparison and −3.0% for placebo. It is not a REDEFINE comparison.
+No. −23.3% is the company-reported EloraTZP efficacy estimand (Lilly release, 30 September 2026; not peer reviewed) for the highest listed combination of eloralintide plus tirzepatide at 48 weeks in adults with type 2 diabetes, versus −14.8% for tirzepatide alone and −3.0% for placebo. It is not a REDEFINE comparison.
 
 ## Sources
 
