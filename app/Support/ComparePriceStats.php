@@ -36,8 +36,53 @@ class ComparePriceStats
      * Blend check runs before the size check. "vial" is not "vials", so a
      * single-vial name stays eligible. The slash is written as "/" because
      * the pattern is delimited with "#".
+     *
+     * "cag" is not in this pattern. It is a substring of "cagrilintide"
+     * and of "glucagon", so a bare search excluded every single-vial
+     * cagrilintide listing. Standalone blend tokens live in
+     * BLEND_TOKEN_PATTERN. A "+" only counts when a letter follows it,
+     * so "NAD+" stays a single compound. Display names drop pack wording
+     * ("Cagrilintide (10mg)" can be a 10-pack), so the same check also
+     * runs on the raw vendor name and on the slug with hyphens read as
+     * spaces. "vial" is still not "vials".
      */
-    private const MULTI_UNIT_PATTERN = '#(pack|kit|vials|bundle|box|×|\bx\s*\d|\d\s*x\s*\d|mgx|pen\b|blend|cag|/|mix|tablet|bulk)#iu';
+    private const MULTI_UNIT_PATTERN = '#(pack|kit|vials|bundle|box|×|\bx\s*\d|\d\s*x\s*\d|mgx|pen\b|blend|/|mix|tablet|bulk)#iu';
+
+    /**
+     * Whole-word blend markers. Boundaries keep these from matching
+     * inside "cagrilintide" or "glucagon". Separators cover Cagri-Sema,
+     * Cagri Sema, and Cagrilintide Semaglutide, not only CagriSema.
+     * Bare "cag" is not in this pattern: "CAG 5mg" is a single compound.
+     */
+    private const BLEND_TOKEN_PATTERN = '#\b(?:cagri[\s_-]*sema(?:glutide)?|cagrilintide[\s_-]*sema(?:glutide)?)\b#iu';
+
+    /**
+     * "cag" is a blend only when it sits next to another compound
+     * ("Reta Cag", "Cag/Sema", "Reta + Cag"). "CAG 5mg" and "Cag 10mg"
+     * have no neighbor compound, so they stay single vials.
+     */
+    private const CAG_BESIDE_COMPOUND_PATTERN = '#\b(?:reta(?:trutide)?|sema(?:glutide)?|tirz(?:epatide)?|glp\d*r?)\b[\s_+&./-]*\bcag(?:ri)?\b|\bcag(?:ri)?\b[\s_+&./-]*\b(?:reta(?:trutide)?|sema(?:glutide)?|tirz(?:epatide)?|glp\d*r?)\b#iu';
+
+    /**
+     * Two compounds joined by +, &, or "and". The character after the
+     * join must be a letter, so "NAD+" alone and "20mg & 40mg" are not
+     * blends. The left side may be the "+" in "NAD+" ("NAD+ & NMN") or
+     * a digit ("BPC-157 and TB-500").
+     */
+    private const COMPOUND_JOIN_PATTERN = '#(?:[[:alnum:]]|\+)\s*(?:\+|\&|\band\b)\s*[[:alpha:]]#iu';
+
+    /**
+     * GLP-1 / GIP / Glucagon written without slashes, including the
+     * slug form "1gipglucagon". A lone "Glucagon 10mg" has no GLP or
+     * GIP marker, so it stays a single vial.
+     */
+    private const GLUCAGON_BLEND_PATTERN = '#gip[\s_-]*glucagon|\b(?:glp|gip)\b[\w\s().+\-]*\bglucagon\b|\bglucagon\b[\w\s().+\-]*\b(?:glp|gip)\b#iu';
+
+    /**
+     * One accessory rule, on the display name, the raw name, and the slug:
+     * "+ BAC" or "+BAC" is a bacteriostatic-water bundle and is excluded.
+     */
+    private const BAC_ACCESSORY_PATTERN = '#\+\s*bac\b#iu';
 
     private const SIZE_PATTERN = '/^\s*(\d+(?:\.\d+)?)\s*mg\s*$/i';
 
@@ -205,8 +250,15 @@ class ComparePriceStats
         }
 
         $name = (string) ($product['name'] ?? '');
+        $rawName = trim((string) ($product['raw_name'] ?? ''));
+        $slugText = str_replace('-', ' ', trim((string) ($product['slug'] ?? '')));
         $sizeRaw = (string) ($product['size_mg'] ?? '');
-        if (preg_match(self::MULTI_UNIT_PATTERN, $name) || str_contains($sizeRaw, '/')) {
+        if (
+            self::isMultiUnitOrBlend($name)
+            || ($rawName !== '' && self::isMultiUnitOrBlend($rawName))
+            || ($slugText !== '' && self::isMultiUnitOrBlend($slugText))
+            || str_contains($sizeRaw, '/')
+        ) {
             return 'multi_unit_or_blend';
         }
 
@@ -236,6 +288,16 @@ class ComparePriceStats
         }
 
         return 'name_size_mismatch';
+    }
+
+    private static function isMultiUnitOrBlend(string $name): bool
+    {
+        return preg_match(self::MULTI_UNIT_PATTERN, $name) === 1
+            || preg_match(self::BLEND_TOKEN_PATTERN, $name) === 1
+            || preg_match(self::CAG_BESIDE_COMPOUND_PATTERN, $name) === 1
+            || preg_match(self::COMPOUND_JOIN_PATTERN, $name) === 1
+            || preg_match(self::GLUCAGON_BLEND_PATTERN, $name) === 1
+            || preg_match(self::BAC_ACCESSORY_PATTERN, $name) === 1;
     }
 
     /**

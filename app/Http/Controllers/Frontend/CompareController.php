@@ -655,9 +655,7 @@ class CompareController extends Controller
                         '@type' => 'Product',
                         '@id' => url("/compare/{$slug}") . '#product',
                         'name' => $seoName,
-                        'description' => $summary
-                            ? mb_substr(strip_tags($summary), 0, 300)
-                            : 'Compare '.$seoName.' prices across '.$vendorCount.' research-peptide '.($vendorCount === 1 ? 'vendor' : 'vendors').'.',
+                        'description' => 'Compare '.$seoName.' listed prices across '.$vendorCount.' research-peptide '.($vendorCount === 1 ? 'vendor' : 'vendors').'. Research use only (RUO).',
                         'offers' => [
                             '@type' => 'AggregateOffer',
                             'priceCurrency' => 'USD',
@@ -1443,6 +1441,7 @@ class CompareController extends Controller
                 return [
                     'id' => $product->id,
                     'name' => $product->display_name,
+                    'raw_name' => $product->name,
                     'product_type' => $product->product_type,
                     'slug' => $product->slug,
                     'price' => $product->price !== null ? (float) $product->price : null,

@@ -107,6 +107,269 @@ class ComparePriceStatsTest extends TestCase
         $this->assertNotContains(1, $ids);
     }
 
+    public function test_single_vial_cagrilintide_is_eligible_under_the_normal_rules(): void
+    {
+        $stats = ComparePriceStats::fromProducts([
+            $this->row(['id' => 1, 'name' => 'Cagrilintide 5mg', 'size_mg' => '5mg', 'effective_price' => 28]),
+            $this->row(['id' => 2, 'name' => 'Cagrilintide 10mg vial', 'size_mg' => '10mg', 'effective_price' => 44]),
+            $this->row(['id' => 3, 'name' => 'Cagrilintide (5mg)', 'size_mg' => '5mg', 'effective_price' => 22]),
+        ]);
+
+        $this->assertSame(3, $stats['per_mg']['eligible_count']);
+        $this->assertSame(0, $stats['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+        $this->assertEquals(22.0, $stats['lowest_single_vial_listed']['listed_usd']);
+        $this->assertEqualsCanonicalizing([1, 2, 3], array_column($stats['per_mg']['rows'], 'id'));
+
+        // $1 / 10mg is $0.10/mg. The other rows sit at $4–$8/mg, so the
+        // 25% median floor still drops the outlier and keeps the vials.
+        $withFloor = ComparePriceStats::fromProducts([
+            $this->row(['id' => 11, 'name' => 'Cagrilintide 5mg', 'size_mg' => '5mg', 'effective_price' => 28]),
+            $this->row(['id' => 12, 'name' => 'Cagrilintide 10mg vial', 'size_mg' => '10mg', 'effective_price' => 44]),
+            $this->row(['id' => 13, 'name' => 'Anchor A — 10mg', 'size_mg' => '10mg', 'effective_price' => 80]),
+            $this->row(['id' => 14, 'name' => 'Anchor B — 10mg', 'size_mg' => '10mg', 'effective_price' => 80]),
+            $this->row(['id' => 15, 'name' => 'Anchor C — 10mg', 'size_mg' => '10mg', 'effective_price' => 80]),
+            $this->row(['id' => 16, 'name' => 'Cagrilintide 10mg', 'size_mg' => '10mg', 'effective_price' => 1.00]),
+        ]);
+
+        $ids = array_column($withFloor['per_mg']['rows'], 'id');
+        $this->assertContains(11, $ids);
+        $this->assertContains(12, $ids);
+        $this->assertNotContains(16, $ids);
+        $this->assertSame(1, $withFloor['per_mg']['excluded_reasons']['below_median_floor']);
+        $this->assertSame(0, $withFloor['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+    }
+
+    public function test_cagrilintide_blend_names_stay_excluded(): void
+    {
+        $names = [
+            'CagriSema',
+            'CagriSema 5mg',
+            'Cagri/Sema',
+            'Cagri+Sema',
+            'Cagrilintide + Semaglutide',
+            'Cagrilintide/Semaglutide',
+            'reta+cag',
+            'reta/cagri',
+            'Retatrutide + Cagrilintide 10mg',
+            'BPC-157 and TB-500 10mg',
+        ];
+
+        foreach ($names as $i => $name) {
+            $stats = ComparePriceStats::fromProducts([
+                $this->row([
+                    'id' => $i + 1,
+                    'name' => $name,
+                    'size_mg' => '5mg',
+                    'effective_price' => 40,
+                ]),
+            ]);
+
+            $this->assertSame(0, $stats['per_mg']['eligible_count'], $name);
+            $this->assertSame(1, $stats['per_mg']['excluded_reasons']['multi_unit_or_blend'], $name);
+        }
+    }
+
+    public function test_spaced_blend_names_glucagon_without_a_slash_and_hidden_packs_are_excluded(): void
+    {
+        $names = [
+            'Cagri-Sema',
+            'Cagri Sema',
+            'Cagrilintide Semaglutide',
+            'NAD+ & NMN 500mg',
+            'GLP-3 (GLP-1 GIP Glucagon) 10mg',
+        ];
+
+        foreach ($names as $i => $name) {
+            $stats = ComparePriceStats::fromProducts([
+                $this->row([
+                    'id' => $i + 1,
+                    'name' => $name,
+                    'size_mg' => '5mg',
+                    'effective_price' => 40,
+                ]),
+            ]);
+
+            $this->assertSame(0, $stats['per_mg']['eligible_count'], $name);
+            $this->assertSame(1, $stats['per_mg']['excluded_reasons']['multi_unit_or_blend'], $name);
+        }
+
+        $bySlug = ComparePriceStats::fromProducts([
+            $this->row([
+                'id' => 20,
+                'name' => 'Cagrilintide (10mg)',
+                'raw_name' => 'Cagrilintide 10mg',
+                'slug' => 'cagrilintide-10mg-10-pack',
+                'size_mg' => '10mg',
+                'effective_price' => 675,
+            ]),
+        ]);
+        $this->assertSame(0, $bySlug['per_mg']['eligible_count']);
+        $this->assertSame(1, $bySlug['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+
+        $byRaw = ComparePriceStats::fromProducts([
+            $this->row([
+                'id' => 21,
+                'name' => 'Cagrilintide (10mg)',
+                'raw_name' => 'Cagrilintide 10mg 10 Pack',
+                'slug' => 'cagrilintide-10mg',
+                'size_mg' => '10mg',
+                'effective_price' => 675,
+            ]),
+        ]);
+        $this->assertSame(0, $byRaw['per_mg']['eligible_count']);
+        $this->assertSame(1, $byRaw['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+
+        $byVials = ComparePriceStats::fromProducts([
+            $this->row([
+                'id' => 22,
+                'name' => 'Cagrilintide (5mg)',
+                'slug' => 'cagrilintide-5mgx10vials-royal-peptides-llc',
+                'size_mg' => '5mg',
+                'effective_price' => 300,
+            ]),
+        ]);
+        $this->assertSame(0, $byVials['per_mg']['eligible_count']);
+        $this->assertSame(1, $byVials['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+    }
+
+    public function test_plus_bac_accessory_is_excluded_on_display_and_raw_name(): void
+    {
+        $bundles = [
+            'BPC-157 10mg + BAC',
+            'BPC-157 10mg +BAC',
+            'NAD+ (500mg) + BAC',
+        ];
+
+        foreach ($bundles as $i => $name) {
+            $size = str_contains($name, '500mg') ? '500mg' : '10mg';
+            $stats = ComparePriceStats::fromProducts([
+                $this->row([
+                    'id' => $i + 1,
+                    'name' => $name,
+                    'size_mg' => $size,
+                    'effective_price' => 80,
+                ]),
+            ]);
+
+            $this->assertSame(0, $stats['per_mg']['eligible_count'], $name);
+            $this->assertSame(1, $stats['per_mg']['excluded_reasons']['multi_unit_or_blend'], $name);
+        }
+
+        $rawOnly = ComparePriceStats::fromProducts([
+            $this->row([
+                'id' => 30,
+                'name' => 'BPC-157 (10mg)',
+                'raw_name' => 'BPC-157 10mg + BAC',
+                'slug' => 'bpc-157-10mg',
+                'size_mg' => '10mg',
+                'effective_price' => 50,
+            ]),
+        ]);
+        $this->assertSame(0, $rawOnly['per_mg']['eligible_count']);
+        $this->assertSame(1, $rawOnly['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+
+        $displayOnly = ComparePriceStats::fromProducts([
+            $this->row([
+                'id' => 31,
+                'name' => 'BPC-157 (10mg) + BAC',
+                'raw_name' => 'BPC-157 10mg',
+                'slug' => 'bpc-157-10mg',
+                'size_mg' => '10mg',
+                'effective_price' => 50,
+            ]),
+        ]);
+        $this->assertSame(0, $displayOnly['per_mg']['eligible_count']);
+        $this->assertSame(1, $displayOnly['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+    }
+
+    public function test_bare_cag_is_a_single_compound_and_cag_beside_another_compound_is_a_blend(): void
+    {
+        $single = ComparePriceStats::fromProducts([
+            $this->row(['id' => 1, 'name' => 'CAG 5mg', 'size_mg' => '5mg', 'effective_price' => 40]),
+            $this->row(['id' => 2, 'name' => 'Cag 10mg', 'size_mg' => '10mg', 'effective_price' => 44]),
+            $this->row([
+                'id' => 3,
+                'name' => 'Cagrilintide (10mg)',
+                'raw_name' => 'IDN-CAG',
+                'slug' => 'idn-cag-idun-peptides',
+                'size_mg' => '10mg',
+                'effective_price' => 49.99,
+            ]),
+        ]);
+        $this->assertEqualsCanonicalizing([1, 2, 3], array_column($single['per_mg']['rows'], 'id'));
+        $this->assertSame(0, $single['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+
+        $glucagon = ComparePriceStats::fromProducts([
+            $this->row(['id' => 4, 'name' => 'Glucagon 10mg', 'size_mg' => '10mg', 'effective_price' => 40]),
+        ]);
+        $this->assertSame(1, $glucagon['per_mg']['eligible_count']);
+        $this->assertSame(0, $glucagon['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+
+        $blend = ComparePriceStats::fromProducts([
+            $this->row(['id' => 10, 'name' => 'Reta + Cag 10mg', 'size_mg' => '10mg', 'effective_price' => 80]),
+        ]);
+        $this->assertSame(0, $blend['per_mg']['eligible_count']);
+        $this->assertSame(1, $blend['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+
+        $beside = ComparePriceStats::fromProducts([
+            $this->row(['id' => 11, 'name' => 'Reta Cag 10mg', 'size_mg' => '10mg', 'effective_price' => 80]),
+        ]);
+        $this->assertSame(0, $beside['per_mg']['eligible_count']);
+        $this->assertSame(1, $beside['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+    }
+
+    public function test_glow_and_klow_rows_drop_out_of_bpc_eligibility(): void
+    {
+        $rows = [
+            [
+                'id' => 4431,
+                'name' => 'BPC-157 (50mg)',
+                'raw_name' => '"GLOW" - BPC-157/TB-500/GHK-Cu',
+                'slug' => 'glow-bpc-157tb-500ghk-cu',
+                'size_mg' => '50mg',
+                'effective_price' => 135,
+            ],
+            [
+                'id' => 4432,
+                'name' => 'BPC-157 (80mg)',
+                'raw_name' => '"KLOW" - BPC-157/TB-500/GHK-Cu/KPV',
+                'slug' => 'klow-bpc-157tb-500ghk-cukpv',
+                'size_mg' => '80mg',
+                'effective_price' => 195,
+            ],
+        ];
+
+        foreach ($rows as $row) {
+            $stats = ComparePriceStats::fromProducts([$this->row($row)]);
+            $this->assertSame(0, $stats['per_mg']['eligible_count'], (string) $row['id']);
+            $this->assertSame(1, $stats['per_mg']['excluded_reasons']['multi_unit_or_blend'], (string) $row['id']);
+        }
+    }
+
+    public function test_other_compound_eligibility_is_unchanged(): void
+    {
+        $products = [
+            $this->row(['id' => 1, 'name' => 'BPC-157 10mg', 'size_mg' => '10mg', 'effective_price' => 50]),
+            $this->row(['id' => 2, 'name' => 'Semaglutide 5mg', 'size_mg' => '5mg', 'effective_price' => 40]),
+            $this->row(['id' => 3, 'name' => 'Tirzepatide 15mg', 'size_mg' => '15mg', 'effective_price' => 90]),
+            $this->row(['id' => 4, 'name' => 'NAD+ (500mg)', 'size_mg' => '500mg', 'effective_price' => 2000]),
+            $this->row(['id' => 5, 'name' => 'PP-2T 20mg & 40mg — 20mg', 'size_mg' => '20mg', 'effective_price' => 80]),
+            $this->row(['id' => 6, 'name' => 'SA-3R — 10mg Single Vial', 'size_mg' => '10mg', 'effective_price' => 52]),
+            $this->row(['id' => 7, 'name' => 'TB-500 10mg', 'size_mg' => '10mg', 'effective_price' => 40]),
+            $this->row(['id' => 8, 'name' => 'GHK-Cu 50mg', 'size_mg' => '50mg', 'effective_price' => 250]),
+            $this->row(['id' => 9, 'name' => 'GLP-3 (GLP-1/GIP/Glucagon) 10mg', 'size_mg' => '10mg', 'effective_price' => 80]),
+            $this->row(['id' => 10, 'name' => 'Retatrutide blend 10mg', 'size_mg' => '10mg', 'effective_price' => 70]),
+            $this->row(['id' => 11, 'name' => 'GLP-3R / CAG 12.5MG / 2.5MG', 'size_mg' => '12.5mg/2.5mg', 'effective_price' => 90]),
+            $this->row(['id' => 12, 'name' => 'Retatrutide 10mg × 10 pack', 'size_mg' => '10mg', 'effective_price' => 120]),
+        ];
+
+        $stats = ComparePriceStats::fromProducts($products);
+
+        $this->assertEqualsCanonicalizing([1, 2, 3, 4, 5, 6, 7, 8], array_column($stats['per_mg']['rows'], 'id'));
+        $this->assertSame(4, $stats['per_mg']['excluded_reasons']['multi_unit_or_blend']);
+        $this->assertSame(0, $stats['per_mg']['excluded_reasons']['below_median_floor']);
+    }
+
     public function test_single_vial_name_is_not_treated_as_a_multi_vial_pack(): void
     {
         $stats = ComparePriceStats::fromProducts([

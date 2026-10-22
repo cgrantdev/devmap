@@ -11,11 +11,11 @@ use App\Models\Setting;
 use App\Support\CompareSlug;
 use App\Support\EncyclopediaFraming;
 use App\Support\EncyclopediaSlug;
+use App\Support\FaqPage;
 use App\Support\FramingProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class EncyclopediaController extends Controller
 {
@@ -32,10 +32,41 @@ class EncyclopediaController extends Controller
      * TODO: move to database fields on education_posts table.
      */
     /**
-     * FAQPage schema builder. Accepts the array shape stored on
-     * education_posts.faqs ([{question, answer}, ...]) and returns a
-     * schema.org FAQPage node. Returns null when there are no FAQs so
-     * we don't emit an empty container Google's rich-result test rejects.
+     * Question/answer strings shared by the visible FAQ and FAQPage
+     * JSON-LD. Input is the stored education_posts.faqs shape
+     * ([{question, answer}, ...]). Empty pairs are dropped so an entry
+     * with no FAQ emits neither a section nor a schema node.
+     *
+     * @param  list<array<string, mixed>>  $faqs
+     * @return list<array{question: string, answer: string}>
+     */
+    private function faqPairs(array $faqs): array
+    {
+        $pairs = [];
+        foreach ($faqs as $f) {
+            if (! is_array($f)) {
+                continue;
+            }
+            $q = trim(html_entity_decode(strip_tags((string) ($f['question'] ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            $a = trim(html_entity_decode(strip_tags((string) ($f['answer'] ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            if ($q === '' || $a === '') {
+                continue;
+            }
+            $pairs[] = [
+                'question' => $q,
+                'answer' => $a,
+            ];
+        }
+
+        return $pairs;
+    }
+
+    /**
+     * FAQPage schema for pages that are not on the visible-FAQ allowlist.
+     * This is the builder main already shipped: trim, then strip_tags on
+     * the answer. It stays so those pages keep the same JSON-LD.
+     *
+     * @param  list<array<string, mixed>>  $faqs
      */
     private function faqPageSchema(array $faqs, string $slug): ?array
     {
@@ -114,12 +145,12 @@ class EncyclopediaController extends Controller
                 'halfLife' => '',
             ],
             'CagriSema' => [
-                'status' => 'Investigational; not approved (as of 19 Oct 2026)',
+                'status' => 'Investigational; not approved (as of 22 Oct 2026)',
                 'routes' => [],
                 'halfLife' => '',
             ],
             'Cagrilintide' => [
-                'status' => 'Investigational; not approved (as of 19 Oct 2026)',
+                'status' => 'Investigational; not approved (as of 22 Oct 2026)',
                 'routes' => [],
                 'halfLife' => '',
             ],
@@ -608,198 +639,6 @@ class EncyclopediaController extends Controller
     }
 
     /**
-     * Show encyclopedia detail page
-     */
-    public function show($slug)
-    {
-        $category = ProductCategory::where('slug', $slug)
-            ->where('is_active', true)
-            ->with(['educationPost' => fn ($q) => $q->where('status', 'published')])
-            ->firstOrFail();
-
-        $educationPost = $category->educationPost;
-
-        // Get image - prioritize education post image, fallback to category image
-        $image = null;
-        if ($educationPost && $educationPost->image) {
-            $image = Storage::url('education_posts/'.$educationPost->image);
-        } elseif ($category->image_url) {
-            $image = Storage::url('categories/'.$category->image_url);
-        }
-
-        // Get products for this category
-        $products = Product::visible()
-            ->where('status', 'active')
-            ->where('product_category_id', $category->id)
-            ->with(['brand', 'category'])
-            ->orderBy('price', 'asc')
-            ->limit(5)
-            ->get()
-            ->map(function ($product) use ($category) {
-                return [
-                    'id' => $product->id,
-                    'name' => $product->display_name,
-                    'product_type' => $product->product_type,
-                    'slug' => $product->slug,
-                    'image_url' => $product->image_url,
-                    'price' => $product->price,
-                    'discount_price' => $product->discount_price,
-                    'size_mg' => $product->size_mg,
-                    'availability' => $product->availability,
-                    'rating_average' => (float) ($product->rating_average ?? 0),
-                    'rating_count' => (int) ($product->rating_count ?? 0),
-                    'brand' => $product->brand ? [
-                        'name' => $product->brand->name,
-                    ] : null,
-                    'category' => $product->category ? [
-                        'name' => $product->category->name,
-                    ] : [
-                        'name' => $category->name,
-                    ],
-                ];
-            });
-
-        // Determine category tag - use education_tag from database, fallback to computed
-        $categoryTag = $educationPost && $educationPost->education_tag
-            ? $educationPost->education_tag
-            : $this->getCategoryTag($category->name, $category->description);
-
-        // Get key effects from education post if available, otherwise use fallback method
-        $keyBenefits = [];
-        if ($educationPost && ! empty($educationPost->key_effects) && is_array($educationPost->key_effects)) {
-            $keyBenefits = $educationPost->key_effects;
-        } else {
-            $keyBenefits = $this->getKeyBenefits($category->name);
-        }
-
-        // Get peptide full name - use from database, fallback to computed
-        $peptideFullName = $educationPost && $educationPost->peptide_full_name
-            ? $educationPost->peptide_full_name
-            : $this->getSubtitle($category->name);
-
-        // Get quick facts from database
-        $quickFacts = [
-            'halfLife' => $educationPost && $educationPost->half_life ? $educationPost->half_life : 'Varies',
-            'bioavailability' => $educationPost && $educationPost->bioavailability ? $educationPost->bioavailability : 'Varies by administration method',
-            'storage' => $educationPost && $educationPost->storage ? $educationPost->storage : 'Refrigerate at 2-8°C',
-            'researchLevel' => 'Moderate Research', // Can be enhanced later
-        ];
-
-        // Get common use cases from database
-        $commonUseCases = [];
-        if ($educationPost && ! empty($educationPost->common_use_cases) && is_array($educationPost->common_use_cases)) {
-            $commonUseCases = $educationPost->common_use_cases;
-        } else {
-            $commonUseCases = $this->getCommonUseCases($category->name);
-        }
-
-        // Get how it works from database (text field)
-        $howItWorks = $educationPost && $educationPost->how_it_works
-            ? $educationPost->how_it_works
-            : 'Mechanism of action varies by peptide type. Research continues to uncover specific pathways.';
-
-        // Get dosage information from database
-        $dosage = [
-            'typicalDosage' => $educationPost && $educationPost->typical_dosage ? $educationPost->typical_dosage : 'Varies',
-            'frequency' => $educationPost && $educationPost->frequency ? $educationPost->frequency : 'Varies',
-            'administration' => $educationPost && $educationPost->administration ? $educationPost->administration : 'Subcutaneous injection',
-            'cycleDuration' => $educationPost && $educationPost->cycle_duration ? $educationPost->cycle_duration : '4-6 weeks',
-        ];
-
-        // Get safety information from database
-        $safetyInfo = [
-            'sideEffects' => $educationPost && ! empty($educationPost->possible_side_effects) && is_array($educationPost->possible_side_effects)
-                ? $educationPost->possible_side_effects
-                : ['Generally well-tolerated'],
-            'contraindications' => $educationPost && ! empty($educationPost->contraindications) && is_array($educationPost->contraindications)
-                ? $educationPost->contraindications
-                : ['Consult doctor before use'],
-        ];
-
-        // Get stacking recommendations from database (array of category IDs)
-        $stackingRecommendations = [];
-        $hasStackingData = false;
-
-        if ($educationPost && ! empty($educationPost->stacking_recommendations) && is_array($educationPost->stacking_recommendations)) {
-            $hasStackingData = true; // We have data from database (even if it's just [null])
-
-            // Filter out null values
-            $stackingCategoryIds = array_filter($educationPost->stacking_recommendations, function ($id) {
-                return $id !== null;
-            });
-
-            if (! empty($stackingCategoryIds)) {
-                $stackingCategories = ProductCategory::whereIn('id', $stackingCategoryIds)
-                    ->where('is_active', true)
-                    ->get();
-
-                $stackingRecommendations = $stackingCategories->map(function ($cat) {
-                    return [
-                        'name' => $cat->name,
-                        'subtitle' => $cat->description ? substr($cat->description, 0, 100) : '',
-                        'slug' => $cat->slug,
-                    ];
-                })->toArray();
-            }
-            // If $stackingCategoryIds is empty, it means "None" was selected, so $stackingRecommendations stays empty
-        }
-
-        // Only use fallback if we don't have any stacking data from database
-        if (! $hasStackingData && empty($stackingRecommendations)) {
-            $stackingRecommendations = $this->getStackingRecommendations($category->name);
-        }
-
-        // Get FAQs from database
-        $faqs = [];
-        if ($educationPost && ! empty($educationPost->faqs) && is_array($educationPost->faqs)) {
-            $faqs = $educationPost->faqs;
-        } else {
-            $faqs = $this->getFAQs($category->name);
-        }
-
-        // Get title - use education post title if available, fallback to category name
-        $title = $educationPost && $educationPost->title
-            ? $educationPost->title
-            : $category->name;
-
-        // Generate SEO data for encyclopedia detail
-        $stubSeo = $this->stubEncyclopediaSeo($title, $slug, 'Peptidemap');
-        $detailDescription = ($educationPost ? $educationPost->description : $category->description)
-            ? $this->safeLimit($educationPost ? $educationPost->description : $category->description, 160)
-            : $stubSeo['description'];
-        $seoData = new SEOData(
-            title: EncyclopediaFraming::match($slug, $title) ? $stubSeo['title'] : ($title.' - Peptide Encyclopedia | Peptidemap'),
-            description: $detailDescription,
-            image: $image,
-            url: url("/encyclopedia/{$slug}"),
-        );
-        session(['page_seo_data' => $seoData]);
-
-        // Get comprehensive data
-        $peptideData = [
-            'id' => $category->id,
-            'name' => $title,
-            'slug' => $category->slug,
-            'subtitle' => $peptideFullName,
-            'description' => $educationPost ? $educationPost->description : $category->description,
-            'image' => $image,
-            'categoryTag' => $categoryTag,
-            'keyBenefits' => $keyBenefits,
-            'quickFacts' => $quickFacts,
-            'commonUseCases' => $commonUseCases,
-            'howItWorks' => $howItWorks,
-            'dosage' => $dosage,
-            'safetyInfo' => $safetyInfo,
-            'stackingRecommendations' => $stackingRecommendations,
-            'faqs' => $faqs,
-            'products' => $products,
-            'researchStudies' => rand(30, 60), // Mock data
-        ];
-
-        return Inertia::render('Frontend/EncyclopediaDetail', $peptideData);
-    }
-
-    /**
      * Show encyclopedia article detail page (new format)
      */
     public function showArticle($slug)
@@ -812,7 +651,6 @@ class EncyclopediaController extends Controller
             return redirect(EncyclopediaSlug::withRequestQuery($redirect), 301);
         }
 
-        // Reuse the same logic as show() but render the new article detail page.
         // Hyphen canonicals (vitamin-b12, hgh-191aa, and the other forced
         // families) do not match the stored slug, so resolve those too.
         $category = ProductCategory::where('slug', $slug)
@@ -975,6 +813,19 @@ class EncyclopediaController extends Controller
         // encyclopedia document at /compare splits the informational URL.
         $encyclopediaUrl = url('/encyclopedia/'.$publicSlug);
 
+        // Allowlisted pages render one normalised list and build FAQPage
+        // JSON-LD from that same list. Every other page keeps the schema
+        // this controller already emitted and gains no visible FAQ.
+        // The faqs column is not written.
+        $storedFaqs = $this->faqsForSchema($educationPost, $profile);
+        if (FaqPage::renderAllowed('encyclopedia', $publicSlug)) {
+            $faqs = $this->faqPairs($storedFaqs);
+            $faqSchema = FaqPage::schema($faqs, url("/encyclopedia/{$publicSlug}#faq"));
+        } else {
+            $faqs = [];
+            $faqSchema = $this->faqPageSchema($storedFaqs, $publicSlug);
+        }
+
         // Build SEO array (same format as products/brands pages)
         $seo = [
             'key' => 'encyclopedia',
@@ -991,13 +842,9 @@ class EncyclopediaController extends Controller
             'schema' => array_values(array_filter([
                 $definedTermSchema,
                 $breadcrumbSchema,
-                // FAQPage schema (SEO rec #7). Turns encyclopedia entries
-                // into rich-snippet candidates for "what is X" queries —
-                // Google renders the Q/A pairs directly under our SERP result.
-                $this->faqPageSchema(
-                    $this->faqsForSchema($educationPost, $profile),
-                    $publicSlug
-                ),
+                // FAQPage schema (SEO rec #7). Allowlisted pages use the
+                // visible pairs. Other pages keep the existing node.
+                $faqSchema,
             ])),
         ];
 
@@ -1088,6 +935,7 @@ class EncyclopediaController extends Controller
         $peptideData = $this->applyStubNarrative($peptideData, $educationPost, $profile);
 
         return Inertia::render('Frontend/EncyclopediaArticleDetail', array_merge($peptideData, [
+            'faqs' => $faqs,
             'seo' => $seo,
         ]));
     }
@@ -1402,37 +1250,5 @@ class EncyclopediaController extends Controller
         }
 
         return [];
-    }
-
-    /**
-     * Get FAQs
-     */
-    private function getFAQs($name)
-    {
-        $nameLower = strtolower($name ?? '');
-
-        if (stripos($nameLower, 'bpc-157') !== false) {
-            return [
-                [
-                    'question' => 'How long does it take to see results from BPC-157?',
-                    'answer' => 'Most users report noticeable improvements within 2-4 weeks of consistent use. Full benefits may take 6-8 weeks or longer depending on the severity of the condition.',
-                ],
-                [
-                    'question' => 'Should I inject BPC-157 near the injury site?',
-                    'answer' => 'While systemic administration is effective, some users prefer to inject near the injury site for potentially faster localized effects. Both methods are valid.',
-                ],
-                [
-                    'question' => 'Can I take BPC-157 orally?',
-                    'answer' => 'Yes, BPC-157 can be taken orally, though bioavailability is lower than injection. Oral administration is more convenient but may require higher doses.',
-                ],
-            ];
-        }
-
-        return [
-            [
-                'question' => 'What is the recommended dosage?',
-                'answer' => 'Dosage varies by individual and condition. Consult with a healthcare professional for personalized recommendations.',
-            ],
-        ];
     }
 }
