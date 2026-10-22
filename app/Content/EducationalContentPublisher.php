@@ -349,7 +349,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host), self::retatrutideVsSemaglutide($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host), self::retatrutideVsSemaglutide($host), self::selankVsSemax($host));
     }
 
     /**
@@ -1154,6 +1154,57 @@ class EducationalContentPublisher
                     ['Is retatrutide FDA-approved?', 'No. As of 19 October 2026, retatrutide is investigational and not approved by the FDA or the EMA. Lilly says it plans to submit it for US approval in the first quarter of 2027. The FDA has determined that retatrutide is a drug rather than a biological product, a classification Lilly is challenging in court.'],
                     ['What is semaglutide approved for?', 'In the US, Ozempic (injection and tablets) and Rybelsus are approved for type 2 diabetes, with cardiovascular risk-reduction indications and, for Ozempic injection, a kidney-outcomes indication. Wegovy injection is approved for weight management in adults and adolescents aged 12 and older, cardiovascular risk reduction in adults with established cardiovascular disease and obesity or overweight, and MASH with moderate to advanced fibrosis. Wegovy tablets were approved on 22 December 2025.'],
                     ['Is research-labelled retatrutide or semaglutide the same as the trial drugs?', 'No. Products sold online as research-use-only retatrutide or semaglutide are not the material used in these trials and are not FDA-approved products. The FDA says retatrutide cannot be used in compounding and has warned companies selling GLP-1 drugs falsely labelled for research purposes. This article is educational and is not medical advice.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Selank vs Semax evidence and FDA-status comparison. Drafted 2026-10-19;
+     * sources checked 2026-10-19. Companion to /compare/selank-vs-semax
+     * (pair page) and /compare/selanksemax (blend landing). The body lives
+     * in resources/content/educational. The publisher reads this catalog,
+     * not the draft YAML.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function selankVsSemax(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'selank-vs-semax.md',
+                'image_file' => 'selank-vs-semax.png',
+                'slug' => 'selank-vs-semax',
+                'h1' => 'Selank vs Semax: Structure, Evidence and FDA Status',
+                'lede' => 'Selank is a tuftsin analogue and Semax an ACTH(4-10) analogue: two Russian heptapeptides with the same Pro-Gly-Pro tail. Sequences, identifiers, proposed mechanisms, evidence tiers and dated FDA compounding status, from primary sources. Educational only.',
+                'seo_title' => 'Selank vs Semax: Structure, Evidence and FDA Status',
+                'seo_description' => 'Selank is a tuftsin analogue, Semax an ACTH(4-10) analogue. Sequences, PubChem IDs, evidence tiers and dated FDA compounding status, from primary sources.',
+                'og_title' => 'Selank vs Semax: Two Russian Heptapeptides Compared',
+                'og_description' => 'Same Pro-Gly-Pro tail, different parents: small Russian studies, the one head-to-head imaging study, and FDA\'s 2023-2026 actions on Semax and Selank.',
+                'blog_type' => 'Research',
+                'read_time' => '21 Min Read',
+                'published_at' => '2026-10-19',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Selank', 'Semax', 'Tuftsin', 'ACTH(4-10)', 'Russian peptides', 'FDA compounding', 'Category 2'],
+                'key_points' => [
+                    'Selank (Thr-Lys-Pro-Arg-Pro-Gly-Pro) is a tuftsin analogue; Semax (Met-Glu-His-Phe-Pro-Gly-Pro) is an ACTH(4-10) analogue that keeps ACTH(4-7). Both end in Pro-Gly-Pro, added for stability, and both were developed at the Institute of Molecular Genetics, Russian Academy of Sciences.',
+                    'Identifiers: Selank PubChem CID 11765600, CAS 129954-34-3; Semax PubChem CID 9811102, CAS 80714-61-0 (free base), per FDA\'s substance registry.',
+                    'Proposed mechanisms come mostly from rodent and cell work, much of it developer-affiliated: GABA-A modulation and enkephalinase inhibition for Selank; BDNF and trkB signalling for Semax. FDA calls Semax\'s mechanisms poorly understood.',
+                    'Human evidence is small and mostly in Russian: two benzodiazepine-comparator studies for Selank and stroke studies without described randomization for Semax. One 52-person imaging study compared both with placebo; no study gave them together (PubMed and ClinicalTrials.gov, 19 October 2026).',
+                    'Semax was in 503A Category 2 from 29 September 2023. FDA staff proposed against 503A listing (memo dated 11 May 2026); the PCAC recommended it by a narrow majority on 24 July 2026. No final FDA action as of 19 October 2026.',
+                    'FDA lists Selank acetate (TP-7) among substances that may present significant safety risks. Neither peptide is FDA- or EMA-approved, and research-use-only vials are not Russian-registered or compounded medicines.',
+                ],
+                'faq' => self::faq($host.'/blog/selank-vs-semax#faq', [
+                    ['Are Selank and Semax the same molecule?', 'No. Both are seven-amino-acid peptides ending in Pro-Gly-Pro, but their first four residues come from different parent molecules. Selank is Thr-Lys-Pro-Arg-Pro-Gly-Pro, built on tuftsin, an immune peptide. Semax is Met-Glu-His-Phe-Pro-Gly-Pro, built on a fragment of ACTH. They have different PubChem records (CID 11765600 and CID 9811102) and different CAS numbers.'],
+                    ['Why are they so often listed together?', 'Both were developed at the Institute of Molecular Genetics of the Russian Academy of Sciences, both carry the same Pro-Gly-Pro tail, and both are described as registered medicines in Russia. FDA has also noted Semax products marketed in combination with Selank. Shared origin and marketing do not make them interchangeable.'],
+                    ['Is Selank or Semax approved anywhere?', 'Russia only, as far as we found. FDA\'s July 2026 briefing says Semax is a registered drug in Russia. Peer-reviewed reviews describe Selank as approved in Russia; we could not open the Russian register to confirm that entry on 19 October 2026. Neither appears in Drugs@FDA or in EMA\'s centralised medicines table.'],
+                    ['Where does Semax stand for compounding in the US?', 'Semax is not on the 503A bulks list as of 19 October 2026, and FDA says it has no USP or NF monograph and is not a component of an FDA-approved drug. FDA placed Semax in 503A Category 2 on 29 September 2023, and the nominations were later withdrawn. FDA staff proposed against listing it. On 24 July 2026 the Pharmacy Compounding Advisory Committee recommended adding it by a narrow majority, but the vote is advisory and no final FDA action was found.'],
+                    ['Where does Selank stand with FDA?', 'FDA lists Selank acetate (TP-7) among substances that may present significant safety risks, citing possible immunogenicity and a lack of human safety information. It is not on the 503A bulks list or in FDA\'s 503A or 503B category lists, and it was not on the July 2026 advisory committee agenda.'],
+                    ['Has any study compared or combined Selank and Semax?', 'One small study compared them. In 52 healthy participants, it measured brain connectivity on MRI minutes after Semax, Selank or placebo, with no clinical outcome. Some animal and test-tube studies tested both in parallel. We found no study of the two given together, and no registered trial of either, in PubMed and ClinicalTrials.gov searches on 19 October 2026.'],
+                    ['Which one is better?', 'This page does not rank them. They come from different parent molecules, were studied in different patient groups, mostly in small Russian-language studies, and have no head-to-head clinical trial. Neither has controlled human evidence for the memory, focus or mood claims common in marketing.'],
+                    ['Is a research-use-only vial the same as the Russian medicine?', 'No. The Russian products are registered medicines made under that country\'s rules. A research-use-only vial is neither a Russian-registered medicine nor a compounded or FDA-approved drug, and FDA found that none of the websites it searched said whether their Semax was the free base or a salt. None of the studies on this page describe the identity, purity or sterility of a research-labelled product.'],
                 ]),
             ],
         ];

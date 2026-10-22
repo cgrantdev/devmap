@@ -296,7 +296,9 @@ class VsSitemapIndexTest extends TestCase
     {
         ProductCategory::create(['name' => 'Selank', 'slug' => 'Selank', 'is_active' => true]);
 
-        $this->assertStringNotContainsString('selank-vs-semax', $this->sitemap());
+        $sitemap = $this->sitemap();
+        $this->assertStringNotContainsString('https://peptidemap.com/compare/selank-vs-semax', $sitemap);
+        $this->assertStringContainsString('https://peptidemap.com/blog/selank-vs-semax', $sitemap);
         $this->get('/compare/selank-vs-semax')->assertNotFound();
     }
 
