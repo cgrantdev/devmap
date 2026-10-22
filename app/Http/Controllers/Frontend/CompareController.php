@@ -502,8 +502,12 @@ class CompareController extends Controller
         // off this page. Other compounds can still use the encyclopedia blurb.
         $summary = null;
         if (!is_array($research)) {
-            $summary = $educationPost?->overview ?: $educationPost?->description;
-            $summary = $summary ? strip_tags($summary) : null;
+            // The encyclopedia overview sits beside listed prices. Outcome
+            // lines become the same class sentence the hub card uses.
+            $summary = CompareHubBlurb::guard(
+                $category->slug,
+                $educationPost?->overview ?: $educationPost?->description
+            );
         }
 
         $vendorCount = $documentProducts->pluck('brand_name')->unique()->count();
@@ -1242,11 +1246,11 @@ class CompareController extends Controller
             'cheapest_price' => $this->listedPriceClaim($products)['low'],
             'top_vendors' => $products->take(5)->values(),
             'summary' => $this->vsSummary($category, $vsNarrative, $ep),
-            'mechanism' => $ep?->mechanism_of_action_intro ? strip_tags($ep->mechanism_of_action_intro) : null,
+            'mechanism' => ($m = strip_tags((string) $ep?->mechanism_of_action_intro)) !== '' && ! CompareHubBlurb::hasOutcomeClaim($m) ? $m : null,
             'half_life' => $ep?->half_life,
-            'administration' => $ep?->administration,
-            'key_effects' => $normalize($ep?->key_effects ?? null),
-            'use_cases' => $normalize($ep?->common_use_cases ?? null),
+            'administration' => CompareHubBlurb::hasOutcomeClaim($ep?->administration) ? null : $ep?->administration,
+            'key_effects' => array_values(array_filter($normalize($ep?->key_effects ?? null), fn ($x) => ! CompareHubBlurb::hasOutcomeClaim($t = trim(($x['heading'] ?? '').' '.($x['text'] ?? ''))) && ! preg_match('/\b(?:supports?|supporting|stabiliz\w*|\w*protective|protects?|suppress\w*|synergistic|fuels?|lipolysis|lean\s+body|recovery|repair|elasticity|testosterone|mood|anti[-\s]?inflammatory|longevity|libido|desire|arousal)\b/iu', $t))),
+            'use_cases' => [],
         ];
     }
 
@@ -1407,12 +1411,10 @@ class CompareController extends Controller
         }
 
         if (is_array($vsNarrative) && filled($vsNarrative['lead'] ?? null)) {
-            return $vsNarrative['lead'];
+            return CompareHubBlurb::guard($category->slug, (string) $vsNarrative['lead']);
         }
 
-        $summary = $ep?->overview ?: $ep?->description;
-
-        return $summary ? strip_tags($summary) : null;
+        return CompareHubBlurb::guard($category->slug, $ep?->overview ?: $ep?->description);
     }
 
     /**

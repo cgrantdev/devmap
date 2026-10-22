@@ -214,7 +214,7 @@ class PublisherWordingTest extends TestCase
                 'PMAP coupons',
             ],
             'app/Support/OgImageRevision.php' => [
-                "public const COPY = '20261012'",
+                "public const COPY = '20261022'",
             ],
             'app/Http/Controllers/Frontend/ProductOgImageController.php' => [
                 'OgImageRevision::COPY',

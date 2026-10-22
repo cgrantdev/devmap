@@ -47,7 +47,7 @@ class CompareHubBlurbTest extends TestCase
 
         $this->assertSame('Cagrilintide', $bySlug['cagrilintide']['name']);
         $this->assertSame(
-            'Cagrilintide is an amylin analog studied in obesity research. Research use only.',
+            'Cagrilintide is a long-acting amylin analog studied in obesity research. Research use only.',
             $bySlug['cagrilintide']['description']
         );
         $this->assertEquals(22.0, $bySlug['cagrilintide']['products'][0]['price']);

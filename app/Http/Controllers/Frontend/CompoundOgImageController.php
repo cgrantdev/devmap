@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Frontend\Concerns\RendersOgImage;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Support\CompareHubBlurb;
 use App\Support\EncyclopediaFraming;
 use App\Support\EncyclopediaSlug;
 use Illuminate\Support\Facades\View;
@@ -69,8 +70,9 @@ class CompoundOgImageController extends Controller
         if (!$raw && $profile) {
             $raw = $profile->cardDescription();
         }
-        if (!$raw) return null;
-        return Str::limit(strip_tags($raw), 180);
+        $guarded = CompareHubBlurb::guard($category->slug, $raw);
+        if (!$guarded) return null;
+        return Str::limit($guarded, 180);
     }
 
     /**
