@@ -26,8 +26,6 @@ class ProductPageSeo
 
     public const SHORT_META = 120;
 
-    private const TRIM_CHARS = " \t-/+&,|·";
-
     private const CLAIM_PATTERN = '/\b(?:wound healing|tissue repair|healing|treatments?|therap(?:y|ies)|cures?|weight loss|fat loss|anti-aging|anti aging|boost(?:ing|s|ed)?|dosing)\b/i';
 
     /**

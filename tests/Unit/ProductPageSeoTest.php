@@ -194,6 +194,12 @@ class ProductPageSeoTest extends TestCase
         $this->assertTrue(ProductPageSeo::hasClaim('trusted'));
         $this->assertTrue(ProductPageSeo::hasClaim('3rd party tested'));
         $this->assertTrue(ProductPageSeo::hasClaim('Coupon code PEP20'));
+        $this->assertTrue(ProductPageSeo::hasClaim('Use code SAVE10 for 10% off'));
+        $this->assertTrue(ProductPageSeo::hasClaim('Coupon code'));
+        $this->assertTrue(ProductPageSeo::hasClaim('Certificate of analysis'));
+        $this->assertTrue(ProductPageSeo::hasClaim('Lowest prices'));
+        $this->assertTrue(ProductPageSeo::hasClaim('cheap'));
+        $this->assertTrue(ProductPageSeo::hasClaim('Pure & Tested'));
     }
 
     public function test_a_vendor_named_trusted_keeps_its_name_in_the_identity_line(): void

@@ -7,6 +7,8 @@ namespace App\Support;
  * dash before the site name. Long vendor names drop "Reviews" first,
  * then the vendor name is cut at the last space, so the rendered title
  * stays within 60 characters. "Coupon Codes" is never removed.
+ *
+ * Not called at runtime. Brand pages render the controller's title formula.
  */
 class BrandPageSeo
 {
