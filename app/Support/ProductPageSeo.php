@@ -31,6 +31,16 @@ class ProductPageSeo
     private const CLAIM_PATTERN = '/\b(?:wound healing|tissue repair|healing|treatments?|therap(?:y|ies)|cures?|weight loss|fat loss|anti-aging|anti aging|boost(?:ing|s|ed)?|dosing)\b/i';
 
     /**
+     * Promotional claims. The trailing boundary sits after the purity
+     * word, not after "%": "%" and the following space are both
+     * non-word characters, so a boundary there would miss "99% purity".
+     * Two or three digits cover "99% purity" and "100% purity".
+     */
+    public const PROMO_PATTERN = '/\b(?:verified|lab[- ]tested|third[- ]party tested|best|cheapest|guarantee(?:d|s)?|pharma(?:ceutical)?[- ]grade|FDA[- ](?:approved|registered)|GMP[- ]certified|doctor[- ]recommended|\d{2,3}(?:\.\d+)?%\s*pur(?:e|ity))\b/i';
+
+    private const SITE_CLAIM_PATTERN = '/\b(?:this|our)\s+(?:site|website)\b|\bon\s+Peptidemap\b|\bCOAs?\b.*\bpublished\b/i';
+
+    /**
      * @param  string|null  $rawName  The imported product name, used to keep a CJC-1295 "no DAC" variant that display_name drops.
      */
     public static function title(string $product, ?string $vendor = null, ?string $rawName = null): string
@@ -75,16 +85,71 @@ class ProductPageSeo
         if ($plain === '' || self::chars($plain) < 40) {
             return self::description($product, $vendor, $vendorCount);
         }
-        if (self::hasClaim($plain)) {
+
+        $kept = self::withoutClaims($plain);
+        if ($kept === null || self::chars($kept) < 40) {
             return self::neutralIdentity($product, $vendor, $class ?: self::extractClass($plain));
         }
 
-        $snippet = self::clipComplete($plain, self::DESCRIPTION_LIMIT);
+        $snippet = self::clipComplete($kept, self::DESCRIPTION_LIMIT);
         if ($snippet === null || self::hasClaim($snippet)) {
             return self::neutralIdentity($product, $vendor, $class ?: self::extractClass($plain));
         }
 
         return self::withPublisherTail($snippet);
+    }
+
+    /**
+     * Stored admin title, filtered when the page renders. The database
+     * row is left as Colin saved it. Claim text falls back to the
+     * generated title. Anything still over 60 characters is cut at the
+     * last space.
+     */
+    public static function storedTitle(?string $stored, string $fallback): string
+    {
+        $stored = trim(preg_replace('/\s+/u', ' ', strip_tags((string) $stored)) ?? '');
+        if ($stored === '') {
+            return self::limitTitle($fallback);
+        }
+
+        $kept = self::withoutClaims($stored);
+
+        return self::limitTitle($kept ?? $fallback);
+    }
+
+    /**
+     * Stored admin description, filtered when the page renders. The
+     * database row is left unchanged. Sentences that carry a claim are
+     * dropped; if too little remains, the generated description is used.
+     */
+    public static function storedDescription(?string $stored, string $fallback): string
+    {
+        $stored = trim(preg_replace('/\s+/u', ' ', strip_tags((string) $stored)) ?? '');
+        if ($stored === '') {
+            return $fallback;
+        }
+
+        $kept = self::withoutClaims($stored);
+        if ($kept === null || self::chars($kept) < 40) {
+            return $fallback;
+        }
+
+        $snippet = self::clipComplete($kept, self::DESCRIPTION_LIMIT);
+        if ($snippet === null || self::hasClaim($snippet)) {
+            return $fallback;
+        }
+
+        return $snippet;
+    }
+
+    public static function limitTitle(string $title): string
+    {
+        $title = trim(preg_replace('/\s+/u', ' ', $title) ?? '');
+        if ($title === '' || self::chars($title) <= self::TITLE_LIMIT) {
+            return $title;
+        }
+
+        return self::cutAtLastSpace($title, self::TITLE_LIMIT);
     }
 
     public static function neutralIdentity(string $product, ?string $vendor = null, ?string $class = null): string
@@ -134,21 +199,24 @@ class ProductPageSeo
             return null;
         }
 
-        $parts = preg_split('/(?<=[.!?])\s+|\s*;\s+/u', $plain) ?: [];
+        $parts = self::splitClauses($plain);
         $kept = [];
         foreach ($parts as $part) {
-            $part = trim($part);
-            if ($part === '' || self::hasClaim($part) || preg_match('/\bverified\b/i', $part) || preg_match('/\bthis site\b/i', $part)) {
+            if ($part === '' || self::hasClaim($part) || self::mentionsSite($part)) {
                 continue;
             }
             $kept[] = self::endSentence($part);
         }
 
-        if ($kept === []) {
+        $joined = trim(implode(' ', $kept));
+        // A leftover fragment such as "RUO catalog data only…" is not a
+        // description. A short clean sentence (about 30 characters or
+        // more) is kept.
+        if ($joined === '' || self::chars($joined) < 30) {
             return self::neutralIdentity($product, $vendor, $class);
         }
 
-        return trim(implode(' ', $kept));
+        return $joined;
     }
 
     public static function normalizeProductName(string $name, ?string $rawName = null): string
@@ -171,7 +239,7 @@ class ProductPageSeo
         $name = preg_replace_callback('/\b([A-Za-z0-9]+(?:-[A-Za-z0-9]+)+)\b/u', function (array $match): string {
             return self::recaseToken($match[0]);
         }, $name) ?? $name;
-        $name = preg_replace_callback('/\b([A-Z]{4,})\b/u', function (array $match): string {
+        $name = preg_replace_callback('/\b([A-Z]{5,})\b/u', function (array $match): string {
             if (count(array_unique(str_split($match[1]))) < 2) {
                 return $match[1];
             }
@@ -193,7 +261,8 @@ class ProductPageSeo
 
     public static function hasClaim(string $text): bool
     {
-        return (bool) preg_match(self::CLAIM_PATTERN, $text);
+        return (bool) preg_match(self::CLAIM_PATTERN, $text)
+            || (bool) preg_match(self::PROMO_PATTERN, $text);
     }
 
     public static function description(string $product, ?string $vendor = null, int $vendorCount = 0): string
@@ -343,6 +412,65 @@ class ProductPageSeo
         return $text;
     }
 
+    /**
+     * Sentences and clauses. Claim-bearing pieces are dropped whole so
+     * a promo tail cannot survive beside an otherwise neutral sentence.
+     *
+     * @return list<string>
+     */
+    private static function splitClauses(string $text): array
+    {
+        $parts = preg_split('/(?<=[.!?])\s+|\s*;\s+|\s+—\s+/u', $text) ?: [];
+
+        return array_values(array_filter(array_map(
+            static fn ($part): string => trim((string) $part),
+            $parts
+        ), static fn (string $part): bool => $part !== ''));
+    }
+
+    private static function withoutClaims(string $text): ?string
+    {
+        $kept = [];
+        foreach (self::splitClauses($text) as $part) {
+            if (self::hasClaim($part) || self::mentionsSite($part)) {
+                continue;
+            }
+            $kept[] = self::endSentence($part);
+        }
+        if ($kept === []) {
+            return null;
+        }
+
+        return trim(implode(' ', $kept));
+    }
+
+    private static function mentionsSite(string $text): bool
+    {
+        return (bool) preg_match(self::SITE_CLAIM_PATTERN, $text);
+    }
+
+    private static function cutAtLastSpace(string $value, int $limit): string
+    {
+        if ($limit < 1) {
+            return '';
+        }
+        if (self::chars($value) <= $limit) {
+            return $value;
+        }
+
+        $slice = rtrim(mb_substr($value, 0, $limit));
+        $space = mb_strrpos($slice, ' ');
+        if ($space !== false && $space > 0) {
+            $slice = rtrim(mb_substr($slice, 0, $space));
+        }
+        $slice = rtrim($slice, self::TRIM_CHARS);
+        if ($slice === '') {
+            $slice = rtrim(mb_substr($value, 0, $limit));
+        }
+
+        return $slice;
+    }
+
     private static function extractClass(string $text): ?string
     {
         if (! preg_match('/\b(?:a|an)\s+([^,.;]{3,70}?)(?=\s+studied\b|\s+intended\b|\s+supplied\b|\s+for\b|,|\.|$)/iu', $text, $match)) {
@@ -388,15 +516,19 @@ class ProductPageSeo
             'BPC-157' => 'BPC-157',
             'TB-500' => 'TB-500',
             'GHK-CU' => 'GHK-Cu',
+            'AHK-CU' => 'AHK-Cu',
             'MOTS-C' => 'MOTS-c',
             'CJC-1295' => 'CJC-1295',
             'AOD-9604' => 'AOD-9604',
+            'GHRP-6' => 'GHRP-6',
             'GLP-2TZ' => 'GLP-2TZ',
             'GLP1-S' => 'GLP1-S',
             'GLP2-T' => 'GLP2-T',
             'GLP3-R' => 'GLP3-R',
             '5-AMINO-1MQ' => '5-Amino-1MQ',
             'NAD+' => 'NAD+',
+            'DSIP' => 'DSIP',
+            'KPV' => 'KPV',
         ];
         if (isset($known[$key])) {
             return $known[$key];

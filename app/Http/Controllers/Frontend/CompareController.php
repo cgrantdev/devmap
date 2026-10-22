@@ -92,12 +92,12 @@ class CompareController extends Controller
         ['a' => 'bpc-157',       'b' => 'tb-500',        'tagline' => 'Two peptides often compared'],
         ['a' => 'cjc-1295',      'b' => 'ipamorelin',    'tagline' => 'Growth-hormone secretagogue duo'],
         ['a' => 'bpc-157',       'b' => 'ghk-cu',        'tagline' => 'Two research peptides often listed together'],
-        ['a' => 'retatrutide',   'b' => 'tirzepatide',   'tagline' => 'Next-gen vs. current-gen GLP-1'],
+        ['a' => 'retatrutide',   'b' => 'tirzepatide',   'tagline' => 'Triple vs. dual incretin agonist'],
         ['a' => 'mots-c',        'b' => 'nad',           'tagline' => 'Two mitochondrial research listings'],
         ['a' => 'ipamorelin',    'b' => 'tesamorelin',   'tagline' => 'GHRH vs GHRP'],
         ['a' => 'ipamorelin',    'b' => 'sermorelin',    'tagline' => 'Two GH-axis research peptides'],
         ['a' => 'aod-9604',      'b' => 'tesamorelin',   'tagline' => 'Two catalog peptides often compared'],
-        ['a' => 'retatrutide',   'b' => 'semaglutide',   'tagline' => 'Newer GLP-1 vs. proven'],
+        ['a' => 'retatrutide',   'b' => 'semaglutide',   'tagline' => 'Two GLP-1-class listings often compared'],
         ['a' => 'ghk-cu',        'b' => 'tb-500',        'tagline' => 'Two research peptides often compared'],
         ['a' => '5-amino-1mq',   'b' => 'mots-c',        'tagline' => 'Metabolic peptides'],
         ['a' => 'bpc-157',       'b' => 'ipamorelin',    'tagline' => 'Two research peptides, listed side by side'],
@@ -1248,7 +1248,7 @@ class CompareController extends Controller
             ['bpc-157', 'tb-500', 'Two peptides often compared'],
             ['cjc-1295', 'ipamorelin', 'Growth-hormone secretagogue duo'],
             ['bpc-157', 'ghk-cu', 'Two research peptides often listed together'],
-            ['retatrutide', 'tirzepatide', 'Next-gen vs. current-gen GLP-1'],
+            ['retatrutide', 'tirzepatide', 'Triple vs. dual incretin agonist'],
             ['mots-c', 'nad', 'Two mitochondrial research listings'],
             ['ipamorelin', 'tesamorelin', 'GHRH vs GHRP'],
             ['ipamorelin', 'sermorelin', 'Two GH-axis research peptides'],
@@ -1267,6 +1267,9 @@ class CompareController extends Controller
             }
             $out[] = [
                 'url' => "/compare/{$left}-vs-{$right}",
+                // Title-cased catalog names, the same names these cards
+                // showed before (not CompoundDisplay code names). The page
+                // heading still uses the code name. The href is canonical.
                 'title' => self::relatedLabel($left).' vs '.self::relatedLabel($right),
                 'name_a' => self::relatedLabel($left),
                 'name_b' => self::relatedLabel($right),

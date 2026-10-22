@@ -29,8 +29,16 @@ class SeoSpotCheckTest extends TestCase
         $stored = 'The definitive platform for research peptide vendors — compare verified suppliers, prices, and COAs.';
         Setting::create(['key' => 'site_description', 'value' => $stored]);
 
-        $this->assertStringContainsString('verified suppliers', $stored);
+        $this->assertSame($stored, Setting::where('key', 'site_description')->value('value'));
         $this->assertSame(SiteCopy::DESCRIPTION, SiteCopy::description($stored));
+        $this->assertSame(
+            SiteCopy::DESCRIPTION,
+            SiteCopy::description('Best price guaranteed. Lab-tested to 99% purity and the cheapest.')
+        );
+        $this->assertSame(
+            'Compare research peptide listings and prices.',
+            SiteCopy::description('Compare research peptide listings and prices.')
+        );
         $this->assertDoesNotMatchRegularExpression('/\bverified\b/i', SiteCopy::DESCRIPTION);
         $this->assertLessThanOrEqual(155, mb_strlen(SiteCopy::DESCRIPTION));
 
@@ -45,12 +53,16 @@ class SeoSpotCheckTest extends TestCase
         $title = $this->headContent($html, '/<title>(.*?)<\/title>/s');
         $description = $this->headContent($html, '/<meta name="description" content="(.*?)"/s');
 
-        $before = 'Peptidemap — Compare research-peptide vendors, prices and coupons';
-        $this->assertSame(65, mb_strlen($before));
         $this->assertSame('Peptidemap — Compare Peptide Vendors, Prices & Coupons', $title);
         $this->assertSame(54, mb_strlen($title), $title);
         $this->assertLessThanOrEqual(60, mb_strlen($title));
+        $this->assertStringNotContainsString('research-peptide vendors', $title);
+        $this->assertSame(
+            'Compare every peptide vendor — Peptidemap',
+            $this->headContent($html, '/<meta property="og:title" content="(.*?)"/')
+        );
         $this->assertSame("Live prices and coupon codes. Check each vendor's site for COAs.", $description);
+        $this->assertLessThanOrEqual(155, mb_strlen($description));
     }
 
     public function test_brand_titles_stay_within_60_and_drop_reviews_when_none_exist(): void
@@ -62,10 +74,19 @@ class SeoSpotCheckTest extends TestCase
 
         $platinum = BrandPageSeo::title('Platinum Lion Peptides');
         $bio = BrandPageSeo::title('BioLongevity Labs');
-        $this->assertLessThanOrEqual(60, mb_strlen($platinum), $platinum);
-        $this->assertLessThanOrEqual(60, mb_strlen($bio), $bio);
-        $this->assertStringContainsString(' — Peptidemap', $platinum);
+        $this->assertSame('Platinum Lion Peptides: Coupon Codes & Prices — Peptidemap', $platinum);
+        $this->assertSame(58, mb_strlen($platinum), $platinum);
+        $this->assertSame('BioLongevity Labs: Coupon Codes & Prices — Peptidemap', $bio);
+        $this->assertSame(53, mb_strlen($bio), $bio);
+        $this->assertStringContainsString('Coupon Codes', $platinum);
+        $this->assertStringContainsString('Coupon Codes', $bio);
         $this->assertStringNotContainsString(' - Peptidemap', $platinum);
+
+        $cut = BrandPageSeo::title('Australian Research Peptides International');
+        $this->assertSame('Australian Research: Coupon Codes & Prices — Peptidemap', $cut);
+        $this->assertSame(55, mb_strlen($cut), $cut);
+        $this->assertStringContainsString('Coupon Codes', $cut);
+        $this->assertStringNotContainsString('International', $cut);
 
         $brand = Brand::create([
             'name' => 'Platinum Lion Peptides',
@@ -82,6 +103,7 @@ class SeoSpotCheckTest extends TestCase
         $description = $this->headContent($html, '/<meta name="description" content="(.*?)"/s');
 
         $this->assertLessThanOrEqual(60, mb_strlen($title), $title);
+        $this->assertStringContainsString('Coupon Codes', $title);
         $this->assertStringContainsString(' — ', $title);
         $this->assertStringNotContainsString(' - Peptidemap', $title);
         $this->assertStringContainsString('Coupon code PMAP', $description);
@@ -181,6 +203,7 @@ class SeoSpotCheckTest extends TestCase
                 }
                 $this->assertContains('GHK-Cu', $names);
                 $this->assertNotContains('GHK-CU', $names);
+                $this->assertNotContains('GLP3-R', $names);
 
                 return true;
             });
@@ -193,6 +216,12 @@ class SeoSpotCheckTest extends TestCase
         $this->assertNotContains('/compare/ipamorelin-vs-cjc-1295', $urls);
         $this->assertNotContains('/compare/sermorelin-vs-ipamorelin', $urls);
         $this->assertNotContains('/compare/tesamorelin-vs-ipamorelin', $urls);
+
+        $featured = array_column(\App\Http\Controllers\Frontend\CompareController::FEATURED_VS_PAIRS, 'tagline');
+        $this->assertContains('Two GLP-1-class listings often compared', $featured);
+        $this->assertContains('Triple vs. dual incretin agonist', $featured);
+        $this->assertNotContains('Newer GLP-1 vs. proven', $featured);
+        $this->assertNotContains('Next-gen vs. current-gen GLP-1', $featured);
 
         foreach ($urls as $url) {
             $this->get($url)->assertOk();
@@ -226,14 +255,84 @@ class SeoSpotCheckTest extends TestCase
         $this->get('/compare/bpc-157-vs-tb-500')
             ->assertOk()
             ->assertInertia(function ($page) {
-                $urls = array_column($page->toArray()['props']['related'], 'url');
+                $related = $page->toArray()['props']['related'];
+                $urls = array_column($related, 'url');
                 foreach ($urls as $url) {
                     $this->assertStringNotContainsString('bpc-157', strtolower($url));
                     $this->assertStringNotContainsString('tb-500', strtolower($url));
                 }
+                $names = [];
+                foreach ($related as $card) {
+                    $names[] = $card['name_a'];
+                    $names[] = $card['name_b'];
+                }
+                $this->assertContains('Retatrutide', $names);
+                $this->assertNotContains('GLP3-R', $names);
+                $this->assertNotContains('RETATRUTIDE', $names);
+                $taglines = array_column($related, 'tagline');
+                $this->assertContains('Triple vs. dual incretin agonist', $taglines);
+                $this->assertNotContains('Next-gen vs. current-gen GLP-1', $taglines);
 
                 return true;
             });
+    }
+
+    public function test_stored_product_and_brand_seo_is_filtered_at_render_time(): void
+    {
+        $category = ProductCategory::create([
+            'name' => 'BPC-157',
+            'slug' => 'bpc-157',
+            'is_active' => true,
+        ]);
+        $brand = Brand::create([
+            'name' => 'Platinum Lion Peptides',
+            'slug' => 'platinum-lion-peptides',
+            'is_active' => true,
+        ]);
+        $storedTitle = 'Best BPC-157 guaranteed — cheapest lab-tested 99% purity listing on Peptidemap';
+        $storedDescription = 'Third-party verified BPC-157, lab-tested to 99% purity. Best price guaranteed — cheapest in the UK. Certificates are published on this site.';
+        $product = Product::create([
+            'name' => 'BPC-157 5mg',
+            'slug' => 'bpc-157-5mg',
+            'brand_id' => $brand->id,
+            'product_category_id' => $category->id,
+            'price' => 39.99,
+            'status' => 'active',
+            'hidden' => false,
+            'vendor_description' => $storedDescription,
+            'seo_page_title' => $storedTitle,
+            'seo_description' => $storedDescription,
+        ]);
+        VendorSetting::create([
+            'brand_id' => $brand->id,
+            'coupon_code' => 'PMAP',
+            'seo_page_title' => 'Best Platinum Lion Peptides guaranteed cheapest',
+            'seo_description' => $storedDescription,
+        ]);
+
+        $productHtml = $this->get("/product/platinum-lion-peptides/bpc-157-5mg/{$product->id}")
+            ->assertOk()
+            ->getContent();
+        $productTitle = $this->headContent($productHtml, '/<title>(.*?)<\/title>/s');
+        $productDescription = $this->headContent($productHtml, '/<meta name="description" content="(.*?)"/s');
+        $this->assertLessThanOrEqual(60, mb_strlen($productTitle), $productTitle);
+        $this->assertLessThanOrEqual(155, mb_strlen($productDescription), $productDescription);
+        $this->assertStoredCopyIsNeutral($productTitle.' '.$productDescription);
+
+        $brandHtml = $this->get('/brand/platinum-lion-peptides')->assertOk()->getContent();
+        $brandTitle = $this->headContent($brandHtml, '/<title>(.*?)<\/title>/s');
+        $brandDescription = $this->headContent($brandHtml, '/<meta name="description" content="(.*?)"/s');
+        $this->assertLessThanOrEqual(60, mb_strlen($brandTitle), $brandTitle);
+        $this->assertStringContainsString('Coupon Codes', $brandTitle);
+        $this->assertStoredCopyIsNeutral($brandTitle.' '.$brandDescription);
+
+        $fresh = Product::findOrFail($product->id);
+        $this->assertSame($storedTitle, $fresh->seo_page_title);
+        $this->assertSame($storedDescription, $fresh->seo_description);
+        $this->assertSame(
+            'Best Platinum Lion Peptides guaranteed cheapest',
+            VendorSetting::where('brand_id', $brand->id)->value('seo_page_title')
+        );
     }
 
     public function test_summary_table_drops_the_one_sided_winner_class(): void
@@ -242,6 +341,17 @@ class SeoSpotCheckTest extends TestCase
         $this->assertStringNotContainsString('betterClass', $vue);
         $this->assertStringNotContainsString('slug.toUpperCase()', $vue);
         $this->assertStringContainsString('Buy →', $vue);
+    }
+
+    private function assertStoredCopyIsNeutral(string $text): void
+    {
+        $this->assertDoesNotMatchRegularExpression('/\bverified\b/i', $text);
+        $this->assertDoesNotMatchRegularExpression('/\blab[- ]tested\b/i', $text);
+        $this->assertDoesNotMatchRegularExpression('/\bbest\b/i', $text);
+        $this->assertDoesNotMatchRegularExpression('/\bcheapest\b/i', $text);
+        $this->assertDoesNotMatchRegularExpression('/\bguarantee/i', $text);
+        $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?%\s*pur/i', $text);
+        $this->assertStringNotContainsString('this site', strtolower($text));
     }
 
     private function headContent(string $html, string $pattern): string

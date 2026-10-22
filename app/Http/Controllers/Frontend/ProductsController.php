@@ -417,12 +417,14 @@ class ProductsController extends Controller
         $autoSeoTitle = $this->buildProductSeoTitle($product, $brand);
 
         if ($hasStoredSeo) {
-            // Admin override wins if they typed a custom title. Otherwise use
-            // the buying-hook default (was: bland "{name} – Peptidemap").
-            $seoTitle = $product->seo_page_title ?: $autoSeoTitle;
-            $seoDescription = $product->seo_description ?: $autoSeoDescription;
-            $seoOgTitle = $product->seo_og_title ?: $seoTitle;
-            $seoOgDescription = $product->seo_og_description ?: $seoDescription;
+            // Stored seo_page_title / seo_description / og copies are
+            // filtered here, at render time. The database row is not
+            // rewritten. Claim text falls back to the generated copy,
+            // and a long title is cut at the last space to 60 characters.
+            $seoTitle = ProductPageSeo::storedTitle($product->seo_page_title, $autoSeoTitle);
+            $seoDescription = ProductPageSeo::storedDescription($product->seo_description, $autoSeoDescription);
+            $seoOgTitle = ProductPageSeo::storedTitle($product->seo_og_title, $seoTitle);
+            $seoOgDescription = ProductPageSeo::storedDescription($product->seo_og_description, $seoDescription);
             // Version param tied to updated_at — when the product changes
             // (price, image, name, category), the OG URL changes too, which
             // busts every downstream cache (Cloudflare edge + Discord/FB/X/
@@ -1057,11 +1059,12 @@ class ProductsController extends Controller
         $defaultBrandTitle = BrandPageSeo::title($brand->name, $siteName);
 
         if ($hasStoredSeo) {
-            // Use stored SEO data from database
-            $seoTitle = $vendorSetting->seo_page_title ?: $defaultBrandTitle;
-            $seoDescription = $vendorSetting->seo_description ?: $defaultBrandDescription;
-            $seoOgTitle = $vendorSetting->seo_og_title ?: $seoTitle;
-            $seoOgDescription = $vendorSetting->seo_og_description ?: $seoDescription;
+            // Stored vendor seo_page_title / seo_description / og copies
+            // are filtered at render time. The database row is not rewritten.
+            $seoTitle = ProductPageSeo::storedTitle($vendorSetting->seo_page_title, $defaultBrandTitle);
+            $seoDescription = ProductPageSeo::storedDescription($vendorSetting->seo_description, $defaultBrandDescription);
+            $seoOgTitle = ProductPageSeo::storedTitle($vendorSetting->seo_og_title, $seoTitle);
+            $seoOgDescription = ProductPageSeo::storedDescription($vendorSetting->seo_og_description, $seoDescription);
             // updated_at plus the copy revision so social platforms refetch when the card changes.
             $ogV = (($brand->updated_at?->timestamp) ?: ($vendorSetting->updated_at?->timestamp ?? 0)).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = $vendorSetting->seo_og_image

@@ -147,5 +147,83 @@ class ProductPageSeoTest extends TestCase
         $this->assertFalse(ProductPageSeo::hasClaim($onlyClaim), $onlyClaim);
         $this->assertStringNotContainsString('verified', strtolower($onlyClaim));
         $this->assertStringContainsString('Peptidemap sells nothing', $onlyClaim);
+
+        $site = ProductPageSeo::schemaDescription(
+            'Supplied for laboratory research. Listed on Peptidemap. COAs are published with the lot. Read more on our website.',
+            'Ipamorelin (10mg)',
+            'ExoLabz'
+        );
+        $this->assertSame('Supplied for laboratory research.', $site);
+        $this->assertStringNotContainsString('on peptidemap', strtolower($site));
+        $this->assertStringNotContainsString('our website', strtolower($site));
+        $this->assertStringNotContainsString('published', strtolower($site));
+    }
+
+    public function test_promo_vendor_copy_is_stripped_from_meta_and_schema(): void
+    {
+        $source = 'Third-party verified BPC-157, lab-tested to 99% purity. Best price guaranteed — cheapest in the UK. RUO catalog data only…';
+        $meta = ProductPageSeo::fromOwnCopy($source, 'BPC-157', 'Amino Club');
+        $schema = ProductPageSeo::schemaDescription($source, 'BPC-157', 'Amino Club');
+
+        foreach ([$meta, $schema] as $text) {
+            $this->assertNotNull($text);
+            $this->assertDoesNotMatchRegularExpression('/\bverified\b/i', $text);
+            $this->assertDoesNotMatchRegularExpression('/\blab[- ]tested\b/i', $text);
+            $this->assertDoesNotMatchRegularExpression('/\bbest\b/i', $text);
+            $this->assertDoesNotMatchRegularExpression('/\bcheapest\b/i', $text);
+            $this->assertDoesNotMatchRegularExpression('/\bguarantee/i', $text);
+            $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?%\s*pur/i', $text);
+            $this->assertStringNotContainsString('this site', strtolower($text));
+            $this->assertStringNotContainsString('on peptidemap', strtolower($text));
+            $this->assertFalse(ProductPageSeo::hasClaim($text), $text);
+        }
+
+        $this->assertLessThanOrEqual(155, mb_strlen($meta), $meta);
+        $this->assertStringContainsString('Peptidemap sells nothing', $meta);
+        $this->assertStringContainsString('Peptidemap sells nothing', $schema);
+        $this->assertStringNotContainsString('…', $meta);
+        $this->assertStringNotContainsString('…', $schema);
+
+        $this->assertTrue(ProductPageSeo::hasClaim('99% purity'));
+        $this->assertTrue(ProductPageSeo::hasClaim('99.5% pure'));
+        $this->assertTrue(ProductPageSeo::hasClaim('100% purity'));
+        $this->assertFalse(ProductPageSeo::hasClaim('9% purity'));
+    }
+
+    public function test_stored_overrides_are_filtered_without_rewriting_the_fallback_contract(): void
+    {
+        $fallbackTitle = 'BPC-157 — Amino Club Listing — Peptidemap';
+        $claimed = ProductPageSeo::storedTitle('Best BPC-157 guaranteed — cheapest', $fallbackTitle);
+        $this->assertSame($fallbackTitle, $claimed);
+
+        $long = 'BPC-157 research listing from Amino Club with extra catalog wording that runs past the limit';
+        $cut = ProductPageSeo::storedTitle($long, $fallbackTitle);
+        $this->assertLessThanOrEqual(60, mb_strlen($cut), $cut);
+        $this->assertStringStartsWith('BPC-157 research listing', $cut);
+        $this->assertStringNotContainsString('…', $cut);
+        $lastWord = (string) preg_replace('/^.*\s/u', '', $cut);
+        $this->assertNotSame('', $lastWord);
+        $this->assertStringContainsString($lastWord, $long);
+        $this->assertLessThan(mb_strlen($long), mb_strlen($cut));
+
+        $fallbackDescription = 'Amino Club lists BPC-157 for research use only (RUO). Peptidemap sells nothing.';
+        $promo = 'Third-party verified BPC-157, lab-tested to 99% purity. Best price guaranteed — cheapest in the UK.';
+        $this->assertSame($fallbackDescription, ProductPageSeo::storedDescription($promo, $fallbackDescription));
+
+        $clean = 'Supplied as a lyophilized research compound in a 5mg vial for laboratory use only.';
+        $this->assertSame($clean, ProductPageSeo::storedDescription($clean, $fallbackDescription));
+    }
+
+    public function test_acronyms_stay_intact_when_a_shouted_name_is_recased(): void
+    {
+        $this->assertSame('DSIP', ProductPageSeo::normalizeProductName('DSIP'));
+        $this->assertSame('KPV', ProductPageSeo::normalizeProductName('KPV'));
+        $this->assertSame('NAD+', ProductPageSeo::normalizeProductName('NAD+'));
+        $this->assertSame('GHRP-6', ProductPageSeo::normalizeProductName('GHRP-6'));
+        $this->assertSame('AHK-Cu', ProductPageSeo::normalizeProductName('AHK-CU'));
+        $this->assertSame('TB-500', ProductPageSeo::normalizeProductName('TB-500'));
+        $this->assertSame('BPC-157', ProductPageSeo::normalizeProductName('BPC-157'));
+        $this->assertSame('GHK-Cu', ProductPageSeo::normalizeProductName('GHK-CU'));
+        $this->assertSame('Pancragen', ProductPageSeo::normalizeProductName('PANCRAGEN'));
     }
 }

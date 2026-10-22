@@ -6,8 +6,9 @@ namespace App\Support;
  * Site-wide default description.
  *
  * The live value is the settings.site_description row (Admin → Settings),
- * not a migration. When that row is empty or still says "verified", the
- * public fallback below is what pages and the Inertia payload use.
+ * not a migration. When that row is empty or matches the product
+ * claim/promo filter, the public fallback below is what pages and
+ * the Inertia payload use. The stored row is not rewritten.
  */
 class SiteCopy
 {
@@ -16,7 +17,7 @@ class SiteCopy
     public static function description(?string $stored = null): string
     {
         $stored = trim((string) $stored);
-        if ($stored === '' || preg_match('/\bverified\b/i', $stored)) {
+        if ($stored === '' || ProductPageSeo::hasClaim($stored)) {
             return self::DESCRIPTION;
         }
 

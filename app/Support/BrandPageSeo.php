@@ -3,9 +3,10 @@
 namespace App\Support;
 
 /**
- * Brand-page title. Keeps the coupon / reviews / prices wording and
- * switches the site separator to an em dash. Long vendor names drop
- * phrases until the rendered title is 60 characters or fewer.
+ * Brand-page title. Keeps Colin's "Coupon Codes" wording and the em
+ * dash before the site name. Long vendor names drop "Reviews" first,
+ * then the vendor name is cut at the last space, so the rendered title
+ * stays within 60 characters. "Coupon Codes" is never removed.
  */
 class BrandPageSeo
 {
@@ -16,24 +17,49 @@ class BrandPageSeo
         $vendor = trim($vendor) !== '' ? trim($vendor) : 'Vendor';
         $site = trim($siteName) !== '' ? trim($siteName) : 'Peptidemap';
         $suffix = ' — '.$site;
-        $candidates = [
-            $vendor.': Coupon Codes, Reviews & Prices',
-            $vendor.': Reviews & Prices',
-            $vendor.': Prices',
-        ];
+        $withReviews = ': Coupon Codes, Reviews & Prices';
+        $pricesOnly = ': Coupon Codes & Prices';
 
-        foreach ($candidates as $candidate) {
-            if (mb_strlen($candidate.$suffix) <= self::TITLE_LIMIT) {
-                return $candidate.$suffix;
-            }
+        $full = $vendor.$withReviews.$suffix;
+        if (mb_strlen($full) <= self::TITLE_LIMIT) {
+            return $full;
         }
 
-        $tail = ': Prices'.$suffix;
-        $budget = self::TITLE_LIMIT - mb_strlen($tail);
-        if ($budget < 1) {
-            return mb_substr($site, 0, self::TITLE_LIMIT);
+        $short = $vendor.$pricesOnly.$suffix;
+        if (mb_strlen($short) <= self::TITLE_LIMIT) {
+            return $short;
         }
 
-        return rtrim(mb_substr($vendor, 0, $budget)).$tail;
+        $tail = $pricesOnly.$suffix;
+        $name = self::cutAtLastSpace($vendor, self::TITLE_LIMIT - mb_strlen($tail));
+        if ($name === '') {
+            $name = 'Vendor';
+        }
+
+        $cut = $name.$tail;
+        if (mb_strlen($cut) <= self::TITLE_LIMIT) {
+            return $cut;
+        }
+
+        return self::cutAtLastSpace($cut, self::TITLE_LIMIT);
+    }
+
+    private static function cutAtLastSpace(string $value, int $limit): string
+    {
+        $value = trim($value);
+        if ($limit < 1) {
+            return '';
+        }
+        if (mb_strlen($value) <= $limit) {
+            return $value;
+        }
+
+        $slice = rtrim(mb_substr($value, 0, $limit));
+        $space = mb_strrpos($slice, ' ');
+        if ($space !== false && $space > 0) {
+            $slice = rtrim(mb_substr($slice, 0, $space));
+        }
+
+        return rtrim($slice, " \t-—,");
     }
 }
