@@ -86,8 +86,14 @@ class CompareVsRedirectTest extends TestCase
             '/compare/retatrutide-vs-tirzepatide'
         );
 
-        $target->assertSee('<h1 class="ssr-seo-h1">GLP3-R vs GLP2-T</h1>', false);
-        $target->assertSee('<title>GLP3-R vs GLP2-T — Vendor &amp; Price Comparison — Peptidemap</title>', false);
+        // SEO H1, title, and breadcrumb use the category names. The
+        // visible heading still reads the CompoundDisplay props (GLP3-R / GLP2-T).
+        $target->assertSee('<h1 class="ssr-seo-h1">Retatrutide vs Tirzepatide</h1>', false);
+        $target->assertDontSee('<h1 class="ssr-seo-h1">GLP3-R vs GLP2-T</h1>', false);
+        $target->assertSee('<title>Retatrutide vs Tirzepatide — Price Comparison — Peptidemap</title>', false);
+        $target->assertSee('"name":"Retatrutide vs Tirzepatide"', false);
+        $target->assertSee('GLP3-R', false);
+        $target->assertSee('GLP2-T', false);
     }
 
     public function test_cagrilintide_vs_reta_redirects_to_the_retatrutide_pair_in_one_hop(): void
@@ -104,9 +110,12 @@ class CompareVsRedirectTest extends TestCase
             $target = $this->assertOneHop($from, '/compare/cagrilintide-vs-retatrutide');
         }
 
-        $target->assertSee('<h1 class="ssr-seo-h1">Cagrilintide vs GLP3-R</h1>', false);
-        $target->assertSee('<title>Cagrilintide vs GLP3-R — Price Comparison — Peptidemap</title>', false);
+        $target->assertSee('<h1 class="ssr-seo-h1">Cagrilintide vs Retatrutide</h1>', false);
+        $target->assertDontSee('<h1 class="ssr-seo-h1">Cagrilintide vs GLP3-R</h1>', false);
+        $target->assertSee('<title>Cagrilintide vs Retatrutide — Price Comparison — Peptidemap</title>', false);
+        $target->assertSee('"name":"Cagrilintide vs Retatrutide"', false);
         $target->assertDontSee('Retatrutide vs', false);
+        $target->assertSee('GLP3-R', false);
     }
 
     public function test_every_featured_vs_pair_returns_200(): void
