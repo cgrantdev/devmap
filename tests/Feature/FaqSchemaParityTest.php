@@ -109,6 +109,63 @@ HTML,
         );
     }
 
+    public function test_allowlisted_catalog_blogs_drop_the_body_faq_and_match_json_ld(): void
+    {
+        $slugs = EducationalContentPublisher::blogSlugs();
+        $this->assertNotEmpty($slugs);
+        foreach ([
+            'orforglipron-vs-tirzepatide',
+            'cagrilintide-vs-eloralintide',
+            'eloralintide-tirzepatide-vs-retatrutide',
+        ] as $held) {
+            $this->assertNotContains($held, $slugs);
+        }
+
+        foreach ($slugs as $slug) {
+            $response = $this->get('/blog/'.$slug)->assertOk();
+            $faqPage = $this->faqPage($response->getContent());
+            $this->assertNotNull($faqPage, $slug);
+
+            $pairs = [];
+            foreach ($faqPage['mainEntity'] as $entity) {
+                $pairs[] = [
+                    'question' => $entity['name'],
+                    'answer' => $entity['acceptedAnswer']['text'],
+                ];
+            }
+
+            $response->assertInertia(fn ($page) => $page
+                ->where('faqs', $pairs)
+                ->where('blog.content', function ($content) use ($slug) {
+                    $this->assertIsString($content);
+                    $this->assertDoesNotMatchRegularExpression(
+                        '/<h2>\s*(?:FAQs?|Frequently Asked Questions)\s*<\/h2>/i',
+                        $content,
+                        $slug
+                    );
+
+                    return true;
+                })
+            );
+        }
+    }
+
+    public function test_held_blog_keeps_stored_faqpage_and_has_no_visible_faq(): void
+    {
+        $slug = 'orforglipron-vs-tirzepatide';
+        $this->assertNotContains($slug, EducationalContentPublisher::blogSlugs());
+
+        $blog = Blog::query()->where('slug', $slug)->firstOrFail();
+        $storedFaq = collect($blog->seo_schema)->first(
+            fn ($block) => is_array($block) && ($block['@type'] ?? null) === 'FAQPage'
+        );
+        $this->assertIsArray($storedFaq);
+
+        $response = $this->get('/blog/'.$slug)->assertOk();
+        $this->assertSame($storedFaq, $this->faqPage($response->getContent()));
+        $response->assertInertia(fn ($page) => $page->has('faqs', 0));
+    }
+
     public function test_other_blog_keeps_stored_faqpage_and_has_no_visible_faq(): void
     {
         $content = <<<'HTML'

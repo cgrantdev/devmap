@@ -47,14 +47,14 @@ class EncyclopediaController extends Controller
             if (! is_array($f)) {
                 continue;
             }
-            $q = trim((string) ($f['question'] ?? ''));
-            $a = trim((string) ($f['answer'] ?? ''));
+            $q = trim(html_entity_decode(strip_tags((string) ($f['question'] ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            $a = trim(html_entity_decode(strip_tags((string) ($f['answer'] ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
             if ($q === '' || $a === '') {
                 continue;
             }
             $pairs[] = [
                 'question' => $q,
-                'answer' => strip_tags($a),
+                'answer' => $a,
             ];
         }
 

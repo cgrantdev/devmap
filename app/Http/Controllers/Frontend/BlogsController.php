@@ -418,9 +418,12 @@ class BlogsController extends Controller
             return $html;
         }
 
+        if (preg_match_all('/<h3\b/i', $match[0]) !== count($faqs)) {
+            return $html;
+        }
         $plain = html_entity_decode(strip_tags($match[0]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         foreach ($faqs as $faq) {
-            if (! str_contains($plain, $faq['question']) || ! str_contains($plain, $faq['answer'])) {
+            if (! str_contains($plain, $faq['question'])) {
                 return $html;
             }
         }

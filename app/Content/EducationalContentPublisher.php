@@ -28,6 +28,8 @@ class EducationalContentPublisher
         'kinetixatx.com',
     ];
 
+    private const FAQ_RENDER_HOLD = ['orforglipron-vs-tirzepatide', 'cagrilintide-vs-eloralintide', 'eloralintide-tirzepatide-vs-retatrutide'];
+
     public static function sync(): void
     {
         foreach (self::catalog() as $page) {
@@ -242,7 +244,7 @@ class EducationalContentPublisher
     {
         $slugs = [];
         foreach (self::catalog() as $page) {
-            if (($page['kind'] ?? null) !== 'blog') {
+            if (($page['kind'] ?? null) !== 'blog' || in_array($page['slug'] ?? null, self::FAQ_RENDER_HOLD, true)) {
                 continue;
             }
             $slug = $page['slug'] ?? null;
