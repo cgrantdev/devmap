@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Http\Controllers\Frontend\CompareController;
 use App\Models\ProductCategory;
+use App\Support\VsPairIndexing;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
@@ -92,8 +93,10 @@ class CompareVsRedirectTest extends TestCase
         $target->assertDontSee('<h1 class="ssr-seo-h1">GLP3-R vs GLP2-T</h1>', false);
         $target->assertSee('<title>Retatrutide vs Tirzepatide — Price Comparison — Peptidemap</title>', false);
         $target->assertSee('"name":"Retatrutide vs Tirzepatide"', false);
-        $target->assertSee('GLP3-R', false);
-        $target->assertSee('GLP2-T', false);
+        $target->assertInertia(fn ($page) => $page
+            ->component('Frontend/CompareCompoundVs')
+            ->where('a.name', 'GLP3-R')
+            ->where('b.name', 'GLP2-T'));
     }
 
     public function test_cagrilintide_vs_reta_redirects_to_the_retatrutide_pair_in_one_hop(): void
@@ -115,7 +118,10 @@ class CompareVsRedirectTest extends TestCase
         $target->assertSee('<title>Cagrilintide vs Retatrutide — Price Comparison — Peptidemap</title>', false);
         $target->assertSee('"name":"Cagrilintide vs Retatrutide"', false);
         $target->assertDontSee('Retatrutide vs', false);
-        $target->assertSee('GLP3-R', false);
+        $target->assertInertia(fn ($page) => $page
+            ->where('a.name', 'Cagrilintide')
+            ->where('b.name', 'GLP3-R'));
+        $this->assertFalse(VsPairIndexing::isAllowlisted('cagrilintide-vs-retatrutide'));
     }
 
     public function test_every_featured_vs_pair_returns_200(): void
