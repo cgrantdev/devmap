@@ -1289,7 +1289,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
         $this->assertSame('2026-10-19', $blog->published_at->toDateString());
         $this->assertSame('Research', $blog->blog_type);
-        $this->assertSame('19 Min Read', $blog->read_time);
+        $this->assertSame('21 Min Read', $blog->read_time);
         $this->assertSame('Peptidemap', $blog->author_name);
         $this->assertFalse((bool) $blog->is_featured);
         $this->assertSame('published', $blog->status);
@@ -1373,7 +1373,7 @@ class EducationalContentTest extends TestCase
         $page->assertSee($cover, false);
         $page->assertSee('What were the most common side effects in the retatrutide trials?', false);
         $page->assertSee('Can these trials be compared with trials of other drugs?', false);
-        $page->assertSee('19 Min Read', false);
+        $page->assertSee('21 Min Read', false);
         $page->assertDontSee('/workspace', false);
         $page->assertDontSee('CMS paste', false);
         $page->assertDontSee('CHANGES', false);
@@ -1381,7 +1381,7 @@ class EducationalContentTest extends TestCase
             ->where('blog.slug', $slug)
             ->where('blog.title', $h1)
             ->where('blog.image', $cover)
-            ->where('blog.readTime', '19 Min Read')
+            ->where('blog.readTime', '21 Min Read')
             ->where('blog.content', function ($html) {
                 return is_string($html)
                     && ! str_contains($html, '<!--')
@@ -1728,7 +1728,7 @@ class EducationalContentTest extends TestCase
         $this->assertIsArray($entry);
         $this->assertSame('retatrutide-vs-semaglutide.md', $entry['file']);
         $this->assertSame('retatrutide-vs-semaglutide.png', $entry['image_file']);
-        $this->assertSame('18 Min Read', $entry['read_time']);
+        $this->assertSame('19 Min Read', $entry['read_time']);
         $this->assertCount(8, $entry['faq']['mainEntity'] ?? []);
         $this->assertSame('https://peptidemap.com/blog/retatrutide-vs-semaglutide#faq', $entry['faq']['@id'] ?? null);
 
@@ -1750,7 +1750,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
         $this->assertSame('2026-10-19', $blog->published_at->toDateString());
         $this->assertSame('Research', $blog->blog_type);
-        $this->assertSame('18 Min Read', $blog->read_time);
+        $this->assertSame('19 Min Read', $blog->read_time);
         $this->assertSame('Peptidemap', $blog->author_name);
         $this->assertFalse((bool) $blog->is_featured);
         $this->assertSame('published', $blog->status);
@@ -1840,7 +1840,7 @@ class EducationalContentTest extends TestCase
         $page->assertSee($cover, false);
         $page->assertSee('Has retatrutide been compared head to head with semaglutide?', false);
         $page->assertSee('Is research-labelled retatrutide or semaglutide the same as the trial drugs?', false);
-        $page->assertSee('18 Min Read', false);
+        $page->assertSee('19 Min Read', false);
         $page->assertDontSee('/workspace', false);
         $page->assertDontSee('CMS paste', false);
         $page->assertDontSee('CHANGES', false);
@@ -1851,7 +1851,7 @@ class EducationalContentTest extends TestCase
             ->where('blog.slug', $slug)
             ->where('blog.title', $h1)
             ->where('blog.image', $cover)
-            ->where('blog.readTime', '18 Min Read')
+            ->where('blog.readTime', '19 Min Read')
             ->where('blog.content', function ($html) {
                 return is_string($html)
                     && ! str_contains($html, '<!--')
@@ -1938,7 +1938,7 @@ class EducationalContentTest extends TestCase
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = preg_match_all('/\S+/', $markdown);
         $this->assertSame(4800, $words);
-        $this->assertSame(((int) round($words / 230)).' Min Read', $entry['read_time']);
+        $this->assertSame(((int) ceil($words / 230)).' Min Read', $entry['read_time']);
         $this->assertSame('21 Min Read', $entry['read_time']);
         $this->assertSame('21 Min Read', $blog->read_time);
         $this->assertStringNotContainsString('<!--', $markdown);

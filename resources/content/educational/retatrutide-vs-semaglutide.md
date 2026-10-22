@@ -62,15 +62,15 @@ So every efficacy and safety figure below comes from trials in which retatrutide
 | Mean body-weight change at week 80 | Placebo | Lowest dose arm | Middle dose arm | Highest dose arm | Source |
 | --- | --- | --- | --- | --- | --- |
 | TRIUMPH-1, treatment-regimen estimand | −3.9% | −17.6% | −23.7% | −25.0% | Paper |
-| TRIUMPH-1, efficacy estimand | −2.2% | −19.0% | −25.9% | −28.3% | reported in the NEJM paper and company-reported by Lilly in its press release of 21 May 2026 |
+| TRIUMPH-1, efficacy estimand | −2.2% | −19.0% | −25.9% | −28.3% | Reported in the NEJM paper and company-reported by Lilly in its press release of 21 May 2026 |
 | TRIUMPH-2, treatment-regimen estimand | −5.1% | −11.9% | −16.8% | −18.8% | Paper |
-| TRIUMPH-2, efficacy estimand | −4.0% | −12.7% | −19.1% | −20.8% | reported in the Lancet paper and company-reported by Lilly in its press release of 23 July 2026 |
+| TRIUMPH-2, efficacy estimand | −4.0% | −12.7% | −19.1% | −20.8% | Reported in the Lancet paper and company-reported by Lilly in its press release of 23 July 2026 |
 | TRIUMPH-3, efficacy estimand | −3.2% | not tested | −21.6% | −22.6% | Company-reported |
 
 Points the sources add:
 
 - **TRIUMPH-1.** The paper's primary analyses compared the middle and highest dose arms with placebo, with differences of −19.8 and −21.0 percentage points. The trial also included basket studies in people with knee osteoarthritis and obstructive sleep apnea, reported in the same paper. Lilly reports a mean baseline weight of 112.7 kg and a mean BMI of 40.0.
-- **TRIUMPH-2.** Estimated treatment differences vs placebo under the treatment-regimen estimand were −6.9, −11.8 and −13.8 percentage points (all p<0.0001). Mean baseline BMI was 38.2 and mean baseline HbA1c 7.71%. Lilly reports HbA1c changes of −1.4%, −1.6% and −1.5% vs −0.2% with placebo under the efficacy estimand (company-reported).
+- **TRIUMPH-2.** Estimated treatment differences vs placebo under the treatment-regimen estimand were −6.9, −11.8 and −13.8 percentage points (all p<0.0001). Mean baseline BMI was 38.2 and mean baseline HbA1c 7.71%. Under the efficacy estimand, HbA1c changed by −1.41%, −1.63% and −1.54% vs −0.19% with placebo, reported in the paper's appendix and company-reported by Lilly.
 - **TRIUMPH-3.** No paper was found. Lilly reports 44 vs 52 five-component major adverse cardiovascular events (hazard ratio 0.82, 95% CI 0.55 to 1.22) and 27 vs 23 three-component events (hazard ratio 1.12, 95% CI 0.64 to 1.96) for pooled retatrutide vs placebo, in a pre-specified in-study analysis. Both confidence intervals cross 1. These figures do not establish a cardiovascular benefit or harm. A dedicated cardiovascular and kidney outcomes trial, TRIUMPH-Outcomes ([NCT06383390](https://clinicaltrials.gov/study/NCT06383390)), is active, not recruiting, with primary completion estimated for February 2029.
 
 ### Semaglutide: STEP 1, STEP 2 and SELECT
@@ -113,7 +113,7 @@ The same caution applies to safety. Adverse-event rates depend on the population
 | Nausea | TRIUMPH-1, reported in the paper and company-reported by Lilly | 14.8% | 28.6% | 38.4% | 42.4% |
 | Vomiting | TRIUMPH-1, reported in the paper and company-reported by Lilly | 4.8% | 10.6% | 22.8% | 25.3% |
 | Dysesthesia | TRIUMPH-1, reported in the paper and company-reported by Lilly | 0.9% | 5.1% | 12.3% | 12.5% |
-| Discontinuation due to adverse events | TRIUMPH-1, company-reported | 4.9% | 4.1% | 6.9% | 11.3% |
+| Discontinuation due to adverse events (randomized population, excluding deaths) | TRIUMPH-1, paper | 4.6% | 4.1% | 6.5% | 11.2% |
 | Discontinuation due to adverse events | TRIUMPH-3, company-reported | 4.8% | not tested | 9.8% | 13.5% |
 
 The TRIUMPH-2 authors describe the safety profile as "generally consistent with other molecules with GLP-1 receptor agonism." Lilly reports these events were generally mild to moderate and the majority resolved during treatment (company-reported). The 2023 phase 2 obesity paper reports a dose-dependent rise in heart rate that peaked at 24 weeks and declined afterwards. A fuller breakdown by trial and source is in Peptidemap's article on [retatrutide side effects in the trial publications](https://peptidemap.com/blog/retatrutide-side-effects-trial-data).
