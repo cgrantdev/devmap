@@ -22,7 +22,7 @@ class CompareHubBlurbTest extends TestCase
         $redefine = 'Cagrilintide is a long-acting amylin analogue developed by Novo Nordisk. With semaglutide (as CagriSema), mean weight change was −20.4% vs −3.0% with placebo over 68 weeks in REDEFINE 1 (NEJM 2025). Not approved as of 22 Oct 2026.';
 
         $this->assertSame(
-            'Cagrilintide is an amylin analog studied in obesity research. Research use only.',
+            'Cagrilintide is a long-acting amylin analog studied in obesity research. Research use only.',
             CompareHubBlurb::render('cagrilintide', $redefine)
         );
     }
@@ -86,11 +86,11 @@ class CompareHubBlurbTest extends TestCase
         $this->assertGreaterThan(200, mb_strlen($clean));
         $this->assertSame(trim($clean), CompareHubBlurb::guard('tesofensine', $clean));
         $this->assertSame(
-            'Cagrilintide is an amylin analog studied in obesity research. Research use only.',
+            'Cagrilintide is a long-acting amylin analog studied in obesity research. Research use only.',
             CompareHubBlurb::guard('cagrilintide', 'The combination showed up to 25% body weight reduction in a later paragraph. '.str_repeat('More context. ', 30))
         );
         $this->assertSame(
-            'Ipamorelin is a growth hormone secretagogue studied in endocrine research. Research use only.',
+            'Ipamorelin is a ghrelin-receptor (GHS-R1a) agonist and growth hormone secretagogue studied in endocrine research. Research use only.',
             CompareHubBlurb::guard('ipamorelin', 'Ipamorelin is the most selective GHS.')
         );
     }
@@ -132,11 +132,11 @@ class CompareHubBlurbTest extends TestCase
             'Tesamorelin is a GHRH analog studied in lipodystrophy research. Research use only.',
             'MOTS-c is a mitochondrial-derived peptide studied in metabolic research. Research use only.',
             'BPC-157 is a synthetic pentadecapeptide derived from a gastric protein, studied in musculoskeletal and gastrointestinal research. Research use only.',
-            'Ipamorelin is a growth hormone secretagogue studied in endocrine research. Research use only.',
+            'Ipamorelin is a ghrelin-receptor (GHS-R1a) agonist and growth hormone secretagogue studied in endocrine research. Research use only.',
             'AOD-9604 is a modified fragment of human growth hormone (amino acids 176-191) studied in metabolic research. Research use only.',
             'TB-500 is a synthetic peptide related to thymosin beta-4, studied in musculoskeletal research. Research use only.',
             'Sermorelin is a GHRH(1-29) analog studied in endocrine research. Research use only.',
-            'Cagrilintide is an amylin analog studied in obesity research. Research use only.',
+            'Cagrilintide is a long-acting amylin analog studied in obesity research. Research use only.',
             'Kisspeptin is a neuropeptide studied in reproductive endocrinology research. Research use only.',
             'Bremelanotide is a melanocortin receptor agonist studied in sexual-function research. Research use only.',
         ];
@@ -171,7 +171,7 @@ class CompareHubBlurbTest extends TestCase
         return [
             'cagrilintide' => [
                 'Cagrilintide is a long-acting amylin analog being developed by Novo Nordisk as a complement to GLP-1 agonists. The combination with semaglutide (CagriSema) showed up to 25% weight reduction.',
-                'Cagrilintide is an amylin analog studied in obesity research. Research use only.',
+                'Cagrilintide is a long-acting amylin analog studied in obesity research. Research use only.',
             ],
             'retatrutide' => [
                 "Retatrutide is a triple agonist targeting GLP-1, GIP, and glucagon receptors simultaneously. Phase 2 data showed up to 24% weight reduction — the highest of any peptide compound studied.\n\nAs of early 2026, phase 3 is underway.",
@@ -199,7 +199,7 @@ class CompareHubBlurbTest extends TestCase
             ],
             'ipamorelin' => [
                 'Ipamorelin is the most selective growth hormone secretagogue, stimulating GH release without affecting cortisol, prolactin, or ACTH levels.',
-                'Ipamorelin is a growth hormone secretagogue studied in endocrine research. Research use only.',
+                'Ipamorelin is a ghrelin-receptor (GHS-R1a) agonist and growth hormone secretagogue studied in endocrine research. Research use only.',
             ],
             'aod-9604' => [
                 'AOD-9604 is a modified fragment of human growth hormone (amino acids 176-191) that replicates the fat-burning action of GH without anabolic or diabetogenic effects.',

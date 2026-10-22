@@ -8,7 +8,7 @@ namespace App\Support;
  */
 class OgImageRevision
 {
-    public const COPY = '20261012';
+    public const COPY = '20261022';
 
     /**
      * Product-card copy only. Compound and brand cards stay on COPY so

@@ -32,11 +32,11 @@ class CompareHubBlurb
         'tesamorelin' => 'Tesamorelin is a GHRH analog studied in lipodystrophy research. Research use only.',
         'mots-c' => 'MOTS-c is a mitochondrial-derived peptide studied in metabolic research. Research use only.',
         'bpc-157' => 'BPC-157 is a synthetic pentadecapeptide derived from a gastric protein, studied in musculoskeletal and gastrointestinal research. Research use only.',
-        'ipamorelin' => 'Ipamorelin is a growth hormone secretagogue studied in endocrine research. Research use only.',
+        'ipamorelin' => 'Ipamorelin is a ghrelin-receptor (GHS-R1a) agonist and growth hormone secretagogue studied in endocrine research. Research use only.',
         'aod-9604' => 'AOD-9604 is a modified fragment of human growth hormone (amino acids 176-191) studied in metabolic research. Research use only.',
         'tb-500' => 'TB-500 is a synthetic peptide related to thymosin beta-4, studied in musculoskeletal research. Research use only.',
         'sermorelin' => 'Sermorelin is a GHRH(1-29) analog studied in endocrine research. Research use only.',
-        'cagrilintide' => 'Cagrilintide is an amylin analog studied in obesity research. Research use only.',
+        'cagrilintide' => 'Cagrilintide is a long-acting amylin analog studied in obesity research. Research use only.',
         'kisspeptin' => 'Kisspeptin is a neuropeptide studied in reproductive endocrinology research. Research use only.',
         'bremelanotide' => 'Bremelanotide is a melanocortin receptor agonist studied in sexual-function research. Research use only.',
         'pt-141' => 'Bremelanotide is a melanocortin receptor agonist studied in sexual-function research. Research use only.',
@@ -60,8 +60,10 @@ class CompareHubBlurb
     }
 
     /**
-     * Full compare-page summary or OG tagline. A claim anywhere in the
-     * source is replaced with the class line. Clean copy is left intact.
+     * Compare-page summary or OG tagline. Clean copy stays intact. A known
+     * compound with an outcome claim uses its class line. Any other claim
+     * keeps the opening text when that opening is only a "not approved"
+     * disclaimer, and uses the short fallback otherwise.
      */
     public static function guard(?string $slug, ?string $raw): ?string
     {
@@ -73,8 +75,13 @@ class CompareHubBlurb
         if (! self::hasOutcomeClaim($plain)) {
             return $plain;
         }
-
-        return self::replacement($slug);
+        $key = strtolower(trim((string) $slug));
+        if (isset(self::NEUTRAL[$key])) {
+            return self::NEUTRAL[$key];
+        }
+        $lead = Str::limit($plain, 200);
+        $check = preg_replace('/\b(?:not|no)\s+(?:an?\s+|the\s+)?(?:U\.S\.\s+)?(?:FDA[-\s]?)?approved\b|\bunapproved\b/iu', '', $lead);
+        return self::hasOutcomeClaim($check) ? self::FALLBACK : $lead;
     }
 
     private static function replacement(?string $slug): string

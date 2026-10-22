@@ -7,6 +7,8 @@ use App\Models\Brand;
 use App\Models\EducationPost;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\VendorSetting;
+use App\Support\CompareHubBlurb;
 use App\Support\ComparePageSeo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use ReflectionMethod;
@@ -18,11 +20,11 @@ class CompareSummaryClaimTest extends TestCase
 
     private const CAGRI_CLAIM = 'Cagrilintide is a long-acting amylin analog. The combination with semaglutide showed up to 25% body weight reduction.';
 
-    private const CAGRI_LINE = 'Cagrilintide is an amylin analog studied in obesity research. Research use only.';
+    private const CAGRI_LINE = 'Cagrilintide is a long-acting amylin analog studied in obesity research. Research use only.';
 
     private const IPAMORELIN_CLAIM = 'Ipamorelin is the most selective GHS, stimulating GH release without affecting cortisol.';
 
-    private const IPAMORELIN_LINE = 'Ipamorelin is a growth hormone secretagogue studied in endocrine research. Research use only.';
+    private const IPAMORELIN_LINE = 'Ipamorelin is a ghrelin-receptor (GHS-R1a) agonist and growth hormone secretagogue studied in endocrine research. Research use only.';
 
     protected function setUp(): void
     {
@@ -39,6 +41,15 @@ class CompareSummaryClaimTest extends TestCase
         ]);
 
         $cagrilintide = $this->compound($brand, 'Cagrilintide', 'cagrilintide', 22.00, self::CAGRI_CLAIM);
+        $cagrilintide->educationPost()->update([
+            'mechanism_of_action_intro' => 'Accelerates tendon and ligament healing',
+            'key_effects' => [
+                ['title' => 'Superior weight reduction', 'content' => 'Greater than GLP-1 alone'],
+            ],
+            'common_use_cases' => [
+                ['title' => 'IBD', 'content' => 'Studied in inflammatory bowel models'],
+            ],
+        ]);
         $this->compound($brand, 'Semaglutide', 'semaglutide', 30.00, 'Semaglutide is a GLP-1 receptor agonist studied in metabolic research. Research use only.');
         $ipamorelin = $this->compound($brand, 'Ipamorelin', 'ipamorelin', 19.00, self::IPAMORELIN_CLAIM);
 
@@ -56,6 +67,8 @@ class CompareSummaryClaimTest extends TestCase
         $this->assertSame('Cagrilintide', $props['compound']['name']);
         $this->assertSame(self::CAGRI_LINE, $props['compound']['summary']);
         $this->assertEquals(22.0, $props['compound']['products'][0]['price']);
+        $this->assertSame('PMAP', $props['compound']['products'][0]['brand_coupon_code']);
+        $this->assertEquals(19.8, $props['compound']['products'][0]['pmap_price']);
         $seo = ComparePageSeo::forCompound('Cagrilintide', 1, false);
         $this->assertSame($seo['title'], $props['seo']['title']);
         $this->assertSame($seo['description'], $props['seo']['description']);
@@ -75,6 +88,12 @@ class CompareSummaryClaimTest extends TestCase
         $this->assertSame(self::CAGRI_LINE, $vsProps['a']['summary']);
         $this->assertSame('GLP1-S', $vsProps['b']['name']);
         $this->assertEquals(22.0, $vsProps['a']['top_vendors'][0]['price']);
+        $this->assertSame('PMAP', $vsProps['a']['top_vendors'][0]['brand_coupon_code']);
+        $this->assertEquals(19.8, $vsProps['a']['top_vendors'][0]['pmap_price']);
+        $vs->assertDontSee('Superior weight reduction', false);
+        $this->assertSame([], $vsProps['a']['key_effects']);
+        $this->assertSame([], $vsProps['a']['use_cases']);
+        $this->assertNull($vsProps['a']['mechanism']);
 
         $ipa = $this->get('/compare/ipamorelin');
         $ipa->assertOk();
@@ -95,6 +114,11 @@ class CompareSummaryClaimTest extends TestCase
 
         $this->assertOgTagline($cagrilintide, self::CAGRI_LINE, 'up to 25% body weight reduction');
         $this->assertOgTagline($ipamorelin, self::IPAMORELIN_LINE, 'most selective');
+
+        $disclaimer = '5-Amino-1MQ is a small-molecule NNMT inhibitor studied as a research chemical. Not approved for human use.';
+        $this->assertSame($disclaimer, CompareHubBlurb::guard('5-amino-1mq', $disclaimer));
+        $this->assertNotSame('Listed for research use only.', CompareHubBlurb::guard('5-amino-1mq', $disclaimer));
+        $this->assertFalse(CompareHubBlurb::hasOutcomeClaim(null));
     }
 
     private function assertOgTagline(ProductCategory $category, string $expected, string $forbidden): void
@@ -144,6 +168,10 @@ class CompareSummaryClaimTest extends TestCase
             'status' => 'active',
             'hidden' => false,
         ]);
+        VendorSetting::updateOrCreate(
+            ['brand_id' => $brand->id],
+            ['coupon_code' => 'PMAP', 'coupon_discount_percent' => 10]
+        );
 
         return $category;
     }

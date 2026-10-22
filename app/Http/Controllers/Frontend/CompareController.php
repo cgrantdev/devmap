@@ -1246,11 +1246,11 @@ class CompareController extends Controller
             'cheapest_price' => $this->listedPriceClaim($products)['low'],
             'top_vendors' => $products->take(5)->values(),
             'summary' => $this->vsSummary($category, $vsNarrative, $ep),
-            'mechanism' => $ep?->mechanism_of_action_intro ? strip_tags($ep->mechanism_of_action_intro) : null,
+            'mechanism' => ($m = strip_tags((string) $ep?->mechanism_of_action_intro)) !== '' && ! CompareHubBlurb::hasOutcomeClaim($m) ? $m : null,
             'half_life' => $ep?->half_life,
-            'administration' => $ep?->administration,
-            'key_effects' => $normalize($ep?->key_effects ?? null),
-            'use_cases' => $normalize($ep?->common_use_cases ?? null),
+            'administration' => CompareHubBlurb::hasOutcomeClaim($ep?->administration) ? null : $ep?->administration,
+            'key_effects' => array_values(array_filter($normalize($ep?->key_effects ?? null), fn ($x) => ! CompareHubBlurb::hasOutcomeClaim(trim(($x['heading'] ?? '').' '.($x['text'] ?? ''))))),
+            'use_cases' => [],
         ];
     }
 
