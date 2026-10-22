@@ -221,17 +221,28 @@ Educational only. Not approved therapy guidance. Not dosing or reconstitution.';
     }
 
     /**
+     * FAQs 4–7 written by the 2026_10_22_155000 audit. upsertFaqs() uses
+     * these as $pairs, including the new question key for item 7.
+     *
+     * @return array<string, string>
+     */
+    public static function replacementFaqPairs(): array
+    {
+        return [
+            'Is “CJC-1295 no DAC” the same molecule as literature CJC-1295?' => 'No. In the peer-reviewed characterization, CJC-1295 is the DAC / albumin-binding GHRH(1-29) analog (Jetté et al., 2005; developer-affiliated). “CJC-1295 no DAC” is a common catalog nickname for Modified GRF 1-29-type material without that DAC group. Shared GHRH-receptor pharmacology does not make the identities or PK datasets interchangeable.',
+            'Can the Teichman half-life be quoted for Mod GRF / no-DAC?' => 'No. Teichman et al. (2006; developer-affiliated) estimated 5.8–8.1 days for the DAC construct. That number must not be transferred to no-DAC / Mod GRF products.',
+            'What about CJC-1295 / Ipamorelin blend vials?' => 'They are marketed two-component products that pair a GHRH-pathway analog with ipamorelin; a blend is two molecules, not one. We found no clinical trial of the pair as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov), and a label that says only “CJC-1295” does not show whether the DAC or the no-DAC construct is meant. For each component’s own evidence, see /compare/cjc-1295-vs-ipamorelin. This page does not give stacking, synergy or dosing guidance.',
+            'Why does the construct name matter for a blend?' => 'Because the DAC and no-DAC lanes are different molecules with different data. The multi-day half-life was measured for the DAC construct only (Teichman et al. 2006, PMID 16352683; developer-affiliated), so it cannot be applied to a product whose label does not say which construct it contains.',
+        ];
+    }
+
+    /**
      * @param  list<mixed>  $faqs
      * @return list<array<string, mixed>>
      */
     private function upsertFaqs(array $faqs): array
     {
-        $pairs = [
-            'Is “CJC-1295 no DAC” the same molecule as literature CJC-1295?' => 'No. In the peer-reviewed characterization, CJC-1295 is the DAC / albumin-binding GHRH(1-29) analog (Jetté et al., 2005). “CJC-1295 no DAC” is a common catalog nickname for Modified GRF 1-29-type material without that DAC group. Shared GHRH-receptor pharmacology does not make the identities or PK datasets interchangeable.',
-            'Can the Teichman half-life be quoted for Mod GRF / no-DAC?' => 'No. Teichman et al. (2006) estimated 5.8–8.1 days for the DAC construct. That number must not be transferred to no-DAC / Mod GRF products.',
-            'What about CJC-1295 / Ipamorelin blend vials?' => 'Those are marketed two-component research blends (GHRH-pathway analog + ipamorelin). Live /encyclopedia/CJC-1295-Ipamorelin is still empty of educational body text (vendors only). For now see /compare/CJC-1295-Ipamorelin and /compare/cjc-1295-vs-ipamorelin. This page does not give stacking, synergy, or dosing guidance.',
-            'What should a blend CoA name?' => 'Each component’s construct (DAC vs no-DAC / Mod GRF; ipamorelin form) should be identifiable. A CoA that only says “CJC-1295” without construct clarity cannot resolve the naming trap above.',
-        ];
+        $pairs = self::replacementFaqPairs();
 
         foreach ($pairs as $question => $answer) {
             $faqs = $this->upsertFaq($faqs, $question, $answer);

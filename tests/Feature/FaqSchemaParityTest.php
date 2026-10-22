@@ -274,7 +274,14 @@ HTML;
 
     public function test_bpc_157_allowlist_renders_visible_faq_matching_json_ld(): void
     {
-        $this->assertSame(['bpc-157'], config('peptidemap.faq_render_allowlist.encyclopedia'));
+        $this->assertSame([
+            'bpc-157',
+            'tb-500',
+            'ipamorelin',
+            'cjc-1295',
+            'aod-9604',
+            'kisspeptin',
+        ], config('peptidemap.faq_render_allowlist.encyclopedia'));
 
         [$post, $stored, $expected, $question, $answer] = $this->bpc157FaqFixture();
 
@@ -296,44 +303,44 @@ HTML;
         $this->assertSame($stored, $post->fresh()->faqs);
     }
 
-    public function test_ipamorelin_keeps_existing_faqpage_and_has_no_visible_faq(): void
+    public function test_non_allowlisted_encyclopedia_keeps_existing_faqpage_and_has_no_visible_faq(): void
     {
         $stored = [[
-            'question' => '  What catalog label does this ipamorelin entry use?  ',
-            'answer' => '<p>It uses the stored encyclopedia label only. See /encyclopedia/ipamorelin.</p>',
+            'question' => '  What catalog label does this sermorelin entry use?  ',
+            'answer' => '<p>It uses the stored encyclopedia label only. See /encyclopedia/sermorelin.</p>',
         ]];
         $expected = [
             '@context' => 'https://schema.org',
             '@type' => 'FAQPage',
-            '@id' => url('/encyclopedia/ipamorelin#faq'),
+            '@id' => url('/encyclopedia/sermorelin#faq'),
             'mainEntity' => [[
                 '@type' => 'Question',
-                'name' => 'What catalog label does this ipamorelin entry use?',
+                'name' => 'What catalog label does this sermorelin entry use?',
                 'acceptedAnswer' => [
                     '@type' => 'Answer',
-                    'text' => 'It uses the stored encyclopedia label only. See /encyclopedia/ipamorelin.',
+                    'text' => 'It uses the stored encyclopedia label only. See /encyclopedia/sermorelin.',
                 ],
             ]],
         ];
 
         $category = ProductCategory::create([
-            'name' => 'Ipamorelin',
-            'slug' => 'ipamorelin',
+            'name' => 'Sermorelin',
+            'slug' => 'sermorelin',
             'is_active' => true,
         ]);
         $post = EducationPost::create([
-            'title' => 'Ipamorelin',
-            'slug' => 'ipamorelin',
+            'title' => 'Sermorelin',
+            'slug' => 'sermorelin',
             'product_category_id' => $category->id,
             'status' => 'published',
             'show_in_encyclopedia' => true,
-            'overview' => 'Ipamorelin overview stays.',
+            'overview' => 'Sermorelin overview stays.',
             'faqs' => $stored,
         ]);
 
-        $response = $this->get('/encyclopedia/ipamorelin');
+        $response = $this->get('/encyclopedia/sermorelin');
         $response->assertOk();
-        $response->assertSee('Ipamorelin overview stays.', false);
+        $response->assertSee('Sermorelin overview stays.', false);
         $response->assertSee(json_encode($expected, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), false);
         $this->assertSame($expected, $this->faqPage($response->getContent()));
 

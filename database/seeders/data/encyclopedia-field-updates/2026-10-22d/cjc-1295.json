@@ -1,0 +1,209 @@
+{
+  "slug": "cjc-1295",
+  "normalize": "normalize(x): recursive. Strings: CRLF/CR -> LF; U+00A0 -> space; rtrim each line; trim. Lists/maps: same order, values normalized.",
+  "reduce": "reduce(stored) = for each stored item, q = trim(item.question ?? item.q ?? \"\"), a = trim(item.answer ?? item.a ?? \"\"); drop items where q or a is empty (faqPageSchema skips them); emit {question: q, answer: strip_tags(a)}. This is exactly the JSON-LD the live page emits.",
+  "op": "Per slug: (1) if normalize(reduce(stored)) === normalize(new_faqs) -> skip \"already at target\". (2) elif normalize(reduce(stored)) !== normalize(old_faqs_guard) -> WARNING \"old mismatch\" + 200-char excerpt, write nothing. (3) else build the write value from the STORED array: same items in the same order; for each index in replace_indices, replace that stored item with new_faqs[index] (keys question/answer); every other stored item is kept byte-for-byte (C items stay exactly as stored, including any HTML). Assert normalize(reduce(result)) === normalize(new_faqs) before saveQuietly(); otherwise throw (rolls back the slug). If the stored array contains items dropped by reduce() (empty q/a), keep them in place and report the count. replace_indices refer to positions in reduce(stored); map them back to stored positions.",
+  "category_slug_match": "cjc-1295",
+  "category_id_live": 363,
+  "url": "https://peptidemap.com/encyclopedia/CJC-1295",
+  "faq_source": "DB education_posts.faqs (linked post; JSON-LD built by EncyclopediaController::faqPageSchema)",
+  "seed_or_code_paths": [
+    "database/seeders/Cjc1295DacIdentitySeeder.php: upsertFaqs() $pairs (~:230-233) seeds FAQs 4–7 keyed on question. MUST be updated in this PR to new_faqs[3..6] verbatim, including the new [6] question key “Why does the construct name matter for a blend?”; otherwise a re-run restores the old text or re-appends the old [6] item.",
+    "database/migrations/2026_10_07_180000_deepen_encyclopedia_identity_literacy.php (runs that seeder; untouched)"
+  ],
+  "old_faqs_guard": [
+    {
+      "question": "What is the difference between CJC-1295 with and without DAC?",
+      "answer": "DAC binds albumin, extending half-life from ~30 min to 6-8 days. Without DAC creates natural pulsatile GH release; with DAC produces sustained elevation."
+    },
+    {
+      "question": "Why is CJC-1295 often stacked with Ipamorelin?",
+      "answer": "CJC-1295 (GHRH analog) and Ipamorelin (GHSR agonist) act on different receptors to synergistically amplify GH pulses."
+    },
+    {
+      "question": "Does CJC-1295 suppress natural GH production?",
+      "answer": "No. As a GHRH analog, it works through the body's own pituitary signaling, preserving feedback regulation."
+    },
+    {
+      "question": "Is “CJC-1295 no DAC” the same molecule as literature CJC-1295?",
+      "answer": "No. In the peer-reviewed characterization, CJC-1295 is the DAC / albumin-binding GHRH(1-29) analog (Jetté et al., 2005). “CJC-1295 no DAC” is a common catalog nickname for Modified GRF 1-29-type material without that DAC group. Shared GHRH-receptor pharmacology does not make the identities or PK datasets interchangeable."
+    },
+    {
+      "question": "Can the Teichman half-life be quoted for Mod GRF / no-DAC?",
+      "answer": "No. Teichman et al. (2006) estimated 5.8–8.1 days for the DAC construct. That number must not be transferred to no-DAC / Mod GRF products."
+    },
+    {
+      "question": "What about CJC-1295 / Ipamorelin blend vials?",
+      "answer": "Those are marketed two-component research blends (GHRH-pathway analog + ipamorelin). Live /encyclopedia/CJC-1295-Ipamorelin is still empty of educational body text (vendors only). For now see /compare/CJC-1295-Ipamorelin and /compare/cjc-1295-vs-ipamorelin. This page does not give stacking, synergy, or dosing guidance."
+    },
+    {
+      "question": "What should a blend CoA name?",
+      "answer": "Each component’s construct (DAC vs no-DAC / Mod GRF; ipamorelin form) should be identifiable. A CoA that only says “CJC-1295” without construct clarity cannot resolve the naming trap above."
+    }
+  ],
+  "new_faqs": [
+    {
+      "question": "What is the difference between CJC-1295 with and without DAC?",
+      "answer": "In the peer-reviewed literature, CJC-1295 is a tetrasubstituted GHRH(1-29) analog with a C-terminal lysine carrying a maleimidopropionamide group, the Drug Affinity Complex (DAC), designed to bind serum albumin (Jetté et al., Endocrinology 2005, PMID 15817669; developer-affiliated, ConjuChem). In healthy adults its estimated half-life was 5.8–8.1 days (Teichman et al., J Clin Endocrinol Metab 2006, PMID 16352683; developer-affiliated). “CJC-1295 without DAC” is a catalog name for Modified GRF 1-29-type material that lacks the albumin-binding group. The DAC half-life and duration data were measured for the DAC construct only and do not establish how no-DAC material behaves in people."
+    },
+    {
+      "question": "Has CJC-1295 been studied together with ipamorelin?",
+      "answer": "We found no clinical trial of the pair as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov). CJC-1295 acts at the GHRH receptor and ipamorelin at the ghrelin (growth hormone secretagogue) receptor (Jetté et al., PMID 15817669, and Raun et al., PMID 9849822, both developer-affiliated). The PubMed search found only review articles and a doping-control assay mentioning both, and ClinicalTrials.gov lists no trial of the pair, so claims that they “synergistically” amplify GH pulses in people have no trial support. FDA lists CJC-1295 among compounding substances that were previously in safety category 2 and whose nominations were withdrawn, citing serious adverse events including increased heart rate and systemic vasodilatory reaction, and places ipamorelin acetate in 503B category 2. This page does not give stacking or dosing guidance."
+    },
+    {
+      "question": "Does CJC-1295 suppress natural GH production?",
+      "answer": "The human data are short-term and cover only the DAC construct. In healthy men aged 20 to 40, a single injection of CJC-1295 (DAC) raised trough and mean GH and IGF-I one week later, while the frequency and size of GH pulses were unchanged (Ionescu and Frohman, J Clin Endocrinol Metab 2006, PMID 17018654; developer-affiliated, ConjuChem-funded). The published healthy-adult trials lasted 28 and 49 days (Teichman et al. 2006, PMID 16352683; developer-affiliated). We found no long-term human data on pituitary feedback as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov), and none for no-DAC / Mod GRF 1-29 material, so the question cannot be answered for catalog products. FDA cites serious adverse events with CJC-1295, including increased heart rate and systemic vasodilatory reaction, and notes that available clinical data are limited."
+    },
+    {
+      "question": "Is “CJC-1295 no DAC” the same molecule as literature CJC-1295?",
+      "answer": "No. In the peer-reviewed characterization, CJC-1295 is the DAC / albumin-binding GHRH(1-29) analog (Jetté et al., 2005; developer-affiliated). “CJC-1295 no DAC” is a common catalog nickname for Modified GRF 1-29-type material without that DAC group. Shared GHRH-receptor pharmacology does not make the identities or PK datasets interchangeable."
+    },
+    {
+      "question": "Can the Teichman half-life be quoted for Mod GRF / no-DAC?",
+      "answer": "No. Teichman et al. (2006; developer-affiliated) estimated 5.8–8.1 days for the DAC construct. That number must not be transferred to no-DAC / Mod GRF products."
+    },
+    {
+      "question": "What about CJC-1295 / Ipamorelin blend vials?",
+      "answer": "They are marketed two-component products that pair a GHRH-pathway analog with ipamorelin; a blend is two molecules, not one. We found no clinical trial of the pair as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov), and a label that says only “CJC-1295” does not show whether the DAC or the no-DAC construct is meant. For each component’s own evidence, see /compare/cjc-1295-vs-ipamorelin. This page does not give stacking, synergy or dosing guidance."
+    },
+    {
+      "question": "Why does the construct name matter for a blend?",
+      "answer": "Because the DAC and no-DAC lanes are different molecules with different data. The multi-day half-life was measured for the DAC construct only (Teichman et al. 2006, PMID 16352683; developer-affiliated), so it cannot be applied to a product whose label does not say which construct it contains."
+    }
+  ],
+  "replace_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "keep_indices_verbatim": [],
+  "replacements": [
+    {
+      "index": 0,
+      "class": "B",
+      "old": {
+        "question": "What is the difference between CJC-1295 with and without DAC?",
+        "answer": "DAC binds albumin, extending half-life from ~30 min to 6-8 days. Without DAC creates natural pulsatile GH release; with DAC produces sustained elevation."
+      },
+      "new": {
+        "question": "What is the difference between CJC-1295 with and without DAC?",
+        "answer": "In the peer-reviewed literature, CJC-1295 is a tetrasubstituted GHRH(1-29) analog with a C-terminal lysine carrying a maleimidopropionamide group, the Drug Affinity Complex (DAC), designed to bind serum albumin (Jetté et al., Endocrinology 2005, PMID 15817669; developer-affiliated, ConjuChem). In healthy adults its estimated half-life was 5.8–8.1 days (Teichman et al., J Clin Endocrinol Metab 2006, PMID 16352683; developer-affiliated). “CJC-1295 without DAC” is a catalog name for Modified GRF 1-29-type material that lacks the albumin-binding group. The DAC half-life and duration data were measured for the DAC construct only and do not establish how no-DAC material behaves in people."
+      },
+      "sources": [
+        "Jetté L et al. Endocrinology 2005;146(7):3052-8. PMID 15817669: https://pubmed.ncbi.nlm.nih.gov/15817669/ (“a tetrasubstituted form of hGRF(1-29) with an added N epsilon-3-maleimidopropionamide derivative of lysine at the C terminus”).",
+        "Teichman SL et al. J Clin Endocrinol Metab 2006;91(3):799-805. PMID 16352683: https://pubmed.ncbi.nlm.nih.gov/16352683/ (“The estimated half-life of CJC-1295 was 5.8-8.1 d”; healthy subjects 21–61 yr).",
+        "Repo: Cjc1295DacIdentitySeeder (SUBTITLE/OVERVIEW) already frames this row as the no-DAC / Mod GRF catalog lane; the replacement matches it. The removed “~30 min” no-DAC half-life had no source.",
+        "Jetté 2005 developer affiliation: PubMed affiliation “Department of Research, ConjuChem Inc., 225 President-Kennedy Avenue, Montreal, Quebec, Canada” (PMID 15817669).",
+        "Teichman 2006 developer affiliation verified 22 Oct 2026: publisher byline (Crossref/OpenAlex for doi:10.1210/jc.2005-1536) lists co-authors Betty Lawrence, Catherine Gagnon and Jean-Paul Castaigne at “ConjuChem, Inc. (B.L., C.G., J.-P.C.), Montréal, Québéc, Canada” (PubMed lists only the first author’s affiliation, WinPharm Associates)."
+      ]
+    },
+    {
+      "index": 1,
+      "class": "A",
+      "old": {
+        "question": "Why is CJC-1295 often stacked with Ipamorelin?",
+        "answer": "CJC-1295 (GHRH analog) and Ipamorelin (GHSR agonist) act on different receptors to synergistically amplify GH pulses."
+      },
+      "new": {
+        "question": "Has CJC-1295 been studied together with ipamorelin?",
+        "answer": "We found no clinical trial of the pair as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov). CJC-1295 acts at the GHRH receptor and ipamorelin at the ghrelin (growth hormone secretagogue) receptor (Jetté et al., PMID 15817669, and Raun et al., PMID 9849822, both developer-affiliated). The PubMed search found only review articles and a doping-control assay mentioning both, and ClinicalTrials.gov lists no trial of the pair, so claims that they “synergistically” amplify GH pulses in people have no trial support. FDA lists CJC-1295 among compounding substances that were previously in safety category 2 and whose nominations were withdrawn, citing serious adverse events including increased heart rate and systemic vasodilatory reaction, and places ipamorelin acetate in 503B category 2. This page does not give stacking or dosing guidance."
+      },
+      "sources": [
+        "PubMed “CJC-1295 AND ipamorelin” → 11 records on 22 Oct 2026: 10 reviews/narrative articles (2026) and PMID 23318763 (horse-plasma doping-control assay). No trial.",
+        "ClinicalTrials.gov query “CJC-1295 ipamorelin” → 0 studies; intervention “CJC-1295” → only NCT00267527 (CJC-1295 alone, HIV visceral obesity, TERMINATED) (22 Oct 2026).",
+        "FDA safety-risks page (content current as of 04/22/2026), table “Bulk drug substances nominated but withdrawn”, CJC-1295: “FDA has identified serious adverse events associated with CJC-1295 including increased heart rate and systemic vasodilatory reaction. Available clinical data are limited.”",
+        "FDA 503B category list (updated 21 March 2025): Category 2 includes Ipamorelin Acetate.",
+        "Jetté 2005 PMID 15817669 (GRF receptor); Raun 1998 PMID 9849822 (GHRP-like receptor).",
+        "Jetté 2005 developer affiliation: PubMed affiliation “Department of Research, ConjuChem Inc., 225 President-Kennedy Avenue, Montreal, Quebec, Canada” (PMID 15817669).",
+        "Raun 1998 developer affiliation: PubMed affiliation “Department of GH Biology, Novo Nordisk A/S, Måløv, Denmark” (PMID 9849822)."
+      ]
+    },
+    {
+      "index": 2,
+      "class": "B",
+      "old": {
+        "question": "Does CJC-1295 suppress natural GH production?",
+        "answer": "No. As a GHRH analog, it works through the body's own pituitary signaling, preserving feedback regulation."
+      },
+      "new": {
+        "question": "Does CJC-1295 suppress natural GH production?",
+        "answer": "The human data are short-term and cover only the DAC construct. In healthy men aged 20 to 40, a single injection of CJC-1295 (DAC) raised trough and mean GH and IGF-I one week later, while the frequency and size of GH pulses were unchanged (Ionescu and Frohman, J Clin Endocrinol Metab 2006, PMID 17018654; developer-affiliated, ConjuChem-funded). The published healthy-adult trials lasted 28 and 49 days (Teichman et al. 2006, PMID 16352683; developer-affiliated). We found no long-term human data on pituitary feedback as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov), and none for no-DAC / Mod GRF 1-29 material, so the question cannot be answered for catalog products. FDA cites serious adverse events with CJC-1295, including increased heart rate and systemic vasodilatory reaction, and notes that available clinical data are limited."
+      },
+      "sources": [
+        "Ionescu M, Frohman LA. J Clin Endocrinol Metab 2006;91(12):4792-7. PMID 17018654: https://pubmed.ncbi.nlm.nih.gov/17018654/ (“healthy 20- to 40-yr-old men”; “The frequency and magnitude of GH secretory pulses were unaltered”; trough GH 7.5-fold, mean GH +46%, IGF-I +45%).",
+        "Teichman SL et al. 2006, PMID 16352683 (“ascending dose trials with durations of 28 and 49 d”).",
+        "FDA safety-risks page (content current as of 04/22/2026), CJC-1295 entry (quoted above).",
+        "Teichman 2006 developer affiliation verified 22 Oct 2026: publisher byline (Crossref/OpenAlex for doi:10.1210/jc.2005-1536) lists co-authors Betty Lawrence, Catherine Gagnon and Jean-Paul Castaigne at “ConjuChem, Inc. (B.L., C.G., J.-P.C.), Montréal, Québéc, Canada” (PubMed lists only the first author’s affiliation, WinPharm Associates).",
+        "Ionescu & Frohman 2006 (PMID 17018654; doi:10.1210/jc.2006-1702): developer-affiliated. Manuscript disclosure: \"L.A.F. consults for ConjuChem, Inc. The study was supported in part by a grant from ConjuChem, Inc., Montreal, Canada…\" (Content QA F1, 22 Oct 2026)."
+      ]
+    },
+    {
+      "index": 3,
+      "class": "C→fixed (QA M9: developer label)",
+      "old": {
+        "question": "Is “CJC-1295 no DAC” the same molecule as literature CJC-1295?",
+        "answer": "No. In the peer-reviewed characterization, CJC-1295 is the DAC / albumin-binding GHRH(1-29) analog (Jetté et al., 2005). “CJC-1295 no DAC” is a common catalog nickname for Modified GRF 1-29-type material without that DAC group. Shared GHRH-receptor pharmacology does not make the identities or PK datasets interchangeable."
+      },
+      "new": {
+        "question": "Is “CJC-1295 no DAC” the same molecule as literature CJC-1295?",
+        "answer": "No. In the peer-reviewed characterization, CJC-1295 is the DAC / albumin-binding GHRH(1-29) analog (Jetté et al., 2005; developer-affiliated). “CJC-1295 no DAC” is a common catalog nickname for Modified GRF 1-29-type material without that DAC group. Shared GHRH-receptor pharmacology does not make the identities or PK datasets interchangeable."
+      },
+      "sources": [
+        "Jetté L et al. Endocrinology 2005;146(7):3052-8. PMID 15817669: https://pubmed.ncbi.nlm.nih.gov/15817669/",
+        "Jetté 2005 developer affiliation: PubMed affiliation “Department of Research, ConjuChem Inc., 225 President-Kennedy Avenue, Montreal, Quebec, Canada” (PMID 15817669)."
+      ]
+    },
+    {
+      "index": 4,
+      "class": "C→fixed (QA M9: developer label)",
+      "old": {
+        "question": "Can the Teichman half-life be quoted for Mod GRF / no-DAC?",
+        "answer": "No. Teichman et al. (2006) estimated 5.8–8.1 days for the DAC construct. That number must not be transferred to no-DAC / Mod GRF products."
+      },
+      "new": {
+        "question": "Can the Teichman half-life be quoted for Mod GRF / no-DAC?",
+        "answer": "No. Teichman et al. (2006; developer-affiliated) estimated 5.8–8.1 days for the DAC construct. That number must not be transferred to no-DAC / Mod GRF products."
+      },
+      "sources": [
+        "Teichman SL et al. J Clin Endocrinol Metab 2006;91(3):799-805. PMID 16352683 (“The estimated half-life of CJC-1295 was 5.8-8.1 d”).",
+        "Teichman 2006 developer affiliation verified 22 Oct 2026: publisher byline (Crossref/OpenAlex for doi:10.1210/jc.2005-1536) lists co-authors Betty Lawrence, Catherine Gagnon and Jean-Paul Castaigne at “ConjuChem, Inc. (B.L., C.G., J.-P.C.), Montréal, Québéc, Canada” (PubMed lists only the first author’s affiliation, WinPharm Associates)."
+      ]
+    },
+    {
+      "index": 5,
+      "class": "C→fixed (QA M9: unsourced/stale)",
+      "old": {
+        "question": "What about CJC-1295 / Ipamorelin blend vials?",
+        "answer": "Those are marketed two-component research blends (GHRH-pathway analog + ipamorelin). Live /encyclopedia/CJC-1295-Ipamorelin is still empty of educational body text (vendors only). For now see /compare/CJC-1295-Ipamorelin and /compare/cjc-1295-vs-ipamorelin. This page does not give stacking, synergy, or dosing guidance."
+      },
+      "new": {
+        "question": "What about CJC-1295 / Ipamorelin blend vials?",
+        "answer": "They are marketed two-component products that pair a GHRH-pathway analog with ipamorelin; a blend is two molecules, not one. We found no clinical trial of the pair as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov), and a label that says only “CJC-1295” does not show whether the DAC or the no-DAC construct is meant. For each component’s own evidence, see /compare/cjc-1295-vs-ipamorelin. This page does not give stacking, synergy or dosing guidance."
+      },
+      "sources": [
+        "PubMed and ClinicalTrials.gov searches, 22 Oct 2026: PubMed “CJC-1295 AND ipamorelin” → 11 records (10 reviews/narrative articles, PMID 23318763 doping-control assay), no trial; ClinicalTrials.gov “CJC-1295 ipamorelin” → 0 studies.",
+        "Teichman 2006 (PMID 16352683) and Jetté 2005 (PMID 15817669): DAC construct data only."
+      ]
+    },
+    {
+      "index": 6,
+      "class": "C→fixed (QA M9: unsourced; question key changed)",
+      "old": {
+        "question": "What should a blend CoA name?",
+        "answer": "Each component’s construct (DAC vs no-DAC / Mod GRF; ipamorelin form) should be identifiable. A CoA that only says “CJC-1295” without construct clarity cannot resolve the naming trap above."
+      },
+      "new": {
+        "question": "Why does the construct name matter for a blend?",
+        "answer": "Because the DAC and no-DAC lanes are different molecules with different data. The multi-day half-life was measured for the DAC construct only (Teichman et al. 2006, PMID 16352683; developer-affiliated), so it cannot be applied to a product whose label does not say which construct it contains."
+      },
+      "sources": [
+        "Teichman SL et al. J Clin Endocrinol Metab 2006, PMID 16352683 (half-life measured for the DAC construct).",
+        "Teichman 2006 developer affiliation verified 22 Oct 2026: publisher byline (Crossref/OpenAlex for doi:10.1210/jc.2005-1536) lists co-authors Betty Lawrence, Catherine Gagnon and Jean-Paul Castaigne at “ConjuChem, Inc. (B.L., C.G., J.-P.C.), Montréal, Québéc, Canada” (PubMed lists only the first author’s affiliation, WinPharm Associates)."
+      ]
+    }
+  ]
+}

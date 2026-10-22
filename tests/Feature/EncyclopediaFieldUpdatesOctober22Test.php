@@ -412,13 +412,13 @@ class EncyclopediaFieldUpdatesOctober22Test extends TestCase
         $this->seedAll();
         (new EncyclopediaFieldUpdatesOctober22Seeder)->run();
 
-        $ipamorelin = ProductCategory::create(['name' => 'Ipamorelin', 'slug' => 'Ipamorelin', 'is_active' => true]);
-        $this->encyclopediaPost($ipamorelin, 'Ipamorelin', [
+        $sermorelin = ProductCategory::create(['name' => 'Sermorelin', 'slug' => 'Sermorelin', 'is_active' => true]);
+        $this->encyclopediaPost($sermorelin, 'Sermorelin', [
             'faqs' => [[
-                'question' => 'What is the best time to inject Ipamorelin?',
+                'question' => 'What is the best time to inject Sermorelin?',
                 'answer' => '  <p>Bedtime is often discussed.</p>  ',
             ]],
-            'regulatory_subsections' => [['title' => 'Current Status', 'entries' => [['type' => 'content', 'value' => 'IPA-REG']]]],
+            'regulatory_subsections' => [['title' => 'Current Status', 'entries' => [['type' => 'content', 'value' => 'SER-REG']]]],
         ]);
 
         $bpcFaqs = $this->payload('bpc-157.json')['columns']['faqs']['new_value'];
@@ -464,14 +464,14 @@ class EncyclopediaFieldUpdatesOctober22Test extends TestCase
                 });
         }
 
-        $this->get('/encyclopedia/Ipamorelin')
+        $this->get('/encyclopedia/Sermorelin')
             ->assertOk()
             ->assertInertia(function ($page) {
                 $props = $page->toArray()['props'];
                 $this->assertSame([], $props['faqs']);
                 $faqPage = collect($props['seo']['schema'])->firstWhere('@type', 'FAQPage');
                 $this->assertIsArray($faqPage);
-                $this->assertSame('What is the best time to inject Ipamorelin?', $faqPage['mainEntity'][0]['name']);
+                $this->assertSame('What is the best time to inject Sermorelin?', $faqPage['mainEntity'][0]['name']);
                 $this->assertSame('Bedtime is often discussed.', $faqPage['mainEntity'][0]['acceptedAnswer']['text']);
 
                 return true;
