@@ -91,7 +91,7 @@ return [
          * where we don't have a description set via an associated ->seo model or via
          * the ->getDynamicSEOData() method.
          */
-        'fallback' => 'Compare research peptide listings and prices across vendors. Catalog data only: RUO, and Peptidemap sells nothing.',
+        'fallback' => 'Compare research-use-only (RUO) peptide vendor listings and prices. Catalog data only; Peptidemap sells nothing.',
     ],
 
     'image' => [

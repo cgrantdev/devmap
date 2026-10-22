@@ -144,7 +144,9 @@ class HandleInertiaRequests extends Middleware
             // is purely a UI hint, not a security boundary.
             'is_ceo' => fn () => strtolower((string) ($request->user()?->email ?? '')) === 'info@peptidemap.com',
             'site_name' => fn () => Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap',
-            'site_description' => fn () => Setting::where('key', 'site_description')->value('value') ?? 'Compare peptide brands, prices, and reviews',
+            'site_description' => fn () => \App\Support\SiteCopy::description(
+                Setting::where('key', 'site_description')->value('value')
+            ),
             'contact_email' => fn () => Setting::where('key', 'contact_email')->value('value') ?? 'contact@peptidemaps.com',
             'pending_vendors_count' => fn () => $request->user() && $request->user()->canAccessAdmin()
                 ? Brand::whereNotNull('user_id')->whereHas('vendorSetting', function ($query) {
