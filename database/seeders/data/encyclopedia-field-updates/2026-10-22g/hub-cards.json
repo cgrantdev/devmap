@@ -1,0 +1,711 @@
+{
+  "as_of": "2026-10-22",
+  "base": "origin/main 8aa2ff6",
+  "migration": "2026_10_22_180000_neutralise_encyclopedia_hub_card_descriptions",
+  "source_column": "EncyclopediaController::index card description = education_posts.description (linked post) ?: product_categories.description ?: FramingProfile::cardDescription(). CompareController::index shows education_posts.description only (Str::limit 200).",
+  "normalize": "CRLF/CR→LF, U+00A0→space, rtrim each line, trim. Comparison only; writes are verbatim.",
+  "op": "Per slug: EncyclopediaPostMatch::find(slug); require status ok (1 category, 1 linked post) else WARNING with counts and no write. One DB::transaction per slug. Per column: if normalize(current)==normalize(new_value) → skip (already current); elif normalize(current) in normalize(old_values) → write new_value; else WARNING old mismatch (200-char excerpt), no write. Legacy unlinked rows never touched.",
+  "scan": {
+    "regex": [
+      "\\d+(\\.\\d+)?\\s?%",
+      "\\b(heal|healing|heals|healed)\\b",
+      "fat[- ]?burn",
+      "burn(s|ing)?\\s+fat",
+      "remarkable",
+      "miracle",
+      "recover(y|ies)?",
+      "anti[- ]?aging|anti[- ]?ageing",
+      "\\b\\d+(\\.\\d+)?\\s?(mg|mcg|µg|ug|iu|ml|units?)\\b",
+      "\\b(mg|mcg|µg|iu)\\b"
+    ],
+    "corpus": "every new_value",
+    "expected_hits": 0
+  },
+  "pending": {
+    "orforglipron/semaglutide → /compare/orforglipron-vs-oral-semaglutide link": "PR #69 merged in 8aa2ff6; route resolves on main (200 in test after the 150000 publisher sync); live 404 until deploy+migrate. Link-only addition: go (separate PR). Included in this package as a guarded references append (see posts.orforglipron and posts.semaglutide.columns.references)."
+  },
+  "posts": {
+    "aod-9604": {
+      "category_id_live": 47,
+      "category_name_live": "AOD-9604",
+      "hub_slug_live": "AOD-9604",
+      "flag_reason": "'fat-burning action' (benefit claim)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "AOD-9604 is a modified fragment of human growth hormone (amino acids 176-191) that replicates the fat-burning action of GH without anabolic or diabetogenic effects."
+          ],
+          "new_value": "AOD-9604 is a synthetic peptide: tyrosine plus human growth hormone residues 177–191. It is not FDA-approved, and WADA lists it as a prohibited GH fragment. Research use only."
+        }
+      },
+      "sources": [
+        "GSRS UNII 7UP768IP4M sequence YLRIVQCRSVEGSCGF https://gsrs.ncats.nih.gov/ (via AOD-9604 GRAS correction package, 2026-10-12)",
+        "UniProt P01241 (hGH) residues 177–191 https://rest.uniprot.org/uniprotkb/P01241.fasta",
+        "openFDA Drugs@FDA: no match for AOD-9604/AOD9604 https://api.fda.gov/drug/drugsfda.json",
+        "WADA 2026 Prohibited List S2 (GH fragments, e.g. AOD-9604) https://www.wada-ama.org/sites/default/files/2025-09/2026list_en_final_clean_september_2025.pdf"
+      ]
+    },
+    "bpc-157": {
+      "category_id_live": 3,
+      "category_name_live": "BPC-157",
+      "hub_slug_live": "BPC-157",
+      "flag_reason": "'remarkable healing properties', 'accelerate wound healing and tissue repair' (healing/benefit claims)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "BPC-157 is a synthetic peptide derived from a protective protein found in the stomach. It has shown remarkable healing properties for tendons, ligaments, muscles, and the gastrointestinal tract. Known for its ability to accelerate wound healing and tissue repair."
+          ],
+          "new_value": "BPC-157 is a synthetic 15-amino-acid peptide studied mainly in animal and cell models. Published human data are limited to a few small, short studies, and it is not an FDA-approved drug. PeptideMap lists it for research-use-only (RUO) comparison.",
+          "overlap": "2026_10_22_170000 (BPC-157 cleanup addendum) writes the same text"
+        }
+      },
+      "sources": [
+        "Text identical to 2026_10_22_170000 target (after Content QA M1); sources in bpc-addendum-2026-10-22-CHANGES.md (Sikiric et al.; FDA bulk drug substances safety-risk page; FDA PCAC briefing: small, short human studies, including two placebo-controlled enema studies reported only as meeting abstracts, pp. 27, 42 fn 68 and Appendix 1 p. 54)"
+      ]
+    },
+    "bremelanotide": {
+      "category_id_live": 54,
+      "category_name_live": "Bremelanotide",
+      "hub_slug_live": "Bremelanotide",
+      "flag_reason": "'works centrally in the brain to increase sexual desire, unlike PDE5 inhibitors' (outcome claim + comparative claim)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "PT-141 (Bremelanotide) is an FDA-approved melanocortin receptor agonist that works centrally in the brain to increase sexual desire, unlike PDE5 inhibitors that work peripherally."
+          ],
+          "new_value": "Bremelanotide (PT-141) is a melanocortin receptor agonist, FDA-approved in 2019 as Vyleesi for acquired, generalized HSDD in premenopausal women. Research material is not Vyleesi."
+        }
+      },
+      "sources": [
+        "FDA Vyleesi label NDA 210557 (2019) https://www.accessdata.fda.gov/drugsatfda_docs/label/2019/210557s000lbl.pdf",
+        "FDA approval package NDA 210557 https://www.accessdata.fda.gov/drugsatfda_docs/nda/2019/210557Orig1s000Approv.pdf"
+      ]
+    },
+    "cagrilintide": {
+      "category_id_live": 437,
+      "category_name_live": "Cagrilintide",
+      "hub_slug_live": "Cagrilintide",
+      "flag_reason": "'up to 25% weight reduction' (efficacy %, weight-loss figure)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "Cagrilintide is a long-acting amylin analog being developed by Novo Nordisk as a complement to GLP-1 agonists. The combination with semaglutide (CagriSema) showed up to 25% weight reduction.",
+            "Cagrilintide is a long-acting amylin analogue developed by Novo Nordisk. With semaglutide (as CagriSema), mean weight change was −20.4% vs −3.0% with placebo over 68 weeks in REDEFINE 1 (NEJM 2025). Not approved as of 22 Oct 2026."
+          ],
+          "new_value": "Cagrilintide is a long-acting amylin analogue from Novo Nordisk that activates amylin and calcitonin receptors. It is studied in obesity research, including in CagriSema. Not approved as of 22 Oct 2026. Research use only.",
+          "overlap": "2026_10_22_130000 (reapply, on main) may already have written its REDEFINE-1 text to the same column; that state is accepted as a guard too"
+        }
+      },
+      "sources": [
+        "Kruse T et al. Development of Cagrilintide, a Long-Acting Amylin Analogue. J Med Chem 2021;64:11183 doi:10.1021/acs.jmedchem.1c00565 (lipidated amylin analogue; AMY and CTR agonist)",
+        "FDA Novel Drug Approvals 2026 https://www.fda.gov/drugs/novel-drug-approvals-fda/novel-drug-approvals-2026 (no CagriSema/cagrilintide); Novo Nordisk company announcement 30 Sep 2026 'decision expected in Q4 2026'"
+      ]
+    },
+    "dsip": {
+      "category_id_live": 40,
+      "category_name_live": "DSIP",
+      "hub_slug_live": "dsip",
+      "flag_reason": "'promotes delta-wave sleep and modulates stress hormone levels' (outcome claim)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "DSIP is a naturally occurring nonapeptide that promotes delta-wave sleep and modulates stress hormone levels. First isolated from rabbit brain in 1977."
+          ],
+          "new_value": "DSIP (delta sleep-inducing peptide) is the nonapeptide Trp-Ala-Gly-Gly-Asp-Ala-Ser-Gly-Glu, isolated from rabbits and characterized in 1977. It is not an FDA-approved drug. Research use only."
+        }
+      },
+      "sources": [
+        "Schoenenberger GA, Monnier M. Characterization of a delta-electroencephalogram (-sleep)-inducing peptide. PNAS 1977;74:1282 PMID 265572 (sequence; rabbit origin)",
+        "openFDA Drugs@FDA: no DSIP product"
+      ]
+    },
+    "ghk-cu": {
+      "category_id_live": 51,
+      "category_name_live": "GHK-Cu",
+      "hub_slug_live": "GHK-Cu",
+      "flag_reason": "'hair follicle stimulation', 'tissue repair pathways' (benefit/repair claim; item c)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "A copper-binding tripeptide (Glycyl-L-Histidyl-L-Lysine + Cu²⁺) studied for its role in skin remodeling, hair follicle stimulation, and tissue repair pathways."
+          ],
+          "new_value": "GHK-Cu is the copper(II) complex of the tripeptide Gly-His-Lys (GHK), first identified in human plasma. It is studied in cell and animal research and is not an FDA-approved drug. Research use only."
+        }
+      },
+      "sources": [
+        "Pickart L, Thaler MM. Tripeptide in human serum… Nat New Biol 1973 PMID 4349963",
+        "Pickart L et al. Growth-modulating plasma tripeptide may function by facilitating copper uptake into cells. Nature 1980 PMID 7453802",
+        "FDA 503A bulk categories list (GHK-Cu nominations; not an approved drug) https://www.fda.gov/media/94155/download"
+      ]
+    },
+    "igf-1-lr3": {
+      "category_id_live": 447,
+      "category_name_live": "IGF-1 LR3",
+      "hub_slug_live": "igf-1-lr3",
+      "flag_reason": "'arginine-to-glutamate' is backwards (Glu3→Arg); 'enhanced and prolonged biological activity' (benefit claim; item b)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "IGF-1 LR3 is an 83-amino acid synthetic analog of insulin-like growth factor 1 (IGF-1) with a modified N-terminus. The arginine-to-glutamate substitution at position 3 and 13-amino acid extension significantly reduces IGF binding protein affinity, resulting in enhanced and prolonged biological activity compared to native IGF-1."
+          ],
+          "new_value": "IGF-1 LR3 (LR3-IGF-I) is an 83-amino-acid analogue of human insulin-like growth factor 1. Arginine replaces glutamate at position 3 (Glu3→Arg), and a 13-amino-acid N-terminal extension is added. In laboratory studies these changes lower binding to IGF-binding proteins. WADA prohibits IGF-1 analogues. Research use only."
+        },
+        "background": {
+          "target": "education_posts.background of the category-linked post",
+          "old_values": [
+            "IGF-1 LR3 (Long R3 Insulin-like Growth Factor-1) is an 83-amino acid synthetic analog of human IGF-1. It was developed by modifying the native IGF-1 sequence — substituting a glutamic acid for the arginine at position 3 and adding a 13-amino acid N-terminal extension peptide. These modifications dramatically reduce binding to IGF binding proteins (IGFBPs), which normally sequester circulating IGF-1 and limit its bioavailability. As a result, IGF-1 LR3 maintains significantly higher biological potency and an extended half-life compared to native IGF-1. Originally developed as a research tool for studying IGF-1 signaling pathways, IGF-1 LR3 has become widely used in cell culture applications where it promotes cellular proliferation and inhibits apoptosis more effectively than standard IGF-1."
+          ],
+          "new_value": "IGF-1 LR3 (Long R3 Insulin-like Growth Factor-1) is an 83-amino acid synthetic analog of human IGF-1. It was developed by modifying the native IGF-1 sequence — replacing the glutamic acid at position 3 with arginine (Glu3→Arg) and adding a 13-amino acid N-terminal extension peptide. These modifications dramatically reduce binding to IGF binding proteins (IGFBPs), which normally sequester circulating IGF-1 and limit its bioavailability. As a result, IGF-1 LR3 maintains significantly higher biological potency and an extended half-life compared to native IGF-1. Originally developed as a research tool for studying IGF-1 signaling pathways, IGF-1 LR3 has become widely used in cell culture applications where it promotes cellular proliferation and inhibits apoptosis more effectively than standard IGF-1."
+        }
+      },
+      "sources": [
+        "Francis GL et al. Novel recombinant fusion protein analogues of IGF-I… J Mol Endocrinol 1992;8:213 PMID 1378742 doi:10.1677/jme.0.0080213 (Glu-3 replaced by Arg; pGH(1-11)-Val-Asn extension; reduced IGFBP interaction)",
+        "Tomas FM et al. Biochem J 1992;282:91 PMID 1371669 doi:10.1042/bj2820091 ('arginine replacing glutamate at position 3'; 13-residue extension MFPAMPLSSLFVN)",
+        "WADA 2026 Prohibited List S2: 'Insulin-like growth factor 1 (IGF-1, mecasermin) and its analogues'"
+      ]
+    },
+    "ipamorelin": {
+      "category_id_live": 56,
+      "category_name_live": "Ipamorelin",
+      "hub_slug_live": "Ipamorelin",
+      "flag_reason": "'the most selective growth hormone secretagogue' (unsupported superlative/benefit claim)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "Ipamorelin is the most selective growth hormone secretagogue, stimulating GH release without affecting cortisol, prolactin, or ACTH levels."
+          ],
+          "new_value": "Ipamorelin is a synthetic pentapeptide from Novo Nordisk that acts as a GHRP-receptor (ghrelin receptor) agonist. It is not an FDA-approved drug. Research use only."
+        }
+      },
+      "sources": [
+        "Raun K et al. Ipamorelin, the first selective growth hormone secretagogue. Eur J Endocrinol 1998;139:552 PMID 9849822 (pentapeptide Aib-His-D-2Nal-D-Phe-Lys-NH2; Novo Nordisk; GHRP-receptor agonist)",
+        "openFDA Drugs@FDA: no ipamorelin product"
+      ]
+    },
+    "kisspeptin": {
+      "category_id_live": 117,
+      "category_name_live": "Kisspeptin",
+      "hub_slug_live": "Kisspeptin",
+      "flag_reason": "'the master upstream regulator … triggering … the entire HPG axis' (overstated outcome claim)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "Kisspeptin is the master upstream regulator of the reproductive hormone cascade, triggering GnRH release and the entire hypothalamic-pituitary-gonadal axis."
+          ],
+          "new_value": "Kisspeptins are KISS1-gene peptides that act as natural ligands of the receptor GPR54 (KISS1R). They are studied in GnRH and reproductive-hormone research. Research use only."
+        }
+      },
+      "sources": [
+        "Kotani M et al. The metastasis suppressor gene KiSS-1 encodes kisspeptins, the natural ligands of the orphan GPCR GPR54. J Biol Chem 2001 PMID 11457843",
+        "Ohtaki T et al. Nature 2001;411:613 doi:10.1038/35079135",
+        "Seminara SB et al. The GPR54 gene as a regulator of puberty. NEJM 2003 doi:10.1056/NEJMoa035322"
+      ]
+    },
+    "mots-c": {
+      "category_id_live": 50,
+      "category_name_live": "MOTS-c",
+      "hub_slug_live": "mots-c",
+      "flag_reason": "'acts as an exercise mimetic … improving metabolic function' (benefit claim)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "MOTS-c is a mitochondrial-derived peptide encoded by mitochondrial DNA that acts as an exercise mimetic, activating AMPK and improving metabolic function."
+          ],
+          "new_value": "MOTS-c is a 16-amino-acid peptide encoded in the mitochondrial 12S rRNA gene. Cell and mouse studies link it to AMPK signalling. It is not FDA-approved. Research use only."
+        }
+      },
+      "sources": [
+        "Lee C et al. The Mitochondrial-Derived Peptide MOTS-c… Cell Metab 2015;21:443 doi:10.1016/j.cmet.2015.02.009 (16 aa; sORF in 12S rRNA; folate–AMPK; mouse/cell data)",
+        "openFDA Drugs@FDA: no MOTS-c product"
+      ]
+    },
+    "nad": {
+      "category_id_live": 36,
+      "category_name_live": "NAD+",
+      "hub_slug_live": "nad",
+      "flag_reason": "'DNA repair'; 'Levels decline significantly with age' (repair/anti-aging framing)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "NAD+ is a critical coenzyme found in every living cell, essential for energy metabolism, DNA repair, and sirtuin activation. Levels decline significantly with age."
+          ],
+          "new_value": "NAD+ (nicotinamide adenine dinucleotide) is a coenzyme in cellular redox reactions and a substrate for enzymes such as sirtuins and PARPs. It is not a peptide. Research use only."
+        }
+      },
+      "sources": [
+        "Covarrubias AJ et al. NAD+ metabolism and its roles in cellular processes during ageing. Nat Rev Mol Cell Biol 2021;22:119 doi:10.1038/s41580-020-00313-x (coenzyme in redox reactions; substrate of sirtuins, PARPs, CD38) — peer-reviewed review used only for textbook biochemistry"
+      ]
+    },
+    "orforglipron": {
+      "category_id_live": null,
+      "category_name_live": "Orforglipron",
+      "hub_slug_live": "orforglipron",
+      "flag_reason": "Link-only: add the /compare/orforglipron-vs-oral-semaglutide educational compare page (#69, merged in 8aa2ff6) to the encyclopedia references. relatedPages is not rendered, so references is the rendered place for the link.",
+      "columns": {
+        "references": {
+          "target": "education_posts.references of the category-linked post",
+          "op": "Append append_item at the END. Skip (already current) if any stored reference link url equals marker_url. Else write only if normalize(current) equals one of old_values; else WARNING old mismatch, untouched.",
+          "marker_url": "https://peptidemap.com/compare/orforglipron-vs-oral-semaglutide",
+          "old_values": [
+            [
+              {
+                "links": [
+                  {
+                    "url": "https://investor.lilly.com/news-releases/news-release-details/fda-approves-lillys-foundayotm-orforglipron-only-glp-1-pill",
+                    "label": "Lilly"
+                  }
+                ],
+                "title": "FDA approves Foundayo (orforglipron) tablets",
+                "authors": "Eli Lilly and Company",
+                "citation": "Eli Lilly and Company press release. April 1, 2026.",
+                "description": "Approval announcement for the oral nonpeptide GLP-1 receptor agonist tablet."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://pubchem.ncbi.nlm.nih.gov/compound/137319706",
+                    "label": "PubChem"
+                  }
+                ],
+                "title": "PubChem record for orforglipron (CID 137319706)",
+                "authors": "",
+                "citation": "National Center for Biotechnology Information. PubChem Compound CID 137319706.",
+                "description": "Free-base formula C48H48F2N10O5, molecular weight 883.0. No CAS is stated on this page."
+              }
+            ],
+            [
+              {
+                "links": [
+                  {
+                    "url": "https://investor.lilly.com/news-releases/news-release-details/fda-approves-lillys-foundayotm-orforglipron-only-glp-1-pill",
+                    "label": "Lilly"
+                  }
+                ],
+                "title": "FDA approves Foundayo (orforglipron) tablets",
+                "authors": "Eli Lilly and Company",
+                "citation": "Eli Lilly and Company press release. April 1, 2026.",
+                "description": "Approval announcement for the oral nonpeptide GLP-1 receptor agonist tablet."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://pubchem.ncbi.nlm.nih.gov/compound/137319706",
+                    "label": "PubChem"
+                  }
+                ],
+                "title": "PubChem record for orforglipron (CID 137319706)",
+                "authors": "",
+                "citation": "National Center for Biotechnology Information. PubChem Compound CID 137319706.",
+                "description": "Free-base formula C48H48F2N10O5, molecular weight 883.0. No CAS is stated on this page."
+              },
+              {
+                "title": "Foundayo (orforglipron): CHMP summary of positive opinion",
+                "authors": "European Medicines Agency, Committee for Medicinal Products for Human Use (CHMP)",
+                "citation": "EMA/CHMP/229918/2026, 15 October 2026 (first published 16 October 2026).",
+                "description": "Positive opinion adopted 15 October 2026 recommending EU marketing authorisation for type 2 diabetes mellitus and weight management in adults; full recommended indication. Published without prejudice to the European Commission decision.",
+                "links": [
+                  {
+                    "url": "https://www.ema.europa.eu/en/documents/smop-initial/chmp-summary-positive-opinion-foundayo_en.pdf",
+                    "label": "EMA summary of opinion (PDF)"
+                  },
+                  {
+                    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/foundayo",
+                    "label": "EMA medicine page"
+                  }
+                ]
+              },
+              {
+                "title": "Meeting highlights from the CHMP, 12–15 October 2026",
+                "authors": "European Medicines Agency",
+                "citation": "EMA news, 16 October 2026.",
+                "description": "Lists Foundayo (orforglipron) among six new medicines recommended for approval; status “pending EC decision”.",
+                "links": [
+                  {
+                    "url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-medicinal-products-human-use-chmp-12-15-october-2026",
+                    "label": "EMA"
+                  }
+                ]
+              },
+              {
+                "title": "Foundayo (orforglipron) tablets: NDA 220934 approval letter and current prescribing information",
+                "authors": "U.S. Food and Drug Administration",
+                "citation": "NDA 220934, approved 1 April 2026; labeling revised 07/2026 (Drugs@FDA supplement 3, approved 4 August 2026).",
+                "description": "U.S. indication: reduce excess body weight and maintain weight reduction long term in adults with obesity, or overweight with at least one weight-related comorbid condition, with diet and physical activity. No type 2 diabetes indication.",
+                "links": [
+                  {
+                    "url": "https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2026/220934Orig1s000ltr.pdf",
+                    "label": "FDA approval letter (PDF)"
+                  },
+                  {
+                    "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2026/220934s003lbl.pdf",
+                    "label": "Current label (PDF)"
+                  },
+                  {
+                    "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=8ac446c5-feba-474f-a103-23facb9b5c62",
+                    "label": "DailyMed"
+                  }
+                ]
+              }
+            ]
+          ],
+          "target_values": [
+            [
+              {
+                "links": [
+                  {
+                    "url": "https://investor.lilly.com/news-releases/news-release-details/fda-approves-lillys-foundayotm-orforglipron-only-glp-1-pill",
+                    "label": "Lilly"
+                  }
+                ],
+                "title": "FDA approves Foundayo (orforglipron) tablets",
+                "authors": "Eli Lilly and Company",
+                "citation": "Eli Lilly and Company press release. April 1, 2026.",
+                "description": "Approval announcement for the oral nonpeptide GLP-1 receptor agonist tablet."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://pubchem.ncbi.nlm.nih.gov/compound/137319706",
+                    "label": "PubChem"
+                  }
+                ],
+                "title": "PubChem record for orforglipron (CID 137319706)",
+                "authors": "",
+                "citation": "National Center for Biotechnology Information. PubChem Compound CID 137319706.",
+                "description": "Free-base formula C48H48F2N10O5, molecular weight 883.0. No CAS is stated on this page."
+              },
+              {
+                "title": "Orforglipron vs oral semaglutide tablets: educational comparison",
+                "authors": "PeptideMap",
+                "citation": "PeptideMap educational compare page, 22 October 2026.",
+                "description": "Compares what each product is, how the molecules differ, regulatory status and what the named trials studied. Not a price comparison and not a dose guide.",
+                "links": [
+                  {
+                    "url": "https://peptidemap.com/compare/orforglipron-vs-oral-semaglutide",
+                    "label": "PeptideMap"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "links": [
+                  {
+                    "url": "https://investor.lilly.com/news-releases/news-release-details/fda-approves-lillys-foundayotm-orforglipron-only-glp-1-pill",
+                    "label": "Lilly"
+                  }
+                ],
+                "title": "FDA approves Foundayo (orforglipron) tablets",
+                "authors": "Eli Lilly and Company",
+                "citation": "Eli Lilly and Company press release. April 1, 2026.",
+                "description": "Approval announcement for the oral nonpeptide GLP-1 receptor agonist tablet."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://pubchem.ncbi.nlm.nih.gov/compound/137319706",
+                    "label": "PubChem"
+                  }
+                ],
+                "title": "PubChem record for orforglipron (CID 137319706)",
+                "authors": "",
+                "citation": "National Center for Biotechnology Information. PubChem Compound CID 137319706.",
+                "description": "Free-base formula C48H48F2N10O5, molecular weight 883.0. No CAS is stated on this page."
+              },
+              {
+                "title": "Foundayo (orforglipron): CHMP summary of positive opinion",
+                "authors": "European Medicines Agency, Committee for Medicinal Products for Human Use (CHMP)",
+                "citation": "EMA/CHMP/229918/2026, 15 October 2026 (first published 16 October 2026).",
+                "description": "Positive opinion adopted 15 October 2026 recommending EU marketing authorisation for type 2 diabetes mellitus and weight management in adults; full recommended indication. Published without prejudice to the European Commission decision.",
+                "links": [
+                  {
+                    "url": "https://www.ema.europa.eu/en/documents/smop-initial/chmp-summary-positive-opinion-foundayo_en.pdf",
+                    "label": "EMA summary of opinion (PDF)"
+                  },
+                  {
+                    "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/foundayo",
+                    "label": "EMA medicine page"
+                  }
+                ]
+              },
+              {
+                "title": "Meeting highlights from the CHMP, 12–15 October 2026",
+                "authors": "European Medicines Agency",
+                "citation": "EMA news, 16 October 2026.",
+                "description": "Lists Foundayo (orforglipron) among six new medicines recommended for approval; status “pending EC decision”.",
+                "links": [
+                  {
+                    "url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-medicinal-products-human-use-chmp-12-15-october-2026",
+                    "label": "EMA"
+                  }
+                ]
+              },
+              {
+                "title": "Foundayo (orforglipron) tablets: NDA 220934 approval letter and current prescribing information",
+                "authors": "U.S. Food and Drug Administration",
+                "citation": "NDA 220934, approved 1 April 2026; labeling revised 07/2026 (Drugs@FDA supplement 3, approved 4 August 2026).",
+                "description": "U.S. indication: reduce excess body weight and maintain weight reduction long term in adults with obesity, or overweight with at least one weight-related comorbid condition, with diet and physical activity. No type 2 diabetes indication.",
+                "links": [
+                  {
+                    "url": "https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2026/220934Orig1s000ltr.pdf",
+                    "label": "FDA approval letter (PDF)"
+                  },
+                  {
+                    "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2026/220934s003lbl.pdf",
+                    "label": "Current label (PDF)"
+                  },
+                  {
+                    "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=8ac446c5-feba-474f-a103-23facb9b5c62",
+                    "label": "DailyMed"
+                  }
+                ]
+              },
+              {
+                "title": "Orforglipron vs oral semaglutide tablets: educational comparison",
+                "authors": "PeptideMap",
+                "citation": "PeptideMap educational compare page, 22 October 2026.",
+                "description": "Compares what each product is, how the molecules differ, regulatory status and what the named trials studied. Not a price comparison and not a dose guide.",
+                "links": [
+                  {
+                    "url": "https://peptidemap.com/compare/orforglipron-vs-oral-semaglutide",
+                    "label": "PeptideMap"
+                  }
+                ]
+              }
+            ]
+          ],
+          "append_item": {
+            "title": "Orforglipron vs oral semaglutide tablets: educational comparison",
+            "authors": "PeptideMap",
+            "citation": "PeptideMap educational compare page, 22 October 2026.",
+            "description": "Compares what each product is, how the molecules differ, regulatory status and what the named trials studied. Not a price comparison and not a dose guide.",
+            "links": [
+              {
+                "url": "https://peptidemap.com/compare/orforglipron-vs-oral-semaglutide",
+                "label": "PeptideMap"
+              }
+            ]
+          }
+        }
+      },
+      "sources": [
+        "#69 (8aa2ff6): App\\Support\\OrforglipronOralSemaglutideComparePage::PUBLIC_PATH; 2026_10_22_150000 publishes it via EducationalContentPublisher::sync()",
+        "Second guard = live references + 2026_10_22_140000 new_items (orfo-reta, on main), so the step works whether or not 140000 has run on prod."
+      ]
+    },
+    "retatrutide": {
+      "category_id_live": 524,
+      "category_name_live": "Retatrutide",
+      "hub_slug_live": "retatrutide",
+      "flag_reason": "'up to 24% weight reduction — the highest of any peptide compound studied' (efficacy %, weight-loss figure, superlative)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "Retatrutide is a triple agonist targeting GLP-1, GIP, and glucagon receptors simultaneously. Phase 2 data showed up to 24% weight reduction — the highest of any peptide compound studied.\n\nAs of early October 2026, retatrutide remains investigational: not FDA-approved and not commercially marketed by the sponsor. Lilly has stated a plan to submit a U.S. BLA in Q1 2027 while completing CMC (filing plan ≠ acceptance ≠ approval). A Seventh Circuit oral argument on biologic classification (Eli Lilly v. Kennedy, No. 26-1301, 24 Sep 2026) was held; no ruling was located as of early Oct 2026."
+          ],
+          "new_value": "Retatrutide is an investigational triple agonist targeting GLP-1, GIP, and glucagon receptors. Phase 3 TRIUMPH-1 and TRIUMPH-2 results were published on 29 Sep 2026 (NEJM; The Lancet). Weight-change figures on the encyclopedia page are labeled by trial and estimand and are not head-to-head comparisons with other compounds.\n\nAs of 22 October 2026, retatrutide remains investigational: not FDA-approved and not commercially marketed by the sponsor. Lilly has said it plans to file a U.S. application no later than Q1 2027 (filing plan ≠ acceptance ≠ approval). On 2 October 2026, on remand, FDA concluded that retatrutide is not a biological product and that an application would go under section 505 (the drug pathway). Lilly’s related Seventh Circuit appeal (Eli Lilly v. Kennedy, No. 26-1301; oral argument 24 Sep 2026) had no ruling as of 22 Oct 2026.",
+          "overlap": "2026_10_22_160000 (retatrutide s505) writes the same text"
+        }
+      },
+      "sources": [
+        "Text identical to 2026_10_22_160000 target; sources in reta-s505-2026-10-22-CHANGES.md (TRIUMPH-1 NEJM 29 Sep 2026; TRIUMPH-2 Lancet; FDA remand decision 2 Oct 2026; 7th Cir. No. 26-1301)"
+      ]
+    },
+    "selank": {
+      "category_id_live": 68,
+      "category_name_live": "Selank",
+      "hub_slug_live": "selank",
+      "flag_reason": "'It provides anxiolytic effects without sedation' (outcome claim)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "Selank is a synthetic heptapeptide derived from the natural immunopeptide tuftsin, developed at the Institute of Molecular Genetics in Russia. It provides anxiolytic effects without sedation."
+          ],
+          "new_value": "Selank is the synthetic heptapeptide Thr-Lys-Pro-Arg-Pro-Gly-Pro: the tuftsin sequence with a C-terminal Pro-Gly-Pro extension. It is not an FDA-approved drug. Research use only."
+        }
+      },
+      "sources": [
+        "Volkova A et al. Selank administration affects the expression of some genes involved in GABAergic neurotransmission. Front Pharmacol 2016 PMC4757669 (sequence TKPRPGP; tuftsin analogue)",
+        "Vyunova TV et al. Peptide-based Anxiolytics: The Molecular Aspects of Heptapeptide Selank Biological Activity. Protein Pept Lett 2018;25:914-923 PMID 30255741",
+        "openFDA Drugs@FDA: no Selank product"
+      ]
+    },
+    "semaglutide": {
+      "category_id_live": 525,
+      "category_name_live": "Semaglutide",
+      "hub_slug_live": "semaglutide",
+      "flag_reason": "'has transformed metabolic research'; 'most-searched peptide compound globally' (unsourced superlatives)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "Semaglutide is a GLP-1 receptor agonist and the most-searched peptide compound globally. FDA-approved for type 2 diabetes (Ozempic) and obesity (Wegovy), it has transformed metabolic research."
+          ],
+          "new_value": "Semaglutide is a GLP-1 receptor agonist. FDA-approved products include Ozempic and Rybelsus for type 2 diabetes and Wegovy for chronic weight management. Research-labeled material is not an approved product."
+        },
+        "references": {
+          "target": "education_posts.references of the category-linked post",
+          "op": "Append append_item at the END. Skip (already current) if any stored reference link url equals marker_url. Else write only if normalize(current) equals one of old_values; else WARNING old mismatch, untouched.",
+          "marker_url": "https://peptidemap.com/compare/orforglipron-vs-oral-semaglutide",
+          "old_values": [
+            [
+              {
+                "links": [],
+                "title": "New England Journal of Medicine (2021) — STEP-1",
+                "authors": "Wilding JPH et al."
+              },
+              {
+                "links": [],
+                "title": "New England Journal of Medicine (2016) — SUSTAIN-6",
+                "authors": "Marso SP et al."
+              },
+              {
+                "links": [],
+                "title": "New England Journal of Medicine (2023) — SELECT",
+                "authors": "Lincoff AM et al."
+              },
+              {
+                "links": [],
+                "title": "The Lancet (2019) — PIONEER-6",
+                "authors": "Husain M et al."
+              },
+              {
+                "links": [],
+                "title": "Diabetes Care (2020)",
+                "authors": "Pratley RE et al."
+              }
+            ]
+          ],
+          "target_values": [
+            [
+              {
+                "links": [],
+                "title": "New England Journal of Medicine (2021) — STEP-1",
+                "authors": "Wilding JPH et al."
+              },
+              {
+                "links": [],
+                "title": "New England Journal of Medicine (2016) — SUSTAIN-6",
+                "authors": "Marso SP et al."
+              },
+              {
+                "links": [],
+                "title": "New England Journal of Medicine (2023) — SELECT",
+                "authors": "Lincoff AM et al."
+              },
+              {
+                "links": [],
+                "title": "The Lancet (2019) — PIONEER-6",
+                "authors": "Husain M et al."
+              },
+              {
+                "links": [],
+                "title": "Diabetes Care (2020)",
+                "authors": "Pratley RE et al."
+              },
+              {
+                "title": "Orforglipron vs oral semaglutide tablets: educational comparison",
+                "authors": "PeptideMap",
+                "citation": "PeptideMap educational compare page, 22 October 2026.",
+                "description": "Compares what each product is, how the molecules differ, regulatory status and what the named trials studied. Not a price comparison and not a dose guide.",
+                "links": [
+                  {
+                    "url": "https://peptidemap.com/compare/orforglipron-vs-oral-semaglutide",
+                    "label": "PeptideMap"
+                  }
+                ]
+              }
+            ]
+          ],
+          "append_item": {
+            "title": "Orforglipron vs oral semaglutide tablets: educational comparison",
+            "authors": "PeptideMap",
+            "citation": "PeptideMap educational compare page, 22 October 2026.",
+            "description": "Compares what each product is, how the molecules differ, regulatory status and what the named trials studied. Not a price comparison and not a dose guide.",
+            "links": [
+              {
+                "url": "https://peptidemap.com/compare/orforglipron-vs-oral-semaglutide",
+                "label": "PeptideMap"
+              }
+            ]
+          }
+        }
+      },
+      "sources": [
+        "Drugs@FDA: Ozempic NDA 209637 (2017), Rybelsus NDA 213051 (2019), Wegovy NDA 215256 (2021) https://www.accessdata.fda.gov/scripts/cder/daf/",
+        "Link-only references append: /compare/orforglipron-vs-oral-semaglutide (#69 merged in 8aa2ff6)."
+      ]
+    },
+    "sermorelin": {
+      "category_id_live": 126,
+      "category_name_live": "Sermorelin",
+      "hub_slug_live": "Sermorelin",
+      "flag_reason": "'stimulates natural GH release while preserving feedback regulation' (benefit claim)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "Sermorelin is the first 29 amino acids of natural GHRH, previously FDA-approved for pediatric GH deficiency. It stimulates natural GH release while preserving feedback regulation."
+          ],
+          "new_value": "Sermorelin is a synthetic peptide matching the first 29 amino acids of human GHRH and acts at the GHRH receptor. Its former FDA-approved product, Geref, is no longer sold. Research use only."
+        }
+      },
+      "sources": [
+        "Federal Register 78 FR 14099 (4 Mar 2013) Determination that GEREF (sermorelin acetate) was not withdrawn from sale for reasons of safety or effectiveness https://www.govinfo.gov/content/pkg/FR-2013-03-04/html/2013-04827.htm",
+        "Drugs@FDA NDA 019863/020443 GEREF (sermorelin acetate = GHRH(1-29)-NH2)"
+      ]
+    },
+    "tb-500": {
+      "category_id_live": 87,
+      "category_name_live": "TB-500",
+      "hub_slug_live": "TB-500",
+      "flag_reason": "'promotes systemic recovery', 'tissue repair' (recovery/repair claims)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "TB-500 is a synthetic fragment of Thymosin Beta-4, a naturally occurring protein involved in cell migration and tissue repair. It promotes systemic recovery through actin polymerization modulation."
+          ],
+          "new_value": "TB-500 is a synthetic peptide sold as a thymosin beta-4 derivative; thymosin beta-4 is a 43-amino-acid actin-binding protein. It is not FDA-approved, and WADA prohibits it. Research use only."
+        }
+      },
+      "sources": [
+        "UniProt P62328 (TMSB4X, thymosin beta-4; 43-residue mature peptide; actin sequestering) https://rest.uniprot.org/uniprotkb/P62328",
+        "WADA 2026 and 2027 Prohibited Lists S2: 'Thymosin-β4 and its derivatives e.g. TB-500'",
+        "openFDA Drugs@FDA: no TB-500 product"
+      ]
+    },
+    "tirzepatide": {
+      "category_id_live": 526,
+      "category_name_live": "Tirzepatide",
+      "hub_slug_live": "tirzepatide",
+      "flag_reason": "'showing superior metabolic outcomes versus GLP-1-only compounds' (outcome/comparative claim)",
+      "columns": {
+        "description": {
+          "target": "education_posts.description of the category-linked post; if that is NULL/empty after normalize, product_categories.description of the same category (the controller fallback). Never both.",
+          "old_values": [
+            "Tirzepatide is the first dual GLP-1/GIP receptor agonist, showing superior metabolic outcomes versus GLP-1-only compounds in head-to-head clinical trials."
+          ],
+          "new_value": "Tirzepatide is a dual GIP and GLP-1 receptor agonist, FDA-approved as Mounjaro (type 2 diabetes, 2022) and Zepbound (chronic weight management, 2023). Research material is not either product."
+        }
+      },
+      "sources": [
+        "FDA news release 13 May 2022: FDA approves novel, dual-targeted treatment for type 2 diabetes (Mounjaro)",
+        "FDA news release 8 Nov 2023: FDA approves new medication for chronic weight management (Zepbound)"
+      ]
+    }
+  }
+}
