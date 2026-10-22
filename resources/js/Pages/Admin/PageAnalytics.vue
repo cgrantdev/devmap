@@ -102,8 +102,12 @@ defineProps({
   recent_queries: { type: Array, default: () => [] },
 })
 
-export const Stat = {
-  props: { label: String, cur: [String, Number], prev: [Number, null], inverse: Boolean, rawCur: Number, rawPrev: Number, fmt: Function },
+// Sub-components for the stat tiles. Declared as local components —
+// Vue 3 <script setup> auto-exposes top-level consts to the template,
+// so no explicit registration needed. Vite rejects `export const`
+// inside <script setup>, hence this shape.
+const Stat = {
+  props: { label: String, cur: [String, Number], prev: [Number, null], inverse: Boolean, rawCur: Number, rawPrev: Number },
   setup(p) {
     return () => {
       const c = p.rawCur != null ? p.rawCur : Number(p.cur)
@@ -124,7 +128,7 @@ export const Stat = {
   }
 }
 
-export const SimpleStat = {
+const SimpleStat = {
   props: { label: String, value: [String, Number] },
   setup(p) {
     return () => h('div', [

@@ -254,9 +254,34 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, h } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
+
+// StatTile component — colocated here to avoid Vite's rejection of
+// `export const` inside <script setup>. Vue 3 auto-exposes top-level
+// consts to the template.
+const StatTile = {
+  props: { label: String, value: [String, Number], prev: [String, Number, null], inverse: Boolean },
+  setup(props) {
+    return () => {
+      const v = Number(props.value) || null
+      const p = props.prev != null ? Number(props.prev) : null
+      let delta = null, cls = 'text-slate-500'
+      if (v != null && p != null && p > 0) {
+        const pct = Math.round(((v - p) / p) * 100)
+        delta = (pct >= 0 ? '+' : '') + pct + '%'
+        const good = props.inverse ? pct < 0 : pct > 0
+        cls = good ? 'text-emerald-600' : (pct === 0 ? 'text-slate-500' : 'text-red-600')
+      }
+      return h('div', { class: 'border border-[color:var(--color-hairline)] rounded-lg p-3' }, [
+        h('div', { class: 'text-[11px] uppercase tracking-wider text-slate-500 mb-1' }, props.label),
+        h('div', { class: 'text-xl font-semibold ui-mono' }, props.value),
+        delta ? h('div', { class: 'text-[11px] mt-0.5 ' + cls }, delta + ' vs prev') : null,
+      ])
+    }
+  }
+}
 
 const props = defineProps({
   tab: { type: String, required: true },
@@ -356,30 +381,6 @@ function renderTable(rows) {
 }
 </script>
 
-<script>
-import { h } from 'vue'
-export const StatTile = {
-  props: { label: String, value: [String, Number], prev: [String, Number, null], inverse: Boolean },
-  setup(props) {
-    return () => {
-      const v = Number(props.value) || null
-      const p = props.prev != null ? Number(props.prev) : null
-      let delta = null, cls = 'text-slate-500'
-      if (v != null && p != null && p > 0) {
-        const pct = Math.round(((v - p) / p) * 100)
-        delta = (pct >= 0 ? '+' : '') + pct + '%'
-        const good = props.inverse ? pct < 0 : pct > 0
-        cls = good ? 'text-emerald-600' : (pct === 0 ? 'text-slate-500' : 'text-red-600')
-      }
-      return h('div', { class: 'border border-[color:var(--color-hairline)] rounded-lg p-3' }, [
-        h('div', { class: 'text-[11px] uppercase tracking-wider text-slate-500 mb-1' }, props.label),
-        h('div', { class: 'text-xl font-semibold ui-mono' }, props.value),
-        delta ? h('div', { class: 'text-[11px] mt-0.5 ' + cls }, delta + ' vs prev') : null,
-      ])
-    }
-  }
-}
-</script>
 
 <style scoped>
 .seo-playbook :deep(h1) { font-size: 1.5rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
