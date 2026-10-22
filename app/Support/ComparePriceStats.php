@@ -41,23 +41,42 @@ class ComparePriceStats
      * and of "glucagon", so a bare search excluded every single-vial
      * cagrilintide listing. Standalone blend tokens live in
      * BLEND_TOKEN_PATTERN. A "+" only counts when a letter follows it,
-     * so "NAD+" stays a single compound.
+     * so "NAD+" stays a single compound. Display names drop pack wording
+     * ("Cagrilintide (10mg)" can be a 10-pack), so the same check also
+     * runs on the raw vendor name and on the slug with hyphens read as
+     * spaces. "vial" is still not "vials".
      */
     private const MULTI_UNIT_PATTERN = '#(pack|kit|vials|bundle|box|×|\bx\s*\d|\d\s*x\s*\d|mgx|pen\b|blend|/|mix|tablet|bulk)#iu';
 
     /**
      * Whole-word blend markers. Boundaries keep "cag" from matching
-     * inside "cagrilintide" or "glucagon". "cagrisema" is the
-     * cagrilintide + semaglutide name with no separator.
+     * inside "cagrilintide" or "glucagon". Separators cover Cagri-Sema,
+     * Cagri Sema, and Cagrilintide Semaglutide, not only CagriSema.
      */
-    private const BLEND_TOKEN_PATTERN = '#\b(?:cag|cagrisema)\b#iu';
+    private const BLEND_TOKEN_PATTERN = '#\b(?:cag|cagri[\s_-]*sema(?:glutide)?|cagrilintide[\s_-]*sema(?:glutide)?)\b#iu';
 
     /**
      * Two compounds joined by +, &, or "and". The character after the
-     * join must be a letter, so "NAD+" and "20mg & 40mg" are not blends.
-     * The left side may end in a digit ("BPC-157 and TB-500").
+     * join must be a letter, so "NAD+" alone and "20mg & 40mg" are not
+     * blends. The left side may be the "+" in "NAD+" ("NAD+ & NMN") or
+     * a digit ("BPC-157 and TB-500").
      */
-    private const COMPOUND_JOIN_PATTERN = '#[[:alnum:]]\s*(?:\+|\&|\band\b)\s*[[:alpha:]]#iu';
+    private const COMPOUND_JOIN_PATTERN = '#(?:[[:alnum:]]|\+)\s*(?:\+|\&|\band\b)\s*[[:alpha:]]#iu';
+
+    /**
+     * GLP-1 / GIP / Glucagon written without slashes, including the
+     * slug form "1gipglucagon". A lone "Glucagon 10mg" has no GLP or
+     * GIP marker, so it stays a single vial.
+     */
+    private const GLUCAGON_BLEND_PATTERN = '#gip[\s_-]*glucagon|\b(?:glp|gip)\b[\w\s().+\-]*\bglucagon\b|\bglucagon\b[\w\s().+\-]*\b(?:glp|gip)\b#iu';
+
+    /**
+     * BAC water bundled with one peptide is an accessory, not a second
+     * compound. Strip every spelling (+ BAC, +BAC, & BAC, and BAC water,
+     * w/ BAC) before the blend check so display name, raw name, and slug
+     * agree. A real second peptide written next to it still matches.
+     */
+    private const BAC_ACCESSORY_PATTERN = '#(?:\s*(?:\+|\&|\band\b|w/|/)\s*|\s+)\+?\s*bac(?:[\s_-]*water)?\b#iu';
 
     private const SIZE_PATTERN = '/^\s*(\d+(?:\.\d+)?)\s*mg\s*$/i';
 
@@ -225,8 +244,15 @@ class ComparePriceStats
         }
 
         $name = (string) ($product['name'] ?? '');
+        $rawName = trim((string) ($product['raw_name'] ?? ''));
+        $slugText = str_replace('-', ' ', trim((string) ($product['slug'] ?? '')));
         $sizeRaw = (string) ($product['size_mg'] ?? '');
-        if (self::isMultiUnitOrBlend($name) || str_contains($sizeRaw, '/')) {
+        if (
+            self::isMultiUnitOrBlend($name)
+            || ($rawName !== '' && self::isMultiUnitOrBlend($rawName))
+            || ($slugText !== '' && self::isMultiUnitOrBlend($slugText))
+            || str_contains($sizeRaw, '/')
+        ) {
             return 'multi_unit_or_blend';
         }
 
@@ -260,9 +286,12 @@ class ComparePriceStats
 
     private static function isMultiUnitOrBlend(string $name): bool
     {
+        $name = trim(preg_replace(self::BAC_ACCESSORY_PATTERN, ' ', $name) ?? $name);
+
         return preg_match(self::MULTI_UNIT_PATTERN, $name) === 1
             || preg_match(self::BLEND_TOKEN_PATTERN, $name) === 1
-            || preg_match(self::COMPOUND_JOIN_PATTERN, $name) === 1;
+            || preg_match(self::COMPOUND_JOIN_PATTERN, $name) === 1
+            || preg_match(self::GLUCAGON_BLEND_PATTERN, $name) === 1;
     }
 
     /**

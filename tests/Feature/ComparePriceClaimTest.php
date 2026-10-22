@@ -197,7 +197,7 @@ class ComparePriceClaimTest extends TestCase
 
         $aggregate = collect($props['seo']['schema'])->firstWhere('@type', 'Product');
         $this->assertSame(
-            'Compare BPC-157 prices across 1 research-peptide vendor.',
+            'Compare BPC-157 listed prices across 1 research-peptide vendor. Research use only (RUO).',
             $aggregate['description']
         );
     }
