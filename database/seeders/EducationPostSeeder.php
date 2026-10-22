@@ -17,7 +17,7 @@ class EducationPostSeeder extends Seeder
         $posts = [
             [
                 'title' => 'BPC-157',
-                'description' => 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation, and promote faster recovery from injuries.',
+                'description' => 'BPC-157 is a synthetic 15-amino-acid peptide studied mainly in animal and cell models. Published human data are limited to a few small, short studies, and it is not an FDA-approved drug. PeptideMap lists it for research-use-only (RUO) comparison.',
                 'overview' => '<p>BPC-157 is a synthetic pentadecapeptide derived from a protective protein found in the gastric juice. Research has investigated its role in tissue regeneration, angiogenesis, and inflammation modulation.</p>',
                 'content' => '<p>BPC-157 has been studied for its potential therapeutic applications in various research contexts.</p>',
                 'image' => 'bpc-157.png',
@@ -50,9 +50,9 @@ class EducationPostSeeder extends Seeder
                     ],
                     [
                         'title' => 'Future of BPC-157 Research',
-                        'content' => '<p>Ongoing research continues to explore the potential applications and mechanisms of BPC-157. Future studies may provide further insights into its therapeutic potential and optimal usage protocols.</p>
+                        'content' => '<p>Ongoing research continues to examine BPC-157 in laboratory and animal models. Published human data are limited to a few small, short studies.</p>
                         
-                        <p>Researchers are investigating various aspects of BPC-157, including dosage optimization, administration methods, and potential combination therapies. As research progresses, our understanding of this peptide continues to evolve.</p>',
+                        <p>Controlled human trials would be needed before any clinical use could be assessed. BPC-157 is not an FDA-approved drug.</p>',
                     ],
                 ],
                 'shop_url' => '/products',

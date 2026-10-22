@@ -132,10 +132,6 @@ const props = defineProps({
     type: String,
     required: true
   },
-  safetyTag: {
-    type: String,
-    default: 'High Safety'
-  },
   popularity: {
     type: [Number, String],
     default: 0

@@ -98,10 +98,12 @@ class EncyclopediaController extends Controller
     private function getClinicalData($compoundName, $field)
     {
         $data = [
+            // Routes studied in animals and no human PK data: FDA PCAC
+            // briefing for BPC-157 (July 2026), pp. 30–34 and p. 40.
             'BPC-157' => [
                 'status' => 'Not marketed',
-                'routes' => ['Oral', 'Subcutaneous', 'IM', 'IV'],
-                'halfLife' => '7.9–30 min',
+                'routes' => ['Intraperitoneal (studied in animals)', 'Oral: gavage or drinking water (studied in animals)', 'Intravenous (studied in animals)', 'Intramuscular (studied in animals)'],
+                'halfLife' => 'No human PK data',
             ],
             'Semaglutide' => [
                 'status' => 'FDA Approved',
@@ -113,10 +115,12 @@ class EncyclopediaController extends Controller
                 'routes' => ['Subcutaneous'],
                 'halfLife' => '~5 days',
             ],
+            // FDA PCAC briefing for TB-500 (July 2026), p. 30: no human
+            // pharmacokinetic studies via any route.
             'TB-500' => [
                 'status' => 'Experimental',
                 'routes' => ['Subcutaneous', 'IM'],
-                'halfLife' => '',
+                'halfLife' => 'No human PK data',
             ],
             'Ipamorelin' => [
                 'status' => 'Not marketed',
@@ -438,7 +442,6 @@ class EncyclopediaController extends Controller
                         : $category->description)),
                 'image' => $image,
                 'categoryTag' => $categoryTag,
-                'safetyTag' => 'High Safety', // Default, can be enhanced later
                 'popularity' => min(95, 70 + ($category->products_count * 2)), // Mock popularity
                 'rating' => '4.7', // Mock rating, can be calculated from reviews
                 'benefits' => $keyEffects,
@@ -580,62 +583,6 @@ class EncyclopediaController extends Controller
         }
 
         return $name; // Fallback to name
-    }
-
-    /**
-     * Get benefits for peptide
-     */
-    private function getBenefits($name, $description)
-    {
-        $nameLower = strtolower($name ?? '');
-        $descLower = strtolower($description ?? '');
-
-        if (stripos($nameLower, 'bpc-157') !== false) {
-            return [
-                'Accelerates tendon and ligament healing',
-                'Reduces inflammation',
-                'Promotes gut health and repairs intestinal damage',
-            ];
-        }
-
-        if (stripos($nameLower, 'tb-500') !== false) {
-            return [
-                'Accelerates healing of muscle injuries',
-                'Promotes flexibility and reduces inflammation',
-                'Improves hair growth (topical use)',
-            ];
-        }
-
-        if (stripos($nameLower, 'ipamorelin') !== false) {
-            return [
-                'Increases lean muscle mass',
-                'Promotes fat loss',
-                'Improves sleep quality',
-            ];
-        }
-
-        if (stripos($nameLower, 'cjc-1295') !== false) {
-            return [
-                'Increases growth hormone levels',
-                'Boosts IGF-1 production',
-                'Enhances muscle growth',
-            ];
-        }
-
-        if (stripos($nameLower, 'pt-141') !== false) {
-            return [
-                'Increases sexual desire and arousal',
-                'Improves erectile function',
-                'Enhances sexual satisfaction',
-            ];
-        }
-
-        // Default benefits
-        return [
-            'Supports research applications',
-            'Well-documented in scientific literature',
-            'Multiple potential benefits',
-        ];
     }
 
     /**
@@ -1109,146 +1056,5 @@ class EncyclopediaController extends Controller
             'Well-documented in scientific literature',
             'Multiple potential benefits',
         ];
-    }
-
-    /**
-     * Get quick facts
-     */
-    private function getQuickFacts($name)
-    {
-        $nameLower = strtolower($name ?? '');
-
-        if (stripos($nameLower, 'bpc-157') !== false) {
-            return [
-                'halfLife' => '~4 hours',
-                'bioavailability' => 'High via injection, lower oral',
-                'storage' => 'Refrigerate at 2-8°C, freeze for long-term storage',
-                'researchLevel' => 'Moderate Research',
-            ];
-        }
-
-        return [
-            'halfLife' => 'Varies',
-            'bioavailability' => 'Varies by administration method',
-            'storage' => 'Refrigerate at 2-8°C',
-            'researchLevel' => 'Moderate Research',
-        ];
-    }
-
-    /**
-     * Get common use cases
-     */
-    private function getCommonUseCases($name)
-    {
-        $nameLower = strtolower($name ?? '');
-
-        if (stripos($nameLower, 'bpc-157') !== false) {
-            return [
-                'Sports injuries (tendonitis, sprains, strains)',
-                'Post-surgical recovery',
-                'Chronic joint pain',
-                'Inflammatory bowel disease (IBD)',
-                'Leaky gut syndrome',
-                'Muscle tears and damage',
-                'General tissue repair',
-            ];
-        }
-
-        return [
-            'Research applications',
-            'General use cases',
-        ];
-    }
-
-    /**
-     * Get how it works information
-     */
-    private function getHowItWorks($name)
-    {
-        $nameLower = strtolower($name ?? '');
-
-        if (stripos($nameLower, 'bpc-157') !== false) {
-            return [
-                'Promotes angiogenesis (formation of new blood vessels)',
-                'Modulates growth factors including VEGF and FGF',
-                'Activates the FAK-paxillin pathway',
-                'Enhances cell migration and proliferation',
-            ];
-        }
-
-        return [
-            'Mechanism of action varies by peptide type',
-            'Research continues to uncover specific pathways',
-        ];
-    }
-
-    /**
-     * Get dosage information
-     */
-    private function getDosage($name)
-    {
-        $nameLower = strtolower($name ?? '');
-
-        if (stripos($nameLower, 'bpc-157') !== false) {
-            return [
-                'typicalDosage' => '250-500 mcg',
-                'frequency' => 'Once or twice daily',
-                'administration' => [
-                    'Subcutaneous injection',
-                    'Intramuscular injection',
-                    'Oral - less effective',
-                ],
-                'cycleDuration' => '4-6 weeks, can be extended',
-            ];
-        }
-
-        return [
-            'typicalDosage' => 'Varies',
-            'frequency' => 'Varies',
-            'administration' => ['Subcutaneous injection'],
-            'cycleDuration' => '4-6 weeks',
-        ];
-    }
-
-    /**
-     * Get safety information
-     */
-    private function getSafetyInfo($name)
-    {
-        return [
-            'sideEffects' => [
-                'Generally well-tolerated',
-                'Mild headache (rare)',
-                'Dizziness (rare)',
-                'Nausea (rare)',
-                'Injection site redness',
-            ],
-            'contraindications' => [
-                'Pregnancy and breastfeeding',
-                'Active cancer (theoretical concern)',
-                'Consult doctor if on blood thinners',
-            ],
-        ];
-    }
-
-    /**
-     * Get stacking recommendations
-     */
-    private function getStackingRecommendations($name)
-    {
-        $nameLower = strtolower($name ?? '');
-
-        if (stripos($nameLower, 'bpc-157') !== false) {
-            return [
-                [
-                    'name' => 'TB-500',
-                    'subtitle' => 'Thymosin Beta-4',
-                    'description' => 'Stacking BPC-157 with TB-500 can enhance healing effects',
-                    'slug' => 'tb-500',
-                ],
-            ];
-        }
-
-        return [];
     }
 }

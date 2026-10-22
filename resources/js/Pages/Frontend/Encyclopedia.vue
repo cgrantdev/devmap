@@ -80,7 +80,6 @@
           :description="peptide.description"
           :image="peptide.image"
           :category-tag="peptide.categoryTag"
-          :safety-tag="peptide.safetyTag"
           :popularity="peptide.popularity"
           :rating="peptide.rating"
           :benefits="peptide.benefits"

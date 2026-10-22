@@ -1,0 +1,1926 @@
+{
+  "as_of": "22 October 2026 (Asia/Bangkok, UTC+7). Old values = live Inertia props of https://peptidemap.com/encyclopedia/bpc-157 and /encyclopedia/tb-500 and the /encyclopedia index card, fetched 22 Oct 2026 ~09:50 UTC+7, plus the post-#65 values from database/seeders/data/encyclopedia-field-updates/2026-10-22/bpc-157.json.",
+  "base": "origin/main 8aa2ff6 (#69; includes #64, #68, #57). 2026_10_22_170000 is free (main has 100000, 120000, 130000, 140000, 150000 (#69 orforglipron compare)). Pending drafts: 155000 (FAQ batch 1: tb-500 faqs only), 160000 (retatrutide s505), 180000 (hub cards; uses this package's BPC-157 description target byte-for-byte). None of #64/#68/#57/#69 touches BPC-157/TB-500 encyclopedia fields.",
+  "migration": {
+    "file": "database/migrations/2026_10_22_170000_bpc_157_cleanup_addendum.php",
+    "seeder": "EncyclopediaBpcCleanupAddendumSeeder",
+    "data": "database/seeders/data/encyclopedia-field-updates/2026-10-22f/bpc-addendum.json"
+  },
+  "normalize": "Recursive. Strings: CRLF/CR→LF, U+00A0→space, rtrim each line, trim. Arrays: same order/keys, values normalized.",
+  "rules": "Per column: if normalize(current) equals a target_values entry → skip (\"already current\"). Else if it equals old_values[i] and the op preconditions hold → apply the op to the STORED value, assert normalize(result)==target_values[i], set. Else WARNING \"old mismatch\" + 200-char excerpt, column untouched. One DB::transaction per slug; saveQuietly() once per slug.",
+  "posts": {
+    "bpc-157": {
+      "lookup": "App\\Support\\EncyclopediaPostMatch::find(\"bpc-157\", $this->command, \"BPC-157 cleanup addendum\"); status must be ok (exactly 1 category by LOWER(TRIM(slug)) — live id 3 — and exactly 1 post with that product_category_id). Never write the unlinked legacy row(s) whose slug is \"bpc-157\" (EducationPostSeeder). The helper logs them as diagnostics.",
+      "columns": {
+        "human_use_subsections": {
+          "old_values": [
+            [
+              {
+                "title": "Pilot Safety Studies",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "To date, only minimal human testing has been published. A recent pilot study in 2025 administered BPC-157 intravenously to two healthy adult volunteers to assess safety. The participants received 10 mg on the first day and 20 mg on the second day by slow infusion. The results were encouraging in terms of safety: no adverse effects were observed, and detailed blood tests showed no harmful changes in liver, kidney, heart, or metabolic function after the infusions.\n\nWhile this finding supports the idea that BPC-157 may be safe in the short term, the sample size was only two people – far too small to draw broad conclusions. More rigorous safety trials with larger participant groups are needed to confirm safety in humans."
+                  }
+                ]
+              },
+              {
+                "title": "Anecdotal Clinical Use",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "In the absence of official trials, some healthcare practitioners (particularly in sports medicine or integrative medicine) have experimented with BPC-157 as an off-label therapy. For example:"
+                  },
+                  {
+                    "type": "item",
+                    "value": "A physician-authored report described 12 patients with knee injuries or osteoarthritis who received BPC-157 injections into the knee joint, with 11 of 12 reporting improvements. However, this was not a controlled study with no placebo group, and outcomes were based on patient self-reports."
+                  },
+                  {
+                    "type": "item",
+                    "value": "A small pilot trial at a private clinic treated women suffering from chronic bladder pain by injecting BPC-157 into the bladder wall, noting symptom relief and no immediate side effects. This too lacked a control group and was an open-label observation."
+                  },
+                  {
+                    "type": "content",
+                    "value": "Such reports must be viewed cautiously, as they are not the gold standard evidence required for medical approval. They do, however, suggest interest in exploring BPC-157's potential despite the unknowns."
+                  }
+                ]
+              },
+              {
+                "title": "Unpublished Clinical Trial",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "A formal Phase I clinical trial (code-named PCO-02) was conducted around 2015 on 42 healthy volunteers to evaluate BPC-157's pharmacokinetics and safety. However, the results of that trial were never published. The trial was completed, but the data were not reported, which has raised questions in the research community. Without publication, the findings remain unknown."
+                  }
+                ]
+              },
+              {
+                "title": "Current Status",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Human experience with BPC-157 remains in early, experimental stages. Small studies and individual experiments hint at effects consistent with animal research, but robust clinical evidence to verify efficacy or proper protocols is lacking. Experts consistently stress that BPC-157 should not be used in routine medical practice yet. It remains a compound with potential, but until large controlled trials are conducted, any human use is effectively experimental."
+                  }
+                ]
+              }
+            ]
+          ],
+          "target_values": [
+            [
+              {
+                "title": "Pilot Safety Studies",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "To date, only minimal human testing has been published. A 2025 pilot study (Lee and Burgess, Alternative Therapies in Health and Medicine; PMID 40131143), carried out at a private clinic in Florida, gave BPC-157 by intravenous infusion on two consecutive days to two adults who had received intravenous BPC-157 before. The authors reported no side effects and no measurable changes in the tested heart, liver, kidney, thyroid and blood glucose markers.\n\nWith two participants, no control group and three days of follow-up, the study cannot establish safety. FDA’s July 2026 briefing document for its Pharmacy Compounding Advisory Committee notes that the published human studies of BPC-157 were of short duration, had small sample sizes and gave limited information on safety."
+                  }
+                ]
+              },
+              {
+                "title": "Registered Phase 1 Trial Without Published Results",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "A Phase 1 study in healthy volunteers, PCO-02 (ClinicalTrials.gov NCT02637284, sponsor PharmaCotherapia), was registered in December 2015 to assess the safety and pharmacokinetics of BPC-157 oral tablets against placebo, with a single-administration part and a two-week repeated-administration part and an estimated enrollment of 42. The registry record was last updated in December 2015, its status is listed as unknown, and no results are posted. FDA’s July 2026 briefing document states that FDA was unable to find an associated published study."
+                  }
+                ]
+              },
+              {
+                "title": "Current Status",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Published human data on BPC-157 are limited to a few small, short studies. Most had no control group; the two placebo-controlled studies FDA identified (rectal enemas in healthy volunteers and in people with ulcerative colitis) are available only as meeting abstracts. A 2026 systematic review (Poolton et al., Acta Orthopaedica Belgica; PMID 42885452) rated the overall certainty of evidence as very low. FDA’s July 2026 briefing document concluded that there is insufficient clinical safety information to characterize the safety profile of BPC-157 (free base) and BPC-157 acetate. Until controlled human trials are published, any human use is experimental."
+                  }
+                ]
+              }
+            ]
+          ],
+          "op": "Replace the whole array with new_value: [0] Pilot Safety Studies rewritten without amounts; [1] \"Anecdotal Clinical Use\" removed; [2] the unpublished-trial entry corrected to the registry record; [3] Current Status rewritten. (#65 does not touch this column.)",
+          "new_value": [
+            {
+              "title": "Pilot Safety Studies",
+              "entries": [
+                {
+                  "type": "content",
+                  "value": "To date, only minimal human testing has been published. A 2025 pilot study (Lee and Burgess, Alternative Therapies in Health and Medicine; PMID 40131143), carried out at a private clinic in Florida, gave BPC-157 by intravenous infusion on two consecutive days to two adults who had received intravenous BPC-157 before. The authors reported no side effects and no measurable changes in the tested heart, liver, kidney, thyroid and blood glucose markers.\n\nWith two participants, no control group and three days of follow-up, the study cannot establish safety. FDA’s July 2026 briefing document for its Pharmacy Compounding Advisory Committee notes that the published human studies of BPC-157 were of short duration, had small sample sizes and gave limited information on safety."
+                }
+              ]
+            },
+            {
+              "title": "Registered Phase 1 Trial Without Published Results",
+              "entries": [
+                {
+                  "type": "content",
+                  "value": "A Phase 1 study in healthy volunteers, PCO-02 (ClinicalTrials.gov NCT02637284, sponsor PharmaCotherapia), was registered in December 2015 to assess the safety and pharmacokinetics of BPC-157 oral tablets against placebo, with a single-administration part and a two-week repeated-administration part and an estimated enrollment of 42. The registry record was last updated in December 2015, its status is listed as unknown, and no results are posted. FDA’s July 2026 briefing document states that FDA was unable to find an associated published study."
+                }
+              ]
+            },
+            {
+              "title": "Current Status",
+              "entries": [
+                {
+                  "type": "content",
+                  "value": "Published human data on BPC-157 are limited to a few small, short studies. Most had no control group; the two placebo-controlled studies FDA identified (rectal enemas in healthy volunteers and in people with ulcerative colitis) are available only as meeting abstracts. A 2026 systematic review (Poolton et al., Acta Orthopaedica Belgica; PMID 42885452) rated the overall certainty of evidence as very low. FDA’s July 2026 briefing document concluded that there is insufficient clinical safety information to characterize the safety profile of BPC-157 (free base) and BPC-157 acetate. Until controlled human trials are published, any human use is experimental."
+                }
+              ]
+            }
+          ]
+        },
+        "regulatory_subsections": {
+          "old_values": [
+            [
+              {
+                "title": "Current Approval Status",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "As of now, no country has approved BPC-157 as a prescription drug. It's not available through legitimate pharmacies for medical use. The peptide is officially designated for research use only."
+                  }
+                ]
+              },
+              {
+                "title": "United States",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "The U.S. Food and Drug Administration (FDA) has taken action against companies marketing BPC-157 as a dietary supplement, stating it does not meet the definition of a legal supplement ingredient. There is also no legal basis for compounding pharmacies to include BPC-157 in medications, though regulatory agencies have found some clinics doing so illegally.\n\nAny product being sold is unregulated. Many websites sell BPC-157 as a \"research chemical\" with disclaimers that it's not for human use. This grey market means quality control is questionable – products might not contain the stated dose or could have impurities."
+                  }
+                ]
+              },
+              {
+                "title": "World Anti-Doping Agency (WADA)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "WADA has banned BPC-157 for athletes under the class of \"S0: Non-approved substances.\" This means athletes can face sanctions if caught using it in sport. The ban signals that BPC-157 is considered experimental and not recognized as a legitimate medication."
+                  }
+                ]
+              },
+              {
+                "title": "Animal Safety Data",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "One attractive feature of BPC-157 in research is its apparently favorable safety profile in animals. Toxicology studies have found no lethal dose even at extremely high amounts:"
+                  },
+                  {
+                    "type": "item",
+                    "value": "In rats, a single injection of 20 mg per kilogram (a massive dose for a peptide) caused no deaths or obvious toxic effects"
+                  },
+                  {
+                    "type": "item",
+                    "value": "In dogs, daily injections for a month at doses up to 1 mg/kg showed no significant adverse effects compared to control animals"
+                  },
+                  {
+                    "type": "item",
+                    "value": "Studies reported no changes in body weight, behavior, or organ health attributable to BPC-157"
+                  }
+                ]
+              },
+              {
+                "title": "Theoretical Concerns",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "The most prominent theoretical concern is BPC-157's ability to promote growth factors and blood vessel formation. While beneficial for healing injuries, this raises a question: could BPC-157 unintentionally help existing cancer cells grow or spread? Cancerous tumors often exploit the same pathways (like FAK/paxillin and VEGF) to invade tissues and nourish themselves with blood supply.\n\nThis idea is currently theoretical – no study has shown BPC-157 causes cancer in animals or humans. In fact, one lab test showed BPC-157 inhibited growth of a particular cancer cell line in culture. Nonetheless, experts urge caution until more is known about long-term effects."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "title": "Current Approval Status",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "As of now, no country has approved BPC-157 as a prescription drug. It's not available through legitimate pharmacies for medical use. The peptide is officially designated for research use only."
+                  }
+                ]
+              },
+              {
+                "title": "United States",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "The U.S. Food and Drug Administration (FDA) has taken action against companies marketing BPC-157 as a dietary supplement, stating it does not meet the definition of a legal supplement ingredient. As of 19 October 2026, BPC-157 is not on the 503A Bulks List (21 CFR 216.23), and no FDA policy permitting its use in compounding has been published. FDA has also found some clinics compounding it. See \"U.S. regulatory status — compounding review\" below for the July 2026 advisory committee meeting and the October 2026 interim policy submitted for OIRA review.\n\nProducts sold as \"research chemicals\" are not FDA-regulated drugs. Many websites sell BPC-157 with disclaimers that it is not for human use. This grey market means quality control is questionable: products might not contain the stated amount or could have impurities."
+                  }
+                ]
+              },
+              {
+                "title": "U.S. regulatory status — compounding review (as of 19 October 2026)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "BPC-157 is not an FDA-approved drug, and no FDA policy permitting its use in compounding has been published as of 19 October 2026. In 2026 two separate U.S. steps concerned BPC-157 and compounding: an advisory committee vote in July and an interim policy sent for White House review in October. Neither one approves BPC-157 or makes it lawful to compound."
+                  },
+                  {
+                    "type": "content",
+                    "value": "Pharmacy Compounding Advisory Committee (23 July 2026). FDA's Pharmacy Compounding Advisory Committee (PCAC) met on 23–24 July 2026. On 23 July it considered BPC-157 (free base) and BPC-157 acetate for the list of bulk drug substances that may be used in compounding under section 503A of the FD&C Act (the \"503A Bulks List\"). FDA evaluated both forms for ulcerative colitis. FDA's published voting questions were: \"Should BPC-157 (free base) be placed on the list?\" and \"Should BPC-157 acetate be placed on the list?\" In its briefing document, FDA proposed that neither BPC-157 (free base) nor BPC-157 acetate be included on the 503A Bulks List. FDA states that advisory committee recommendations are non-binding. Reuters reported on 15 October 2026 that the advisers had recommended FDA loosen restrictions on six of the seven peptides reviewed in July, including BPC-157. As of 19 October 2026, FDA has not posted official minutes or vote tallies on the meeting page, so this entry gives no vote counts. The 503A Bulks List (21 CFR 216.23) has not been amended to include BPC-157."
+                  },
+                  {
+                    "type": "content",
+                    "value": "Interim access policy under OIRA review (received 14 October 2026). OMB's Office of Information and Regulatory Affairs (OIRA) lists a pending Executive Order 12866 review with these details (reginfo.gov, checked 19 October 2026; status \"Pending EO 12866 Regulatory Review\"). Title: \"Interim Access Policy for Compounding Using Certain Peptides\". Agency/Subagency: HHS / FDA. RIN: 0910-ZD94. Stage: Notice. Received Date: 10/14/2026. Legal Deadline: None. Economically Significant: No. The listing does not name any peptides and does not include the policy text. As of 19 October 2026, no matching Federal Register document and no FDA press announcement were found. Reuters, citing an Associated Press report based on two unnamed people, reported that the policy would allow some popular peptides, including BPC-157, to be compounded. That is a press report and has not been confirmed in any published text. Reginfo.gov lists three EO 12866 meetings on this review, on 21, 23 and 27 October 2026 (checked 22 October 2026); the 21 October meeting was requested by the American Academy of Peptide Medicine. EO 12866 meetings let outside parties present their views to OIRA while a review is pending; a scheduled meeting is not a decision and does not indicate the outcome."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Not an approval: neither the PCAC vote nor the OIRA submission is FDA approval of BPC-157 for any use."
+                  },
+                  {
+                    "type": "item",
+                    "value": "No published text: the policy text has not been released, and no Federal Register notice has been located."
+                  },
+                  {
+                    "type": "item",
+                    "value": "No effective or start date: none has been announced."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Scope unknown: the OIRA listing does not say which peptides would be covered."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Review is not a final policy: an OIRA review is a step before publication. The policy may be changed, withdrawn, or published in a different form."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Other status lines are unchanged: on FDA's \"Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks\" page (content current as of 22 April 2026), BPC-157 is listed as nominated but withdrawn. BPC-157 remains on WADA's S0 (non-approved substances) list."
+                  }
+                ]
+              },
+              {
+                "title": "World Anti-Doping Agency (WADA)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "WADA has banned BPC-157 for athletes under the class of \"S0: Non-approved substances.\" This means athletes can face sanctions if caught using it in sport. The ban signals that BPC-157 is considered experimental and not recognized as a legitimate medication."
+                  }
+                ]
+              },
+              {
+                "title": "Animal Safety Data",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "One attractive feature of BPC-157 in research is its apparently favorable safety profile in animals. Toxicology studies have found no lethal dose even at extremely high amounts:"
+                  },
+                  {
+                    "type": "item",
+                    "value": "In rats, a single injection of 20 mg per kilogram (a massive dose for a peptide) caused no deaths or obvious toxic effects"
+                  },
+                  {
+                    "type": "item",
+                    "value": "In dogs, daily injections for a month at doses up to 1 mg/kg showed no significant adverse effects compared to control animals"
+                  },
+                  {
+                    "type": "item",
+                    "value": "Studies reported no changes in body weight, behavior, or organ health attributable to BPC-157"
+                  }
+                ]
+              },
+              {
+                "title": "Theoretical Concerns",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "The most prominent theoretical concern is BPC-157's ability to promote growth factors and blood vessel formation. While beneficial for healing injuries, this raises a question: could BPC-157 unintentionally help existing cancer cells grow or spread? Cancerous tumors often exploit the same pathways (like FAK/paxillin and VEGF) to invade tissues and nourish themselves with blood supply.\n\nThis idea is currently theoretical – no study has shown BPC-157 causes cancer in animals or humans. In fact, one lab test showed BPC-157 inhibited growth of a particular cancer cell line in culture. Nonetheless, experts urge caution until more is known about long-term effects."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "title": "Current Approval Status",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "As of now, no country has approved BPC-157 as a prescription drug. It's not available through legitimate pharmacies for medical use. The peptide is officially designated for research use only."
+                  }
+                ]
+              },
+              {
+                "title": "United States",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "The U.S. Food and Drug Administration (FDA) has taken action against companies marketing BPC-157 as a dietary supplement, stating it does not meet the definition of a legal supplement ingredient. As of 19 October 2026, BPC-157 is not on the 503A Bulks List (21 CFR 216.23), and no FDA policy permitting its use in compounding has been published. FDA has also found some clinics compounding it. See \"U.S. regulatory status — compounding review\" below for the July 2026 advisory committee meeting and the October 2026 interim policy submitted for OIRA review.\n\nProducts sold as \"research chemicals\" are not FDA-regulated drugs. Many websites sell BPC-157 with disclaimers that it is not for human use. This grey market means quality control is questionable: products might not contain the stated amount or could have impurities."
+                  }
+                ]
+              },
+              {
+                "title": "U.S. regulatory status — compounding review (as of 19 October 2026)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "BPC-157 is not an FDA-approved drug, and no FDA policy permitting its use in compounding has been published as of 19 October 2026. In 2026 two separate U.S. steps concerned BPC-157 and compounding: an advisory committee vote in July and an interim policy sent for White House review in October. Neither one approves BPC-157 or makes it lawful to compound."
+                  },
+                  {
+                    "type": "content",
+                    "value": "Pharmacy Compounding Advisory Committee (23 July 2026). FDA's Pharmacy Compounding Advisory Committee (PCAC) met on 23–24 July 2026. On 23 July it considered BPC-157 (free base) and BPC-157 acetate for the list of bulk drug substances that may be used in compounding under section 503A of the FD&C Act (the \"503A Bulks List\"). FDA evaluated both forms for ulcerative colitis. FDA's published voting questions were: \"Should BPC-157 (free base) be placed on the list?\" and \"Should BPC-157 acetate be placed on the list?\" In its briefing document, FDA proposed that neither BPC-157 (free base) nor BPC-157 acetate be included on the 503A Bulks List. FDA states that advisory committee recommendations are non-binding. Reuters reported on 15 October 2026 that the advisers had recommended FDA loosen restrictions on six of the seven peptides reviewed in July, including BPC-157. As of 19 October 2026, FDA has not posted official minutes or vote tallies on the meeting page, so this entry gives no vote counts. The 503A Bulks List (21 CFR 216.23) has not been amended to include BPC-157."
+                  },
+                  {
+                    "type": "content",
+                    "value": "Interim access policy under OIRA review (received 14 October 2026). OMB's Office of Information and Regulatory Affairs (OIRA) lists a pending Executive Order 12866 review with these details (reginfo.gov, checked 19 October 2026; status \"Pending EO 12866 Regulatory Review\"). Title: \"Interim Access Policy for Compounding Using Certain Peptides\". Agency/Subagency: HHS / FDA. RIN: 0910-ZD94. Stage: Notice. Received Date: 10/14/2026. Legal Deadline: None. Economically Significant: No. The listing does not name any peptides and does not include the policy text. As of 19 October 2026, no matching Federal Register document and no FDA press announcement were found. Reuters, citing an Associated Press report based on two unnamed people, reported that the policy would allow some popular peptides, including BPC-157, to be compounded. That is a press report and has not been confirmed in any published text. Reginfo.gov lists three EO 12866 meetings on this review, on 21, 23 and 27 October 2026 (checked 22 October 2026); the 21 October meeting was requested by the American Academy of Peptide Medicine. EO 12866 meetings let outside parties present their views to OIRA while a review is pending; a scheduled meeting is not a decision and does not indicate the outcome."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Not an approval: neither the PCAC vote nor the OIRA submission is FDA approval of BPC-157 for any use."
+                  },
+                  {
+                    "type": "item",
+                    "value": "No published text: the policy text has not been released, and no Federal Register notice has been located."
+                  },
+                  {
+                    "type": "item",
+                    "value": "No effective or start date: none has been announced."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Scope unknown: the OIRA listing does not say which peptides would be covered."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Review is not a final policy: an OIRA review is a step before publication. The policy may be changed, withdrawn, or published in a different form."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Other status lines are unchanged: on FDA's \"Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks\" page (content current as of 22 April 2026), BPC-157 is listed as nominated but withdrawn. BPC-157 remains on WADA's S0 (non-approved substances) list."
+                  }
+                ]
+              },
+              {
+                "title": "World Anti-Doping Agency (WADA)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "WADA has banned BPC-157 for athletes under the class of \"S0: Non-approved substances.\" This means athletes can face sanctions if caught using it in sport. The ban signals that BPC-157 is considered experimental and not recognized as a legitimate medication."
+                  }
+                ]
+              },
+              {
+                "title": "Animal Safety Data",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "One attractive feature of BPC-157 in research is its apparently favorable safety profile in animals. Toxicology studies have found no lethal dose even at extremely high amounts:"
+                  },
+                  {
+                    "type": "item",
+                    "value": "In rats, a single injection of 20 mg per kilogram (a massive dose for a peptide) caused no deaths or obvious toxic effects"
+                  },
+                  {
+                    "type": "item",
+                    "value": "In dogs, daily injections for a month at doses up to 1 mg/kg showed no significant adverse effects compared to control animals"
+                  },
+                  {
+                    "type": "item",
+                    "value": "Studies reported no changes in body weight, behavior, or organ health attributable to BPC-157"
+                  }
+                ]
+              },
+              {
+                "title": "Theoretical Concerns",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "The most prominent theoretical concern is BPC-157's ability to promote growth factors and blood vessel formation. While beneficial for healing injuries, this raises a question: could BPC-157 unintentionally help existing cancer cells grow or spread? Cancerous tumors often exploit the same pathways (like FAK/paxillin and VEGF) to invade tissues and nourish themselves with blood supply.\n\nThis idea is currently theoretical – no study has shown BPC-157 causes cancer in animals or humans. In fact, one lab test showed BPC-157 inhibited growth of a particular cancer cell line in culture. Nonetheless, experts urge caution until more is known about long-term effects."
+                  }
+                ]
+              },
+              {
+                "title": "Australia (as of 22 October 2026)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "NSW Health reported (19 Oct 2026) 1,180 presentations to NSW emergency departments associated with peptide use between 1 July 2025 and 30 September 2026. The release does not break this figure down by peptide. The release names BPC-157 among the peptides that products may claim to contain and states: \"None of these peptides are currently approved in Australia for any purpose.\""
+                  },
+                  {
+                    "type": "content",
+                    "value": "Poisons Standard (October 2026; F2026L01327; in force from 1 October 2026): BPC-157 is a named Schedule 4 entry (prescription only medicines) and is listed in Appendix D, clause 5, item 5 (\"Poisons for which possession without authority is illegal\"). Scheduling is implemented through State and Territory legislation."
+                  }
+                ]
+              }
+            ]
+          ],
+          "labels": [
+            "live",
+            "after #65 op0 (16/19 Oct re-apply)",
+            "after #65 op0+AU (normal #65 result)"
+          ],
+          "target_values": [
+            [
+              {
+                "title": "Current Approval Status",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "As of now, no country has approved BPC-157 as a prescription drug. It's not available through legitimate pharmacies for medical use. The peptide is officially designated for research use only."
+                  }
+                ]
+              },
+              {
+                "title": "United States",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "The U.S. Food and Drug Administration (FDA) has taken action against companies marketing BPC-157 as a dietary supplement, stating it does not meet the definition of a legal supplement ingredient. There is also no legal basis for compounding pharmacies to include BPC-157 in medications, though regulatory agencies have found some clinics doing so illegally.\n\nAny product being sold is unregulated. Many websites sell BPC-157 as a \"research chemical\" with disclaimers that it's not for human use. This grey market means quality control is questionable – products might not contain the stated dose or could have impurities."
+                  }
+                ]
+              },
+              {
+                "title": "World Anti-Doping Agency (WADA)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "WADA has banned BPC-157 for athletes under the class of \"S0: Non-approved substances.\" This means athletes can face sanctions if caught using it in sport. The ban signals that BPC-157 is considered experimental and not recognized as a legitimate medication."
+                  }
+                ]
+              },
+              {
+                "title": "Animal Toxicology Data",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Published animal toxicology data on BPC-157 are limited. FDA’s July 2026 briefing document for its Pharmacy Compounding Advisory Committee summarizes one published set of studies (Xu et al. 2020, Regulatory Toxicology and Pharmacology; PMID 32334036; by a group developing BPC-157 as a drug, developer-affiliated) in which rats and dogs were given BPC-157 (free base) by intramuscular injection:"
+                  },
+                  {
+                    "type": "item",
+                    "value": "Single-administration study in rats and dogs: the authors reported no signs of acute toxicity and no histopathological changes in various organs 14 days after treatment."
+                  },
+                  {
+                    "type": "item",
+                    "value": "28-day studies in rats and dogs (once-daily treatment at three levels, saline-treated controls, 14-day recovery period): the authors reported no significant effects on body weight, behavior, survival or organ histopathology, but FDA notes that the histopathological data are not included in the article. FDA’s reading is that the 28-day treatment appeared to be associated with clinically relevant safety signals, including altered clotting measures (aPTT) and liver-associated signals (increased serum ALT, glucose and triglyceride levels)."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Gaps identified by FDA: no carcinogenicity studies, no longer-term repeated-treatment studies, and no toxicity or pharmacokinetic studies by the oral, rectal, subcutaneous or nasal routes nominated for compounding. FDA states that intramuscular results cannot be used to estimate no-adverse-effect levels for those other routes."
+                  }
+                ]
+              },
+              {
+                "title": "Theoretical Concerns",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Animal and cell studies have reported that BPC-157 may increase growth-factor signalling and blood-vessel formation (angiogenesis). Because tumours also use these pathways, some researchers have raised a theoretical question about effects on existing cancers. This has not been tested: FDA’s July 2026 briefing document states that FDA did not identify any carcinogenicity studies of BPC-157 (free base) or BPC-157 acetate. The cancer risk is therefore unknown, not ruled out."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "title": "Current Approval Status",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "As of now, no country has approved BPC-157 as a prescription drug. It's not available through legitimate pharmacies for medical use. The peptide is officially designated for research use only."
+                  }
+                ]
+              },
+              {
+                "title": "United States",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "The U.S. Food and Drug Administration (FDA) has taken action against companies marketing BPC-157 as a dietary supplement, stating it does not meet the definition of a legal supplement ingredient. As of 19 October 2026, BPC-157 is not on the 503A Bulks List (21 CFR 216.23), and no FDA policy permitting its use in compounding has been published. FDA has also found some clinics compounding it. See \"U.S. regulatory status — compounding review\" below for the July 2026 advisory committee meeting and the October 2026 interim policy submitted for OIRA review.\n\nProducts sold as \"research chemicals\" are not FDA-regulated drugs. Many websites sell BPC-157 with disclaimers that it is not for human use. This grey market means quality control is questionable: products might not contain the stated amount or could have impurities."
+                  }
+                ]
+              },
+              {
+                "title": "U.S. regulatory status — compounding review (as of 19 October 2026)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "BPC-157 is not an FDA-approved drug, and no FDA policy permitting its use in compounding has been published as of 19 October 2026. In 2026 two separate U.S. steps concerned BPC-157 and compounding: an advisory committee vote in July and an interim policy sent for White House review in October. Neither one approves BPC-157 or makes it lawful to compound."
+                  },
+                  {
+                    "type": "content",
+                    "value": "Pharmacy Compounding Advisory Committee (23 July 2026). FDA's Pharmacy Compounding Advisory Committee (PCAC) met on 23–24 July 2026. On 23 July it considered BPC-157 (free base) and BPC-157 acetate for the list of bulk drug substances that may be used in compounding under section 503A of the FD&C Act (the \"503A Bulks List\"). FDA evaluated both forms for ulcerative colitis. FDA's published voting questions were: \"Should BPC-157 (free base) be placed on the list?\" and \"Should BPC-157 acetate be placed on the list?\" In its briefing document, FDA proposed that neither BPC-157 (free base) nor BPC-157 acetate be included on the 503A Bulks List. FDA states that advisory committee recommendations are non-binding. Reuters reported on 15 October 2026 that the advisers had recommended FDA loosen restrictions on six of the seven peptides reviewed in July, including BPC-157. As of 19 October 2026, FDA has not posted official minutes or vote tallies on the meeting page, so this entry gives no vote counts. The 503A Bulks List (21 CFR 216.23) has not been amended to include BPC-157."
+                  },
+                  {
+                    "type": "content",
+                    "value": "Interim access policy under OIRA review (received 14 October 2026). OMB's Office of Information and Regulatory Affairs (OIRA) lists a pending Executive Order 12866 review with these details (reginfo.gov, checked 19 October 2026; status \"Pending EO 12866 Regulatory Review\"). Title: \"Interim Access Policy for Compounding Using Certain Peptides\". Agency/Subagency: HHS / FDA. RIN: 0910-ZD94. Stage: Notice. Received Date: 10/14/2026. Legal Deadline: None. Economically Significant: No. The listing does not name any peptides and does not include the policy text. As of 19 October 2026, no matching Federal Register document and no FDA press announcement were found. Reuters, citing an Associated Press report based on two unnamed people, reported that the policy would allow some popular peptides, including BPC-157, to be compounded. That is a press report and has not been confirmed in any published text. Reginfo.gov lists three EO 12866 meetings on this review, on 21, 23 and 27 October 2026 (checked 22 October 2026); the 21 October meeting was requested by the American Academy of Peptide Medicine. EO 12866 meetings let outside parties present their views to OIRA while a review is pending; a scheduled meeting is not a decision and does not indicate the outcome."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Not an approval: neither the PCAC vote nor the OIRA submission is FDA approval of BPC-157 for any use."
+                  },
+                  {
+                    "type": "item",
+                    "value": "No published text: the policy text has not been released, and no Federal Register notice has been located."
+                  },
+                  {
+                    "type": "item",
+                    "value": "No effective or start date: none has been announced."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Scope unknown: the OIRA listing does not say which peptides would be covered."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Review is not a final policy: an OIRA review is a step before publication. The policy may be changed, withdrawn, or published in a different form."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Other status lines are unchanged: on FDA's \"Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks\" page (content current as of 22 April 2026), BPC-157 is listed as nominated but withdrawn. BPC-157 remains on WADA's S0 (non-approved substances) list."
+                  }
+                ]
+              },
+              {
+                "title": "World Anti-Doping Agency (WADA)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "WADA has banned BPC-157 for athletes under the class of \"S0: Non-approved substances.\" This means athletes can face sanctions if caught using it in sport. The ban signals that BPC-157 is considered experimental and not recognized as a legitimate medication."
+                  }
+                ]
+              },
+              {
+                "title": "Animal Toxicology Data",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Published animal toxicology data on BPC-157 are limited. FDA’s July 2026 briefing document for its Pharmacy Compounding Advisory Committee summarizes one published set of studies (Xu et al. 2020, Regulatory Toxicology and Pharmacology; PMID 32334036; by a group developing BPC-157 as a drug, developer-affiliated) in which rats and dogs were given BPC-157 (free base) by intramuscular injection:"
+                  },
+                  {
+                    "type": "item",
+                    "value": "Single-administration study in rats and dogs: the authors reported no signs of acute toxicity and no histopathological changes in various organs 14 days after treatment."
+                  },
+                  {
+                    "type": "item",
+                    "value": "28-day studies in rats and dogs (once-daily treatment at three levels, saline-treated controls, 14-day recovery period): the authors reported no significant effects on body weight, behavior, survival or organ histopathology, but FDA notes that the histopathological data are not included in the article. FDA’s reading is that the 28-day treatment appeared to be associated with clinically relevant safety signals, including altered clotting measures (aPTT) and liver-associated signals (increased serum ALT, glucose and triglyceride levels)."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Gaps identified by FDA: no carcinogenicity studies, no longer-term repeated-treatment studies, and no toxicity or pharmacokinetic studies by the oral, rectal, subcutaneous or nasal routes nominated for compounding. FDA states that intramuscular results cannot be used to estimate no-adverse-effect levels for those other routes."
+                  }
+                ]
+              },
+              {
+                "title": "Theoretical Concerns",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Animal and cell studies have reported that BPC-157 may increase growth-factor signalling and blood-vessel formation (angiogenesis). Because tumours also use these pathways, some researchers have raised a theoretical question about effects on existing cancers. This has not been tested: FDA’s July 2026 briefing document states that FDA did not identify any carcinogenicity studies of BPC-157 (free base) or BPC-157 acetate. The cancer risk is therefore unknown, not ruled out."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "title": "Current Approval Status",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "As of now, no country has approved BPC-157 as a prescription drug. It's not available through legitimate pharmacies for medical use. The peptide is officially designated for research use only."
+                  }
+                ]
+              },
+              {
+                "title": "United States",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "The U.S. Food and Drug Administration (FDA) has taken action against companies marketing BPC-157 as a dietary supplement, stating it does not meet the definition of a legal supplement ingredient. As of 19 October 2026, BPC-157 is not on the 503A Bulks List (21 CFR 216.23), and no FDA policy permitting its use in compounding has been published. FDA has also found some clinics compounding it. See \"U.S. regulatory status — compounding review\" below for the July 2026 advisory committee meeting and the October 2026 interim policy submitted for OIRA review.\n\nProducts sold as \"research chemicals\" are not FDA-regulated drugs. Many websites sell BPC-157 with disclaimers that it is not for human use. This grey market means quality control is questionable: products might not contain the stated amount or could have impurities."
+                  }
+                ]
+              },
+              {
+                "title": "U.S. regulatory status — compounding review (as of 19 October 2026)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "BPC-157 is not an FDA-approved drug, and no FDA policy permitting its use in compounding has been published as of 19 October 2026. In 2026 two separate U.S. steps concerned BPC-157 and compounding: an advisory committee vote in July and an interim policy sent for White House review in October. Neither one approves BPC-157 or makes it lawful to compound."
+                  },
+                  {
+                    "type": "content",
+                    "value": "Pharmacy Compounding Advisory Committee (23 July 2026). FDA's Pharmacy Compounding Advisory Committee (PCAC) met on 23–24 July 2026. On 23 July it considered BPC-157 (free base) and BPC-157 acetate for the list of bulk drug substances that may be used in compounding under section 503A of the FD&C Act (the \"503A Bulks List\"). FDA evaluated both forms for ulcerative colitis. FDA's published voting questions were: \"Should BPC-157 (free base) be placed on the list?\" and \"Should BPC-157 acetate be placed on the list?\" In its briefing document, FDA proposed that neither BPC-157 (free base) nor BPC-157 acetate be included on the 503A Bulks List. FDA states that advisory committee recommendations are non-binding. Reuters reported on 15 October 2026 that the advisers had recommended FDA loosen restrictions on six of the seven peptides reviewed in July, including BPC-157. As of 19 October 2026, FDA has not posted official minutes or vote tallies on the meeting page, so this entry gives no vote counts. The 503A Bulks List (21 CFR 216.23) has not been amended to include BPC-157."
+                  },
+                  {
+                    "type": "content",
+                    "value": "Interim access policy under OIRA review (received 14 October 2026). OMB's Office of Information and Regulatory Affairs (OIRA) lists a pending Executive Order 12866 review with these details (reginfo.gov, checked 19 October 2026; status \"Pending EO 12866 Regulatory Review\"). Title: \"Interim Access Policy for Compounding Using Certain Peptides\". Agency/Subagency: HHS / FDA. RIN: 0910-ZD94. Stage: Notice. Received Date: 10/14/2026. Legal Deadline: None. Economically Significant: No. The listing does not name any peptides and does not include the policy text. As of 19 October 2026, no matching Federal Register document and no FDA press announcement were found. Reuters, citing an Associated Press report based on two unnamed people, reported that the policy would allow some popular peptides, including BPC-157, to be compounded. That is a press report and has not been confirmed in any published text. Reginfo.gov lists three EO 12866 meetings on this review, on 21, 23 and 27 October 2026 (checked 22 October 2026); the 21 October meeting was requested by the American Academy of Peptide Medicine. EO 12866 meetings let outside parties present their views to OIRA while a review is pending; a scheduled meeting is not a decision and does not indicate the outcome."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Not an approval: neither the PCAC vote nor the OIRA submission is FDA approval of BPC-157 for any use."
+                  },
+                  {
+                    "type": "item",
+                    "value": "No published text: the policy text has not been released, and no Federal Register notice has been located."
+                  },
+                  {
+                    "type": "item",
+                    "value": "No effective or start date: none has been announced."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Scope unknown: the OIRA listing does not say which peptides would be covered."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Review is not a final policy: an OIRA review is a step before publication. The policy may be changed, withdrawn, or published in a different form."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Other status lines are unchanged: on FDA's \"Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks\" page (content current as of 22 April 2026), BPC-157 is listed as nominated but withdrawn. BPC-157 remains on WADA's S0 (non-approved substances) list."
+                  }
+                ]
+              },
+              {
+                "title": "World Anti-Doping Agency (WADA)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "WADA has banned BPC-157 for athletes under the class of \"S0: Non-approved substances.\" This means athletes can face sanctions if caught using it in sport. The ban signals that BPC-157 is considered experimental and not recognized as a legitimate medication."
+                  }
+                ]
+              },
+              {
+                "title": "Animal Toxicology Data",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Published animal toxicology data on BPC-157 are limited. FDA’s July 2026 briefing document for its Pharmacy Compounding Advisory Committee summarizes one published set of studies (Xu et al. 2020, Regulatory Toxicology and Pharmacology; PMID 32334036; by a group developing BPC-157 as a drug, developer-affiliated) in which rats and dogs were given BPC-157 (free base) by intramuscular injection:"
+                  },
+                  {
+                    "type": "item",
+                    "value": "Single-administration study in rats and dogs: the authors reported no signs of acute toxicity and no histopathological changes in various organs 14 days after treatment."
+                  },
+                  {
+                    "type": "item",
+                    "value": "28-day studies in rats and dogs (once-daily treatment at three levels, saline-treated controls, 14-day recovery period): the authors reported no significant effects on body weight, behavior, survival or organ histopathology, but FDA notes that the histopathological data are not included in the article. FDA’s reading is that the 28-day treatment appeared to be associated with clinically relevant safety signals, including altered clotting measures (aPTT) and liver-associated signals (increased serum ALT, glucose and triglyceride levels)."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Gaps identified by FDA: no carcinogenicity studies, no longer-term repeated-treatment studies, and no toxicity or pharmacokinetic studies by the oral, rectal, subcutaneous or nasal routes nominated for compounding. FDA states that intramuscular results cannot be used to estimate no-adverse-effect levels for those other routes."
+                  }
+                ]
+              },
+              {
+                "title": "Theoretical Concerns",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Animal and cell studies have reported that BPC-157 may increase growth-factor signalling and blood-vessel formation (angiogenesis). Because tumours also use these pathways, some researchers have raised a theoretical question about effects on existing cancers. This has not been tested: FDA’s July 2026 briefing document states that FDA did not identify any carcinogenicity studies of BPC-157 (free base) or BPC-157 acetate. The cancer risk is therefore unknown, not ruled out."
+                  }
+                ]
+              },
+              {
+                "title": "Australia (as of 22 October 2026)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "NSW Health reported (19 Oct 2026) 1,180 presentations to NSW emergency departments associated with peptide use between 1 July 2025 and 30 September 2026. The release does not break this figure down by peptide. The release names BPC-157 among the peptides that products may claim to contain and states: \"None of these peptides are currently approved in Australia for any purpose.\""
+                  },
+                  {
+                    "type": "content",
+                    "value": "Poisons Standard (October 2026; F2026L01327; in force from 1 October 2026): BPC-157 is a named Schedule 4 entry (prescription only medicines) and is listed in Appendix D, clause 5, item 5 (\"Poisons for which possession without authority is illegal\"). Scheduling is implemented through State and Territory legislation."
+                  }
+                ]
+              }
+            ]
+          ],
+          "op": "Two in-place replacements, each guarded. (1) Find the subsection whose title is exactly \"Animal Safety Data\" (must be exactly one, and normalize-equal to old_subsection); replace it in place with new_subsection. (2) Find the subsection whose title is exactly \"Theoretical Concerns\" (must be exactly one, and normalize-equal to old_theoretical_concerns); replace it in place with new_theoretical_concerns (title unchanged; source: FDA briefing p.39, no carcinogenicity studies). If either precondition fails, warn and leave the whole column unchanged. Every other subsection byte-for-byte.",
+          "old_subsection": {
+            "title": "Animal Safety Data",
+            "entries": [
+              {
+                "type": "content",
+                "value": "One attractive feature of BPC-157 in research is its apparently favorable safety profile in animals. Toxicology studies have found no lethal dose even at extremely high amounts:"
+              },
+              {
+                "type": "item",
+                "value": "In rats, a single injection of 20 mg per kilogram (a massive dose for a peptide) caused no deaths or obvious toxic effects"
+              },
+              {
+                "type": "item",
+                "value": "In dogs, daily injections for a month at doses up to 1 mg/kg showed no significant adverse effects compared to control animals"
+              },
+              {
+                "type": "item",
+                "value": "Studies reported no changes in body weight, behavior, or organ health attributable to BPC-157"
+              }
+            ]
+          },
+          "new_subsection": {
+            "title": "Animal Toxicology Data",
+            "entries": [
+              {
+                "type": "content",
+                "value": "Published animal toxicology data on BPC-157 are limited. FDA’s July 2026 briefing document for its Pharmacy Compounding Advisory Committee summarizes one published set of studies (Xu et al. 2020, Regulatory Toxicology and Pharmacology; PMID 32334036; by a group developing BPC-157 as a drug, developer-affiliated) in which rats and dogs were given BPC-157 (free base) by intramuscular injection:"
+              },
+              {
+                "type": "item",
+                "value": "Single-administration study in rats and dogs: the authors reported no signs of acute toxicity and no histopathological changes in various organs 14 days after treatment."
+              },
+              {
+                "type": "item",
+                "value": "28-day studies in rats and dogs (once-daily treatment at three levels, saline-treated controls, 14-day recovery period): the authors reported no significant effects on body weight, behavior, survival or organ histopathology, but FDA notes that the histopathological data are not included in the article. FDA’s reading is that the 28-day treatment appeared to be associated with clinically relevant safety signals, including altered clotting measures (aPTT) and liver-associated signals (increased serum ALT, glucose and triglyceride levels)."
+              },
+              {
+                "type": "item",
+                "value": "Gaps identified by FDA: no carcinogenicity studies, no longer-term repeated-treatment studies, and no toxicity or pharmacokinetic studies by the oral, rectal, subcutaneous or nasal routes nominated for compounding. FDA states that intramuscular results cannot be used to estimate no-adverse-effect levels for those other routes."
+              }
+            ]
+          },
+          "old_theoretical_concerns": {
+            "title": "Theoretical Concerns",
+            "entries": [
+              {
+                "type": "content",
+                "value": "The most prominent theoretical concern is BPC-157's ability to promote growth factors and blood vessel formation. While beneficial for healing injuries, this raises a question: could BPC-157 unintentionally help existing cancer cells grow or spread? Cancerous tumors often exploit the same pathways (like FAK/paxillin and VEGF) to invade tissues and nourish themselves with blood supply.\n\nThis idea is currently theoretical – no study has shown BPC-157 causes cancer in animals or humans. In fact, one lab test showed BPC-157 inhibited growth of a particular cancer cell line in culture. Nonetheless, experts urge caution until more is known about long-term effects."
+              }
+            ]
+          },
+          "new_theoretical_concerns": {
+            "title": "Theoretical Concerns",
+            "entries": [
+              {
+                "type": "content",
+                "value": "Animal and cell studies have reported that BPC-157 may increase growth-factor signalling and blood-vessel formation (angiogenesis). Because tumours also use these pathways, some researchers have raised a theoretical question about effects on existing cancers. This has not been tested: FDA’s July 2026 briefing document states that FDA did not identify any carcinogenicity studies of BPC-157 (free base) or BPC-157 acetate. The cancer risk is therefore unknown, not ruled out."
+              }
+            ]
+          }
+        },
+        "preclinical_subsections": {
+          "old_values": [
+            [
+              {
+                "title": "Musculoskeletal Tissue Research",
+                "findings": [
+                  {
+                    "title": "Wound and Muscle Healing",
+                    "content": "Animal studies demonstrate accelerated healing of skin incisions and muscle tears when BPC-157 is applied. In rats with partially torn or crushed muscles, treated animals showed quicker healing and more complete muscle fiber regeneration compared to untreated controls in various research summaries."
+                  },
+                  {
+                    "title": "Tendon and Ligament Repair",
+                    "content": "Some of the most robust data comes from tendon injury models. A study published in the Journal of Applied Physiology showed that BPC-157 dramatically improved healing of transected (cut) Achilles tendons in rats. Treated tendons exhibited better strength, structure, and cell survival with less inflammation.\n\nAdditional experiments demonstrated accelerated healing of damaged knee ligaments and increased outgrowth of tendon cells, suggesting the peptide can stimulate cells to rebuild connective tissue. Researchers observed that even without additional growth factors, BPC-157 alone enhanced tendon cell migration and viability at injury sites."
+                  },
+                  {
+                    "title": "Bone Healing",
+                    "content": "A study in rabbits with non-healing bone defects found that local BPC-157 treatment was as effective as bone graft surgery in mending the defect. The peptide-treated rabbits showed new bone formation bridging the gap, similar to rabbits that received bone tissue transplants, suggesting BPC-157 may trigger regenerative processes in bone tissue."
+                  }
+                ]
+              },
+              {
+                "title": "Gastrointestinal Research",
+                "findings": [
+                  {
+                    "title": "Gastric Protection",
+                    "content": "BPC-157 was initially studied as a \"cytoprotective\" agent in the stomach, meaning it can protect stomach cells from injury. In rat studies, BPC-157 demonstrated the ability to prevent and heal stomach ulcers, including ulcers caused by NSAID painkillers, which are known for eroding the stomach lining. The peptide also protected the GI tract from alcohol-induced damage."
+                  },
+                  {
+                    "title": "Inflammatory Bowel Disease Models",
+                    "content": "Beyond the stomach, BPC-157 showed benefits in inflammatory bowel disease models. Rats with ulcerative colitis (a severe gut inflammation) recovered faster and had reduced intestinal damage when given BPC-157. A preliminary clinical trial in people with ulcerative colitis reported positive results, though full details have not been published."
+                  }
+                ]
+              },
+              {
+                "title": "Other Organ Systems",
+                "findings": [
+                  {
+                    "title": "Anti-Inflammatory Effects",
+                    "content": "In rat models of induced inflammatory arthritis, animals treated with BPC-157 had reduced joint swelling, less inflammatory cell buildup, and better preserved joint function than untreated rats. The peptide appeared to protect joints from autoimmune damage."
+                  },
+                  {
+                    "title": "Neuroprotection",
+                    "content": "BPC-157 has shown promise as a neuroprotective compound in animal studies. It helped preserve brain cells in rodent experiments of traumatic brain injury and stroke, and produced antidepressant-like effects in a rat model of chronic stress. Rats with symptoms of depression or anxiety exhibited improved behaviors after BPC-157 treatment, correlating with modulation of serotonin and dopamine systems."
+                  },
+                  {
+                    "title": "Organ Protection",
+                    "content": "In laboratory rodents, BPC-157 reduced damage to the liver caused by toxic chemicals and improved survival in cases of acute liver failure. Similarly, it lessened heart muscle damage in animal models of certain cardiac injuries, suggesting potential cardio-protective effects."
+                  }
+                ]
+              }
+            ]
+          ],
+          "labels": [
+            "live (#65 does not touch this column)"
+          ],
+          "target_values": [
+            [
+              {
+                "title": "Musculoskeletal Tissue Research",
+                "findings": [
+                  {
+                    "title": "Wound and Muscle Healing",
+                    "content": "Animal studies demonstrate accelerated healing of skin incisions and muscle tears when BPC-157 is applied. In rats with partially torn or crushed muscles, treated animals showed quicker healing and more complete muscle fiber regeneration compared to untreated controls in various research summaries."
+                  },
+                  {
+                    "title": "Tendon and Ligament Repair",
+                    "content": "In a rat model of transected (cut) Achilles tendon, a study by the Zagreb group that first described BPC-157 (Staresinic et al. 2003, Journal of Orthopaedic Research; PMID 14554208; developer-affiliated) reported better functional, biomechanical and microscopic healing measures in treated rats than in controls. A separate laboratory study (Chang et al. 2011, Journal of Applied Physiology; PMID 21030672) used rat tendon explants and cultured tendon cells and reported more tendon-cell outgrowth, better cell survival under oxidative stress and more cell migration.\n\nThese are animal and cell findings. They have not been tested in controlled human trials."
+                  },
+                  {
+                    "title": "Bone Healing",
+                    "content": "A study in rabbits with non-healing bone defects found that local BPC-157 treatment was as effective as bone graft surgery in mending the defect. The peptide-treated rabbits showed new bone formation bridging the gap, similar to rabbits that received bone tissue transplants, suggesting BPC-157 may trigger regenerative processes in bone tissue."
+                  }
+                ]
+              },
+              {
+                "title": "Gastrointestinal Research",
+                "findings": [
+                  {
+                    "title": "Gastric Protection",
+                    "content": "BPC-157 was initially studied as a \"cytoprotective\" agent in the stomach, meaning it can protect stomach cells from injury. In rat studies, BPC-157 demonstrated the ability to prevent and heal stomach ulcers, including ulcers caused by NSAID painkillers, which are known for eroding the stomach lining. The peptide also protected the GI tract from alcohol-induced damage."
+                  },
+                  {
+                    "title": "Inflammatory Bowel Disease Models",
+                    "content": "Beyond the stomach, BPC-157 showed benefits in inflammatory bowel disease models. Rats with ulcerative colitis (a severe gut inflammation) recovered faster and had reduced intestinal damage when given BPC-157. A preliminary clinical trial in people with ulcerative colitis reported positive results, though full details have not been published."
+                  }
+                ]
+              },
+              {
+                "title": "Other Organ Systems",
+                "findings": [
+                  {
+                    "title": "Anti-Inflammatory Effects",
+                    "content": "In rat models of induced inflammatory arthritis, animals treated with BPC-157 had reduced joint swelling, less inflammatory cell buildup, and better preserved joint function than untreated rats. The peptide appeared to protect joints from autoimmune damage."
+                  },
+                  {
+                    "title": "Neuroprotection",
+                    "content": "BPC-157 has shown promise as a neuroprotective compound in animal studies. It helped preserve brain cells in rodent experiments of traumatic brain injury and stroke, and produced antidepressant-like effects in a rat model of chronic stress. Rats with symptoms of depression or anxiety exhibited improved behaviors after BPC-157 treatment, correlating with modulation of serotonin and dopamine systems."
+                  },
+                  {
+                    "title": "Organ Protection",
+                    "content": "In laboratory rodents, BPC-157 reduced damage to the liver caused by toxic chemicals and improved survival in cases of acute liver failure. Similarly, it lessened heart muscle damage in animal models of certain cardiac injuries, suggesting potential cardio-protective effects."
+                  }
+                ]
+              }
+            ]
+          ],
+          "op": "Find the finding whose title is exactly \"Tendon and Ligament Repair\" across all preclinical subsections (must be exactly one, and its content must normalize-equal old_finding.content). Replace only that finding's content with new_finding.content (title unchanged). Every other subsection and finding byte-for-byte. Else WARNING \"old mismatch\" + excerpt, column untouched.",
+          "old_finding": {
+            "title": "Tendon and Ligament Repair",
+            "content": "Some of the most robust data comes from tendon injury models. A study published in the Journal of Applied Physiology showed that BPC-157 dramatically improved healing of transected (cut) Achilles tendons in rats. Treated tendons exhibited better strength, structure, and cell survival with less inflammation.\n\nAdditional experiments demonstrated accelerated healing of damaged knee ligaments and increased outgrowth of tendon cells, suggesting the peptide can stimulate cells to rebuild connective tissue. Researchers observed that even without additional growth factors, BPC-157 alone enhanced tendon cell migration and viability at injury sites."
+          },
+          "new_finding": {
+            "title": "Tendon and Ligament Repair",
+            "content": "In a rat model of transected (cut) Achilles tendon, a study by the Zagreb group that first described BPC-157 (Staresinic et al. 2003, Journal of Orthopaedic Research; PMID 14554208; developer-affiliated) reported better functional, biomechanical and microscopic healing measures in treated rats than in controls. A separate laboratory study (Chang et al. 2011, Journal of Applied Physiology; PMID 21030672) used rat tendon explants and cultured tendon cells and reported more tendon-cell outgrowth, better cell survival under oxidative stress and more cell migration.\n\nThese are animal and cell findings. They have not been tested in controlled human trials."
+          },
+          "sources": [
+            "PubMed 14554208 (Staresinic et al. 2003, J Orthop Res 21(6):976-83; Zagreb group, developer-affiliated; in vivo rat Achilles transection)",
+            "PubMed 21030672 (Chang et al. 2011, J Appl Physiol 110(3):774-80; ex vivo explants and in vitro tendon fibroblasts)"
+          ]
+        },
+        "background": {
+          "old_values": [
+            "BPC-157 was originally discovered in human gastric juice during gastroenterology research. In simple terms, a peptide is a short chain of amino acids – the building blocks of proteins. This particular peptide has been nicknamed the \"body protection compound\" in research circles due to the broad protective effects observed on the body's tissues in laboratory studies.\n\nUnlike many peptides that are quickly broken down by digestive enzymes, BPC-157 demonstrates exceptional stability. This characteristic means the peptide could potentially be administered orally and still exert effects, unlike most peptides that must be given by injection. In rodent studies, BPC-157 proved effective when administered through various routes including intramuscular and intravenous injection, demonstrating bioavailability and activity in the body.\n\nIt's important to clarify that BPC-157 is an experimental compound. It is not approved as a medication by regulatory agencies and is officially designated for research use only at present. Despite this regulatory status, interest in BPC-157 has grown substantially due to promising early research findings in preclinical models."
+          ],
+          "target_values": [
+            "BPC-157 was originally discovered in human gastric juice during gastroenterology research. In simple terms, a peptide is a short chain of amino acids – the building blocks of proteins. This particular peptide has been nicknamed the \"body protection compound\" in research circles due to the broad protective effects observed on the body's tissues in laboratory studies.\n\nBPC-157 has been described as unusually stable for a peptide. FDA’s July 2026 briefing document cites a laboratory report that BPC-157 resisted breakdown in gastric juice in vitro (Veljaca et al. 1995). Routes studied in animals include intraperitoneal injection, oral administration by gavage or in drinking water, intravenous injection and intramuscular injection. FDA found no human pharmacokinetic data after oral, subcutaneous, nasal or transdermal administration; in small human studies of rectal enemas, BPC-157 was reported as not detected in plasma. Animal findings by any route do not show how BPC-157 behaves in people.\n\nIt's important to clarify that BPC-157 is an experimental compound. It is not approved as a medication by regulatory agencies and is officially designated for research use only at present. Despite this regulatory status, interest in BPC-157 has grown substantially due to promising early research findings in preclinical models."
+          ],
+          "op": "Each old sentence must occur exactly once; str_replace in order.",
+          "edits": [
+            {
+              "old": "This characteristic means the peptide could potentially be administered orally and still exert effects, unlike most peptides that must be given by injection. In rodent studies, BPC-157 proved effective when administered through various routes including intramuscular and intravenous injection, demonstrating bioavailability and activity in the body.",
+              "new": "FDA’s July 2026 briefing document cites a laboratory report that BPC-157 resisted breakdown in gastric juice in vitro (Veljaca et al. 1995). Routes studied in animals include intraperitoneal injection, oral administration by gavage or in drinking water, intravenous injection and intramuscular injection. FDA found no human pharmacokinetic data after oral, subcutaneous, nasal or transdermal administration; in small human studies of rectal enemas, BPC-157 was reported as not detected in plasma. Animal findings by any route do not show how BPC-157 behaves in people."
+            },
+            {
+              "old": "Unlike many peptides that are quickly broken down by digestive enzymes, BPC-157 demonstrates exceptional stability.",
+              "new": "BPC-157 has been described as unusually stable for a peptide."
+            }
+          ]
+        },
+        "conclusion": {
+          "old_values": [
+            "BPC-157 stands out as a compound at the frontier of medical research. From a research perspective, it demonstrates several noteworthy characteristics: it's small and stable, easy to administer in various forms, and has shown remarkable healing capabilities in preclinical models across the board – from mending torn tendons to healing ulcerated gastrointestinal tissues and protecting neural cells.\n\nHowever, a key message is caution. As of now, BPC-157 is not an approved treatment for any condition and remains in the realm of experimental research. The peptide is currently available only as a research tool, and any human use is essentially an off-label experiment. While current findings in the laboratory are inspiring, science demands evidence through well-designed human studies.\n\nThe current state of knowledge presents a paradox: enthusiastic reports and underground usage suggest it may help people recover from injuries, yet solid clinical data to fully back up those claims and ensure long-term safety is lacking. Until comprehensive human studies are completed, experts advise that BPC-157 should be confined to laboratories and carefully controlled trials.\n\nResearchers around the world are actively studying this peptide, as evidenced by increasing publications and even patents, because its multi-faceted actions are unlike anything in current therapeutic arsenals. For those learning about BPC-157, the best course is to stay informed but cautious. With time and rigorous research, we will discover whether BPC-157 can safely fulfill its healing reputation and possibly become a mainstream therapeutic agent. Until then, it remains a compelling scientific discovery on the path from laboratory to clinical application."
+          ],
+          "target_values": [
+            "BPC-157 stands out as a compound at the frontier of medical research. From a research perspective, it demonstrates several noteworthy characteristics: it's small and stable, has been studied by several routes in animals, and has shown remarkable healing capabilities in preclinical models across the board – from mending torn tendons to healing ulcerated gastrointestinal tissues and protecting neural cells.\n\nHowever, a key message is caution. As of now, BPC-157 is not an approved treatment for any condition and remains in the realm of experimental research. The peptide is currently available only as a research tool, and any human use is essentially an off-label experiment. While current findings in the laboratory are inspiring, science demands evidence through well-designed human studies.\n\nThe current state of knowledge presents a gap: interest in BPC-157 is high, yet controlled clinical data on efficacy and long-term safety are lacking. Until comprehensive human studies are completed, experts advise that BPC-157 should be confined to laboratories and carefully controlled trials.\n\nResearchers around the world are actively studying this peptide, as evidenced by increasing publications and even patents, because its multi-faceted actions are unlike anything in current therapeutic arsenals. For those learning about BPC-157, the best course is to stay informed but cautious. With time and rigorous research, we will discover whether BPC-157 can safely fulfill its healing reputation and possibly become a mainstream therapeutic agent. Until then, it remains a compelling scientific discovery on the path from laboratory to clinical application."
+          ],
+          "op": "Same as background.",
+          "edits": [
+            {
+              "old": "easy to administer in various forms",
+              "new": "has been studied by several routes in animals"
+            },
+            {
+              "old": "The current state of knowledge presents a paradox: enthusiastic reports and underground usage suggest it may help people recover from injuries, yet solid clinical data to fully back up those claims and ensure long-term safety is lacking.",
+              "new": "The current state of knowledge presents a gap: interest in BPC-157 is high, yet controlled clinical data on efficacy and long-term safety are lacking."
+            }
+          ]
+        },
+        "half_life": {
+          "old_values": [
+            "~4 hours"
+          ],
+          "target_values": [
+            "No human PK data"
+          ],
+          "op": "Set to new value (TEXT column since 2026_10_20_130000).",
+          "new_value": "No human PK data"
+        },
+        "references": {
+          "old_values": [
+            [
+              {
+                "links": [],
+                "title": "Journal of Applied Physiology (2011)",
+                "authors": "Chang et al.",
+                "citation": "Journal of Applied Physiology, 2011",
+                "description": "Study showing BPC-157 enhanced tendon healing in animal models."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://www.mdpi.com/1424-8247/18/2/185",
+                    "label": null
+                  },
+                  {
+                    "url": "PubMed: 40005999",
+                    "label": null
+                  }
+                ],
+                "title": "Pharmaceuticals (2025)",
+                "authors": "Jóźwiak et al.",
+                "citation": null,
+                "description": "Multifunctionality and Possible Medical Application of the BPC 157 Peptide—Literature and Patent Review."
+              },
+              {
+                "links": [
+                  {
+                    "url": "PMC Article: PMC11053547",
+                    "label": null
+                  }
+                ],
+                "title": "Neural Regeneration Research (2022)",
+                "authors": "Sikiric et al.",
+                "citation": null,
+                "description": "The Stable Gastric Pentadecapeptide BPC 157 Pleiotropic Beneficial Activity and Its Possible Relations with Neurotransmitter Activity."
+              },
+              {
+                "links": [],
+                "title": "Alternative Therapies in Health and Medicine (2025)",
+                "authors": "Lee et al.",
+                "citation": null,
+                "description": "Safety of Intravenous Infusion of BPC157 in Humans: A Pilot Study. Two-person pilot study showing IV BPC-157 caused no adverse effects in short-term administration."
+              },
+              {
+                "links": [
+                  {
+                    "url": "PMC Article: PMC12313605",
+                    "label": null
+                  }
+                ],
+                "title": "Emerging Use of BPC-157 in Orthopaedic Sports Medicine (2023)",
+                "authors": "Trebinjac et al.",
+                "citation": null,
+                "description": "Systematic review detailing mechanisms (VEGF, FAK, etc.) and healing outcomes in animal studies."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://www.usada.org/spirit-of-sport/bpc-157-peptide-prohibited/",
+                    "label": null
+                  }
+                ],
+                "title": "USADA - U.S. Anti-Doping Agency (2020)",
+                "authors": null,
+                "citation": null,
+                "description": "BPC-157: Experimental Peptide Creates Risk for Athletes. Official announcement that BPC-157 is a prohibited, unapproved substance, not legal as a supplement."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://www.orthoandwellness.com/blog/bpc-157-update-and-deep-dive-miracle-healing-peptide-or-hidden-danger",
+                    "label": null
+                  }
+                ],
+                "title": "Ortho & Wellness (2023)",
+                "authors": null,
+                "citation": null,
+                "description": "BPC-157: Miracle Healing Peptide or Hidden Danger? Article discussing theoretical concerns about pro-angiogenic pathways and potential risks."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://en.wikipedia.org/wiki/BPC-157",
+                    "label": null
+                  }
+                ],
+                "title": "Wikipedia - BPC-157 Entry",
+                "authors": null,
+                "citation": null,
+                "description": "Comprehensive summary of peptide's definition, research use, and WADA ban status."
+              }
+            ],
+            [
+              {
+                "links": [],
+                "title": "Journal of Applied Physiology (2011)",
+                "authors": "Chang et al.",
+                "citation": "Journal of Applied Physiology, 2011",
+                "description": "Study showing BPC-157 enhanced tendon healing in animal models."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://www.mdpi.com/1424-8247/18/2/185",
+                    "label": null
+                  },
+                  {
+                    "url": "PubMed: 40005999",
+                    "label": null
+                  }
+                ],
+                "title": "Pharmaceuticals (2025)",
+                "authors": "Jóźwiak et al.",
+                "citation": null,
+                "description": "Multifunctionality and Possible Medical Application of the BPC 157 Peptide—Literature and Patent Review."
+              },
+              {
+                "links": [
+                  {
+                    "url": "PMC Article: PMC11053547",
+                    "label": null
+                  }
+                ],
+                "title": "Neural Regeneration Research (2022)",
+                "authors": "Sikiric et al.",
+                "citation": null,
+                "description": "The Stable Gastric Pentadecapeptide BPC 157 Pleiotropic Beneficial Activity and Its Possible Relations with Neurotransmitter Activity."
+              },
+              {
+                "links": [],
+                "title": "Alternative Therapies in Health and Medicine (2025)",
+                "authors": "Lee et al.",
+                "citation": null,
+                "description": "Safety of Intravenous Infusion of BPC157 in Humans: A Pilot Study. Two-person pilot study showing IV BPC-157 caused no adverse effects in short-term administration."
+              },
+              {
+                "links": [
+                  {
+                    "url": "PMC Article: PMC12313605",
+                    "label": null
+                  }
+                ],
+                "title": "Emerging Use of BPC-157 in Orthopaedic Sports Medicine (2023)",
+                "authors": "Trebinjac et al.",
+                "citation": null,
+                "description": "Systematic review detailing mechanisms (VEGF, FAK, etc.) and healing outcomes in animal studies."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://www.usada.org/spirit-of-sport/bpc-157-peptide-prohibited/",
+                    "label": null
+                  }
+                ],
+                "title": "USADA - U.S. Anti-Doping Agency (2020)",
+                "authors": null,
+                "citation": null,
+                "description": "BPC-157: Experimental Peptide Creates Risk for Athletes. Official announcement that BPC-157 is a prohibited, unapproved substance, not legal as a supplement."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://www.orthoandwellness.com/blog/bpc-157-update-and-deep-dive-miracle-healing-peptide-or-hidden-danger",
+                    "label": null
+                  }
+                ],
+                "title": "Ortho & Wellness (2023)",
+                "authors": null,
+                "citation": null,
+                "description": "BPC-157: Miracle Healing Peptide or Hidden Danger? Article discussing theoretical concerns about pro-angiogenic pathways and potential risks."
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://en.wikipedia.org/wiki/BPC-157",
+                    "label": null
+                  }
+                ],
+                "title": "Wikipedia - BPC-157 Entry",
+                "authors": null,
+                "citation": null,
+                "description": "Comprehensive summary of peptide's definition, research use, and WADA ban status."
+              },
+              {
+                "title": "NSW Health warns of surge in hospital presentations linked to peptide use",
+                "authors": "NSW Government, Minister for Health",
+                "citation": "Ministerial media release, 19 October 2026.",
+                "description": "NSW Health surveillance data: 1,180 presentations to NSW emergency departments associated with peptide use, 1 July 2025 to 30 September 2026. Names BPC-157, GHK-Cu, TB-500, retatrutide and CJC-1295 and states that none of these peptides is currently approved in Australia for any purpose.",
+                "links": [
+                  {
+                    "url": "https://www.nsw.gov.au/ministerial-releases/nsw-health-warns-of-surge-hospital-presentations-linked-to-peptide-use",
+                    "label": "NSW Government"
+                  }
+                ]
+              },
+              {
+                "title": "Health authorities issue unapproved peptide use warning after surge in NSW hospital visits",
+                "authors": "Coote G, ABC News",
+                "citation": "ABC News, 19 October 2026.",
+                "description": "News report of the NSW Health data (1,180 emergency department presentations between July 2025 and September 2026).",
+                "links": [
+                  {
+                    "url": "https://www.abc.net.au/news/2026-10-19/nsw-peptide-emergency-department-surge-prompts-warning/107281674",
+                    "label": "ABC News"
+                  }
+                ]
+              },
+              {
+                "title": "Therapeutic Goods (Poisons Standard—October 2026) Instrument 2026",
+                "authors": "Australian Government, Federal Register of Legislation",
+                "citation": "F2026L01327. Made under the Therapeutic Goods Act 1989; in force from 1 October 2026.",
+                "description": "Schedule 4 entry \"# BPC-157.\"; Appendix D, clause 5, item 5. Text read 22 October 2026.",
+                "links": [
+                  {
+                    "url": "https://www.legislation.gov.au/F2026L01327/asmade/text",
+                    "label": "Federal Register of Legislation"
+                  }
+                ]
+              }
+            ]
+          ],
+          "labels": [
+            "live (8)",
+            "after #65 (8 + NSW, ABC, Poisons Standard)"
+          ],
+          "target_values": [
+            [
+              {
+                "title": "The promoting effect of pentadecapeptide BPC 157 on tendon healing involves tendon outgrowth, cell survival, and cell migration",
+                "authors": "Chang CH, Tsai WC, Lin MS, Hsu YH, Pang JH",
+                "citation": "J Appl Physiol (1985). 2011;110(3):774–780. PMID 21030672.",
+                "description": "Ex vivo and in vitro study using rat Achilles tendon explants and cultured tendon fibroblasts: outgrowth, cell survival under oxidative stress, migration, and FAK–paxillin activation. Not an in vivo healing study.",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/21030672/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "Multifunctionality and Possible Medical Application of the BPC 157 Peptide—Literature and Patent Review",
+                "authors": "Jóźwiak M, Bauer M, Kamysz W, et al.",
+                "citation": "Pharmaceuticals (Basel). 2025;18(2):185. PMID 40005999.",
+                "description": "Literature and patent review.",
+                "links": [
+                  {
+                    "url": "https://www.mdpi.com/1424-8247/18/2/185",
+                    "label": "MDPI"
+                  },
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/40005999/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "The Stable Gastric Pentadecapeptide BPC 157 Pleiotropic Beneficial Activity and Its Possible Relations with Neurotransmitter Activity",
+                "authors": "Sikiric P, Boban Blagaic A, Strbe S, et al.",
+                "citation": "Pharmaceuticals (Basel). 2024;17(4):461. PMID 38675421.",
+                "description": "Review by the Zagreb group that first described BPC-157 (developer-affiliated).",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/38675421/",
+                    "label": "PubMed"
+                  },
+                  {
+                    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11053547/",
+                    "label": "PMC"
+                  }
+                ]
+              },
+              {
+                "title": "Safety of Intravenous Infusion of BPC157 in Humans: A Pilot Study",
+                "authors": "Lee E, Burgess K",
+                "citation": "Altern Ther Health Med. 2025;31(5):20–24. PMID 40131143.",
+                "description": "Two-participant intravenous pilot at a private clinic; no control group; three days of follow-up.",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/40131143/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "Emerging Use of BPC-157 in Orthopaedic Sports Medicine: A Systematic Review",
+                "authors": "Vasireddi N, Hahamyan H, Salata MJ, et al.",
+                "citation": "HSS J. 2025;21(4):485–495. PMID 40756949.",
+                "description": "Systematic review of 36 studies published 1993–2024 (35 preclinical, 1 clinical).",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/40756949/",
+                    "label": "PubMed"
+                  },
+                  {
+                    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12313605/",
+                    "label": "PMC"
+                  }
+                ]
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://www.usada.org/spirit-of-sport/bpc-157-peptide-prohibited/",
+                    "label": null
+                  }
+                ],
+                "title": "USADA - U.S. Anti-Doping Agency (2020)",
+                "authors": null,
+                "citation": null,
+                "description": "BPC-157: Experimental Peptide Creates Risk for Athletes. Official announcement that BPC-157 is a prohibited, unapproved substance, not legal as a supplement."
+              },
+              {
+                "title": "FDA Briefing Document: BPC-157-Related Bulk Drug Substances (BPC-157 (free base) and BPC-157 acetate)",
+                "authors": "U.S. Food and Drug Administration, CDER",
+                "citation": "Pharmacy Compounding Advisory Committee meeting, 23–24 July 2026. FDA evaluation dated 11 May 2026.",
+                "description": "FDA evaluation for the 503A Bulks List (use evaluated: ulcerative colitis). Covers characterization, nonclinical pharmacology, pharmacokinetics and toxicology (pp. 30–40), human data including the finding of no human pharmacokinetic data after oral, subcutaneous, nasal or transdermal administration (pp. 40–46), immunogenicity concerns, and FDA’s proposal not to add either form to the list (p. 47).",
+                "links": [
+                  {
+                    "url": "https://www.fda.gov/media/193343/download",
+                    "label": "FDA (PDF)"
+                  }
+                ]
+              },
+              {
+                "title": "World Anti-Doping Code International Standard: Prohibited List 2026",
+                "authors": "World Anti-Doping Agency",
+                "citation": "In effect from 1 January 2026.",
+                "description": "Class S0 (Non-approved substances), prohibited at all times; BPC-157 is named as an example.",
+                "links": [
+                  {
+                    "url": "https://www.wada-ama.org/sites/default/files/2025-09/2026list_en_final_clean_september_2025.pdf",
+                    "label": "WADA (PDF)"
+                  }
+                ]
+              },
+              {
+                "title": "July 23–24, 2026: Meeting of the Pharmacy Compounding Advisory Committee",
+                "authors": "U.S. Food and Drug Administration",
+                "citation": "FDA advisory committee calendar.",
+                "description": "Meeting page listing BPC-157 (free base) and BPC-157 acetate, use evaluated ulcerative colitis, with the briefing documents and voting questions.",
+                "links": [
+                  {
+                    "url": "https://www.fda.gov/advisory-committees/advisory-committee-calendar/july-23-24-2026-meeting-pharmacy-compounding-advisory-committee-07232026",
+                    "label": "FDA"
+                  }
+                ]
+              },
+              {
+                "title": "Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks",
+                "authors": "U.S. Food and Drug Administration",
+                "citation": "Content current as of 22 April 2026.",
+                "description": "States that compounded drugs containing BPC-157 may pose risk for immunogenicity for certain routes of administration and may have complexities with regard to peptide-related impurities and API characterization, and that FDA has identified no, or only limited, safety-related information for the proposed routes.",
+                "links": [
+                  {
+                    "url": "https://www.fda.gov/drugs/human-drug-compounding/certain-bulk-drug-substances-use-compounding-may-present-significant-safety-risks",
+                    "label": "FDA"
+                  }
+                ]
+              },
+              {
+                "title": "Preclinical safety evaluation of body protective compound-157, a potential drug for treating various wounds",
+                "authors": "Xu C, Sun L, Ren F, et al.",
+                "citation": "Regul Toxicol Pharmacol. 2020;114:104665. PMID 32334036.",
+                "description": "Acute and 28-day toxicity and embryo-fetal toxicity studies by intramuscular injection, plus genotoxicity tests (in vitro and in mice), by a group developing BPC-157 as a wound-treatment drug (developer-affiliated); summarized and critiqued in FDA’s July 2026 briefing document.",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/32334036/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "Pharmacokinetics, distribution, metabolism, and excretion of body-protective compound 157, a potential drug for treating various wounds, in rats and dogs",
+                "authors": "He L, Feng D, Guo H, et al.",
+                "citation": "Front Pharmacol. 2022;13:1026182. PMID 36588717.",
+                "description": "Animal pharmacokinetic study (rats and dogs) by the same developer-affiliated group. No human pharmacokinetic data.",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/36588717/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "Human evidence for BPC-157 in orthopaedic and regenerative medicine: a systematic review of efficacy and safety",
+                "authors": "Poolton JT, Minett J, Kazmi A",
+                "citation": "Acta Orthop Belg. 2026;92(3). PMID 42885452.",
+                "description": "Three small human studies without control groups; poor methodological quality; overall certainty of evidence rated very low.",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/42885452/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "PCO-02 - Safety and Pharmacokinetics Trial (NCT02637284)",
+                "authors": "PharmaCotherapia d.o.o.",
+                "citation": "ClinicalTrials.gov record, first posted December 2015; last update December 2015.",
+                "description": "Phase 1 study of oral BPC-157 tablets versus placebo in healthy volunteers; status unknown; estimated enrollment 42; no results posted.",
+                "links": [
+                  {
+                    "url": "https://clinicaltrials.gov/study/NCT02637284",
+                    "label": "ClinicalTrials.gov"
+                  }
+                ]
+              },
+              {
+                "title": "Gastric pentadecapeptide BPC 157 accelerates healing of transected rat Achilles tendon and in vitro stimulates tendocytes growth",
+                "authors": "Staresinic M, Sebecic B, Patrlj L, et al.",
+                "citation": "J Orthop Res. 2003;21(6):976–983. PMID 14554208.",
+                "description": "Rat Achilles-tendon transection study with a cultured-tendocyte arm, by the Zagreb group that first described BPC-157 (developer-affiliated).",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/14554208/",
+                    "label": "PubMed"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "title": "The promoting effect of pentadecapeptide BPC 157 on tendon healing involves tendon outgrowth, cell survival, and cell migration",
+                "authors": "Chang CH, Tsai WC, Lin MS, Hsu YH, Pang JH",
+                "citation": "J Appl Physiol (1985). 2011;110(3):774–780. PMID 21030672.",
+                "description": "Ex vivo and in vitro study using rat Achilles tendon explants and cultured tendon fibroblasts: outgrowth, cell survival under oxidative stress, migration, and FAK–paxillin activation. Not an in vivo healing study.",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/21030672/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "Multifunctionality and Possible Medical Application of the BPC 157 Peptide—Literature and Patent Review",
+                "authors": "Jóźwiak M, Bauer M, Kamysz W, et al.",
+                "citation": "Pharmaceuticals (Basel). 2025;18(2):185. PMID 40005999.",
+                "description": "Literature and patent review.",
+                "links": [
+                  {
+                    "url": "https://www.mdpi.com/1424-8247/18/2/185",
+                    "label": "MDPI"
+                  },
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/40005999/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "The Stable Gastric Pentadecapeptide BPC 157 Pleiotropic Beneficial Activity and Its Possible Relations with Neurotransmitter Activity",
+                "authors": "Sikiric P, Boban Blagaic A, Strbe S, et al.",
+                "citation": "Pharmaceuticals (Basel). 2024;17(4):461. PMID 38675421.",
+                "description": "Review by the Zagreb group that first described BPC-157 (developer-affiliated).",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/38675421/",
+                    "label": "PubMed"
+                  },
+                  {
+                    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11053547/",
+                    "label": "PMC"
+                  }
+                ]
+              },
+              {
+                "title": "Safety of Intravenous Infusion of BPC157 in Humans: A Pilot Study",
+                "authors": "Lee E, Burgess K",
+                "citation": "Altern Ther Health Med. 2025;31(5):20–24. PMID 40131143.",
+                "description": "Two-participant intravenous pilot at a private clinic; no control group; three days of follow-up.",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/40131143/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "Emerging Use of BPC-157 in Orthopaedic Sports Medicine: A Systematic Review",
+                "authors": "Vasireddi N, Hahamyan H, Salata MJ, et al.",
+                "citation": "HSS J. 2025;21(4):485–495. PMID 40756949.",
+                "description": "Systematic review of 36 studies published 1993–2024 (35 preclinical, 1 clinical).",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/40756949/",
+                    "label": "PubMed"
+                  },
+                  {
+                    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12313605/",
+                    "label": "PMC"
+                  }
+                ]
+              },
+              {
+                "links": [
+                  {
+                    "url": "https://www.usada.org/spirit-of-sport/bpc-157-peptide-prohibited/",
+                    "label": null
+                  }
+                ],
+                "title": "USADA - U.S. Anti-Doping Agency (2020)",
+                "authors": null,
+                "citation": null,
+                "description": "BPC-157: Experimental Peptide Creates Risk for Athletes. Official announcement that BPC-157 is a prohibited, unapproved substance, not legal as a supplement."
+              },
+              {
+                "title": "FDA Briefing Document: BPC-157-Related Bulk Drug Substances (BPC-157 (free base) and BPC-157 acetate)",
+                "authors": "U.S. Food and Drug Administration, CDER",
+                "citation": "Pharmacy Compounding Advisory Committee meeting, 23–24 July 2026. FDA evaluation dated 11 May 2026.",
+                "description": "FDA evaluation for the 503A Bulks List (use evaluated: ulcerative colitis). Covers characterization, nonclinical pharmacology, pharmacokinetics and toxicology (pp. 30–40), human data including the finding of no human pharmacokinetic data after oral, subcutaneous, nasal or transdermal administration (pp. 40–46), immunogenicity concerns, and FDA’s proposal not to add either form to the list (p. 47).",
+                "links": [
+                  {
+                    "url": "https://www.fda.gov/media/193343/download",
+                    "label": "FDA (PDF)"
+                  }
+                ]
+              },
+              {
+                "title": "World Anti-Doping Code International Standard: Prohibited List 2026",
+                "authors": "World Anti-Doping Agency",
+                "citation": "In effect from 1 January 2026.",
+                "description": "Class S0 (Non-approved substances), prohibited at all times; BPC-157 is named as an example.",
+                "links": [
+                  {
+                    "url": "https://www.wada-ama.org/sites/default/files/2025-09/2026list_en_final_clean_september_2025.pdf",
+                    "label": "WADA (PDF)"
+                  }
+                ]
+              },
+              {
+                "title": "NSW Health warns of surge in hospital presentations linked to peptide use",
+                "authors": "NSW Government, Minister for Health",
+                "citation": "Ministerial media release, 19 October 2026.",
+                "description": "NSW Health surveillance data: 1,180 presentations to NSW emergency departments associated with peptide use, 1 July 2025 to 30 September 2026. Names BPC-157, GHK-Cu, TB-500, retatrutide and CJC-1295 and states that none of these peptides is currently approved in Australia for any purpose.",
+                "links": [
+                  {
+                    "url": "https://www.nsw.gov.au/ministerial-releases/nsw-health-warns-of-surge-hospital-presentations-linked-to-peptide-use",
+                    "label": "NSW Government"
+                  }
+                ]
+              },
+              {
+                "title": "Health authorities issue unapproved peptide use warning after surge in NSW hospital visits",
+                "authors": "Coote G, ABC News",
+                "citation": "ABC News, 19 October 2026.",
+                "description": "News report of the NSW Health data (1,180 emergency department presentations between July 2025 and September 2026).",
+                "links": [
+                  {
+                    "url": "https://www.abc.net.au/news/2026-10-19/nsw-peptide-emergency-department-surge-prompts-warning/107281674",
+                    "label": "ABC News"
+                  }
+                ]
+              },
+              {
+                "title": "Therapeutic Goods (Poisons Standard—October 2026) Instrument 2026",
+                "authors": "Australian Government, Federal Register of Legislation",
+                "citation": "F2026L01327. Made under the Therapeutic Goods Act 1989; in force from 1 October 2026.",
+                "description": "Schedule 4 entry \"# BPC-157.\"; Appendix D, clause 5, item 5. Text read 22 October 2026.",
+                "links": [
+                  {
+                    "url": "https://www.legislation.gov.au/F2026L01327/asmade/text",
+                    "label": "Federal Register of Legislation"
+                  }
+                ]
+              },
+              {
+                "title": "July 23–24, 2026: Meeting of the Pharmacy Compounding Advisory Committee",
+                "authors": "U.S. Food and Drug Administration",
+                "citation": "FDA advisory committee calendar.",
+                "description": "Meeting page listing BPC-157 (free base) and BPC-157 acetate, use evaluated ulcerative colitis, with the briefing documents and voting questions.",
+                "links": [
+                  {
+                    "url": "https://www.fda.gov/advisory-committees/advisory-committee-calendar/july-23-24-2026-meeting-pharmacy-compounding-advisory-committee-07232026",
+                    "label": "FDA"
+                  }
+                ]
+              },
+              {
+                "title": "Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks",
+                "authors": "U.S. Food and Drug Administration",
+                "citation": "Content current as of 22 April 2026.",
+                "description": "States that compounded drugs containing BPC-157 may pose risk for immunogenicity for certain routes of administration and may have complexities with regard to peptide-related impurities and API characterization, and that FDA has identified no, or only limited, safety-related information for the proposed routes.",
+                "links": [
+                  {
+                    "url": "https://www.fda.gov/drugs/human-drug-compounding/certain-bulk-drug-substances-use-compounding-may-present-significant-safety-risks",
+                    "label": "FDA"
+                  }
+                ]
+              },
+              {
+                "title": "Preclinical safety evaluation of body protective compound-157, a potential drug for treating various wounds",
+                "authors": "Xu C, Sun L, Ren F, et al.",
+                "citation": "Regul Toxicol Pharmacol. 2020;114:104665. PMID 32334036.",
+                "description": "Acute and 28-day toxicity and embryo-fetal toxicity studies by intramuscular injection, plus genotoxicity tests (in vitro and in mice), by a group developing BPC-157 as a wound-treatment drug (developer-affiliated); summarized and critiqued in FDA’s July 2026 briefing document.",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/32334036/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "Pharmacokinetics, distribution, metabolism, and excretion of body-protective compound 157, a potential drug for treating various wounds, in rats and dogs",
+                "authors": "He L, Feng D, Guo H, et al.",
+                "citation": "Front Pharmacol. 2022;13:1026182. PMID 36588717.",
+                "description": "Animal pharmacokinetic study (rats and dogs) by the same developer-affiliated group. No human pharmacokinetic data.",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/36588717/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "Human evidence for BPC-157 in orthopaedic and regenerative medicine: a systematic review of efficacy and safety",
+                "authors": "Poolton JT, Minett J, Kazmi A",
+                "citation": "Acta Orthop Belg. 2026;92(3). PMID 42885452.",
+                "description": "Three small human studies without control groups; poor methodological quality; overall certainty of evidence rated very low.",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/42885452/",
+                    "label": "PubMed"
+                  }
+                ]
+              },
+              {
+                "title": "PCO-02 - Safety and Pharmacokinetics Trial (NCT02637284)",
+                "authors": "PharmaCotherapia d.o.o.",
+                "citation": "ClinicalTrials.gov record, first posted December 2015; last update December 2015.",
+                "description": "Phase 1 study of oral BPC-157 tablets versus placebo in healthy volunteers; status unknown; estimated enrollment 42; no results posted.",
+                "links": [
+                  {
+                    "url": "https://clinicaltrials.gov/study/NCT02637284",
+                    "label": "ClinicalTrials.gov"
+                  }
+                ]
+              },
+              {
+                "title": "Gastric pentadecapeptide BPC 157 accelerates healing of transected rat Achilles tendon and in vitro stimulates tendocytes growth",
+                "authors": "Staresinic M, Sebecic B, Patrlj L, et al.",
+                "citation": "J Orthop Res. 2003;21(6):976–983. PMID 14554208.",
+                "description": "Rat Achilles-tendon transection study with a cultured-tendocyte arm, by the Zagreb group that first described BPC-157 (developer-affiliated).",
+                "links": [
+                  {
+                    "url": "https://pubmed.ncbi.nlm.nih.gov/14554208/",
+                    "label": "PubMed"
+                  }
+                ]
+              }
+            ]
+          ],
+          "op": "Preconditions: item 5 title starts \"USADA\", item 6 link is orthoandwellness.com, item 7 link is en.wikipedia.org. Replace items 0,1,2,3,4,6,7 in place; keep item 5 and anything after index 7 (the #65 items) byte-for-byte; append new_items at the END.",
+          "replace": {
+            "0": {
+              "title": "The promoting effect of pentadecapeptide BPC 157 on tendon healing involves tendon outgrowth, cell survival, and cell migration",
+              "authors": "Chang CH, Tsai WC, Lin MS, Hsu YH, Pang JH",
+              "citation": "J Appl Physiol (1985). 2011;110(3):774–780. PMID 21030672.",
+              "description": "Ex vivo and in vitro study using rat Achilles tendon explants and cultured tendon fibroblasts: outgrowth, cell survival under oxidative stress, migration, and FAK–paxillin activation. Not an in vivo healing study.",
+              "links": [
+                {
+                  "url": "https://pubmed.ncbi.nlm.nih.gov/21030672/",
+                  "label": "PubMed"
+                }
+              ]
+            },
+            "1": {
+              "title": "Multifunctionality and Possible Medical Application of the BPC 157 Peptide—Literature and Patent Review",
+              "authors": "Jóźwiak M, Bauer M, Kamysz W, et al.",
+              "citation": "Pharmaceuticals (Basel). 2025;18(2):185. PMID 40005999.",
+              "description": "Literature and patent review.",
+              "links": [
+                {
+                  "url": "https://www.mdpi.com/1424-8247/18/2/185",
+                  "label": "MDPI"
+                },
+                {
+                  "url": "https://pubmed.ncbi.nlm.nih.gov/40005999/",
+                  "label": "PubMed"
+                }
+              ]
+            },
+            "2": {
+              "title": "The Stable Gastric Pentadecapeptide BPC 157 Pleiotropic Beneficial Activity and Its Possible Relations with Neurotransmitter Activity",
+              "authors": "Sikiric P, Boban Blagaic A, Strbe S, et al.",
+              "citation": "Pharmaceuticals (Basel). 2024;17(4):461. PMID 38675421.",
+              "description": "Review by the Zagreb group that first described BPC-157 (developer-affiliated).",
+              "links": [
+                {
+                  "url": "https://pubmed.ncbi.nlm.nih.gov/38675421/",
+                  "label": "PubMed"
+                },
+                {
+                  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11053547/",
+                  "label": "PMC"
+                }
+              ]
+            },
+            "3": {
+              "title": "Safety of Intravenous Infusion of BPC157 in Humans: A Pilot Study",
+              "authors": "Lee E, Burgess K",
+              "citation": "Altern Ther Health Med. 2025;31(5):20–24. PMID 40131143.",
+              "description": "Two-participant intravenous pilot at a private clinic; no control group; three days of follow-up.",
+              "links": [
+                {
+                  "url": "https://pubmed.ncbi.nlm.nih.gov/40131143/",
+                  "label": "PubMed"
+                }
+              ]
+            },
+            "4": {
+              "title": "Emerging Use of BPC-157 in Orthopaedic Sports Medicine: A Systematic Review",
+              "authors": "Vasireddi N, Hahamyan H, Salata MJ, et al.",
+              "citation": "HSS J. 2025;21(4):485–495. PMID 40756949.",
+              "description": "Systematic review of 36 studies published 1993–2024 (35 preclinical, 1 clinical).",
+              "links": [
+                {
+                  "url": "https://pubmed.ncbi.nlm.nih.gov/40756949/",
+                  "label": "PubMed"
+                },
+                {
+                  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12313605/",
+                  "label": "PMC"
+                }
+              ]
+            },
+            "6": {
+              "title": "FDA Briefing Document: BPC-157-Related Bulk Drug Substances (BPC-157 (free base) and BPC-157 acetate)",
+              "authors": "U.S. Food and Drug Administration, CDER",
+              "citation": "Pharmacy Compounding Advisory Committee meeting, 23–24 July 2026. FDA evaluation dated 11 May 2026.",
+              "description": "FDA evaluation for the 503A Bulks List (use evaluated: ulcerative colitis). Covers characterization, nonclinical pharmacology, pharmacokinetics and toxicology (pp. 30–40), human data including the finding of no human pharmacokinetic data after oral, subcutaneous, nasal or transdermal administration (pp. 40–46), immunogenicity concerns, and FDA’s proposal not to add either form to the list (p. 47).",
+              "links": [
+                {
+                  "url": "https://www.fda.gov/media/193343/download",
+                  "label": "FDA (PDF)"
+                }
+              ]
+            },
+            "7": {
+              "title": "World Anti-Doping Code International Standard: Prohibited List 2026",
+              "authors": "World Anti-Doping Agency",
+              "citation": "In effect from 1 January 2026.",
+              "description": "Class S0 (Non-approved substances), prohibited at all times; BPC-157 is named as an example.",
+              "links": [
+                {
+                  "url": "https://www.wada-ama.org/sites/default/files/2025-09/2026list_en_final_clean_september_2025.pdf",
+                  "label": "WADA (PDF)"
+                }
+              ]
+            }
+          },
+          "new_items": [
+            {
+              "title": "July 23–24, 2026: Meeting of the Pharmacy Compounding Advisory Committee",
+              "authors": "U.S. Food and Drug Administration",
+              "citation": "FDA advisory committee calendar.",
+              "description": "Meeting page listing BPC-157 (free base) and BPC-157 acetate, use evaluated ulcerative colitis, with the briefing documents and voting questions.",
+              "links": [
+                {
+                  "url": "https://www.fda.gov/advisory-committees/advisory-committee-calendar/july-23-24-2026-meeting-pharmacy-compounding-advisory-committee-07232026",
+                  "label": "FDA"
+                }
+              ]
+            },
+            {
+              "title": "Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks",
+              "authors": "U.S. Food and Drug Administration",
+              "citation": "Content current as of 22 April 2026.",
+              "description": "States that compounded drugs containing BPC-157 may pose risk for immunogenicity for certain routes of administration and may have complexities with regard to peptide-related impurities and API characterization, and that FDA has identified no, or only limited, safety-related information for the proposed routes.",
+              "links": [
+                {
+                  "url": "https://www.fda.gov/drugs/human-drug-compounding/certain-bulk-drug-substances-use-compounding-may-present-significant-safety-risks",
+                  "label": "FDA"
+                }
+              ]
+            },
+            {
+              "title": "Preclinical safety evaluation of body protective compound-157, a potential drug for treating various wounds",
+              "authors": "Xu C, Sun L, Ren F, et al.",
+              "citation": "Regul Toxicol Pharmacol. 2020;114:104665. PMID 32334036.",
+              "description": "Acute and 28-day toxicity and embryo-fetal toxicity studies by intramuscular injection, plus genotoxicity tests (in vitro and in mice), by a group developing BPC-157 as a wound-treatment drug (developer-affiliated); summarized and critiqued in FDA’s July 2026 briefing document.",
+              "links": [
+                {
+                  "url": "https://pubmed.ncbi.nlm.nih.gov/32334036/",
+                  "label": "PubMed"
+                }
+              ]
+            },
+            {
+              "title": "Pharmacokinetics, distribution, metabolism, and excretion of body-protective compound 157, a potential drug for treating various wounds, in rats and dogs",
+              "authors": "He L, Feng D, Guo H, et al.",
+              "citation": "Front Pharmacol. 2022;13:1026182. PMID 36588717.",
+              "description": "Animal pharmacokinetic study (rats and dogs) by the same developer-affiliated group. No human pharmacokinetic data.",
+              "links": [
+                {
+                  "url": "https://pubmed.ncbi.nlm.nih.gov/36588717/",
+                  "label": "PubMed"
+                }
+              ]
+            },
+            {
+              "title": "Human evidence for BPC-157 in orthopaedic and regenerative medicine: a systematic review of efficacy and safety",
+              "authors": "Poolton JT, Minett J, Kazmi A",
+              "citation": "Acta Orthop Belg. 2026;92(3). PMID 42885452.",
+              "description": "Three small human studies without control groups; poor methodological quality; overall certainty of evidence rated very low.",
+              "links": [
+                {
+                  "url": "https://pubmed.ncbi.nlm.nih.gov/42885452/",
+                  "label": "PubMed"
+                }
+              ]
+            },
+            {
+              "title": "PCO-02 - Safety and Pharmacokinetics Trial (NCT02637284)",
+              "authors": "PharmaCotherapia d.o.o.",
+              "citation": "ClinicalTrials.gov record, first posted December 2015; last update December 2015.",
+              "description": "Phase 1 study of oral BPC-157 tablets versus placebo in healthy volunteers; status unknown; estimated enrollment 42; no results posted.",
+              "links": [
+                {
+                  "url": "https://clinicaltrials.gov/study/NCT02637284",
+                  "label": "ClinicalTrials.gov"
+                }
+              ]
+            },
+            {
+              "title": "Gastric pentadecapeptide BPC 157 accelerates healing of transected rat Achilles tendon and in vitro stimulates tendocytes growth",
+              "authors": "Staresinic M, Sebecic B, Patrlj L, et al.",
+              "citation": "J Orthop Res. 2003;21(6):976–983. PMID 14554208.",
+              "description": "Rat Achilles-tendon transection study with a cultured-tendocyte arm, by the Zagreb group that first described BPC-157 (developer-affiliated).",
+              "links": [
+                {
+                  "url": "https://pubmed.ncbi.nlm.nih.gov/14554208/",
+                  "label": "PubMed"
+                }
+              ]
+            }
+          ]
+        },
+        "description": {
+          "old_values": [
+            "BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation, and promote faster recovery from injuries.",
+            "BPC-157 is a synthetic peptide derived from a protective protein found in the stomach. It has shown remarkable healing properties for tendons, ligaments, muscles, and the gastrointestinal tract. Known for its ability to accelerate wound healing and tissue repair."
+          ],
+          "target_values": [
+            "BPC-157 is a synthetic 15-amino-acid peptide studied mainly in animal and cell models. Published human data are limited to a few small, short studies, and it is not an FDA-approved drug. PeptideMap lists it for research-use-only (RUO) comparison."
+          ],
+          "op": "Linked post only. Write new_value only if the stored description equals one of old_values (the EducationPostSeeder text or the text the /encyclopedia card shows today). If the stored value is empty (card falling back to product_categories.description) → skip with info; do not touch product_categories.",
+          "new_value": "BPC-157 is a synthetic 15-amino-acid peptide studied mainly in animal and cell models. Published human data are limited to a few small, short studies, and it is not an FDA-approved drug. PeptideMap lists it for research-use-only (RUO) comparison."
+        }
+      }
+    },
+    "tb-500": {
+      "lookup": "EncyclopediaPostMatch::find(\"tb-500\", …) — live category id 87. Columns: molecular_formula, molecular_weight, half_life, conclusion (all in one DB::transaction). Never touch faqs (155000).",
+      "columns": {
+        "molecular_formula": {
+          "old_values": [
+            "C₃₆H₆₆N₁₀O₁₃",
+            "C36H66N10O13"
+          ],
+          "new_value": "C₃₈H₆₈N₁₀O₁₄",
+          "op": "Write new_value only if normalize(current) is one of old_values; skip if already new_value.",
+          "source": "PubChem CID 62707662 (TB-500; synonyms include 885340-08-9 and Ac-Leu-Lys-Lys-Thr-Glu-Thr-Gln-OH): MolecularFormula C38H68N10O14, MolecularWeight 889.0 (PUG REST, read 22 Oct 2026). The live C36H66N10O13 / 846.97 is the non-acetylated heptapeptide LKKTETQ."
+        },
+        "molecular_weight": {
+          "old_values": [
+            "846.97 g/mol",
+            "846.97"
+          ],
+          "new_value": "889.0 g/mol",
+          "op": "Write new_value only if normalize(current) is one of old_values; skip if already new_value.",
+          "source": "PubChem CID 62707662 (TB-500; synonyms include 885340-08-9 and Ac-Leu-Lys-Lys-Thr-Glu-Thr-Gln-OH): MolecularFormula C38H68N10O14, MolecularWeight 889.0 (PUG REST, read 22 Oct 2026). The live C36H66N10O13 / 846.97 is the non-acetylated heptapeptide LKKTETQ."
+        },
+        "half_life": {
+          "old_values": [
+            "3-4 days",
+            "3–4 days"
+          ],
+          "new_value": "No human PK data",
+          "op": "Write new_value only if normalize(current) is one of old_values; skip if already new_value; else WARNING \"old mismatch\" + excerpt, column untouched.",
+          "source": "FDA PCAC briefing document for TB-500 (https://www.fda.gov/media/193349/download), p.30: \"FDA did not identify clinical studies in humans assessing pharmacokinetics or pharmacodynamics of TB-500 (free base) or TB-500 acetate via any ROA.\" The live \"3-4 days\" had no source."
+        },
+        "conclusion": {
+          "old_values": [
+            "TB-500 represents a unique approach to tissue repair research — one focused on cellular mobilization rather than direct growth factor stimulation. Its mechanism of action through actin dynamics provides a complementary pathway to other repair peptides, which is why it has become one of the most commonly combined compounds in multi-peptide research protocols.\n\nThe preclinical evidence base is substantial, particularly for cardiac repair, wound healing, and neuroinflammation. Clinical investigation of the parent compound Thymosin Beta-4 has progressed furthest in ophthalmology, with Phase 2/3 trials for corneal healing providing the strongest clinical validation of the biological mechanism.\n\nFor researchers, TB-500 offers a well-characterized compound with a clear mechanistic profile and extensive preclinical support. Its complementary mechanism to BPC-157 — systemic cell migration versus localized growth factor signaling — explains why the two compounds are so frequently studied together.\n\nAs with all research peptides, TB-500 is designated for research use only and is not approved for human therapeutic use. Researchers should source from vendors with third-party COA documentation and verified purity testing."
+          ],
+          "target_values": [
+            "TB-500 represents a unique approach to tissue repair research — one focused on cellular mobilization rather than direct growth factor stimulation. Its mechanism of action through actin dynamics provides a complementary pathway to other repair peptides, which is why it has become one of the most commonly combined compounds in multi-peptide research protocols.\n\nThe preclinical evidence base is substantial, particularly for cardiac repair, wound healing, and neuroinflammation. Clinical investigation of the parent compound Thymosin Beta-4 has progressed furthest in ophthalmology, with Phase 2/3 trials for corneal healing providing the strongest clinical validation of the biological mechanism.\n\nFor researchers, TB-500 offers a well-characterized compound with a clear mechanistic profile and extensive preclinical support. Its complementary mechanism to BPC-157 — systemic cell migration versus localized growth factor signaling — explains why the two compounds are so frequently studied together.\n\nAs with all research peptides, TB-500 is designated for research use only and is not approved for human therapeutic use."
+          ],
+          "op": "The old sentence (with its leading space) must occur exactly once; str_replace it with \"\". Skip if already at the target; else WARNING \"old mismatch\" + excerpt, column untouched.",
+          "edits": [
+            {
+              "old": " Researchers should source from vendors with third-party COA documentation and verified purity testing.",
+              "new": ""
+            }
+          ]
+        }
+      }
+    },
+    "blog:safe-handling-of-peptides-in-laboratory-settings": {
+      "lookup": "blogs WHERE LOWER(TRIM(slug)) = \"safe-handling-of-peptides-in-laboratory-settings\": exactly 1 row, else warn and write nothing. (Not live: /blog/safe-handling-of-peptides-in-laboratory-settings returned 404 on 22 Oct.)",
+      "columns": {
+        "description": {
+          "old_values": [
+            "BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation, and promote faster recovery from injuries."
+          ],
+          "target_values": [
+            "General laboratory handling practices for research peptides: storage conditions, protective equipment and record-keeping."
+          ],
+          "new_value": "General laboratory handling practices for research peptides: storage conditions, protective equipment and record-keeping.",
+          "op": "Write only on exact (normalized) match."
+        }
+      }
+    }
+  },
+  "do_not_touch": [
+    "bpc-157 faqs (#65)",
+    "regulatory_important_note, key_points (#65)",
+    "tb-500 faqs (155000)",
+    "every other column/post",
+    "product_categories.description",
+    "legacy unlinked education_posts rows"
+  ],
+  "simulation": [
+    {
+      "order": "120",
+      "reachable_via_migrate": true,
+      "mismatches": [],
+      "rerun_noop": true,
+      "rerun_log": [
+        "120 op0 skip",
+        "120 au skip",
+        "120 ref skip"
+      ]
+    },
+    {
+      "order": "170",
+      "reachable_via_migrate": true,
+      "mismatches": [],
+      "rerun_noop": true,
+      "rerun_log": [
+        "170 reg skip",
+        "170 pre skip",
+        "170 hu skip",
+        "170 bg skip",
+        "170 conc skip",
+        "170 hl skip",
+        "170 ref skip",
+        "170 desc skip",
+        "170 tb formula skip",
+        "170 tb mw skip",
+        "170 tb hl skip",
+        "170 tb conc skip"
+      ]
+    },
+    {
+      "order": "120→170",
+      "reachable_via_migrate": true,
+      "mismatches": [],
+      "rerun_noop": true,
+      "rerun_log": [
+        "120 op0 skip",
+        "120 au skip",
+        "120 ref skip",
+        "170 reg skip",
+        "170 pre skip",
+        "170 hu skip",
+        "170 bg skip",
+        "170 conc skip",
+        "170 hl skip",
+        "170 ref skip",
+        "170 desc skip",
+        "170 tb formula skip",
+        "170 tb mw skip",
+        "170 tb hl skip",
+        "170 tb conc skip"
+      ]
+    },
+    {
+      "order": "170→120",
+      "reachable_via_migrate": false,
+      "mismatches": [
+        "120 op0 MISMATCH",
+        "120 au MISMATCH",
+        "120 ref MISMATCH"
+      ],
+      "rerun_noop": true,
+      "rerun_log": [
+        "170 reg skip",
+        "170 pre skip",
+        "170 hu skip",
+        "170 bg skip",
+        "170 conc skip",
+        "170 hl skip",
+        "170 ref skip",
+        "170 desc skip",
+        "170 tb formula skip",
+        "170 tb mw skip",
+        "170 tb hl skip",
+        "170 tb conc skip",
+        "120 op0 MISMATCH",
+        "120 au MISMATCH",
+        "120 ref MISMATCH"
+      ]
+    }
+  ],
+  "regex": {
+    "dose": "(?i)\\b\\d+(?:[.,]\\d+)?\\s?(?:mg|mcg|µg|μg|ug|ng|kg|g|ml|cc|iu|units?)\\b|mg/kg|/kg\\b|per kilogram|\\bdos(?:e|es|ed|ing|age|ages)\\b|\\b(?:micro|milli)grams?\\b|\\bprotocols?\\b|\\bcycl(?:e|es|ing)\\b|\\bstack(?:s|ing|ed)?\\b",
+    "sourcing": "(?i)\\b(?:buy|buying|purchas\\w*|(?<!executive )order(?:s|ing)?|vendors?|suppliers?|sourc(?:e|es|ing)|shop\\w*|discount\\w*|coupons?|in stock|for sale|where to (?:buy|get))\\b",
+    "new_text_hits": [],
+    "full_page_hits_after_120000_170000_excluding_faqs": []
+  }
+}
