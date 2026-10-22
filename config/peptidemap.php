@@ -9,18 +9,19 @@ return [
     | {question, answer} list feeds both that section and faqPageSchema().
     |
     | Blog slugs are derived from EducationalContentPublisher::catalog()
-    | (kind blog) via blogSlugs(). Those faq() pairs are QA-passed, so
-    | the list is not copied by hand. Encyclopedia starts empty: the
-    | live BPC-157 FAQ is still the old use-guidance copy, and its
-    | replacement has not merged. Matching for encyclopedia slugs is
-    | case-insensitive, so a later 'bpc-157' entry covers BPC-157.
+    | (kind blog) via blogSlugs(), excluding the FAQ render hold. Those
+    | faq() pairs are QA-passed, so the list is not copied by hand.
+    | Encyclopedia is bpc-157 now that the research-use FAQ replacement
+    | is on main. Matching for encyclopedia slugs is case-insensitive.
     |
     | Every other page keeps its existing FAQPage JSON-LD and does not
     | gain a visible FAQ. Stored FAQ rows are not rewritten.
     */
     'faq_render_allowlist' => [
         'blog' => EducationalContentPublisher::blogSlugs(),
-        'encyclopedia' => [],
+        'encyclopedia' => [
+            'bpc-157',
+        ],
     ],
 
 ];

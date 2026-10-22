@@ -838,16 +838,29 @@
                   </template>
                 </section>
 
-                <!-- FAQ — same stored pairs as the FAQPage JSON-LD. -->
-                <section v-if="faqs.length" id="faq" class="mb-12">
+                <!-- FAQ — only the controller allowlist passes a non-empty list. Plain text; no v-html. -->
+                <section v-if="faqs && faqs.length" id="faqs" class="mb-12">
                   <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
+                    <div class="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-help w-5 h-5 text-white" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <path d="M12 17h.01"></path>
+                      </svg>
+                    </div>
                     <h2 class="text-2xl font-semibold text-slate-900 m-0">
-                      FAQ
+                      Frequently asked questions
                     </h2>
                   </div>
-                  <div v-for="(faq, index) in faqs" :key="index" class="mb-6">
-                    <h3 class="text-lg font-semibold text-slate-900 mb-2">{{ faq.question }}</h3>
-                    <p class="text-slate-700 leading-relaxed mb-0">{{ faq.answer }}</p>
+                  <div class="space-y-4">
+                    <div
+                      v-for="(faq, index) in faqs"
+                      :key="index"
+                      class="bg-slate-50 border border-slate-200 rounded-lg p-5"
+                    >
+                      <h3 class="text-base font-semibold text-slate-900 mb-2">{{ faq.question }}</h3>
+                      <p class="text-slate-700 text-sm leading-relaxed whitespace-pre-line">{{ faq.answer }}</p>
+                    </div>
                   </div>
                 </section>
 
@@ -1536,6 +1549,7 @@ const props = defineProps({
       // findings; nothing on the page frames human use at all.
       { id: 'regulatory-status', label: 'Regulatory Status' },
       { id: 'potential-applications', label: 'Potential Applications' },
+      { id: 'faqs', label: 'FAQ' },
       { id: 'references', label: 'References' }
     ]
   },
@@ -1823,20 +1837,12 @@ const canonical = computed(() => {
 const visibleContents = computed(() => {
   const items = props.contents || []
   const hasReferences = Array.isArray(props.references) && props.references.length > 0
-  const visible = items.filter((item) => item.id !== 'references' || hasReferences)
-  if (!Array.isArray(props.faqs) || props.faqs.length === 0) {
-    return visible
-  }
-  const faqItem = { id: 'faq', label: 'FAQ' }
-  const referenceIndex = visible.findIndex((item) => item.id === 'references')
-  if (referenceIndex === -1) {
-    return [...visible, faqItem]
-  }
-  return [
-    ...visible.slice(0, referenceIndex),
-    faqItem,
-    ...visible.slice(referenceIndex),
-  ]
+  const hasFaqs = Array.isArray(props.faqs) && props.faqs.length > 0
+  return items.filter((item) => {
+    if (item.id === 'references') return hasReferences
+    if (item.id === 'faqs') return hasFaqs
+    return true
+  })
 })
 
 // Watch for SEO changes and update document meta tags

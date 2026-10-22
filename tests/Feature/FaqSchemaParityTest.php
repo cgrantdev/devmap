@@ -245,28 +245,9 @@ HTML;
         );
     }
 
-    public function test_bpc_157_with_empty_allowlist_keeps_existing_faqpage_and_has_no_visible_faq(): void
+    public function test_bpc_157_allowlist_renders_visible_faq_matching_json_ld(): void
     {
-        $this->assertSame([], config('peptidemap.faq_render_allowlist.encyclopedia'));
-
-        [$post, $stored, $expected] = $this->bpc157FaqFixture();
-
-        $response = $this->get('/encyclopedia/BPC-157');
-        $response->assertOk();
-        $response->assertSee('Overview paragraph stays.', false);
-        $response->assertSee(json_encode($expected, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), false);
-        $this->assertSame($expected, $this->faqPage($response->getContent()));
-
-        $response->assertInertia(fn ($page) => $page
-            ->has('faqs', 0)
-        );
-
-        $this->assertSame($stored, $post->fresh()->faqs);
-    }
-
-    public function test_runtime_encyclopedia_allowlist_renders_bpc_157_faq_matching_json_ld(): void
-    {
-        config(['peptidemap.faq_render_allowlist.encyclopedia' => ['bpc-157']]);
+        $this->assertSame(['bpc-157'], config('peptidemap.faq_render_allowlist.encyclopedia'));
 
         [$post, $stored, $expected, $question, $answer] = $this->bpc157FaqFixture();
 
