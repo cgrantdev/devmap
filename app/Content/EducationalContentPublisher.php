@@ -437,7 +437,7 @@ class EducationalContentPublisher
                 'og_title' => 'Retatrutide vs Tirzepatide: Triple Agonist, Dual Agonist',
                 'og_description' => 'Retatrutide is an investigational triple agonist. Tirzepatide is an approved dual agonist. This note keeps their own trials, weeks, and estimands apart.',
                 'blog_type' => 'Research',
-                'read_time' => '6 Min Read',
+                'read_time' => '7 Min Read',
                 'published_at' => $published,
                 'is_featured' => false,
                 'author_name' => 'Peptidemap',
