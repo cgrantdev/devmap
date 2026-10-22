@@ -1249,7 +1249,7 @@ class CompareController extends Controller
             'mechanism' => ($m = strip_tags((string) $ep?->mechanism_of_action_intro)) !== '' && ! CompareHubBlurb::hasOutcomeClaim($m) ? $m : null,
             'half_life' => $ep?->half_life,
             'administration' => CompareHubBlurb::hasOutcomeClaim($ep?->administration) ? null : $ep?->administration,
-            'key_effects' => array_values(array_filter($normalize($ep?->key_effects ?? null), fn ($x) => ! CompareHubBlurb::hasOutcomeClaim(trim(($x['heading'] ?? '').' '.($x['text'] ?? ''))))),
+            'key_effects' => array_values(array_filter($normalize($ep?->key_effects ?? null), fn ($x) => ! CompareHubBlurb::hasOutcomeClaim($t = trim(($x['heading'] ?? '').' '.($x['text'] ?? ''))) && ! preg_match('/\b(?:supports?|supporting|stabiliz\w*|\w*protective|protects?|suppress\w*|synergistic|fuels?|lipolysis|lean\s+body|recovery|repair|elasticity|testosterone|mood|anti[-\s]?inflammatory|longevity|libido|desire|arousal)\b/iu', $t))),
             'use_cases' => [],
         ];
     }

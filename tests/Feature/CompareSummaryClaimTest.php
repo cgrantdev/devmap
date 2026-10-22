@@ -45,6 +45,7 @@ class CompareSummaryClaimTest extends TestCase
             'mechanism_of_action_intro' => 'Accelerates tendon and ligament healing',
             'key_effects' => [
                 ['title' => 'Superior weight reduction', 'content' => 'Greater than GLP-1 alone'],
+                'Supports skin elasticity',
             ],
             'common_use_cases' => [
                 ['title' => 'IBD', 'content' => 'Studied in inflammatory bowel models'],
@@ -91,6 +92,7 @@ class CompareSummaryClaimTest extends TestCase
         $this->assertSame('PMAP', $vsProps['a']['top_vendors'][0]['brand_coupon_code']);
         $this->assertEquals(19.8, $vsProps['a']['top_vendors'][0]['pmap_price']);
         $vs->assertDontSee('Superior weight reduction', false);
+        $vs->assertDontSee('Supports skin elasticity', false);
         $this->assertSame([], $vsProps['a']['key_effects']);
         $this->assertSame([], $vsProps['a']['use_cases']);
         $this->assertNull($vsProps['a']['mechanism']);
@@ -119,6 +121,10 @@ class CompareSummaryClaimTest extends TestCase
         $this->assertSame($disclaimer, CompareHubBlurb::guard('5-amino-1mq', $disclaimer));
         $this->assertNotSame('Listed for research use only.', CompareHubBlurb::guard('5-amino-1mq', $disclaimer));
         $this->assertFalse(CompareHubBlurb::hasOutcomeClaim(null));
+
+        $epitalon = 'Epitalon (Epithalon) is the synthetic tetrapeptide Ala-Glu-Asp-Gly (AEDG), developed in pineal bioregulator research associated with the Khavinson group. It is studied primarily for telomerase/telomere effects in cell systems. It is not FDA-approved. Independent human longevity RCTs are lacking. Educational only.';
+        $this->assertSame($epitalon, CompareHubBlurb::guard('epitalon', $epitalon."\n\nOne study reported up to 33% longer survival."));
+        $this->assertSame('Oxytocin is a cyclic nonapeptide hormone.', CompareHubBlurb::guard('oxytocin-test', 'Oxytocin is a cyclic nonapeptide hormone. Pitocin is the approved oxytocin injection used in obstetric care.'));
     }
 
     private function assertOgTagline(ProductCategory $category, string $expected, string $forbidden): void
