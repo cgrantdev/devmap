@@ -5,8 +5,10 @@ namespace Tests\Feature;
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
 use Database\Seeders\EncyclopediaFieldUpdatesOctober22Seeder;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -332,6 +334,12 @@ class EncyclopediaFieldUpdatesOctober22Test extends TestCase
 
         $this->wipe();
         $category = ProductCategory::create(['name' => 'BPC-157', 'slug' => 'BPC-157', 'is_active' => true]);
+        // product_category_id is unique, so two linked posts cannot be
+        // inserted on a migrated database. Drop that index only here so
+        // the seeder's post_count=2 guard is still exercised.
+        Schema::table('education_posts', function (Blueprint $table) {
+            $table->dropUnique(['product_category_id']);
+        });
         $left = $this->encyclopediaPost($category, 'dup-post-a', array_merge($this->oldAttributes('bpc-157'), ['overview' => 'DUP-A']));
         $right = $this->encyclopediaPost($category, 'dup-post-b', array_merge($this->oldAttributes('bpc-157'), ['overview' => 'DUP-B']));
         $leftBefore = $left->getAttributes();
