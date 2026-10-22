@@ -62,8 +62,14 @@
         </div>
       </nav>
 
-      <!-- Logout -->
-      <div class="px-3 py-4 border-t border-white/[0.06]">
+      <!-- Account + logout -->
+      <div class="px-3 py-4 border-t border-white/[0.06] space-y-1">
+        <a href="/admin/profile" class="w-full flex items-center gap-3 px-3 py-2 text-[13px] text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+          Account &amp; password
+        </a>
         <form @submit.prevent="logout">
           <button type="submit" class="w-full flex items-center gap-3 px-3 py-2 text-[13px] text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">

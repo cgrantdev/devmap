@@ -381,6 +381,13 @@ Route::post('/api/dev-console/run', [\App\Http\Controllers\Admin\DevConsoleContr
 Route::middleware(['auth', 'role:admin,admin_viewer,seo_agency', 'email.verified', 'block.viewer.writes', \App\Http\Middleware\BlockSeoAgency::class])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
+    // In-admin profile editor — change name/email/password without
+    // leaving the admin UI. Available to every admin role including
+    // seo_agency so Jake can rotate the generated password.
+    Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('admin.profile');
+    Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'updateProfile'])->name('admin.profile.update');
+    Route::post('/profile/password', [\App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('admin.profile.password');
+
     // CEO-only dashboard. ceo.only middleware locks the endpoint down to
     // info@peptidemap.com; sidebar link is gated separately in Vue via
     // the `is_ceo` shared prop.
