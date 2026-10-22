@@ -188,38 +188,37 @@ HTML;
         );
     }
 
-    public function test_bpc_157_allowlist_renders_visible_faq_matching_json_ld(): void
+    public function test_bpc_157_with_empty_allowlist_keeps_existing_faqpage_and_has_no_visible_faq(): void
     {
-        $question = 'What does this bpc-157 entry record?';
-        $answer = 'It records a catalog label only.';
-        $stored = [[
-            'question' => '  '.$question.'  ',
-            'answer' => '<p>'.$answer.'</p>',
-        ]];
+        $this->assertSame([], config('peptidemap.faq_render_allowlist.encyclopedia'));
 
-        $category = ProductCategory::create([
-            'name' => 'BPC-157',
-            'slug' => 'BPC-157',
-            'is_active' => true,
-        ]);
-        $post = EducationPost::create([
-            'title' => 'BPC-157',
-            'slug' => 'BPC-157',
-            'product_category_id' => $category->id,
-            'status' => 'published',
-            'show_in_encyclopedia' => true,
-            'overview' => 'Overview paragraph stays.',
-            'faqs' => $stored,
-        ]);
+        [$post, $stored, $expected] = $this->bpc157FaqFixture();
 
         $response = $this->get('/encyclopedia/BPC-157');
         $response->assertOk();
+        $response->assertSee('Overview paragraph stays.', false);
+        $response->assertSee(json_encode($expected, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), false);
+        $this->assertSame($expected, $this->faqPage($response->getContent()));
+
+        $response->assertInertia(fn ($page) => $page
+            ->has('faqs', 0)
+        );
+
+        $this->assertSame($stored, $post->fresh()->faqs);
+    }
+
+    public function test_runtime_encyclopedia_allowlist_renders_bpc_157_faq_matching_json_ld(): void
+    {
+        config(['peptidemap.faq_render_allowlist.encyclopedia' => ['bpc-157']]);
+
+        [$post, $stored, $expected, $question, $answer] = $this->bpc157FaqFixture();
+
+        $response = $this->get('/encyclopedia/BPC-157');
+        $response->assertOk();
+        $response->assertSee(json_encode($expected, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), false);
 
         $faqPage = $this->faqPage($response->getContent());
-        $this->assertNotNull($faqPage);
-        $this->assertCount(1, $faqPage['mainEntity']);
-        $this->assertSame($question, $faqPage['mainEntity'][0]['name']);
-        $this->assertSame($answer, $faqPage['mainEntity'][0]['acceptedAnswer']['text']);
+        $this->assertSame($expected, $faqPage);
 
         $response->assertInertia(fn ($page) => $page
             ->has('faqs', 1)
@@ -347,6 +346,46 @@ HTML;
                 $response->assertDontSee($needle, false);
             }
         }
+    }
+
+    /**
+     * @return array{0: EducationPost, 1: list<array{question: string, answer: string}>, 2: array<string, mixed>, 3: string, 4: string}
+     */
+    private function bpc157FaqFixture(): array
+    {
+        $question = 'What does this bpc-157 entry record?';
+        $answer = 'It records a catalog label only.';
+        $stored = [[
+            'question' => '  '.$question.'  ',
+            'answer' => '<p>'.$answer.'</p>',
+        ]];
+        $expected = [
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            '@id' => url('/encyclopedia/BPC-157#faq'),
+            'mainEntity' => [[
+                '@type' => 'Question',
+                'name' => $question,
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => $answer],
+            ]],
+        ];
+
+        $category = ProductCategory::create([
+            'name' => 'BPC-157',
+            'slug' => 'BPC-157',
+            'is_active' => true,
+        ]);
+        $post = EducationPost::create([
+            'title' => 'BPC-157',
+            'slug' => 'BPC-157',
+            'product_category_id' => $category->id,
+            'status' => 'published',
+            'show_in_encyclopedia' => true,
+            'overview' => 'Overview paragraph stays.',
+            'faqs' => $stored,
+        ]);
+
+        return [$post, $stored, $expected, $question, $answer];
     }
 
     /**
