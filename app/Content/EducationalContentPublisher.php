@@ -1238,7 +1238,8 @@ class EducationalContentPublisher
     /**
      * Eloralintide vs petrelintide amylin-class comparison.
      * Sources checked 22 October 2026. Body lives in
-     * resources/content/educational. read_time is ceil(words/230).
+     * resources/content/educational. read_time is
+     * ceil(rendered words/230), body text plus sources.
      *
      * @return array<int, array<string, mixed>>
      */
@@ -1257,7 +1258,7 @@ class EducationalContentPublisher
                 'og_title' => 'Eloralintide vs Petrelintide: Class, Trials and Status',
                 'og_description' => 'Two investigational amylin-class peptides. Named trials, once-weekly study designs, approval status, and results this page does not compare.',
                 'blog_type' => 'Research',
-                'read_time' => '8 Min Read',
+                'read_time' => '9 Min Read',
                 'published_at' => '2026-10-22',
                 'is_featured' => false,
                 'author_name' => 'Peptidemap',
@@ -1265,17 +1266,17 @@ class EducationalContentPublisher
                 'key_points' => [
                     'Eloralintide (LY3841136) is Lilly\'s investigational selective amylin receptor agonist. Petrelintide (formerly ZP8396) is Zealand Pharma\'s long-acting amylin analogue, co-developed with Roche.',
                     'No head-to-head trial of the two was found. This page does not place one trial\'s percentages next to the other\'s.',
-                    'Eloralintide Phase 2 (NCT06230523) is published in The Lancet. On the efficacy estimand, the abstract reports −9%, −12%, −18%, and −20% from the lowest fixed dose arm to the highest, versus −0.4% with placebo.',
-                    'Petrelintide Phase 2 results have been reported for ZUPREME-1 (Roche, 5 March 2026; an ADA abstract) and ZUPREME-2 (Zealand, 7 October 2026). Per-arm percentages are not repeated here.',
+                    'Eloralintide Phase 2 (NCT06230523) is published in The Lancet in a developer-affiliated paper (Lilly-funded, with Lilly authors). It reports dose-dependent weight reduction versus placebo; per-arm percentages are not repeated here.',
+                    'Petrelintide Phase 2 results have been reported for ZUPREME-1 (Roche, company-reported, 5 March 2026; a developer-affiliated ADA abstract; and a developer-affiliated Lancet Diabetes & Endocrinology paper, PMID 42810355) and ZUPREME-2 (Zealand, company-reported topline, 7 October 2026). Per-arm percentages are not repeated here.',
                     'Phase 3 programmes on ClinicalTrials.gov: ENLIGHTEN for eloralintide, and ZUPREME-3, ZUPREME-4, and ZUPREME-5 for petrelintide. Those records were recruiting, with no results posted, on 22 October 2026.',
                     'Neither compound was found to be approved. A research-use-only vial is not the trial material.',
                 ],
                 'faq' => self::faq($host.'/blog/eloralintide-vs-petrelintide#faq', [
                     ['Are eloralintide and petrelintide the same molecule?', 'No. Eloralintide (LY3841136) is Eli Lilly\'s investigational selective amylin receptor agonist. Petrelintide, formerly ZP8396, is a long-acting amylin analogue from Zealand Pharma, co-developed with Roche. No head-to-head trial of the two was found in the sources checked on 22 October 2026.'],
                     ['Is either compound approved?', 'No approval was found. Zealand Pharma\'s pipeline page says petrelintide has not been evaluated or approved for marketing by any regulatory authority. Lilly describes eloralintide as investigational. Approval of tirzepatide does not approve eloralintide, EloraTZP, or petrelintide.'],
-                    ['What trials are studying petrelintide?', 'Phase 2 ZUPREME-1 (NCT06662539) compared once-weekly petrelintide with placebo in people with obesity or overweight without type 2 diabetes. Phase 2 ZUPREME-2 (NCT06926842) compared once-weekly petrelintide with placebo in people with overweight or obesity and type 2 diabetes. ClinicalTrials.gov lists both as completed. Phase 3 ZUPREME-3, ZUPREME-4, and ZUPREME-5 (NCT07843498, NCT07843485, and NCT07843472) are sponsored by Roche with Zealand Pharma as a collaborator and were listed as recruiting on 22 October 2026.'],
-                    ['Have petrelintide results been reported?', 'Yes, by the sponsors, and this page does not repeat the per-arm percentages. Roche announced ZUPREME-1 Phase 2 results on 5 March 2026. An American Diabetes Association abstract also reports that trial (DOI 10.2337/db26-3083-lb). Zealand Pharma announced ZUPREME-2 topline results on 7 October 2026. Phase 3 results were not posted on the registry records checked that day.'],
-                    ['What did eloralintide\'s Phase 2 trial report?', 'Billings and colleagues reported a 48-week, once-weekly Phase 2 trial of eloralintide alone in 263 adults with obesity or overweight and without type 2 diabetes (The Lancet; PMID 41207310; NCT06230523). On the efficacy estimand, the abstract reports mean percent change in body weight of −9%, −12%, −18%, and −20% from the lowest fixed dose arm to the highest, versus −0.4% with placebo. Those figures are not petrelintide results and are not a comparison with petrelintide.'],
+                    ['What trials are studying petrelintide?', 'Phase 2 ZUPREME-1 (NCT06662539) compared once-weekly petrelintide with placebo in people with obesity or overweight without type 2 diabetes. Phase 2b ZUPREME-2 (NCT06926842) compared once-weekly petrelintide with placebo in people with overweight or obesity and type 2 diabetes. ClinicalTrials.gov lists both as completed. Phase 3 ZUPREME-3, ZUPREME-4, and ZUPREME-5 (NCT07843498, NCT07843485, and NCT07843472) are sponsored by Roche with Zealand Pharma as a collaborator and were listed as recruiting on 22 October 2026.'],
+                    ['Have petrelintide results been reported?', 'Yes, and this page does not repeat the per-arm percentages. Roche announced company-reported ZUPREME-1 Phase 2 results on 5 March 2026. A developer-affiliated American Diabetes Association abstract (DOI 10.2337/db26-3083-lb) and a developer-affiliated paper in The Lancet Diabetes & Endocrinology (PMID 42810355, published online 29 September 2026) also report that trial. Zealand Pharma announced company-reported ZUPREME-2 topline results on 7 October 2026. Phase 3 results were not posted on the registry records checked that day.'],
+                    ['What did eloralintide\'s Phase 2 trial report?', 'In a developer-affiliated paper (funded by Eli Lilly, with Lilly employees among the authors), Billings and colleagues reported a 48-week, once-weekly Phase 2 trial of eloralintide alone in 263 adults with obesity or overweight and without type 2 diabetes (The Lancet; PMID 41207310; NCT06230523). The abstract reports dose-dependent reductions in body weight versus placebo on the efficacy estimand. Per-arm percentages are not repeated here, and these are not petrelintide results or a comparison with petrelintide.'],
                     ['Is a research-use vial the same as the trial drug?', 'No. A research-use-only vial is not the investigational material used in these trials and is not an approved medicine. Peptidemap compares research-use and grey-area peptide listings. It is not a clinic, a pharmacy, or a seller. See the peptide legality guide for FDA, RUO, and compounding status. This page is not medical advice and does not give a dose.'],
                 ]),
             ],

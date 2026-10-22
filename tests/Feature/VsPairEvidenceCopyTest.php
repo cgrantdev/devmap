@@ -40,11 +40,8 @@ class VsPairEvidenceCopyTest extends TestCase
         $this->assertStringContainsString('company-reported', $note);
         $this->assertStringContainsString('sponsor press release', $note);
         $this->assertStringContainsString('no peer-reviewed paper', $note);
-        $this->assertStringContainsString('lowest combination dose arm', $note);
-        $this->assertStringContainsString('highest combination dose arm', $note);
-        $this->assertStringContainsString('−23.3%', $note);
-        $this->assertStringContainsString('−14.8%', $note);
-        $this->assertStringContainsString('−3.0%', $note);
+        $this->assertStringContainsString('not repeated on this compare page', $note);
+        $this->assertDoesNotMatchRegularExpression('/[−-]\d+(\.\d+)?%/u', $note);
         $this->assertDoesNotMatchRegularExpression('/\d+\s*mg\b/i', $note);
         $this->assertDoesNotMatchRegularExpression('/\bwinner\b/i', $note);
         $this->assertSame([], $copy['faqs']);

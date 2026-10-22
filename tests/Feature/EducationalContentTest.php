@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Content\EducationalContentPublisher;
 use App\Content\ListingImageGuard;
+use App\Support\SimpleMarkdown;
 use App\Models\Blog;
 use App\Models\EducationalGuide;
 use App\Models\ProductCategory;
@@ -2087,9 +2088,16 @@ class EducationalContentTest extends TestCase
         $this->assertLessThanOrEqual(155, strlen($ogDescription));
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
-        $words = preg_match_all('/\S+/u', trim($markdown));
+        $rendered = html_entity_decode(
+            strip_tags(SimpleMarkdown::toHtml(EducationalContentPublisher::prepare($markdown))),
+            ENT_QUOTES | ENT_HTML5,
+            'UTF-8'
+        );
+        $words = preg_match_all('/\S+/u', trim(preg_replace('/\s+/u', ' ', $rendered) ?? $rendered));
+        $this->assertSame(1874, $words);
+        $this->assertGreaterThan(1840, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $entry['read_time']);
-        $this->assertSame('8 Min Read', $entry['read_time']);
+        $this->assertSame('9 Min Read', $entry['read_time']);
 
         $this->assertSame(1, Blog::where('slug', $slug)->count());
         $blog = Blog::where('slug', $slug)->firstOrFail();
@@ -2103,7 +2111,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
         $this->assertSame('2026-10-22', $blog->published_at->toDateString());
         $this->assertSame('Research', $blog->blog_type);
-        $this->assertSame('8 Min Read', $blog->read_time);
+        $this->assertSame('9 Min Read', $blog->read_time);
         $this->assertSame('Peptidemap', $blog->author_name);
         $this->assertFalse((bool) $blog->is_featured);
         $this->assertSame('published', $blog->status);
@@ -2121,6 +2129,9 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('/compare/eloralintide-vs-tirzepatide', $markdown);
         $this->assertStringContainsString('/guides/peptide-legality-fda-ruo-compounding', $markdown);
         $this->assertDoesNotMatchRegularExpression('/\d+\s*mg\b/i', $markdown);
+        $pageCopy = $markdown."\n".json_encode($entry['key_points'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)."\n".json_encode($entry['faq'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->assertDoesNotMatchRegularExpression('/[−-]\d+(\.\d+)?%/u', $pageCopy);
+        $this->assertDoesNotMatchRegularExpression('/\d+(\.\d+)?%/u', $pageCopy);
         foreach (EducationalContentPublisher::COMPETITOR_HOSTS as $host) {
             $this->assertStringNotContainsString($host, $markdown);
         }

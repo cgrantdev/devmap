@@ -142,6 +142,7 @@ return [
         'cagrilintide-vs-semaglutide',
         'cjc-1295-vs-ipamorelin',
         'elamipretide-vs-mots-c',
+        'eloralintide-vs-tirzepatide',
         'ghk-cu-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv',
         'ghk-cu-vs-tb-500',
         'glow-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv',
