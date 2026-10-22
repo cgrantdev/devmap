@@ -656,4 +656,176 @@ class IngestionPipelineTest extends TestCase
             $product->fresh()->product_url
         );
     }
+
+    public function test_promote_matches_an_http_variant_url_to_the_https_row(): void
+    {
+        $brand = $this->makeBrand();
+        $config = $this->makeConfig($brand);
+        $five = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'http-bpc-5mg',
+            'brand_id' => $brand->id,
+            'price' => 30,
+            'product_url' => 'https://elite.example.com/product/bpc-157?attribute_pa_size=5mg',
+            'status' => 'active',
+        ]);
+        $ten = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'http-bpc-10mg',
+            'brand_id' => $brand->id,
+            'price' => 50,
+            'product_url' => 'https://elite.example.com/product/bpc-157?attribute_pa_size=10mg',
+            'status' => 'active',
+        ]);
+
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'http-10mg',
+            'name' => 'BPC-157',
+            'price' => '55.00',
+            'source_url' => 'http://elite.example.com/product/bpc-157?attribute_pa_size=10mg',
+        ]);
+
+        $updated = $ingestion->promote($staged->fresh());
+
+        $this->assertNotNull($updated);
+        $this->assertSame($ten->id, $updated->id);
+        $this->assertEqualsWithDelta(55.00, (float) $ten->fresh()->price, 0.001);
+        $this->assertEqualsWithDelta(30.00, (float) $five->fresh()->price, 0.001);
+        $this->assertSame(
+            'https://elite.example.com/product/bpc-157?attribute_pa_size=10mg',
+            $ten->fresh()->product_url
+        );
+        $this->assertSame(
+            'https://elite.example.com/product/bpc-157?attribute_pa_size=5mg',
+            $five->fresh()->product_url
+        );
+        $this->assertSame(2, Product::where('brand_id', $brand->id)->count());
+    }
+
+    public function test_promote_matches_a_www_variant_url_to_the_non_www_row(): void
+    {
+        $brand = $this->makeBrand();
+        $config = $this->makeConfig($brand);
+        $five = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'www-bpc-5mg',
+            'brand_id' => $brand->id,
+            'price' => 30,
+            'product_url' => 'https://elite.example.com/product/bpc-157?attribute_pa_size=5mg',
+            'status' => 'active',
+        ]);
+        $ten = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'www-bpc-10mg',
+            'brand_id' => $brand->id,
+            'price' => 50,
+            'product_url' => 'https://elite.example.com/product/bpc-157?attribute_pa_size=10mg',
+            'status' => 'active',
+        ]);
+
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'www-10mg',
+            'name' => 'BPC-157',
+            'price' => '55.00',
+            'source_url' => 'https://www.elite.example.com/product/bpc-157?attribute_pa_size=10mg',
+        ]);
+
+        $updated = $ingestion->promote($staged->fresh());
+
+        $this->assertNotNull($updated);
+        $this->assertSame($ten->id, $updated->id);
+        $this->assertEqualsWithDelta(55.00, (float) $ten->fresh()->price, 0.001);
+        $this->assertEqualsWithDelta(30.00, (float) $five->fresh()->price, 0.001);
+        $this->assertSame(
+            'https://elite.example.com/product/bpc-157?attribute_pa_size=10mg',
+            $ten->fresh()->product_url
+        );
+        $this->assertSame(
+            'https://elite.example.com/product/bpc-157?attribute_pa_size=5mg',
+            $five->fresh()->product_url
+        );
+        $this->assertSame(2, Product::where('brand_id', $brand->id)->count());
+    }
+
+    public function test_promote_leaves_pending_when_the_name_matches_more_than_one_row(): void
+    {
+        $brand = $this->makeBrand();
+        $config = $this->makeConfig($brand);
+        $five = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'name-bpc-5mg',
+            'brand_id' => $brand->id,
+            'price' => 30,
+            'product_url' => 'https://shop.example.com/product/bpc-157-5mg',
+            'status' => 'active',
+        ]);
+        $ten = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'name-bpc-10mg',
+            'brand_id' => $brand->id,
+            'price' => 50,
+            'product_url' => 'https://shop.example.com/product/bpc-157-10mg',
+            'status' => 'active',
+        ]);
+
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'name-ambiguous',
+            'name' => 'BPC-157',
+            'price' => '55.00',
+            'source_url' => 'https://shop.example.com/product/bpc-157-new',
+        ]);
+
+        Log::spy();
+        $this->assertNull($ingestion->promote($staged->fresh()));
+
+        $this->assertSame('pending', $staged->fresh()->status);
+        $this->assertEqualsWithDelta(30.00, (float) $five->fresh()->price, 0.001);
+        $this->assertEqualsWithDelta(50.00, (float) $ten->fresh()->price, 0.001);
+        $this->assertSame('https://shop.example.com/product/bpc-157-5mg', $five->fresh()->product_url);
+        $this->assertSame('https://shop.example.com/product/bpc-157-10mg', $ten->fresh()->product_url);
+        $this->assertSame(2, Product::where('brand_id', $brand->id)->count());
+        Log::shouldHaveReceived('warning')->withArgs(function ($message, $context) use ($staged, $five, $ten) {
+            $ids = $context['candidate_ids'] ?? [];
+
+            return $message === 'promote: ambiguous product name match'
+                && ($context['staged_id'] ?? null) === $staged->id
+                && (int) ($context['brand_id'] ?? 0) === (int) $five->brand_id
+                && in_array($five->id, $ids, true)
+                && in_array($ten->id, $ids, true);
+        })->once();
+    }
+
+    public function test_promote_matches_a_mid_path_double_slash_without_creating_a_duplicate(): void
+    {
+        $brand = $this->makeBrand();
+        $config = $this->makeConfig($brand);
+        $product = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'slash-bpc',
+            'brand_id' => $brand->id,
+            'price' => 40,
+            'product_url' => 'https://acme.example.com/products/bpc-157',
+            'status' => 'active',
+        ]);
+
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'slash-bpc',
+            'name' => 'Staged double slash',
+            'price' => '45.00',
+            'source_url' => 'https://acme.example.com/products//bpc-157',
+        ]);
+
+        $updated = $ingestion->promote($staged->fresh());
+
+        $this->assertNotNull($updated);
+        $this->assertSame($product->id, $updated->id);
+        $this->assertEqualsWithDelta(45.00, (float) $product->fresh()->price, 0.001);
+        $this->assertSame('https://acme.example.com/products/bpc-157', $product->fresh()->product_url);
+        $this->assertSame('approved', $staged->fresh()->status);
+        $this->assertSame(1, Product::where('brand_id', $brand->id)->count());
+    }
 }

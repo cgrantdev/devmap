@@ -286,9 +286,21 @@ class IngestionService
             // URL never reaches this point unless a stronger match exists.
             $product = $existing;
             if (!$product && $brandId && !empty($staged->name)) {
-                $product = Product::where('brand_id', $brandId)
+                $byName = Product::where('brand_id', $brandId)
                     ->where('name', $staged->name)
-                    ->first();
+                    ->orderBy('id')
+                    ->limit(2)
+                    ->get();
+                if ($byName->count() > 1) {
+                    Log::warning('promote: ambiguous product name match', [
+                        'staged_id' => $staged->id,
+                        'brand_id' => $brandId,
+                        'candidate_ids' => $byName->pluck('id')->all(),
+                    ]);
+
+                    return null;
+                }
+                $product = $byName->first();
             }
 
             if ($product) {
@@ -489,7 +501,8 @@ class IngestionService
             ->where('product_url', '!=', '')
             ->whereRaw("product_url LIKE ? ESCAPE '\\'", ['%'.$this->likeLiteral($host).'%']);
 
-        $pathNeedle = trim($path, '/');
+        $segments = array_values(array_filter(explode('/', $path), 'strlen'));
+        $pathNeedle = $segments === [] ? '' : end($segments);
         if ($pathNeedle !== '') {
             $query->whereRaw("product_url LIKE ? ESCAPE '\\'", ['%'.$this->likeLiteral($pathNeedle).'%']);
         }
@@ -517,15 +530,15 @@ class IngestionService
             return null;
         }
 
-        $scheme = strtolower($parts['scheme'] ?? 'https');
         $host = strtolower($parts['host']);
+        $host = str_starts_with($host, 'www.') ? substr($host, 4) : $host;
         $path = preg_replace('#/+#', '/', $parts['path'] ?? '') ?? '';
         $path = rtrim($path, '/');
 
         return [
             'host' => $host,
             'path' => $path,
-            'path_key' => $scheme.'://'.$host.$path,
+            'path_key' => $host.$path,
             'query_key' => $this->canonicalQueryKey($parts['query'] ?? ''),
         ];
     }
