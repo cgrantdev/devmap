@@ -28,16 +28,16 @@ class SeoDashboardController extends Controller
 {
     public function __construct(private SeoMetrics $seo) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $snap = $this->seo->snapshot(28);
         $snap7 = $this->seo->snapshot(7);
-
-        // Index-coverage counts — our side of the "what should rank" set
         $sitemapCount = $this->estimateSitemapCount();
 
         return Inertia::render('Admin/SeoDashboard', [
             'tab' => 'overview',
+            'is_agency' => (bool) ($request->user()?->isSeoAgency() ?? false),
+            'agency_welcome' => $this->agencyWelcome(),
             'snapshot_28d' => $snap,
             'snapshot_7d' => $snap7,
             'index_coverage' => [
@@ -46,6 +46,33 @@ class SeoDashboardController extends Controller
             ],
             'recovery_context' => $this->recoveryContext(),
         ]);
+    }
+
+    /**
+     * First-touch orientation shown to seo_agency users on the SEO
+     * dashboard. Short, actionable, and tells them exactly where to
+     * ask when they need something that isn't in the admin.
+     */
+    private function agencyWelcome(): array
+    {
+        return [
+            'contact_email' => 'colin@sercas.com',
+            'quick_links' => [
+                ['label' => 'Read the Playbook first', 'url' => '/admin/seo/playbook', 'why' => 'Site taxonomy + conventions + what NOT to touch'],
+                ['label' => 'Set per-URL SEO overrides', 'url' => '/admin/seo/pages', 'why' => 'Override title / meta / OG per page key'],
+                ['label' => 'Edit Products', 'url' => '/admin/products', 'why' => '4,500+ product pages, each with its own SEO tab'],
+                ['label' => 'Edit Blogs', 'url' => '/admin/blogs', 'why' => 'Long-form content + per-post SEO'],
+                ['label' => 'Edit Encyclopedia', 'url' => '/admin/encyclopedia-entries', 'why' => 'Compound reference articles'],
+                ['label' => 'Edit Compare pages', 'url' => '/admin/categories', 'why' => 'Price-comparison pages per compound'],
+                ['label' => 'GSC dashboard', 'url' => '/admin/ceo', 'why' => 'Top queries, top pages, opportunities (read-only)'],
+            ],
+            'how_to_ask' => [
+                'When your role is blocked from a page you need' => 'Email Colin with the page URL + what you need to do. He grants scoped access.',
+                'When you need a bulk operation' => 'Email Colin — Claude (the SEO engineer) runs backfills, regenerations, re-indexing requests on demand.',
+                'When you spot a bug' => 'Screenshot + URL + what you expected. Colin or Claude will fix within a day.',
+                'When you want new fields exposed in admin' => 'Describe what you want to edit; Claude will ship the UI.',
+            ],
+        ];
     }
 
     public function pages(): Response

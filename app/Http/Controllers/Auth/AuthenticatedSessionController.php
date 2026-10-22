@@ -44,9 +44,13 @@ class AuthenticatedSessionController extends Controller
                 return redirect($safeRedirect);
             }
 
-            // Route to the right dashboard based on role
+            // Route to the right dashboard based on role. seo_agency
+            // lands on the SEO dashboard directly (Colin 10/23) since
+            // the generic /admin/dashboard has sections they can't
+            // use. SEO dashboard IS their home.
             return match ($user->role) {
                 'admin', 'admin_viewer' => redirect()->intended('/admin/dashboard'),
+                'seo_agency' => redirect()->intended('/admin/seo'),
                 'vendor' => redirect()->intended('/vendor/dashboard'),
                 default => redirect()->intended('/'),
             };

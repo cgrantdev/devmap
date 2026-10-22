@@ -29,7 +29,12 @@ class AdminAuthenticatedSessionController extends Controller
         }
 
         // Admin and admin_viewer accounts skip email verification —
-        // they're internal staff accounts.
+        // they're internal staff accounts. seo_agency lands on their
+        // SEO dashboard directly (Colin 10/23).
+        $user = Auth::user();
+        if ($user && $user->role === 'seo_agency') {
+            return redirect()->intended('/admin/seo');
+        }
         return redirect()->intended('/admin/dashboard');
     }
 

@@ -143,6 +143,9 @@ class HandleInertiaRequests extends Middleware
             // Route is separately gated by the ceo.only middleware — this prop
             // is purely a UI hint, not a security boundary.
             'is_ceo' => fn () => strtolower((string) ($request->user()?->email ?? '')) === 'info@peptidemap.com',
+            // seo_agency role — the agency sees a limited sidebar and
+            // lands on /admin/seo instead of /admin/dashboard.
+            'is_seo_agency' => fn () => $request->user()?->role === 'seo_agency',
             'site_name' => fn () => Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap',
             'site_description' => fn () => \App\Support\SiteCopy::description(
                 Setting::where('key', 'site_description')->value('value')

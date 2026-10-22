@@ -32,6 +32,32 @@
 
       <!-- OVERVIEW -->
       <div v-if="tab === 'overview'" class="space-y-8">
+        <!-- Agency welcome / orientation — only shown to seo_agency role. -->
+        <section v-if="is_agency && agency_welcome" class="rounded-lg border border-indigo-200 bg-indigo-50/40 p-5">
+          <h2 class="text-base font-semibold text-indigo-900 mb-1">Welcome — start here</h2>
+          <p class="text-[13px] text-indigo-900/80 mb-4">
+            Your home base is this page. Below is where everything lives + how to reach us when you need something we haven't surfaced yet.
+          </p>
+
+          <h3 class="text-[12px] uppercase tracking-wider font-semibold text-indigo-700 mb-2">Where to find things</h3>
+          <ul class="space-y-1.5 mb-5">
+            <li v-for="link in agency_welcome.quick_links" :key="link.url" class="text-[13px]">
+              <a :href="link.url" class="text-indigo-700 hover:underline font-semibold">{{ link.label }}</a>
+              <span class="text-[color:var(--color-ink-muted)]"> — {{ link.why }}</span>
+            </li>
+          </ul>
+
+          <h3 class="text-[12px] uppercase tracking-wider font-semibold text-indigo-700 mb-2">How to ask for anything</h3>
+          <p class="text-[13px] text-[color:var(--color-ink-muted)] mb-2">
+            Direct contact: <a :href="`mailto:${agency_welcome.contact_email}`" class="text-indigo-700 hover:underline font-medium">{{ agency_welcome.contact_email }}</a>
+          </p>
+          <ul class="space-y-1 mb-1">
+            <li v-for="(answer, question) in agency_welcome.how_to_ask" :key="question" class="text-[13px] text-[color:var(--color-ink-muted)]">
+              <strong class="text-[color:var(--color-ink)]">{{ question }}:</strong> {{ answer }}
+            </li>
+          </ul>
+        </section>
+
         <!-- Recovery banner -->
         <section v-if="recovery_context"
           class="rounded-lg border border-amber-200 bg-amber-50 p-5">
@@ -292,6 +318,8 @@ const props = defineProps({
   playbook: { type: String, default: '' },
   seo_pages: { type: Array, default: () => [] },
   suggested_keys: { type: Array, default: () => [] },
+  is_agency: { type: Boolean, default: false },
+  agency_welcome: { type: Object, default: null },
 })
 
 // Pages tab state

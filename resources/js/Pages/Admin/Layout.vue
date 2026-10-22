@@ -16,22 +16,23 @@
         <div>
           <NavItem href="/admin/dashboard" icon="dashboard" label="Dashboard" />
           <NavItem href="/admin/analytics" icon="chart" label="Analytics" />
+          <NavItem href="/admin/seo" icon="chart" label="SEO Dashboard" />
           <NavItem v-if="$page.props.is_ceo" href="/admin/ceo" icon="crown" label="CEO" />
         </div>
 
         <!-- Catalog -->
         <div>
           <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Catalog</div>
-          <NavItem href="/admin/applicants" icon="user-plus" label="Applicants" :badge="$page.props.pending_vendors_count" badge-color="red" />
-          <NavItem href="/admin/vendors" icon="store" label="Vendors" />
+          <NavItem v-if="!$page.props.is_seo_agency" href="/admin/applicants" icon="user-plus" label="Applicants" :badge="$page.props.pending_vendors_count" badge-color="red" />
+          <NavItem v-if="!$page.props.is_seo_agency" href="/admin/vendors" icon="store" label="Vendors" />
           <NavItem href="/admin/products" icon="package" label="Products" />
           <NavItem href="/admin/categories" icon="folder" label="Categories" />
-          <NavItem href="/admin/deals" icon="tag" label="Deals & Coupons" />
-          <NavItem href="/admin/affiliates" icon="dollar" label="Affiliates" />
+          <NavItem v-if="!$page.props.is_seo_agency" href="/admin/deals" icon="tag" label="Deals & Coupons" />
+          <NavItem v-if="!$page.props.is_seo_agency" href="/admin/affiliates" icon="dollar" label="Affiliates" />
         </div>
 
-        <!-- Ingestion -->
-        <div>
+        <!-- Ingestion — hidden for seo_agency role entirely -->
+        <div v-if="!$page.props.is_seo_agency">
           <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Ingestion</div>
           <NavItem href="/admin/discover" icon="search" label="Vendor Discovery" />
           <NavItem href="/admin/product-scraping" icon="refresh" label="Scraping" />
@@ -43,18 +44,18 @@
           <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Content</div>
           <NavItem href="/admin/blogs" icon="file" label="Blog Posts" />
           <NavItem href="/admin/encyclopedia-entries" icon="book" label="Encyclopedia" />
-          <NavItem href="/admin/research" icon="file" label="Research" />
+          <NavItem v-if="!$page.props.is_seo_agency" href="/admin/research" icon="file" label="Research" />
         </div>
 
-        <!-- Marketing -->
-        <div>
+        <!-- Marketing — hidden for seo_agency -->
+        <div v-if="!$page.props.is_seo_agency">
           <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Marketing</div>
           <NavItem href="/admin/banners" icon="image" label="Homepage Banners" />
           <NavItem href="/admin/reviews" icon="message" label="Reviews" :badge="$page.props.pending_reviews_count" badge-color="yellow" />
         </div>
 
-        <!-- System -->
-        <div>
+        <!-- System — hidden for seo_agency -->
+        <div v-if="!$page.props.is_seo_agency">
           <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">System</div>
           <NavItem href="/admin/users" icon="users" label="Users" />
           <NavItem href="/admin/settings" icon="settings" label="Settings" />
