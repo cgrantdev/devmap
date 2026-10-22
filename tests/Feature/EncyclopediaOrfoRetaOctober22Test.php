@@ -43,8 +43,8 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
         $this->assertStringContainsString('EncyclopediaOrfoRetaOctober22Seeder', $migration);
         $this->assertStringContainsString('Previous encyclopedia field values are not restored.', $migration);
 
-        $legacyOrfo = $this->post(null, 'orforglipron', $this->oldAttributes('orforglipron'));
-        $legacyReta = $this->post(null, 'retatrutide', $this->oldAttributes('retatrutide'));
+        $legacyOrfo = $this->educationPost(null, 'orforglipron', $this->oldAttributes('orforglipron'));
+        $legacyReta = $this->educationPost(null, 'retatrutide', $this->oldAttributes('retatrutide'));
         $linked = $this->seedPair();
         $legacyBefore = [
             $legacyOrfo->id => $legacyOrfo->fresh()->getAttributes(),
@@ -90,7 +90,7 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
             $seeder->run();
 
             $this->assertSame('updated', $seeder->report[$slug], $categorySlug);
-            $this->assertSame($this->expected($slug), $this->readColumns($post->fresh()), $categorySlug);
+            $this->assertSame($this->expected($slug), $this->readColumns($post->fresh(), $slug), $categorySlug);
             $this->assertSame($categorySlug, $post->fresh()->category->slug);
         }
     }
@@ -99,8 +99,8 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
     {
         $first = ProductCategory::create(['name' => 'Retatrutide', 'slug' => 'retatrutide', 'is_active' => true]);
         $second = ProductCategory::create(['name' => 'Retatrutide spaced', 'slug' => ' RETATRUTIDE ', 'is_active' => true]);
-        $left = $this->post($first, 'reta-dup-a', $this->oldAttributes('retatrutide'));
-        $right = $this->post($second, 'reta-dup-b', $this->oldAttributes('retatrutide'));
+        $left = $this->educationPost($first, 'reta-dup-a', $this->oldAttributes('retatrutide'));
+        $right = $this->educationPost($second, 'reta-dup-b', $this->oldAttributes('retatrutide'));
         $before = [$left->fresh()->getAttributes(), $right->fresh()->getAttributes()];
         $warnings = $this->captureWarnings();
         $began = $this->countTransactions();
@@ -114,7 +114,7 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
         $this->assertSame(0, $began());
         $this->assertSame($before[0], $left->fresh()->getAttributes());
         $this->assertSame($before[1], $right->fresh()->getAttributes());
-        $this->assertTrue($this->warningsContain($warnings, 'retatrutide', 'categories 2'));
+        $this->assertTrue($this->warningsContain($warnings, 'retatrutide', 'categories 2'), json_encode($warnings->getArrayCopy()));
 
         $this->deleteNormalized('retatrutide');
         $category = ProductCategory::create(['name' => 'Retatrutide', 'slug' => 'retatrutide', 'is_active' => true]);
@@ -125,8 +125,8 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
         } catch (\Throwable) {
             // The unique index is already absent in this process.
         }
-        $one = $this->post($category, 'reta-post-a', array_merge($this->oldAttributes('retatrutide'), ['overview' => 'DUP-A']));
-        $two = $this->post($category, 'reta-post-b', array_merge($this->oldAttributes('retatrutide'), ['overview' => 'DUP-B']));
+        $one = $this->educationPost($category, 'reta-post-a', array_merge($this->oldAttributes('retatrutide'), ['overview' => 'DUP-A']));
+        $two = $this->educationPost($category, 'reta-post-b', array_merge($this->oldAttributes('retatrutide'), ['overview' => 'DUP-B']));
         $postBefore = [$one->fresh()->getAttributes(), $two->fresh()->getAttributes()];
         $warnings = $this->captureWarnings();
         $began = $this->countTransactions();
@@ -141,7 +141,7 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
         $this->assertSame($postBefore[1], $two->fresh()->getAttributes());
         $this->assertSame('DUP-A', $one->fresh()->overview);
         $this->assertSame('DUP-B', $two->fresh()->overview);
-        $this->assertTrue($this->warningsContain($warnings, 'retatrutide', 'linked posts 2'));
+        $this->assertTrue($this->warningsContain($warnings, 'retatrutide', 'linked posts 2'), json_encode($warnings->getArrayCopy()));
 
         EducationPost::query()->where('product_category_id', $category->id)->delete();
         try {
@@ -208,7 +208,7 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
         }
         foreach ($seeded as $slug => $post) {
             $this->assertSame($this->expectedChangedKeys($slug), $this->changedKeys($before[$slug], $post->fresh()), $slug);
-            $this->assertSame($this->expected($slug), $this->readColumns($post->fresh()), $slug);
+            $this->assertSame($this->expected($slug), $this->readColumns($post->fresh(), $slug), $slug);
             $this->assertSame('KEEP-'.$slug, $post->fresh()->overview);
         }
     }
@@ -374,7 +374,7 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
 
         $this->assertSame('updated', $seeder->report['orforglipron']);
         $this->assertSame('failed', $seeder->report['retatrutide']);
-        $this->assertSame($this->expected('orforglipron'), $this->readColumns($seeded['orforglipron']->fresh()));
+        $this->assertSame($this->expected('orforglipron'), $this->readColumns($seeded['orforglipron']->fresh(), 'orforglipron'));
         $this->assertSame($retaBefore, $seeded['retatrutide']->fresh()->getAttributes());
         $this->assertNotNull($this->findLog($seeder, 'retatrutide', 'forced write failure'));
         $this->assertContains('orforglipron', $seeder->transactions);
@@ -404,15 +404,17 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
             ->assertInertia(fn ($page) => $page
                 ->component('Frontend/EncyclopediaArticleDetail')
                 ->where('regulatorySubsections', function ($sections) use ($euTitle) {
-                    $last = $sections[array_key_last($sections)];
+                    $last = collect($sections)->last();
 
                     return is_array($last) && ($last['title'] ?? null) === $euTitle;
                 })
                 ->where('keyPoints', function ($points) use ($euPoint) {
-                    return is_array($points) && ($points[array_key_last($points)] ?? null) === $euPoint;
+                    return collect($points)->last() === $euPoint;
                 })
                 ->where('references', function ($references) use ($ema) {
-                    return str_contains((string) json_encode($references), $ema);
+                    $encoded = json_encode($references, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+                    return is_string($encoded) && str_contains($encoded, $ema);
                 }));
 
         $this->get('/encyclopedia/retatrutide')
@@ -477,7 +479,7 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
             'is_active' => true,
         ]);
 
-        return $this->post($category, $postSlug ?? $slug.'-linked', array_merge($this->oldAttributes($slug), $overrides));
+        return $this->educationPost($category, $postSlug ?? $slug.'-linked', array_merge($this->oldAttributes($slug), $overrides));
     }
 
     /**
@@ -519,7 +521,7 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
                 'slug' => $slug,
                 'is_active' => true,
             ]);
-            $rows[$slug] = $this->post($category, $slug, [
+            $rows[$slug] = $this->educationPost($category, $slug, [
                 'overview' => $marker,
                 'description' => $marker,
                 'regulatory_subsections' => [['title' => $marker, 'entries' => [['type' => 'content', 'value' => $marker]]]],
@@ -535,7 +537,7 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
     /**
      * @param  array<string, mixed>  $attributes
      */
-    private function post(?ProductCategory $category, string $slug, array $attributes): EducationPost
+    private function educationPost(?ProductCategory $category, string $slug, array $attributes): EducationPost
     {
         $post = EducationPost::create(array_merge([
             'title' => $slug,
@@ -615,10 +617,10 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
     /**
      * @return array<string, mixed>
      */
-    private function readColumns(EducationPost $post): array
+    private function readColumns(EducationPost $post, string $slug = 'retatrutide'): array
     {
         $columns = [];
-        foreach (array_keys($this->payload('retatrutide')['columns']) as $column) {
+        foreach (array_keys($this->payload($slug)['columns']) as $column) {
             $columns[$column] = $post->{$column};
         }
 
@@ -681,7 +683,7 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
             if ($protect !== null && $protect !== '' && str_contains($value, $protect)) {
                 [$head, $tail] = explode($protect, $value, 2);
 
-                return $this->driftString($head).$protect.$this->driftString($tail);
+                return $this->driftNormalizeSafe($head).$protect.$this->driftNormalizeSafe($tail);
             }
 
             return $this->driftString($value);
@@ -699,10 +701,14 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
 
     private function driftString(string $value): string
     {
-        $value = str_replace("\n", "\r\n", $value);
-        $value = preg_replace('/ /', "\u{00A0}", $value, 1) ?? $value;
+        return ' '.$this->driftNormalizeSafe($value)." \t";
+    }
 
-        return ' '.$value." \t";
+    private function driftNormalizeSafe(string $value): string
+    {
+        $value = str_replace("\n", "\r\n", $value);
+
+        return preg_replace('/ /', "\u{00A0}", $value, 1) ?? $value;
     }
 
     private function newCorpus(): string
@@ -779,10 +785,10 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
     /**
      * @return array<int, string>
      */
-    private function captureWarnings(): array
+    private function captureWarnings(): \ArrayObject
     {
-        $warnings = [];
-        Log::listen(function (MessageLogged $event) use (&$warnings) {
+        $warnings = new \ArrayObject;
+        Log::listen(function (MessageLogged $event) use ($warnings) {
             if ($event->level === 'warning') {
                 $warnings[] = $event->message;
             }
@@ -791,13 +797,10 @@ class EncyclopediaOrfoRetaOctober22Test extends TestCase
         return $warnings;
     }
 
-    /**
-     * @param  array<int, string>  $warnings
-     */
-    private function warningsContain(array $warnings, string $slug, string $needle): bool
+    private function warningsContain(\ArrayObject $warnings, string $slug, string $needle): bool
     {
         foreach ($warnings as $warning) {
-            if (str_contains($warning, $slug) && str_contains($warning, $needle)) {
+            if (is_string($warning) && str_contains($warning, $slug) && str_contains($warning, $needle)) {
                 return true;
             }
         }
