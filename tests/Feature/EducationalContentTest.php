@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Content\EducationalContentPublisher;
 use App\Content\ListingImageGuard;
+use App\Support\SimpleMarkdown;
 use App\Models\Blog;
 use App\Models\EducationalGuide;
 use App\Models\ProductCategory;
@@ -2090,10 +2091,14 @@ class EducationalContentTest extends TestCase
         $this->assertLessThanOrEqual(155, strlen($ogDescription));
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
-        $words = preg_split('/\s+/', trim($markdown), -1, PREG_SPLIT_NO_EMPTY);
-        $this->assertIsArray($words);
-        $this->assertSame(2880, count($words));
-        $this->assertSame((int) ceil(count($words) / 230).' Min Read', $entry['read_time']);
+        $rendered = html_entity_decode(
+            strip_tags(SimpleMarkdown::toHtml(EducationalContentPublisher::prepare($markdown))),
+            ENT_QUOTES | ENT_HTML5,
+            'UTF-8'
+        );
+        $words = preg_match_all('/\S+/', $rendered);
+        $this->assertSame(2880, $words);
+        $this->assertSame((int) ceil($words / 230).' Min Read', $entry['read_time']);
         $this->assertStringNotContainsString('<!--', $markdown);
         $this->assertStringNotContainsString('/workspace', $markdown);
         $this->assertDoesNotMatchRegularExpression('/\A---\n/', $markdown);
@@ -2106,7 +2111,11 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('/guides/peptide-legality-fda-ruo-compounding', $markdown);
         $this->assertStringContainsString('As of 22 October 2026', $markdown);
         $this->assertStringContainsString('pending a European Commission decision', $markdown);
-        $this->assertStringContainsString('company-reported', $markdown);
+        $this->assertStringContainsString('company-reported press release', $markdown);
+        $this->assertStringNotContainsString('company announcement', $markdown);
+        $this->assertSame(5, substr_count($markdown, 'developer-affiliated. https://'));
+        $this->assertStringContainsString('which is developer-affiliated', $markdown);
+        $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?\s*(?:%|percent)/i', $markdown);
         foreach (EducationalContentPublisher::COMPETITOR_HOSTS as $host) {
             $this->assertStringNotContainsString($host, $markdown);
         }
