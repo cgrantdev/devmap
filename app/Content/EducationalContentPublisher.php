@@ -28,8 +28,6 @@ class EducationalContentPublisher
         'kinetixatx.com',
     ];
 
-    private const FAQ_RENDER_HOLD = ['orforglipron-vs-tirzepatide', 'cagrilintide-vs-eloralintide', 'eloralintide-tirzepatide-vs-retatrutide'];
-
     public static function sync(): void
     {
         foreach (self::catalog() as $page) {
@@ -244,7 +242,7 @@ class EducationalContentPublisher
     {
         $slugs = [];
         foreach (self::catalog() as $page) {
-            if (($page['kind'] ?? null) !== 'blog' || in_array($page['slug'] ?? null, self::FAQ_RENDER_HOLD, true)) {
+            if (($page['kind'] ?? null) !== 'blog') {
                 continue;
             }
             $slug = $page['slug'] ?? null;
@@ -431,22 +429,22 @@ class EducationalContentPublisher
                 'og_title' => 'Orforglipron vs Tirzepatide: Two Molecules, Two Programs',
                 'og_description' => 'Orforglipron is an oral small molecule, not a peptide. Tirzepatide is injectable. This evidence note keeps their trials, populations, and estimands apart.',
                 'blog_type' => 'Research',
-                'read_time' => '8 Min Read',
+                'read_time' => '7 Min Read',
                 'published_at' => $published,
                 'is_featured' => false,
                 'author_name' => 'Peptidemap',
                 'tags' => ['Orforglipron', 'Tirzepatide', 'ATTAIN', 'SURMOUNT', 'Estimands'],
                 'key_points' => [
                     'Orforglipron is an oral nonpeptide GLP-1 receptor agonist. Tirzepatide is an injectable GIP and GLP-1 peptide.',
-                    'ATTAIN-1’s primary treatment-regimen result at 36 mg was −11.2% at week 72. The −12.4% figure is that trial’s efficacy estimand.',
-                    'SURMOUNT-1’s treatment-regimen result at tirzepatide 15 mg was −20.9%. The −22.5% figure is that trial’s efficacy estimand, not orforglipron.',
-                    'ATTAIN-2’s treatment-regimen result at 36 mg was −9.6% in type 2 diabetes. It is not the ATTAIN-1 −12.4% and not SURMOUNT-1.',
+                    'ATTAIN-1’s primary treatment-regimen result in the highest dose arm was −11.2% at week 72. The −12.4% figure is that trial’s efficacy estimand.',
+                    'SURMOUNT-1’s treatment-regimen result in tirzepatide’s highest dose arm was −20.9%. The −22.5% figure is that trial’s efficacy estimand, not orforglipron.',
+                    'ATTAIN-2’s treatment-regimen result in the highest dose arm was −9.6% in type 2 diabetes. It is not the ATTAIN-1 −12.4% and not SURMOUNT-1.',
                     'Lilly’s 9 April 2026 release says FDA approved Foundayo (orforglipron) tablets on 1 April 2026. A research-use listing is not that tablet.',
                 ],
                 'faq' => self::faq($host.'/blog/orforglipron-vs-tirzepatide#faq', [
                     ['Is orforglipron a peptide?', 'No. Orforglipron is a small-molecule, nonpeptide GLP-1 receptor agonist taken by mouth. Tirzepatide is a peptide dual agonist at the GIP and GLP-1 receptors, given once weekly by subcutaneous injection.'],
-                    ['What did ATTAIN-1 report for orforglipron?', 'ATTAIN-1’s primary treatment-regimen estimand at week 72 was −7.5% at 6 mg, −8.4% at 12 mg, and −11.2% at 36 mg, versus −2.1% with placebo. The −12.4% figure is the 36 mg efficacy estimand in that trial, not the primary −11.2%. Those milligram figures are trial assignments, not use instructions.'],
-                    ['Are the SURMOUNT-1 percents orforglipron results?', 'No. SURMOUNT-1 is a tirzepatide trial without diabetes. Its treatment-regimen change at 15 mg was −20.9% versus −3.1% with placebo. The −22.5% figure is that trial’s 15 mg efficacy estimand.'],
+                    ['What did ATTAIN-1 report for orforglipron?', 'ATTAIN-1’s primary treatment-regimen estimand at week 72 was −7.5% in the lowest dose arm, −8.4% in the middle dose arm, and −11.2% in the highest dose arm, versus −2.1% with placebo. The −12.4% figure is the highest dose arm efficacy estimand in that trial, not the primary −11.2%. Those dose arms are trial assignments, not use instructions.'],
+                    ['Are the SURMOUNT-1 percents orforglipron results?', 'No. SURMOUNT-1 is a tirzepatide trial without diabetes. Its treatment-regimen change in the highest dose arm was −20.9% versus −3.1% with placebo. The −22.5% figure is that trial’s highest dose arm efficacy estimand.'],
                     ['Does Foundayo approval make a research-use listing the labeled tablet?', 'No. Lilly’s 9 April 2026 release says the FDA approved Foundayo (orforglipron) tablets on 1 April 2026, and DailyMed lists initial U.S. approval in 2026 for a labeled weight-management use with diet and activity. A research-use powder, capsule, or vial is not a Foundayo tablet. This note is not medical advice.'],
                 ]),
             ],
@@ -524,7 +522,7 @@ class EducationalContentPublisher
                 'og_title' => 'Cagrilintide vs Eloralintide: Two Amylin-Pathway Compounds, Not One Trial',
                 'og_description' => 'Cagrilintide is not eloralintide. This note separates the published trials, estimands, and populations behind the price comparison, without any winner.',
                 'blog_type' => 'Research',
-                'read_time' => '8 Min Read',
+                'read_time' => '7 Min Read',
                 'published_at' => $published,
                 'is_featured' => false,
                 'author_name' => 'Peptidemap',
@@ -533,14 +531,14 @@ class EducationalContentPublisher
                     'Cagrilintide and eloralintide are different molecules. No head-to-head was identified in the primaries checked here.',
                     'REDEFINE-1’s cagrilintide-only arm was −11.5% on the treatment-policy estimand. −20.4% is cagrilintide plus semaglutide.',
                     'REDEFINE-2’s −13.7% is CagriSema in type 2 diabetes. That trial had no cagrilintide-only arm.',
-                    'Eloralintide monotherapy efficacy-estimand results ran from −9.5% at 1 mg to −20.1% at 9 mg, versus −0.4% with placebo, at 48 weeks.',
-                    'EloraTZP’s −23.3% is eloralintide 9 mg plus tirzepatide 15 mg on the efficacy estimand. It is not a cagrilintide result.',
+                    'Eloralintide monotherapy efficacy-estimand results ran from −9.5% in the lowest dose arm to −20.1% in the highest dose arm, versus −0.4% with placebo, at 48 weeks.',
+                    'EloraTZP’s −23.3% is the highest listed combination of eloralintide plus tirzepatide on the efficacy estimand. It is not a cagrilintide result.',
                 ],
                 'faq' => self::faq($host.'/blog/cagrilintide-vs-eloralintide#faq', [
                     ['Are cagrilintide and eloralintide the same molecule?', 'No. Cagrilintide is Novo Nordisk’s long-acting amylin analogue. Eloralintide (LY3841136) is Eli Lilly’s investigational once-weekly selective amylin receptor agonist. No randomized comparison of the two was identified in the primaries checked for this note.'],
-                    ['What is the cagrilintide-only result in REDEFINE-1?', 'On the treatment-policy estimand at week 68, cagrilintide 2.4 mg alone was −11.5%, and the trial-product row was −11.8%. The −20.4% and −22.7% figures are cagrilintide plus semaglutide, not cagrilintide alone.'],
-                    ['What did eloralintide monotherapy report?', 'Lilly’s phase 2 release gives an efficacy-estimand range from −9.5% at 1 mg to −20.1% at 9 mg, versus −0.4% with placebo, at 48 weeks in adults without type 2 diabetes. Those percents are eloralintide alone. They are not CagriSema.'],
-                    ['Is the −23.3% figure a cagrilintide result?', 'No. −23.3% is the EloraTZP efficacy estimand for eloralintide 9 mg plus tirzepatide 15 mg at 48 weeks in adults with type 2 diabetes, versus −14.8% for tirzepatide 15 mg alone and −3.0% for placebo. It is not a REDEFINE comparison.'],
+                    ['What is the cagrilintide-only result in REDEFINE-1?', 'On the treatment-policy estimand at week 68, cagrilintide alone at the dose used in that trial was −11.5%, and the trial-product row was −11.8%. The −20.4% and −22.7% figures are cagrilintide plus semaglutide, not cagrilintide alone.'],
+                    ['What did eloralintide monotherapy report?', 'Lilly’s phase 2 release gives an efficacy-estimand range from −9.5% in the lowest dose arm to −20.1% in the highest dose arm, versus −0.4% with placebo, at 48 weeks in adults without type 2 diabetes. Those percents are eloralintide alone. They are not CagriSema.'],
+                    ['Is the −23.3% figure a cagrilintide result?', 'No. −23.3% is the company-reported EloraTZP efficacy estimand (Lilly release, 30 September 2026; not peer reviewed) for the highest listed combination of eloralintide plus tirzepatide at 48 weeks in adults with type 2 diabetes, versus −14.8% for tirzepatide alone and −3.0% for placebo. It is not a REDEFINE comparison.'],
                 ]),
             ],
             [
@@ -555,23 +553,23 @@ class EducationalContentPublisher
                 'og_title' => 'Eloralintide + Tirzepatide vs Retatrutide: What the Published Data Actually Show',
                 'og_description' => 'Eloralintide plus tirzepatide vs retatrutide: published trial figures, why TRIUMPH-1\'s 25.0% and 28.3% both fit, and why combo data are not head-to-heads.',
                 'blog_type' => 'Research',
-                'read_time' => '7 Min Read',
+                'read_time' => '6 Min Read',
                 'published_at' => $published,
                 'is_featured' => false,
                 'author_name' => 'Peptidemap',
                 'tags' => ['Eloralintide', 'Tirzepatide', 'Retatrutide', 'EloraTZP', 'TRIUMPH'],
                 'key_points' => [
-                    'EloraTZP’s efficacy estimand for eloralintide 9 mg plus tirzepatide 15 mg was −23.3% at 48 weeks in type 2 diabetes.',
-                    'TRIUMPH-1 at 12 mg and 80 weeks, without diabetes: treatment-regimen −25.0% and efficacy estimand −28.3%. Both can be true.',
-                    'TRIUMPH-2, with type 2 diabetes, was −18.8% treatment-regimen and −20.8% efficacy estimand at 12 mg. It is not TRIUMPH-1.',
+                    'EloraTZP’s efficacy estimand for the highest listed combination of eloralintide plus tirzepatide was −23.3% at 48 weeks in type 2 diabetes.',
+                    'TRIUMPH-1 in the highest dose arm at 80 weeks, without diabetes: treatment-regimen −25.0% and efficacy estimand −28.3%. Both can be true.',
+                    'TRIUMPH-2, with type 2 diabetes, was −18.8% treatment-regimen and −20.8% efficacy estimand in the highest dose arm. It is not TRIUMPH-1.',
                     'The programs differ in population, duration, phase, intervention, and estimand. No published head-to-head was identified.',
                     'An unverified early-combo slide figure is not printed. This note does not rank a winner.',
                 ],
                 'faq' => self::faq($host.'/blog/eloralintide-tirzepatide-vs-retatrutide#faq', [
-                    ['Why can TRIUMPH-1 list both −25.0% and −28.3%?', 'They are two estimands of one trial at 12 mg and 80 weeks in adults without type 2 diabetes. −25.0% is the treatment-regimen estimand. −28.3% is the efficacy estimand. Lead with −25.0% when comparing programs. −28.3% is the efficacy-estimand companion, not a second trial.'],
-                    ['What did EloraTZP report for eloralintide plus tirzepatide?', 'Lilly’s 30 September 2026 release reports an efficacy estimand of −23.3% for eloralintide 9 mg plus tirzepatide 15 mg at 48 weeks, versus −14.8% for tirzepatide 15 mg alone and −3.0% for placebo, in 367 adults with obesity or overweight and type 2 diabetes.'],
+                    ['Why can TRIUMPH-1 list both −25.0% and −28.3%?', 'They are two estimands of one trial in the highest dose arm at 80 weeks in adults without type 2 diabetes. −25.0% is the treatment-regimen estimand. −28.3% is the efficacy estimand. Lead with −25.0% when comparing programs. −28.3% is the efficacy-estimand companion, not a second trial.'],
+                    ['What did EloraTZP report for eloralintide plus tirzepatide?', 'Lilly’s 30 September 2026 release (company-reported, not peer reviewed) reports an efficacy estimand of −23.3% for the highest listed combination of eloralintide plus tirzepatide at 48 weeks, versus −14.8% for tirzepatide alone and −3.0% for placebo, in 367 adults with obesity or overweight and type 2 diabetes.'],
                     ['Is that combination result a head-to-head with TRIUMPH-1?', 'No. EloraTZP phase 2b included type 2 diabetes, ran 48 weeks, and its table is an efficacy estimand. TRIUMPH-1 excluded diabetes, ran 80 weeks, and its lead figure is a treatment-regimen estimand. No published head-to-head of the combination versus retatrutide was identified.'],
-                    ['What did TRIUMPH-2 report?', 'TRIUMPH-2 enrolled adults with type 2 diabetes, a closer population match for EloraTZP and still a different study. At 80 weeks the 12 mg treatment-regimen change was −18.8% (placebo −5.1%). The efficacy estimand at 12 mg was −20.8% (placebo −4.0% on Lilly Medical).'],
+                    ['What did TRIUMPH-2 report?', 'TRIUMPH-2 enrolled adults with type 2 diabetes, a closer population match for EloraTZP and still a different study. At 80 weeks the highest dose arm treatment-regimen change was −18.8% (placebo −5.1%). The efficacy estimand in the highest dose arm was −20.8% (placebo −4.0% on Lilly Medical).'],
                 ]),
             ],
         ];
@@ -1019,7 +1017,7 @@ class EducationalContentPublisher
                 'key_points' => [
                     'Gastrointestinal events were the most common adverse events in every retatrutide trial reviewed, and were dose-related in the phase 2 papers.',
                     'Discontinuation due to adverse events in the TRIUMPH-2 paper was 4%, 12% and 8% across the lowest, middle and highest dose arms vs 5% with placebo.',
-                    'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; the TRIUMPH-1 paper reports a pulse-rate peak at 20 weeks in the middle and highest dose arms, followed by a decline.',
+                    'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; the TRIUMPH-1 NEJM paper reports a pulse-rate peak at week 20 (appendix Figure S22), with week-80 changes of 1.5, 2.7 and 2.6 bpm vs −0.3 with placebo (appendix Table S12).',
                     'Phase 3 trials report dysesthesia, which Lilly defines as skin burning sensation and related events; mechanism, onset and duration are not characterized.',
                     'Several phase 3 figures are company-reported, not peer reviewed, and are labelled that way.',
                     'Research-labelled retatrutide is not the trial drug, is not approved, and is not described by these data.',
@@ -1027,7 +1025,7 @@ class EducationalContentPublisher
                 'faq' => self::faq($host.'/blog/retatrutide-side-effects-trial-data#faq', [
                     ['What were the most common side effects in the retatrutide trials?', 'Gastrointestinal events: nausea, diarrhoea, vomiting, constipation and decreased appetite. In both phase 2 papers they were dose-related and mostly mild to moderate, and the obesity paper says they occurred mainly during dose escalation. In the TRIUMPH-2 paper, diarrhoea was reported in 27% to 34% of the retatrutide arms vs 13% with placebo, and nausea in 14% to 28% vs 8%.'],
                     ['How many people stopped retatrutide because of adverse events?', 'In the phase 2 obesity trial, 6% to 16% of the retatrutide arms vs none on placebo. In the phase 2 type 2 diabetes trial, 16 of 190 retatrutide participants (8%) vs 2 of 45 on placebo (4%). In the TRIUMPH-2 paper, permanent discontinuation due to adverse events or death was 4%, 12% and 8% in the lowest, middle and highest dose arms vs 5% with placebo. In the TRIUMPH-1 paper, discontinuation of study drug due to adverse events (randomized population, excluding deaths) was 4.1%, 6.5% and 11.2% in the lowest, middle and highest dose arms vs 4.6% with placebo.'],
-                    ['Does retatrutide raise heart rate?', 'In the phase 2 obesity paper, heart rate rose in a dose-dependent manner, peaked at 24 weeks and declined at 36 and 48 weeks. In the phase 2 type 2 diabetes paper, pulse rose by up to about 7 beats per minute early in treatment and had decreased by 36 weeks. In the TRIUMPH-1 paper, mean pulse rate peaked at 20 weeks in the middle and highest dose arms and then decreased; at week 80 the change from baseline was 1.5, 2.7 and 2.6 beats per minute in the lowest, middle and highest dose arms vs −0.3 with placebo (appendix Table S12).'],
+                    ['Does retatrutide raise heart rate?', 'In the phase 2 obesity paper, heart rate rose in a dose-dependent manner, peaked at 24 weeks and declined at 36 and 48 weeks. In the phase 2 type 2 diabetes paper, pulse rose by up to about 7 beats per minute early in treatment and had decreased by 36 weeks. The TRIUMPH-1 NEJM paper reports that mean pulse rate peaked at 20 weeks in the middle and highest dose arms and then decreased (appendix Figure S22); at week 80 the change from baseline was 1.5, 2.7 and 2.6 beats per minute in the lowest, middle and highest dose arms vs −0.3 with placebo (appendix Table S12).'],
                     ['What is the dysesthesia reported in the TRIUMPH trials?', 'Lilly defines it as a skin burning sensation and related adverse events. In the TRIUMPH-2 paper it was reported in 4% to 7% of the retatrutide arms vs 1% with placebo. The TRIUMPH-1 rate of up to 12.5% is reported in the paper and company-reported by Lilly. Company-reported rates were up to 20.9% in TRIUMPH-4. Lilly says events were generally mild to moderate and most resolved during treatment. The cause, timing and duration have not been characterized in the sources reviewed.'],
                     ['Were pancreatitis, gallbladder or hypoglycaemia events reported?', 'In the phase 2 papers these events were few. The obesity trial reported one acute pancreatitis, three biliary events and no clinically significant hypoglycaemia. The type 2 diabetes trial reported two adjudicated pancreatitis events and three participants with hypoglycaemia below 54 mg/dL, none severe. In the TRIUMPH-1 paper, Table 3 reports severe or serious gallbladder or biliary tract disorders in 10, 5 and 4 participants in the lowest, middle and highest dose arms vs 4 with placebo, severe or serious hepatic disorders in 0, 0 and 3 vs 0, and adjudication-confirmed pancreatitis in 1, 3 and 4 vs 2. That table does not report hypoglycaemia. In the TRIUMPH-2 paper, Table 3 reports severe or serious gallbladder and biliary tract disorders in 3, 1 and 1 vs 1 with placebo, severe or serious hepatic disorders in 1, 0 and 0 vs 1, adjudication-confirmed pancreatitis in 0, 1 and 2 vs 0, and level 2 or level 3 hypoglycaemia in 2, 4 and 9 vs 5.'],
                     ['Is research-labelled retatrutide the same as the trial drug?', 'No. Retatrutide is investigational and not approved anywhere. Lilly states it cannot be legally sold or marketed for human use. Products sold online as research-labelled retatrutide are not the material used in these trials, and the trial safety data do not describe them.'],

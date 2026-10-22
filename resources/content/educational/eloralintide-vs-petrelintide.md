@@ -4,7 +4,7 @@ Price listings for related pairs stay on the compare pages: [Cagrilintide vs elo
 
 ## How to read this page
 
-Sponsor press releases are labelled company-reported or sponsor-reported. A peer-reviewed abstract is labelled as the paper. Registry facts are labelled ClinicalTrials.gov. A percent from one trial is not placed next to a percent from another. Petrelintide per-arm weight-change percentages are not printed on this page. Sources were checked on 22 October 2026.
+Sponsor press releases are labelled company-reported or sponsor-reported. A peer-reviewed abstract is labelled as the paper. Registry facts are labelled ClinicalTrials.gov. A percent from one trial is not placed next to a percent from another. Per-arm weight-change percentages are not printed on this page. Sources were checked on 22 October 2026.
 
 ## What each compound is
 
@@ -69,7 +69,7 @@ A research-use-only vial is not the material used in these trials and is not an 
 
 Known from the sources above: the two molecules, the sponsors, the amylin class, the named Phase 2, Phase 2b, and Phase 3 programmes, once-weekly administration in those studies, and that Phase 2 results have been reported for each compound in the places named. Eloralintide's Phase 2 summary above is from the developer-affiliated Lancet abstract only.
 
-Not shown here: any head-to-head of eloralintide versus petrelintide; Phase 3 outcomes for either compound; a peer-reviewed paper of the eloralintide-plus-tirzepatide Phase 2b study; petrelintide per-arm percentages, which stay in the sponsor reports and the ADA abstract, and the Lancet Diabetes & Endocrinology paper; results for a petrelintide combination with CT-388; and the identity, purity, or sterility of any research-labelled vial.
+Not shown here: any head-to-head of eloralintide versus petrelintide; Phase 3 outcomes for either compound; a peer-reviewed paper of the eloralintide-plus-tirzepatide Phase 2b study; per-arm percentages for either compound, which stay in the sponsor reports, the ADA abstract, and the two Lancet-family papers; results for a petrelintide combination with CT-388; and the identity, purity, or sterility of any research-labelled vial.
 
 ## Related pages
 
@@ -116,7 +116,7 @@ No. A research-use-only vial is not the investigational material used in these t
 11. Zealand Pharma. Petrelintide pipeline. https://www.zealandpharma.com/pipeline/petrelintide/
 12. Roche. ZUPREME-1 Phase 2 announcement, 5 March 2026. https://www.roche.com/media/releases/med-cor-2026-03-05
 13. 3083-LB: Petrelintide, a Human Amylin Analog for the Treatment of Obesity: Efficacy and Safety from the Phase 2 Trial, ZUPREME 1. Diabetes. DOI 10.2337/db26-3083-lb. https://doi.org/10.2337/db26-3083-lb
-14. Garvey WT, et al. Petrelintide, a human amylin analogue for the treatment of obesity (ZUPREME 1): a randomised, double-blind, placebo-controlled, phase 2 trial. Lancet Diabetes Endocrinol. 2026;14(11):914-926. PMID 42810355. https://pubmed.ncbi.nlm.nih.gov/42810355/
+14. Garvey WT, et al. Petrelintide, a human amylin analogue for the treatment of obesity (ZUPREME 1): a randomised, double-blind, placebo-controlled, phase 2 trial. Lancet Diabetes Endocrinol. 2026;14(11):914-926. DOI 10.1016/S2213-8587(26)00213-5. PMID 42810355. https://pubmed.ncbi.nlm.nih.gov/42810355/
 15. ClinicalTrials.gov. ZUPREME-1, NCT06662539. https://clinicaltrials.gov/study/NCT06662539
 16. Zealand Pharma. Company announcement No. 54/2026, 7 October 2026: "Zealand Pharma announces positive Phase 2 ZUPREME-2 topline results for amylin analog petrelintide in people with overweight or obesity and type 2 diabetes." https://www.globenewswire.com/news-release/2026/10/07/3376750/0/en/zealand-pharma-announces-positive-phase-2-zupreme-2-topline-results-for-amylin-analog-petrelintide-in-people-with-overweight-or-obesity-and-type-2-diabetes.html
 17. ClinicalTrials.gov. ZUPREME-2, NCT06926842. https://clinicaltrials.gov/study/NCT06926842

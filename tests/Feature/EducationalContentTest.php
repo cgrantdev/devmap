@@ -1319,7 +1319,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame([
             'Gastrointestinal events were the most common adverse events in every retatrutide trial reviewed, and were dose-related in the phase 2 papers.',
             'Discontinuation due to adverse events in the TRIUMPH-2 paper was 4%, 12% and 8% across the lowest, middle and highest dose arms vs 5% with placebo.',
-            'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; the TRIUMPH-1 paper reports a pulse-rate peak at 20 weeks in the middle and highest dose arms, followed by a decline.',
+            'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; the TRIUMPH-1 NEJM paper reports a pulse-rate peak at week 20 (appendix Figure S22), with week-80 changes of 1.5, 2.7 and 2.6 bpm vs −0.3 with placebo (appendix Table S12).',
             'Phase 3 trials report dysesthesia, which Lilly defines as skin burning sensation and related events; mechanism, onset and duration are not characterized.',
             'Several phase 3 figures are company-reported, not peer reviewed, and are labelled that way.',
             'Research-labelled retatrutide is not the trial drug, is not approved, and is not described by these data.',
@@ -1338,7 +1338,7 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('/compare/retatrutide-vs-tirzepatide', $markdown);
         $this->assertStringContainsString('/guides/peptide-legality-fda-ruo-compounding', $markdown);
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(4386, $words);
+        $this->assertSame(4388, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringContainsString('/blog/retatrutide-testing-coa-limits', $markdown);
 
@@ -1788,7 +1788,7 @@ class EducationalContentTest extends TestCase
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(3925, $words);
+        $this->assertSame(3967, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringNotContainsString('<!--', $markdown);
         $this->assertStringNotContainsString('/workspace', $markdown);
@@ -2109,13 +2109,8 @@ class EducationalContentTest extends TestCase
         $this->assertLessThanOrEqual(155, strlen($ogDescription));
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
-        $rendered = html_entity_decode(
-            strip_tags(SimpleMarkdown::toHtml(EducationalContentPublisher::prepare($markdown))),
-            ENT_QUOTES | ENT_HTML5,
-            'UTF-8'
-        );
-        $words = preg_match_all('/\S+/u', trim(preg_replace('/\s+/u', ' ', $rendered) ?? $rendered));
-        $this->assertSame(1874, $words);
+        $words = $this->renderedWordCount($markdown);
+        $this->assertSame(1901, $words);
         $this->assertGreaterThan(1840, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $entry['read_time']);
         $this->assertSame('9 Min Read', $entry['read_time']);
@@ -2213,6 +2208,90 @@ class EducationalContentTest extends TestCase
         $schema = json_encode($faq, JSON_UNESCAPED_SLASHES);
         $this->assertIsString($schema);
         $page->assertSee($schema, false);
+    }
+
+    public function test_dose_arm_blogs_omit_milligram_labels_outside_sources_and_match_faq(): void
+    {
+        $pattern = '/\b\d+(\.\d+)?\s?mg\b(?!\/dL)/i';
+        $expected = [
+            'orforglipron-vs-tirzepatide' => [1515, '7 Min Read'],
+            'cagrilintide-vs-eloralintide' => [1488, '7 Min Read'],
+            'eloralintide-tirzepatide-vs-retatrutide' => [1306, '6 Min Read'],
+        ];
+
+        foreach ($expected as $slug => [$words, $readTime]) {
+            $this->assertContains($slug, EducationalContentPublisher::blogSlugs());
+            $this->assertContains($slug, config('peptidemap.faq_render_allowlist.blog'));
+
+            $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
+            $this->assertSame($words, $this->renderedWordCount($markdown), $slug);
+            $this->assertSame(((int) ceil($words / 230)).' Min Read', $readTime);
+
+            $blog = Blog::where('slug', $slug)->firstOrFail();
+            $this->assertSame($readTime, $blog->read_time, $slug);
+            foreach ([
+                (string) $blog->description,
+                (string) $blog->seo_description,
+                (string) $blog->seo_og_description,
+                implode("\n", $blog->key_points ?? []),
+            ] as $prose) {
+                $this->assertDoesNotMatchRegularExpression($pattern, $prose, $slug);
+            }
+
+            $plain = html_entity_decode(strip_tags((string) $blog->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $stored = collect($blog->seo_schema)->first(
+                fn ($block) => is_array($block) && ($block['@type'] ?? null) === 'FAQPage'
+            );
+            $this->assertIsArray($stored, $slug);
+            foreach ($stored['mainEntity'] as $entity) {
+                $this->assertSame(
+                    $entity['acceptedAnswer']['text'],
+                    $this->visibleFaqAnswer($plain, $entity['name']),
+                    $slug.' '.$entity['name']
+                );
+            }
+
+            $response = $this->get('/blog/'.$slug)->assertOk();
+            $faqPage = null;
+            preg_match_all('/<script type="application\/ld\+json">\s*(.*?)\s*<\/script>/s', $response->getContent(), $matches);
+            foreach ($matches[1] as $json) {
+                $data = json_decode($json, true);
+                if (is_array($data) && ($data['@type'] ?? null) === 'FAQPage') {
+                    $faqPage = $data;
+                    break;
+                }
+            }
+            $this->assertIsArray($faqPage, $slug);
+            $this->assertSame($stored['mainEntity'], $faqPage['mainEntity'], $slug);
+
+            $pairs = [];
+            foreach ($faqPage['mainEntity'] as $entity) {
+                $answer = $entity['acceptedAnswer']['text'];
+                $this->assertDoesNotMatchRegularExpression($pattern, $entity['name']."\n".$answer, $slug);
+                $pairs[] = [
+                    'question' => $entity['name'],
+                    'answer' => $answer,
+                ];
+            }
+            $encoded = json_encode($faqPage, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->assertIsString($encoded);
+            $this->assertDoesNotMatchRegularExpression($pattern, $encoded, $slug);
+
+            $response->assertInertia(fn ($page) => $page
+                ->where('faqs', $pairs)
+                ->where('blog.content', function ($content) use ($pattern, $slug) {
+                    $this->assertIsString($content);
+                    $parts = preg_split('/<h2>\s*Sources\s*<\/h2>/i', $content, 2);
+                    $this->assertCount(2, $parts, $slug);
+                    $this->assertDoesNotMatchRegularExpression($pattern, $parts[0], $slug);
+                    if ($slug === 'cagrilintide-vs-eloralintide') {
+                        $this->assertStringContainsString('tirzepatide 15 mg', $parts[1]);
+                    }
+
+                    return true;
+                })
+            );
+        }
     }
 
     public function test_orforglipron_vs_oral_semaglutide_compare_page_publishes_once_with_matching_faq(): void

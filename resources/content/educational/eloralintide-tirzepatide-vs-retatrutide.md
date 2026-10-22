@@ -16,28 +16,28 @@ The online “versus” is **amylin agonist + dual incretin** versus **triple ag
 
 ### Eloralintide monotherapy
 
-Phase 2 [NCT06230523](https://clinicaltrials.gov/study/NCT06230523) (*Lancet*; Lilly release 6 Nov 2025) enrolled 263 adults with obesity or overweight and at least one weight-related comorbidity, **without** type 2 diabetes. At 48 weeks, the Lilly release (not the Lancet abstract, which rounds those arms) gives the **efficacy estimand** mean percent body-weight change as −9.5% (1 mg) to −20.1% (9 mg) versus −0.4% placebo. That is monotherapy context for the amylin piece—not the combination.
+Phase 2 [NCT06230523](https://clinicaltrials.gov/study/NCT06230523) (*Lancet*; Lilly release 6 Nov 2025) enrolled 263 adults with obesity or overweight and at least one weight-related comorbidity, **without** type 2 diabetes. At 48 weeks, the Lilly release (not the Lancet abstract, which rounds those arms) gives the **efficacy estimand** mean percent body-weight change as −9.5% (lowest dose arm) to −20.1% (highest dose arm) versus −0.4% placebo. That is monotherapy context for the amylin piece—not the combination.
 
 ### Eloralintide + tirzepatide (EloraTZP)
 
-The combination package tied to a primary Lilly / EASD release is phase 2b [NCT06603571](https://clinicaltrials.gov/study/NCT06603571): 367 adults with obesity or overweight **and type 2 diabetes**, 48 weeks. Lilly’s 30 Sep 2026 release (also via EASD / EurekAlert) reports an **efficacy estimand** table: highest listed combo arm (eloralintide 9 mg + tirzepatide 15 mg) **−23.3%**, versus **−14.8%** tirzepatide 15 mg alone and **−3.0%** placebo. Eloralintide-alone arms in that T2D trial were lower than the top combo. GI events and discontinuations were more frequent in combo arms; Lilly plans phase 3 of a co-formulation with optimized escalation.
+The combination package tied to a primary Lilly / EASD release is phase 2b [NCT06603571](https://clinicaltrials.gov/study/NCT06603571): 367 adults with obesity or overweight **and type 2 diabetes**, 48 weeks. Lilly’s 30 Sep 2026 release (also via EASD / EurekAlert) reports an **efficacy estimand** table: highest listed combo arm (eloralintide plus tirzepatide) **−23.3%**, versus **−14.8%** for tirzepatide alone and **−3.0%** placebo. Eloralintide-alone arms in that T2D trial were lower than the top combo. GI events and discontinuations were more frequent in combo arms; Lilly plans phase 3 of a co-formulation with optimized escalation.
 
 Smaller early co-administration cohorts (including [NCT06345066](https://clinicaltrials.gov/study/NCT06345066) and related phase 1b work) circulate in congress talk and secondary blogs. Those readouts remain **preliminary**—small arms, shorter follow-up, incomplete evaluable counts in secondary reports. This page does **not** print an unverified viral percent from that slide-level discussion. Without a checkable Lilly, journal, registry-results, or official congress primary for a specific figure, treat phase 1b combo numbers as exploratory—not a TRIUMPH-1 comparator.
 
 ### Retatrutide TRIUMPH-1 (no diabetes)
 
-TRIUMPH-1 ([NCT05929066](https://clinicaltrials.gov/study/NCT05929066); Jastreboff et al., *NEJM*, DOI [10.1056/NEJMoa2604169](https://doi.org/10.1056/NEJMoa2604169), PMID 42814954) studied adults with obesity or overweight **without** type 2 diabetes. At 80 weeks, **treatment-regimen estimand** mean percent body-weight change at 12 mg was **−25.0%** (4 mg −17.6%, 9 mg −23.7%, placebo −3.9%). The same trial’s **efficacy estimand** at 12 mg was **−28.3%** (4 mg −19.0%, 9 mg −25.9%). These are **two estimands of one trial**, not two trials. Lead with **−25.0%** when comparing programs; **−28.3%** is the efficacy-estimand companion, not a “stale wrong number.”
+TRIUMPH-1 ([NCT05929066](https://clinicaltrials.gov/study/NCT05929066); Jastreboff et al., *NEJM*, DOI [10.1056/NEJMoa2604169](https://doi.org/10.1056/NEJMoa2604169), PMID 42814954) studied adults with obesity or overweight **without** type 2 diabetes. At 80 weeks, **treatment-regimen estimand** mean percent body-weight change in the highest dose arm was **−25.0%** (lowest dose arm −17.6%, middle dose arm −23.7%, placebo −3.9%). The same trial’s **efficacy estimand** in the highest dose arm was **−28.3%** (lowest dose arm −19.0%, middle dose arm −25.9%). These are **two estimands of one trial**, not two trials. Lead with **−25.0%** when comparing programs; **−28.3%** is the efficacy-estimand companion, not a “stale wrong number.”
 
 ### Retatrutide TRIUMPH-2 (with type 2 diabetes)
 
-TRIUMPH-2 (Bellido et al., *Lancet*, DOI [10.1016/S0140-6736(26)01861-1](https://doi.org/10.1016/S0140-6736(26)01861-1)) is a **different population**—adults with type 2 diabetes. At 80 weeks, **treatment-regimen estimand** at 12 mg was **−18.8%** (placebo −5.1%). **Efficacy estimand** at 12 mg was **−20.8%** (placebo −4.0% on Lilly Medical). Do not mix TRIUMPH-1 and TRIUMPH-2 toplines as if they were interchangeable.
+TRIUMPH-2 (Bellido et al., *Lancet*, DOI [10.1016/S0140-6736(26)01861-1](https://doi.org/10.1016/S0140-6736(26)01861-1)) is a **different population**—adults with type 2 diabetes. At 80 weeks, **treatment-regimen estimand** in the highest dose arm was **−18.8%** (placebo −5.1%). **Efficacy estimand** in the highest dose arm was **−20.8%** (placebo −4.0% on Lilly Medical). Do not mix TRIUMPH-1 and TRIUMPH-2 toplines as if they were interchangeable.
 
 ## Why 25.0% and 28.3% can both be true
 
 Obesity trials often pre-specify two estimands:
 
-- **Treatment-regimen (treatment-policy):** average effect for randomized participants even if some stop drug or start other weight-loss treatments. TRIUMPH-1’s −25.0% (12 mg) sits here.
-- **Efficacy estimand:** a hypothetical “everyone stayed on assigned intervention without those intercurrent events” contrast. Same TRIUMPH-1 dataset → −28.3% at 12 mg.
+- **Treatment-regimen (treatment-policy):** average effect for randomized participants even if some stop drug or start other weight-loss treatments. TRIUMPH-1’s −25.0% (highest dose arm) sits here.
+- **Efficacy estimand:** a hypothetical “everyone stayed on assigned intervention without those intercurrent events” contrast. Same TRIUMPH-1 dataset → −28.3% in the highest dose arm.
 
 Both can be true because they answer different questions. Name the estimand every time a percent appears, and prefer the treatment-regimen number when informal ranking is tempting.
 
@@ -66,6 +66,24 @@ Until then: retatrutide has large phase 3 packages with labeled estimands; elora
 Vendor compares live under `/compare`. This blog does not rank a winner, invent a cross-trial percent, or tell anyone what to take. RUO vials are not approved medicines.
 
 Educational only. Not medical advice.
+
+## FAQ
+
+### Why can TRIUMPH-1 list both −25.0% and −28.3%?
+
+They are two estimands of one trial in the highest dose arm at 80 weeks in adults without type 2 diabetes. −25.0% is the treatment-regimen estimand. −28.3% is the efficacy estimand. Lead with −25.0% when comparing programs. −28.3% is the efficacy-estimand companion, not a second trial.
+
+### What did EloraTZP report for eloralintide plus tirzepatide?
+
+Lilly’s 30 September 2026 release (company-reported, not peer reviewed) reports an efficacy estimand of −23.3% for the highest listed combination of eloralintide plus tirzepatide at 48 weeks, versus −14.8% for tirzepatide alone and −3.0% for placebo, in 367 adults with obesity or overweight and type 2 diabetes.
+
+### Is that combination result a head-to-head with TRIUMPH-1?
+
+No. EloraTZP phase 2b included type 2 diabetes, ran 48 weeks, and its table is an efficacy estimand. TRIUMPH-1 excluded diabetes, ran 80 weeks, and its lead figure is a treatment-regimen estimand. No published head-to-head of the combination versus retatrutide was identified.
+
+### What did TRIUMPH-2 report?
+
+TRIUMPH-2 enrolled adults with type 2 diabetes, a closer population match for EloraTZP and still a different study. At 80 weeks the highest dose arm treatment-regimen change was −18.8% (placebo −5.1%). The efficacy estimand in the highest dose arm was −20.8% (placebo −4.0% on Lilly Medical).
 
 ## Sources
 

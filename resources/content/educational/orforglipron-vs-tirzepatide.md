@@ -8,33 +8,33 @@ Vendor listings stay on the compare page: [Orforglipron vs tirzepatide](https://
 
 Orforglipron is a small-molecule, nonpeptide glucagon-like peptide-1 (GLP-1) receptor agonist taken by mouth. It is not a peptide. Chugai discovered it, and Lilly licensed it. The 2025 ATTAIN papers still call it investigational, which was its status in those trials.
 
-Lilly’s 9 April 2026 release says the U.S. Food and Drug Administration approved Foundayo (orforglipron) tablets on 1 April 2026. The DailyMed label, updated 29 July 2026, lists initial U.S. approval in 2026. DailyMed’s indication is: in combination with a reduced-calorie diet and increased physical activity to reduce excess body weight and maintain weight reduction long term in adults with obesity or adults with overweight in the presence of at least one weight-related comorbid condition. This note does not restate the label’s dose schedule. The milligram figures in the ATTAIN papers are not the tablet strengths on that label. A research-use powder, capsule, or vial is not a Foundayo tablet.
+Lilly’s 9 April 2026 release says the U.S. Food and Drug Administration approved Foundayo (orforglipron) tablets on 1 April 2026. The DailyMed label, updated 29 July 2026, lists initial U.S. approval in 2026. DailyMed’s indication is: in combination with a reduced-calorie diet and increased physical activity to reduce excess body weight and maintain weight reduction long term in adults with obesity or adults with overweight in the presence of at least one weight-related comorbid condition. This note does not restate the label’s dose schedule. The ATTAIN dose arms are not the tablet strengths on that label. A research-use powder, capsule, or vial is not a Foundayo tablet.
 
 Tirzepatide is a peptide and a dual agonist at the glucose-dependent insulinotropic polypeptide (GIP) receptor and the GLP-1 receptor. It is given once weekly by subcutaneous injection. In the United States it is approved as Mounjaro and as Zepbound for labeled uses. That approval is not a dosing guide, and a research-use vial is not those brands.
 
 ## ATTAIN-1 is an orforglipron trial without diabetes
 
-ATTAIN-1 (NCT05869903) is Lilly’s 72-week phase 3 trial of once-daily oral orforglipron at assigned doses of 6 mg, 12 mg, or 36 mg, versus placebo, plus healthy diet and physical activity. Wharton and colleagues published it in the *New England Journal of Medicine* (2025;393:1796-1806). The trial randomized 3,127 people. The abstract says all of them had obesity without diabetes. Lilly’s trial description also includes adults with overweight and a weight-related medical problem, still without diabetes. Those dose figures are the trial assignments, not instructions.
+ATTAIN-1 (NCT05869903) is Lilly’s 72-week phase 3 trial of once-daily oral orforglipron in the lowest dose arm, the middle dose arm, or the highest dose arm, versus placebo, plus healthy diet and physical activity. Wharton and colleagues published it in the *New England Journal of Medicine* (2025;393:1796-1806). The trial randomized 3,127 people. The abstract says all of them had obesity without diabetes. Lilly’s trial description also includes adults with overweight and a weight-related medical problem, still without diabetes. Those dose arms are the trial assignments, not instructions.
 
-The primary endpoint was percent change in body weight at week 72 on the treatment-regimen estimand: the average effect in everyone randomized, whether or not they stayed on treatment or started a prohibited weight-management treatment. On that estimand the mean change was −7.5% at 6 mg, −8.4% at 12 mg, and −11.2% at 36 mg, versus −2.1% with placebo.
+The primary endpoint was percent change in body weight at week 72 on the treatment-regimen estimand: the average effect in everyone randomized, whether or not they stayed on treatment or started a prohibited weight-management treatment. On that estimand the mean change was −7.5% in the lowest dose arm, −8.4% in the middle dose arm, and −11.2% in the highest dose arm, versus −2.1% with placebo.
 
-Lilly’s 16 September 2025 release also reports an efficacy estimand: the result as if people had stayed on assigned treatment for 72 weeks, with possible dose interruptions or modifications, and had not started prohibited weight-management treatments. That row is −7.8%, −9.3%, and −12.4%, versus −0.9% with placebo. The −12.4% figure is the 36 mg efficacy estimand in this trial. It is not the primary −11.2%. Lilly also says ATTAIN-1 used exercise and a balanced diet rather than a reduced-calorie diet.
+Lilly’s 16 September 2025 release also reports an efficacy estimand: the result as if people had stayed on assigned treatment for 72 weeks, with possible dose interruptions or modifications, and had not started prohibited weight-management treatments. That row is −7.8%, −9.3%, and −12.4%, versus −0.9% with placebo. The −12.4% figure is the highest dose arm efficacy estimand in this trial. It is not the primary −11.2%. Lilly also says ATTAIN-1 used exercise and a balanced diet rather than a reduced-calorie diet.
 
 ## SURMOUNT-1 is a tirzepatide trial without diabetes
 
-SURMOUNT-1 (NCT04184622) is a different 72-week phase 3 trial. Jastreboff and colleagues published it in the *New England Journal of Medicine* (2022;387:205-216). It randomized 2,539 adults with a body-mass index of 30 or higher, or 27 or higher with at least one weight-related complication, excluding diabetes. Assigned treatment was once-weekly subcutaneous tirzepatide at 5 mg, 10 mg, or 15 mg, or placebo. The 72 weeks included a 20-week dose-escalation period. Again, those are trial assignments, not use instructions.
+SURMOUNT-1 (NCT04184622) is a different 72-week phase 3 trial. Jastreboff and colleagues published it in the *New England Journal of Medicine* (2022;387:205-216). It randomized 2,539 adults with a body-mass index of 30 or higher, or 27 or higher with at least one weight-related complication, excluding diabetes. Assigned treatment was once-weekly subcutaneous tirzepatide in the lowest dose arm, the middle dose arm, or the highest dose arm, or placebo. The 72 weeks included a 20-week dose-escalation period. Again, those are trial assignments, not use instructions.
 
-The coprimary weight analysis in the abstract uses the treatment-regimen estimand: effect regardless of treatment discontinuation, in the intention-to-treat population. At week 72 the mean change was −15.0% at 5 mg, −19.5% at 10 mg, and −20.9% at 15 mg, versus −3.1% with placebo.
+The coprimary weight analysis in the abstract uses the treatment-regimen estimand: effect regardless of treatment discontinuation, in the intention-to-treat population. At week 72 the mean change was −15.0% in the lowest dose arm, −19.5% in the middle dose arm, and −20.9% in the highest dose arm, versus −3.1% with placebo.
 
-Lilly’s 4 June 2022 release gives the efficacy estimand for the same trial: −16.0% at 5 mg, −21.4% at 10 mg, and −22.5% at 15 mg, versus −2.4% with placebo. The −22.5% figure is that 15 mg efficacy row. It is not the treatment-regimen −20.9%, and it is not orforglipron. SURMOUNT-2 enrolled people with type 2 diabetes. Its percents are not used here.
+Lilly’s 4 June 2022 release gives the efficacy estimand for the same trial: −16.0% in the lowest dose arm, −21.4% in the middle dose arm, and −22.5% in the highest dose arm, versus −2.4% with placebo. The −22.5% figure is that highest dose arm efficacy row. It is not the treatment-regimen −20.9%, and it is not orforglipron. SURMOUNT-2 enrolled people with type 2 diabetes. Its percents are not used here.
 
 ## ATTAIN-2 is orforglipron in people with type 2 diabetes
 
-ATTAIN-2 (NCT05872620) is orforglipron again, not tirzepatide. It is a 72-week phase 3 trial in adults with a body-mass index of 27 or higher and type 2 diabetes. Assigned doses were once-daily orforglipron 6 mg, 12 mg, or 36 mg, or placebo. The *Lancet* report (DOI 10.1016/S0140-6736(25)02165-8) randomized 1,613 people. The treatment-regimen estimand was primary.
+ATTAIN-2 (NCT05872620) is orforglipron again, not tirzepatide. It is a 72-week phase 3 trial in adults with a body-mass index of 27 or higher and type 2 diabetes. Assigned doses were once-daily orforglipron in the lowest dose arm, the middle dose arm, or the highest dose arm, or placebo. The *Lancet* report (DOI 10.1016/S0140-6736(25)02165-8) randomized 1,613 people. The treatment-regimen estimand was primary.
 
-On that estimand, mean percent change in body weight at week 72 was −5.1% at 6 mg, −7.0% at 12 mg, and −9.6% at 36 mg, versus −2.5% with placebo. The public *Lancet* abstract and Lilly’s 26 August 2025 topline release agree on those four figures. The full paper was not used beyond the abstract.
+On that estimand, mean percent change in body weight at week 72 was −5.1% in the lowest dose arm, −7.0% in the middle dose arm, and −9.6% in the highest dose arm, versus −2.5% with placebo. The public *Lancet* abstract and Lilly’s 26 August 2025 topline release agree on those four figures. The full paper was not used beyond the abstract.
 
-Lilly’s efficacy estimand in that release was −5.5%, −7.8%, and −10.5%, versus −2.2% with placebo. The −10.5% figure is orforglipron 36 mg in type 2 diabetes. It is not the ATTAIN-1 −12.4%, and it is not SURMOUNT-1.
+Lilly’s efficacy estimand in that release was −5.5%, −7.8%, and −10.5%, versus −2.2% with placebo. The −10.5% figure is orforglipron’s highest dose arm in type 2 diabetes. It is not the ATTAIN-1 −12.4%, and it is not SURMOUNT-1.
 
 ## Why these percents cannot be stacked
 
@@ -52,6 +52,24 @@ Subtracting one of these percents from another would invent a head-to-head these
 The compare page lists vendors and prices. A shared shop category does not show that the compounds are substitutes, that one outperformed the other, or that a listing matches a trial arm.
 
 Educational only. Not medical advice.
+
+## FAQ
+
+### Is orforglipron a peptide?
+
+No. Orforglipron is a small-molecule, nonpeptide GLP-1 receptor agonist taken by mouth. Tirzepatide is a peptide dual agonist at the GIP and GLP-1 receptors, given once weekly by subcutaneous injection.
+
+### What did ATTAIN-1 report for orforglipron?
+
+ATTAIN-1’s primary treatment-regimen estimand at week 72 was −7.5% in the lowest dose arm, −8.4% in the middle dose arm, and −11.2% in the highest dose arm, versus −2.1% with placebo. The −12.4% figure is the highest dose arm efficacy estimand in that trial, not the primary −11.2%. Those dose arms are trial assignments, not use instructions.
+
+### Are the SURMOUNT-1 percents orforglipron results?
+
+No. SURMOUNT-1 is a tirzepatide trial without diabetes. Its treatment-regimen change in the highest dose arm was −20.9% versus −3.1% with placebo. The −22.5% figure is that trial’s highest dose arm efficacy estimand.
+
+### Does Foundayo approval make a research-use listing the labeled tablet?
+
+No. Lilly’s 9 April 2026 release says the FDA approved Foundayo (orforglipron) tablets on 1 April 2026, and DailyMed lists initial U.S. approval in 2026 for a labeled weight-management use with diet and activity. A research-use powder, capsule, or vial is not a Foundayo tablet. This note is not medical advice.
 
 ## Sources
 
