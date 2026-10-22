@@ -1,0 +1,532 @@
+{
+  "as_of": "22 October 2026 (Asia/Bangkok). Old values copied from live Inertia props (regulatorySubsections, regulatoryImportantNote, keyPoints, references) and BPC-157 FAQPage JSON-LD of https://peptidemap.com/encyclopedia/<slug> fetched 22 Oct 2026. These props are passed through from the DB unchanged (no profile phrase replacement for these 5 slugs); FAQ JSON-LD is trim + strip_tags of stored answers.",
+  "normalize": "normalize(x): recursive. Strings: CRLF/CR -> LF; U+00A0 -> space; rtrim each line; trim. Arrays: same keys/order, values normalized. No HTML stripping except in the faqs op. Compare decoded JSON.",
+  "migration": {
+    "timestamp": "2026_10_22_120000",
+    "file": "database/migrations/2026_10_22_120000_update_encyclopedia_fields_october_22_2026.php",
+    "seeder": "EncyclopediaFieldUpdatesOctober22Seeder"
+  },
+  "slug": "retatrutide",
+  "slug_match": "Find the post via the category, not education_posts.slug: (1) product_categories WHERE LOWER(TRIM(slug)) = 'retatrutide' must return exactly 1 row; (2) education_posts WHERE product_category_id = <that id> must return exactly 1 row (any status). Also count education_posts WHERE LOWER(TRIM(slug)) = 'retatrutide' and log it as a diagnostic. If (1) or (2) is not exactly 1: warn loudly (Log::warning + command->error + STDERR line with the counts and stored slugs/ids), report 'missing'/'collision', write nothing for this slug.",
+  "columns": {
+    "regulatory_subsections": {
+      "camelCase_prop": "regulatorySubsections",
+      "ops": [
+        {
+          "id": "retatrutide_reg_au",
+          "op": "ORDER-INDEPENDENT with orfo-reta (2026_10_22_140000). Skip if any subsection title starts with 'Australia (as of' or any entry value contains 'NSW Health'. Otherwise accept only if normalize(current) equals normalize(one of old_values) (A = live; B = live + Senate-letter subsection). Append au_subsection at the END of the stored array.",
+          "au_subsection": {
+            "title": "Australia (as of 22 October 2026)",
+            "entries": [
+              {
+                "type": "content",
+                "value": "NSW Health reported (19 Oct 2026) 1,180 presentations to NSW emergency departments associated with peptide use between 1 July 2025 and 30 September 2026. The release does not break this figure down by peptide. The release names retatrutide among the peptides that products may claim to contain and states: \"None of these peptides are currently approved in Australia for any purpose.\""
+              },
+              {
+                "type": "content",
+                "value": "No entry naming retatrutide was found in the Poisons Standard (October 2026; F2026L01327; in force from 1 October 2026). This page does not state a schedule for it. Not being named does not mean a product is unscheduled or may lawfully be supplied, and the NSW release states that retatrutide is not approved in Australia for any purpose."
+              }
+            ]
+          },
+          "old_values": [
+            [
+              {
+                "title": "Development Status",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Retatrutide is not FDA-approved. Phase 3 TRIUMPH results are published, including TRIUMPH-1 (The New England Journal of Medicine, 29 Sep 2026) and TRIUMPH-2 (The Lancet, 29 Sep 2026). Eli Lilly has stated a planned U.S. BLA in Q1 2027. A filing plan is not approval. Research-grade retatrutide on PeptideMap is listed for research-use (RUO) comparison only. It is not clinical trial supply, not a prescription, and not medical advice."
+                  }
+                ]
+              },
+              {
+                "title": "Development status (investigational)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Retatrutide is an investigational GIP/GLP-1/glucagon receptor agonist. It is not approved by the FDA (or EMA / other regulators cited here) for any indication and is not commercially marketed by Eli Lilly as a prescription medicine. PeptideMap vendor listings are RUO / research-use comparison data only — not trial supply, not expanded-access supply, and not prescriptions."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Company materials continue to describe retatrutide as an investigational molecule that cannot be legally sold or marketed for human use pending approval pathways."
+                  }
+                ]
+              },
+              {
+                "title": "Filing literacy — planned BLA in Q1 2027 (≠ approval)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "On 23 July 2026, Eli Lilly announced positive topline results from TRIUMPH-2 and TRIUMPH-3 and stated it is completing the comprehensive CMC data package required for a Biologics License Application (BLA) and plans to subsequently submit retatrutide in Q1 2027 for U.S. approval. That sentence is a sponsor filing plan."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Filing is not FDA acceptance (filing decision) and acceptance is not approval. Until FDA receives and files an application and assigns a review clock, there is no agency action date to treat as an approval date."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Do not convert “Q1 2027” into “approved in 2027.” Secondary timeline calendars that project review windows are estimates, not facts, and are not pasted here as predictions."
+                  }
+                ]
+              },
+              {
+                "title": "Biologic vs drug classification dispute — Seventh Circuit argument (no ruling yet)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Lilly’s stated U.S. path is a BLA (biologic). Whether retatrutide is classified as a biological product under the relevant protein / “analogous product” rules has been litigated. The U.S. Court of Appeals for the Seventh Circuit listed oral argument in Eli Lilly and Company v. Robert Kennedy, Jr., No. 26-1301, on 24 September 2026 (civil), with public argument audio on the court’s oral-argument calendar."
+                  },
+                  {
+                    "type": "item",
+                    "value": "As of early October 2026, no published appellate ruling in No. 26-1301 was located on a Seventh Circuit opinions lookup attempted for this pass. Same-day argument coverage dated 24–25 Sep 2026 confirms the hearing. Argument is not a decision."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Educational takeaway only: the classification dispute can affect which application type (BLA vs NDA) a sponsor pursues. It is not an approval decision and must not be narrated as one."
+                  }
+                ]
+              },
+              {
+                "title": "Access before approval — trials vs expanded access vs grey-market",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Before any approval, legitimate pathways discussed in primary manufacturer/FDA-process materials are clinical trials and, in limited circumstances, expanded access (sometimes called compassionate use) coordinated with a treating physician and applicable FDA IND / IRB requirements."
+                  },
+                  {
+                    "type": "content",
+                    "value": "Lilly Medical states that retatrutide is not currently FDA-approved; that Lilly is supporting single-patient expanded-access requests for individuals who meet eligibility criteria when they cannot join a trial and have exhausted available options; that availability depends on geography, supply, and case-by-case assessment; and that requests are physician-initiated. ClinicalTrials.gov lists pre-approval expanded access as NCT07629401."
+                  },
+                  {
+                    "type": "item",
+                    "value": "High-level eligibility themes on Lilly Medical include refractory obesity (BMI ≥35 despite highest tolerated approved chronic weight-management therapy), at least two serious or life-threatening obesity-related complications under standard care, and inability to join an ongoing retatrutide (or comparable) trial. This page does not turn those criteria into an application guide or medical advice."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Grey-market / RUO vials sold online are not clinical-trial supply and are not expanded access. Catalog adjacency is not a manufacturer program."
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "title": "Development Status",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Retatrutide is not FDA-approved. Phase 3 TRIUMPH results are published, including TRIUMPH-1 (The New England Journal of Medicine, 29 Sep 2026) and TRIUMPH-2 (The Lancet, 29 Sep 2026). Eli Lilly has stated a planned U.S. BLA in Q1 2027. A filing plan is not approval. Research-grade retatrutide on PeptideMap is listed for research-use (RUO) comparison only. It is not clinical trial supply, not a prescription, and not medical advice."
+                  }
+                ]
+              },
+              {
+                "title": "Development status (investigational)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Retatrutide is an investigational GIP/GLP-1/glucagon receptor agonist. It is not approved by the FDA (or EMA / other regulators cited here) for any indication and is not commercially marketed by Eli Lilly as a prescription medicine. PeptideMap vendor listings are RUO / research-use comparison data only — not trial supply, not expanded-access supply, and not prescriptions."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Company materials continue to describe retatrutide as an investigational molecule that cannot be legally sold or marketed for human use pending approval pathways."
+                  }
+                ]
+              },
+              {
+                "title": "Filing literacy — planned BLA in Q1 2027 (≠ approval)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "On 23 July 2026, Eli Lilly announced positive topline results from TRIUMPH-2 and TRIUMPH-3 and stated it is completing the comprehensive CMC data package required for a Biologics License Application (BLA) and plans to subsequently submit retatrutide in Q1 2027 for U.S. approval. That sentence is a sponsor filing plan."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Filing is not FDA acceptance (filing decision) and acceptance is not approval. Until FDA receives and files an application and assigns a review clock, there is no agency action date to treat as an approval date."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Do not convert “Q1 2027” into “approved in 2027.” Secondary timeline calendars that project review windows are estimates, not facts, and are not pasted here as predictions."
+                  }
+                ]
+              },
+              {
+                "title": "Biologic vs drug classification dispute — Seventh Circuit argument (no ruling yet)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Lilly’s stated U.S. path is a BLA (biologic). Whether retatrutide is classified as a biological product under the relevant protein / “analogous product” rules has been litigated. The U.S. Court of Appeals for the Seventh Circuit listed oral argument in Eli Lilly and Company v. Robert Kennedy, Jr., No. 26-1301, on 24 September 2026 (civil), with public argument audio on the court’s oral-argument calendar."
+                  },
+                  {
+                    "type": "item",
+                    "value": "As of early October 2026, no published appellate ruling in No. 26-1301 was located on a Seventh Circuit opinions lookup attempted for this pass. Same-day argument coverage dated 24–25 Sep 2026 confirms the hearing. Argument is not a decision."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Educational takeaway only: the classification dispute can affect which application type (BLA vs NDA) a sponsor pursues. It is not an approval decision and must not be narrated as one."
+                  }
+                ]
+              },
+              {
+                "title": "Access before approval — trials vs expanded access vs grey-market",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "Before any approval, legitimate pathways discussed in primary manufacturer/FDA-process materials are clinical trials and, in limited circumstances, expanded access (sometimes called compassionate use) coordinated with a treating physician and applicable FDA IND / IRB requirements."
+                  },
+                  {
+                    "type": "content",
+                    "value": "Lilly Medical states that retatrutide is not currently FDA-approved; that Lilly is supporting single-patient expanded-access requests for individuals who meet eligibility criteria when they cannot join a trial and have exhausted available options; that availability depends on geography, supply, and case-by-case assessment; and that requests are physician-initiated. ClinicalTrials.gov lists pre-approval expanded access as NCT07629401."
+                  },
+                  {
+                    "type": "item",
+                    "value": "High-level eligibility themes on Lilly Medical include refractory obesity (BMI ≥35 despite highest tolerated approved chronic weight-management therapy), at least two serious or life-threatening obesity-related complications under standard care, and inability to join an ongoing retatrutide (or comparable) trial. This page does not turn those criteria into an application guide or medical advice."
+                  },
+                  {
+                    "type": "item",
+                    "value": "Grey-market / RUO vials sold online are not clinical-trial supply and are not expanded access. Catalog adjacency is not a manufacturer program."
+                  }
+                ]
+              },
+              {
+                "title": "U.S. Senate letter on “research use only” sales (14 October 2026)",
+                "entries": [
+                  {
+                    "type": "content",
+                    "value": "On 14 October 2026, nine U.S. senators (Jim Banks, Martin Heinrich, Ted Budd, Adam B. Schiff, Tom Cotton, Andy Kim, David H. McCormick, Jon Husted and Todd Young) wrote to Acting FDA Commissioner Kyle Diamantas about online vendors that sell unapproved drugs and active pharmaceutical ingredients labeled “for research use only.” The letter uses “knockoff retatrutide” as its example and says: “We are concerned that ‘for research use only’ has become a dangerous loophole that undermines the FDA’s authority.” Sen. Banks’s office released the letter on 15 October 2026."
+                  },
+                  {
+                    "type": "content",
+                    "value": "The letter urges FDA “to work more closely with U.S. Customs & Border Protection and other law enforcement agencies to take these illicit drugs off the market and hold the companies selling them accountable,” and requests a briefing on FDA’s enforcement strategy. It cites America’s Poison Centers data showing “a 265% increase in poisonings related to illicit retatrutide in the first four months of 2026 compared to the last four months of 2025.” PeptideMap has not checked that figure against an America’s Poison Centers release."
+                  },
+                  {
+                    "type": "item",
+                    "value": "The letter is a request from members of Congress to FDA. It is not a law, a regulation or an FDA action, and it does not change retatrutide’s status: retatrutide is not FDA-approved."
+                  }
+                ]
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    "references": {
+      "camelCase_prop": "references",
+      "op": "ORDER-INDEPENDENT with orfo-reta. Skip if any reference link url equals the NSW release URL. Otherwise accept only if normalize(current) equals normalize(one of old_values) (A = live 10; B = live 10 + the 3 orfo-reta references). Append new_items at the END of the stored array.",
+      "new_items": [
+        {
+          "title": "NSW Health warns of surge in hospital presentations linked to peptide use",
+          "authors": "NSW Government, Minister for Health",
+          "citation": "Ministerial media release, 19 October 2026.",
+          "description": "NSW Health surveillance data: 1,180 presentations to NSW emergency departments associated with peptide use, 1 July 2025 to 30 September 2026. Names BPC-157, GHK-Cu, TB-500, retatrutide and CJC-1295 and states that none of these peptides is currently approved in Australia for any purpose.",
+          "links": [
+            {
+              "url": "https://www.nsw.gov.au/ministerial-releases/nsw-health-warns-of-surge-hospital-presentations-linked-to-peptide-use",
+              "label": "NSW Government"
+            }
+          ]
+        },
+        {
+          "title": "Health authorities issue unapproved peptide use warning after surge in NSW hospital visits",
+          "authors": "Coote G, ABC News",
+          "citation": "ABC News, 19 October 2026.",
+          "description": "News report of the NSW Health data (1,180 emergency department presentations between July 2025 and September 2026).",
+          "links": [
+            {
+              "url": "https://www.abc.net.au/news/2026-10-19/nsw-peptide-emergency-department-surge-prompts-warning/107281674",
+              "label": "ABC News"
+            }
+          ]
+        },
+        {
+          "title": "Therapeutic Goods (Poisons Standard—October 2026) Instrument 2026",
+          "authors": "Australian Government, Federal Register of Legislation",
+          "citation": "F2026L01327. Made under the Therapeutic Goods Act 1989; in force from 1 October 2026.",
+          "description": "Searched 22 October 2026: no entry naming retatrutide.",
+          "links": [
+            {
+              "url": "https://www.legislation.gov.au/F2026L01327/asmade/text",
+              "label": "Federal Register of Legislation"
+            }
+          ]
+        }
+      ],
+      "old_values": [
+        [
+          {
+            "title": "New England Journal of Medicine (2023)",
+            "authors": "Jastreboff et al.",
+            "description": "Phase 2 trial of retatrutide for obesity showing 24.2% weight reduction."
+          },
+          {
+            "title": "The Lancet (2023)",
+            "authors": "Rosenstock et al.",
+            "description": "Retatrutide Phase 2 efficacy and safety in type 2 diabetes."
+          },
+          {
+            "links": [
+              {
+                "url": "https://www.prnewswire.com/news-releases/lillys-triple-agonist-retatrutide-delivered-substantial-weight-loss-and-a1c-reduction-underscoring-its-potential-promise-for-people-with-obesity-and-type-2-diabetes-302891798.html",
+                "label": "PR Newswire"
+              }
+            ],
+            "title": "TRIUMPH-2 detailed results press release",
+            "authors": "Eli Lilly and Company",
+            "citation": "PR Newswire, 29 Sep 2026",
+            "description": "Efficacy estimand weight and A1C results at 80 weeks for retatrutide vs placebo in T2D with obesity/overweight."
+          },
+          {
+            "links": [
+              {
+                "url": "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(26)01861-1/abstract",
+                "label": "Lancet abstract"
+              }
+            ],
+            "title": "Retatrutide in adults with obesity and type 2 diabetes (TRIUMPH-2)",
+            "authors": "The Lancet",
+            "citation": "DOI 10.1016/S0140-6736(26)01861-1; NCT05929079; 29 Sep 2026",
+            "description": "Treatment-regimen estimand Findings: −11.9% / −16.8% / −18.8% vs −5.1% placebo; ETDs −6.9% / −11.8% / −13.8%."
+          },
+          {
+            "links": [],
+            "title": "Phase 2 obesity trial (background)",
+            "authors": "Jastreboff et al.",
+            "citation": "NEJM 2023",
+            "description": "Background Phase 2 obesity data; different population/duration than TRIUMPH-2."
+          },
+          {
+            "links": [
+              {
+                "url": "https://pubmed.ncbi.nlm.nih.gov/42814954/",
+                "label": "PubMed"
+              },
+              {
+                "url": "https://doi.org/10.1056/NEJMoa2604169",
+                "label": "DOI"
+              }
+            ],
+            "title": "Retatrutide, a Triple Hormone Receptor Agonist, for Treatment of Obesity (TRIUMPH-1)",
+            "authors": "Jastreboff et al. for the TRIUMPH-1 Investigators",
+            "citation": "N Engl J Med. 2026 Sep 29. DOI 10.1056/NEJMoa2604169. PMID 42814954. NCT05929066.",
+            "description": "Abstract weight result is the treatment-regimen estimand: −17.6%, −23.7%, and −25.0% versus −3.9% placebo. −28.3% is not the abstract figure."
+          },
+          {
+            "links": [
+              {
+                "url": "https://medical.lilly.com/us/products/answers/what-are-the-results-of-retatrutide-from-triumph-1-in-participants-with-obesity-or-overweight-without-type-2-diabetes-386151",
+                "label": "Lilly Medical"
+              }
+            ],
+            "title": "Lilly Medical table of TRIUMPH-1 outcomes",
+            "authors": "Eli Lilly and Company",
+            "citation": "Lilly Medical document 386151, citing NEJM DOI 10.1056/NEJMoa2604169.",
+            "description": "Efficacy estimand percent change in body weight: −19.0%, −25.9%, and −28.3% versus −2.2% placebo. The treatment-regimen row matches the NEJM abstract."
+          },
+          {
+            "links": [
+              {
+                "url": "https://www.prnewswire.com/news-releases/lillys-triple-agonist-retatrutide-successful-in-two-additional-phase-3-obesity-trials-delivering-significant-improvements-in-weight-and-a1c-302832674.html",
+                "label": "PR Newswire"
+              }
+            ],
+            "title": "Eli Lilly topline on two additional Phase 3 retatrutide trials (TRIUMPH-3)",
+            "authors": "Eli Lilly and Company",
+            "citation": "PR Newswire, 23 Jul 2026. NCT05882045.",
+            "description": "Topline only. Efficacy-estimand weight change −21.6% (9 mg) and −22.6% (12 mg) versus −3.2% placebo. Pre-specified MACE-5 and MACE-3 hazard ratios have 95% confidence intervals that include 1. Not a peer-reviewed cardiovascular-outcomes paper."
+          },
+          {
+            "links": [
+              {
+                "url": "https://media.ca7.uscourts.gov/oralArguments/oar.jsp?amonth=09%2F2026&aMonth=List+case%28s%29",
+                "label": "Argument calendar"
+              },
+              {
+                "url": "https://media.ca7.uscourts.gov/sound/external/ef.26-1301.26-1301_09_24_2026.mp3",
+                "label": "Argument audio"
+              }
+            ],
+            "title": "Seventh Circuit oral-argument calendar — Eli Lilly and Company v. Robert Kennedy, Jr., No. 26-1301",
+            "authors": "U.S. Court of Appeals for the Seventh Circuit",
+            "citation": "Argument date 24 Sep 2026.",
+            "description": "Confirms oral argument was held. Not a ruling."
+          },
+          {
+            "links": [
+              {
+                "url": "https://medical.lilly.com/us/products/answers/is-there-an-expanded-access-program-for-retatrutide-416668",
+                "label": "Lilly Medical"
+              },
+              {
+                "url": "https://clinicaltrials.gov/study/NCT07629401",
+                "label": "ClinicalTrials.gov"
+              }
+            ],
+            "title": "Is there an expanded access program for retatrutide?",
+            "authors": "Lilly Medical",
+            "citation": "medical.lilly.com answer; cites NCT07629401.",
+            "description": "Investigational and not FDA-approved. Single-patient expanded access is physician-initiated and is not a grey-market catalog."
+          }
+        ],
+        [
+          {
+            "title": "New England Journal of Medicine (2023)",
+            "authors": "Jastreboff et al.",
+            "description": "Phase 2 trial of retatrutide for obesity showing 24.2% weight reduction."
+          },
+          {
+            "title": "The Lancet (2023)",
+            "authors": "Rosenstock et al.",
+            "description": "Retatrutide Phase 2 efficacy and safety in type 2 diabetes."
+          },
+          {
+            "links": [
+              {
+                "url": "https://www.prnewswire.com/news-releases/lillys-triple-agonist-retatrutide-delivered-substantial-weight-loss-and-a1c-reduction-underscoring-its-potential-promise-for-people-with-obesity-and-type-2-diabetes-302891798.html",
+                "label": "PR Newswire"
+              }
+            ],
+            "title": "TRIUMPH-2 detailed results press release",
+            "authors": "Eli Lilly and Company",
+            "citation": "PR Newswire, 29 Sep 2026",
+            "description": "Efficacy estimand weight and A1C results at 80 weeks for retatrutide vs placebo in T2D with obesity/overweight."
+          },
+          {
+            "links": [
+              {
+                "url": "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(26)01861-1/abstract",
+                "label": "Lancet abstract"
+              }
+            ],
+            "title": "Retatrutide in adults with obesity and type 2 diabetes (TRIUMPH-2)",
+            "authors": "The Lancet",
+            "citation": "DOI 10.1016/S0140-6736(26)01861-1; NCT05929079; 29 Sep 2026",
+            "description": "Treatment-regimen estimand Findings: −11.9% / −16.8% / −18.8% vs −5.1% placebo; ETDs −6.9% / −11.8% / −13.8%."
+          },
+          {
+            "links": [],
+            "title": "Phase 2 obesity trial (background)",
+            "authors": "Jastreboff et al.",
+            "citation": "NEJM 2023",
+            "description": "Background Phase 2 obesity data; different population/duration than TRIUMPH-2."
+          },
+          {
+            "links": [
+              {
+                "url": "https://pubmed.ncbi.nlm.nih.gov/42814954/",
+                "label": "PubMed"
+              },
+              {
+                "url": "https://doi.org/10.1056/NEJMoa2604169",
+                "label": "DOI"
+              }
+            ],
+            "title": "Retatrutide, a Triple Hormone Receptor Agonist, for Treatment of Obesity (TRIUMPH-1)",
+            "authors": "Jastreboff et al. for the TRIUMPH-1 Investigators",
+            "citation": "N Engl J Med. 2026 Sep 29. DOI 10.1056/NEJMoa2604169. PMID 42814954. NCT05929066.",
+            "description": "Abstract weight result is the treatment-regimen estimand: −17.6%, −23.7%, and −25.0% versus −3.9% placebo. −28.3% is not the abstract figure."
+          },
+          {
+            "links": [
+              {
+                "url": "https://medical.lilly.com/us/products/answers/what-are-the-results-of-retatrutide-from-triumph-1-in-participants-with-obesity-or-overweight-without-type-2-diabetes-386151",
+                "label": "Lilly Medical"
+              }
+            ],
+            "title": "Lilly Medical table of TRIUMPH-1 outcomes",
+            "authors": "Eli Lilly and Company",
+            "citation": "Lilly Medical document 386151, citing NEJM DOI 10.1056/NEJMoa2604169.",
+            "description": "Efficacy estimand percent change in body weight: −19.0%, −25.9%, and −28.3% versus −2.2% placebo. The treatment-regimen row matches the NEJM abstract."
+          },
+          {
+            "links": [
+              {
+                "url": "https://www.prnewswire.com/news-releases/lillys-triple-agonist-retatrutide-successful-in-two-additional-phase-3-obesity-trials-delivering-significant-improvements-in-weight-and-a1c-302832674.html",
+                "label": "PR Newswire"
+              }
+            ],
+            "title": "Eli Lilly topline on two additional Phase 3 retatrutide trials (TRIUMPH-3)",
+            "authors": "Eli Lilly and Company",
+            "citation": "PR Newswire, 23 Jul 2026. NCT05882045.",
+            "description": "Topline only. Efficacy-estimand weight change −21.6% (9 mg) and −22.6% (12 mg) versus −3.2% placebo. Pre-specified MACE-5 and MACE-3 hazard ratios have 95% confidence intervals that include 1. Not a peer-reviewed cardiovascular-outcomes paper."
+          },
+          {
+            "links": [
+              {
+                "url": "https://media.ca7.uscourts.gov/oralArguments/oar.jsp?amonth=09%2F2026&aMonth=List+case%28s%29",
+                "label": "Argument calendar"
+              },
+              {
+                "url": "https://media.ca7.uscourts.gov/sound/external/ef.26-1301.26-1301_09_24_2026.mp3",
+                "label": "Argument audio"
+              }
+            ],
+            "title": "Seventh Circuit oral-argument calendar — Eli Lilly and Company v. Robert Kennedy, Jr., No. 26-1301",
+            "authors": "U.S. Court of Appeals for the Seventh Circuit",
+            "citation": "Argument date 24 Sep 2026.",
+            "description": "Confirms oral argument was held. Not a ruling."
+          },
+          {
+            "links": [
+              {
+                "url": "https://medical.lilly.com/us/products/answers/is-there-an-expanded-access-program-for-retatrutide-416668",
+                "label": "Lilly Medical"
+              },
+              {
+                "url": "https://clinicaltrials.gov/study/NCT07629401",
+                "label": "ClinicalTrials.gov"
+              }
+            ],
+            "title": "Is there an expanded access program for retatrutide?",
+            "authors": "Lilly Medical",
+            "citation": "medical.lilly.com answer; cites NCT07629401.",
+            "description": "Investigational and not FDA-approved. Single-patient expanded access is physician-initiated and is not a grey-market catalog."
+          },
+          {
+            "title": "Banks Urges FDA to Crack Down on Illicit “Research Use Only” Drugs",
+            "authors": "Office of U.S. Senator Jim Banks",
+            "citation": "Press release, 15 October 2026, with the senators’ letter to FDA dated 14 October 2026.",
+            "description": "Letter from nine senators to Acting FDA Commissioner Kyle Diamantas on “for research use only” labeling, citing retatrutide; urges closer FDA work with U.S. Customs & Border Protection and requests a briefing.",
+            "links": [
+              {
+                "url": "https://www.banks.senate.gov/news/press-releases/banks-urges-fda-to-crack-down-on-illicit-research-use-only-drugs/",
+                "label": "Press release"
+              },
+              {
+                "url": "https://www.dropbox.com/scl/fi/eaeulrk1plwq3ff5e9gar/2026.10.14-Senators-Letter-to-FDA-re-For-Research-Use-Only-Labeling.pdf?rlkey=9vjj3ateafudmlanlmwub60ga&st=gui4uyfq&dl=0",
+                "label": "Signed letter (PDF, linked from the release)"
+              }
+            ]
+          },
+          {
+            "title": "FDA decision on remand: Eli Lilly and Co. v. Robert F. Kennedy, Jr. et al. – Issues Remanded to FDA",
+            "authors": "U.S. Food and Drug Administration, Center for Drug Evaluation and Research",
+            "citation": "Letter to Eli Lilly and Company, 2 October 2026 (redacted copy filed in the Seventh Circuit, No. 26-1301, Dkt. 46, 8 October 2026).",
+            "description": "Concludes that retatrutide is not an analogous product to a protein and therefore not a biological product, and that an application for retatrutide would need to be submitted under section 505 of the FD&C Act.",
+            "links": [
+              {
+                "url": "https://storage.courtlistener.com/recap/gov.uscourts.ca7.55916/gov.uscourts.ca7.55916.46.2.pdf",
+                "label": "FDA decision as filed (PDF)"
+              }
+            ]
+          },
+          {
+            "title": "Eli Lilly and Company v. Robert F. Kennedy, Jr., No. 26-1301 (7th Cir.): supplemental briefs on appellate jurisdiction",
+            "authors": "U.S. Court of Appeals for the Seventh Circuit (docket via CourtListener RECAP)",
+            "citation": "Order of 24 September 2026 (Dkt. 45); government and Lilly supplemental filings of 8 October 2026 (Dkt. 46, 47). No ruling on the docket checked 22 October 2026.",
+            "description": "Lilly’s brief says it plans to file its retatrutide application no later than the first quarter of 2027, that the remand decision is beyond the scope of the appeal, and that a challenge to it would require a new suit.",
+            "links": [
+              {
+                "url": "https://www.courtlistener.com/docket/73173235/eli-lilly-and-company-v-robert-kennedy-jr/",
+                "label": "Docket"
+              },
+              {
+                "url": "https://storage.courtlistener.com/recap/gov.uscourts.ca7.55916/gov.uscourts.ca7.55916.47.0.pdf",
+                "label": "Lilly supplemental brief (PDF)"
+              }
+            ]
+          }
+        ]
+      ]
+    }
+  },
+  "do_not_touch": "every other column; other posts",
+  "order_independence": "ghk-cu regulatory_subsections and references accept either the live value or the value after reapply-2026-10-22 (2026_10_22_130000). Final state is identical whichever runs first. Other slugs: the reapply does not touch regulatory_subsections/references for retatrutide (or any AU column), so no change needed. retatrutide regulatory_subsections and references also accept the state after orfo-reta (2026_10_22_140000); final order is always live, Senate letter, Australia (and references live 10, orfo-reta 3, AU 3)."
+}
