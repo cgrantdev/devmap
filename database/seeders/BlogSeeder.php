@@ -18,7 +18,7 @@ class BlogSeeder extends Seeder
         $blogs = [
             [
                 'title' => 'Safe Handling of Peptides in Laboratory Settings',
-                'description' => 'BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation, and promote faster recovery from injuries.',
+                'description' => 'General laboratory handling practices for research peptides: storage conditions, protective equipment and record-keeping.',
                 'content' => '<p>Peptides are powerful research compounds that require careful handling and storage. This comprehensive guide covers essential safety protocols for working with peptides in laboratory environments.</p>
                 
                 <h2>Storage Requirements</h2>
