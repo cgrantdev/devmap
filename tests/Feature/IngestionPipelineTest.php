@@ -91,7 +91,7 @@ class IngestionPipelineTest extends TestCase
             'external_id' => '1',
             'name' => 'Semaglutide',
             'price' => '99.99',
-            'source_url' => 'https://acme.example.com/semag',
+            'source_url' => 'https://acme.example.com/products/semag',
         ]);
 
         $this->assertEquals('approved', $staged->fresh()->status);
@@ -99,7 +99,7 @@ class IngestionPipelineTest extends TestCase
         $this->assertDatabaseHas('products', [
             'name' => 'Semaglutide',
             'brand_id' => $brand->id,
-            'product_url' => 'https://acme.example.com/semag',
+            'product_url' => 'https://acme.example.com/products/semag',
         ]);
     }
 
@@ -214,6 +214,8 @@ class IngestionPipelineTest extends TestCase
             'password' => bcrypt('password'),
             'role' => 'vendor',
         ]);
+        // email_verified_at is not fillable; vendor routes require a verified email.
+        $user->forceFill(['email_verified_at' => now()])->save();
         $brand->user_id = $user->id;
         $brand->save();
 
