@@ -62,37 +62,37 @@ class EncyclopediaController extends Controller
     }
 
     /**
-     * FAQPage node for the same pairs the template renders. Null when
-     * the list is empty, so the page emits no empty FAQPage container.
+     * FAQPage schema for pages that are not on the visible-FAQ allowlist.
+     * This is the builder main already shipped: trim, then strip_tags on
+     * the answer. It stays so those pages keep the same JSON-LD.
      *
-     * @param  list<array{question: string, answer: string}>  $faqs
+     * @param  list<array<string, mixed>>  $faqs
      */
     private function faqPageSchema(array $faqs, string $slug): ?array
     {
-        return FaqPage::schema($faqs, url("/encyclopedia/{$slug}#faq"));
-    }
-
-    /**
-     * Allowlist match for the public encyclopedia slug. Stored FAQ rows
-     * for other slugs stay in the database and are not rendered.
-     */
-    private function encyclopediaFaqAllowed(string $slug): bool
-    {
-        $needle = EncyclopediaSlug::normalize($slug);
-        if ($needle === '') {
-            return false;
-        }
-        $allow = config('peptidemap.encyclopedia_faq_allowlist', []);
-        if (! is_array($allow)) {
-            return false;
-        }
-        foreach ($allow as $item) {
-            if (EncyclopediaSlug::normalize((string) $item) === $needle) {
-                return true;
+        $mainEntity = [];
+        foreach ($faqs as $f) {
+            $q = trim((string) ($f['question'] ?? ''));
+            $a = trim((string) ($f['answer'] ?? ''));
+            if ($q === '' || $a === '') {
+                continue;
             }
+            $mainEntity[] = [
+                '@type' => 'Question',
+                'name' => $q,
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => strip_tags($a)],
+            ];
+        }
+        if (empty($mainEntity)) {
+            return null;
         }
 
-        return false;
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            '@id' => url("/encyclopedia/{$slug}#faq"),
+            'mainEntity' => $mainEntity,
+        ];
     }
 
     private function getClinicalData($compoundName, $field)
@@ -813,11 +813,17 @@ class EncyclopediaController extends Controller
         // encyclopedia document at /compare splits the informational URL.
         $encyclopediaUrl = url('/encyclopedia/'.$publicSlug);
 
-        // One normalised list for the visible FAQ and faqPageSchema().
-        // Off the allowlist, both stay empty. The faqs column is not written.
-        $faqs = $this->faqPairs($this->faqsForSchema($educationPost, $profile));
-        if (! $this->encyclopediaFaqAllowed($publicSlug)) {
+        // Allowlisted pages render one normalised list and build FAQPage
+        // JSON-LD from that same list. Every other page keeps the schema
+        // this controller already emitted and gains no visible FAQ.
+        // The faqs column is not written.
+        $storedFaqs = $this->faqsForSchema($educationPost, $profile);
+        if (FaqPage::renderAllowed('encyclopedia', $publicSlug)) {
+            $faqs = $this->faqPairs($storedFaqs);
+            $faqSchema = FaqPage::schema($faqs, url("/encyclopedia/{$publicSlug}#faq"));
+        } else {
             $faqs = [];
+            $faqSchema = $this->faqPageSchema($storedFaqs, $publicSlug);
         }
 
         // Build SEO array (same format as products/brands pages)
@@ -836,9 +842,9 @@ class EncyclopediaController extends Controller
             'schema' => array_values(array_filter([
                 $definedTermSchema,
                 $breadcrumbSchema,
-                // FAQPage schema (SEO rec #7). Same strings as the visible
-                // FAQ. Omitted when $faqs is empty.
-                $this->faqPageSchema($faqs, $publicSlug),
+                // FAQPage schema (SEO rec #7). Allowlisted pages use the
+                // visible pairs. Other pages keep the existing node.
+                $faqSchema,
             ])),
         ];
 

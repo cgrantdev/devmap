@@ -46,4 +46,36 @@ class FaqPage
 
         return $node;
     }
+
+    /**
+     * Visible FAQ is allowlisted. Encyclopedia matching is case-insensitive.
+     * Blog matching is a lowercase slug compare against the catalog list.
+     */
+    public static function renderAllowed(string $section, string $slug): bool
+    {
+        $allow = config('peptidemap.faq_render_allowlist.'.$section, []);
+        if (! is_array($allow)) {
+            return false;
+        }
+        $needle = self::normaliseSlug($section, $slug);
+        if ($needle === '') {
+            return false;
+        }
+        foreach ($allow as $item) {
+            if (self::normaliseSlug($section, (string) $item) === $needle) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function normaliseSlug(string $section, string $slug): string
+    {
+        if ($section === 'encyclopedia') {
+            return EncyclopediaSlug::normalize($slug);
+        }
+
+        return strtolower(trim($slug));
+    }
 }

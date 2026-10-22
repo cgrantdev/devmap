@@ -207,12 +207,21 @@ class BlogsController extends Controller
             ],
         ];
 
-        // One normalised {question, answer} list. faqPageSchema() and the
-        // visible FAQ prop both receive it. Other stored schema blocks stay.
-        [$otherSchemas, $faqs, $faqId] = $this->partitionStoredSchema($blog->seo_schema);
-        $schemas = array_merge([$articleSchema, $breadcrumbSchema], $otherSchemas);
-        if ($faqSchema = $this->faqPageSchema($faqs, $faqId)) {
-            $schemas[] = $faqSchema;
+        // Catalog blogs render one normalised list and rebuild FAQPage
+        // JSON-LD from it. Every other post keeps its stored schema
+        // blocks, including an existing FAQPage, and gains no visible FAQ.
+        $storedSchemas = $this->storedSchemaBlocks($blog->seo_schema);
+        if (FaqPage::renderAllowed('blog', (string) $blog->slug)) {
+            [$otherSchemas, $faqs, $faqId] = $this->partitionStoredSchema($blog->seo_schema);
+            $schemas = array_merge([$articleSchema, $breadcrumbSchema], $otherSchemas);
+            if ($faqSchema = $this->faqPageSchema($faqs, $faqId)) {
+                $schemas[] = $faqSchema;
+            }
+            $content = $this->withoutMarkdownFaqHeading($blog->content, $faqs);
+        } else {
+            $schemas = array_merge([$articleSchema, $breadcrumbSchema], $storedSchemas);
+            $faqs = [];
+            $content = $blog->content;
         }
 
         // Build SEO array (same format as products/brands pages)
@@ -247,10 +256,7 @@ class BlogsController extends Controller
                 'key_points' => $blog->key_points ?? [],
                 'detailed_analysis' => $blog->detailed_analysis,
                 'conclusion' => $blog->conclusion,
-                // Markdown FAQ/FAQs heading blocks are the publisher's
-                // second copy of seo_schema. Drop that block on the way
-                // to the view so the section below is the only FAQ.
-                'content' => $this->withoutMarkdownFaqHeading($blog->content, $faqs),
+                'content' => $content,
                 'tags' => $blog->tags ?? [],
                 'author_name' => $blog->author_name,
                 'author_job' => $blog->author_job,
@@ -301,6 +307,34 @@ class BlogsController extends Controller
         }
 
         return 'Research'; // Default
+    }
+
+    /**
+     * Stored seo_schema blocks, passed through unchanged. This is the
+     * blog JSON-LD behaviour for posts that are not on the allowlist.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function storedSchemaBlocks(mixed $extra): array
+    {
+        if (is_string($extra)) {
+            $extra = json_decode($extra, true);
+        }
+        if (! is_array($extra)) {
+            return [];
+        }
+        if (isset($extra['@type'])) {
+            $extra = [$extra];
+        }
+
+        $blocks = [];
+        foreach ($extra as $block) {
+            if (is_array($block)) {
+                $blocks[] = $block;
+            }
+        }
+
+        return $blocks;
     }
 
     /**

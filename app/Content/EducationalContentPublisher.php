@@ -231,6 +231,29 @@ class EducationalContentPublisher
         ];
     }
 
+    /**
+     * Blog slugs this catalog publishes. Their faq() pairs are the
+     * QA-passed set, so the visible-FAQ allowlist is derived from here
+     * instead of copying the slugs into config.
+     *
+     * @return list<string>
+     */
+    public static function blogSlugs(): array
+    {
+        $slugs = [];
+        foreach (self::catalog() as $page) {
+            if (($page['kind'] ?? null) !== 'blog') {
+                continue;
+            }
+            $slug = $page['slug'] ?? null;
+            if (is_string($slug) && $slug !== '') {
+                $slugs[] = $slug;
+            }
+        }
+
+        return $slugs;
+    }
+
     private static function catalog(): array
     {
         $host = self::CANONICAL_HOST;

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Content\EducationalContentPublisher;
 use App\Models\Blog;
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
@@ -32,19 +33,37 @@ class FaqSchemaParityTest extends TestCase
         $this->withoutVite();
     }
 
-    public function test_blog_with_faq_renders_the_faqpage_strings_and_drops_the_markdown_copy(): void
+    public function test_allowlisted_blog_renders_visible_faq_matching_json_ld(): void
     {
+        $slug = EducationalContentPublisher::blogSlugs()[0];
+        $this->assertContains($slug, config('peptidemap.faq_render_allowlist.blog'));
+
         $question = 'What does this sample record?';
         $answer = 'It records a catalog label only.';
         $secondQuestion = 'Where does the answer text come from?';
         $secondAnswer = 'It comes from the FAQPage entity, character for character.';
+        $stored = [
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            '@id' => 'https://peptidemap.com/blog/'.$slug.'#faq',
+            'mainEntity' => [
+                [
+                    '@type' => 'Question',
+                    'name' => $question,
+                    'acceptedAnswer' => ['@type' => 'Answer', 'text' => $answer],
+                ],
+                [
+                    '@type' => 'Question',
+                    'name' => $secondQuestion,
+                    'acceptedAnswer' => ['@type' => 'Answer', 'text' => $secondAnswer],
+                ],
+            ],
+        ];
 
-        $blog = Blog::create([
-            'title' => 'FAQ parity sample',
-            'slug' => 'faq-parity-sample',
+        $blog = Blog::query()->where('slug', $slug)->firstOrFail();
+        $blog->update([
             'status' => 'published',
             'published_at' => now()->subDay(),
-            'description' => 'A sample post used to check FAQ parity.',
             'content' => <<<'HTML'
 <h2>Overview</h2>
 <p>Body paragraph stays.</p>
@@ -56,42 +75,27 @@ class FaqSchemaParityTest extends TestCase
 <h2>Sources</h2>
 <p>Source paragraph stays.</p>
 HTML,
-            'seo_schema' => [[
-                '@context' => 'https://schema.org',
-                '@type' => 'FAQPage',
-                '@id' => 'https://peptidemap.com/blog/faq-parity-sample#faq',
-                'mainEntity' => [
-                    [
-                        '@type' => 'Question',
-                        'name' => $question,
-                        'acceptedAnswer' => ['@type' => 'Answer', 'text' => $answer],
-                    ],
-                    [
-                        '@type' => 'Question',
-                        'name' => $secondQuestion,
-                        'acceptedAnswer' => ['@type' => 'Answer', 'text' => $secondAnswer],
-                    ],
-                ],
-            ]],
+            'seo_schema' => [$stored],
         ]);
 
         $response = $this->get('/blog/'.$blog->slug);
         $response->assertOk();
+        $response->assertSee(json_encode($stored, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), false);
 
         $faqPage = $this->faqPage($response->getContent());
         $this->assertNotNull($faqPage);
-        $this->assertCount(2, $faqPage['mainEntity']);
+        $this->assertSame($stored, $faqPage);
 
         $response->assertInertia(fn ($page) => $page
             ->has('faqs', 2)
-            ->where('faqs.0.question', $faqPage['mainEntity'][0]['name'])
-            ->where('faqs.0.answer', $faqPage['mainEntity'][0]['acceptedAnswer']['text'])
-            ->where('faqs.1.question', $faqPage['mainEntity'][1]['name'])
-            ->where('faqs.1.answer', $faqPage['mainEntity'][1]['acceptedAnswer']['text'])
             ->where('faqs.0.question', $question)
             ->where('faqs.0.answer', $answer)
             ->where('faqs.1.question', $secondQuestion)
             ->where('faqs.1.answer', $secondAnswer)
+            ->where('faqs.0.question', $faqPage['mainEntity'][0]['name'])
+            ->where('faqs.0.answer', $faqPage['mainEntity'][0]['acceptedAnswer']['text'])
+            ->where('faqs.1.question', $faqPage['mainEntity'][1]['name'])
+            ->where('faqs.1.answer', $faqPage['mainEntity'][1]['acceptedAnswer']['text'])
             ->where('blog.content', function ($content) {
                 $this->assertIsString($content);
                 $this->assertStringContainsString('Body paragraph stays.', $content);
@@ -103,19 +107,65 @@ HTML,
                 return true;
             })
         );
-
-        $this->assertSame($question, $faqPage['mainEntity'][0]['name']);
-        $this->assertSame($answer, $faqPage['mainEntity'][0]['acceptedAnswer']['text']);
-        $this->assertSame($secondQuestion, $faqPage['mainEntity'][1]['name']);
-        $this->assertSame($secondAnswer, $faqPage['mainEntity'][1]['acceptedAnswer']['text']);
     }
 
-    public function test_blog_without_faq_emits_no_faqpage_and_no_faq_section(): void
+    public function test_other_blog_keeps_stored_faqpage_and_has_no_visible_faq(): void
+    {
+        $content = <<<'HTML'
+<h2>Overview</h2>
+<p>Body paragraph stays.</p>
+<h2>FAQs</h2>
+<h3>What does this sample record?</h3>
+<p>It records a catalog label only.</p>
+<h2>Sources</h2>
+<p>Source paragraph stays.</p>
+HTML;
+        $stored = [
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            '@id' => 'https://peptidemap.com/blog/faq-parity-sample#faq',
+            'publisher' => ['@type' => 'Organization', 'name' => 'Peptidemap'],
+            'mainEntity' => [[
+                '@type' => 'Question',
+                'name' => 'What does this sample record?',
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'It records a catalog label only.'],
+            ]],
+        ];
+        $this->assertNotContains('faq-parity-sample', EducationalContentPublisher::blogSlugs());
+
+        $blog = Blog::create([
+            'title' => 'FAQ parity sample',
+            'slug' => 'faq-parity-sample',
+            'status' => 'published',
+            'published_at' => now()->subDay(),
+            'description' => 'A sample post used to check FAQ parity.',
+            'content' => $content,
+            'seo_schema' => [$stored],
+        ]);
+
+        $response = $this->get('/blog/'.$blog->slug);
+        $response->assertOk();
+        $response->assertSee(json_encode($stored, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), false);
+        $this->assertSame($stored, $this->faqPage($response->getContent()));
+
+        $response->assertInertia(fn ($page) => $page
+            ->has('faqs', 0)
+            ->where('blog.content', $content)
+        );
+    }
+
+    public function test_blog_without_faq_keeps_an_empty_stored_faqpage(): void
     {
         $content = <<<'HTML'
 <h2>Notes</h2>
 <p>This post has no question block.</p>
 HTML;
+        $stored = [
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            '@id' => 'https://peptidemap.com/blog/no-faq-sample#faq',
+            'mainEntity' => [],
+        ];
 
         $blog = Blog::create([
             'title' => 'No FAQ sample',
@@ -124,31 +174,17 @@ HTML;
             'published_at' => now()->subDay(),
             'description' => 'A sample post with no FAQ.',
             'content' => $content,
-            'seo_schema' => [[
-                '@context' => 'https://schema.org',
-                '@type' => 'FAQPage',
-                '@id' => 'https://peptidemap.com/blog/no-faq-sample#faq',
-                'mainEntity' => [],
-            ]],
+            'seo_schema' => [$stored],
         ]);
 
         $response = $this->get('/blog/'.$blog->slug);
         $response->assertOk();
-        $response->assertDontSee('FAQPage', false);
-        $response->assertDontSee('<h2>FAQ</h2>', false);
-        $response->assertDontSee('<h2>FAQs</h2>', false);
-        $this->assertNull($this->faqPage($response->getContent()));
+        $response->assertSee(json_encode($stored, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), false);
+        $this->assertSame($stored, $this->faqPage($response->getContent()));
 
         $response->assertInertia(fn ($page) => $page
             ->has('faqs', 0)
             ->where('blog.content', $content)
-            ->where('seo.schema', function ($schema) {
-                foreach ($schema as $block) {
-                    $this->assertNotSame('FAQPage', is_array($block) ? ($block['@type'] ?? null) : null);
-                }
-
-                return true;
-            })
         );
     }
 
@@ -163,12 +199,12 @@ HTML;
 
         $category = ProductCategory::create([
             'name' => 'BPC-157',
-            'slug' => 'bpc-157',
+            'slug' => 'BPC-157',
             'is_active' => true,
         ]);
         $post = EducationPost::create([
             'title' => 'BPC-157',
-            'slug' => 'bpc-157',
+            'slug' => 'BPC-157',
             'product_category_id' => $category->id,
             'status' => 'published',
             'show_in_encyclopedia' => true,
@@ -176,7 +212,7 @@ HTML;
             'faqs' => $stored,
         ]);
 
-        $response = $this->get('/encyclopedia/bpc-157');
+        $response = $this->get('/encyclopedia/BPC-157');
         $response->assertOk();
 
         $faqPage = $this->faqPage($response->getContent());
@@ -196,12 +232,25 @@ HTML;
         $this->assertSame($stored, $post->fresh()->faqs);
     }
 
-    public function test_ipamorelin_stored_faqs_are_not_rendered_or_marked_up(): void
+    public function test_ipamorelin_keeps_existing_faqpage_and_has_no_visible_faq(): void
     {
         $stored = [[
-            'question' => 'What catalog label does this ipamorelin entry use?',
-            'answer' => 'It uses the stored encyclopedia label only.',
+            'question' => '  What catalog label does this ipamorelin entry use?  ',
+            'answer' => '<p>It uses the stored encyclopedia label only. See /encyclopedia/ipamorelin.</p>',
         ]];
+        $expected = [
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            '@id' => url('/encyclopedia/ipamorelin#faq'),
+            'mainEntity' => [[
+                '@type' => 'Question',
+                'name' => 'What catalog label does this ipamorelin entry use?',
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => 'It uses the stored encyclopedia label only. See /encyclopedia/ipamorelin.',
+                ],
+            ]],
+        ];
 
         $category = ProductCategory::create([
             'name' => 'Ipamorelin',
@@ -221,20 +270,11 @@ HTML;
         $response = $this->get('/encyclopedia/ipamorelin');
         $response->assertOk();
         $response->assertSee('Ipamorelin overview stays.', false);
-        $response->assertDontSee('FAQPage', false);
-        $response->assertDontSee($stored[0]['question'], false);
-        $response->assertDontSee($stored[0]['answer'], false);
-        $this->assertNull($this->faqPage($response->getContent()));
+        $response->assertSee(json_encode($expected, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), false);
+        $this->assertSame($expected, $this->faqPage($response->getContent()));
 
         $response->assertInertia(fn ($page) => $page
             ->has('faqs', 0)
-            ->where('seo.schema', function ($schema) {
-                foreach ($schema as $block) {
-                    $this->assertNotSame('FAQPage', is_array($block) ? ($block['@type'] ?? null) : null);
-                }
-
-                return true;
-            })
         );
 
         $this->assertSame($stored, $post->fresh()->faqs);

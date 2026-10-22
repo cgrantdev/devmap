@@ -1,15 +1,26 @@
 <?php
 
+use App\Content\EducationalContentPublisher;
+
 return [
 
     /*
-    | Encyclopedia slugs that may render a visible FAQ and FAQPage
-    | JSON-LD. Matching is case-insensitive. Every other encyclopedia
-    | entry keeps its stored faqs column and emits neither a section
-    | nor a schema node.
+    | Pages that render a visible FAQ. On these pages one normalised
+    | {question, answer} list feeds both that section and faqPageSchema().
+    |
+    | Blog slugs are derived from EducationalContentPublisher::catalog()
+    | (kind blog) via blogSlugs(). Those faq() pairs are QA-passed, so
+    | the list is not copied by hand. Encyclopedia starts with bpc-157.
+    | Matching for encyclopedia slugs is case-insensitive.
+    |
+    | Every other page keeps its existing FAQPage JSON-LD and does not
+    | gain a visible FAQ. Stored FAQ rows are not rewritten.
     */
-    'encyclopedia_faq_allowlist' => [
-        'bpc-157',
+    'faq_render_allowlist' => [
+        'blog' => EducationalContentPublisher::blogSlugs(),
+        'encyclopedia' => [
+            'bpc-157',
+        ],
     ],
 
 ];
