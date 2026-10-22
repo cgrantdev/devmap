@@ -89,21 +89,21 @@ class CompareController extends Controller
      */
     public const FEATURED_VS_PAIRS = [
         ['a' => 'semaglutide',   'b' => 'tirzepatide',   'tagline' => 'The two big GLP-1s'],
-        ['a' => 'bpc-157',       'b' => 'tb-500',        'tagline' => 'The classic healing stack'],
+        ['a' => 'bpc-157',       'b' => 'tb-500',        'tagline' => 'Two peptides often compared'],
         ['a' => 'cjc-1295',      'b' => 'ipamorelin',    'tagline' => 'Growth-hormone secretagogue duo'],
-        ['a' => 'bpc-157',       'b' => 'ghk-cu',        'tagline' => 'Skin & recovery'],
+        ['a' => 'bpc-157',       'b' => 'ghk-cu',        'tagline' => 'Two research peptides often listed together'],
         ['a' => 'retatrutide',   'b' => 'tirzepatide',   'tagline' => 'Next-gen vs. current-gen GLP-1'],
-        ['a' => 'mots-c',        'b' => 'nad',           'tagline' => 'Mitochondrial support'],
+        ['a' => 'mots-c',        'b' => 'nad',           'tagline' => 'Two mitochondrial research listings'],
         ['a' => 'ipamorelin',    'b' => 'tesamorelin',   'tagline' => 'GHRH vs GHRP'],
-        ['a' => 'ipamorelin',    'b' => 'sermorelin',    'tagline' => 'Two ways to boost GH'],
-        ['a' => 'aod-9604',      'b' => 'tesamorelin',   'tagline' => 'Fat-loss peptides'],
+        ['a' => 'ipamorelin',    'b' => 'sermorelin',    'tagline' => 'Two GH-axis research peptides'],
+        ['a' => 'aod-9604',      'b' => 'tesamorelin',   'tagline' => 'Two catalog peptides often compared'],
         ['a' => 'retatrutide',   'b' => 'semaglutide',   'tagline' => 'Newer GLP-1 vs. proven'],
-        ['a' => 'ghk-cu',        'b' => 'tb-500',        'tagline' => 'Regeneration alternatives'],
+        ['a' => 'ghk-cu',        'b' => 'tb-500',        'tagline' => 'Two research peptides often compared'],
         ['a' => '5-amino-1mq',   'b' => 'mots-c',        'tagline' => 'Metabolic peptides'],
-        ['a' => 'bpc-157',       'b' => 'ipamorelin',    'tagline' => 'Recovery vs. growth'],
+        ['a' => 'bpc-157',       'b' => 'ipamorelin',    'tagline' => 'Two research peptides, listed side by side'],
         // PT-141 is the research code. The active category slug is bremelanotide.
         ['a' => 'bremelanotide', 'b' => 'kisspeptin',    'tagline' => 'Melanocortin vs. kisspeptin research'],
-        ['a' => 'cagrilintide',  'b' => 'semaglutide',   'tagline' => 'Newer weight-loss combo option'],
+        ['a' => 'cagrilintide',  'b' => 'semaglutide',   'tagline' => 'Two catalog peptides often compared'],
     ];
 
     /**
@@ -1245,29 +1245,65 @@ class CompareController extends Controller
         // that reference either of the current two compounds so we don't
         // suggest a duplicate.
         $curated = [
-            ['semaglutide', 'tirzepatide', 'The two big GLP-1s'],
-            ['bpc-157', 'tb-500', 'The classic healing stack'],
-            ['ipamorelin', 'cjc-1295', 'Growth-hormone secretagogue duo'],
-            ['ghk-cu', 'bpc-157', 'Skin & recovery comparison'],
+            ['bpc-157', 'tb-500', 'Two peptides often compared'],
+            ['cjc-1295', 'ipamorelin', 'Growth-hormone secretagogue duo'],
+            ['bpc-157', 'ghk-cu', 'Two research peptides often listed together'],
             ['retatrutide', 'tirzepatide', 'Next-gen vs. current-gen GLP-1'],
-            ['mots-c', 'nad', 'Mitochondrial support alternatives'],
-            ['tesamorelin', 'ipamorelin', 'GHRH vs GHRP'],
-            ['sermorelin', 'ipamorelin', 'Two ways to boost GH'],
+            ['mots-c', 'nad', 'Two mitochondrial research listings'],
+            ['ipamorelin', 'tesamorelin', 'GHRH vs GHRP'],
+            ['ipamorelin', 'sermorelin', 'Two GH-axis research peptides'],
+            ['semaglutide', 'tirzepatide', 'The two big GLP-1s'],
         ];
-        $excluded = [$a->slug, $b->slug];
+        $excluded = array_map(fn ($slug) => strtolower((string) $slug), [$a->slug, $b->slug]);
         $out = [];
         foreach ($curated as [$s1, $s2, $tagline]) {
-            if (in_array($s1, $excluded, true) || in_array($s2, $excluded, true)) continue;
+            if (in_array(strtolower($s1), $excluded, true) || in_array(strtolower($s2), $excluded, true)) {
+                continue;
+            }
+            $left = $s1;
+            $right = $s2;
+            if (strcmp($left, $right) > 0) {
+                [$left, $right] = [$right, $left];
+            }
             $out[] = [
-                'url' => "/compare/{$s1}-vs-{$s2}",
-                'title' => strtoupper($s1) . ' vs ' . strtoupper($s2),  // display names filled by Vue
-                'raw_a' => $s1,
-                'raw_b' => $s2,
+                'url' => "/compare/{$left}-vs-{$right}",
+                'title' => self::relatedLabel($left).' vs '.self::relatedLabel($right),
+                'name_a' => self::relatedLabel($left),
+                'name_b' => self::relatedLabel($right),
+                'raw_a' => $left,
+                'raw_b' => $right,
                 'tagline' => $tagline,
             ];
             if (count($out) >= 6) break;
         }
         return $out;
+    }
+
+    private static function relatedLabel(string $slug): string
+    {
+        $labels = [
+            'bpc-157' => 'BPC-157',
+            'tb-500' => 'TB-500',
+            'cjc-1295' => 'CJC-1295',
+            'ipamorelin' => 'Ipamorelin',
+            'ghk-cu' => 'GHK-Cu',
+            'retatrutide' => 'Retatrutide',
+            'tirzepatide' => 'Tirzepatide',
+            'mots-c' => 'MOTS-c',
+            'nad' => 'NAD+',
+            'tesamorelin' => 'Tesamorelin',
+            'sermorelin' => 'Sermorelin',
+            'semaglutide' => 'Semaglutide',
+        ];
+
+        if (isset($labels[$slug])) {
+            return $labels[$slug];
+        }
+
+        return implode('-', array_map(
+            fn ($part) => mb_convert_case($part, MB_CASE_TITLE, 'UTF-8'),
+            explode('-', $slug)
+        ));
     }
 
     /**

@@ -34,8 +34,9 @@
     <meta name="msvalidate.01" content="63538BD42BDE107E930BCBB0DB36B709" />
     @php
         $siteName = \App\Models\Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
-        $siteDescription = \App\Models\Setting::where('key', 'site_description')->value('value')
-            ?? 'Compare research-peptide vendors, prices, coupons and vendor-published COAs.';
+        $siteDescription = \App\Support\SiteCopy::description(
+            \App\Models\Setting::where('key', 'site_description')->value('value')
+        );
         $contactEmail = \App\Models\Setting::where('key', 'contact_email')->value('value') ?? 'info@peptidemap.com';
         $canonicalHost = 'https://peptidemap.com';
         $defaultOgImage = $canonicalHost . '/images/og-default-v8.png';

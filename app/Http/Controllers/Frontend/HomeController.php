@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Support\SiteCopy;
 use App\Models\SeoPage;
 use App\Models\ProductCategory;
 use App\Models\Brand;
@@ -324,8 +325,9 @@ class HomeController extends Controller
         // vendor directory, coupon codes) instead of the generic
         // "Live prices and coupon codes" placeholder. Admin SeoPage
         // override still wins when Julia sets one.
-        $defaultDescription = Setting::where('key', 'site_description')->value('value')
-            ?? 'Compare research peptide prices across 50+ vendors. Verified lab testing, live coupon codes, and side-by-side pricing on every compound — BPC-157, Retatrutide, Tirzepatide, Semaglutide, GHK-Cu and more. Research use only.';
+        $defaultDescription = SiteCopy::description(
+            Setting::where('key', 'site_description')->value('value')
+        );
         $defaultTitle = 'Compare Research Peptide Prices & Vendors — Peptidemap';
         $defaultImage = $heroSlides[0]['image'] ?? null;
 
@@ -878,7 +880,7 @@ class HomeController extends Controller
         // render the correct <title>, canonical, and OG/Twitter tags.
         $seo = [
             'key'            => 'home',
-            'title'          => 'Peptidemap — Compare research-peptide vendors, prices and coupons',
+            'title'          => 'Peptidemap — Compare Peptide Vendors, Prices & Coupons',
             'description'    => "Live prices and coupon codes. Check each vendor's site for COAs.",
             'url'            => 'https://peptidemap.com/',
             'og_title'       => 'Compare every peptide vendor — Peptidemap',

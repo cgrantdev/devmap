@@ -12,6 +12,7 @@ use App\Models\Puse;
 use App\Models\Brand;
 use App\Models\Location;
 use App\Models\Deal;
+use App\Support\BrandPageSeo;
 use App\Support\ProductPageSeo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -32,7 +33,8 @@ class ProductsController extends Controller
     {
         return ProductPageSeo::title(
             (string) ($product->display_name ?? $product->name),
-            $brand?->name
+            $brand?->name,
+            (string) $product->name
         );
     }
 
@@ -40,35 +42,14 @@ class ProductsController extends Controller
     {
         // Colin 10/21 SEO work: Google was collapsing product pages as
         // near-duplicates partly because the meta description was
-        // templated identically across every product ("X from Y.
-        // Compare listings from N vendors..."). We now have genuinely
-        // unique AI-generated descriptions per product (or scraped
-        // vendor copy). Use the first sentence of that as the meta —
-        // ~150 chars of truly distinct text per URL.
+        // templated identically across every product. Unique vendor
+        // copy (or the generated description) stays the source. Claim
+        // language is rewritten, short lines gain a publisher tail, and
+        // the cut is a sentence or clause — never a trailing ellipsis.
         $source = $product->vendor_description
             ?: $product->generated_description
             ?: null;
 
-        if ($source) {
-            // First sentence, trimmed to the SEO limit.
-            $firstSentence = preg_split('/(?<=[.!?])\s+/', trim($source), 2)[0] ?? '';
-            $firstSentence = trim($firstSentence);
-            if (mb_strlen($firstSentence) >= 60 && mb_strlen($firstSentence) <= 155) {
-                return $firstSentence;
-            }
-            // Too short? Grab the first 150 chars at word boundary.
-            if (mb_strlen($source) > 60) {
-                $snippet = mb_substr($source, 0, 150);
-                $lastSpace = mb_strrpos($snippet, ' ');
-                if ($lastSpace !== false && $lastSpace >= 100) {
-                    return mb_substr($snippet, 0, $lastSpace) . '…';
-                }
-                return $snippet . '…';
-            }
-        }
-
-        // Fallback: the old generic template. Keeps things working on
-        // the 1 straggler product that didn't get a description.
         $vendorCount = 0;
         if ($product->product_category_id) {
             $vendorCount = Product::visible()
@@ -78,9 +59,16 @@ class ProductsController extends Controller
                 ->count('brand_id');
         }
 
-        return ProductPageSeo::description(
+        $name = ProductPageSeo::normalizeProductName(
             (string) ($product->display_name ?? $product->name),
+            (string) $product->name
+        );
+
+        return ProductPageSeo::fromOwnCopy(
+            $source,
+            $name,
             $brand?->name,
+            null,
             (int) $vendorCount
         );
     }
@@ -459,7 +447,14 @@ class ProductsController extends Controller
             '@type' => 'Product',
             'name' => $product->display_name,
             'image' => $productImage ? [$productImage] : null,
-            'description' => $product->description ? strip_tags($product->description) : null,
+            'description' => ProductPageSeo::schemaDescription(
+                $product->description ?: $product->vendor_description ?: $product->generated_description,
+                ProductPageSeo::normalizeProductName(
+                    (string) ($product->display_name ?? $product->name),
+                    (string) $product->name
+                ),
+                $brand?->name
+            ),
             'brand' => $brand ? ['@type' => 'Brand', 'name' => $brand->name] : null,
             'sku' => (string) $product->id,
             'offers' => [
@@ -1053,11 +1048,17 @@ class ProductsController extends Controller
         $couponClause = ($vendorSetting && !empty($vendorSetting->coupon_code))
             ? "Coupon code {$vendorSetting->coupon_code}, "
             : '';
-        $defaultBrandDescription = "{$couponClause}real customer reviews, and live prices for {$brandProductCount} peptides from {$brand->name}. Compare against {$otherVendorCount} other listed vendors on Peptidemap.";
+        $onSiteReviewCount = $approvedReviews->count();
+        $reviewsClause = $onSiteReviewCount > 0 ? 'real customer reviews, and ' : '';
+        $defaultBrandDescription = "{$couponClause}{$reviewsClause}live prices for {$brandProductCount} peptides from {$brand->name}. Compare against {$otherVendorCount} other listed vendors on Peptidemap.";
+        if ($couponClause === '' && $reviewsClause === '') {
+            $defaultBrandDescription = ucfirst($defaultBrandDescription);
+        }
+        $defaultBrandTitle = BrandPageSeo::title($brand->name, $siteName);
 
         if ($hasStoredSeo) {
             // Use stored SEO data from database
-            $seoTitle = $vendorSetting->seo_page_title ?: ($brand->name . ': Coupon Codes, Reviews & Prices - ' . $siteName);
+            $seoTitle = $vendorSetting->seo_page_title ?: $defaultBrandTitle;
             $seoDescription = $vendorSetting->seo_description ?: $defaultBrandDescription;
             $seoOgTitle = $vendorSetting->seo_og_title ?: $seoTitle;
             $seoOgDescription = $vendorSetting->seo_og_description ?: $seoDescription;
@@ -1067,7 +1068,7 @@ class ProductsController extends Controller
                 ? \App\Support\OgImageUrl::fold(str_starts_with($vendorSetting->seo_og_image, 'http') ? $vendorSetting->seo_og_image : url($vendorSetting->seo_og_image))
                 : \App\Support\OgImageUrl::brand((string) $brand->slug, (string) $ogV);
         } else {
-            $seoTitle = $brand->name . ': Coupon Codes, Reviews & Prices - ' . $siteName;
+            $seoTitle = $defaultBrandTitle;
             $seoDescription = $defaultBrandDescription;
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;

@@ -74,13 +74,14 @@ class VsPageSeo
     {
         $pair = self::pair($a, $b);
         $candidates = [
-            "{$pair} side-by-side: mechanism, half-life, and use cases. Compare vendor listings. Catalog data only: RUO, and Peptidemap sells nothing.",
-            // The vendor-listings line is 157 characters for Bremelanotide
-            // vs Kisspeptin. This shorter line is 150, still inside 140–155.
-            // Shorter pairs keep the line above.
-            "{$pair} side-by-side: mechanism, half-life, and use cases. Compare listings. Catalog data only: RUO, and Peptidemap sells nothing.",
-            "{$pair} side-by-side: mechanism, half-life, and use cases. Catalog data only: RUO, and Peptidemap sells nothing.",
-            "{$pair} side-by-side: mechanism, half-life, and use cases. RUO only. Peptidemap sells nothing.",
+            "{$pair} side-by-side: mechanism, half-life, and research context. Compare vendor listings. Catalog data only: RUO, and Peptidemap sells nothing.",
+            // Bremelanotide vs Kisspeptin is 164 on the vendor-listings
+            // line and 157 on the catalog line below. The following line
+            // is 144, still inside 140–155. Shorter pairs keep an earlier line.
+            "{$pair} side-by-side: mechanism, half-life, and research context. Compare listings. Catalog data only: RUO, and Peptidemap sells nothing.",
+            "{$pair} side-by-side: mechanism, half-life, and research context. Compare listings. RUO data only; Peptidemap sells nothing.",
+            "{$pair} side-by-side: mechanism, half-life, and research context. Catalog data only: RUO, and Peptidemap sells nothing.",
+            "{$pair} side-by-side: mechanism, half-life, and research context. RUO only. Peptidemap sells nothing.",
             "Compare {$pair} listings. Catalog data only: RUO, and Peptidemap sells nothing.",
             "Compare {$pair} listings. RUO. Peptidemap sells nothing.",
         ];
