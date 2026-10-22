@@ -20,7 +20,7 @@ class RetatrutideEncyclopediaFaqSeeder extends Seeder
 {
     public const SLUG = 'retatrutide';
 
-    public const FDA_ANSWER = 'No. Retatrutide is still not FDA-approved. Phase 3 TRIUMPH results are published, including TRIUMPH-1 in The New England Journal of Medicine (29 Sep 2026) and TRIUMPH-2 in The Lancet (29 Sep 2026). Eli Lilly has stated a planned U.S. biologics license application in Q1 2027. That filing plan is not FDA approval. PeptideMap is a research-use (RUO) comparison publisher, not a clinic or pharmacy. This is trial reporting, not medical advice and not a dose.';
+    public const FDA_ANSWER = 'No. Retatrutide is still not FDA-approved. Phase 3 TRIUMPH results are published, including TRIUMPH-1 in The New England Journal of Medicine (29 Sep 2026) and TRIUMPH-2 in The Lancet (29 Sep 2026). Lilly told the Seventh Circuit on 8 October 2026 that it plans to file its application no later than the first quarter of 2027 (Q1 2027). On 2 October 2026, in a decision on remand, FDA concluded that retatrutide is not a biological product and that an application would need to be submitted under section 505 of the Federal Food, Drug, and Cosmetic Act (the drug pathway). That filing plan is not FDA approval. PeptideMap is a research-use (RUO) comparison publisher, not a clinic or pharmacy. This is trial reporting, not medical advice and not a dose.';
 
     public const TRIUMPH1_QUESTION = 'How do published TRIUMPH-1 results differ from TRIUMPH-2?';
 
@@ -36,7 +36,7 @@ class RetatrutideEncyclopediaFaqSeeder extends Seeder
 
     public const TRIUMPH3_TITLE = 'TRIUMPH-3 topline (Lilly, 23 Jul 2026) — not a peer-reviewed cardiovascular-outcomes paper';
 
-    public const APPROVAL_STATUS = 'Retatrutide is not FDA-approved. Phase 3 TRIUMPH results are published, including TRIUMPH-1 (The New England Journal of Medicine, 29 Sep 2026) and TRIUMPH-2 (The Lancet, 29 Sep 2026). Eli Lilly has stated a planned U.S. BLA in Q1 2027. A filing plan is not approval. Research-grade retatrutide on PeptideMap is listed for research-use (RUO) comparison only. It is not clinical trial supply, not a prescription, and not medical advice.';
+    public const APPROVAL_STATUS = 'Retatrutide is not FDA-approved. Phase 3 TRIUMPH results are published, including TRIUMPH-1 (The New England Journal of Medicine, 29 Sep 2026) and TRIUMPH-2 (The Lancet, 29 Sep 2026). Eli Lilly has said it plans to file a U.S. application no later than Q1 2027. On 2 October 2026, FDA concluded on remand that retatrutide is not a biological product and that an application would need to be submitted under section 505 of the Federal Food, Drug, and Cosmetic Act (the drug pathway). A filing plan is not approval. Research-grade retatrutide on PeptideMap is listed for research-use (RUO) comparison only. It is not clinical trial supply, not a prescription, and not medical advice.';
 
     public const PHASE2_UNDERWAY = 'Phase 3 trials are underway with enrollment expanded significantly.';
 
@@ -484,7 +484,7 @@ class RetatrutideEncyclopediaFaqSeeder extends Seeder
             $text = str_replace(self::PHASE2_UNDERWAY, self::PHASE2_PUBLISHED, $text);
         }
 
-        $replacement = 'Phase 3 TRIUMPH results are published (29 Sep 2026); a planned U.S. BLA in Q1 2027 is a filing plan, not FDA approval';
+        $replacement = 'Phase 3 TRIUMPH results are published (29 Sep 2026); Lilly plans to file a U.S. application no later than Q1 2027, which FDA concluded on 2 Oct 2026 would go under section 505; a filing plan is not FDA approval';
 
         $updated = preg_replace('/results expected in 2025\s*[–-]\s*2026/iu', $replacement, $text);
         $text = is_string($updated) ? $updated : $text;

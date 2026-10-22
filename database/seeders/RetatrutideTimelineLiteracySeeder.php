@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 /**
  * Timeline and filing literacy for the live retatrutide encyclopedia row.
  *
- * Adds investigational status, the Q1 2027 BLA submission plan, the
+ * Adds investigational status, the Q1 2027 filing plan and the FDA section 505 decision on remand, the
  * Seventh Circuit argument, and expanded-access boundaries. Does not rewrite
  * existing TRIUMPH-2 body figures or the TRIUMPH-1 −25.0% vs −28.3% labels.
  *
@@ -20,22 +20,22 @@ class RetatrutideTimelineLiteracySeeder extends Seeder
 {
     public const SLUG = 'retatrutide';
 
-    public const OVERVIEW_SHORT_ADDITION = 'As of early October 2026, retatrutide remains investigational: not FDA-approved and not commercially marketed by the sponsor. Lilly has stated a plan to submit a U.S. BLA in Q1 2027 while completing CMC (filing plan ≠ acceptance ≠ approval). A Seventh Circuit oral argument on biologic classification (Eli Lilly v. Kennedy, No. 26-1301, 24 Sep 2026) was held; no ruling was located as of early Oct 2026.';
+    public const OVERVIEW_SHORT_ADDITION = 'As of 22 October 2026, retatrutide remains investigational: not FDA-approved and not commercially marketed by the sponsor. Lilly has said it plans to file a U.S. application no later than Q1 2027 (filing plan ≠ acceptance ≠ approval). On 2 October 2026, on remand, FDA concluded that retatrutide is not a biological product and that an application would go under section 505 (the drug pathway). Lilly’s related Seventh Circuit appeal (Eli Lilly v. Kennedy, No. 26-1301; oral argument 24 Sep 2026) had no ruling as of 22 Oct 2026.';
 
-    public const OVERVIEW_ADDITION = 'Timeline literacy (early Oct 2026): Retatrutide (LY3437943) is still an investigational triple agonist. It is not FDA-approved and is not a sponsor-marketed medicine. Lilly’s 23 July 2026 topline on TRIUMPH-2 and TRIUMPH-3 stated that the company is completing the Chemistry, Manufacturing, and Controls (CMC) package required for a Biologics License Application and plans to submit in Q1 2027 for U.S. review — a company filing plan, not FDA acceptance and not approval. Grey-market / RUO catalog vials are not clinical-trial supply and are not expanded-access supply.';
+    public const OVERVIEW_ADDITION = 'Timeline literacy (as of 22 Oct 2026): Retatrutide (LY3437943) is still an investigational triple agonist. It is not FDA-approved and is not a sponsor-marketed medicine. Lilly’s 23 July 2026 topline on TRIUMPH-2 and TRIUMPH-3 stated that the company is completing the Chemistry, Manufacturing, and Controls (CMC) package required for a Biologics License Application and plans to submit in Q1 2027 for U.S. review — a company filing plan, not FDA acceptance and not approval. On 2 October 2026, in a decision on remand, FDA concluded that retatrutide is not a biological product and that an application would need to be submitted under section 505 of the Federal Food, Drug, and Cosmetic Act; Lilly’s related Seventh Circuit appeal (No. 26-1301) had no ruling as of 22 October 2026. Grey-market / RUO catalog vials are not clinical-trial supply and are not expanded-access supply.';
 
-    public const REGULATORY_NOTE = 'Retatrutide is investigational and not approved by the FDA, EMA, or other regulators for any indication. Lilly’s stated Q1 2027 U.S. BLA intent is a filing plan, not marketing authorization. PeptideMap is not a pharmacy or clinic. Vendor listings are RUO / research-use comparison data only — not prescriptions, not compounding advice, not clinical-trial supply, and not expanded-access supply.';
+    public const REGULATORY_NOTE = 'Retatrutide is investigational and not approved by the FDA, EMA, or other regulators for any indication. Lilly said on 29 September 2026 that it plans to submit a Biologics License Application (BLA) in Q1 2027. On 2 October 2026, in a decision on remand from a federal district court, FDA concluded that retatrutide is not a biological product and that an application for it would need to be submitted under section 505 of the Federal Food, Drug, and Cosmetic Act (the drug pathway). Lilly’s related appeal in the Seventh Circuit (No. 26-1301) had no ruling as of 22 October 2026. A filing plan is not marketing authorization. PeptideMap is not a pharmacy or clinic. Vendor listings are RUO / research-use comparison data only — not prescriptions, not compounding advice, not clinical-trial supply, and not expanded-access supply.';
 
-    public const CONCLUSION_ADDITION = 'Program literacy for readers: TRIUMPH-1 / TRIUMPH-2 / TRIUMPH-3 are different trials with differently labeled estimands; Q1 2027 is a planned BLA filing window, not an approval prophecy; the Seventh Circuit argument of 24 Sep 2026 had no located ruling by early Oct 2026; expanded access is a narrow manufacturer/FDA-process pathway and is not a grey-market catalog.';
+    public const CONCLUSION_ADDITION = 'Program literacy for readers: TRIUMPH-1 / TRIUMPH-2 / TRIUMPH-3 are different trials with differently labeled estimands; Q1 2027 is Lilly’s stated filing window, not an approval prophecy; Lilly’s Seventh Circuit appeal (argued 24 Sep 2026) had no ruling on the docket as of 22 Oct 2026; expanded access is a narrow manufacturer/FDA-process pathway and is not a grey-market catalog.';
 
     public const MAP_TITLE = 'TRIUMPH program map (names + disclosure type)';
 
     /** @var list<string> */
     public const KEY_POINT_ADDITIONS = [
-        'Status (early Oct 2026): investigational; not FDA-approved; not commercially marketed by Lilly',
+        'Status (as of 22 Oct 2026): investigational; not FDA-approved; not commercially marketed by Lilly',
         'TRIUMPH map: TRIUMPH-1 (obesity without diabetes; NEJM), TRIUMPH-2 (T2D + obesity/overweight; Lancet), TRIUMPH-3 (severe obesity + CVD; July 2026 topline) — quote labeled estimands only',
-        'Q1 2027 = Lilly’s stated BLA submission window while finishing CMC — not an approval date',
-        'Seventh Circuit Eli Lilly v. Kennedy, No. 26-1301: oral argument 24 Sep 2026; no published ruling as of early Oct 2026',
+        'Q1 2027 = Lilly’s stated filing window (“no later than the first quarter of 2027”, Seventh Circuit memorandum of 8 Oct 2026) — not an approval date',
+        'Seventh Circuit Eli Lilly v. Kennedy, No. 26-1301 (Lilly’s appeal of the district court judgment): argued 24 Sep 2026; jurisdiction memoranda filed 8 Oct 2026; no ruling as of 22 Oct 2026',
         'Expanded access is not the same as trials and is not grey-market vials (manufacturer/FDA-process literacy only)',
     ];
 
@@ -95,8 +95,8 @@ class RetatrutideTimelineLiteracySeeder extends Seeder
 
     private function apply(EducationPost $post): void
     {
-        $post->description = $this->appendOnce($post->description, self::OVERVIEW_SHORT_ADDITION, 'Seventh Circuit oral argument');
-        $post->overview = $this->appendOnce($post->overview, self::OVERVIEW_ADDITION, 'Timeline literacy (early Oct 2026)');
+        $post->description = $this->appendOnce($post->description, self::OVERVIEW_SHORT_ADDITION, 'Eli Lilly v. Kennedy, No. 26-1301');
+        $post->overview = $this->appendOnce($post->overview, self::OVERVIEW_ADDITION, 'Timeline literacy (');
         $post->key_points = $this->appendKeyPoints(is_array($post->key_points) ? $post->key_points : []);
         $post->human_use_subsections = $this->insertMap(
             is_array($post->human_use_subsections) ? $post->human_use_subsections : []
@@ -106,7 +106,7 @@ class RetatrutideTimelineLiteracySeeder extends Seeder
         );
         $post->regulatory_important_note = $this->regulatoryNote($post->regulatory_important_note);
         $post->faqs = $this->upsertFaqs(is_array($post->faqs) ? $post->faqs : []);
-        $post->conclusion = $this->appendOnce($post->conclusion, self::CONCLUSION_ADDITION, 'planned BLA filing window');
+        $post->conclusion = $this->appendOnce($post->conclusion, self::CONCLUSION_ADDITION, 'Program literacy for readers');
         $post->references = $this->appendReferences(is_array($post->references) ? $post->references : []);
     }
 
@@ -130,9 +130,13 @@ class RetatrutideTimelineLiteracySeeder extends Seeder
     private function appendKeyPoints(array $points): array
     {
         foreach (self::KEY_POINT_ADDITIONS as $addition) {
+            $legacy = $this->legacyKeyPoint($addition);
             $present = false;
             foreach ($points as $point) {
-                if (is_string($point) && $point === $addition) {
+                if (! is_string($point)) {
+                    continue;
+                }
+                if ($point === $addition || ($legacy !== null && $point === $legacy)) {
                     $present = true;
                     break;
                 }
@@ -143,6 +147,16 @@ class RetatrutideTimelineLiteracySeeder extends Seeder
         }
 
         return $points;
+    }
+
+    private function legacyKeyPoint(string $addition): ?string
+    {
+        return match ($addition) {
+            self::KEY_POINT_ADDITIONS[0] => 'Status (early Oct 2026): investigational; not FDA-approved; not commercially marketed by Lilly',
+            self::KEY_POINT_ADDITIONS[2] => 'Q1 2027 = Lilly’s stated BLA submission window while finishing CMC — not an approval date',
+            self::KEY_POINT_ADDITIONS[3] => 'Seventh Circuit Eli Lilly v. Kennedy, No. 26-1301: oral argument 24 Sep 2026; no published ruling as of early Oct 2026',
+            default => null,
+        };
     }
 
     /**
@@ -214,13 +228,34 @@ class RetatrutideTimelineLiteracySeeder extends Seeder
     private function appendRegulatory(array $sections): array
     {
         foreach ($this->regulatorySubsections() as $section) {
-            if ($this->hasExactTitle($sections, $section['title'])) {
+            $titles = [$section['title']];
+            $legacy = $this->legacyRegulatoryTitle($section['title']);
+            if ($legacy !== null) {
+                $titles[] = $legacy;
+            }
+            $skip = false;
+            foreach ($titles as $title) {
+                if ($this->hasExactTitle($sections, $title)) {
+                    $skip = true;
+                    break;
+                }
+            }
+            if ($skip) {
                 continue;
             }
             $sections[] = $section;
         }
 
         return $sections;
+    }
+
+    private function legacyRegulatoryTitle(string $title): ?string
+    {
+        return match ($title) {
+            'Filing literacy — Lilly’s stated Q1 2027 filing plan (≠ approval)' => 'Filing literacy — planned BLA in Q1 2027 (≠ approval)',
+            'Biologic vs drug classification — FDA decision on remand (2 Oct 2026); Seventh Circuit appeal pending' => 'Biologic vs drug classification dispute — Seventh Circuit argument (no ruling yet)',
+            default => null,
+        };
     }
 
     /**
@@ -243,7 +278,7 @@ class RetatrutideTimelineLiteracySeeder extends Seeder
                 ],
             ],
             [
-                'title' => 'Filing literacy — planned BLA in Q1 2027 (≠ approval)',
+                'title' => 'Filing literacy — Lilly’s stated Q1 2027 filing plan (≠ approval)',
                 'entries' => [
                     [
                         'type' => 'content',
@@ -257,22 +292,26 @@ class RetatrutideTimelineLiteracySeeder extends Seeder
                         'type' => 'item',
                         'value' => 'Do not convert “Q1 2027” into “approved in 2027.” Secondary timeline calendars that project review windows are estimates, not facts, and are not pasted here as predictions.',
                     ],
+                    [
+                        'type' => 'item',
+                        'value' => 'Later dated statements: Lilly’s 29 September 2026 announcement said it plans to submit a BLA in Q1 2027. On 2 October 2026, FDA concluded on remand that an application for retatrutide would need to be submitted under section 505 of the Federal Food, Drug, and Cosmetic Act. Lilly’s 8 October 2026 Seventh Circuit memorandum says it plans to file “no later than the first quarter of 2027” and needs to know which application pathway (biological product or drug) to pursue. See the classification subsection below.',
+                    ],
                 ],
             ],
             [
-                'title' => 'Biologic vs drug classification dispute — Seventh Circuit argument (no ruling yet)',
+                'title' => 'Biologic vs drug classification — FDA decision on remand (2 Oct 2026); Seventh Circuit appeal pending',
                 'entries' => [
                     [
                         'type' => 'content',
-                        'value' => 'Lilly’s stated U.S. path is a BLA (biologic). Whether retatrutide is classified as a biological product under the relevant protein / “analogous product” rules has been litigated. The U.S. Court of Appeals for the Seventh Circuit listed oral argument in Eli Lilly and Company v. Robert Kennedy, Jr., No. 26-1301, on 24 September 2026 (civil), with public argument audio on the court’s oral-argument calendar.',
+                        'value' => 'In January 2024, Lilly asked FDA to regulate retatrutide as a biological product under a Biologics License Application (BLA). FDA responded on 18 March 2024 that retatrutide is a drug, not a biological product. Lilly sued in the U.S. District Court for the Southern District of Indiana (No. 1:24-cv-01503), which sent issues about whether retatrutide is “analogous” to a protein back to FDA. On 2 October 2026, deciding those issues on remand, FDA’s Center for Drug Evaluation and Research concluded that “retatrutide is not an analogous product to a protein and is therefore not a biological product. Accordingly, an application for retatrutide would need to be submitted under section 505 of the Federal Food, Drug, and Cosmetic Act.” A redacted copy of the decision was filed in the Seventh Circuit on 8 October 2026 (No. 26-1301, Dkt. 46-2).',
+                    ],
+                    [
+                        'type' => 'content',
+                        'value' => 'Lilly’s appeal in the U.S. Court of Appeals for the Seventh Circuit, Eli Lilly and Company v. Robert F. Kennedy, Jr., No. 26-1301, is from the district court’s judgment. The court heard oral argument on 24 September 2026 and ordered supplemental memoranda on appellate jurisdiction, which both sides filed on 8 October 2026 (Dkt. 45–47). In a footnote, Lilly’s memorandum says FDA’s new decision is “beyond the scope of this appeal” (Dkt. 47, n.3). As of 22 October 2026, no ruling appeared on the docket.',
                     ],
                     [
                         'type' => 'item',
-                        'value' => 'As of early October 2026, no published appellate ruling in No. 26-1301 was located on a Seventh Circuit opinions lookup attempted for this pass. Same-day argument coverage dated 24–25 Sep 2026 confirms the hearing. Argument is not a decision.',
-                    ],
-                    [
-                        'type' => 'item',
-                        'value' => 'Educational takeaway only: the classification dispute can affect which application type (BLA vs NDA) a sponsor pursues. It is not an approval decision and must not be narrated as one.',
+                        'value' => 'Educational takeaway only: under FDA’s 2 October 2026 decision, an application for retatrutide would be a section 505 drug application. Neither that classification decision nor the pending appeal is an approval decision, and an argument or a pending appeal is not a ruling.',
                     ],
                 ],
             ],
@@ -331,14 +370,30 @@ class RetatrutideTimelineLiteracySeeder extends Seeder
     private function upsertFaqs(array $faqs): array
     {
         $pairs = [
-            'Is retatrutide approved?' => 'No. As of early October 2026 it remains investigational and is not FDA-approved, and it is not commercially marketed by the sponsor as an approved medicine.',
-            'Does “BLA in Q1 2027” mean retatrutide will be approved in 2027?' => 'No. That date is Lilly’s stated plan to submit a Biologics License Application while completing CMC. Submission is not FDA acceptance, and acceptance is not approval. No approval date should be inferred from the filing window alone.',
-            'What did the Seventh Circuit decide in Eli Lilly v. Kennedy?' => 'As of early October 2026: the Seventh Circuit heard oral argument on 24 September 2026 in No. 26-1301. No published ruling from that appeal was located in this check. Argument is not a decision.',
-            'Are research-vendor “retatrutide” vials the same as trial or expanded-access supply?' => 'No. Grey-market / RUO listings are not Lilly clinical-trial material and are not expanded-access product released through the manufacturer/physician FDA-process pathway.',
+            [
+                'question' => 'Is retatrutide approved?',
+                'also' => [],
+                'answer' => 'No. As of 22 October 2026 it remains investigational and is not FDA-approved, and it is not commercially marketed by the sponsor as an approved medicine.',
+            ],
+            [
+                'question' => 'Does Lilly’s Q1 2027 filing plan mean retatrutide will be approved in 2027?',
+                'also' => ['Does “BLA in Q1 2027” mean retatrutide will be approved in 2027?'],
+                'answer' => 'No. Lilly’s 29 September 2026 announcement said it plans to submit a Biologics License Application (BLA) in Q1 2027. Its 8 October 2026 Seventh Circuit memorandum says it plans to file its application “no later than the first quarter of 2027” and “needs to know which application pathway (biological product or drug) to pursue when filing.” FDA’s 2 October 2026 decision on remand concluded that an application would need to be submitted under section 505 of the Federal Food, Drug, and Cosmetic Act (the drug pathway). Submission is not FDA acceptance, and acceptance is not approval. No approval date should be inferred from a filing window.',
+            ],
+            [
+                'question' => 'What did the Seventh Circuit decide in Eli Lilly v. Kennedy?',
+                'also' => [],
+                'answer' => 'No ruling yet. As of 22 October 2026, the Seventh Circuit had not ruled in No. 26-1301, Lilly’s appeal from the district court’s judgment. The court heard oral argument on 24 September 2026 and ordered supplemental memoranda on appellate jurisdiction, which both sides filed on 8 October 2026. FDA’s separate 2 October 2026 decision on remand concluded that retatrutide is not a biological product; Lilly’s memorandum says that decision is “beyond the scope of this appeal.” Argument is not a decision.',
+            ],
+            [
+                'question' => 'Are research-vendor “retatrutide” vials the same as trial or expanded-access supply?',
+                'also' => [],
+                'answer' => 'No. Grey-market / RUO listings are not Lilly clinical-trial material and are not expanded-access product released through the manufacturer/physician FDA-process pathway.',
+            ],
         ];
 
-        foreach ($pairs as $question => $answer) {
-            $faqs = $this->upsertFaq($faqs, $question, $answer);
+        foreach ($pairs as $pair) {
+            $faqs = $this->upsertFaq($faqs, $pair['question'], $pair['answer'], $pair['also']);
         }
 
         return $faqs;
@@ -348,22 +403,27 @@ class RetatrutideTimelineLiteracySeeder extends Seeder
      * @param  list<mixed>  $faqs
      * @return list<array<string, mixed>>
      */
-    private function upsertFaq(array $faqs, string $question, string $answer): array
+    private function upsertFaq(array $faqs, string $question, string $answer, array $also = []): array
     {
-        $needle = $this->normalize($question);
+        $needles = array_map(
+            fn (string $candidate) => $this->normalize($candidate),
+            array_merge([$question], $also)
+        );
         foreach ($faqs as &$faq) {
             if (! is_array($faq)) {
                 continue;
             }
             $existing = $this->normalize((string) ($faq['question'] ?? $faq['q'] ?? ''));
-            if ($existing !== $needle) {
+            if (! in_array($existing, $needles, true)) {
                 continue;
             }
-            $key = array_key_exists('a', $faq) && ! array_key_exists('answer', $faq) ? 'a' : 'answer';
-            if ((string) ($faq[$key] ?? '') === $answer) {
+            $answerKey = array_key_exists('a', $faq) && ! array_key_exists('answer', $faq) ? 'a' : 'answer';
+            $questionKey = array_key_exists('q', $faq) && ! array_key_exists('question', $faq) ? 'q' : 'question';
+            if ((string) ($faq[$answerKey] ?? '') === $answer && (string) ($faq[$questionKey] ?? '') === $question) {
                 return $faqs;
             }
-            $faq[$key] = $answer;
+            $faq[$questionKey] = $question;
+            $faq[$answerKey] = $answer;
 
             return $faqs;
         }
