@@ -41,7 +41,7 @@ class VsPairEvidenceCopyTest extends TestCase
         $this->assertStringContainsString('sponsor press release', $note);
         $this->assertStringContainsString('no peer-reviewed paper', $note);
         $this->assertStringContainsString('not repeated on this compare page', $note);
-        $this->assertDoesNotMatchRegularExpression('/[−-]\d+(\.\d+)?%/u', $note);
+        $this->assertDoesNotMatchRegularExpression('/\d+(\.\d+)?\s*%/u', $note);
         $this->assertDoesNotMatchRegularExpression('/\d+\s*mg\b/i', $note);
         $this->assertDoesNotMatchRegularExpression('/\bwinner\b/i', $note);
         $this->assertSame([], $copy['faqs']);
