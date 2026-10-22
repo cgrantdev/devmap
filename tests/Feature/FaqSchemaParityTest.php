@@ -152,31 +152,31 @@ HTML;
         );
     }
 
-    public function test_encyclopedia_with_faq_renders_the_stored_field_in_the_page_and_schema(): void
+    public function test_bpc_157_allowlist_renders_visible_faq_matching_json_ld(): void
     {
-        $question = 'What does this sample entry record?';
+        $question = 'What does this bpc-157 entry record?';
         $answer = 'It records a catalog label only.';
-        $storedAnswer = '<p>It records a catalog label only.</p>';
+        $stored = [[
+            'question' => '  '.$question.'  ',
+            'answer' => '<p>'.$answer.'</p>',
+        ]];
 
         $category = ProductCategory::create([
-            'name' => 'Faq Parity Sample',
-            'slug' => 'faq-parity-sample',
+            'name' => 'BPC-157',
+            'slug' => 'bpc-157',
             'is_active' => true,
         ]);
-        EducationPost::create([
-            'title' => 'Faq Parity Sample',
-            'slug' => 'faq-parity-sample',
+        $post = EducationPost::create([
+            'title' => 'BPC-157',
+            'slug' => 'bpc-157',
             'product_category_id' => $category->id,
             'status' => 'published',
             'show_in_encyclopedia' => true,
             'overview' => 'Overview paragraph stays.',
-            'faqs' => [[
-                'question' => '  '.$question.'  ',
-                'answer' => $storedAnswer,
-            ]],
+            'faqs' => $stored,
         ]);
 
-        $response = $this->get('/encyclopedia/faq-parity-sample');
+        $response = $this->get('/encyclopedia/bpc-157');
         $response->assertOk();
 
         $faqPage = $this->faqPage($response->getContent());
@@ -184,7 +184,6 @@ HTML;
         $this->assertCount(1, $faqPage['mainEntity']);
         $this->assertSame($question, $faqPage['mainEntity'][0]['name']);
         $this->assertSame($answer, $faqPage['mainEntity'][0]['acceptedAnswer']['text']);
-        $this->assertStringNotContainsString($storedAnswer, $faqPage['mainEntity'][0]['acceptedAnswer']['text']);
 
         $response->assertInertia(fn ($page) => $page
             ->has('faqs', 1)
@@ -193,6 +192,52 @@ HTML;
             ->where('faqs.0.question', $faqPage['mainEntity'][0]['name'])
             ->where('faqs.0.answer', $faqPage['mainEntity'][0]['acceptedAnswer']['text'])
         );
+
+        $this->assertSame($stored, $post->fresh()->faqs);
+    }
+
+    public function test_ipamorelin_stored_faqs_are_not_rendered_or_marked_up(): void
+    {
+        $stored = [[
+            'question' => 'What catalog label does this ipamorelin entry use?',
+            'answer' => 'It uses the stored encyclopedia label only.',
+        ]];
+
+        $category = ProductCategory::create([
+            'name' => 'Ipamorelin',
+            'slug' => 'ipamorelin',
+            'is_active' => true,
+        ]);
+        $post = EducationPost::create([
+            'title' => 'Ipamorelin',
+            'slug' => 'ipamorelin',
+            'product_category_id' => $category->id,
+            'status' => 'published',
+            'show_in_encyclopedia' => true,
+            'overview' => 'Ipamorelin overview stays.',
+            'faqs' => $stored,
+        ]);
+
+        $response = $this->get('/encyclopedia/ipamorelin');
+        $response->assertOk();
+        $response->assertSee('Ipamorelin overview stays.', false);
+        $response->assertDontSee('FAQPage', false);
+        $response->assertDontSee($stored[0]['question'], false);
+        $response->assertDontSee($stored[0]['answer'], false);
+        $this->assertNull($this->faqPage($response->getContent()));
+
+        $response->assertInertia(fn ($page) => $page
+            ->has('faqs', 0)
+            ->where('seo.schema', function ($schema) {
+                foreach ($schema as $block) {
+                    $this->assertNotSame('FAQPage', is_array($block) ? ($block['@type'] ?? null) : null);
+                }
+
+                return true;
+            })
+        );
+
+        $this->assertSame($stored, $post->fresh()->faqs);
     }
 
     public function test_encyclopedia_without_faq_emits_no_faqpage_and_no_faq_section(): void

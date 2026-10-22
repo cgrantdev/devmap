@@ -27,7 +27,7 @@ class EncyclopediaFramingTest extends TestCase
             'bacteriostatic-water' => 'diluent',
             'hCG' => 'glycoprotein',
             'methylene-blue' => 'phenothiazine',
-            'NMN' => '/encyclopedia/nad',
+            'NMN' => 'nicotinamide mononucleotide',
             'acetic-acid' => 'carboxylic',
             'Ibutamoren' => 'ghrelin',
             'ACE-031' => 'ActRIIB',
@@ -58,6 +58,7 @@ class EncyclopediaFramingTest extends TestCase
         }
 
         $nmn = $this->get('/encyclopedia/NMN')->assertOk()->getContent();
+        $this->assertStringContainsString('encyclopedia\/nad', $nmn);
         $this->assertStringNotContainsString('/encyclopedia/NAD+', $nmn);
         $this->assertStringNotContainsString('/encyclopedia/nad-plus', $nmn);
         $this->assertStringNotContainsString('0.6%', $this->get('/encyclopedia/acetic-acid')->getContent());
@@ -127,7 +128,7 @@ class EncyclopediaFramingTest extends TestCase
 
         $this->get('/encyclopedia/oxytocin')->assertOk()->assertSee('Pitocin', false)->assertDontSee('Peptide Encyclopedia');
         $this->get('/encyclopedia/gonadorelin')->assertOk()->assertSee('Factrel', false);
-        $this->get('/encyclopedia/ghk-basic')->assertOk()->assertSee('/encyclopedia/GHK-Cu', false);
+        $this->get('/encyclopedia/ghk-basic')->assertOk()->assertSee('encyclopedia\/GHK-Cu', false);
         $this->get('/encyclopedia/Cerebrolysin')->assertOk()->assertSee('not one peptide', false);
         $this->get('/encyclopedia/Adalank')->assertOk()->assertSee('unsettled', false);
         $this->get('/encyclopedia/Eloralintide')->assertOk()->assertSee('amylin', false)->assertSee('not a GLP-1', false);

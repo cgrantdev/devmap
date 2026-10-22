@@ -64,8 +64,9 @@ class RetatrutideEncyclopediaFaqTest extends TestCase
         ));
         $this->get('/encyclopedia/retatrutide')
             ->assertOk()
-            ->assertSee('Q1 2027', false)
             ->assertSee('TRIUMPH-1', false)
+            ->assertDontSee('Q1 2027', false)
+            ->assertDontSee('FAQPage', false)
             ->assertDontSee('expected in 2025-2026', false)
             ->assertDontSee('expected in 2025', false);
         $this->get('/encyclopedia/Retatrutide')
@@ -296,10 +297,11 @@ class RetatrutideEncyclopediaFaqTest extends TestCase
 
         $this->get('/encyclopedia/Retatrutide')
             ->assertOk()
-            ->assertSee('Is retatrutide FDA-approved?', false)
-            ->assertSee('still not FDA-approved', false)
+            ->assertDontSee('Is retatrutide FDA-approved?', false)
+            ->assertDontSee('still not FDA-approved', false)
+            ->assertDontSee('filing plan is not FDA approval', false)
+            ->assertDontSee('FAQPage', false)
             ->assertSee('Q1 2027', false)
-            ->assertSee('filing plan is not FDA approval', false)
             ->assertSee('treatment-regimen estimand', false)
             ->assertSee('\u221225.0%', false)
             ->assertSee('efficacy estimand', false)

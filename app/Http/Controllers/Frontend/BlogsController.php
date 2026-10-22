@@ -6,6 +6,7 @@ use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Setting;
+use App\Support\FaqPage;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
@@ -206,12 +207,13 @@ class BlogsController extends Controller
             ],
         ];
 
-        // FAQPage JSON-LD and the visible FAQ are the same entities.
-        // An empty FAQPage is omitted. Other stored schema blocks stay.
-        [$schemas, $faqs] = $this->schemaWithVisibleFaqs(
-            [$articleSchema, $breadcrumbSchema],
-            $blog->seo_schema
-        );
+        // One normalised {question, answer} list. faqPageSchema() and the
+        // visible FAQ prop both receive it. Other stored schema blocks stay.
+        [$otherSchemas, $faqs, $faqId] = $this->partitionStoredSchema($blog->seo_schema);
+        $schemas = array_merge([$articleSchema, $breadcrumbSchema], $otherSchemas);
+        if ($faqSchema = $this->faqPageSchema($faqs, $faqId)) {
+            $schemas[] = $faqSchema;
+        }
 
         // Build SEO array (same format as products/brands pages)
         $seo = [
@@ -302,19 +304,32 @@ class BlogsController extends Controller
     }
 
     /**
-     * Split stored seo_schema into non-FAQ blocks plus FAQ pairs.
+     * FAQPage node for the same pairs BlogDetail renders.
+     *
+     * @param  list<array{question: string, answer: string}>  $faqs
+     * @return array<string, mixed>|null
+     */
+    private function faqPageSchema(array $faqs, ?string $id): ?array
+    {
+        return FaqPage::schema($faqs, $id);
+    }
+
+    /**
+     * Split stored seo_schema into non-FAQ blocks plus one FAQ pair list.
      * Pair strings are the FAQPage name and acceptedAnswer.text, unchanged.
      *
-     * @return array{0: list<array<string, mixed>>, 1: list<array{question: string, answer: string}>}
+     * @return array{0: list<array<string, mixed>>, 1: list<array{question: string, answer: string}>, 2: ?string}
      */
-    private function schemaWithVisibleFaqs(array $schemas, mixed $extra): array
+    private function partitionStoredSchema(mixed $extra): array
     {
+        $other = [];
         $faqs = [];
+        $id = null;
         if (is_string($extra)) {
             $extra = json_decode($extra, true);
         }
         if (! is_array($extra)) {
-            return [$schemas, $faqs];
+            return [$other, $faqs, $id];
         }
         if (isset($extra['@type'])) {
             $extra = [$extra];
@@ -325,12 +340,13 @@ class BlogsController extends Controller
                 continue;
             }
             if (($block['@type'] ?? null) !== 'FAQPage') {
-                $schemas[] = $block;
+                $other[] = $block;
 
                 continue;
             }
-
-            $entities = [];
+            if ($id === null && is_string($block['@id'] ?? null) && $block['@id'] !== '') {
+                $id = $block['@id'];
+            }
             foreach ($block['mainEntity'] ?? [] as $entity) {
                 if (! is_array($entity)) {
                     continue;
@@ -340,17 +356,11 @@ class BlogsController extends Controller
                 if (! is_string($name) || $name === '' || ! is_string($text) || $text === '') {
                     continue;
                 }
-                $entities[] = $entity;
                 $faqs[] = ['question' => $name, 'answer' => $text];
             }
-            if ($entities === []) {
-                continue;
-            }
-            $block['mainEntity'] = $entities;
-            $schemas[] = $block;
         }
 
-        return [$schemas, $faqs];
+        return [$other, $faqs, $id];
     }
 
     /**

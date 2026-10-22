@@ -11,6 +11,7 @@ use App\Models\Setting;
 use App\Support\CompareSlug;
 use App\Support\EncyclopediaFraming;
 use App\Support\EncyclopediaSlug;
+use App\Support\FaqPage;
 use App\Support\FramingProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -61,38 +62,37 @@ class EncyclopediaController extends Controller
     }
 
     /**
-     * FAQPage schema builder. $faqs must already be the pairs returned
-     * by faqPairs(), so name and acceptedAnswer.text are the same
-     * strings the page renders. Returns null when there are no FAQs so
-     * we don't emit an empty container Google's rich-result test rejects.
+     * FAQPage node for the same pairs the template renders. Null when
+     * the list is empty, so the page emits no empty FAQPage container.
      *
      * @param  list<array{question: string, answer: string}>  $faqs
      */
     private function faqPageSchema(array $faqs, string $slug): ?array
     {
-        $mainEntity = [];
-        foreach ($faqs as $f) {
-            $q = (string) ($f['question'] ?? '');
-            $a = (string) ($f['answer'] ?? '');
-            if ($q === '' || $a === '') {
-                continue;
-            }
-            $mainEntity[] = [
-                '@type' => 'Question',
-                'name' => $q,
-                'acceptedAnswer' => ['@type' => 'Answer', 'text' => $a],
-            ];
+        return FaqPage::schema($faqs, url("/encyclopedia/{$slug}#faq"));
+    }
+
+    /**
+     * Allowlist match for the public encyclopedia slug. Stored FAQ rows
+     * for other slugs stay in the database and are not rendered.
+     */
+    private function encyclopediaFaqAllowed(string $slug): bool
+    {
+        $needle = EncyclopediaSlug::normalize($slug);
+        if ($needle === '') {
+            return false;
         }
-        if ($mainEntity === []) {
-            return null;
+        $allow = config('peptidemap.encyclopedia_faq_allowlist', []);
+        if (! is_array($allow)) {
+            return false;
+        }
+        foreach ($allow as $item) {
+            if (EncyclopediaSlug::normalize((string) $item) === $needle) {
+                return true;
+            }
         }
 
-        return [
-            '@context' => 'https://schema.org',
-            '@type' => 'FAQPage',
-            '@id' => url("/encyclopedia/{$slug}#faq"),
-            'mainEntity' => $mainEntity,
-        ];
+        return false;
     }
 
     private function getClinicalData($compoundName, $field)
@@ -813,10 +813,12 @@ class EncyclopediaController extends Controller
         // encyclopedia document at /compare splits the informational URL.
         $encyclopediaUrl = url('/encyclopedia/'.$publicSlug);
 
-        // One list for the visible FAQ and the FAQPage node. The list
-        // is the stored faqs column, or the framing profile only when
-        // the category has no education post.
+        // One normalised list for the visible FAQ and faqPageSchema().
+        // Off the allowlist, both stay empty. The faqs column is not written.
         $faqs = $this->faqPairs($this->faqsForSchema($educationPost, $profile));
+        if (! $this->encyclopediaFaqAllowed($publicSlug)) {
+            $faqs = [];
+        }
 
         // Build SEO array (same format as products/brands pages)
         $seo = [
