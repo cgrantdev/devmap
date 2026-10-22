@@ -455,7 +455,7 @@ const description = computed(() => {
   return (
     props.seo?.description ||
     page.props.site_description ||
-    'Compare research peptide listings and prices across vendors. Catalog data only: RUO, and Peptidemap sells nothing.'
+    'Compare research-use-only (RUO) peptide vendor listings and prices. Catalog data only; Peptidemap sells nothing.'
   )
 })
 

@@ -8,7 +8,9 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\SeoPage;
+use App\Support\CompareHubBlurb;
 use App\Support\ComparePageSeo;
+use App\Support\ProductPageSeo;
 use App\Support\ComparePriceStats;
 use App\Support\VsPageSeo;
 use App\Support\VsPairIndexing;
@@ -18,8 +20,10 @@ use App\Support\EncyclopediaSlug;
 use App\Support\CompoundDisplay;
 use App\Support\RetatrutideCompareNarrative;
 use App\Support\RetatrutideTirzepatideCompareCopy;
+use App\Support\EloralintideTirzepatideCompareCopy;
 use App\Support\BpcTb500CompareCopy;
 use App\Support\KlowCompareCopy;
+use App\Support\OrforglipronOralSemaglutideComparePage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -88,21 +92,21 @@ class CompareController extends Controller
      */
     public const FEATURED_VS_PAIRS = [
         ['a' => 'semaglutide',   'b' => 'tirzepatide',   'tagline' => 'The two big GLP-1s'],
-        ['a' => 'bpc-157',       'b' => 'tb-500',        'tagline' => 'The classic healing stack'],
+        ['a' => 'bpc-157',       'b' => 'tb-500',        'tagline' => 'Two peptides often compared'],
         ['a' => 'cjc-1295',      'b' => 'ipamorelin',    'tagline' => 'Growth-hormone secretagogue duo'],
-        ['a' => 'bpc-157',       'b' => 'ghk-cu',        'tagline' => 'Skin & recovery'],
-        ['a' => 'retatrutide',   'b' => 'tirzepatide',   'tagline' => 'Next-gen vs. current-gen GLP-1'],
-        ['a' => 'mots-c',        'b' => 'nad',           'tagline' => 'Mitochondrial support'],
+        ['a' => 'bpc-157',       'b' => 'ghk-cu',        'tagline' => 'Two research peptides often listed together'],
+        ['a' => 'retatrutide',   'b' => 'tirzepatide',   'tagline' => 'Triple vs. dual incretin agonist'],
+        ['a' => 'mots-c',        'b' => 'nad',           'tagline' => 'Two mitochondrial research listings'],
         ['a' => 'ipamorelin',    'b' => 'tesamorelin',   'tagline' => 'GHRH vs GHRP'],
-        ['a' => 'ipamorelin',    'b' => 'sermorelin',    'tagline' => 'Two ways to boost GH'],
-        ['a' => 'aod-9604',      'b' => 'tesamorelin',   'tagline' => 'Fat-loss peptides'],
-        ['a' => 'retatrutide',   'b' => 'semaglutide',   'tagline' => 'Newer GLP-1 vs. proven'],
-        ['a' => 'ghk-cu',        'b' => 'tb-500',        'tagline' => 'Regeneration alternatives'],
+        ['a' => 'ipamorelin',    'b' => 'sermorelin',    'tagline' => 'Two GH-axis research peptides'],
+        ['a' => 'aod-9604',      'b' => 'tesamorelin',   'tagline' => 'Two catalog peptides often compared'],
+        ['a' => 'retatrutide',   'b' => 'semaglutide',   'tagline' => 'Two GLP-1-class listings often compared'],
+        ['a' => 'ghk-cu',        'b' => 'tb-500',        'tagline' => 'Two research peptides often compared'],
         ['a' => '5-amino-1mq',   'b' => 'mots-c',        'tagline' => 'Metabolic peptides'],
-        ['a' => 'bpc-157',       'b' => 'ipamorelin',    'tagline' => 'Recovery vs. growth'],
+        ['a' => 'bpc-157',       'b' => 'ipamorelin',    'tagline' => 'Two research peptides, listed side by side'],
         // PT-141 is the research code. The active category slug is bremelanotide.
         ['a' => 'bremelanotide', 'b' => 'kisspeptin',    'tagline' => 'Melanocortin vs. kisspeptin research'],
-        ['a' => 'cagrilintide',  'b' => 'semaglutide',   'tagline' => 'Newer weight-loss combo option'],
+        ['a' => 'cagrilintide',  'b' => 'semaglutide',   'tagline' => 'Two catalog peptides often compared'],
     ];
 
     /**
@@ -271,9 +275,10 @@ class CompareController extends Controller
                 // so "BPC-157" and "Vitamin B12" don't point at 404s.
                 'slug' => CompareSlug::canonical($category->slug) ?? $category->slug,
                 'anchor' => Str::slug($displayName),
-                'description' => $educationPost?->description
-                    ? Str::limit(strip_tags($educationPost->description), 200)
-                    : null,
+                // Encyclopedia descriptions can carry trial outcomes. The hub
+                // card sits beside a listed price, so those lines are replaced
+                // with a class sentence. Prices and display names stay put.
+                'description' => CompareHubBlurb::render($category->slug, $educationPost?->description),
                 'encyclopedia_url' => ($educationPost && $educationPost->status === 'published')
                     ? EncyclopediaSlug::path($category->slug)
                     : null,
@@ -295,12 +300,14 @@ class CompareController extends Controller
         $defaultDescription = 'Compare research peptide listings and prices across vendors, including GLP-1s, BPC-157, GHK-Cu, and TB-500. Catalog data only: RUO.';
 
         $seoPage = SeoPage::where('key', 'compare')->first();
+        $compareTitle = ProductPageSeo::storedTitle($seoPage?->title, $defaultTitle);
+        $compareDescription = ProductPageSeo::storedDescription($seoPage?->description, $defaultDescription);
         $seo = [
             'key' => 'compare',
-            'title' => $seoPage?->title ?: $defaultTitle,
-            'description' => $seoPage?->description ?: $defaultDescription,
-            'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
-            'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
+            'title' => $compareTitle,
+            'description' => $compareDescription,
+            'og_title' => ProductPageSeo::storedTitle($seoPage?->og_title, $compareTitle),
+            'og_description' => ProductPageSeo::storedDescription($seoPage?->og_description, $compareDescription),
             'og_image' => $seoPage?->og_image ?: null,
             'image' => $seoPage?->og_image ?: null,
             'url' => url('/compare'),
@@ -384,6 +391,16 @@ class CompareController extends Controller
     public function show(Request $request, string $slug)
     {
         $canonical = CompareSlug::canonical($slug);
+
+        // Educational article, not a vendor pair. Oral semaglutide is not
+        // a product category, so the alphabetical reorder would 404.
+        if (OrforglipronOralSemaglutideComparePage::matchesRequestSlug($canonical)) {
+            if (! OrforglipronOralSemaglutideComparePage::isCanonicalPublicSlug($canonical)) {
+                return $this->redirectToCompareSlug(OrforglipronOralSemaglutideComparePage::PUBLIC_SLUG);
+            }
+
+            return app(BlogsController::class)->show(OrforglipronOralSemaglutideComparePage::BLOG_SLUG);
+        }
 
         // X-vs-Y compare pages piggyback on the same route via the -vs-
         // separator. Since no legit compound slug contains '-vs-', a single
@@ -1113,6 +1130,7 @@ class CompareController extends Controller
 
         $pairCopy = ElamipretideMotsCCompareFaqs::forSlug($final)
             ?? RetatrutideTirzepatideCompareCopy::forSlug($final)
+            ?? EloralintideTirzepatideCompareCopy::forSlug($final)
             ?? BpcTb500CompareCopy::forSlug($final)
             ?? KlowCompareCopy::forSlug($final);
         $pairEvidence = $pairCopy['evidence'] ?? null;
@@ -1243,29 +1261,68 @@ class CompareController extends Controller
         // that reference either of the current two compounds so we don't
         // suggest a duplicate.
         $curated = [
+            ['bpc-157', 'tb-500', 'Two peptides often compared'],
+            ['cjc-1295', 'ipamorelin', 'Growth-hormone secretagogue duo'],
+            ['bpc-157', 'ghk-cu', 'Two research peptides often listed together'],
+            ['retatrutide', 'tirzepatide', 'Triple vs. dual incretin agonist'],
+            ['mots-c', 'nad', 'Two mitochondrial research listings'],
+            ['ipamorelin', 'tesamorelin', 'GHRH vs GHRP'],
+            ['ipamorelin', 'sermorelin', 'Two GH-axis research peptides'],
             ['semaglutide', 'tirzepatide', 'The two big GLP-1s'],
-            ['bpc-157', 'tb-500', 'The classic healing stack'],
-            ['ipamorelin', 'cjc-1295', 'Growth-hormone secretagogue duo'],
-            ['ghk-cu', 'bpc-157', 'Skin & recovery comparison'],
-            ['retatrutide', 'tirzepatide', 'Next-gen vs. current-gen GLP-1'],
-            ['mots-c', 'nad', 'Mitochondrial support alternatives'],
-            ['tesamorelin', 'ipamorelin', 'GHRH vs GHRP'],
-            ['sermorelin', 'ipamorelin', 'Two ways to boost GH'],
         ];
-        $excluded = [$a->slug, $b->slug];
+        $excluded = array_map(fn ($slug) => strtolower((string) $slug), [$a->slug, $b->slug]);
         $out = [];
         foreach ($curated as [$s1, $s2, $tagline]) {
-            if (in_array($s1, $excluded, true) || in_array($s2, $excluded, true)) continue;
+            if (in_array(strtolower($s1), $excluded, true) || in_array(strtolower($s2), $excluded, true)) {
+                continue;
+            }
+            $left = $s1;
+            $right = $s2;
+            if (strcmp($left, $right) > 0) {
+                [$left, $right] = [$right, $left];
+            }
             $out[] = [
-                'url' => "/compare/{$s1}-vs-{$s2}",
-                'title' => strtoupper($s1) . ' vs ' . strtoupper($s2),  // display names filled by Vue
-                'raw_a' => $s1,
-                'raw_b' => $s2,
+                'url' => "/compare/{$left}-vs-{$right}",
+                // Title-cased catalog names, the same names these cards
+                // showed before (not CompoundDisplay code names). The page
+                // heading still uses the code name. The href is canonical.
+                'title' => self::relatedLabel($left).' vs '.self::relatedLabel($right),
+                'name_a' => self::relatedLabel($left),
+                'name_b' => self::relatedLabel($right),
+                'raw_a' => $left,
+                'raw_b' => $right,
                 'tagline' => $tagline,
             ];
             if (count($out) >= 6) break;
         }
         return $out;
+    }
+
+    private static function relatedLabel(string $slug): string
+    {
+        $labels = [
+            'bpc-157' => 'BPC-157',
+            'tb-500' => 'TB-500',
+            'cjc-1295' => 'CJC-1295',
+            'ipamorelin' => 'Ipamorelin',
+            'ghk-cu' => 'GHK-Cu',
+            'retatrutide' => 'Retatrutide',
+            'tirzepatide' => 'Tirzepatide',
+            'mots-c' => 'MOTS-c',
+            'nad' => 'NAD+',
+            'tesamorelin' => 'Tesamorelin',
+            'sermorelin' => 'Sermorelin',
+            'semaglutide' => 'Semaglutide',
+        ];
+
+        if (isset($labels[$slug])) {
+            return $labels[$slug];
+        }
+
+        return implode('-', array_map(
+            fn ($part) => mb_convert_case($part, MB_CASE_TITLE, 'UTF-8'),
+            explode('-', $slug)
+        ));
     }
 
     /**

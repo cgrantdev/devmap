@@ -374,7 +374,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host), self::retatrutideVsSemaglutide($host), self::selankVsSemax($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host), self::retatrutideVsSemaglutide($host), self::selankVsSemax($host), self::eloralintideVsPetrelintide($host), self::orforglipronVsOralSemaglutideCompare($host));
     }
 
     /**
@@ -493,7 +493,7 @@ class EducationalContentPublisher
                 'og_title' => 'Retatrutide–Cagrilintide Blend: Catalog Name, Not a Published Trial',
                 'og_description' => 'A research blend named retatrutide plus cagrilintide is not a published trial. This note separates TRIUMPH, REDEFINE/CagriSema evidence from that label.',
                 'blog_type' => 'Research',
-                'read_time' => '7 Min Read',
+                'read_time' => '6 Min Read',
                 'published_at' => $published,
                 'is_featured' => false,
                 'author_name' => 'Peptidemap',
@@ -1005,13 +1005,13 @@ class EducationalContentPublisher
                 'image_file' => 'retatrutide-side-effects-trial-data.png',
                 'slug' => 'retatrutide-side-effects-trial-data',
                 'h1' => 'Retatrutide Side Effects: What the Trial Publications Report',
-                'lede' => 'Adverse events from the retatrutide phase 2 papers, TRIUMPH-2 and company-reported TRIUMPH data: GI events, discontinuation, heart rate and dysesthesia.',
+                'lede' => 'Adverse events from the retatrutide phase 2 papers, the published TRIUMPH-1 and TRIUMPH-2 papers, and other company-reported TRIUMPH readouts: GI events, discontinuation, heart rate and dysesthesia.',
                 'seo_title' => 'Retatrutide Side Effects: GI, Heart Rate, Dysesthesia Data',
-                'seo_description' => 'Retatrutide adverse events as reported in phase 2 papers, TRIUMPH-2 and Lilly data: GI events, discontinuation, heart rate, dysesthesia. Educational only.',
+                'seo_description' => 'Retatrutide adverse events from phase 2 papers, the published TRIUMPH-1 and TRIUMPH-2 papers, and other company-reported readouts. Educational only.',
                 'og_title' => 'Retatrutide Side Effects: GI, Heart Rate, Dysesthesia Data',
-                'og_description' => 'Retatrutide adverse events as reported in phase 2 papers, TRIUMPH-2 and Lilly data: GI events, discontinuation, heart rate, dysesthesia. Educational only.',
+                'og_description' => 'Retatrutide adverse events from phase 2 papers, the published TRIUMPH-1 and TRIUMPH-2 papers, and other company-reported readouts. Educational only.',
                 'blog_type' => 'Research',
-                'read_time' => '19 Min Read',
+                'read_time' => '20 Min Read',
                 'published_at' => '2026-10-19',
                 'is_featured' => false,
                 'author_name' => 'Peptidemap',
@@ -1019,17 +1019,17 @@ class EducationalContentPublisher
                 'key_points' => [
                     'Gastrointestinal events were the most common adverse events in every retatrutide trial reviewed, and were dose-related in the phase 2 papers.',
                     'Discontinuation due to adverse events in the TRIUMPH-2 paper was 4%, 12% and 8% across the lowest, middle and highest dose arms vs 5% with placebo.',
-                    'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; phase 3 heart-rate data were not in the sources reviewed.',
+                    'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; the TRIUMPH-1 paper reports a pulse-rate peak at 20 weeks in the middle and highest dose arms, followed by a decline.',
                     'Phase 3 trials report dysesthesia, which Lilly defines as skin burning sensation and related events; mechanism, onset and duration are not characterized.',
                     'Several phase 3 figures are company-reported, not peer reviewed, and are labelled that way.',
                     'Research-labelled retatrutide is not the trial drug, is not approved, and is not described by these data.',
                 ],
                 'faq' => self::faq($host.'/blog/retatrutide-side-effects-trial-data#faq', [
                     ['What were the most common side effects in the retatrutide trials?', 'Gastrointestinal events: nausea, diarrhoea, vomiting, constipation and decreased appetite. In both phase 2 papers they were dose-related and mostly mild to moderate, and the obesity paper says they occurred mainly during dose escalation. In the TRIUMPH-2 paper, diarrhoea was reported in 27% to 34% of the retatrutide arms vs 13% with placebo, and nausea in 14% to 28% vs 8%.'],
-                    ['How many people stopped retatrutide because of adverse events?', 'In the phase 2 obesity trial, 6% to 16% of the retatrutide arms vs none on placebo. In the phase 2 type 2 diabetes trial, 16 of 190 retatrutide participants (8%) vs 2 of 45 on placebo (4%). In the TRIUMPH-2 paper, permanent discontinuation due to adverse events or death was 4%, 12% and 8% in the lowest, middle and highest dose arms vs 5% with placebo. Company-reported TRIUMPH-1 figures were 4.1% to 11.3% vs 4.9%.'],
-                    ['Does retatrutide raise heart rate?', 'In the phase 2 obesity paper, heart rate rose in a dose-dependent manner, peaked at 24 weeks and declined at 36 and 48 weeks. In the phase 2 type 2 diabetes paper, pulse rose by up to about 7 beats per minute early in treatment and had decreased by 36 weeks. Heart-rate time courses for the phase 3 TRIUMPH trials were not available in the sources reviewed.'],
+                    ['How many people stopped retatrutide because of adverse events?', 'In the phase 2 obesity trial, 6% to 16% of the retatrutide arms vs none on placebo. In the phase 2 type 2 diabetes trial, 16 of 190 retatrutide participants (8%) vs 2 of 45 on placebo (4%). In the TRIUMPH-2 paper, permanent discontinuation due to adverse events or death was 4%, 12% and 8% in the lowest, middle and highest dose arms vs 5% with placebo. In the TRIUMPH-1 paper, discontinuation of study drug due to adverse events (randomized population, excluding deaths) was 4.1%, 6.5% and 11.2% in the lowest, middle and highest dose arms vs 4.6% with placebo.'],
+                    ['Does retatrutide raise heart rate?', 'In the phase 2 obesity paper, heart rate rose in a dose-dependent manner, peaked at 24 weeks and declined at 36 and 48 weeks. In the phase 2 type 2 diabetes paper, pulse rose by up to about 7 beats per minute early in treatment and had decreased by 36 weeks. In the TRIUMPH-1 paper, mean pulse rate peaked at 20 weeks in the middle and highest dose arms and then decreased; at week 80 the change from baseline was 1.5, 2.7 and 2.6 beats per minute in the lowest, middle and highest dose arms vs −0.3 with placebo (appendix Table S12).'],
                     ['What is the dysesthesia reported in the TRIUMPH trials?', 'Lilly defines it as a skin burning sensation and related adverse events. In the TRIUMPH-2 paper it was reported in 4% to 7% of the retatrutide arms vs 1% with placebo. The TRIUMPH-1 rate of up to 12.5% is reported in the paper and company-reported by Lilly. Company-reported rates were up to 20.9% in TRIUMPH-4. Lilly says events were generally mild to moderate and most resolved during treatment. The cause, timing and duration have not been characterized in the sources reviewed.'],
-                    ['Were pancreatitis, gallbladder or hypoglycaemia events reported?', 'In the phase 2 papers these events were few. The obesity trial reported one acute pancreatitis, three biliary events and no clinically significant hypoglycaemia. The type 2 diabetes trial reported two adjudicated pancreatitis events and three participants with hypoglycaemia below 54 mg/dL, none severe. Phase 3 rates for these events were not available in the published abstracts reviewed.'],
+                    ['Were pancreatitis, gallbladder or hypoglycaemia events reported?', 'In the phase 2 papers these events were few. The obesity trial reported one acute pancreatitis, three biliary events and no clinically significant hypoglycaemia. The type 2 diabetes trial reported two adjudicated pancreatitis events and three participants with hypoglycaemia below 54 mg/dL, none severe. In the TRIUMPH-1 paper, Table 3 reports severe or serious gallbladder or biliary tract disorders in 10, 5 and 4 participants in the lowest, middle and highest dose arms vs 4 with placebo, severe or serious hepatic disorders in 0, 0 and 3 vs 0, and adjudication-confirmed pancreatitis in 1, 3 and 4 vs 2. That table does not report hypoglycaemia. In the TRIUMPH-2 paper, Table 3 reports severe or serious gallbladder and biliary tract disorders in 3, 1 and 1 vs 1 with placebo, severe or serious hepatic disorders in 1, 0 and 0 vs 1, adjudication-confirmed pancreatitis in 0, 1 and 2 vs 0, and level 2 or level 3 hypoglycaemia in 2, 4 and 9 vs 5.'],
                     ['Is research-labelled retatrutide the same as the trial drug?', 'No. Retatrutide is investigational and not approved anywhere. Lilly states it cannot be legally sold or marketed for human use. Products sold online as research-labelled retatrutide are not the material used in these trials, and the trial safety data do not describe them.'],
                     ['Can these trials be compared with trials of other drugs?', 'Not reliably. The trials differ in population, duration, dose escalation and how events were defined and counted. This article reports results within each trial only and does not rank retatrutide against other drugs.'],
                 ]),
@@ -1208,7 +1208,7 @@ class EducationalContentPublisher
                 'og_title' => 'Selank vs Semax: Two Russian Heptapeptides Compared',
                 'og_description' => 'Same Pro-Gly-Pro tail, different parents: small Russian studies, the one head-to-head imaging study, and FDA\'s 2023-2026 actions on Semax and Selank.',
                 'blog_type' => 'Research',
-                'read_time' => '21 Min Read',
+                'read_time' => '20 Min Read',
                 'published_at' => '2026-10-19',
                 'is_featured' => false,
                 'author_name' => 'Peptidemap',
@@ -1230,6 +1230,102 @@ class EducationalContentPublisher
                     ['Has any study compared or combined Selank and Semax?', 'One small study compared them. In 52 healthy participants, it measured brain connectivity on MRI minutes after Semax, Selank or placebo, with no clinical outcome. Some animal and test-tube studies tested both in parallel. We found no study of the two given together, and no registered trial of either, in PubMed and ClinicalTrials.gov searches on 19 October 2026.'],
                     ['Which one is better?', 'This page does not rank them. They come from different parent molecules, were studied in different patient groups, mostly in small Russian-language studies, and have no head-to-head clinical trial. Neither has controlled human evidence for the memory, focus or mood claims common in marketing.'],
                     ['Is a research-use-only vial the same as the Russian medicine?', 'No. The Russian products are registered medicines made under that country\'s rules. A research-use-only vial is neither a Russian-registered medicine nor a compounded or FDA-approved drug, and FDA found that none of the websites it searched said whether their Semax was the free base or a salt. None of the studies on this page describe the identity, purity or sterility of a research-labelled product.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Eloralintide vs petrelintide amylin-class comparison.
+     * Sources checked 22 October 2026. Body lives in
+     * resources/content/educational. read_time is
+     * ceil(rendered words/230), body text plus sources.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function eloralintideVsPetrelintide(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'eloralintide-vs-petrelintide.md',
+                'image_file' => 'eloralintide-vs-petrelintide.png',
+                'slug' => 'eloralintide-vs-petrelintide',
+                'h1' => 'Eloralintide vs Petrelintide: Class, Trials and Status',
+                'lede' => 'Eloralintide is Lilly\'s investigational selective amylin receptor agonist. Petrelintide is a long-acting amylin analogue from Zealand Pharma, co-developed with Roche. Trial names, stage, and what is still unknown. No head-to-head, and no per-arm petrelintide percentages. Educational only.',
+                'seo_title' => 'Eloralintide vs Petrelintide: Class, Trials and Status',
+                'seo_description' => 'Eloralintide (Lilly) and petrelintide (Zealand, with Roche) are investigational amylin-class peptides. Trial names, stage, and what is not known.',
+                'og_title' => 'Eloralintide vs Petrelintide: Class, Trials and Status',
+                'og_description' => 'Two investigational amylin-class peptides. Named trials, once-weekly study designs, approval status, and results this page does not compare.',
+                'blog_type' => 'Research',
+                'read_time' => '9 Min Read',
+                'published_at' => '2026-10-22',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Eloralintide', 'Petrelintide', 'Amylin', 'ZUPREME', 'ENLIGHTEN'],
+                'key_points' => [
+                    'Eloralintide (LY3841136) is Lilly\'s investigational selective amylin receptor agonist. Petrelintide (formerly ZP8396) is Zealand Pharma\'s long-acting amylin analogue, co-developed with Roche.',
+                    'No head-to-head trial of the two was found. This page does not place one trial\'s percentages next to the other\'s.',
+                    'Eloralintide Phase 2 (NCT06230523) is published in The Lancet in a developer-affiliated paper (Lilly-funded, with Lilly authors). It reports dose-dependent weight reduction versus placebo; per-arm percentages are not repeated here.',
+                    'Petrelintide Phase 2 results have been reported for ZUPREME-1 (Roche, company-reported, 5 March 2026; a developer-affiliated ADA abstract; and a developer-affiliated Lancet Diabetes & Endocrinology paper, PMID 42810355) and ZUPREME-2 (Zealand, company-reported topline, 7 October 2026). Per-arm percentages are not repeated here.',
+                    'Phase 3 programmes on ClinicalTrials.gov: ENLIGHTEN for eloralintide, and ZUPREME-3, ZUPREME-4, and ZUPREME-5 for petrelintide. Those records were recruiting, with no results posted, on 22 October 2026.',
+                    'Neither compound was found to be approved. A research-use-only vial is not the trial material.',
+                ],
+                'faq' => self::faq($host.'/blog/eloralintide-vs-petrelintide#faq', [
+                    ['Are eloralintide and petrelintide the same molecule?', 'No. Eloralintide (LY3841136) is Eli Lilly\'s investigational selective amylin receptor agonist. Petrelintide, formerly ZP8396, is a long-acting amylin analogue from Zealand Pharma, co-developed with Roche. No head-to-head trial of the two was found in the sources checked on 22 October 2026.'],
+                    ['Is either compound approved?', 'No approval was found. Zealand Pharma\'s pipeline page says petrelintide has not been evaluated or approved for marketing by any regulatory authority. Lilly describes eloralintide as investigational. Approval of tirzepatide does not approve eloralintide, EloraTZP, or petrelintide.'],
+                    ['What trials are studying petrelintide?', 'Phase 2 ZUPREME-1 (NCT06662539) compared once-weekly petrelintide with placebo in people with obesity or overweight without type 2 diabetes. Phase 2b ZUPREME-2 (NCT06926842) compared once-weekly petrelintide with placebo in people with overweight or obesity and type 2 diabetes. ClinicalTrials.gov lists both as completed. Phase 3 ZUPREME-3, ZUPREME-4, and ZUPREME-5 (NCT07843498, NCT07843485, and NCT07843472) are sponsored by Roche with Zealand Pharma as a collaborator and were listed as recruiting on 22 October 2026.'],
+                    ['Have petrelintide results been reported?', 'Yes, and this page does not repeat the per-arm percentages. Roche announced company-reported ZUPREME-1 Phase 2 results on 5 March 2026. A developer-affiliated American Diabetes Association abstract (DOI 10.2337/db26-3083-lb) and a developer-affiliated paper in The Lancet Diabetes & Endocrinology (PMID 42810355, published online 29 September 2026) also report that trial. Zealand Pharma announced company-reported ZUPREME-2 topline results on 7 October 2026. Phase 3 results were not posted on the registry records checked that day.'],
+                    ['What did eloralintide\'s Phase 2 trial report?', 'In a developer-affiliated paper (funded by Eli Lilly, with Lilly employees among the authors), Billings and colleagues reported a 48-week, once-weekly Phase 2 trial of eloralintide alone in 263 adults with obesity or overweight and without type 2 diabetes (The Lancet; PMID 41207310; NCT06230523). The abstract reports dose-dependent reductions in body weight versus placebo on the efficacy estimand. Per-arm percentages are not repeated here, and these are not petrelintide results or a comparison with petrelintide.'],
+                    ['Is a research-use vial the same as the trial drug?', 'No. A research-use-only vial is not the investigational material used in these trials and is not an approved medicine. Peptidemap compares research-use and grey-area peptide listings. It is not a clinic, a pharmacy, or a seller. See the peptide legality guide for FDA, RUO, and compounding status. This page is not medical advice and does not give a dose.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Educational compare page for /compare/orforglipron-vs-oral-semaglutide.
+     * The row is stored under a distinct blog slug so it does not overwrite
+     * the ACHIEVE-3 article at /blog/orforglipron-vs-oral-semaglutide.
+     * Sources checked 22 October 2026. The body lives in
+     * resources/content/educational. The publisher reads this catalog.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function orforglipronVsOralSemaglutideCompare(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'orforglipron-vs-oral-semaglutide-compare.md',
+                'image_file' => 'orforglipron-vs-oral-semaglutide-compare.png',
+                'slug' => 'orforglipron-vs-oral-semaglutide-compare',
+                'h1' => 'Orforglipron vs Oral Semaglutide Tablets: Labels, US/EU/UK',
+                'lede' => 'Orforglipron is Lilly\'s oral small-molecule nonpeptide GLP-1 receptor agonist. Oral semaglutide is Novo Nordisk\'s peptide tablet. US and EU status as of 22 October 2026, label conditions for food and water, and what ACHIEVE, ATTAIN, PIONEER, and OASIS studied. Educational only.',
+                'seo_title' => 'Orforglipron vs Oral Semaglutide Tablets: Labels, US/EU/UK',
+                'seo_description' => 'Orforglipron vs oral semaglutide: molecule type, US and EU status on 22 October 2026, label food and water conditions, and trial design. Educational only.',
+                'og_title' => 'Orforglipron vs Oral Semaglutide Tablets: Labels, US/EU/UK',
+                'og_description' => 'Small-molecule orforglipron versus Novo\'s peptide tablet: US and EU status on 22 October 2026, label food and water conditions, and trial designs.',
+                'blog_type' => 'Research',
+                'read_time' => '14 Min Read',
+                'published_at' => '2026-10-22',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Orforglipron', 'Oral semaglutide', 'Foundayo', 'Rybelsus', 'Wegovy', 'RUO'],
+                'key_points' => [
+                    'Orforglipron is a small-molecule, nonpeptide oral GLP-1 receptor agonist. Oral semaglutide is a peptide tablet co-formulated with the absorption enhancer SNAC.',
+                    'As of 22 October 2026, FDA-approved Foundayo is a US weight-management tablet. The CHMP positive opinion of 15 October 2026 is pending a European Commission decision and is not an EU authorisation.',
+                    'US labels for the oral semaglutide tablets state an empty-stomach condition and a water limit. The Foundayo label says with or without food and does not state that water limit.',
+                    'ACHIEVE-3 compared the two in type 2 diabetes. ATTAIN, PIONEER, and OASIS are separate programmes. This page does not rank them and does not repeat per-arm weight-change percentages.',
+                    'A research-use listing is not Foundayo, Rybelsus, an Ozempic tablet, or a Wegovy tablet.',
+                ],
+                'faq' => self::faq($host.'/compare/orforglipron-vs-oral-semaglutide#faq', [
+                    ['Is orforglipron a peptide?', 'No. The ATTAIN-1 paper in the New England Journal of Medicine, which is developer-affiliated, describes orforglipron as a small-molecule, nonpeptide oral GLP-1 receptor agonist, and a phase 2 paper in the same journal, also developer-affiliated, calls it a nonpeptide GLP-1 receptor agonist. Oral semaglutide is a peptide. The US label says its peptide backbone is produced by yeast fermentation and that the tablets contain salcaprozate sodium (SNAC), an absorption enhancer.'],
+                    ['What is oral semaglutide on the current labels?', 'Oral semaglutide is Novo Nordisk\'s peptide GLP-1 receptor agonist in a tablet. On the US labels checked on 22 October 2026, Rybelsus tablets and Ozempic tablets are indicated for type 2 diabetes, and Wegovy tablets are indicated for adult weight management and for cardiovascular risk reduction in adults with established cardiovascular disease and obesity or overweight. In the EU, Rybelsus has been authorised for type 2 diabetes since 3 April 2020, and the Wegovy authorisation includes tablets for adult weight management.'],
+                    ['Is Foundayo approved in the United States and the European Union as of 22 October 2026?', 'In the United States, yes, for weight management. The FDA approved Foundayo (orforglipron) tablets on 1 April 2026 for adults with obesity, or overweight with at least one weight-related condition, together with diet and activity. The US label indication checked on 22 October 2026 is that use. It does not list type 2 diabetes. In the European Union, not yet as a granted authorisation. The CHMP adopted a positive opinion on 15 October 2026 recommending a marketing authorisation for type 2 diabetes and weight management. EMA\'s meeting highlights, published on 16 October 2026, list that opinion as pending a European Commission decision. A positive opinion is not a granted EU authorisation.'],
+                    ['How do the labels differ on food and water?', 'The US labels for Rybelsus tablets, Ozempic tablets, and Wegovy tablets state an empty-stomach morning condition, water up to 4 ounces, no other liquids, and a wait of at least 30 minutes before food, drink, or other oral medicines. Those sentences are label conditions, not instructions from this page. The Foundayo label states that the tablet is taken once daily with or without food, and it does not state an empty-stomach condition or a water-volume limit. A phase 2 trial, reported in a developer-affiliated paper, gave orforglipron once daily without meal-timing restrictions. Lilly\'s 1 April 2026 press release, which is company-reported, says Foundayo can be taken any time of day without food or water restrictions.'],
+                    ['Did a trial compare orforglipron with oral semaglutide, and does this page rank the programmes?', 'ACHIEVE-3 compared them in adults with type 2 diabetes who were taking metformin. It was a 52-week, open-label, randomized phase 3 trial, reported in a developer-affiliated Lancet paper. This page does not repeat its outcome figures. Those figures, with the estimand labelled, are on the orforglipron versus oral semaglutide blog. ATTAIN-1, PIONEER 6, OASIS 1, and OASIS 4 enrolled different populations and used different designs. This page does not rank one programme against another.'],
+                    ['Is a research-use listing the same as the approved tablet?', 'No. A research-use-only product sold under one of these names is not Foundayo, not Rybelsus, not an Ozempic tablet, and not a Wegovy tablet. Peptidemap is a comparison publisher for research-use and grey-area peptide listings. It is not a clinic, a pharmacy, or a seller. The peptide legality guide separates FDA approval, research-use labelling, and compounding. This page is not medical advice and does not give a dose.'],
                 ]),
             ],
         ];

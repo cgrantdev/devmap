@@ -34,6 +34,7 @@ class VsSitemapIndexTest extends TestCase
 
         foreach ([
             'elamipretide-vs-mots-c',
+            'eloralintide-vs-tirzepatide',
             'mazdutide-vs-tirzepatide',
             'retatrutide-vs-survodutide',
             'selank-vs-semax',

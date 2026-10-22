@@ -20,8 +20,9 @@ use Illuminate\Support\Facades\Schema;
  *
  * 1. It is a FEATURED_VS_PAIRS entry. Those curated pairs count.
  * 2. Pair-specific copy is rendered on the compare page. That is
- *    ElamipretideMotsCCompareFaqs for elamipretide-vs-mots-c, and
- *    KlowCompareCopy for
+ *    ElamipretideMotsCCompareFaqs for elamipretide-vs-mots-c,
+ *    EloralintideTirzepatideCompareCopy for eloralintide-vs-tirzepatide,
+ *    and KlowCompareCopy for
  *    glow-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv and
  *    ghk-cu-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv. canonicalPair does
  *    not resolve compare-side aliases, so the copy class is keyed on
@@ -109,6 +110,10 @@ class VsPairIndexing
         }
 
         if (ElamipretideMotsCCompareFaqs::forSlug($canonical) !== null) {
+            return true;
+        }
+
+        if (EloralintideTirzepatideCompareCopy::forSlug($canonical) !== null) {
             return true;
         }
 

@@ -91,7 +91,7 @@ return [
          * where we don't have a description set via an associated ->seo model or via
          * the ->getDynamicSEOData() method.
          */
-        'fallback' => 'Compare research peptide listings and prices across vendors. Catalog data only: RUO, and Peptidemap sells nothing.',
+        'fallback' => 'Compare research-use-only (RUO) peptide vendor listings and prices. Catalog data only; Peptidemap sells nothing.',
     ],
 
     'image' => [
@@ -142,6 +142,7 @@ return [
         'cagrilintide-vs-semaglutide',
         'cjc-1295-vs-ipamorelin',
         'elamipretide-vs-mots-c',
+        'eloralintide-vs-tirzepatide',
         'ghk-cu-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv',
         'ghk-cu-vs-tb-500',
         'glow-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv',

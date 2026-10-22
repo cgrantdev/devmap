@@ -332,12 +332,18 @@ class SeoHygieneTest extends TestCase
         $home->assertDontSee('unsplash.com', false);
         $home->assertDontSee('noindex', false);
         $home->assertDontSee('nofollow', false);
-        $home->assertSee('compounded-glp-1-status.png', false);
+        $home->assertSee('orforglipron-vs-oral-semaglutide-compare.png', false);
+        $home->assertSee('eloralintide-vs-petrelintide.png', false);
 
         $this->get('/blogs')
             ->assertOk()
             ->assertDontSee('picsum.photos', false)
             ->assertDontSee('unsplash.com', false)
+            ->assertSee('orforglipron-vs-oral-semaglutide-compare.png', false)
+            ->assertSee('eloralintide-vs-petrelintide.png', false);
+
+        $this->get('/blogs?page=2')
+            ->assertOk()
             ->assertSee('bpc-157-vs-tb-500-evidence.png', false);
 
         $this->get('/blog/legacy-unsplash')

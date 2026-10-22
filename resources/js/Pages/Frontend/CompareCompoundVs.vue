@@ -149,9 +149,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           <a v-for="r in related" :key="r.url" :href="r.url" class="ui-focus group p-4 rounded-[10px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all">
             <div class="text-[13px] font-semibold text-[color:var(--color-ink)] group-hover:text-[color:var(--color-accent-600)] transition-colors">
-              <span class="text-indigo-700">{{ formatSlug(r.raw_a) }}</span>
+              <span class="text-indigo-700">{{ r.name_a || formatSlug(r.raw_a) }}</span>
               <span class="text-[color:var(--color-ink-subtle)] mx-1.5">vs</span>
-              <span class="text-emerald-700">{{ formatSlug(r.raw_b) }}</span>
+              <span class="text-emerald-700">{{ r.name_b || formatSlug(r.raw_b) }}</span>
             </div>
             <div class="mt-1 text-[11px] text-[color:var(--color-ink-muted)]">{{ r.tagline }}</div>
           </a>
@@ -184,21 +184,10 @@ function fmtPrice(v) {
   return '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
-function betterClass(aVal, bVal, aWinsIfLower = false) {
-  if (aVal == null || bVal == null) return { a: '', b: '' }
-  const aWins = aWinsIfLower ? aVal < bVal : aVal > bVal
-  if (aVal === bVal) return { a: '', b: '' }
-  return aWins
-    ? { a: 'font-semibold text-emerald-700', b: '' }
-    : { a: '', b: 'font-semibold text-emerald-700' }
-}
-
 const snapshotRows = computed(() => {
-  const cheapestClasses = betterClass(props.a.cheapest_price, props.b.cheapest_price, true)
-  const vendorClasses = betterClass(props.a.vendor_count, props.b.vendor_count, false)
   return [
-    { label: 'Lowest listed', a: fmtPrice(props.a.cheapest_price), b: fmtPrice(props.b.cheapest_price), aClass: cheapestClasses.a, bClass: cheapestClasses.b },
-    { label: 'Vendors', a: props.a.vendor_count, b: props.b.vendor_count, aClass: vendorClasses.a, bClass: vendorClasses.b },
+    { label: 'Lowest listed', a: fmtPrice(props.a.cheapest_price), b: fmtPrice(props.b.cheapest_price) },
+    { label: 'Vendors', a: props.a.vendor_count, b: props.b.vendor_count },
     { label: 'Products', a: props.a.product_count, b: props.b.product_count },
     { label: 'Half-life', a: props.a.half_life || null, b: props.b.half_life || null },
     { label: 'Administration', a: truncate(props.a.administration, 80), b: truncate(props.b.administration, 80) },
@@ -216,7 +205,10 @@ function truncate(s, max) {
 }
 
 function formatSlug(slug) {
-  return slug.toUpperCase()
+  return String(slug || '')
+    .split('-')
+    .map((part) => part ? part.charAt(0).toUpperCase() + part.slice(1) : part)
+    .join('-')
 }
 
 /**

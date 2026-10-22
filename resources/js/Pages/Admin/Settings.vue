@@ -372,7 +372,7 @@ const props = defineProps({
     type: Object,
     default: () => ({
       site_name: 'Peptidemap',
-      site_description: 'Compare peptide brands, prices, and reviews',
+      site_description: 'Compare research-use-only (RUO) peptide vendor listings and prices. Catalog data only; Peptidemap sells nothing.',
       contact_email: 'contact@peptidemaps.com',
       email_new_vendor_registrations: true,
       email_new_product_submissions: true,
@@ -396,7 +396,7 @@ const props = defineProps({
 // Settings form
 const settingsForm = useForm({
   site_name: props.settings?.site_name || 'Peptidemap',
-  site_description: props.settings?.site_description || 'Compare peptide brands, prices, and reviews',
+  site_description: props.settings?.site_description || 'Compare research-use-only (RUO) peptide vendor listings and prices. Catalog data only; Peptidemap sells nothing.',
   contact_email: props.settings?.contact_email || 'contact@peptidemaps.com',
   email_new_vendor_registrations: props.settings?.email_new_vendor_registrations ?? true,
   email_new_product_submissions: props.settings?.email_new_product_submissions ?? true,

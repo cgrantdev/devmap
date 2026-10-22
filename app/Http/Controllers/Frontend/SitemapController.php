@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Support\CompareSlug;
 use App\Support\EncyclopediaSlug;
+use App\Support\OrforglipronOralSemaglutideComparePage;
 use App\Support\VsPairIndexing;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
@@ -211,8 +212,11 @@ class SitemapController extends Controller
                 ->select('id', 'slug', 'updated_at')
                 ->chunkById(500, function ($chunk) use (&$urls) {
                     foreach ($chunk as $b) {
+                        $loc = OrforglipronOralSemaglutideComparePage::isBlogSlug($b->slug)
+                            ? self::BASE_URL . OrforglipronOralSemaglutideComparePage::PUBLIC_PATH
+                            : self::BASE_URL . '/blog/' . $b->slug;
                         $urls[] = [
-                            'loc'        => self::BASE_URL . '/blog/' . $b->slug,
+                            'loc'        => $loc,
                             'lastmod'    => $b->updated_at?->toDateString(),
                             'changefreq' => 'monthly',
                             'priority'   => '0.5',

@@ -1,0 +1,257 @@
+{
+  "as_of": "22 October 2026 (Asia/Bangkok). Old values from live Inertia props of https://peptidemap.com/encyclopedia/orforglipron and /retatrutide fetched 22 Oct 2026.",
+  "normalize": "normalize(x): recursive. Strings: CRLF/CR -> LF; U+00A0 -> space; rtrim each line; trim. Arrays: same keys/order, values normalized. No HTML stripping except in the faqs op. Compare decoded JSON.",
+  "skip_rule": "Per column: skip (report 'already applied') if the marker is present OR normalize(current) === normalize(target/new value). Each slug runs inside DB::transaction; any exception rolls back that slug only.",
+  "migration": {
+    "timestamp": "2026_10_22_140000",
+    "file": "database/migrations/2026_10_22_140000_orforglipron_retatrutide_regulatory_october_22.php",
+    "seeder": "EncyclopediaOrfoRetaOctober22Seeder"
+  },
+  "base": "origin/main b4eb1ffcca7d853bbe4517c1a62f8273fb617c11 (current main, 22 Oct 2026 08:57 UTC+7)",
+  "order_independence": "retatrutide regulatory_subsections/references are order-independent with AU/TGA (2026_10_22_120000); regulatory_important_note/key_points with the re-apply (2026_10_22_130000). AU and re-apply payloads were patched (guards only, no text change) to accept the post-140000 state as well. orforglipron is touched by no other open package.",
+  "slug_match": "Category-based lookup (EncyclopediaPostMatch, same helper as the 22 Oct packages): product_categories WHERE LOWER(TRIM(slug))='orforglipron' exactly 1 row; education_posts WHERE product_category_id=<id> exactly 1 row. Otherwise loud warning with counts, write nothing. Never write a row with product_category_id NULL.",
+  "render_note": "OrforglipronProfile (EncyclopediaFraming) only fills props when NO linked post exists (applyStubNarrative). Live og_image has no ?v= suffix, which only the stored-seo_og_image branch of showArticle produces, so a linked post exists and these columns render from the DB. If the helper reports 'missing', the page is rendering the code profile: stop and report; do not edit OrforglipronProfile in this PR.",
+  "columns": {
+    "regulatory_subsections": {
+      "camelCase_prop": "regulatorySubsections",
+      "op": "Append new_subsection at the END only if normalize(current) === normalize(old_value). Skip if any subsection title starts with 'European Union: CHMP positive opinion' or normalize(current) === normalize(target_value).",
+      "old_value": [
+        {
+          "title": "Regulatory status",
+          "entries": [
+            {
+              "type": "content",
+              "value": "Foundayo is an approved prescription tablet. Research-chemical orforglipron is not that product and is not a substitute for it."
+            }
+          ]
+        }
+      ],
+      "new_subsection": {
+        "title": "European Union: CHMP positive opinion (as of 22 October 2026)",
+        "entries": [
+          {
+            "type": "content",
+            "value": "On 15 October 2026, the European Medicines Agency’s Committee for Medicinal Products for Human Use (CHMP) adopted a positive opinion recommending the granting of an EU marketing authorisation for Foundayo (orforglipron). The applicant is Eli Lilly Nederland B.V. A CHMP opinion is a recommendation, not an authorisation: Foundayo becomes authorised in the EU only if the European Commission issues a decision. EMA listed Foundayo as “pending EC decision” when checked on 22 October 2026."
+          },
+          {
+            "type": "content",
+            "value": "The indication recommended by the CHMP covers two uses in adults. Weight management, “including weight loss and weight maintenance,” as an adjunct to healthy diet and physical activity, in adults with an initial BMI of ≥30 kg/m² (obesity), or ≥27 kg/m² to <30 kg/m² (overweight) with at least one weight-related comorbidity. Type 2 diabetes mellitus: treatment of adults with insufficiently controlled type 2 diabetes as an adjunct to healthy diet and physical activity, either as monotherapy when metformin is considered inappropriate or in combination with other medicinal products for the treatment of diabetes."
+          },
+          {
+            "type": "content",
+            "value": "United States comparison: FDA approved Foundayo on 1 April 2026 (NDA 220934). The current U.S. labeling (Drugs@FDA and DailyMed, checked 22 October 2026) indicates it, in combination with a reduced-calorie diet and increased physical activity, to reduce excess body weight and maintain weight reduction long term in adults with obesity, or adults with overweight and at least one weight-related comorbid condition. The U.S. label does not include a type 2 diabetes indication, so the indication recommended by the CHMP is broader than the current U.S. one."
+          },
+          {
+            "type": "item",
+            "value": "Neither the CHMP opinion nor the U.S. approval applies to research-chemical material sold under the orforglipron name."
+          }
+        ]
+      },
+      "target_value": [
+        {
+          "title": "Regulatory status",
+          "entries": [
+            {
+              "type": "content",
+              "value": "Foundayo is an approved prescription tablet. Research-chemical orforglipron is not that product and is not a substitute for it."
+            }
+          ]
+        },
+        {
+          "title": "European Union: CHMP positive opinion (as of 22 October 2026)",
+          "entries": [
+            {
+              "type": "content",
+              "value": "On 15 October 2026, the European Medicines Agency’s Committee for Medicinal Products for Human Use (CHMP) adopted a positive opinion recommending the granting of an EU marketing authorisation for Foundayo (orforglipron). The applicant is Eli Lilly Nederland B.V. A CHMP opinion is a recommendation, not an authorisation: Foundayo becomes authorised in the EU only if the European Commission issues a decision. EMA listed Foundayo as “pending EC decision” when checked on 22 October 2026."
+            },
+            {
+              "type": "content",
+              "value": "The indication recommended by the CHMP covers two uses in adults. Weight management, “including weight loss and weight maintenance,” as an adjunct to healthy diet and physical activity, in adults with an initial BMI of ≥30 kg/m² (obesity), or ≥27 kg/m² to <30 kg/m² (overweight) with at least one weight-related comorbidity. Type 2 diabetes mellitus: treatment of adults with insufficiently controlled type 2 diabetes as an adjunct to healthy diet and physical activity, either as monotherapy when metformin is considered inappropriate or in combination with other medicinal products for the treatment of diabetes."
+            },
+            {
+              "type": "content",
+              "value": "United States comparison: FDA approved Foundayo on 1 April 2026 (NDA 220934). The current U.S. labeling (Drugs@FDA and DailyMed, checked 22 October 2026) indicates it, in combination with a reduced-calorie diet and increased physical activity, to reduce excess body weight and maintain weight reduction long term in adults with obesity, or adults with overweight and at least one weight-related comorbid condition. The U.S. label does not include a type 2 diabetes indication, so the indication recommended by the CHMP is broader than the current U.S. one."
+            },
+            {
+              "type": "item",
+              "value": "Neither the CHMP opinion nor the U.S. approval applies to research-chemical material sold under the orforglipron name."
+            }
+          ]
+        }
+      ]
+    },
+    "key_points": {
+      "camelCase_prop": "keyPoints",
+      "op": "Append new_item at the END only if normalize(current) === normalize(old_value). Skip if any item starts with 'EU (15 Oct 2026):' or normalize(current) === normalize(target_value).",
+      "old_value": [
+        "Orforglipron is a small-molecule, nonpeptide GLP-1 receptor agonist.",
+        "Foundayo is the FDA-approved orforglipron tablet (April 1, 2026).",
+        "Research-chemical powders and vials are not Foundayo and are not the approved dosage form.",
+        "This page does not provide dosing or prices."
+      ],
+      "new_item": "EU (15 Oct 2026): the CHMP recommended authorising Foundayo for weight management and type 2 diabetes in adults. This awaits a European Commission decision and is not yet an EU authorisation.",
+      "target_value": [
+        "Orforglipron is a small-molecule, nonpeptide GLP-1 receptor agonist.",
+        "Foundayo is the FDA-approved orforglipron tablet (April 1, 2026).",
+        "Research-chemical powders and vials are not Foundayo and are not the approved dosage form.",
+        "This page does not provide dosing or prices.",
+        "EU (15 Oct 2026): the CHMP recommended authorising Foundayo for weight management and type 2 diabetes in adults. This awaits a European Commission decision and is not yet an EU authorisation."
+      ]
+    },
+    "references": {
+      "camelCase_prop": "references",
+      "op": "Append new_items at the END only if normalize(current) === normalize(old_value). Skip if any reference link url equals the EMA summary-of-opinion PDF url or normalize(current) === normalize(target_value).",
+      "old_value": [
+        {
+          "links": [
+            {
+              "url": "https://investor.lilly.com/news-releases/news-release-details/fda-approves-lillys-foundayotm-orforglipron-only-glp-1-pill",
+              "label": "Lilly"
+            }
+          ],
+          "title": "FDA approves Foundayo (orforglipron) tablets",
+          "authors": "Eli Lilly and Company",
+          "citation": "Eli Lilly and Company press release. April 1, 2026.",
+          "description": "Approval announcement for the oral nonpeptide GLP-1 receptor agonist tablet."
+        },
+        {
+          "links": [
+            {
+              "url": "https://pubchem.ncbi.nlm.nih.gov/compound/137319706",
+              "label": "PubChem"
+            }
+          ],
+          "title": "PubChem record for orforglipron (CID 137319706)",
+          "authors": "",
+          "citation": "National Center for Biotechnology Information. PubChem Compound CID 137319706.",
+          "description": "Free-base formula C48H48F2N10O5, molecular weight 883.0. No CAS is stated on this page."
+        }
+      ],
+      "new_items": [
+        {
+          "title": "Foundayo (orforglipron): CHMP summary of positive opinion",
+          "authors": "European Medicines Agency, Committee for Medicinal Products for Human Use (CHMP)",
+          "citation": "EMA/CHMP/229918/2026, 15 October 2026 (first published 16 October 2026).",
+          "description": "Positive opinion adopted 15 October 2026 recommending EU marketing authorisation for type 2 diabetes mellitus and weight management in adults; full recommended indication. Published without prejudice to the European Commission decision.",
+          "links": [
+            {
+              "url": "https://www.ema.europa.eu/en/documents/smop-initial/chmp-summary-positive-opinion-foundayo_en.pdf",
+              "label": "EMA summary of opinion (PDF)"
+            },
+            {
+              "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/foundayo",
+              "label": "EMA medicine page"
+            }
+          ]
+        },
+        {
+          "title": "Meeting highlights from the CHMP, 12–15 October 2026",
+          "authors": "European Medicines Agency",
+          "citation": "EMA news, 16 October 2026.",
+          "description": "Lists Foundayo (orforglipron) among six new medicines recommended for approval; status “pending EC decision”.",
+          "links": [
+            {
+              "url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-medicinal-products-human-use-chmp-12-15-october-2026",
+              "label": "EMA"
+            }
+          ]
+        },
+        {
+          "title": "Foundayo (orforglipron) tablets: NDA 220934 approval letter and current prescribing information",
+          "authors": "U.S. Food and Drug Administration",
+          "citation": "NDA 220934, approved 1 April 2026; labeling revised 07/2026 (Drugs@FDA supplement 3, approved 4 August 2026).",
+          "description": "U.S. indication: reduce excess body weight and maintain weight reduction long term in adults with obesity, or overweight with at least one weight-related comorbid condition, with diet and physical activity. No type 2 diabetes indication.",
+          "links": [
+            {
+              "url": "https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2026/220934Orig1s000ltr.pdf",
+              "label": "FDA approval letter (PDF)"
+            },
+            {
+              "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2026/220934s003lbl.pdf",
+              "label": "Current label (PDF)"
+            },
+            {
+              "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=8ac446c5-feba-474f-a103-23facb9b5c62",
+              "label": "DailyMed"
+            }
+          ]
+        }
+      ],
+      "target_value": [
+        {
+          "links": [
+            {
+              "url": "https://investor.lilly.com/news-releases/news-release-details/fda-approves-lillys-foundayotm-orforglipron-only-glp-1-pill",
+              "label": "Lilly"
+            }
+          ],
+          "title": "FDA approves Foundayo (orforglipron) tablets",
+          "authors": "Eli Lilly and Company",
+          "citation": "Eli Lilly and Company press release. April 1, 2026.",
+          "description": "Approval announcement for the oral nonpeptide GLP-1 receptor agonist tablet."
+        },
+        {
+          "links": [
+            {
+              "url": "https://pubchem.ncbi.nlm.nih.gov/compound/137319706",
+              "label": "PubChem"
+            }
+          ],
+          "title": "PubChem record for orforglipron (CID 137319706)",
+          "authors": "",
+          "citation": "National Center for Biotechnology Information. PubChem Compound CID 137319706.",
+          "description": "Free-base formula C48H48F2N10O5, molecular weight 883.0. No CAS is stated on this page."
+        },
+        {
+          "title": "Foundayo (orforglipron): CHMP summary of positive opinion",
+          "authors": "European Medicines Agency, Committee for Medicinal Products for Human Use (CHMP)",
+          "citation": "EMA/CHMP/229918/2026, 15 October 2026 (first published 16 October 2026).",
+          "description": "Positive opinion adopted 15 October 2026 recommending EU marketing authorisation for type 2 diabetes mellitus and weight management in adults; full recommended indication. Published without prejudice to the European Commission decision.",
+          "links": [
+            {
+              "url": "https://www.ema.europa.eu/en/documents/smop-initial/chmp-summary-positive-opinion-foundayo_en.pdf",
+              "label": "EMA summary of opinion (PDF)"
+            },
+            {
+              "url": "https://www.ema.europa.eu/en/medicines/human/EPAR/foundayo",
+              "label": "EMA medicine page"
+            }
+          ]
+        },
+        {
+          "title": "Meeting highlights from the CHMP, 12–15 October 2026",
+          "authors": "European Medicines Agency",
+          "citation": "EMA news, 16 October 2026.",
+          "description": "Lists Foundayo (orforglipron) among six new medicines recommended for approval; status “pending EC decision”.",
+          "links": [
+            {
+              "url": "https://www.ema.europa.eu/en/news/meeting-highlights-committee-medicinal-products-human-use-chmp-12-15-october-2026",
+              "label": "EMA"
+            }
+          ]
+        },
+        {
+          "title": "Foundayo (orforglipron) tablets: NDA 220934 approval letter and current prescribing information",
+          "authors": "U.S. Food and Drug Administration",
+          "citation": "NDA 220934, approved 1 April 2026; labeling revised 07/2026 (Drugs@FDA supplement 3, approved 4 August 2026).",
+          "description": "U.S. indication: reduce excess body weight and maintain weight reduction long term in adults with obesity, or overweight with at least one weight-related comorbid condition, with diet and physical activity. No type 2 diabetes indication.",
+          "links": [
+            {
+              "url": "https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2026/220934Orig1s000ltr.pdf",
+              "label": "FDA approval letter (PDF)"
+            },
+            {
+              "url": "https://www.accessdata.fda.gov/drugsatfda_docs/label/2026/220934s003lbl.pdf",
+              "label": "Current label (PDF)"
+            },
+            {
+              "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=8ac446c5-feba-474f-a103-23facb9b5c62",
+              "label": "DailyMed"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "do_not_touch": "overview, background, human_use_*, faqs (the US-only FAQ 'What is Foundayo approved for?' stays correct for the US; see follow-ups), regulatory_important_note, OrforglipronProfile.php"
+}
