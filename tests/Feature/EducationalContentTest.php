@@ -1274,12 +1274,12 @@ class EducationalContentTest extends TestCase
         $cover = '/images/educational/'.$slug.'.png';
         $h1 = 'Retatrutide Side Effects: What the Trial Publications Report';
         $seoTitle = 'Retatrutide Side Effects: GI, Heart Rate, Dysesthesia Data';
-        $seoDescription = 'Retatrutide adverse events as reported in phase 2 papers, TRIUMPH-2 and Lilly data: GI events, discontinuation, heart rate, dysesthesia. Educational only.';
+        $seoDescription = 'Retatrutide adverse events from phase 2 papers, the published TRIUMPH-1 and TRIUMPH-2 papers, and other company-reported readouts. Educational only.';
 
         $this->assertSame(1, Blog::where('slug', $slug)->count());
         $blog = Blog::where('slug', $slug)->firstOrFail();
         $this->assertSame($h1, $blog->title);
-        $this->assertSame('Adverse events from the retatrutide phase 2 papers, TRIUMPH-2 and company-reported TRIUMPH data: GI events, discontinuation, heart rate and dysesthesia.', $blog->description);
+        $this->assertSame('Adverse events from the retatrutide phase 2 papers, the published TRIUMPH-1 and TRIUMPH-2 papers, and other company-reported TRIUMPH readouts: GI events, discontinuation, heart rate and dysesthesia.', $blog->description);
         $this->assertSame($seoTitle, $blog->seo_page_title);
         $this->assertSame($seoDescription, $blog->seo_description);
         $this->assertSame(58, strlen($seoTitle));
@@ -1289,7 +1289,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
         $this->assertSame('2026-10-19', $blog->published_at->toDateString());
         $this->assertSame('Research', $blog->blog_type);
-        $this->assertSame('19 Min Read', $blog->read_time);
+        $this->assertSame('20 Min Read', $blog->read_time);
         $this->assertSame('Peptidemap', $blog->author_name);
         $this->assertFalse((bool) $blog->is_featured);
         $this->assertSame('published', $blog->status);
@@ -1303,7 +1303,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame([
             'Gastrointestinal events were the most common adverse events in every retatrutide trial reviewed, and were dose-related in the phase 2 papers.',
             'Discontinuation due to adverse events in the TRIUMPH-2 paper was 4%, 12% and 8% across the lowest, middle and highest dose arms vs 5% with placebo.',
-            'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; phase 3 heart-rate data were not in the sources reviewed.',
+            'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; the TRIUMPH-1 paper reports a pulse-rate peak at 20 weeks in the middle and highest dose arms, followed by a decline.',
             'Phase 3 trials report dysesthesia, which Lilly defines as skin burning sensation and related events; mechanism, onset and duration are not characterized.',
             'Several phase 3 figures are company-reported, not peer reviewed, and are labelled that way.',
             'Research-labelled retatrutide is not the trial drug, is not approved, and is not described by these data.',
@@ -1321,6 +1321,9 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('/encyclopedia/retatrutide', $markdown);
         $this->assertStringContainsString('/compare/retatrutide-vs-tirzepatide', $markdown);
         $this->assertStringContainsString('/guides/peptide-legality-fda-ruo-compounding', $markdown);
+        $words = $this->renderedWordCount($markdown);
+        $this->assertSame(4386, $words);
+        $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringContainsString('/blog/retatrutide-testing-coa-limits', $markdown);
 
         $this->assertStringNotContainsString('<!--', (string) $blog->content);
@@ -1373,7 +1376,7 @@ class EducationalContentTest extends TestCase
         $page->assertSee($cover, false);
         $page->assertSee('What were the most common side effects in the retatrutide trials?', false);
         $page->assertSee('Can these trials be compared with trials of other drugs?', false);
-        $page->assertSee('19 Min Read', false);
+        $page->assertSee('20 Min Read', false);
         $page->assertDontSee('/workspace', false);
         $page->assertDontSee('CMS paste', false);
         $page->assertDontSee('CHANGES', false);
@@ -1381,7 +1384,7 @@ class EducationalContentTest extends TestCase
             ->where('blog.slug', $slug)
             ->where('blog.title', $h1)
             ->where('blog.image', $cover)
-            ->where('blog.readTime', '19 Min Read')
+            ->where('blog.readTime', '20 Min Read')
             ->where('blog.content', function ($html) {
                 return is_string($html)
                     && ! str_contains($html, '<!--')
@@ -1391,7 +1394,7 @@ class EducationalContentTest extends TestCase
             })
         );
 
-        $schema = json_encode($faq, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $schema = json_encode($faq, JSON_UNESCAPED_SLASHES);
         $this->assertIsString($schema);
         $page->assertSee($schema, false);
 
@@ -1768,6 +1771,9 @@ class EducationalContentTest extends TestCase
         $this->assertFileExists(resource_path('content/educational/images/'.$slug.'.png'));
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
+        $words = $this->renderedWordCount($markdown);
+        $this->assertSame(3925, $words);
+        $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringNotContainsString('<!--', $markdown);
         $this->assertStringNotContainsString('/workspace', $markdown);
         $this->assertDoesNotMatchRegularExpression('/\A---\n/', $markdown);
@@ -1936,11 +1942,11 @@ class EducationalContentTest extends TestCase
         $this->assertFileExists(resource_path('content/educational/images/'.$slug.'.png'));
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
-        $words = preg_match_all('/\S+/', $markdown);
-        $this->assertSame(4800, $words);
+        $words = $this->renderedWordCount($markdown);
+        $this->assertSame(4600, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $entry['read_time']);
-        $this->assertSame('21 Min Read', $entry['read_time']);
-        $this->assertSame('21 Min Read', $blog->read_time);
+        $this->assertSame('20 Min Read', $entry['read_time']);
+        $this->assertSame('20 Min Read', $blog->read_time);
         $this->assertStringNotContainsString('<!--', $markdown);
         $this->assertStringNotContainsString('/workspace', $markdown);
         $this->assertDoesNotMatchRegularExpression('/\A---\n/', $markdown);
@@ -2017,7 +2023,7 @@ class EducationalContentTest extends TestCase
         $page->assertSee($cover, false);
         $page->assertSee('Are Selank and Semax the same molecule?', false);
         $page->assertSee('Is a research-use-only vial the same as the Russian medicine?', false);
-        $page->assertSee('21 Min Read', false);
+        $page->assertSee('20 Min Read', false);
         $page->assertDontSee('/workspace', false);
         $page->assertDontSee('CMS paste', false);
         $page->assertDontSee('CHANGES', false);
@@ -2028,7 +2034,7 @@ class EducationalContentTest extends TestCase
             ->where('blog.slug', $slug)
             ->where('blog.title', $h1)
             ->where('blog.image', $cover)
-            ->where('blog.readTime', '21 Min Read')
+            ->where('blog.readTime', '20 Min Read')
             ->where('blog.content', function ($html) {
                 return is_string($html)
                     && ! str_contains($html, '<!--')
@@ -2058,6 +2064,18 @@ class EducationalContentTest extends TestCase
 
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee('https://peptidemap.com/blog/selank-vs-semax', false);
+    }
+
+    /**
+     * Words in the body as rendered to text, including sources.
+     * Table pipes, heading and list markers, and link URLs are not words.
+     */
+    private function renderedWordCount(string $markdown): int
+    {
+        $html = \App\Support\SimpleMarkdown::toHtml($markdown);
+        $text = html_entity_decode(preg_replace('/<[^>]+>/', ' ', $html) ?? $html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return preg_match_all('/\S+/', $text);
     }
 
     private function visibleFaqAnswer(string $plain, string $question): string
