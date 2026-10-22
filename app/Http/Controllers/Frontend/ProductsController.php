@@ -12,7 +12,6 @@ use App\Models\Puse;
 use App\Models\Brand;
 use App\Models\Location;
 use App\Models\Deal;
-use App\Support\BrandPageSeo;
 use App\Support\ProductPageSeo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -1050,28 +1049,22 @@ class ProductsController extends Controller
         $couponClause = ($vendorSetting && !empty($vendorSetting->coupon_code))
             ? "Coupon code {$vendorSetting->coupon_code}, "
             : '';
-        $onSiteReviewCount = $approvedReviews->count();
-        $reviewsClause = $onSiteReviewCount > 0 ? 'real customer reviews, and ' : '';
-        $defaultBrandDescription = "{$couponClause}{$reviewsClause}live prices for {$brandProductCount} peptides from {$brand->name}. Compare against {$otherVendorCount} other listed vendors on Peptidemap.";
-        if ($couponClause === '' && $reviewsClause === '') {
-            $defaultBrandDescription = ucfirst($defaultBrandDescription);
-        }
-        $defaultBrandTitle = BrandPageSeo::title($brand->name, $siteName);
+        $defaultBrandDescription = "{$couponClause}real customer reviews, and live prices for {$brandProductCount} peptides from {$brand->name}. Compare against {$otherVendorCount} other listed vendors on Peptidemap.";
 
         if ($hasStoredSeo) {
-            // Stored vendor seo_page_title / seo_description / og copies
-            // are filtered at render time. The database row is not rewritten.
-            $seoTitle = ProductPageSeo::storedTitle($vendorSetting->seo_page_title, $defaultBrandTitle);
-            $seoDescription = ProductPageSeo::storedDescription($vendorSetting->seo_description, $defaultBrandDescription);
-            $seoOgTitle = ProductPageSeo::storedTitle($vendorSetting->seo_og_title, $seoTitle);
-            $seoOgDescription = ProductPageSeo::storedDescription($vendorSetting->seo_og_description, $seoDescription);
+            // Stored brand titles and metas are Colin's copy. They are
+            // not run through the vendor promo filter.
+            $seoTitle = $vendorSetting->seo_page_title ?: ($brand->name . ': Coupon Codes, Reviews & Prices - ' . $siteName);
+            $seoDescription = $vendorSetting->seo_description ?: $defaultBrandDescription;
+            $seoOgTitle = $vendorSetting->seo_og_title ?: $seoTitle;
+            $seoOgDescription = $vendorSetting->seo_og_description ?: $seoDescription;
             // updated_at plus the copy revision so social platforms refetch when the card changes.
             $ogV = (($brand->updated_at?->timestamp) ?: ($vendorSetting->updated_at?->timestamp ?? 0)).'-'.\App\Support\OgImageRevision::COPY;
             $seoOgImage = $vendorSetting->seo_og_image
                 ? \App\Support\OgImageUrl::fold(str_starts_with($vendorSetting->seo_og_image, 'http') ? $vendorSetting->seo_og_image : url($vendorSetting->seo_og_image))
                 : \App\Support\OgImageUrl::brand((string) $brand->slug, (string) $ogV);
         } else {
-            $seoTitle = $defaultBrandTitle;
+            $seoTitle = $brand->name . ': Coupon Codes, Reviews & Prices - ' . $siteName;
             $seoDescription = $defaultBrandDescription;
             $seoOgTitle = $seoTitle;
             $seoOgDescription = $seoDescription;
@@ -1125,7 +1118,7 @@ class ProductsController extends Controller
             'name' => $brand->name,
             'url' => $brandUrl,
             'logo' => $vs?->logo ? asset('storage/' . $vs->logo) : null,
-            'description' => $vs?->description ? mb_substr(strip_tags($vs->description), 0, 300) : null,
+            'description' => $vs?->description ? mb_substr((string) ProductPageSeo::schemaDescription($vs->description, (string) $brand->name), 0, 300) : null,
         ];
         if ($ratingAvg && $ratingCount > 0) {
             $organizationSchema['aggregateRating'] = [

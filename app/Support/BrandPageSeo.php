@@ -60,6 +60,6 @@ class BrandPageSeo
             $slice = rtrim(mb_substr($slice, 0, $space));
         }
 
-        return rtrim($slice, " \t-—,");
+        return (string) preg_replace('/[\s\-–—,:&]+$/u', '', $slice);
     }
 }

@@ -9,6 +9,7 @@ use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\SeoPage;
 use App\Support\ComparePageSeo;
+use App\Support\ProductPageSeo;
 use App\Support\ComparePriceStats;
 use App\Support\VsPageSeo;
 use App\Support\VsPairIndexing;
@@ -296,12 +297,14 @@ class CompareController extends Controller
         $defaultDescription = 'Compare research peptide listings and prices across vendors, including GLP-1s, BPC-157, GHK-Cu, and TB-500. Catalog data only: RUO.';
 
         $seoPage = SeoPage::where('key', 'compare')->first();
+        $compareTitle = ProductPageSeo::storedTitle($seoPage?->title, $defaultTitle);
+        $compareDescription = ProductPageSeo::storedDescription($seoPage?->description, $defaultDescription);
         $seo = [
             'key' => 'compare',
-            'title' => $seoPage?->title ?: $defaultTitle,
-            'description' => $seoPage?->description ?: $defaultDescription,
-            'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
-            'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
+            'title' => $compareTitle,
+            'description' => $compareDescription,
+            'og_title' => ProductPageSeo::storedTitle($seoPage?->og_title, $compareTitle),
+            'og_description' => ProductPageSeo::storedDescription($seoPage?->og_description, $compareDescription),
             'og_image' => $seoPage?->og_image ?: null,
             'image' => $seoPage?->og_image ?: null,
             'url' => url('/compare'),

@@ -188,13 +188,37 @@ class ProductPageSeoTest extends TestCase
         $this->assertTrue(ProductPageSeo::hasClaim('99.5% pure'));
         $this->assertTrue(ProductPageSeo::hasClaim('100% purity'));
         $this->assertFalse(ProductPageSeo::hasClaim('9% purity'));
+        $this->assertTrue(ProductPageSeo::hasClaim('20% OFF with code'));
+        $this->assertTrue(ProductPageSeo::hasClaim('free shipping over $200'));
+        $this->assertTrue(ProductPageSeo::hasClaim('COA available'));
+        $this->assertTrue(ProductPageSeo::hasClaim('trusted'));
+        $this->assertTrue(ProductPageSeo::hasClaim('3rd party tested'));
+        $this->assertTrue(ProductPageSeo::hasClaim('Coupon code PEP20'));
+    }
+
+    public function test_a_vendor_named_trusted_keeps_its_name_in_the_identity_line(): void
+    {
+        $meta = ProductPageSeo::neutralIdentity('BPC-157', 'Trusted Peptides');
+
+        $this->assertStringContainsString('Trusted Peptides', $meta);
+        $this->assertLessThanOrEqual(155, mb_strlen($meta), $meta);
+        $this->assertStringContainsString('Compare listed prices, vial sizes and vendor details across listings', $meta);
     }
 
     public function test_stored_overrides_are_filtered_without_rewriting_the_fallback_contract(): void
     {
         $fallbackTitle = 'BPC-157 — Amino Club Listing — Peptidemap';
+        $cleanTitle = 'BPC-157 10mg — Amino Club — Peptidemap';
+        $this->assertSame($cleanTitle, ProductPageSeo::storedTitle($cleanTitle, 'X'));
         $claimed = ProductPageSeo::storedTitle('Best BPC-157 guaranteed — cheapest', $fallbackTitle);
         $this->assertSame($fallbackTitle, $claimed);
+
+        $cutOnDash = ProductPageSeo::limitTitle('BPC-157 research listing from Amino Club — extra catalog words past the sixty character limit');
+        $this->assertLessThanOrEqual(60, mb_strlen($cutOnDash), $cutOnDash);
+        $this->assertDoesNotMatchRegularExpression('/[—·]$/u', $cutOnDash);
+        $dot = ProductPageSeo::limitTitle(str_repeat('Catalog listing ', 6).'· leftover words');
+        $this->assertLessThanOrEqual(60, mb_strlen($dot), $dot);
+        $this->assertDoesNotMatchRegularExpression('/[—·]$/u', $dot);
 
         $long = 'BPC-157 research listing from Amino Club with extra catalog wording that runs past the limit';
         $cut = ProductPageSeo::storedTitle($long, $fallbackTitle);

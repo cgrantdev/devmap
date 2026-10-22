@@ -39,6 +39,7 @@ class SeoSpotCheckTest extends TestCase
             'Compare research peptide listings and prices.',
             SiteCopy::description('Compare research peptide listings and prices.')
         );
+        $this->assertSame(SiteCopy::DESCRIPTION, SiteCopy::description('Compare vendors on Peptidemap.'));
         $this->assertDoesNotMatchRegularExpression('/\bverified\b/i', SiteCopy::DESCRIPTION);
         $this->assertLessThanOrEqual(155, mb_strlen(SiteCopy::DESCRIPTION));
 
@@ -102,12 +103,12 @@ class SeoSpotCheckTest extends TestCase
         $title = $this->headContent($html, '/<title>(.*?)<\/title>/s');
         $description = $this->headContent($html, '/<meta name="description" content="(.*?)"/s');
 
-        $this->assertLessThanOrEqual(60, mb_strlen($title), $title);
+        $this->assertSame('Platinum Lion Peptides: Coupon Codes, Reviews & Prices - PeptideMap', $title);
         $this->assertStringContainsString('Coupon Codes', $title);
-        $this->assertStringContainsString(' — ', $title);
-        $this->assertStringNotContainsString(' - Peptidemap', $title);
-        $this->assertStringContainsString('Coupon code PMAP', $description);
-        $this->assertStringNotContainsString('real customer reviews', $description);
+        $this->assertSame(
+            'Coupon code PMAP, real customer reviews, and live prices for 0 peptides from Platinum Lion Peptides. Compare against 0 other listed vendors on Peptidemap.',
+            $description
+        );
     }
 
     public function test_product_meta_and_schema_drop_claims_verified_and_ellipsis(): void
@@ -302,11 +303,14 @@ class SeoSpotCheckTest extends TestCase
             'vendor_description' => $storedDescription,
             'seo_page_title' => $storedTitle,
             'seo_description' => $storedDescription,
+            'seo_og_description' => $storedDescription,
         ]);
+        $brandStoredTitle = 'Best Platinum Lion Peptides guaranteed cheapest';
         VendorSetting::create([
             'brand_id' => $brand->id,
             'coupon_code' => 'PMAP',
-            'seo_page_title' => 'Best Platinum Lion Peptides guaranteed cheapest',
+            'description' => $storedDescription,
+            'seo_page_title' => $brandStoredTitle,
             'seo_description' => $storedDescription,
         ]);
 
@@ -318,13 +322,28 @@ class SeoSpotCheckTest extends TestCase
         $this->assertLessThanOrEqual(60, mb_strlen($productTitle), $productTitle);
         $this->assertLessThanOrEqual(155, mb_strlen($productDescription), $productDescription);
         $this->assertStoredCopyIsNeutral($productTitle.' '.$productDescription);
+        $og = $this->headContent($productHtml, '/<meta property="og:description" content="(.*?)"/s');
+        $twitter = $this->headContent($productHtml, '/<meta name="twitter:description" content="(.*?)"/s');
+        $this->assertSame($og, $twitter);
+        $this->assertStoredCopyIsNeutral($og);
 
         $brandHtml = $this->get('/brand/platinum-lion-peptides')->assertOk()->getContent();
         $brandTitle = $this->headContent($brandHtml, '/<title>(.*?)<\/title>/s');
         $brandDescription = $this->headContent($brandHtml, '/<meta name="description" content="(.*?)"/s');
-        $this->assertLessThanOrEqual(60, mb_strlen($brandTitle), $brandTitle);
-        $this->assertStringContainsString('Coupon Codes', $brandTitle);
-        $this->assertStoredCopyIsNeutral($brandTitle.' '.$brandDescription);
+        $this->assertSame($brandStoredTitle.' — Peptidemap', $brandTitle);
+        $this->assertSame($storedDescription, $brandDescription);
+
+        preg_match_all('/<script type="application\/ld\+json">(.*?)<\/script>/s', $brandHtml, $blocks);
+        $organization = null;
+        foreach ($blocks[1] as $json) {
+            $decoded = json_decode(trim($json), true);
+            if (($decoded['@type'] ?? null) === 'Organization') {
+                $organization = $decoded;
+                break;
+            }
+        }
+        $this->assertIsArray($organization);
+        $this->assertStoredCopyIsNeutral((string) ($organization['description'] ?? ''));
 
         $fresh = Product::findOrFail($product->id);
         $this->assertSame($storedTitle, $fresh->seo_page_title);
@@ -332,6 +351,54 @@ class SeoSpotCheckTest extends TestCase
         $this->assertSame(
             'Best Platinum Lion Peptides guaranteed cheapest',
             VendorSetting::where('brand_id', $brand->id)->value('seo_page_title')
+        );
+    }
+
+    public function test_brand_and_coupon_pages_match_main_for_a_pmap_percent_off_fixture(): void
+    {
+        $brand = Brand::create([
+            'name' => 'Acme Peptides',
+            'slug' => 'acme-peptides',
+            'is_active' => true,
+        ]);
+        VendorSetting::create([
+            'brand_id' => $brand->id,
+            'coupon_code' => 'PMAP',
+            'coupon_discount_percent' => 10,
+        ]);
+
+        $brandHtml = $this->get('/brand/acme-peptides')->assertOk()->getContent();
+        $this->assertSame(
+            'Acme Peptides: Coupon Codes, Reviews & Prices - PeptideMap',
+            $this->headContent($brandHtml, '/<title>(.*?)<\/title>/s')
+        );
+        $this->assertSame(
+            'Coupon code PMAP, real customer reviews, and live prices for 0 peptides from Acme Peptides. Compare against 0 other listed vendors on Peptidemap.',
+            $this->headContent($brandHtml, '/<meta name="description" content="(.*?)"/s')
+        );
+
+        $connection = \Illuminate\Support\Facades\DB::connection();
+        if ($connection->getDriverName() === 'sqlite') {
+            $connection->getPdo()->sqliteCreateFunction('LEAST', static function ($left, $right) {
+                if ($left === null) {
+                    return $right;
+                }
+                if ($right === null) {
+                    return $left;
+                }
+
+                return min($left, $right);
+            }, 2);
+        }
+
+        $couponHtml = $this->get('/coupon/acme-peptides')->assertOk()->getContent();
+        $this->assertSame(
+            'Acme Peptides Coupon Code PMAP — 10% Off — Peptidemap',
+            $this->headContent($couponHtml, '/<title>(.*?)<\/title>/s')
+        );
+        $this->assertSame(
+            'Peptidemap code PMAP. Save 10% at Acme Peptides. Code supplied by Acme Peptides. Applies across 0 products.',
+            $this->headContent($couponHtml, '/<meta name="description" content="(.*?)"/s')
         );
     }
 

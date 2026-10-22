@@ -17,7 +17,7 @@ class SiteCopy
     public static function description(?string $stored = null): string
     {
         $stored = trim((string) $stored);
-        if ($stored === '' || ProductPageSeo::hasClaim($stored)) {
+        if ($stored === '' || ProductPageSeo::hasClaim($stored) || ProductPageSeo::mentionsSite($stored)) {
             return self::DESCRIPTION;
         }
 

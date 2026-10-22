@@ -31,12 +31,11 @@ class ProductPageSeo
     private const CLAIM_PATTERN = '/\b(?:wound healing|tissue repair|healing|treatments?|therap(?:y|ies)|cures?|weight loss|fat loss|anti-aging|anti aging|boost(?:ing|s|ed)?|dosing)\b/i';
 
     /**
-     * Promotional claims. The trailing boundary sits after the purity
-     * word, not after "%": "%" and the following space are both
-     * non-word characters, so a boundary there would miss "99% purity".
-     * Two or three digits cover "99% purity" and "100% purity".
+     * Promotional claims in vendor-sourced copy. The purity alternative
+     * ends on the word "pure"/"purity", not on "%", because "%" and a
+     * following space are both non-word characters.
      */
-    public const PROMO_PATTERN = '/\b(?:verified|lab[- ]tested|third[- ]party tested|best|cheapest|guarantee(?:d|s)?|pharma(?:ceutical)?[- ]grade|FDA[- ](?:approved|registered)|GMP[- ]certified|doctor[- ]recommended|\d{2,3}(?:\.\d+)?%\s*pur(?:e|ity))\b/i';
+    public const PROMO_PATTERN = '/\b(?:verified|(?:lab|third[- ]party|3rd[- ]party|independently)[- ]tested|best|cheap(?:est)?|lowest[- ]prices?|trusted|guarantee(?:d|s)?|pharma(?:ceutical)?[- ]grade|FDA[- ](?:approved|registered)|GMP[- ]certified|doctor[- ]recommended|free[- ]shipping|coupons?|discount(?:s|ed)?|promo(?:tions?)?|(?:use|with)\s+code|COAs?|certificates?\s+of\s+analysis|pure\s*(?:&|and)\s*tested|\d{2,3}(?:\.\d+)?%\s*pur(?:e|ity))\b|\d{1,3}%\s*off\b/i';
 
     private const SITE_CLAIM_PATTERN = '/\b(?:this|our)\s+(?:site|website)\b|\bon\s+Peptidemap\b|\bCOAs?\b.*\bpublished\b/i';
 
@@ -112,9 +111,11 @@ class ProductPageSeo
             return self::limitTitle($fallback);
         }
 
-        $kept = self::withoutClaims($stored);
+        if (self::hasClaim($stored) || self::mentionsSite($stored)) {
+            return self::limitTitle($fallback);
+        }
 
-        return self::limitTitle($kept ?? $fallback);
+        return self::limitTitle($stored);
     }
 
     /**
@@ -159,12 +160,13 @@ class ProductPageSeo
         $named = $size !== null ? "{$compound} ({$size})" : $compound;
         $vendor = trim((string) $vendor);
         $class = trim((string) $class);
-        if ($class !== '' && self::hasClaim($class)) {
+        if ($class !== '' && self::templateHasClaim($class)) {
             $class = '';
         }
 
         $candidates = [];
         if ($vendor !== '') {
+            $candidates[] = "{$vendor} lists {$named} for research use only (RUO). Compare listed prices, vial sizes and vendor details across listings; Peptidemap sells nothing.";
             if ($class !== '') {
                 $candidates[] = "{$vendor} lists {$named}, a {$class}, for research use only (RUO). Compare listings; Peptidemap sells nothing.";
             }
@@ -180,7 +182,7 @@ class ProductPageSeo
         $candidates[] = 'Research-use-only (RUO) catalog listing. Compare listings; Peptidemap sells nothing.';
 
         foreach ($candidates as $candidate) {
-            if (self::chars($candidate) <= self::DESCRIPTION_LIMIT && ! self::hasClaim($candidate)) {
+            if (self::chars($candidate) <= self::DESCRIPTION_LIMIT && ! self::templateHasClaim($candidate, $vendor, $named, $class)) {
                 return $candidate;
             }
         }
@@ -330,7 +332,7 @@ class ProductPageSeo
 
     private static function trimSeparators(string $value): string
     {
-        return rtrim($value, self::TRIM_CHARS);
+        return (string) preg_replace('/[\s\-–—\/+&,|·:]+$/u', '', $value);
     }
 
     private static function chars(string $value): int
@@ -394,7 +396,7 @@ class ProductPageSeo
             return null;
         }
 
-        $clause = self::endSentence(rtrim(mb_substr($text, 0, $cut), " \t,;:—-"));
+        $clause = self::endSentence((string) preg_replace('/[\s,;:–—\-]+$/u', '', mb_substr($text, 0, $cut)));
 
         return self::chars($clause) <= $limit ? $clause : null;
     }
@@ -420,7 +422,7 @@ class ProductPageSeo
      */
     private static function splitClauses(string $text): array
     {
-        $parts = preg_split('/(?<=[.!?])\s+|\s*;\s+|\s+—\s+/u', $text) ?: [];
+        $parts = preg_split('/(?<=[.!?])\s+/u', $text) ?: [];
 
         return array_values(array_filter(array_map(
             static fn ($part): string => trim((string) $part),
@@ -444,9 +446,27 @@ class ProductPageSeo
         return trim(implode(' ', $kept));
     }
 
-    private static function mentionsSite(string $text): bool
+    public static function mentionsSite(string $text): bool
     {
         return (bool) preg_match(self::SITE_CLAIM_PATTERN, $text);
+    }
+
+    /**
+     * Claim check for generated identity lines. The vendor and compound
+     * names are removed first, so a vendor named "Trusted" keeps its name.
+     */
+    private static function templateHasClaim(string $candidate, string ...$names): bool
+    {
+        $template = $candidate;
+        foreach ($names as $name) {
+            $name = trim($name);
+            if ($name === '') {
+                continue;
+            }
+            $template = str_ireplace($name, ' ', $template);
+        }
+
+        return self::hasClaim($template);
     }
 
     private static function cutAtLastSpace(string $value, int $limit): string
@@ -463,7 +483,7 @@ class ProductPageSeo
         if ($space !== false && $space > 0) {
             $slice = rtrim(mb_substr($slice, 0, $space));
         }
-        $slice = rtrim($slice, self::TRIM_CHARS);
+        $slice = self::trimSeparators($slice);
         if ($slice === '') {
             $slice = rtrim(mb_substr($value, 0, $limit));
         }
