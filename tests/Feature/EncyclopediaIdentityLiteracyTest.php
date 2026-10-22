@@ -239,17 +239,17 @@ class EncyclopediaIdentityLiteracyTest extends TestCase
 
         $retaPost->refresh();
         $this->assertStringStartsWith($lockedOverview, $retaPost->overview);
-        $this->assertStringContainsString('Timeline literacy (early Oct 2026)', $retaPost->overview);
+        $this->assertStringContainsString('Timeline literacy (as of 22 Oct 2026)', $retaPost->overview);
         $this->assertStringContainsString('Q1 2027', $retaPost->overview);
         $this->assertStringContainsString('filing plan', $retaPost->overview);
         $this->assertStringStartsWith($lockedShort, $retaPost->description);
         $this->assertStringContainsString('Seventh Circuit', $retaPost->description);
-        $this->assertStringContainsString('no ruling was located', $retaPost->description);
+        $this->assertStringContainsString('had no ruling as of 22 Oct 2026', $retaPost->description);
         $this->assertStringStartsWith($lockedConclusion, $retaPost->conclusion);
-        $this->assertStringContainsString('planned BLA filing window', $retaPost->conclusion);
+        $this->assertStringContainsString('stated filing window', $retaPost->conclusion);
         $this->assertContains($triumph1Point, $retaPost->key_points);
         $this->assertContains('TRIUMPH-2 Phase 3 locked bullet', $retaPost->key_points);
-        $this->assertContains('Q1 2027 = Lilly’s stated BLA submission window while finishing CMC — not an approval date', $retaPost->key_points);
+        $this->assertContains('Q1 2027 = Lilly’s stated filing window (“no later than the first quarter of 2027”, Seventh Circuit memorandum of 8 Oct 2026) — not an approval date', $retaPost->key_points);
         $sections = $retaPost->human_use_subsections;
         $this->assertSame('Phase 2 Results', $sections[0]['title']);
         $this->assertSame($phase2, $sections[0]['entries'][0]['value']);
@@ -259,12 +259,14 @@ class EncyclopediaIdentityLiteracyTest extends TestCase
         $this->assertSame(RetatrutideTimelineLiteracySeeder::MAP_TITLE, $sections[3]['title']);
         $this->assertSame($context, $sections[4]['entries'][0]['value']);
         $this->assertSame($triumph2Body, $retaPost->regulatory_subsections[0]['entries'][0]['value']);
-        $this->assertSame('Filing literacy — planned BLA in Q1 2027 (≠ approval)', $retaPost->regulatory_subsections[2]['title']);
+        $this->assertSame('Filing literacy — Lilly’s stated Q1 2027 filing plan (≠ approval)', $retaPost->regulatory_subsections[2]['title']);
         $this->assertSame(RetatrutideTimelineLiteracySeeder::REGULATORY_NOTE, $retaPost->regulatory_important_note);
         $this->assertSame($keptFda, $retaPost->faqs[0]['answer']);
         $seventh = collect($retaPost->faqs)->first(fn ($faq) => str_contains((string) $faq['question'], 'Seventh Circuit'));
         $this->assertNotNull($seventh);
-        $this->assertStringContainsString('No published ruling', $seventh['answer']);
+        $this->assertStringContainsString('No ruling yet', $seventh['answer']);
+        $this->assertStringNotContainsString('No published ruling', $seventh['answer']);
+        $this->assertStringContainsString('no ruling appeared on the docket', $retaPost->regulatory_subsections[3]['entries'][1]['value']);
         $this->assertStringContainsString('26-1301', json_encode($retaPost->references));
         $retaBlob = json_encode($retaPost->only([
             'description', 'overview', 'conclusion', 'key_points', 'human_use_subsections',
