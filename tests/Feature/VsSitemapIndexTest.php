@@ -296,7 +296,12 @@ class VsSitemapIndexTest extends TestCase
     {
         ProductCategory::create(['name' => 'Selank', 'slug' => 'Selank', 'is_active' => true]);
 
-        $this->assertStringNotContainsString('selank-vs-semax', $this->sitemap());
+        $sitemap = $this->sitemap();
+        // This post's /blog loc contains the pair slug. Drop only that loc;
+        // the original check still rejects the compare URL and any other hit.
+        $withoutThisPost = str_replace('https://peptidemap.com/blog/selank-vs-semax', '', $sitemap);
+        $this->assertNotSame($sitemap, $withoutThisPost);
+        $this->assertStringNotContainsString('selank-vs-semax', $withoutThisPost);
         $this->get('/compare/selank-vs-semax')->assertNotFound();
     }
 
