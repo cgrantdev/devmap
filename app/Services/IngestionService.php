@@ -381,8 +381,15 @@ class IngestionService
         // Cache aliases per-request to avoid hammering the DB during bulk syncs
         static $aliases = null;
         if ($aliases === null) {
+            // Longest alias wins. MySQL CHAR_LENGTH counts characters.
+            // SQLite has no CHAR_LENGTH; its LENGTH() also counts characters.
+            // Do not use MySQL LENGTH() here — that counts bytes.
+            $lengthExpr = DB::connection()->getDriverName() === 'sqlite'
+                ? 'LENGTH(keyword)'
+                : 'CHAR_LENGTH(keyword)';
+
             $aliases = DB::table('category_aliases')
-                ->orderByRaw('CHAR_LENGTH(keyword) DESC')
+                ->orderByRaw($lengthExpr.' DESC')
                 ->get(['keyword', 'product_category_id']);
         }
 
