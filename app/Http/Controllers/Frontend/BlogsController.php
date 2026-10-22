@@ -206,21 +206,12 @@ class BlogsController extends Controller
             ],
         ];
 
-        $schemas = [$articleSchema, $breadcrumbSchema];
-        $extra = $blog->seo_schema;
-        if (is_string($extra)) {
-            $extra = json_decode($extra, true);
-        }
-        if (is_array($extra)) {
-            if (isset($extra['@type'])) {
-                $extra = [$extra];
-            }
-            foreach ($extra as $block) {
-                if (is_array($block)) {
-                    $schemas[] = $block;
-                }
-            }
-        }
+        // FAQPage JSON-LD and the visible FAQ are the same entities.
+        // An empty FAQPage is omitted. Other stored schema blocks stay.
+        [$schemas, $faqs] = $this->schemaWithVisibleFaqs(
+            [$articleSchema, $breadcrumbSchema],
+            $blog->seo_schema
+        );
 
         // Build SEO array (same format as products/brands pages)
         $seo = [
@@ -243,6 +234,7 @@ class BlogsController extends Controller
         session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/BlogDetail', [
+            'faqs' => $faqs,
             'blog' => [
                 'id' => $blog->id,
                 'title' => $blog->title,
@@ -253,7 +245,10 @@ class BlogsController extends Controller
                 'key_points' => $blog->key_points ?? [],
                 'detailed_analysis' => $blog->detailed_analysis,
                 'conclusion' => $blog->conclusion,
-                'content' => $blog->content,
+                // Markdown FAQ/FAQs heading blocks are the publisher's
+                // second copy of seo_schema. Drop that block on the way
+                // to the view so the section below is the only FAQ.
+                'content' => $this->withoutMarkdownFaqHeading($blog->content, $faqs),
                 'tags' => $blog->tags ?? [],
                 'author_name' => $blog->author_name,
                 'author_job' => $blog->author_job,
@@ -304,5 +299,90 @@ class BlogsController extends Controller
         }
 
         return 'Research'; // Default
+    }
+
+    /**
+     * Split stored seo_schema into non-FAQ blocks plus FAQ pairs.
+     * Pair strings are the FAQPage name and acceptedAnswer.text, unchanged.
+     *
+     * @return array{0: list<array<string, mixed>>, 1: list<array{question: string, answer: string}>}
+     */
+    private function schemaWithVisibleFaqs(array $schemas, mixed $extra): array
+    {
+        $faqs = [];
+        if (is_string($extra)) {
+            $extra = json_decode($extra, true);
+        }
+        if (! is_array($extra)) {
+            return [$schemas, $faqs];
+        }
+        if (isset($extra['@type'])) {
+            $extra = [$extra];
+        }
+
+        foreach ($extra as $block) {
+            if (! is_array($block)) {
+                continue;
+            }
+            if (($block['@type'] ?? null) !== 'FAQPage') {
+                $schemas[] = $block;
+
+                continue;
+            }
+
+            $entities = [];
+            foreach ($block['mainEntity'] ?? [] as $entity) {
+                if (! is_array($entity)) {
+                    continue;
+                }
+                $name = $entity['name'] ?? null;
+                $text = $entity['acceptedAnswer']['text'] ?? null;
+                if (! is_string($name) || $name === '' || ! is_string($text) || $text === '') {
+                    continue;
+                }
+                $entities[] = $entity;
+                $faqs[] = ['question' => $name, 'answer' => $text];
+            }
+            if ($entities === []) {
+                continue;
+            }
+            $block['mainEntity'] = $entities;
+            $schemas[] = $block;
+        }
+
+        return [$schemas, $faqs];
+    }
+
+    /**
+     * Drop the markdown FAQ heading when this post already has FAQPage
+     * entities. The visible section is those entities, so the heading
+     * block (FAQ, FAQs, or Frequently Asked Questions, through the next
+     * h2) is not rendered a second time. Stored content is not rewritten.
+     * The block is removed only when its plain text already contains
+     * every JSON-LD question and answer, which is the duplicate copy.
+     *
+     * @param  list<array{question: string, answer: string}>  $faqs
+     */
+    private function withoutMarkdownFaqHeading(?string $html, array $faqs): ?string
+    {
+        if ($html === null || $html === '' || $faqs === []) {
+            return $html;
+        }
+
+        $pattern = '/<h2>\s*(?:FAQs?|Frequently Asked Questions)\s*<\/h2>.*?(?=<h2\b|\z)/is';
+        if (! preg_match($pattern, $html, $match)) {
+            return $html;
+        }
+
+        $plain = html_entity_decode(strip_tags($match[0]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        foreach ($faqs as $faq) {
+            if (! str_contains($plain, $faq['question']) || ! str_contains($plain, $faq['answer'])) {
+                return $html;
+            }
+        }
+
+        $stripped = preg_replace($pattern, '', $html, 1);
+
+        return is_string($stripped) ? $stripped : $html;
     }
 }

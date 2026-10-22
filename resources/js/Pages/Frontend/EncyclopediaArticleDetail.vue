@@ -838,6 +838,19 @@
                   </template>
                 </section>
 
+                <!-- FAQ — same stored pairs as the FAQPage JSON-LD. -->
+                <section v-if="faqs.length" id="faq" class="mb-12">
+                  <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
+                    <h2 class="text-2xl font-semibold text-slate-900 m-0">
+                      FAQ
+                    </h2>
+                  </div>
+                  <div v-for="(faq, index) in faqs" :key="index" class="mb-6">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">{{ faq.question }}</h3>
+                    <p class="text-slate-700 leading-relaxed mb-0">{{ faq.answer }}</p>
+                  </div>
+                </section>
+
                 <!-- References — omitted when the entry has no citations. -->
                 <section v-if="references && references.length" id="references" class="mb-8">
                   <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
@@ -1652,6 +1665,10 @@ const props = defineProps({
     type: [String, Array],
     default: ''
   },
+  faqs: {
+    type: Array,
+    default: () => []
+  },
   references: {
     type: Array,
     default: () => []
@@ -1806,7 +1823,20 @@ const canonical = computed(() => {
 const visibleContents = computed(() => {
   const items = props.contents || []
   const hasReferences = Array.isArray(props.references) && props.references.length > 0
-  return items.filter((item) => item.id !== 'references' || hasReferences)
+  const visible = items.filter((item) => item.id !== 'references' || hasReferences)
+  if (!Array.isArray(props.faqs) || props.faqs.length === 0) {
+    return visible
+  }
+  const faqItem = { id: 'faq', label: 'FAQ' }
+  const referenceIndex = visible.findIndex((item) => item.id === 'references')
+  if (referenceIndex === -1) {
+    return [...visible, faqItem]
+  }
+  return [
+    ...visible.slice(0, referenceIndex),
+    faqItem,
+    ...visible.slice(referenceIndex),
+  ]
 })
 
 // Watch for SEO changes and update document meta tags

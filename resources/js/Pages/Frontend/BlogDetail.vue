@@ -90,6 +90,17 @@
         <!-- HTML content fallback -->
         <div v-if="!blog.introduction && !blog.detailed_analysis && blog.content" class="edu-article" v-html="blog.content"></div>
 
+        <!-- FAQ from the same FAQPage entities as the JSON-LD. -->
+        <section v-if="faqs.length" id="faq" class="mt-12 pt-8 border-t border-[color:var(--color-hairline)]">
+          <h2 class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-6">FAQ</h2>
+          <div class="space-y-6">
+            <div v-for="(faq, i) in faqs" :key="i">
+              <h3 class="text-[16px] font-semibold text-[color:var(--color-ink)] mb-2">{{ faq.question }}</h3>
+              <p class="text-[16px] text-[color:var(--color-ink)] leading-[1.8] whitespace-pre-line">{{ faq.answer }}</p>
+            </div>
+          </div>
+        </section>
+
         <!-- Disclaimer -->
         <div class="mt-10 p-5 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] text-[13px] text-[color:var(--color-ink-muted)]">
           <strong class="text-[color:var(--color-ink)]">Disclaimer:</strong> This article is for informational and educational purposes only. The compounds discussed are intended for research use only and are not approved for human therapeutic use. Consult a qualified professional before making any decisions based on this content.
@@ -137,6 +148,7 @@ import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
 const props = defineProps({
   blog: Object,
+  faqs: { type: Array, default: () => [] },
   related: { type: Array, default: () => [] },
   seo: { type: Object, default: () => ({}) },
 })
