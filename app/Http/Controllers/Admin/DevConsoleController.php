@@ -76,6 +76,11 @@ class DevConsoleController extends Controller
             'label' => 'Show brand slugs (optional substring filter)',
             'args' => [],
         ],
+        'users:create-seo-agency' => [
+            'label' => 'Create an SEO agency user (positional: email, optional name)',
+            'args' => [],
+            'positional' => ['email' => 'string', 'name' => 'string'],
+        ],
         'vendor:inspect' => [
             'label' => 'Dump integration fields for one brand',
             'args' => [],

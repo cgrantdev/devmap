@@ -375,7 +375,10 @@ Route::post('/api/dev-console/run', [\App\Http\Controllers\Admin\DevConsoleContr
     ->name('api.dev-console.run');
 
 // Admin routes
-Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.viewer.writes'])->prefix('admin')->group(function () {
+// Added seo_agency role (Colin 10/23) so the agency can access
+// SEO-relevant admin pages. BlockSeoAgency middleware strips them
+// from sensitive sections (vendors, users, settings, dev console).
+Route::middleware(['auth', 'role:admin,admin_viewer,seo_agency', 'email.verified', 'block.viewer.writes', \App\Http\Middleware\BlockSeoAgency::class])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // CEO-only dashboard. ceo.only middleware locks the endpoint down to

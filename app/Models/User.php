@@ -61,7 +61,12 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function canAccessAdmin(): bool
     {
-        return in_array($this->role, ['admin', 'admin_viewer'], true);
+        return in_array($this->role, ['admin', 'admin_viewer', 'seo_agency'], true);
+    }
+
+    public function isSeoAgency(): bool
+    {
+        return $this->role === 'seo_agency';
     }
 
     public function isVendor(): bool
