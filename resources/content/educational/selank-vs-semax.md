@@ -149,7 +149,7 @@ Under section 503A, a compounder may use a bulk substance only if it has a USP o
 
 #### What comes next
 
-On 14 October 2026 the Office of Information and Regulatory Affairs received an FDA item titled "Interim Access Policy for Compounding Using Certain Peptides" (RIN 0910-ZD94, stage: Notice). The listing names no peptides and its text is not public, so whether it covers either compound is unknown. It would not make any peptide an FDA-approved drug. Reginfo.gov also lists an EO 12866 meeting on RIN 0910-ZD94, requested by the American Academy of Peptide Medicine (AAPM) and scheduled for 21 October 2026 at 3:00 PM; reginfo.gov shows no time zone (government document).
+On 14 October 2026 the Office of Information and Regulatory Affairs received an FDA item titled "Interim Access Policy for Compounding Using Certain Peptides" (RIN 0910-ZD94, stage: Notice). The listing names no peptides and its text is not public, so whether it covers either compound is unknown. It would not make any peptide an FDA-approved drug.
 
 A research-use-only label is not a compounding pathway or an approval, and a compounded drug is not FDA-approved. The [peptide legality guide](/guides/peptide-legality-fda-ruo-compounding) explains how these categories differ.
 
@@ -247,7 +247,7 @@ No. The Russian products are registered medicines made under that country's rule
 31. NIH, PubChem. Selank (CID 11765600) and Semax (CID 9811102). https://pubchem.ncbi.nlm.nih.gov/compound/11765600 ; https://pubchem.ncbi.nlm.nih.gov/compound/9811102
 32. openFDA Drugs@FDA API, active-ingredient queries for Selank and Semax (queried 19 October 2026). https://open.fda.gov/apis/drug/drugsfda/
 33. ClinicalTrials.gov. Intervention searches for "selank" and "semax" (searched 19 October 2026). https://clinicaltrials.gov/search?intr=semax
-34. Office of Information and Regulatory Affairs. Pending EO 12866 Regulatory Review: Interim Access Policy for Compounding Using Certain Peptides, RIN 0910-ZD94, received 14 October 2026. https://www.reginfo.gov/public/do/eoDetails?rrid=1568964 ; EO 12866 meeting record (meeting 21 October 2026, 3:00 PM as listed; requestor American Academy of Peptide Medicine; read 19 October 2026): https://www.reginfo.gov/public/do/viewEO12866Meeting?viewRule=true&rin=0910-ZD94&meetingId=1586023&acronym=0910-HHS/FDA
+34. Office of Information and Regulatory Affairs. Pending EO 12866 Regulatory Review: Interim Access Policy for Compounding Using Certain Peptides, RIN 0910-ZD94, received 14 October 2026. https://www.reginfo.gov/public/do/eoDetails?rrid=1568964
 35. European Medicines Agency. Download medicine data: medicines table (generated 18 October 2026). https://www.ema.europa.eu/en/medicines/download-medicine-data
 
 *Educational content only. Not medical or legal advice. Regulatory status can change after publication; check the primary sources above.*
