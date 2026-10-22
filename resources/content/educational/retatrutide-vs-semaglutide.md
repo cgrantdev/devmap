@@ -53,6 +53,8 @@ So every efficacy and safety figure below comes from trials in which retatrutide
 
 ### Retatrutide: TRIUMPH-1, TRIUMPH-2 and TRIUMPH-3
 
+The TRIUMPH-1 and TRIUMPH-2 papers were funded by Lilly and include Lilly-employed authors (developer-affiliated).
+
 | Trial | Population | Duration | Randomized | Arms |
 | --- | --- | --- | --- | --- |
 | TRIUMPH-1 (NEJM 2026) | Adults with obesity, without diabetes | 80 weeks | 2,339 | Three retatrutide arms and placebo |
@@ -115,6 +117,8 @@ The same caution applies to safety. Adverse-event rates depend on the population
 | Dysesthesia | TRIUMPH-1, reported in the paper and company-reported by Lilly | 0.9% | 5.1% | 12.3% | 12.5% |
 | Discontinuation due to adverse events (randomized population, excluding deaths) | TRIUMPH-1, paper | 4.6% | 4.1% | 6.5% | 11.2% |
 | Discontinuation due to adverse events | TRIUMPH-3, company-reported | 4.8% | not tested | 9.8% | 13.5% |
+
+For the TRIUMPH-1 discontinuation row, Table 3 prints 11.2% for the highest dose arm, while the paper's results text and participant-flow figure give 11.1% for the same 65 participants (65 of 584 randomized, vs 65 of 582 who received at least one dose).
 
 The TRIUMPH-2 authors describe the safety profile as "generally consistent with other molecules with GLP-1 receptor agonism." Lilly reports these events were generally mild to moderate and the majority resolved during treatment (company-reported). The 2023 phase 2 obesity paper reports a dose-dependent rise in heart rate that peaked at 24 weeks and declined afterwards. A fuller breakdown by trial and source is in Peptidemap's article on [retatrutide side effects in the trial publications](https://peptidemap.com/blog/retatrutide-side-effects-trial-data).
 
