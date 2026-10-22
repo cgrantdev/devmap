@@ -14,19 +14,19 @@ Putting the two molecules in one research vial is not CagriSema and not TRIUMPH.
 
 ## TRIUMPH-1: retatrutide alone, no diabetes
 
-TRIUMPH-1 (NCT05929066) is an 80-week phase 3 trial in adults with obesity or overweight without type 2 diabetes. Jastreboff and colleagues published it in the *New England Journal of Medicine* (DOI 10.1056/NEJMoa2604169). Participants were assigned to once-weekly subcutaneous retatrutide at 4 mg, 9 mg, or 12 mg, or placebo.
+TRIUMPH-1 (NCT05929066) is an 80-week phase 3 trial in adults with obesity or overweight without type 2 diabetes. Jastreboff and colleagues published it in the *New England Journal of Medicine* (DOI 10.1056/NEJMoa2604169). Participants were assigned to once-weekly subcutaneous retatrutide in the lowest dose arm, the middle dose arm, or the highest dose arm, or placebo.
 
-Weight end points used a treatment-regimen estimand (intention-to-treat style). At week 80 the estimated mean percent change in body weight was −17.6% at 4 mg, −23.7% at 9 mg, and −25.0% at 12 mg, versus −3.9% with placebo. The same dataset’s efficacy estimand was −19.0% at 4 mg, −25.9% at 9 mg, and −28.3% at 12 mg. Those rows are retatrutide monotherapy. They are not a blend result.
+Weight end points used a treatment-regimen estimand (intention-to-treat style). At week 80 the estimated mean percent change in body weight in the *New England Journal of Medicine* paper was −17.6% in the lowest dose arm, −23.7% in the middle dose arm, and −25.0% in the highest dose arm, versus −3.9% with placebo. The same paper’s efficacy estimand, also company-reported by Lilly in its press release of 21 May 2026, was −19.0% in the lowest dose arm, −25.9% in the middle dose arm, and −28.3% in the highest dose arm, versus −2.2% with placebo. Those rows are retatrutide monotherapy. They are not a blend result.
 
 ## TRIUMPH-2: retatrutide alone, with type 2 diabetes
 
-TRIUMPH-2 (NCT05929079; Bellido et al., *Lancet*, DOI 10.1016/S0140-6736(26)01861-1) enrolled adults with obesity or overweight and type 2 diabetes for 80 weeks of once-weekly retatrutide at 4 mg, 9 mg, or 12 mg, or placebo.
+TRIUMPH-2 (NCT05929079; Bellido et al., *Lancet*, DOI 10.1016/S0140-6736(26)01861-1) enrolled adults with obesity or overweight and type 2 diabetes for 80 weeks of once-weekly retatrutide in the lowest dose arm, the middle dose arm, or the highest dose arm, or placebo.
 
-Under the treatment-regimen estimand, mean percent change in body weight at week 80 was −11.9% at 4 mg, −16.8% at 9 mg, and −18.8% at 12 mg, versus −5.1% with placebo. Under the efficacy estimand the same arms were −12.7%, −19.1%, and −20.8%, versus −4.0% with placebo. These figures are still retatrutide alone. They cannot be moved onto a catalog blend or onto CagriSema.
+Under the treatment-regimen estimand, mean percent change in body weight at week 80 in the *Lancet* paper was −11.9% in the lowest dose arm, −16.8% in the middle dose arm, and −18.8% in the highest dose arm, versus −5.1% with placebo. Under the efficacy estimand, reported in the *Lancet* paper and company-reported by Lilly in its press release of 23 July 2026, the mean change was −12.7% in the lowest dose arm, −19.1% in the middle dose arm, and −20.8% in the highest dose arm, versus −4.0% with placebo. These figures are still retatrutide alone. They cannot be moved onto a catalog blend or onto CagriSema.
 
 ## REDEFINE-1: CagriSema and cagrilintide alone
 
-REDEFINE-1 (NCT05567796) is a 68-week phase 3a trial in adults with overweight or obesity without diabetes. Garvey and colleagues published it in the *New England Journal of Medicine* (DOI 10.1056/NEJMoa2502081). Arms were once-weekly cagrilintide 2.4 mg plus semaglutide 2.4 mg (CagriSema), semaglutide 2.4 mg alone, cagrilintide 2.4 mg alone, or placebo, plus lifestyle intervention for all groups.
+REDEFINE-1 (NCT05567796) is a 68-week phase 3a trial in adults with overweight or obesity without diabetes. Garvey and colleagues published it in the *New England Journal of Medicine* (DOI 10.1056/NEJMoa2502081). Arms were once-weekly cagrilintide plus semaglutide (CagriSema), semaglutide alone, cagrilintide alone, or placebo, plus lifestyle intervention for all groups.
 
 The coprimary analysis uses the treatment-policy estimand. At week 68 the estimated mean percent change in body weight was −20.4% with CagriSema, −14.9% with semaglutide alone, −11.5% with cagrilintide alone, and −3.0% with placebo. The trial-product estimand in the same paper was −22.7% for CagriSema, −16.1% for semaglutide, −11.8% for cagrilintide alone, and −2.3% for placebo.
 
@@ -73,3 +73,5 @@ Educational only. Not medical advice.
 10. ClinicalTrials.gov. NCT05394519, REDEFINE 2. Novo Nordisk. https://clinicaltrials.gov/study/NCT05394519
 11. ClinicalTrials.gov. NCT06662383, TRIUMPH-5. Eli Lilly. https://clinicaltrials.gov/study/NCT06662383
 12. Peptidemap compare page. https://peptidemap.com/compare/retatrutide-cagrilintide-blend
+13. Eli Lilly and Company (company-reported). Lilly's triple agonist, retatrutide, delivered powerful weight loss in pivotal Phase 3 obesity trial, 21 May 2026. https://investor.lilly.com/news-releases/news-release-details/lillys-triple-agonist-retatrutide-delivered-powerful-weight-loss
+14. Eli Lilly and Company (company-reported). Lilly's triple agonist, retatrutide, successful in two additional Phase 3 obesity trials, delivering significant improvements in weight and A1C, 23 July 2026. https://investor.lilly.com/news-releases/news-release-details/lillys-triple-agonist-retatrutide-successful-two-additional
