@@ -145,12 +145,12 @@ class EncyclopediaController extends Controller
                 'halfLife' => '',
             ],
             'CagriSema' => [
-                'status' => 'Investigational; not approved (as of 19 Oct 2026)',
+                'status' => 'Investigational; not approved (as of 22 Oct 2026)',
                 'routes' => [],
                 'halfLife' => '',
             ],
             'Cagrilintide' => [
-                'status' => 'Investigational; not approved (as of 19 Oct 2026)',
+                'status' => 'Investigational; not approved (as of 22 Oct 2026)',
                 'routes' => [],
                 'halfLife' => '',
             ],
