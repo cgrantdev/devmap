@@ -1938,7 +1938,7 @@ class EducationalContentTest extends TestCase
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = preg_match_all('/\S+/', $markdown);
         $this->assertSame(4800, $words);
-        $this->assertSame(((int) round($words / 230)).' Min Read', $entry['read_time']);
+        $this->assertSame(((int) ceil($words / 230)).' Min Read', $entry['read_time']);
         $this->assertSame('21 Min Read', $entry['read_time']);
         $this->assertSame('21 Min Read', $blog->read_time);
         $this->assertStringNotContainsString('<!--', $markdown);
