@@ -338,6 +338,10 @@ class SeoHygieneTest extends TestCase
             ->assertOk()
             ->assertDontSee('picsum.photos', false)
             ->assertDontSee('unsplash.com', false)
+            ->assertSee('orforglipron-vs-oral-semaglutide-compare.png', false);
+
+        $this->get('/blogs?page=2')
+            ->assertOk()
             ->assertSee('bpc-157-vs-tb-500-evidence.png', false);
 
         $this->get('/blog/legacy-unsplash')

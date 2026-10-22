@@ -349,7 +349,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host), self::retatrutideVsSemaglutide($host), self::selankVsSemax($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host), self::retatrutideVsSemaglutide($host), self::selankVsSemax($host), self::orforglipronVsOralSemaglutideCompare($host));
     }
 
     /**
@@ -1205,6 +1205,54 @@ class EducationalContentPublisher
                     ['Has any study compared or combined Selank and Semax?', 'One small study compared them. In 52 healthy participants, it measured brain connectivity on MRI minutes after Semax, Selank or placebo, with no clinical outcome. Some animal and test-tube studies tested both in parallel. We found no study of the two given together, and no registered trial of either, in PubMed and ClinicalTrials.gov searches on 19 October 2026.'],
                     ['Which one is better?', 'This page does not rank them. They come from different parent molecules, were studied in different patient groups, mostly in small Russian-language studies, and have no head-to-head clinical trial. Neither has controlled human evidence for the memory, focus or mood claims common in marketing.'],
                     ['Is a research-use-only vial the same as the Russian medicine?', 'No. The Russian products are registered medicines made under that country\'s rules. A research-use-only vial is neither a Russian-registered medicine nor a compounded or FDA-approved drug, and FDA found that none of the websites it searched said whether their Semax was the free base or a salt. None of the studies on this page describe the identity, purity or sterility of a research-labelled product.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Educational compare page for /compare/orforglipron-vs-oral-semaglutide.
+     * The row is stored under a distinct blog slug so it does not overwrite
+     * the ACHIEVE-3 article at /blog/orforglipron-vs-oral-semaglutide.
+     * Sources checked 22 October 2026. The body lives in
+     * resources/content/educational. The publisher reads this catalog.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function orforglipronVsOralSemaglutideCompare(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'orforglipron-vs-oral-semaglutide-compare.md',
+                'image_file' => 'orforglipron-vs-oral-semaglutide-compare.png',
+                'slug' => 'orforglipron-vs-oral-semaglutide-compare',
+                'h1' => 'Orforglipron vs Oral Semaglutide: Labels and Status',
+                'lede' => 'Orforglipron is Lilly\'s oral small-molecule nonpeptide GLP-1 receptor agonist. Oral semaglutide is Novo Nordisk\'s peptide tablet. US and EU status as of 22 October 2026, label conditions for food and water, and what ACHIEVE, ATTAIN, PIONEER, and OASIS studied. Educational only.',
+                'seo_title' => 'Orforglipron vs Oral Semaglutide: Labels and Status',
+                'seo_description' => 'Orforglipron vs oral semaglutide: molecule type, US and EU status on 22 October 2026, label food and water conditions, and trial design. Educational only.',
+                'og_title' => 'Orforglipron vs Oral Semaglutide: Labels and Status',
+                'og_description' => 'Small-molecule orforglipron versus Novo\'s peptide tablet: US and EU status on 22 October 2026, label food and water conditions, and trial designs.',
+                'blog_type' => 'Research',
+                'read_time' => '13 Min Read',
+                'published_at' => '2026-10-22',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['Orforglipron', 'Oral semaglutide', 'Foundayo', 'Rybelsus', 'Wegovy', 'RUO'],
+                'key_points' => [
+                    'Orforglipron is a small-molecule, nonpeptide oral GLP-1 receptor agonist. Oral semaglutide is a peptide tablet co-formulated with the absorption enhancer SNAC.',
+                    'As of 22 October 2026, FDA-approved Foundayo is a US weight-management tablet. The CHMP positive opinion of 15 October 2026 is pending a European Commission decision and is not an EU authorisation.',
+                    'US labels for the oral semaglutide tablets state an empty-stomach condition and a water limit. The Foundayo label says with or without food and does not state that water limit.',
+                    'ACHIEVE-3 compared the two in type 2 diabetes. ATTAIN, PIONEER, and OASIS are separate programmes. This page does not rank them and does not repeat per-arm weight-change percentages.',
+                    'A research-use listing is not Foundayo, Rybelsus, an Ozempic tablet, or a Wegovy tablet.',
+                ],
+                'faq' => self::faq($host.'/compare/orforglipron-vs-oral-semaglutide#faq', [
+                    ['Is orforglipron a peptide?', 'No. The ATTAIN-1 paper in the New England Journal of Medicine describes orforglipron as a small-molecule, nonpeptide oral GLP-1 receptor agonist, and a phase 2 paper in the same journal calls it a nonpeptide GLP-1 receptor agonist. Oral semaglutide is a peptide. The US label says its peptide backbone is produced by yeast fermentation and that the tablets contain salcaprozate sodium (SNAC), an absorption enhancer.'],
+                    ['What is oral semaglutide on the current labels?', 'Oral semaglutide is Novo Nordisk\'s peptide GLP-1 receptor agonist in a tablet. On the US labels checked on 22 October 2026, Rybelsus tablets and Ozempic tablets are indicated for type 2 diabetes, and Wegovy tablets are indicated for adult weight management and for cardiovascular risk reduction in adults with established cardiovascular disease and obesity or overweight. In the EU, Rybelsus has been authorised for type 2 diabetes since 3 April 2020, and the Wegovy authorisation includes tablets for adult weight management.'],
+                    ['Is Foundayo approved in the United States and the European Union as of 22 October 2026?', 'In the United States, yes, for weight management. The FDA approved Foundayo (orforglipron) tablets on 1 April 2026 for adults with obesity, or overweight with at least one weight-related condition, together with diet and activity. The US label indication checked on 22 October 2026 is that use. It does not list type 2 diabetes. In the European Union, not yet as a granted authorisation. The CHMP adopted a positive opinion on 15 October 2026 recommending a marketing authorisation for type 2 diabetes and weight management. EMA\'s meeting highlights, published on 16 October 2026, list that opinion as pending a European Commission decision. A positive opinion is not a granted EU authorisation.'],
+                    ['How do the labels differ on food and water?', 'The US labels for Rybelsus tablets, Ozempic tablets, and Wegovy tablets state an empty-stomach morning condition, water up to 4 ounces, no other liquids, and a wait of at least 30 minutes before food, drink, or other oral medicines. Those sentences are label conditions, not instructions from this page. The Foundayo label states that the tablet is taken once daily with or without food, and it does not state an empty-stomach condition or a water-volume limit. A phase 2 trial gave orforglipron once daily without meal-timing restrictions. Lilly\'s 1 April 2026 press release, which is company-reported, says Foundayo can be taken any time of day without food or water restrictions.'],
+                    ['Did a trial compare orforglipron with oral semaglutide, and does this page rank the programmes?', 'ACHIEVE-3 compared them in adults with type 2 diabetes who were taking metformin. It was a 52-week, open-label, randomized phase 3 trial. This page does not repeat its outcome figures. Those figures, with the estimand labelled, are on the orforglipron versus oral semaglutide blog. ATTAIN-1, PIONEER 6, OASIS 1, and OASIS 4 enrolled different populations and used different designs. This page does not rank one programme against another.'],
+                    ['Is a research-use listing the same as the approved tablet?', 'No. A research-use-only product sold under one of these names is not Foundayo, not Rybelsus, not an Ozempic tablet, and not a Wegovy tablet. Peptidemap is a comparison publisher for research-use and grey-area peptide listings. It is not a clinic, a pharmacy, or a seller. The peptide legality guide separates FDA approval, research-use labelling, and compounding. This page is not medical advice and does not give a dose.'],
                 ]),
             ],
         ];
