@@ -50,6 +50,7 @@ So every efficacy and safety figure below comes from trials in which retatrutide
 - **Dose arms.** The trials tested several dose arms. This article names them by position only: the lowest, middle and highest dose arm within each trial. Within the TRIUMPH program the positions refer to the same three dose levels; TRIUMPH-3 tested only the middle and highest. Semaglutide arm labels are separate and do not correspond to retatrutide positions.
 - **Estimands.** Each figure is labelled with its estimand. Lilly's treatment-regimen estimand and Novo Nordisk's treatment-policy estimand both count everyone randomized, whether or not they stayed on treatment. Lilly's efficacy estimand and Novo's trial-product estimand estimate the effect had participants stayed on treatment as intended. Efficacy-type figures are usually larger, and they are the ones that tend to appear in headlines.
 - **Sources.** "Paper" means a peer-reviewed publication. "Company-reported" means a Lilly or Novo Nordisk release or information page that has not been peer reviewed.
+- **Populations.** Adverse-event percentages from the TRIUMPH papers use the safety population (participants who received at least one dose), except TRIUMPH-1 discontinuation, which Table 3 reports against the randomized population, excluding deaths.
 
 ### Retatrutide: TRIUMPH-1, TRIUMPH-2 and TRIUMPH-3
 
@@ -76,6 +77,8 @@ Points the sources add:
 - **TRIUMPH-3.** No paper was found. Lilly reports 44 vs 52 five-component major adverse cardiovascular events (hazard ratio 0.82, 95% CI 0.55 to 1.22) and 27 vs 23 three-component events (hazard ratio 1.12, 95% CI 0.64 to 1.96) for pooled retatrutide vs placebo, in a pre-specified in-study analysis. Both confidence intervals cross 1. These figures do not establish a cardiovascular benefit or harm. A dedicated cardiovascular and kidney outcomes trial, TRIUMPH-Outcomes ([NCT06383390](https://clinicaltrials.gov/study/NCT06383390)), is active, not recruiting, with primary completion estimated for February 2029.
 
 ### Semaglutide: STEP 1, STEP 2 and SELECT
+
+The STEP and SELECT papers were funded by Novo Nordisk (developer-affiliated).
 
 | Trial | Population | Duration | Randomized | Arms |
 | --- | --- | --- | --- | --- |

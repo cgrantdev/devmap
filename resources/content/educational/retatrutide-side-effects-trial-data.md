@@ -121,7 +121,7 @@ Both phase 2 papers describe a rise in heart rate that peaked and then fell duri
 
 - **Phase 2 obesity (paper).** Heart rate "increased in a dose-dependent manner with retatrutide up to 24 weeks and then declined thereafter". The discussion describes the increase as peaking at 24 weeks, followed by a decline at 36 and 48 weeks. The numeric changes are in the supplementary appendix, which was not reviewed for this article, so no values are given here.
 - **Phase 2 type 2 diabetes (paper).** Pulse rose by "up to approximately 7 bpm" early in treatment and had decreased by 36 weeks. At 36 weeks the mean change ranged from 0.03 to 4.34 beats per minute across the retatrutide arms. It was minus 3.16 with placebo and 1.76 with dulaglutide. The paper says the week-36 retatrutide changes were not significantly different from dulaglutide. They were significantly different from placebo in every retatrutide arm except one escalation arm (p=0.0819).
-- **TRIUMPH-1 (paper).** The NEJM paper reports that mean pulse rate increased with retatrutide, peaked at 20 weeks in the middle and highest dose arms and decreased thereafter (appendix Table S12 and Figure S22). At week 80 the change from baseline was 1.5, 2.7 and 2.6 beats per minute in the lowest, middle and highest dose arms vs −0.3 with placebo (appendix Table S12, model-based estimates, safety population). Heart-rate time courses for TRIUMPH-2, TRIUMPH-3 and TRIUMPH-4 are not covered here.
+- **TRIUMPH-1 (paper).** The NEJM paper reports that mean pulse rate increased with retatrutide, peaked at 20 weeks in the middle and highest dose arms and decreased thereafter (appendix Figure S22). At week 80 the change from baseline was 1.5, 2.7 and 2.6 beats per minute in the lowest, middle and highest dose arms vs −0.3 with placebo (appendix Table S12, model-based estimates, safety population). Heart-rate time courses for TRIUMPH-2, TRIUMPH-3 and TRIUMPH-4 are not covered here.
 
 ## Dysesthesia, allodynia and skin-sensation events
 
@@ -230,7 +230,7 @@ In the phase 2 obesity trial, 6% to 16% of the retatrutide arms vs none on place
 
 ### Does retatrutide raise heart rate?
 
-In the phase 2 obesity paper, heart rate rose in a dose-dependent manner, peaked at 24 weeks and declined at 36 and 48 weeks. In the phase 2 type 2 diabetes paper, pulse rose by up to about 7 beats per minute early in treatment and had decreased by 36 weeks. In the TRIUMPH-1 paper, mean pulse rate peaked at 20 weeks in the middle and highest dose arms and then decreased; at week 80 the change from baseline was 1.5, 2.7 and 2.6 beats per minute in the lowest, middle and highest dose arms vs −0.3 with placebo (appendix Table S12).
+In the phase 2 obesity paper, heart rate rose in a dose-dependent manner, peaked at 24 weeks and declined at 36 and 48 weeks. In the phase 2 type 2 diabetes paper, pulse rose by up to about 7 beats per minute early in treatment and had decreased by 36 weeks. The TRIUMPH-1 NEJM paper reports that mean pulse rate peaked at 20 weeks in the middle and highest dose arms and then decreased (appendix Figure S22); at week 80 the change from baseline was 1.5, 2.7 and 2.6 beats per minute in the lowest, middle and highest dose arms vs −0.3 with placebo (appendix Table S12).
 
 ### What is the dysesthesia reported in the TRIUMPH trials?
 

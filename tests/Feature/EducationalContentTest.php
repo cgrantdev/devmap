@@ -1307,7 +1307,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame([
             'Gastrointestinal events were the most common adverse events in every retatrutide trial reviewed, and were dose-related in the phase 2 papers.',
             'Discontinuation due to adverse events in the TRIUMPH-2 paper was 4%, 12% and 8% across the lowest, middle and highest dose arms vs 5% with placebo.',
-            'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; the TRIUMPH-1 paper reports a pulse-rate peak at 20 weeks in the middle and highest dose arms, followed by a decline.',
+            'Both phase 2 papers report a heart-rate rise that peaked and then declined during treatment; the TRIUMPH-1 NEJM paper reports a pulse-rate peak at week 20 (appendix Figure S22), with week-80 changes of 1.5, 2.7 and 2.6 bpm vs −0.3 with placebo (appendix Table S12).',
             'Phase 3 trials report dysesthesia, which Lilly defines as skin burning sensation and related events; mechanism, onset and duration are not characterized.',
             'Several phase 3 figures are company-reported, not peer reviewed, and are labelled that way.',
             'Research-labelled retatrutide is not the trial drug, is not approved, and is not described by these data.',
@@ -1326,7 +1326,7 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('/compare/retatrutide-vs-tirzepatide', $markdown);
         $this->assertStringContainsString('/guides/peptide-legality-fda-ruo-compounding', $markdown);
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(4386, $words);
+        $this->assertSame(4388, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringContainsString('/blog/retatrutide-testing-coa-limits', $markdown);
 
@@ -1776,7 +1776,7 @@ class EducationalContentTest extends TestCase
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(3925, $words);
+        $this->assertSame(3967, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringNotContainsString('<!--', $markdown);
         $this->assertStringNotContainsString('/workspace', $markdown);
@@ -2094,13 +2094,8 @@ class EducationalContentTest extends TestCase
         $this->assertLessThanOrEqual(155, strlen($ogDescription));
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
-        $rendered = html_entity_decode(
-            strip_tags(SimpleMarkdown::toHtml(EducationalContentPublisher::prepare($markdown))),
-            ENT_QUOTES | ENT_HTML5,
-            'UTF-8'
-        );
-        $words = preg_match_all('/\S+/u', trim(preg_replace('/\s+/u', ' ', $rendered) ?? $rendered));
-        $this->assertSame(1874, $words);
+        $words = $this->renderedWordCount($markdown);
+        $this->assertSame(1901, $words);
         $this->assertGreaterThan(1840, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $entry['read_time']);
         $this->assertSame('9 Min Read', $entry['read_time']);
