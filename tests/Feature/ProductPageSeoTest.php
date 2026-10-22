@@ -60,7 +60,7 @@ class ProductPageSeoTest extends TestCase
         $ogImage = $this->headContent($html, '/property="og:image" content="(.*?)"/s');
 
         $expectedTitle = ProductPageSeo::title('BPC-157 5mg', 'Amino Club');
-        $expectedDescription = ProductPageSeo::description('BPC-157 5mg', 'Amino Club', 1);
+        $expectedDescription = ProductPageSeo::description('BPC-157 (5mg)', 'Amino Club', 1);
 
         $this->assertSame($expectedTitle, $title);
         $this->assertSame($expectedTitle, $ogTitle);
