@@ -1,0 +1,106 @@
+{
+  "slug": "tb-500",
+  "normalize": "normalize(x): recursive. Strings: CRLF/CR -> LF; U+00A0 -> space; rtrim each line; trim. Lists/maps: same order, values normalized.",
+  "reduce": "reduce(stored) = for each stored item, q = trim(item.question ?? item.q ?? \"\"), a = trim(item.answer ?? item.a ?? \"\"); drop items where q or a is empty (faqPageSchema skips them); emit {question: q, answer: strip_tags(a)}. This is exactly the JSON-LD the live page emits.",
+  "op": "Per slug: (1) if normalize(reduce(stored)) === normalize(new_faqs) -> skip \"already at target\". (2) elif normalize(reduce(stored)) !== normalize(old_faqs_guard) -> WARNING \"old mismatch\" + 200-char excerpt, write nothing. (3) else build the write value from the STORED array: same items in the same order; for each index in replace_indices, replace that stored item with new_faqs[index] (keys question/answer); every other stored item is kept byte-for-byte (C items stay exactly as stored, including any HTML). Assert normalize(reduce(result)) === normalize(new_faqs) before saveQuietly(); otherwise throw (rolls back the slug). If the stored array contains items dropped by reduce() (empty q/a), keep them in place and report the count. replace_indices refer to positions in reduce(stored); map them back to stored positions.",
+  "category_slug_match": "tb-500",
+  "category_id_live": 87,
+  "url": "https://peptidemap.com/encyclopedia/TB-500",
+  "faq_source": "DB education_posts.faqs (linked post; JSON-LD built by EncyclopediaController::faqPageSchema)",
+  "seed_or_code_paths": [
+    "none: text not present in any repo seeder, shell or profile (git grep origin/main ed4b0e2, 22 Oct 2026); DB-only edit"
+  ],
+  "old_faqs_guard": [
+    {
+      "question": "What is the difference between TB-500 and Thymosin Beta-4?",
+      "answer": "TB-500 is the synthetic 7-amino-acid active fragment (residues 17-23) of the full 43-amino-acid Thymosin Beta-4 protein. It replicates the actin-binding and tissue-repair signaling domain."
+    },
+    {
+      "question": "How quickly does TB-500 take effect?",
+      "answer": "Most research protocols observe initial responses within 2-3 weeks of the loading phase, with full effects developing over 4-6 weeks."
+    },
+    {
+      "question": "Can TB-500 be used alongside BPC-157?",
+      "answer": "These two peptides are frequently studied together as they target complementary repair pathways — TB-500 for systemic tissue migration and BPC-157 for localized angiogenesis."
+    }
+  ],
+  "new_faqs": [
+    {
+      "question": "What is the difference between TB-500 and thymosin beta-4?",
+      "answer": "Thymosin beta-4 is a naturally occurring 43-amino-acid peptide. FDA’s July 2026 compounding briefing describes TB-500 (free base) as a seven-amino-acid synthetic fragment of thymosin beta-4, residues 17 to 23, with an acetyl group on the N-terminal leucine: Ac-Leu-Lys-Lys-Thr-Glu-Thr-Gln-OH, or Ac-LKKTETQ (PubChem CID 62707662, C38H68N10O14). FDA states that “thymosin beta-4 and TB-500 are not the same substance” and that TB-500 is a common name, not an adopted drug name, under which it has encountered different salts and active moieties. Research on full-length thymosin beta-4 is therefore not evidence about the fragment (FDA PCAC briefing, 23–24 July 2026, fda.gov/media/193349)."
+    },
+    {
+      "question": "Is there human evidence for TB-500?",
+      "answer": "Very little. In its July 2026 briefing, FDA reported that neither the nomination nor its own searches identified any clinical studies or human exposure data for TB-500, and concluded that “potential safety risks associated with the use of TB-500 in humans are unknown.” Since then, one uncontrolled 2026 case series has described three patients given TB-500 as part of a multi-ingredient regimen (Froum et al., Front Oral Health 2026, PMID 42876687). One phase 1/2 trial (NCT07487363) was first posted in March 2026 and lists no results; we found no completed human trial as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov). FDA staff proposed not adding TB-500 to the section 503A bulks list, but on 23 July 2026 FDA’s Pharmacy Compounding Advisory Committee voted 8 to 6, with 1 abstention, to recommend adding it (FDA meeting webcast; Reuters, 23 July 2026). Neither the staff proposal nor the advisory vote is an approval or a final decision: as of 22 October 2026 TB-500 is not on the 503A bulks list (21 CFR 216.23) and is not an FDA-approved drug. WADA’s 2026 Prohibited List names TB-500 under S2.3 (thymosin-β4 and its derivatives)."
+    },
+    {
+      "question": "Has TB-500 been studied together with BPC-157?",
+      "answer": "We found no controlled human trial of the combination as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov). A 2026 uncontrolled case series described three patients with inferior alveolar nerve injury who received both, together with ARA-290, dexamethasone and a local anesthetic; the authors state that causality cannot be established (Froum et al., Front Oral Health 2026, PMID 42876687). In one 2026 study of Achilles tendon repair in 32 rats, the authors reported that “Combined BPC-157 and TB-500 treatment did not confer additional benefits compared to either agent alone” (Biçer et al., Jt Dis Relat Surg 2026, PMID 42542926); the paper calls its material “synthetic thymosin beta-4 (TB-500)” and does not confirm it was the Ac-LKKTETQ fragment. FDA’s food and supplement complaint system held two reports about blended TB-500 and BPC-157 products, neither with a safety assessment (FDA PCAC briefing, July 2026). This page does not give combination, dosing or protocol guidance."
+    }
+  ],
+  "replace_indices": [
+    0,
+    1,
+    2
+  ],
+  "keep_indices_verbatim": [],
+  "replacements": [
+    {
+      "index": 0,
+      "class": "B",
+      "old": {
+        "question": "What is the difference between TB-500 and Thymosin Beta-4?",
+        "answer": "TB-500 is the synthetic 7-amino-acid active fragment (residues 17-23) of the full 43-amino-acid Thymosin Beta-4 protein. It replicates the actin-binding and tissue-repair signaling domain."
+      },
+      "new": {
+        "question": "What is the difference between TB-500 and thymosin beta-4?",
+        "answer": "Thymosin beta-4 is a naturally occurring 43-amino-acid peptide. FDA’s July 2026 compounding briefing describes TB-500 (free base) as a seven-amino-acid synthetic fragment of thymosin beta-4, residues 17 to 23, with an acetyl group on the N-terminal leucine: Ac-Leu-Lys-Lys-Thr-Glu-Thr-Gln-OH, or Ac-LKKTETQ (PubChem CID 62707662, C38H68N10O14). FDA states that “thymosin beta-4 and TB-500 are not the same substance” and that TB-500 is a common name, not an adopted drug name, under which it has encountered different salts and active moieties. Research on full-length thymosin beta-4 is therefore not evidence about the fragment (FDA PCAC briefing, 23–24 July 2026, fda.gov/media/193349)."
+      },
+      "sources": [
+        "FDA Pharmacy Compounding Advisory Committee briefing document for TB-500-related bulk drug substances, meeting of 23–24 July 2026 (https://www.fda.gov/media/193349/download) — identity, PDF p. 8 (“understood today to be a seven amino acid synthetic fragment of thymosin beta-4 (β4) from amino acids 17 to 23 and an acetyl group at the N-terminal leucine”; “TB-500 is a common name and not a United States Adopted Name (USAN)”; “FDA has encountered multiple salts, and derivatives, including different active moieties, sold commercially under the same common name”); footnote 35, PDF p. 21 (“thymosin beta-4 and TB-500 are not the same substance”); “full-length (43-amino acid) peptide thymosin β4”.",
+        "PubChem CID 62707662 (C38H68N10O14, MW 889.0; IUPAC name = N-acetyl-Leu-Lys-Lys-Thr-Glu-Thr-Gln): https://pubchem.ncbi.nlm.nih.gov/compound/62707662",
+        "UniProt P62328 (precursor 44 aa incl. initiator Met; mature 43 aa; LKKTETQ = mature residues 17–23): https://www.uniprot.org/uniprotkb/P62328/entry"
+      ]
+    },
+    {
+      "index": 1,
+      "class": "A",
+      "old": {
+        "question": "How quickly does TB-500 take effect?",
+        "answer": "Most research protocols observe initial responses within 2-3 weeks of the loading phase, with full effects developing over 4-6 weeks."
+      },
+      "new": {
+        "question": "Is there human evidence for TB-500?",
+        "answer": "Very little. In its July 2026 briefing, FDA reported that neither the nomination nor its own searches identified any clinical studies or human exposure data for TB-500, and concluded that “potential safety risks associated with the use of TB-500 in humans are unknown.” Since then, one uncontrolled 2026 case series has described three patients given TB-500 as part of a multi-ingredient regimen (Froum et al., Front Oral Health 2026, PMID 42876687). One phase 1/2 trial (NCT07487363) was first posted in March 2026 and lists no results; we found no completed human trial as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov). FDA staff proposed not adding TB-500 to the section 503A bulks list, but on 23 July 2026 FDA’s Pharmacy Compounding Advisory Committee voted 8 to 6, with 1 abstention, to recommend adding it (FDA meeting webcast; Reuters, 23 July 2026). Neither the staff proposal nor the advisory vote is an approval or a final decision: as of 22 October 2026 TB-500 is not on the 503A bulks list (21 CFR 216.23) and is not an FDA-approved drug. WADA’s 2026 Prohibited List names TB-500 under S2.3 (thymosin-β4 and its derivatives)."
+      },
+      "sources": [
+        "FDA Pharmacy Compounding Advisory Committee briefing document for TB-500-related bulk drug substances, meeting of 23–24 July 2026 (https://www.fda.gov/media/193349/download) — Human Safety, PDF p. 31 (“The nomination did not include, and FDA has not identified, any clinical studies or human exposure data using TB-500 via any ROA. Therefore, potential safety risks associated with the use of TB-500 in humans are unknown.”); FAERS search through 26 March 2025 retrieved no reports;  Conclusion, PDF p. 34 (“we propose not adding TB-500 (free base) or TB-500 acetate to the 503A Bulks List”).",
+        "openFDA Drugs@FDA, products.active_ingredients.name:\"TB-500\" → \"No matches found\" (checked 22 Oct 2026).",
+        "ClinicalTrials.gov NCT07487363 (Phase 1/2, RECRUITING, first posted 2026-03-23, hasResults=false; checked 22 Oct 2026): https://clinicaltrials.gov/study/NCT07487363",
+        "WADA 2026 Prohibited List, S2.3 “Thymosin-ß4 and its derivatives e.g. TB-500”: https://www.wada-ama.org/sites/default/files/2025-09/2026list_en_final_clean_september_2025.pdf",
+        "Froum S et al. Front Oral Health 2026, PMID 42876687: https://pubmed.ncbi.nlm.nih.gov/42876687/ (case report/series, 3 patients with inferior alveolar nerve injury; multi-ingredient regimen including TB-500, BPC-157, ARA-290, dexamethasone and a local anesthetic; authors state causality cannot be established; uncontrolled).",
+        "FDA Pharmacy Compounding Advisory Committee meeting webcast, 23 July 2026 (TB-500 vote: 8 yes, 6 no, 1 abstain): https://www.youtube.com/live/DhDC0DAYdBI",
+        "Reuters, 23 July 2026, “FDA advisory panel votes to place …” (syndicated): https://ca.news.yahoo.com/fda-advisory-panel-votes-place-220009348.html",
+        "eCFR 21 CFR 216.23 (503A bulk drug substances list; TB-500 not listed, checked 22 Oct 2026): https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-C/section-216.23"
+      ]
+    },
+    {
+      "index": 2,
+      "class": "A",
+      "old": {
+        "question": "Can TB-500 be used alongside BPC-157?",
+        "answer": "These two peptides are frequently studied together as they target complementary repair pathways — TB-500 for systemic tissue migration and BPC-157 for localized angiogenesis."
+      },
+      "new": {
+        "question": "Has TB-500 been studied together with BPC-157?",
+        "answer": "We found no controlled human trial of the combination as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov). A 2026 uncontrolled case series described three patients with inferior alveolar nerve injury who received both, together with ARA-290, dexamethasone and a local anesthetic; the authors state that causality cannot be established (Froum et al., Front Oral Health 2026, PMID 42876687). In one 2026 study of Achilles tendon repair in 32 rats, the authors reported that “Combined BPC-157 and TB-500 treatment did not confer additional benefits compared to either agent alone” (Biçer et al., Jt Dis Relat Surg 2026, PMID 42542926); the paper calls its material “synthetic thymosin beta-4 (TB-500)” and does not confirm it was the Ac-LKKTETQ fragment. FDA’s food and supplement complaint system held two reports about blended TB-500 and BPC-157 products, neither with a safety assessment (FDA PCAC briefing, July 2026). This page does not give combination, dosing or protocol guidance."
+      },
+      "sources": [
+        "Biçer O et al. Jt Dis Relat Surg 2026;37(3):822-837, PMID 42542926: https://pubmed.ncbi.nlm.nih.gov/42542926/ (32 male rats; abstract sentence quoted verbatim).",
+        "FDA Pharmacy Compounding Advisory Committee briefing document for TB-500-related bulk drug substances, meeting of 23–24 July 2026 (https://www.fda.gov/media/193349/download) — HFCS search 1/1/2004–3/10/2025 (PDF pp. 30–31) “retrieved two cases about ‘blended TB-500 and BPC-157’; however, the reports did not include safety assessments.”",
+        "ClinicalTrials.gov intervention search “TB-500” → only NCT07487363 (TB-500 alone); “BPC-157” → NCT07752381, NCT07803250, NCT02637284, NCT07437547, none with TB-500 (checked 22 Oct 2026).",
+        "Froum S et al. Front Oral Health 2026, PMID 42876687: https://pubmed.ncbi.nlm.nih.gov/42876687/ (case report/series, 3 patients with inferior alveolar nerve injury; multi-ingredient regimen including TB-500, BPC-157, ARA-290, dexamethasone and a local anesthetic; authors state causality cannot be established; uncontrolled)."
+      ]
+    }
+  ]
+}

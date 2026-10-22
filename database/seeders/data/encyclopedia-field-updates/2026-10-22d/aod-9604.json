@@ -1,0 +1,102 @@
+{
+  "slug": "aod-9604",
+  "normalize": "normalize(x): recursive. Strings: CRLF/CR -> LF; U+00A0 -> space; rtrim each line; trim. Lists/maps: same order, values normalized.",
+  "reduce": "reduce(stored) = for each stored item, q = trim(item.question ?? item.q ?? \"\"), a = trim(item.answer ?? item.a ?? \"\"); drop items where q or a is empty (faqPageSchema skips them); emit {question: q, answer: strip_tags(a)}. This is exactly the JSON-LD the live page emits.",
+  "op": "Per slug: (1) if normalize(reduce(stored)) === normalize(new_faqs) -> skip \"already at target\". (2) elif normalize(reduce(stored)) !== normalize(old_faqs_guard) -> WARNING \"old mismatch\" + 200-char excerpt, write nothing. (3) else build the write value from the STORED array: same items in the same order; for each index in replace_indices, replace that stored item with new_faqs[index] (keys question/answer); every other stored item is kept byte-for-byte (C items stay exactly as stored, including any HTML). Assert normalize(reduce(result)) === normalize(new_faqs) before saveQuietly(); otherwise throw (rolls back the slug). If the stored array contains items dropped by reduce() (empty q/a), keep them in place and report the count. replace_indices refer to positions in reduce(stored); map them back to stored positions.",
+  "category_slug_match": "aod-9604",
+  "category_id_live": 47,
+  "url": "https://peptidemap.com/encyclopedia/AOD-9604",
+  "faq_source": "DB education_posts.faqs (linked post; JSON-LD built by EncyclopediaController::faqPageSchema)",
+  "seed_or_code_paths": [
+    "none: text not present in any repo seeder, shell or profile (git grep origin/main ed4b0e2, 22 Oct 2026); DB-only edit"
+  ],
+  "old_faqs_guard": [
+    {
+      "question": "Does AOD-9604 increase growth hormone levels?",
+      "answer": "No. AOD-9604 is the lipolytic fragment of hGH and does not stimulate GH secretion or increase IGF-1."
+    },
+    {
+      "question": "Is AOD-9604 approved for any use?",
+      "answer": "It has GRAS status from the FDA as a food substance. It is not approved as a pharmaceutical drug."
+    },
+    {
+      "question": "Why must it be taken on an empty stomach?",
+      "answer": "Insulin from food intake inhibits the lipolytic signaling pathway, reducing effectiveness."
+    }
+  ],
+  "new_faqs": [
+    {
+      "question": "Does AOD-9604 increase growth hormone levels?",
+      "answer": "AOD-9604 is a synthetic 16-amino-acid peptide based on the C-terminal region of human growth hormone (residues 177–191 with an added N-terminal tyrosine); it is not growth hormone itself. In a 2013 review of six placebo-controlled human trials, written by authors with financial ties to the developer (developer-affiliated), AOD-9604 had no effect on serum IGF-1, which growth hormone normally raises (Stier et al., J Endocrinol Metab 2013, doi:10.4021/jem157w). This page relies on that IGF-1 finding and makes no separate claim about GH secretion."
+    },
+    {
+      "question": "Is AOD-9604 approved for any use?",
+      "answer": "No. AOD-9604 is not an FDA-approved drug, and FDA’s GRAS Notice Inventory listed no notice for it when searched on 22 October 2026. In 2012 its developer announced that an expert panel had made a self-affirmed, conditional GRAS determination for use in foods (Calzada Ltd ASX announcement, 25 June 2012). That is a company determination, not an FDA approval or FDA-issued status, and GRAS covers substances added to food, not injectable products (21 CFR 170.30). FDA lists AOD-9604 among compounding substances that were previously in safety category 2 and whose nominations were withdrawn, and notes serious adverse events that may be associated with it, though causality is not clear. WADA prohibits it as a growth hormone fragment (2026 List, S2.2.3)."
+    },
+    {
+      "question": "What did the human trials of AOD-9604 find?",
+      "answer": "Six randomized, double-blind, placebo-controlled trials funded by the developer enrolled approximately 900 adults, and a 2013 safety review by authors with financial ties to the developer (developer-affiliated) reported no effect on serum IGF-1 (Stier et al., J Endocrinol Metab 2013, doi:10.4021/jem157w). In the largest, a 24-week phase 2b obesity trial with 536 participants, the developer reported that weight loss compared with placebo was “too low to reach statistical significance” and terminated the obesity program in 2007 (company-reported; Metabolic Pharmaceuticals ASX announcement, 21 February 2007). These trials used the developer’s investigational product, not research-use-only products."
+    }
+  ],
+  "replace_indices": [
+    0,
+    1,
+    2
+  ],
+  "keep_indices_verbatim": [],
+  "replacements": [
+    {
+      "index": 0,
+      "class": "C→fixed (QA M10: unsourced)",
+      "old": {
+        "question": "Does AOD-9604 increase growth hormone levels?",
+        "answer": "No. AOD-9604 is the lipolytic fragment of hGH and does not stimulate GH secretion or increase IGF-1."
+      },
+      "new": {
+        "question": "Does AOD-9604 increase growth hormone levels?",
+        "answer": "AOD-9604 is a synthetic 16-amino-acid peptide based on the C-terminal region of human growth hormone (residues 177–191 with an added N-terminal tyrosine); it is not growth hormone itself. In a 2013 review of six placebo-controlled human trials, written by authors with financial ties to the developer (developer-affiliated), AOD-9604 had no effect on serum IGF-1, which growth hormone normally raises (Stier et al., J Endocrinol Metab 2013, doi:10.4021/jem157w). This page relies on that IGF-1 finding and makes no separate claim about GH secretion."
+      },
+      "sources": [
+        "Stier H et al. Safety and Tolerability of the Hexadecapeptide AOD9604 in Humans. J Endocrinol Metab 2013;3(1-2):7-15. doi:10.4021/jem157w (“AOD9604 had no effect on serum IGF-1 levels”; authors with financial ties to the developer per Content QA ruling 22 Oct 2026). Not PubMed-indexed.",
+        "AOD-9604 structure wording is Content QA’s (M10, 22 Oct 2026); WADA 2026 Prohibited List S2.2.3 lists AOD-9604 among “growth hormone fragments”."
+      ]
+    },
+    {
+      "index": 1,
+      "class": "C→corrected (unverifiable GRAS wording)",
+      "old": {
+        "question": "Is AOD-9604 approved for any use?",
+        "answer": "It has GRAS status from the FDA as a food substance. It is not approved as a pharmaceutical drug."
+      },
+      "new": {
+        "question": "Is AOD-9604 approved for any use?",
+        "answer": "No. AOD-9604 is not an FDA-approved drug, and FDA’s GRAS Notice Inventory listed no notice for it when searched on 22 October 2026. In 2012 its developer announced that an expert panel had made a self-affirmed, conditional GRAS determination for use in foods (Calzada Ltd ASX announcement, 25 June 2012). That is a company determination, not an FDA approval or FDA-issued status, and GRAS covers substances added to food, not injectable products (21 CFR 170.30). FDA lists AOD-9604 among compounding substances that were previously in safety category 2 and whose nominations were withdrawn, and notes serious adverse events that may be associated with it, though causality is not clear. WADA prohibits it as a growth hormone fragment (2026 List, S2.2.3)."
+      },
+      "sources": [
+        "openFDA Drugs@FDA products.active_ingredients.name:\"AOD9604\" → \"No matches found\" (22 Oct 2026).",
+        "FDA GRAS Notice Inventory (page last updated 10/21/2026): search “AOD9604” → Records Found: 0 (searched 22 Oct 2026); “AOD-9604”, “growth hormone”, “somatotropin”, “Metabolic” → 0; “AOD” → 1 unrelated record (GRN 1198, inositol). https://www.hfpappexternal.fda.gov/scripts/fdcc/index.cfm?set=GRASNotices",
+        "Calzada Limited, “AOD9604 Receives GRAS Status”, ASX announcement, 25 June 2012: https://announcements.asx.com.au/asxpdf/20120625/pdf/4270mj9x71tv3k.pdf (“a conditional GRAS status determination by an expert scientific panel”; “self-affirmed conditional GRAS status”; “It reflects the intended use of the peptide in foods”).",
+        "21 CFR 170.30 (GRAS for substances added to food under the conditions of intended use): https://www.ecfr.gov/current/title-21/chapter-I/subchapter-B/part-170/subpart-B/section-170.30",
+        "FDA safety-risks page (content current as of 04/22/2026), “nominated but withdrawn”, AOD-9604: “FDA has also identified serious adverse events that may be associated with AOD-9604, though causality is not clear.”",
+        "WADA 2026 Prohibited List S2.2.3 “growth hormone fragments, e.g. AOD-9604 and hGH 176-191”."
+      ]
+    },
+    {
+      "index": 2,
+      "class": "A",
+      "old": {
+        "question": "Why must it be taken on an empty stomach?",
+        "answer": "Insulin from food intake inhibits the lipolytic signaling pathway, reducing effectiveness."
+      },
+      "new": {
+        "question": "What did the human trials of AOD-9604 find?",
+        "answer": "Six randomized, double-blind, placebo-controlled trials funded by the developer enrolled approximately 900 adults, and a 2013 safety review by authors with financial ties to the developer (developer-affiliated) reported no effect on serum IGF-1 (Stier et al., J Endocrinol Metab 2013, doi:10.4021/jem157w). In the largest, a 24-week phase 2b obesity trial with 536 participants, the developer reported that weight loss compared with placebo was “too low to reach statistical significance” and terminated the obesity program in 2007 (company-reported; Metabolic Pharmaceuticals ASX announcement, 21 February 2007). These trials used the developer’s investigational product, not research-use-only products."
+      },
+      "sources": [
+        "Stier H et al. Safety and Tolerability of the Hexadecapeptide AOD9604 in Humans. J Endocrinol Metab 2013;3(1-2):7-15. doi:10.4021/jem157w (“AOD9604 had no effect on serum IGF-1 levels”; authors with financial ties to the developer per Content QA ruling 22 Oct 2026). Not PubMed-indexed.",
+        "Metabolic Pharmaceuticals Ltd, “Metabolic’s obesity drug: Phase 2B clinical trial results”, ASX announcement, 21 Feb 2007 (https://data-api.marketindex.com.au/api/v1/announcements/XASX:PNV:XX270709/pdf): 536 subjects; 24 weeks; “too low to reach statistical significance”; “Development of the drug for this condition is terminated.”",
+        "Trial-size note (Content QA soft note): the Stier 2013 paper’s safety set for the phase 2b trial is 502; the 536 figure is the company-announced enrolment and is labelled company-reported in the answer."
+      ]
+    }
+  ]
+}

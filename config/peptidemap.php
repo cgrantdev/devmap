@@ -11,8 +11,10 @@ return [
     | Blog slugs are derived from EducationalContentPublisher::catalog()
     | (kind blog) via blogSlugs(). Those faq() pairs are QA-passed, so
     | the list is not copied by hand.
-    | Encyclopedia is bpc-157 now that the research-use FAQ replacement
-    | is on main. Matching for encyclopedia slugs is case-insensitive.
+    | Encyclopedia is bpc-157 plus tb-500, ipamorelin, cjc-1295,
+    | aod-9604 and kisspeptin. Those five slugs were added with FAQ
+    | audit batch 1 (migration 2026_10_22_155000) after QA PASS.
+    | Matching for encyclopedia slugs is case-insensitive.
     |
     | Every other page keeps its existing FAQPage JSON-LD and does not
     | gain a visible FAQ. Stored FAQ rows are not rewritten.
@@ -21,6 +23,11 @@ return [
         'blog' => EducationalContentPublisher::blogSlugs(),
         'encyclopedia' => [
             'bpc-157',
+            'tb-500',
+            'ipamorelin',
+            'cjc-1295',
+            'aod-9604',
+            'kisspeptin',
         ],
     ],
 

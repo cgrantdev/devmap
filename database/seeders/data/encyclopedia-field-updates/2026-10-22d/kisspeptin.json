@@ -1,0 +1,102 @@
+{
+  "slug": "kisspeptin",
+  "normalize": "normalize(x): recursive. Strings: CRLF/CR -> LF; U+00A0 -> space; rtrim each line; trim. Lists/maps: same order, values normalized.",
+  "reduce": "reduce(stored) = for each stored item, q = trim(item.question ?? item.q ?? \"\"), a = trim(item.answer ?? item.a ?? \"\"); drop items where q or a is empty (faqPageSchema skips them); emit {question: q, answer: strip_tags(a)}. This is exactly the JSON-LD the live page emits.",
+  "op": "Per slug: (1) if normalize(reduce(stored)) === normalize(new_faqs) -> skip \"already at target\". (2) elif normalize(reduce(stored)) !== normalize(old_faqs_guard) -> WARNING \"old mismatch\" + 200-char excerpt, write nothing. (3) else build the write value from the STORED array: same items in the same order; for each index in replace_indices, replace that stored item with new_faqs[index] (keys question/answer); every other stored item is kept byte-for-byte (C items stay exactly as stored, including any HTML). Assert normalize(reduce(result)) === normalize(new_faqs) before saveQuietly(); otherwise throw (rolls back the slug). If the stored array contains items dropped by reduce() (empty q/a), keep them in place and report the count. replace_indices refer to positions in reduce(stored); map them back to stored positions.",
+  "category_slug_match": "kisspeptin",
+  "category_id_live": 117,
+  "url": "https://peptidemap.com/encyclopedia/Kisspeptin",
+  "faq_source": "DB education_posts.faqs (linked post; JSON-LD built by EncyclopediaController::faqPageSchema)",
+  "seed_or_code_paths": [
+    "none: text not present in any repo seeder, shell or profile (git grep origin/main ed4b0e2, 22 Oct 2026); DB-only edit"
+  ],
+  "old_faqs_guard": [
+    {
+      "question": "Why is kisspeptin important for fertility?",
+      "answer": "Kisspeptin is the master upstream regulator of GnRH neurons, triggering the entire reproductive hormone cascade."
+    },
+    {
+      "question": "Why does continuous kisspeptin cause tachyphylaxis?",
+      "answer": "Continuous exposure causes KISS1R receptor desensitization, paradoxically suppressing hormones. Pulsed dosing is essential."
+    },
+    {
+      "question": "Do effects differ between men and women?",
+      "answer": "Yes. Men show robust LH stimulation at all times, but in women the response depends on menstrual cycle phase, strongest in the preovulatory period."
+    }
+  ],
+  "new_faqs": [
+    {
+      "question": "Why is kisspeptin important for fertility?",
+      "answer": "Human genetics shows that its receptor is needed for normal puberty and reproduction: people with loss-of-function mutations in the kisspeptin receptor (GPR54, also called KISS1R) have hypogonadotropic hypogonadism (de Roux et al., PNAS 2003, PMID 12944565; Seminara et al., N Engl J Med 2003, PMID 14573733). In small studies of healthy volunteers, kisspeptin raised LH and FSH (Dhillo et al., J Clin Endocrinol Metab 2005, PMID 16174713). This is why researchers describe it as a key regulator of the reproductive hormone axis. It is not an approved fertility treatment, and no kisspeptin product is FDA-approved."
+    },
+    {
+      "question": "Does repeated kisspeptin exposure cause tachyphylaxis?",
+      "answer": "In one small randomized trial it did. Women with hypothalamic amenorrhea given repeated kisspeptin-54 injections for two weeks had strong LH and FSH rises on the first day that were significantly reduced by day 14, while they stayed responsive to GnRH (Jayasena et al., J Clin Endocrinol Metab 2009, PMID 19820030; five women per group). The authors described this as desensitization to kisspeptin’s effects on gonadotropin release. The study used kisspeptin-54 in one patient group and does not establish how kisspeptin-10 behaves with repeated exposure. No kisspeptin product is FDA-approved. FDA places kisspeptin-10 in 503A category 2 for significant safety risks, and WADA prohibits kisspeptin and its agonist analogues in males (2026 List, S2.2.1). This page does not give dosing or scheduling guidance."
+    },
+    {
+      "question": "Do effects differ between men and women?",
+      "answer": "In small human studies, yes. In healthy men, kisspeptin-54 and kisspeptin-10 raised LH (Dhillo et al., J Clin Endocrinol Metab 2005, PMID 16174713; Jayasena et al., J Clin Endocrinol Metab 2011, PMID 21976724). In healthy women, kisspeptin-54 raised LH in every menstrual phase tested, most in the preovulatory phase and least in the follicular phase (Dhillo et al. 2007, PMID 17635940); kisspeptin-10 did not change gonadotropins in the follicular phase but raised them in the preovulatory phase (Jayasena et al. 2011). Each study had only a few volunteers per group, so these findings do not establish effects outside those study settings."
+    }
+  ],
+  "replace_indices": [
+    0,
+    1,
+    2
+  ],
+  "keep_indices_verbatim": [],
+  "replacements": [
+    {
+      "index": 0,
+      "class": "C→fixed (QA M12: unsourced)",
+      "old": {
+        "question": "Why is kisspeptin important for fertility?",
+        "answer": "Kisspeptin is the master upstream regulator of GnRH neurons, triggering the entire reproductive hormone cascade."
+      },
+      "new": {
+        "question": "Why is kisspeptin important for fertility?",
+        "answer": "Human genetics shows that its receptor is needed for normal puberty and reproduction: people with loss-of-function mutations in the kisspeptin receptor (GPR54, also called KISS1R) have hypogonadotropic hypogonadism (de Roux et al., PNAS 2003, PMID 12944565; Seminara et al., N Engl J Med 2003, PMID 14573733). In small studies of healthy volunteers, kisspeptin raised LH and FSH (Dhillo et al., J Clin Endocrinol Metab 2005, PMID 16174713). This is why researchers describe it as a key regulator of the reproductive hormone axis. It is not an approved fertility treatment, and no kisspeptin product is FDA-approved."
+      },
+      "sources": [
+        "de Roux N et al. Proc Natl Acad Sci U S A 2003, PMID 12944565: https://pubmed.ncbi.nlm.nih.gov/12944565/",
+        "Seminara SB et al. N Engl J Med 2003, PMID 14573733: https://pubmed.ncbi.nlm.nih.gov/14573733/",
+        "Dhillo WS et al. J Clin Endocrinol Metab 2005, PMID 16174713: https://pubmed.ncbi.nlm.nih.gov/16174713/",
+        "openFDA Drugs@FDA products.active_ingredients.name:\"KISSPEPTIN\" → \"No matches found\" (22 Oct 2026)."
+      ]
+    },
+    {
+      "index": 1,
+      "class": "A",
+      "old": {
+        "question": "Why does continuous kisspeptin cause tachyphylaxis?",
+        "answer": "Continuous exposure causes KISS1R receptor desensitization, paradoxically suppressing hormones. Pulsed dosing is essential."
+      },
+      "new": {
+        "question": "Does repeated kisspeptin exposure cause tachyphylaxis?",
+        "answer": "In one small randomized trial it did. Women with hypothalamic amenorrhea given repeated kisspeptin-54 injections for two weeks had strong LH and FSH rises on the first day that were significantly reduced by day 14, while they stayed responsive to GnRH (Jayasena et al., J Clin Endocrinol Metab 2009, PMID 19820030; five women per group). The authors described this as desensitization to kisspeptin’s effects on gonadotropin release. The study used kisspeptin-54 in one patient group and does not establish how kisspeptin-10 behaves with repeated exposure. No kisspeptin product is FDA-approved. FDA places kisspeptin-10 in 503A category 2 for significant safety risks, and WADA prohibits kisspeptin and its agonist analogues in males (2026 List, S2.2.1). This page does not give dosing or scheduling guidance."
+      },
+      "sources": [
+        "Jayasena CN et al. J Clin Endocrinol Metab 2009;94(11):4315-23. PMID 19820030: https://pubmed.ncbi.nlm.nih.gov/19820030/ (n = 5 per group; 2 weeks; LH/FSH responses “significantly reduced on the 14th injection day”; “Subjects remained responsive to GnRH”; “chronic administration of kisspeptin results in desensitization to its effects on gonadotropin release”).",
+        "openFDA Drugs@FDA products.active_ingredients.name:\"KISSPEPTIN\" → \"No matches found\" (22 Oct 2026).",
+        "FDA, Bulk Drug Substances Nominated Under Section 503A, updated 14 May 2026 (https://www.fda.gov/media/94155/download): 503A Category 2 includes Kisspeptin-10; FDA safety-risks page: Kisspeptin-10, 503A, 29 Sept 2023.",
+        "WADA 2026 Prohibited List S2.2.1 (testosterone-stimulating peptides in males): “kisspeptin and its agonist analogues”."
+      ]
+    },
+    {
+      "index": 2,
+      "class": "C→fixed (QA M13: unsourced)",
+      "old": {
+        "question": "Do effects differ between men and women?",
+        "answer": "Yes. Men show robust LH stimulation at all times, but in women the response depends on menstrual cycle phase, strongest in the preovulatory period."
+      },
+      "new": {
+        "question": "Do effects differ between men and women?",
+        "answer": "In small human studies, yes. In healthy men, kisspeptin-54 and kisspeptin-10 raised LH (Dhillo et al., J Clin Endocrinol Metab 2005, PMID 16174713; Jayasena et al., J Clin Endocrinol Metab 2011, PMID 21976724). In healthy women, kisspeptin-54 raised LH in every menstrual phase tested, most in the preovulatory phase and least in the follicular phase (Dhillo et al. 2007, PMID 17635940); kisspeptin-10 did not change gonadotropins in the follicular phase but raised them in the preovulatory phase (Jayasena et al. 2011). Each study had only a few volunteers per group, so these findings do not establish effects outside those study settings."
+      },
+      "sources": [
+        "Dhillo WS et al. J Clin Endocrinol Metab 2005, PMID 16174713 (kisspeptin-54, healthy men).",
+        "Jayasena CN et al. J Clin Endocrinol Metab 2011, PMID 21976724: https://pubmed.ncbi.nlm.nih.gov/21976724/ (kisspeptin-10, men and women).",
+        "Dhillo WS et al. J Clin Endocrinol Metab 2007, PMID 17635940: https://pubmed.ncbi.nlm.nih.gov/17635940/ (kisspeptin-54 across menstrual phases)."
+      ]
+    }
+  ]
+}

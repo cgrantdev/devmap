@@ -1,0 +1,109 @@
+{
+  "slug": "ipamorelin",
+  "normalize": "normalize(x): recursive. Strings: CRLF/CR -> LF; U+00A0 -> space; rtrim each line; trim. Lists/maps: same order, values normalized.",
+  "reduce": "reduce(stored) = for each stored item, q = trim(item.question ?? item.q ?? \"\"), a = trim(item.answer ?? item.a ?? \"\"); drop items where q or a is empty (faqPageSchema skips them); emit {question: q, answer: strip_tags(a)}. This is exactly the JSON-LD the live page emits.",
+  "op": "Per slug: (1) if normalize(reduce(stored)) === normalize(new_faqs) -> skip \"already at target\". (2) elif normalize(reduce(stored)) !== normalize(old_faqs_guard) -> WARNING \"old mismatch\" + 200-char excerpt, write nothing. (3) else build the write value from the STORED array: same items in the same order; for each index in replace_indices, replace that stored item with new_faqs[index] (keys question/answer); every other stored item is kept byte-for-byte (C items stay exactly as stored, including any HTML). Assert normalize(reduce(result)) === normalize(new_faqs) before saveQuietly(); otherwise throw (rolls back the slug). If the stored array contains items dropped by reduce() (empty q/a), keep them in place and report the count. replace_indices refer to positions in reduce(stored); map them back to stored positions.",
+  "category_slug_match": "ipamorelin",
+  "category_id_live": 56,
+  "url": "https://peptidemap.com/encyclopedia/Ipamorelin",
+  "faq_source": "DB education_posts.faqs (linked post; JSON-LD built by EncyclopediaController::faqPageSchema)",
+  "seed_or_code_paths": [
+    "none: text not present in any repo seeder, shell or profile (git grep origin/main ed4b0e2, 22 Oct 2026); DB-only edit"
+  ],
+  "old_faqs_guard": [
+    {
+      "question": "Why is Ipamorelin considered selective?",
+      "answer": "Unlike other GH secretagogues, Ipamorelin stimulates growth hormone release without significantly increasing cortisol, prolactin, or ACTH, making it the most selective GHSR agonist available."
+    },
+    {
+      "question": "When is the best time to inject Ipamorelin?",
+      "answer": "Approximately 1-1.5 hours after the last meal, ideally at bedtime, to align with the body's natural nocturnal GH secretion."
+    },
+    {
+      "question": "How does Ipamorelin differ from GHRP-6?",
+      "answer": "Ipamorelin does not stimulate appetite (no ghrelin-like hunger spike) and produces a cleaner GH pulse without elevating cortisol."
+    }
+  ],
+  "new_faqs": [
+    {
+      "question": "Why is Ipamorelin considered selective?",
+      "answer": "The term comes from a 1998 study in rats and swine by its developer, Novo Nordisk (developer-affiliated; Raun et al., Eur J Endocrinol 1998, PMID 9849822). Ipamorelin, a pentapeptide that acts at the ghrelin (growth hormone secretagogue) receptor, released GH with potency similar to GHRP-6. In swine, GHRP-6 and GHRP-2 raised ACTH and cortisol, while ipamorelin did not raise them to levels significantly different from those after GHRH, even at more than 200 times the amount needed for half-maximal GH release; none of the compounds changed FSH, LH, prolactin or TSH. That is selectivity relative to older GHRPs in animals. It is not a human finding and does not make ipamorelin the “most selective” compound available."
+    },
+    {
+      "question": "Has ipamorelin been tested in humans?",
+      "answer": "Only in a few clinical studies, none of which led to approval. A 1999 study measured its pharmacokinetics and GH response after single intravenous infusions in healthy men (Gobburu et al., Pharm Res 1999, PMID 10496658; Novo Nordisk co-authors, developer-affiliated). A phase 2 trial sponsored by Helsinn, then developing ipamorelin (developer-affiliated), in 117 bowel-resection patients (NCT00672074) found no significant difference from placebo in its key or secondary efficacy analyses (Beck et al., Int J Colorectal Dis 2014, PMID 25331030). A second Helsinn-sponsored phase 2 trial (NCT01280344) was completed in 2014 with no posted results. No ipamorelin product is FDA-approved. FDA places ipamorelin acetate in 503B category 2 for significant safety risks, citing a published report of serious adverse events including death with intravenous use for gastric motility, and its advisory committee voted 0 yes, 12 no, 1 abstain on adding ipamorelin to the 503A bulks list on 29 October 2024. WADA prohibits it (2026 List, S2.2.4)."
+    },
+    {
+      "question": "How does Ipamorelin differ from GHRP-6?",
+      "answer": "Both are synthetic agonists of the ghrelin (growth hormone secretagogue) receptor. Ipamorelin is a pentapeptide (Aib-His-D-2-Nal-D-Phe-Lys-NH2; PubChem CID 9831659); GHRP-6 is a hexapeptide (PubChem CID 4345065). In the 1998 animal study, the two released GH with similar potency, but GHRP-6 raised ACTH and cortisol in swine and ipamorelin did not (Raun et al., PMID 9849822; developer-affiliated). We found no head-to-head human comparison as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov), so claims of a “cleaner” GH pulse or no appetite effect in people are not established. FDA lists both GHRP-6 and ipamorelin acetate in 503B category 2, and WADA prohibits both (2026 List, S2.2.4)."
+    }
+  ],
+  "replace_indices": [
+    0,
+    1,
+    2
+  ],
+  "keep_indices_verbatim": [],
+  "replacements": [
+    {
+      "index": 0,
+      "class": "B",
+      "old": {
+        "question": "Why is Ipamorelin considered selective?",
+        "answer": "Unlike other GH secretagogues, Ipamorelin stimulates growth hormone release without significantly increasing cortisol, prolactin, or ACTH, making it the most selective GHSR agonist available."
+      },
+      "new": {
+        "question": "Why is Ipamorelin considered selective?",
+        "answer": "The term comes from a 1998 study in rats and swine by its developer, Novo Nordisk (developer-affiliated; Raun et al., Eur J Endocrinol 1998, PMID 9849822). Ipamorelin, a pentapeptide that acts at the ghrelin (growth hormone secretagogue) receptor, released GH with potency similar to GHRP-6. In swine, GHRP-6 and GHRP-2 raised ACTH and cortisol, while ipamorelin did not raise them to levels significantly different from those after GHRH, even at more than 200 times the amount needed for half-maximal GH release; none of the compounds changed FSH, LH, prolactin or TSH. That is selectivity relative to older GHRPs in animals. It is not a human finding and does not make ipamorelin the “most selective” compound available."
+      },
+      "sources": [
+        "Raun K et al. Ipamorelin, the first selective growth hormone secretagogue. Eur J Endocrinol 1998;139(5):552-61. PMID 9849822: https://pubmed.ncbi.nlm.nih.gov/9849822/ (“ipamorelin did not release ACTH or cortisol in levels significantly different from those observed following GHRH stimulation … even at doses more than 200-fold higher than the ED50 for GH release”; “None of the GH secretagogues tested affected FSH, LH, PRL or TSH”).",
+        "Raun 1998 developer affiliation: PubMed affiliation “Department of GH Biology, Novo Nordisk A/S, Måløv, Denmark” (PMID 9849822)."
+      ]
+    },
+    {
+      "index": 1,
+      "class": "A",
+      "old": {
+        "question": "When is the best time to inject Ipamorelin?",
+        "answer": "Approximately 1-1.5 hours after the last meal, ideally at bedtime, to align with the body's natural nocturnal GH secretion."
+      },
+      "new": {
+        "question": "Has ipamorelin been tested in humans?",
+        "answer": "Only in a few clinical studies, none of which led to approval. A 1999 study measured its pharmacokinetics and GH response after single intravenous infusions in healthy men (Gobburu et al., Pharm Res 1999, PMID 10496658; Novo Nordisk co-authors, developer-affiliated). A phase 2 trial sponsored by Helsinn, then developing ipamorelin (developer-affiliated), in 117 bowel-resection patients (NCT00672074) found no significant difference from placebo in its key or secondary efficacy analyses (Beck et al., Int J Colorectal Dis 2014, PMID 25331030). A second Helsinn-sponsored phase 2 trial (NCT01280344) was completed in 2014 with no posted results. No ipamorelin product is FDA-approved. FDA places ipamorelin acetate in 503B category 2 for significant safety risks, citing a published report of serious adverse events including death with intravenous use for gastric motility, and its advisory committee voted 0 yes, 12 no, 1 abstain on adding ipamorelin to the 503A bulks list on 29 October 2024. WADA prohibits it (2026 List, S2.2.4)."
+      },
+      "sources": [
+        "Gobburu JV et al. Pharm Res 1999;16(9):1412-6. PMID 10496658: https://pubmed.ncbi.nlm.nih.gov/10496658/ (healthy male volunteers, 15-minute infusions).",
+        "Beck DE et al. Int J Colorectal Dis 2014;29(12):1527-34. PMID 25331030: https://pubmed.ncbi.nlm.nih.gov/25331030/ (“One hundred seventeen patients were enrolled”; “There were no significant differences between ipamorelin and placebo in the key and secondary efficacy analyses”).",
+        "ClinicalTrials.gov NCT01280344 (Phase 2, COMPLETED, completion 2014-05, 320 enrolled, hasResults=false; checked 22 Oct 2026).",
+        "openFDA Drugs@FDA generic_name \"ipamorelin\" → \"No matches found\" (22 Oct 2026).",
+        "FDA, Bulk Drug Substances Nominated Under Section 503B, updated 21 March 2025 (https://www.fda.gov/media/94164/download) — 503B Category 2 lists “Ipamorelin Acetate”; FDA safety-risks page (content current as of 04/22/2026; https://www.fda.gov/drugs/human-drug-compounding/certain-bulk-drug-substances-use-compounding-may-present-significant-safety-risks) — 503B, 29 Sept 2023, “A study published in literature identified serious adverse events including death when ipamorelin was administered intravenously for improving gastric motility.”",
+        "FDA PCAC Final Summary Minutes, 29 October 2024 (https://www.fda.gov/media/185412/download), Question 3b/3c: Yes 0, No 12, Abstain 1 for ipamorelin (free base) and ipamorelin acetate.",
+        "WADA 2026 Prohibited List S2.2.4 (GHS and their mimetics, e.g. … ipamorelin).",
+        "Gobburu 1999 co-author affiliation verified 22 Oct 2026 on the publisher page (https://link.springer.com/article/10.1023/A:1018955126402, “Authors and Affiliations”): Henrik Agersø and Lars Ynddal, “Department of Pharmacokineties [sic], Novo Nordisk A/S, DK-2760, Maaloev, Denmark”; Gobburu and Jusko at SUNY Buffalo. PubMed lists only Gobburu’s affiliation.",
+        "ClinicalTrials.gov API (22 Oct 2026): NCT00672074 and NCT01280344 lead sponsor “Helsinn Therapeutics (U.S.), Inc” (class INDUSTRY)."
+      ]
+    },
+    {
+      "index": 2,
+      "class": "B",
+      "old": {
+        "question": "How does Ipamorelin differ from GHRP-6?",
+        "answer": "Ipamorelin does not stimulate appetite (no ghrelin-like hunger spike) and produces a cleaner GH pulse without elevating cortisol."
+      },
+      "new": {
+        "question": "How does Ipamorelin differ from GHRP-6?",
+        "answer": "Both are synthetic agonists of the ghrelin (growth hormone secretagogue) receptor. Ipamorelin is a pentapeptide (Aib-His-D-2-Nal-D-Phe-Lys-NH2; PubChem CID 9831659); GHRP-6 is a hexapeptide (PubChem CID 4345065). In the 1998 animal study, the two released GH with similar potency, but GHRP-6 raised ACTH and cortisol in swine and ipamorelin did not (Raun et al., PMID 9849822; developer-affiliated). We found no head-to-head human comparison as of 22 October 2026 (searches of PubMed and ClinicalTrials.gov), so claims of a “cleaner” GH pulse or no appetite effect in people are not established. FDA lists both GHRP-6 and ipamorelin acetate in 503B category 2, and WADA prohibits both (2026 List, S2.2.4)."
+      },
+      "sources": [
+        "Raun K et al. 1998, PMID 9849822 (sequence; GHRP-6 comparison; ACTH/cortisol in swine).",
+        "PubChem CID 9831659 (Ipamorelin, C38H49N9O5): https://pubchem.ncbi.nlm.nih.gov/compound/9831659 ; PubChem CID 4345065 (GHRP-6, C46H56N12O6): https://pubchem.ncbi.nlm.nih.gov/compound/4345065",
+        "PubMed search ipamorelin AND (GHRP-6 OR GHRP6), 26 records on 22 Oct 2026: reviews, doping-control assays and animal studies; no human head-to-head trial.",
+        "FDA 503B category list, updated 21 March 2025 (https://www.fda.gov/media/94164/download): Category 2 includes GHRP-6 and Ipamorelin Acetate.",
+        "WADA 2026 Prohibited List S2.2.4 (ipamorelin under GHS; GHRP-6 under GHRPs).",
+        "Raun 1998 developer affiliation: PubMed affiliation “Department of GH Biology, Novo Nordisk A/S, Måløv, Denmark” (PMID 9849822).",
+        "PubMed and ClinicalTrials.gov searches for a head-to-head human ipamorelin vs GHRP-6 comparison, 22 Oct 2026: none found."
+      ]
+    }
+  ]
+}
