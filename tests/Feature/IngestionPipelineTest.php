@@ -10,6 +10,7 @@ use App\Models\ScrapingConfig;
 use App\Services\IngestionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class IngestionPipelineTest extends TestCase
@@ -279,13 +280,22 @@ class IngestionPipelineTest extends TestCase
             'source_url' => 'https://instantpeptides.com/bpc157',
         ]);
 
+        Log::spy();
         $updated = $ingestion->promote($staged->fresh());
 
         $this->assertNotNull($updated);
         $this->assertSame($product->id, $updated->id);
         $this->assertEqualsWithDelta(59.50, (float) $updated->fresh()->price, 0.001);
+        $this->assertSame('https://instantpeptides.com/bpc157', $updated->fresh()->product_url);
         $this->assertSame('approved', $staged->fresh()->status);
         $this->assertSame(1, Product::where('brand_id', $brand->id)->count());
+        Log::shouldHaveReceived('info')->withArgs(function ($message, $context) use ($staged, $product) {
+            return $message === 'promote: url-pattern bypass'
+                && ($context['staged_id'] ?? null) === $staged->id
+                && ($context['product_id'] ?? null) === $product->id
+                && ($context['match_type'] ?? null) === 'url'
+                && ($context['url'] ?? null) === 'https://instantpeptides.com/bpc157';
+        })->once();
     }
 
     public function test_promote_matches_double_slash_url_through_normalization(): void
@@ -318,6 +328,10 @@ class IngestionPipelineTest extends TestCase
         $this->assertNotNull($updated);
         $this->assertSame($product->id, $updated->id);
         $this->assertEqualsWithDelta(44.00, (float) $updated->fresh()->price, 0.001);
+        $this->assertSame(
+            'https://limitlesslifenootropics.com/bpc-157-acetate-tb-500-fragment-17-23-blend-spray',
+            $updated->fresh()->product_url
+        );
         $this->assertSame('approved', $staged->fresh()->status);
         $this->assertSame(1, Product::where('brand_id', $brand->id)->count());
     }
@@ -404,7 +418,242 @@ class IngestionPipelineTest extends TestCase
         $this->assertNotNull($updated);
         $this->assertSame($product->id, $updated->id);
         $this->assertEqualsWithDelta(33.00, (float) $updated->fresh()->price, 0.001);
+        $this->assertSame('https://acme.example.com/product/ipamorelin', $updated->fresh()->product_url);
         $this->assertSame('approved', $staged->fresh()->status);
         $this->assertSame(1, Product::where('brand_id', $brand->id)->count());
+    }
+
+    public function test_promote_updates_only_the_matching_woo_variant_query(): void
+    {
+        $brand = $this->makeBrand();
+        $config = $this->makeConfig($brand);
+        $five = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'woo-bpc-5mg',
+            'brand_id' => $brand->id,
+            'price' => 30,
+            'product_url' => 'https://elite.example.com/product/bpc-157?attribute_pa_size=5mg',
+            'status' => 'active',
+        ]);
+        $ten = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'woo-bpc-10mg',
+            'brand_id' => $brand->id,
+            'price' => 50,
+            'product_url' => 'https://elite.example.com/product/bpc-157?attribute_pa_size=10mg',
+            'status' => 'active',
+        ]);
+
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'woo-10mg',
+            'name' => 'BPC-157',
+            'price' => '55.00',
+            'source_url' => 'https://elite.example.com/product/bpc-157?attribute_pa_size=10mg&utm_source=pmap#dose',
+        ]);
+
+        $updated = $ingestion->promote($staged->fresh());
+
+        $this->assertNotNull($updated);
+        $this->assertSame($ten->id, $updated->id);
+        $this->assertEqualsWithDelta(55.00, (float) $ten->fresh()->price, 0.001);
+        $this->assertEqualsWithDelta(30.00, (float) $five->fresh()->price, 0.001);
+        $this->assertSame(
+            'https://elite.example.com/product/bpc-157?attribute_pa_size=10mg',
+            $ten->fresh()->product_url
+        );
+        $this->assertSame(
+            'https://elite.example.com/product/bpc-157?attribute_pa_size=5mg',
+            $five->fresh()->product_url
+        );
+        $this->assertSame('approved', $staged->fresh()->status);
+        $this->assertSame(2, Product::where('brand_id', $brand->id)->count());
+    }
+
+    public function test_promote_leaves_an_ambiguous_shared_url_pending(): void
+    {
+        $brand = $this->makeBrand();
+        $config = $this->makeConfig($brand);
+        $shared = 'https://medusa.example.com/products/bpc-157';
+        $first = Product::create([
+            'name' => 'BPC-157 5mg',
+            'slug' => 'medusa-bpc-5',
+            'brand_id' => $brand->id,
+            'price' => 30,
+            'product_url' => $shared,
+            'status' => 'active',
+        ]);
+        $second = Product::create([
+            'name' => 'BPC-157 10mg',
+            'slug' => 'medusa-bpc-10',
+            'brand_id' => $brand->id,
+            'price' => 50,
+            'product_url' => $shared,
+            'status' => 'active',
+        ]);
+
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'medusa-shared',
+            'name' => 'Staged shared parent',
+            'price' => '55.00',
+            'source_url' => $shared.'?utm_source=pmap#reviews',
+        ]);
+
+        Log::spy();
+        $this->assertNull($ingestion->promote($staged->fresh()));
+
+        $this->assertSame('pending', $staged->fresh()->status);
+        $this->assertEqualsWithDelta(30.00, (float) $first->fresh()->price, 0.001);
+        $this->assertEqualsWithDelta(50.00, (float) $second->fresh()->price, 0.001);
+        $this->assertSame($shared, $first->fresh()->product_url);
+        $this->assertSame($shared, $second->fresh()->product_url);
+        $this->assertSame(2, Product::where('brand_id', $brand->id)->count());
+        Log::shouldHaveReceived('warning')->withArgs(function ($message, $context) use ($staged, $first, $second) {
+            $ids = $context['candidate_ids'] ?? [];
+
+            return $message === 'promote: ambiguous product url match'
+                && ($context['staged_id'] ?? null) === $staged->id
+                && in_array($first->id, $ids, true)
+                && in_array($second->id, $ids, true);
+        })->once();
+    }
+
+    public function test_promote_leaves_pending_when_a_sibling_differs_only_by_query(): void
+    {
+        $brand = $this->makeBrand();
+        $config = $this->makeConfig($brand);
+        $parent = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'parent-bpc',
+            'brand_id' => $brand->id,
+            'price' => 30,
+            'product_url' => 'https://shop.example.com/products/bpc-157',
+            'status' => 'active',
+        ]);
+        $variant = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'variant-bpc',
+            'brand_id' => $brand->id,
+            'price' => 50,
+            'product_url' => 'https://shop.example.com/products/bpc-157?variation_id=99',
+            'status' => 'active',
+        ]);
+
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'variation-99',
+            'name' => 'BPC-157',
+            'price' => '55.00',
+            'source_url' => 'https://shop.example.com/products/bpc-157?variation_id=99&utm_campaign=spring',
+        ]);
+
+        Log::spy();
+        $this->assertNull($ingestion->promote($staged->fresh()));
+
+        $this->assertSame('pending', $staged->fresh()->status);
+        $this->assertEqualsWithDelta(30.00, (float) $parent->fresh()->price, 0.001);
+        $this->assertEqualsWithDelta(50.00, (float) $variant->fresh()->price, 0.001);
+        $this->assertSame('https://shop.example.com/products/bpc-157', $parent->fresh()->product_url);
+        $this->assertSame(
+            'https://shop.example.com/products/bpc-157?variation_id=99',
+            $variant->fresh()->product_url
+        );
+        Log::shouldHaveReceived('warning')->withArgs(function ($message) {
+            return $message === 'promote: ambiguous product url match';
+        })->once();
+    }
+
+    public function test_promote_does_not_update_a_linked_product_from_another_vendor(): void
+    {
+        $owner = Brand::create([
+            'name' => 'Owner Vendor',
+            'slug' => 'owner-vendor',
+            'is_active' => true,
+        ]);
+        $other = $this->makeBrand();
+        $linked = Product::create([
+            'name' => 'Owner BPC',
+            'slug' => 'owner-bpc',
+            'brand_id' => $owner->id,
+            'price' => 40,
+            'product_url' => 'https://owner.example.com/product/bpc-157',
+            'status' => 'active',
+        ]);
+        $config = $this->makeConfig($other);
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'cross-vendor',
+            'name' => 'Staged cross vendor',
+            'price' => '99.00',
+            'source_url' => 'https://other.example.com/not-a-product',
+        ]);
+        $staged->product_id = $linked->id;
+        $staged->save();
+
+        Log::spy();
+        $this->assertNull($ingestion->promote($staged->fresh()));
+
+        $this->assertSame('rejected', $staged->fresh()->status);
+        $this->assertEqualsWithDelta(40.00, (float) $linked->fresh()->price, 0.001);
+        $this->assertSame('https://owner.example.com/product/bpc-157', $linked->fresh()->product_url);
+        $this->assertSame(1, Product::count());
+        Log::shouldHaveReceived('warning')->withArgs(function ($message, $context) use ($staged, $linked, $owner, $other) {
+            return $message === 'promote: linked product brand mismatch'
+                && ($context['staged_id'] ?? null) === $staged->id
+                && ($context['product_id'] ?? null) === $linked->id
+                && (int) ($context['linked_brand_id'] ?? 0) === $owner->id
+                && (int) ($context['staged_brand_id'] ?? 0) === $other->id;
+        })->once();
+    }
+
+    public function test_promote_does_not_match_a_blank_external_id(): void
+    {
+        $brand = $this->makeBrand();
+        $config = $this->makeConfig($brand);
+        $product = Product::create([
+            'name' => 'Real Product',
+            'slug' => 'real-product',
+            'brand_id' => $brand->id,
+            'external_id' => '   ',
+            'price' => 25,
+            'product_url' => 'https://acme.example.com/product/real',
+            'status' => 'active',
+        ]);
+
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => '   ',
+            'name' => 'Whitespace sku',
+            'price' => '80.00',
+            'source_url' => 'https://acme.example.com/whitespace-root',
+        ]);
+
+        $this->assertNull($ingestion->promote($staged->fresh()));
+        $this->assertSame('rejected', $staged->fresh()->status);
+        $this->assertEqualsWithDelta(25.00, (float) $product->fresh()->price, 0.001);
+        $this->assertSame('https://acme.example.com/product/real', $product->fresh()->product_url);
+        $this->assertSame(1, Product::where('brand_id', $brand->id)->count());
+    }
+
+    public function test_promote_strips_tracking_params_and_fragments_from_a_new_product_url(): void
+    {
+        $brand = $this->makeBrand();
+        $config = $this->makeConfig($brand);
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'semag-10',
+            'name' => 'Semaglutide 10mg',
+            'price' => '99.00',
+            'source_url' => 'https://acme.example.com/products/semag?attribute_pa_size=10mg&utm_source=pmap&gclid=abc&fbclid=def&ref=home#reviews',
+        ]);
+
+        $product = $ingestion->promote($staged->fresh());
+
+        $this->assertNotNull($product);
+        $this->assertSame(
+            'https://acme.example.com/products/semag?attribute_pa_size=10mg',
+            $product->fresh()->product_url
+        );
     }
 }

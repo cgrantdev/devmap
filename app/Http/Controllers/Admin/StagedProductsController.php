@@ -88,6 +88,10 @@ class StagedProductsController extends Controller
     {
         $product = $ingestion->promote($stagedProduct);
         if (!$product) {
+            $stagedProduct->refresh();
+            if ($stagedProduct->status === ScrapedProduct::STATUS_PENDING) {
+                return back()->with('error', 'Left pending: more than one live product matches this URL for the vendor, so nothing was updated.');
+            }
             return back()->with('error', 'Rejected by promote guards (no price, or URL is not a product page). See scraped_products status = rejected for the reason.');
         }
         return back()->with('success', "Promoted to product #{$product->id}");
@@ -111,15 +115,22 @@ class StagedProductsController extends Controller
 
         $count = 0;
         $rejected = 0;
+        $pending = 0;
         foreach (ScrapedProduct::whereIn('id', $validated['ids'])->get() as $row) {
             if ($ingestion->promote($row) !== null) {
                 $count++;
+                continue;
+            }
+            $row->refresh();
+            if ($row->status === ScrapedProduct::STATUS_PENDING) {
+                $pending++;
             } else {
                 $rejected++;
             }
         }
         $msg = "Promoted {$count} product" . ($count === 1 ? '' : 's') . '.';
         if ($rejected > 0) $msg .= " {$rejected} rejected by pollution guards.";
+        if ($pending > 0) $msg .= " {$pending} left pending (ambiguous URL match).";
         return back()->with('success', $msg);
     }
 

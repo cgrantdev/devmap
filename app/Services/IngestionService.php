@@ -206,8 +206,10 @@ class IngestionService
      * Otherwise creates a new Product and links it.
      *
      * Returns null when the staged row fails a sanity check — it gets
-     * auto-rejected instead so it can't pollute the live products table.
-     * Callers must handle null (StagedProductsController + bulkPromote).
+     * auto-rejected instead so it can't pollute the live products table —
+     * or when the URL matches more than one live row for the vendor. That
+     * second case leaves the staged row pending. Callers must handle null
+     * (StagedProductsController + bulkPromote).
      */
     public function promote(ScrapedProduct $staged): ?Product
     {
@@ -223,25 +225,43 @@ class IngestionService
         }
 
         $brandId = $staged->brand_id ?? $staged->scrapingConfig?->vendor_id;
+        $resolved = $this->resolveExistingLiveProduct($staged, $brandId);
+        if ($resolved['ambiguous']) {
+            Log::warning('promote: ambiguous product url match', [
+                'staged_id' => $staged->id,
+                'brand_id' => $brandId,
+                'url' => $staged->source_url,
+                'candidate_ids' => $resolved['candidate_ids'],
+            ]);
 
-        // Linked row, same-vendor external id, or same-vendor normalized URL.
-        // Those are already in the catalog, so a root-slug or double-slash
-        // URL can still refresh price. The pattern guard below is only for
-        // a product we would otherwise create.
-        $existing = $this->findExistingLiveProduct($staged, $brandId);
+            return null;
+        }
+
+        $existing = $resolved['product'];
+        $matchType = $resolved['match_type'];
 
         // Only accept URLs that look like a product detail page. Homepage,
         // /shop landing, /about, /blog, etc. all fail this. Skip the check
         // when the source_url is null (some feeds don't carry it — but that
         // usually means the row came from an authenticated API where the
         // shape is trustworthy, e.g. WooCommerce REST), and when the row
-        // matches a live product for this vendor.
-        if (!$existing && $staged->source_url && !$this->looksLikeProductUrl($staged->source_url)) {
+        // uniquely matches a live product for this vendor.
+        $patternFails = $staged->source_url && !$this->looksLikeProductUrl($staged->source_url);
+        if (!$existing && $patternFails) {
             $this->reject($staged, 'Source URL does not look like a product page: ' . $staged->source_url);
             return null;
         }
 
-        return DB::transaction(function () use ($staged, $brandId, $existing) {
+        if ($existing && $patternFails) {
+            Log::info('promote: url-pattern bypass', [
+                'staged_id' => $staged->id,
+                'product_id' => $existing->id,
+                'match_type' => $matchType,
+                'url' => $staged->source_url,
+            ]);
+        }
+
+        return DB::transaction(function () use ($staged, $brandId, $existing, $patternFails) {
             // Resolve product_category_id (used only for NEW products — see below):
             //   1. Use the scraping config's category if it pinned one (legacy single-category vendors)
             //   2. Otherwise auto-match the product name against the category_aliases table
@@ -250,9 +270,9 @@ class IngestionService
 
             // Find an existing Product to update instead of creating a
             // duplicate. Priority:
-            //   1. staged->product_id (explicit link from a prior promote)
-            //   2. Same brand + external_id
-            //   3. Same brand + normalized product URL
+            //   1. staged->product_id, only when that product is this vendor
+            //   2. Same brand + non-blank external_id
+            //   3. Same brand + unique normalized product URL
             //   4. Same brand + exact name match (fallback for feeds that
             //      don't carry stable URLs, e.g. some JSON feeds)
             //
@@ -262,6 +282,8 @@ class IngestionService
             // fresh scraping_config or when a config is recreated. Result:
             // 140 duplicate live rows across Instant Peptides + Peptselect
             // by the time we caught it.
+            // Name matching does not bypass the URL-pattern guard: a bad
+            // URL never reaches this point unless a stronger match exists.
             $product = $existing;
             if (!$product && $brandId && !empty($staged->name)) {
                 $product = Product::where('brand_id', $brandId)
@@ -278,15 +300,24 @@ class IngestionService
                 // "DSIP (Delta Sleep Inducing Peptide 5mg)" and undo the work
                 // of every triage pass.
                 if ($product->auto_update || $staged->manual_override) {
-                    $product->update([
+                    $updates = [
                         'description' => $staged->description,
                         'price' => $staged->price,
                         'discount_price' => $staged->discount_price,
                         'image_url' => $staged->image_url,
-                        'product_url' => $staged->source_url,
                         'auto_scraped' => true,
                         'last_scraped_at' => $staged->last_scraped_at ?? now(),
-                    ]);
+                    ];
+                    // Catalog matches and failing URLs keep the stored
+                    // product_url. A name-match refresh may store the staged
+                    // URL only after tracking params and the fragment are gone.
+                    if (!$existing && !$patternFails) {
+                        $storedUrl = $this->urlWithoutTracking($staged->source_url);
+                        if ($storedUrl !== null) {
+                            $updates['product_url'] = $storedUrl;
+                        }
+                    }
+                    $product->update($updates);
                 }
                 // Backfill the link so subsequent promotes hit tier (1)
                 // directly and skip the URL/name lookups.
@@ -304,7 +335,7 @@ class IngestionService
                     'price' => $staged->price,
                     'discount_price' => $staged->discount_price,
                     'image_url' => $staged->image_url,
-                    'product_url' => $staged->source_url,
+                    'product_url' => $this->urlWithoutTracking($staged->source_url),
                     'auto_scraped' => true,
                     'last_scraped_at' => $staged->last_scraped_at ?? now(),
                 ]);
@@ -319,75 +350,162 @@ class IngestionService
     }
 
     /**
-     * Live product this staged row should update.
-     *
-     * Same vendor, and either the vendor's external id or the same URL after
-     * normalization (lowercase host, duplicate slashes collapsed, trailing
-     * slash removed, query and fragment dropped). An explicit product_id
-     * link from a prior promote is kept as the first match. Name matching
-     * stays in promote() and does not bypass the URL-pattern guard.
+     * @return array{product: ?Product, match_type: ?string, ambiguous: bool, candidate_ids: list<int>}
      */
-    protected function findExistingLiveProduct(ScrapedProduct $staged, ?int $brandId): ?Product
+    protected function resolveExistingLiveProduct(ScrapedProduct $staged, ?int $brandId): array
     {
+        $none = ['product' => null, 'match_type' => null, 'ambiguous' => false, 'candidate_ids' => []];
+
         if ($staged->product_id) {
             $linked = Product::find($staged->product_id);
+            if ($linked && $brandId && (int) $linked->brand_id === (int) $brandId) {
+                return [
+                    'product' => $linked,
+                    'match_type' => 'product_id',
+                    'ambiguous' => false,
+                    'candidate_ids' => [],
+                ];
+            }
             if ($linked) {
-                return $linked;
+                Log::warning('promote: linked product brand mismatch', [
+                    'staged_id' => $staged->id,
+                    'product_id' => $linked->id,
+                    'linked_brand_id' => $linked->brand_id,
+                    'staged_brand_id' => $brandId,
+                ]);
             }
         }
 
-        if (!$brandId) {
-            return null;
-        }
-
-        if (!empty($staged->external_id)) {
+        $externalId = trim((string) ($staged->external_id ?? ''));
+        if ($brandId && $externalId !== '') {
             $byExternalId = Product::where('brand_id', $brandId)
-                ->where('external_id', $staged->external_id)
+                ->where('external_id', $externalId)
                 ->first();
             if ($byExternalId) {
-                return $byExternalId;
+                return [
+                    'product' => $byExternalId,
+                    'match_type' => 'external_id',
+                    'ambiguous' => false,
+                    'candidate_ids' => [],
+                ];
             }
         }
 
-        if (empty($staged->source_url)) {
-            return null;
+        if (!$brandId || empty($staged->source_url)) {
+            return $none;
         }
 
-        $exact = Product::where('brand_id', $brandId)
-            ->where('product_url', $staged->source_url)
-            ->first();
-        if ($exact) {
-            return $exact;
-        }
-
-        $normalized = $this->normalizeProductUrl($staged->source_url);
-        if ($normalized === null) {
-            return null;
-        }
-
-        $candidates = Product::where('brand_id', $brandId)
-            ->whereNotNull('product_url')
-            ->where('product_url', '!=', '')
-            ->orderBy('id')
-            ->get(['id', 'product_url']);
-
-        foreach ($candidates as $candidate) {
-            if ($this->normalizeProductUrl($candidate->product_url) === $normalized) {
-                return Product::find($candidate->id);
-            }
-        }
-
-        return null;
+        return $this->matchLiveProductByUrl($staged->source_url, $brandId);
     }
 
     /**
-     * Identity key for a vendor product URL.
+     * Same-vendor URL match. The identity keeps variant query keys and drops
+     * tracking keys and the fragment. A match is used only when it is unique
+     * and no sibling row shares the host and path but differs by query.
+     * Variant permalinks (?attribute_pa_size=) are unique when every sibling
+     * also has its own variant query. A query-less parent next to a variant,
+     * or several rows with the same URL, is ambiguous.
      *
-     * Host is lowercased. Duplicate slashes collapse. A trailing slash is
-     * removed. The query string and fragment are dropped, which also drops
-     * tracking parameters. The path's own casing is kept.
+     * @return array{product: ?Product, match_type: ?string, ambiguous: bool, candidate_ids: list<int>}
      */
-    protected function normalizeProductUrl(?string $url): ?string
+    protected function matchLiveProductByUrl(string $url, int $brandId): array
+    {
+        $none = ['product' => null, 'match_type' => null, 'ambiguous' => false, 'candidate_ids' => []];
+        $identity = $this->urlIdentity($url);
+        if ($identity === null) {
+            return $none;
+        }
+
+        $candidates = $this->candidateProductsForUrl($brandId, $identity['host'], $identity['path']);
+        $exact = [];
+        $samePath = [];
+        foreach ($candidates as $candidate) {
+            $other = $this->urlIdentity($candidate->product_url);
+            if ($other === null || $other['path_key'] !== $identity['path_key']) {
+                continue;
+            }
+            $samePath[] = $candidate;
+            if ($other['query_key'] === $identity['query_key']) {
+                $exact[] = $candidate;
+            }
+        }
+
+        $ids = array_map(fn (Product $product) => (int) $product->id, $samePath);
+
+        if (count($exact) === 1 && count($samePath) === 1) {
+            return [
+                'product' => $exact[0],
+                'match_type' => 'url',
+                'ambiguous' => false,
+                'candidate_ids' => $ids,
+            ];
+        }
+
+        if (count($exact) === 1 && $identity['query_key'] !== '') {
+            $parentSibling = false;
+            foreach ($samePath as $row) {
+                if ((int) $row->id === (int) $exact[0]->id) {
+                    continue;
+                }
+                $other = $this->urlIdentity($row->product_url);
+                if ($other === null || $other['query_key'] === '') {
+                    $parentSibling = true;
+                    break;
+                }
+            }
+            if (!$parentSibling) {
+                return [
+                    'product' => $exact[0],
+                    'match_type' => 'url',
+                    'ambiguous' => false,
+                    'candidate_ids' => $ids,
+                ];
+            }
+        }
+
+        if ($samePath !== []) {
+            return [
+                'product' => null,
+                'match_type' => null,
+                'ambiguous' => true,
+                'candidate_ids' => $ids,
+            ];
+        }
+
+        return $none;
+    }
+
+    /**
+     * Products for this vendor whose URL might be the same path.
+     * brand_id is indexed; the host and path fragments keep this off a full catalog load.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Product>
+     */
+    protected function candidateProductsForUrl(int $brandId, string $host, string $path)
+    {
+        $query = Product::query()
+            ->where('brand_id', $brandId)
+            ->whereNotNull('product_url')
+            ->where('product_url', '!=', '')
+            ->whereRaw("product_url LIKE ? ESCAPE '\\'", ['%'.$this->likeLiteral($host).'%']);
+
+        $pathNeedle = trim($path, '/');
+        if ($pathNeedle !== '') {
+            $query->whereRaw("product_url LIKE ? ESCAPE '\\'", ['%'.$this->likeLiteral($pathNeedle).'%']);
+        }
+
+        return $query->orderBy('id')->get();
+    }
+
+    protected function likeLiteral(string $value): string
+    {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
+    }
+
+    /**
+     * @return array{host: string, path: string, path_key: string, query_key: string}|null
+     */
+    protected function urlIdentity(?string $url): ?array
     {
         $url = trim((string) $url);
         if ($url === '') {
@@ -404,7 +522,73 @@ class IngestionService
         $path = preg_replace('#/+#', '/', $parts['path'] ?? '') ?? '';
         $path = rtrim($path, '/');
 
-        return $scheme.'://'.$host.$path;
+        return [
+            'host' => $host,
+            'path' => $path,
+            'path_key' => $scheme.'://'.$host.$path,
+            'query_key' => $this->canonicalQueryKey($parts['query'] ?? ''),
+        ];
+    }
+
+    /**
+     * Query identity with variant keys kept and tracking keys removed.
+     * attribute_*, variation_id, and variant stay. utm_*, gclid, fbclid, and ref go.
+     */
+    protected function canonicalQueryKey(string $query): string
+    {
+        if ($query === '') {
+            return '';
+        }
+
+        parse_str($query, $params);
+        $kept = [];
+        foreach ($params as $key => $value) {
+            if (!is_string($key) || $this->isTrackingQueryKey($key)) {
+                continue;
+            }
+            $kept[$key] = $value;
+        }
+        if ($kept === []) {
+            return '';
+        }
+        ksort($kept);
+
+        return http_build_query($kept);
+    }
+
+    protected function isTrackingQueryKey(string $key): bool
+    {
+        $key = strtolower($key);
+
+        return str_starts_with($key, 'utm_') || in_array($key, ['gclid', 'fbclid', 'ref'], true);
+    }
+
+    /**
+     * URL safe to persist: no fragment, no tracking query keys.
+     * Path, host, and variant query keys are left as given.
+     */
+    protected function urlWithoutTracking(?string $url): ?string
+    {
+        $url = trim((string) $url);
+        if ($url === '') {
+            return null;
+        }
+
+        $parts = parse_url($url);
+        if (!is_array($parts) || empty($parts['host'])) {
+            return $url;
+        }
+
+        $scheme = $parts['scheme'] ?? 'https';
+        $port = isset($parts['port']) ? ':'.$parts['port'] : '';
+        $path = $parts['path'] ?? '';
+        $query = $this->canonicalQueryKey($parts['query'] ?? '');
+        $stored = $scheme.'://'.$parts['host'].$port.$path;
+        if ($query !== '') {
+            $stored .= '?'.$query;
+        }
+
+        return $stored;
     }
 
     public function reject(ScrapedProduct $staged, ?string $reason = null): void
