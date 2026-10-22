@@ -222,32 +222,38 @@ class IngestionService
             return null;
         }
 
+        $brandId = $staged->brand_id ?? $staged->scrapingConfig?->vendor_id;
+
+        // Linked row, same-vendor external id, or same-vendor normalized URL.
+        // Those are already in the catalog, so a root-slug or double-slash
+        // URL can still refresh price. The pattern guard below is only for
+        // a product we would otherwise create.
+        $existing = $this->findExistingLiveProduct($staged, $brandId);
+
         // Only accept URLs that look like a product detail page. Homepage,
         // /shop landing, /about, /blog, etc. all fail this. Skip the check
         // when the source_url is null (some feeds don't carry it — but that
         // usually means the row came from an authenticated API where the
-        // shape is trustworthy, e.g. WooCommerce REST).
-        if ($staged->source_url && !$this->looksLikeProductUrl($staged->source_url)) {
+        // shape is trustworthy, e.g. WooCommerce REST), and when the row
+        // matches a live product for this vendor.
+        if (!$existing && $staged->source_url && !$this->looksLikeProductUrl($staged->source_url)) {
             $this->reject($staged, 'Source URL does not look like a product page: ' . $staged->source_url);
             return null;
         }
 
-        return DB::transaction(function () use ($staged) {
+        return DB::transaction(function () use ($staged, $brandId, $existing) {
             // Resolve product_category_id (used only for NEW products — see below):
             //   1. Use the scraping config's category if it pinned one (legacy single-category vendors)
             //   2. Otherwise auto-match the product name against the category_aliases table
             $categoryId = $staged->scrapingConfig?->product_category_id
                 ?? $this->matchCategoryByName($staged->name);
 
-            $brandId = $staged->brand_id ?? $staged->scrapingConfig?->vendor_id;
-
             // Find an existing Product to update instead of creating a
             // duplicate. Priority:
             //   1. staged->product_id (explicit link from a prior promote)
-            //   2. Same brand + same product_url (URL is the most stable
-            //      per-vendor identifier — different scraping_configs for
-            //      the same vendor will still land on the same URL)
-            //   3. Same brand + exact name match (fallback for feeds that
+            //   2. Same brand + external_id
+            //   3. Same brand + normalized product URL
+            //   4. Same brand + exact name match (fallback for feeds that
             //      don't carry stable URLs, e.g. some JSON feeds)
             //
             // Colin Sep 7: 'why is our scrapes creating NEW products?' —
@@ -256,15 +262,7 @@ class IngestionService
             // fresh scraping_config or when a config is recreated. Result:
             // 140 duplicate live rows across Instant Peptides + Peptselect
             // by the time we caught it.
-            $product = null;
-            if ($staged->product_id) {
-                $product = Product::find($staged->product_id);
-            }
-            if (!$product && $brandId && !empty($staged->source_url)) {
-                $product = Product::where('brand_id', $brandId)
-                    ->where('product_url', $staged->source_url)
-                    ->first();
-            }
+            $product = $existing;
             if (!$product && $brandId && !empty($staged->name)) {
                 $product = Product::where('brand_id', $brandId)
                     ->where('name', $staged->name)
@@ -318,6 +316,95 @@ class IngestionService
 
             return $product;
         });
+    }
+
+    /**
+     * Live product this staged row should update.
+     *
+     * Same vendor, and either the vendor's external id or the same URL after
+     * normalization (lowercase host, duplicate slashes collapsed, trailing
+     * slash removed, query and fragment dropped). An explicit product_id
+     * link from a prior promote is kept as the first match. Name matching
+     * stays in promote() and does not bypass the URL-pattern guard.
+     */
+    protected function findExistingLiveProduct(ScrapedProduct $staged, ?int $brandId): ?Product
+    {
+        if ($staged->product_id) {
+            $linked = Product::find($staged->product_id);
+            if ($linked) {
+                return $linked;
+            }
+        }
+
+        if (!$brandId) {
+            return null;
+        }
+
+        if (!empty($staged->external_id)) {
+            $byExternalId = Product::where('brand_id', $brandId)
+                ->where('external_id', $staged->external_id)
+                ->first();
+            if ($byExternalId) {
+                return $byExternalId;
+            }
+        }
+
+        if (empty($staged->source_url)) {
+            return null;
+        }
+
+        $exact = Product::where('brand_id', $brandId)
+            ->where('product_url', $staged->source_url)
+            ->first();
+        if ($exact) {
+            return $exact;
+        }
+
+        $normalized = $this->normalizeProductUrl($staged->source_url);
+        if ($normalized === null) {
+            return null;
+        }
+
+        $candidates = Product::where('brand_id', $brandId)
+            ->whereNotNull('product_url')
+            ->where('product_url', '!=', '')
+            ->orderBy('id')
+            ->get(['id', 'product_url']);
+
+        foreach ($candidates as $candidate) {
+            if ($this->normalizeProductUrl($candidate->product_url) === $normalized) {
+                return Product::find($candidate->id);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Identity key for a vendor product URL.
+     *
+     * Host is lowercased. Duplicate slashes collapse. A trailing slash is
+     * removed. The query string and fragment are dropped, which also drops
+     * tracking parameters. The path's own casing is kept.
+     */
+    protected function normalizeProductUrl(?string $url): ?string
+    {
+        $url = trim((string) $url);
+        if ($url === '') {
+            return null;
+        }
+
+        $parts = parse_url($url);
+        if (!is_array($parts) || empty($parts['host'])) {
+            return null;
+        }
+
+        $scheme = strtolower($parts['scheme'] ?? 'https');
+        $host = strtolower($parts['host']);
+        $path = preg_replace('#/+#', '/', $parts['path'] ?? '') ?? '';
+        $path = rtrim($path, '/');
+
+        return $scheme.'://'.$host.$path;
     }
 
     public function reject(ScrapedProduct $staged, ?string $reason = null): void

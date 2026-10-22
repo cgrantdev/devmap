@@ -253,4 +253,158 @@ class IngestionPipelineTest extends TestCase
             'frequency' => 'hourly',
         ]);
     }
+
+    public function test_promote_updates_existing_root_slug_product_instead_of_rejecting(): void
+    {
+        $brand = Brand::create([
+            'name' => 'Instant Peptides',
+            'slug' => 'instant-peptides',
+            'is_active' => true,
+        ]);
+        $config = $this->makeConfig($brand);
+        $product = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'instant-bpc157',
+            'brand_id' => $brand->id,
+            'price' => 49.99,
+            'product_url' => 'https://instantpeptides.com/bpc157',
+            'status' => 'active',
+        ]);
+
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'bpc157',
+            'name' => 'BPC-157 10mg',
+            'price' => '59.50',
+            'source_url' => 'https://instantpeptides.com/bpc157',
+        ]);
+
+        $updated = $ingestion->promote($staged->fresh());
+
+        $this->assertNotNull($updated);
+        $this->assertSame($product->id, $updated->id);
+        $this->assertEqualsWithDelta(59.50, (float) $updated->fresh()->price, 0.001);
+        $this->assertSame('approved', $staged->fresh()->status);
+        $this->assertSame(1, Product::where('brand_id', $brand->id)->count());
+    }
+
+    public function test_promote_matches_double_slash_url_through_normalization(): void
+    {
+        $brand = Brand::create([
+            'name' => 'Limitless Biotech',
+            'slug' => 'limitless-biotech',
+            'is_active' => true,
+        ]);
+        $config = $this->makeConfig($brand);
+        $product = Product::create([
+            'name' => 'BPC-157 / TB-500 blend spray',
+            'slug' => 'limitless-blend-spray',
+            'brand_id' => $brand->id,
+            'price' => 40,
+            'product_url' => 'https://limitlesslifenootropics.com/bpc-157-acetate-tb-500-fragment-17-23-blend-spray',
+            'status' => 'active',
+        ]);
+
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'blend-spray',
+            'name' => 'Staged blend spray',
+            'price' => '44.00',
+            'source_url' => 'https://LimitlessLifeNootropics.com//bpc-157-acetate-tb-500-fragment-17-23-blend-spray/?utm_source=pmap#reviews',
+        ]);
+
+        $updated = $ingestion->promote($staged->fresh());
+
+        $this->assertNotNull($updated);
+        $this->assertSame($product->id, $updated->id);
+        $this->assertEqualsWithDelta(44.00, (float) $updated->fresh()->price, 0.001);
+        $this->assertSame('approved', $staged->fresh()->status);
+        $this->assertSame(1, Product::where('brand_id', $brand->id)->count());
+    }
+
+    public function test_promote_rejects_a_new_product_whose_url_fails_the_pattern(): void
+    {
+        $brand = $this->makeBrand();
+        $config = $this->makeConfig($brand);
+        $ingestion = app(IngestionService::class);
+
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'new-root',
+            'name' => 'Brand New Root Slug',
+            'price' => '19.00',
+            'source_url' => 'https://newvendor.example.com/brand-new-root-slug',
+        ]);
+
+        $this->assertNull($ingestion->promote($staged->fresh()));
+        $this->assertSame('rejected', $staged->fresh()->status);
+        $this->assertDatabaseMissing('products', ['name' => 'Brand New Root Slug']);
+    }
+
+    public function test_promote_does_not_match_the_same_url_from_another_vendor(): void
+    {
+        $owner = Brand::create([
+            'name' => 'Instant Peptides',
+            'slug' => 'instant-peptides',
+            'is_active' => true,
+        ]);
+        $other = Brand::create([
+            'name' => 'Other Vendor',
+            'slug' => 'other-vendor',
+            'is_active' => true,
+        ]);
+        $existing = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'owner-bpc157',
+            'brand_id' => $owner->id,
+            'external_id' => 'bpc157',
+            'price' => 49.99,
+            'product_url' => 'https://instantpeptides.com/bpc157',
+            'status' => 'active',
+        ]);
+        $config = $this->makeConfig($other);
+        $ingestion = app(IngestionService::class);
+
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'bpc157',
+            'name' => 'BPC-157',
+            'price' => '10.00',
+            'source_url' => 'https://instantpeptides.com/bpc157/',
+        ]);
+
+        $this->assertNull($ingestion->promote($staged->fresh()));
+        $this->assertSame('rejected', $staged->fresh()->status);
+        $this->assertEqualsWithDelta(49.99, (float) $existing->fresh()->price, 0.001);
+        $this->assertSame(1, Product::count());
+    }
+
+    public function test_promote_matches_existing_product_by_external_id_when_url_shape_is_bad(): void
+    {
+        $brand = $this->makeBrand();
+        $config = $this->makeConfig($brand);
+        $product = Product::create([
+            'name' => 'Ipamorelin',
+            'slug' => 'acme-ipamorelin',
+            'brand_id' => $brand->id,
+            'external_id' => 'sku-ipa',
+            'price' => 30,
+            'product_url' => 'https://acme.example.com/product/ipamorelin',
+            'status' => 'active',
+        ]);
+
+        $ingestion = app(IngestionService::class);
+        $staged = $ingestion->upsertStaged($config, [
+            'external_id' => 'sku-ipa',
+            'name' => 'Staged ipamorelin',
+            'price' => '33.00',
+            'source_url' => 'https://acme.example.com/ipamorelin',
+        ]);
+
+        $updated = $ingestion->promote($staged->fresh());
+
+        $this->assertNotNull($updated);
+        $this->assertSame($product->id, $updated->id);
+        $this->assertEqualsWithDelta(33.00, (float) $updated->fresh()->price, 0.001);
+        $this->assertSame('approved', $staged->fresh()->status);
+        $this->assertSame(1, Product::where('brand_id', $brand->id)->count());
+    }
 }
