@@ -62,9 +62,9 @@ So every efficacy and safety figure below comes from trials in which retatrutide
 | Mean body-weight change at week 80 | Placebo | Lowest dose arm | Middle dose arm | Highest dose arm | Source |
 | --- | --- | --- | --- | --- | --- |
 | TRIUMPH-1, treatment-regimen estimand | −3.9% | −17.6% | −23.7% | −25.0% | Paper |
-| TRIUMPH-1, efficacy estimand | −2.2% | −19.0% | −25.9% | −28.3% | Company-reported |
+| TRIUMPH-1, efficacy estimand | −2.2% | −19.0% | −25.9% | −28.3% | reported in the NEJM paper and company-reported by Lilly in its press release of 21 May 2026 |
 | TRIUMPH-2, treatment-regimen estimand | −5.1% | −11.9% | −16.8% | −18.8% | Paper |
-| TRIUMPH-2, efficacy estimand | −4.0% | −12.7% | −19.1% | −20.8% | Company-reported |
+| TRIUMPH-2, efficacy estimand | −4.0% | −12.7% | −19.1% | −20.8% | reported in the Lancet paper and company-reported by Lilly in its press release of 23 July 2026 |
 | TRIUMPH-3, efficacy estimand | −3.2% | not tested | −21.6% | −22.6% | Company-reported |
 
 Points the sources add:
@@ -110,9 +110,9 @@ The same caution applies to safety. Adverse-event rates depend on the population
 | Dysesthesia | TRIUMPH-2, paper | 1% | 4% | 6% | 7% |
 | Hypotension (abstract term) | TRIUMPH-2, paper | under 1% | 1% | 5% | 6% |
 | Permanent discontinuation due to adverse event or death | TRIUMPH-2, paper | 5% | 4% | 12% | 8% |
-| Nausea | TRIUMPH-1, company-reported | 14.8% | 28.6% | 38.4% | 42.4% |
-| Vomiting | TRIUMPH-1, company-reported | 4.8% | 10.6% | 22.8% | 25.3% |
-| Dysesthesia | TRIUMPH-1, company-reported | 0.9% | 5.1% | 12.3% | 12.5% |
+| Nausea | TRIUMPH-1, reported in the paper and company-reported by Lilly | 14.8% | 28.6% | 38.4% | 42.4% |
+| Vomiting | TRIUMPH-1, reported in the paper and company-reported by Lilly | 4.8% | 10.6% | 22.8% | 25.3% |
+| Dysesthesia | TRIUMPH-1, reported in the paper and company-reported by Lilly | 0.9% | 5.1% | 12.3% | 12.5% |
 | Discontinuation due to adverse events | TRIUMPH-1, company-reported | 4.9% | 4.1% | 6.9% | 11.3% |
 | Discontinuation due to adverse events | TRIUMPH-3, company-reported | 4.8% | not tested | 9.8% | 13.5% |
 
@@ -158,7 +158,7 @@ The current Wegovy label carries a boxed warning on the risk of thyroid C-cell t
 
 - **No head-to-head data yet.** TRANSCEND-T2D-2 has not reported. Even when it does, it will describe people with type 2 diabetes on metformin, in an open-label design, not people without diabetes.
 - **Different durations and eras.** The TRIUMPH trials ran 80 weeks and reported in 2026. STEP 1 and STEP 2 ran 68 weeks and reported in 2021.
-- **Peer review is partial for retatrutide.** TRIUMPH-1 and TRIUMPH-2 have papers, but only their abstracts were accessible for this article. TRIUMPH-3 figures are company-reported only.
+- **Peer review is partial for retatrutide.** TRIUMPH-1 and TRIUMPH-2 have papers. The efficacy rows are reported in those papers and company-reported by Lilly. TRIUMPH-3 figures are company-reported only.
 - **Outcomes evidence differs.** Semaglutide has a completed cardiovascular outcomes trial in people without diabetes (SELECT) and FDA-approved cardiovascular and kidney risk-reduction indications. Retatrutide's outcomes trial is not expected to complete before 2029.
 - **Long-term safety.** Semaglutide has been FDA-approved since December 2017. Retatrutide data come only from controlled trials lasting up to about two years.
 - **Not about individual response.** Trial averages do not predict how one person will respond.
@@ -185,7 +185,7 @@ No. They are separate placebo-controlled trials that differ in population, durat
 
 ### Why do some retatrutide figures look higher in news coverage?
 
-They usually use a different estimand. In TRIUMPH-1, mean weight change in the highest dose arm was 25.0% under the treatment-regimen estimand in the NEJM paper and 28.3% under the efficacy estimand in Lilly's release. The first counts everyone randomized. The second estimates the effect had everyone stayed on treatment.
+They usually use a different estimand. In TRIUMPH-1, mean weight change in the highest dose arm was 25.0% under the treatment-regimen estimand in the NEJM paper and 28.3% under the efficacy estimand, reported in the paper and company-reported by Lilly. The first counts everyone randomized. The second estimates the effect had everyone stayed on treatment.
 
 ### What side effects were reported in the trials?
 

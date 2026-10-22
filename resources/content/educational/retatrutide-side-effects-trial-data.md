@@ -6,7 +6,7 @@ The trials tested several dose arms. This article names them by position only: t
 
 Three kinds of source appear below:
 
-- **Paper**: the peer-reviewed publication. For the two phase 2 trials, the full text was read. For TRIUMPH-1 and TRIUMPH-2, only the published abstracts were accessible.
+- **Paper**: the peer-reviewed publication. For the two phase 2 trials, the full text was read. For TRIUMPH-2, the rows labelled Paper are those in the published paper. TRIUMPH-1 figures that appear in the NEJM paper are labelled as reported in the paper and company-reported by Lilly.
 - **Registry**: results posted on ClinicalTrials.gov. These use the trial's own adverse-event terms and time frames, which can differ from the paper's.
 - **Company-reported**: figures from Lilly press releases or Lilly Medical Information pages. These have not been peer reviewed, and they are labelled as company-reported every time they appear.
 
@@ -18,7 +18,7 @@ Percentages are the share of participants with at least one event, unless stated
 | --- | --- | --- | --- | --- |
 | Phase 2 obesity (NEJM 2023) | Adults with obesity or overweight, without diabetes, US sites | 48 weeks plus 4 weeks of safety follow-up | 338 | Full paper; registry results |
 | Phase 2 type 2 diabetes (Lancet 2023) | Adults with type 2 diabetes, US sites | 36 weeks | 281 | Full paper; registry results |
-| TRIUMPH-1 (NEJM 2026) | Adults with obesity, or overweight with a weight-related condition, without diabetes | 80 weeks | 2,339 | Abstract; company-reported figures |
+| TRIUMPH-1 (NEJM 2026) | Adults with obesity, or overweight with a weight-related condition, without diabetes | 80 weeks | 2,339 | Paper and company-reported figures |
 | TRIUMPH-2 (Lancet 2026) | Adults with BMI 27 or higher and type 2 diabetes, 92 centres in 8 countries | 80 weeks | 1,152 | Abstract; company-reported figures |
 | TRIUMPH-3 | Adults with BMI 35 or higher and established cardiovascular disease | 80 weeks | 1,949 | Company-reported figures only |
 | TRIUMPH-4 | Adults with obesity or overweight and knee osteoarthritis | 68 weeks | 445 | Company-reported figures only |
@@ -71,11 +71,11 @@ The TRIUMPH-2 abstract reports diarrhoea and nausea by arm. Lilly's July 2026 re
 
 The paper also reports hypotension-related events in 1%, 5% and 6% of the lowest, middle and highest dose arms, vs under 1% with placebo.
 
-### TRIUMPH-1 (company-reported)
+### TRIUMPH-1 (paper and company-reported)
 
-The TRIUMPH-1 abstract states only that "the most common adverse events were gastrointestinal". The full text was not accessible, so the arm-level figures below are from Lilly's May 2026 release. Lilly's release says the types of adverse events were "generally consistent with trials of other incretin-based therapies"; it gives no severity or resolution statement for the gastrointestinal events.
+Nausea, diarrhoea, constipation and vomiting below are reported in the NEJM paper (Table 3) and company-reported by Lilly in its press release of 21 May 2026. The abstract states only that the most common adverse events were gastrointestinal. Lilly's release says the types of adverse events were "generally consistent with trials of other incretin-based therapies"; it gives no severity or resolution statement for the gastrointestinal events.
 
-| Event (company-reported) | Placebo | Lowest dose arm | Middle dose arm | Highest dose arm |
+| Event (reported in the paper and company-reported by Lilly) | Placebo | Lowest dose arm | Middle dose arm | Highest dose arm |
 | --- | --- | --- | --- | --- |
 | Nausea | 14.8% | 28.6% | 38.4% | 42.4% |
 | Diarrhoea | 13.5% | 25.2% | 34.1% | 32.0% |
@@ -144,7 +144,7 @@ The phase 3 trials report **dysesthesia**. Lilly's Medical Information page defi
 
 | Trial | Source | Placebo | Lowest dose arm | Middle dose arm | Highest dose arm |
 | --- | --- | --- | --- | --- | --- |
-| TRIUMPH-1 | Company-reported | 0.9% | 5.1% | 12.3% | 12.5% |
+| TRIUMPH-1 | Reported in the paper and company-reported by Lilly | 0.9% | 5.1% | 12.3% | 12.5% |
 | TRIUMPH-2 | Paper | 1% | 4% | 6% | 7% |
 | TRIUMPH-3 | Company-reported | 1.3% | not tested | 6.4% | 6.4% |
 | TRIUMPH-4 | Company-reported | 0.7% | not tested | 8.8% | 20.9% |
@@ -233,7 +233,7 @@ In the phase 2 obesity paper, heart rate rose in a dose-dependent manner, peaked
 
 ### What is the dysesthesia reported in the TRIUMPH trials?
 
-Lilly defines it as a skin burning sensation and related adverse events. In the TRIUMPH-2 paper it was reported in 4% to 7% of the retatrutide arms vs 1% with placebo. Company-reported rates were up to 12.5% in TRIUMPH-1 and up to 20.9% in TRIUMPH-4. Lilly says events were generally mild to moderate and most resolved during treatment. The cause, timing and duration have not been characterized in the sources reviewed.
+Lilly defines it as a skin burning sensation and related adverse events. In the TRIUMPH-2 paper it was reported in 4% to 7% of the retatrutide arms vs 1% with placebo. The TRIUMPH-1 rate of up to 12.5% is reported in the paper and company-reported by Lilly. Company-reported rates were up to 20.9% in TRIUMPH-4. Lilly says events were generally mild to moderate and most resolved during treatment. The cause, timing and duration have not been characterized in the sources reviewed.
 
 ### Were pancreatitis, gallbladder or hypoglycaemia events reported?
 

@@ -272,7 +272,7 @@ class PublisherWordingTest extends TestCase
             'app/Http/Controllers/Frontend/HomeController.php' => [
                 'Live prices and coupon codes. Check each vendor\'s site for COAs.',
                 'og-default-v8.png',
-                "'robots' => 'noindex, follow'",
+                'defaults to Google\'s standard (index, follow)',
             ],
             'resources/views/app.blade.php' => [
                 'og-default-v8.png',
@@ -369,6 +369,7 @@ class PublisherWordingTest extends TestCase
             ],
             'app/Http/Controllers/Frontend/HomeController.php' => [
                 'vendor-published COAs',
+                "'robots' => 'noindex, follow'",
             ],
             'public/og-source.html' => [
                 'Lab Verified',
