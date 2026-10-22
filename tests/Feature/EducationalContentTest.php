@@ -2088,7 +2088,7 @@ class EducationalContentTest extends TestCase
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = preg_match_all('/\S+/u', trim($markdown));
-        $this->assertSame((int) round($words / 230).' Min Read', $entry['read_time']);
+        $this->assertSame(((int) ceil($words / 230)).' Min Read', $entry['read_time']);
         $this->assertSame('8 Min Read', $entry['read_time']);
 
         $this->assertSame(1, Blog::where('slug', $slug)->count());

@@ -1213,7 +1213,7 @@ class EducationalContentPublisher
     /**
      * Eloralintide vs petrelintide amylin-class comparison.
      * Sources checked 22 October 2026. Body lives in
-     * resources/content/educational. read_time is round(words/230).
+     * resources/content/educational. read_time is ceil(words/230).
      *
      * @return array<int, array<string, mixed>>
      */
