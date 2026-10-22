@@ -1,0 +1,115 @@
+{
+  "as_of": "22 October 2026 (Asia/Bangkok). Old values copied from live Inertia props (regulatorySubsections, regulatoryImportantNote, keyPoints, references) and BPC-157 FAQPage JSON-LD of https://peptidemap.com/encyclopedia/<slug> fetched 22 Oct 2026. These props are passed through from the DB unchanged (no profile phrase replacement for these 5 slugs); FAQ JSON-LD is trim + strip_tags of stored answers.",
+  "normalize": "normalize(x): recursive. Strings: CRLF/CR -> LF; U+00A0 -> space; rtrim each line; trim. Arrays: same keys/order, values normalized. No HTML stripping except in the faqs op. Compare decoded JSON.",
+  "migration": {
+    "timestamp": "2026_10_22_120000",
+    "file": "database/migrations/2026_10_22_120000_update_encyclopedia_fields_october_22_2026.php",
+    "seeder": "EncyclopediaFieldUpdatesOctober22Seeder"
+  },
+  "slug": "tb-500",
+  "slug_match": "Find the post via the category, not education_posts.slug: (1) product_categories WHERE LOWER(TRIM(slug)) = 'tb-500' must return exactly 1 row; (2) education_posts WHERE product_category_id = <that id> must return exactly 1 row (any status). Also count education_posts WHERE LOWER(TRIM(slug)) = 'tb-500' and log it as a diagnostic. If (1) or (2) is not exactly 1: warn loudly (Log::warning + command->error + STDERR line with the counts and stored slugs/ids), report 'missing'/'collision', write nothing for this slug.",
+  "columns": {
+    "regulatory_subsections": {
+      "camelCase_prop": "regulatorySubsections",
+      "ops": [
+        {
+          "id": "tb500_reg_au",
+          "op": "Append au_subsection at the END only if normalize(current) === normalize(old_value). Skip if any subsection title starts with 'Australia (as of' or any entry value contains 'NSW Health'. Append to the stored array (do not rebuild from old_value).",
+          "old_value": [
+            {
+              "title": "Current Status",
+              "entries": [
+                {
+                  "type": "content",
+                  "value": "TB-500 is not approved by the FDA or any other major regulatory body for human use. It is classified as a research peptide and sold under research-use-only designations."
+                }
+              ]
+            },
+            {
+              "title": "Sports Regulations",
+              "entries": [
+                {
+                  "type": "content",
+                  "value": "TB-500 and Thymosin Beta-4 are prohibited by the World Anti-Doping Agency (WADA) under the S2 category (Peptide Hormones, Growth Factors, Related Substances, and Mimetics). Several athletes have received bans for testing positive for Thymosin Beta-4."
+                }
+              ]
+            }
+          ],
+          "au_subsection": {
+            "title": "Australia (as of 22 October 2026)",
+            "entries": [
+              {
+                "type": "content",
+                "value": "NSW Health reported (19 Oct 2026) 1,180 presentations to NSW emergency departments associated with peptide use between 1 July 2025 and 30 September 2026. The release does not break this figure down by peptide. The release names TB-500 among the peptides that products may claim to contain and states: \"None of these peptides are currently approved in Australia for any purpose.\""
+              },
+              {
+                "type": "content",
+                "value": "Poisons Standard (October 2026; F2026L01327; in force from 1 October 2026): \"TB-500\" is a named Schedule 4 entry and is listed in Appendix D, clause 5, item 38 (\"Poisons for which possession without authority is illegal\"). Thymosin beta 4 has its own entry (item 39). Neither the instrument nor the NSW release defines the structure behind the name \"TB-500\", so this page does not state that either refers specifically to Ac-LKKTETQ, the fragment described here. Scheduling is implemented through State and Territory legislation."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "references": {
+      "camelCase_prop": "references",
+      "op": "Append new_items at the END only if normalize(current) === normalize(old_value). Skip if any reference link url equals 'https://www.nsw.gov.au/ministerial-releases/nsw-health-warns-of-surge-hospital-presentations-linked-to-peptide-use'. Append to the stored array.",
+      "old_value": [
+        {
+          "title": "PNAS (1977)",
+          "authors": "Goldstein et al.",
+          "description": "Original isolation and characterization of Thymosin Beta-4 from thymus tissue."
+        },
+        {
+          "title": "Expert Opinion on Biological Therapy (2007)",
+          "authors": "Sosne et al.",
+          "description": "Comprehensive review of Thymosin Beta-4 in wound healing and tissue repair."
+        },
+        {
+          "title": "Nature (2007)",
+          "authors": "Smart et al.",
+          "description": "Thymosin Beta-4 activates epicardial progenitor cells for cardiac repair after myocardial infarction."
+        }
+      ],
+      "new_items": [
+        {
+          "title": "NSW Health warns of surge in hospital presentations linked to peptide use",
+          "authors": "NSW Government, Minister for Health",
+          "citation": "Ministerial media release, 19 October 2026.",
+          "description": "NSW Health surveillance data: 1,180 presentations to NSW emergency departments associated with peptide use, 1 July 2025 to 30 September 2026. Names BPC-157, GHK-Cu, TB-500, retatrutide and CJC-1295 and states that none of these peptides is currently approved in Australia for any purpose.",
+          "links": [
+            {
+              "url": "https://www.nsw.gov.au/ministerial-releases/nsw-health-warns-of-surge-hospital-presentations-linked-to-peptide-use",
+              "label": "NSW Government"
+            }
+          ]
+        },
+        {
+          "title": "Health authorities issue unapproved peptide use warning after surge in NSW hospital visits",
+          "authors": "Coote G, ABC News",
+          "citation": "ABC News, 19 October 2026.",
+          "description": "News report of the NSW Health data (1,180 emergency department presentations between July 2025 and September 2026).",
+          "links": [
+            {
+              "url": "https://www.abc.net.au/news/2026-10-19/nsw-peptide-emergency-department-surge-prompts-warning/107281674",
+              "label": "ABC News"
+            }
+          ]
+        },
+        {
+          "title": "Therapeutic Goods (Poisons Standard—October 2026) Instrument 2026",
+          "authors": "Australian Government, Federal Register of Legislation",
+          "citation": "F2026L01327. Made under the Therapeutic Goods Act 1989; in force from 1 October 2026.",
+          "description": "Schedule 4 entry \"# TB-500.\"; Appendix D, clause 5, item 38. Separate entry \"# THYMOSIN BETA 4 (THYMOSIN β4).\" (item 39). The instrument does not define TB-500's structure. Text read 22 October 2026.",
+          "links": [
+            {
+              "url": "https://www.legislation.gov.au/F2026L01327/asmade/text",
+              "label": "Federal Register of Legislation"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "do_not_touch": "every other column; other posts"
+}

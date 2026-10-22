@@ -1,0 +1,171 @@
+{
+  "as_of": "22 October 2026 (Asia/Bangkok). Old values rebuilt from live Inertia props and FAQPage JSON-LD of https://peptidemap.com/encyclopedia/{retatrutide,GHK-Cu,Cagrilintide} fetched 22 Oct 2026. New values are the merged #39 (e3124b2) / #47 (4989c0c) payloads (byte-identical to the drafts retatrutide-safety-signals-2026-10-fields.json, cagrilintide-2026-10-fields.json, GHK-Cu-evidence-limits-2026-10-fields.json) except the dated-copy changes listed in 'changes_vs_merged'.",
+  "normalize": "Same as AU-TGA-status-2026-10-22-fields.json: recursive; strings CRLF/CR -> LF, U+00A0 -> space, rtrim each line, trim. Compare decoded JSON. Writes use new values verbatim; appends append to the stored array.",
+  "migration": {
+    "timestamp": "2026_10_22_130000",
+    "file": "database/migrations/2026_10_22_130000_reapply_october_2026_encyclopedia_fields.php",
+    "seeder": "EncyclopediaFieldReapplyOctober22Seeder"
+  },
+  "slug_match": "Category-based lookup (same helper as PR-brief-2026-10-22.md, EncyclopediaPostMatch): product_categories WHERE LOWER(TRIM(slug)) = 'retatrutide' must be exactly 1 row; education_posts WHERE product_category_id = <that id> must be exactly 1 row. Diagnostic: count education_posts WHERE LOWER(TRIM(slug)) = 'retatrutide' and log ids/slugs/product_category_id. Otherwise warn loudly (Log::warning + command->error + STDERR with counts and stored ids/slugs), report 'missing'/'collision', write nothing for this slug. Never write a legacy row with no product_category_id.",
+  "source": "#39 Bpc157RetatrutideOctober2026Seeder RETA_JSON",
+  "columns": {
+    "human_use_subsections": {
+      "camelCase_prop": "humanUseSubsections",
+      "op": "append new_subsection at END only if normalize(current) === normalize(old_value). Skip if any subsection title starts with 'Reported safety signals outside clinical trials'. Append to the stored array.",
+      "old_value": [
+        {
+          "title": "Phase 2 Results",
+          "entries": [
+            {
+              "type": "content",
+              "value": "The Phase 2 trial, published in the New England Journal of Medicine in 2023, showed retatrutide achieved up to 24.2% body weight reduction at 48 weeks at the highest dose — exceeding all previous results from any single pharmacological agent.\\n\\nThe compound was generally well-tolerated, with nausea, diarrhea, and vomiting as the most common adverse events (consistent with GLP-1-class effects). Phase 3 TRIUMPH results have since been published; see the TRIUMPH-1 and TRIUMPH-2 subsections. Publication is not FDA approval, and those figures are not a dose."
+            }
+          ]
+        },
+        {
+          "title": "TRIUMPH-2 Phase 3 (EASD / The Lancet, Sep 2026)",
+          "entries": [
+            {
+              "type": "content",
+              "value": "TRIUMPH-2 (NCT05929079) was a registrational Phase 3 trial: 1,152 adults with type 2 diabetes and BMI ≥27 kg/m² were randomized to once-weekly retatrutide trial arms (4 mg, 9 mg, or 12 mg) or placebo for 80 weeks (EASD 2026 presentation; simultaneous Lancet publication, 29 Sep 2026). Figures below describe what was reported in that study — not how anyone should use research materials sold as RUO.\n\nEfficacy estimand (Lilly press release, 29 Sep 2026) — models remaining on assigned intervention without prohibited weight-management treatments:\n\n• 4 mg: mean weight change −12.7% (−29.8 lbs); A1C −1.4\n• 9 mg: mean weight change −19.1% (−45.4 lbs); A1C −1.6\n• 12 mg: mean weight change −20.8% (−49.6 lbs); A1C −1.5\n• Placebo: mean weight change −4.0% (−9.3 lbs); A1C −0.2\n\nBaseline averages cited by Lilly: weight ~106.4 kg, BMI ~38.2 kg/m², A1C ~7.7%. At 12 mg, Lilly reported 52.0% of participants achieving ≥20% weight reduction and 34.9% achieving ≥25% (efficacy estimand); 59.5% no longer met BMI criteria for obesity. Among participants with baseline BMI ≥35, mean loss at 12 mg was reported as 23.4% (60.8 lbs). Up to 40.0% reached A1C <5.7% (not family-wise type I error controlled per Lilly footnote).\n\nTreatment-regimen estimand (Lancet abstract Findings): mean percent weight change −11.9% (4 mg), −16.8% (9 mg), and −18.8% (12 mg) versus −5.1% placebo (estimated treatment differences vs placebo −6.9%, −11.8%, −13.8%; p<0.0001 for all). Prefer stating which estimand you quote; do not mix them in one sentence without labeling.\n\nSafety (Lilly): most common AEs vs placebo included diarrhea (27.4% / 33.5% / 33.6% vs 13.2%), nausea (13.7% / 20.8% / 28.0% vs 8.0%), constipation (14.0% / 16.2% / 16.8% vs 9.4%), decreased appetite (5.8% / 12.3% / 17.1% vs 4.5%), vomiting (5.5% / 10.2% / 15.7% vs 4.2%). Dysesthesia 4.5% / 5.6% / 7.3% vs 0.7%. Discontinuations due to AEs: 3.8% / 11.6% / 7.7% vs 4.9% placebo. Highest-dose CV risk-factor changes reported by Lilly included average reductions of 39.5% triglycerides, 19.6% non-HDL cholesterol, 10.8 mmHg systolic BP, 6.7 in (16.9 cm) waist circumference, and 58.3% hsCRP — risk factors, not CV outcomes from this trial."
+            }
+          ]
+        },
+        {
+          "title": "TRIUMPH-1 Phase 3 (NEJM, 29 Sep 2026) — different trial from TRIUMPH-2",
+          "entries": [
+            {
+              "type": "content",
+              "value": "TRIUMPH-1 (NCT05929066) is not TRIUMPH-2. Jastreboff and colleagues, for the TRIUMPH-1 Investigators, reported it in The New England Journal of Medicine (29 Sep 2026; DOI 10.1056/NEJMoa2604169; PMID 42814954): adults with obesity or overweight without diabetes, randomized to once-weekly retatrutide 4 mg, 9 mg, or 12 mg or placebo for 80 weeks (2,339 participants). The abstract states that, for weight-related endpoints, intercurrent events were handled by a treatment-regimen estimand. Under that analysis, mean percent change in body weight was −17.6% (4 mg), −23.7% (9 mg), and −25.0% (12 mg) versus −3.9% with placebo. Those abstract figures are the treatment-regimen result. They are not a treatment recommendation and not a head-to-head comparison with semaglutide, tirzepatide, or eloralintide. The same paper’s abstract does not print −28.3%. Lilly Medical’s table of TRIUMPH-1 outcomes, which cites that NEJM article, lists a separate efficacy estimand: percent change in body weight at 80 weeks was −19.0% (4 mg), −25.9% (9 mg), and −28.3% (12 mg) versus −2.2% with placebo. −28.3% is not the abstract primary weight result. TRIUMPH-2 remains the separate type 2 diabetes plus obesity or overweight trial; its published figures are not restated here and are not a ranking against TRIUMPH-1. PeptideMap is a research-use (RUO) comparison publisher, not a clinic or pharmacy. This is not medical advice and not a dose."
+            }
+          ]
+        },
+        {
+          "title": "TRIUMPH-3 topline (Lilly, 23 Jul 2026) — not a peer-reviewed cardiovascular-outcomes paper",
+          "entries": [
+            {
+              "type": "content",
+              "value": "No. TRIUMPH-3 (NCT05882045) is not sourced from a peer-reviewed NEJM or Lancet cardiovascular-outcomes paper. Eli Lilly’s 23 July 2026 topline is the source. The trial enrolled adults with severe obesity (BMI ≥35 kg/m²) and established cardiovascular disease, with or without type 2 diabetes (1,949 participants; 9 mg, 12 mg, or placebo; 80 weeks). Under the efficacy estimand in that release, mean percent weight change at 80 weeks was −21.6% (9 mg) and −22.6% (12 mg) versus −3.2% with placebo. That is not the TRIUMPH-1 or TRIUMPH-2 result, and a treatment-regimen weight figure for TRIUMPH-3 was not in the release. The same release reported pre-specified in-study analyses of time to first event for pooled 9 mg and 12 mg versus placebo. MACE-5 was 44 events versus 52 (hazard ratio 0.82, 95% CI 0.55 to 1.22). MACE-3 was 27 events versus 23 (hazard ratio 1.12, 95% CI 0.64 to 1.96). Both intervals include 1. The release does not establish a reduction in cardiovascular events. It says these events occurred less frequently than anticipated in both the retatrutide and placebo arms. Urinary tract infection in that topline was 6.1% (9 mg) and 7.0% (12 mg) versus 5.3% with placebo in TRIUMPH-3. This is not medical advice and not a dose."
+            }
+          ]
+        },
+        {
+          "title": "TRIUMPH program map (names + disclosure type)",
+          "entries": [
+            {
+              "type": "content",
+              "value": "The TRIUMPH Phase 3 program evaluates retatrutide across related obesity and complication settings. Names below are literacy labels only. Prefer the estimand label printed in the source you cite."
+            },
+            {
+              "type": "item",
+              "value": "TRIUMPH-1 (NCT05929066) — adults with obesity without diabetes; NEJM 29 Sep 2026 (DOI 10.1056/NEJMoa2604169; PMID 42814954). Abstract weight result uses a treatment-regimen (ITT) estimand: mean percent body-weight change −17.6% (4 mg), −23.7% (9 mg), −25.0% (12 mg) versus −3.9% placebo. A separate efficacy-estimand row of −28.3% at 12 mg (vs −2.2% placebo) appears on Lilly Medical’s TRIUMPH-1 outcomes table citing that paper — keep −25.0% and −28.3% labeled separately; do not present −28.3% as the abstract’s treatment-regimen primary weight line."
+            },
+            {
+              "type": "item",
+              "value": "TRIUMPH-2 (NCT05929079) — adults with type 2 diabetes and obesity or overweight; EASD / Lancet 29 Sep 2026 (DOI 10.1016/S0140-6736(26)01861-1). Do not rewrite live figures. Locked efficacy estimand includes up to −20.8% mean weight change at 12 mg vs −4.0% placebo; locked treatment-regimen includes −18.8% at 12 mg vs −5.1% placebo."
+            },
+            {
+              "type": "item",
+              "value": "TRIUMPH-3 (NCT05882045) — adults with severe obesity (BMI ≥35) and established cardiovascular disease, with or without T2D; Lilly topline 23 Jul 2026 (not treated here as a peer-reviewed cardiovascular-outcomes paper). Efficacy-estimand mean weight change −21.6% (9 mg) and −22.6% (12 mg) versus −3.2% placebo. Pre-specified in-study MACE-5 HR 0.82 (95% CI 0.55–1.22) and MACE-3 HR 1.12 (95% CI 0.64–1.96); intervals include 1 — the release does not establish cardiovascular-event reduction."
+            },
+            {
+              "type": "item",
+              "value": "Label topline versus peer-reviewed whenever you quote. July 2026 PR Newswire is topline for TRIUMPH-2/3 efficacy-estimand headlines; September 2026 Lancet is peer-reviewed for TRIUMPH-2 treatment-regimen Findings; September 2026 NEJM is peer-reviewed for TRIUMPH-1 treatment-regimen weight means."
+            }
+          ]
+        },
+        {
+          "title": "Context vs semaglutide / tirzepatide (not head-to-head)",
+          "entries": [
+            {
+              "type": "content",
+              "value": "TRIUMPH-2 compared retatrutide with placebo, not with semaglutide or tirzepatide. Do not present TRIUMPH-2 percentages as a three-way ranking. Mechanistically, retatrutide adds glucagon receptor agonism to GIP/GLP-1 activity, whereas semaglutide is a GLP-1 receptor agonist and tirzepatide is a dual GIP/GLP-1 agonist — different trials, populations, and endpoints. A dedicated Phase 3 comparison versus tirzepatide (TRIUMPH-5, NCT06662383) is registered separately; do not invent results. Older Phase 2 obesity data (e.g., Jastreboff et al., NEJM 2023) remain useful background for non-diabetes obesity cohorts but are not interchangeable with TRIUMPH-2’s diabetes population."
+            }
+          ]
+        }
+      ],
+      "new_subsection": {
+        "title": "Reported safety signals outside clinical trials (as of 22 October 2026)",
+        "entries": [
+          {
+            "type": "content",
+            "value": "This section summarizes reports about products sold under the name retatrutide outside Lilly's clinical trials. It is separate from the TRIUMPH clinical-trial results and does not change them. None of the reports below establishes that retatrutide caused any event. In most cases, the identity, content, and purity of the product involved are unknown. Products sold online under this name are not Lilly trial supply."
+          },
+          {
+            "type": "content",
+            "value": "FDA Adverse Event Reporting System (FAERS) death reports, as reported by CBS News. On 13 October 2026, CBS News reported that FDA had received two reports of deaths after people took products claiming to be retatrutide. CBS said it reviewed redacted FAERS reports obtained under the Freedom of Information Act. According to CBS, the first report (July 2026) described a 41-year-old woman who had cardiac arrest; the report listed retatrutide as a \"suspect product\" obtained \"from an unreliable source.\" The second report (September 2026) described a 49-year-old patient who had severe dehydration, malnutrition, and cardiac arrest after buying the product from an online peptide vendor. CBS reported that it could not independently verify the reports, that FDA declined to say whether it had verified them, and that neither death was connected to a clinical trial. CBS also reported Lilly's statement that the reports \"make clear the two individuals were taking black-market retatrutide.\" PeptideMap has not seen these reports. The public openFDA FAERS data (last updated 30 July 2026) listed 44 reports in which retatrutide appears as a drug name and no report coded as a death. That dataset predates the September report and may not yet include the July report."
+          },
+          {
+            "type": "content",
+            "value": "Poison center exposures, as reported by CBS News. CBS reported that America's Poison Centers logged 862 retatrutide exposures in the three months ending in September 2026, 460 in the three months before that, and 249 in the first three months of 2026. America's Poison Centers began tracking retatrutide in late 2025. CBS noted that rising counts are common for a newly monitored drug. An exposure call is not a confirmed adverse effect. PeptideMap has not checked these figures against a public America's Poison Centers or NPDS release."
+          },
+          {
+            "type": "content",
+            "value": "Limits of FAERS. FAERS is a spontaneous reporting system. Reports are not verified by FDA, can be incomplete or duplicated, and do not show that a product caused an event. For grey-market or \"research use\" products, the substance actually taken is usually unknown. Report counts cannot be used to estimate how often an event happens."
+          },
+          {
+            "type": "content",
+            "value": "Social-media pharmacovigilance study (JAMA Network Open, published online 14 October 2026; PMID 42873503). Sehgal NKR, Tronieri JS, Rader B, Ungar L, and Guntuku SC published \"Self-Reported Adverse Effects Among Social Media Users Taking Nonapproved Retatrutide\" in JAMA Network Open (doi:10.1001/jamanetworkopen.2026.38929). The study was a cross-sectional analysis of 148,640 retatrutide-related Reddit posts and comments. These came from 38,936 users across 27 communities, posted between May 2021 and December 2025. Large language models classified self-reported use and mapped the symptoms users attributed to retatrutide to MedDRA Preferred Terms, and the authors manually validated 100 posts. The models identified 13,589 users reporting current use. Of these, 7,823 had at least one mapped term after prespecified weight-loss and appetite-suppression terms were excluded. Among those 7,823 users, the most frequent terms were increased appetite (17.1%), fatigue (15.2%), increased energy (12.4%), nausea (11.6%), food craving (7.3%), insomnia (6.1%), and heart rate increased (4.8%). The authors note that gastrointestinal symptoms were common but not dominant, which differs from phase 2 trial findings."
+          },
+          {
+            "type": "item",
+            "value": "Limits the authors themselves state: the findings are hypothesis-generating. Product identity, purity, dose, route, duration, concomitant medications, and medical history cannot be verified. Reddit users may not represent all users, and adverse events may be preferentially reported. The analysis cannot assess incidence, causality, dose-response, or comparative safety. The reported events may also reflect reconstitution practices, and natural language processing and MedDRA mapping may miss or misclassify symptoms. The reports may reflect product variability, peptide stacking, user characteristics, or misattribution. The study's comparison with semaglutide and tirzepatide was descriptive only, with unmatched samples and no statistical tests."
+          },
+          {
+            "type": "item",
+            "value": "These reports describe unregulated products and cannot be compared directly with the controlled TRIUMPH trial safety data."
+          }
+        ]
+      }
+    },
+    "regulatory_important_note": {
+      "camelCase_prop": "regulatoryImportantNote",
+      "op": "ORDER-INDEPENDENT with orfo-reta (2026_10_22_140000), which rewrites one sentence of this note. Skip if current contains 'do not establish causation' or normalize(current) equals normalize(one of new_values). Otherwise accept only if normalize(current) equals normalize(old_values[i]) and write new_values[i] (= current + the two sentences). GUARD FIX: #39's old_value was the pre-6 Oct note.",
+      "merged_39_old_value_for_reference": "Retatrutide is investigational and not approved by the FDA, EMA, or other regulators for any indication. PeptideMap is not a pharmacy or clinic. Vendor listings are RUO / research-use comparison data only — not prescriptions, not compounding advice, and not clinical supply.",
+      "old_values": [
+        "Retatrutide is investigational and not approved by the FDA, EMA, or other regulators for any indication. Lilly’s stated Q1 2027 U.S. BLA intent is a filing plan, not marketing authorization. PeptideMap is not a pharmacy or clinic. Vendor listings are RUO / research-use comparison data only — not prescriptions, not compounding advice, not clinical-trial supply, and not expanded-access supply.",
+        "Retatrutide is investigational and not approved by the FDA, EMA, or other regulators for any indication. Lilly has said it plans a U.S. submission in Q1 2027 and has described it as a Biologics License Application (BLA). On 2 October 2026, in a decision on remand from a federal district court, FDA concluded that retatrutide is not a biological product and that an application for it would need to be submitted under section 505 of the Federal Food, Drug, and Cosmetic Act (the drug pathway). Lilly’s related appeal in the Seventh Circuit (No. 26-1301) had no ruling as of 22 October 2026. A filing plan is not marketing authorization. PeptideMap is not a pharmacy or clinic. Vendor listings are RUO / research-use comparison data only — not prescriptions, not compounding advice, not clinical-trial supply, and not expanded-access supply."
+      ],
+      "new_values": [
+        "Retatrutide is investigational and not approved by the FDA, EMA, or other regulators for any indication. Lilly’s stated Q1 2027 U.S. BLA intent is a filing plan, not marketing authorization. PeptideMap is not a pharmacy or clinic. Vendor listings are RUO / research-use comparison data only — not prescriptions, not compounding advice, not clinical-trial supply, and not expanded-access supply. Products sold online under this name are not Lilly trial supply. Reports of deaths and adverse effects linked to products sold as retatrutide (October 2026) are unverified and do not establish causation.",
+        "Retatrutide is investigational and not approved by the FDA, EMA, or other regulators for any indication. Lilly has said it plans a U.S. submission in Q1 2027 and has described it as a Biologics License Application (BLA). On 2 October 2026, in a decision on remand from a federal district court, FDA concluded that retatrutide is not a biological product and that an application for it would need to be submitted under section 505 of the Federal Food, Drug, and Cosmetic Act (the drug pathway). Lilly’s related appeal in the Seventh Circuit (No. 26-1301) had no ruling as of 22 October 2026. A filing plan is not marketing authorization. PeptideMap is not a pharmacy or clinic. Vendor listings are RUO / research-use comparison data only — not prescriptions, not compounding advice, not clinical-trial supply, and not expanded-access supply. Products sold online under this name are not Lilly trial supply. Reports of deaths and adverse effects linked to products sold as retatrutide (October 2026) are unverified and do not establish causation."
+      ]
+    },
+    "key_points": {
+      "camelCase_prop": "keyPoints",
+      "op": "ORDER-INDEPENDENT with orfo-reta, which replaces key point index 5 in place. Append new_item at END only if normalize(current) equals normalize(one of old_values). Skip if any item starts with 'Safety reports outside trials (Oct 2026)'.",
+      "new_item": "Safety reports outside trials (Oct 2026): CBS News reported two unverified FAERS death reports and rising poison-center exposure counts, and a JAMA Network Open Reddit study described self-reported symptoms. None of these establishes causation. Products sold online under this name are not Lilly trial supply.",
+      "old_values": [
+        [
+          "Investigational GIP + GLP-1 + glucagon (triple) agonist; not FDA-approved",
+          "TRIUMPH-2 Phase 3: T2D with obesity/overweight, 80 weeks (NCT05929079)",
+          "Efficacy estimand weight loss: up to 20.8% mean at 12 mg vs 4.0% placebo (Lilly, 29 Sep 2026)",
+          "A1C reductions ~1.4–1.6 points vs ~0.2 placebo (same readout)",
+          "GI AEs more frequent at higher trial arms (diarrhea, nausea, vomiting, constipation); dysesthesia reported",
+          "Planned U.S. BLA stated for Q1 2027 (company plan, not approval)",
+          "TRIUMPH-1 (obesity without diabetes): treatment-regimen −25.0% at 12 mg vs −3.9% placebo (NEJM abstract, 29 Sep 2026; PMID 42814954). −28.3% is the efficacy estimand on Lilly Medical citing that paper, not the abstract primary.",
+          "Status (early Oct 2026): investigational; not FDA-approved; not commercially marketed by Lilly",
+          "TRIUMPH map: TRIUMPH-1 (obesity without diabetes; NEJM), TRIUMPH-2 (T2D + obesity/overweight; Lancet), TRIUMPH-3 (severe obesity + CVD; July 2026 topline) — quote labeled estimands only",
+          "Q1 2027 = Lilly’s stated BLA submission window while finishing CMC — not an approval date",
+          "Seventh Circuit Eli Lilly v. Kennedy, No. 26-1301: oral argument 24 Sep 2026; no published ruling as of early Oct 2026",
+          "Expanded access is not the same as trials and is not grey-market vials (manufacturer/FDA-process literacy only)"
+        ],
+        [
+          "Investigational GIP + GLP-1 + glucagon (triple) agonist; not FDA-approved",
+          "TRIUMPH-2 Phase 3: T2D with obesity/overweight, 80 weeks (NCT05929079)",
+          "Efficacy estimand weight loss: up to 20.8% mean at 12 mg vs 4.0% placebo (Lilly, 29 Sep 2026)",
+          "A1C reductions ~1.4–1.6 points vs ~0.2 placebo (same readout)",
+          "GI AEs more frequent at higher trial arms (diarrhea, nausea, vomiting, constipation); dysesthesia reported",
+          "U.S. pathway (as of 22 Oct 2026): Lilly has stated a Q1 2027 submission plan, described as a BLA. On 2 Oct 2026, on remand, FDA decided that retatrutide is not a biological product and that an application would go under FD&C Act section 505. Lilly’s related Seventh Circuit appeal (No. 26-1301) is undecided. A filing plan is not approval.",
+          "TRIUMPH-1 (obesity without diabetes): treatment-regimen −25.0% at 12 mg vs −3.9% placebo (NEJM abstract, 29 Sep 2026; PMID 42814954). −28.3% is the efficacy estimand on Lilly Medical citing that paper, not the abstract primary.",
+          "Status (early Oct 2026): investigational; not FDA-approved; not commercially marketed by Lilly",
+          "TRIUMPH map: TRIUMPH-1 (obesity without diabetes; NEJM), TRIUMPH-2 (T2D + obesity/overweight; Lancet), TRIUMPH-3 (severe obesity + CVD; July 2026 topline) — quote labeled estimands only",
+          "Q1 2027 = Lilly’s stated BLA submission window while finishing CMC — not an approval date",
+          "Seventh Circuit Eli Lilly v. Kennedy, No. 26-1301: oral argument 24 Sep 2026; no published ruling as of early Oct 2026",
+          "Expanded access is not the same as trials and is not grey-market vials (manufacturer/FDA-process literacy only)"
+        ]
+      ]
+    }
+  },
+  "do_not_touch": "regulatory_subsections and references (AU/TGA package), every other column, TRIUMPH figures"
+}

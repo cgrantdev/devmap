@@ -2168,12 +2168,32 @@ class EducationalContentTest extends TestCase
         foreach (EducationalContentPublisher::COMPETITOR_HOSTS as $host) {
             $page->assertDontSee($host, false);
         }
+        $pairs = array_map(
+            fn (array $entity) => [
+                'question' => $entity['name'],
+                'answer' => $entity['acceptedAnswer']['text'],
+            ],
+            $faq['mainEntity']
+        );
         $page->assertInertia(fn ($inertia) => $inertia
             ->component('Frontend/BlogDetail')
             ->where('blog.slug', $slug)
             ->where('blog.title', $h1)
             ->where('blog.readTime', '13 Min Read')
             ->where('seo.canonical', $public)
+            ->where('faqs', $pairs)
+            ->where('blog.content', function ($content) use ($pairs) {
+                $this->assertIsString($content);
+                $this->assertDoesNotMatchRegularExpression(
+                    '/<h2>\s*(?:FAQs?|Frequently Asked Questions)\s*<\/h2>/i',
+                    $content
+                );
+                foreach ($pairs as $pair) {
+                    $this->assertStringNotContainsString($pair['question'], $content);
+                }
+
+                return true;
+            })
         );
 
         $schema = json_encode($faq, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

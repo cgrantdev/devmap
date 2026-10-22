@@ -6,6 +6,7 @@ use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Setting;
+use App\Support\FaqPage;
 use App\Support\OrforglipronOralSemaglutideComparePage;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -217,20 +218,21 @@ class BlogsController extends Controller
             ],
         ];
 
-        $schemas = [$articleSchema, $breadcrumbSchema];
-        $extra = $blog->seo_schema;
-        if (is_string($extra)) {
-            $extra = json_decode($extra, true);
-        }
-        if (is_array($extra)) {
-            if (isset($extra['@type'])) {
-                $extra = [$extra];
+        // Catalog blogs render one normalised list and rebuild FAQPage
+        // JSON-LD from it. Every other post keeps its stored schema
+        // blocks, including an existing FAQPage, and gains no visible FAQ.
+        $storedSchemas = $this->storedSchemaBlocks($blog->seo_schema);
+        if (FaqPage::renderAllowed('blog', (string) $blog->slug)) {
+            [$otherSchemas, $faqs, $faqId] = $this->partitionStoredSchema($blog->seo_schema);
+            $schemas = array_merge([$articleSchema, $breadcrumbSchema], $otherSchemas);
+            if ($faqSchema = $this->faqPageSchema($faqs, $faqId)) {
+                $schemas[] = $faqSchema;
             }
-            foreach ($extra as $block) {
-                if (is_array($block)) {
-                    $schemas[] = $block;
-                }
-            }
+            $content = $this->withoutMarkdownFaqHeading($blog->content, $faqs);
+        } else {
+            $schemas = array_merge([$articleSchema, $breadcrumbSchema], $storedSchemas);
+            $faqs = [];
+            $content = $blog->content;
         }
 
         // Build SEO array (same format as products/brands pages)
@@ -254,6 +256,7 @@ class BlogsController extends Controller
         session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/BlogDetail', [
+            'faqs' => $faqs,
             'blog' => [
                 'id' => $blog->id,
                 'title' => $blog->title,
@@ -264,7 +267,7 @@ class BlogsController extends Controller
                 'key_points' => $blog->key_points ?? [],
                 'detailed_analysis' => $blog->detailed_analysis,
                 'conclusion' => $blog->conclusion,
-                'content' => $blog->content,
+                'content' => $content,
                 'tags' => $blog->tags ?? [],
                 'author_name' => $blog->author_name,
                 'author_job' => $blog->author_job,
@@ -315,5 +318,129 @@ class BlogsController extends Controller
         }
 
         return 'Research'; // Default
+    }
+
+    /**
+     * Stored seo_schema blocks, passed through unchanged. This is the
+     * blog JSON-LD behaviour for posts that are not on the allowlist.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function storedSchemaBlocks(mixed $extra): array
+    {
+        if (is_string($extra)) {
+            $extra = json_decode($extra, true);
+        }
+        if (! is_array($extra)) {
+            return [];
+        }
+        if (isset($extra['@type'])) {
+            $extra = [$extra];
+        }
+
+        $blocks = [];
+        foreach ($extra as $block) {
+            if (is_array($block)) {
+                $blocks[] = $block;
+            }
+        }
+
+        return $blocks;
+    }
+
+    /**
+     * FAQPage node for the same pairs BlogDetail renders.
+     *
+     * @param  list<array{question: string, answer: string}>  $faqs
+     * @return array<string, mixed>|null
+     */
+    private function faqPageSchema(array $faqs, ?string $id): ?array
+    {
+        return FaqPage::schema($faqs, $id);
+    }
+
+    /**
+     * Split stored seo_schema into non-FAQ blocks plus one FAQ pair list.
+     * Pair strings are the FAQPage name and acceptedAnswer.text, unchanged.
+     *
+     * @return array{0: list<array<string, mixed>>, 1: list<array{question: string, answer: string}>, 2: ?string}
+     */
+    private function partitionStoredSchema(mixed $extra): array
+    {
+        $other = [];
+        $faqs = [];
+        $id = null;
+        if (is_string($extra)) {
+            $extra = json_decode($extra, true);
+        }
+        if (! is_array($extra)) {
+            return [$other, $faqs, $id];
+        }
+        if (isset($extra['@type'])) {
+            $extra = [$extra];
+        }
+
+        foreach ($extra as $block) {
+            if (! is_array($block)) {
+                continue;
+            }
+            if (($block['@type'] ?? null) !== 'FAQPage') {
+                $other[] = $block;
+
+                continue;
+            }
+            if ($id === null && is_string($block['@id'] ?? null) && $block['@id'] !== '') {
+                $id = $block['@id'];
+            }
+            foreach ($block['mainEntity'] ?? [] as $entity) {
+                if (! is_array($entity)) {
+                    continue;
+                }
+                $name = $entity['name'] ?? null;
+                $text = $entity['acceptedAnswer']['text'] ?? null;
+                if (! is_string($name) || $name === '' || ! is_string($text) || $text === '') {
+                    continue;
+                }
+                $faqs[] = ['question' => $name, 'answer' => $text];
+            }
+        }
+
+        return [$other, $faqs, $id];
+    }
+
+    /**
+     * Drop the markdown FAQ heading when this post already has FAQPage
+     * entities. The visible section is those entities, so the heading
+     * block (FAQ, FAQs, or Frequently Asked Questions, through the next
+     * h2) is not rendered a second time. Stored content is not rewritten.
+     * The block is removed only when its plain text already contains
+     * every JSON-LD question and answer, which is the duplicate copy.
+     *
+     * @param  list<array{question: string, answer: string}>  $faqs
+     */
+    private function withoutMarkdownFaqHeading(?string $html, array $faqs): ?string
+    {
+        if ($html === null || $html === '' || $faqs === []) {
+            return $html;
+        }
+
+        $pattern = '/<h2>\s*(?:FAQs?|Frequently Asked Questions)\s*<\/h2>.*?(?=<h2\b|\z)/is';
+        if (! preg_match($pattern, $html, $match)) {
+            return $html;
+        }
+
+        if (preg_match_all('/<h3\b/i', $match[0]) !== count($faqs)) {
+            return $html;
+        }
+        $plain = html_entity_decode(strip_tags($match[0]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        foreach ($faqs as $faq) {
+            if (! str_contains($plain, $faq['question'])) {
+                return $html;
+            }
+        }
+
+        $stripped = preg_replace($pattern, '', $html, 1);
+
+        return is_string($stripped) ? $stripped : $html;
     }
 }

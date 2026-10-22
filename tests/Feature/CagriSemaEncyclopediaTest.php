@@ -235,7 +235,7 @@ class CagriSemaEncyclopediaTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->where('aminoAcidSequence.residueCount', 0)
-                ->where('drugStatus', 'Investigational; not approved (as of 19 Oct 2026)')
+                ->where('drugStatus', 'Investigational; not approved (as of 22 Oct 2026)')
                 ->where('routes', [])
             );
         $this->get('/encyclopedia/ghk-sequence')
@@ -248,7 +248,7 @@ class CagriSemaEncyclopediaTest extends TestCase
         $this->get('/encyclopedia/cagrisema')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->where('drugStatus', 'Investigational; not approved (as of 19 Oct 2026)')
+                ->where('drugStatus', 'Investigational; not approved (as of 22 Oct 2026)')
                 ->where('routes', [])
                 ->where('featuredImage', '/images/encyclopedia/cagrisema-featured.png')
                 ->where('molecularInfo.formula', '')
