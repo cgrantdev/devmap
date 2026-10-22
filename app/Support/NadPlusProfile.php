@@ -72,7 +72,7 @@ class NadPlusProfile
 
     public static function researchUrl(): ?string
     {
-        return 'https://pubchem.ncbi.nlm.nih.gov/compound/5893';
+        return 'https://pubchem.ncbi.nlm.nih.gov/compound/5892';
     }
 
     public static function preservesExistingArticle(): bool
@@ -188,12 +188,12 @@ class NadPlusProfile
             'conclusion' => 'NAD+ is nicotinamide adenine dinucleotide, a dinucleotide coenzyme. It is not a peptide. Encyclopedia titles and body copy should say coenzyme, not peptide.',
             'references' => [
                 [
-                    'title' => 'PubChem record for NAD+ (CID 5893)',
+                    'title' => 'PubChem record for NAD+ (CID 5892)',
                     'authors' => '',
                     'description' => 'Dinucleotide coenzyme identity. CAS is omitted here rather than restated from secondary vendor copy.',
-                    'citation' => 'National Center for Biotechnology Information. PubChem Compound CID 5893.',
+                    'citation' => 'National Center for Biotechnology Information. PubChem Compound CID 5892.',
                     'links' => [
-                        ['label' => 'PubChem', 'url' => 'https://pubchem.ncbi.nlm.nih.gov/compound/5893'],
+                        ['label' => 'PubChem', 'url' => 'https://pubchem.ncbi.nlm.nih.gov/compound/5892'],
                     ],
                 ],
             ],

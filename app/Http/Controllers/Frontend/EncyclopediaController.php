@@ -93,9 +93,9 @@ class EncyclopediaController extends Controller
                 'halfLife' => '~2 hours',
             ],
             'Sermorelin' => [
-                'status' => 'Prescription (US)',
+                'status' => 'Not FDA-approved (approvals withdrawn 2009)',
                 'routes' => ['Subcutaneous'],
-                'halfLife' => '10–20 min',
+                'halfLife' => '',
             ],
             'PT-141' => [
                 'status' => 'FDA Approved (Vyleesi)',
@@ -103,7 +103,7 @@ class EncyclopediaController extends Controller
                 'halfLife' => '~2.7 hours',
             ],
             'NAD+' => [
-                'status' => 'Supplement',
+                'status' => 'Not FDA-approved',
                 'routes' => ['Oral', 'IV', 'Subcutaneous'],
                 'halfLife' => '',
             ],

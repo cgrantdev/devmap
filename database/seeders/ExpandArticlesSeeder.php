@@ -143,38 +143,6 @@ class ExpandArticlesSeeder extends Seeder
                 ]),
             ],
 
-            'sermorelin' => [
-                'background' => 'Sermorelin (sermorelin acetate) is a synthetic peptide analog consisting of the first 29 amino acids of the naturally occurring 44-amino acid growth hormone-releasing hormone (GHRH). Designated as GRF(1-29)NH₂, sermorelin retains the full biological activity of native GHRH as the first 29 residues contain the entire pharmacophore required for GHRH receptor binding and activation. It was developed in the 1980s and became the first GHRH analog approved by the FDA (as Geref) for diagnostic evaluation of pituitary GH secretory capacity and was later approved as Geref Diagnostic. Sermorelin acts on the GHRH receptor (GHRHR) expressed on somatotroph cells of the anterior pituitary, stimulating growth hormone synthesis and secretion in a physiological pulsatile pattern. Unlike exogenous GH administration, sermorelin preserves the negative feedback regulation of the GH/IGF-1 axis, as GH release remains subject to somatostatin inhibition and endogenous regulatory mechanisms. This makes sermorelin a physiologically "cleaner" approach to GH axis stimulation compared to direct GH replacement.',
-                'preclinical_subsections' => json_encode([
-                    [
-                        'title' => 'Growth Hormone Axis Research',
-                        'findings' => [
-                            ['title' => 'GH Secretion Dynamics', 'description' => 'In rodent and primate models, sermorelin dose-dependently stimulated pulsatile GH release while preserving somatostatin-mediated feedback inhibition. This pulsatile pattern is critical — continuous GH exposure and pulsatile GH exposure activate different gene transcription programs in target tissues (liver, muscle, bone).'],
-                            ['title' => 'Age-Related GH Decline', 'description' => 'In aged rodent models, sermorelin partially restored GH pulse amplitude, which declines with age (somatopause). However, the magnitude of GH response decreased with age, suggesting age-related changes in somatotroph responsiveness and/or increased somatostatin tone.'],
-                            ['title' => 'Somatotroph Physiology', 'description' => 'Long-term sermorelin administration maintained or increased pituitary somatotroph number and GH mRNA expression, suggesting trophic effects on the pituitary gland — in contrast to exogenous GH which can cause somatotroph atrophy through negative feedback.'],
-                        ],
-                    ],
-                    [
-                        'title' => 'Body Composition and Metabolic Effects',
-                        'findings' => [
-                            ['title' => 'Lean Body Mass', 'description' => 'In GH-deficient animal models, sermorelin-stimulated endogenous GH release was associated with increased lean body mass, improved nitrogen balance, and enhanced protein synthesis rates in skeletal muscle.'],
-                            ['title' => 'Sleep Architecture', 'description' => 'GHRH is a recognized physiological sleep-promoting factor. Animal studies confirmed that sermorelin administration during the sleep period enhanced slow-wave (Stage III/IV) sleep duration, consistent with the known role of GHRH neurons in sleep regulation.'],
-                        ],
-                    ],
-                ]),
-                'human_use_subsections' => json_encode([
-                    [
-                        'title' => 'Clinical Studies',
-                        'entries' => [
-                            ['type' => 'content', 'value' => 'Sermorelin was FDA-approved as Geref Diagnostic for evaluating pituitary GH reserve. In the diagnostic setting, sermorelin injection reliably stimulates GH release in patients with intact somatotroph function, with failure to respond indicating pituitary-level GH deficiency.'],
-                            ['type' => 'content', 'value' => 'Clinical studies in GH-deficient children demonstrated that sermorelin (Geref) could stimulate growth velocity when administered subcutaneously, though it was less potent than direct GH replacement. It was briefly marketed for pediatric GH deficiency before being withdrawn for commercial (not safety) reasons.'],
-                            ['type' => 'content', 'value' => 'In healthy older adults, sermorelin increased GH pulse amplitude and IGF-1 levels in studies lasting 3-6 months. A 16-week study showed improvements in body composition parameters including reduced trunk fat and increased lean body mass.'],
-                            ['type' => 'content', 'value' => 'Sleep studies in healthy subjects demonstrated that evening GHRH administration increased slow-wave sleep percentage without altering sleep latency or REM sleep, consistent with GHRH\'s role as an endogenous sleep factor.'],
-                        ],
-                    ],
-                ]),
-                'conclusion' => 'Sermorelin holds a distinctive position in growth hormone biology as the first clinically validated GHRH analog. Its mechanism — stimulating endogenous GH release while preserving physiological feedback regulation — offers a fundamentally different pharmacological approach compared to exogenous GH administration. The preservation of pulsatile GH secretion is particularly significant, as research has established that the pattern of GH exposure (pulsatile vs continuous) determines downstream gene expression and metabolic outcomes. Although withdrawn from the US market for commercial reasons (not safety concerns), sermorelin remains an active area of research interest. Its effects on sleep architecture, body composition, and the aging GH axis continue to be studied in clinical and preclinical settings. Research-grade sermorelin serves as the reference GHRH agonist against which newer secretagogues (tesamorelin, CJC-1295, MK-677) are benchmarked. The compound illustrates an important principle in endocrine pharmacology: physiological axis stimulation may offer advantages over direct hormone replacement in preserving normal regulatory mechanisms.',
-            ],
 
             'tesamorelin' => [
                 'background' => 'Tesamorelin (tesamorelin acetate) is a synthetic analog of growth hormone-releasing hormone (GHRH) consisting of the full 44-amino acid human GHRH sequence with an additional trans-3-hexenoic acid group attached to the tyrosine at position 1. This N-terminal modification significantly improves resistance to enzymatic degradation by dipeptidyl peptidase-4 (DPP-4), which rapidly cleaves native GHRH between positions 2 and 3, thereby extending the compound\'s biological activity. Developed by Theratechnologies Inc. of Montreal, Canada, tesamorelin was approved by the FDA in 2010 as Egrifta for the reduction of excess abdominal fat (lipodystrophy) in HIV-infected patients with lipohypertrophy. This made tesamorelin the only GHRH analog currently FDA-approved for a therapeutic (non-diagnostic) indication. The drug targets the specific pattern of visceral adipose tissue (VAT) accumulation that occurs in HIV-associated lipodystrophy, a metabolic complication of antiretroviral therapy that increases cardiovascular risk.',
