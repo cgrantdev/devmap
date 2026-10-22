@@ -26,7 +26,7 @@ TRIUMPH-1 (NCT05929066) randomized 2,339 adults with obesity without diabetes to
 
 Weight end points used a treatment-regimen estimand, which the paper treats as intention-to-treat. At 80 weeks the treatment-regimen change was −17.6% in the lowest dose arm, −23.7% in the middle dose arm, and −25.0% in the highest dose arm, versus −3.9% with placebo. Those are the *New England Journal of Medicine* paper’s own figures.
 
-The efficacy estimand for that 80-week weight change is company-reported by Lilly in its press release of 21 May 2026: −19.0% in the lowest dose arm, −25.9% in the middle dose arm, and −28.3% in the highest dose arm. The −28.3% figure is that company-reported efficacy estimand for the highest dose arm, not the paper’s treatment-regimen −25.0%.
+The efficacy estimand for that 80-week weight change is reported in the *New England Journal of Medicine* paper and company-reported by Lilly in its press release of 21 May 2026: −19.0% in the lowest dose arm, −25.9% in the middle dose arm, and −28.3% in the highest dose arm, versus −2.2% with placebo. The −28.3% figure is that efficacy estimand for the highest dose arm, reported in the paper and by Lilly, not the paper’s treatment-regimen −25.0%.
 
 A prespecified extension later moved participants, including those from placebo, toward a maximum tolerated dose. That period is not the 80-week placebo comparison, so its percents are not used here. Knee-pain and sleep-apnea results are separate end points and are not used here.
 
@@ -34,7 +34,7 @@ A prespecified extension later moved participants, including those from placebo,
 
 TRIUMPH-2 (NCT05929079) is retatrutide again, not tirzepatide and not TRIUMPH-1. It randomized 1,152 adults with a body-mass index of 27 or higher and type 2 diabetes to once-weekly subcutaneous retatrutide in the lowest dose arm, the middle dose arm, or the highest dose arm, or placebo, for 80 weeks. Bellido and colleagues published it in *The Lancet* on 29 September 2026 (DOI 10.1016/S0140-6736(26)01861-1). Primary weight comparisons were the middle dose arm and the highest dose arm versus placebo. The lowest dose arm comparison was key secondary.
 
-On the treatment-regimen estimand, mean percent change in body weight at week 80 was −11.9% in the lowest dose arm, −16.8% in the middle dose arm, and −18.8% in the highest dose arm, versus −5.1% with placebo. On the efficacy estimand, company-reported by Lilly in its press release of 23 July 2026, the mean change was −12.7% in the lowest dose arm, −19.1% in the middle dose arm, and −20.8% in the highest dose arm, versus −4.0% with placebo. The −18.8% figure is the highest dose arm treatment-regimen result in type 2 diabetes. It is not the TRIUMPH-1 treatment-regimen −25.0%, measured without diabetes.
+On the treatment-regimen estimand, mean percent change in body weight at week 80 in the *Lancet* paper was −11.9% in the lowest dose arm, −16.8% in the middle dose arm, and −18.8% in the highest dose arm, versus −5.1% with placebo. On the efficacy estimand, reported in the *Lancet* paper and company-reported by Lilly in its press release of 23 July 2026, the mean change was −12.7% in the lowest dose arm, −19.1% in the middle dose arm, and −20.8% in the highest dose arm, versus −4.0% with placebo. The −18.8% figure is the highest dose arm treatment-regimen result in type 2 diabetes. It is not the TRIUMPH-1 treatment-regimen −25.0%, measured without diabetes.
 
 ## Why these percents cannot be stacked
 
