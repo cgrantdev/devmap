@@ -1,0 +1,155 @@
+{
+  "as_of": "22 October 2026 (Asia/Bangkok). Old values copied from live Inertia props (regulatorySubsections, regulatoryImportantNote, keyPoints, references) and BPC-157 FAQPage JSON-LD of https://peptidemap.com/encyclopedia/<slug> fetched 22 Oct 2026. These props are passed through from the DB unchanged (no profile phrase replacement for these 5 slugs); FAQ JSON-LD is trim + strip_tags of stored answers.",
+  "normalize": "normalize(x): recursive. Strings: CRLF/CR -> LF; U+00A0 -> space; rtrim each line; trim. Arrays: same keys/order, values normalized. No HTML stripping except in the faqs op. Compare decoded JSON.",
+  "migration": {
+    "timestamp": "2026_10_22_120000",
+    "file": "database/migrations/2026_10_22_120000_update_encyclopedia_fields_october_22_2026.php",
+    "seeder": "EncyclopediaFieldUpdatesOctober22Seeder"
+  },
+  "slug": "cjc-1295",
+  "slug_match": "Find the post via the category, not education_posts.slug: (1) product_categories WHERE LOWER(TRIM(slug)) = 'cjc-1295' must return exactly 1 row; (2) education_posts WHERE product_category_id = <that id> must return exactly 1 row (any status). Also count education_posts WHERE LOWER(TRIM(slug)) = 'cjc-1295' and log it as a diagnostic. If (1) or (2) is not exactly 1: warn loudly (Log::warning + command->error + STDERR line with the counts and stored slugs/ids), report 'missing'/'collision', write nothing for this slug.",
+  "columns": {
+    "regulatory_subsections": {
+      "camelCase_prop": "regulatorySubsections",
+      "ops": [
+        {
+          "id": "cjc1295_reg_au",
+          "op": "Append au_subsection at the END only if normalize(current) === normalize(old_value). Skip if any subsection title starts with 'Australia (as of' or any entry value contains 'NSW Health'. Append to the stored array (do not rebuild from old_value).",
+          "old_value": [
+            {
+              "title": "Current Status",
+              "entries": [
+                {
+                  "type": "content",
+                  "value": "CJC-1295 is not FDA-approved for human use. Available as a research peptide."
+                }
+              ]
+            },
+            {
+              "title": "WADA Status",
+              "entries": [
+                {
+                  "type": "content",
+                  "value": "CJC-1295 is prohibited by WADA under S2."
+                }
+              ]
+            }
+          ],
+          "au_subsection": {
+            "title": "Australia (as of 22 October 2026)",
+            "entries": [
+              {
+                "type": "content",
+                "value": "NSW Health reported (19 Oct 2026) 1,180 presentations to NSW emergency departments associated with peptide use between 1 July 2025 and 30 September 2026. The release does not break this figure down by peptide. The release names CJC-1295 among the peptides that products may claim to contain and states: \"None of these peptides are currently approved in Australia for any purpose.\""
+              },
+              {
+                "type": "content",
+                "value": "Poisons Standard (October 2026; F2026L01327; in force from 1 October 2026): \"CJC-1295 (CAS No. 863288-34-0)\" is a named Schedule 4 entry and is listed in Appendix D, clause 5, item 7 (\"Poisons for which possession without authority is illegal\"). The NSW release does not say which CJC-1295 form (with or without DAC) it means. Scheduling is implemented through State and Territory legislation. That CAS number differs from the one shown on this page (446036-97-1). This page does not state whether that entry, or the Schedule 4 class entry for GROWTH HORMONE RELEASING HORMONES (GHRHs), covers the Modified GRF 1-29 form described here."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "references": {
+      "camelCase_prop": "references",
+      "op": "Append new_items at the END only if normalize(current) === normalize(old_value). Skip if any reference link url equals 'https://www.nsw.gov.au/ministerial-releases/nsw-health-warns-of-surge-hospital-presentations-linked-to-peptide-use'. Append to the stored array.",
+      "old_value": [
+        {
+          "title": "Journal of Clinical Endocrinology & Metabolism (2006)",
+          "authors": "Teichman et al.",
+          "description": "Prolonged stimulation of GH, IGF-1, and prolactin in healthy adults by CJC-1295."
+        },
+        {
+          "title": "Journal of Clinical Endocrinology & Metabolism (2006)",
+          "authors": "Alba et al.",
+          "description": "Once-weekly CJC-1295 administration raises IGF-1 sustainably."
+        },
+        {
+          "links": [
+            {
+              "url": "https://pubmed.ncbi.nlm.nih.gov/16352683/",
+              "label": "PubMed"
+            },
+            {
+              "url": "https://doi.org/10.1210/jc.2005-1536",
+              "label": "DOI"
+            }
+          ],
+          "title": "Prolonged stimulation of growth hormone (GH) and insulin-like growth factor I secretion by CJC-1295, a long-acting analog of GH-releasing hormone, in healthy adults",
+          "authors": "Teichman SL, Neale A, Lawrence B, Gagnon C, Castaigne JP, Frohman LA",
+          "citation": "J Clin Endocrinol Metab. 2006; DOI 10.1210/jc.2005-1536. PMID 16352683.",
+          "description": "Healthy-adult PK/PD for DAC CJC-1295; estimated half-life 5.8–8.1 days; multi-day GH/IGF-I elevation. DAC construct only."
+        },
+        {
+          "links": [
+            {
+              "url": "https://pubmed.ncbi.nlm.nih.gov/15817669/",
+              "label": "PubMed"
+            },
+            {
+              "url": "https://doi.org/10.1210/en.2004-1286",
+              "label": "DOI"
+            }
+          ],
+          "title": "Human growth hormone-releasing factor (hGRF)1-29-albumin bioconjugates with an extended duration of action. Identification of CJC-1295 as a long-lasting GRF analog",
+          "authors": "Jetté L, Léger R, Thibaudeau K, et al.",
+          "citation": "Endocrinology. 2005; DOI 10.1210/en.2004-1286. PMID 15817669.",
+          "description": "Defines CJC-1295 as tetrasubstituted hGRF(1-29) with Nε-3-maleimidopropionamide lysine (DAC) for albumin binding."
+        },
+        {
+          "links": [
+            {
+              "url": "https://apexlab.org/cjc-1295-research-guide/",
+              "label": "Source"
+            }
+          ],
+          "title": "CJC-1295 With DAC vs No DAC: An Identity-First Research Guide",
+          "authors": "Apex Laboratory Editorial Team",
+          "citation": "apexlab.org research guide (structure/identity map).",
+          "description": "Structure-only identity map for DAC versus Modified GRF naming. Not a primary pharmacokinetic source."
+        }
+      ],
+      "new_items": [
+        {
+          "title": "NSW Health warns of surge in hospital presentations linked to peptide use",
+          "authors": "NSW Government, Minister for Health",
+          "citation": "Ministerial media release, 19 October 2026.",
+          "description": "NSW Health surveillance data: 1,180 presentations to NSW emergency departments associated with peptide use, 1 July 2025 to 30 September 2026. Names BPC-157, GHK-Cu, TB-500, retatrutide and CJC-1295 and states that none of these peptides is currently approved in Australia for any purpose.",
+          "links": [
+            {
+              "url": "https://www.nsw.gov.au/ministerial-releases/nsw-health-warns-of-surge-hospital-presentations-linked-to-peptide-use",
+              "label": "NSW Government"
+            }
+          ]
+        },
+        {
+          "title": "Health authorities issue unapproved peptide use warning after surge in NSW hospital visits",
+          "authors": "Coote G, ABC News",
+          "citation": "ABC News, 19 October 2026.",
+          "description": "News report of the NSW Health data (1,180 emergency department presentations between July 2025 and September 2026).",
+          "links": [
+            {
+              "url": "https://www.abc.net.au/news/2026-10-19/nsw-peptide-emergency-department-surge-prompts-warning/107281674",
+              "label": "ABC News"
+            }
+          ]
+        },
+        {
+          "title": "Therapeutic Goods (Poisons Standard—October 2026) Instrument 2026",
+          "authors": "Australian Government, Federal Register of Legislation",
+          "citation": "F2026L01327. Made under the Therapeutic Goods Act 1989; in force from 1 October 2026.",
+          "description": "Schedule 4 entry \"# CJC-1295 (CAS No. 863288-34-0).\"; Appendix D, clause 5, item 7. Text read 22 October 2026.",
+          "links": [
+            {
+              "url": "https://www.legislation.gov.au/F2026L01327/asmade/text",
+              "label": "Federal Register of Legislation"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "do_not_touch": "every other column; other posts",
+  "note": "Targets the single CJC-1295 entry (/encyclopedia/CJC-1295). The CJC-1295-Ipamorelin blend entry is not touched."
+}
