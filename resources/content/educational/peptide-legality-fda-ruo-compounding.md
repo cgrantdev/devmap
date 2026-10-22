@@ -49,6 +49,13 @@ The contents of the policy will not be known until it is issued. Until then, any
 
 **What would change the in-force column:** FDA issuing the interim policy (and its actual terms), FDA moving a specific substance into an interim category, or a final rule adding a substance to 21 CFR 216.23. A news report, a law-firm alert, or an OMB listing does not.
 
+## Enforcement pressure (October 2026)
+
+**As of 22 October 2026.** The items below are public reports from that month. The Senate letter is a request to FDA. It is not a statute, an FDA rule, or a change to the compounding lists in this guide. FDA has not announced a response.
+
+- **Senate letter, 14 October 2026.** The office of Senator Jim Banks (R-Ind.) published a press release on 15 October 2026 that links a letter dated 14 October 2026 to Kyle Diamantas, Acting Commissioner of Food and Drugs. The letter is signed by Jim Banks, Martin Heinrich, Ted Budd, Adam B. Schiff, Tom Cotton, Andy Kim, David H. McCormick, Jon Husted, and Todd Young. It concerns vendors using “for research use only” labeling to sell unapproved drugs and active pharmaceutical ingredients. Its example is online sales of retatrutide, which the letter describes as an investigational drug that FDA has not approved. It asks the Acting Commissioner to “work more closely with U.S. Customs & Border Protection and other law enforcement agencies to take these illicit drugs off the market and hold the companies selling them accountable,” and it requests a briefing on the “for research use only” labeling authority and FDA’s enforcement strategy, including coordination with Customs and Border Protection. The letter is addressed to the Acting FDA Commissioner. Customs and Border Protection is named as an agency the letter asks FDA to work with. The press release and the letter do not describe a response from FDA. As of 22 October 2026, no FDA announcement answering the letter was found. Source: Office of Senator Jim Banks, “Banks Urges FDA to Crack Down on Illicit ‘Research Use Only’ Drugs,” 15 October 2026, https://www.banks.senate.gov/news/press-releases/banks-urges-fda-to-crack-down-on-illicit-research-use-only-drugs/
+- **TikTok searches, as of 20 October 2026.** The Verge reported that searches on TikTok for certain peptide names were returning a “no results found” page. Names in the article include semaglutide, BPC-157, and TB-500, and the article also lists the search string “retratutide.” It reported that a search for the word “peptides” still returned videos, that it saw no sign videos had been removed, and that some small changes to the blocked names still returned published videos. TikTok’s U.S. owner did not respond to The Verge’s request for comment. The article does not give a reason stated by TikTok. Source: Richard Lawler, “TikTok has started censoring searches for popular peptides,” The Verge, 20 October 2026, https://www.theverge.com/science/1014825/peptide-tiktok-search-ban
+
 ## Three lanes: approved, compounded, research-labeled
 
 | Lane | What it is | What people get wrong |
@@ -233,6 +240,12 @@ October 2026 interim access policy (pending, checked 19 October 2026):
 7h. U.S. FDA, Bulk Drug Substances Used in Compounding Under Section 503A of the FD&C Act (content current as of 14 May 2026): https://www.fda.gov/drugs/human-drug-compounding/bulk-drug-substances-used-compounding-under-section-503a-fdc-act
 
 7i. 21 CFR 216.23, Bulk drug substances that can be used to compound drug products in accordance with section 503A (read 19 October 2026): https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-216/subpart-B/section-216.23
+
+Enforcement pressure (checked 22 October 2026):
+
+7j. Office of Senator Jim Banks (R-Ind.), “Banks Urges FDA to Crack Down on Illicit ‘Research Use Only’ Drugs,” press release, 15 October 2026. Links a letter dated 14 October 2026 to Kyle Diamantas, Acting Commissioner of Food and Drugs, signed by Jim Banks, Martin Heinrich, Ted Budd, Adam B. Schiff, Tom Cotton, Andy Kim, David H. McCormick, Jon Husted, and Todd Young. The letter requests closer FDA work with U.S. Customs and Border Protection and a briefing. It does not report an FDA response: https://www.banks.senate.gov/news/press-releases/banks-urges-fda-to-crack-down-on-illicit-research-use-only-drugs/ ; letter PDF linked from that page: https://www.dropbox.com/scl/fi/eaeulrk1plwq3ff5e9gar/2026.10.14-Senators-Letter-to-FDA-re-For-Research-Use-Only-Labeling.pdf?rlkey=9vjj3ateafudmlanlmwub60ga&dl=0
+
+7k. Richard Lawler, “TikTok has started censoring searches for popular peptides,” The Verge, 20 October 2026. Reports a “no results found” page for certain peptide-name searches, that a search for “peptides” still returned videos, and that TikTok’s U.S. owner did not respond to a request for comment: https://www.theverge.com/science/1014825/peptide-tiktok-search-ban
 
 
 ## Disclaimer

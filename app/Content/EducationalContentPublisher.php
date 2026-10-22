@@ -337,7 +337,7 @@ class EducationalContentPublisher
                 'og_title' => 'Are Research Peptides Legal? FDA & RUO Basics',
                 'og_description' => 'Educational explainer: FDA approval vs 503A compounding vs RUO, plus the October 2026 interim peptide compounding policy under OMB review (not issued).',
                 'tag' => 'Regulation',
-                'read_time' => '13 Min Read',
+                'read_time' => '14 Min Read',
                 'published_at' => '2026-09-29',
                 'faq' => self::faq($host.'/guides/peptide-legality-fda-ruo-compounding#faq', [
                     ['Are research peptides legal to buy online?', 'There is no single yes/no answer for every peptide, seller, claim, and jurisdiction. RUO listings exist; FDA still polices unapproved new drugs marketed for human use. This page does not advise purchases.'],
