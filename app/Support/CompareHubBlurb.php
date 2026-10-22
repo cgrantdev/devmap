@@ -17,7 +17,7 @@ class CompareHubBlurb
      * Percent outcomes, efficacy or healing results, superlatives, and
      * per-dose figures. Matched against the blurb the hub would render.
      */
-    private const OUTCOME_PATTERN = '/\d+(?:\.\d+)?\s*%|\b(?:proven|clinically\s+shown|clinically\s+proven|healing|fat[-\s]?burning|fat[-\s]?loss|weight[-\s]?(?:loss|reduction)|superior|remarkable|highest|best|most[-\s]searched|most\s+selective|most\s+effective|exercise\s+mimetic|master\s+upstream)\b|\breduc(?:e|es|ing)\s+(?:visceral\s+)?fat\b|\bpromotes?\s+(?:systemic\s+)?recovery\b|\bincreas(?:e|es|ing)\s+sexual\s+desire\b|\btransformed\b|\bhas\s+shown\b|\bstimulat(?:e|es|ing)\s+(?:natural\s+)?(?:gh|growth\s+hormone)\s+release\b|\bimprov(?:e|es|ing)\s+metabolic\b|\b\d+(?:\.\d+)?\s*(?:mg|mcg|µg|μg|iu)\b|\b(?:once|twice)[-\s](?:daily|weekly)\b|\bper\s+dose\b/iu';
+    private const OUTCOME_PATTERN = '/\d+(?:[.,]\d+)?\s*%|\bup\s+to\b|\b(?:reduc(?:e|es|ed|ing|tions?)|loss|lose|losing|heal(?:s|ed|ing)?|improv(?:e|es|ed|ing|ements?)|boost(?:s|ed|ing)?|promot(?:e|es|ed|ing)|enhanc(?:e|es|ed|ing|ements?)|increas(?:e|es|ed|ing)|decreas(?:e|es|ed|ing)|lower(?:s|ed|ing)?|burn(?:s|ed|ing)?|accelerat(?:e|es|ed|ing)|regenerat(?:e|es|ed|ing|ion)|restor(?:e|es|ed|ing)|treat(?:s|ed|ing|ments?)?|cur(?:e|es|ed)|effective|efficacy|proven|clinically\s+shown|superior|remarkable|highest|best|cheapest|verified|approved|transformed|has\s+shown|anti[-\s]?aging|weight[-\s]?management|exercise\s+mimetic|master\s+upstream|most[-\s][a-z]+)\b|\b\d+(?:\.\d+)?\s*(?:mg|mcg|µg|μg|iu)\b|\b(?:once|twice)[-\s](?:daily|weekly)\b|\bper\s+dose\b/iu';
 
     /**
      * Class lines for compounds whose stored hub blurb is an outcome claim.
@@ -31,10 +31,10 @@ class CompareHubBlurb
         'semaglutide' => 'Semaglutide is a GLP-1 receptor agonist studied in metabolic research. Research use only.',
         'tesamorelin' => 'Tesamorelin is a GHRH analog studied in lipodystrophy research. Research use only.',
         'mots-c' => 'MOTS-c is a mitochondrial-derived peptide studied in metabolic research. Research use only.',
-        'bpc-157' => 'BPC-157 is a synthetic peptide fragment studied in tissue-repair research. Research use only.',
+        'bpc-157' => 'BPC-157 is a synthetic pentadecapeptide derived from a gastric protein, studied in musculoskeletal and gastrointestinal research. Research use only.',
         'ipamorelin' => 'Ipamorelin is a growth hormone secretagogue studied in endocrine research. Research use only.',
         'aod-9604' => 'AOD-9604 is a modified fragment of human growth hormone (amino acids 176-191) studied in metabolic research. Research use only.',
-        'tb-500' => 'TB-500 is a synthetic fragment of thymosin beta-4 studied in tissue-repair research. Research use only.',
+        'tb-500' => 'TB-500 is a synthetic peptide related to thymosin beta-4, studied in musculoskeletal research. Research use only.',
         'sermorelin' => 'Sermorelin is a GHRH(1-29) analog studied in endocrine research. Research use only.',
         'cagrilintide' => 'Cagrilintide is an amylin analog studied in obesity research. Research use only.',
         'kisspeptin' => 'Kisspeptin is a neuropeptide studied in reproductive endocrinology research. Research use only.',

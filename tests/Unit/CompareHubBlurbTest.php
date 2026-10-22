@@ -79,6 +79,74 @@ class CompareHubBlurbTest extends TestCase
         );
     }
 
+    public function test_outcome_words_match_and_neutral_lines_do_not(): void
+    {
+        foreach ([
+            'Improves insulin sensitivity',
+            'Heals tendons',
+            'Boosts GH',
+            'Reduces appetite',
+            'up to twenty pounds',
+            'Treats obesity',
+            'Cheapest',
+            'Verified',
+            'FDA-approved',
+        ] as $claim) {
+            $this->assertTrue(CompareHubBlurb::hasOutcomeClaim($claim), $claim);
+        }
+
+        foreach ($this->neutralLines() as $line) {
+            $this->assertFalse(CompareHubBlurb::hasOutcomeClaim($line), $line);
+        }
+
+        foreach ($this->livePassThroughCards() as $slug => $line) {
+            $this->assertFalse(CompareHubBlurb::hasOutcomeClaim($line), $slug);
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function neutralLines(): array
+    {
+        return [
+            'Retatrutide is a triple agonist (GLP-1, GIP, and glucagon) studied in obesity research. Research use only.',
+            'Tirzepatide is a dual GIP and GLP-1 receptor agonist studied in metabolic research. Research use only.',
+            'Semaglutide is a GLP-1 receptor agonist studied in metabolic research. Research use only.',
+            'Tesamorelin is a GHRH analog studied in lipodystrophy research. Research use only.',
+            'MOTS-c is a mitochondrial-derived peptide studied in metabolic research. Research use only.',
+            'BPC-157 is a synthetic pentadecapeptide derived from a gastric protein, studied in musculoskeletal and gastrointestinal research. Research use only.',
+            'Ipamorelin is a growth hormone secretagogue studied in endocrine research. Research use only.',
+            'AOD-9604 is a modified fragment of human growth hormone (amino acids 176-191) studied in metabolic research. Research use only.',
+            'TB-500 is a synthetic peptide related to thymosin beta-4, studied in musculoskeletal research. Research use only.',
+            'Sermorelin is a GHRH(1-29) analog studied in endocrine research. Research use only.',
+            'Cagrilintide is an amylin analog studied in obesity research. Research use only.',
+            'Kisspeptin is a neuropeptide studied in reproductive endocrinology research. Research use only.',
+            'Bremelanotide is a melanocortin receptor agonist studied in sexual-function research. Research use only.',
+        ];
+    }
+
+    /**
+     * Hub cards whose stored copy is already class or identity language.
+     *
+     * @return array<string, string>
+     */
+    private function livePassThroughCards(): array
+    {
+        return [
+            'ghk-cu' => 'A copper-binding tripeptide (Glycyl-L-Histidyl-L-Lysine + Cu²⁺) studied for its role in skin remodeling, hair follicle stimulation, and tissue repair pathways.',
+            'glow' => 'GLOW is a marketplace blend name, not a single molecule or CAS-registered substance. On Peptidemap and across multiple vendors, GLOW listings typically denote a co-lyophilized trio of GHK-Cu, BPC-157,...',
+            'nad' => 'NAD+ is a critical coenzyme found in every living cell, essential for energy metabolism, DNA repair, and sirtuin activation. Levels decline significantly with age.',
+            'glutathione' => 'Glutathione (GSH) is a ubiquitous endogenous tripeptide (glutamate–cysteine–glycine) central to cellular redox biology, detoxification, and antioxidant defense. It is sold in research and compounding...',
+            'cjc-1295' => 'Catalog labels often call a tetrasubstituted GHRH(1-29) analog “CJC-1295 no DAC” or Modified GRF 1-29. In the peer-reviewed literature, CJC-1295 names the long-acting Drug Affinity Complex (DAC) const...',
+            '5-amino-1mq' => '5-Amino-1MQ (5-amino-1-methylquinolinium) is a synthetic small-molecule inhibitor of nicotinamide N-methyltransferase (NNMT). It is a research chemical, not a peptide: it has no amino-acid sequence (l...',
+            'igf-1-lr3' => 'IGF-1 LR3 is an 83-amino acid synthetic analog of insulin-like growth factor 1 (IGF-1) with a modified N-terminus. The arginine-to-glutamate substitution at position 3 and 13-amino acid extension sign...',
+            'tesofensine' => 'Tesofensine is a small-molecule inhibitor of serotonin, norepinephrine, and dopamine reuptake. It is not a peptide.',
+            'epitalon' => 'Epitalon (Epithalon) is the synthetic tetrapeptide Ala-Glu-Asp-Gly (AEDG), developed in pineal bioregulator research associated with the Khavinson group. It is studied primarily for telomerase/telomer...',
+            'kpv' => 'KPV is the tripeptide lysine–proline–valine, corresponding to α-melanocyte-stimulating hormone residues 11–13. It is studied mainly for anti-inflammatory activity in cell and animal models, with parti...',
+        ];
+    }
+
     /**
      * @return array<string, array{0: string, 1: string}>
      */
@@ -111,7 +179,7 @@ class CompareHubBlurbTest extends TestCase
             ],
             'bpc-157' => [
                 'BPC-157 is a synthetic peptide derived from a protective protein found in the stomach. It has shown remarkable healing properties for tendons, ligaments, muscles, and the gastrointestinal tract.',
-                'BPC-157 is a synthetic peptide fragment studied in tissue-repair research. Research use only.',
+                'BPC-157 is a synthetic pentadecapeptide derived from a gastric protein, studied in musculoskeletal and gastrointestinal research. Research use only.',
             ],
             'ipamorelin' => [
                 'Ipamorelin is the most selective growth hormone secretagogue, stimulating GH release without affecting cortisol, prolactin, or ACTH levels.',
@@ -123,7 +191,7 @@ class CompareHubBlurbTest extends TestCase
             ],
             'tb-500' => [
                 'TB-500 is a synthetic fragment of Thymosin Beta-4, a naturally occurring protein involved in cell migration and tissue repair. It promotes systemic recovery through actin polymerization modulation.',
-                'TB-500 is a synthetic fragment of thymosin beta-4 studied in tissue-repair research. Research use only.',
+                'TB-500 is a synthetic peptide related to thymosin beta-4, studied in musculoskeletal research. Research use only.',
             ],
             'sermorelin' => [
                 'Sermorelin is the first 29 amino acids of natural GHRH, previously FDA-approved for pediatric GH deficiency. It stimulates natural GH release while preserving feedback regulation.',

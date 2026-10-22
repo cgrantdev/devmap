@@ -66,7 +66,7 @@ class CompareHubBlurbTest extends TestCase
         $this->assertEquals(18.0, $bySlug['tesofensine']['products'][0]['price']);
 
         $this->assertSame(
-            'BPC-157 is a synthetic peptide fragment studied in tissue-repair research. Research use only.',
+            'BPC-157 is a synthetic pentadecapeptide derived from a gastric protein, studied in musculoskeletal and gastrointestinal research. Research use only.',
             $bySlug['bpc-157']['description']
         );
 
