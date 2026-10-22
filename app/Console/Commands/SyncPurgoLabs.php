@@ -142,14 +142,12 @@ class SyncPurgoLabs extends Command
             }
             $sku = $data['sku'] ?? ($data['productID'] ?? null);
 
-            // Size is usually embedded in the name (e.g. "BPC-157 10mg")
-            // or on the sku suffix. Extract the mg from name where present.
-            $size = null;
-            if (!empty($data['name']) && preg_match('~(\d+(?:\.\d+)?)\s*mg\b~i', $data['name'], $sm)) {
-                $size = $sm[1] . 'mg';
-            } elseif ($sku && preg_match('~(\d+(?:\.\d+)?)\s*MG~i', (string) $sku, $sm)) {
-                $size = $sm[1] . 'mg';
-            }
+            // Size is embedded in the name (e.g. "BPC-157 10mg", "GHK-CU
+            // Serum 30ml", "BPC-157 Strips 30 Strips"). Covers every unit
+            // Purgo ships: mg, mcg, ml, g, iu, strips, tablets, capsules.
+            // Julia 10/21 — original regex only matched 'mg' so topical
+            // and recon-solution products shipped with empty size_mg.
+            $size = $this->extractSize($data['name'] ?? '', (string) ($sku ?: ''));
 
             return [
                 'name' => trim((string) $data['name']),
@@ -175,11 +173,25 @@ class SyncPurgoLabs extends Command
             })
             ->first();
 
-        // Base update payload — safe to overwrite on every sync.
-        // Price, stock, image, size can change on Purgo's site; we keep
-        // our copy in step. hidden/status stay sync-controlled because
-        // Purgo is an approved vendor — anything they list is live.
-        $attrs = [
+        if ($existing) {
+            // Colin 10/21 — auto-refresh is price, image, stock only.
+            // Everything else (name, size, type, category, description,
+            // hidden, status, url, sku) is admin-curated and never
+            // touched by sync. Purgo doesn't return a per-product
+            // discount price so we leave that alone too.
+            $existing->fill([
+                'price' => $p['price'],
+                'image_url' => $p['image'],
+                'stock_status' => 'in_stock',
+            ])->save();
+            return 'updated';
+        }
+
+        // Insert path — Purgo is the source of truth for every field
+        // because no admin has touched it yet.
+        Product::create([
+            'brand_id' => $brandId,
+            'slug' => $this->uniqueSlug($brandId, $p['name'], $slug),
             'name' => $p['name'],
             'price' => $p['price'],
             'image_url' => $p['image'],
@@ -190,23 +202,68 @@ class SyncPurgoLabs extends Command
             'external_id' => $extId,
             'hidden' => false,
             'status' => 'active',
-        ];
-
-        if ($existing) {
-            // Julia 10/15 — manual category edits in /admin/products were
-            // reverting to Uncategorized every day. Cause: this sync set
-            // product_category_id on every write, overwriting whatever
-            // she just picked. Only categorize on INSERT; on UPDATE,
-            // Julia's manual choice is the source of truth.
-            $existing->fill($attrs)->save();
-            return 'updated';
-        }
-
-        $attrs['brand_id'] = $brandId;
-        $attrs['slug'] = $this->uniqueSlug($brandId, $p['name'], $slug);
-        $attrs['product_category_id'] = $this->categorize($slug, $p['name']);
-        Product::create($attrs);
+            'product_category_id' => $this->categorize($slug, $p['name']),
+            'product_type' => $this->inferType($slug, $p['name']),
+        ]);
         return 'new';
+    }
+
+    /**
+     * Extract a human size from a product name + SKU. Handles the
+     * units Purgo actually uses: mg, mcg, g, ml, iu, strips, tablets,
+     * capsules. Returns null when nothing matches.
+     */
+    private function extractSize(string $name, string $sku): ?string
+    {
+        // Primary: "<number><unit>" or "<number> <unit>" in the name
+        $units = '(?:mg|mcg|g|ml|iu|strips?|tablets?|capsules?|caps|pack)';
+        if (preg_match('~(\d+(?:\.\d+)?)\s*' . $units . '\b~i', $name, $m)) {
+            $num = $m[1];
+            $unit = strtolower(trim(substr($m[0], strlen($m[1]))));
+            // Normalize noisy units
+            $unit = match (true) {
+                str_starts_with($unit, 'strip') => 'strips',
+                str_starts_with($unit, 'tablet') => 'tablets',
+                str_starts_with($unit, 'capsule'), str_starts_with($unit, 'cap') => 'capsules',
+                default => $unit,
+            };
+            return $num . $unit;
+        }
+        // Fallback: "<number>MG" style on the SKU
+        if ($sku && preg_match('~(\d+(?:\.\d+)?)\s*(?:MG|MCG|ML|G|IU)~i', $sku, $m)) {
+            return $m[1] . strtolower(preg_replace('/[^A-Za-z]/', '', substr($m[0], strlen($m[1]))));
+        }
+        return null;
+    }
+
+    /**
+     * Infer product_type from the slug or name. Shampoo/cream/serum →
+     * Topical, nasal spray → Nasal Spray, acetic acid / recon / BAC
+     * water → Bacteriostatic Water, strips/caps/tablets → Capsule
+     * (closest available), everything else → Peptide. Julia 10/21:
+     * Purgo keeps shipping topicals + solutions that landed with no
+     * type, needing manual cleanup every sync.
+     */
+    private function inferType(string $slug, string $name): ?string
+    {
+        $hay = strtolower($slug . ' ' . $name);
+        return match (true) {
+            str_contains($hay, 'shampoo'), str_contains($hay, 'cream'),
+            str_contains($hay, 'serum'), str_contains($hay, 'balm'),
+            str_contains($hay, 'lotion') => 'Topical',
+            str_contains($hay, 'nasal'), str_contains($hay, 'spray') => 'Nasal Spray',
+            str_contains($hay, 'bac') && str_contains($hay, 'water'),
+            str_contains($hay, 'bacteriostatic'),
+            str_contains($hay, 'acetic'),
+            str_contains($hay, 'recon'),
+            str_contains($hay, 'reconstitution'),
+            str_contains($hay, 'reconst') => 'Bacteriostatic Water',
+            str_contains($hay, 'capsule'), str_contains($hay, 'tablet'),
+            str_contains($hay, 'strip') => 'Capsule',
+            str_contains($hay, 'kit'), str_contains($hay, 'case'),
+            str_contains($hay, 'storage') => 'Kit',
+            default => 'Peptide',
+        };
     }
 
     /**
@@ -221,34 +278,67 @@ class SyncPurgoLabs extends Command
         $key = strtolower($slug);
         if (array_key_exists($key, $cache)) return $cache[$key];
 
-        // slug-based pseudonym map (keys match the URL token on purgolabs.com)
+        // slug-based pseudonym map (keys match the URL token on purgolabs.com).
+        // Julia 10/21 — expanded to cover topicals, strips, recon solutions,
+        // BPC-157 variants, GHK-CU series, AHK-Cu combos.
         $pseudonyms = [
+            // GLP series
             'glp-1-s' => 'Semaglutide',
             'glp-2-t' => 'Tirzepatide',
             'glp-3-r' => 'Retatrutide',
-            'glp-4-metatrutide' => 'Retatrutide', // closest match until metatrutide has its own category
+            'glp-4-metatrutide' => 'Retatrutide',
+            // Blends
             'klow' => 'KLOW',
             'glow-complex' => 'GLOW',
             'glow-caps' => 'GLOW',
+            // Copper peptides — GHK-Cu / AHK-Cu family
             'ahk-cu' => 'AHK-Cu',
+            'ahk-cu-ghk-cu-copper-peptide-shampoo' => 'GHK-Cu',
             'ghkcu' => 'GHK-Cu',
+            'ghk-cu' => 'GHK-Cu',
             'ghk-cu-spray' => 'GHK-Cu',
+            'ghk-cu-serum' => 'GHK-Cu',
             'ghk-cu-copper-peptide-shampoo' => 'GHK-Cu',
             'ghk-cu-copper-peptide-capsule-cream' => 'GHK-Cu',
             'ghk-cu-lift-cream' => 'GHK-Cu',
             'ghk-cu-whipped-tallow-honey-balm' => 'GHK-Cu',
+            // BPC-157 variants
+            'bpc-157' => 'BPC-157',
+            'bpc-157-strips' => 'BPC-157',
+            'bpc-157-tb-500' => 'BPC-157 / TB-500',
+            // Secretagogues + growth
             'cjc-ipamorelin-no-dac' => 'CJC-1295 / Ipamorelin',
+            'cjc-1295-ipamorelin' => 'CJC-1295 / Ipamorelin',
             'ipamorlin' => 'Ipamorelin',
-            'melanoton-1' => 'Melanotan',
+            'ipamorelin' => 'Ipamorelin',
             'tesamorlin' => 'Tesamorelin',
+            'tesamorelin' => 'Tesamorelin',
+            // Melanocortins
+            'melanoton-1' => 'Melanotan',
+            'melanotan-1' => 'Melanotan',
+            'melanotan-2' => 'Melanotan',
+            // Nootropics
+            'selank' => 'Selank',
             'selank-semax-blend' => 'Selank',
+            'semax' => 'Semax',
             'semax-selank-spray' => 'Semax',
+            // PT-141 line
+            'pt-141' => 'PT-141',
             'pt-141-oxytocin-xo-spray' => 'PT-141',
             'pt-141-spray' => 'PT-141',
+            // NAD / sleep
             'nad-plus' => 'NAD+',
             'nad-plus-spray' => 'NAD+',
+            'dsip' => 'DSIP',
             'dsip-pinealon-zzz-spray' => 'DSIP',
+            'adamax' => 'Adamax',
             'adamax-research-spray' => 'Adamax',
+            // Bacteriostatic / recon solutions
+            'aa-acetic-acid-water' => 'Bacteriostatic Water',
+            'acetic-acid-water' => 'Bacteriostatic Water',
+            'bacteriostatic-water' => 'Bacteriostatic Water',
+            'hosp-recon-solution' => 'Bacteriostatic Water',
+            'reconstitution-solution' => 'Bacteriostatic Water',
         ];
 
         $target = $pseudonyms[$key] ?? null;

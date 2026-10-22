@@ -38,6 +38,37 @@ class ProductsController extends Controller
 
     private function buildProductMetaDescription($product, $brand): string
     {
+        // Colin 10/21 SEO work: Google was collapsing product pages as
+        // near-duplicates partly because the meta description was
+        // templated identically across every product ("X from Y.
+        // Compare listings from N vendors..."). We now have genuinely
+        // unique AI-generated descriptions per product (or scraped
+        // vendor copy). Use the first sentence of that as the meta —
+        // ~150 chars of truly distinct text per URL.
+        $source = $product->vendor_description
+            ?: $product->generated_description
+            ?: null;
+
+        if ($source) {
+            // First sentence, trimmed to the SEO limit.
+            $firstSentence = preg_split('/(?<=[.!?])\s+/', trim($source), 2)[0] ?? '';
+            $firstSentence = trim($firstSentence);
+            if (mb_strlen($firstSentence) >= 60 && mb_strlen($firstSentence) <= 155) {
+                return $firstSentence;
+            }
+            // Too short? Grab the first 150 chars at word boundary.
+            if (mb_strlen($source) > 60) {
+                $snippet = mb_substr($source, 0, 150);
+                $lastSpace = mb_strrpos($snippet, ' ');
+                if ($lastSpace !== false && $lastSpace >= 100) {
+                    return mb_substr($snippet, 0, $lastSpace) . '…';
+                }
+                return $snippet . '…';
+            }
+        }
+
+        // Fallback: the old generic template. Keeps things working on
+        // the 1 straggler product that didn't get a description.
         $vendorCount = 0;
         if ($product->product_category_id) {
             $vendorCount = Product::visible()
@@ -488,7 +519,16 @@ class ProductsController extends Controller
                 'original_name' => $product->getRawOriginal('name'),
                 'product_type' => $product->product_type,
                 'slug' => $product->slug,
-                'description' => $product->description,
+                // Fallback chain (Colin 10/20 — Google dedup fix):
+                //   1. vendor_description (scraped from vendor site)
+                //   2. generated_description (Claude AI gap-filler)
+                //   3. description (original stored boilerplate)
+                // Each layer is more fallback-y than the last; every one
+                // is strictly more unique than our old approach of showing
+                // the same boilerplate on every page.
+                'description' => $product->vendor_description
+                    ?: $product->generated_description
+                    ?: $product->description,
                 'price' => $product->price,
                 'discount_price' => $product->discount_price,
                 'size_mg' => $product->size_mg,
@@ -1189,7 +1229,14 @@ class ProductsController extends Controller
                 'initials' => $initials,
                 'rating' => (float) ($brand->rating_average ?? 0),
                 'reviews' => (int) ($brand->rating_count ?? 0),
-                'description' => $brand->vendorSetting->description ?? 'Premium quality peptides for research purposes.',
+                // Colin 10/21 SEO push — fall back through the dedup
+                // chain so every /brand/{slug} has a unique body
+                // description instead of the "Premium quality peptides
+                // for research purposes." boilerplate that was shared
+                // across ~40 vendors with no manual description.
+                'description' => $brand->vendorSetting->description
+                    ?: $brand->vendorSetting->generated_description
+                    ?: 'Research peptide supplier listed on Peptidemap.',
                 'shop_url' => $brand->vendorSetting->shop_url ?? null,
                 'contact_email' => $brand->vendorSetting->contact_email ?? null,
                 'phone_number' => $brand->vendorSetting->phone_number ?? null,

@@ -1086,11 +1086,20 @@ class CompareController extends Controller
         $displayA = $aData['name'];
         $displayB = $bData['name'];
 
-        // Display names are already CompoundDisplay labels, so GLP vs
-        // pages keep GLP3-R / GLP2-T / GLP1-S. VsPageSeo only shortens.
-        // $final is the alias-resolved canonical slug, so a pair override
-        // in KlowCompareCopy is keyed on the long KLOW slug.
-        $seoCopy = VsPageSeo::forPair($displayA, $displayB, $final);
+        // Colin 10/21 SEO fix — split visible display from SEO meta.
+        // The old code used CompoundDisplay labels for BOTH, so VS
+        // pages for GLP compounds rendered "GLP3-R vs GLP2-T" in the
+        // title / description / H1. Nobody searches "GLP3-R" —
+        // "retatrutide vs tirzepatide" has thousands of monthly
+        // searches, "GLP3-R vs GLP2-T" has none. Google was ranking
+        // our pages against zero demand.
+        // Fix: use raw category names ($a->name, $b->name) for SEO
+        // meta + schema; keep the pseudonyms for the visible h1 /
+        // body only (vendor optics on-page). Same split pattern
+        // compound compare pages have used since Sep 14.
+        $seoA = $a->name;
+        $seoB = $b->name;
+        $seoCopy = VsPageSeo::forPair($seoA, $seoB, $final);
         $seoTitle = $seoCopy['title'];
         $seoDescription = $seoCopy['description'];
 
@@ -1100,7 +1109,7 @@ class CompareController extends Controller
             'itemListElement' => [
                 ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home',    'item' => url('/')],
                 ['@type' => 'ListItem', 'position' => 2, 'name' => 'Compare', 'item' => url('/compare')],
-                ['@type' => 'ListItem', 'position' => 3, 'name' => "{$displayA} vs {$displayB}", 'item' => url("/compare/{$aSlug}-vs-{$bSlug}")],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => "{$seoA} vs {$seoB}", 'item' => url("/compare/{$aSlug}-vs-{$bSlug}")],
             ],
         ];
 

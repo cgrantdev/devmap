@@ -365,6 +365,15 @@ Route::middleware(['auth', 'role:vendor', 'email.verified'])->prefix('vendor')->
     Route::delete('/integrations/woo', [\App\Http\Controllers\Vendor\IntegrationsController::class, 'destroy'])->name('vendor.integrations.woo.destroy');
 });
 
+// Dev-console runner with bearer-token auth — Claude's out-of-session
+// trigger point. The route lives OUTSIDE the admin middleware group
+// because it carries its own auth via the DEV_CONSOLE_TOKEN env var
+// (checked in controller). Set that env var in Forge to a long random
+// string; leave unset to disable the token path entirely (session-authed
+// /admin/dev/console/run keeps working regardless).
+Route::post('/api/dev-console/run', [\App\Http\Controllers\Admin\DevConsoleController::class, 'runWithToken'])
+    ->name('api.dev-console.run');
+
 // Admin routes
 Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.viewer.writes'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
@@ -393,9 +402,29 @@ Route::middleware(['auth', 'role:admin,admin_viewer', 'email.verified', 'block.v
     // Internal SEO inventory + notes scratchpad. Same ceo.only gate as
     // /admin/ceo. Excluded from sitemap; noindex header on the response;
     // /admin/* already disallowed in robots.txt.
+    // SEO dashboard — agency-facing. NOT ceo.only so the agency can log
+    // in and work directly. Overview + Playbook sections live here; the
+    // internal /admin/seo-wip stays CEO-only for the ops inventory.
+    Route::get('/seo', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'index'])->name('admin.seo');
+    Route::get('/seo/pages', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'pages'])->name('admin.seo.pages');
+    Route::post('/seo/pages', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'savePage'])->name('admin.seo.pages.save');
+    Route::delete('/seo/pages/{seoPage}', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'deletePage'])->name('admin.seo.pages.delete');
+    Route::get('/seo/playbook', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'playbook'])->name('admin.seo.playbook');
+
+    // Per-page analytics — GSC + internal signals for any one URL.
+    // Deep-linked from the frontend AdminBar's "Analytics" button.
+    Route::get('/analytics/page', [\App\Http\Controllers\Admin\PageAnalyticsController::class, 'show'])->name('admin.analytics.page');
+
     Route::middleware('ceo.only')->group(function () {
         Route::get('/seo-wip', [\App\Http\Controllers\Admin\SeoWipController::class, 'index'])->name('admin.seo-wip');
         Route::post('/seo-wip/notes', [\App\Http\Controllers\Admin\SeoWipController::class, 'saveNotes'])->name('admin.seo-wip.notes');
+
+        // Dev console — whitelisted artisan runner so Colin / Claude
+        // can trigger scrapers + maintenance from the browser instead
+        // of Forge SSH. CEO-only; whitelist in the controller is the
+        // entire interface. See DevConsoleController.
+        Route::get('/dev/console', [\App\Http\Controllers\Admin\DevConsoleController::class, 'index'])->name('admin.dev.console');
+        Route::post('/dev/console/run', [\App\Http\Controllers\Admin\DevConsoleController::class, 'run'])->name('admin.dev.console.run');
     });
     Route::get('/vendors', [VendorsController::class, 'index'])->name('admin.vendors');
     Route::get('/applicants', [VendorsController::class, 'applicants'])->name('admin.applicants');

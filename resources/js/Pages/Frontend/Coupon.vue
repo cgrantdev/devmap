@@ -94,6 +94,17 @@
         </div>
       </div>
 
+      <!-- Vendor description — surfaces the brand's unique copy so
+           every /coupon/{brand} page has distinct body content that
+           Google can distinguish from every other coupon URL. Shown
+           above the FAQ since it's more directly relevant to someone
+           evaluating the vendor at code-use time. Colin 10/21. -->
+      <div v-if="brand.description" class="mb-6 pb-6 border-b border-[color:var(--color-hairline)]">
+        <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-2">About {{ brand.name }}</h2>
+        <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed whitespace-pre-line">{{ brand.description }}</p>
+        <p v-if="brand.location" class="text-[12px] text-[color:var(--color-ink-subtle)] mt-2">Based in {{ brand.location }}.</p>
+      </div>
+
       <!-- FAQ / body copy for query-match depth -->
       <div class="space-y-5">
         <div>

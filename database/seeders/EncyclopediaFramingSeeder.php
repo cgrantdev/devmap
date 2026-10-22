@@ -74,9 +74,31 @@ class EncyclopediaFramingSeeder extends Seeder
             return;
         }
 
+        // Colin 10/22 — this seeder failed EVERY auto-deploy for 2
+        // days with "Duplicate entry 'hCG' for key education_posts_slug
+        // _unique." The old logic looked up EducationPost by
+        // product_category_id, found none for the hCG ProductCategory,
+        // and tried to INSERT with slug=$category->slug (="hCG") — but
+        // a separate category already owns an education_posts row with
+        // slug='hCG'. Unique constraint blew every migrate --force.
+        //
+        // Fix: if the proposed slug is already taken by a DIFFERENT
+        // EducationPost (owned by another category), adopt that
+        // existing post instead of trying to create a new one. The
+        // ProductCategory → EducationPost link gets rewired on the
+        // existing row so we only ever end up with one post per slug.
+        $desiredSlug = $post?->slug ?: $category->slug;
+
+        if (!$post) {
+            $existingBySlug = EducationPost::query()->where('slug', $desiredSlug)->first();
+            if ($existingBySlug) {
+                $post = $existingBySlug;
+            }
+        }
+
         $attributes = array_merge($profile->articleAttributes(), [
             'product_category_id' => $category->id,
-            'slug' => $post?->slug ?: $category->slug,
+            'slug' => $desiredSlug,
             'status' => 'published',
             'show_in_encyclopedia' => true,
             'published_at' => $post?->published_at ?? now(),

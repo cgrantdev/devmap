@@ -319,21 +319,31 @@ class HomeController extends Controller
 
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "home")
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
-        $defaultDescription = Setting::where('key', 'site_description')->value('value') ?? 'Compare research peptide listings and prices across vendors. Catalog data only: RUO, and Peptidemap sells nothing.';
+        // Colin 10/21 SEO push — homepage defaults now target the
+        // high-intent query cluster (compare prices, cheap peptides,
+        // vendor directory, coupon codes) instead of the generic
+        // "Live prices and coupon codes" placeholder. Admin SeoPage
+        // override still wins when Julia sets one.
+        $defaultDescription = Setting::where('key', 'site_description')->value('value')
+            ?? 'Compare research peptide prices across 50+ vendors. Verified lab testing, live coupon codes, and side-by-side pricing on every compound — BPC-157, Retatrutide, Tirzepatide, Semaglutide, GHK-Cu and more. Research use only.';
+        $defaultTitle = 'Compare Research Peptide Prices & Vendors — Peptidemap';
         $defaultImage = $heroSlides[0]['image'] ?? null;
 
         $seoPage = SeoPage::where('key', 'home')->first();
         $seo = [
             'key' => 'home',
-            'title' => $seoPage?->title ?: $siteName,
+            'title' => $seoPage?->title ?: $defaultTitle,
             'description' => $seoPage?->description ?: $defaultDescription,
-            'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $siteName),
+            'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
             'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
             'og_image' => $seoPage?->og_image ?: $defaultImage,
             // Backward-compatible field used by some pages
             'image' => $seoPage?->og_image ?: $defaultImage,
             'url' => url('/'),
-            'robots' => 'noindex, follow',
+            // Colin 10/21 — was 'noindex, follow'. Not currently
+            // rendered to <meta robots>, but one layout wire-up away
+            // from catastrophe. Dropping entirely so the homepage
+            // defaults to Google's standard (index, follow).
         ];
 
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)

@@ -119,6 +119,13 @@ class CouponController extends Controller
                 'logo' => $vs->logo ? asset('storage/' . $vs->logo) : null,
                 'website' => $vs->website,
                 'shop_url' => $vs->shop_url,
+                // Colin 10/21 SEO push — surface the brand's unique
+                // description on the coupon page body. Previously every
+                // coupon page was templated identically down to the FAQ,
+                // so Google saw ~30 near-duplicate URLs. Prefer vendor-
+                // authored description, fall back to AI-generated.
+                'description' => $vs->description ?: $vs->generated_description,
+                'location' => $vs->location?->name,
             ],
             'coupon' => [
                 'code' => $couponCode,

@@ -1,5 +1,11 @@
 <template>
   <div class="min-h-screen bg-[color:var(--color-bg)] text-[color:var(--color-ink)] antialiased">
+    <!-- WP-style admin bar — Colin 10/22. Only renders for logged-in
+         admins; hidden entirely for public visitors. Pushes the rest
+         of the layout down by 32px via the pt-8 class on the wrapper
+         when active (handled below via admin_bar prop). -->
+    <AdminBar />
+
     <!-- Notice bar -->
     <div v-if="showNotice" class="fixed top-0 left-0 right-0 z-[60] bg-[#0A0B0E] text-white">
       <div class="max-w-[1280px] mx-auto px-4 lg:px-10 h-9 flex items-center justify-center gap-1.5 sm:gap-2 text-[11px] sm:text-[13px] relative">
@@ -378,6 +384,7 @@ import { usePage, Link } from '@inertiajs/vue3'
 import Button from '@/components/ui/Button.vue'
 import SearchPalette from '@/components/ui/SearchPalette.vue'
 import CountrySelector from '@/components/ui/CountrySelector.vue'
+import AdminBar from '@/components/AdminBar.vue'
 
 const page = usePage()
 const isStaff = computed(() => {

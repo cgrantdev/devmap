@@ -109,6 +109,8 @@ class VendorsController extends Controller
                         'logo_url' => $brand->vendorSetting->logo ? asset('storage/' . $brand->vendorSetting->logo) : null,
                         'banner_url' => $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
                         'shop_url' => $brand->vendorSetting->shop_url ?? null, // shop_url is the website
+                        'feed_url' => $brand->vendorSetting->feed_url ?? null,
+                        'feed_last_synced_at' => $brand->vendorSetting->feed_last_synced_at?->toIso8601String(),
                         'referral_url' => $brand->vendorSetting->referral_url ?? null,
                         'location_id' => $brand->vendorSetting->location_id ?? null,
                         'description' => $brand->vendorSetting->description ?? null,
@@ -216,6 +218,7 @@ class VendorsController extends Controller
                 },
             ],
             'shop_url' => 'required|url|max:255',
+            'feed_url' => 'nullable|url|max:512',
             'referral_url' => 'nullable|url|max:2000',
             'email' => 'nullable|email|max:255',
             'description' => 'nullable|string|max:2000',
@@ -292,6 +295,9 @@ class VendorsController extends Controller
         
         $settings->description = $validated['description'] ?? null;
         $settings->shop_url = $validated['shop_url'] ?? null; // shop_url is the website
+        if (array_key_exists('feed_url', $validated)) {
+            $settings->feed_url = $validated['feed_url'] ?: null;
+        }
         $settings->referral_url = $validated['referral_url'] ?? null;
         // Save email to contact_email field
         $settings->contact_email = $validated['email'] ?? $validated['contact_email'] ?? null;
@@ -347,6 +353,8 @@ class VendorsController extends Controller
             'settings' => $brand->vendorSetting ? [
                 'description' => $brand->vendorSetting->description,
                 'shop_url' => $brand->vendorSetting->shop_url, // shop_url is the website
+                'feed_url' => $brand->vendorSetting->feed_url,
+                'feed_last_synced_at' => $brand->vendorSetting->feed_last_synced_at?->toIso8601String(),
                 'referral_url' => $brand->vendorSetting->referral_url,
                 'contact_email' => $brand->vendorSetting->contact_email,
                 'phone_number' => $brand->vendorSetting->phone_number,
@@ -486,6 +494,7 @@ class VendorsController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'shop_url' => 'nullable|url|max:255', // shop_url is the website
+            'feed_url' => 'nullable|url|max:512',
             // referral_url wasn't in the rules — that meant array_key_exists()
             // check below never fired and Julia's edits were silently dropped.
             // Reported Aug 2026 via video attachment.
@@ -583,6 +592,9 @@ class VendorsController extends Controller
 
         $settings->description = $validated['description'] ?? $settings->description;
         $settings->shop_url = $validated['shop_url'] ?? $settings->shop_url; // shop_url is the website
+        if (array_key_exists('feed_url', $validated)) {
+            $settings->feed_url = $validated['feed_url'] ?: null;
+        }
         if (array_key_exists('referral_url', $validated)) {
             $settings->referral_url = $validated['referral_url'];
         }

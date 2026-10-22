@@ -494,6 +494,22 @@
             </FormField>
           </FormSection>
 
+          <!-- Colin 10/21 — expose feed_url so the admin can wire up any
+               vendor whose data source is an XML / RSS / Google Shopping
+               feed (VialVerse, Coastal, future PrestaShop vendors). The
+               daily SyncVendorFeeds job pulls from vendor_settings.feed_url. -->
+          <FormSection title="Product Feed">
+            <FormField label="Feed URL" hint="Direct XML/RSS feed URL (e.g. Google Shopping, PrestaShop vvpartnerhub). Our daily sync (05:00 UTC) pulls prices + stock from here.">
+              <input v-model="editForm.feed_url" type="url" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" placeholder="https://vendor.com/feed" />
+            </FormField>
+            <div v-if="editForm.feed_url" class="text-[12px] text-[color:var(--color-ink-muted)] mt-2">
+              <template v-if="vendor?.settings?.feed_last_synced_at">
+                Last synced: {{ new Date(vendor.settings.feed_last_synced_at).toLocaleString() }}
+              </template>
+              <template v-else>Never synced — first pull happens at 05:00 UTC (01:00 ET).</template>
+            </div>
+          </FormSection>
+
           <FormSection v-if="editForm.api_platform && editForm.api_platform !== 'page_scrape'" title="API Credentials">
             <FormField label="API Key" hint="Publishable key, consumer key, or access token. Stored encrypted.">
               <input v-model="editForm.api_key" type="password" autocomplete="off" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 ui-mono" placeholder="Enter API key..." />
@@ -889,6 +905,7 @@ const editForm = useForm({
     ? props.vendor.settings.ships_to_ids.slice()
     : [],
   shop_url: props.vendor?.settings?.shop_url || '',
+  feed_url: props.vendor?.settings?.feed_url || '',
   founded_year: props.vendor?.settings?.founded_year || null,
   coupon_code: props.vendor?.settings?.coupon_code || '',
   coupon_discount_percent: props.vendor?.settings?.coupon_discount_percent ?? null,
@@ -939,6 +956,7 @@ watch(() => props.vendor, (newVendor) => {
     editForm.phone_number = newVendor.settings?.phone_number || ''
     editForm.location_id = newVendor.settings?.location_id || null
     editForm.shop_url = newVendor.settings?.shop_url || ''
+    editForm.feed_url = newVendor.settings?.feed_url || ''
     editForm.founded_year = newVendor.settings?.founded_year || null
     editForm.coupon_code = newVendor.settings?.coupon_code || ''
     editForm.coupon_discount_percent = newVendor.settings?.coupon_discount_percent ?? null

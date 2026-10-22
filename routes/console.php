@@ -82,6 +82,27 @@ Schedule::command('purgo:sync')
     ->withoutOverlapping()
     ->runInBackground();
 
+// Australian Research Peptides — well-structured llms.txt + per-product
+// /text.md mirrors with price/stock/SKU tables. 05:45 UTC after Purgo.
+Schedule::command('arp:sync')
+    ->dailyAt('05:45')
+    ->withoutOverlapping()
+    ->runInBackground();
+
+// Zenith Bioscience — public REST catalog (PRICETOOL_CATALOG_API_CONTRACT),
+// Bearer-auth. Contract polls 1-4x/day; we align with that cadence.
+Schedule::command('zenith:sync')
+    ->dailyAt('06:00')
+    ->withoutOverlapping()
+    ->runInBackground();
+
+// My Peptides UK — public paginated JSON API, no auth. Skip
+// is_unlisted products per their note.
+Schedule::command('mypeptides:sync')
+    ->dailyAt('06:15')
+    ->withoutOverlapping()
+    ->runInBackground();
+
 // Daily affiliate-stats pull. Hits each configured vendor's affiliate
 // program API (GoAffPro today; Refersion/Impact clients to add) and
 // caches the snapshot on vendor_settings.affiliate_stats_json. Powers

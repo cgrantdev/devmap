@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CeoOnly
 {
-    private const WHITELIST = ['info@peptidemap.com'];
+    private const WHITELIST = ['info@peptidemap.com', 'colin@sercas.com'];
 
     public function handle(Request $request, Closure $next): Response
     {

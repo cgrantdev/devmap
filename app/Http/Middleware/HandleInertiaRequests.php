@@ -40,12 +40,93 @@ class HandleInertiaRequests extends Middleware
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+    /**
+     * Resolve the admin "Edit this page" URL based on the current
+     * frontend route + its route parameters. Returns null for guest
+     * users or non-admins so the AdminBar hides entirely.
+     */
+    private function buildAdminBar(Request $request): ?array
+    {
+        $user = $request->user();
+        if (!$user || !$user->canAccessAdmin()) return null;
+
+        $route = $request->route();
+        $editUrl = null;
+        $pageType = null;
+
+        if ($route) {
+            $name = $route->getName() ?? '';
+            $params = $route->parameters();
+
+            // Products — route is product.detail with (vendorSlug, productSlug, id)
+            if (str_starts_with($name, 'product.') && isset($params['id'])) {
+                $editUrl = url('/admin/products/' . $params['id'] . '/edit');
+                $pageType = 'Product';
+            }
+            // Brand storefront — route brand.products with (slug)
+            elseif ($name === 'brand.products' && isset($params['slug'])) {
+                $brand = \App\Models\Brand::where('slug', $params['slug'])->first();
+                if ($brand) {
+                    $editUrl = url('/admin/vendors/' . $brand->id . '/edit');
+                    $pageType = 'Vendor';
+                }
+            }
+            // Encyclopedia article
+            elseif (str_starts_with($name, 'encyclopedia.') && isset($params['slug'])) {
+                $ep = \App\Models\EducationPost::where('slug', $params['slug'])
+                    ->orWhereHas('category', fn ($q) => $q->where('slug', $params['slug']))->first();
+                if ($ep) {
+                    $editUrl = url('/admin/encyclopedia-entries/' . $ep->id . '/edit');
+                    $pageType = 'Encyclopedia';
+                }
+            }
+            // Blog post
+            elseif (str_starts_with($name, 'blog') && isset($params['slug'])) {
+                $blog = \App\Models\Blog::where('slug', $params['slug'])->first();
+                if ($blog) {
+                    $editUrl = url('/admin/blogs/' . $blog->id . '/edit');
+                    $pageType = 'Blog';
+                }
+            }
+            // Compare compound
+            elseif (str_starts_with($name, 'compare.') && isset($params['slug'])) {
+                $cat = \App\Models\ProductCategory::where('slug', $params['slug'])->first();
+                if ($cat) {
+                    $editUrl = url('/admin/categories/' . $cat->id . '/edit');
+                    $pageType = 'Compare';
+                }
+            }
+            // Coupon
+            elseif (str_starts_with($name, 'coupon.') && isset($params['slug'])) {
+                $brand = \App\Models\Brand::where('slug', $params['slug'])->first();
+                if ($brand) {
+                    $editUrl = url('/admin/vendors/' . $brand->id . '/edit');
+                    $pageType = 'Coupon';
+                }
+            }
+        }
+
+        return [
+            'user_label' => $user->email,
+            'user_role' => $user->role ?? 'admin',
+            'edit_url' => $editUrl,
+            'page_type' => $pageType,
+            'admin_home' => url('/admin/dashboard'),
+            'seo_dashboard' => url('/admin/seo'),
+        ];
+    }
+
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),
             ],
+            // Colin 10/22 — WordPress-style admin bar on frontend pages.
+            // Only populated for users with admin access. Carries the
+            // contextual edit-URL for the current page + user label so
+            // the AdminBar component can render without extra lookups.
+            'admin_bar' => fn () => $this->buildAdminBar($request),
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
                 'success' => fn () => $request->session()->get('success'),
