@@ -330,6 +330,8 @@ class SeoHygieneTest extends TestCase
         $home->assertOk();
         $home->assertDontSee('picsum.photos', false);
         $home->assertDontSee('unsplash.com', false);
+        $home->assertDontSee('noindex', false);
+        $home->assertDontSee('nofollow', false);
         $home->assertSee('compounded-glp-1-status.png', false);
 
         $this->get('/blogs')
