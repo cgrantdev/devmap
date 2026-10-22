@@ -1,0 +1,397 @@
+{
+  "slug_match": "LOWER(slug) = 'sermorelin'; skip if match count != 1; no-op if 0 (stored slug 'Sermorelin'; post id 126 per props; /encyclopedia/sermorelin 301 -> /encyclopedia/Sermorelin)",
+  "as_of": "19 October 2026 (Asia/Bangkok). Old values pulled from live Inertia props of https://peptidemap.com/encyclopedia/Sermorelin on 22 Oct 2026 (Asia/Bangkok); identical to the 19 Oct capture for every guarded column. Compare decoded JSON values. No framing profile or CatalogFraming entry matches Sermorelin, so props equal stored values.",
+  "columns": {
+    "faqs": {
+      "camelCase_prop": "faqs (FAQPage JSON-LD is generated from this same column; there is no separate JSON-LD field)",
+      "op": "write new_value only if current decoded value exactly equals old_value (old_value read from the rendered FAQPage JSON-LD; no render-time replacement applies to Sermorelin; if stored items carry extra keys, compare question/answer only and keep extra keys on kept items); skip if any question equals 'What was GEREF Diagnostic used for?'. FAQ 1 answer rewritten (dated facts); FAQ 2 unchanged; FAQ 3 (dosing-framed) replaced with a cited diagnostic-use FAQ; FAQs 4-6 appended. Result: 6 FAQs.",
+      "old_value": [
+        {
+          "question": "Was Sermorelin FDA-approved?",
+          "answer": "Yes, as Geref for pediatric GH deficiency. It was voluntarily withdrawn for commercial reasons, not safety, and remains available via compounding."
+        },
+        {
+          "question": "How does Sermorelin differ from HGH?",
+          "answer": "Sermorelin stimulates the pituitary to release GH naturally, preserving feedback. HGH bypasses the pituitary and can suppress endogenous production."
+        },
+        {
+          "question": "Why is bedtime dosing preferred?",
+          "answer": "Sermorelin amplifies the natural nocturnal GH pulse during deep sleep, producing a more physiologic response."
+        }
+      ],
+      "new_value": [
+        {
+          "question": "Was Sermorelin FDA-approved?",
+          "answer": "Yes. GEREF (sermorelin acetate) for injection was approved by FDA on 28 Dec 1990 for evaluating the pituitary's ability to secrete growth hormone (NDA 019863), and on 26 Sep 1997 for treating idiopathic growth hormone deficiency in children with growth failure (NDA 020443). FDA withdrew approval of both applications effective 18 Jun 2009, after the holder, EMD Serono, said the products were no longer marketed and asked for withdrawal (74 FR 23407). On 4 Mar 2013 FDA published its determination that neither product was withdrawn from sale for reasons of safety or effectiveness (78 FR 14095). As of 19 Oct 2026 no sermorelin product is FDA-approved."
+        },
+        {
+          "question": "How does Sermorelin differ from HGH?",
+          "answer": "Sermorelin stimulates the pituitary to release GH naturally, preserving feedback. HGH bypasses the pituitary and can suppress endogenous production."
+        },
+        {
+          "question": "What was GEREF Diagnostic used for?",
+          "answer": "GEREF Diagnostic (NDA 019863, approved 28 Dec 1990) was indicated for evaluating the ability of the somatotroph of the pituitary gland to secrete growth hormone (78 FR 14095). A 1999 review noted that a normal growth hormone response to intravenous sermorelin cannot rule out growth hormone deficiency caused by a hypothalamic problem, so other tests are needed in that case (BioDrugs 1999)."
+        },
+        {
+          "question": "How did GHRH(1-29) affect the pattern of GH release in older men?",
+          "answer": "In a 6-week study in healthy men aged 64 to 76, GHRH(1-29) increased mean nocturnal growth hormone release and GH peak amplitude without changing GH pulse frequency, and IGF-I did not change (Metabolism 1997)."
+        },
+        {
+          "question": "Is sermorelin on FDA's compounding lists?",
+          "answer": "Sermorelin acetate is in Category 1 of FDA's 503B list for outsourcing facilities (list updated 21 Mar 2025), marked as a component of an FDA-approved drug (GEREF, since discontinued). That is enforcement discretion while the nomination is evaluated, not placement on the 503B bulks list and not an approval. Sermorelin does not appear on FDA's 503A categories list (updated 14 May 2026)."
+        },
+        {
+          "question": "Is sermorelin prohibited in sport?",
+          "answer": "Yes. The World Anti-Doping Agency 2026 Prohibited List, in effect from 1 Jan 2026, names sermorelin under S2.2.4 growth hormone releasing factors, including GHRH and its analogues, among substances prohibited at all times."
+        }
+      ]
+    },
+    "overview": {
+      "camelCase_prop": "overview (also feeds overviewShort and, with no stored seo_description, the SEO/og description via safeLimit(overview,160))",
+      "op": "write new_value only if current value exactly equals old_value; skip if it contains 'NDA 019863'.",
+      "old_value": "Sermorelin is the shortest fully functional fragment of growth hormone-releasing hormone (GHRH), comprising the first 29 of 44 amino acids. It was previously FDA-approved as Geref for diagnosing and treating GH deficiency in children before being voluntarily withdrawn for commercial reasons.\n\nSermorelin remains available through compounding pharmacies and is widely used in age-management research for its ability to restore natural GH pulsatility without the risks of exogenous growth hormone.",
+      "new_value": "Sermorelin is a synthetic peptide matching the first 29 amino acids of human growth hormone-releasing hormone (GHRH). It was FDA-approved as GEREF from 1990 to 2009. GEREF (sermorelin acetate) for injection was approved by FDA on 28 Dec 1990 for evaluating the pituitary's ability to secrete growth hormone (NDA 019863), and on 26 Sep 1997 for treating idiopathic growth hormone deficiency in children with growth failure (NDA 020443). FDA withdrew approval of both applications effective 18 Jun 2009, after the holder, EMD Serono, said the products were no longer marketed and asked for withdrawal (74 FR 23407). On 4 Mar 2013 FDA published its determination that neither product was withdrawn from sale for reasons of safety or effectiveness (78 FR 14095).\n\nAs of 19 Oct 2026, no sermorelin product is FDA-approved. Research continues on its effects on growth hormone secretion, sleep and the ageing growth hormone axis."
+    },
+    "background": {
+      "camelCase_prop": "background",
+      "op": "write new_value only if current value exactly equals old_value; skip if it contains 'NDA 019863'. One sentence replaced (approval history).",
+      "old_value": "Sermorelin (sermorelin acetate) is a synthetic peptide analog consisting of the first 29 amino acids of the naturally occurring 44-amino acid growth hormone-releasing hormone (GHRH). Designated as GRF(1-29)NH₂, sermorelin retains the full biological activity of native GHRH as the first 29 residues contain the entire pharmacophore required for GHRH receptor binding and activation. It was developed in the 1980s and became the first GHRH analog approved by the FDA (as Geref) for diagnostic evaluation of pituitary GH secretory capacity and was later approved as Geref Diagnostic. Sermorelin acts on the GHRH receptor (GHRHR) expressed on somatotroph cells of the anterior pituitary, stimulating growth hormone synthesis and secretion in a physiological pulsatile pattern. Unlike exogenous GH administration, sermorelin preserves the negative feedback regulation of the GH/IGF-1 axis, as GH release remains subject to somatostatin inhibition and endogenous regulatory mechanisms. This makes sermorelin a physiologically \"cleaner\" approach to GH axis stimulation compared to direct GH replacement.",
+      "new_value": "Sermorelin (sermorelin acetate) is a synthetic peptide analog consisting of the first 29 amino acids of the naturally occurring 44-amino acid growth hormone-releasing hormone (GHRH). Designated as GRF(1-29)NH₂, sermorelin retains the full biological activity of native GHRH as the first 29 residues contain the entire pharmacophore required for GHRH receptor binding and activation. It was developed in the 1980s. FDA approved it as GEREF on 28 Dec 1990 for evaluating pituitary growth hormone secretion (NDA 019863) and on 26 Sep 1997 for treating idiopathic growth hormone deficiency in children with growth failure (NDA 020443). Approval of both applications was withdrawn effective 18 Jun 2009 (74 FR 23407). Sermorelin acts on the GHRH receptor (GHRHR) expressed on somatotroph cells of the anterior pituitary, stimulating growth hormone synthesis and secretion in a physiological pulsatile pattern. Unlike exogenous GH administration, sermorelin preserves the negative feedback regulation of the GH/IGF-1 axis, as GH release remains subject to somatostatin inhibition and endogenous regulatory mechanisms. This makes sermorelin a physiologically \"cleaner\" approach to GH axis stimulation compared to direct GH replacement."
+    },
+    "human_use_intro": {
+      "camelCase_prop": "humanUseIntro",
+      "op": "write new_value only if current value exactly equals old_value; skip otherwise. Removes the unsourced 'most extensive clinical history of any GH secretagogue' claim.",
+      "old_value": "Sermorelin has the most extensive clinical history of any GH secretagogue, having been FDA-approved.",
+      "new_value": "Sermorelin was studied in clinical trials and was FDA-approved, as GEREF, from 1990 until approval was withdrawn effective 18 Jun 2009."
+    },
+    "human_use_subsections": {
+      "camelCase_prop": "humanUseSubsections",
+      "op": "write new_value only if current decoded value exactly equals old_value; skip if any entry contains 'NDA 020443' or 'Metabolism 1997'. In 'Clinical Studies': entries[1] last sentence replaced (commercial-reasons claim); entries[2] replaced (unsourced '3-6 months' and '16-week' body-composition claims removed; Corpas 1992 and Vittone 1997 cited). entries[0] and [3] unchanged. No newlines.",
+      "old_value": [
+        {
+          "title": "Clinical Studies",
+          "entries": [
+            {
+              "type": "content",
+              "value": "Sermorelin was FDA-approved as Geref Diagnostic for evaluating pituitary GH reserve. In the diagnostic setting, sermorelin injection reliably stimulates GH release in patients with intact somatotroph function, with failure to respond indicating pituitary-level GH deficiency."
+            },
+            {
+              "type": "content",
+              "value": "Clinical studies in GH-deficient children demonstrated that sermorelin (Geref) could stimulate growth velocity when administered subcutaneously, though it was less potent than direct GH replacement. It was briefly marketed for pediatric GH deficiency before being withdrawn for commercial (not safety) reasons."
+            },
+            {
+              "type": "content",
+              "value": "In healthy older adults, sermorelin increased GH pulse amplitude and IGF-1 levels in studies lasting 3-6 months. A 16-week study showed improvements in body composition parameters including reduced trunk fat and increased lean body mass."
+            },
+            {
+              "type": "content",
+              "value": "Sleep studies in healthy subjects demonstrated that evening GHRH administration increased slow-wave sleep percentage without altering sleep latency or REM sleep, consistent with GHRH's role as an endogenous sleep factor."
+            }
+          ]
+        }
+      ],
+      "new_value": [
+        {
+          "title": "Clinical Studies",
+          "entries": [
+            {
+              "type": "content",
+              "value": "Sermorelin was FDA-approved as Geref Diagnostic for evaluating pituitary GH reserve. In the diagnostic setting, sermorelin injection reliably stimulates GH release in patients with intact somatotroph function, with failure to respond indicating pituitary-level GH deficiency."
+            },
+            {
+              "type": "content",
+              "value": "Clinical studies in GH-deficient children demonstrated that sermorelin (Geref) could stimulate growth velocity when administered subcutaneously, though it was less potent than direct GH replacement. GEREF was approved for this use on 26 Sep 1997 (NDA 020443). FDA withdrew approval effective 18 Jun 2009 after the holder said the product was no longer marketed, and in 2013 determined that it was not withdrawn for reasons of safety or effectiveness (74 FR 23407; 78 FR 14095)."
+            },
+            {
+              "type": "content",
+              "value": "In small studies of healthy older men, GHRH(1-29) increased growth hormone secretion. One study reported higher GH and IGF-I levels (J Clin Endocrinol Metab 1992). In another, nocturnal GH release and GH peak amplitude increased without a change in GH pulse frequency or IGF-I, two of six muscle-strength measures improved, and DEXA measures of muscle and fat did not change (Metabolism 1997)."
+            },
+            {
+              "type": "content",
+              "value": "Sleep studies in healthy subjects demonstrated that evening GHRH administration increased slow-wave sleep percentage without altering sleep latency or REM sleep, consistent with GHRH's role as an endogenous sleep factor."
+            }
+          ]
+        }
+      ]
+    },
+    "regulatory_subsections": {
+      "camelCase_prop": "regulatorySubsections",
+      "op": "write new_value only if current decoded value exactly equals old_value; skip if any subsection title starts with 'FDA history (as of'. Also corrects the false 'Not currently on the WADA prohibited list'.",
+      "old_value": [
+        {
+          "title": "FDA History",
+          "entries": [
+            {
+              "type": "content",
+              "value": "Sermorelin was FDA-approved (1997) as Geref and voluntarily withdrawn (2008) for commercial reasons. It remains available through compounding pharmacies under physician supervision. Not currently on the WADA prohibited list."
+            }
+          ]
+        }
+      ],
+      "new_value": [
+        {
+          "title": "FDA history (as of 19 Oct 2026)",
+          "entries": [
+            {
+              "type": "content",
+              "value": "GEREF (sermorelin acetate) for injection, held by EMD Serono, was approved under two new drug applications. NDA 019863 (GEREF Diagnostic) was approved on 28 Dec 1990 for evaluating the ability of the pituitary somatotroph to secrete growth hormone. NDA 020443 was approved on 26 Sep 1997 for treating idiopathic growth hormone deficiency in children with growth failure (Drugs@FDA; 78 FR 14095)."
+            },
+            {
+              "type": "content",
+              "value": "In letters dated 11 Jul 2008 and 2 Dec 2008, EMD Serono told FDA the products were being discontinued, and in letters of 2 Dec and 12 Dec 2008 it asked FDA to withdraw NDA 020443 and NDA 019863 (78 FR 14095)."
+            },
+            {
+              "type": "content",
+              "value": "FDA withdrew approval of both applications effective 18 Jun 2009, in a notice covering applications whose holders said the products were no longer marketed (74 FR 23407, 19 May 2009)."
+            },
+            {
+              "type": "content",
+              "value": "In response to a citizen petition, FDA published its determination on 4 Mar 2013 that neither GEREF product was withdrawn from sale for reasons of safety or effectiveness (78 FR 14095). Drugs@FDA lists both applications as discontinued and lists no other sermorelin application (checked 19 Oct 2026)."
+            }
+          ]
+        },
+        {
+          "title": "Compounding lists (as of 19 Oct 2026)",
+          "entries": [
+            {
+              "type": "content",
+              "value": "Sermorelin acetate is in Category 1 (bulk drug substances under evaluation) of FDA's list of substances nominated for use by outsourcing facilities under section 503B (list updated 21 Mar 2025), marked as a component of an FDA-approved drug (GEREF, since discontinued). Under FDA's interim policy, FDA generally does not intend to take action against compounding with a Category 1 substance while the nomination is evaluated, if other conditions are met. This is enforcement discretion, not placement on the 503B bulks list and not an approval. Sermorelin does not appear on FDA's 503A categories list (updated 14 May 2026)."
+            }
+          ]
+        },
+        {
+          "title": "Sport",
+          "entries": [
+            {
+              "type": "content",
+              "value": "The World Anti-Doping Agency 2026 Prohibited List, in effect from 1 Jan 2026, names sermorelin under S2.2.4 growth hormone releasing factors, including GHRH and its analogues, among substances prohibited at all times."
+            }
+          ]
+        }
+      ]
+    },
+    "regulatory_important_note": {
+      "camelCase_prop": "regulatoryImportantNote",
+      "op": "write new_value only if current value exactly equals old_value; skip otherwise.",
+      "old_value": "Sermorelin was previously FDA-approved and withdrawn for commercial (not safety) reasons. It is available via compounding pharmacies.",
+      "new_value": "No sermorelin product is FDA-approved as of 19 Oct 2026; the GEREF approvals were withdrawn effective 18 Jun 2009. This page is educational and gives no dosing or administration guidance."
+    },
+    "potential_applications": {
+      "camelCase_prop": "potentialApplications",
+      "op": "write new_value only if the whole current decoded list exactly equals old_value; skip if any item title equals 'Sleep' or any description contains 'Metabolism 1997'. Item [0] description replaced ('FDA-validated safety data' removed); item [1] replaced (slow-wave sleep scoped to Kerkhofs 1993); item [2] description replaced (unsourced long-term lean-mass claim; Vittone 1997).",
+      "old_value": [
+        {
+          "title": "Age-Related GH Decline",
+          "description": "The most physiological approach to restoring GH pulsatility in aging adults, with FDA-validated safety data."
+        },
+        {
+          "title": "Sleep Quality",
+          "description": "Enhancement of slow-wave sleep through nocturnal GH pulse amplification."
+        },
+        {
+          "title": "Body Composition",
+          "description": "Long-term improvement in lean mass to fat ratio through sustained physiological GH optimization."
+        }
+      ],
+      "new_value": [
+        {
+          "title": "Age-Related GH Decline",
+          "description": "Research into whether stimulating the body's own growth hormone release can offset the age-related fall in GH secretion. GEREF's former FDA approvals covered pituitary diagnostic testing and growth hormone deficiency in children, not use in ageing adults."
+        },
+        {
+          "title": "Sleep",
+          "description": "Research on GHRH and slow-wave sleep."
+        },
+        {
+          "title": "Body Composition",
+          "description": "Research into whether GHRH analogues change body composition; in a 6-week study in healthy older men, DEXA measures of muscle and fat did not change (Metabolism 1997)."
+        }
+      ]
+    },
+    "potential_applications_important_context": {
+      "camelCase_prop": "potentialApplicationsImportantContext",
+      "op": "write new_value only if current value exactly equals old_value; skip otherwise.",
+      "old_value": "While previously FDA-approved, current use is through compounding pharmacies. Formal reapproval has not been pursued.",
+      "new_value": "These are research areas, not approved uses. No sermorelin product is FDA-approved as of 19 Oct 2026; approval of GEREF was withdrawn effective 18 Jun 2009 (74 FR 23407)."
+    },
+    "conclusion": {
+      "camelCase_prop": "conclusion",
+      "op": "write new_value only if current value exactly equals old_value; skip if it contains 'not withdrawn for reasons of safety'. Two sentences changed: the 'commercial reasons' sentence is replaced, the 'Research-grade sermorelin ... benchmarked' sentence is removed.",
+      "old_value": "Sermorelin holds a distinctive position in growth hormone biology as the first clinically validated GHRH analog. Its mechanism — stimulating endogenous GH release while preserving physiological feedback regulation — offers a fundamentally different pharmacological approach compared to exogenous GH administration. The preservation of pulsatile GH secretion is particularly significant, as research has established that the pattern of GH exposure (pulsatile vs continuous) determines downstream gene expression and metabolic outcomes. Although withdrawn from the US market for commercial reasons (not safety concerns), sermorelin remains an active area of research interest. Its effects on sleep architecture, body composition, and the aging GH axis continue to be studied in clinical and preclinical settings. Research-grade sermorelin serves as the reference GHRH agonist against which newer secretagogues (tesamorelin, CJC-1295, MK-677) are benchmarked. The compound illustrates an important principle in endocrine pharmacology: physiological axis stimulation may offer advantages over direct hormone replacement in preserving normal regulatory mechanisms.",
+      "new_value": "Sermorelin holds a distinctive position in growth hormone biology as the first clinically validated GHRH analog. Its mechanism — stimulating endogenous GH release while preserving physiological feedback regulation — offers a fundamentally different pharmacological approach compared to exogenous GH administration. The preservation of pulsatile GH secretion is particularly significant, as research has established that the pattern of GH exposure (pulsatile vs continuous) determines downstream gene expression and metabolic outcomes. FDA withdrew approval of GEREF effective 18 Jun 2009 after the holder said the products were no longer marketed, and in 2013 determined that they were not withdrawn for reasons of safety or effectiveness. Sermorelin remains a subject of research. Its effects on sleep architecture, body composition, and the aging GH axis continue to be studied in clinical and preclinical settings. The compound illustrates an important principle in endocrine pharmacology: physiological axis stimulation may offer advantages over direct hormone replacement in preserving normal regulatory mechanisms."
+    },
+    "references": {
+      "camelCase_prop": "references",
+      "op": "write new_value only if current decoded value exactly equals old_value; skip if any citation contains '74 FR 23407'. Item 1 (mislabelled 'Drug Development Research (2006)', Walker) corrected to Walker RF, Clin Interv Aging 2006, PMID 18046908; item 2 (Merriam 2001) kept unchanged (not re-verified); 10 primary sources appended.",
+      "old_value": [
+        {
+          "title": "Drug Development Research (2006)",
+          "authors": "Walker",
+          "description": "Sermorelin: clinical pharmacology and therapeutic applications."
+        },
+        {
+          "title": "Journal of Clinical Endocrinology & Metabolism (2001)",
+          "authors": "Merriam et al.",
+          "description": "Effects of GH releasing hormone on body composition in healthy aging adults."
+        }
+      ],
+      "new_value": [
+        {
+          "title": "Sermorelin: a better approach to management of adult-onset growth hormone insufficiency?",
+          "authors": "Walker RF",
+          "citation": "Clin Interv Aging. 2006;1(4):307-308. doi:10.2147/ciia.2006.1.4.307. PMID 18046908",
+          "description": "Editorial (PubMed publication type: Editorial).",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/18046908/"
+          ]
+        },
+        {
+          "title": "Journal of Clinical Endocrinology & Metabolism (2001)",
+          "authors": "Merriam et al.",
+          "description": "Effects of GH releasing hormone on body composition in healthy aging adults."
+        },
+        {
+          "title": "Drugs@FDA: GEREF (sermorelin acetate), NDA 019863 and NDA 020443",
+          "authors": "U.S. Food and Drug Administration",
+          "citation": "NDA 019863 approved 28 Dec 1990; NDA 020443 approved 26 Sep 1997; both listed as discontinued (accessed 19 Oct 2026)",
+          "description": "Approval dates and marketing status of the GEREF applications.",
+          "links": [
+            "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=019863",
+            "https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=020443"
+          ]
+        },
+        {
+          "title": "Novartis Pharmaceuticals Corp. et al.; Withdrawal of Approval of 92 New Drug Applications and 49 Abbreviated New Drug Applications",
+          "authors": "U.S. Food and Drug Administration",
+          "citation": "Federal Register 74 FR 23407-23412, 19 May 2009 (FR Doc E9-11628; Docket FDA-2009-N-0211). Effective 18 Jun 2009",
+          "description": "Withdrawal of approval of NDA 19-863 (Geref Diagnostic) and NDA 20-443 (Geref), EMD Serono; holders said the products were no longer marketed.",
+          "links": [
+            "https://www.govinfo.gov/content/pkg/FR-2009-05-19/pdf/E9-11628.pdf",
+            "https://www.federalregister.gov/d/E9-11628"
+          ]
+        },
+        {
+          "title": "Determination That GEREF (Sermorelin Acetate) Injection, 0.5 Milligrams Base/Vial and 1.0 Milligrams Base/Vial, and GEREF (Sermorelin Acetate) Injection, 0.05 Milligrams Base/Amp, Were Not Withdrawn From Sale for Reasons of Safety or Effectiveness",
+          "authors": "U.S. Food and Drug Administration",
+          "citation": "Federal Register 78 FR 14095-14096, 4 Mar 2013 (FR Doc 2013-04827; Docket FDA-2012-P-1071)",
+          "description": "FDA determination on the GEREF products.",
+          "links": [
+            "https://www.govinfo.gov/content/pkg/FR-2013-03-04/pdf/2013-04827.pdf",
+            "https://www.federalregister.gov/d/2013-04827"
+          ]
+        },
+        {
+          "title": "Bulk Drug Substances Nominated for Use in Compounding Under Section 503B of the FD&C Act (categories list)",
+          "authors": "U.S. Food and Drug Administration",
+          "citation": "Updated 21 Mar 2025 (accessed 19 Oct 2026)",
+          "description": "Category 1 lists Sermorelin Acetate (marked as a component of an FDA-approved drug).",
+          "links": [
+            "https://www.fda.gov/media/94164/download"
+          ]
+        },
+        {
+          "title": "World Anti-Doping Code International Standard: Prohibited List 2026",
+          "authors": "World Anti-Doping Agency",
+          "citation": "In effect 1 Jan 2026; S2.2.4",
+          "description": "Lists sermorelin among GHRH analogues prohibited at all times.",
+          "links": [
+            "https://www.wada-ama.org/sites/default/files/2025-09/2026list_en_final_clean_september_2025.pdf"
+          ]
+        },
+        {
+          "title": "Growth hormone (GH)-releasing hormone-(1-29) twice daily reverses the decreased GH and insulin-like growth factor-I levels in old men",
+          "authors": "Corpas E, Harman SM, Piñeyro MA, et al.",
+          "citation": "J Clin Endocrinol Metab. 1992;75(2):530-535. doi:10.1210/jcem.75.2.1379256. PMID 1379256",
+          "description": "Healthy old men; GHRH(1-29) increased GH and IGF-I.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/1379256/"
+          ]
+        },
+        {
+          "title": "Effects of single nightly injections of growth hormone-releasing hormone (GHRH 1-29) in healthy elderly men",
+          "authors": "Vittone J, Blackman MR, Busby-Whitehead J, et al.",
+          "citation": "Metabolism. 1997;46(1):89-96. doi:10.1016/s0026-0495(97)90174-8. PMID 9005976",
+          "description": "11 men aged 64-76, 6 weeks: GH release and peak amplitude increased, pulse frequency and IGF-I unchanged; DEXA muscle and fat unchanged.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/9005976/"
+          ]
+        },
+        {
+          "title": "Incorporation of D-Ala2 in growth hormone-releasing hormone-(1-29)-NH2 increases the half-life and decreases metabolic clearance in normal men",
+          "authors": "Soule S, King JA, Millar RP",
+          "citation": "J Clin Endocrinol Metab. 1994;79(4):1208-1211. doi:10.1210/jcem.79.4.7962295. PMID 7962295",
+          "description": "Disappearance half-time of GHRH(1-29)-NH2 4.3 +/- 1.4 min during intravenous infusion in 10 normal men.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/7962295/"
+          ]
+        },
+        {
+          "title": "Sermorelin: a review of its use in the diagnosis and treatment of children with idiopathic growth hormone deficiency",
+          "authors": "Prakash A, Goa KL",
+          "citation": "BioDrugs. 1999;12(2):139-157. doi:10.2165/00063030-199912020-00007. PMID 18031173",
+          "description": "Review of diagnostic and pediatric treatment use.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/18031173/"
+          ]
+        },
+        {
+          "title": "Sleep-promoting effects of growth hormone-releasing hormone in normal men",
+          "authors": "Kerkhofs M, Van Cauter E, Van Onderbergen A, et al.",
+          "citation": "Am J Physiol. 1993;264(4 Pt 1):E594-E598. doi:10.1152/ajpendo.1993.264.4.E594. PMID 8476038",
+          "description": "Healthy young men: GHRH increased REM sleep when given early in sleep and slow-wave sleep when given during the third REM period.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/8476038/"
+          ]
+        }
+      ]
+    },
+    "half_life": {
+      "camelCase_prop": "halfLife (stored half_life wins over getClinicalData '10–20 min')",
+      "op": "write new_value only if current value exactly equals old_value; skip if current value contains 'J Clin Endocrinol Metab 1994'.",
+      "old_value": "~11-12 minutes",
+      "new_value": "Short. About 4 minutes as a plasma disappearance half-time after a 90-minute constant intravenous infusion of GHRH(1-29)-NH2 in 10 healthy men (J Clin Endocrinol Metab 1994). The former GEREF prescribing information gave 11–12 minutes after intravenous or subcutaneous administration."
+    },
+    "areas_of_research": {
+      "camelCase_prop": "areasOfResearch",
+      "op": "write new_value only if the whole current decoded list exactly equals old_value; skip if any item name equals 'GHRH and sleep'. 'Adult GH Optimization' and 'Sleep and Aging' replaced; 'Pediatric GH Deficiency' unchanged.",
+      "old_value": [
+        {
+          "name": "Pediatric GH Deficiency",
+          "description": "Originally FDA-approved for diagnosis and treatment"
+        },
+        {
+          "name": "Adult GH Optimization",
+          "description": "Restoring age-related GH pulsatility decline"
+        },
+        {
+          "name": "Sleep and Aging",
+          "description": "Enhancing slow-wave sleep quality correlated with GH secretion"
+        }
+      ],
+      "new_value": [
+        {
+          "name": "Pediatric GH Deficiency",
+          "description": "Originally FDA-approved for diagnosis and treatment"
+        },
+        {
+          "name": "Ageing and GH secretion",
+          "description": "Studies of GHRH(1-29) and GH secretion in healthy older men"
+        },
+        {
+          "name": "Sleep and Aging",
+          "description": "Research on GHRH's role in sleep regulation"
+        }
+      ]
+    }
+  },
+  "code_changes_for_pr": {
+    "drugStatus": "No DB column. getClinicalData() has 'Sermorelin' => ['status' => 'Prescription (US)', ...]. No FDA-approved sermorelin product exists (both NDAs withdrawn effective 18 Jun 2009). PR change: set status to e.g. 'Not FDA-approved (approvals withdrawn 2009)'.",
+    "halfLife": "Stored half_life becomes 'About 4 minutes (... J Clin Endocrinol Metab 1994)'. getClinicalData 'Sermorelin' halfLife '10–20 min' is unsourced and disagrees; change it to '' (or the same cited label) so a cleared DB value cannot fall back to it.",
+    "ExpandArticlesSeeder": "database/seeders/ExpandArticlesSeeder.php has a 'sermorelin' entry that calls $post->update() unconditionally on background, preclinical_subsections, human_use_subsections and conclusion, with the old 'commercial (not safety) reasons' text. It is not called from DatabaseSeeder, but a manual re-run would revert this correction. PR note: update or remove that entry."
+  },
+  "do_not_touch": "name, slug, subtitle, molecular_formula/weight/CAS, residue_count, mechanism_*, preclinical_*, human_use_subsections 'Clinical Studies' entries[0] and [3], areas_of_research 'Pediatric GH Deficiency', areas_of_research_intro, potential_applications_intro, key_points, faqs[1], seo_*",
+  "migration": {
+    "timestamp": "2026_10_20_130000",
+    "note": "DB-only correction applied by the shared field-replace migration 2026_10_20_130000 (2026_10_20_120000 is taken on main by add_vendor_description_to_products) with NAD-2026-10-fields.json; see PR-brief-2026-10-19b.md. No Sermorelin shell file on main (2f8a1d3, re-checked 22 Oct 2026). Neutralise or remove the ExpandArticlesSeeder 'sermorelin' entry in the same PR."
+  }
+}

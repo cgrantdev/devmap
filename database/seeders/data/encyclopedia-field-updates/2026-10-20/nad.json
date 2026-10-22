@@ -1,0 +1,548 @@
+{
+  "slug_match": "LOWER(slug) = 'nad'; skip if match count != 1; no-op if 0 (stored slug 'nad'; post id 36 per props; /encyclopedia/NAD 301 -> /encyclopedia/nad)",
+  "as_of": "19 October 2026 (Asia/Bangkok). Old values pulled from live Inertia props of https://peptidemap.com/encyclopedia/nad on 22 Oct 2026 (Asia/Bangkok); identical to the 19 Oct capture for every guarded column. Compare decoded JSON values. NAD+ is rendered through App\\Support\\NadPlusProfile (phrase replacements at render); see per-column guards.",
+  "columns": {
+    "overview": {
+      "camelCase_prop": "overview (also feeds overviewShort; SEO description comes from NadPlusProfile, unaffected)",
+      "op": "replace whole value. Guard: NadPlusProfile::phraseReplacements() is applied with strtr() at render, so live props can differ from stored text. Write new_value only if strtr(current_db_value, NadPlusProfile::phraseReplacements()) === old_value (old_value is the rendered props value). Skip and log otherwise. new_value contains none of the replacement source phrases, so render == stored after the write. Skip if current value contains 'Nature Metabolism'. Removes the unsourced '50% between ages 40 and 60' claim.",
+      "old_value": "NAD+ (Nicotinamide Adenine Dinucleotide) is a coenzyme found in every living cell, playing essential roles in energy metabolism, DNA repair, and gene expression regulation. It is a dinucleotide coenzyme, not a peptide.\n\nNAD+ levels decline approximately 50% between ages 40 and 60, correlating with many hallmarks of aging including mitochondrial dysfunction, genomic instability, and cellular senescence. This age-related decline has positioned NAD+ supplementation as a central focus of longevity research.\n\nResearch interest spans neurodegenerative disease, aging biology, metabolic health, and addiction medicine.",
+      "new_value": "NAD+ (Nicotinamide Adenine Dinucleotide) is a coenzyme found in every living cell, playing essential roles in energy metabolism, DNA repair, and gene expression regulation. It is a dinucleotide coenzyme, not a peptide.\n\nA decline in NAD+ has been linked to ageing and age-related disorders, mainly on the basis of animal studies. In people the evidence is limited. A 2025 review in Nature Metabolism found that an age-related fall in NAD+ has been consistently observed in only a limited number of human studies, and that data on NAD+ in human tissues remain sparse. Findings vary by tissue and by measurement method: a 2026 study of seven human cohorts, using a validated mass-spectrometry method, found that whole-blood NAD+ levels did not vary with age. Whether raising NAD+ benefits people is still an open research question.\n\nResearch interest spans neurodegenerative disease, aging biology, metabolic health, and addiction medicine."
+    },
+    "background": {
+      "camelCase_prop": "background",
+      "op": "replace whole value. Guard: NadPlusProfile::phraseReplacements() is applied with strtr() at render, so live props can differ from stored text. Write new_value only if strtr(current_db_value, NadPlusProfile::phraseReplacements()) === old_value (old_value is the rendered props value). Skip and log otherwise. new_value contains none of the replacement source phrases, so render == stored after the write. Skip if current value contains 'mainly from rodent studies' or 'William John Young' or 'Walter Christian'. Paragraph 1 rewritten (Harden & Young 1906 cited; 'multiple Nobel Prizes' replaced by the 1929 Chemistry prize); paragraph 2 sentence 2 changed ('decline dramatically with age'); paragraph 3 unchanged.",
+      "old_value": "NAD+ was first discovered in 1906 by Arthur Harden during fermentation research. Its role in cellular energy production was elucidated over the following decades, earning multiple Nobel Prizes for researchers studying its biochemistry.\n\nThe modern era of NAD+ research began with the discovery that sirtuins — a family of enzymes linked to longevity — require NAD+ as a substrate. This connection, combined with the demonstration that NAD+ levels decline dramatically with age, catalyzed a surge of research into NAD+ supplementation.\n\nCurrent research approaches include direct IV or subcutaneous NAD+ administration, as well as oral precursors like NMN (nicotinamide mononucleotide) and NR (nicotinamide riboside) that the body converts to NAD+.",
+      "new_value": "NAD+ was first described in 1906, when Arthur Harden and William John Young showed that a heat-stable factor in boiled yeast juice was needed for alcoholic fermentation (Proc R Soc Lond B 1906). The factor, later called cozymase, was characterised over the following decades; in 1936 Otto Warburg and Walter Christian identified its pyridine (nicotinamide) component as the part that transfers hydrogen (Helv Chim Acta 1936). Harden shared the 1929 Nobel Prize in Chemistry with Hans von Euler-Chelpin \"for their investigations on the fermentation of sugar and fermentative enzymes\" (nobelprize.org).\n\nThe modern era of NAD+ research began with the discovery that sirtuins — a family of enzymes linked to longevity — require NAD+ as a substrate. This connection, combined with reports, mainly from rodent studies, that NAD+ levels decline with age, catalyzed a surge of research into NAD+ supplementation. Human evidence for an age-related decline is limited and varies by tissue and measurement method (see Overview).\n\nCurrent research approaches include direct IV or subcutaneous NAD+ administration, as well as oral precursors like NMN (nicotinamide mononucleotide) and NR (nicotinamide riboside) that the body converts to NAD+."
+    },
+    "conclusion": {
+      "camelCase_prop": "conclusion",
+      "op": "replace whole value. Guard: NadPlusProfile::phraseReplacements() is applied with strtr() at render, so live props can differ from stored text. Write new_value only if strtr(current_db_value, NadPlusProfile::phraseReplacements()) === old_value (old_value is the rendered props value). Skip and log otherwise. new_value contains none of the replacement source phrases, so render == stored after the write. (live conclusion paragraph 1 contains the rendered phrase 'in cellular-energy and longevity research', so the stored value probably holds the source phrase 'in the peptide and longevity research landscape'; write new_value with the rendered wording). Skip if current value contains 'Nat Metab 2026'. Paragraphs 2 and 3 replaced (50% claim; 'most compelling'; 'IV NAD+ protocols have a track record'); paragraphs 1 and 4 unchanged. Paragraph 4: 'growing clinical evidence' → 'a limited but growing body of clinical studies'.",
+      "old_value": "NAD+ occupies a unique position in cellular-energy and longevity research as the molecule that connects cellular energy production to the fundamental biology of aging. Its role as a substrate for sirtuins and PARPs places it at the intersection of metabolism, DNA repair, and gene regulation.\n\nThe age-related decline in NAD+ levels — approximately 50% between ages 40 and 60 — provides a clear biological rationale for supplementation research. Preclinical evidence for NAD+ restoration is among the most compelling in aging biology, with consistent demonstrations of improved healthspan across multiple model organisms.\n\nHuman evidence is growing but not yet definitive. IV NAD+ protocols have a track record in clinical settings, and oral precursor trials are generating encouraging data. The field awaits large-scale, long-term human trials to determine whether the dramatic preclinical benefits translate to meaningful human health improvements.\n\nFor researchers, NAD+ represents a well-characterized, mechanistically understood compound with extensive published literature and growing clinical evidence.",
+      "new_value": "NAD+ occupies a unique position in cellular-energy and longevity research as the molecule that connects cellular energy production to the fundamental biology of aging. Its role as a substrate for sirtuins and PARPs places it at the intersection of metabolism, DNA repair, and gene regulation.\n\nWhether NAD+ levels fall with age in people is less settled than often stated. Human data are limited and differ by tissue and measurement method, and a 2026 study of seven cohorts found that whole-blood NAD+ did not vary with age (Nat Metab 2025; Nat Metab 2026). Preclinical studies in several model organisms report benefits from raising NAD+, but rodent findings do not translate directly to people.\n\nHuman evidence is limited. A 2025 review found that clinical trials of NAD+ precursors have so far shown limited efficacy. The field awaits large-scale, long-term human trials to determine whether preclinical benefits translate to meaningful human health improvements.\n\nFor researchers, NAD+ represents a well-characterized, mechanistically understood compound with extensive published literature and a limited but growing body of clinical studies."
+    },
+    "regulatory_subsections": {
+      "camelCase_prop": "regulatorySubsections",
+      "op": "write new_value only if current decoded value exactly equals old_value; skip if any subsection title starts with 'Regulatory status (as of'. Not subject to NadPlusProfile phrase replacement. No newlines in entries.",
+      "old_value": [
+        {
+          "title": "Regulatory Status",
+          "entries": [
+            {
+              "type": "content",
+              "value": "NAD+ is not classified as a drug by the FDA. IV NAD+ is administered in clinical settings under physician supervision. Oral precursors NMN and NR are marketed as dietary supplements. In 2022, FDA issued a notice questioning NMN's status as a supplement due to its investigation as a drug candidate."
+            }
+          ]
+        }
+      ],
+      "new_value": [
+        {
+          "title": "Regulatory status (as of 19 Oct 2026)",
+          "entries": [
+            {
+              "type": "content",
+              "value": "NAD+ (nadide) is not the active ingredient of any FDA-approved drug. A search of Drugs@FDA (openFDA) on 19 Oct 2026 found no application listing it."
+            },
+            {
+              "type": "content",
+              "value": "**Compounding lists:** FDA lists nicotinamide adenine dinucleotide (NAD) in Category 1 (bulk drug substances under evaluation) of its list for compounding under section 503A (list updated 14 May 2026). It lists beta-nicotinamide adenine dinucleotide in Category 1 of its list for outsourcing facilities under section 503B (list updated 21 Mar 2025). Under FDA's interim policies, FDA generally does not intend to take action against compounding with a Category 1 substance while the nomination is evaluated, if other conditions are met. This is enforcement discretion, not placement on a bulks list and not an approval. Beta-nicotinamide adenine dinucleotide disodium salt trihydrate appears in Category 3 (nominated without adequate support) of both lists."
+            },
+            {
+              "type": "content",
+              "value": "**Precursors:** nicotinamide riboside (NR) and nicotinamide mononucleotide (NMN) are NAD+ precursors, not NAD+ itself. Nicotinamide riboside chloride is also in Category 1 of FDA's 503B list. In letters of October and November 2022 to firms that had notified it of NMN as a new dietary ingredient, FDA said NMN was excluded from the definition of a dietary supplement because, in its view at the time, NMN had not been lawfully marketed as a supplement or food before it was authorized for investigation as a new drug. In a September 2025 response to a citizen petition (docket FDA-2023-P-0872), FDA reversed that position. It concluded that NMN is not excluded from the definition, because NMN was marketed as a dietary supplement in the United States before that authorization. In the same response FDA described NMN as a new dietary ingredient, so the new-dietary-ingredient notification requirements (section 413 of the FD&C Act) still apply. The response addressed only whether NMN is excluded from the supplement definition; it was not a safety finding."
+            }
+          ]
+        }
+      ]
+    },
+    "regulatory_important_note": {
+      "camelCase_prop": "regulatoryImportantNote",
+      "op": "write new_value only if current value exactly equals old_value; skip otherwise.",
+      "old_value": "NAD+ infusion should be administered under medical supervision. This information is for educational purposes only.",
+      "new_value": "NAD+ is not an FDA-approved drug as of 19 Oct 2026. This page is educational and gives no dosing or administration guidance."
+    },
+    "references": {
+      "camelCase_prop": "references",
+      "op": "write new_value only if current decoded value exactly equals old_value; skip if any citation contains 'PMID 41083806'. Items 1-2 completed with full PubMed citations; 13 primary or authoritative sources appended (Warburg & Christian 1936 replaces the 2017 review).",
+      "old_value": [
+        {
+          "title": "Cell Metabolism (2018)",
+          "authors": "Yoshino et al.",
+          "description": "NAD+ intermediates: the biology and therapeutic potential of NMN and NR."
+        },
+        {
+          "title": "Science (2015)",
+          "authors": "Verdin",
+          "description": "NAD+ in aging, metabolism, and neurodegeneration."
+        }
+      ],
+      "new_value": [
+        {
+          "title": "NAD+ Intermediates: The Biology and Therapeutic Potential of NMN and NR",
+          "authors": "Yoshino J, Baur JA, Imai SI",
+          "citation": "Cell Metab. 2018;27(3):513-528. doi:10.1016/j.cmet.2017.11.002. PMID 29249689",
+          "description": "Review of NMN and NR as NAD+ intermediates.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/29249689/"
+          ]
+        },
+        {
+          "title": "NAD+ in aging, metabolism, and neurodegeneration",
+          "authors": "Verdin E",
+          "citation": "Science. 2015;350(6265):1208-1213. doi:10.1126/science.aac4854. PMID 26785480",
+          "description": "Review of NAD+ in aging, metabolism and neurodegeneration.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/26785480/"
+          ]
+        },
+        {
+          "title": "NAD+ precursor supplementation in human ageing: clinical evidence and challenges",
+          "authors": "Vinten KT, Trętowicz MM, Coskun E, van Weeghel M, Cantó C, Zapata-Pérez R, Janssens GE, Houtkooper RH",
+          "citation": "Nat Metab. 2025;7(10):1974-1990. doi:10.1038/s42255-025-01387-7. PMID 41083806",
+          "description": "Review: an age-related NAD+ decline has been consistently observed in only a limited number of human studies; human tissue data remain sparse; precursor trials have shown limited efficacy.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/41083806/"
+          ]
+        },
+        {
+          "title": "Human whole-blood NAD+ levels do not vary with age or lifestyle interventions",
+          "authors": "Trętowicz MM, Scantlebery AML, Schomakers BV, et al.; Houtkooper RH",
+          "citation": "Nat Metab. 2026;8(6):1282-1290. doi:10.1038/s42255-026-01537-5. PMID 42135539",
+          "description": "Seven human cohorts, validated UHPLC-HRMS: whole-blood NAD+ stable with age and lifestyle interventions; changed with nicotinamide riboside supplementation.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/42135539/"
+          ]
+        },
+        {
+          "title": "Nicotinamide mononucleotide increases muscle insulin sensitivity in prediabetic women",
+          "authors": "Yoshino M, Yoshino J, Kayser BD, et al.",
+          "citation": "Science. 2021;372(6547):1224-1229. doi:10.1126/science.abe9985. PMID 33888596",
+          "description": "10-week randomized, placebo-controlled trial of NMN in postmenopausal women with prediabetes who were overweight or obese.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/33888596/"
+          ]
+        },
+        {
+          "title": "Bulk Drug Substances Nominated for Use in Compounding Under Section 503A of the FD&C Act (categories list)",
+          "authors": "U.S. Food and Drug Administration",
+          "citation": "Updated 14 May 2026 (accessed 19 Oct 2026)",
+          "description": "Category 1 lists Nicotinamide Adenine Dinucleotide (NAD) and NADH.",
+          "links": [
+            "https://www.fda.gov/media/94155/download"
+          ]
+        },
+        {
+          "title": "Bulk Drug Substances Nominated for Use in Compounding Under Section 503B of the FD&C Act (categories list)",
+          "authors": "U.S. Food and Drug Administration",
+          "citation": "Updated 21 Mar 2025 (accessed 19 Oct 2026)",
+          "description": "Category 1 lists Beta-Nicotinamide Adenine Dinucleotide and Nicotinamide riboside chloride.",
+          "links": [
+            "https://www.fda.gov/media/94164/download",
+            "https://www.fda.gov/drugs/human-drug-compounding/bulk-drug-substances-used-compounding-under-section-503b-fdc-act"
+          ]
+        },
+        {
+          "title": "FDA response to citizen petition on the regulatory status of beta-nicotinamide mononucleotide (NMN)",
+          "authors": "U.S. Food and Drug Administration, Human Foods Program",
+          "citation": "Docket FDA-2023-P-0872 (document FDA-2023-P-0872-2754), September 2025",
+          "description": "FDA concluded that NMN is not excluded from the dietary-supplement definition under section 201(ff)(3)(B), reversing its 2022 position.",
+          "links": [
+            "https://www.regulations.gov/docket/FDA-2023-P-0872"
+          ]
+        },
+        {
+          "title": "The alcoholic ferment of yeast-juice",
+          "authors": "Harden A, Young WJ",
+          "citation": "Proc R Soc Lond B. 1906;77(519):405-420. doi:10.1098/rspb.1906.0029",
+          "description": "Reported that boiled yeast juice restored fermentation; the heat-stable factor was later called cozymase.",
+          "links": [
+            "https://doi.org/10.1098/rspb.1906.0029"
+          ]
+        },
+        {
+          "title": "The alcoholic ferment of yeast-juice. Part II. The coferment of yeast-juice",
+          "authors": "Harden A, Young WJ",
+          "citation": "Proc R Soc Lond B. 1906;78:369-375. doi:10.1098/rspb.1906.0070",
+          "description": "The 'coferment' of yeast juice.",
+          "links": [
+            "https://doi.org/10.1098/rspb.1906.0070"
+          ]
+        },
+        {
+          "title": "The Nobel Prize in Chemistry 1929",
+          "authors": "Nobel Prize Outreach (nobelprize.org)",
+          "citation": "Accessed 19 Oct 2026",
+          "description": "Awarded jointly to Arthur Harden and Hans von Euler-Chelpin \"for their investigations on the fermentation of sugar and fermentative enzymes\".",
+          "links": [
+            "https://www.nobelprize.org/prizes/chemistry/1929/summary/"
+          ]
+        },
+        {
+          "title": "Pyridin, der wasserstoffübertragende Bestandteil von Gärungsfermenten",
+          "authors": "Warburg O, Christian W",
+          "citation": "Helv Chim Acta. 1936;19(1). doi:10.1002/hlca.193601901199",
+          "description": "Identified the pyridine (nicotinamide) component as the hydrogen-transferring part of the fermentation coenzyme.",
+          "links": [
+            "https://doi.org/10.1002/hlca.193601901199"
+          ]
+        },
+        {
+          "title": "CD38 Dictates Age-Related NAD Decline and Mitochondrial Dysfunction through an SIRT3-Dependent Mechanism",
+          "authors": "Camacho-Pereira J, Tarragó MG, Chini CCS, et al.",
+          "citation": "Cell Metab. 2016;23(6):1127-1139. doi:10.1016/j.cmet.2016.05.006. PMID 27304511",
+          "description": "Mouse study: CD38 expression and activity rise with age and CD38 is required for the age-related NAD decline.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/27304511/"
+          ]
+        },
+        {
+          "title": "Declining NAD+ induces a pseudohypoxic state disrupting nuclear-mitochondrial communication during aging",
+          "authors": "Gomes AP, Price NL, Ling AJ, et al.",
+          "citation": "Cell. 2013;155(7):1624-1638. doi:10.1016/j.cell.2013.11.037. PMID 24360282",
+          "description": "In old mice, raising NAD+ restored mitochondrial function to that of young mice.",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/24360282/"
+          ]
+        },
+        {
+          "title": "A Pilot Study Investigating Changes in the Human Plasma and Urine NAD+ Metabolome During a 6 Hour Intravenous Infusion of NAD",
+          "authors": "Grant R, Berg J, Mestayer R, et al.",
+          "citation": "Front Aging Neurosci. 2019;11:257. doi:10.3389/fnagi.2019.00257. PMID 31572171",
+          "description": "Small human pilot measuring plasma and urine NAD+ metabolites during infusion; NAD+ rapidly and completely removed from plasma for at least the first 2 hours; no half-life reported; not a clinical-benefit trial. Author affiliations include NAD+ Research Inc. and Springfield Wellness Center (Springfield, LA).",
+          "links": [
+            "https://pubmed.ncbi.nlm.nih.gov/31572171/"
+          ]
+        }
+      ]
+    },
+    "human_use_subsections": {
+      "camelCase_prop": "humanUseSubsections",
+      "op": "write new_value only if current decoded value exactly equals old_value; skip if any subsection title equals 'Intravenous NAD+'. Not subject to NadPlusProfile replacement. Entry values keep the literal two-character backslash-n sequence used by the live data; do not convert. Removes the infusion amount and duration (dosing), 'pioneered by clinics', 'over a decade', and corrects the NMN trial to Yoshino M et al., Science 2021 (PMID 33888596).",
+      "old_value": [
+        {
+          "title": "IV NAD+ Protocols",
+          "entries": [
+            {
+              "type": "content",
+              "value": "Intravenous NAD+ infusion has been used in clinical settings for over a decade, primarily in addiction medicine. BR+NAD (Brain Restoration Plus NAD) protocols, pioneered by clinics in the US and Australia, use slow IV infusion (500-1000mg over 4-8 hours) for substance withdrawal support.\\n\\nPatient-reported outcomes include reduced withdrawal symptoms, improved cognitive clarity, and decreased cravings. However, rigorous placebo-controlled trials specifically for IV NAD+ in addiction remain limited."
+            }
+          ]
+        },
+        {
+          "title": "Oral Precursor Trials",
+          "entries": [
+            {
+              "type": "content",
+              "value": "Multiple clinical trials have evaluated oral NMN and NR supplementation. A 2022 trial published in Science showed that NMN supplementation increased NAD+ levels and improved insulin sensitivity in prediabetic women. NR trials have demonstrated measurable NAD+ elevation in blood and improved metabolic markers in older adults.\\n\\nThe key question — whether raising NAD+ in humans produces the dramatic health benefits seen in mice — remains under active investigation."
+            }
+          ]
+        }
+      ],
+      "new_value": [
+        {
+          "title": "Intravenous NAD+",
+          "entries": [
+            {
+              "type": "content",
+              "value": "Intravenous NAD+ is offered in some clinical settings, including addiction medicine, but controlled human evidence is limited. A small human pilot study (Front Aging Neurosci 2019) found that, during an intravenous infusion, NAD+ was rapidly and completely removed from plasma for at least the first 2 hours, with a metabolite profile consistent with breakdown by NAD+-consuming enzymes; urinary products included NAD+ itself and methylnicotinamide. Two of its authors were affiliated with NAD+ Research Inc. and Springfield Wellness Center (Springfield, LA). The study was not designed to test clinical benefit.\\n\\nReports of reduced withdrawal symptoms, improved cognitive clarity or decreased cravings come from patient reports, not from rigorous placebo-controlled trials."
+            }
+          ]
+        },
+        {
+          "title": "Oral Precursor Trials",
+          "entries": [
+            {
+              "type": "content",
+              "value": "Multiple clinical trials have evaluated oral NMN and NR supplementation. In a 10-week randomized, placebo-controlled, double-blind trial in postmenopausal women with prediabetes who were overweight or obese, NMN increased muscle insulin sensitivity (measured with a hyperinsulinemic-euglycemic clamp), muscle insulin signaling and the expression of muscle-remodeling genes (Science 2021). Whole-blood NAD+ changes with NR supplementation (Nat Metab 2026). A 2025 review concluded that, overall, human trials of NAD+ precursors have shown limited efficacy (Nat Metab 2025).\\n\\nThe key question — whether raising NAD+ in humans produces the benefits reported in mice — remains under active investigation."
+            }
+          ]
+        }
+      ]
+    },
+    "mechanism_subsections": {
+      "camelCase_prop": "mechanismSubsections",
+      "op": "write new_value only if current decoded value exactly equals old_value; skip if any item description contains 'Cell Metab 2016'. Only the 'CD38 Signaling' item description changes (scoped to mice, cited).",
+      "old_value": [
+        {
+          "intro": "NAD+ is essential for mitochondrial ATP production:",
+          "items": [
+            {
+              "item": "Electron Transport Chain",
+              "description": "NAD+ accepts electrons from glycolysis and the TCA cycle as NADH, donating them to Complex I of the ETC to drive oxidative phosphorylation"
+            },
+            {
+              "item": "Glycolysis & TCA Cycle",
+              "description": "Serves as the primary electron acceptor in catabolic pathways, enabling glucose and fatty acid oxidation"
+            }
+          ],
+          "title": "Energy Metabolism"
+        },
+        {
+          "intro": "NAD+ serves as a consumed substrate for critical enzymes:",
+          "items": [
+            {
+              "item": "Sirtuin Activation",
+              "description": "SIRT1-7 enzymes require NAD+ to deacetylate proteins involved in DNA repair, gene silencing, metabolism, and stress resistance"
+            },
+            {
+              "item": "PARP Activity",
+              "description": "Poly(ADP-ribose) polymerases consume NAD+ during DNA damage repair, linking NAD+ levels directly to genomic integrity"
+            },
+            {
+              "item": "CD38 Signaling",
+              "description": "CD38 enzyme consumes NAD+ for calcium signaling; CD38 expression increases with age, contributing to NAD+ decline"
+            }
+          ],
+          "title": "Signaling & Repair"
+        }
+      ],
+      "new_value": [
+        {
+          "intro": "NAD+ is essential for mitochondrial ATP production:",
+          "items": [
+            {
+              "item": "Electron Transport Chain",
+              "description": "NAD+ accepts electrons from glycolysis and the TCA cycle as NADH, donating them to Complex I of the ETC to drive oxidative phosphorylation"
+            },
+            {
+              "item": "Glycolysis & TCA Cycle",
+              "description": "Serves as the primary electron acceptor in catabolic pathways, enabling glucose and fatty acid oxidation"
+            }
+          ],
+          "title": "Energy Metabolism"
+        },
+        {
+          "intro": "NAD+ serves as a consumed substrate for critical enzymes:",
+          "items": [
+            {
+              "item": "Sirtuin Activation",
+              "description": "SIRT1-7 enzymes require NAD+ to deacetylate proteins involved in DNA repair, gene silencing, metabolism, and stress resistance"
+            },
+            {
+              "item": "PARP Activity",
+              "description": "Poly(ADP-ribose) polymerases consume NAD+ during DNA damage repair, linking NAD+ levels directly to genomic integrity"
+            },
+            {
+              "item": "CD38 Signaling",
+              "description": "CD38 enzyme consumes NAD+ in producing calcium-signaling molecules. In mice, CD38 expression and activity increase with age, and CD38 was required for the age-related NAD+ decline (Cell Metab 2016)"
+            }
+          ],
+          "title": "Signaling & Repair"
+        }
+      ]
+    },
+    "preclinical_subsections": {
+      "camelCase_prop": "preclinicalSubsections",
+      "op": "write new_value only if current decoded value exactly equals old_value; skip if any finding content contains 'Cell 2013'. Only 'Aging & Longevity' findings[0] last sentence changes ('within days' removed; Gomes 2013 cited).",
+      "old_value": [
+        {
+          "title": "Aging & Longevity",
+          "findings": [
+            {
+              "title": "Lifespan Extension",
+              "content": "NAD+ precursor supplementation (NMN, NR) extended healthspan in mouse models, improving metabolic function, muscle performance, and stem cell renewal in aged animals. Studies showed reversal of age-related mitochondrial dysfunction within days of treatment."
+            },
+            {
+              "title": "Epigenetic Clock",
+              "content": "Research demonstrated that NAD+ levels correlate with epigenetic age markers. Supplementation partially reversed age-related epigenetic changes in multiple tissue types."
+            }
+          ]
+        },
+        {
+          "title": "Neurodegeneration",
+          "findings": [
+            {
+              "title": "Alzheimer's Disease",
+              "content": "NAD+ supplementation in AD mouse models improved cognitive function, reduced amyloid and tau pathology, and restored synaptic plasticity. The mechanism involves SIRT1-mediated neuroprotection and improved mitochondrial function in neurons."
+            },
+            {
+              "title": "Parkinson's Disease",
+              "content": "NAD+ precursors protected dopaminergic neurons in PD models, improved mitochondrial complex I activity, and reduced alpha-synuclein aggregation."
+            }
+          ]
+        }
+      ],
+      "new_value": [
+        {
+          "title": "Aging & Longevity",
+          "findings": [
+            {
+              "title": "Lifespan Extension",
+              "content": "NAD+ precursor supplementation (NMN, NR) extended healthspan in mouse models, improving metabolic function, muscle performance, and stem cell renewal in aged animals. In old mice, raising NAD+ restored measures of mitochondrial function toward those of young mice (Cell 2013)."
+            },
+            {
+              "title": "Epigenetic Clock",
+              "content": "Research demonstrated that NAD+ levels correlate with epigenetic age markers. Supplementation partially reversed age-related epigenetic changes in multiple tissue types."
+            }
+          ]
+        },
+        {
+          "title": "Neurodegeneration",
+          "findings": [
+            {
+              "title": "Alzheimer's Disease",
+              "content": "NAD+ supplementation in AD mouse models improved cognitive function, reduced amyloid and tau pathology, and restored synaptic plasticity. The mechanism involves SIRT1-mediated neuroprotection and improved mitochondrial function in neurons."
+            },
+            {
+              "title": "Parkinson's Disease",
+              "content": "NAD+ precursors protected dopaminergic neurons in PD models, improved mitochondrial complex I activity, and reduced alpha-synuclein aggregation."
+            }
+          ]
+        }
+      ]
+    },
+    "half_life": {
+      "camelCase_prop": "halfLife (stored half_life wins over getClinicalData; NAD+ code value is '')",
+      "op": "write new_value ('') only if current value exactly equals old_value; skip if current value is already ''. No human source reporting a plasma half-life for NAD+ was found; the 2019 human infusion pilot reported rapid removal from plasma without a half-life.",
+      "old_value": "30-45 minutes (plasma)",
+      "new_value": ""
+    },
+    "faqs": {
+      "camelCase_prop": "faqs (FAQPage JSON-LD is generated from this column)",
+      "op": "Rendered-text guard: NadPlusProfile::phraseReplacements() is applied with strtr() to faq answers at render. Write new_value only if the list of {question, strtr(answer)} pairs from the current stored value exactly equals old_value (the rendered FAQPage JSON-LD); skip and log otherwise. Skip if any question equals 'Do NAD+ levels fall with age in humans?'. FAQ 1 answer replaced (removes the duplicated sentence: the stored answer, after strtr, renders 'It is a dinucleotide coenzyme' twice); FAQ 2 (infusion duration, dosing) replaced with an evidence FAQ; FAQ 3 answer rewritten (removes the unsourced 'bypassing conversion steps'; Grant 2019 scoped to the first 2 hours); FAQs 4-6 appended. Result: 6 FAQs. new_value contains no replacement source phrase.",
+      "old_value": [
+        {
+          "question": "Is NAD+ a peptide?",
+          "answer": "No. NAD+ is a dinucleotide coenzyme. It is a dinucleotide coenzyme, not a peptide."
+        },
+        {
+          "question": "Why are IV infusions so slow?",
+          "answer": "Rapid NAD+ infusion causes uncomfortable side effects (nausea, chest pressure). Slow infusion over 2-6 hours is standard for tolerability."
+        },
+        {
+          "question": "How does NAD+ differ from NMN supplements?",
+          "answer": "NMN is an oral precursor that the body converts into NAD+. IV NAD+ delivers the active coenzyme directly, bypassing conversion steps."
+        }
+      ],
+      "new_value": [
+        {
+          "question": "Is NAD+ a peptide?",
+          "answer": "No. NAD+ is a dinucleotide coenzyme. It has no amino-acid sequence."
+        },
+        {
+          "question": "What is known about intravenous NAD+ in humans?",
+          "answer": "Published human data are limited. A small human pilot study (Front Aging Neurosci 2019) found that, during an intravenous infusion, NAD+ was rapidly and completely removed from plasma for at least the first 2 hours, with a metabolite profile consistent with breakdown by NAD+-consuming enzymes; urinary products included NAD+ itself and methylnicotinamide. Two of its authors were affiliated with NAD+ Research Inc. and Springfield Wellness Center (Springfield, LA). The study was not designed to test clinical benefit."
+        },
+        {
+          "question": "How does NAD+ differ from NMN supplements?",
+          "answer": "NMN is a precursor that cells convert into NAD+. In a small intravenous pilot, infused NAD+ was rapidly removed from plasma and its metabolites were consistent with breakdown by NAD+-cleaving enzymes, so it is not established that infused NAD+ reaches cells intact (Front Aging Neurosci 2019)."
+        },
+        {
+          "question": "Do NAD+ levels fall with age in humans?",
+          "answer": "The evidence is limited and inconsistent. A 2025 review found that an age-related decline has been consistently observed in only a limited number of human studies, and that data on human tissues remain sparse (Nat Metab 2025). Results vary by tissue and measurement method; a 2026 study of seven cohorts found that whole-blood NAD+ did not vary with age (Nat Metab 2026)."
+        },
+        {
+          "question": "Is NAD+ an FDA-approved drug?",
+          "answer": "No, as of 19 Oct 2026. FDA lists NAD in Category 1 of its 503A list and beta-nicotinamide adenine dinucleotide in Category 1 of its 503B list. That is enforcement discretion while nominations are evaluated, not placement on a bulks list and not an approval."
+        },
+        {
+          "question": "What is FDA's position on NMN as a dietary supplement?",
+          "answer": "In 2022 FDA said NMN was excluded from the dietary-supplement definition. In a September 2025 response to a citizen petition (docket FDA-2023-P-0872), FDA reversed that position and concluded that NMN is not excluded, because it was marketed as a dietary supplement in the United States before it was authorized for investigation as a new drug. FDA described NMN as a new dietary ingredient, so notification rules still apply, and the response was not a safety finding."
+        }
+      ]
+    },
+    "human_use_intro": {
+      "camelCase_prop": "humanUseIntro",
+      "op": "write new_value only if current value exactly equals old_value; skip if it contains 'pilot study'. Removes 'IV infusion protocols' framing.",
+      "old_value": "NAD+ has been studied in multiple human contexts, from IV infusion protocols to oral precursor supplementation.",
+      "new_value": "NAD+ has been studied in people as an intravenous infusion and through oral precursors such as NMN and NR. Controlled human evidence is limited."
+    },
+    "potential_applications": {
+      "camelCase_prop": "potentialApplications",
+      "op": "write new_value only if the whole current decoded list exactly equals old_value; skip if any item title equals 'Aging research'. Item [0] replaced ('Restoring youthful NAD+ levels' presumed a human decline); item [2] description replaced (scoped to Science 2021 NMN trial); item [1] unchanged.",
+      "old_value": [
+        {
+          "title": "Aging Intervention",
+          "description": "Restoring youthful NAD+ levels as a strategy to delay or reverse age-related decline across multiple organ systems."
+        },
+        {
+          "title": "Neurodegenerative Disease",
+          "description": "Neuroprotective applications in Alzheimer's, Parkinson's, and other conditions characterized by mitochondrial dysfunction."
+        },
+        {
+          "title": "Metabolic Health",
+          "description": "Improving insulin sensitivity, glucose metabolism, and mitochondrial function in metabolic syndrome and diabetes."
+        }
+      ],
+      "new_value": [
+        {
+          "title": "Aging research",
+          "description": "Research into whether raising NAD+ affects age-related changes. Human evidence for an age-related NAD+ decline is limited and varies by tissue (see Overview)."
+        },
+        {
+          "title": "Neurodegenerative Disease",
+          "description": "Neuroprotective applications in Alzheimer's, Parkinson's, and other conditions characterized by mitochondrial dysfunction."
+        },
+        {
+          "title": "Metabolic Health",
+          "description": "Research on insulin sensitivity and glucose metabolism; a 10-week trial in women with prediabetes reported higher muscle insulin sensitivity with NMN (Science 2021)."
+        }
+      ]
+    },
+    "potential_applications_important_context": {
+      "camelCase_prop": "potentialApplicationsImportantContext",
+      "op": "write new_value only if current value exactly equals old_value; skip otherwise.",
+      "old_value": "NAD+ supplementation research is rapidly evolving. While preclinical data is compelling, translation to human clinical benefits requires ongoing investigation.",
+      "new_value": "NAD+ supplementation research is evolving. Preclinical findings in animal models are promising, but whether they translate to clinical benefit in people has not been shown, and human trials of NAD+ precursors have so far shown limited efficacy (Nat Metab 2025)."
+    },
+    "areas_of_research": {
+      "camelCase_prop": "areasOfResearch",
+      "op": "write new_value only if the whole current decoded list exactly equals old_value; skip if any description contains 'placebo-controlled trials are lacking'. Only the 'Addiction Medicine' and 'Metabolic Health' descriptions change; names and other items unchanged.",
+      "old_value": [
+        {
+          "name": "Neurodegenerative Disease",
+          "description": "Restoring mitochondrial function in Alzheimer's and Parkinson's models"
+        },
+        {
+          "name": "Aging Biology",
+          "description": "Sirtuin activation and epigenetic clock research"
+        },
+        {
+          "name": "Addiction Medicine",
+          "description": "Reducing withdrawal symptoms and cravings in clinical protocols"
+        },
+        {
+          "name": "Metabolic Health",
+          "description": "Improving insulin sensitivity and metabolic function"
+        }
+      ],
+      "new_value": [
+        {
+          "name": "Neurodegenerative Disease",
+          "description": "Restoring mitochondrial function in Alzheimer's and Parkinson's models"
+        },
+        {
+          "name": "Aging Biology",
+          "description": "Sirtuin activation and epigenetic clock research"
+        },
+        {
+          "name": "Addiction Medicine",
+          "description": "Patient-reported withdrawal and craving effects; controlled trials are lacking"
+        },
+        {
+          "name": "Metabolic Health",
+          "description": "Insulin sensitivity in precursor trials; overall human efficacy is limited (Nat Metab 2025)"
+        }
+      ]
+    },
+    "research_url": {
+      "camelCase_prop": "primaryResearch.url (controller uses stored research_url, else NadPlusProfile::researchUrl())",
+      "op": "write new_value only if the stored research_url exactly equals old_value; if it is NULL or '' (URL then comes from NadPlusProfile::researchUrl(), see code note) skip and log; skip if it already equals new_value. CID 5892 is PubChem 'Nadide', C21H27N7O14P2, MW 663.4, the CID PubChem returns for CAS 53-84-9, matching the page's formula, weight and CAS; CID 5893 is the cation C21H28N7O14P2+ (664.4).",
+      "old_value": "https://pubchem.ncbi.nlm.nih.gov/compound/5893",
+      "new_value": "https://pubchem.ncbi.nlm.nih.gov/compound/5892"
+    }
+  },
+  "code_changes_for_pr": {
+    "drugStatus": "No DB column. EncyclopediaController::getClinicalData() 'NAD+' => ['status' => 'Supplement', ...] → 'Not FDA-approved'. Basis: no Drugs@FDA application; 503A/503B Category 1 is enforcement discretion, not approval.",
+    "routes": "getClinicalData 'NAD+' routes ['Oral','IV','Subcutaneous'] are hardcoded; 'Oral' describes precursors rather than NAD+ itself. Optional PR change; not touched here.",
+    "NadPlusProfile": "phraseReplacements() is applied at render to overview, conclusion, background, description, peptide_full_name and faq answers; the migration must compare strtr(stored) with old_value for those columns. FAQ 1 duplication is produced by stored text + the replacement map; the faqs write fixes it in the DB. Optional PR hardening: make the replacement map idempotent against an already-present 'It is a dinucleotide coenzyme, not a peptide.' sentence.",
+    "CatalogFraming NMN": "app/Support/CatalogFraming.php NMN entry (renders /encyclopedia/nmn) states the 2022 FDA exclusion position and says it 'does not describe a later reversal'. FDA reversed that position in September 2025 (FDA-2023-P-0872). Out of scope here; flag for a separate NMN correction.",
+    "halfLife": "Stored half_life is cleared to ''. Confirm the controller then falls back to getClinicalData 'NAD+' halfLife '' and renders no half-life (not the NadPlusProfile stub text).",
+    "EncyclopediaFramingSeeder": "Main 2f8a1d3 (e8e84ff) fixed EncyclopediaFramingSeeder, which had failed every auto-deploy for 2 days. For NAD (preservesExistingArticle) it calls patchPreserved(), which persists strtr(phraseReplacements) into overview/conclusion/background/description/peptide_full_name and faq answers. The stored NAD text may therefore already equal the rendered text. The strtr guard accepts both states, because strtr of already-replaced text is a no-op. new_value contains no replacement source phrase, so a later framing-seeder run leaves it unchanged.",
+    "researchUrl": "app/Support/NadPlusProfile.php: researchUrl() (L75-78) returns https://pubchem.ncbi.nlm.nih.gov/compound/5893 and the stub reference at L191-196 ('PubChem record for NAD+ (CID 5893)', citation 'PubChem Compound CID 5893', link .../compound/5893) → change all to CID 5892 (Nadide, C21H27N7O14P2, 663.4; PubChem's CID for CAS 53-84-9). Keep the page identity values (C₂₁H₂₇N₇O₁₄P₂, 663.43 g/mol, CAS 53-84-9)."
+  },
+  "do_not_touch": "name, slug, subtitle, molecular_formula/weight/CAS (identity values kept; they match CID 5892), mechanism_of_action_intro, mechanism_subsections other than the CD38 item, preclinical_* other than Aging & Longevity findings[0], potential_applications[1], potential_applications_intro, areas_of_research items other than 'Addiction Medicine' and 'Metabolic Health', areas_of_research_intro, key_points, seo_* (NadPlusProfile supplies SEO)",
+  "migration": {
+    "timestamp": "2026_10_20_130000",
+    "note": "DB-only correction applied by the shared field-replace migration 2026_10_20_130000 (2026_10_20_120000 is taken on main by add_vendor_description_to_products) with Sermorelin-2026-10-fields.json; see PR-brief-2026-10-19b.md. No NAD shell file on main (2f8a1d3, re-checked 22 Oct 2026). strtr guard for overview, background, conclusion and faqs."
+  }
+}
