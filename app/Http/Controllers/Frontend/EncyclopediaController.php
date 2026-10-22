@@ -11,11 +11,11 @@ use App\Models\Setting;
 use App\Support\CompareSlug;
 use App\Support\EncyclopediaFraming;
 use App\Support\EncyclopediaSlug;
+use App\Support\FaqPage;
 use App\Support\FramingProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
-use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class EncyclopediaController extends Controller
 {
@@ -32,10 +32,41 @@ class EncyclopediaController extends Controller
      * TODO: move to database fields on education_posts table.
      */
     /**
-     * FAQPage schema builder. Accepts the array shape stored on
-     * education_posts.faqs ([{question, answer}, ...]) and returns a
-     * schema.org FAQPage node. Returns null when there are no FAQs so
-     * we don't emit an empty container Google's rich-result test rejects.
+     * Question/answer strings shared by the visible FAQ and FAQPage
+     * JSON-LD. Input is the stored education_posts.faqs shape
+     * ([{question, answer}, ...]). Empty pairs are dropped so an entry
+     * with no FAQ emits neither a section nor a schema node.
+     *
+     * @param  list<array<string, mixed>>  $faqs
+     * @return list<array{question: string, answer: string}>
+     */
+    private function faqPairs(array $faqs): array
+    {
+        $pairs = [];
+        foreach ($faqs as $f) {
+            if (! is_array($f)) {
+                continue;
+            }
+            $q = trim(html_entity_decode(strip_tags((string) ($f['question'] ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            $a = trim(html_entity_decode(strip_tags((string) ($f['answer'] ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            if ($q === '' || $a === '') {
+                continue;
+            }
+            $pairs[] = [
+                'question' => $q,
+                'answer' => $a,
+            ];
+        }
+
+        return $pairs;
+    }
+
+    /**
+     * FAQPage schema for pages that are not on the visible-FAQ allowlist.
+     * This is the builder main already shipped: trim, then strip_tags on
+     * the answer. It stays so those pages keep the same JSON-LD.
+     *
+     * @param  list<array<string, mixed>>  $faqs
      */
     private function faqPageSchema(array $faqs, string $slug): ?array
     {
@@ -620,7 +651,6 @@ class EncyclopediaController extends Controller
             return redirect(EncyclopediaSlug::withRequestQuery($redirect), 301);
         }
 
-        // Reuse the same logic as show() but render the new article detail page.
         // Hyphen canonicals (vitamin-b12, hgh-191aa, and the other forced
         // families) do not match the stored slug, so resolve those too.
         $category = ProductCategory::where('slug', $slug)
@@ -783,9 +813,18 @@ class EncyclopediaController extends Controller
         // encyclopedia document at /compare splits the informational URL.
         $encyclopediaUrl = url('/encyclopedia/'.$publicSlug);
 
-        // One normalised list feeds FAQPage JSON-LD on every page and the
-        // visible FAQ prop on the allowlist only.
-        $normalisedFaqs = $this->normalisedFaqs($educationPost, $profile);
+        // Allowlisted pages render one normalised list and build FAQPage
+        // JSON-LD from that same list. Every other page keeps the schema
+        // this controller already emitted and gains no visible FAQ.
+        // The faqs column is not written.
+        $storedFaqs = $this->faqsForSchema($educationPost, $profile);
+        if (FaqPage::renderAllowed('encyclopedia', $publicSlug)) {
+            $faqs = $this->faqPairs($storedFaqs);
+            $faqSchema = FaqPage::schema($faqs, url("/encyclopedia/{$publicSlug}#faq"));
+        } else {
+            $faqs = [];
+            $faqSchema = $this->faqPageSchema($storedFaqs, $publicSlug);
+        }
 
         // Build SEO array (same format as products/brands pages)
         $seo = [
@@ -803,10 +842,9 @@ class EncyclopediaController extends Controller
             'schema' => array_values(array_filter([
                 $definedTermSchema,
                 $breadcrumbSchema,
-                // FAQPage schema (SEO rec #7). Turns encyclopedia entries
-                // into rich-snippet candidates for "what is X" queries —
-                // Google renders the Q/A pairs directly under our SERP result.
-                $this->faqPageSchema($normalisedFaqs, $publicSlug),
+                // FAQPage schema (SEO rec #7). Allowlisted pages use the
+                // visible pairs. Other pages keep the existing node.
+                $faqSchema,
             ])),
         ];
 
@@ -895,9 +933,9 @@ class EncyclopediaController extends Controller
         ];
 
         $peptideData = $this->applyStubNarrative($peptideData, $educationPost, $profile);
-        $peptideData['faqs'] = $this->visibleFaqs($category, $normalisedFaqs);
 
         return Inertia::render('Frontend/EncyclopediaArticleDetail', array_merge($peptideData, [
+            'faqs' => $faqs,
             'seo' => $seo,
         ]));
     }
@@ -971,52 +1009,6 @@ class EncyclopediaController extends Controller
         return $text === ''
             || str_contains($text, 'peptide encyclopedia')
             || str_contains($text, ' peptides.');
-    }
-
-    /**
-     * trim(question) and trim(strip_tags(answer)), the same transform
-     * faqPageSchema() applies. Built once and shared with the visible prop.
-     *
-     * @return list<array{question: string, answer: string}>
-     */
-    private function normalisedFaqs(?EducationPost $post, ?FramingProfile $profile): array
-    {
-        $normalised = [];
-        foreach ($this->faqsForSchema($post, $profile) as $faq) {
-            if (! is_array($faq)) {
-                continue;
-            }
-            $question = trim((string) ($faq['question'] ?? ''));
-            $answer = trim(strip_tags((string) ($faq['answer'] ?? '')));
-            if ($question === '' || $answer === '') {
-                continue;
-            }
-            $normalised[] = [
-                'question' => $question,
-                'answer' => $answer,
-            ];
-        }
-
-        return $normalised;
-    }
-
-    /**
-     * @param  list<array{question: string, answer: string}>  $normalisedFaqs
-     * @return list<array{question: string, answer: string}>
-     */
-    private function visibleFaqs(ProductCategory $category, array $normalisedFaqs): array
-    {
-        $allow = config('peptidemap.faq_render_allowlist.encyclopedia');
-        if (! is_array($allow)) {
-            return [];
-        }
-        $slug = strtolower(trim((string) $category->slug));
-        $allowed = array_map(
-            fn ($item) => strtolower(trim((string) $item)),
-            $allow
-        );
-
-        return in_array($slug, $allowed, true) ? $normalisedFaqs : [];
     }
 
     /**
@@ -1259,5 +1251,4 @@ class EncyclopediaController extends Controller
 
         return [];
     }
-
 }

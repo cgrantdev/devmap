@@ -28,6 +28,8 @@ class EducationalContentPublisher
         'kinetixatx.com',
     ];
 
+    private const FAQ_RENDER_HOLD = ['orforglipron-vs-tirzepatide', 'cagrilintide-vs-eloralintide', 'eloralintide-tirzepatide-vs-retatrutide'];
+
     public static function sync(): void
     {
         foreach (self::catalog() as $page) {
@@ -229,6 +231,29 @@ class EducationalContentPublisher
             '@id' => $id,
             'mainEntity' => $main,
         ];
+    }
+
+    /**
+     * Blog slugs this catalog publishes. Their faq() pairs are the
+     * QA-passed set, so the visible-FAQ allowlist is derived from here
+     * instead of copying the slugs into config.
+     *
+     * @return list<string>
+     */
+    public static function blogSlugs(): array
+    {
+        $slugs = [];
+        foreach (self::catalog() as $page) {
+            if (($page['kind'] ?? null) !== 'blog' || in_array($page['slug'] ?? null, self::FAQ_RENDER_HOLD, true)) {
+                continue;
+            }
+            $slug = $page['slug'] ?? null;
+            if (is_string($slug) && $slug !== '') {
+                $slugs[] = $slug;
+            }
+        }
+
+        return $slugs;
     }
 
     private static function catalog(): array
