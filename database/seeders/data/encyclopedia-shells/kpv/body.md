@@ -171,6 +171,6 @@ Not well established in humans for research-chemical routes; do not invent a cli
 
 ## Editor notes (do not publish)
 
-- CAS: **67727-97-3** locked by Colin 2026-09-30 (Wikipedia KPV tripeptide). Do not use 67724-34-9.
+- CAS: **67727-97-3** locked by Colin 2026-09-30 (Wikipedia KPV tripeptide; PubChem CID 125672). Use no other CAS number.
 - Melanotan-II related link set to https://peptidemap.com/encyclopedia/Melanotan-II.
 - PCAC July 2026 KPV recommendation: advisory; keep “not on final Bulks List” language until FDA rule posts.
