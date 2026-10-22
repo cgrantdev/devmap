@@ -131,7 +131,7 @@ Outside the US: on 15 October 2026 the EMA's Committee for Medicinal Products fo
 - **Cross-trial comparisons are not valid.** Figures from other orforglipron or semaglutide trials, such as obesity trials with different populations and durations, should not be lined up against ACHIEVE-3. Only within-trial comparisons are reported here.
 - **Not about individual response.** Trial averages do not predict one person's response. Treatment choices belong with a licensed clinician.
 
-Vendor and price listings for the research market are on the [Orforglipron vs Semaglutide compare page](https://peptidemap.com/compare/orforglipron-vs-semaglutide) and the [Orforglipron vs Tirzepatide compare page](https://peptidemap.com/compare/orforglipron-vs-tirzepatide). Listings are not evidence of identity, quality or approval.
+Label conditions, molecule type, and US, EU and UK status are on the [orforglipron versus oral semaglutide compare page](https://peptidemap.com/compare/orforglipron-vs-oral-semaglutide). Vendor and price listings for the research market are on the [Orforglipron vs Semaglutide compare page](https://peptidemap.com/compare/orforglipron-vs-semaglutide) and the [Orforglipron vs Tirzepatide compare page](https://peptidemap.com/compare/orforglipron-vs-tirzepatide). Listings are not evidence of identity, quality or approval.
 
 ## FAQ
 

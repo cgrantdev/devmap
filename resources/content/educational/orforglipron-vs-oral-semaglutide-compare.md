@@ -6,13 +6,13 @@ Orforglipron is an oral GLP-1 receptor agonist from Eli Lilly and Company. The A
 
 Oral semaglutide is Novo Nordisk's semaglutide in a tablet. The US prescribing information says the peptide backbone is produced by yeast fermentation and that the tablets are co-formulated with salcaprozate sodium, also called SNAC, which the label describes as an absorption enhancer. The label says absorption after oral administration occurs predominantly in the stomach.
 
-In the United States, the diabetes oral-semaglutide label checked on 22 October 2026 covers two tablet products, Rybelsus and Ozempic tablets, and states that they are not substitutable for one another. The Wegovy label checked the same day includes tablets for oral use as well as the injection. In the European Union, Rybelsus has held a marketing authorisation for type 2 diabetes since 3 April 2020. The Wegovy EU authorisation includes tablets for adult weight management. The procedural-steps record lists a European Commission decision of 14 July 2026 for that tablet extension, after a CHMP positive opinion on 21 May 2026.
+In the United States, the diabetes oral-semaglutide label checked on 22 October 2026 covers two tablet products, Rybelsus and Ozempic tablets, and states that the two are not substitutable strength-for-strength. The label has a separate section on switching between them. The Wegovy label checked the same day includes tablets for oral use as well as the injection. In the European Union, Rybelsus has held a marketing authorisation for type 2 diabetes since 3 April 2020. The Wegovy EU authorisation includes tablets for adult weight management. The procedural-steps record lists a European Commission decision of 14 July 2026 for that tablet extension, after a CHMP positive opinion on 21 May 2026.
 
 ## How the molecules differ
 
 Both act at the GLP-1 receptor. That shared target does not make them the same molecule, the same tablet, or interchangeable.
 
-Orforglipron is not a peptide. A phase 2 paper in the New England Journal of Medicine, which is developer-affiliated, calls it a nonpeptide GLP-1 receptor agonist, and the ATTAIN-1 paper, also developer-affiliated, calls it a small-molecule, nonpeptide oral agonist. The Foundayo label describes a synthetic small molecule, not a chain of amino acids.
+Orforglipron is not a peptide. A phase 2 paper in the New England Journal of Medicine, which is developer-affiliated, calls it a nonpeptide GLP-1 receptor agonist, and the ATTAIN-1 paper, also developer-affiliated, calls it a small-molecule, nonpeptide oral agonist. The Foundayo label gives a non-peptide chemical name and formula and does not describe an amino-acid sequence.
 
 Oral semaglutide is a peptide analogue of GLP-1. The US label describes modifications that slow breakdown and support albumin binding, and it states that the tablets rely on SNAC for oral absorption. The Foundayo label does not list SNAC as an ingredient and does not describe an absorption enhancer.
 
@@ -31,6 +31,10 @@ Oral semaglutide is already an approved tablet in the United States under more t
 On 15 October 2026 the CHMP adopted a positive opinion recommending a marketing authorisation for Foundayo (orforglipron). The EMA product page states that the opinion covers type 2 diabetes mellitus and weight management. Meeting highlights from the CHMP meeting of 12-15 October 2026, published on 16 October 2026, list Foundayo as pending a European Commission decision. The product page says the summary of product characteristics will be published after the Commission grants the authorisation. As of 22 October 2026, the positive opinion is not itself an EU marketing authorisation.
 
 Rybelsus (semaglutide tablets) has been authorised in the EU for type 2 diabetes since 3 April 2020. Wegovy has been authorised in the EU since 6 January 2022. Its current EMA overview describes both a pre-filled pen and tablets, and it says the tablets are for adults. The procedural-steps document records the Commission decision of 14 July 2026 that added the tablet form.
+
+### United Kingdom
+
+The Medicines and Healthcare products Regulatory Agency (MHRA) authorised Foundayo (orforglipron) on 10 August 2026. The MHRA announcement lists weight loss and weight maintenance in adults with obesity, or with overweight and at least one weight-related comorbidity, alongside a reduced-calorie diet and increased physical activity, and glycaemic control in adults with insufficiently controlled type 2 diabetes. That is a UK national authorisation. It is not an EU marketing authorisation, and it does not change the pending status of the CHMP opinion.
 
 ## What the labels state about food and water
 
@@ -129,9 +133,10 @@ No. A research-use-only product sold under one of these names is not Foundayo, n
 15. European Medicines Agency. Rybelsus (semaglutide). EMEA/H/C/004953. Marketing authorisation issued 3 April 2020. https://www.ema.europa.eu/en/medicines/human/EPAR/rybelsus
 16. European Medicines Agency. Wegovy (semaglutide). EMEA/H/C/005422. Marketing authorisation issued 6 January 2022. Overview describes tablets as well as the pen. https://www.ema.europa.eu/en/medicines/human/EPAR/wegovy
 17. European Medicines Agency. Wegovy, procedural steps taken and scientific information after authorisation. Tablet extension, European Commission decision 14 July 2026. https://www.ema.europa.eu/en/documents/procedural-steps-after/wegovy-epar-procedural-steps-taken-scientific-information-after-authorisation_en.pdf
-18. European Medicines Agency. Wegovy, CHMP post-authorisation opinion on tablets for oral use, 21 May 2026. https://www.ema.europa.eu/en/medicines/human/variation/wegovy
+18. European Medicines Agency. CHMP post-authorisation summary of positive opinion for Wegovy (X/0000296344). 21 May 2026. https://www.ema.europa.eu/en/documents/smop/chmp-post-authorisation-summary-positive-opinion-wegovy-x-0000296344_en.pdf
 19. New England Journal of Medicine. Oral semaglutide and cardiovascular outcomes in patients with type 2 diabetes (PIONEER 6). DOI 10.1056/NEJMoa1901118. NCT02692716. developer-affiliated. https://www.nejm.org/doi/full/10.1056/NEJMoa1901118
 20. ClinicalTrials.gov. PIONEER 6, NCT02692716. https://clinicaltrials.gov/study/NCT02692716
 21. The Lancet. Oral semaglutide taken once per day in adults with overweight or obesity (OASIS 1). PMID 37385278. developer-affiliated. https://pubmed.ncbi.nlm.nih.gov/37385278/
 22. ClinicalTrials.gov. OASIS 1, NCT05035095. https://clinicaltrials.gov/study/NCT05035095
 23. ClinicalTrials.gov. OASIS 4, NCT05564117. https://clinicaltrials.gov/study/NCT05564117
+24. Medicines and Healthcare products Regulatory Agency. UK first in Europe to authorise orforglipron for weight management and type 2 diabetes. 10 August 2026. https://www.gov.uk/government/news/uk-first-in-europe-to-authorise-orforglipron-for-weight-management-and-type-2-diabetes

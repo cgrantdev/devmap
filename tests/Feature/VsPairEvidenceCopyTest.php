@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\ProductCategory;
 use App\Support\BpcTb500CompareCopy;
 use App\Support\ElamipretideMotsCCompareFaqs;
+use App\Support\EloralintideTirzepatideCompareCopy;
 use App\Support\RetatrutideTirzepatideCompareCopy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -26,6 +27,44 @@ class VsPairEvidenceCopyTest extends TestCase
         $this->assertNotNull(BpcTb500CompareCopy::forSlug('bpc-157-vs-tb-500'));
         $this->assertNull(BpcTb500CompareCopy::forSlug('retatrutide-vs-tirzepatide'));
         $this->assertNull(ElamipretideMotsCCompareFaqs::forSlug('bpc-157-vs-tb-500'));
+        $this->assertNotNull(EloralintideTirzepatideCompareCopy::forSlug('eloralintide-vs-tirzepatide'));
+        $this->assertNull(EloralintideTirzepatideCompareCopy::forSlug('eloralintide-vs-petrelintide'));
+    }
+
+    public function test_eloralintide_tirzepatide_page_shows_the_dated_company_reported_note(): void
+    {
+        $copy = EloralintideTirzepatideCompareCopy::forSlug('eloralintide-vs-tirzepatide');
+        $note = $copy['evidence']['title']."\n".implode("\n", $copy['evidence']['paragraphs']);
+
+        $this->assertSame('As of 22 October 2026', $copy['evidence']['title']);
+        $this->assertStringContainsString('company-reported', $note);
+        $this->assertStringContainsString('sponsor press release', $note);
+        $this->assertStringContainsString('no peer-reviewed paper', $note);
+        $this->assertStringContainsString('not repeated on this compare page', $note);
+        $this->assertDoesNotMatchRegularExpression('/[−-]\d+(\.\d+)?%/u', $note);
+        $this->assertDoesNotMatchRegularExpression('/\d+\s*mg\b/i', $note);
+        $this->assertDoesNotMatchRegularExpression('/\bwinner\b/i', $note);
+        $this->assertSame([], $copy['faqs']);
+
+        $sourceTitle = $copy['evidence']['sources'][0]['title'];
+        $this->assertStringContainsString('tirzepatide 15 mg', $sourceTitle);
+        $this->assertSame(
+            'https://investor.lilly.com/news-releases/news-release-details/lillys-eloratzp-combination-eloralintide-and-tirzepatide',
+            $copy['evidence']['sources'][0]['url']
+        );
+
+        ProductCategory::create(['name' => 'Eloralintide', 'slug' => 'eloralintide', 'is_active' => true]);
+        ProductCategory::create(['name' => 'Tirzepatide', 'slug' => 'tirzepatide', 'is_active' => true]);
+
+        $this->get('/compare/eloralintide-vs-tirzepatide')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('Frontend/CompareCompoundVs')
+                ->where('evidence.title', 'As of 22 October 2026')
+                ->where('evidence.paragraphs.0', $copy['evidence']['paragraphs'][0])
+                ->where('evidence.paragraphs.1', $copy['evidence']['paragraphs'][1])
+                ->where('evidence.paragraphs.2', $copy['evidence']['paragraphs'][2])
+                ->has('faqs', 0));
     }
 
     public function test_retatrutide_vs_page_stays_neutral_with_no_trial_figures(): void

@@ -51,10 +51,14 @@ class KlowComparePagesTest extends TestCase
     public function test_canonical_pages_render_copy_and_are_indexed_once(): void
     {
         $allow = config('seo.vs_sitemap_allowlist');
-        $this->assertCount(24, $allow);
+        $this->assertCount(25, $allow);
+        $this->assertSame(
+            'eloralintide-vs-tirzepatide',
+            $allow[array_search('elamipretide-vs-mots-c', $allow, true) + 1]
+        );
         $this->assertSame(
             'ghk-cu-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv',
-            $allow[array_search('elamipretide-vs-mots-c', $allow, true) + 1]
+            $allow[array_search('eloralintide-vs-tirzepatide', $allow, true) + 1]
         );
         $this->assertSame(
             'ghk-cu-vs-tb-500',

@@ -14,8 +14,10 @@ return new class extends Migration
      * this row does not replace the ACHIEVE-3 blog.
      *
      * Production pick-up is `php artisan migrate` after deploy.
-     * Sync upserts by slug, so a second migrate does not duplicate rows.
-     * Rolling back removes only the new slug.
+     * Sync upserts every catalog slug, including the ACHIEVE-3 article
+     * orforglipron-vs-oral-semaglutide, so its compare-page backlink
+     * is stored on deploy. A second migrate does not duplicate rows.
+     * Rolling back removes only the new compare slug.
      */
     public function up(): void
     {
