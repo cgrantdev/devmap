@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\SeoPage;
+use App\Support\CompareHubBlurb;
 use App\Support\ComparePageSeo;
 use App\Support\ComparePriceStats;
 use App\Support\VsPageSeo;
@@ -272,9 +273,10 @@ class CompareController extends Controller
                 // so "BPC-157" and "Vitamin B12" don't point at 404s.
                 'slug' => CompareSlug::canonical($category->slug) ?? $category->slug,
                 'anchor' => Str::slug($displayName),
-                'description' => $educationPost?->description
-                    ? Str::limit(strip_tags($educationPost->description), 200)
-                    : null,
+                // Encyclopedia descriptions can carry trial outcomes. The hub
+                // card sits beside a listed price, so those lines are replaced
+                // with a class sentence. Prices and display names stay put.
+                'description' => CompareHubBlurb::render($category->slug, $educationPost?->description),
                 'encyclopedia_url' => ($educationPost && $educationPost->status === 'published')
                     ? EncyclopediaSlug::path($category->slug)
                     : null,
