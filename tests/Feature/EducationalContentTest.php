@@ -2200,6 +2200,90 @@ class EducationalContentTest extends TestCase
         $page->assertSee($schema, false);
     }
 
+    public function test_dose_arm_blogs_omit_milligram_labels_outside_sources_and_match_faq(): void
+    {
+        $pattern = '/\b\d+(\.\d+)?\s?mg\b(?!\/dL)/i';
+        $expected = [
+            'orforglipron-vs-tirzepatide' => [1518, '7 Min Read'],
+            'cagrilintide-vs-eloralintide' => [1497, '7 Min Read'],
+            'eloralintide-tirzepatide-vs-retatrutide' => [1320, '6 Min Read'],
+        ];
+
+        foreach ($expected as $slug => [$words, $readTime]) {
+            $this->assertContains($slug, EducationalContentPublisher::blogSlugs());
+            $this->assertContains($slug, config('peptidemap.faq_render_allowlist.blog'));
+
+            $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
+            $this->assertSame($words, $this->renderedWordCount($markdown), $slug);
+            $this->assertSame(((int) ceil($words / 230)).' Min Read', $readTime);
+
+            $blog = Blog::where('slug', $slug)->firstOrFail();
+            $this->assertSame($readTime, $blog->read_time, $slug);
+            foreach ([
+                (string) $blog->description,
+                (string) $blog->seo_description,
+                (string) $blog->seo_og_description,
+                implode("\n", $blog->key_points ?? []),
+            ] as $prose) {
+                $this->assertDoesNotMatchRegularExpression($pattern, $prose, $slug);
+            }
+
+            $plain = html_entity_decode(strip_tags((string) $blog->content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $stored = collect($blog->seo_schema)->first(
+                fn ($block) => is_array($block) && ($block['@type'] ?? null) === 'FAQPage'
+            );
+            $this->assertIsArray($stored, $slug);
+            foreach ($stored['mainEntity'] as $entity) {
+                $this->assertSame(
+                    $entity['acceptedAnswer']['text'],
+                    $this->visibleFaqAnswer($plain, $entity['name']),
+                    $slug.' '.$entity['name']
+                );
+            }
+
+            $response = $this->get('/blog/'.$slug)->assertOk();
+            $faqPage = null;
+            preg_match_all('/<script type="application\/ld\+json">\s*(.*?)\s*<\/script>/s', $response->getContent(), $matches);
+            foreach ($matches[1] as $json) {
+                $data = json_decode($json, true);
+                if (is_array($data) && ($data['@type'] ?? null) === 'FAQPage') {
+                    $faqPage = $data;
+                    break;
+                }
+            }
+            $this->assertIsArray($faqPage, $slug);
+            $this->assertSame($stored['mainEntity'], $faqPage['mainEntity'], $slug);
+
+            $pairs = [];
+            foreach ($faqPage['mainEntity'] as $entity) {
+                $answer = $entity['acceptedAnswer']['text'];
+                $this->assertDoesNotMatchRegularExpression($pattern, $entity['name']."\n".$answer, $slug);
+                $pairs[] = [
+                    'question' => $entity['name'],
+                    'answer' => $answer,
+                ];
+            }
+            $encoded = json_encode($faqPage, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $this->assertIsString($encoded);
+            $this->assertDoesNotMatchRegularExpression($pattern, $encoded, $slug);
+
+            $response->assertInertia(fn ($page) => $page
+                ->where('faqs', $pairs)
+                ->where('blog.content', function ($content) use ($pattern, $slug) {
+                    $this->assertIsString($content);
+                    $parts = preg_split('/<h2>\s*Sources\s*<\/h2>/i', $content, 2);
+                    $this->assertCount(2, $parts, $slug);
+                    $this->assertDoesNotMatchRegularExpression($pattern, $parts[0], $slug);
+                    if ($slug === 'cagrilintide-vs-eloralintide') {
+                        $this->assertStringContainsString('tirzepatide 15 mg', $parts[1]);
+                    }
+
+                    return true;
+                })
+            );
+        }
+    }
+
     /**
      * Words in the body as rendered to text, including sources.
      * Table pipes, heading and list markers, and link URLs are not words.

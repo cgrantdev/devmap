@@ -14,7 +14,7 @@ Neither cagrilintide nor eloralintide is an approved weight-management medicine.
 
 ## REDEFINE-1: combination and cagrilintide alone
 
-REDEFINE-1 (NCT05567796) is a 68-week phase 3a trial in adults with overweight or obesity and without diabetes. Garvey and colleagues published it in the *New England Journal of Medicine*. Participants were assigned to once-weekly cagrilintide 2.4 mg plus semaglutide 2.4 mg, semaglutide 2.4 mg alone, cagrilintide 2.4 mg alone, or placebo. Every group also had a lifestyle intervention. Of 3,417 people randomized, 2,108 were assigned to the combination, 302 to semaglutide, 302 to cagrilintide, and 705 to placebo.
+REDEFINE-1 (NCT05567796) is a 68-week phase 3a trial in adults with overweight or obesity and without diabetes. Garvey and colleagues published it in the *New England Journal of Medicine*. Participants were assigned to once-weekly cagrilintide plus semaglutide at the doses used in that trial, semaglutide alone at the approved semaglutide dose used in that trial, cagrilintide alone at the dose used in that trial, or placebo. Every group also had a lifestyle intervention. Of 3,417 people randomized, 2,108 were assigned to the combination, 302 to semaglutide, 302 to cagrilintide, and 705 to placebo.
 
 The coprimary analysis uses the treatment-policy estimand, which the paper describes as consistent with the intention-to-treat principle: assigned treatment, whether or not everyone stayed on drug. At week 68 the estimated mean percent change in body weight was −20.4% with cagrilintide plus semaglutide, −14.9% with semaglutide alone, −11.5% with cagrilintide alone, and −3.0% with placebo. The −20.4% figure is the combination. The cagrilintide-only arm on that same estimand is −11.5%.
 
@@ -22,7 +22,7 @@ The paper also reports a trial-product estimand: the effect if the products were
 
 ## REDEFINE-2 is not the monotherapy arm
 
-REDEFINE-2 (NCT05394519; Davies et al., *NEJM*) enrolled adults with overweight or obesity and type 2 diabetes. It compared once-weekly cagrilintide 2.4 mg plus semaglutide 2.4 mg with placebo for 68 weeks. It did not include a cagrilintide-only group. Under the treatment-policy estimand, the estimated mean change in body weight at week 68 was −13.7% with the combination and −3.4% with placebo. The trial randomized 1,206 people: 904 to the combination and 302 to placebo.
+REDEFINE-2 (NCT05394519; Davies et al., *NEJM*) enrolled adults with overweight or obesity and type 2 diabetes. It compared once-weekly cagrilintide plus semaglutide with placebo for 68 weeks, with semaglutide at the approved semaglutide dose used in that trial and cagrilintide at the dose used in that trial. It did not include a cagrilintide-only group. Under the treatment-policy estimand, the estimated mean change in body weight at week 68 was −13.7% with the combination and −3.4% with placebo. The trial randomized 1,206 people: 904 to the combination and 302 to placebo.
 
 That −13.7% is CagriSema in people with type 2 diabetes. It is not the REDEFINE-1 combination result, and it is not cagrilintide alone.
 
@@ -30,7 +30,7 @@ That −13.7% is CagriSema in people with type 2 diabetes. It is not the REDEFIN
 
 Lilly’s phase 2 monotherapy trial (NCT06230523) randomized 263 adults in the United States with obesity or overweight and at least one weight-related comorbidity, without type 2 diabetes. Assigned treatment lasted 48 weeks. Lilly announced the results on 6 November 2025. The trial was presented at ObesityWeek 2025 and published in *The Lancet* (DOI 10.1016/S0140-6736(25)02155-5).
 
-On the efficacy estimand, the Lilly release gives mean weight reduction from −9.5% at 1 mg to −20.1% at 9 mg, versus −0.4% with placebo. Lilly’s endnote defines that estimand as efficacy had all randomized participants remained on study intervention for 48 weeks, with possible dose interruptions or dose modifications. The one-decimal range is the Lilly release. The *Lancet* abstract reports the same endpoint in rounded percents. This note does not print those rounded figures next to Lilly’s decimals.
+On the efficacy estimand, the Lilly release gives mean weight reduction from −9.5% in the lowest dose arm to −20.1% in the highest dose arm, versus −0.4% with placebo. Lilly’s endnote defines that estimand as efficacy had all randomized participants remained on study intervention for 48 weeks, with possible dose interruptions or dose modifications. The one-decimal range is the Lilly release. The *Lancet* abstract reports the same endpoint in rounded percents. This note does not print those rounded figures next to Lilly’s decimals.
 
 Those percents are eloralintide alone, without type 2 diabetes, at 48 weeks, on the efficacy estimand. They are not CagriSema, and they are not the REDEFINE cagrilintide-only arms.
 
@@ -38,7 +38,7 @@ Those percents are eloralintide alone, without type 2 diabetes, at 48 weeks, on 
 
 Phase 2b NCT06603571 tested eloralintide, tirzepatide, and the combination EloraTZP in 367 adults with obesity or overweight and type 2 diabetes. Lilly’s 30 September 2026 release reports 48-week efficacy-estimand results. The primary comparison was the combination versus placebo.
 
-The highest listed combination, eloralintide 9 mg plus tirzepatide 15 mg, was −23.3%. Tirzepatide 15 mg alone was −14.8%. Placebo was −3.0%. Other dose rows in that release are not repeated here. The −23.3% figure includes tirzepatide, in people with type 2 diabetes, at 48 weeks. It is not a cagrilintide result and not a REDEFINE comparison. An unverified early-combo slide figure is not printed.
+The highest listed combination, eloralintide plus tirzepatide, was −23.3%. Tirzepatide alone, at the approved tirzepatide dose used in that comparison, was −14.8%. Placebo was −3.0%. Other dose rows in that release are not repeated here. The −23.3% figure includes tirzepatide, in people with type 2 diabetes, at 48 weeks. It is not a cagrilintide result and not a REDEFINE comparison. An unverified early-combo slide figure is not printed.
 
 ## Why these percents cannot be ranked
 
@@ -57,6 +57,24 @@ No randomized comparison of cagrilintide versus eloralintide was identified in t
 The compare page lists vendors and prices. A shared shop category does not show that the compounds are substitutes, that one outperformed the other, or that a research-use listing matches a trial arm.
 
 Educational only. Not medical advice.
+
+## FAQ
+
+### Are cagrilintide and eloralintide the same molecule?
+
+No. Cagrilintide is Novo Nordisk’s long-acting amylin analogue. Eloralintide (LY3841136) is Eli Lilly’s investigational once-weekly selective amylin receptor agonist. No randomized comparison of the two was identified in the primaries checked for this note.
+
+### What is the cagrilintide-only result in REDEFINE-1?
+
+On the treatment-policy estimand at week 68, cagrilintide alone at the dose used in that trial was −11.5%, and the trial-product row was −11.8%. The −20.4% and −22.7% figures are cagrilintide plus semaglutide, not cagrilintide alone.
+
+### What did eloralintide monotherapy report?
+
+Lilly’s phase 2 release gives an efficacy-estimand range from −9.5% in the lowest dose arm to −20.1% in the highest dose arm, versus −0.4% with placebo, at 48 weeks in adults without type 2 diabetes. Those percents are eloralintide alone. They are not CagriSema.
+
+### Is the −23.3% figure a cagrilintide result?
+
+No. −23.3% is the EloraTZP efficacy estimand for the highest listed combination of eloralintide plus tirzepatide at 48 weeks in adults with type 2 diabetes, versus −14.8% for tirzepatide alone at the approved tirzepatide dose used in that comparison and −3.0% for placebo. It is not a REDEFINE comparison.
 
 ## Sources
 
