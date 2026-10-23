@@ -96,6 +96,16 @@ class DevConsoleController extends Controller
             'args' => [],
             'positional' => ['brand' => 'string'],
         ],
+        'vendor:category-audit' => [
+            'label' => 'Flag miscategorized products for one brand',
+            'args' => [],
+            'positional' => ['brand' => 'string'],
+        ],
+        'product:recategorize' => [
+            'label' => 'Fix a product\'s category (positional: product_id, category slug/name)',
+            'args' => [],
+            'positional' => ['product_id' => 'int', 'category' => 'string'],
+        ],
         'brands:ensure-generated-desc-column' => [
             'label' => 'Add generated_description to vendor_settings (schema)',
             'args' => [],
