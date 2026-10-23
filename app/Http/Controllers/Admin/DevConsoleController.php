@@ -91,6 +91,11 @@ class DevConsoleController extends Controller
             'args' => [],
             'positional' => ['brand' => 'string'],
         ],
+        'vendor:products-export' => [
+            'label' => 'CSV dump of a brand\'s products + duplicate flagging',
+            'args' => [],
+            'positional' => ['brand' => 'string'],
+        ],
         'brands:ensure-generated-desc-column' => [
             'label' => 'Add generated_description to vendor_settings (schema)',
             'args' => [],
