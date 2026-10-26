@@ -140,6 +140,10 @@ class DevConsoleController extends Controller
             'label' => 'Scrape Vistara Labs central price library',
             'args' => ['--dry-run' => true, '--limit' => 'int'],
         ],
+        'recherche:add-missing' => [
+            'label' => 'Add Recherche Kisspeptin 10mg + Tirzepatide 20mg (one-off)',
+            'args' => [],
+        ],
         'zenith:sync' => [
             'label' => 'Pull Zenith Bioscience catalog (needs API key on vendor row)',
             'args' => ['--dry-run' => true, '--limit' => 'int'],
