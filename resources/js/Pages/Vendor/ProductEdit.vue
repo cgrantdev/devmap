@@ -38,7 +38,17 @@
                  autocompletes as they type, but still allows free-text
                  for weird one-offs. -->
             <datalist id="size-presets">
+              <option value="5mg" />
               <option value="10mg" />
+              <option value="15mg" />
+              <option value="20mg" />
+              <option value="25mg" />
+              <option value="50mg" />
+              <option value="100mg" />
+              <option value="100mcg" />
+              <option value="200mcg" />
+              <option value="350mcg" />
+              <option value="500mcg" />
               <option value="10mg/2.5mg" />
               <option value="30mg/5mg" />
               <option value="50mg/10mg" />
