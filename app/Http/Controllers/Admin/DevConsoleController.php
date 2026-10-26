@@ -136,6 +136,10 @@ class DevConsoleController extends Controller
             'label' => 'Scrape Australian Research Peptides via /llms.txt',
             'args' => ['--dry-run' => true, '--limit' => 'int'],
         ],
+        'vistara:sync' => [
+            'label' => 'Scrape Vistara Labs central price library',
+            'args' => ['--dry-run' => true, '--limit' => 'int'],
+        ],
         'zenith:sync' => [
             'label' => 'Pull Zenith Bioscience catalog (needs API key on vendor row)',
             'args' => ['--dry-run' => true, '--limit' => 'int'],

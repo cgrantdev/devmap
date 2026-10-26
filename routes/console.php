@@ -96,6 +96,13 @@ Schedule::command('zenith:sync')
     ->withoutOverlapping()
     ->runInBackground();
 
+// Vistara Labs — central price library at /peptide-library/prices/.
+// Vendor-recommended source. 06:30 UTC after Zenith.
+Schedule::command('vistara:sync')
+    ->dailyAt('06:30')
+    ->withoutOverlapping()
+    ->runInBackground();
+
 // My Peptides UK — public paginated JSON API, no auth. Skip
 // is_unlisted products per their note.
 Schedule::command('mypeptides:sync')
