@@ -36,7 +36,17 @@
           class="px-4 py-2 text-sm font-medium border-b-2 -mb-px border-transparent text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">
           Content scanner
         </a>
+        <a href="/admin/seo/changelog"
+          class="px-4 py-2 text-sm font-medium border-b-2 -mb-px border-transparent text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">
+          Changelog
+        </a>
       </nav>
+
+      <!-- Admin preview banner — shown when a non-agency user viewed with ?view=agency -->
+      <div v-if="is_agency_preview" class="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-[12px] text-amber-900 flex justify-between items-center">
+        <span><strong>Previewing agency view.</strong> This is what Advantage Collective sees when they log in.</span>
+        <a href="/admin/seo" class="text-amber-800 hover:underline font-semibold">Exit preview</a>
+      </div>
 
       <!-- OVERVIEW -->
       <div v-if="tab === 'overview'" class="space-y-8">
@@ -327,6 +337,7 @@ const props = defineProps({
   seo_pages: { type: Array, default: () => [] },
   suggested_keys: { type: Array, default: () => [] },
   is_agency: { type: Boolean, default: false },
+  is_agency_preview: { type: Boolean, default: false },
   agency_welcome: { type: Object, default: null },
 })
 

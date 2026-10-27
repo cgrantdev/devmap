@@ -196,5 +196,8 @@ const quickActions = [
   { href: '/admin/banners', label: 'Banner Ads', icon: '📢' },
   { href: '/admin/staged-products', label: 'Review Staged', icon: '✓' },
   { href: '/admin/blogs/create', label: 'Write Blog', icon: '✍️' },
+  { href: '/admin/seo', label: 'SEO dashboard', icon: '🔍' },
+  { href: '/admin/seo?view=agency', label: 'View as agency', icon: '👁' },
+  { href: '/admin/seo/changelog', label: 'SEO changelog', icon: '📋' },
 ]
 </script>

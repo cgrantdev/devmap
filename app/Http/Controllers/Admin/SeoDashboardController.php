@@ -34,9 +34,14 @@ class SeoDashboardController extends Controller
         $snap7 = $this->seo->snapshot(7);
         $sitemapCount = $this->estimateSitemapCount();
 
+        // Admins can preview the agency's view with ?view=agency.
+        $isAgency = (bool) ($request->user()?->isSeoAgency() ?? false)
+            || $request->query('view') === 'agency';
+
         return Inertia::render('Admin/SeoDashboard', [
             'tab' => 'overview',
-            'is_agency' => (bool) ($request->user()?->isSeoAgency() ?? false),
+            'is_agency' => $isAgency,
+            'is_agency_preview' => !($request->user()?->isSeoAgency() ?? false) && $request->query('view') === 'agency',
             'agency_welcome' => $this->agencyWelcome(),
             'snapshot_28d' => $snap,
             'snapshot_7d' => $snap7,

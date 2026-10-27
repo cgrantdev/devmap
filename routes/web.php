@@ -432,6 +432,12 @@ Route::middleware(['auth', 'role:admin,admin_viewer,seo_agency', 'email.verified
     // pages. Audit Part 5, ~12 known hits.
     Route::get('/content-scanner', [\App\Http\Controllers\Admin\ContentScannerController::class, 'index'])->name('admin.content-scanner');
 
+    // SEO changelog — every SEO-relevant change in one place, visible to
+    // both Colin and the agency. Not git-log driven — curated entries.
+    Route::get('/seo/changelog', [\App\Http\Controllers\Admin\SeoChangelogController::class, 'index'])->name('admin.seo.changelog');
+    Route::post('/seo/changelog', [\App\Http\Controllers\Admin\SeoChangelogController::class, 'store'])->name('admin.seo.changelog.store');
+    Route::delete('/seo/changelog/{seoChange}', [\App\Http\Controllers\Admin\SeoChangelogController::class, 'destroy'])->name('admin.seo.changelog.destroy');
+
     // Per-page analytics — GSC + internal signals for any one URL.
     // Deep-linked from the frontend AdminBar's "Analytics" button.
     Route::get('/analytics/page', [\App\Http\Controllers\Admin\PageAnalyticsController::class, 'show'])->name('admin.analytics.page');
