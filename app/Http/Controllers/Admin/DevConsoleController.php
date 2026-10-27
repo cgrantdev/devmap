@@ -144,6 +144,14 @@ class DevConsoleController extends Controller
             'label' => 'Add Recherche Kisspeptin 10mg + Tirzepatide 20mg (one-off)',
             'args' => [],
         ],
+        'vialverse:dedup-dump' => [
+            'label' => 'VialVerse: dump duplicate rows for inspection',
+            'args' => [],
+        ],
+        'vialverse:dedup-fix' => [
+            'label' => 'VialVerse: merge duplicates, keep canonical row',
+            'args' => ['--dry-run' => true],
+        ],
         'zenith:sync' => [
             'label' => 'Pull Zenith Bioscience catalog (needs API key on vendor row)',
             'args' => ['--dry-run' => true, '--limit' => 'int'],
