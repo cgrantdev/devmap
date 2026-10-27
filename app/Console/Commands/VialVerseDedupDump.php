@@ -30,10 +30,23 @@ class VialVerseDedupDump extends Command
             ->orderBy('name')->orderBy('id')
             ->get(['id', 'name', 'size_mg', 'external_id', 'product_url', 'price']);
 
-        $groups = $products->groupBy(fn ($p) => strtolower(trim((string) $p->name)));
+        // Count products with no size_mg — this is what Julia likely means
+        // by "no size set" repeating.
+        $noSize = $products->filter(fn ($p) => trim((string) $p->size_mg) === '')->count();
+        $withSize = $products->count() - $noSize;
+        $this->info("{$products->count()} total products: {$withSize} have size_mg set, {$noSize} do not.");
+        $this->newLine();
+
+        // Duplicate detection by COMPOUND (name minus trailing size).
+        $groups = $products->groupBy(function ($p) {
+            $n = strtolower(trim((string) $p->name));
+            // Strip trailing size patterns like "10mg", "100mcg", "10mg/5mg/5mg".
+            $n = preg_replace('~\s+\d+(\.\d+)?\s*(mg|mcg|ml|iu)(\s*/\s*\d+(\.\d+)?\s*(mg|mcg|ml|iu))*(\s*\(.*\))?$~i', '', $n);
+            return trim($n);
+        });
         $dupGroups = $groups->filter(fn ($g) => $g->count() > 1);
 
-        $this->info("{$products->count()} total products. {$dupGroups->count()} duplicate name-groups covering " . $dupGroups->sum(fn ($g) => $g->count()) . ' rows.');
+        $this->info("Grouping by compound (size stripped): {$dupGroups->count()} compound(s) with more than one row.");
         $this->newLine();
 
         foreach ($dupGroups as $name => $g) {
