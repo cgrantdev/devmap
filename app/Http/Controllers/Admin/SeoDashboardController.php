@@ -28,7 +28,7 @@ class SeoDashboardController extends Controller
 {
     public function __construct(private SeoMetrics $seo) {}
 
-    public function index(Request $request): Response
+    public function index(Request $request): Response|RedirectResponse
     {
         $snap = $this->seo->snapshot(28);
         $snap7 = $this->seo->snapshot(7);
