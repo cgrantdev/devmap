@@ -2,6 +2,7 @@
 
 use Database\Seeders\EncyclopediaCategoryCreateSeeder;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Fills the hexarelin encyclopedia post from the shell draft.
@@ -23,6 +24,16 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Hexarelin's half_life string exceeds the original VARCHAR(255)
+        // cap. A later migration (2026_10_20_130000) alters this column to
+        // TEXT, but it runs AFTER this one — so without the alter hoisted
+        // here, the hexarelin insert blows up with "data too long" and
+        // every subsequent pending migration stays stuck. Alter first,
+        // then seed. Idempotent — repeat ALTERs to TEXT are no-ops.
+        try {
+            DB::statement('ALTER TABLE education_posts MODIFY half_life TEXT NULL');
+        } catch (\Throwable $e) { /* already TEXT or table missing: ignore */ }
+
         (new EncyclopediaCategoryCreateSeeder)->run();
     }
 
