@@ -92,6 +92,16 @@
         <span><strong>View-only mode.</strong> Your account can browse the admin panel but cannot create, edit, or delete any data.</span>
       </div>
 
+      <!-- Agency-preview banner — shown globally when preview_as_agency is on -->
+      <div v-if="page.props.is_agency_preview_active" class="bg-indigo-50 border-b border-indigo-200 px-6 py-2.5 flex items-center justify-center gap-3 text-[13px] text-indigo-900">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <span><strong>Previewing agency view.</strong> Sidebar + access restricted to what Advantage Collective sees.</span>
+        <a href="/admin/seo?view=exit" class="font-semibold underline underline-offset-2 hover:text-indigo-700">Exit preview</a>
+      </div>
+
       <!-- Flash error (e.g. blocked write attempts for view-only accounts) -->
       <div v-if="page.props.flash?.error" class="bg-red-50 border-b border-red-200 px-6 py-2.5 flex items-center justify-center gap-2 text-[13px] text-red-800">
         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">

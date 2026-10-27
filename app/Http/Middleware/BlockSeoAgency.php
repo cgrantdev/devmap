@@ -41,13 +41,22 @@ class BlockSeoAgency
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        if (!$user || ($user->role ?? '') !== 'seo_agency') {
+        $isRealAgency = $user && ($user->role ?? '') === 'seo_agency';
+        $isPreview = !$isRealAgency && (bool) session('preview_as_agency', false);
+
+        // Real agency = full enforcement. Admin previewing = same block
+        // list applies so what Colin sees matches what the agency sees.
+        if (!$isRealAgency && !$isPreview) {
             return $next($request);
         }
 
         $path = ltrim($request->path(), '/');
         foreach (self::BLOCKED_PATH_PREFIXES as $prefix) {
             if (str_starts_with($path, $prefix)) {
+                if ($isPreview) {
+                    // Preview: show the exit affordance instead of a 403 wall.
+                    return redirect('/admin/seo')->with('error', "Agency can't access /{$path} — exit preview to view this page.");
+                }
                 abort(403, 'This section is not available to SEO agency accounts. Contact Colin for access.');
             }
         }

@@ -145,7 +145,13 @@ class HandleInertiaRequests extends Middleware
             'is_ceo' => fn () => strtolower((string) ($request->user()?->email ?? '')) === 'info@peptidemap.com',
             // seo_agency role — the agency sees a limited sidebar and
             // lands on /admin/seo instead of /admin/dashboard.
-            'is_seo_agency' => fn () => $request->user()?->role === 'seo_agency',
+            // true for a real seo_agency user, OR an admin currently
+            // previewing the agency view (session flag toggled via
+            // /admin/seo?view=agency on SeoDashboardController).
+            'is_seo_agency' => fn () => $request->user()?->role === 'seo_agency'
+                || (bool) session('preview_as_agency', false),
+            'is_agency_preview_active' => fn () => $request->user()?->role !== 'seo_agency'
+                && (bool) session('preview_as_agency', false),
             'site_name' => fn () => Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap',
             'site_description' => fn () => \App\Support\SiteCopy::description(
                 Setting::where('key', 'site_description')->value('value')

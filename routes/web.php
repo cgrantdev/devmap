@@ -438,6 +438,14 @@ Route::middleware(['auth', 'role:admin,admin_viewer,seo_agency', 'email.verified
     Route::post('/seo/changelog', [\App\Http\Controllers\Admin\SeoChangelogController::class, 'store'])->name('admin.seo.changelog.store');
     Route::delete('/seo/changelog/{seoChange}', [\App\Http\Controllers\Admin\SeoChangelogController::class, 'destroy'])->name('admin.seo.changelog.destroy');
 
+    // Brand SEO editor — narrow slice of /admin/vendors exposing ONLY
+    // the brand-page SEO fields (title, meta, OG) + long-form description.
+    // Lets the SEO agency fix brand-page SEO without reaching financial
+    // / scraping / affiliate data. Audit Part 3 brand-title fixes.
+    Route::get('/seo/brands', [\App\Http\Controllers\Admin\SeoBrandsController::class, 'index'])->name('admin.seo.brands');
+    Route::get('/seo/brands/{brand}/edit', [\App\Http\Controllers\Admin\SeoBrandsController::class, 'edit'])->name('admin.seo.brands.edit');
+    Route::put('/seo/brands/{brand}', [\App\Http\Controllers\Admin\SeoBrandsController::class, 'update'])->name('admin.seo.brands.update');
+
     // Per-page analytics — GSC + internal signals for any one URL.
     // Deep-linked from the frontend AdminBar's "Analytics" button.
     Route::get('/analytics/page', [\App\Http\Controllers\Admin\PageAnalyticsController::class, 'show'])->name('admin.analytics.page');

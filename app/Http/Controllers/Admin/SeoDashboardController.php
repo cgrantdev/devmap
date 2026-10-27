@@ -34,14 +34,27 @@ class SeoDashboardController extends Controller
         $snap7 = $this->seo->snapshot(7);
         $sitemapCount = $this->estimateSitemapCount();
 
-        // Admins can preview the agency's view with ?view=agency.
-        $isAgency = (bool) ($request->user()?->isSeoAgency() ?? false)
-            || $request->query('view') === 'agency';
+        // Admins can preview the agency view with ?view=agency|exit.
+        // Flipping the session flag means the preview applies to every
+        // page they visit (sidebar, dashboard, etc), not just this one.
+        if ($request->query('view') === 'agency' && !$request->user()?->isSeoAgency()) {
+            session(['preview_as_agency' => true]);
+            return redirect('/admin/seo');
+        }
+        if ($request->query('view') === 'exit' || $request->query('view') === 'admin') {
+            session()->forget('preview_as_agency');
+            return redirect('/admin/seo');
+        }
+
+        $isAgency = ($request->user()?->isSeoAgency() ?? false)
+            || (bool) session('preview_as_agency', false);
+        $isPreview = !($request->user()?->isSeoAgency() ?? false)
+            && (bool) session('preview_as_agency', false);
 
         return Inertia::render('Admin/SeoDashboard', [
             'tab' => 'overview',
             'is_agency' => $isAgency,
-            'is_agency_preview' => !($request->user()?->isSeoAgency() ?? false) && $request->query('view') === 'agency',
+            'is_agency_preview' => $isPreview,
             'agency_welcome' => $this->agencyWelcome(),
             'snapshot_28d' => $snap,
             'snapshot_7d' => $snap7,

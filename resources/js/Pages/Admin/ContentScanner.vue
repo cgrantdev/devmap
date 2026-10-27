@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[color:var(--color-canvas)]">
+  <AdminLayout>
     <PageHeader title="Content issue scanner" subtitle="Internal notes bleeding onto public pages">
       <template #actions>
         <Link href="/admin/seo" class="text-[13px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">← SEO dashboard</Link>
@@ -48,12 +48,13 @@
         </div>
       </div>
     </div>
-  </div>
+  </AdminLayout>
 </template>
 
 <script setup>
 import { Link } from '@inertiajs/vue3'
 import PageHeader from '@/components/admin/PageHeader.vue'
+import AdminLayout from './Layout.vue'
 
 defineProps({
   hits: Array,

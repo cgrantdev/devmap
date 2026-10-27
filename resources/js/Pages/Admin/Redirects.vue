@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[color:var(--color-canvas)]">
+  <AdminLayout>
     <PageHeader title="Redirects" subtitle="301/302 forwards for retired URLs — SEO agency tool">
       <template #actions>
         <Link href="/admin/seo" class="text-[13px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">← SEO dashboard</Link>
@@ -75,13 +75,14 @@
         </table>
       </div>
     </div>
-  </div>
+  </AdminLayout>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { Link, router, useForm } from '@inertiajs/vue3'
 import PageHeader from '@/components/admin/PageHeader.vue'
+import AdminLayout from './Layout.vue'
 
 const props = defineProps({
   redirects: Object,
