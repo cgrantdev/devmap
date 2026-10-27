@@ -118,7 +118,7 @@ class KlowComparePagesTest extends TestCase
             $this->assertLessThanOrEqual(60, mb_strlen($title), $title);
             $this->assertLessThanOrEqual(60, mb_strlen($h1), $h1);
             $this->assertLessThanOrEqual(60, mb_strlen($title.VsPageSeo::SITE_SUFFIX), $title.VsPageSeo::SITE_SUFFIX);
-            $response->assertSee('<h1 class="ssr-seo-h1">'.$h1.'</h1>', false);
+            $response->assertSee('<div class="ssr-seo-h1" role="heading" aria-level="1">'.$h1.'</div>', false);
         }
 
         $glow = KlowCompareCopy::forSlug(self::GLOW);

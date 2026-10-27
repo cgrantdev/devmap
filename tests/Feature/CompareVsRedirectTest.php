@@ -89,8 +89,8 @@ class CompareVsRedirectTest extends TestCase
 
         // SEO H1, title, and breadcrumb use the category names. The
         // visible heading still reads the CompoundDisplay props (GLP3-R / GLP2-T).
-        $target->assertSee('<h1 class="ssr-seo-h1">Retatrutide vs Tirzepatide</h1>', false);
-        $target->assertDontSee('<h1 class="ssr-seo-h1">GLP3-R vs GLP2-T</h1>', false);
+        $target->assertSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Retatrutide vs Tirzepatide</div>', false);
+        $target->assertDontSee('<div class="ssr-seo-h1" role="heading" aria-level="1">GLP3-R vs GLP2-T</div>', false);
         $target->assertSee('<title>Retatrutide vs Tirzepatide — Price Comparison — Peptidemap</title>', false);
         $target->assertSee('"name":"Retatrutide vs Tirzepatide"', false);
         $target->assertInertia(fn ($page) => $page
@@ -113,8 +113,8 @@ class CompareVsRedirectTest extends TestCase
             $target = $this->assertOneHop($from, '/compare/cagrilintide-vs-retatrutide');
         }
 
-        $target->assertSee('<h1 class="ssr-seo-h1">Cagrilintide vs Retatrutide</h1>', false);
-        $target->assertDontSee('<h1 class="ssr-seo-h1">Cagrilintide vs GLP3-R</h1>', false);
+        $target->assertSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Cagrilintide vs Retatrutide</div>', false);
+        $target->assertDontSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Cagrilintide vs GLP3-R</div>', false);
         $target->assertSee('<title>Cagrilintide vs Retatrutide — Price Comparison — Peptidemap</title>', false);
         $target->assertSee('"name":"Cagrilintide vs Retatrutide"', false);
         $target->assertDontSee('Retatrutide vs', false);
@@ -169,7 +169,7 @@ class CompareVsRedirectTest extends TestCase
             $target = $this->assertOneHop($from, '/compare/bremelanotide-vs-kisspeptin');
         }
 
-        $target->assertSee('<h1 class="ssr-seo-h1">Bremelanotide vs Kisspeptin</h1>', false);
+        $target->assertSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Bremelanotide vs Kisspeptin</div>', false);
         $target->assertSee('<title>Bremelanotide vs Kisspeptin — Price Comparison — Peptidemap</title>', false);
 
         $this->assertOneHop(

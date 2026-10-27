@@ -530,12 +530,53 @@ watch(mobileOpen, (open) => {
   if (open) showMobileSearch.value = false
 })
 
+// GA4 outbound-click tracker. Advantage Collective Oct 2026 audit flagged
+// that vendor clicks (our main business event) weren't registering as a
+// standard GA4 web event — the server-side Measurement Protocol fire on
+// /go/ redirects doesn't show in standard "Events" / "Key Events" reports.
+// Delegated listener on document catches every click on an anchor whose
+// href starts with /go/ (every Buy / View Product button on the site uses
+// that path), fires a client-side gtag event with transport:beacon so the
+// request survives the page unload. GA4 can then mark 'outbound_click' as
+// a Key Event in the UI and the agency can measure which pages convert.
+function handleOutboundClick(e) {
+  const a = e.target.closest?.('a[href]')
+  if (!a) return
+  const href = a.getAttribute('href') || ''
+  if (!href.startsWith('/go/')) return
+  const productId = href.match(/^\/go\/(\d+)/)?.[1]
+  const brand = a.dataset.brandSlug || a.dataset.brand || null
+  const productName = a.dataset.productName || a.textContent?.trim().slice(0, 100) || null
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'outbound_click', {
+        transport_type: 'beacon',
+        event_category: 'vendor',
+        event_label: brand || productName,
+        product_id: productId,
+        brand_slug: brand,
+        product_name: productName,
+        page_path: window.location.pathname,
+      })
+    }
+    (window.dataLayer = window.dataLayer || []).push({
+      event: 'vendor_click',
+      product_id: productId,
+      brand_slug: brand,
+      product_name: productName,
+      page_path: window.location.pathname,
+    })
+  } catch { /* never block the redirect */ }
+}
+
 onMounted(() => {
   handleScroll()
   window.addEventListener('scroll', handleScroll, { passive: true })
+  document.addEventListener('click', handleOutboundClick, { capture: true })
 })
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  document.removeEventListener('click', handleOutboundClick, { capture: true })
   document.body.style.overflow = ''
 })
 </script>

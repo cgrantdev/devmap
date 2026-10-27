@@ -134,8 +134,8 @@ class VsSitemapIndexTest extends TestCase
         $this->get('/compare/retatrutide-vs-tirzepatide')
             ->assertOk()
             ->assertDontSee('noindex', false)
-            ->assertSee('<h1 class="ssr-seo-h1">Retatrutide vs Tirzepatide</h1>', false)
-            ->assertDontSee('<h1 class="ssr-seo-h1">GLP3-R vs GLP2-T</h1>', false)
+            ->assertSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Retatrutide vs Tirzepatide</div>', false)
+            ->assertDontSee('<div class="ssr-seo-h1" role="heading" aria-level="1">GLP3-R vs GLP2-T</div>', false)
             ->assertSee('<title>Retatrutide vs Tirzepatide — Price Comparison — Peptidemap</title>', false)
             ->assertSee('"name":"Retatrutide vs Tirzepatide"', false)
             ->assertInertia(fn ($page) => $page

@@ -208,10 +208,14 @@
     @inertiaHead
 </head>
 <body class="antialiased">
-    {{-- Server-rendered H1 so bots (Bing, DuckDuckGo, LLM crawlers) that
-         don't execute JS see a real heading in the initial HTML. Vue mounts
-         its own visible H1s on hydration; this one stays visually hidden. --}}
-    <h1 class="ssr-seo-h1">{{ $seoH1 }}</h1>
+    {{-- Server-rendered heading so bots (Bing, DuckDuckGo, LLM crawlers) that
+         don't execute JS see a page title in the initial HTML. Vue mounts
+         its own visible H1 on hydration — that is the page's real H1. We
+         emit a role=heading aria-level=1 div here (not an <h1> tag) so SEO
+         tools don't flag duplicate H1s, while assistive tech + non-JS
+         crawlers still recognize the heading. Advantage Collective Oct 2026
+         audit, Part 5. --}}
+    <div class="ssr-seo-h1" role="heading" aria-level="1">{{ $seoH1 }}</div>
 
     @inertia
 </body>

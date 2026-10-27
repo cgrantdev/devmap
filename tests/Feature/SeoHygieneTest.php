@@ -109,14 +109,14 @@ class SeoHygieneTest extends TestCase
         $this->get('/compare/retatrutide')
             ->assertOk()
             ->assertSee($title, false)
-            ->assertSee('<h1 class="ssr-seo-h1">Retatrutide Price Comparison</h1>', false)
+            ->assertSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Retatrutide Price Comparison</div>', false)
             ->assertSee('<link rel="canonical" href="https://peptidemap.com/compare/retatrutide" />', false);
 
         $filtered = $this->get('/compare/retatrutide?location=Canada');
         $filtered->assertOk();
         $filtered->assertSee($title, false);
         $filtered->assertDontSee('0 Vendors Compared', false);
-        $filtered->assertSee('<h1 class="ssr-seo-h1">Retatrutide Price Comparison</h1>', false);
+        $filtered->assertSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Retatrutide Price Comparison</div>', false);
         $filtered->assertSee('<link rel="canonical" href="https://peptidemap.com/compare/retatrutide" />', false);
         $filtered->assertInertia(fn ($page) => $page
             ->where('seo.title', 'Retatrutide Price per mg: 1 Vendor Compared')

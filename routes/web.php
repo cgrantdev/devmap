@@ -421,6 +421,17 @@ Route::middleware(['auth', 'role:admin,admin_viewer,seo_agency', 'email.verified
     Route::delete('/seo/pages/{seoPage}', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'deletePage'])->name('admin.seo.pages.delete');
     Route::get('/seo/playbook', [\App\Http\Controllers\Admin\SeoDashboardController::class, 'playbook'])->name('admin.seo.playbook');
 
+    // Redirect manager — SEO agency tool for 301/302 forwards without
+    // code access. Advantage Collective Oct 2026 audit, Part 5.
+    Route::get('/redirects', [\App\Http\Controllers\Admin\RedirectsController::class, 'index'])->name('admin.redirects');
+    Route::post('/redirects', [\App\Http\Controllers\Admin\RedirectsController::class, 'store'])->name('admin.redirects.store');
+    Route::put('/redirects/{redirect}', [\App\Http\Controllers\Admin\RedirectsController::class, 'update'])->name('admin.redirects.update');
+    Route::delete('/redirects/{redirect}', [\App\Http\Controllers\Admin\RedirectsController::class, 'destroy'])->name('admin.redirects.destroy');
+
+    // Content issue scanner — finds internal notes bleeding onto public
+    // pages. Audit Part 5, ~12 known hits.
+    Route::get('/content-scanner', [\App\Http\Controllers\Admin\ContentScannerController::class, 'index'])->name('admin.content-scanner');
+
     // Per-page analytics — GSC + internal signals for any one URL.
     // Deep-linked from the frontend AdminBar's "Analytics" button.
     Route::get('/analytics/page', [\App\Http\Controllers\Admin\PageAnalyticsController::class, 'show'])->name('admin.analytics.page');

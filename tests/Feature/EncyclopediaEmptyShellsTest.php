@@ -361,7 +361,7 @@ class EncyclopediaEmptyShellsTest extends TestCase
 
         $this->get('/compare/retatrutide')
             ->assertOk()
-            ->assertSee('<h1 class="ssr-seo-h1">Retatrutide Price Comparison</h1>', false)
+            ->assertSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Retatrutide Price Comparison</div>', false)
             ->assertSee('<title>Retatrutide Vendor Comparison — Peptidemap</title>', false)
             ->assertSee('Retatrutide is an investigational compound.', false)
             ->assertSee('Trial context is in the encyclopedia entry.', false)

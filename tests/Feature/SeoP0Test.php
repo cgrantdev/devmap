@@ -89,12 +89,12 @@ class SeoP0Test extends TestCase
 
         $this->get('/compare/retatrutide')
             ->assertOk()
-            ->assertSee('<h1 class="ssr-seo-h1">Retatrutide Price Comparison</h1>', false)
+            ->assertSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Retatrutide Price Comparison</div>', false)
             ->assertSee('<title>Retatrutide Vendor Comparison — Peptidemap</title>', false)
-            ->assertDontSee('<h1 class="ssr-seo-h1">Cheapest Retatrutide</h1>', false)
-            ->assertDontSee('<h1 class="ssr-seo-h1">Retatrutide</h1>', false)
-            ->assertDontSee('<h1 class="ssr-seo-h1">GLP3-R</h1>', false)
-            ->assertDontSee('<h1 class="ssr-seo-h1">Cheapest GLP3-R</h1>', false);
+            ->assertDontSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Cheapest Retatrutide</div>', false)
+            ->assertDontSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Retatrutide</div>', false)
+            ->assertDontSee('<div class="ssr-seo-h1" role="heading" aria-level="1">GLP3-R</div>', false)
+            ->assertDontSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Cheapest GLP3-R</div>', false);
     }
 
     public function test_compare_faqs_use_primary_name_and_keep_alias_secondary(): void
@@ -155,7 +155,7 @@ class SeoP0Test extends TestCase
 
         $this->get('/compare/retatrutide')
             ->assertOk()
-            ->assertSee('<h1 class="ssr-seo-h1">Retatrutide Price Comparison</h1>', false)
+            ->assertSee('<div class="ssr-seo-h1" role="heading" aria-level="1">Retatrutide Price Comparison</div>', false)
             ->assertSee('<title>Retatrutide Price per mg: 1 Vendor Compared — Peptidemap</title>', false)
             ->assertSee('property="og:title" content="Retatrutide Price per mg: 1 Vendor Compared"', false)
             ->assertSee('name="description" content="Compare Retatrutide research listings from 1 vendor by vial price and price per mg. Catalog data only: RUO, and Peptidemap sells nothing."', false)
@@ -194,7 +194,7 @@ class SeoP0Test extends TestCase
 
         $this->get('/compare/bpc-157')
             ->assertOk()
-            ->assertSee('<h1 class="ssr-seo-h1">BPC-157</h1>', false)
+            ->assertSee('<div class="ssr-seo-h1" role="heading" aria-level="1">BPC-157</div>', false)
             ->assertSee('How do BPC-157 listings compare across vendors?', false)
             ->assertSee($bpcCompare, false)
             ->assertDontSee('What is the cheapest BPC-157?', false)
