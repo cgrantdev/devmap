@@ -197,6 +197,10 @@ class DevConsoleController extends Controller
             'label' => 'Clear all compiled caches (config/route/view/events)',
             'args' => [],
         ],
+        'tail-log' => [
+            'label' => 'Dump last 100 lines of laravel.log',
+            'args' => [],
+        ],
     ];
 
     public function index()
