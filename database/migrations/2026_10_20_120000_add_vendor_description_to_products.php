@@ -17,9 +17,16 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Idempotent — the column may already exist from the
+        // products:ensure-vendor-desc-column dev-console command
+        // run earlier.
         Schema::table('products', function (Blueprint $table) {
-            $table->longText('vendor_description')->nullable()->after('description');
-            $table->timestamp('vendor_description_fetched_at')->nullable();
+            if (!Schema::hasColumn('products', 'vendor_description')) {
+                $table->longText('vendor_description')->nullable()->after('description');
+            }
+            if (!Schema::hasColumn('products', 'vendor_description_fetched_at')) {
+                $table->timestamp('vendor_description_fetched_at')->nullable();
+            }
         });
     }
 
