@@ -13,6 +13,7 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('redirects')) return; // idempotent — may be partly-created from a prior failed migrate batch
         Schema::create('redirects', function (Blueprint $table) {
             $table->id();
             $table->string('from_path', 1024)->unique();
