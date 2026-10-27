@@ -152,6 +152,10 @@ class DevConsoleController extends Controller
             'label' => 'VialVerse: merge duplicates, keep canonical row',
             'args' => ['--dry-run' => true],
         ],
+        'vialverse:backfill-sizes' => [
+            'label' => 'VialVerse: parse size_mg from product URL (fills empty rows)',
+            'args' => ['--dry-run' => true],
+        ],
         'zenith:sync' => [
             'label' => 'Pull Zenith Bioscience catalog (needs API key on vendor row)',
             'args' => ['--dry-run' => true, '--limit' => 'int'],

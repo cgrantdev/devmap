@@ -142,13 +142,25 @@ class SyncVendorFeeds extends Command
                 ? $sale
                 : null;
 
+            // Size fallback: some feeds (VialVerse, several Woo-ish ones)
+            // omit a size field and bake the size into the URL path or
+            // the display name. If the feed gave us nothing, infer it
+            // from the URL's final path segment, then from the name
+            // suffix. Julia 10/27 — VialVerse was leaving 81/88 rows
+            // with no size_mg so they kept showing on the "no size set"
+            // admin filter.
+            $size = trim((string) ($r['size'] ?? ''));
+            if ($size === '') {
+                $size = $this->inferSize($productUrl, $r['name']) ?? '';
+            }
+
             $attrs = [
                 'name' => $r['name'],
                 'price' => $retail,
                 'discount_price' => $discountPrice,
                 'image_url' => $r['image_url'] ?? null,
                 'product_url' => $productUrl ?: null,
-                'size_mg' => $r['size'] ?? null,
+                'size_mg' => $size !== '' ? $size : null,
                 'stock_status' => $r['stock_status'] ?? null,
                 'description' => $r['description'] ?? null,
                 'external_id' => $extId ?: null,
@@ -166,5 +178,30 @@ class SyncVendorFeeds extends Command
         }
 
         return ['new' => $new, 'updated' => $updated];
+    }
+
+    /**
+     * Pull a size out of the last URL path segment ("10mg", "50mcg",
+     * "3ml") or a blend pattern ("10mg-5mg-5mg" → "10mg/5mg/5mg").
+     * Falls back to the trailing size token in the display name
+     * ("BPC-157 10mg" → "10mg").
+     */
+    private function inferSize(?string $url, ?string $name): ?string
+    {
+        if ($url) {
+            $path = parse_url($url, PHP_URL_PATH) ?: '';
+            $segments = array_values(array_filter(explode('/', $path), fn ($s) => $s !== ''));
+            $last = strtolower(end($segments) ?: '');
+            if (preg_match('~^(\d+(?:\.\d+)?)(mg|mcg|ml|iu)$~', $last, $m)) {
+                return $m[1] . $m[2];
+            }
+            if (preg_match('~^(\d+(?:\.\d+)?(?:mg|mcg)(?:-\d+(?:\.\d+)?(?:mg|mcg)){1,3})$~', $last)) {
+                return str_replace('-', '/', $last);
+            }
+        }
+        if ($name && preg_match('~\b(\d+(?:\.\d+)?)\s*(mg|mcg|ml|iu)\b\s*$~i', $name, $m)) {
+            return $m[1] . strtolower($m[2]);
+        }
+        return null;
     }
 }
