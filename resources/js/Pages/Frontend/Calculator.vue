@@ -308,8 +308,45 @@
             </div>
           </div>
 
-          <!-- Standalone share section removed — Copy result + Copy link
-               buttons now live in the hero card at the top of results. -->
+          <!-- Share this calculation — explains the shareable-URL flow in
+               plain language. Every input (compound, mg, water, dose,
+               syringe, frequency) is already encoded in the URL above, so
+               copying the link = sending the exact same setup. -->
+          <div class="rounded-[16px] border border-[color:var(--color-accent-200)] bg-[color:var(--color-accent-50)] p-6">
+            <div class="flex items-start gap-4">
+              <div class="shrink-0 w-10 h-10 rounded-[10px] bg-white border border-[color:var(--color-accent-200)] flex items-center justify-center text-[color:var(--color-accent-600)]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h2 class="ui-display text-lg font-semibold text-[color:var(--color-ink)] mb-1">Share this calculation</h2>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed mb-3">
+                  Every change you make here is saved into the page's URL. Send the link to anyone &mdash; a friend, a Reddit thread, a Discord group &mdash; and they'll open the calculator preloaded with your exact
+                  <template v-if="preset"><strong class="text-[color:var(--color-ink)]">{{ preset }}</strong> preset, </template>
+                  <strong class="text-[color:var(--color-ink)]">{{ peptideMg }}mg vial</strong>,
+                  <strong class="text-[color:var(--color-ink)]">{{ waterMl }}mL</strong> BAC water, and
+                  <strong class="text-[color:var(--color-ink)]">{{ doseMcg }}mcg dose</strong>. No signup, no login, same calculation on the other end.
+                </p>
+                <div class="flex flex-wrap gap-2 mb-3">
+                  <button @click="copyShareLink" :class="['inline-flex items-center gap-2 h-9 px-4 rounded-[8px] text-[13px] font-semibold transition-all', copiedShare ? 'bg-emerald-600 text-white' : 'bg-[color:var(--color-ink)] text-white hover:opacity-90']">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><template v-if="copiedShare"><path d="M20 6L9 17l-5-5"/></template><template v-else><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></template></svg>
+                    {{ copiedShare ? 'Link copied' : 'Copy shareable link' }}
+                  </button>
+                  <button @click="copyResult" :class="['inline-flex items-center gap-2 h-9 px-4 rounded-[8px] text-[13px] font-semibold transition-all', copiedResult ? 'bg-emerald-600 text-white' : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)]']">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><template v-if="copiedResult"><path d="M20 6L9 17l-5-5"/></template><template v-else><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></template></svg>
+                    {{ copiedResult ? 'Result copied' : 'Copy result as text' }}
+                  </button>
+                  <button v-if="canNativeShare" @click="nativeShare" class="inline-flex items-center gap-2 h-9 px-4 rounded-[8px] text-[13px] font-semibold bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    Share&hellip;
+                  </button>
+                </div>
+                <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-1">Your shareable link</div>
+                <div class="flex items-center gap-2">
+                  <input :value="shareUrl" readonly @focus="e => e.target.select()" class="flex-1 h-9 px-3 text-[12px] ui-mono border border-[color:var(--color-hairline)] rounded-[8px] bg-white text-[color:var(--color-ink-muted)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- FAQ — visible mirror of the FAQPage schema, required for the
                rich Q&A snippet to earn a SERP block. -->
@@ -456,6 +493,21 @@ const props = defineProps({
 // funnel + viral share vector.
 const copiedShare = ref(false)
 const copiedResult = ref(false)
+// Reactive mirror of the browser location so the "Your shareable link"
+// input updates in real time as inputs change. Hydrated on mount, kept
+// in sync by the state <-> URL watcher below.
+const shareUrl = ref('')
+const canNativeShare = ref(false)
+
+async function nativeShare() {
+  if (!navigator.share) return
+  const text = mode.value === 'reconstitution'
+    ? `My peptide reconstitution: ${peptideMg.value}mg + ${waterMl.value}mL BAC water`
+    : `${preset.value || 'My peptide dose'}: ${doseMcg.value}mcg (${syringeMarks.value} units)`
+  try {
+    await navigator.share({ title: 'Peptide calculation', text, url: shareUrl.value })
+  } catch { /* user cancelled */ }
+}
 async function copyShareLink() {
   try {
     await navigator.clipboard.writeText(window.location.href)
@@ -633,6 +685,8 @@ const vialsPerMonth = computed(() => {
 // so the browser history doesn't clog with every keystroke.
 onMounted(() => {
   if (typeof window === 'undefined') return
+  canNativeShare.value = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
+  shareUrl.value = window.location.href
   // Prefilled slug from /calculator/{slug} wins over ?preset= query
   // param — the compound URL is the canonical for that compound and
   // its SEO assumes those inputs are what's rendered.
@@ -666,6 +720,7 @@ watch([mode, preset, peptideMg, waterMl, doseMcg, syringeUnits, frequency], () =
   set('syringe', syringeUnits.value, 100)
   set('freq', frequency.value, 'daily')
   window.history.replaceState({}, '', url.toString())
+  shareUrl.value = url.toString()
 })
 
 // Reconstitution table
