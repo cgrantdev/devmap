@@ -56,7 +56,7 @@ class EducationalContentTest extends TestCase
         $legality = $this->get('/guides/peptide-legality-fda-ruo-compounding');
         $legality->assertOk();
         $legality->assertSee('Are Research Peptides Legal? FDA &amp; RUO Basics', false);
-        $legality->assertSee('Last verified against FDA: 2026-10-19', false);
+        $legality->assertSee('Last verified against FDA and HHS primary sources: 2026-10-29', false);
         $legality->assertSee('https://peptidemap.com/guides/peptide-legality-fda-ruo-compounding', false);
         $legality->assertDontSee('formblends', false);
         $legality->assertDontSee('FormBlends', false);
@@ -478,7 +478,7 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('Peptide Partners', $legality->content);
         $this->assertStringContainsString('for research use only', $legality->content);
         $this->assertStringContainsString('not permission to compound', $legality->content);
-        $this->assertStringContainsString('Last verified against FDA: 2026-10-19', $legality->content);
+        $this->assertStringContainsString('Last verified against FDA and HHS primary sources: 2026-10-29', $legality->content);
         $this->assertStringContainsString('not, by itself, a license to compound', $legality->content);
         $this->assertStringNotContainsString('formblends', strtolower($legality->content));
         $this->assertStringNotContainsString('Note for Meta Optimizer', $legality->content);

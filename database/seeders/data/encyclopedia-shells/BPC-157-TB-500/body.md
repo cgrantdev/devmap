@@ -174,6 +174,11 @@ Not established for the combination. Component PK claims vary by model and shoul
 - type: content — value: WADA 2026 Prohibited List names BPC-157 under S0 and thymosin-β4 and derivatives e.g. TB-500 under S2.3 (prohibited at all times).
 - type: content — value: DoD OPSS describes BPC-157 as an unapproved drug and prohibited dietary-supplement ingredient for service members.
 
+### subsection 3 — title: U.S. compounding policy and blends (as of 29 October 2026)
+**entries:**
+- type: content — value: On 28 October 2026 the HHS Office of the Secretary announced a draft interim enforcement-discretion policy, published for comment (FR Doc. 2026-22192), on 503A compounding with six peptide bulk drug substances: BPC-157, epitalon, KPV, MOTS-c, semax and TB-500. One of the policy’s conditions is that the compounded drug product “contains only a single Active Pharmaceutical Ingredient (API) listed in Appendix A.” BPC-157 / TB-500 combines two peptides (BPC-157 and TB-500), so a BPC-157 / TB-500 blend is outside the policy.
+- type: item — value: The policy is not an FDA approval, does not place any peptide on the 503A Bulks List, is not binding, has no fixed end date and makes no safety or efficacy finding. This describes the policy’s scope. It is not usage guidance.
+
 ### references
 
 1. title: Emerging Use of BPC-157 in Orthopaedic Sports Medicine — authors: Vasireddi et al. — citation: HSS Journal, 2025 — description: Systematic review; literature overwhelmingly preclinical. — links: [https://pmc.ncbi.nlm.nih.gov/articles/PMC12313605/]
