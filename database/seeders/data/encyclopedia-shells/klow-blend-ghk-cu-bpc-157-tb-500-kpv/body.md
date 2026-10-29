@@ -138,6 +138,12 @@ KLOW is best encyclopedia-framed as “GLOW + KPV” commercial taxonomy with a 
 - type: content — value: Not FDA-approved. FDA compounding safety-risk materials include KPV among substances with no identified human exposure data in FDA’s summary narrative (verify live page). BPC-157/TB-500 issues as on those component pages. WADA bans relevant repair peptides as listed (BPC-157; TB-500).
 - type: content — value: PCAC/Category headlines for KPV and others must be read with “vote ≠ final rule” literacy.
 
+### subsection 2 — title: U.S. compounding policy and blends (as of 29 October 2026)
+**entries:**
+- type: content — value: On 28 October 2026 the HHS Office of the Secretary announced a draft interim enforcement-discretion policy, published for comment (FR Doc. 2026-22192), on 503A compounding with six peptide bulk drug substances: BPC-157, epitalon, KPV, MOTS-c, semax and TB-500. One of the policy’s conditions is that the compounded drug product “contains only a single Active Pharmaceutical Ingredient (API) listed in Appendix A.” KLOW combines four peptides (GHK-Cu, BPC-157, TB-500 and KPV), so a KLOW blend is outside the policy.
+- type: content — value: GHK-Cu is not one of the six peptides in the policy’s Appendix A. Its status is a separate matter.
+- type: item — value: The policy is not an FDA approval, does not place any peptide on the 503A Bulks List, is not binding, has no fixed end date and makes no safety or efficacy finding. This describes the policy’s scope. It is not usage guidance.
+
 ## Field: references
 
 1. title: PepT1-mediated KPV uptake reduces intestinal inflammation — authors: Dalmasso et al. — citation: Gastroenterology / related IBD literature — description: Mechanistic + mouse colitis evidence. — links: [https://pubmed.ncbi.nlm.nih.gov/18061177/]

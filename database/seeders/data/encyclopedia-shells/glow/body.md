@@ -144,6 +144,12 @@ Treat GLOW as a commercial multipath label requiring lot-level identity checks a
 - type: content — value: RUO disclaimers do not create approval.
 - type: content — value: **Regulatory literacy:** Removal from FDA Category 2 (or a favorable Pharmacy Compounding Advisory Committee vote) is **not** placement on the final 503A Bulks List and does **not** by itself authorize compounding—verify current FDA compounding pages.
 
+### subsection 2 — title: U.S. compounding policy and blends (as of 29 October 2026)
+**entries:**
+- type: content — value: On 28 October 2026 the HHS Office of the Secretary announced a draft interim enforcement-discretion policy, published for comment (FR Doc. 2026-22192), on 503A compounding with six peptide bulk drug substances: BPC-157, epitalon, KPV, MOTS-c, semax and TB-500. One of the policy’s conditions is that the compounded drug product “contains only a single Active Pharmaceutical Ingredient (API) listed in Appendix A.” GLOW combines three peptides (typically GHK-Cu, BPC-157 and TB-500), so a GLOW blend is outside the policy.
+- type: content — value: GHK-Cu is not one of the six peptides in the policy’s Appendix A. Its status is a separate matter.
+- type: item — value: The policy is not an FDA approval, does not place any peptide on the 503A Bulks List, is not binding, has no fixed end date and makes no safety or efficacy finding. This describes the policy’s scope. It is not usage guidance.
+
 ### references
 
 1. title: GHK Peptide as a Natural Modulator of Multiple Cellular Pathways in Skin Regeneration — authors: Pickart L, Vasquez-Soltero JM, Margolina A — citation: Biomed Res Int. 2015;2015:648108. PMID 26236730; PMC4508379 — description: Foundational open-access review of GHK/GHK-Cu dermal and remodeling biology. — links: [https://pmc.ncbi.nlm.nih.gov/articles/PMC4508379/] [https://pubmed.ncbi.nlm.nih.gov/26236730/]

@@ -202,7 +202,7 @@ class KlowCompareCopy
 
     private static function categoryNote(string $closing): string
     {
-        return 'FDA\'s page on compounding bulk substances that may present significant safety risks (content current as of 22 April 2026) lists BPC-157, GHK-Cu (injectable routes), KPV, and the TB-500 fragment among substances previously in Category 2 whose nominations were withdrawn, and it keeps its safety concerns for each. FDA\'s 503A categories list (updated 14 May 2026) places GHK-Cu, except for injectable routes, in Category 1, under evaluation. In July 2026 an FDA advisory committee narrowly recommended adding BPC-157, KPV, and TB-500 to the 503A bulks list; that vote is not binding. On 14 October 2026 FDA sent an interim access policy for compounding certain peptides to the White House for review; its details were not public as of 19 October 2026. '.$closing;
+        return 'FDA\'s page on compounding bulk substances that may present significant safety risks (content current as of 22 April 2026) lists BPC-157, GHK-Cu (injectable routes), KPV, and the TB-500 fragment among substances previously in Category 2 whose nominations were withdrawn, and it keeps its safety concerns for each. FDA\'s 503A categories list (updated 14 May 2026) places GHK-Cu, except for injectable routes, in Category 1, under evaluation. In July 2026 an FDA advisory committee narrowly recommended adding BPC-157, KPV, and TB-500 to the 503A bulks list; that vote is not binding. On 28 October 2026 the HHS Office of the Secretary announced a draft interim enforcement-discretion policy, published for comment (FR Doc. 2026-22192), that names BPC-157, KPV and TB-500 among six peptides. It covers single-ingredient 503A compounding only, so neither blend is covered, and GHK-Cu is not among the six. It is not an FDA approval and makes no safety or efficacy finding. '.$closing;
     }
 
     private static function ghkGradeLine(): string
@@ -229,8 +229,8 @@ class KlowCompareCopy
                 'url' => 'https://www.fda.gov/media/193349/download',
             ],
             [
-                'title' => 'Office of Information and Regulatory Affairs (OIRA), RIN 0910-ZD94. Interim Access Policy for Compounding Using Certain Peptides. Received 14 October 2026.',
-                'url' => 'https://www.reginfo.gov/public/do/eoDetails?rrid=1568964',
+                'title' => 'Office of the Secretary, HHS. Notice of availability: Enforcement Discretion Policy Regarding 503A Compounding Using Certain Peptide Bulk Drug Substances (draft). FR Doc. 2026-22192, Docket HHS-OASH-2026-0496. Filed 28 October 2026.',
+                'url' => 'https://public-inspection.federalregister.gov/2026-22192.pdf',
             ],
             [
                 'title' => 'Reuters. FDA advisers back first four of seven unapproved peptides under review for looser rules. 23 July 2026. The committee voted 8-6, with one abstention, to recommend adding BPC-157, KPV, and TB-500 to the 503A bulks list, as reported by Reuters.',
