@@ -406,6 +406,16 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
         return $fixture['posts'][$slug][$field];
     }
 
+    public function test_stream_writes_are_guarded_for_non_cli_callers(): void
+    {
+        foreach (['app/Support/GuardedFieldWriter.php', 'app/Support/EncyclopediaPostMatch.php'] as $file) {
+            $source = (string) file_get_contents(base_path($file));
+            $this->assertDoesNotMatchRegularExpression('/emit\(STD(ERR|OUT)/', $source, $file);
+            $this->assertStringContainsString("defined('STDERR') ? STDERR : null", $source, $file);
+            $this->assertStringContainsString("defined('STDOUT') ? STDOUT : null", $source, $file);
+        }
+    }
+
     private function labelIndex(string $field, string $needle): int
     {
         foreach ($this->payload()['posts']['retatrutide']['columns'][$field]['labels'] as $i => $label) {

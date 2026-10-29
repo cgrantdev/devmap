@@ -20,7 +20,9 @@ use Illuminate\Support\Facades\Log;
  * "updated" and "already current" go to Log::info, the console command
  * (info) and STDOUT. "guard mismatch" goes to Log::warning (with a
  * 200-character excerpt of the stored value in the context), the console
- * command (error) and STDERR.
+ * command (error) and STDERR. Stream writes are skipped when
+ * STDOUT/STDERR are not defined (non-CLI, e.g. /admin dev console
+ * migrate); Log:: lines are always written.
  *
  * Comparison uses comparable(): normalize() (CRLF/CR become LF, U+00A0
  * becomes a space, each line is right-trimmed and the whole string
@@ -114,7 +116,7 @@ final class GuardedFieldWriter
         $this->lines[] = $line;
         Log::warning($line);
         $this->command?->error($line);
-        self::emit(STDERR, $line);
+        self::emit('stderr', $line);
 
         return $reason;
     }
@@ -170,14 +172,14 @@ final class GuardedFieldWriter
         if ($status === self::MISMATCH) {
             Log::warning($line, ['excerpt' => self::excerpt($current)]);
             $this->command?->error($line);
-            self::emit(STDERR, $line);
+            self::emit('stderr', $line);
 
             return $status;
         }
 
         Log::info($line);
         $this->command?->info($line);
-        self::emit(STDOUT, $line);
+        self::emit('stdout', $line);
 
         return $status;
     }
@@ -195,13 +197,14 @@ final class GuardedFieldWriter
         return mb_substr(str_replace("\n", ' ', $text), 0, 200);
     }
 
-    /**
-     * @param  resource  $stream
-     */
-    private static function emit($stream, string $line): void
+    private static function emit(string $stream, string $line): void
     {
-        if (is_resource($stream)) {
-            fwrite($stream, $line.PHP_EOL);
+        $handle = match ($stream) {
+            'stderr' => defined('STDERR') ? STDERR : null,
+            default => defined('STDOUT') ? STDOUT : null,
+        };
+        if (is_resource($handle)) {
+            @fwrite($handle, $line.PHP_EOL);
         }
     }
 }

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\EducationalGuide;
 use App\Models\EducationPost;
 use App\Support\EncyclopediaPostMatch;
+use App\Support\GuardedFieldWriter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,9 @@ use RuntimeException;
  * Posts: App\Support\EncyclopediaPostMatch must return exactly 1 category
  * and 1 linked post, else nothing is written for that slug. Guides:
  * exactly 1 educational_guides row by LOWER(TRIM(slug)). One
- * DB::transaction per slug. Per column: normalize(current) equal to a
+ * DB::transaction per slug. Per column (compared with
+ * GuardedFieldWriter::comparable(): normalize() and JSON object key order
+ * ignored, because production MySQL reorders keys): current equal to a
  * target -> "already current"; equal to old_values[i] -> write
  * target_values[i]; otherwise WARNING "old mismatch" + 200-char excerpt,
  * column untouched. Old values list both the live production value and
@@ -194,7 +197,10 @@ class EncyclopediaCompoundingPolicyOctober29Seeder extends Seeder
     private function applyColumn(string $key, Model $model, string $column, array $spec): void
     {
         $stored = $model->{$column};
-        $current = self::normalize($stored);
+        // Key-order-insensitive compare: production's MySQL JSON columns hand
+        // object keys back shortest-first (e.g. faqs as answer, question;
+        // seo_schema as @id, @type, ...), not in payload order.
+        $current = GuardedFieldWriter::comparable($stored);
         $olds = array_values((array) ($spec['old_values'] ?? []));
         $targets = array_values((array) ($spec['target_values'] ?? []));
         if ($olds === [] || count($olds) !== count($targets)) {
@@ -202,7 +208,7 @@ class EncyclopediaCompoundingPolicyOctober29Seeder extends Seeder
         }
 
         foreach ($targets as $target) {
-            if ($current === self::normalize($target)) {
+            if ($current === GuardedFieldWriter::comparable($target)) {
                 $this->status($key, $column, self::CURRENT);
 
                 return;
@@ -210,7 +216,7 @@ class EncyclopediaCompoundingPolicyOctober29Seeder extends Seeder
         }
 
         foreach ($olds as $i => $old) {
-            if ($current === self::normalize($old)) {
+            if ($current === GuardedFieldWriter::comparable($old)) {
                 $model->{$column} = $targets[$i];
                 $this->status($key, $column, self::UPDATED);
 

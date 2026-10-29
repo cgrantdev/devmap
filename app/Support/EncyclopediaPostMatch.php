@@ -88,7 +88,7 @@ final class EncyclopediaPostMatch
         foreach ($lines as $line) {
             Log::info($line);
             $command?->info($line);
-            self::emit(STDOUT, $line);
+            self::emit('stdout', $line);
         }
 
         $warning = null;
@@ -108,7 +108,7 @@ final class EncyclopediaPostMatch
             );
             Log::warning($warning);
             $command?->error($warning);
-            self::emit(STDERR, $warning);
+            self::emit('stderr', $warning);
         } else {
             $status = 'ok';
             /** @var EducationPost $post */
@@ -150,13 +150,14 @@ final class EncyclopediaPostMatch
             .'.';
     }
 
-    /**
-     * @param  resource  $stream
-     */
-    private static function emit($stream, string $line): void
+    private static function emit(string $stream, string $line): void
     {
-        if (is_resource($stream)) {
-            fwrite($stream, $line.PHP_EOL);
+        $handle = match ($stream) {
+            'stderr' => defined('STDERR') ? STDERR : null,
+            default => defined('STDOUT') ? STDOUT : null,
+        };
+        if (is_resource($handle)) {
+            @fwrite($handle, $line.PHP_EOL);
         }
     }
 }

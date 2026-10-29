@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\EducationPost;
 use App\Support\EncyclopediaPostMatch;
+use App\Support\GuardedFieldWriter;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,8 +18,10 @@ use RuntimeException;
  * sellers, inserted after the classification subsection) and five
  * references. Nothing existing is edited or removed.
  *
- * One post, one transaction. Comparison uses normalize() (same rules as
- * the 160000 seeder). A column is written only when its current value
+ * One post, one transaction. Comparison uses
+ * GuardedFieldWriter::comparable(): the 160000 seeder's normalize() rules,
+ * with JSON object key order ignored, because production MySQL returns
+ * keys shortest-first. A column is written only when its current value
  * equals one of the payload's old_values; the result must equal the paired
  * target_values entry or the transaction throws and rolls back. A column
  * already at a target is skipped. Anything else logs a WARNING and that
@@ -133,7 +136,7 @@ class EncyclopediaRetatrutideOsaLitigationSeeder extends Seeder
         $current = $post->{$column};
 
         foreach ($this->list($spec, 'target_values') as $target) {
-            if (self::normalize($current) === self::normalize($target)) {
+            if (GuardedFieldWriter::comparable($current) === GuardedFieldWriter::comparable($target)) {
                 $this->emit(self::SLUG.'.'.$column.': '.self::ALREADY);
 
                 return self::ALREADY;
@@ -142,7 +145,7 @@ class EncyclopediaRetatrutideOsaLitigationSeeder extends Seeder
 
         $matched = null;
         foreach ($this->list($spec, 'old_values') as $index => $old) {
-            if (self::normalize($current) === self::normalize($old)) {
+            if (GuardedFieldWriter::comparable($current) === GuardedFieldWriter::comparable($old)) {
                 $matched = $index;
                 break;
             }
@@ -162,7 +165,7 @@ class EncyclopediaRetatrutideOsaLitigationSeeder extends Seeder
         }
 
         $expected = $this->list($spec, 'target_values')[$matched] ?? null;
-        if ($expected === null || self::normalize($result) !== self::normalize($expected)) {
+        if ($expected === null || GuardedFieldWriter::comparable($result) !== GuardedFieldWriter::comparable($expected)) {
             throw new RuntimeException($column.' post-edit assertion failed');
         }
 
