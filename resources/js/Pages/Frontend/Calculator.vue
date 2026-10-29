@@ -173,21 +173,50 @@
               Draw the plunger to the <strong class="text-[color:var(--color-ink)]">{{ syringeMarks }}-unit mark</strong> on your {{ syringeUnits }}-unit insulin syringe for a {{ doseMcg }}mcg ({{ (doseMcg/1000).toFixed(doseMcg >= 1000 ? 1 : 3) }}mg) dose.
             </p>
 
-            <!-- Integrated syringe visual — the visual anchor. -->
-            <div class="relative w-full h-12 rounded-full border-2 border-[color:var(--color-ink)]/15 bg-white overflow-hidden mb-4">
-              <div
-                class="absolute left-0 top-0 bottom-0 rounded-full transition-all duration-500 ease-out"
-                :class="fillPercent > 80 ? 'bg-[color:var(--color-danger)]/25' : 'bg-[color:var(--color-accent-500)]/30'"
-                :style="{ width: Math.min(fillPercent, 100) + '%' }"
-              ></div>
-              <div v-for="tick in 10" :key="tick" class="absolute top-0 h-3 border-l border-[color:var(--color-ink)]/15" :style="{ left: (tick * 10) + '%' }"></div>
-              <div class="absolute top-1/2 -translate-y-1/2 w-0.5 h-8 bg-[color:var(--color-accent-600)] shadow-[0_0_6px_rgba(79,70,229,0.5)] transition-all duration-500 ease-out" :style="{ left: Math.min(fillPercent, 100) + '%' }"></div>
+            <!-- Syringe visual — now actually looks like a syringe + has
+                 unit labels so the user can map the "pull to X units"
+                 instruction to a physical mark on their own syringe. -->
+            <div class="mb-5">
+              <!-- Caption above tells the user what the picture is. -->
+              <div class="flex items-center justify-between text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-2 px-1">
+                <span>Your {{ syringeUnits }}-unit insulin syringe</span>
+                <span class="text-[color:var(--color-accent-700)]">Pull plunger to {{ Math.min(syringeMarks, syringeUnits) }} units</span>
+              </div>
+              <div class="relative pl-1 pr-10">
+                <!-- Barrel -->
+                <div class="relative h-9 bg-white border border-[color:var(--color-ink)]/25 rounded-[3px] overflow-hidden">
+                  <!-- Fill (liquid inside the barrel) -->
+                  <div
+                    class="absolute left-0 top-0 bottom-0 transition-all duration-500 ease-out"
+                    :class="fillPercent > 100 ? 'bg-[color:var(--color-danger)]/25' : 'bg-[color:var(--color-accent-500)]/35'"
+                    :style="{ width: Math.min(fillPercent, 100) + '%' }"
+                  ></div>
+                  <!-- Minor tick marks every 10 units -->
+                  <div v-for="tick in 9" :key="`minor-${tick}`" class="absolute top-0 h-2 border-l border-[color:var(--color-ink)]/25" :style="{ left: (tick * 10) + '%' }"></div>
+                  <!-- Major tick marks every 20 units with labels -->
+                  <div v-for="tick in 4" :key="`major-${tick}`" class="absolute top-0 h-full border-l border-[color:var(--color-ink)]/35" :style="{ left: (tick * 20) + '%' }"></div>
+                  <!-- Plunger line (where the user pulls to) -->
+                  <div class="absolute top-0 bottom-0 w-[3px] bg-[color:var(--color-accent-700)] shadow-[0_0_8px_rgba(79,70,229,0.5)] transition-all duration-500 ease-out z-10" :style="{ left: `calc(${Math.min(fillPercent, 100)}% - 1.5px)` }"></div>
+                </div>
+                <!-- Needle hint on the right -->
+                <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
+                  <div class="w-2 h-[6px] bg-[color:var(--color-ink)]/50 rounded-r-[2px]"></div>
+                  <div class="w-6 h-[2px] bg-[color:var(--color-ink)]/40"></div>
+                </div>
+                <!-- Unit scale under the barrel -->
+                <div class="relative mt-1 h-4 text-[10px] ui-mono text-[color:var(--color-ink-subtle)]">
+                  <span v-for="(lbl, i) in [0, 0.2, 0.4, 0.6, 0.8, 1]" :key="i"
+                        class="absolute -translate-x-1/2"
+                        :style="{ left: (lbl * 100) + '%' }">{{ Math.round(lbl * syringeUnits) }}</span>
+                </div>
+              </div>
             </div>
 
-            <div class="flex items-center justify-between gap-4 text-[13px] flex-wrap">
-              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Volume</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ volumeMl }} mL</span></div>
+            <!-- Result stats underneath — plain English labels, no "aliquot". -->
+            <div class="flex items-center justify-between gap-4 text-[13px] flex-wrap pt-4 border-t border-[color:var(--color-hairline-soft)]">
+              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Liquid volume</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ volumeMl }} mL</span></div>
               <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Dose</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ doseMcg }} mcg</span></div>
-              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Aliquots per vial</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ dosesPerVial }}</span></div>
+              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Doses per vial</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ dosesPerVial }}</span></div>
             </div>
 
             <div v-if="fillPercent > 100" class="mt-4 flex items-center gap-2 text-[12px] text-[color:var(--color-danger)] font-semibold">
