@@ -10,6 +10,8 @@
 6. As of **19 October 2026**, peptides reviewed at the **July 2026 PCAC** meeting (including BPC-157 and TB-500) had been **recommended by the committee for 503A Bulks List inclusion** but **had not been added by FDA rulemaking**. The codified 503A Bulks List does not name them, and no proposed rule to add them has appeared in the Federal Register. Treat any “now legal to compound” claim with extreme skepticism unless it cites a final listing.
 7. On **14 October 2026**, HHS/FDA sent an **“Interim Access Policy for Compounding Using Certain Peptides”** to the White House Office of Management and Budget (OMB) for review. As of 19 October 2026 it is **under OMB review, not yet issued, and its text is not public**. It is not FDA approval of any peptide. See the dated update below.
 
+On 28 Oct 2026 the HHS Office of the Secretary announced a draft, interim, non-binding enforcement-discretion policy on 503A compounding of six named peptides (FR Doc. 2026-22192, Federal Register publication 30 Oct 2026), explained in [Compounded vs RUO Peptides](/guides/compounded-vs-ruo-peptides).
+
 ## Update, October 2026: proposed interim access policy (pending, not in force)
 
 **As of 19 October 2026.** This section records a pending federal action. It does not change anything in force today, and it will be revised when the record changes.
