@@ -14,10 +14,10 @@
       <nav class="flex-1 px-3 py-4 space-y-6">
         <!-- Overview -->
         <div>
-          <NavItem href="/admin/dashboard" icon="dashboard" label="Dashboard" />
-          <NavItem href="/admin/analytics" icon="chart" label="Analytics" />
+          <NavItem v-if="!$page.props.is_seo_agency" href="/admin/dashboard" icon="dashboard" label="Dashboard" />
+          <NavItem v-if="!$page.props.is_seo_agency" href="/admin/analytics" icon="chart" label="Analytics" />
           <NavItem href="/admin/seo" icon="chart" label="SEO Dashboard" />
-          <NavItem v-if="$page.props.is_ceo" href="/admin/ceo" icon="crown" label="CEO" />
+          <NavItem v-if="$page.props.is_ceo && !$page.props.is_seo_agency && !$page.props.is_agency_preview_active" href="/admin/ceo" icon="crown" label="CEO" />
         </div>
 
         <!-- Catalog — hidden for seo_agency; they get the SEO-scoped versions below -->

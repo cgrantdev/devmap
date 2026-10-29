@@ -43,6 +43,9 @@ class BlockSeoAgency
         'admin/product-scraping',
         'admin/products',
         'admin/categories',
+        'admin/dashboard',
+        'admin/analytics',
+        'admin/ceo',
     ];
 
     public function handle(Request $request, Closure $next): Response
