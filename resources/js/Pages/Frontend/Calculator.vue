@@ -13,7 +13,7 @@
           The Best Peptide Calculator
         </h1>
         <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-5">
-          Reconstitution, dosage, and schedule — all in one place. 17+ preset compounds (BPC-157, Semaglutide, Tirzepatide, Retatrutide, TB-500, and more) with instant insulin-syringe unit output.
+          Reconstitution, dosage, and schedule — all in one place. 55+ preset compounds across GLP-1s, growth-hormone secretagogues, healing peptides, longevity, and cognitive stacks — with instant insulin-syringe unit output.
         </p>
         <!-- Trust chips: quantifies the "best" claim -->
         <div class="flex flex-wrap items-center gap-2 text-[12px]">
@@ -71,7 +71,9 @@
               class="w-full h-10 px-3 text-[13px] border border-[color:var(--color-hairline)] rounded-[8px] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
             >
               <option value="">Custom</option>
-              <option v-for="p in presets" :key="p.name" :value="p.name">{{ p.name }}</option>
+              <optgroup v-for="g in presetGroups" :key="g.label" :label="g.label">
+                <option v-for="p in g.items" :key="p.name" :value="p.name">{{ p.name }}</option>
+              </optgroup>
             </select>
           </div>
 
@@ -328,11 +330,39 @@
               </div>
               <div>
                 <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Is the Peptidemap Peptide Calculator really free?</h3>
-                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — completely free, no signup, no email required, no paywall. Supports 17+ preset compounds and works in reconstitution, dosage, and schedule modes. Shareable results via URL parameters.</p>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — completely free, no signup, no email required, no paywall. Supports 55+ preset compounds and works in reconstitution, dosage, and schedule modes. Shareable results via URL parameters.</p>
               </div>
               <div>
                 <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Can I share my calculator settings?</h3>
                 <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — every change to the calculator updates the URL with your current settings. Copy the URL (or click the "Copy shareable link" button above), and the person opening it sees the exact same inputs and results.</p>
+              </div>
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">What's the difference between bacteriostatic water and sterile water?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Bacteriostatic water contains <strong>0.9% benzyl alcohol</strong>, which inhibits bacterial growth and lets a reconstituted peptide stay stable for 28–30 days refrigerated. Sterile water contains no preservative, so a reconstituted vial should be used within a few hours. For multi-use research vials, bacteriostatic water is standard.</p>
+              </div>
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">What size insulin syringe should I use — 30, 50, or 100 units?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Choose based on the aliquot volume you need. A <strong>30-unit (0.3 mL)</strong> syringe gives the finest resolution for small aliquots under 20 units. A <strong>50-unit (0.5 mL)</strong> syringe is the common middle ground. A <strong>100-unit (1 mL)</strong> syringe is best when you need to draw volumes above 0.5 mL in one pull. The calculator shows the required units for whichever syringe you pick.</p>
+              </div>
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">How do I convert between mcg, mg, and IU?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed"><strong>1 mg = 1,000 mcg.</strong> So a 5mg vial = 5,000 mcg of peptide. IU (international units) are compound-specific — for example, 1 IU of HGH ≈ 0.33 mg, but every peptide has its own IU-to-mg ratio set by its monograph. For reconstitution math, always work in mg and mcg; convert IU at the end if the vendor labels in IU.</p>
+              </div>
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Can I split one vial into multiple aliquots over several days?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — reconstituted peptide stays stable 28–30 days refrigerated at 2–8°C, so one vial typically covers a multi-week cycle. The Schedule mode above shows exactly how many aliquots per vial and how long one vial lasts at your frequency.</p>
+              </div>
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Can I freeze reconstituted peptides to make them last longer?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">No. Freezing a reconstituted peptide forms ice crystals that disrupt the peptide's structure and reduce its potency. The standard practice is to keep lyophilized (unmixed) powder frozen at −20°C for long-term storage, and only reconstitute what you need over the following 28–30 days — kept in the refrigerator (not the freezer) once mixed.</p>
+              </div>
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">How do I know if my peptide has gone bad?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">A healthy reconstituted solution is <strong>clear and colorless</strong>. Warning signs: cloudiness, visible particulates, discoloration (yellow or brown tint), odor, or a precipitate at the bottom of the vial. Any of these indicate degradation and the vial should be discarded. Note that some peptides (notably NAD+ and GHK-Cu) are naturally coloured — know the baseline for your specific compound.</p>
+              </div>
+              <div>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Can I mix two peptides into the same vial?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Some combinations are commercially sold pre-blended (CJC-1295 + Ipamorelin, BPC-157 + TB-500) and are stable together in solution. For arbitrary combinations we recommend keeping them in separate vials — some peptides interact chemically, and co-reconstitution can shorten the stable shelf life of both. If you need to co-administer, draw each dose from its own vial into the same syringe just before use.</p>
               </div>
             </div>
           </div>
@@ -346,6 +376,52 @@
               <p><strong class="text-[color:var(--color-ink)]">Step 3 &mdash; Add water slowly.</strong> Swab both vial tops with alcohol. Draw the desired volume of BAC water and introduce it to the peptide vial. Direct the stream at the glass wall, not directly onto the lyophilized powder. Allow it to dissolve gently &mdash; do not shake or vortex aggressively.</p>
               <p><strong class="text-[color:var(--color-ink)]">Step 4 &mdash; Measure your aliquot.</strong> Once fully dissolved (solution should be clear), use the calculator to determine the appropriate volume. For a 250mcg aliquot from a 2,500 mcg/mL solution, the volume is 10 units (0.10 mL).</p>
               <p><strong class="text-[color:var(--color-ink)]">Step 5 &mdash; Store properly.</strong> Reconstituted peptides should be refrigerated at 2&ndash;8&deg;C and are typically stable for 28&ndash;30 days. Do not freeze reconstituted peptides.</p>
+            </div>
+          </div>
+
+          <!-- Storage + handling reference -->
+          <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
+            <h2 class="ui-display text-xl font-semibold text-[color:var(--color-ink)] mb-3">Storage &amp; handling by state</h2>
+            <div class="grid gap-4 md:grid-cols-3 text-[13px] leading-relaxed">
+              <div class="rounded-[10px] border border-[color:var(--color-hairline-soft)] p-4">
+                <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-1.5">Lyophilized (unmixed)</div>
+                <ul class="space-y-1.5 text-[color:var(--color-ink-muted)] list-disc list-inside">
+                  <li>Long-term: <strong class="text-[color:var(--color-ink)]">freezer, &minus;20&deg;C</strong></li>
+                  <li>Short-term: refrigerator, 2&ndash;8&deg;C</li>
+                  <li>Stability: 24+ months properly stored</li>
+                  <li>Keep away from light + humidity</li>
+                </ul>
+              </div>
+              <div class="rounded-[10px] border border-[color:var(--color-hairline-soft)] p-4">
+                <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-1.5">Reconstituted</div>
+                <ul class="space-y-1.5 text-[color:var(--color-ink-muted)] list-disc list-inside">
+                  <li>Storage: <strong class="text-[color:var(--color-ink)]">refrigerator, 2&ndash;8&deg;C</strong></li>
+                  <li>Stability: 28&ndash;30 days typical</li>
+                  <li>Never freeze (destroys the peptide)</li>
+                  <li>Discard if cloudy, discolored, or particulate</li>
+                </ul>
+              </div>
+              <div class="rounded-[10px] border border-[color:var(--color-hairline-soft)] p-4">
+                <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-1.5">In transit / shipping</div>
+                <ul class="space-y-1.5 text-[color:var(--color-ink-muted)] list-disc list-inside">
+                  <li>Short exposure to room temperature is tolerated</li>
+                  <li>Refrigerate on arrival, don't delay</li>
+                  <li>Vials sealed in foil pouches handle shipping best</li>
+                  <li>Document any heat damage before use</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Troubleshooting -->
+          <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
+            <h2 class="ui-display text-xl font-semibold text-[color:var(--color-ink)] mb-3">Troubleshooting common issues</h2>
+            <div class="space-y-3 text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
+              <p><strong class="text-[color:var(--color-ink)]">Vial doesn't fully dissolve &mdash;</strong> gently swirl the vial by rolling it between your palms. Do not shake or vortex. If particles persist after 10 minutes at room temperature, add 0.25&ndash;0.5 mL more BAC water and swirl again. Larger peptides and some blends take longer to dissolve than small ones.</p>
+              <p><strong class="text-[color:var(--color-ink)]">Air bubble in the syringe &mdash;</strong> hold the syringe needle-up, tap the barrel to float the bubble to the top, then slowly press the plunger to expel the air. Redraw to the correct unit mark if you've expelled some solution with the bubble.</p>
+              <p><strong class="text-[color:var(--color-ink)]">Solution turned cloudy or yellow &mdash;</strong> degradation. The peptide should be discarded. Common causes: freezing a reconstituted vial, exposure to light or heat, bacterial contamination from a compromised seal, or storage past the ~30-day refrigerated window.</p>
+              <p><strong class="text-[color:var(--color-ink)]">Can't draw an accurate aliquot &mdash;</strong> switch to a smaller syringe. If the calculator shows under 10 units on a 100-unit syringe, you'll get finer resolution on a 50- or 30-unit syringe. Alternatively, reconstitute with less water so each unit represents fewer mcg.</p>
+              <p><strong class="text-[color:var(--color-ink)]">Lost track of what's in the vial &mdash;</strong> label the vial on reconstitution with the compound name, reconstitution date, and final concentration (mcg/mL). The calculator's "Copy result" button generates a one-line summary suitable for a vial label.</p>
             </div>
           </div>
 
@@ -408,25 +484,92 @@ const modes = [
 const mode = ref('dosage')
 
 // --- Presets ---
+// Grouped by category for the dropdown. 55+ compounds spanning
+// GLP-1s, growth-hormone secretagogues, healing/repair, longevity,
+// cognitive, metabolic, sexual-function. Dose values are the most
+// common research-use starting aliquot; users override if needed.
 const presets = [
-  { name: 'BPC-157 (5mg)', mg: 5, water: 2, dose: 250 },
-  { name: 'BPC-157 (10mg)', mg: 10, water: 3, dose: 500 },
-  { name: 'TB-500 (5mg)', mg: 5, water: 2, dose: 2500 },
-  { name: 'Semaglutide (3mg)', mg: 3, water: 1.5, dose: 250 },
-  { name: 'Semaglutide (5mg)', mg: 5, water: 2, dose: 500 },
-  { name: 'Tirzepatide (5mg)', mg: 5, water: 2, dose: 2500 },
-  { name: 'Tirzepatide (10mg)', mg: 10, water: 2, dose: 5000 },
-  { name: 'Retatrutide (5mg)', mg: 5, water: 2, dose: 1000 },
-  { name: 'CJC-1295 (5mg)', mg: 5, water: 2.5, dose: 100 },
-  { name: 'Ipamorelin (5mg)', mg: 5, water: 2.5, dose: 200 },
-  { name: 'Tesamorelin (2mg)', mg: 2, water: 2, dose: 2000 },
-  { name: 'Sermorelin (2mg)', mg: 2, water: 2, dose: 200 },
-  { name: 'GHK-Cu (50mg)', mg: 50, water: 2, dose: 500 },
-  { name: 'PT-141 (10mg)', mg: 10, water: 2, dose: 1750 },
-  { name: 'AOD-9604 (5mg)', mg: 5, water: 2, dose: 300 },
-  { name: 'MOTS-c (5mg)', mg: 5, water: 2.5, dose: 5000 },
-  { name: 'NAD+ (100mg)', mg: 100, water: 2, dose: 5000 },
+  // GLP-1 / weight management
+  { group: 'GLP-1 / Weight', name: 'Semaglutide (3mg)', mg: 3, water: 1.5, dose: 250 },
+  { group: 'GLP-1 / Weight', name: 'Semaglutide (5mg)', mg: 5, water: 2, dose: 500 },
+  { group: 'GLP-1 / Weight', name: 'Semaglutide (10mg)', mg: 10, water: 2, dose: 500 },
+  { group: 'GLP-1 / Weight', name: 'Tirzepatide (5mg)', mg: 5, water: 2, dose: 2500 },
+  { group: 'GLP-1 / Weight', name: 'Tirzepatide (10mg)', mg: 10, water: 2, dose: 5000 },
+  { group: 'GLP-1 / Weight', name: 'Tirzepatide (15mg)', mg: 15, water: 3, dose: 5000 },
+  { group: 'GLP-1 / Weight', name: 'Tirzepatide (30mg)', mg: 30, water: 3, dose: 5000 },
+  { group: 'GLP-1 / Weight', name: 'Retatrutide (5mg)', mg: 5, water: 2, dose: 1000 },
+  { group: 'GLP-1 / Weight', name: 'Retatrutide (10mg)', mg: 10, water: 2, dose: 2000 },
+  { group: 'GLP-1 / Weight', name: 'Liraglutide (5mg)', mg: 5, water: 2, dose: 1200 },
+  { group: 'GLP-1 / Weight', name: 'Cagrilintide (5mg)', mg: 5, water: 2, dose: 1200 },
+  { group: 'GLP-1 / Weight', name: 'Survodutide (10mg)', mg: 10, water: 2, dose: 1500 },
+  { group: 'GLP-1 / Weight', name: 'Pemvidutide (10mg)', mg: 10, water: 2, dose: 1200 },
+
+  // Growth hormone / GH secretagogues
+  { group: 'Growth / GH', name: 'CJC-1295 no DAC (2mg)', mg: 2, water: 2, dose: 100 },
+  { group: 'Growth / GH', name: 'CJC-1295 no DAC (5mg)', mg: 5, water: 2.5, dose: 100 },
+  { group: 'Growth / GH', name: 'CJC-1295 w/ DAC (2mg)', mg: 2, water: 2, dose: 1000 },
+  { group: 'Growth / GH', name: 'Ipamorelin (2mg)', mg: 2, water: 2, dose: 200 },
+  { group: 'Growth / GH', name: 'Ipamorelin (5mg)', mg: 5, water: 2.5, dose: 200 },
+  { group: 'Growth / GH', name: 'CJC/Ipamorelin Blend (10mg)', mg: 10, water: 3, dose: 300 },
+  { group: 'Growth / GH', name: 'Tesamorelin (2mg)', mg: 2, water: 2, dose: 2000 },
+  { group: 'Growth / GH', name: 'Tesamorelin (5mg)', mg: 5, water: 2, dose: 2000 },
+  { group: 'Growth / GH', name: 'Sermorelin (2mg)', mg: 2, water: 2, dose: 200 },
+  { group: 'Growth / GH', name: 'Sermorelin (5mg)', mg: 5, water: 2.5, dose: 300 },
+  { group: 'Growth / GH', name: 'Hexarelin (2mg)', mg: 2, water: 2, dose: 100 },
+  { group: 'Growth / GH', name: 'Hexarelin (5mg)', mg: 5, water: 2.5, dose: 200 },
+  { group: 'Growth / GH', name: 'GHRP-2 (5mg)', mg: 5, water: 2, dose: 150 },
+  { group: 'Growth / GH', name: 'GHRP-6 (5mg)', mg: 5, water: 2, dose: 150 },
+
+  // Healing / repair
+  { group: 'Healing / Repair', name: 'BPC-157 (5mg)', mg: 5, water: 2, dose: 250 },
+  { group: 'Healing / Repair', name: 'BPC-157 (10mg)', mg: 10, water: 3, dose: 500 },
+  { group: 'Healing / Repair', name: 'TB-500 (5mg)', mg: 5, water: 2, dose: 2500 },
+  { group: 'Healing / Repair', name: 'TB-500 (10mg)', mg: 10, water: 3, dose: 5000 },
+  { group: 'Healing / Repair', name: 'BPC-157 / TB-500 Blend (10mg)', mg: 10, water: 3, dose: 500 },
+  { group: 'Healing / Repair', name: 'KPV (5mg)', mg: 5, water: 2, dose: 500 },
+  { group: 'Healing / Repair', name: 'LL-37 (5mg)', mg: 5, water: 2, dose: 500 },
+  { group: 'Healing / Repair', name: 'Thymosin Alpha-1 (5mg)', mg: 5, water: 2, dose: 1600 },
+  { group: 'Healing / Repair', name: 'GHK-Cu (50mg)', mg: 50, water: 2, dose: 500 },
+  { group: 'Healing / Repair', name: 'GHK-Cu (100mg)', mg: 100, water: 3, dose: 1000 },
+
+  // Longevity / mitochondrial
+  { group: 'Longevity', name: 'MOTS-c (5mg)', mg: 5, water: 2.5, dose: 5000 },
+  { group: 'Longevity', name: 'MOTS-c (10mg)', mg: 10, water: 2, dose: 10000 },
+  { group: 'Longevity', name: 'Humanin (5mg)', mg: 5, water: 2, dose: 1500 },
+  { group: 'Longevity', name: 'SS-31 / Elamipretide (10mg)', mg: 10, water: 2, dose: 1000 },
+  { group: 'Longevity', name: 'Epitalon (10mg)', mg: 10, water: 2, dose: 1000 },
+  { group: 'Longevity', name: 'Epitalon (50mg)', mg: 50, water: 2, dose: 5000 },
+  { group: 'Longevity', name: 'NAD+ (100mg)', mg: 100, water: 2, dose: 5000 },
+  { group: 'Longevity', name: 'NAD+ (500mg)', mg: 500, water: 3, dose: 25000 },
+  { group: 'Longevity', name: 'FOXO4-DRI (5mg)', mg: 5, water: 2, dose: 1000 },
+
+  // Cognitive / nootropic
+  { group: 'Cognitive', name: 'Semax (5mg)', mg: 5, water: 2, dose: 300 },
+  { group: 'Cognitive', name: 'Selank (5mg)', mg: 5, water: 2, dose: 300 },
+  { group: 'Cognitive', name: 'Dihexa (10mg)', mg: 10, water: 2, dose: 8000 },
+  { group: 'Cognitive', name: 'DSIP (5mg)', mg: 5, water: 2, dose: 300 },
+
+  // Sexual function / cosmetic
+  { group: 'Sexual / Cosmetic', name: 'PT-141 / Bremelanotide (10mg)', mg: 10, water: 2, dose: 1750 },
+  { group: 'Sexual / Cosmetic', name: 'Melanotan II (10mg)', mg: 10, water: 2, dose: 250 },
+  { group: 'Sexual / Cosmetic', name: 'Melanotan I (10mg)', mg: 10, water: 2, dose: 500 },
+  { group: 'Sexual / Cosmetic', name: 'Kisspeptin-10 (5mg)', mg: 5, water: 2, dose: 100 },
+  { group: 'Sexual / Cosmetic', name: 'Kisspeptin-10 (10mg)', mg: 10, water: 2, dose: 100 },
+
+  // Metabolic / lipolytic
+  { group: 'Metabolic', name: 'AOD-9604 (5mg)', mg: 5, water: 2, dose: 300 },
+  { group: 'Metabolic', name: '5-Amino-1MQ (50mg)', mg: 50, water: 2, dose: 50000 },
+  { group: 'Metabolic', name: 'SLU-PP-332 (10mg)', mg: 10, water: 2, dose: 500 },
 ]
+
+// Group presets for the dropdown (optgroup rendering).
+const presetGroups = computed(() => {
+  const groups = {}
+  for (const p of presets) {
+    (groups[p.group] ||= []).push(p)
+  }
+  return Object.entries(groups).map(([label, items]) => ({ label, items }))
+})
 
 const preset = ref('')
 
