@@ -114,9 +114,20 @@
         <div v-if="(evidence.notes || []).length" class="max-w-3xl mt-5 space-y-3">
           <p v-for="(n, i) in evidence.notes" :key="'n' + i" class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">{{ n }}</p>
         </div>
+        <div v-for="(section, s) in evidence.sections || []" :key="'sec' + s" class="max-w-3xl mt-8">
+          <h2 class="text-[20px] font-semibold text-[color:var(--color-ink)] mb-3">{{ section.title }}</h2>
+          <div class="space-y-3">
+            <p v-for="(p, i) in section.paragraphs || []" :key="'sp' + s + '-' + i" class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">
+              <template v-if="p && p.lead">
+                <strong class="font-semibold text-[color:var(--color-ink)]">{{ p.lead }}</strong> {{ p.text }}
+              </template>
+              <template v-else>{{ p }}</template>
+            </p>
+          </div>
+        </div>
         <p v-if="evidenceLink" class="max-w-3xl mt-4 text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">{{ evidenceLink.before }}<a :href="evidenceLink.href" class="underline underline-offset-2 text-[color:var(--color-accent-600)]">{{ evidenceLink.text }}</a>{{ evidenceLink.after }}</p>
         <ol v-if="(evidence.sources || []).length" class="max-w-3xl mt-6 space-y-2 text-[12px] text-[color:var(--color-ink-muted)] list-decimal pl-5">
-          <li v-for="s in evidence.sources" :key="s.url">
+          <li v-for="(s, i) in evidence.sources" :key="'src' + i">
             <a :href="s.url" class="underline underline-offset-2 hover:text-[color:var(--color-ink)]" target="_blank" rel="noopener noreferrer">{{ s.title }}</a>
           </li>
         </ol>

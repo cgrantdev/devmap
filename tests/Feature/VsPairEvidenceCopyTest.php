@@ -70,13 +70,20 @@ class VsPairEvidenceCopyTest extends TestCase
     public function test_retatrutide_vs_page_stays_neutral_with_no_trial_figures(): void
     {
         $copy = RetatrutideTirzepatideCompareCopy::forSlug('retatrutide-vs-tirzepatide');
-        $blob = (string) json_encode($copy, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $this->assertNotNull($copy);
 
-        // House rule #31: no per-arm results, estimands or mg figures in the
-        // evidence block. Vendor product names live outside this copy.
-        $this->assertNeutralTrialCopy($blob);
-        $this->assertSame([], $copy['faqs']);
+        $triumph = $copy['evidence']['title']."\n"
+            .implode("\n", $copy['evidence']['paragraphs'])."\n"
+            .implode("\n", $copy['evidence']['notes']);
+        $this->assertStringNotContainsStringIgnoringCase('efficacy estimand', $triumph);
+        $this->assertNoMgOrPerArmPercent($triumph, 'triumph block');
         $this->assertSame('/encyclopedia/retatrutide', $copy['link']['href']);
+        $this->assertSame(
+            'Obstructive sleep apnea (OSA): what the trials report',
+            $copy['evidence']['sections'][0]['title']
+        );
+        $this->assertCount(11, $copy['evidence']['sources']);
+        $this->assertCount(2, $copy['faqs']);
 
         ProductCategory::create(['name' => 'Retatrutide', 'slug' => 'retatrutide', 'is_active' => true]);
         ProductCategory::create(['name' => 'Tirzepatide', 'slug' => 'tirzepatide', 'is_active' => true]);
@@ -84,21 +91,28 @@ class VsPairEvidenceCopyTest extends TestCase
         $response = $this->get('/compare/retatrutide-vs-tirzepatide')->assertOk();
         $html = (string) $response->getContent();
 
-        $this->assertStringNotContainsStringIgnoringCase('efficacy estimand', $html);
         $this->assertStringNotContainsString('/blog/retatrutide-vs-tirzepatide', $html);
 
-        // Scope % and mg checks to the evidence section payload. Listing
-        // tables can name vials such as "10 mg" without being trial results.
         $rendered = $this->renderedEvidenceSection($response);
         $this->assertStringContainsString('TRIUMPH-2: retatrutide vs placebo', $rendered);
-        $this->assertNeutralTrialCopy($rendered);
+        $this->assertStringContainsString('Obstructive sleep apnea (OSA): what the trials report', $rendered);
+        $this->assertCompareEditorialOmitsDoseStrings($response, $copy);
 
         $response->assertInertia(fn ($page) => $page
             ->component('Frontend/CompareCompoundVs')
             ->where('evidence.title', 'TRIUMPH-2: retatrutide vs placebo')
+            ->where('evidence.sections.0.title', 'Obstructive sleep apnea (OSA): what the trials report')
             ->where('evidenceLink.href', '/encyclopedia/retatrutide')
-            ->has('faqs', 0)
-            ->missing('seo.schema.1'));
+            ->has('faqs', 2)
+            ->where('faqs.0.q', $copy['faqs'][0]['q'])
+            ->where('faqs.0.a', $copy['faqs'][0]['a'])
+            ->where('faqs.1.q', $copy['faqs'][1]['q'])
+            ->where('faqs.1.a', $copy['faqs'][1]['a'])
+            ->where('seo.schema.1.@type', 'FAQPage')
+            ->where('seo.schema.1.mainEntity.0.name', $copy['faqs'][0]['q'])
+            ->where('seo.schema.1.mainEntity.0.acceptedAnswer.text', $copy['faqs'][0]['a'])
+            ->where('seo.schema.1.mainEntity.1.name', $copy['faqs'][1]['q'])
+            ->where('seo.schema.1.mainEntity.1.acceptedAnswer.text', $copy['faqs'][1]['a']));
     }
 
     public function test_bpc_tb500_block_grades_evidence_and_has_no_dosing(): void
@@ -135,11 +149,106 @@ class VsPairEvidenceCopyTest extends TestCase
                 ->where('seo.schema.1.mainEntity.0.acceptedAnswer.text', $copy['faqs'][0]['a']));
     }
 
-    private function assertNeutralTrialCopy(string $text): void
+    /**
+     * Body above the numbered Sources, the FAQ, and the FAQPage JSON-LD
+     * on /compare/retatrutide-vs-tirzepatide. Listing tables are outside
+     * this check. Milligram dose strings and per-arm percentages are not.
+     *
+     * @param  array{evidence: array<string, mixed>, link: array<string, string>|null, faqs: list<array{q: string, a: string}>}  $copy
+     */
+    private function assertCompareEditorialOmitsDoseStrings(\Illuminate\Testing\TestResponse $response, array $copy): void
     {
-        $this->assertDoesNotMatchRegularExpression('/[−-]\d+(\.\d)?%/u', $text);
-        $this->assertStringNotContainsStringIgnoringCase('efficacy estimand', $text);
-        $this->assertDoesNotMatchRegularExpression('/\d+ mg/i', $text);
+        $props = $response->inertiaPage()['props'];
+        $body = $this->evidenceBodyAboveSources(
+            is_array($props['evidence'] ?? null) ? $props['evidence'] : [],
+            is_array($props['evidenceLink'] ?? null) ? $props['evidenceLink'] : null
+        );
+        $this->assertStringContainsString('apnea-hypopnea index', $body);
+        $this->assertStringContainsString('[4][5]', $body);
+        $this->assertStringContainsString('[11]', $body);
+        $this->assertStringNotContainsString('Grunstein RR', $body);
+        $this->assertStringNotContainsString('NEJMoa2611477', $body);
+
+        $faq = implode("\n", array_map(
+            fn (array $row) => $row['q']."\n".$row['a'],
+            $props['faqs'] ?? []
+        ));
+        $faqSchema = null;
+        foreach ($props['seo']['schema'] ?? [] as $block) {
+            if (is_array($block) && ($block['@type'] ?? null) === 'FAQPage') {
+                $faqSchema = $block;
+            }
+        }
+        $this->assertIsArray($faqSchema);
+        $jsonLd = (string) json_encode($faqSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        $this->assertNoMgOrPerArmPercent($body, 'body above Sources');
+        $this->assertNoMgOrPerArmPercent($faq, 'FAQ');
+        $this->assertNoMgOrPerArmPercent($jsonLd, 'JSON-LD');
+
+        foreach ($copy['faqs'] as $i => $row) {
+            $this->assertSame($row['q'], $props['faqs'][$i]['q']);
+            $this->assertSame($row['a'], $props['faqs'][$i]['a']);
+            $this->assertSame($row['q'], $faqSchema['mainEntity'][$i]['name']);
+            $this->assertSame($row['a'], $faqSchema['mainEntity'][$i]['acceptedAnswer']['text']);
+        }
+
+        $htmlFaq = $this->faqPageFromHtml((string) $response->getContent());
+        $this->assertSame($faqSchema['mainEntity'], $htmlFaq['mainEntity']);
+        $this->assertNoMgOrPerArmPercent(
+            (string) json_encode($htmlFaq, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            'rendered JSON-LD'
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $evidence
+     * @param  array<string, string>|null  $link
+     */
+    private function evidenceBodyAboveSources(array $evidence, ?array $link): string
+    {
+        $chunks = [
+            (string) ($evidence['title'] ?? ''),
+            ...array_map('strval', $evidence['paragraphs'] ?? []),
+            ...array_map('strval', $evidence['notes'] ?? []),
+        ];
+        foreach ($evidence['sections'] ?? [] as $section) {
+            $chunks[] = (string) ($section['title'] ?? '');
+            foreach ($section['paragraphs'] ?? [] as $paragraph) {
+                if (is_string($paragraph)) {
+                    $chunks[] = $paragraph;
+                    continue;
+                }
+                $chunks[] = trim((string) ($paragraph['lead'] ?? '').' '.(string) ($paragraph['text'] ?? ''));
+            }
+        }
+        if (is_array($link)) {
+            $chunks[] = (string) ($link['before'] ?? '').(string) ($link['text'] ?? '').(string) ($link['after'] ?? '');
+        }
+
+        return implode("\n", $chunks);
+    }
+
+    private function assertNoMgOrPerArmPercent(string $text, string $label = ''): void
+    {
+        $this->assertDoesNotMatchRegularExpression('/\b\d+(?:\.\d+)?\s*mg\b/i', $text, $label);
+        $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?\s*%/u', $text, $label);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function faqPageFromHtml(string $html): array
+    {
+        preg_match_all('/<script type="application\/ld\+json">\s*(.*?)\s*<\/script>/s', $html, $matches);
+        foreach ($matches[1] as $json) {
+            $data = json_decode(html_entity_decode($json, ENT_QUOTES | ENT_HTML5, 'UTF-8'), true);
+            if (is_array($data) && ($data['@type'] ?? null) === 'FAQPage') {
+                return $data;
+            }
+        }
+
+        $this->fail('FAQPage JSON-LD was not rendered');
     }
 
     private function renderedEvidenceSection(\Illuminate\Testing\TestResponse $response): string

@@ -395,8 +395,10 @@ class EncyclopediaEmptyShellsTest extends TestCase
         $this->get('/compare/retatrutide-vs-tirzepatide')
             ->assertOk()
             ->assertSee($vsSummary, false)
+            ->assertSee('Obstructive sleep apnea (OSA): what the trials report', false)
             ->assertDontSee('−25.0%', false)
-            ->assertDontSee('efficacy estimand', false)
+            ->assertDontSee('−28.3%', false)
+            ->assertDontSee('12 mg', false)
             ->assertInertia(fn ($page) => $page
                 ->where('a.summary', $vsSummary)
                 ->where('a.encyclopedia_url', '/encyclopedia/retatrutide')
