@@ -56,10 +56,17 @@
             >{{ m.label }}</button>
           </div>
           <!-- Inline mode hint — tells first-timers which tab is theirs. -->
-          <div class="text-[11px] text-[color:var(--color-ink-subtle)] mb-5 px-1">
-            <template v-if="mode === 'dosage'">Figure out how many syringe units to draw for a target dose.</template>
-            <template v-else-if="mode === 'reconstitution'">Just mixed a vial with BAC water? See what concentration you got.</template>
-            <template v-else-if="mode === 'schedule'">See how long each vial lasts at your dosing frequency.</template>
+          <div class="text-[12px] text-[color:var(--color-ink-muted)] leading-relaxed mb-5 px-1">
+            <template v-if="mode === 'dosage'">
+              <strong class="text-[color:var(--color-ink)]">Pick your peptide, enter your dose, see the exact syringe units.</strong>
+              If you don't know your peptide's vial size or how much BAC water you added, pick a preset below and we'll fill in the standard values.
+            </template>
+            <template v-else-if="mode === 'reconstitution'">
+              <strong class="text-[color:var(--color-ink)]">Just mixed a vial with BAC water?</strong> Enter what's on the vial and how much water you added — we'll show you the strength and a quick dose-to-units reference.
+            </template>
+            <template v-else-if="mode === 'schedule'">
+              <strong class="text-[color:var(--color-ink)]">How long does one vial last?</strong> Enter your dose + how often you take it — we'll show how many days per vial and how many vials you'll go through in a month.
+            </template>
           </div>
 
           <!-- Peptide preset -->
@@ -78,13 +85,16 @@
           </div>
 
           <!-- Peptide amount -->
-          <CalcField label="Peptide amount in vial" unit="mg" v-model="peptideMg" :step="0.5" :min="0.1" />
+          <CalcField label="Peptide in vial" unit="mg" v-model="peptideMg" :step="0.5" :min="0.1" />
 
-          <!-- Water volume -->
-          <CalcField label="Bacteriostatic water added" unit="mL" v-model="waterMl" :step="0.5" :min="0.1" />
+          <!-- Water volume — called out as BAC water for clarity -->
+          <CalcField label="BAC water added" unit="mL" v-model="waterMl" :step="0.5" :min="0.1" />
 
-          <!-- Desired aliquot (reconstitution mode doesn't need this) -->
-          <CalcField v-if="mode !== 'reconstitution'" label="Desired aliquot amount" unit="mcg" v-model="doseMcg" :step="10" :min="1" />
+          <!-- Desired dose (reconstitution mode doesn't need this).
+               Was labelled "Desired aliquot amount" — layman doesn't know
+               'aliquot'. "Dose per injection" is what they're actually
+               looking up. -->
+          <CalcField v-if="mode !== 'reconstitution'" label="Dose per injection" unit="mcg" v-model="doseMcg" :step="10" :min="1" />
 
           <!-- Syringe size -->
           <div class="mb-5">
@@ -149,13 +159,19 @@
               </div>
             </div>
 
-            <div class="flex items-baseline gap-3 mb-4">
+            <div class="flex items-baseline gap-3 mb-2">
               <span class="ui-display text-[64px] lg:text-[88px] leading-none font-bold text-[color:var(--color-ink)] tracking-tight">{{ syringeMarks }}</span>
               <span class="text-[color:var(--color-ink-muted)]">
                 <div class="text-lg font-semibold">units</div>
                 <div class="text-[13px]">on a {{ syringeUnits }}-unit syringe</div>
               </span>
             </div>
+
+            <!-- Plain-English restatement — reads the answer back to the
+                 user so they don't have to decode the number. -->
+            <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">
+              Draw the plunger to the <strong class="text-[color:var(--color-ink)]">{{ syringeMarks }}-unit mark</strong> on your {{ syringeUnits }}-unit insulin syringe for a {{ doseMcg }}mcg ({{ (doseMcg/1000).toFixed(doseMcg >= 1000 ? 1 : 3) }}mg) dose.
+            </p>
 
             <!-- Integrated syringe visual — the visual anchor. -->
             <div class="relative w-full h-12 rounded-full border-2 border-[color:var(--color-ink)]/15 bg-white overflow-hidden mb-4">
@@ -545,17 +561,17 @@ const presetsFallback = [
   // GLP-1 / weight management
   { group: 'GLP-1 / Weight', name: 'Semaglutide (3mg)', mg: 3, water: 1.5, dose: 250 },
   { group: 'GLP-1 / Weight', name: 'Semaglutide (5mg)', mg: 5, water: 2, dose: 500 },
-  { group: 'GLP-1 / Weight', name: 'Semaglutide (10mg)', mg: 10, water: 2, dose: 500 },
+  { group: 'GLP-1 / Weight', name: 'Semaglutide (10mg)', mg: 10, water: 2, dose: 250 },
   { group: 'GLP-1 / Weight', name: 'Tirzepatide (5mg)', mg: 5, water: 2, dose: 2500 },
-  { group: 'GLP-1 / Weight', name: 'Tirzepatide (10mg)', mg: 10, water: 2, dose: 5000 },
-  { group: 'GLP-1 / Weight', name: 'Tirzepatide (15mg)', mg: 15, water: 3, dose: 5000 },
-  { group: 'GLP-1 / Weight', name: 'Tirzepatide (30mg)', mg: 30, water: 3, dose: 5000 },
+  { group: 'GLP-1 / Weight', name: 'Tirzepatide (10mg)', mg: 10, water: 2, dose: 2500 },
+  { group: 'GLP-1 / Weight', name: 'Tirzepatide (15mg)', mg: 15, water: 3, dose: 2500 },
+  { group: 'GLP-1 / Weight', name: 'Tirzepatide (30mg)', mg: 30, water: 3, dose: 2500 },
   { group: 'GLP-1 / Weight', name: 'Retatrutide (5mg)', mg: 5, water: 2, dose: 1000 },
-  { group: 'GLP-1 / Weight', name: 'Retatrutide (10mg)', mg: 10, water: 2, dose: 2000 },
-  { group: 'GLP-1 / Weight', name: 'Liraglutide (5mg)', mg: 5, water: 2, dose: 1200 },
-  { group: 'GLP-1 / Weight', name: 'Cagrilintide (5mg)', mg: 5, water: 2, dose: 1200 },
-  { group: 'GLP-1 / Weight', name: 'Survodutide (10mg)', mg: 10, water: 2, dose: 1500 },
-  { group: 'GLP-1 / Weight', name: 'Pemvidutide (10mg)', mg: 10, water: 2, dose: 1200 },
+  { group: 'GLP-1 / Weight', name: 'Retatrutide (10mg)', mg: 10, water: 2, dose: 1000 },
+  { group: 'GLP-1 / Weight', name: 'Liraglutide (5mg)', mg: 5, water: 2, dose: 600 },
+  { group: 'GLP-1 / Weight', name: 'Cagrilintide (5mg)', mg: 5, water: 2, dose: 600 },
+  { group: 'GLP-1 / Weight', name: 'Survodutide (10mg)', mg: 10, water: 2, dose: 800 },
+  { group: 'GLP-1 / Weight', name: 'Pemvidutide (10mg)', mg: 10, water: 2, dose: 1000 },
 
   // Growth hormone / GH secretagogues
   { group: 'Growth / GH', name: 'CJC-1295 no DAC (2mg)', mg: 2, water: 2, dose: 100 },
