@@ -126,6 +126,13 @@ class VsPairEvidenceCopyTest extends TestCase
         $this->assertNull($copy['link']);
         $this->assertDoesNotMatchRegularExpression('/\d+(\.\d+)?\s?(mg|mcg|µg|iu)\b|verified|condor|per (day|week)/i', $blob);
         $this->assertSame('What is the “Wolverine stack”?', $copy['faqs'][0]['q']);
+        $note = $copy['evidence']['notes'][2];
+        $this->assertStringContainsString('Regulatory note (Oct 2026).', $note);
+        $this->assertStringContainsString('/guides/compounded-vs-ruo-peptides', $note);
+        $this->assertStringContainsString('/blog/hhs-503a-peptide-enforcement-discretion-2026', $note);
+        $this->assertStringNotContainsString('HHS/FDA', $note);
+        $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?\s*mg\b/i', $note);
+        $this->assertDoesNotMatchRegularExpression('/%/', $note);
     }
 
     public function test_bpc_tb500_vs_page_renders_evidence_and_matching_faq_schema(): void
@@ -139,6 +146,9 @@ class VsPairEvidenceCopyTest extends TestCase
             ->assertOk()
             ->assertSee('Human RCTs: none', false)
             ->assertSee('Ac-LKKTETQ', false)
+            ->assertSee('Regulatory note (Oct 2026).', false)
+            ->assertSee('guides\\/compounded-vs-ruo-peptides', false)
+            ->assertSee('blog\\/hhs-503a-peptide-enforcement-discretion-2026', false)
             ->assertInertia(fn ($page) => $page
                 ->component('Frontend/CompareCompoundVs')
                 ->where('evidence.title', 'Evidence at a glance')

@@ -30,7 +30,53 @@ class EducationalContentPublisher
 
     public static function sync(): void
     {
-        foreach (self::catalog() as $page) {
+        self::syncPages(self::catalog());
+    }
+
+    /**
+     * Upsert only the catalog pages whose slug is listed.
+     * Other blog and guide rows are not read or written.
+     *
+     * @param  list<string>  $slugs
+     */
+    public static function syncOnly(array $slugs): void
+    {
+        $wanted = [];
+        foreach ($slugs as $slug) {
+            if (! is_string($slug) || trim($slug) === '') {
+                throw new RuntimeException('Educational syncOnly expected a non-empty slug string.');
+            }
+            $wanted[trim($slug)] = true;
+        }
+
+        $catalog = self::catalog();
+        $known = [];
+        foreach ($catalog as $page) {
+            $known[(string) ($page['slug'] ?? '')] = true;
+        }
+        $missing = array_keys(array_diff_key($wanted, $known));
+        if ($missing !== []) {
+            throw new RuntimeException(
+                'Educational catalog has no page for slug(s): '.implode(', ', $missing)
+            );
+        }
+
+        $pages = [];
+        foreach ($catalog as $page) {
+            if (isset($wanted[(string) $page['slug']])) {
+                $pages[] = $page;
+            }
+        }
+
+        self::syncPages($pages);
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $pages
+     */
+    private static function syncPages(array $pages): void
+    {
+        foreach ($pages as $page) {
             $markdown = self::prepare((string) file_get_contents(resource_path('content/educational/'.$page['file'])));
             $html = SimpleMarkdown::toHtml($markdown);
             if ($page['kind'] === 'blog') {
@@ -372,7 +418,7 @@ class EducationalContentPublisher
                     ['Where should I check status before believing a clinic ad?', 'FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions.'],
                 ]),
             ],
-        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host), self::retatrutideVsSemaglutide($host), self::selankVsSemax($host), self::eloralintideVsPetrelintide($host), self::orforglipronVsOralSemaglutideCompare($host));
+        ], self::evidenceNotes($host), self::octoberQaPieces($host), self::coaLiteracyAndIdentityNotes($host), self::bpc157VsGhkCu($host), self::aod9604VsTesamorelin($host), self::cagrisemaVsTirzepatide($host), self::orforglipronVsOralSemaglutide($host), self::compoundedGlp1Status($host), self::retatrutideSideEffectsTrialData($host), self::motsCVsNad($host), self::ipamorelinVsSermorelin($host), self::retatrutideVsSemaglutide($host), self::selankVsSemax($host), self::eloralintideVsPetrelintide($host), self::orforglipronVsOralSemaglutideCompare($host), self::compoundedVsRuoPeptides($host), self::sixPeptide503aExplainer($host));
     }
 
     /**
@@ -1324,6 +1370,89 @@ class EducationalContentPublisher
                     ['How do the labels differ on food and water?', 'The US labels for Rybelsus tablets, Ozempic tablets, and Wegovy tablets state an empty-stomach morning condition, water up to 4 ounces, no other liquids, and a wait of at least 30 minutes before food, drink, or other oral medicines. Those sentences are label conditions, not instructions from this page. The Foundayo label states that the tablet is taken once daily with or without food, and it does not state an empty-stomach condition or a water-volume limit. A phase 2 trial, reported in a developer-affiliated paper, gave orforglipron once daily without meal-timing restrictions. Lilly\'s 1 April 2026 press release, which is company-reported, says Foundayo can be taken any time of day without food or water restrictions.'],
                     ['Did a trial compare orforglipron with oral semaglutide, and does this page rank the programmes?', 'ACHIEVE-3 compared them in adults with type 2 diabetes who were taking metformin. It was a 52-week, open-label, randomized phase 3 trial, reported in a developer-affiliated Lancet paper. This page does not repeat its outcome figures. Those figures, with the estimand labelled, are on the orforglipron versus oral semaglutide blog. ATTAIN-1, PIONEER 6, OASIS 1, and OASIS 4 enrolled different populations and used different designs. This page does not rank one programme against another.'],
                     ['Is a research-use listing the same as the approved tablet?', 'No. A research-use-only product sold under one of these names is not Foundayo, not Rybelsus, not an Ozempic tablet, and not a Wegovy tablet. Peptidemap is a comparison publisher for research-use and grey-area peptide listings. It is not a clinic, a pharmacy, or a seller. The peptide legality guide separates FDA approval, research-use labelling, and compounding. This page is not medical advice and does not give a dose.'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Compounded vs RUO guide for the 28 Oct 2026 HHS draft 503A policy.
+     * Body lives in resources/content/educational. read_time is
+     * ceil(rendered words/230), body text plus sources. The publisher
+     * reads this catalog, not the draft YAML. Guide rows have no
+     * key_points column, so those draft points are not a separate list.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function compoundedVsRuoPeptides(string $host): array
+    {
+        return [
+            [
+                'kind' => 'guide',
+                'file' => 'compounded-vs-ruo-peptides.md',
+                'image_file' => 'compounded-vs-ruo-peptides.png',
+                'slug' => 'compounded-vs-ruo-peptides',
+                'h1' => 'Compounded vs RUO Peptides: What the Draft HHS 503A Policy Covers',
+                'lede' => 'On 28 Oct 2026 the HHS Office of the Secretary announced a draft, interim, non-binding policy on compounding six peptides under section 503A. This guide sets out what the documents say about compounded and RUO-labelled peptides, and what they do not say.',
+                'seo_title' => 'Compounded vs RUO Peptides: The Draft HHS 503A Policy',
+                'seo_description' => 'How the draft HHS 503A peptide enforcement-discretion policy works, what it does not do, and how compounded drugs differ from RUO-labelled peptides.',
+                'og_title' => 'Compounded vs RUO Peptides: The Draft HHS 503A Policy',
+                'og_description' => 'How the draft HHS 503A peptide enforcement-discretion policy works, what it does not do, and how compounded drugs differ from RUO-labelled peptides.',
+                'tag' => 'Regulation',
+                'read_time' => '9 Min Read',
+                'published_at' => '2026-10-29',
+                'faq' => self::faq($host.'/guides/compounded-vs-ruo-peptides#faq', [
+                    ['Did FDA approve these six peptides?', 'No. The notice comes from the HHS Office of the Secretary. It says compounded drugs are not FDA-approved, and none of the six is on the 503A Bulks List [1][2] [primary].'],
+                    ['Is the policy final?', 'No. The Federal Register notice calls it a draft, says it is not binding, and opens a two-week comment window after publication on 30 Oct 2026 [2] [primary].'],
+                    ['How long does it last?', 'No end date is given. It applies until a final rule addresses each substance, and HHS may revisit it at any time [1] [primary].'],
+                    ['Does it cover blends such as BPC-157 with TB-500?', 'No. The draft requires a single listed active ingredient [1] [primary].'],
+                    ['Does it cover RUO-labelled products?', 'No. Its terms depend on 503A compounding, a patient-specific prescription and registered CGMP sourcing. HHS calls foreign RUO peptides a safety risk [1] [primary].'],
+                    ['Did FDA scientists support it?', 'Appendix B records that CDER recommended against listing each of the six and that the PCAC voted in favour [1] [primary].'],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Six-peptide explainer for the 28 Oct 2026 HHS draft 503A policy.
+     * Public URL /blog/hhs-503a-peptide-enforcement-discretion-2026.
+     * Body lives in resources/content/educational. read_time is
+     * ceil(rendered words/230), body text plus sources.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private static function sixPeptide503aExplainer(string $host): array
+    {
+        return [
+            [
+                'kind' => 'blog',
+                'file' => 'hhs-503a-peptide-enforcement-discretion-2026.md',
+                'image_file' => 'hhs-503a-peptide-enforcement-discretion-2026.png',
+                'slug' => 'hhs-503a-peptide-enforcement-discretion-2026',
+                'h1' => 'Six Peptides Named in the Draft HHS 503A Enforcement-Discretion Policy',
+                'lede' => 'A draft HHS policy announced on 28 Oct 2026 names six peptides that HHS does not intend to take enforcement action over when 503A compounders meet listed conditions. It is not approval, and rulemaking is still pending.',
+                'seo_title' => 'Six Peptides in the Draft HHS 503A Policy: What It Means',
+                'seo_description' => 'HHS named six peptides in a draft, non-binding 503A enforcement-discretion policy. See the timeline, the scope, and what is still pending in 2026.',
+                'og_title' => 'Six Peptides in the Draft HHS 503A Policy: What It Means',
+                'og_description' => 'HHS named six peptides in a draft, non-binding 503A enforcement-discretion policy. See the timeline, the scope, and what is still pending in 2026.',
+                'blog_type' => 'Regulation',
+                'read_time' => '4 Min Read',
+                'published_at' => '2026-10-29',
+                'is_featured' => false,
+                'author_name' => 'Peptidemap',
+                'tags' => ['503A', 'Compounding', 'BPC-157', 'TB-500', 'HHS', 'RUO'],
+                'key_points' => [
+                    'Issuer: HHS Office of the Secretary. FR Doc. 2026-22192, docket HHS-OASH-2026-0496, Federal Register publication 30 Oct 2026. [primary]',
+                    'The six: BPC-157, epitalon, KPV, MOTS-c, semax and TB-500, in specific salt forms with listed routes. [primary]',
+                    'Draft, interim and non-binding, with a two-week comment window. It has no end date and runs until a final rule. [primary]',
+                    'None of the six is FDA-approved, on the 503A Bulks List, or in Category 1. CDER recommended against all six, and the PCAC voted for them. [primary]',
+                    'It covers single-ingredient, patient-specific 503A compounding only. RUO-labelled products are outside its terms. [primary]',
+                ],
+                'faq' => self::faq($host.'/blog/hhs-503a-peptide-enforcement-discretion-2026#faq', [
+                    ['Is this an FDA approval?', 'No. The issuer is the HHS Office of the Secretary, and the notice says compounded drugs are not FDA-approved [2] [primary].'],
+                    ['Is it final?', 'No. It is a draft, interim, non-binding policy with a two-week comment window [2] [primary].'],
+                    ['Are blends covered?', 'No. The draft requires a single listed active ingredient [1] [primary].'],
+                    ['Does it cover RUO-labelled products?', 'No. Its terms require 503A compounding, a patient-specific prescription and registered CGMP sourcing [1] [primary].'],
                 ]),
             ],
         ];

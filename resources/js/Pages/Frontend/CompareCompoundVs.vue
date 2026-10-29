@@ -112,7 +112,13 @@
           </li>
         </ul>
         <div v-if="(evidence.notes || []).length" class="max-w-3xl mt-5 space-y-3">
-          <p v-for="(n, i) in evidence.notes" :key="'n' + i" class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">{{ n }}</p>
+          <p v-for="(n, i) in evidence.notes" :key="'n' + i" class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">
+            <template v-for="(part, j) in noteSegments(n)" :key="'np' + i + '-' + j">
+              <strong v-if="part.strong" class="font-semibold text-[color:var(--color-ink)]">{{ part.text }}</strong>
+              <a v-else-if="part.href" :href="part.href" class="underline underline-offset-2 text-[color:var(--color-accent-600)]">{{ part.text }}</a>
+              <template v-else>{{ part.text }}</template>
+            </template>
+          </p>
         </div>
         <div v-for="(section, s) in evidence.sections || []" :key="'sec' + s" class="max-w-3xl mt-8">
           <h2 class="text-[20px] font-semibold text-[color:var(--color-ink)] mb-3">{{ section.title }}</h2>
@@ -220,6 +226,23 @@ function formatSlug(slug) {
     .split('-')
     .map((part) => part ? part.charAt(0).toUpperCase() + part.slice(1) : part)
     .join('-')
+}
+
+// Editorial notes are plain text, plus **bold** and same-site or https links.
+function noteSegments(note) {
+  const input = String(note ?? '')
+  const re = /\*\*([^*]+)\*\*|\[([^\]]+)\]\((\/[^)\s]*|https?:\/\/[^)\s]+)\)/g
+  const parts = []
+  let last = 0
+  let match
+  while ((match = re.exec(input)) !== null) {
+    if (match.index > last) parts.push({ text: input.slice(last, match.index) })
+    if (match[1] != null) parts.push({ text: match[1], strong: true })
+    else parts.push({ text: match[2], href: match[3] })
+    last = match.index + match[0].length
+  }
+  if (last < input.length) parts.push({ text: input.slice(last) })
+  return parts.length ? parts : [{ text: input }]
 }
 
 /**
