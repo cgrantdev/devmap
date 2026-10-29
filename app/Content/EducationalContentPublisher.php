@@ -30,7 +30,53 @@ class EducationalContentPublisher
 
     public static function sync(): void
     {
-        foreach (self::catalog() as $page) {
+        self::syncPages(self::catalog());
+    }
+
+    /**
+     * Upsert only the catalog pages whose slug is listed.
+     * Other blog and guide rows are not read or written.
+     *
+     * @param  list<string>  $slugs
+     */
+    public static function syncOnly(array $slugs): void
+    {
+        $wanted = [];
+        foreach ($slugs as $slug) {
+            if (! is_string($slug) || trim($slug) === '') {
+                throw new RuntimeException('Educational syncOnly expected a non-empty slug string.');
+            }
+            $wanted[trim($slug)] = true;
+        }
+
+        $catalog = self::catalog();
+        $known = [];
+        foreach ($catalog as $page) {
+            $known[(string) ($page['slug'] ?? '')] = true;
+        }
+        $missing = array_keys(array_diff_key($wanted, $known));
+        if ($missing !== []) {
+            throw new RuntimeException(
+                'Educational catalog has no page for slug(s): '.implode(', ', $missing)
+            );
+        }
+
+        $pages = [];
+        foreach ($catalog as $page) {
+            if (isset($wanted[(string) $page['slug']])) {
+                $pages[] = $page;
+            }
+        }
+
+        self::syncPages($pages);
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $pages
+     */
+    private static function syncPages(array $pages): void
+    {
+        foreach ($pages as $page) {
             $markdown = self::prepare((string) file_get_contents(resource_path('content/educational/'.$page['file'])));
             $html = SimpleMarkdown::toHtml($markdown);
             if ($page['kind'] === 'blog') {
@@ -360,7 +406,7 @@ class EducationalContentPublisher
                 'og_title' => 'Are Research Peptides Legal? FDA & RUO Basics',
                 'og_description' => 'Educational explainer: FDA approval vs 503A compounding vs RUO, plus the October 2026 interim peptide compounding policy under OMB review (not issued).',
                 'tag' => 'Regulation',
-                'read_time' => '19 Min Read',
+                'read_time' => '20 Min Read',
                 'published_at' => '2026-09-29',
                 'faq' => self::faq($host.'/guides/peptide-legality-fda-ruo-compounding#faq', [
                     ['Are research peptides legal to buy online?', 'There is no single yes/no answer for every peptide, seller, claim, and jurisdiction. RUO listings exist; FDA still polices unapproved new drugs marketed for human use. This page does not advise purchases.'],
@@ -1369,7 +1415,7 @@ class EducationalContentPublisher
 
     /**
      * Six-peptide explainer for the 28 Oct 2026 HHS draft 503A policy.
-     * Public URL /blog/fda-503a-peptide-enforcement-discretion-2026.
+     * Public URL /blog/hhs-503a-peptide-enforcement-discretion-2026.
      * Body lives in resources/content/educational. read_time is
      * ceil(rendered words/230), body text plus sources.
      *
@@ -1380,15 +1426,15 @@ class EducationalContentPublisher
         return [
             [
                 'kind' => 'blog',
-                'file' => 'fda-503a-peptide-enforcement-discretion-2026.md',
-                'image_file' => 'fda-503a-peptide-enforcement-discretion-2026.png',
-                'slug' => 'fda-503a-peptide-enforcement-discretion-2026',
+                'file' => 'hhs-503a-peptide-enforcement-discretion-2026.md',
+                'image_file' => 'hhs-503a-peptide-enforcement-discretion-2026.png',
+                'slug' => 'hhs-503a-peptide-enforcement-discretion-2026',
                 'h1' => 'Six Peptides Named in the Draft HHS 503A Enforcement-Discretion Policy',
                 'lede' => 'A draft HHS policy announced on 28 Oct 2026 names six peptides that HHS does not intend to take enforcement action over when 503A compounders meet listed conditions. It is not approval, and rulemaking is still pending.',
                 'seo_title' => 'Six Peptides in the Draft HHS 503A Policy: What It Means',
-                'seo_description' => 'HHS named six peptides in a draft, non-binding 503A enforcement-discretion policy. See the timeline, the scope, and what is still pending.',
+                'seo_description' => 'HHS named six peptides in a draft, non-binding 503A enforcement-discretion policy. See the timeline, the scope, and what is still pending in 2026.',
                 'og_title' => 'Six Peptides in the Draft HHS 503A Policy: What It Means',
-                'og_description' => 'HHS named six peptides in a draft, non-binding 503A enforcement-discretion policy. See the timeline, the scope, and what is still pending.',
+                'og_description' => 'HHS named six peptides in a draft, non-binding 503A enforcement-discretion policy. See the timeline, the scope, and what is still pending in 2026.',
                 'blog_type' => 'Regulation',
                 'read_time' => '4 Min Read',
                 'published_at' => '2026-10-29',
@@ -1402,7 +1448,7 @@ class EducationalContentPublisher
                     'None of the six is FDA-approved, on the 503A Bulks List, or in Category 1. CDER recommended against all six, and the PCAC voted for them. [primary]',
                     'It covers single-ingredient, patient-specific 503A compounding only. RUO-labelled products are outside its terms. [primary]',
                 ],
-                'faq' => self::faq($host.'/blog/fda-503a-peptide-enforcement-discretion-2026#faq', [
+                'faq' => self::faq($host.'/blog/hhs-503a-peptide-enforcement-discretion-2026#faq', [
                     ['Is this an FDA approval?', 'No. The issuer is the HHS Office of the Secretary, and the notice says compounded drugs are not FDA-approved [2] [primary].'],
                     ['Is it final?', 'No. It is a draft, interim, non-binding policy with a two-week comment window [2] [primary].'],
                     ['Are blends covered?', 'No. The draft requires a single listed active ingredient [1] [primary].'],

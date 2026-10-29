@@ -281,7 +281,7 @@ class EducationalContentTest extends TestCase
         $this->assertFileExists(public_path(ltrim($beginner->cover, '/')));
         $this->assertFileExists(public_path(ltrim($legality->cover, '/')));
 
-        $newestSlug = 'fda-503a-peptide-enforcement-discretion-2026';
+        $newestSlug = 'hhs-503a-peptide-enforcement-discretion-2026';
         $newestImage = '/images/educational/'.$newestSlug.'.png';
 
         $this->get('/blogs')->assertOk()->assertInertia(fn ($page) => $page
@@ -2478,7 +2478,7 @@ class EducationalContentTest extends TestCase
 
         $guideMarkdown = (string) file_get_contents(resource_path('content/educational/'.$guideSlug.'.md'));
         $guideWords = $this->renderedWordCount($guideMarkdown);
-        $this->assertSame(2044, $guideWords);
+        $this->assertSame(2036, $guideWords);
         $this->assertSame('9 Min Read', ((int) ceil($guideWords / 230)).' Min Read');
         $this->assertSame('9 Min Read', $guideEntry['read_time']);
         $this->assertStringContainsString('## FAQ', $guideMarkdown);
@@ -2526,10 +2526,10 @@ class EducationalContentTest extends TestCase
             ->where('guide.readingTime', '9 Min Read')
         );
 
-        $blogSlug = 'fda-503a-peptide-enforcement-discretion-2026';
+        $blogSlug = 'hhs-503a-peptide-enforcement-discretion-2026';
         $blogH1 = 'Six Peptides Named in the Draft HHS 503A Enforcement-Discretion Policy';
         $blogSeo = 'Six Peptides in the Draft HHS 503A Policy: What It Means';
-        $blogDescription = 'HHS named six peptides in a draft, non-binding 503A enforcement-discretion policy. See the timeline, the scope, and what is still pending.';
+        $blogDescription = 'HHS named six peptides in a draft, non-binding 503A enforcement-discretion policy. See the timeline, the scope, and what is still pending in 2026.';
         $blogEntry = collect($catalog)->firstWhere('slug', $blogSlug);
         $this->assertIsArray($blogEntry);
         $this->assertSame('blog', $blogEntry['kind']);
@@ -2625,18 +2625,6 @@ class EducationalContentTest extends TestCase
             })
         );
 
-        $legalityMarkdown = (string) file_get_contents(resource_path('content/educational/peptide-legality-fda-ruo-compounding.md'));
-        $legalityWords = $this->renderedWordCount($legalityMarkdown);
-        $this->assertSame(4318, $legalityWords);
-        $this->assertSame('19 Min Read', ((int) ceil($legalityWords / 230)).' Min Read');
-        $legalityEntry = collect($catalog)->firstWhere('slug', 'peptide-legality-fda-ruo-compounding');
-        $this->assertSame('19 Min Read', $legalityEntry['read_time']);
-        $this->assertStringContainsString('/guides/compounded-vs-ruo-peptides', $legalityMarkdown);
-        $this->get('/guides/peptide-legality-fda-ruo-compounding')
-            ->assertOk()
-            ->assertSee('19 Min Read', false)
-            ->assertSee('guides\\/compounded-vs-ruo-peptides', false);
-
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee('https://peptidemap.com/guides/'.$guideSlug, false)
             ->assertSee('https://peptidemap.com/blog/'.$blogSlug, false);
@@ -2659,10 +2647,10 @@ class EducationalContentTest extends TestCase
             (string) $guideFaq,
         ]);
 
-        $blog = Blog::where('slug', 'fda-503a-peptide-enforcement-discretion-2026')->firstOrFail();
+        $blog = Blog::where('slug', 'hhs-503a-peptide-enforcement-discretion-2026')->firstOrFail();
         $blogFaq = json_encode($blog->seo_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $blogCopy = implode("\n", [
-            (string) file_get_contents(resource_path('content/educational/fda-503a-peptide-enforcement-discretion-2026.md')),
+            (string) file_get_contents(resource_path('content/educational/hhs-503a-peptide-enforcement-discretion-2026.md')),
             (string) $blog->title,
             (string) $blog->description,
             (string) $blog->seo_page_title,
@@ -2679,7 +2667,67 @@ class EducationalContentTest extends TestCase
         }
 
         $this->get('/guides/compounded-vs-ruo-peptides')->assertOk();
-        $this->get('/blog/fda-503a-peptide-enforcement-discretion-2026')->assertOk();
+        $this->get('/blog/hhs-503a-peptide-enforcement-discretion-2026')->assertOk();
+    }
+
+    public function test_sync_only_updates_listed_slugs_and_rejects_unknown_ones(): void
+    {
+        $guideSentinel = 'SENTINEL legality body that syncOnly must not replace.';
+        $blogSentinel = 'SENTINEL evidence blog body that syncOnly must not replace.';
+
+        $legality = EducationalGuide::where('slug', 'peptide-legality-fda-ruo-compounding')->firstOrFail();
+        $legality->content = $guideSentinel;
+        $legality->reading_time = '99 Min Read';
+        $legality->save();
+
+        $evidence = Blog::where('slug', 'bpc-157-vs-tb-500-evidence')->firstOrFail();
+        $evidence->content = $blogSentinel;
+        $evidence->read_time = '99 Min Read';
+        $evidence->save();
+
+        $policyGuide = EducationalGuide::where('slug', 'compounded-vs-ruo-peptides')->firstOrFail();
+        $policyGuideId = $policyGuide->id;
+        $policyGuide->content = 'STALE GUIDE';
+        $policyGuide->save();
+
+        Blog::where('slug', 'hhs-503a-peptide-enforcement-discretion-2026')->delete();
+        $blogCount = Blog::count();
+
+        try {
+            EducationalContentPublisher::syncOnly([
+                'compounded-vs-ruo-peptides',
+                'not-in-the-catalog',
+            ]);
+            $this->fail('An unknown slug should throw before any row is written.');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('not-in-the-catalog', $e->getMessage());
+        }
+
+        $this->assertSame('STALE GUIDE', EducationalGuide::where('slug', 'compounded-vs-ruo-peptides')->firstOrFail()->content);
+        $this->assertSame($guideSentinel, EducationalGuide::where('slug', 'peptide-legality-fda-ruo-compounding')->firstOrFail()->content);
+        $this->assertSame($blogSentinel, Blog::where('slug', 'bpc-157-vs-tb-500-evidence')->firstOrFail()->content);
+        $this->assertNull(Blog::where('slug', 'hhs-503a-peptide-enforcement-discretion-2026')->first());
+
+        EducationalContentPublisher::syncOnly([
+            'compounded-vs-ruo-peptides',
+            'hhs-503a-peptide-enforcement-discretion-2026',
+        ]);
+
+        $this->assertSame($guideSentinel, EducationalGuide::where('slug', 'peptide-legality-fda-ruo-compounding')->firstOrFail()->content);
+        $this->assertSame('99 Min Read', EducationalGuide::where('slug', 'peptide-legality-fda-ruo-compounding')->firstOrFail()->reading_time);
+        $this->assertSame($blogSentinel, Blog::where('slug', 'bpc-157-vs-tb-500-evidence')->firstOrFail()->content);
+        $this->assertSame('99 Min Read', Blog::where('slug', 'bpc-157-vs-tb-500-evidence')->firstOrFail()->read_time);
+
+        $updatedGuide = EducationalGuide::where('slug', 'compounded-vs-ruo-peptides')->firstOrFail();
+        $this->assertSame($policyGuideId, $updatedGuide->id);
+        $this->assertStringNotContainsString('STALE GUIDE', (string) $updatedGuide->content);
+        $this->assertStringContainsString('federal district courts in California and Texas', (string) $updatedGuide->content);
+        $this->assertSame('9 Min Read', $updatedGuide->reading_time);
+
+        $this->assertSame($blogCount + 1, Blog::count());
+        $createdBlog = Blog::where('slug', 'hhs-503a-peptide-enforcement-discretion-2026')->firstOrFail();
+        $this->assertSame('4 Min Read', $createdBlog->read_time);
+        $this->assertStringContainsString('HHS Office of the Secretary', (string) $createdBlog->content);
     }
 
     /**

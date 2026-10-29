@@ -129,7 +129,7 @@ class VsPairEvidenceCopyTest extends TestCase
         $note = $copy['evidence']['notes'][2];
         $this->assertStringContainsString('Regulatory note (Oct 2026).', $note);
         $this->assertStringContainsString('/guides/compounded-vs-ruo-peptides', $note);
-        $this->assertStringContainsString('/blog/fda-503a-peptide-enforcement-discretion-2026', $note);
+        $this->assertStringContainsString('/blog/hhs-503a-peptide-enforcement-discretion-2026', $note);
         $this->assertStringNotContainsString('HHS/FDA', $note);
         $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?\s*mg\b/i', $note);
         $this->assertDoesNotMatchRegularExpression('/%/', $note);
@@ -148,7 +148,7 @@ class VsPairEvidenceCopyTest extends TestCase
             ->assertSee('Ac-LKKTETQ', false)
             ->assertSee('Regulatory note (Oct 2026).', false)
             ->assertSee('guides\\/compounded-vs-ruo-peptides', false)
-            ->assertSee('blog\\/fda-503a-peptide-enforcement-discretion-2026', false)
+            ->assertSee('blog\\/hhs-503a-peptide-enforcement-discretion-2026', false)
             ->assertInertia(fn ($page) => $page
                 ->component('Frontend/CompareCompoundVs')
                 ->where('evidence.title', 'Evidence at a glance')

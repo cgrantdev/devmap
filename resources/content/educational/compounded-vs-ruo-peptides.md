@@ -41,7 +41,7 @@ The draft also lists routes. The list below describes the policy's scope only. I
 - Semax free base: intranasal use
 - KPV acetate: topical and oral dosage forms [1] [primary]
 
-The product must contain "only a single Active Pharmaceutical Ingredient (API) listed in Appendix A" [1] [primary]. Blends fall outside the draft. That includes combinations of two listed peptides, such as BPC-157 with TB-500. The only drug delivery device allowed is "an FDA 510(k)-cleared syringe" [1] [primary]. For any oral form, the compounder is expected to keep documentation showing "an adequate level of oral bioavailability in humans" [1] [primary].
+The product must contain "only a single Active Pharmaceutical Ingredient (API) listed in Appendix A" [1] [primary]. Blends fall outside the draft. That includes combinations of two listed peptides, such as BPC-157 with TB-500. The only drug delivery device that may be co-packaged with or contain the compounded drug is "an FDA 510(k)-cleared syringe" [1] [primary]. For any oral form, the compounder is expected to keep documentation showing "an adequate level of oral bioavailability in humans" [1] [primary].
 
 ## Identity, purity and adverse-event conditions, as stated
 
@@ -71,7 +71,7 @@ The draft mentions States in its reporting condition and covers "State-licensed"
 
 ## Litigation context: Eli Lilly's retatrutide suits
 
-On 12 Aug 2026, Eli Lilly announced six US lawsuits over unapproved retatrutide. Retatrutide is an investigational drug that Lilly says is in Phase 3 trials and not approved anywhere [8] [company-reported]. Lilly says the suits target "compounding pharmacies, medical spas, and online sellers that falsely claim their drugs are for 'research-use only' when they are actually intended for human use" [8] [company-reported]. The cases it lists are against Aesthetic Envy (N.D. Cal.), Astra Peptides (W.D. Tex.), Legendary Peptides (E.D. Tex.), Striker Pharmacy (S.D. Tex.), Texas Peptides (W.D. Tex.) and Lone Star Peptide (S.D. Tex.) [8] [company-reported]. Reuters reported the filings the same day [9] [press]. These are allegations, and no ruling is reported in these sources. Retatrutide is not one of the six peptides in the HHS draft.
+On 12 Aug 2026, Eli Lilly announced six US lawsuits over unapproved retatrutide. Retatrutide is an investigational drug that Lilly says is in Phase 3 trials and not approved anywhere [8] [company-reported]. Lilly says the suits target "compounding pharmacies, medical spas, and online sellers that falsely claim their drugs are for 'research-use only' when they are actually intended for human use" [8] [company-reported]. The six cases it lists were filed in federal district courts in California and Texas [8] [company-reported]. Reuters reported the filings the same day [9] [press]. These are allegations, and no ruling is reported in these sources. Retatrutide is not one of the six peptides in the HHS draft.
 
 ## FAQ
 
