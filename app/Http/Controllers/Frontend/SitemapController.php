@@ -8,6 +8,7 @@ use App\Models\Brand;
 use App\Models\EducationalGuide;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Support\CalculatorPresets;
 use App\Support\CompareSlug;
 use App\Support\EncyclopediaSlug;
 use App\Support\OrforglipronOralSemaglutideComparePage;
@@ -24,8 +25,9 @@ use Illuminate\Support\Facades\Cache;
  */
 class SitemapController extends Controller
 {
-    // v5 adds the vs allowlist. Featured pairs stay. Thin pairs stay out.
-    public const CACHE_KEY = 'sitemap.xml.v5';
+    // v6 adds /calculator and the /calculator/{slug} compound pages so each
+    // compound-specific calculator URL earns its own crawl path.
+    public const CACHE_KEY = 'sitemap.xml.v6';
     private const CACHE_TTL = 21600; // 6h
     private const BASE_URL  = 'https://peptidemap.com';
 
@@ -63,8 +65,23 @@ class SitemapController extends Controller
             ['/encyclopedia',  'weekly',  '0.8'],
             ['/blogs',         'weekly',  '0.6'],
             ['/guides',        'weekly',  '0.6'],
+            ['/calculator',    'weekly',  '0.9'],
         ] as [$path, $freq, $priority]) {
             $urls[] = ['loc' => self::BASE_URL . $path, 'lastmod' => $today, 'changefreq' => $freq, 'priority' => $priority];
+        }
+
+        // Compound-specific calculator pages. Each preset gets its own
+        // URL so queries like "semaglutide reconstitution calculator",
+        // "tirzepatide calculator", "bpc-157 dose calculator" land on a
+        // dedicated page with compound-targeted meta, not the generic
+        // /calculator landing.
+        foreach (CalculatorPresets::all() as $preset) {
+            $urls[] = [
+                'loc'        => self::BASE_URL . '/calculator/' . $preset['slug'],
+                'lastmod'    => $today,
+                'changefreq' => 'monthly',
+                'priority'   => '0.7',
+            ];
         }
 
         // Brand storefronts + coupon landing pages. Coupon page only

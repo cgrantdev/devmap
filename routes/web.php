@@ -183,22 +183,45 @@ Route::get('/compare/{slug}', [CompareController::class, 'show'])
 Route::get('/coupon/{slug}', [\App\Http\Controllers\Frontend\CouponController::class, 'show'])
     ->where('slug', '[a-z0-9-]+')
     ->name('coupon.brand');
-Route::get('/calculator', function () {
+// Shared handler for /calculator and /calculator/{slug}. Passing a slug
+// prefills a specific preset and emits compound-targeted SEO so each
+// compound gets its own ranking lane (semaglutide calculator, tirzepatide
+// calculator, bpc-157 calculator, etc).
+$calculatorRenderer = function (?string $compoundSlug = null) {
     $seoPage = \App\Models\SeoPage::where('key', 'calculator')->first();
-    // Sep 7 2026 revenue push: title targets 'best peptide calculator'
-    // + 'peptide dosage calculator' commercial-intent queries. Description
-    // leads with concrete numbers (presets, dose types) so the SERP snippet
-    // is scan-friendly and click-driving.
-    $defaultTitle = 'Best Peptide Calculator — Reconstitution, Dosage & Schedule · Free · No Signup';
-    $defaultDescription = 'The most-used peptide calculator on the internet. 55+ preset compounds across GLP-1s, growth, healing, longevity and cognitive peptides, with instant syringe unit output. Reconstitution, dosage, and schedule modes. Shareable results. RUO.';
+    $preset = $compoundSlug ? \App\Support\CalculatorPresets::findBySlug($compoundSlug) : null;
+    if ($compoundSlug && !$preset) {
+        abort(404);
+    }
+
+    // Compound-specific SEO when a slug is provided. Otherwise the
+    // generic calculator landing SEO.
+    if ($preset) {
+        $compound = \App\Support\CalculatorPresets::compoundName($preset);
+        $defaultTitle = "{$compound} Reconstitution Calculator — Dose, BAC Water & Syringe Units";
+        $defaultDescription = "Free {$compound} calculator preloaded with the {$preset['name']} preset ({$preset['mg']}mg vial, {$preset['water']}mL BAC water, {$preset['dose']}mcg aliquot). Reconstitution, dosage and schedule modes with instant insulin-syringe unit output. Shareable result. Research use only.";
+    } else {
+        // Sep 7 2026 revenue push: title targets 'best peptide calculator'
+        // + 'peptide dosage calculator' commercial-intent queries. Description
+        // leads with concrete numbers (presets, dose types) so the SERP snippet
+        // is scan-friendly and click-driving.
+        $defaultTitle = 'Best Peptide Calculator — Reconstitution, Dosage & Schedule · Free · No Signup';
+        $defaultDescription = 'The most-used peptide calculator on the internet. 55+ preset compounds across GLP-1s, growth, healing, longevity and cognitive peptides, with instant syringe unit output. Reconstitution, dosage, and schedule modes. Shareable results. RUO.';
+    }
+    $pageUrl = $preset ? url('/calculator/' . $preset['slug']) : url('/calculator');
+    // On compound-specific pages the SeoPage override is for the generic
+    // landing — do not apply it, so each compound page emits its unique
+    // compound-targeted title and meta.
+    $usePageOverride = !$preset;
     $seo = [
         'key' => 'calculator',
-        'title' => $seoPage?->title ?: $defaultTitle,
-        'description' => $seoPage?->description ?: $defaultDescription,
-        'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
-        'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
+        'title' => $usePageOverride ? ($seoPage?->title ?: $defaultTitle) : $defaultTitle,
+        'description' => $usePageOverride ? ($seoPage?->description ?: $defaultDescription) : $defaultDescription,
+        'og_title' => $usePageOverride ? ($seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle)) : $defaultTitle,
+        'og_description' => $usePageOverride ? ($seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription)) : $defaultDescription,
         'og_image' => $seoPage?->og_image ?: null,
-        'url' => url('/calculator'),
+        'url' => $pageUrl,
+        'prefilled_preset_slug' => $preset['slug'] ?? null,
         // HowTo JSON-LD earns numbered-step SERP treatment for peptide
         // reconstitution — matches the step block rendered by Calculator.vue.
         // Deliberately scoped to reconstitution only (no injection guides).
@@ -277,8 +300,14 @@ Route::get('/calculator', function () {
 
     return Inertia::render('Frontend/Calculator', [
         'seo' => $seo,
+        'presets' => \App\Support\CalculatorPresets::all(),
     ]);
-})->name('calculator');
+};
+
+Route::get('/calculator', fn () => $calculatorRenderer(null))->name('calculator');
+Route::get('/calculator/{compound}', fn (string $compound) => $calculatorRenderer($compound))
+    ->where('compound', '[a-z0-9-]+')
+    ->name('calculator.compound');
 Route::get('/news', [KnowledgeCenterController::class, 'index'])->name('news');
 Route::get('/research/{id}', [KnowledgeCenterController::class, 'showResearch'])->name('research.show');
 Route::get('/deals', [DealsController::class, 'index'])->name('deals');

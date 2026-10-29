@@ -444,8 +444,9 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 
-defineProps({
+const props = defineProps({
   seo: { type: Object, default: () => ({}) },
+  presets: { type: Array, default: () => [] },
 })
 
 // --- Share-link support -----------------------------------------------
@@ -484,11 +485,11 @@ const modes = [
 const mode = ref('dosage')
 
 // --- Presets ---
-// Grouped by category for the dropdown. 55+ compounds spanning
-// GLP-1s, growth-hormone secretagogues, healing/repair, longevity,
-// cognitive, metabolic, sexual-function. Dose values are the most
-// common research-use starting aliquot; users override if needed.
-const presets = [
+// Presets now come from the server (app/Support/CalculatorPresets.php)
+// so one source of truth drives both the dropdown and the /calculator/{slug}
+// routing. If server props are missing (unusual) we fall back to this
+// hardcoded list to keep the UI functional during local hot-reload.
+const presetsFallback = [
   // GLP-1 / weight management
   { group: 'GLP-1 / Weight', name: 'Semaglutide (3mg)', mg: 3, water: 1.5, dose: 250 },
   { group: 'GLP-1 / Weight', name: 'Semaglutide (5mg)', mg: 5, water: 2, dose: 500 },
@@ -562,10 +563,13 @@ const presets = [
   { group: 'Metabolic', name: 'SLU-PP-332 (10mg)', mg: 10, water: 2, dose: 500 },
 ]
 
+// Prefer server-supplied presets, fall back to the JS copy if props empty.
+const presets = computed(() => (props.presets?.length ? props.presets : presetsFallback))
+
 // Group presets for the dropdown (optgroup rendering).
 const presetGroups = computed(() => {
   const groups = {}
-  for (const p of presets) {
+  for (const p of presets.value) {
     (groups[p.group] ||= []).push(p)
   }
   return Object.entries(groups).map(([label, items]) => ({ label, items }))
@@ -574,7 +578,7 @@ const presetGroups = computed(() => {
 const preset = ref('')
 
 function applyPreset() {
-  const p = presets.find(x => x.name === preset.value)
+  const p = presets.value.find(x => x.name === preset.value)
   if (p) {
     peptideMg.value = p.mg
     waterMl.value = p.water
@@ -629,10 +633,18 @@ const vialsPerMonth = computed(() => {
 // so the browser history doesn't clog with every keystroke.
 onMounted(() => {
   if (typeof window === 'undefined') return
+  // Prefilled slug from /calculator/{slug} wins over ?preset= query
+  // param — the compound URL is the canonical for that compound and
+  // its SEO assumes those inputs are what's rendered.
+  const prefilled = props.seo?.prefilled_preset_slug
+  if (prefilled) {
+    const p = presets.value.find(x => x.slug === prefilled)
+    if (p) { preset.value = p.name; applyPreset() }
+  }
   const p = new URL(window.location.href).searchParams
   const get = (k, cast) => (p.has(k) ? (cast ? cast(p.get(k)) : p.get(k)) : null)
   const m = get('mode'); if (m && modes.some(x => x.key === m)) mode.value = m
-  const pr = get('preset'); if (pr) { preset.value = pr; applyPreset() }
+  const pr = get('preset'); if (pr && !prefilled) { preset.value = pr; applyPreset() }
   const mg = get('mg', parseFloat); if (mg && mg > 0) peptideMg.value = mg
   const w = get('water', parseFloat); if (w && w > 0) waterMl.value = w
   const d = get('dose', parseFloat); if (d && d > 0) doseMcg.value = d
