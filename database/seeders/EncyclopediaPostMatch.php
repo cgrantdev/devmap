@@ -152,6 +152,21 @@ final class EncyclopediaPostMatch
             $command?->warn($message);
         }
 
-        fwrite(STDERR, $message.PHP_EOL);
+        self::stream('stderr', $message);
+    }
+
+    /**
+     * STDOUT/STDERR are undefined outside the CLI (e.g. Artisan::call from
+     * the /admin dev console), so only write when the constant exists.
+     */
+    private static function stream(string $stream, string $line): void
+    {
+        $handle = match ($stream) {
+            'stderr' => defined('STDERR') ? STDERR : null,
+            default => defined('STDOUT') ? STDOUT : null,
+        };
+        if (is_resource($handle)) {
+            @fwrite($handle, $line.PHP_EOL);
+        }
     }
 }

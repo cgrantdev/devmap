@@ -23,6 +23,12 @@ use Tests\TestCase;
  * the Inertia props use. sqlite keeps insertion order, so these tests
  * re-encode every JSON column in MySQL order before each migration runs,
  * then replay the filename-order chain 100000 -> 110000 -> 120000 -> 200000.
+ *
+ * Primary scenario (b): production, where 100000, 110000 and 200000 already
+ * ran (100000 with its original key-order-sensitive compare, so it skipped
+ * bpc-157 faqs and the legality guide seo_schema), then 120000 runs and
+ * catches those two columns up. Scenario (a): a fresh chain in filename
+ * order.
  */
 class ProdKeyOrderMigrationChainOctober29Test extends TestCase
 {
@@ -35,6 +41,11 @@ class ProdKeyOrderMigrationChainOctober29Test extends TestCase
         'semax' => 'Semax', 'BPC-157-TB-500' => 'BPC-157-TB-500', 'glow' => 'glow',
         'klow-blend-ghk-cu-bpc-157-tb-500-kpv' => 'klow-blend-ghk-cu-bpc-157-tb-500-kpv',
     ];
+
+    /** 100000 slugs whose live page renders no published post. */
+    private const NO_LIVE_POST = ['semax', 'BPC-157-TB-500', 'klow-blend-ghk-cu-bpc-157-tb-500-kpv'];
+
+    private const GUIDE_MISSING = '2026_10_29_120000 guide:peptide-legality-fda-ruo-compounding.seo_schema: guide lookup missing — nothing written';
 
     private const PAGES_200000 = ['compounded-vs-ruo-peptides', 'hhs-503a-peptide-enforcement-discretion-2026'];
 
@@ -58,6 +69,116 @@ class ProdKeyOrderMigrationChainOctober29Test extends TestCase
                 $this->warnings[] = $e->message;
             }
         });
+    }
+
+    public function test_b_prod_after_100000_110000_200000_with_strict_skips_then_120000_reaches_main(): void
+    {
+        $policy = Policy::payload();
+        $posts = [];
+        foreach ($policy['posts'] as $slug => $spec) {
+            if (in_array($slug, self::NO_LIVE_POST, true)) {
+                continue;
+            }
+            $attrs = [];
+            foreach ($spec['columns'] as $column => $colSpec) {
+                $attrs[$column] = $slug === 'bpc-157' && $column === 'faqs'
+                    ? $colSpec['old_values'][0]           // skipped by strict 100000
+                    : $colSpec['target_values'][0];       // written by 100000
+            }
+            $posts[$slug] = $this->linkedPost($this->category($slug, self::POLICY_CATEGORY[$slug]), strtolower($slug).'-linked', $attrs);
+        }
+        // semax / blends: live renders [] because no published post is linked.
+        // One prod shape each: no post, a draft with NULL, a draft with [].
+        $this->category('semax', 'Semax');
+        $this->linkedPost($this->category('BPC-157-TB-500', 'BPC-157-TB-500'), 'bpc-157-tb-500-draft', ['status' => 'draft', 'regulatory_subsections' => null]);
+        $this->linkedPost($this->category('klow', 'klow-blend-ghk-cu-bpc-157-tb-500-kpv'), 'klow-draft', ['status' => 'draft', 'regulatory_subsections' => []]);
+
+        $live = $this->liveFixture();
+        $after110000 = json_decode((string) file_get_contents(base_path('tests/Fixtures/prod-drift-2026-10-29/live-after-110000.json')), true)['posts']['retatrutide'];
+        $ids = [];
+        foreach ($live['posts'] as $slug => $fields) {
+            if ($slug === 'retatrutide') {
+                $fields = array_merge($fields, $after110000, ['regulatory_subsections' => $this->osaColumns()['regulatory_subsections']['target_values'][0]]);
+            }
+            $category = $this->category($live['categories'][$slug]['name'], $live['categories'][$slug]['slug']);
+            $post = EducationPost::query()->where('product_category_id', $category->id)->first();
+            if ($post) {
+                // bpc-157: keep what 100000 wrote; take the rest from live.
+                $fields = array_diff_key($fields, $policy['posts']['bpc-157']['columns']);
+                $post->forceFill($fields)->saveQuietly();
+            } else {
+                $post = $this->linkedPost($category, $slug.'-linked', $fields);
+            }
+            $ids[$slug] = $post->id;
+        }
+        $this->assertNotSame([], $this->dateHits(EducationPost::findOrFail($ids['retatrutide'])->getAttributes()));
+
+        $this->runMigration('2026_10_29_200000_publish_503a_peptide_policy_pages.php');
+        $guideSpec = $policy['guides'][self::GUIDE]['columns'];
+        $guideAttrs = [];
+        foreach ($guideSpec as $column => $colSpec) {
+            $guideAttrs[$column] = $column === 'seo_schema' ? $colSpec['old_values'][0] : $colSpec['target_values'][0];
+        }
+        $this->guide()->forceFill($guideAttrs)->saveQuietly();
+        $this->reencodeAll();
+        $untouched = EducationPost::query()->where('status', 'draft')->orderBy('id')->get()->map->getAttributes()->all();
+        $this->warnings = [];
+
+        $this->runMigration('2026_10_29_120000_reconcile_encyclopedia_prod_drift_october_29.php');
+        $this->reencodeAll();
+
+        $this->assertSame([], $this->warnings);
+        $this->assertChainFinal($posts, $ids, skipNoLivePost: true);
+        $this->assertSame($untouched, EducationPost::query()->where('status', 'draft')->orderBy('id')->get()->map->getAttributes()->all());
+        $this->assertSame(0, EducationPost::query()->whereHas('category', fn ($q) => $q->where('slug', 'Semax'))->count());
+
+        // Re-migrate: 120000 again changes nothing and warns about nothing.
+        $snapshot = $this->contentSnapshot();
+        $seeder = new Reconcile;
+        $seeder->run();
+        $this->assertSame([], $this->warnings);
+        foreach ($seeder->results as $key => $status) {
+            $this->assertSame(GuardedFieldWriter::ALREADY, $status, $key);
+        }
+        $this->assertCount(14, $seeder->results);
+        $this->assertSame($snapshot, $this->contentSnapshot());
+    }
+
+    public function test_b_catch_up_guards_leave_unknown_values_alone(): void
+    {
+        $policy = Policy::payload();
+        $faqs = $policy['posts']['bpc-157']['columns']['faqs']['old_values'][0];
+        $faqs[0]['answer'] .= ' (admin edit)';
+        $live = $this->liveFixture();
+        $ids = [];
+        foreach ($live['posts'] as $slug => $fields) {
+            if ($slug === 'bpc-157') {
+                $fields['faqs'] = $faqs;
+            }
+            $ids[$slug] = $this->linkedPost($this->category($live['categories'][$slug]['name'], $live['categories'][$slug]['slug']), $slug.'-linked', $fields)->id;
+        }
+        $schema = $policy['guides'][self::GUIDE]['columns']['seo_schema']['old_values'][0];
+        $schema[0]['@id'] .= '-edited';
+        $this->guide()->forceFill(['seo_schema' => self::mysqlKeyOrder($schema)])->saveQuietly();
+        $guideBefore = $this->guide()->getAttributes()['seo_schema'];
+        $this->warnings = [];
+
+        $seeder = new Reconcile;
+        $seeder->run();
+
+        $this->assertSame(GuardedFieldWriter::MISMATCH, $seeder->results['bpc-157.faqs']);
+        $this->assertSame(GuardedFieldWriter::MISMATCH, $seeder->results['guide:'.self::GUIDE.'.seo_schema']);
+        $this->assertSame(GuardedFieldWriter::UPDATED, $seeder->results['bpc-157.references']);
+        $this->assertSame($faqs, EducationPost::findOrFail($ids['bpc-157'])->faqs);
+        $this->assertSame($guideBefore, $this->guide()->getAttributes()['seo_schema']);
+        $this->assertCount(2, $this->warnings);
+
+        // No guide row: a WARNING, nothing written, the posts still reconcile.
+        EducationalGuide::where('slug', self::GUIDE)->delete();
+        $this->warnings = [];
+        $again = new Reconcile;
+        $again->run();
+        $this->assertSame([self::GUIDE_MISSING], array_values(array_filter($this->warnings, fn ($w) => str_contains($w, 'guide:'))));
     }
 
     public function test_100000_writes_on_prod_key_order_and_reruns_clean(): void
@@ -146,7 +267,7 @@ class ProdKeyOrderMigrationChainOctober29Test extends TestCase
         $this->assertSame([], $this->warnings);
     }
 
-    public function test_filename_order_chain_from_prod_like_values_reaches_main_with_no_warnings_and_no_21_oct(): void
+    public function test_a_fresh_filename_order_chain_from_prod_like_values_reaches_main_with_no_warnings_and_no_21_oct(): void
     {
         $posts = $this->seedPolicyPosts();
         $live = $this->liveFixture();
@@ -197,9 +318,12 @@ class ProdKeyOrderMigrationChainOctober29Test extends TestCase
      * @param  array<string, EducationPost>  $policyPosts
      * @param  array<string, int>  $ids
      */
-    private function assertChainFinal(array $policyPosts, array $ids): void
+    private function assertChainFinal(array $policyPosts, array $ids, bool $skipNoLivePost = false): void
     {
         foreach (Policy::payload()['posts'] as $slug => $spec) {
+            if ($skipNoLivePost && in_array($slug, self::NO_LIVE_POST, true)) {
+                continue;
+            }
             foreach ($spec['columns'] as $column => $colSpec) {
                 $this->assertSame(GuardedFieldWriter::comparable($colSpec['target_values'][0]), GuardedFieldWriter::comparable($policyPosts[$slug]->fresh()->{$column}), "100000 {$slug}.{$column}");
             }
@@ -212,7 +336,7 @@ class ProdKeyOrderMigrationChainOctober29Test extends TestCase
         $this->assertSame(GuardedFieldWriter::comparable($this->osaColumns()['regulatory_subsections']['target_values'][0]), GuardedFieldWriter::comparable($reta->regulatory_subsections));
         $reconcile = json_decode((string) file_get_contents(database_path(Reconcile::PAYLOAD_PATH)), true)['posts'];
         foreach ($reconcile as $slug => $post) {
-            $row = EducationPost::findOrFail($ids[$slug]);
+            $row = EducationPost::findOrFail($slug === 'bpc-157' && isset($policyPosts['bpc-157']) ? $policyPosts['bpc-157']->id : $ids[$slug]);
             foreach ($post['columns'] as $column => $spec) {
                 $value = $column === 'description' && trim((string) $row->description) === ''
                     ? ProductCategory::findOrFail($row->product_category_id)->description
@@ -229,15 +353,38 @@ class ProdKeyOrderMigrationChainOctober29Test extends TestCase
         }
 
         // No 21 October date anywhere in the content tables.
-        $pattern = '/\b21 Oct(?:ober)?\b|October 21\b/';
         foreach ([EducationPost::class, ProductCategory::class, EducationalGuide::class, Blog::class] as $model) {
             foreach ($model::query()->get() as $row) {
-                $blob = json_encode($row->getAttributes(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '';
-                $this->assertDoesNotMatchRegularExpression($pattern, $blob, $model.' #'.$row->getKey());
+                $this->assertSame([], $this->dateHits($row->getAttributes()), $model.' #'.$row->getKey());
             }
         }
         $osaSection = collect($reta->human_use_subsections)->first(fn ($s) => str_starts_with((string) ($s['title'] ?? ''), 'Obstructive sleep apnea trials'));
         $this->assertSame('Obstructive sleep apnea trials (NEJM, 20 Oct 2026) — developer-affiliated (Lilly-funded)', $osaSection['title']);
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     * @return list<string>
+     */
+    private function dateHits(array $attributes): array
+    {
+        $blob = json_encode($attributes, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '';
+        preg_match_all('/\b21 Oct(?:ober)?\b|October 21\b/', $blob, $m);
+
+        return $m[0];
+    }
+
+    /**
+     * @return array<string, list<array<string, mixed>>>
+     */
+    private function contentSnapshot(): array
+    {
+        return [
+            'posts' => EducationPost::orderBy('id')->get()->map->getAttributes()->all(),
+            'categories' => ProductCategory::orderBy('id')->get()->map->getAttributes()->all(),
+            'guides' => EducationalGuide::orderBy('id')->get()->map->getAttributes()->all(),
+            'blogs' => Blog::orderBy('id')->get()->map->getAttributes()->all(),
+        ];
     }
 
     private function runMigration(string $file): void

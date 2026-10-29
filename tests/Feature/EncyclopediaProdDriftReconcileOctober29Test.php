@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\EducationalGuide;
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
 use App\Support\GuardedFieldWriter;
 use App\Support\RetatrutideTirzepatideCompareCopy;
 use Database\Seeders\EncyclopediaBpcCleanupAddendumSeeder;
+use Database\Seeders\EncyclopediaCompoundingPolicyOctober29Seeder;
 use Database\Seeders\EncyclopediaFaqAuditBatch1Seeder;
 use Database\Seeders\EncyclopediaFieldReapplyOctober22Seeder;
 use Database\Seeders\EncyclopediaFieldUpdatesOctober22Seeder;
@@ -24,9 +26,11 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
 {
     use RefreshDatabase;
 
-    private const SHA = 'c5c52c29c842fcf7989ecb46a7316e98df15521e202d38db2f2d1cd157aa960f';
+    private const SHA = 'ca4d3990fcb9a9fbaf21f48b5eda057b79ce04350b54970eb1613e7436e4a0f0';
 
     private const M = '2026_10_29_120000';
+
+    private const GUIDE = 'peptide-legality-fda-ruo-compounding';
 
     /** @var list<array{level: string, message: string}> */
     private array $logged = [];
@@ -76,8 +80,11 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
                 $this->assertTrue($this->hasLog('info', self::M.' '.$slug.'.'.$field.': updated'), $slug.'.'.$field);
             }
         }
+        $guide = EducationalGuide::where('slug', self::GUIDE)->firstOrFail();
+        $this->assertSame(GuardedFieldWriter::UPDATED, $seeder->results['guide:'.self::GUIDE.'.seo_schema']);
+        $this->assertSame($this->payload()['guides'][self::GUIDE]['columns']['seo_schema']['target_value'], $guide->seo_schema);
         $this->assertSame([], $this->warnings());
-        $this->assertSame(array_keys(EncyclopediaProdDriftReconcileOctober29Seeder::COLUMNS), $seeder->transactions);
+        $this->assertSame([...array_keys(EncyclopediaProdDriftReconcileOctober29Seeder::COLUMNS), 'guide:'.self::GUIDE], $seeder->transactions);
     }
 
     public function test_live_values_after_110000_reach_the_same_targets(): void
@@ -166,7 +173,7 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
         $seeder = new EncyclopediaProdDriftReconcileOctober29Seeder;
         $seeder->run();
 
-        $this->assertCount(12, $seeder->results);
+        $this->assertCount(14, $seeder->results);
         foreach ($seeder->results as $key => $status) {
             $this->assertSame(GuardedFieldWriter::ALREADY, $status, $key);
         }
@@ -215,7 +222,7 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
             $this->assertSame(GuardedFieldWriter::ALREADY, $status, $key);
             $this->assertContains(self::M.' '.$key.': already current', $seeder->lines);
         }
-        $this->assertCount(12, $seeder->results);
+        $this->assertCount(14, $seeder->results);
         $this->assertSame($before, EducationPost::whereIn('id', array_values($ids))->orderBy('id')->get()->map->getAttributes()->all());
         $this->assertSame($categories, ProductCategory::orderBy('id')->get()->map->getAttributes()->all());
         $this->assertSame([], $this->warnings());
@@ -325,6 +332,7 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
             EncyclopediaRetatrutideS505Seeder::class,
             EncyclopediaBpcCleanupAddendumSeeder::class,
             EncyclopediaHubCardsOctober22Seeder::class,
+            EncyclopediaCompoundingPolicyOctober29Seeder::class,
             EncyclopediaRetatrutideOsaLitigationSeeder::class,
         ] as $class) {
             (new $class)->run();
@@ -341,6 +349,7 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
                 $this->assertEquals($this->target($slug, $field), $post->{$field}, $slug.'.'.$field);
             }
         }
+        $this->assertSame(GuardedFieldWriter::ALREADY, $seeder->results['guide:'.self::GUIDE.'.seo_schema']);
         $this->assertSame([], $this->warnings());
     }
 
@@ -382,6 +391,13 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
                 'status' => 'published', 'show_in_encyclopedia' => true,
             ], $fields))->id;
         }
+        if ($file !== 'main-chain-s0.json') {
+            // Production's legality guide: 100000 skipped seo_schema, so it
+            // still holds the pre-100000 value, in MySQL key order.
+            EducationalGuide::where('slug', self::GUIDE)->firstOrFail()
+                ->forceFill(['seo_schema' => $this->mysqlKeyOrder($this->payload()['guides'][self::GUIDE]['columns']['seo_schema']['old_values'][0])])
+                ->saveQuietly();
+        }
 
         return $ids;
     }
@@ -411,6 +427,16 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
         foreach (['app/Support/GuardedFieldWriter.php', 'app/Support/EncyclopediaPostMatch.php'] as $file) {
             $source = (string) file_get_contents(base_path($file));
             $this->assertDoesNotMatchRegularExpression('/emit\(STD(ERR|OUT)/', $source, $file);
+            $this->assertStringContainsString("defined('STDERR') ? STDERR : null", $source, $file);
+            $this->assertStringContainsString("defined('STDOUT') ? STDOUT : null", $source, $file);
+        }
+    }
+
+    public function test_110000_seeder_and_seeder_post_match_stream_writes_are_guarded(): void
+    {
+        foreach (['database/seeders/EncyclopediaRetatrutideOsaLitigationSeeder.php', 'database/seeders/EncyclopediaPostMatch.php'] as $file) {
+            $source = (string) file_get_contents(base_path($file));
+            $this->assertDoesNotMatchRegularExpression('/(fwrite|emit|stream)\(STD(ERR|OUT)/', $source, $file);
             $this->assertStringContainsString("defined('STDERR') ? STDERR : null", $source, $file);
             $this->assertStringContainsString("defined('STDOUT') ? STDOUT : null", $source, $file);
         }

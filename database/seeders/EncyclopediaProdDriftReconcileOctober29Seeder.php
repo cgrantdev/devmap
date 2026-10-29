@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\EducationalGuide;
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
 use App\Support\EncyclopediaPostMatch;
@@ -31,9 +32,20 @@ use RuntimeException;
  * regulatory_subsections, regulatory_important_note, conclusion,
  * description; orforglipron references; bpc-157 references.
  *
- * Not touched: bpc-157 regulatory_subsections (2026_10_29_100000),
- * retatrutide regulatory_subsections (2026_10_29_110000), every other
- * column and post, and legacy unlinked education_posts rows.
+ * 2026_10_29_100000 catch-up: 100000 (#81) ran on production with a
+ * key-order-sensitive compare, so MySQL's key order made it skip bpc-157
+ * faqs and the peptide-legality-fda-ruo-compounding guide's seo_schema.
+ * This seeder writes exactly 100000's target_values[0] to those two
+ * columns, guarded (order-insensitive) on the pre-100000 value, and skips
+ * them when they are already at that target. The guide is matched by
+ * LOWER(TRIM(slug)) and must be exactly one row.
+ *
+ * Not touched: every other 100000 column (bpc-157 regulatory_subsections,
+ * note and key_points, and the other 100000 posts), including semax,
+ * BPC-157-TB-500 and KLOW regulatory_subsections, whose stored value is
+ * unknown (live renders the empty default: no published post); retatrutide
+ * regulatory_subsections (2026_10_29_110000); every other column and
+ * post; legacy unlinked education_posts rows.
  *
  * Each post is resolved with EncyclopediaPostMatch (exactly one category
  * and one linked post). One DB::transaction per slug; saveQuietly.
@@ -52,7 +64,7 @@ class EncyclopediaProdDriftReconcileOctober29Seeder extends Seeder
 
     public const PAYLOAD_PATH = 'seeders/data/encyclopedia-field-updates/2026-10-29c/prod-drift.json';
 
-    public const PAYLOAD_SHA256 = 'c5c52c29c842fcf7989ecb46a7316e98df15521e202d38db2f2d1cd157aa960f';
+    public const PAYLOAD_SHA256 = 'ca4d3990fcb9a9fbaf21f48b5eda057b79ce04350b54970eb1613e7436e4a0f0';
 
     /** @var array<string, list<string>> */
     public const COLUMNS = [
@@ -60,8 +72,15 @@ class EncyclopediaProdDriftReconcileOctober29Seeder extends Seeder
         'retatrutide' => ['references', 'human_use_subsections'],
         'cagrilintide' => ['overview', 'regulatory_subsections', 'regulatory_important_note', 'conclusion', 'description'],
         'orforglipron' => ['references'],
-        'bpc-157' => ['references'],
+        'bpc-157' => ['references', 'faqs'],
     ];
+
+    /** @var array<string, list<string>> educational_guides slug => columns */
+    public const GUIDES = [
+        'peptide-legality-fda-ruo-compounding' => ['seo_schema'],
+    ];
+
+    public const GUIDE_PREFIX = 'guide:';
 
     /** @var array<string, string> "<slug>.<field>" => status */
     public array $results = [];
@@ -94,6 +113,18 @@ class EncyclopediaProdDriftReconcileOctober29Seeder extends Seeder
                 throw new RuntimeException(self::LABEL.': payload columns for '.$slug.' do not match.');
             }
             $this->reconcileSlug($writer, $slug, $columns);
+        }
+
+        $guides = $this->payload()['guides'] ?? null;
+        if (! is_array($guides) || array_keys($guides) !== array_keys(self::GUIDES)) {
+            throw new RuntimeException(self::LABEL.': payload guides do not match the seeder guide list.');
+        }
+        foreach (self::GUIDES as $slug => $fields) {
+            $columns = $guides[$slug]['columns'] ?? null;
+            if (! is_array($columns) || array_keys($columns) !== $fields) {
+                throw new RuntimeException(self::LABEL.': payload columns for guide '.$slug.' do not match.');
+            }
+            $this->reconcileGuide($writer, $slug, $columns);
         }
 
         $this->results = $writer->results;
@@ -145,6 +176,44 @@ class EncyclopediaProdDriftReconcileOctober29Seeder extends Seeder
             }
             if ($categoryChanged) {
                 $category->saveQuietly();
+            }
+        });
+    }
+
+    /**
+     * @param  array<string, array<string, mixed>>  $columns
+     */
+    private function reconcileGuide(GuardedFieldWriter $writer, string $slug, array $columns): void
+    {
+        $key = self::GUIDE_PREFIX.$slug;
+        $rows = EducationalGuide::query()
+            ->whereRaw('LOWER(TRIM(slug)) = ?', [strtolower(trim($slug))])
+            ->orderBy('id')
+            ->get();
+        if ($rows->count() !== 1) {
+            $status = $rows->count() === 0 ? 'missing' : 'collision';
+            foreach (array_keys($columns) as $field) {
+                $writer->skip($key, $field, 'guide lookup '.$status);
+            }
+
+            return;
+        }
+
+        /** @var EducationalGuide $guide */
+        $guide = $rows->first();
+
+        DB::transaction(function () use ($writer, $key, $columns, $guide): void {
+            $this->transactions[] = $key;
+            $changed = false;
+            foreach ($columns as $field => $spec) {
+                if (! array_key_exists('target_value', $spec) || ! is_array($spec['old_values'] ?? null)) {
+                    throw new RuntimeException(self::LABEL.': payload spec for '.$key.'.'.$field.' is incomplete.');
+                }
+                $status = $writer->apply($guide, $key, $field, $spec['target_value'], array_values($spec['old_values']));
+                $changed = $changed || $status === GuardedFieldWriter::UPDATED;
+            }
+            if ($changed) {
+                $guide->saveQuietly();
             }
         });
     }

@@ -4093,6 +4093,202 @@
               ]
             }
           ]
+        },
+        "faqs": {
+          "catch_up": "2026_10_29_100000",
+          "labels": [
+            "pre-100000 value: live 29 Oct 2026 09:51 UTC+7 (order-insensitive equal; MySQL key order answer, question) = main before #81 (2026_10_22_120000 new_value) = 2026_10_29_100000 old_values[0]"
+          ],
+          "old_values": [
+            [
+              {
+                "question": "Has BPC-157 been tested in humans?",
+                "answer": "Only in a few very small studies. A 2026 systematic review (Poolton et al., Acta Orthopaedica Belgica; PMID 42885452) found three human studies with 30 participants in total: a retrospective chart review of knee pain (16 people), a retrospective pilot study in interstitial cystitis (12 people) and a two-person safety pilot. None had a control group. The reviewers judged all three to be of poor methodological quality and rated the overall certainty of evidence as very low. These studies cannot show whether BPC-157 is effective or safe in people."
+              },
+              {
+                "question": "What does the animal research on BPC-157 show?",
+                "answer": "Most BPC-157 research is preclinical, mainly in rats. A 2025 systematic review (Vasireddi et al., HSS Journal; PMID 40756949) included 36 studies, 35 of them preclinical, and reported improved healing outcomes in animal models of muscle, tendon, ligament and bone injury. Many of these animal studies come from the University of Zagreb group led by Predrag Sikiric, which first described BPC-157 in 1993 (McGuire et al., 2025; PMID 40789979). They are developer-affiliated, and readers should weigh them with that in mind. Animal results do not show that the same effects occur in people."
+              },
+              {
+                "question": "Is BPC-157 approved by FDA or allowed in compounding?",
+                "answer": "No. BPC-157 is not an FDA-approved drug, and as of 22 October 2026 it is not on the 503A Bulks List (21 CFR 216.23). FDA's page on bulk drug substances that may present significant safety risks lists BPC-157 in its \"nominated but withdrawn\" table (substances previously in Category 2), not on the current Category 2 list, and the page still describes FDA's safety concerns. On 23 July 2026 a narrow majority of FDA's Pharmacy Compounding Advisory Committee, according to press reports, voted to recommend adding BPC-157 to the 503A Bulks List. The vote is non-binding, and FDA has not posted minutes. A separate HHS/FDA \"Interim Access Policy for Compounding Using Certain Peptides\" (RIN 0910-ZD94) is under OIRA review at the Notice stage. Its text has not been published, and it is not an approval."
+              },
+              {
+                "question": "Is BPC-157 prohibited in sport?",
+                "answer": "Yes. BPC-157 is named as an example in class S0 (Non-approved substances) of the World Anti-Doping Agency's 2026 Prohibited List. Substances in S0 are prohibited at all times, in and out of competition."
+              },
+              {
+                "question": "Does PeptideMap give dosing, route or usage advice for BPC-157?",
+                "answer": "No. PeptideMap is a research-use-only (RUO) comparison and reference site. It does not give dosing, route, timing, cycling, stacking, storage or sourcing guidance, and nothing on this page is medical advice. Products sold as BPC-157 \"research chemicals\" are not FDA-regulated drugs, and their content and purity are not verified."
+              }
+            ]
+          ],
+          "target_value": [
+            {
+              "question": "Has BPC-157 been tested in humans?",
+              "answer": "Only in a few very small studies. A 2026 systematic review (Poolton et al., Acta Orthopaedica Belgica; PMID 42885452) found three human studies with 30 participants in total: a retrospective chart review of knee pain (16 people), a retrospective pilot study in interstitial cystitis (12 people) and a two-person safety pilot. None had a control group. The reviewers judged all three to be of poor methodological quality and rated the overall certainty of evidence as very low. These studies cannot show whether BPC-157 is effective or safe in people."
+            },
+            {
+              "question": "What does the animal research on BPC-157 show?",
+              "answer": "Most BPC-157 research is preclinical, mainly in rats. A 2025 systematic review (Vasireddi et al., HSS Journal; PMID 40756949) included 36 studies, 35 of them preclinical, and reported improved healing outcomes in animal models of muscle, tendon, ligament and bone injury. Many of these animal studies come from the University of Zagreb group led by Predrag Sikiric, which first described BPC-157 in 1993 (McGuire et al., 2025; PMID 40789979). They are developer-affiliated, and readers should weigh them with that in mind. Animal results do not show that the same effects occur in people."
+            },
+            {
+              "question": "Is BPC-157 approved by FDA or allowed in compounding?",
+              "answer": "No. As of 29 October 2026 BPC-157 is not an FDA-approved drug and is not on the 503A Bulks List (21 CFR 216.23). It was in FDA's interim Category 2 from September 2023 until 22 April 2026 and is not in any FDA interim category on the list updated 14 May 2026. On 23 July 2026 FDA's Pharmacy Compounding Advisory Committee considered BPC-157. FDA's briefing document proposed that it not be listed, and the HHS policy's Appendix B states that the committee \"voted in favor of inclusion.\" The vote is non-binding. On 28 October 2026 the HHS Office of the Secretary announced a draft interim enforcement-discretion policy, published for comment (Docket No. HHS-OASH-2026-0496). Under it, HHS does not intend to take action against 503A compounding of BPC-157 acetate by State-licensed pharmacies, Federal facilities or licensed physicians when all of the policy's conditions are met. That policy is not an FDA approval, does not add BPC-157 to the Bulks List, is not binding, and makes no safety or efficacy finding. It covers single-ingredient products only, and nothing in it treats research-use-only products as covered."
+            },
+            {
+              "question": "Is BPC-157 prohibited in sport?",
+              "answer": "Yes. BPC-157 is named as an example in class S0 (Non-approved substances) of the World Anti-Doping Agency's 2026 Prohibited List. Substances in S0 are prohibited at all times, in and out of competition."
+            },
+            {
+              "question": "Does PeptideMap give dosing, route or usage advice for BPC-157?",
+              "answer": "No. PeptideMap is a research-use-only (RUO) comparison and reference site. It does not give dosing, route, timing, cycling, stacking, storage or sourcing guidance, and nothing on this page is medical advice. Products sold as BPC-157 \"research chemicals\" are not FDA-regulated drugs, and their content and purity are not verified."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "guides": {
+    "peptide-legality-fda-ruo-compounding": {
+      "columns": {
+        "seo_schema": {
+          "catch_up": "2026_10_29_100000",
+          "labels": [
+            "pre-100000 value: live 29 Oct 2026 09:51 UTC+7 (stored FAQPage block, order-insensitive equal; MySQL key order @id, @type, @context, mainEntity) = EducationalContentPublisher::sync() output on main before #81 = 2026_10_29_100000 old_values[0]"
+          ],
+          "old_values": [
+            [
+              {
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "@id": "https://peptidemap.com/guides/peptide-legality-fda-ruo-compounding#faq",
+                "mainEntity": [
+                  {
+                    "@type": "Question",
+                    "name": "Are research peptides legal to buy online?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "There is no single yes/no answer for every peptide, seller, claim, and jurisdiction. RUO listings exist; FDA still polices unapproved new drugs marketed for human use. This page does not advise purchases."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Does “removed from Category 2” mean pharmacies can compound it?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "No. Removal from Category 2 is not placement on the 503A Bulks List and is not Category 1 permission."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Did PCAC “approve” BPC-157 or TB-500 in July 2026?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "PCAC recommended inclusion on the 503A Bulks List for several peptides (per contemporaneous reporting). That is not FDA drug approval and not a final bulks-list rule."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Did FDA approve compounded peptides in October 2026?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "No. On 14 October 2026 HHS/FDA sent an “Interim Access Policy for Compounding Using Certain Peptides” to OMB for review. As of 19 October 2026 it is under OMB review, not yet issued, and its text is not public. A policy under review is not FDA drug approval and does not place any peptide on the 503A Bulks List."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Is compounding the same as FDA approval?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "No. Compounding is a limited pharmacy pathway. Approval is a separate product authorization process."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Does WADA ban mean something is illegal for everyone?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "No. WADA governs athletes in anti-doping programs. It is separate from FDA compounding and general consumer law—though the same substance can be constrained in multiple systems at once."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Where should I check status before believing a clinic ad?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions."
+                    }
+                  }
+                ]
+              }
+            ]
+          ],
+          "target_value": [
+            {
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "@id": "https://peptidemap.com/guides/peptide-legality-fda-ruo-compounding#faq",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "Are research peptides legal to buy online?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "There is no single yes/no answer for every peptide, seller, claim, and jurisdiction. RUO listings exist; FDA still polices unapproved new drugs marketed for human use. This page does not advise purchases."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Does “removed from Category 2” mean pharmacies can compound it?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. Removal from Category 2 is not placement on the 503A Bulks List and is not Category 1 permission."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Did PCAC “approve” BPC-157 or TB-500 in July 2026?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. PCAC votes are non-binding recommendations. FDA’s briefing documents proposed that BPC-157 and TB-500 not be included, and the HHS policy’s Appendix B states that the committee voted in favor. A vote is not FDA drug approval and not a final bulks-list rule."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Did FDA approve compounded peptides in October 2026?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. On 28 October 2026 the HHS Office of the Secretary announced a draft interim enforcement-discretion policy published for comment (FR Doc. 2026-22192). It describes when HHS does not intend to take action against certain 503A compounding of six peptides under listed conditions. It is not FDA drug approval, it does not place any peptide on the 503A Bulks List or in Category 1, it is not binding, and it makes no safety or efficacy finding. FDA rulemaking on the Bulks List is still pending."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Is compounding the same as FDA approval?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. Compounding is a limited pharmacy pathway. Approval is a separate product authorization process."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Does WADA ban mean something is illegal for everyone?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. WADA governs athletes in anti-doping programs. It is separate from FDA compounding and general consumer law—though the same substance can be constrained in multiple systems at once."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Where should I check status before believing a clinic ad?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "FDA compounding / bulks / safety-risk pages first; then dated educational trackers; then counsel. On-site Peptidemap posts are context only—cross-check against primary FDA sources when making decisions."
+                  }
+                }
+              ]
+            }
+          ]
         }
       }
     }
@@ -4116,5 +4312,10 @@
         "N Engl J Med. Published online 20 October 2026."
       ]
     ]
+  },
+  "catch_up_100000": {
+    "why": "2026_10_29_100000 (#81) already ran on production with a key-order-sensitive compare. MySQL returned bpc-157 faqs as answer, question and the legality guide seo_schema FAQPage block as @id, @type, @context, mainEntity, so both columns failed its guard and were skipped. 120000 writes exactly 100000's target_values[0] to them, guarded on the pre-100000 value with GuardedFieldWriter::comparable().",
+    "targets": "exactly 2026_10_29_100000 target_values[0], verbatim",
+    "not_caught_up": "semax, BPC-157-TB-500, klow-blend-ghk-cu-bpc-157-tb-500-kpv regulatory_subsections: live renders [] because no published education post is linked to those categories (the controller's default for a missing or unpublished post). 100000's old_values[0] [] was taken from that rendered default, so the stored value (or whether a post exists) is unknown. Left alone."
   }
 }
