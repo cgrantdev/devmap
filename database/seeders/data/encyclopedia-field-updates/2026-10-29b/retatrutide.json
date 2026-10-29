@@ -24,11 +24,11 @@
             "op": "insert_after_title",
             "after_title": "TRIUMPH program map (names + disclosure type)",
             "insert": {
-                "title": "Obstructive sleep apnea trials (NEJM, 21 Oct 2026) — developer-affiliated (Lilly-funded)",
+                "title": "Obstructive sleep apnea trials (NEJM, 20 Oct 2026) — developer-affiliated (Lilly-funded)",
                 "entries": [
                     {
                         "type": "content",
-                        "value": "On 21 October 2026, The New England Journal of Medicine published the TRIUMPH-1-OSA and TRIUMPH-2-OSA results (full title under References) by Grunstein RR, Somers VK, Azarbarzin A, Malhotra A, Sands SA, Lucey BP, Allen SE, Giblin K, Falcon BL, Park SY, Lou J and Krueger K, for the TRIUMPH-1-OSA and TRIUMPH-2-OSA Investigators (DOI 10.1056/NEJMoa2611477; PMID 42904878). Developer-affiliated: the abstract states the work was funded by Eli Lilly, the company developing retatrutide."
+                        "value": "On 20 October 2026, The New England Journal of Medicine published online the TRIUMPH-1-OSA and TRIUMPH-2-OSA results (full title under References) by Grunstein RR, Somers VK, Azarbarzin A, Malhotra A, Sands SA, Lucey BP, Allen SE, Giblin K, Falcon BL, Park SY, Lou J and Krueger K, for the TRIUMPH-1-OSA and TRIUMPH-2-OSA Investigators (DOI 10.1056/NEJMoa2611477; PMID 42904878). Developer-affiliated: the abstract states the work was funded by Eli Lilly, the company developing retatrutide."
                     },
                     {
                         "type": "content",
@@ -332,11 +332,11 @@
                         ]
                     },
                     {
-                        "title": "Obstructive sleep apnea trials (NEJM, 21 Oct 2026) — developer-affiliated (Lilly-funded)",
+                        "title": "Obstructive sleep apnea trials (NEJM, 20 Oct 2026) — developer-affiliated (Lilly-funded)",
                         "entries": [
                             {
                                 "type": "content",
-                                "value": "On 21 October 2026, The New England Journal of Medicine published the TRIUMPH-1-OSA and TRIUMPH-2-OSA results (full title under References) by Grunstein RR, Somers VK, Azarbarzin A, Malhotra A, Sands SA, Lucey BP, Allen SE, Giblin K, Falcon BL, Park SY, Lou J and Krueger K, for the TRIUMPH-1-OSA and TRIUMPH-2-OSA Investigators (DOI 10.1056/NEJMoa2611477; PMID 42904878). Developer-affiliated: the abstract states the work was funded by Eli Lilly, the company developing retatrutide."
+                                "value": "On 20 October 2026, The New England Journal of Medicine published online the TRIUMPH-1-OSA and TRIUMPH-2-OSA results (full title under References) by Grunstein RR, Somers VK, Azarbarzin A, Malhotra A, Sands SA, Lucey BP, Allen SE, Giblin K, Falcon BL, Park SY, Lou J and Krueger K, for the TRIUMPH-1-OSA and TRIUMPH-2-OSA Investigators (DOI 10.1056/NEJMoa2611477; PMID 42904878). Developer-affiliated: the abstract states the work was funded by Eli Lilly, the company developing retatrutide."
                             },
                             {
                                 "type": "content",
@@ -470,11 +470,11 @@
                         ]
                     },
                     {
-                        "title": "Obstructive sleep apnea trials (NEJM, 21 Oct 2026) — developer-affiliated (Lilly-funded)",
+                        "title": "Obstructive sleep apnea trials (NEJM, 20 Oct 2026) — developer-affiliated (Lilly-funded)",
                         "entries": [
                             {
                                 "type": "content",
-                                "value": "On 21 October 2026, The New England Journal of Medicine published the TRIUMPH-1-OSA and TRIUMPH-2-OSA results (full title under References) by Grunstein RR, Somers VK, Azarbarzin A, Malhotra A, Sands SA, Lucey BP, Allen SE, Giblin K, Falcon BL, Park SY, Lou J and Krueger K, for the TRIUMPH-1-OSA and TRIUMPH-2-OSA Investigators (DOI 10.1056/NEJMoa2611477; PMID 42904878). Developer-affiliated: the abstract states the work was funded by Eli Lilly, the company developing retatrutide."
+                                "value": "On 20 October 2026, The New England Journal of Medicine published online the TRIUMPH-1-OSA and TRIUMPH-2-OSA results (full title under References) by Grunstein RR, Somers VK, Azarbarzin A, Malhotra A, Sands SA, Lucey BP, Allen SE, Giblin K, Falcon BL, Park SY, Lou J and Krueger K, for the TRIUMPH-1-OSA and TRIUMPH-2-OSA Investigators (DOI 10.1056/NEJMoa2611477; PMID 42904878). Developer-affiliated: the abstract states the work was funded by Eli Lilly, the company developing retatrutide."
                             },
                             {
                                 "type": "content",
@@ -829,7 +829,7 @@
                 {
                     "title": "Retatrutide Once Weekly for Treatment of Obstructive Sleep Apnea",
                     "authors": "Grunstein RR, Somers VK, Azarbarzin A, et al.; TRIUMPH-1-OSA and TRIUMPH-2-OSA Investigators",
-                    "citation": "N Engl J Med. Published 21 October 2026. DOI 10.1056/NEJMoa2611477. PMID 42904878. ClinicalTrials.gov NCT05929066, NCT05929079.",
+                    "citation": "N Engl J Med. Published online 20 October 2026. DOI 10.1056/NEJMoa2611477. PMID 42904878. ClinicalTrials.gov NCT05929066, NCT05929079.",
                     "description": "Developer-affiliated: funded by Eli Lilly. Primary end point: change in AHI at 80 weeks (hybrid-treatment estimand); ITT results also reported.",
                     "links": [
                         {
@@ -1388,7 +1388,7 @@
                     {
                         "title": "Retatrutide Once Weekly for Treatment of Obstructive Sleep Apnea",
                         "authors": "Grunstein RR, Somers VK, Azarbarzin A, et al.; TRIUMPH-1-OSA and TRIUMPH-2-OSA Investigators",
-                        "citation": "N Engl J Med. Published 21 October 2026. DOI 10.1056/NEJMoa2611477. PMID 42904878. ClinicalTrials.gov NCT05929066, NCT05929079.",
+                        "citation": "N Engl J Med. Published online 20 October 2026. DOI 10.1056/NEJMoa2611477. PMID 42904878. ClinicalTrials.gov NCT05929066, NCT05929079.",
                         "description": "Developer-affiliated: funded by Eli Lilly. Primary end point: change in AHI at 80 weeks (hybrid-treatment estimand); ITT results also reported.",
                         "links": [
                             {
@@ -1642,7 +1642,7 @@
                     {
                         "title": "Retatrutide Once Weekly for Treatment of Obstructive Sleep Apnea",
                         "authors": "Grunstein RR, Somers VK, Azarbarzin A, et al.; TRIUMPH-1-OSA and TRIUMPH-2-OSA Investigators",
-                        "citation": "N Engl J Med. Published 21 October 2026. DOI 10.1056/NEJMoa2611477. PMID 42904878. ClinicalTrials.gov NCT05929066, NCT05929079.",
+                        "citation": "N Engl J Med. Published online 20 October 2026. DOI 10.1056/NEJMoa2611477. PMID 42904878. ClinicalTrials.gov NCT05929066, NCT05929079.",
                         "description": "Developer-affiliated: funded by Eli Lilly. Primary end point: change in AHI at 80 weeks (hybrid-treatment estimand); ITT results also reported.",
                         "links": [
                             {

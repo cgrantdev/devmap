@@ -23,11 +23,11 @@ class RetatrutideOsaLitigationUpdateTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const PAYLOAD_SHA256 = 'b530f35b741be684bd657bcc3568324a25e01709d7108b4c65e1d023a247362d';
+    private const PAYLOAD_SHA256 = 'd5d05de947fa83a70332bb8087b3b12f949a3b38ac5072cdaa72b9af8809a742';
 
     private const COLUMNS = ['human_use_subsections', 'regulatory_subsections', 'references'];
 
-    private const OSA_TITLE = 'Obstructive sleep apnea trials (NEJM, 21 Oct 2026) — developer-affiliated (Lilly-funded)';
+    private const OSA_TITLE = 'Obstructive sleep apnea trials (NEJM, 20 Oct 2026) — developer-affiliated (Lilly-funded)';
 
     private const LAW_TITLE = 'Lilly lawsuits against retatrutide sellers (2026) — separate from the classification case';
 

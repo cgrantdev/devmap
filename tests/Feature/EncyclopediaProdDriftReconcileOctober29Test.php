@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
 use App\Support\GuardedFieldWriter;
+use App\Support\RetatrutideTirzepatideCompareCopy;
 use Database\Seeders\EncyclopediaBpcCleanupAddendumSeeder;
 use Database\Seeders\EncyclopediaFaqAuditBatch1Seeder;
 use Database\Seeders\EncyclopediaFieldReapplyOctober22Seeder;
@@ -23,7 +24,7 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
 {
     use RefreshDatabase;
 
-    private const SHA = 'ca00711567409031d36b8aa32b6ffb21a0a20ad82926d869a4737586f4581153';
+    private const SHA = 'c5c52c29c842fcf7989ecb46a7316e98df15521e202d38db2f2d1cd157aa960f';
 
     private const M = '2026_10_29_120000';
 
@@ -54,7 +55,7 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
             foreach ($post['columns'] as $field => $spec) {
                 $this->assertStringContainsString('live 29 Oct 2026', $spec['labels'][0], $slug.'.'.$field);
                 foreach ($spec['old_values'] as $old) {
-                    $this->assertNotEquals(GuardedFieldWriter::normalize($spec['target_value']), GuardedFieldWriter::normalize($old));
+                    $this->assertNotEquals(GuardedFieldWriter::comparable($spec['target_value']), GuardedFieldWriter::comparable($old));
                 }
             }
         }
@@ -99,6 +100,104 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
         $this->assertEquals($osa['human_use_subsections']['target_values'][1], $reta->human_use_subsections);
         $this->assertEquals($osa['regulatory_subsections']['target_values'][0], $reta->regulatory_subsections);
         $this->assertSame([], $this->warnings());
+    }
+
+    public function test_prod_110000_merged_text_is_corrected_to_20_october(): void
+    {
+        $prod = json_decode((string) file_get_contents(base_path('tests/Fixtures/prod-drift-2026-10-29/live-after-110000.json')), true)['posts']['retatrutide'];
+        $columns = $this->payload()['posts']['retatrutide']['columns'];
+        $variants = ['prod 29 Oct 09:35' => $prod];
+        foreach (['references', 'human_use_subsections'] as $field) {
+            $i = $this->labelIndex($field, 'main chain final before the TRIUMPH-OSA date fix');
+            $variants['pre-fix main chain'][$field] = $columns[$field]['old_values'][$i];
+        }
+
+        $ids = $this->seedFixture('live.json');
+        foreach ($variants as $name => $values) {
+            $reta = EducationPost::findOrFail($ids['retatrutide']);
+            $this->assertNotSame([], $this->osaDateHits($values['references']), $name);
+            $this->assertNotSame([], $this->osaDateHits($values['human_use_subsections']), $name);
+            $reta->references = $values['references'];
+            $reta->human_use_subsections = $values['human_use_subsections'];
+            $reta->saveQuietly();
+            $this->logged = [];
+
+            $seeder = new EncyclopediaProdDriftReconcileOctober29Seeder;
+            $seeder->run();
+            $reta->refresh();
+
+            foreach (['references', 'human_use_subsections'] as $field) {
+                $this->assertSame(GuardedFieldWriter::UPDATED, $seeder->results['retatrutide.'.$field], $name.' '.$field);
+                $this->assertTrue($this->hasLog('info', self::M.' retatrutide.'.$field.': updated'), $name.' '.$field);
+                $this->assertEquals($this->target('retatrutide', $field), $reta->{$field}, $name.' '.$field);
+                $this->assertSame([], $this->osaDateHits($reta->{$field}), $name.' '.$field);
+            }
+            $this->assertSame([], $this->warnings(), $name);
+
+            $subsection = collect($reta->human_use_subsections)->firstWhere('title', 'Obstructive sleep apnea trials (NEJM, 20 Oct 2026) — developer-affiliated (Lilly-funded)');
+            $this->assertNotNull($subsection, $name);
+            $this->assertStringStartsWith('On 20 October 2026, The New England Journal of Medicine published online the TRIUMPH-1-OSA and TRIUMPH-2-OSA results', $subsection['entries'][0]['value']);
+            $reference = collect($reta->references)->first(fn ($r) => str_contains((string) ($r['citation'] ?? ''), '10.1056/NEJMoa2611477'));
+            $this->assertSame('N Engl J Med. Published online 20 October 2026. DOI 10.1056/NEJMoa2611477. PMID 42904878. ClinicalTrials.gov NCT05929066, NCT05929079.', $reference['citation']);
+        }
+    }
+
+    public function test_mysql_json_key_order_is_not_a_guard_mismatch(): void
+    {
+        $ids = $this->seedFixture('live.json');
+        (new EncyclopediaProdDriftReconcileOctober29Seeder)->run();
+
+        // Production's MySQL JSON columns return object keys shortest-first
+        // (links, title, authors, citation, description), not payload order.
+        foreach (EncyclopediaProdDriftReconcileOctober29Seeder::COLUMNS as $slug => $fields) {
+            $post = EducationPost::findOrFail($ids[$slug]);
+            foreach ($fields as $field) {
+                if (is_array($post->{$field})) {
+                    $post->{$field} = $this->mysqlKeyOrder($post->{$field});
+                }
+            }
+            $post->saveQuietly();
+        }
+        $reordered = EducationPost::findOrFail($ids['retatrutide'])->references;
+        $targetRefs = $this->target('retatrutide', 'references');
+        $this->assertNotSame(array_keys(end($targetRefs)), array_keys(end($reordered)));
+        $this->logged = [];
+
+        $seeder = new EncyclopediaProdDriftReconcileOctober29Seeder;
+        $seeder->run();
+
+        $this->assertCount(12, $seeder->results);
+        foreach ($seeder->results as $key => $status) {
+            $this->assertSame(GuardedFieldWriter::ALREADY, $status, $key);
+        }
+        $this->assertSame([], $this->warnings());
+        $this->assertSame($reordered, EducationPost::findOrFail($ids['retatrutide'])->references);
+    }
+
+    public function test_date_fix_changes_only_the_triumph_osa_dates(): void
+    {
+        $prod = json_decode((string) file_get_contents(base_path('tests/Fixtures/prod-drift-2026-10-29/live-after-110000.json')), true)['posts']['retatrutide'];
+        $osa = json_decode((string) file_get_contents(database_path(EncyclopediaRetatrutideOsaLitigationSeeder::PAYLOAD_PATH)), true)['columns'];
+        $swap = [
+            'Obstructive sleep apnea trials (NEJM, 21 Oct 2026)' => 'Obstructive sleep apnea trials (NEJM, 20 Oct 2026)',
+            'On 21 October 2026, The New England Journal of Medicine published the' => 'On 20 October 2026, The New England Journal of Medicine published online the',
+            'N Engl J Med. Published 21 October 2026.' => 'N Engl J Med. Published online 20 October 2026.',
+        ];
+        foreach (['references', 'human_use_subsections'] as $field) {
+            $fixed = json_decode(strtr(json_encode($prod[$field], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $swap), true);
+            // 110000 on a fresh DB (its target_values[0]) == prod's merged text with only the three date strings changed.
+            $this->assertEquals($fixed, GuardedFieldWriter::normalize($osa[$field]['target_values'][0]), $field);
+            $this->assertEquals($osa[$field]['target_values'][1], $this->target('retatrutide', $field), $field);
+            $this->assertSame([], $this->osaDateHits($osa[$field]['target_values'][0]), $field);
+            $this->assertSame([], $this->osaDateHits($osa[$field]['target_values'][1]), $field);
+        }
+        $this->assertSame([], $this->osaDateHits($osa['human_use_subsections']['insert']));
+        $this->assertSame([], $this->osaDateHits($osa['references']['append']));
+
+        $copy = (string) file_get_contents(app_path('Support/RetatrutideTirzepatideCompareCopy.php'));
+        $this->assertDoesNotMatchRegularExpression('/\b21 Oct(ober)?\b|October 21/', $copy);
+        $this->assertStringContainsString('(published online'."\n".' * 20 October 2026) and the 20 December 2024 FDA announcement.', $copy);
+        $this->assertStringContainsString('Published online October 20, 2026.', json_encode(RetatrutideTirzepatideCompareCopy::evidence(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '');
     }
 
     public function test_second_run_is_a_no_op(): void
@@ -305,6 +404,50 @@ class EncyclopediaProdDriftReconcileOctober29Test extends TestCase
         $fixture = json_decode((string) file_get_contents(base_path('tests/Fixtures/prod-drift-2026-10-29/live.json')), true);
 
         return $fixture['posts'][$slug][$field];
+    }
+
+    private function labelIndex(string $field, string $needle): int
+    {
+        foreach ($this->payload()['posts']['retatrutide']['columns'][$field]['labels'] as $i => $label) {
+            if (str_contains($label, $needle)) {
+                return $i;
+            }
+        }
+        $this->fail('label not found: '.$needle);
+    }
+
+    /**
+     * 21 October dates attached to TRIUMPH-OSA (NEJM 10.1056/NEJMoa2611477):
+     * the OSA human-use subsection and the paper's reference entry.
+     *
+     * @return list<string>
+     */
+    private function osaDateHits(mixed $value): array
+    {
+        $items = is_array($value) && array_is_list($value) ? $value : [$value];
+        $hits = [];
+        foreach ($items as $item) {
+            $blob = json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '';
+            $isOsa = str_contains($blob, 'Obstructive sleep apnea trials') || str_contains($blob, 'NEJMoa2611477');
+            if ($isOsa && preg_match_all('/\b21 Oct(?:ober)?\b|October 21/', $blob, $m)) {
+                array_push($hits, ...$m[0]);
+            }
+        }
+
+        return $hits;
+    }
+
+    private function mysqlKeyOrder(mixed $value): mixed
+    {
+        if (! is_array($value)) {
+            return $value;
+        }
+        $value = array_map(fn ($v) => $this->mysqlKeyOrder($v), $value);
+        if (! array_is_list($value)) {
+            uksort($value, fn ($a, $b) => [strlen((string) $a), (string) $a] <=> [strlen((string) $b), (string) $b]);
+        }
+
+        return $value;
     }
 
     private function hasLog(string $level, string $message): bool

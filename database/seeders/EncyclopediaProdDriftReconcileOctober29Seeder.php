@@ -18,6 +18,14 @@ use RuntimeException;
  * main's final value (the result of main's own migration chain through
  * 2026_10_29_110000) to each of those columns. It adds no new copy.
  *
+ * One correction on top of main (Content QA, 29 Oct 2026): TRIUMPH-OSA
+ * (NEJM, DOI 10.1056/NEJMoa2611477, PMID 42904878) was published online
+ * 20 October 2026, not 21. The retatrutide human_use_subsections and
+ * references targets carry 20 Oct in the OSA subsection title, its first
+ * entry and the reference citation. Their guards accept 110000's merged
+ * 21 Oct output, which is live on production. The 110000 payload carries
+ * the same fix, so a fresh database matches.
+ *
  * Columns: ghk-cu regulatory_subsections, references, human_use_subsections;
  * retatrutide references, human_use_subsections; cagrilintide overview,
  * regulatory_subsections, regulatory_important_note, conclusion,
@@ -44,7 +52,7 @@ class EncyclopediaProdDriftReconcileOctober29Seeder extends Seeder
 
     public const PAYLOAD_PATH = 'seeders/data/encyclopedia-field-updates/2026-10-29c/prod-drift.json';
 
-    public const PAYLOAD_SHA256 = 'ca00711567409031d36b8aa32b6ffb21a0a20ad82926d869a4737586f4581153';
+    public const PAYLOAD_SHA256 = 'c5c52c29c842fcf7989ecb46a7316e98df15521e202d38db2f2d1cd157aa960f';
 
     /** @var array<string, list<string>> */
     public const COLUMNS = [

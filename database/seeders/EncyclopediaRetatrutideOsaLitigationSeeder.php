@@ -13,7 +13,7 @@ use RuntimeException;
  * Retatrutide OSA trials + 2026 seller lawsuits (29 October 2026).
  *
  * Adds one human-use subsection (TRIUMPH-1-OSA / TRIUMPH-2-OSA, NEJM
- * 21 Oct 2026), one regulatory subsection (Lilly's 2026 suits against
+ * 20 Oct 2026), one regulatory subsection (Lilly's 2026 suits against
  * sellers, inserted after the classification subsection) and five
  * references. Nothing existing is edited or removed.
  *
@@ -32,7 +32,7 @@ class EncyclopediaRetatrutideOsaLitigationSeeder extends Seeder
 
     public const PAYLOAD_PATH = 'seeders/data/encyclopedia-field-updates/2026-10-29b/retatrutide.json';
 
-    public const PAYLOAD_SHA256 = 'b530f35b741be684bd657bcc3568324a25e01709d7108b4c65e1d023a247362d';
+    public const PAYLOAD_SHA256 = 'd5d05de947fa83a70332bb8087b3b12f949a3b38ac5072cdaa72b9af8809a742';
 
     public const UPDATED = 'updated';
 

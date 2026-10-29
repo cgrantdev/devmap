@@ -22,10 +22,16 @@ use Illuminate\Support\Facades\Log;
  * 200-character excerpt of the stored value in the context), the console
  * command (error) and STDERR.
  *
- * Comparison uses normalize(): CRLF/CR become LF, U+00A0 becomes a space,
- * each line is right-trimmed and the whole string trimmed, recursively
- * through arrays (keys and order kept). The value written is the target
- * exactly as given, never the normalized form.
+ * Comparison uses comparable(): normalize() (CRLF/CR become LF, U+00A0
+ * becomes a space, each line is right-trimmed and the whole string
+ * trimmed, recursively through arrays), then object keys are sorted at
+ * every level. List order still counts; object key order does not. This
+ * matters because production's MySQL JSON columns hand keys back in their
+ * own order (shorter keys first: links, title, authors, citation, ...),
+ * not the payload's, so a strict key-ordered compare turns a matching
+ * value into a false mismatch, and a re-run never sees "already current".
+ * The value written is the target exactly as given, never the
+ * normalized form.
  *
  * How a new content migration should use it:
  *
@@ -80,14 +86,14 @@ final class GuardedFieldWriter
     ): string {
         $column ??= $field;
         $current = $model->getAttribute($column);
-        $normalizedCurrent = self::normalize($current);
+        $normalizedCurrent = self::comparable($current);
 
-        if ($normalizedCurrent === self::normalize($target)) {
+        if ($normalizedCurrent === self::comparable($target)) {
             return $this->record($slug, $field, self::ALREADY);
         }
 
         foreach ($oldValues as $old) {
-            if ($normalizedCurrent === self::normalize($old)) {
+            if ($normalizedCurrent === self::comparable($old)) {
                 $model->setAttribute($column, $target);
 
                 return $this->record($slug, $field, self::UPDATED);
@@ -111,6 +117,26 @@ final class GuardedFieldWriter
         self::emit(STDERR, $line);
 
         return $reason;
+    }
+
+    /**
+     * normalize(), plus object (string-keyed) arrays sorted by key at every
+     * level, so key order never decides a guard. Lists keep their order.
+     */
+    public static function comparable(mixed $value): mixed
+    {
+        $value = self::normalize($value);
+        if (! is_array($value)) {
+            return $value;
+        }
+        foreach ($value as $key => $item) {
+            $value[$key] = self::comparable($item);
+        }
+        if (! array_is_list($value)) {
+            ksort($value, SORT_STRING);
+        }
+
+        return $value;
     }
 
     public static function normalize(mixed $value): mixed

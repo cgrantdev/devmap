@@ -11,8 +11,8 @@ namespace App\Support;
  * report, without those figures. Its two Q&As are this page's FAQ;
  * the visible questions and the FAQPage JSON-LD are this same list.
  * Checked 2026-10-19 against PubMed (PMID 42810372) and ClinicalTrials.gov.
- * OSA sources checked against the 21 October 2026 NEJM paper and the
- * 20 December 2024 FDA announcement.
+ * OSA sources checked against the NEJM paper (published online
+ * 20 October 2026) and the 20 December 2024 FDA announcement.
  */
 class RetatrutideTirzepatideCompareCopy
 {
