@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\EducationPost;
 use App\Support\EncyclopediaPostMatch;
+use App\Support\GuardedFieldWriter;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,12 +14,14 @@ use RuntimeException;
  * Retatrutide OSA trials + 2026 seller lawsuits (29 October 2026).
  *
  * Adds one human-use subsection (TRIUMPH-1-OSA / TRIUMPH-2-OSA, NEJM
- * 21 Oct 2026), one regulatory subsection (Lilly's 2026 suits against
+ * 20 Oct 2026), one regulatory subsection (Lilly's 2026 suits against
  * sellers, inserted after the classification subsection) and five
  * references. Nothing existing is edited or removed.
  *
- * One post, one transaction. Comparison uses normalize() (same rules as
- * the 160000 seeder). A column is written only when its current value
+ * One post, one transaction. Comparison uses
+ * GuardedFieldWriter::comparable(): the 160000 seeder's normalize() rules,
+ * with JSON object key order ignored, because production MySQL returns
+ * keys shortest-first. A column is written only when its current value
  * equals one of the payload's old_values; the result must equal the paired
  * target_values entry or the transaction throws and rolls back. A column
  * already at a target is skipped. Anything else logs a WARNING and that
@@ -32,7 +35,7 @@ class EncyclopediaRetatrutideOsaLitigationSeeder extends Seeder
 
     public const PAYLOAD_PATH = 'seeders/data/encyclopedia-field-updates/2026-10-29b/retatrutide.json';
 
-    public const PAYLOAD_SHA256 = 'b530f35b741be684bd657bcc3568324a25e01709d7108b4c65e1d023a247362d';
+    public const PAYLOAD_SHA256 = 'd5d05de947fa83a70332bb8087b3b12f949a3b38ac5072cdaa72b9af8809a742';
 
     public const UPDATED = 'updated';
 
@@ -133,7 +136,7 @@ class EncyclopediaRetatrutideOsaLitigationSeeder extends Seeder
         $current = $post->{$column};
 
         foreach ($this->list($spec, 'target_values') as $target) {
-            if (self::normalize($current) === self::normalize($target)) {
+            if (GuardedFieldWriter::comparable($current) === GuardedFieldWriter::comparable($target)) {
                 $this->emit(self::SLUG.'.'.$column.': '.self::ALREADY);
 
                 return self::ALREADY;
@@ -142,7 +145,7 @@ class EncyclopediaRetatrutideOsaLitigationSeeder extends Seeder
 
         $matched = null;
         foreach ($this->list($spec, 'old_values') as $index => $old) {
-            if (self::normalize($current) === self::normalize($old)) {
+            if (GuardedFieldWriter::comparable($current) === GuardedFieldWriter::comparable($old)) {
                 $matched = $index;
                 break;
             }
@@ -162,7 +165,7 @@ class EncyclopediaRetatrutideOsaLitigationSeeder extends Seeder
         }
 
         $expected = $this->list($spec, 'target_values')[$matched] ?? null;
-        if ($expected === null || self::normalize($result) !== self::normalize($expected)) {
+        if ($expected === null || GuardedFieldWriter::comparable($result) !== GuardedFieldWriter::comparable($expected)) {
             throw new RuntimeException($column.' post-edit assertion failed');
         }
 
@@ -284,14 +287,14 @@ class EncyclopediaRetatrutideOsaLitigationSeeder extends Seeder
         if ($warning) {
             Log::warning($line);
             $this->command?->error($line);
-            fwrite(STDERR, $line.PHP_EOL);
+            self::stream('stderr', $line);
 
             return;
         }
 
         Log::info($line);
         $this->command?->info($line);
-        fwrite(STDOUT, $line.PHP_EOL);
+        self::stream('stdout', $line);
     }
 
     /**
@@ -310,5 +313,20 @@ class EncyclopediaRetatrutideOsaLitigationSeeder extends Seeder
         }
 
         return $decoded;
+    }
+
+    /**
+     * STDOUT/STDERR are undefined outside the CLI (e.g. Artisan::call from
+     * the /admin dev console), so only write when the constant exists.
+     */
+    private static function stream(string $stream, string $line): void
+    {
+        $handle = match ($stream) {
+            'stderr' => defined('STDERR') ? STDERR : null,
+            default => defined('STDOUT') ? STDOUT : null,
+        };
+        if (is_resource($handle)) {
+            @fwrite($handle, $line.PHP_EOL);
+        }
     }
 }

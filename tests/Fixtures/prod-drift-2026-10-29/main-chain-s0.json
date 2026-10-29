@@ -1,0 +1,1317 @@
+{
+ "note": "Pre-2026_10_22 state for every column the 2026_10_22 migrations target (each column's earliest guard value). Running main's chain from here reproduces origin/main's final values.",
+ "categories": {
+  "bpc-157": {
+   "name": "BPC-157",
+   "slug": "BPC-157"
+  },
+  "ghk-cu": {
+   "name": "GHK-Cu",
+   "slug": "GHK-Cu"
+  },
+  "tb-500": {
+   "name": "TB-500",
+   "slug": "TB-500"
+  },
+  "retatrutide": {
+   "name": "Retatrutide",
+   "slug": "retatrutide"
+  },
+  "cjc-1295": {
+   "name": "CJC-1295",
+   "slug": "CJC-1295"
+  },
+  "cagrilintide": {
+   "name": "Cagrilintide",
+   "slug": "Cagrilintide"
+  },
+  "orforglipron": {
+   "name": "Orforglipron",
+   "slug": "orforglipron"
+  },
+  "ipamorelin": {
+   "name": "Ipamorelin",
+   "slug": "Ipamorelin"
+  },
+  "aod-9604": {
+   "name": "AOD-9604",
+   "slug": "AOD-9604"
+  },
+  "kisspeptin": {
+   "name": "Kisspeptin",
+   "slug": "Kisspeptin"
+  },
+  "bremelanotide": {
+   "name": "Bremelanotide",
+   "slug": "Bremelanotide"
+  },
+  "dsip": {
+   "name": "DSIP",
+   "slug": "dsip"
+  },
+  "igf-1-lr3": {
+   "name": "IGF-1 LR3",
+   "slug": "igf-1-lr3"
+  },
+  "mots-c": {
+   "name": "MOTS-c",
+   "slug": "mots-c"
+  },
+  "nad": {
+   "name": "NAD+",
+   "slug": "nad"
+  },
+  "selank": {
+   "name": "Selank",
+   "slug": "selank"
+  },
+  "semaglutide": {
+   "name": "Semaglutide",
+   "slug": "semaglutide"
+  },
+  "sermorelin": {
+   "name": "Sermorelin",
+   "slug": "Sermorelin"
+  },
+  "tirzepatide": {
+   "name": "Tirzepatide",
+   "slug": "tirzepatide"
+  }
+ },
+ "posts": {
+  "bpc-157": {
+   "regulatory_subsections": [
+    {
+     "title": "Current Approval Status",
+     "entries": [
+      {
+       "type": "content",
+       "value": "As of now, no country has approved BPC-157 as a prescription drug. It's not available through legitimate pharmacies for medical use. The peptide is officially designated for research use only."
+      }
+     ]
+    },
+    {
+     "title": "United States",
+     "entries": [
+      {
+       "type": "content",
+       "value": "The U.S. Food and Drug Administration (FDA) has taken action against companies marketing BPC-157 as a dietary supplement, stating it does not meet the definition of a legal supplement ingredient. There is also no legal basis for compounding pharmacies to include BPC-157 in medications, though regulatory agencies have found some clinics doing so illegally.\n\nAny product being sold is unregulated. Many websites sell BPC-157 as a \"research chemical\" with disclaimers that it's not for human use. This grey market means quality control is questionable – products might not contain the stated dose or could have impurities."
+      }
+     ]
+    },
+    {
+     "title": "World Anti-Doping Agency (WADA)",
+     "entries": [
+      {
+       "type": "content",
+       "value": "WADA has banned BPC-157 for athletes under the class of \"S0: Non-approved substances.\" This means athletes can face sanctions if caught using it in sport. The ban signals that BPC-157 is considered experimental and not recognized as a legitimate medication."
+      }
+     ]
+    },
+    {
+     "title": "Animal Safety Data",
+     "entries": [
+      {
+       "type": "content",
+       "value": "One attractive feature of BPC-157 in research is its apparently favorable safety profile in animals. Toxicology studies have found no lethal dose even at extremely high amounts:"
+      },
+      {
+       "type": "item",
+       "value": "In rats, a single injection of 20 mg per kilogram (a massive dose for a peptide) caused no deaths or obvious toxic effects"
+      },
+      {
+       "type": "item",
+       "value": "In dogs, daily injections for a month at doses up to 1 mg/kg showed no significant adverse effects compared to control animals"
+      },
+      {
+       "type": "item",
+       "value": "Studies reported no changes in body weight, behavior, or organ health attributable to BPC-157"
+      }
+     ]
+    },
+    {
+     "title": "Theoretical Concerns",
+     "entries": [
+      {
+       "type": "content",
+       "value": "The most prominent theoretical concern is BPC-157's ability to promote growth factors and blood vessel formation. While beneficial for healing injuries, this raises a question: could BPC-157 unintentionally help existing cancer cells grow or spread? Cancerous tumors often exploit the same pathways (like FAK/paxillin and VEGF) to invade tissues and nourish themselves with blood supply.\n\nThis idea is currently theoretical – no study has shown BPC-157 causes cancer in animals or humans. In fact, one lab test showed BPC-157 inhibited growth of a particular cancer cell line in culture. Nonetheless, experts urge caution until more is known about long-term effects."
+      }
+     ]
+    }
+   ],
+   "regulatory_important_note": "\"Absence of evidence is not evidence of absence\" when it comes to safety. Because BPC-157 has not been extensively studied in people, there could be side effects that haven't been observed in small samples. Minor side effects like headaches, dizziness, or injection site reactions might not show up in tiny studies but could in larger populations.",
+   "key_points": [
+    "BPC-157 is a synthetic pentadecapeptide (15 amino acids) originally discovered in human gastric juice, with remarkable stability in harsh environments like stomach acid.",
+    "Preclinical research demonstrates significant healing potential for tendons, ligaments, muscles, bones, and gastrointestinal tissues through multiple biological pathways.",
+    "The peptide operates through pleiotropic mechanisms, increasing pro-healing factors (VEGF, nitric oxide) while decreasing inflammatory markers (COX-2, IL-6, TNF-α).",
+    "Human clinical evidence remains limited, with only small pilot studies conducted; BPC-157 is currently designated for research use only and is not approved by regulatory agencies.",
+    "The World Anti-Doping Agency has banned BPC-157 as a non-approved substance, and the FDA does not recognize it as a legal dietary supplement or drug ingredient."
+   ],
+   "faqs": [
+    {
+     "question": "How long does it take to see results from BPC-157?",
+     "answer": "Most users report noticeable improvements in pain and mobility within 1-2 weeks. Full healing benefits may take 4-6 weeks depending on the severity of the injury."
+    },
+    {
+     "question": "Should I inject BPC-157 near the injury site?",
+     "answer": "While systemic (anywhere) injection works, many users prefer injecting near the injury site for potentially faster local effects. Research suggests both methods are effective."
+    },
+    {
+     "question": "Can I take BPC-157 orally?",
+     "answer": "Yes, but oral bioavailability is significantly lower than injection. For gut-related issues, oral administration may be beneficial. For musculoskeletal issues, injection is preferred."
+    }
+   ],
+   "references": [
+    {
+     "links": [],
+     "title": "Journal of Applied Physiology (2011)",
+     "authors": "Chang et al.",
+     "citation": "Journal of Applied Physiology, 2011",
+     "description": "Study showing BPC-157 enhanced tendon healing in animal models."
+    },
+    {
+     "links": [
+      {
+       "url": "https://www.mdpi.com/1424-8247/18/2/185",
+       "label": null
+      },
+      {
+       "url": "PubMed: 40005999",
+       "label": null
+      }
+     ],
+     "title": "Pharmaceuticals (2025)",
+     "authors": "Jóźwiak et al.",
+     "citation": null,
+     "description": "Multifunctionality and Possible Medical Application of the BPC 157 Peptide—Literature and Patent Review."
+    },
+    {
+     "links": [
+      {
+       "url": "PMC Article: PMC11053547",
+       "label": null
+      }
+     ],
+     "title": "Neural Regeneration Research (2022)",
+     "authors": "Sikiric et al.",
+     "citation": null,
+     "description": "The Stable Gastric Pentadecapeptide BPC 157 Pleiotropic Beneficial Activity and Its Possible Relations with Neurotransmitter Activity."
+    },
+    {
+     "links": [],
+     "title": "Alternative Therapies in Health and Medicine (2025)",
+     "authors": "Lee et al.",
+     "citation": null,
+     "description": "Safety of Intravenous Infusion of BPC157 in Humans: A Pilot Study. Two-person pilot study showing IV BPC-157 caused no adverse effects in short-term administration."
+    },
+    {
+     "links": [
+      {
+       "url": "PMC Article: PMC12313605",
+       "label": null
+      }
+     ],
+     "title": "Emerging Use of BPC-157 in Orthopaedic Sports Medicine (2023)",
+     "authors": "Trebinjac et al.",
+     "citation": null,
+     "description": "Systematic review detailing mechanisms (VEGF, FAK, etc.) and healing outcomes in animal studies."
+    },
+    {
+     "links": [
+      {
+       "url": "https://www.usada.org/spirit-of-sport/bpc-157-peptide-prohibited/",
+       "label": null
+      }
+     ],
+     "title": "USADA - U.S. Anti-Doping Agency (2020)",
+     "authors": null,
+     "citation": null,
+     "description": "BPC-157: Experimental Peptide Creates Risk for Athletes. Official announcement that BPC-157 is a prohibited, unapproved substance, not legal as a supplement."
+    },
+    {
+     "links": [
+      {
+       "url": "https://www.orthoandwellness.com/blog/bpc-157-update-and-deep-dive-miracle-healing-peptide-or-hidden-danger",
+       "label": null
+      }
+     ],
+     "title": "Ortho & Wellness (2023)",
+     "authors": null,
+     "citation": null,
+     "description": "BPC-157: Miracle Healing Peptide or Hidden Danger? Article discussing theoretical concerns about pro-angiogenic pathways and potential risks."
+    },
+    {
+     "links": [
+      {
+       "url": "https://en.wikipedia.org/wiki/BPC-157",
+       "label": null
+      }
+     ],
+     "title": "Wikipedia - BPC-157 Entry",
+     "authors": null,
+     "citation": null,
+     "description": "Comprehensive summary of peptide's definition, research use, and WADA ban status."
+    }
+   ],
+   "human_use_subsections": [
+    {
+     "title": "Pilot Safety Studies",
+     "entries": [
+      {
+       "type": "content",
+       "value": "To date, only minimal human testing has been published. A recent pilot study in 2025 administered BPC-157 intravenously to two healthy adult volunteers to assess safety. The participants received 10 mg on the first day and 20 mg on the second day by slow infusion. The results were encouraging in terms of safety: no adverse effects were observed, and detailed blood tests showed no harmful changes in liver, kidney, heart, or metabolic function after the infusions.\n\nWhile this finding supports the idea that BPC-157 may be safe in the short term, the sample size was only two people – far too small to draw broad conclusions. More rigorous safety trials with larger participant groups are needed to confirm safety in humans."
+      }
+     ]
+    },
+    {
+     "title": "Anecdotal Clinical Use",
+     "entries": [
+      {
+       "type": "content",
+       "value": "In the absence of official trials, some healthcare practitioners (particularly in sports medicine or integrative medicine) have experimented with BPC-157 as an off-label therapy. For example:"
+      },
+      {
+       "type": "item",
+       "value": "A physician-authored report described 12 patients with knee injuries or osteoarthritis who received BPC-157 injections into the knee joint, with 11 of 12 reporting improvements. However, this was not a controlled study with no placebo group, and outcomes were based on patient self-reports."
+      },
+      {
+       "type": "item",
+       "value": "A small pilot trial at a private clinic treated women suffering from chronic bladder pain by injecting BPC-157 into the bladder wall, noting symptom relief and no immediate side effects. This too lacked a control group and was an open-label observation."
+      },
+      {
+       "type": "content",
+       "value": "Such reports must be viewed cautiously, as they are not the gold standard evidence required for medical approval. They do, however, suggest interest in exploring BPC-157's potential despite the unknowns."
+      }
+     ]
+    },
+    {
+     "title": "Unpublished Clinical Trial",
+     "entries": [
+      {
+       "type": "content",
+       "value": "A formal Phase I clinical trial (code-named PCO-02) was conducted around 2015 on 42 healthy volunteers to evaluate BPC-157's pharmacokinetics and safety. However, the results of that trial were never published. The trial was completed, but the data were not reported, which has raised questions in the research community. Without publication, the findings remain unknown."
+      }
+     ]
+    },
+    {
+     "title": "Current Status",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Human experience with BPC-157 remains in early, experimental stages. Small studies and individual experiments hint at effects consistent with animal research, but robust clinical evidence to verify efficacy or proper protocols is lacking. Experts consistently stress that BPC-157 should not be used in routine medical practice yet. It remains a compound with potential, but until large controlled trials are conducted, any human use is effectively experimental."
+      }
+     ]
+    }
+   ],
+   "preclinical_subsections": [
+    {
+     "title": "Musculoskeletal Tissue Research",
+     "findings": [
+      {
+       "title": "Wound and Muscle Healing",
+       "content": "Animal studies demonstrate accelerated healing of skin incisions and muscle tears when BPC-157 is applied. In rats with partially torn or crushed muscles, treated animals showed quicker healing and more complete muscle fiber regeneration compared to untreated controls in various research summaries."
+      },
+      {
+       "title": "Tendon and Ligament Repair",
+       "content": "Some of the most robust data comes from tendon injury models. A study published in the Journal of Applied Physiology showed that BPC-157 dramatically improved healing of transected (cut) Achilles tendons in rats. Treated tendons exhibited better strength, structure, and cell survival with less inflammation.\n\nAdditional experiments demonstrated accelerated healing of damaged knee ligaments and increased outgrowth of tendon cells, suggesting the peptide can stimulate cells to rebuild connective tissue. Researchers observed that even without additional growth factors, BPC-157 alone enhanced tendon cell migration and viability at injury sites."
+      },
+      {
+       "title": "Bone Healing",
+       "content": "A study in rabbits with non-healing bone defects found that local BPC-157 treatment was as effective as bone graft surgery in mending the defect. The peptide-treated rabbits showed new bone formation bridging the gap, similar to rabbits that received bone tissue transplants, suggesting BPC-157 may trigger regenerative processes in bone tissue."
+      }
+     ]
+    },
+    {
+     "title": "Gastrointestinal Research",
+     "findings": [
+      {
+       "title": "Gastric Protection",
+       "content": "BPC-157 was initially studied as a \"cytoprotective\" agent in the stomach, meaning it can protect stomach cells from injury. In rat studies, BPC-157 demonstrated the ability to prevent and heal stomach ulcers, including ulcers caused by NSAID painkillers, which are known for eroding the stomach lining. The peptide also protected the GI tract from alcohol-induced damage."
+      },
+      {
+       "title": "Inflammatory Bowel Disease Models",
+       "content": "Beyond the stomach, BPC-157 showed benefits in inflammatory bowel disease models. Rats with ulcerative colitis (a severe gut inflammation) recovered faster and had reduced intestinal damage when given BPC-157. A preliminary clinical trial in people with ulcerative colitis reported positive results, though full details have not been published."
+      }
+     ]
+    },
+    {
+     "title": "Other Organ Systems",
+     "findings": [
+      {
+       "title": "Anti-Inflammatory Effects",
+       "content": "In rat models of induced inflammatory arthritis, animals treated with BPC-157 had reduced joint swelling, less inflammatory cell buildup, and better preserved joint function than untreated rats. The peptide appeared to protect joints from autoimmune damage."
+      },
+      {
+       "title": "Neuroprotection",
+       "content": "BPC-157 has shown promise as a neuroprotective compound in animal studies. It helped preserve brain cells in rodent experiments of traumatic brain injury and stroke, and produced antidepressant-like effects in a rat model of chronic stress. Rats with symptoms of depression or anxiety exhibited improved behaviors after BPC-157 treatment, correlating with modulation of serotonin and dopamine systems."
+      },
+      {
+       "title": "Organ Protection",
+       "content": "In laboratory rodents, BPC-157 reduced damage to the liver caused by toxic chemicals and improved survival in cases of acute liver failure. Similarly, it lessened heart muscle damage in animal models of certain cardiac injuries, suggesting potential cardio-protective effects."
+      }
+     ]
+    }
+   ],
+   "background": "BPC-157 was originally discovered in human gastric juice during gastroenterology research. In simple terms, a peptide is a short chain of amino acids – the building blocks of proteins. This particular peptide has been nicknamed the \"body protection compound\" in research circles due to the broad protective effects observed on the body's tissues in laboratory studies.\n\nUnlike many peptides that are quickly broken down by digestive enzymes, BPC-157 demonstrates exceptional stability. This characteristic means the peptide could potentially be administered orally and still exert effects, unlike most peptides that must be given by injection. In rodent studies, BPC-157 proved effective when administered through various routes including intramuscular and intravenous injection, demonstrating bioavailability and activity in the body.\n\nIt's important to clarify that BPC-157 is an experimental compound. It is not approved as a medication by regulatory agencies and is officially designated for research use only at present. Despite this regulatory status, interest in BPC-157 has grown substantially due to promising early research findings in preclinical models.",
+   "conclusion": "BPC-157 stands out as a compound at the frontier of medical research. From a research perspective, it demonstrates several noteworthy characteristics: it's small and stable, easy to administer in various forms, and has shown remarkable healing capabilities in preclinical models across the board – from mending torn tendons to healing ulcerated gastrointestinal tissues and protecting neural cells.\n\nHowever, a key message is caution. As of now, BPC-157 is not an approved treatment for any condition and remains in the realm of experimental research. The peptide is currently available only as a research tool, and any human use is essentially an off-label experiment. While current findings in the laboratory are inspiring, science demands evidence through well-designed human studies.\n\nThe current state of knowledge presents a paradox: enthusiastic reports and underground usage suggest it may help people recover from injuries, yet solid clinical data to fully back up those claims and ensure long-term safety is lacking. Until comprehensive human studies are completed, experts advise that BPC-157 should be confined to laboratories and carefully controlled trials.\n\nResearchers around the world are actively studying this peptide, as evidenced by increasing publications and even patents, because its multi-faceted actions are unlike anything in current therapeutic arsenals. For those learning about BPC-157, the best course is to stay informed but cautious. With time and rigorous research, we will discover whether BPC-157 can safely fulfill its healing reputation and possibly become a mainstream therapeutic agent. Until then, it remains a compelling scientific discovery on the path from laboratory to clinical application.",
+   "half_life": "~4 hours",
+   "description": "BPC-157 is a lab-made peptide studied for its healing properties. It may support tissue repair, reduce inflammation, and promote faster recovery from injuries."
+  },
+  "ghk-cu": {
+   "regulatory_subsections": [
+    {
+     "title": "Current Status",
+     "entries": [
+      {
+       "type": "content",
+       "value": "GHK-Cu is not FDA-approved as a drug. Topical formulations are widely available as cosmetic products. Injectable forms are classified as research peptides. The compound's natural occurrence in human plasma provides inherent safety rationale but does not constitute regulatory approval."
+      }
+     ]
+    }
+   ],
+   "references": [
+    {
+     "title": "GHK Peptide as a Natural Modulator of Multiple Cellular Pathways in Skin Regeneration",
+     "authors": "Pickart L, Vasquez-Soltero JM, Margolina A",
+     "citation": "Biomed Res Int. 2015;2015:648108. doi:10.1155/2015/648108. PMID 26236730",
+     "description": "Review of GHK and GHK-Cu activity in skin regeneration (laboratory, animal and gene-expression data). Authors' affiliation: Skin Biology (Bellevue, WA), a company associated with copper-peptide products.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/26236730/"
+     ]
+    },
+    {
+     "title": "Efficacy of a Complex of 5-Aminolevulinic Acid and Glycyl-Histidyl-Lysine Peptide on Hair Growth",
+     "authors": "Lee WJ, Sim HB, Jang YH, Lee SJ, Kim DW, Yim SH",
+     "citation": "Ann Dermatol. 2016;28(4):438-443. doi:10.5021/ad.2016.28.4.438. PMID 27489425",
+     "description": "Randomised, double-blind, placebo-controlled scalp spray study of a copper-free 5-ALA–GHK conjugate (ALAVAX) in men.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/27489425/"
+     ]
+    },
+    {
+     "title": "Intradermal injections of a hair growth factor formulation for enhancement of human hair regrowth - safety and efficacy evaluation in a first-in-man pilot clinical study",
+     "authors": "Kapoor R, Shome D",
+     "citation": "J Cosmet Laser Ther. 2018;20(6):369-379. doi:10.1080/14764172.2018.1439965. PMID 29482481",
+     "description": "Open-label single-arm study; multi-ingredient formulation including copper tripeptide-1.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/29482481/"
+     ]
+    },
+    {
+     "title": "Androgenetic Alopecia Treatment in Asian Men",
+     "authors": "Tanaka Y, Aso T, Ono J, Hosoi R, Kaneko T",
+     "citation": "J Clin Aesthet Dermatol. 2018;11(7):32-35. PMID 30057663",
+     "description": "Uncontrolled clinic case series (18,918 men); multi-ingredient combination treatment.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/30057663/"
+     ]
+    },
+    {
+     "title": "Enhanced hair regrowth with five monthly sessions of minoxidil-dutasteride-copper peptides tattooing for androgenetic alopecia assessed by artificial intelligence and blinded evaluators",
+     "authors": "Kuceki G, Coppinger AJ, Ragi SD, et al.",
+     "citation": "JAAD Int. 2025;20:38-40. doi:10.1016/j.jdin.2025.01.012. PMID 40225275",
+     "description": "Retrospective report of 7 men; combination micro-infusion.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/40225275/"
+     ]
+    },
+    {
+     "title": "Fractional non-ablative laser-assisted drug delivery leads to improvement in male and female pattern hair loss",
+     "authors": "Bertin ACJ, Vilarinho A, Junqueira ALA",
+     "citation": "J Cosmet Laser Ther. 2018;20(7-8):391-394. doi:10.1080/14764172.2017.1418516. PMID 29452017",
+     "description": "Four case reports; combination treatment.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/29452017/"
+     ]
+    },
+    {
+     "title": "Chemical agents and peptides affect hair growth",
+     "authors": "Uno H, Kurata S",
+     "citation": "J Invest Dermatol. 1993;101(1 Suppl):143S-147S. doi:10.1111/1523-1747.ep12363275. PMID 8326148",
+     "description": "Animal data; copper-binding peptide PC1031.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/8326148/"
+     ]
+    },
+    {
+     "title": "The effect of tripeptide-copper complex on human hair growth in vitro",
+     "authors": "Pyo HK, Yoo HG, Won CH, et al.",
+     "citation": "Arch Pharm Res. 2007;30(7):834-839. doi:10.1007/BF02978833. PMID 17703734",
+     "description": "AHK-Cu (not GHK-Cu) on cultured human hair follicles.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/17703734/"
+     ]
+    },
+    {
+     "title": "Effects of topical copper tripeptide complex on CO2 laser-resurfaced skin",
+     "authors": "Miller TR, Wagner JD, Baack BR, Eisbach KJ",
+     "citation": "Arch Facial Plast Surg. 2006;8(4):252-259. doi:10.1001/archfaci.8.4.252. PMID 16847171",
+     "description": "Study in which 13 patients completed; no significant objective differences.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/16847171/"
+     ]
+    },
+    {
+     "title": "GHK-Cu as a Bioactive Metallopeptide and Drug-Delivery Cargo: Coordination Chemistry, Formulation Science, Therapeutic Evidence, and a Translational Roadmap",
+     "authors": "Mateescu DM, Gavrilescu DM, Mincioaga RI, et al.",
+     "citation": "Pharmaceutics. 2026;18(9):1077. doi:10.3390/pharmaceutics18091077. PMID 42797253",
+     "description": "Review; clinical evidence described as sparse.",
+     "links": [
+      "https://pubmed.ncbi.nlm.nih.gov/42797253/"
+     ]
+    },
+    {
+     "title": "Bulk Drug Substances Nominated for Use in Compounding Under Section 503A of the Federal Food, Drug, and Cosmetic Act",
+     "authors": "U.S. Food and Drug Administration",
+     "citation": "Updated May 14, 2026",
+     "description": "Category 1 entry \"GHK-Cu (except for injectable routes of administration)\"; PCAC consultation planned before end of February 2027.",
+     "links": [
+      "https://www.fda.gov/media/94155/download"
+     ]
+    },
+    {
+     "title": "Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks",
+     "authors": "U.S. Food and Drug Administration",
+     "citation": "Content current as of 04/22/2026",
+     "description": "\"GHK-Cu (for injectable routes of administration)\" under nominated but withdrawn, with FDA safety text.",
+     "links": [
+      "https://www.fda.gov/drugs/human-drug-compounding/certain-bulk-drug-substances-use-compounding-may-present-significant-safety-risks"
+     ]
+    },
+    {
+     "title": "Meeting of the Pharmacy Compounding Advisory Committee",
+     "authors": "U.S. Food and Drug Administration",
+     "citation": "Content current as of 04/15/2026",
+     "description": "Planned meeting before the end of February 2027; GHK-Cu on agenda.",
+     "links": [
+      "https://www.fda.gov/advisory-committees/pharmacy-compounding-advisory-committee/meeting-pharmacy-compounding-advisory-committee"
+     ]
+    },
+    {
+     "title": "Topical GHK-Cu Gel for Acute Skin Wound Healing",
+     "authors": "ClinicalTrials.gov",
+     "citation": "NCT07437586 (record last updated 27 Feb 2026)",
+     "description": "Phase 2; recruiting; no results posted.",
+     "links": [
+      "https://clinicaltrials.gov/study/NCT07437586"
+     ]
+    }
+   ],
+   "human_use_subsections": [
+    {
+     "title": "Dermatological Studies",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Multiple controlled clinical studies have evaluated topical GHK-Cu formulations for anti-aging applications. 12-week studies demonstrated significant improvements in skin firmness, elasticity, and density measurements compared to placebo.\\n\\nIn comparative studies, GHK-Cu outperformed both vitamin C serum and retinoic acid (tretinoin) in collagen synthesis stimulation — a notable finding given that these are considered gold-standard skincare actives."
+      }
+     ]
+    },
+    {
+     "title": "Injectable Research",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Injectable (subcutaneous) GHK-Cu research is earlier-stage. The distinction between topical and systemic administration is significant — topical delivers the compound to skin, while injectable potentially delivers systemic gene expression effects.\\n\\nSafety data from injectable use shows a favorable profile: transient injection site erythema (4.2%) and mild pruritus (2.8%) are the most commonly reported events."
+      }
+     ]
+    }
+   ],
+   "potential_applications": [
+    {
+     "title": "Gene-expression research",
+     "description": "Connectivity Map analyses summarised by Pickart and colleagues, who are affiliated with Skin Biology, report that GHK can raise or lower expression of thousands of human genes in cell data. These are computational and laboratory findings; no systemic anti-ageing effect has been shown in people."
+    },
+    {
+     "title": "Post-Procedure Recovery",
+     "description": "Supporting skin healing after dermatological procedures (laser, microneedling, chemical peels) with enhanced collagen remodeling."
+    },
+    {
+     "title": "Hair research (evidence limited)",
+     "description": "Hair-follicle findings come from animal and cell studies, including studies of related copper peptides rather than GHK-Cu. No completed, published randomised trial of GHK-Cu itself for pattern hair loss was found (as of 19 Oct 2026). Human hair reports tested multi-ingredient products."
+    }
+   ],
+   "key_points": [
+    "Experimental studies link GHK‑Cu to increased ECM components (collagen, glycosaminoglycans) in wound models and altered expression of remodeling enzymes (MMPs) and their inhibitors (TIMPs)",
+    "Copper is an essential micronutrient and cofactor for multiple enzymes involved in connective tissue formation and antioxidant defense; a peptide that binds copper tightly may influence how copper is transported, buffered, or delivered to cells",
+    "Several animal and cell studies report reduced inflammatory cytokines and altered redox or stress signaling pathways following GHK‑Cu exposure",
+    "Computational and in vitro work has suggested GHK (and by extension interest in GHK‑Cu) may reverse certain disease‑associated gene signatures, particularly in lung disease research contexts"
+   ],
+   "faqs": [
+    {
+     "question": "How does GHK-Cu modulate gene expression?",
+     "answer": "GHK-Cu resets the expression of over 4,000 human genes, suppressing genes associated with disease while activating genes for tissue repair and regeneration."
+    },
+    {
+     "question": "Is copper supplementation necessary with GHK-Cu?",
+     "answer": "No. The copper content per dose is negligible. The copper serves as a structural component for receptor binding, not as a nutritional supplement."
+    },
+    {
+     "question": "Can GHK-Cu be combined with retinoids?",
+     "answer": "They target complementary pathways. Some protocols alternate application times to avoid interaction."
+    }
+   ],
+   "conclusion": "GHK-Cu stands apart in the peptide research landscape for the breadth of its biological activity. No other single compound has been shown to modulate the expression of over 4,000 human genes, spanning DNA repair, antioxidant defense, inflammation, and tissue remodeling.\n\nThe compound's natural occurrence in human plasma, its decades of published research, and its established dermatological efficacy provide a foundation of evidence that is unusual for a research peptide. The age-related decline from ~200 ng/mL to ~80 ng/mL provides a clear biological rationale for supplementation research.\n\nFor researchers, GHK-Cu offers the rare combination of a well-characterized compound with both strong clinical data (dermatology) and an emerging systemic research frontier (injectable administration). Its complementary mechanism to other repair peptides explains its inclusion in multi-peptide protocols like the GLOW and KLOW stacks.\n\nPeptideMaps provides verified vendor listings with pricing and COA documentation for GHK-Cu across multiple dosage options.",
+   "research_url": "https://example.com",
+   "molecular_formula": "C₁₄H₂₄CuN₆O₄",
+   "molecular_weight": "401~404 g/mol",
+   "cas_registry_number": "49557-75-7",
+   "half_life": "",
+   "description": "A copper-binding tripeptide (Glycyl-L-Histidyl-L-Lysine + Cu²⁺) studied for its role in skin remodeling, hair follicle stimulation, and tissue repair pathways."
+  },
+  "tb-500": {
+   "regulatory_subsections": [
+    {
+     "title": "Current Status",
+     "entries": [
+      {
+       "type": "content",
+       "value": "TB-500 is not approved by the FDA or any other major regulatory body for human use. It is classified as a research peptide and sold under research-use-only designations."
+      }
+     ]
+    },
+    {
+     "title": "Sports Regulations",
+     "entries": [
+      {
+       "type": "content",
+       "value": "TB-500 and Thymosin Beta-4 are prohibited by the World Anti-Doping Agency (WADA) under the S2 category (Peptide Hormones, Growth Factors, Related Substances, and Mimetics). Several athletes have received bans for testing positive for Thymosin Beta-4."
+      }
+     ]
+    }
+   ],
+   "references": [
+    {
+     "title": "PNAS (1977)",
+     "authors": "Goldstein et al.",
+     "description": "Original isolation and characterization of Thymosin Beta-4 from thymus tissue."
+    },
+    {
+     "title": "Expert Opinion on Biological Therapy (2007)",
+     "authors": "Sosne et al.",
+     "description": "Comprehensive review of Thymosin Beta-4 in wound healing and tissue repair."
+    },
+    {
+     "title": "Nature (2007)",
+     "authors": "Smart et al.",
+     "description": "Thymosin Beta-4 activates epicardial progenitor cells for cardiac repair after myocardial infarction."
+    }
+   ],
+   "faqs": [
+    {
+     "question": "What is the difference between TB-500 and Thymosin Beta-4?",
+     "answer": "TB-500 is the synthetic 7-amino-acid active fragment (residues 17-23) of the full 43-amino-acid Thymosin Beta-4 protein. It replicates the actin-binding and tissue-repair signaling domain."
+    },
+    {
+     "question": "How quickly does TB-500 take effect?",
+     "answer": "Most research protocols observe initial responses within 2-3 weeks of the loading phase, with full effects developing over 4-6 weeks."
+    },
+    {
+     "question": "Can TB-500 be used alongside BPC-157?",
+     "answer": "These two peptides are frequently studied together as they target complementary repair pathways — TB-500 for systemic tissue migration and BPC-157 for localized angiogenesis."
+    }
+   ],
+   "molecular_formula": "C₃₆H₆₆N₁₀O₁₃",
+   "molecular_weight": "846.97 g/mol",
+   "half_life": "3-4 days",
+   "conclusion": "TB-500 represents a unique approach to tissue repair research — one focused on cellular mobilization rather than direct growth factor stimulation. Its mechanism of action through actin dynamics provides a complementary pathway to other repair peptides, which is why it has become one of the most commonly combined compounds in multi-peptide research protocols.\n\nThe preclinical evidence base is substantial, particularly for cardiac repair, wound healing, and neuroinflammation. Clinical investigation of the parent compound Thymosin Beta-4 has progressed furthest in ophthalmology, with Phase 2/3 trials for corneal healing providing the strongest clinical validation of the biological mechanism.\n\nFor researchers, TB-500 offers a well-characterized compound with a clear mechanistic profile and extensive preclinical support. Its complementary mechanism to BPC-157 — systemic cell migration versus localized growth factor signaling — explains why the two compounds are so frequently studied together.\n\nAs with all research peptides, TB-500 is designated for research use only and is not approved for human therapeutic use. Researchers should source from vendors with third-party COA documentation and verified purity testing.",
+   "description": "TB-500 is a synthetic fragment of Thymosin Beta-4, a naturally occurring protein involved in cell migration and tissue repair. It promotes systemic recovery through actin polymerization modulation."
+  },
+  "retatrutide": {
+   "regulatory_subsections": [
+    {
+     "title": "Development Status",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Retatrutide is not FDA-approved. Phase 3 TRIUMPH results are published, including TRIUMPH-1 (The New England Journal of Medicine, 29 Sep 2026) and TRIUMPH-2 (The Lancet, 29 Sep 2026). Eli Lilly has stated a planned U.S. BLA in Q1 2027. A filing plan is not approval. Research-grade retatrutide on PeptideMap is listed for research-use (RUO) comparison only. It is not clinical trial supply, not a prescription, and not medical advice."
+      }
+     ]
+    },
+    {
+     "title": "Development status (investigational)",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Retatrutide is an investigational GIP/GLP-1/glucagon receptor agonist. It is not approved by the FDA (or EMA / other regulators cited here) for any indication and is not commercially marketed by Eli Lilly as a prescription medicine. PeptideMap vendor listings are RUO / research-use comparison data only — not trial supply, not expanded-access supply, and not prescriptions."
+      },
+      {
+       "type": "item",
+       "value": "Company materials continue to describe retatrutide as an investigational molecule that cannot be legally sold or marketed for human use pending approval pathways."
+      }
+     ]
+    },
+    {
+     "title": "Filing literacy — planned BLA in Q1 2027 (≠ approval)",
+     "entries": [
+      {
+       "type": "content",
+       "value": "On 23 July 2026, Eli Lilly announced positive topline results from TRIUMPH-2 and TRIUMPH-3 and stated it is completing the comprehensive CMC data package required for a Biologics License Application (BLA) and plans to subsequently submit retatrutide in Q1 2027 for U.S. approval. That sentence is a sponsor filing plan."
+      },
+      {
+       "type": "item",
+       "value": "Filing is not FDA acceptance (filing decision) and acceptance is not approval. Until FDA receives and files an application and assigns a review clock, there is no agency action date to treat as an approval date."
+      },
+      {
+       "type": "item",
+       "value": "Do not convert “Q1 2027” into “approved in 2027.” Secondary timeline calendars that project review windows are estimates, not facts, and are not pasted here as predictions."
+      }
+     ]
+    },
+    {
+     "title": "Biologic vs drug classification dispute — Seventh Circuit argument (no ruling yet)",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Lilly’s stated U.S. path is a BLA (biologic). Whether retatrutide is classified as a biological product under the relevant protein / “analogous product” rules has been litigated. The U.S. Court of Appeals for the Seventh Circuit listed oral argument in Eli Lilly and Company v. Robert Kennedy, Jr., No. 26-1301, on 24 September 2026 (civil), with public argument audio on the court’s oral-argument calendar."
+      },
+      {
+       "type": "item",
+       "value": "As of early October 2026, no published appellate ruling in No. 26-1301 was located on a Seventh Circuit opinions lookup attempted for this pass. Same-day argument coverage dated 24–25 Sep 2026 confirms the hearing. Argument is not a decision."
+      },
+      {
+       "type": "item",
+       "value": "Educational takeaway only: the classification dispute can affect which application type (BLA vs NDA) a sponsor pursues. It is not an approval decision and must not be narrated as one."
+      }
+     ]
+    },
+    {
+     "title": "Access before approval — trials vs expanded access vs grey-market",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Before any approval, legitimate pathways discussed in primary manufacturer/FDA-process materials are clinical trials and, in limited circumstances, expanded access (sometimes called compassionate use) coordinated with a treating physician and applicable FDA IND / IRB requirements."
+      },
+      {
+       "type": "content",
+       "value": "Lilly Medical states that retatrutide is not currently FDA-approved; that Lilly is supporting single-patient expanded-access requests for individuals who meet eligibility criteria when they cannot join a trial and have exhausted available options; that availability depends on geography, supply, and case-by-case assessment; and that requests are physician-initiated. ClinicalTrials.gov lists pre-approval expanded access as NCT07629401."
+      },
+      {
+       "type": "item",
+       "value": "High-level eligibility themes on Lilly Medical include refractory obesity (BMI ≥35 despite highest tolerated approved chronic weight-management therapy), at least two serious or life-threatening obesity-related complications under standard care, and inability to join an ongoing retatrutide (or comparable) trial. This page does not turn those criteria into an application guide or medical advice."
+      },
+      {
+       "type": "item",
+       "value": "Grey-market / RUO vials sold online are not clinical-trial supply and are not expanded access. Catalog adjacency is not a manufacturer program."
+      }
+     ]
+    }
+   ],
+   "references": [
+    {
+     "title": "New England Journal of Medicine (2023)",
+     "authors": "Jastreboff et al.",
+     "description": "Phase 2 trial of retatrutide for obesity showing 24.2% weight reduction."
+    },
+    {
+     "title": "The Lancet (2023)",
+     "authors": "Rosenstock et al.",
+     "description": "Retatrutide Phase 2 efficacy and safety in type 2 diabetes."
+    },
+    {
+     "links": [
+      {
+       "url": "https://www.prnewswire.com/news-releases/lillys-triple-agonist-retatrutide-delivered-substantial-weight-loss-and-a1c-reduction-underscoring-its-potential-promise-for-people-with-obesity-and-type-2-diabetes-302891798.html",
+       "label": "PR Newswire"
+      }
+     ],
+     "title": "TRIUMPH-2 detailed results press release",
+     "authors": "Eli Lilly and Company",
+     "citation": "PR Newswire, 29 Sep 2026",
+     "description": "Efficacy estimand weight and A1C results at 80 weeks for retatrutide vs placebo in T2D with obesity/overweight."
+    },
+    {
+     "links": [
+      {
+       "url": "https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(26)01861-1/abstract",
+       "label": "Lancet abstract"
+      }
+     ],
+     "title": "Retatrutide in adults with obesity and type 2 diabetes (TRIUMPH-2)",
+     "authors": "The Lancet",
+     "citation": "DOI 10.1016/S0140-6736(26)01861-1; NCT05929079; 29 Sep 2026",
+     "description": "Treatment-regimen estimand Findings: −11.9% / −16.8% / −18.8% vs −5.1% placebo; ETDs −6.9% / −11.8% / −13.8%."
+    },
+    {
+     "links": [],
+     "title": "Phase 2 obesity trial (background)",
+     "authors": "Jastreboff et al.",
+     "citation": "NEJM 2023",
+     "description": "Background Phase 2 obesity data; different population/duration than TRIUMPH-2."
+    },
+    {
+     "links": [
+      {
+       "url": "https://pubmed.ncbi.nlm.nih.gov/42814954/",
+       "label": "PubMed"
+      },
+      {
+       "url": "https://doi.org/10.1056/NEJMoa2604169",
+       "label": "DOI"
+      }
+     ],
+     "title": "Retatrutide, a Triple Hormone Receptor Agonist, for Treatment of Obesity (TRIUMPH-1)",
+     "authors": "Jastreboff et al. for the TRIUMPH-1 Investigators",
+     "citation": "N Engl J Med. 2026 Sep 29. DOI 10.1056/NEJMoa2604169. PMID 42814954. NCT05929066.",
+     "description": "Abstract weight result is the treatment-regimen estimand: −17.6%, −23.7%, and −25.0% versus −3.9% placebo. −28.3% is not the abstract figure."
+    },
+    {
+     "links": [
+      {
+       "url": "https://medical.lilly.com/us/products/answers/what-are-the-results-of-retatrutide-from-triumph-1-in-participants-with-obesity-or-overweight-without-type-2-diabetes-386151",
+       "label": "Lilly Medical"
+      }
+     ],
+     "title": "Lilly Medical table of TRIUMPH-1 outcomes",
+     "authors": "Eli Lilly and Company",
+     "citation": "Lilly Medical document 386151, citing NEJM DOI 10.1056/NEJMoa2604169.",
+     "description": "Efficacy estimand percent change in body weight: −19.0%, −25.9%, and −28.3% versus −2.2% placebo. The treatment-regimen row matches the NEJM abstract."
+    },
+    {
+     "links": [
+      {
+       "url": "https://www.prnewswire.com/news-releases/lillys-triple-agonist-retatrutide-successful-in-two-additional-phase-3-obesity-trials-delivering-significant-improvements-in-weight-and-a1c-302832674.html",
+       "label": "PR Newswire"
+      }
+     ],
+     "title": "Eli Lilly topline on two additional Phase 3 retatrutide trials (TRIUMPH-3)",
+     "authors": "Eli Lilly and Company",
+     "citation": "PR Newswire, 23 Jul 2026. NCT05882045.",
+     "description": "Topline only. Efficacy-estimand weight change −21.6% (9 mg) and −22.6% (12 mg) versus −3.2% placebo. Pre-specified MACE-5 and MACE-3 hazard ratios have 95% confidence intervals that include 1. Not a peer-reviewed cardiovascular-outcomes paper."
+    },
+    {
+     "links": [
+      {
+       "url": "https://media.ca7.uscourts.gov/oralArguments/oar.jsp?amonth=09%2F2026&aMonth=List+case%28s%29",
+       "label": "Argument calendar"
+      },
+      {
+       "url": "https://media.ca7.uscourts.gov/sound/external/ef.26-1301.26-1301_09_24_2026.mp3",
+       "label": "Argument audio"
+      }
+     ],
+     "title": "Seventh Circuit oral-argument calendar — Eli Lilly and Company v. Robert Kennedy, Jr., No. 26-1301",
+     "authors": "U.S. Court of Appeals for the Seventh Circuit",
+     "citation": "Argument date 24 Sep 2026.",
+     "description": "Confirms oral argument was held. Not a ruling."
+    },
+    {
+     "links": [
+      {
+       "url": "https://medical.lilly.com/us/products/answers/is-there-an-expanded-access-program-for-retatrutide-416668",
+       "label": "Lilly Medical"
+      },
+      {
+       "url": "https://clinicaltrials.gov/study/NCT07629401",
+       "label": "ClinicalTrials.gov"
+      }
+     ],
+     "title": "Is there an expanded access program for retatrutide?",
+     "authors": "Lilly Medical",
+     "citation": "medical.lilly.com answer; cites NCT07629401.",
+     "description": "Investigational and not FDA-approved. Single-patient expanded access is physician-initiated and is not a grey-market catalog."
+    }
+   ],
+   "human_use_subsections": [
+    {
+     "title": "Phase 2 Results",
+     "entries": [
+      {
+       "type": "content",
+       "value": "The Phase 2 trial, published in the New England Journal of Medicine in 2023, showed retatrutide achieved up to 24.2% body weight reduction at 48 weeks at the highest dose — exceeding all previous results from any single pharmacological agent.\\n\\nThe compound was generally well-tolerated, with nausea, diarrhea, and vomiting as the most common adverse events (consistent with GLP-1-class effects). Phase 3 TRIUMPH results have since been published; see the TRIUMPH-1 and TRIUMPH-2 subsections. Publication is not FDA approval, and those figures are not a dose."
+      }
+     ]
+    },
+    {
+     "title": "TRIUMPH-2 Phase 3 (EASD / The Lancet, Sep 2026)",
+     "entries": [
+      {
+       "type": "content",
+       "value": "TRIUMPH-2 (NCT05929079) was a registrational Phase 3 trial: 1,152 adults with type 2 diabetes and BMI ≥27 kg/m² were randomized to once-weekly retatrutide trial arms (4 mg, 9 mg, or 12 mg) or placebo for 80 weeks (EASD 2026 presentation; simultaneous Lancet publication, 29 Sep 2026). Figures below describe what was reported in that study — not how anyone should use research materials sold as RUO.\n\nEfficacy estimand (Lilly press release, 29 Sep 2026) — models remaining on assigned intervention without prohibited weight-management treatments:\n\n• 4 mg: mean weight change −12.7% (−29.8 lbs); A1C −1.4\n• 9 mg: mean weight change −19.1% (−45.4 lbs); A1C −1.6\n• 12 mg: mean weight change −20.8% (−49.6 lbs); A1C −1.5\n• Placebo: mean weight change −4.0% (−9.3 lbs); A1C −0.2\n\nBaseline averages cited by Lilly: weight ~106.4 kg, BMI ~38.2 kg/m², A1C ~7.7%. At 12 mg, Lilly reported 52.0% of participants achieving ≥20% weight reduction and 34.9% achieving ≥25% (efficacy estimand); 59.5% no longer met BMI criteria for obesity. Among participants with baseline BMI ≥35, mean loss at 12 mg was reported as 23.4% (60.8 lbs). Up to 40.0% reached A1C <5.7% (not family-wise type I error controlled per Lilly footnote).\n\nTreatment-regimen estimand (Lancet abstract Findings): mean percent weight change −11.9% (4 mg), −16.8% (9 mg), and −18.8% (12 mg) versus −5.1% placebo (estimated treatment differences vs placebo −6.9%, −11.8%, −13.8%; p<0.0001 for all). Prefer stating which estimand you quote; do not mix them in one sentence without labeling.\n\nSafety (Lilly): most common AEs vs placebo included diarrhea (27.4% / 33.5% / 33.6% vs 13.2%), nausea (13.7% / 20.8% / 28.0% vs 8.0%), constipation (14.0% / 16.2% / 16.8% vs 9.4%), decreased appetite (5.8% / 12.3% / 17.1% vs 4.5%), vomiting (5.5% / 10.2% / 15.7% vs 4.2%). Dysesthesia 4.5% / 5.6% / 7.3% vs 0.7%. Discontinuations due to AEs: 3.8% / 11.6% / 7.7% vs 4.9% placebo. Highest-dose CV risk-factor changes reported by Lilly included average reductions of 39.5% triglycerides, 19.6% non-HDL cholesterol, 10.8 mmHg systolic BP, 6.7 in (16.9 cm) waist circumference, and 58.3% hsCRP — risk factors, not CV outcomes from this trial."
+      }
+     ]
+    },
+    {
+     "title": "TRIUMPH-1 Phase 3 (NEJM, 29 Sep 2026) — different trial from TRIUMPH-2",
+     "entries": [
+      {
+       "type": "content",
+       "value": "TRIUMPH-1 (NCT05929066) is not TRIUMPH-2. Jastreboff and colleagues, for the TRIUMPH-1 Investigators, reported it in The New England Journal of Medicine (29 Sep 2026; DOI 10.1056/NEJMoa2604169; PMID 42814954): adults with obesity or overweight without diabetes, randomized to once-weekly retatrutide 4 mg, 9 mg, or 12 mg or placebo for 80 weeks (2,339 participants). The abstract states that, for weight-related endpoints, intercurrent events were handled by a treatment-regimen estimand. Under that analysis, mean percent change in body weight was −17.6% (4 mg), −23.7% (9 mg), and −25.0% (12 mg) versus −3.9% with placebo. Those abstract figures are the treatment-regimen result. They are not a treatment recommendation and not a head-to-head comparison with semaglutide, tirzepatide, or eloralintide. The same paper’s abstract does not print −28.3%. Lilly Medical’s table of TRIUMPH-1 outcomes, which cites that NEJM article, lists a separate efficacy estimand: percent change in body weight at 80 weeks was −19.0% (4 mg), −25.9% (9 mg), and −28.3% (12 mg) versus −2.2% with placebo. −28.3% is not the abstract primary weight result. TRIUMPH-2 remains the separate type 2 diabetes plus obesity or overweight trial; its published figures are not restated here and are not a ranking against TRIUMPH-1. PeptideMap is a research-use (RUO) comparison publisher, not a clinic or pharmacy. This is not medical advice and not a dose."
+      }
+     ]
+    },
+    {
+     "title": "TRIUMPH-3 topline (Lilly, 23 Jul 2026) — not a peer-reviewed cardiovascular-outcomes paper",
+     "entries": [
+      {
+       "type": "content",
+       "value": "No. TRIUMPH-3 (NCT05882045) is not sourced from a peer-reviewed NEJM or Lancet cardiovascular-outcomes paper. Eli Lilly’s 23 July 2026 topline is the source. The trial enrolled adults with severe obesity (BMI ≥35 kg/m²) and established cardiovascular disease, with or without type 2 diabetes (1,949 participants; 9 mg, 12 mg, or placebo; 80 weeks). Under the efficacy estimand in that release, mean percent weight change at 80 weeks was −21.6% (9 mg) and −22.6% (12 mg) versus −3.2% with placebo. That is not the TRIUMPH-1 or TRIUMPH-2 result, and a treatment-regimen weight figure for TRIUMPH-3 was not in the release. The same release reported pre-specified in-study analyses of time to first event for pooled 9 mg and 12 mg versus placebo. MACE-5 was 44 events versus 52 (hazard ratio 0.82, 95% CI 0.55 to 1.22). MACE-3 was 27 events versus 23 (hazard ratio 1.12, 95% CI 0.64 to 1.96). Both intervals include 1. The release does not establish a reduction in cardiovascular events. It says these events occurred less frequently than anticipated in both the retatrutide and placebo arms. Urinary tract infection in that topline was 6.1% (9 mg) and 7.0% (12 mg) versus 5.3% with placebo in TRIUMPH-3. This is not medical advice and not a dose."
+      }
+     ]
+    },
+    {
+     "title": "TRIUMPH program map (names + disclosure type)",
+     "entries": [
+      {
+       "type": "content",
+       "value": "The TRIUMPH Phase 3 program evaluates retatrutide across related obesity and complication settings. Names below are literacy labels only. Prefer the estimand label printed in the source you cite."
+      },
+      {
+       "type": "item",
+       "value": "TRIUMPH-1 (NCT05929066) — adults with obesity without diabetes; NEJM 29 Sep 2026 (DOI 10.1056/NEJMoa2604169; PMID 42814954). Abstract weight result uses a treatment-regimen (ITT) estimand: mean percent body-weight change −17.6% (4 mg), −23.7% (9 mg), −25.0% (12 mg) versus −3.9% placebo. A separate efficacy-estimand row of −28.3% at 12 mg (vs −2.2% placebo) appears on Lilly Medical’s TRIUMPH-1 outcomes table citing that paper — keep −25.0% and −28.3% labeled separately; do not present −28.3% as the abstract’s treatment-regimen primary weight line."
+      },
+      {
+       "type": "item",
+       "value": "TRIUMPH-2 (NCT05929079) — adults with type 2 diabetes and obesity or overweight; EASD / Lancet 29 Sep 2026 (DOI 10.1016/S0140-6736(26)01861-1). Do not rewrite live figures. Locked efficacy estimand includes up to −20.8% mean weight change at 12 mg vs −4.0% placebo; locked treatment-regimen includes −18.8% at 12 mg vs −5.1% placebo."
+      },
+      {
+       "type": "item",
+       "value": "TRIUMPH-3 (NCT05882045) — adults with severe obesity (BMI ≥35) and established cardiovascular disease, with or without T2D; Lilly topline 23 Jul 2026 (not treated here as a peer-reviewed cardiovascular-outcomes paper). Efficacy-estimand mean weight change −21.6% (9 mg) and −22.6% (12 mg) versus −3.2% placebo. Pre-specified in-study MACE-5 HR 0.82 (95% CI 0.55–1.22) and MACE-3 HR 1.12 (95% CI 0.64–1.96); intervals include 1 — the release does not establish cardiovascular-event reduction."
+      },
+      {
+       "type": "item",
+       "value": "Label topline versus peer-reviewed whenever you quote. July 2026 PR Newswire is topline for TRIUMPH-2/3 efficacy-estimand headlines; September 2026 Lancet is peer-reviewed for TRIUMPH-2 treatment-regimen Findings; September 2026 NEJM is peer-reviewed for TRIUMPH-1 treatment-regimen weight means."
+      }
+     ]
+    },
+    {
+     "title": "Context vs semaglutide / tirzepatide (not head-to-head)",
+     "entries": [
+      {
+       "type": "content",
+       "value": "TRIUMPH-2 compared retatrutide with placebo, not with semaglutide or tirzepatide. Do not present TRIUMPH-2 percentages as a three-way ranking. Mechanistically, retatrutide adds glucagon receptor agonism to GIP/GLP-1 activity, whereas semaglutide is a GLP-1 receptor agonist and tirzepatide is a dual GIP/GLP-1 agonist — different trials, populations, and endpoints. A dedicated Phase 3 comparison versus tirzepatide (TRIUMPH-5, NCT06662383) is registered separately; do not invent results. Older Phase 2 obesity data (e.g., Jastreboff et al., NEJM 2023) remain useful background for non-diabetes obesity cohorts but are not interchangeable with TRIUMPH-2’s diabetes population."
+      }
+     ]
+    }
+   ],
+   "regulatory_important_note": "Retatrutide is investigational and not approved by the FDA, EMA, or other regulators for any indication. Lilly’s stated Q1 2027 U.S. BLA intent is a filing plan, not marketing authorization. PeptideMap is not a pharmacy or clinic. Vendor listings are RUO / research-use comparison data only — not prescriptions, not compounding advice, not clinical-trial supply, and not expanded-access supply.",
+   "key_points": [
+    "Investigational GIP + GLP-1 + glucagon (triple) agonist; not FDA-approved",
+    "TRIUMPH-2 Phase 3: T2D with obesity/overweight, 80 weeks (NCT05929079)",
+    "Efficacy estimand weight loss: up to 20.8% mean at 12 mg vs 4.0% placebo (Lilly, 29 Sep 2026)",
+    "A1C reductions ~1.4–1.6 points vs ~0.2 placebo (same readout)",
+    "GI AEs more frequent at higher trial arms (diarrhea, nausea, vomiting, constipation); dysesthesia reported",
+    "Planned U.S. BLA stated for Q1 2027 (company plan, not approval)",
+    "TRIUMPH-1 (obesity without diabetes): treatment-regimen −25.0% at 12 mg vs −3.9% placebo (NEJM abstract, 29 Sep 2026; PMID 42814954). −28.3% is the efficacy estimand on Lilly Medical citing that paper, not the abstract primary.",
+    "Status (early Oct 2026): investigational; not FDA-approved; not commercially marketed by Lilly",
+    "TRIUMPH map: TRIUMPH-1 (obesity without diabetes; NEJM), TRIUMPH-2 (T2D + obesity/overweight; Lancet), TRIUMPH-3 (severe obesity + CVD; July 2026 topline) — quote labeled estimands only",
+    "Q1 2027 = Lilly’s stated BLA submission window while finishing CMC — not an approval date",
+    "Seventh Circuit Eli Lilly v. Kennedy, No. 26-1301: oral argument 24 Sep 2026; no published ruling as of early Oct 2026",
+    "Expanded access is not the same as trials and is not grey-market vials (manufacturer/FDA-process literacy only)"
+   ],
+   "faqs": [
+    {
+     "question": "How does retatrutide differ from tirzepatide?",
+     "answer": "Retatrutide adds glucagon receptor agonism on top of GLP-1 and GIP. The glucagon component increases energy expenditure and fat oxidation beyond what dual agonists achieve."
+    },
+    {
+     "question": "Is retatrutide FDA-approved?",
+     "answer": "No. Retatrutide is still not FDA-approved. Phase 3 TRIUMPH results are published, including TRIUMPH-1 in The New England Journal of Medicine (29 Sep 2026) and TRIUMPH-2 in The Lancet (29 Sep 2026). Eli Lilly has stated a planned U.S. biologics license application in Q1 2027. That filing plan is not FDA approval. PeptideMap is a research-use (RUO) comparison publisher, not a clinic or pharmacy. This is trial reporting, not medical advice and not a dose."
+    },
+    {
+     "question": "Why add glucagon if it raises blood sugar?",
+     "answer": "The GLP-1 component offsets glucagon's glycemic effect, while glucagon's metabolic benefits (increased energy expenditure, hepatic fat reduction) add to the overall effect."
+    },
+    {
+     "question": "How do published TRIUMPH-1 results differ from TRIUMPH-2?",
+     "answer": "TRIUMPH-1 (NCT05929066) is not TRIUMPH-2. Jastreboff and colleagues, for the TRIUMPH-1 Investigators, reported it in The New England Journal of Medicine (29 Sep 2026; DOI 10.1056/NEJMoa2604169; PMID 42814954): adults with obesity or overweight without diabetes, randomized to once-weekly retatrutide 4 mg, 9 mg, or 12 mg or placebo for 80 weeks (2,339 participants). The abstract states that, for weight-related endpoints, intercurrent events were handled by a treatment-regimen estimand. Under that analysis, mean percent change in body weight was −17.6% (4 mg), −23.7% (9 mg), and −25.0% (12 mg) versus −3.9% with placebo. Those abstract figures are the treatment-regimen result. They are not a treatment recommendation and not a head-to-head comparison with semaglutide, tirzepatide, or eloralintide. The same paper’s abstract does not print −28.3%. Lilly Medical’s table of TRIUMPH-1 outcomes, which cites that NEJM article, lists a separate efficacy estimand: percent change in body weight at 80 weeks was −19.0% (4 mg), −25.9% (9 mg), and −28.3% (12 mg) versus −2.2% with placebo. −28.3% is not the abstract primary weight result. TRIUMPH-2 remains the separate type 2 diabetes plus obesity or overweight trial; its published figures are not restated here and are not a ranking against TRIUMPH-1. PeptideMap is a research-use (RUO) comparison publisher, not a clinic or pharmacy. This is not medical advice and not a dose."
+    },
+    {
+     "question": "What did TRIUMPH-3 report for cardiovascular events?",
+     "answer": "No. TRIUMPH-3 (NCT05882045) is not sourced from a peer-reviewed NEJM or Lancet cardiovascular-outcomes paper. Eli Lilly’s 23 July 2026 topline is the source. The trial enrolled adults with severe obesity (BMI ≥35 kg/m²) and established cardiovascular disease, with or without type 2 diabetes (1,949 participants; 9 mg, 12 mg, or placebo; 80 weeks). Under the efficacy estimand in that release, mean percent weight change at 80 weeks was −21.6% (9 mg) and −22.6% (12 mg) versus −3.2% with placebo. That is not the TRIUMPH-1 or TRIUMPH-2 result, and a treatment-regimen weight figure for TRIUMPH-3 was not in the release. The same release reported pre-specified in-study analyses of time to first event for pooled 9 mg and 12 mg versus placebo. MACE-5 was 44 events versus 52 (hazard ratio 0.82, 95% CI 0.55 to 1.22). MACE-3 was 27 events versus 23 (hazard ratio 1.12, 95% CI 0.64 to 1.96). Both intervals include 1. The release does not establish a reduction in cardiovascular events. It says these events occurred less frequently than anticipated in both the retatrutide and placebo arms. Urinary tract infection in that topline was 6.1% (9 mg) and 7.0% (12 mg) versus 5.3% with placebo in TRIUMPH-3. This is not medical advice and not a dose."
+    },
+    {
+     "question": "Is retatrutide approved?",
+     "answer": "No. As of early October 2026 it remains investigational and is not FDA-approved, and it is not commercially marketed by the sponsor as an approved medicine."
+    },
+    {
+     "question": "Does “BLA in Q1 2027” mean retatrutide will be approved in 2027?",
+     "answer": "No. That date is Lilly’s stated plan to submit a Biologics License Application while completing CMC. Submission is not FDA acceptance, and acceptance is not approval. No approval date should be inferred from the filing window alone."
+    },
+    {
+     "question": "What did the Seventh Circuit decide in Eli Lilly v. Kennedy?",
+     "answer": "As of early October 2026: the Seventh Circuit heard oral argument on 24 September 2026 in No. 26-1301. No published ruling from that appeal was located in this check. Argument is not a decision."
+    },
+    {
+     "question": "Are research-vendor “retatrutide” vials the same as trial or expanded-access supply?",
+     "answer": "No. Grey-market / RUO listings are not Lilly clinical-trial material and are not expanded-access product released through the manufacturer/physician FDA-process pathway."
+    }
+   ],
+   "conclusion": "Retatrutide remains investigational and unapproved. TRIUMPH-2 is peer-reviewed Phase 3 research news for a T2D + obesity/overweight population: large placebo-adjusted weight and A1C changes under published estimands, with GI AEs typical of the incretin class plus reported dysesthesia. PeptideMap’s job is comparison and citation, not therapy recommendations. Cross-trial claims against approved incretins need head-to-head evidence. Lilly’s stated Q1 2027 U.S. BLA intent is a filing plan, not marketing authorization. RUO vendor products are not medicines and are not equivalent to trial supply.\n\nProgram literacy for readers: TRIUMPH-1 / TRIUMPH-2 / TRIUMPH-3 are different trials with differently labeled estimands; Q1 2027 is a planned BLA filing window, not an approval prophecy; the Seventh Circuit argument of 24 Sep 2026 had no located ruling by early Oct 2026; expanded access is a narrow manufacturer/FDA-process pathway and is not a grey-market catalog.",
+   "overview": "Retatrutide (LY3437943) is an investigational triple hormone receptor agonist (GIP, GLP-1, and glucagon receptors) studied as a once-weekly injectable in clinical trials. It is not FDA-approved and is not a marketed medicine. PeptideMap covers it as research news + RUO vendor comparison — not therapy guidance.\n\nDetailed Phase 3 results from TRIUMPH-2 (adults with type 2 diabetes and obesity or overweight; n=1,152; 80 weeks) were presented at EASD 2026 and published in The Lancet (29 Sep 2026). Under Lilly’s efficacy estimand, mean body-weight change at week 80 was −12.7% (4 mg arm), −19.1% (9 mg arm), and −20.8% (12 mg arm) versus −4.0% with placebo; A1C fell about 1.4–1.6 percentage points versus −0.2 with placebo. The Lancet abstract also reports treatment-regimen mean percent weight change of −11.9%, −16.8%, and −18.8% versus −5.1% placebo. GI adverse events were the most common reported events in the trial; Lilly has stated a planned U.S. BLA in Q1 2027 (filing plan ≠ approval).\n\nAlso known in research-vendor catalogs as GLP3-R — PeptideMap lists Retatrutide as the primary name. Grey-market / RUO listings are not clinical trial supply.\n\nTimeline literacy (early Oct 2026): Retatrutide (LY3437943) is still an investigational triple agonist. It is not FDA-approved and is not a sponsor-marketed medicine. Lilly’s 23 July 2026 topline on TRIUMPH-2 and TRIUMPH-3 stated that the company is completing the Chemistry, Manufacturing, and Controls (CMC) package required for a Biologics License Application and plans to submit in Q1 2027 for U.S. review — a company filing plan, not FDA acceptance and not approval. Grey-market / RUO catalog vials are not clinical-trial supply and are not expanded-access supply.",
+   "description": "Retatrutide is a triple agonist targeting GLP-1, GIP, and glucagon receptors simultaneously. Phase 2 data showed up to 24% weight reduction — the highest of any peptide compound studied.\n\nAs of early October 2026, retatrutide remains investigational: not FDA-approved and not commercially marketed by the sponsor. Lilly has stated a plan to submit a U.S. BLA in Q1 2027 while completing CMC (filing plan ≠ acceptance ≠ approval). A Seventh Circuit oral argument on biologic classification (Eli Lilly v. Kennedy, No. 26-1301, 24 Sep 2026) was held; no ruling was located as of early Oct 2026."
+  },
+  "cjc-1295": {
+   "regulatory_subsections": [
+    {
+     "title": "Current Status",
+     "entries": [
+      {
+       "type": "content",
+       "value": "CJC-1295 is not FDA-approved for human use. Available as a research peptide."
+      }
+     ]
+    },
+    {
+     "title": "WADA Status",
+     "entries": [
+      {
+       "type": "content",
+       "value": "CJC-1295 is prohibited by WADA under S2."
+      }
+     ]
+    }
+   ],
+   "references": [
+    {
+     "title": "Journal of Clinical Endocrinology & Metabolism (2006)",
+     "authors": "Teichman et al.",
+     "description": "Prolonged stimulation of GH, IGF-1, and prolactin in healthy adults by CJC-1295."
+    },
+    {
+     "title": "Journal of Clinical Endocrinology & Metabolism (2006)",
+     "authors": "Alba et al.",
+     "description": "Once-weekly CJC-1295 administration raises IGF-1 sustainably."
+    },
+    {
+     "links": [
+      {
+       "url": "https://pubmed.ncbi.nlm.nih.gov/16352683/",
+       "label": "PubMed"
+      },
+      {
+       "url": "https://doi.org/10.1210/jc.2005-1536",
+       "label": "DOI"
+      }
+     ],
+     "title": "Prolonged stimulation of growth hormone (GH) and insulin-like growth factor I secretion by CJC-1295, a long-acting analog of GH-releasing hormone, in healthy adults",
+     "authors": "Teichman SL, Neale A, Lawrence B, Gagnon C, Castaigne JP, Frohman LA",
+     "citation": "J Clin Endocrinol Metab. 2006; DOI 10.1210/jc.2005-1536. PMID 16352683.",
+     "description": "Healthy-adult PK/PD for DAC CJC-1295; estimated half-life 5.8–8.1 days; multi-day GH/IGF-I elevation. DAC construct only."
+    },
+    {
+     "links": [
+      {
+       "url": "https://pubmed.ncbi.nlm.nih.gov/15817669/",
+       "label": "PubMed"
+      },
+      {
+       "url": "https://doi.org/10.1210/en.2004-1286",
+       "label": "DOI"
+      }
+     ],
+     "title": "Human growth hormone-releasing factor (hGRF)1-29-albumin bioconjugates with an extended duration of action. Identification of CJC-1295 as a long-lasting GRF analog",
+     "authors": "Jetté L, Léger R, Thibaudeau K, et al.",
+     "citation": "Endocrinology. 2005; DOI 10.1210/en.2004-1286. PMID 15817669.",
+     "description": "Defines CJC-1295 as tetrasubstituted hGRF(1-29) with Nε-3-maleimidopropionamide lysine (DAC) for albumin binding."
+    },
+    {
+     "links": [
+      {
+       "url": "https://apexlab.org/cjc-1295-research-guide/",
+       "label": "Source"
+      }
+     ],
+     "title": "CJC-1295 With DAC vs No DAC: An Identity-First Research Guide",
+     "authors": "Apex Laboratory Editorial Team",
+     "citation": "apexlab.org research guide (structure/identity map).",
+     "description": "Structure-only identity map for DAC versus Modified GRF naming. Not a primary pharmacokinetic source."
+    }
+   ],
+   "faqs": [
+    {
+     "question": "What is the difference between CJC-1295 with and without DAC?",
+     "answer": "DAC binds albumin, extending half-life from ~30 min to 6-8 days. Without DAC creates natural pulsatile GH release; with DAC produces sustained elevation."
+    },
+    {
+     "question": "Why is CJC-1295 often stacked with Ipamorelin?",
+     "answer": "CJC-1295 (GHRH analog) and Ipamorelin (GHSR agonist) act on different receptors to synergistically amplify GH pulses."
+    },
+    {
+     "question": "Does CJC-1295 suppress natural GH production?",
+     "answer": "No. As a GHRH analog, it works through the body's own pituitary signaling, preserving feedback regulation."
+    },
+    {
+     "question": "Is “CJC-1295 no DAC” the same molecule as literature CJC-1295?",
+     "answer": "No. In the peer-reviewed characterization, CJC-1295 is the DAC / albumin-binding GHRH(1-29) analog (Jetté et al., 2005). “CJC-1295 no DAC” is a common catalog nickname for Modified GRF 1-29-type material without that DAC group. Shared GHRH-receptor pharmacology does not make the identities or PK datasets interchangeable."
+    },
+    {
+     "question": "Can the Teichman half-life be quoted for Mod GRF / no-DAC?",
+     "answer": "No. Teichman et al. (2006) estimated 5.8–8.1 days for the DAC construct. That number must not be transferred to no-DAC / Mod GRF products."
+    },
+    {
+     "question": "What about CJC-1295 / Ipamorelin blend vials?",
+     "answer": "Those are marketed two-component research blends (GHRH-pathway analog + ipamorelin). Live /encyclopedia/CJC-1295-Ipamorelin is still empty of educational body text (vendors only). For now see /compare/CJC-1295-Ipamorelin and /compare/cjc-1295-vs-ipamorelin. This page does not give stacking, synergy, or dosing guidance."
+    },
+    {
+     "question": "What should a blend CoA name?",
+     "answer": "Each component’s construct (DAC vs no-DAC / Mod GRF; ipamorelin form) should be identifiable. A CoA that only says “CJC-1295” without construct clarity cannot resolve the naming trap above."
+    }
+   ]
+  },
+  "cagrilintide": {
+   "overview": "Cagrilintide is a long-acting analog of amylin, a peptide hormone co-secreted with insulin from pancreatic beta cells. Novo Nordisk developed it as a complement to semaglutide, and the combination (CagriSema) has emerged as a leading next-generation obesity treatment.\n\nThe REDEFINE Phase 3 trial program showed CagriSema achieving up to 25% body weight reduction — positioning the amylin + GLP-1 combination as potentially the most effective peptide-based weight management approach.",
+   "background": "Amylin was discovered in 1987 as a peptide co-secreted with insulin from pancreatic beta cells. Natural amylin has a half-life of only ~15 minutes. Pramlintide (Symlin), a first-generation amylin analog, was FDA-approved for diabetes but required three daily injections.\n\nCagrilintide was engineered with fatty acid acylation for albumin binding, extending half-life to approximately one week for once-weekly dosing. The strategic insight was combining amylin-pathway satiety with GLP-1-pathway appetite suppression.",
+   "half_life": "~7 days (albumin binding)",
+   "molecular_formula": "C₁₇₆H₂₇₂N₅₀O₅₃S₃",
+   "molecular_weight": "3,990.5 g/mol",
+   "cas_registry_number": "2196967-89-4",
+   "human_use_intro": "Cagrilintide is in advanced clinical development with encouraging Phase 2 and Phase 3 data.",
+   "human_use_subsections": [
+    {
+     "title": "Clinical Program",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Phase 2 trials of standalone cagrilintide showed meaningful weight reduction. The CagriSema combination (cagrilintide + semaglutide) achieved approximately 25% body weight reduction in the REDEFINE Phase 3 program — potentially the highest pharmacological weight loss recorded.\\n\\nThe combination was generally well-tolerated with GI side effects (nausea, vomiting, diarrhea) consistent with the individual compound profiles."
+      }
+     ]
+    }
+   ],
+   "regulatory_subsections": [
+    {
+     "title": "Development Status",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Cagrilintide is not yet FDA-approved. Phase 3 trials (REDEFINE program) are ongoing. Novo Nordisk is developing both standalone cagrilintide and the CagriSema fixed-dose combination. Research-grade cagrilintide is available through peptide vendors."
+      }
+     ]
+    }
+   ],
+   "regulatory_important_note": "Cagrilintide is investigational. Not approved for any indication. Phase 3 trials ongoing.",
+   "potential_applications_important_context": "Cagrilintide is investigational. Regulatory approval will depend on Phase 3 outcomes.",
+   "potential_applications": [
+    {
+     "title": "Weight management (CagriSema)",
+     "description": "Studied in the REDEFINE phase 3 programme; in REDEFINE 1, mean weight loss at 68 weeks was 20.4% with CagriSema vs 3.0% with placebo (NEJM 2025). Not approved."
+    },
+    {
+     "title": "Amylin Biology",
+     "description": "Understanding amylin's role in satiety, glucose homeostasis, and bone metabolism."
+    },
+    {
+     "title": "Combination Therapeutics",
+     "description": "Studied with semaglutide in the CagriSema combination; Novo Nordisk reports an additive effect on weight loss (company-reported)."
+    }
+   ],
+   "areas_of_research": [
+    {
+     "name": "Obesity (CagriSema)",
+     "description": "Combined with semaglutide in the REDEFINE phase 3 programme; NDA submitted to the FDA on 18 Dec 2025"
+    },
+    {
+     "name": "Type 2 Diabetes",
+     "description": "Amylin replacement for post-meal glucose control"
+    },
+    {
+     "name": "Satiety Research",
+     "description": "Understanding amylin receptor signaling in appetite regulation"
+    }
+   ],
+   "conclusion": "Cagrilintide and the CagriSema combination represent the most promising near-term advance in obesity pharmacotherapy. By combining amylin and GLP-1 pathway activation, these compounds achieve a level of weight reduction that was previously only possible through surgical intervention.\n\nThe scientific contribution is the validation of pathway complementarity — demonstrating that targeting distinct satiety circuits in the brain produces genuinely synergistic effects rather than simple additive ones.\n\nFor researchers, cagrilintide offers insight into amylin biology, which has been understudied relative to GLP-1 despite amylin's critical role in post-meal satiety and glucose regulation.",
+   "references": [
+    {
+     "title": "The Lancet (2021)",
+     "authors": "Lau et al.",
+     "description": "Phase 2 trial of cagrilintide for weight management in obesity."
+    },
+    {
+     "title": "Nature Medicine (2023)",
+     "authors": "Frias et al.",
+     "description": "CagriSema Phase 2: combined amylin and GLP-1 agonism for obesity."
+    }
+   ],
+   "faqs": [
+    {
+     "question": "What is CagriSema?",
+     "answer": "CagriSema is the fixed-dose combination of cagrilintide (amylin analog) and semaglutide (GLP-1 agonist) in a single weekly injection, currently in Phase 3 trials."
+    },
+    {
+     "question": "How does cagrilintide differ from GLP-1 agonists?",
+     "answer": "Cagrilintide targets amylin receptors in different brain regions than GLP-1 agonists, providing complementary satiety signaling through distinct neural pathways."
+    },
+    {
+     "question": "Is cagrilintide FDA-approved?",
+     "answer": "Not yet. It is in Phase 3 clinical trials as both a standalone agent and in the CagriSema combination."
+    }
+   ],
+   "key_points": [
+    "Long-acting amylin receptor agonism",
+    "Reduces appetite via area postrema",
+    "Slows gastric emptying",
+    "Studied with semaglutide as CagriSema; Novo Nordisk describes the effect as additive (company statement).",
+    "Enhances satiety signaling",
+    "Reduces post-meal glucose excursions",
+    "Status (as of 19 Oct 2026): not approved alone or in CagriSema. Novo Nordisk submitted an NDA for CagriSema on 18 Dec 2025 and expects an FDA decision by late 2026. In REDEFINE 4, CagriSema did not show non-inferiority to tirzepatide (company-reported, 23 Feb 2026). Cagrilintide alone is in phase 3 (RENEW)."
+   ],
+   "description": "Cagrilintide is a long-acting amylin analog being developed by Novo Nordisk as a complement to GLP-1 agonists. The combination with semaglutide (CagriSema) showed up to 25% weight reduction.",
+   "preclinical_subsections": [
+    {
+     "title": "Metabolic Effects",
+     "findings": [
+      {
+       "title": "Weight Reduction",
+       "content": "In obese animal models, cagrilintide produced dose-dependent weight loss through reduced food intake. The combination with semaglutide produced significantly greater weight loss than either compound alone, confirming the pathway complementarity hypothesis."
+      },
+      {
+       "title": "Combined amylin and GLP-1 agonism (preclinical)",
+       "content": "In rodent studies, combined amylin and GLP-1 agonism produced greater weight loss than either alone (preclinical; not a human result)."
+      }
+     ]
+    }
+   ]
+  },
+  "orforglipron": {
+   "regulatory_subsections": [
+    {
+     "title": "Regulatory status",
+     "entries": [
+      {
+       "type": "content",
+       "value": "Foundayo is an approved prescription tablet. Research-chemical orforglipron is not that product and is not a substitute for it."
+      }
+     ]
+    }
+   ],
+   "key_points": [
+    "Orforglipron is a small-molecule, nonpeptide GLP-1 receptor agonist.",
+    "Foundayo is the FDA-approved orforglipron tablet (April 1, 2026).",
+    "Research-chemical powders and vials are not Foundayo and are not the approved dosage form.",
+    "This page does not provide dosing or prices."
+   ],
+   "references": [
+    {
+     "links": [
+      {
+       "url": "https://investor.lilly.com/news-releases/news-release-details/fda-approves-lillys-foundayotm-orforglipron-only-glp-1-pill",
+       "label": "Lilly"
+      }
+     ],
+     "title": "FDA approves Foundayo (orforglipron) tablets",
+     "authors": "Eli Lilly and Company",
+     "citation": "Eli Lilly and Company press release. April 1, 2026.",
+     "description": "Approval announcement for the oral nonpeptide GLP-1 receptor agonist tablet."
+    },
+    {
+     "links": [
+      {
+       "url": "https://pubchem.ncbi.nlm.nih.gov/compound/137319706",
+       "label": "PubChem"
+      }
+     ],
+     "title": "PubChem record for orforglipron (CID 137319706)",
+     "authors": "",
+     "citation": "National Center for Biotechnology Information. PubChem Compound CID 137319706.",
+     "description": "Free-base formula C48H48F2N10O5, molecular weight 883.0. No CAS is stated on this page."
+    }
+   ]
+  },
+  "ipamorelin": {
+   "faqs": [
+    {
+     "question": "Why is Ipamorelin considered selective?",
+     "answer": "Unlike other GH secretagogues, Ipamorelin stimulates growth hormone release without significantly increasing cortisol, prolactin, or ACTH, making it the most selective GHSR agonist available."
+    },
+    {
+     "question": "When is the best time to inject Ipamorelin?",
+     "answer": "Approximately 1-1.5 hours after the last meal, ideally at bedtime, to align with the body's natural nocturnal GH secretion."
+    },
+    {
+     "question": "How does Ipamorelin differ from GHRP-6?",
+     "answer": "Ipamorelin does not stimulate appetite (no ghrelin-like hunger spike) and produces a cleaner GH pulse without elevating cortisol."
+    }
+   ],
+   "description": "Ipamorelin is the most selective growth hormone secretagogue, stimulating GH release without affecting cortisol, prolactin, or ACTH levels."
+  },
+  "aod-9604": {
+   "faqs": [
+    {
+     "question": "Does AOD-9604 increase growth hormone levels?",
+     "answer": "No. AOD-9604 is the lipolytic fragment of hGH and does not stimulate GH secretion or increase IGF-1."
+    },
+    {
+     "question": "Is AOD-9604 approved for any use?",
+     "answer": "It has GRAS status from the FDA as a food substance. It is not approved as a pharmaceutical drug."
+    },
+    {
+     "question": "Why must it be taken on an empty stomach?",
+     "answer": "Insulin from food intake inhibits the lipolytic signaling pathway, reducing effectiveness."
+    }
+   ],
+   "description": "AOD-9604 is a modified fragment of human growth hormone (amino acids 176-191) that replicates the fat-burning action of GH without anabolic or diabetogenic effects."
+  },
+  "kisspeptin": {
+   "faqs": [
+    {
+     "question": "Why is kisspeptin important for fertility?",
+     "answer": "Kisspeptin is the master upstream regulator of GnRH neurons, triggering the entire reproductive hormone cascade."
+    },
+    {
+     "question": "Why does continuous kisspeptin cause tachyphylaxis?",
+     "answer": "Continuous exposure causes KISS1R receptor desensitization, paradoxically suppressing hormones. Pulsed dosing is essential."
+    },
+    {
+     "question": "Do effects differ between men and women?",
+     "answer": "Yes. Men show robust LH stimulation at all times, but in women the response depends on menstrual cycle phase, strongest in the preovulatory period."
+    }
+   ],
+   "description": "Kisspeptin is the master upstream regulator of the reproductive hormone cascade, triggering GnRH release and the entire hypothalamic-pituitary-gonadal axis."
+  },
+  "bremelanotide": {
+   "description": "PT-141 (Bremelanotide) is an FDA-approved melanocortin receptor agonist that works centrally in the brain to increase sexual desire, unlike PDE5 inhibitors that work peripherally."
+  },
+  "dsip": {
+   "description": "DSIP is a naturally occurring nonapeptide that promotes delta-wave sleep and modulates stress hormone levels. First isolated from rabbit brain in 1977."
+  },
+  "igf-1-lr3": {
+   "description": "IGF-1 LR3 is an 83-amino acid synthetic analog of insulin-like growth factor 1 (IGF-1) with a modified N-terminus. The arginine-to-glutamate substitution at position 3 and 13-amino acid extension significantly reduces IGF binding protein affinity, resulting in enhanced and prolonged biological activity compared to native IGF-1.",
+   "background": "IGF-1 LR3 (Long R3 Insulin-like Growth Factor-1) is an 83-amino acid synthetic analog of human IGF-1. It was developed by modifying the native IGF-1 sequence — substituting a glutamic acid for the arginine at position 3 and adding a 13-amino acid N-terminal extension peptide. These modifications dramatically reduce binding to IGF binding proteins (IGFBPs), which normally sequester circulating IGF-1 and limit its bioavailability. As a result, IGF-1 LR3 maintains significantly higher biological potency and an extended half-life compared to native IGF-1. Originally developed as a research tool for studying IGF-1 signaling pathways, IGF-1 LR3 has become widely used in cell culture applications where it promotes cellular proliferation and inhibits apoptosis more effectively than standard IGF-1."
+  },
+  "mots-c": {
+   "description": "MOTS-c is a mitochondrial-derived peptide encoded by mitochondrial DNA that acts as an exercise mimetic, activating AMPK and improving metabolic function."
+  },
+  "nad": {
+   "description": "NAD+ is a critical coenzyme found in every living cell, essential for energy metabolism, DNA repair, and sirtuin activation. Levels decline significantly with age."
+  },
+  "selank": {
+   "description": "Selank is a synthetic heptapeptide derived from the natural immunopeptide tuftsin, developed at the Institute of Molecular Genetics in Russia. It provides anxiolytic effects without sedation."
+  },
+  "semaglutide": {
+   "description": "Semaglutide is a GLP-1 receptor agonist and the most-searched peptide compound globally. FDA-approved for type 2 diabetes (Ozempic) and obesity (Wegovy), it has transformed metabolic research.",
+   "references": [
+    {
+     "links": [],
+     "title": "New England Journal of Medicine (2021) — STEP-1",
+     "authors": "Wilding JPH et al."
+    },
+    {
+     "links": [],
+     "title": "New England Journal of Medicine (2016) — SUSTAIN-6",
+     "authors": "Marso SP et al."
+    },
+    {
+     "links": [],
+     "title": "New England Journal of Medicine (2023) — SELECT",
+     "authors": "Lincoff AM et al."
+    },
+    {
+     "links": [],
+     "title": "The Lancet (2019) — PIONEER-6",
+     "authors": "Husain M et al."
+    },
+    {
+     "links": [],
+     "title": "Diabetes Care (2020)",
+     "authors": "Pratley RE et al."
+    }
+   ]
+  },
+  "sermorelin": {
+   "description": "Sermorelin is the first 29 amino acids of natural GHRH, previously FDA-approved for pediatric GH deficiency. It stimulates natural GH release while preserving feedback regulation."
+  },
+  "tirzepatide": {
+   "description": "Tirzepatide is the first dual GLP-1/GIP receptor agonist, showing superior metabolic outcomes versus GLP-1-only compounds in head-to-head clinical trials."
+  }
+ }
+}
