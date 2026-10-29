@@ -68,7 +68,7 @@ class RetatrutideTirzepatideCompareCopy
                     'url' => 'https://clinicaltrials.gov/study/NCT06662383',
                 ],
                 [
-                    'title' => 'Grunstein RR, Somers VK, Azarbarzin A, et al. Retatrutide Once Weekly for Treatment of Obstructive Sleep Apnea. N Engl J Med. Published online October 21, 2026 (Crossref lists October 20, 2026). Funded by Eli Lilly. DOI: 10.1056/NEJMoa2611477.',
+                    'title' => 'Grunstein RR, Somers VK, Azarbarzin A, et al. Retatrutide Once Weekly for Treatment of Obstructive Sleep Apnea. N Engl J Med. Published online October 20, 2026. Funded by Eli Lilly. DOI: 10.1056/NEJMoa2611477.',
                     'url' => 'https://doi.org/10.1056/NEJMoa2611477',
                 ],
                 [
@@ -88,7 +88,7 @@ class RetatrutideTirzepatideCompareCopy
                     'url' => 'https://investor.lilly.com/news-releases/news-release-details/lillys-triple-agonist-retatrutide-drove-substantial-improvements',
                 ],
                 [
-                    'title' => 'Malhotra A, Grunstein RR, Fietze I, et al. Tirzepatide for the Treatment of Obstructive Sleep Apnea and Obesity. N Engl J Med. 2024;391(13):1193-1205 (online June 21, 2024). Funded by Eli Lilly. DOI: 10.1056/NEJMoa2404881. (open full text: https://pmc.ncbi.nlm.nih.gov/articles/PMC11598664/)',
+                    'title' => 'Malhotra A, Grunstein RR, Fietze I, et al. Tirzepatide for the Treatment of Obstructive Sleep Apnea and Obesity. N Engl J Med. 2024;391(13):1193-1205 (online June 21, 2024). Funded by Eli Lilly. DOI: 10.1056/NEJMoa2404881. PMID 38912654. (open full text: https://pmc.ncbi.nlm.nih.gov/articles/PMC11598664/)',
                     'url' => 'https://doi.org/10.1056/NEJMoa2404881',
                 ],
                 [
@@ -114,14 +114,14 @@ class RetatrutideTirzepatideCompareCopy
         return [
             'title' => 'Obstructive sleep apnea (OSA): what the trials report',
             'paragraphs' => [
-                'Both compounds have been studied in adults with moderate-to-severe OSA and obesity or overweight, using the same primary endpoint: change in the apnea-hypopnea index (AHI), the number of breathing pauses or shallow-breathing events per hour of sleep. The two programs were separate, placebo-controlled trials. No head-to-head trial has compared retatrutide with tirzepatide in OSA, and differences in populations, duration and estimands mean the results should not be ranked against each other.',
+                'Both compounds have been studied in adults with moderate-to-severe OSA and excess weight (obesity or overweight in the retatrutide trials; obesity in the tirzepatide trials), using the same primary endpoint: change in the apnea-hypopnea index (AHI), the number of breathing pauses or shallow-breathing events per hour of sleep. The two programs were separate, placebo-controlled trials. No head-to-head trial has compared retatrutide with tirzepatide in OSA, and differences in populations, duration and estimands mean the results should not be ranked against each other.',
                 [
                     'lead' => 'Retatrutide.',
-                    'text' => 'TRIUMPH-1-OSA (participants without type 2 diabetes) and TRIUMPH-2-OSA (participants with type 2 diabetes) were reported together in a single developer-affiliated NEJM paper (Grunstein et al.), published online in October 2026 [4][5]. The OSA trials were nested within the larger TRIUMPH-1 and TRIUMPH-2 basket trials [6][7]. Across dose arms, each trial reported a greater reduction in AHI than placebo at week 80 under a hybrid-treatment estimand. The paper also reports intention-to-treat results. The most common adverse events were gastrointestinal [4]. An earlier company-reported Lilly release (June 2026) covered only the TRIUMPH-1 OSA basket and used an efficacy estimand [8]. Retatrutide is investigational and has no approved indication.',
+                    'text' => 'TRIUMPH-1-OSA (participants without type 2 diabetes) and TRIUMPH-2-OSA (participants with type 2 diabetes) were reported together in a single developer-affiliated NEJM paper (Grunstein et al.), published online in October 2026 [4][5]. The OSA trials were nested within the larger TRIUMPH-1 and TRIUMPH-2 basket trials [6][7]. The primary endpoint was tested in the middle and highest dose arms; in each trial, AHI fell more in all three dose arms (lowest, middle and highest) than with placebo at week 80 under a hybrid-treatment estimand. The paper also reports intention-to-treat results. The most common adverse events were gastrointestinal [4]. An earlier company-reported Lilly release (June 2026) covered only the TRIUMPH-1 OSA basket and used an efficacy estimand [8]. Retatrutide is investigational and has no approved indication.',
                 ],
                 [
                     'lead' => 'Tirzepatide.',
-                    'text' => 'SURMOUNT-OSA (Malhotra et al., NEJM 2024) was a developer-affiliated pair of trials: one in people not using positive airway pressure (PAP) therapy and one in people using it [9][10]. Each reported a greater reduction in AHI than placebo at week 52 under the treatment-regimen estimand, the paper\'s primary estimand, with an efficacy estimand reported as supportive [9]. On 20 December 2024 the FDA approved Zepbound (tirzepatide) for moderate-to-severe OSA in adults with obesity [11].',
+                    'text' => 'SURMOUNT-OSA (Malhotra et al., NEJM 2024) was a developer-affiliated pair of trials: one in people not using positive airway pressure (PAP) therapy and one in people using it [9][10]. In each, AHI fell more with tirzepatide than with placebo at week 52 under the treatment-regimen estimand, the estimand the paper uses for its reported results; the paper also reports an efficacy estimand [9]. On 20 December 2024 the FDA approved Zepbound (tirzepatide) for moderate-to-severe OSA in adults with obesity [11].',
                 ],
             ],
         ];
@@ -137,11 +137,11 @@ class RetatrutideTirzepatideCompareCopy
         return [
             [
                 'q' => 'Has retatrutide been compared directly with tirzepatide for sleep apnea?',
-                'a' => 'No. TRIUMPH-1-OSA, TRIUMPH-2-OSA and SURMOUNT-OSA each compared one compound with placebo. They differed in population (with or without type 2 diabetes, PAP use), length (80 vs 52 weeks) and estimand, so they cannot be used to say which compound works better.',
+                'a' => 'No. TRIUMPH-1-OSA, TRIUMPH-2-OSA and SURMOUNT-OSA each compared one compound with placebo. They differed in population (with or without type 2 diabetes, PAP use), length (80 vs 52 weeks) and estimand, so they cannot be used to rank the two compounds against each other.',
             ],
             [
                 'q' => 'Is either compound approved for OSA?',
-                'a' => 'Tirzepatide, as Zepbound, has an FDA-approved OSA indication (December 2024). Retatrutide is not approved for any use; Lilly states it is available only to clinical-trial participants.',
+                'a' => 'Tirzepatide, as Zepbound, has an FDA-approved OSA indication (December 2024). Retatrutide is not approved for any use; Lilly states it is legally available only to participants in its clinical trials [8].',
             ],
         ];
     }
