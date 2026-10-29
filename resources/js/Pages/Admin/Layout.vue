@@ -20,15 +20,26 @@
           <NavItem v-if="$page.props.is_ceo" href="/admin/ceo" icon="crown" label="CEO" />
         </div>
 
-        <!-- Catalog -->
-        <div>
+        <!-- Catalog — hidden for seo_agency; they get the SEO-scoped versions below -->
+        <div v-if="!$page.props.is_seo_agency">
           <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">Catalog</div>
-          <NavItem v-if="!$page.props.is_seo_agency" href="/admin/applicants" icon="user-plus" label="Applicants" :badge="$page.props.pending_vendors_count" badge-color="red" />
-          <NavItem v-if="!$page.props.is_seo_agency" href="/admin/vendors" icon="store" label="Vendors" />
+          <NavItem href="/admin/applicants" icon="user-plus" label="Applicants" :badge="$page.props.pending_vendors_count" badge-color="red" />
+          <NavItem href="/admin/vendors" icon="store" label="Vendors" />
           <NavItem href="/admin/products" icon="package" label="Products" />
           <NavItem href="/admin/categories" icon="folder" label="Categories" />
-          <NavItem v-if="!$page.props.is_seo_agency" href="/admin/deals" icon="tag" label="Deals & Coupons" />
-          <NavItem v-if="!$page.props.is_seo_agency" href="/admin/affiliates" icon="dollar" label="Affiliates" />
+          <NavItem href="/admin/deals" icon="tag" label="Deals & Coupons" />
+          <NavItem href="/admin/affiliates" icon="dollar" label="Affiliates" />
+        </div>
+
+        <!-- SEO Tools — only shown to the agency (and in agency preview) -->
+        <div v-if="$page.props.is_seo_agency">
+          <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">SEO Tools</div>
+          <NavItem href="/admin/seo/brands" icon="store" label="Brand SEO" />
+          <NavItem href="/admin/seo/products" icon="package" label="Product SEO" />
+          <NavItem href="/admin/seo/pages" icon="file" label="Pages SEO" />
+          <NavItem href="/admin/redirects" icon="refresh" label="Redirects" />
+          <NavItem href="/admin/content-scanner" icon="search" label="Content Scanner" />
+          <NavItem href="/admin/seo/changelog" icon="clipboard" label="SEO Changelog" />
         </div>
 
         <!-- Ingestion — hidden for seo_agency role entirely -->

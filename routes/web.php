@@ -446,6 +446,14 @@ Route::middleware(['auth', 'role:admin,admin_viewer,seo_agency', 'email.verified
     Route::get('/seo/brands/{brand}/edit', [\App\Http\Controllers\Admin\SeoBrandsController::class, 'edit'])->name('admin.seo.brands.edit');
     Route::put('/seo/brands/{brand}', [\App\Http\Controllers\Admin\SeoBrandsController::class, 'update'])->name('admin.seo.brands.update');
 
+    // Product SEO editor — narrow slice of /admin/products exposing ONLY
+    // the SEO fields (title, meta, OG) + description. Lets the SEO
+    // agency fix product-page SEO without seeing price, stock, affiliate
+    // URL, scraper config, or admin lock flags.
+    Route::get('/seo/products', [\App\Http\Controllers\Admin\SeoProductsController::class, 'index'])->name('admin.seo.products');
+    Route::get('/seo/products/{product}/edit', [\App\Http\Controllers\Admin\SeoProductsController::class, 'edit'])->name('admin.seo.products.edit');
+    Route::put('/seo/products/{product}', [\App\Http\Controllers\Admin\SeoProductsController::class, 'update'])->name('admin.seo.products.update');
+
     // Per-page analytics — GSC + internal signals for any one URL.
     // Deep-linked from the frontend AdminBar's "Analytics" button.
     Route::get('/analytics/page', [\App\Http\Controllers\Admin\PageAnalyticsController::class, 'show'])->name('admin.analytics.page');

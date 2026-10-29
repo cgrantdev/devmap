@@ -15,9 +15,14 @@ use Symfony\Component\HttpFoundation\Response;
  * but clicking lands on a clear "not allowed" page instead of silently
  * breaking.
  *
- * Agency CAN access: /admin/seo/*, /admin/products/*, /admin/blogs/*,
- * /admin/encyclopedia-entries/*, /admin/categories/*,
- * /admin/analytics/*, /admin/ceo (read-only GSC), /admin/dashboard.
+ * Agency CAN access: /admin/seo/*, /admin/blogs/*,
+ * /admin/encyclopedia-entries/*, /admin/analytics/*, /admin/ceo
+ * (read-only GSC), /admin/dashboard.
+ *
+ * Raw /admin/products + /admin/categories are BLOCKED — those expose
+ * price, stock, affiliate URLs, scraper config, and admin notes. The
+ * agency uses the SEO-scoped equivalents at /admin/seo/products +
+ * /admin/seo/brands instead.
  */
 class BlockSeoAgency
 {
@@ -36,6 +41,8 @@ class BlockSeoAgency
         'admin/reviews',
         'admin/seo-wip',
         'admin/product-scraping',
+        'admin/products',
+        'admin/categories',
     ];
 
     public function handle(Request $request, Closure $next): Response
