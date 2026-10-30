@@ -25,9 +25,11 @@ use Illuminate\Support\Facades\Cache;
  */
 class SitemapController extends Controller
 {
-    // v6 adds /calculator and the /calculator/{slug} compound pages so each
-    // compound-specific calculator URL earns its own crawl path.
-    public const CACHE_KEY = 'sitemap.xml.v6';
+    // v7 adds /product/{slug} compound listing pages (one per active
+    // ProductCategory). These rank for high-intent "{compound} for sale"
+    // queries (retatrutide 6.4k/mo, bpc-157 etc.) and were previously
+    // crawl-orphaned — Google saw them only via internal links on /products.
+    public const CACHE_KEY = 'sitemap.xml.v7';
     private const CACHE_TTL = 21600; // 6h
     private const BASE_URL  = 'https://peptidemap.com';
 
@@ -163,6 +165,21 @@ class SitemapController extends Controller
             ->chunkById(500, function ($chunk) use (&$urls, &$emittedCompareSlugs, $listedCategoryIds) {
                 foreach ($chunk as $c) {
                     $lastmod = $c->updated_at?->toDateString();
+
+                    // /product/{slug} compound listing page (ProductsController::show).
+                    // Route segment can't contain '/' or whitespace, so a stored slug
+                    // like "BPC-157 / TB500 / Cartalax" is skipped — those 8 need the
+                    // slug cleaned at the row level (separate fix). Case is preserved
+                    // because the controller does an exact slug match.
+                    if (preg_match('#^[A-Za-z0-9._\-]+$#', $c->slug)) {
+                        $urls[] = [
+                            'loc'        => self::BASE_URL . '/product/' . $c->slug,
+                            'lastmod'    => $lastmod,
+                            'changefreq' => 'weekly',
+                            'priority'   => '0.75',
+                        ];
+                    }
+
                     $encyclopediaPath = EncyclopediaSlug::path($c->slug);
                     if ($encyclopediaPath) {
                         $urls[] = [
