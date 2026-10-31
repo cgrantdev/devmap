@@ -148,6 +148,23 @@ class OrforglipronProfile
                         ],
                     ],
                 ],
+                [
+                    'title' => 'Cardiovascular safety trial (ACHIEVE-4)',
+                    'entries' => [
+                        [
+                            'type' => 'content',
+                            'value' => 'ACHIEVE-4 (NCT05803421) was a Phase 3, event-driven, randomised, open-label trial comparing orforglipron with insulin glargine in adults with type 2 diabetes and obesity or overweight at increased cardiovascular risk. The Lilly-funded paper in The Lancet (published online 30 September 2026; PMID 42815506) reports results "showing non-inferiority to insulin glargine for MACE-4", a composite of cardiovascular death, non-fatal myocardial infarction, non-fatal stroke and hospitalisation for unstable angina [developer-affiliated]. Lilly\'s announcement the same day describes the trial as "meeting the primary objective for non-inferiority compared to insulin glargine" [company-reported].',
+                        ],
+                        [
+                            'type' => 'content',
+                            'value' => 'Non-inferiority means the trial was designed to show that risk was not worse than the comparator by more than a prespecified margin. It is not a finding of cardiovascular benefit. The U.S. Foundayo labeling has no type 2 diabetes indication, and this result does not apply to research-chemical orforglipron.',
+                        ],
+                        [
+                            'type' => 'content',
+                            'value' => 'Lilly\'s Form 10-Q for the quarter ended 30 September 2026 states that it has \'Submitted orforglipron for type 2 diabetes in the U.S. and Japan\' [company-reported]. A submission is not an approval.',
+                        ],
+                    ],
+                ],
             ],
             'regulatory_subsections' => [
                 [

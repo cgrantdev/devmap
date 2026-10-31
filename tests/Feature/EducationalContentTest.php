@@ -55,7 +55,7 @@ class EducationalContentTest extends TestCase
         $legality = $this->get('/guides/peptide-legality-fda-ruo-compounding');
         $legality->assertOk();
         $legality->assertSee('Are Research Peptides Legal? FDA &amp; RUO Basics', false);
-        $legality->assertSee('Last verified against FDA and HHS primary sources: 2026-10-29', false);
+        $legality->assertSee('Last verified against FDA and HHS primary sources: 2026-10-31', false);
         $legality->assertSee('https://peptidemap.com/guides/peptide-legality-fda-ruo-compounding', false);
         $legality->assertDontSee('formblends', false);
         $legality->assertDontSee('FormBlends', false);
@@ -477,7 +477,7 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('Peptide Partners', $legality->content);
         $this->assertStringContainsString('for research use only', $legality->content);
         $this->assertStringContainsString('not permission to compound', $legality->content);
-        $this->assertStringContainsString('Last verified against FDA and HHS primary sources: 2026-10-29', $legality->content);
+        $this->assertStringContainsString('Last verified against FDA and HHS primary sources: 2026-10-31', $legality->content);
         $this->assertStringContainsString('not, by itself, a license to compound', $legality->content);
         $this->assertStringNotContainsString('formblends', strtolower($legality->content));
         $this->assertStringNotContainsString('Note for Meta Optimizer', $legality->content);
@@ -2477,9 +2477,9 @@ class EducationalContentTest extends TestCase
 
         $guideMarkdown = (string) file_get_contents(resource_path('content/educational/'.$guideSlug.'.md'));
         $guideWords = $this->renderedWordCount($guideMarkdown);
-        $this->assertSame(2036, $guideWords);
-        $this->assertSame('9 Min Read', ((int) ceil($guideWords / 230)).' Min Read');
-        $this->assertSame('9 Min Read', $guideEntry['read_time']);
+        $this->assertSame(2381, $guideWords);
+        $this->assertSame('11 Min Read', ((int) ceil($guideWords / 230)).' Min Read');
+        $this->assertSame('11 Min Read', $guideEntry['read_time']);
         $this->assertStringContainsString('## FAQ', $guideMarkdown);
         $this->assertDoesNotMatchRegularExpression('/^# [^#]/m', $guideMarkdown);
         $this->assertDoesNotMatchRegularExpression('/\A---\n/', $guideMarkdown);
@@ -2490,7 +2490,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame($guideEntry['lede'], $guide->description);
         $this->assertSame($guideSeo, $guide->seo_page_title);
         $this->assertSame($guideDescription, $guide->seo_description);
-        $this->assertSame('9 Min Read', $guide->reading_time);
+        $this->assertSame('11 Min Read', $guide->reading_time);
         $this->assertSame('2026-10-29', $guide->published_at->toDateString());
         $this->assertSame($guideEntry['faq'], $guide->seo_schema[0] ?? null);
         $this->assertFileExists(public_path('images/educational/'.$guideSlug.'.png'));
@@ -2510,7 +2510,7 @@ class EducationalContentTest extends TestCase
         $guidePage->assertOk();
         $guidePage->assertSee($guideH1, false);
         $guidePage->assertSee($guideSeo, false);
-        $guidePage->assertSee('9 Min Read', false);
+        $guidePage->assertSee('11 Min Read', false);
         $guidePage->assertSee('https://peptidemap.com/guides/'.$guideSlug.'#faq', false);
         $guidePage->assertSee('https://peptidemap.com/guides/'.$guideSlug, false);
         $guidePage->assertSee('Did FDA approve these six peptides?', false);
@@ -2522,7 +2522,7 @@ class EducationalContentTest extends TestCase
             ->component('Frontend/GuideArticle')
             ->where('guide.slug', $guideSlug)
             ->where('guide.title', $guideH1)
-            ->where('guide.readingTime', '9 Min Read')
+            ->where('guide.readingTime', '11 Min Read')
         );
 
         $blogSlug = 'hhs-503a-peptide-enforcement-discretion-2026';
@@ -2543,7 +2543,7 @@ class EducationalContentTest extends TestCase
 
         $blogMarkdown = (string) file_get_contents(resource_path('content/educational/'.$blogSlug.'.md'));
         $blogWords = $this->renderedWordCount($blogMarkdown);
-        $this->assertSame(842, $blogWords);
+        $this->assertSame(906, $blogWords);
         $this->assertSame('4 Min Read', ((int) ceil($blogWords / 230)).' Min Read');
         $this->assertSame('4 Min Read', $blogEntry['read_time']);
         $this->assertStringContainsString('## FAQ', $blogMarkdown);
@@ -2721,7 +2721,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame($policyGuideId, $updatedGuide->id);
         $this->assertStringNotContainsString('STALE GUIDE', (string) $updatedGuide->content);
         $this->assertStringContainsString('federal district courts in California and Texas', (string) $updatedGuide->content);
-        $this->assertSame('9 Min Read', $updatedGuide->reading_time);
+        $this->assertSame('11 Min Read', $updatedGuide->reading_time);
 
         $this->assertSame($blogCount + 1, Blog::count());
         $createdBlog = Blog::where('slug', 'hhs-503a-peptide-enforcement-discretion-2026')->firstOrFail();

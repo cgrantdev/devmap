@@ -1,6 +1,6 @@
 *Peptidemap is a research-use-only (RUO) comparison publisher. It is not a clinic, pharmacy, supplier or drug company. This page explains a regulatory document. It is not medical, legal or purchasing advice, and it does not say that any compounded or RUO product is safe, effective or legal to use.*
 
-On 28 Oct 2026 the HHS Office of the Secretary announced a draft "Enforcement Discretion Policy Regarding 503A Compounding Using Certain Peptide Bulk Drug Substances" [1][2] [primary]. It names six peptides: BPC-157, epitalon, KPV, MOTS-c, semax and TB-500 [1] [primary]. The Federal Register notice (FR Doc. 2026-22192, docket HHS-OASH-2026-0496, RIN 0910-ZD94) was filed on 28 Oct and is scheduled for publication on 30 Oct 2026 [2] [primary]. This guide covers who can compound, what the draft does and does not do, and how compounded drugs differ from RUO-labelled peptides.
+On 28 Oct 2026 the HHS Office of the Secretary announced a draft "Enforcement Discretion Policy Regarding 503A Compounding Using Certain Peptide Bulk Drug Substances" [1][2] [primary]. It names six peptides: BPC-157, epitalon, KPV, MOTS-c, semax and TB-500 [1] [primary]. The Federal Register notice (FR Doc. 2026-22192, docket HHS-OASH-2026-0496, RIN 0910-ZD94) was filed on 28 Oct and published on 30 Oct 2026 at 91 FR 68526 [2] [primary]. This guide covers who can compound, what the draft does and does not do, and how compounded drugs differ from RUO-labelled peptides.
 
 ## Who can compound: 503A vs 503B
 
@@ -26,7 +26,7 @@ The documents say this is **not**:
 - **Irrevocable.** "HHS may revisit application of this interim policy (in whole or in part) if, among other things, a safety signal or product quality issue arises" [1][2] [primary].
 - **A safety or efficacy finding.** The documents contain no determination that any of the six is safe or effective. Appendix B records that for each peptide "CDER recommended against listing" and that the PCAC, which met 23–24 Jul 2026 [4], voted in favour [1] [primary]. The draft was reviewed by OIRA from 14 Oct to 27 Oct 2026 under the title "Interim Access Policy for Compounding Using Certain Peptides" [3] [primary]. NPR reports that FDA's own scientists recommended against unwinding the restrictions [5] [press].
 
-The comment window is "2 weeks after date of publication in the Federal Register," through regulations.gov on docket HHS-OASH-2026-0496 [2] [primary].
+The comment window is "2 weeks after date of publication in the Federal Register," through regulations.gov on docket HHS-OASH-2026-0496 [2] [primary]. Regulations.gov lists the comment period as closing on 13 Nov 2026 at 11:59 pm Eastern Time [10] [primary].
 
 ## Scope: forms, listed routes and single ingredient
 
@@ -67,7 +67,13 @@ HHS's stated rationale refers to RUO directly. The Secretary "has determined tha
 
 ## State-law note
 
-The draft mentions States in its reporting condition and covers "State-licensed" pharmacies [1] [primary]. It contains no express statement about state pharmacy law. The law firm Frier Levitt writes that the policy "does not displace independent state pharmacy board requirements" and that pharmacies must still assess state law [7] [press]. That is the firm's analysis, not text from the policy.
+The draft mentions States in its reporting condition and covers "State-licensed" pharmacies [1] [primary]. It contains no express statement about state pharmacy law. The law firm Frier Levitt writes that the policy "does not displace independent state pharmacy board requirements" and that pharmacies must still assess state law [7] [press]. That is the firm's analysis, not text from the policy. AJMC reports that Jeff Cohen, cofounder of the American Peptide Association, told Reuters that states may not follow the federal government in relaxing rules [11] [press]. That is a reported comment, not a statement of any state's position.
+
+## Petition and next PCAC review
+
+On 23 Oct 2026 the Partnership for Safe Medicines (PSM) filed a citizen petition with FDA (docket FDA-2026-P-13366) [12] [primary, petitioner's filing]. It asks FDA to "refrain from taking action … to allow for compounding of drug products using any of the seven peptide bulk drug substances" considered at the 23–24 Jul 2026 PCAC meeting, and to "refrain from relying on" that meeting, which PSM says was constituted in violation of federal advisory-committee and ethics law [12]. PSM's press release describes this as urging FDA "to disregard the advisory committee vote that recommended allowing them" [13] [press release]. It is a petition to the agency, not a lawsuit, and no FDA response is reported in these sources.
+
+AJMC reports that, as of July, the PCAC was scheduled to review five more unapproved peptides for pharmacy compounding in February [11] [press]. FDA's PCAC page says FDA "will host an advisory committee meeting before the end of February 2027" [14] [primary]. A scheduled review is not a listing.
 
 ## Litigation context: Eli Lilly's retatrutide suits
 
@@ -102,7 +108,7 @@ Appendix B records that CDER recommended against listing each of the six and tha
 ## Sources
 
 1. HHS, "HHS Enforcement Discretion Policy Regarding 503A Compounding Using Certain Peptide Bulk Drug Substances" (with Appendices A and B). https://www.hhs.gov/sites/default/files/hhs-503a-peptide-enforcement-discretion-policy-appendix-b.pdf [primary]
-2. Federal Register, public inspection, FR Doc. 2026-22192, "Enforcement Discretion Policy Regarding 503A Compounding Using Certain Peptide Bulk Drug Substances," Office of the Secretary, HHS; docket HHS-OASH-2026-0496; filed 28 Oct 2026, publication 30 Oct 2026. https://public-inspection.federalregister.gov/2026-22192.pdf (final: https://www.federalregister.gov/d/2026-22192) [primary]
+2. Federal Register, 91 FR 68526–68527, FR Doc. 2026-22192, "Enforcement Discretion Policy Regarding 503A Compounding Using Certain Peptide Bulk Drug Substances," notice of availability, Office of the Secretary, HHS; docket HHS-OASH-2026-0496; filed 28 Oct 2026, published 30 Oct 2026. https://www.federalregister.gov/documents/2026/10/30/2026-22192/enforcement-discretion-policy-regarding-503a-compounding-using-certain-peptide-bulk-drug-substances [primary]
 3. OIRA, EO 12866 review, RIN 0910-ZD94, "Interim Access Policy for Compounding Using Certain Peptides," received 14 Oct 2026, concluded 27 Oct 2026. https://www.reginfo.gov/public/do/eoDetails?rrid=1569111 [primary]
 4. FDA, Pharmacy Compounding Advisory Committee meeting, 23–24 Jul 2026. https://www.fda.gov/advisory-committees/advisory-committee-calendar/july-23-24-2026-meeting-pharmacy-compounding-advisory-committee-07232026 [primary]
 5. NPR, "Trump administration will allow pharmacies to make popular peptides," 28 Oct 2026. https://www.npr.org/2026/10/28/nx-s1-6021030/peptides-compounding-enforcement [press]
@@ -110,3 +116,8 @@ Appendix B records that CDER recommended against listing each of the six and tha
 7. Frier Levitt, "HHS Announces Landmark Peptide Enforcement Discretion Policy," 28 Oct 2026. https://www.frierlevitt.com/articles/hhs-peptide-compounding-enforcement-discretion-policy/ [press, law-firm analysis]
 8. Eli Lilly and Company, "Lilly calls on online platforms, payment companies and regulators to shut down the illegal retatrutide black market," PR Newswire, 12 Aug 2026. https://www.prnewswire.com/news-releases/lilly-calls-on-online-platforms-payment-companies-and-regulators-to-shut-down-the-illegal-retatrutide-black-market-302849551.html [company-reported]
 9. Reuters, "Lilly sues six companies over alleged illegal sales of experimental obesity drug retatrutide," 12 Aug 2026. https://www.reuters.com/legal/litigation/lilly-sues-six-companies-over-alleged-illegal-sales-experimental-obesity-drug-2026-08-12/ [press]
+10. Regulations.gov, HHS-OASH-2026-0496-0002, comment page for FR Doc. 2026-22192; comment period closes 13 Nov 2026, 11:59 pm Eastern Time (checked 31 Oct 2026). https://www.regulations.gov/commenton/HHS-OASH-2026-0496-0002 [primary]
+11. Pearl Steinzor, "5 Things to Know About HHS's Interim Peptide Compounding Policy," AJMC, 29 Oct 2026. https://www.ajmc.com/view/5-things-to-know-about-hhs-s-interim-peptide-compounding-policy [press]
+12. Partnership for Safe Medicines, citizen petition under 21 C.F.R. 10.30, docket FDA-2026-P-13366, submitted 23 Oct 2026. https://www.regulations.gov/document/FDA-2026-P-13366-0001 [primary, petitioner's filing]
+13. Partnership for Safe Medicines, "Partnership for Safe Medicines Files Citizen Petition Urging FDA to Block Compounding of Unapproved and Uncharacterized Peptides," press release, 21 October 2026. https://www.safemedicines.org/2026/10/press-release-psm-petition-peptides.html [press release]
+14. FDA, Meeting of the Pharmacy Compounding Advisory Committee (meeting to be held before the end of February 2027; checked 31 Oct 2026). https://www.fda.gov/advisory-committees/pharmacy-compounding-advisory-committee/meeting-pharmacy-compounding-advisory-committee [primary]
