@@ -3,7 +3,7 @@
  * Plugin Name: PeptideMap Connect
  * Plugin URI: https://peptidemap.com
  * Description: One-click connect your WooCommerce store to PeptideMap. Auto-generates a read-only REST API key and securely sends it to PeptideMap so your products and pricing stay in sync.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: PeptideMap
  * Author URI: https://peptidemap.com
  * License: MIT

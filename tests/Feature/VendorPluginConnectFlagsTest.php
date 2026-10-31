@@ -160,7 +160,7 @@ class VendorPluginConnectFlagsTest extends TestCase
             ->assertJsonPath('message', 'That store URL is not allowed.');
         Http::assertNothingSent();
 
-        $this->postJson('/api/vendor-plugin/connect', $this->payload(self::TOKEN, 'https://shop.example.test'))
+        $this->postJson('/api/vendor-plugin/connect', $this->payload(self::TOKEN, 'https://8.8.8.8'))
             ->assertOk();
     }
 

@@ -9,6 +9,12 @@ use Illuminate\Support\Str;
 
 class Brand extends Model
 {
+    /**
+     * Plaintext connection token, set only on the instance that just
+     * generated it in the creating hook. Never stored or serialized.
+     */
+    public ?string $plainConnectionToken = null;
+
     use HasFactory;
 
     protected $fillable = [
@@ -127,14 +133,18 @@ class Brand extends Model
             }
 
             // Auto-generate a per-brand connection token for the WP plugin.
-            // Always plaintext here. Hashed storage is opt-in and happens
-            // in vendors:rotate-connection-tokens, which is the only place
-            // that can hand the owner the plaintext.
+            // With VENDOR_PLUGIN_HASH_TOKENS on, only sha256(token) is
+            // stored, matching what connect looks up.
             if (empty($brand->connection_token)) {
+                $hashed = (bool) config('vendor_plugin.hash_tokens');
                 do {
                     $token = 'pmap_' . Str::random(40);
-                } while (static::where('connection_token', $token)->exists());
-                $brand->connection_token = $token;
+                    $stored = $hashed ? hash('sha256', $token) : $token;
+                } while (static::withoutGlobalScope(DemoScope::class)->where('connection_token', $stored)->exists());
+                $brand->connection_token = $stored;
+                // Plaintext for this request only (not an attribute, never
+                // persisted or serialized). Deliver it once, then drop it.
+                $brand->plainConnectionToken = $token;
             }
 
             if (empty($brand->connection_token_issued_at)) {

@@ -37,8 +37,12 @@ class VendorPluginController extends Controller
             'consumer_secret' => ['required', 'string', 'min:10', 'max:255', 'starts_with:cs_'],
         ]);
 
-        if (config('vendor_plugin.reject_private_store_urls') && StoreUrlGuard::isBlocked($validated['store_url'])) {
-            return $this->failure('That store URL is not allowed.', 422);
+        $target = null;
+        if (config('vendor_plugin.reject_private_store_urls')) {
+            $target = StoreUrlGuard::resolveAllowed($validated['store_url']);
+            if ($target === null) {
+                return $this->failure('That store URL is not allowed.', 422);
+            }
         }
 
         $brand = $this->findBrand($validated['connection_token']);
@@ -65,8 +69,18 @@ class VendorPluginController extends Controller
             $pending = Http::withBasicAuth($validated['consumer_key'], $validated['consumer_secret'])
                 ->timeout(15)
                 ->acceptJson();
-            if (config('vendor_plugin.reject_private_store_urls')) {
-                $pending = $pending->withOptions(['allow_redirects' => false]);
+            if ($target !== null) {
+                // No redirects, and pin the connection to the vetted IP so a
+                // DNS change between the check and the request cannot
+                // redirect the probe to an internal address.
+                $options = ['allow_redirects' => false];
+                if (!filter_var($target['host'], FILTER_VALIDATE_IP)) {
+                    $ip = $target['ips'][0];
+                    $options['curl'] = [CURLOPT_RESOLVE => [
+                        sprintf('%s:%d:%s', $target['host'], $target['port'], str_contains($ip, ':') ? '['.$ip.']' : $ip),
+                    ]];
+                }
+                $pending = $pending->withOptions($options);
             }
             $test = $pending->get($endpoint, ['per_page' => 1]);
 
@@ -85,6 +99,18 @@ class VendorPluginController extends Controller
                 'Could not reach your store. Verify the URL is publicly accessible: ' . $e->getMessage(),
                 422
             );
+        }
+
+        // Claim a single-use token atomically before writing anything, so
+        // two concurrent requests cannot both use it.
+        if (config('vendor_plugin.single_use_tokens')) {
+            $claimed = Brand::withoutGlobalScope(DemoScope::class)
+                ->whereKey($brand->id)
+                ->whereNull('connection_token_used_at')
+                ->update(['connection_token_used_at' => now()]);
+            if ($claimed === 0) {
+                return $this->failure('Connection token has already been used.', 422);
+            }
         }
 
         $existing = ScrapingConfig::where('vendor_id', $brand->id)
@@ -110,11 +136,15 @@ class VendorPluginController extends Controller
             ]
         );
 
-        $this->alertIfUrlChanged($brand, $existing !== null, $previousStore, $previousFeed, $validated['store_url']);
-
-        if (config('vendor_plugin.single_use_tokens')) {
-            $brand->connection_token_used_at = now();
-            $brand->save();
+        try {
+            $this->alertIfUrlChanged($brand, $existing !== null, $previousStore, $previousFeed, $validated['store_url']);
+        } catch (\Throwable $e) {
+            // A mail or log-channel failure must not turn a completed
+            // connect into a 500 for the vendor.
+            Log::warning('Plugin connect: URL-change alert failed', [
+                'brand_id' => $brand->id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         // Update vendor settings to reflect they're now using the API
