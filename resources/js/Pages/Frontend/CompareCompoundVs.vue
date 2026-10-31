@@ -28,6 +28,7 @@
         <p v-if="a.summary || b.summary" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl">
           Side-by-side vendor comparison, mechanism &amp; use-case differences, and listed prices.
         </p>
+        <CatalogCrossLinks :groups="catalogLinks?.groups || []" />
         <p v-if="evidenceUrl" class="mt-4 max-w-3xl text-[15px] leading-relaxed">
           <a :href="evidenceUrl" class="font-semibold text-[color:var(--color-accent-600)] underline underline-offset-2 hover:text-[color:var(--color-accent-700)]">Read the evidence comparison</a>
           <span class="text-[color:var(--color-ink-muted)]"> — animal studies, human-evidence gaps, untested stacking claims, and FDA/WADA context. Vendor prices stay on this page.</span>
@@ -182,6 +183,7 @@
 import { Head } from '@inertiajs/vue3'
 import { computed, defineComponent, h } from 'vue'
 import ModernLayout from '../Layouts/ModernLayout.vue'
+import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
 import { withSrc } from '@/composables/useOutbound'
 
 const props = defineProps({
@@ -193,6 +195,7 @@ const props = defineProps({
   references: { type: Array, default: () => [] },
   evidence: { type: Object, default: null },
   evidenceLink: { type: Object, default: null },
+  catalogLinks: { type: Object, default: () => ({ groups: [] }) },
   seo: { type: Object, default: () => ({}) },
 })
 

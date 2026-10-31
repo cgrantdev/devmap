@@ -203,7 +203,7 @@
     {{-- Critical CSS for the SSR H1's sr-only class — inlined so it takes
          effect before the Vite CSS bundle loads, otherwise the H1 flashes
          visible for one paint frame on slow connections. --}}
-    <style>.ssr-seo-h1{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}</style>
+    <style>.ssr-seo-h1,.ssr-catalog-links{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}</style>
 
     @inertiaHead
 </head>
@@ -216,6 +216,23 @@
          crawlers still recognize the heading. Advantage Collective Oct 2026
          audit, Part 5. --}}
     <div class="ssr-seo-h1" role="heading" aria-level="1">{{ $seoH1 }}</div>
+
+    {{-- Same catalog links the Vue page renders. Clipped so the visible
+         block stays in the app, and present as real anchors for crawlers
+         that do not run JavaScript. aria-hidden avoids announcing them
+         twice once Vue hydrates. --}}
+    @php
+        $catalogCrossLinks = app('view')->shared('catalogCrossLinks', ['groups' => []]);
+    @endphp
+    @if (!empty($catalogCrossLinks['groups']))
+    <nav class="ssr-catalog-links" aria-hidden="true">
+        @foreach ($catalogCrossLinks['groups'] as $group)
+            @foreach ($group['links'] as $link)
+                <a href="{{ $link['href'] }}" tabindex="-1">{{ $link['label'] }}</a>
+            @endforeach
+        @endforeach
+    </nav>
+    @endif
 
     @inertia
 </body>

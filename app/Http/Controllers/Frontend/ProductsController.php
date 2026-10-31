@@ -12,6 +12,7 @@ use App\Models\Puse;
 use App\Models\Brand;
 use App\Models\Location;
 use App\Models\Deal;
+use App\Support\CatalogCrossLinks;
 use App\Support\ProductListingSeo;
 use App\Support\ProductPageSeo;
 use Illuminate\Http\Request;
@@ -865,6 +866,9 @@ class ProductsController extends Controller
             'sort' => $sortBy,
             'sortDir' => $sortDir,
             'search' => $request->get('search', ''),
+            'catalogLinks' => CatalogCrossLinks::share(
+                CatalogCrossLinks::forCategory($category, ['encyclopedia', 'compare'])
+            ),
             'seo' => $seo,
         ]);
     }
