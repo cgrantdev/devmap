@@ -765,7 +765,9 @@ class ProductsController extends Controller
         // Slugs that fail the sitemap's route-safe check are the 8 broken
         // category rows (a slash or whitespace in the stored slug). They
         // keep the previous title and meta. Colin is cleaning those rows.
-        if (! ProductListingSeo::slugIsRouteSafe($category->slug)) {
+        // uncategorized is route-safe, but it is a bucket, not a compound,
+        // so it keeps the previous title and meta too.
+        if (! ProductListingSeo::usesVendorTemplate($category->slug)) {
             $seoTitle = $category->name.' – '.$siteName;
             $seoDescription = $category->description
                 ? $this->safeLimit($category->description, 155)

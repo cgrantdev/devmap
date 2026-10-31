@@ -34,6 +34,20 @@ class ProductListingSeo
         return (bool) preg_match('#^[A-Za-z0-9._\-]+$#', (string) $slug);
     }
 
+    /**
+     * Broken slugs and the uncategorized bucket keep the previous title
+     * and meta. uncategorized is a real route, so the slug check alone
+     * does not exclude it.
+     */
+    public static function usesVendorTemplate(?string $slug): bool
+    {
+        if (strtolower(trim((string) $slug)) === 'uncategorized') {
+            return false;
+        }
+
+        return self::slugIsRouteSafe($slug);
+    }
+
     public static function compoundName(?string $raw): string
     {
         $raw = trim((string) $raw);
@@ -52,15 +66,16 @@ class ProductListingSeo
         $n = (string) $count;
         $suffix = self::SITE_SUFFIX;
 
-        if ($count >= 2) {
-            $primary = "{$compound}: Compare {$n} Research Vendors";
-        } elseif ($count === 1) {
-            $primary = "{$compound}: 1 Research Vendor Listed";
-        } else {
-            $primary = "{$compound}: Research Compound Profile";
+        $primary = self::primaryTitle($compound, $count, $n);
+        $candidates = [$primary, "{$compound}: {$n} Research Vendors"];
+        $short = self::shortName($compound);
+        if ($short !== $compound) {
+            $candidates[] = self::primaryTitle($short, $count, $n);
+            $candidates[] = "{$short}: {$n} Research Vendors";
         }
+        $candidates[] = $compound;
 
-        foreach ([$primary, "{$compound}: {$n} Research Vendors", $compound] as $candidate) {
+        foreach ($candidates as $candidate) {
             $full = $candidate.$suffix;
             if (self::chars($full) <= self::TITLE_LIMIT) {
                 return $full;
@@ -76,31 +91,91 @@ class ProductListingSeo
         $count = max(0, $vendorCount);
         $n = (string) $count;
 
-        if ($count >= 2) {
-            $meta = "Compare {$n} research vendors listing {$compound}: vial sizes, vendor details and listings side by side. Research use only; Peptidemap sells nothing.";
-        } elseif ($count === 1) {
-            $meta = "{$compound} has 1 research vendor listed on Peptidemap. See vial sizes and vendor details. Research use only; Peptidemap sells nothing.";
-        } else {
-            $meta = "{$compound} research-use-only profile. No vendors currently list it on Peptidemap; compared listings appear here when they do. We sell nothing.";
+        foreach ([false, true] as $compact) {
+            [$prefix, $tail] = self::metaParts($count, $n, $compact);
+            $meta = $prefix.$compound.$tail;
+            if (self::chars($meta) <= self::DESCRIPTION_LIMIT) {
+                return $meta;
+            }
+            if ($compact) {
+                return $prefix.self::trimName($compound, self::DESCRIPTION_LIMIT - self::chars($prefix.$tail)).$tail;
+            }
         }
 
-        return self::fitMeta($meta);
+        return $compound;
     }
 
-    private static function fitMeta(string $meta): string
+    /**
+     * Blend display names use " — " or " / " before the rest of the
+     * label. The short token is only a title fallback; the meta keeps
+     * the full name.
+     */
+    private static function shortName(string $compound): string
     {
-        $meta = trim(preg_replace('/\s+/u', ' ', $meta) ?? '');
-        if ($meta === '' || self::chars($meta) <= self::DESCRIPTION_LIMIT) {
-            return $meta;
+        $cut = null;
+        foreach ([' — ', ' / '] as $separator) {
+            $at = mb_strpos($compound, $separator);
+            if ($at !== false && ($cut === null || $at < $cut)) {
+                $cut = $at;
+            }
+        }
+        if ($cut === null || $cut < 1) {
+            return $compound;
         }
 
-        $slice = rtrim(mb_substr($meta, 0, self::DESCRIPTION_LIMIT));
+        return trim(mb_substr($compound, 0, $cut));
+    }
+
+    private static function primaryTitle(string $compound, int $count, string $n): string
+    {
+        if ($count >= 2) {
+            return "{$compound}: Compare {$n} Research Vendors";
+        }
+        if ($count === 1) {
+            return "{$compound}: 1 Research Vendor Listed";
+        }
+
+        return "{$compound}: Research Compound Profile";
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private static function metaParts(int $count, string $n, bool $compact): array
+    {
+        if ($count >= 2) {
+            return $compact
+                ? ["Compare {$n} research vendors listing ", '. Research use only; Peptidemap sells nothing.']
+                : ["Compare {$n} research vendors listing ", ': vial sizes, vendor details and listings side by side. Research use only; Peptidemap sells nothing.'];
+        }
+        if ($count === 1) {
+            return $compact
+                ? ['', ' has 1 research vendor listed on Peptidemap. Research use only; Peptidemap sells nothing.']
+                : ['', ' has 1 research vendor listed on Peptidemap. See vial sizes and vendor details. Research use only; Peptidemap sells nothing.'];
+        }
+
+        return $compact
+            ? ['', ' research-use-only profile on Peptidemap. No vendors list it yet. We sell nothing.']
+            : ['', ' research-use-only profile. No vendors currently list it on Peptidemap; compared listings appear here when they do. We sell nothing.'];
+    }
+
+    private static function trimName(string $name, int $budget): string
+    {
+        if ($budget < 1) {
+            return '';
+        }
+        if (self::chars($name) <= $budget) {
+            return $name;
+        }
+
+        $slice = rtrim(mb_substr($name, 0, $budget));
         $space = mb_strrpos($slice, ' ');
         if ($space !== false && $space > 0) {
             $slice = rtrim(mb_substr($slice, 0, $space));
         }
+        $slice = (string) preg_replace('/[\s\-–—\/+&,|·:]+$/u', '', $slice);
 
-        return $slice;
+        return $slice !== '' ? $slice : rtrim(mb_substr($name, 0, $budget));
     }
 
     private static function chars(string $value): int
