@@ -1793,7 +1793,7 @@ class EducationalContentTest extends TestCase
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(4181, $words);
+        $this->assertSame(4237, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringNotContainsString('<!--', $markdown);
         $this->assertStringNotContainsString('/workspace', $markdown);
@@ -1839,7 +1839,7 @@ class EducationalContentTest extends TestCase
             );
         }
         $this->assertSame(
-            'Yes, in one trial, but so far only in a company announcement. On 28 Oct 2026, Eli Lilly reported topline results from TRANSCEND-T2D-2, an open-label Phase 3 trial comparing two retatrutide dose arms with once-weekly semaglutide (Ozempic) in adults with type 2 diabetes on metformin. Lilly said retatrutide met the primary endpoint (A1C noninferiority at 80 weeks) and all key secondary endpoints [company-reported]. The results have not been peer-reviewed or fully published, and they apply only to that population. Retatrutide is not approved.',
+            'Yes, in one trial, but so far only in a company announcement. On 28 Oct 2026, Eli Lilly reported topline results from TRANSCEND-T2D-2, an open-label Phase 3 trial comparing two retatrutide dose arms with once-weekly semaglutide (Ozempic) in adults with type 2 diabetes on metformin [company-reported]. The primary endpoint was noninferiority on A1C change at 80 weeks for the highest retatrutide dose arm versus semaglutide, and Lilly said the trial met it [company-reported]. The results have not been peer-reviewed or fully published, and they apply only to that population. Retatrutide is not approved.',
             $faq['mainEntity'][0]['acceptedAnswer']['text'] ?? null
         );
         $this->assertSame(

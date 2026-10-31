@@ -21,7 +21,7 @@ class RetatrutideSemaglutideCompareCopy
     /**
      * One note, 60-90 words. Bold and links render in CompareCompoundVs.
      */
-    public const NOTE = 'On 28 Oct 2026, Lilly announced topline results from TRANSCEND-T2D-2, an open-label Phase 3 trial versus once-weekly semaglutide (Ozempic) in adults with type 2 diabetes on metformin [company-reported]. Lilly says retatrutide met its primary endpoint (A1C noninferiority at 80 weeks) and all key secondary endpoints [company-reported]. It is not peer-reviewed. Retatrutide is investigational and not approved. Peptidemap is a research-use-only peptide comparison publisher, not a clinic. Sources and limits are in the [retatrutide vs semaglutide article](/blog/retatrutide-vs-semaglutide) and in Lilly\'s [topline press release]('.self::LILLY_URL.').';
+    public const NOTE = 'Lilly has reported topline results from TRANSCEND-T2D-2, an open-label Phase 3 head-to-head trial of retatrutide versus once-weekly injectable semaglutide in adults with type 2 diabetes on metformin, announced on 28 Oct 2026 [company-reported]. Full results have not been peer-reviewed or published. Retatrutide is investigational and not approved. Peptidemap is a research-use-only peptide comparison publisher, not a clinic. Sources and limits are in the [retatrutide vs semaglutide article](/blog/retatrutide-vs-semaglutide) and in Lilly\'s [topline press release]('.self::LILLY_URL.').';
 
     /**
      * @return array{evidence: array<string, mixed>, link: null, faqs: list<array{q: string, a: string}>, references: list<array{title: string, url: string}>}|null

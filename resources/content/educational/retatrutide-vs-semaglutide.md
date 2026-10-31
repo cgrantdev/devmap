@@ -36,13 +36,17 @@ The same paper reports that, compared with the natural hormones, retatrutide is 
 
 ### TRANSCEND-T2D-2: topline results (company-reported, 28 Oct 2026)
 
-On 28 Oct 2026, Eli Lilly announced topline results from TRANSCEND-T2D-2, the first Phase 3 trial comparing retatrutide with another incretin medicine [23][24] [company-reported]. The trial was randomised and open-label. It compared two once-weekly retatrutide dose arms (a lower and a higher dose arm) with once-weekly injectable semaglutide (Ozempic) in 1,298 adults with type 2 diabetes not controlled on metformin, with or without an SGLT2 inhibitor [23][7]. Lilly says it chose the semaglutide arm because it was "the highest approved dose" [23] [company-reported].
+On 28 Oct 2026, Eli Lilly announced topline results from TRANSCEND-T2D-2, the first Phase 3 trial comparing retatrutide with another incretin medicine [23][24] [company-reported]. The trial was randomised and open-label. It compared two once-weekly retatrutide dose arms (the middle and highest of the three retatrutide dose levels used in the TRIUMPH trials) with once-weekly injectable semaglutide (Ozempic) in 1,298 adults with type 2 diabetes not controlled on metformin, with or without an SGLT2 inhibitor [23]. Its registry record is NCT06260722 [7]. Lilly says it chose the semaglutide arm because it was "the highest approved dose" [23] [company-reported].
 
-The primary objective was noninferiority on A1C change at 80 weeks for the higher dose arm versus semaglutide. Body-weight change was a key secondary endpoint [23]. Lilly reported that retatrutide "met the primary and all key secondary endpoints" [23] [company-reported]. All figures Lilly released use the efficacy estimand, which estimates results had all participants stayed on treatment without added glucose-lowering medicine [23]. This page does not reproduce per-arm figures.
+The primary objective was noninferiority on A1C change at 80 weeks for the highest dose arm versus semaglutide. Body-weight change was a key secondary endpoint [23]. Lilly reported that retatrutide "met the primary and all key secondary endpoints" [23] [company-reported]. All figures Lilly released use the efficacy estimand, which estimates results had all participants stayed on treatment without added glucose-lowering medicine [23]. This page does not reproduce per-arm figures.
 
 Lilly said gastrointestinal events were the most common adverse events and that dysesthesia was also reported [23] [company-reported].
 
 This is a topline company announcement. It has not been peer-reviewed, and full results are not yet published. Lilly says detailed results will be presented at a medical meeting and published in a journal [23]. Retatrutide is investigational and is not approved anywhere [23].
+
+### Other registered trials with a semaglutide arm
+
+A ClinicalTrials.gov search on 19 October 2026 also found one Lilly-sponsored study with an open-label semaglutide arm:
 
 - **A phase 1 mechanistic study ([NCT06982859](https://clinicaltrials.gov/study/NCT06982859)).** About 95 adults with type 2 diabetes, comparing retatrutide with placebo on insulin secretion and insulin sensitivity over 28 weeks. A semaglutide arm, open-label, is included as a secondary comparison. The study is active, not recruiting, with completion estimated for January 2027.
 
@@ -185,7 +189,7 @@ For another comparison that does have a head-to-head trial, see [Orforglipron vs
 
 ### Has retatrutide been compared head to head with semaglutide?
 
-Yes, in one trial, but so far only in a company announcement. On 28 Oct 2026, Eli Lilly reported topline results from TRANSCEND-T2D-2, an open-label Phase 3 trial comparing two retatrutide dose arms with once-weekly semaglutide (Ozempic) in adults with type 2 diabetes on metformin. Lilly said retatrutide met the primary endpoint (A1C noninferiority at 80 weeks) and all key secondary endpoints [company-reported]. The results have not been peer-reviewed or fully published, and they apply only to that population. Retatrutide is not approved.
+Yes, in one trial, but so far only in a company announcement. On 28 Oct 2026, Eli Lilly reported topline results from TRANSCEND-T2D-2, an open-label Phase 3 trial comparing two retatrutide dose arms with once-weekly semaglutide (Ozempic) in adults with type 2 diabetes on metformin [company-reported]. The primary endpoint was noninferiority on A1C change at 80 weeks for the highest retatrutide dose arm versus semaglutide, and Lilly said the trial met it [company-reported]. The results have not been peer-reviewed or fully published, and they apply only to that population. Retatrutide is not approved.
 
 ### How do retatrutide and semaglutide work differently?
 
@@ -197,11 +201,11 @@ No. They are separate placebo-controlled trials that differ in population, durat
 
 ### Why do some retatrutide figures look higher in news coverage?
 
-They usually use a different estimand. In TRIUMPH-1, mean weight change in the highest dose arm was 25.0% under the treatment-regimen estimand in the NEJM paper and 28.3% under the efficacy estimand, reported in the paper and company-reported by Lilly. The first counts everyone randomized. The second estimates the effect had everyone stayed on treatment.
+They usually use a different estimand. In TRIUMPH-1, the efficacy estimand, reported in the paper and company-reported by Lilly, gives a larger mean weight change for the highest dose arm than the treatment-regimen estimand in the NEJM paper. The treatment-regimen estimand counts everyone randomized. The efficacy estimand estimates the effect had everyone stayed on treatment. Both figures, with their sources, are in the TRIUMPH table above.
 
 ### What side effects were reported in the trials?
 
-For both drugs, gastrointestinal events such as nausea, diarrhoea, vomiting and constipation were the most common. In the TRIUMPH-2 paper, diarrhoea was reported in 27% to 34% of the retatrutide arms vs 13% with placebo, and dysesthesia and hypotension were more frequent than with placebo. In STEP 1, gastrointestinal disorders were reported in 74.2% of the semaglutide group vs 47.9% with placebo.
+For both drugs, gastrointestinal events such as nausea, diarrhoea, vomiting and constipation were the most common. In the TRIUMPH-2 paper, diarrhoea, dysesthesia and hypotension were more frequent in the retatrutide arms than with placebo. In STEP 1, gastrointestinal disorders were more frequent with semaglutide than with placebo. Rates by arm, with their sources, are in the side-effect tables above.
 
 ### Is retatrutide FDA-approved?
 

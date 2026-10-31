@@ -52,11 +52,11 @@ class VsPairEvidenceCopyTest extends TestCase
         $this->assertLessThanOrEqual(90, $words);
 
         $this->assertStringContainsString('28 Oct 2026', $note);
-        $this->assertStringContainsString('open-label Phase 3 trial versus once-weekly semaglutide (Ozempic)', $note);
+        $this->assertStringContainsString('open-label Phase 3 head-to-head trial of retatrutide versus once-weekly injectable semaglutide', $note);
         $this->assertStringContainsString('adults with type 2 diabetes on metformin', $note);
-        $this->assertStringContainsString('met its primary endpoint (A1C noninferiority at 80 weeks) and all key secondary endpoints', $note);
+        $this->assertDoesNotMatchRegularExpression('/endpoint|noninferior/i', $note);
         $this->assertStringContainsString('[company-reported]', $note);
-        $this->assertStringContainsString('It is not peer-reviewed.', $note);
+        $this->assertStringContainsString('Full results have not been peer-reviewed or published.', $note);
         $this->assertStringContainsString('Retatrutide is investigational and not approved.', $note);
         $this->assertStringContainsString('research-use-only peptide comparison publisher, not a clinic', $note);
         $this->assertStringContainsString('/blog/retatrutide-vs-semaglutide', $note);
@@ -68,7 +68,7 @@ class VsPairEvidenceCopyTest extends TestCase
 
         $prose = preg_replace('#https?://\S+#', '', $note.' '.$copy['evidence']['title'].' '.$copy['evidence']['sources'][0]['title']);
         $this->assertIsString($prose);
-        $this->assertDoesNotMatchRegularExpression('/\bgreater\b|\bsuperior\b|\bwinner\b|outperformed|works better|more than double/i', $prose);
+        $this->assertDoesNotMatchRegularExpression('/\bgreater\b|\bsuperior(ity)?\b|\bbetter\b|\bbeat\b|\bwinner\b|outperform|more effective|landmark|more than double|substantially more/i', $prose);
         $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?\s*mg\b/i', $note);
         $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?\s*%/', $note);
         $this->assertStringNotContainsString('Ozempic 2', $note);
@@ -79,8 +79,8 @@ class VsPairEvidenceCopyTest extends TestCase
         $this->get('/compare/retatrutide-vs-semaglutide')
             ->assertOk()
             ->assertSee('Head-to-head trial: TRANSCEND-T2D-2 (company-reported)', false)
-            ->assertSee('open-label Phase 3 trial versus once-weekly semaglutide (Ozempic)', false)
-            ->assertSee('It is not peer-reviewed.', false)
+            ->assertSee('open-label Phase 3 head-to-head trial of retatrutide versus once-weekly injectable semaglutide', false)
+            ->assertSee('Full results have not been peer-reviewed or published.', false)
             ->assertSee('Retatrutide is investigational and not approved.', false)
             ->assertSee('blog\\/retatrutide-vs-semaglutide', false)
             ->assertSee('lillys-retatrutide-delivered-greater-a1c-reduction-and-more', false)
