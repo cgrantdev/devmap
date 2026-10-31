@@ -181,7 +181,7 @@ class ProductListingSeoTest extends TestCase
         $this->assertSame('Uncategorized – Peptidemap', $title);
         $this->assertSame('Browse Uncategorized peptides. Compare products, prices, and vendors.', $description);
         $this->assertStringNotContainsString('Research Compound Profile', $title);
-        $this->assertStringNotContainsString('noindex', $html);
+        $this->assertStringContainsString('<meta name="robots" content="noindex, follow" />', $html);
     }
 
     public function test_broken_slug_category_keeps_the_previous_title_and_meta(): void
