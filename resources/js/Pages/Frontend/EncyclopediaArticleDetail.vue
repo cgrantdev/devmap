@@ -54,6 +54,7 @@
               <a v-if="vendorCount > 0" :href="`/compare/${slug || slugify(categoryName || name)}`" class="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
                 Available from {{ vendorCount }} vendors <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
               </a>
+              <CatalogCrossLinks :groups="catalogLinks?.groups || []" />
             </div>
 
             <!-- Featured image from this app, otherwise the PubChem structure -->
@@ -945,6 +946,7 @@ import { ref, computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
+import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
 
 // Format mechanism item text to bold key terms
 const formatMechanismItem = (item) => {
@@ -1703,6 +1705,10 @@ const props = defineProps({
       url: null,
       canonical: null,
     })
+  },
+  catalogLinks: {
+    type: Object,
+    default: () => ({ groups: [] }),
   }
 })
 

@@ -118,6 +118,12 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
+        // Cleared on every request, then set again by the product,
+        // encyclopedia, and compare controllers. The view factory keeps
+        // shared data for the life of the app, so a later page in the
+        // same process must not inherit the previous page's links.
+        view()->share('catalogCrossLinks', ['groups' => []]);
+
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),

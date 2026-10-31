@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Brand;
 use App\Models\SeoPage;
+use App\Support\CatalogCrossLinks;
 use App\Support\CompareHubBlurb;
 use App\Support\ComparePageSeo;
 use App\Support\ProductPageSeo;
@@ -769,6 +770,9 @@ class CompareController extends Controller
                 ->take(6)
                 ->values()
                 ->all(),
+            'catalogLinks' => CatalogCrossLinks::share(
+                CatalogCrossLinks::forCategory($category, ['encyclopedia', 'product'])
+            ),
             'seo' => $seo,
         ]);
     }
@@ -1051,6 +1055,45 @@ class CompareController extends Controller
     }
 
     /**
+     * Compare-side alias fold (ss-31 → elamipretide, klow → the blend
+     * slug, reta, pt-141). Callers that link to /compare/{slug} use the
+     * returned side only when findForCompareSlug still returns the same
+     * category. A fold onto a different category is a redirect, not this
+     * compound's compare page.
+     */
+    public static function resolveCompareSide(string $slug): string
+    {
+        return (new self)->canonicalCompareSide($slug);
+    }
+
+    /**
+     * Canonical /compare/{a}-vs-{b} slug when that URL returns 200 and is
+     * indexable. Null for a 404, a redirect away from the pair (HGH vs
+     * tesamorelin), or a thin noindex pair.
+     */
+    public static function liveIndexableVsSlug(string $slug): ?string
+    {
+        $canonical = CompareSlug::canonical($slug);
+        if ($canonical === null || !str_contains($canonical, '-vs-')) {
+            return null;
+        }
+
+        $self = new self;
+        $final = $self->canonicalVsSlug($canonical);
+        if ($final === null || $self->vsFallbackRedirect($final) !== null) {
+            return null;
+        }
+        if (!$self->vsPairResolves($final)) {
+            return null;
+        }
+        if (!VsPairIndexing::isIndexable($final)) {
+            return null;
+        }
+
+        return $final;
+    }
+
+    /**
      * True when both sides are active categories, which is what showVs
      * needs before it will return 200. Checked before a canonical-order
      * 301 so a missing pair cannot redirect to its own 404.
@@ -1193,6 +1236,7 @@ class CompareController extends Controller
             'references' => $pairReferences,
             'evidence' => $pairEvidence,
             'evidenceLink' => $pairEvidenceLink,
+            'catalogLinks' => CatalogCrossLinks::share(CatalogCrossLinks::forPair($a, $b)),
             'seo' => $seo,
         ]);
     }
