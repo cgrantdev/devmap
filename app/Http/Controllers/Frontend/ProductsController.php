@@ -567,13 +567,15 @@ class ProductsController extends Controller
 
     public function show(Request $request, $slug)
     {
-        // Find category by slug. Production MySQL matches letter case,
-        // so /product/BPC-157 can load the stored slug bpc-157. SQLite
-        // does not, so a unique case-insensitive match is the fallback.
-        // The canonical below always uses the stored slug.
+        // Find category by slug. The exact match is checked in PHP because
+        // production MySQL's case-insensitive collation would otherwise treat
+        // /product/bpc-157 as an exact match for the stored slug BPC-157.
+        // If there is no exact match, a single case-insensitive match is used;
+        // two or more case-insensitive matches return 404.
         $category = ProductCategory::where('slug', $slug)
             ->where('is_active', true)
-            ->first();
+            ->get()
+            ->first(fn (ProductCategory $c) => (string) $c->slug === (string) $slug);
 
         if (! $category) {
             $matches = ProductCategory::where('is_active', true)
@@ -585,6 +587,19 @@ class ProductsController extends Controller
 
         if (!$category) {
             abort(404, 'Category not found');
+        }
+
+        // Each listing has one URL. A request that loaded a row whose
+        // stored slug differs (letter case, or trailing spaces under
+        // MySQL PAD SPACE) 301s to the stored slug and keeps the query
+        // string. The target resolves exactly, so it cannot loop.
+        if ((string) $category->slug !== (string) $slug) {
+            $qs = $request->getQueryString();
+
+            return redirect(
+                '/product/'.rawurlencode((string) $category->slug).($qs ? '?'.$qs : ''),
+                301
+            );
         }
 
         // Start building query for products in this category

@@ -37,8 +37,8 @@ class ProductListingCanonicalTest extends TestCase
         $exact = $this->get('/product/bpc-157')->assertOk()->getContent();
         $this->assertCanonical($exact, 'https://peptidemap.com/product/bpc-157');
 
-        $otherCase = $this->get('/product/BPC-157')->assertOk()->getContent();
-        $this->assertCanonical($otherCase, 'https://peptidemap.com/product/bpc-157');
+        $this->get('/product/BPC-157')->assertStatus(301)
+            ->assertHeader('Location', 'http://localhost/product/bpc-157');
 
         $space = $this->get('/product/Sterile%20Water')->assertOk()->getContent();
         $this->assertCanonical($space, 'https://peptidemap.com/product/Sterile%20Water');
