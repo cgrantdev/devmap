@@ -18,14 +18,14 @@ class PublicVendorController extends Controller
         // Find brand by slug (preferred) or by name conversion from URL
         $brand = Brand::where('slug', $vendor_name)
             ->orWhere('slug', Str::slug($vendor_name))
-            ->with(['vendorSetting', 'vendorSetting.location'])
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic()->with('location')])
             ->first();
 
         // Fallback: try name-based lookup for legacy URLs
         if (!$brand) {
             $name = str_replace('-', ' ', $vendor_name);
             $brand = Brand::where('name', 'LIKE', $name)
-                ->with(['vendorSetting', 'vendorSetting.location'])
+                ->with(['vendorSetting' => fn ($q) => $q->forPublic()->with('location')])
                 ->first();
         }
 

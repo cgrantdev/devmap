@@ -643,7 +643,10 @@ class EncyclopediaController extends Controller
         $products = Product::visible()
             ->where('status', 'active')
             ->where('product_category_id', $category->id)
-            ->with(['brand', 'category'])
+            ->with([
+                'brand' => fn ($q) => $q->forCard(),
+                'category',
+            ])
             ->orderBy('price', 'asc')
             ->limit(5)
             ->get()

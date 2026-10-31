@@ -246,7 +246,11 @@ class ProductsController extends Controller
     public function showProduct(Request $request, $vendorSlug, $productSlug, $id)
     {
         // Find product by id and slug
-        $product = Product::with(['brand', 'location', 'types', 'puses', 'category', 'brand.vendorSetting'])
+        $product = Product::with([
+            'brand' => fn ($q) => $q->forPublic(),
+            'brand.vendorSetting' => fn ($q) => $q->forPublic(),
+            'location', 'types', 'puses', 'category',
+        ])
             ->visible()
             ->where('id', $id)
             ->where('slug', $productSlug)
@@ -270,7 +274,7 @@ class ProductsController extends Controller
 
         if ($product->product_category_id) {
             // Prefer other vendors' same-compound products first.
-            $otherVendorQuery = Product::with(['brand'])
+            $otherVendorQuery = Product::with(['brand' => fn ($q) => $q->forCard()])
                 ->visible()
                 ->where('status', 'active')
                 ->where('product_category_id', $product->product_category_id)
@@ -289,7 +293,7 @@ class ProductsController extends Controller
 
         // Top-up from same brand's other products if we still have room.
         if ($related->count() < $relatedLimit && $product->brand_id) {
-            $fill = Product::with(['brand'])
+            $fill = Product::with(['brand' => fn ($q) => $q->forCard()])
                 ->visible()
                 ->where('status', 'active')
                 ->where('brand_id', $product->brand_id)
@@ -604,7 +608,11 @@ class ProductsController extends Controller
         }
 
         // Start building query for products in this category
-        $query = Product::with(['brand.vendorSetting', 'location', 'types', 'puses', 'category'])
+        $query = Product::with([
+                'brand' => fn ($q) => $q->forCard(),
+                'brand.vendorSetting' => fn ($q) => $q->forCard(),
+                'location', 'types', 'puses', 'category',
+            ])
             ->visible()
             ->where('product_category_id', $category->id)
             ->where('status', 'active');
@@ -881,7 +889,11 @@ class ProductsController extends Controller
         // Build query for all products of this brand. Filter out $0 rows —
         // those are broken scrapes (Peptiva has 11 like this today) and
         // they render as ghost cards on the brand page with no price/image.
-        $query = Product::with(['brand.vendorSetting', 'location', 'types', 'puses', 'category'])
+        $query = Product::with([
+                'brand' => fn ($q) => $q->forCard(),
+                'brand.vendorSetting' => fn ($q) => $q->forCard(),
+                'location', 'types', 'puses', 'category',
+            ])
             ->visible()
             ->where('brand_id', $brandId)
             ->where('status', 'active')
@@ -1000,7 +1012,10 @@ class ProductsController extends Controller
         $priceRange = $baseQuery->selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
 
         // Get brand details with vendor settings and reviews
-        $brand->load(['vendorSetting.location', 'approvedReviews.user']);
+        $brand->load([
+            'vendorSetting' => fn ($q) => $q->forPublic()->with('location'),
+            'approvedReviews.user',
+        ]);
         
         // Get initials for logo
         $words = explode(' ', $brand->name);

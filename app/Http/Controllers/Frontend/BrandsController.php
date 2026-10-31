@@ -26,7 +26,7 @@ class BrandsController extends Controller
                 })
                 ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility with vendors without settings
             })
-            ->with(['vendorSetting', 'vendorSetting.location'])
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic()->with('location')])
             ->withCount([
                 'products as products_count' => function ($q) {
                     $q->visible()->where('status', 'active');

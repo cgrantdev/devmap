@@ -16,7 +16,17 @@ class OutboundClickController extends Controller
      */
     public function redirect(Request $request, Product $product)
     {
-        $product->loadMissing(['brand.vendorSetting']);
+        // Affiliate template and tag are hidden credentials used only to
+        // build this redirect. They are selected here and stay $hidden, so
+        // they are not part of any serialized prop. connection_token and
+        // vendor API secrets are not selected.
+        $product->loadMissing([
+            'brand' => fn ($q) => $q->select(array_merge(
+                \App\Models\Brand::PUBLIC_COLUMNS,
+                ['affiliate_url_template', 'affiliate_tag']
+            )),
+            'brand.vendorSetting' => fn ($q) => $q->forPublic(),
+        ]);
 
         $destination = $this->resolveDestinationUrl($product);
 

@@ -16,7 +16,7 @@ class ProductController extends Controller
      */
     public function show($id, $slug = null)
     {
-        $product = Product::with('brand')->findOrFail($id);
+        $product = Product::with(['brand' => fn ($q) => $q->forCard()])->findOrFail($id);
         $brandSlug = $product->brand?->slug;
         $productSlug = $product->slug;
 

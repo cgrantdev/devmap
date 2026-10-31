@@ -104,6 +104,124 @@ class VendorSetting extends Model
     ];
 
     /**
+     * Secrets and integration material. None of these are storefront
+     * copy. connection_token is a brands column; it is listed here so a
+     * value set on this model still cannot be serialized.
+     *
+     * api_key and affiliate_credentials are encrypted at rest. feed_url
+     * and api_route are ingestion endpoints and can carry query tokens.
+     * affiliate_stats_json and commission_rate_pct are commercial terms,
+     * not a public price.
+     *
+     * Admin and vendor code reads these in PHP. makeVisible() is for the
+     * feed URL on the admin edit form only. The API key and affiliate
+     * credentials stay hidden (write-only). Do not makeVisible() on a
+     * model that is about to be rendered to a public page.
+     */
+    public const SECRET_COLUMNS = [
+        'connection_token',
+        'api_key',
+        'api_route',
+        'feed_url',
+        'affiliate_credentials',
+        'affiliate_stats_json',
+        'commission_rate_pct',
+    ];
+
+    /**
+     * Columns a public response may serialize. Relation keys (id,
+     * brand_id, location_id) are required for eager loads. Everything
+     * else is rendered on a storefront, coupon, deal, or brand page,
+     * or is the public meta for that page.
+     */
+    public const PUBLIC_COLUMNS = [
+        'id',
+        'brand_id',
+        'location_id',
+        'banner',
+        'logo',
+        'banner_image_url',
+        'description',
+        'tagline',
+        'contact_email',
+        'phone_number',
+        'status',
+        'approval_status',
+        'shop_url',
+        'website',
+        'founded_year',
+        'coupon_code',
+        'coupon_discount_percent',
+        'coupon_boost_expires_at',
+        'referral_url',
+        'trustpilot_url',
+        'google_reviews_url',
+        'reviews_io_url',
+        'pepreviewpro_url',
+        'external_rating_avg',
+        'external_rating_count',
+        'external_ratings_json',
+        'usps',
+        'why_choose_bullets',
+        'business_hours',
+        'business_hours_json',
+        'shipping_info',
+        'return_policy',
+        'manufacturing_notes',
+        'independent_testing_notes',
+        'payment_methods',
+        'top_vendor',
+        'featured',
+        'is_partner',
+        'seo_page_title',
+        'seo_description',
+        'seo_og_title',
+        'seo_og_description',
+        'seo_og_image',
+        'updated_at',
+    ];
+
+    /**
+     * Product grids serialize the whole product, including this relation.
+     * Cards only need the coupon fields behind brand_coupon_code and
+     * brand_discount_percent. id and brand_id hydrate the eager load.
+     */
+    public const CARD_COLUMNS = [
+        'id',
+        'brand_id',
+        'coupon_code',
+        'coupon_discount_percent',
+    ];
+
+    /**
+     * Read by couponBoostActive() so a live boost still flags on the
+     * homepage and deals page. Not storefront fields, so they are not
+     * part of PUBLIC_COLUMNS. Load them only for queries that map the
+     * result into a boolean and do not serialize the model.
+     */
+    public const BOOST_STATE_COLUMNS = [
+        'coupon_boost_starts_at',
+        'coupon_discount_previous_percent',
+    ];
+
+    protected $hidden = self::SECRET_COLUMNS;
+
+    public function scopeForPublic($query, bool $withBoostState = false)
+    {
+        $columns = self::PUBLIC_COLUMNS;
+        if ($withBoostState) {
+            $columns = array_merge($columns, self::BOOST_STATE_COLUMNS);
+        }
+
+        return $query->select($columns);
+    }
+
+    public function scopeForCard($query)
+    {
+        return $query->select(self::CARD_COLUMNS);
+    }
+
+    /**
      * True while a temporary coupon boost is currently running —
      * starts_at (if set) has passed and expires_at is still in the
      * future. A boost whose starts_at is still ahead reads as
