@@ -19,6 +19,7 @@ use App\Support\ElamipretideMotsCCompareFaqs;
 use App\Support\EncyclopediaSlug;
 use App\Support\CompoundDisplay;
 use App\Support\RetatrutideCompareNarrative;
+use App\Support\RetatrutideSemaglutideCompareCopy;
 use App\Support\RetatrutideTirzepatideCompareCopy;
 use App\Support\EloralintideTirzepatideCompareCopy;
 use App\Support\BpcTb500CompareCopy;
@@ -1134,6 +1135,7 @@ class CompareController extends Controller
 
         $pairCopy = ElamipretideMotsCCompareFaqs::forSlug($final)
             ?? RetatrutideTirzepatideCompareCopy::forSlug($final)
+            ?? RetatrutideSemaglutideCompareCopy::forSlug($final)
             ?? EloralintideTirzepatideCompareCopy::forSlug($final)
             ?? BpcTb500CompareCopy::forSlug($final)
             ?? KlowCompareCopy::forSlug($final);

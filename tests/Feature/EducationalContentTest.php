@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Content\EducationalContentPublisher;
 use App\Content\ListingImageGuard;
-use App\Support\SimpleMarkdown;
 use App\Models\Blog;
 use App\Models\EducationalGuide;
 use App\Models\ProductCategory;
@@ -1746,14 +1745,14 @@ class EducationalContentTest extends TestCase
         $seoTitle = 'Retatrutide vs Semaglutide: Trials, Side Effects, FDA Status';
         $seoDescription = 'Retatrutide vs semaglutide: triple vs single receptor agonist, TRIUMPH and STEP results by estimand, side effects as reported, and FDA status.';
         $ogTitle = 'Retatrutide vs Semaglutide: Trials, Side Effects, FDA Status';
-        $ogDescription = 'No head-to-head trial has reported yet. Retatrutide and semaglutide compared on mechanism, trial data by estimand, side effects and FDA status.';
+        $ogDescription = 'TRANSCEND-T2D-2 topline is company-reported as of 28 Oct 2026 and not yet peer-reviewed. Mechanism, trial data, side effects and FDA status.';
 
         $catalog = (new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null);
         $entry = collect($catalog)->firstWhere('slug', $slug);
         $this->assertIsArray($entry);
         $this->assertSame('retatrutide-vs-semaglutide.md', $entry['file']);
         $this->assertSame('retatrutide-vs-semaglutide.png', $entry['image_file']);
-        $this->assertSame('18 Min Read', $entry['read_time']);
+        $this->assertSame('19 Min Read', $entry['read_time']);
         $this->assertCount(8, $entry['faq']['mainEntity'] ?? []);
         $this->assertSame('https://peptidemap.com/blog/retatrutide-vs-semaglutide#faq', $entry['faq']['@id'] ?? null);
 
@@ -1762,7 +1761,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame($h1, $blog->title);
         $this->assertSame(71, strlen($h1));
         $this->assertSame($entry['lede'], $blog->description);
-        $this->assertSame(315, strlen($blog->description));
+        $this->assertSame(421, strlen($blog->description));
         $this->assertSame($seoTitle, $blog->seo_page_title);
         $this->assertSame($seoDescription, $blog->seo_description);
         $this->assertSame(60, strlen($seoTitle));
@@ -1770,12 +1769,12 @@ class EducationalContentTest extends TestCase
         $this->assertSame($ogTitle, $blog->seo_og_title);
         $this->assertSame(60, strlen($ogTitle));
         $this->assertSame($ogDescription, $blog->seo_og_description);
-        $this->assertSame(143, strlen($ogDescription));
+        $this->assertSame(140, strlen($ogDescription));
         $this->assertSame($cover, $blog->image);
         $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
         $this->assertSame('2026-10-19', $blog->published_at->toDateString());
         $this->assertSame('Research', $blog->blog_type);
-        $this->assertSame('18 Min Read', $blog->read_time);
+        $this->assertSame('19 Min Read', $blog->read_time);
         $this->assertSame('Peptidemap', $blog->author_name);
         $this->assertFalse((bool) $blog->is_featured);
         $this->assertSame('published', $blog->status);
@@ -1794,7 +1793,7 @@ class EducationalContentTest extends TestCase
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(3967, $words);
+        $this->assertSame(4181, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringNotContainsString('<!--', $markdown);
         $this->assertStringNotContainsString('/workspace', $markdown);
@@ -1840,7 +1839,7 @@ class EducationalContentTest extends TestCase
             );
         }
         $this->assertSame(
-            'Not with results. TRANSCEND-T2D-2 (NCT06260722) is a phase 3, open-label trial comparing two retatrutide dose arms with once-weekly semaglutide in about 1,250 adults with type 2 diabetes, with HbA1c change at week 80 as the primary endpoint. As of 19 October 2026 it was active, not recruiting, with no results posted or published.',
+            'Yes, in one trial, but so far only in a company announcement. On 28 Oct 2026, Eli Lilly reported topline results from TRANSCEND-T2D-2, an open-label Phase 3 trial comparing two retatrutide dose arms with once-weekly semaglutide (Ozempic) in adults with type 2 diabetes on metformin. Lilly said retatrutide met the primary endpoint (A1C noninferiority at 80 weeks) and all key secondary endpoints [company-reported]. The results have not been peer-reviewed or fully published, and they apply only to that population. Retatrutide is not approved.',
             $faq['mainEntity'][0]['acceptedAnswer']['text'] ?? null
         );
         $this->assertSame(
@@ -1868,7 +1867,7 @@ class EducationalContentTest extends TestCase
         $page->assertSee($cover, false);
         $page->assertSee('Has retatrutide been compared head to head with semaglutide?', false);
         $page->assertSee('Is research-labelled retatrutide or semaglutide the same as the trial drugs?', false);
-        $page->assertSee('18 Min Read', false);
+        $page->assertSee('19 Min Read', false);
         $page->assertDontSee('/workspace', false);
         $page->assertDontSee('CMS paste', false);
         $page->assertDontSee('CHANGES', false);
@@ -1879,7 +1878,7 @@ class EducationalContentTest extends TestCase
             ->where('blog.slug', $slug)
             ->where('blog.title', $h1)
             ->where('blog.image', $cover)
-            ->where('blog.readTime', '18 Min Read')
+            ->where('blog.readTime', '19 Min Read')
             ->where('blog.content', function ($html) {
                 return is_string($html)
                     && ! str_contains($html, '<!--')

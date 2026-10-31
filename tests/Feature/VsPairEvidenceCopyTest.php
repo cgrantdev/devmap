@@ -6,6 +6,7 @@ use App\Models\ProductCategory;
 use App\Support\BpcTb500CompareCopy;
 use App\Support\ElamipretideMotsCCompareFaqs;
 use App\Support\EloralintideTirzepatideCompareCopy;
+use App\Support\RetatrutideSemaglutideCompareCopy;
 use App\Support\RetatrutideTirzepatideCompareCopy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -29,6 +30,65 @@ class VsPairEvidenceCopyTest extends TestCase
         $this->assertNull(ElamipretideMotsCCompareFaqs::forSlug('bpc-157-vs-tb-500'));
         $this->assertNotNull(EloralintideTirzepatideCompareCopy::forSlug('eloralintide-vs-tirzepatide'));
         $this->assertNull(EloralintideTirzepatideCompareCopy::forSlug('eloralintide-vs-petrelintide'));
+        $this->assertNotNull(RetatrutideSemaglutideCompareCopy::forSlug('retatrutide-vs-semaglutide'));
+        $this->assertNull(RetatrutideSemaglutideCompareCopy::forSlug('retatrutide-vs-tirzepatide'));
+    }
+
+    public function test_retatrutide_semaglutide_page_renders_the_transcend_note(): void
+    {
+        $copy = RetatrutideSemaglutideCompareCopy::forSlug('retatrutide-vs-semaglutide');
+        $this->assertNotNull($copy);
+        $this->assertSame(RetatrutideSemaglutideCompareCopy::HEADING, $copy['evidence']['title']);
+        $this->assertSame([], $copy['evidence']['paragraphs']);
+        $this->assertSame([RetatrutideSemaglutideCompareCopy::NOTE], $copy['evidence']['notes']);
+        $this->assertSame([], $copy['faqs']);
+        $this->assertNull($copy['link']);
+
+        $note = $copy['evidence']['notes'][0];
+        $visible = preg_replace('/\[([^\]]+)\]\((?:\/[^)\s]*|https?:\/\/[^)\s]+)\)/', '$1', $note);
+        $this->assertIsString($visible);
+        $words = preg_match_all('/\S+/', $visible);
+        $this->assertGreaterThanOrEqual(60, $words);
+        $this->assertLessThanOrEqual(90, $words);
+
+        $this->assertStringContainsString('28 Oct 2026', $note);
+        $this->assertStringContainsString('open-label Phase 3 trial versus once-weekly semaglutide (Ozempic)', $note);
+        $this->assertStringContainsString('adults with type 2 diabetes on metformin', $note);
+        $this->assertStringContainsString('met its primary endpoint (A1C noninferiority at 80 weeks) and all key secondary endpoints', $note);
+        $this->assertStringContainsString('[company-reported]', $note);
+        $this->assertStringContainsString('It is not peer-reviewed.', $note);
+        $this->assertStringContainsString('Retatrutide is investigational and not approved.', $note);
+        $this->assertStringContainsString('research-use-only peptide comparison publisher, not a clinic', $note);
+        $this->assertStringContainsString('/blog/retatrutide-vs-semaglutide', $note);
+        $this->assertStringContainsString(RetatrutideSemaglutideCompareCopy::LILLY_URL, $note);
+        $this->assertSame(
+            'Eli Lilly and Company (company-reported). TRANSCEND-T2D-2 topline press release, 28 October 2026.',
+            $copy['evidence']['sources'][0]['title']
+        );
+
+        $prose = preg_replace('#https?://\S+#', '', $note.' '.$copy['evidence']['title'].' '.$copy['evidence']['sources'][0]['title']);
+        $this->assertIsString($prose);
+        $this->assertDoesNotMatchRegularExpression('/\bgreater\b|\bsuperior\b|\bwinner\b|outperformed|works better|more than double/i', $prose);
+        $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?\s*mg\b/i', $note);
+        $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?\s*%/', $note);
+        $this->assertStringNotContainsString('Ozempic 2', $note);
+
+        ProductCategory::create(['name' => 'Retatrutide', 'slug' => 'retatrutide', 'is_active' => true]);
+        ProductCategory::create(['name' => 'Semaglutide', 'slug' => 'semaglutide', 'is_active' => true]);
+
+        $this->get('/compare/retatrutide-vs-semaglutide')
+            ->assertOk()
+            ->assertSee('Head-to-head trial: TRANSCEND-T2D-2 (company-reported)', false)
+            ->assertSee('open-label Phase 3 trial versus once-weekly semaglutide (Ozempic)', false)
+            ->assertSee('It is not peer-reviewed.', false)
+            ->assertSee('Retatrutide is investigational and not approved.', false)
+            ->assertSee('blog\\/retatrutide-vs-semaglutide', false)
+            ->assertSee('lillys-retatrutide-delivered-greater-a1c-reduction-and-more', false)
+            ->assertInertia(fn ($page) => $page
+                ->component('Frontend/CompareCompoundVs')
+                ->where('evidence.title', RetatrutideSemaglutideCompareCopy::HEADING)
+                ->where('evidence.notes.0', RetatrutideSemaglutideCompareCopy::NOTE)
+                ->has('faqs', 0));
     }
 
     public function test_eloralintide_tirzepatide_page_shows_the_dated_company_reported_note(): void

@@ -1,4 +1,4 @@
-Retatrutide and semaglutide both act on the GLP-1 receptor, but they are at very different stages. Retatrutide, from Eli Lilly, is an investigational once-weekly injection that also acts on GIP and glucagon receptors. Semaglutide, from Novo Nordisk, is a GLP-1 receptor agonist that the FDA has approved as Ozempic, Wegovy and Rybelsus. As of 19 October 2026, no head-to-head trial of the two has reported results. The one phase 3 trial that compares them directly, TRANSCEND-T2D-2, is still running.
+Retatrutide and semaglutide both act on the GLP-1 receptor, but they are at very different stages. Retatrutide, from Eli Lilly, is an investigational once-weekly injection that also acts on GIP and glucagon receptors. Semaglutide, from Novo Nordisk, is a GLP-1 receptor agonist that the FDA has approved as Ozempic, Wegovy and Rybelsus. As of 28 October 2026, one head-to-head Phase 3 trial of the two, TRANSCEND-T2D-2 in type 2 diabetes, has company-reported topline results that are not yet peer-reviewed or published.
 
 This article covers what each molecule is, how their mechanisms differ, what each trial program measured, the side effects reported in the trial publications, and where each stands with regulators. Every efficacy figure is labelled with its estimand and its source. Retatrutide and semaglutide figures are kept in separate tables, because they come from different trials with different populations, durations and analysis methods.
 
@@ -30,18 +30,23 @@ Retatrutide adds two more targets:
 - **GIP receptor.** GIP is a second gut hormone released after meals. In laboratory assays cited in the phase 2 obesity paper, retatrutide was more potent than natural GIP at the human GIP receptor.
 - **Glucagon receptor.** Glucagon is a pancreatic hormone. The phase 2 authors write that adding glucagon receptor agonism "may further reduce energy intake, increase energy expenditure, or both." They describe this as a premise and a speculation, not an established human mechanism.
 
-The same paper reports that, compared with the natural hormones, retatrutide is less potent at the human glucagon and GLP-1 receptors. A triple-receptor design is a difference in pharmacology. On its own, it says nothing about whether a drug is more effective or safer, and no trial has yet compared the two drugs directly.
+The same paper reports that, compared with the natural hormones, retatrutide is less potent at the human glucagon and GLP-1 receptors. A triple-receptor design is a difference in pharmacology. On its own, it says nothing about whether a drug is more effective or safer. One head-to-head Phase 3 trial in type 2 diabetes, TRANSCEND-T2D-2, has company-reported topline results as of 28 Oct 2026 that are not yet peer-reviewed or published.
 
 ## Has there been a head-to-head trial?
 
-Not with results. A ClinicalTrials.gov search on 19 October 2026 found two Lilly-sponsored trials that randomize participants to retatrutide or semaglutide:
+### TRANSCEND-T2D-2: topline results (company-reported, 28 Oct 2026)
 
-- **TRANSCEND-T2D-2 ([NCT06260722](https://clinicaltrials.gov/study/NCT06260722)).** A phase 3, open-label trial in adults with type 2 diabetes who are not controlled on metformin, with or without an SGLT2 inhibitor. It has two retatrutide dose arms and one once-weekly injected semaglutide arm, and an estimated 1,250 participants. The primary endpoint is change in HbA1c from baseline to week 80. Secondary endpoints include body weight. The registry lists the status as active, not recruiting, with primary completion on 27 August 2026 and study completion estimated for February 2027. No results are posted, and a PubMed search found no publication.
+On 28 Oct 2026, Eli Lilly announced topline results from TRANSCEND-T2D-2, the first Phase 3 trial comparing retatrutide with another incretin medicine [23][24] [company-reported]. The trial was randomised and open-label. It compared two once-weekly retatrutide dose arms (a lower and a higher dose arm) with once-weekly injectable semaglutide (Ozempic) in 1,298 adults with type 2 diabetes not controlled on metformin, with or without an SGLT2 inhibitor [23][7]. Lilly says it chose the semaglutide arm because it was "the highest approved dose" [23] [company-reported].
+
+The primary objective was noninferiority on A1C change at 80 weeks for the higher dose arm versus semaglutide. Body-weight change was a key secondary endpoint [23]. Lilly reported that retatrutide "met the primary and all key secondary endpoints" [23] [company-reported]. All figures Lilly released use the efficacy estimand, which estimates results had all participants stayed on treatment without added glucose-lowering medicine [23]. This page does not reproduce per-arm figures.
+
+Lilly said gastrointestinal events were the most common adverse events and that dysesthesia was also reported [23] [company-reported].
+
+This is a topline company announcement. It has not been peer-reviewed, and full results are not yet published. Lilly says detailed results will be presented at a medical meeting and published in a journal [23]. Retatrutide is investigational and is not approved anywhere [23].
+
 - **A phase 1 mechanistic study ([NCT06982859](https://clinicaltrials.gov/study/NCT06982859)).** About 95 adults with type 2 diabetes, comparing retatrutide with placebo on insulin secretion and insulin sensitivity over 28 weeks. A semaglutide arm, open-label, is included as a secondary comparison. The study is active, not recruiting, with completion estimated for January 2027.
 
-Lilly's Medical Information page (last reviewed 21 April 2026) says that "no phase 3 head-to-head active comparator trials have been completed against retatrutide therefore no efficacy or safety comparisons can be made at this time."
-
-So every efficacy and safety figure below comes from trials in which retatrutide or semaglutide was compared with placebo, never with each other. Network meta-analyses that estimate indirect comparisons have been published, but they are not randomized head-to-head evidence and are not used here.
+So every efficacy and safety figure below comes from trials in which retatrutide or semaglutide was compared with placebo. One head-to-head Phase 3 trial, TRANSCEND-T2D-2 in type 2 diabetes, has company-reported topline results as of 28 Oct 2026 that are not yet peer-reviewed or published. Network meta-analyses that estimate indirect comparisons have been published, but they are not randomized head-to-head evidence and are not used here.
 
 ## What the trials measured
 
@@ -100,7 +105,7 @@ Points the sources add:
 
 ### Why these tables are not a ranking
 
-TRIUMPH-1 and STEP 1 both enrolled adults without diabetes, and TRIUMPH-2 and STEP 2 both enrolled adults with type 2 diabetes. They are still different trials. They ran for 80 vs 68 weeks, enrolled different people years apart, used different escalation schemes and lifestyle programs, and named and handled their estimands differently. Retatrutide also has no completed outcomes trial comparable to SELECT. Placing the numbers side by side does not show which drug works better. Only a randomized head-to-head trial, such as TRANSCEND-T2D-2 once it reports, can address that, and only in the population it studied.
+TRIUMPH-1 and STEP 1 both enrolled adults without diabetes, and TRIUMPH-2 and STEP 2 both enrolled adults with type 2 diabetes. They are still different trials. They ran for 80 vs 68 weeks, enrolled different people years apart, used different escalation schemes and lifestyle programs, and named and handled their estimands differently. Retatrutide also has no completed outcomes trial comparable to SELECT. Placing the numbers side by side does not rank the two drugs. One head-to-head Phase 3 trial, TRANSCEND-T2D-2 in type 2 diabetes, has company-reported topline results as of 28 Oct 2026 that are not yet peer-reviewed or published, and those results apply only to the population that trial studied.
 
 ## Side-effect data as reported
 
@@ -163,7 +168,7 @@ The current Wegovy label carries a boxed warning on the risk of thyroid C-cell t
 
 ## What the trials don't tell us
 
-- **No head-to-head data yet.** TRANSCEND-T2D-2 has not reported. Even when it does, it will describe people with type 2 diabetes on metformin, in an open-label design, not people without diabetes.
+- **Company-reported topline only.** One head-to-head Phase 3 trial, TRANSCEND-T2D-2 in type 2 diabetes, has company-reported topline results as of 28 Oct 2026 that are not yet peer-reviewed or published. It describes people with type 2 diabetes on metformin, in an open-label design, not people without diabetes.
 - **Different durations and eras.** The TRIUMPH trials ran 80 weeks and reported in 2026. STEP 1 and STEP 2 ran 68 weeks and reported in 2021.
 - **Peer review is partial for retatrutide.** TRIUMPH-1 and TRIUMPH-2 have papers. The efficacy rows are reported in those papers and company-reported by Lilly. TRIUMPH-3 figures are company-reported only.
 - **Outcomes evidence differs.** Semaglutide has a completed cardiovascular outcomes trial in people without diabetes (SELECT) and FDA-approved cardiovascular and kidney risk-reduction indications. Retatrutide's outcomes trial is not expected to complete before 2029.
@@ -180,7 +185,7 @@ For another comparison that does have a head-to-head trial, see [Orforglipron vs
 
 ### Has retatrutide been compared head to head with semaglutide?
 
-Not with results. TRANSCEND-T2D-2 (NCT06260722) is a phase 3, open-label trial comparing two retatrutide dose arms with once-weekly semaglutide in about 1,250 adults with type 2 diabetes, with HbA1c change at week 80 as the primary endpoint. As of 19 October 2026 it was active, not recruiting, with no results posted or published.
+Yes, in one trial, but so far only in a company announcement. On 28 Oct 2026, Eli Lilly reported topline results from TRANSCEND-T2D-2, an open-label Phase 3 trial comparing two retatrutide dose arms with once-weekly semaglutide (Ozempic) in adults with type 2 diabetes on metformin. Lilly said retatrutide met the primary endpoint (A1C noninferiority at 80 weeks) and all key secondary endpoints [company-reported]. The results have not been peer-reviewed or fully published, and they apply only to that population. Retatrutide is not approved.
 
 ### How do retatrutide and semaglutide work differently?
 
@@ -218,7 +223,7 @@ No. Products sold online as research-use-only retatrutide or semaglutide are not
 4. Wilding JPH, et al. Once-Weekly Semaglutide in Adults with Overweight or Obesity. *N Engl J Med*. 2021;384:989-1002 (STEP 1). PMID 33567185. doi:10.1056/NEJMoa2032183. https://www.nejm.org/doi/full/10.1056/NEJMoa2032183
 5. Davies M, et al. Semaglutide 2·4 mg once a week in adults with overweight or obesity, and type 2 diabetes (STEP 2): a randomised, double-blind, double-dummy, placebo-controlled, phase 3 trial. *Lancet*. 2021;397:971-984. PMID 33667417. doi:10.1016/S0140-6736(21)00213-0. https://pubmed.ncbi.nlm.nih.gov/33667417/
 6. Lincoff AM, et al. Semaglutide and Cardiovascular Outcomes in Obesity without Diabetes. *N Engl J Med*. 2023;389:2221-2232 (SELECT). PMID 37952131. doi:10.1056/NEJMoa2307563. https://pubmed.ncbi.nlm.nih.gov/37952131/
-7. ClinicalTrials.gov. TRANSCEND-T2D-2, NCT06260722 (record last updated 28 September 2026). https://clinicaltrials.gov/study/NCT06260722
+7. ClinicalTrials.gov. TRANSCEND-T2D-2, NCT06260722 (record last updated 28 September 2026) (record accessed 31 October 2026). https://clinicaltrials.gov/study/NCT06260722
 8. ClinicalTrials.gov. Retatrutide α- and β-cell function study, NCT06982859 (record last updated 6 October 2026). https://clinicaltrials.gov/study/NCT06982859
 9. ClinicalTrials.gov. TRIUMPH-Outcomes, NCT06383390. https://clinicaltrials.gov/study/NCT06383390
 10. Eli Lilly and Company (company-reported). Lilly's triple agonist, retatrutide, delivered powerful weight loss in pivotal Phase 3 obesity trial, 21 May 2026. https://investor.lilly.com/news-releases/news-release-details/lillys-triple-agonist-retatrutide-delivered-powerful-weight-loss
@@ -234,5 +239,7 @@ No. Products sold online as research-use-only retatrutide or semaglutide are not
 20. U.S. FDA. Wegovy injection and tablets prescribing information (NDA 215256/S-031, approved 5 May 2026, revised 05/2026). https://www.accessdata.fda.gov/drugsatfda_docs/label/2026/215256s031,218316s00lbl.pdf
 21. U.S. FDA. Wegovy (semaglutide) tablets, NDA 218316 approval package (approval date 22 December 2025). https://www.accessdata.fda.gov/drugsatfda_docs/nda/2026/218316Orig1s000TOC.html
 22. European Medicines Agency. Ozempic, Rybelsus and Wegovy EPARs, and EMA medicines data download (accessed 19 October 2026). https://www.ema.europa.eu/en/medicines/human/EPAR/wegovy
+23. Eli Lilly and Company (company-reported). TRANSCEND-T2D-2 topline press release, 28 October 2026. https://investor.lilly.com/news-releases/news-release-details/lillys-retatrutide-delivered-greater-a1c-reduction-and-more
+24. Eli Lilly and Company (company-reported). Lilly reports third-quarter 2026 financial results, raises full-year guidance and highlights regulatory progress across the portfolio, 29 October 2026. https://investor.lilly.com/news-releases/news-release-details/lilly-reports-third-quarter-2026-financial-results-raises-full
 
 *Educational content only. Not medical or legal advice. Regulatory status can change after publication; check the primary sources above.*
