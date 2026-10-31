@@ -406,7 +406,7 @@ class EducationalContentPublisher
                 'og_title' => 'Are Research Peptides Legal? FDA & RUO Basics',
                 'og_description' => 'Educational explainer: FDA approval vs 503A compounding vs RUO, plus the draft HHS interim peptide enforcement-discretion policy of October 2026.',
                 'tag' => 'Regulation',
-                'read_time' => '21 Min Read',
+                'read_time' => '24 Min Read',
                 'published_at' => '2026-09-29',
                 'faq' => self::faq($host.'/guides/peptide-legality-fda-ruo-compounding#faq', [
                     ['Are research peptides legal to buy online?', 'There is no single yes/no answer for every peptide, seller, claim, and jurisdiction. RUO listings exist; FDA still polices unapproved new drugs marketed for human use. This page does not advise purchases.'],
@@ -1399,7 +1399,7 @@ class EducationalContentPublisher
                 'og_title' => 'Compounded vs RUO Peptides: The Draft HHS 503A Policy',
                 'og_description' => 'How the draft HHS 503A peptide enforcement-discretion policy works, what it does not do, and how compounded drugs differ from RUO-labelled peptides.',
                 'tag' => 'Regulation',
-                'read_time' => '9 Min Read',
+                'read_time' => '11 Min Read',
                 'published_at' => '2026-10-29',
                 'faq' => self::faq($host.'/guides/compounded-vs-ruo-peptides#faq', [
                     ['Did FDA approve these six peptides?', 'No. The notice comes from the HHS Office of the Secretary. It says compounded drugs are not FDA-approved, and none of the six is on the 503A Bulks List [1][2] [primary].'],
