@@ -6,6 +6,7 @@
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-8 lg:pt-12 pb-6">
         <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-2">{{ productName }}</h1>
         <p class="text-[15px] text-[color:var(--color-ink-muted)]">Compare prices across listed vendors</p>
+        <CatalogCrossLinks :groups="catalogLinks?.groups || []" />
       </div>
 
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pb-8">
@@ -143,6 +144,7 @@ import { Link, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import MainButton from '@/components/MainButton.vue'
+import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
 
 const props = defineProps({
   productName: String,
@@ -155,6 +157,10 @@ const props = defineProps({
   sortDir: String,
   search: String,
   category: Object,
+  catalogLinks: {
+    type: Object,
+    default: () => ({ groups: [] }),
+  },
   seo: {
     type: Object,
     default: () => ({

@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\SeoPage;
 use App\Models\Setting;
+use App\Support\CatalogCrossLinks;
 use App\Support\CompareSlug;
 use App\Support\EncyclopediaFraming;
 use App\Support\EncyclopediaSlug;
@@ -883,6 +884,9 @@ class EncyclopediaController extends Controller
 
         return Inertia::render('Frontend/EncyclopediaArticleDetail', array_merge($peptideData, [
             'faqs' => $faqs,
+            'catalogLinks' => CatalogCrossLinks::share(
+                CatalogCrossLinks::forCategory($category, ['product', 'compare'])
+            ),
             'seo' => $seo,
         ]));
     }

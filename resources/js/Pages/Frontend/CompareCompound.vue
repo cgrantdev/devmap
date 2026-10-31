@@ -64,6 +64,7 @@
             ← All compare pages
           </a>
         </div>
+        <CatalogCrossLinks :groups="catalogLinks?.groups || []" />
 
         <!-- Trust filters — Colin PMAP tab 1: same three toggles as
              the vendors + peptides pages. cGMP + 7+ Tested combine
@@ -382,12 +383,14 @@ import ModernLayout from '../Layouts/ModernLayout.vue'
 import BuyThroughModal from '@/components/BuyThroughModal.vue'
 import ComparePriceSummary from '@/components/ComparePriceSummary.vue'
 import PricePerMgTable from '@/components/PricePerMgTable.vue'
+import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
 import { withSrc } from '@/composables/useOutbound'
 
 const props = defineProps({
   compound: { type: Object, required: true },
   related: { type: Array, default: () => [] },
   vsPairs: { type: Array, default: () => [] },
+  catalogLinks: { type: Object, default: () => ({ groups: [] }) },
   seo: { type: Object, default: () => ({}) },
   trustFilters: { type: Object, default: () => ({ verified: [], usp: null }) },
 })

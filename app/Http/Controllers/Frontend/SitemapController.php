@@ -174,10 +174,7 @@ class SitemapController extends Controller
                     // slug cleaned at the row level (separate fix). Case is preserved
                     // because the controller does an exact slug match.
                     // uncategorized is route-safe but it is a bucket, not a compound.
-                    if (
-                        strcasecmp((string) $c->slug, 'uncategorized') !== 0
-                        && preg_match('#^[A-Za-z0-9._\-]+$#', $c->slug)
-                    ) {
+                    if (\App\Support\ProductListingSeo::usesVendorTemplate($c->slug)) {
                         $urls[] = [
                             'loc'        => self::BASE_URL . '/product/' . $c->slug,
                             'lastmod'    => $lastmod,
