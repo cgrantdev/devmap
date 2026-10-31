@@ -59,19 +59,26 @@ class ProductListingSeo
         return $display;
     }
 
+    public const DESCRIPTION_MIN = 140;
+
     public static function title(string $compound, int $vendorCount): string
     {
         $compound = trim($compound);
         $count = max(0, $vendorCount);
         $n = (string) $count;
         $suffix = self::SITE_SUFFIX;
+        $blend = self::isBlend($compound);
 
-        $primary = self::primaryTitle($compound, $count, $n);
-        $candidates = [$primary, "{$compound}: {$n} Research Vendors"];
+        $candidates = [self::primaryTitle($compound, $count, $n, $blend)];
+        if ($count >= 2) {
+            $candidates[] = "{$compound}: {$n} Research Vendors";
+        }
         $short = self::shortName($compound);
         if ($short !== $compound) {
-            $candidates[] = self::primaryTitle($short, $count, $n);
-            $candidates[] = "{$short}: {$n} Research Vendors";
+            $candidates[] = self::primaryTitle($short, $count, $n, $blend);
+            if ($count >= 2) {
+                $candidates[] = "{$short}: {$n} Research Vendors";
+            }
         }
         $candidates[] = $compound;
 
@@ -82,100 +89,162 @@ class ProductListingSeo
             }
         }
 
-        return ProductPageSeo::limitTitle($compound.$suffix);
+        // Keep the suffix so app.blade.php does not append it again and
+        // push the rendered <title> past 60 characters.
+        return self::trimName($compound, self::TITLE_LIMIT - self::chars($suffix)).$suffix;
     }
 
+    /**
+     * Picks the first template between DESCRIPTION_MIN and
+     * DESCRIPTION_LIMIT. Every template ends "Peptidemap sells nothing."
+     * Only a name too long for the shortest template is trimmed.
+     */
     public static function description(string $compound, int $vendorCount): string
     {
         $compound = trim($compound);
         $count = max(0, $vendorCount);
         $n = (string) $count;
+        $blend = self::isBlend($compound);
 
-        foreach ([false, true] as $compact) {
-            [$prefix, $tail] = self::metaParts($count, $n, $compact);
+        $fallback = null;
+        foreach (self::metaTemplates($count, $n, $blend) as [$prefix, $tail]) {
             $meta = $prefix.$compound.$tail;
-            if (self::chars($meta) <= self::DESCRIPTION_LIMIT) {
+            $length = self::chars($meta);
+            if ($length >= self::DESCRIPTION_MIN && $length <= self::DESCRIPTION_LIMIT) {
                 return $meta;
             }
-            if ($compact) {
-                return $prefix.self::trimName($compound, self::DESCRIPTION_LIMIT - self::chars($prefix.$tail)).$tail;
+            if ($length <= self::DESCRIPTION_LIMIT && $fallback === null) {
+                $fallback = $meta;
             }
         }
+        if ($fallback !== null) {
+            return $fallback;
+        }
 
-        return $compound;
+        $templates = self::metaTemplates($count, $n, $blend);
+        [$prefix, $tail] = end($templates);
+
+        $meta = $prefix.self::trimName($compound, self::DESCRIPTION_LIMIT - self::chars($prefix.$tail)).$tail;
+
+        return str_replace('….', '…', $meta);
+    }
+
+    public static function isBlend(string $compound): bool
+    {
+        return (bool) preg_match('#\s(?:—|/)\s|\bblend\b#iu', $compound);
     }
 
     /**
-     * Blend display names use " — " or " / " before the rest of the
-     * label. The short token is only a title fallback; the meta keeps
-     * the full name.
+     * Title fallback name. "KLOW — GHK-Cu/…" becomes "KLOW". A " / "
+     * blend keeps both compounds and only drops a trailing "Blend", so
+     * "CJC-1295 / Ipamorelin Blend" never shortens to "CJC-1295" and
+     * collides with the single-compound page.
      */
     private static function shortName(string $compound): string
     {
-        $cut = null;
-        foreach ([' — ', ' / '] as $separator) {
-            $at = mb_strpos($compound, $separator);
-            if ($at !== false && ($cut === null || $at < $cut)) {
-                $cut = $at;
-            }
+        $at = mb_strpos($compound, ' — ');
+        if ($at !== false && $at > 0) {
+            return trim(mb_substr($compound, 0, $at));
         }
-        if ($cut === null || $cut < 1) {
-            return $compound;
-        }
+        $stripped = trim((string) preg_replace('/\s+blend$/iu', '', $compound));
 
-        return trim(mb_substr($compound, 0, $cut));
+        return $stripped !== '' ? $stripped : $compound;
     }
 
-    private static function primaryTitle(string $compound, int $count, string $n): string
+    private static function primaryTitle(string $compound, int $count, string $n, bool $blend): string
     {
         if ($count >= 2) {
-            return "{$compound}: Compare {$n} Research Vendors";
+            return "{$compound}: {$n} Research Vendors Listed";
         }
         if ($count === 1) {
             return "{$compound}: 1 Research Vendor Listed";
         }
 
-        return "{$compound}: Research Compound Profile";
+        return $blend ? "{$compound}: Research Blend Profile" : "{$compound}: Research Compound Profile";
     }
 
     /**
-     * @return array{0: string, 1: string}
+     * Longest first. Adjacent templates differ by at most 15
+     * characters, so any name up to the longest fit lands in 140–155.
+     *
+     * @return list<array{0: string, 1: string}>
      */
-    private static function metaParts(int $count, string $n, bool $compact): array
+    private static function metaTemplates(int $count, string $n, bool $blend): array
     {
+        $tails = ['. Research use only (RUO); Peptidemap sells nothing.', '. Research use only; Peptidemap sells nothing.'];
         if ($count >= 2) {
-            return $compact
-                ? ["Compare {$n} research vendors listing ", '. Research use only; Peptidemap sells nothing.']
-                : ["Compare {$n} research vendors listing ", ': vial sizes, vendor details and listings side by side. Research use only; Peptidemap sells nothing.'];
-        }
-        if ($count === 1) {
-            return $compact
-                ? ['', ' has 1 research vendor listed on Peptidemap. Research use only; Peptidemap sells nothing.']
-                : ['', ' has 1 research vendor listed on Peptidemap. See vial sizes and vendor details. Research use only; Peptidemap sells nothing.'];
+            $prefix = "Compare {$n} research vendors listing ";
+            $middles = [
+                ': vial sizes, product formats, catalog names and vendor details side by side',
+                ': vial sizes, product formats, catalog names and vendor details',
+                ': vial sizes, product formats and vendor details side by side',
+                ': vial sizes, vendor details and listings side by side',
+                ': vial sizes and vendor details side by side',
+                ', with vial sizes and vendor details',
+                ', with vendor details',
+                '',
+            ];
+        } elseif ($count === 1) {
+            $prefix = '';
+            $middles = [
+                ' has 1 research vendor listed on Peptidemap. See its vial sizes, product formats, catalog names and vendor details',
+                ' has 1 research vendor listed on Peptidemap. See vial sizes, product formats and vendor details',
+                ' has 1 research vendor listed on Peptidemap. See vial sizes and vendor details',
+                ' has 1 research vendor listed on Peptidemap. See vendor details',
+                ' has 1 research vendor listed on Peptidemap',
+                ': 1 research vendor listed',
+            ];
+        } else {
+            $kind = $blend ? 'blend' : 'compound';
+            $prefix = '';
+            $middles = [
+                ": {$kind} profile. No research vendors currently list it on Peptidemap; vendor listings and vial sizes appear here when they do",
+                ": {$kind} profile. No research vendors currently list it on Peptidemap; vendor listings appear here when they do",
+                ": {$kind} profile. No research vendors currently list it on Peptidemap; listings appear here when they do",
+                ": {$kind} profile. No research vendors list it on Peptidemap yet; listings appear here when they do",
+                ": {$kind} profile. No research vendors list it yet; listings appear here when they do",
+                ": {$kind} profile. No research vendors currently list it on Peptidemap",
+                ": {$kind} profile. No research vendors list it yet",
+                ": {$kind} profile, not yet listed",
+                ": {$kind} profile",
+            ];
         }
 
-        return $compact
-            ? ['', ' research-use-only profile on Peptidemap. No vendors list it yet. We sell nothing.']
-            : ['', ' research-use-only profile. No vendors currently list it on Peptidemap; compared listings appear here when they do. We sell nothing.'];
+        $templates = [];
+        foreach ($middles as $middle) {
+            foreach ($tails as $tail) {
+                $templates[] = [$prefix, $middle.$tail];
+            }
+        }
+
+        return $templates;
     }
 
+    /**
+     * Cuts at a word boundary and marks the cut with "…". A name with
+     * no space in its first half is cut mid-token, still with "…".
+     */
     private static function trimName(string $name, int $budget): string
     {
-        if ($budget < 1) {
-            return '';
+        if ($budget < 2) {
+            return '…';
         }
         if (self::chars($name) <= $budget) {
             return $name;
         }
 
-        $slice = rtrim(mb_substr($name, 0, $budget));
+        $keep = $budget - 1;
+        $slice = mb_substr($name, 0, $keep);
         $space = mb_strrpos($slice, ' ');
-        if ($space !== false && $space > 0) {
-            $slice = rtrim(mb_substr($slice, 0, $space));
+        if ($space !== false && $space >= (int) floor($keep / 2)) {
+            $slice = mb_substr($slice, 0, $space);
         }
         $slice = (string) preg_replace('/[\s\-–—\/+&,|·:]+$/u', '', $slice);
+        if ($slice === '') {
+            $slice = mb_substr($name, 0, $keep);
+        }
 
-        return $slice !== '' ? $slice : rtrim(mb_substr($name, 0, $budget));
+        return $slice.'…';
     }
 
     private static function chars(string $value): int

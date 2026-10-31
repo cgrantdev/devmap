@@ -46,7 +46,7 @@ class ProductListingSeoTest extends TestCase
             ProductListingSeo::compoundName('GLOW')
         );
         $this->assertSame(
-            'GLOW: Research Compound Profile — Peptidemap',
+            'GLOW: Research Blend Profile — Peptidemap',
             ProductListingSeo::title('GLOW — GHK-Cu/BPC-157/TB-500', 0)
         );
         $this->assertStringContainsString(
@@ -58,7 +58,7 @@ class ProductListingSeoTest extends TestCase
         $retaHtml = $retaPage->getContent();
         $retaTitle = $this->headContent($retaHtml, '/<title>(.*?)<\/title>/s');
         $this->assertSame(ProductListingSeo::title('Retatrutide', 2), $retaTitle);
-        $this->assertStringStartsWith('Retatrutide: Compare 2 Research Vendors', $retaTitle);
+        $this->assertStringStartsWith('Retatrutide: 2 Research Vendors Listed', $retaTitle);
         $this->assertStringNotContainsString('GLP3-R', $retaTitle);
         $retaPage->assertInertia(fn ($page) => $page
             ->component('Frontend/ProductListing')
@@ -86,22 +86,24 @@ class ProductListingSeoTest extends TestCase
         $long = trim(str_repeat('Longname ', 8));
         $longTitle = ProductListingSeo::title($long, 4);
         $this->assertLessThanOrEqual(60, mb_strlen($longTitle));
-        $this->assertSame('Longname Longname Longname Longname Longname Longname', $longTitle);
+        $this->assertSame('Longname Longname Longname Longname Longname… — Peptidemap', $longTitle);
         $this->assertDoesNotMatchRegularExpression('/\bLongn\b|\bLongna\b/', $longTitle);
+        $this->assertStringEndsWith(' — Peptidemap', $longTitle);
 
         $fullMeta = $long.' research-use-only profile. No vendors currently list it on Peptidemap; compared listings appear here when they do. We sell nothing.';
         $meta = ProductListingSeo::description($long, 0);
         $this->assertGreaterThan(155, mb_strlen($fullMeta));
         $this->assertLessThanOrEqual(155, mb_strlen($meta));
-        $this->assertStringEndsWith('We sell nothing.', $meta);
+        $this->assertStringEndsWith('Peptidemap sells nothing.', $meta);
+        $this->assertGreaterThanOrEqual(140, mb_strlen($meta));
         $this->assertStringContainsString($long, $meta);
 
         $huge = trim(str_repeat('Longname ', 12));
         $trimmed = ProductListingSeo::description($huge, 0);
-        $this->assertGreaterThan(155, mb_strlen($huge.' research-use-only profile on Peptidemap. No vendors list it yet. We sell nothing.'));
         $this->assertLessThanOrEqual(155, mb_strlen($trimmed));
-        $this->assertStringEndsWith(' research-use-only profile on Peptidemap. No vendors list it yet. We sell nothing.', $trimmed);
-        $kept = strstr($trimmed, ' research-use-only', true);
+        $this->assertGreaterThanOrEqual(140, mb_strlen($trimmed));
+        $this->assertStringEndsWith('Peptidemap sells nothing.', $trimmed);
+        $kept = strstr($trimmed, '…', true);
         $this->assertNotFalse($kept);
         $this->assertStringStartsWith($kept, $huge);
         $this->assertSame(' ', mb_substr($huge, mb_strlen($kept), 1));
@@ -128,8 +130,8 @@ class ProductListingSeoTest extends TestCase
         $title = ProductListingSeo::title($name, 44);
         $meta = ProductListingSeo::description($name, 44);
 
-        $this->assertSame('KLOW: Compare 44 Research Vendors — Peptidemap', $title);
-        $this->assertSame(46, mb_strlen($title));
+        $this->assertSame('KLOW: 44 Research Vendors Listed — Peptidemap', $title);
+        $this->assertSame(45, mb_strlen($title));
         $this->assertLessThanOrEqual(155, mb_strlen($meta));
         $this->assertStringContainsString($name, $meta);
         $this->assertStringEndsWith('sells nothing.', $meta);
@@ -137,12 +139,35 @@ class ProductListingSeoTest extends TestCase
 
         $slash = 'CJC-1295 / Ipamorelin Blend';
         $this->assertSame(
-            'CJC-1295: Compare 36 Research Vendors — Peptidemap',
+            'CJC-1295 / Ipamorelin: 36 Research Vendors — Peptidemap',
             ProductListingSeo::title($slash, 36)
         );
         $slashMeta = ProductListingSeo::description($slash, 36);
         $this->assertStringContainsString($slash, $slashMeta);
         $this->assertMetaKeepsTheTail($slashMeta);
+    }
+
+    public function test_every_name_length_and_count_stays_within_the_gates(): void
+    {
+        $names = ['A', 'KPV', 'BPC-157', 'Retatrutide', 'Bacteriostatic Water', 'CJC-1295 / Ipamorelin Blend',
+            'BPC-157 / TB-500 Blend', 'KLOW — GHK-Cu/BPC-157/TB-500/KPV', 'GLOW — GHK-Cu/BPC-157/TB-500',
+            'Thymosin Beta-4 Fragment Ac-SDKP Acetate Research Grade Lyophilized', str_repeat('x', 90)];
+        foreach ($names as $name) {
+            foreach ([0, 1, 2, 9, 10, 99, 100, 1000] as $count) {
+                $title = ProductListingSeo::title($name, $count);
+                $meta = ProductListingSeo::description($name, $count);
+                $this->assertLessThanOrEqual(60, mb_strlen($title), $title);
+                $this->assertStringEndsWith(' — Peptidemap', $title);
+                $this->assertMetaKeepsTheTail($meta);
+                $this->assertClean($title);
+                $this->assertClean($meta);
+                if ($count < 2) {
+                    $this->assertDoesNotMatchRegularExpression('/\\d Research Vendors/', $title, $title);
+                }
+            }
+        }
+        $this->assertSame('CJC-1295 / Ipamorelin: 1 Research Vendor Listed — Peptidemap', ProductListingSeo::title('CJC-1295 / Ipamorelin Blend', 1));
+        $this->assertStringNotContainsString('Compound', ProductListingSeo::title('BPC-157 / TB-500 Blend', 0));
     }
 
     public function test_uncategorized_keeps_the_previous_title_and_meta(): void
@@ -211,8 +236,8 @@ class ProductListingSeoTest extends TestCase
         $this->assertSame($expectedDescription, $twitterDescription);
         $this->assertStringContainsString('role="heading" aria-level="1">'.$category->name.'</div>', $html);
 
-        if ($count >= 2 && mb_strlen($name.': Compare '.$count.' Research Vendors — Peptidemap') <= 60) {
-            $this->assertStringContainsString('Compare '.$count.' Research Vendors', $title);
+        if ($count >= 2 && mb_strlen($name.': '.$count.' Research Vendors Listed — Peptidemap') <= 60) {
+            $this->assertStringContainsString($count.' Research Vendors Listed', $title);
         } elseif ($count === 1 && mb_strlen($name.': 1 Research Vendor Listed — Peptidemap') <= 60) {
             $this->assertStringContainsString('1 Research Vendor Listed', $title);
         } elseif ($count === 0 && mb_strlen($name.': Research Compound Profile — Peptidemap') <= 60) {
@@ -222,7 +247,9 @@ class ProductListingSeoTest extends TestCase
 
     private function assertMetaKeepsTheTail(string $meta): void
     {
-        $this->assertMatchesRegularExpression('/(?:sells nothing\.|We sell nothing\.)$/', $meta, $meta);
+        $this->assertMatchesRegularExpression('/Peptidemap sells nothing\.$/', $meta, $meta);
+        $this->assertGreaterThanOrEqual(140, mb_strlen($meta), $meta);
+        $this->assertLessThanOrEqual(155, mb_strlen($meta), $meta);
     }
 
     private function assertClean(string $copy): void

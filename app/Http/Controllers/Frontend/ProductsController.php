@@ -794,13 +794,15 @@ class ProductsController extends Controller
             'description' => $seoDescription,
             'og_title' => $seoTitle,
             'og_description' => $seoDescription,
-            'h1' => $seoH1,
             'og_image' => $categoryImage,
             // Backward-compatible field used by some pages
             'image' => $categoryImage,
             'url' => $categoryUrl,
             'canonical' => $categoryUrl,
         ];
+        if ($seoH1 !== null) {
+            $seo['h1'] = $seoH1;
+        }
         
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
