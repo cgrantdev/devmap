@@ -12,6 +12,7 @@ use App\Models\Puse;
 use App\Models\Brand;
 use App\Models\Location;
 use App\Models\Deal;
+use App\Support\ProductListingSeo;
 use App\Support\ProductPageSeo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -761,14 +762,29 @@ class ProductsController extends Controller
             $categoryImage = Storage::url('categories/' . $category->image_url);
         }
         
-        // Build title: {CategoryName} – Peptidemap
-        $seoTitle = $category->name . ' – ' . $siteName;
-        
-        // Build description: first ~150-160 chars of category description
-        $seoDescription = $category->description 
-            ? $this->safeLimit($category->description, 155) 
-            : 'Browse ' . $category->name . ' peptides. Compare products, prices, and vendors.';
-        
+        // Slugs that fail the sitemap's route-safe check are the 8 broken
+        // category rows (a slash or whitespace in the stored slug). They
+        // keep the previous title and meta. Colin is cleaning those rows.
+        if (! ProductListingSeo::slugIsRouteSafe($category->slug)) {
+            $seoTitle = $category->name.' – '.$siteName;
+            $seoDescription = $category->description
+                ? $this->safeLimit($category->description, 155)
+                : 'Browse '.$category->name.' peptides. Compare products, prices, and vendors.';
+            $seoH1 = null;
+        } else {
+            $vendorCount = Product::visible()
+                ->where('status', 'active')
+                ->where('product_category_id', $category->id)
+                ->distinct('brand_id')
+                ->count('brand_id');
+            $listingName = ProductListingSeo::compoundName($category->name);
+            $seoTitle = ProductListingSeo::title($listingName, (int) $vendorCount);
+            $seoDescription = ProductListingSeo::description($listingName, (int) $vendorCount);
+            // Keep the bot heading on the raw compound name. The visible
+            // H1 stays the uppercased display label, including GLP codes.
+            $seoH1 = $category->name;
+        }
+
         // Build SEO array (same format as other pages)
         $seo = [
             'key' => 'product-listing',
@@ -776,6 +792,7 @@ class ProductsController extends Controller
             'description' => $seoDescription,
             'og_title' => $seoTitle,
             'og_description' => $seoDescription,
+            'h1' => $seoH1,
             'og_image' => $categoryImage,
             // Backward-compatible field used by some pages
             'image' => $categoryImage,
@@ -788,8 +805,9 @@ class ProductsController extends Controller
 
         // Visible label uses the compound pseudonym map (Sep 14) so
         // the compound page shows "GLP1-S" instead of "Semaglutide"
-        // for vendor-safe optics. SEO title / meta description above
-        // still spell out the raw compound name for search.
+        // for vendor-safe optics. The title above uses that display
+        // name too, except the three GLP entries, which keep the raw
+        // name in the title and meta.
         $displayName = \App\Support\CompoundDisplay::label($category->name);
         return Inertia::render('Frontend/ProductListing', [
             'category' => [
