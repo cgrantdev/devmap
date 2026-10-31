@@ -7,6 +7,7 @@ use App\Models\EducationalGuide;
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
 use Database\Seeders\EncyclopediaCompoundingPolicyOctober29Seeder as Policy;
+use Database\Seeders\EncyclopediaFreshnessOctober31Seeder as Freshness;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -65,6 +66,9 @@ class CompoundingPolicyOctober29Test extends TestCase
             'regulatory_important_note' => 'KEEP', 'faqs' => [['question' => 'Q', 'answer' => 'A']],
         ]);
         $before = $other->getAttributes();
+        // The guide as 100000 left it (2026_10_31_100000 later moves
+        // content and reading_time on; see EncyclopediaFreshnessOctober31Test).
+        $this->setGuide('target_values');
 
         $seeder = new Policy;
         $seeder->run();
@@ -194,10 +198,20 @@ class CompoundingPolicyOctober29Test extends TestCase
 
     public function test_publisher_output_matches_guide_targets(): void
     {
+        // content and reading_time moved on in 2026_10_31_100000, whose
+        // guard is this payload's target; every other column is unchanged.
+        $fresh = json_decode((string) file_get_contents(database_path(Freshness::PAYLOAD_PATH)), true)['guides'][self::GUIDE]['columns'];
         EducationalContentPublisher::sync();
         foreach ($this->guideCols() as $column => $spec) {
+            if (isset($fresh[$column])) {
+                $this->assertSame([$spec['target_values'][0]], $fresh[$column]['old_values'], $column);
+                $this->assertSame(Policy::normalize($fresh[$column]['target_value']), Policy::normalize($this->guide()->{$column}), $column);
+
+                continue;
+            }
             $this->assertSame(Policy::normalize($spec['target_values'][0]), Policy::normalize($this->guide()->{$column}), $column);
         }
+        $this->assertSame(['content', 'reading_time'], array_keys($fresh));
     }
 
     public function test_guide_seo_and_og_descriptions_are_160_characters_or_fewer(): void
@@ -220,7 +234,9 @@ class CompoundingPolicyOctober29Test extends TestCase
 
     public function test_guide_reading_time_moves_from_20_or_19_to_21_and_is_guarded(): void
     {
-        $this->assertSame('21 Min Read', collect((new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null))
+        $this->assertSame('21 Min Read', $this->guideCols()['reading_time']['target_values'][0]);
+        // The catalog now carries the 2026_10_31_100000 value (24 Min Read).
+        $this->assertSame('24 Min Read', collect((new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null))
             ->firstWhere('slug', self::GUIDE)['read_time']);
         $this->assertSame(['20 Min Read', '19 Min Read'], $this->guideCols()['reading_time']['old_values']);
         foreach (['20 Min Read', '19 Min Read'] as $old) {

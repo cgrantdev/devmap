@@ -225,13 +225,13 @@ final class FramingProfile
             ]],
             'preclinical_disclaimer' => 'This page does not provide dosing, prices, or preparation instructions.',
             'human_use_intro' => 'This entry is informational.',
-            'human_use_subsections' => [[
+            'human_use_subsections' => array_merge([[
                 'title' => 'What this page covers',
                 'entries' => [[
                     'type' => 'content',
                     'value' => $d['human'],
                 ]],
-            ]],
+            ]], $d['humanSubsections'] ?? []),
             'regulatory_subsections' => [[
                 'title' => 'Identity and status',
                 'entries' => [[

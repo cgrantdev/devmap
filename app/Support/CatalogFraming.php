@@ -360,26 +360,50 @@ class CatalogFraming
                 ['unsettled'],
                 false,
             ),
-            self::peptide(
-                ['eloralintide', 'ly3841136'],
-                'Eloralintide',
-                'What is Eloralintide? Investigational Amylin Agonist',
-                'Eloralintide is an investigational selective amylin receptor agonist. It is not a GLP-1 agonist and it is not an approved drug.',
-                'What is eloralintide?',
-                'Investigational selective amylin receptor agonist',
-                'Investigational',
-                'Investigational Amylin Agonist',
-                ['Amylin Agonist', 'Investigational'],
-                'Eloralintide (LY3841136) is an investigational selective amylin receptor agonist from Eli Lilly, described in the company literature as a peptide amylin mimetic. It is not a GLP-1 receptor agonist. It is not an approved drug. Research-chemical material that uses the name is not the investigational clinical product. No dose is given. No CAS is stated. No weight-change percentages from trials are repeated here.',
-                'Amylin receptor agonism is a different class from GLP-1 receptor agonism. Lilly has reported phase 2 work and has described the molecule as investigational. Approval has not been granted on the basis of those reports.',
-                'This page does not turn an investigational amylin agonist into a GLP-1 drug and does not give a dose.',
-                'Eloralintide is investigational. It is not an approved GLP-1 medicine.',
-                'Eloralintide is an investigational amylin receptor agonist, not a GLP-1 agonist, and not an approved drug.',
-                ['Eloralintide is LY3841136, an investigational amylin receptor agonist.', 'It is not a GLP-1 receptor agonist.', 'It is not approved.', 'No dose is given.'],
-                'Eloralintide is reported as a selective agonist at amylin receptors. That is not GLP-1 receptor agonism.',
-                [['question' => 'Is eloralintide a GLP-1 drug?', 'answer' => 'No. Eloralintide is an investigational selective amylin receptor agonist. It is not a GLP-1 agonist and it is not an approved drug.']],
-                ['amylin'],
-                false,
+            self::withArticleExtras(
+                self::peptide(
+                    ['eloralintide', 'ly3841136'],
+                    'Eloralintide',
+                    'What is Eloralintide? Investigational Amylin Agonist',
+                    'Eloralintide is an investigational selective amylin receptor agonist. It is not a GLP-1 agonist and it is not an approved drug.',
+                    'What is eloralintide?',
+                    'Investigational selective amylin receptor agonist',
+                    'Investigational',
+                    'Investigational Amylin Agonist',
+                    ['Amylin Agonist', 'Investigational'],
+                    'Eloralintide (LY3841136) is an investigational selective amylin receptor agonist from Eli Lilly, described in the company literature as a peptide amylin mimetic. It is not a GLP-1 receptor agonist. It is not an approved drug. Research-chemical material that uses the name is not the investigational clinical product. No dose is given. No CAS is stated. No weight-change percentages from trials are repeated here.',
+                    'Amylin receptor agonism is a different class from GLP-1 receptor agonism. Lilly has reported phase 2 work and has described the molecule as investigational. Approval has not been granted on the basis of those reports.',
+                    'This page does not turn an investigational amylin agonist into a GLP-1 drug and does not give a dose.',
+                    'Eloralintide is investigational. It is not an approved GLP-1 medicine.',
+                    'Eloralintide is an investigational amylin receptor agonist, not a GLP-1 agonist, and not an approved drug.',
+                    ['Eloralintide is LY3841136, an investigational amylin receptor agonist.', 'It is not a GLP-1 receptor agonist.', 'It is not approved.', 'No dose is given.'],
+                    'Eloralintide is reported as a selective agonist at amylin receptors. That is not GLP-1 receptor agonism.',
+                    [['question' => 'Is eloralintide a GLP-1 drug?', 'answer' => 'No. Eloralintide is an investigational selective amylin receptor agonist. It is not a GLP-1 agonist and it is not an approved drug.']],
+                    ['amylin'],
+                    false,
+                ),
+                [[
+                    'title' => 'Company-reported Phase 3 starts (Form 10-Q, quarter ended 30 September 2026)',
+                    'entries' => [
+                        [
+                            'type' => 'content',
+                            'value' => 'Eli Lilly\'s Form 10-Q for the quarter ended 30 September 2026 lists these among developments since its 2025 annual report: "A Phase 3 trial was initiated for eloralintide incretin add-on for obesity." "A Phase 3 trial was initiated for eloralintide for obstructive sleep apnea (OSA)." "A Phase 3 trial was initiated for eloralintide for osteoarthritis (OA) pain." [company-reported]',
+                        ],
+                        [
+                            'type' => 'content',
+                            'value' => 'A trial start is not a trial result. The filing makes no safety or efficacy finding, and eloralintide remains investigational.',
+                        ],
+                    ],
+                ]],
+                [[
+                    'title' => 'Eli Lilly and Company, Form 10-Q for the quarterly period ended September 30, 2026',
+                    'authors' => 'Eli Lilly and Company',
+                    'description' => 'Company-reported. The pipeline update lists Phase 3 trial initiations for eloralintide as an incretin add-on for obesity, for obstructive sleep apnea (OSA) and for osteoarthritis (OA) pain.',
+                    'citation' => 'SEC Form 10-Q, filed October 29, 2026 (accession no. 0000059478-26-000108).',
+                    'links' => [
+                        ['label' => 'SEC', 'url' => 'https://www.sec.gov/Archives/edgar/data/59478/000005947826000108/lly-20260930.htm'],
+                    ],
+                ]],
             ),
             self::peptide(
                 ['thymulin'],
@@ -856,6 +880,24 @@ class CatalogFraming
         array $markers = [],
     ): array {
         return self::entry($aliases, $name, $seoTitle, $seoDescription, $h1, $subtitle, $tag, $eyebrow, $tags, $overview, $background, $human, $regulatory, $conclusion, $keyPoints, $how, $faqs, true, $markers, $formula, $mw, $cas, $researchUrl);
+    }
+
+    /**
+     * Extra human-use subsections and references for a catalog entry whose
+     * post has been updated by a guarded content migration, so a fresh
+     * database builds the same article.
+     *
+     * @param  array<string, mixed>  $def
+     * @param  list<array<string, mixed>>  $humanSubsections
+     * @param  list<array<string, mixed>>  $references
+     * @return array<string, mixed>
+     */
+    private static function withArticleExtras(array $def, array $humanSubsections, array $references): array
+    {
+        $def['humanSubsections'] = $humanSubsections;
+        $def['references'] = $references;
+
+        return $def;
     }
 
     /**
