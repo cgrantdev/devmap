@@ -26,7 +26,7 @@ class CouponController extends Controller
     {
         $brand = Brand::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['vendorSetting'])
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic()->with('location')])
             ->firstOrFail();
 
         $vs = $brand->vendorSetting;
@@ -47,7 +47,9 @@ class CouponController extends Controller
                 $q->where('discount_price', '>', 0)
                   ->orWhere(function ($qq) { $qq->whereNull('discount_price')->where('price', '>', 0); });
             })
-            ->selectRaw('LEAST(COALESCE(discount_price, price), price) as effective')
+            // Same figure as LEAST(COALESCE(discount_price, price), price).
+            // CASE is used so the page runs on SQLite as well as MySQL.
+            ->selectRaw('CASE WHEN discount_price IS NOT NULL AND discount_price > 0 AND discount_price < price THEN discount_price ELSE price END as effective')
             ->orderBy('effective')
             ->limit(1)
             ->value('effective');

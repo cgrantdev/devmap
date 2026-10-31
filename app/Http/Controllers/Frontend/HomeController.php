@@ -141,7 +141,7 @@ class HomeController extends Controller
                 })
                 ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
             })
-            ->with(['vendorSetting', 'vendorSetting.location'])
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic()->with('location')])
             ->withCount([
                 'products as products_count' => function ($q) {
                     $q->visible()->where('status', 'active');
@@ -205,7 +205,10 @@ class HomeController extends Controller
                 $query->whereNull('usage_limit')
                     ->orWhereRaw('used_count < usage_limit');
             })
-            ->with(['brand.vendorSetting'])
+            ->with([
+                'brand' => fn ($q) => $q->forPublic(),
+                'brand.vendorSetting' => fn ($q) => $q->forPublic(),
+            ])
             ->orderByDesc('discount')
             ->take(8)
             ->get()
@@ -247,7 +250,7 @@ class HomeController extends Controller
                     })
                     ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
                 })
-                ->with(['vendorSetting'])
+                ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
                 ->withCount([
                     'products as products_count' => function ($q) {
                         $q->visible()->where('status', 'active');
@@ -289,7 +292,7 @@ class HomeController extends Controller
                     })
                     ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
                 })
-                ->with(['vendorSetting'])
+                ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
                 ->withCount([
                     'products as products_count' => function ($q) {
                         $q->visible()->where('status', 'active');
@@ -358,7 +361,10 @@ class HomeController extends Controller
         // affiliates. Colin Sep 6: revenue push.
         $bestDeals = \App\Models\Product::visible()
             ->where('status', 'active')
-            ->with(['brand:id,name,slug', 'brand.vendorSetting'])
+            ->with([
+                'brand:id,name,slug',
+                'brand.vendorSetting' => fn ($q) => $q->forPublic(true),
+            ])
             ->orderByRaw('COALESCE(NULLIF(discount_price, 0), price) ASC')
             ->limit(60)
             ->get()
@@ -472,7 +478,7 @@ class HomeController extends Controller
         $verifiedVendors = Brand::where('is_active', true)
             ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
             ->tap($applyBrandLocation)
-            ->with(['vendorSetting', 'vendorSetting.location'])
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic()->with('location')])
             ->withCount(['products as product_count' => function ($q) {
                 $q->visible()->where('status', 'active');
             }])
@@ -523,7 +529,10 @@ class HomeController extends Controller
         $trendingProducts = Product::visible()
             ->where('status', 'active')
             ->tap($applyProductLocation)
-            ->with('brand.vendorSetting')
+            ->with([
+                'brand' => fn ($q) => $q->forPublic(),
+                'brand.vendorSetting' => fn ($q) => $q->forPublic()->with('location'),
+            ])
             ->orderByDesc('rating_count')
             ->orderByDesc('featured')
             ->orderByDesc('rating_average')
@@ -616,7 +625,7 @@ class HomeController extends Controller
                 });
             })
             ->tap($applyBrandLocation)
-            ->with(['vendorSetting', 'vendorSetting.location'])
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic()->with('location')])
             ->withCount(['products as product_count' => function ($q) {
                 $q->visible()->where('status', 'active');
             }])
@@ -629,7 +638,7 @@ class HomeController extends Controller
             $premiumVendors = Brand::where('is_active', true)
                 ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
                 ->tap($applyBrandLocation)
-                ->with(['vendorSetting', 'vendorSetting.location'])
+                ->with(['vendorSetting' => fn ($q) => $q->forPublic()->with('location')])
                 ->withCount(['products as product_count' => function ($q) {
                     $q->visible()->where('status', 'active');
                 }])
@@ -664,7 +673,10 @@ class HomeController extends Controller
                 $query->whereNull('expiry_date')->orWhere('expiry_date', '>=', now());
             })
             ->when($locationFilter, fn ($q) => $q->whereHas('brand.vendorSetting.location', fn ($l) => $l->where('name', $locationFilter)))
-            ->with(['brand.vendorSetting'])
+            ->with([
+                'brand' => fn ($q) => $q->forPublic(),
+                'brand.vendorSetting' => fn ($q) => $q->forPublic(),
+            ])
             ->orderByDesc('discount')
             ->take(8)
             ->get()
@@ -699,7 +711,7 @@ class HomeController extends Controller
                         ->where('coupon_code', '!=', '');
                 })
                 ->tap($applyBrandLocation)
-                ->with(['vendorSetting'])
+                ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
                 ->take(8 - $limitedDeals->count())
                 ->get()
                 ->map(function ($brand) {
@@ -804,7 +816,7 @@ class HomeController extends Controller
         // Brand strip marquee — all verified vendors with a logo (or placeholder)
         $brandStripVendors = Brand::where('is_active', true)
             ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
-            ->with('vendorSetting')
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
             ->orderByDesc('rating_average')
             ->take(16)
             ->get()
@@ -905,7 +917,10 @@ class HomeController extends Controller
                 $q->where('coupon_discount_percent', '>', 0)
                   ->where('coupon_discount_percent', '<', 100);
             })
-            ->with(['brand:id,name,slug', 'brand.vendorSetting'])
+            ->with([
+                'brand:id,name,slug',
+                'brand.vendorSetting' => fn ($q) => $q->forPublic(true),
+            ])
             // Accessible price band: \$40-\$500 retail. Excludes low-AOV
             // noise on the floor AND bulk/kit products on the ceiling
             // (\$2K Teduglutide kits, 10-packs, etc.) that don't convert

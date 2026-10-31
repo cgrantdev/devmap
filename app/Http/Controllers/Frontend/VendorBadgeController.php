@@ -36,7 +36,7 @@ class VendorBadgeController extends Controller
         $slug = preg_replace('/\.svg$/i', '', $slug);
 
         $brand = Brand::where('slug', $slug)
-            ->with('vendorSetting')
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
             ->first();
 
         if (!$brand || !$brand->is_active) {
@@ -64,7 +64,7 @@ class VendorBadgeController extends Controller
         // find their brand.
         if (!$slug) {
             $vendors = Brand::where('is_active', true)
-                ->with('vendorSetting')
+                ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
                 ->orderBy('name')
                 ->get()
                 ->map(fn ($b) => [
@@ -82,7 +82,7 @@ class VendorBadgeController extends Controller
         }
 
         $brand = Brand::where('slug', $slug)
-            ->with('vendorSetting')
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
             ->firstOrFail();
 
         $stats = $this->ratingStats($brand);

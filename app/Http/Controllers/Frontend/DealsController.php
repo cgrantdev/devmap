@@ -42,7 +42,10 @@ class DealsController extends Controller
                 'brand.vendorSetting.location',
                 fn ($l) => $l->where('name', $locationFilter)
             ))
-            ->with(['brand.vendorSetting']);
+            ->with([
+                'brand' => fn ($q) => $q->forPublic(),
+                'brand.vendorSetting' => fn ($q) => $q->forPublic(),
+            ]);
 
         $deals = $dealsQuery->get()
             ->map(function ($deal) {
@@ -85,7 +88,7 @@ class DealsController extends Controller
                     ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
                 })
                 ->tap($filterBrandByLocation)
-                ->with(['vendorSetting'])
+                ->with(['vendorSetting' => fn ($q) => $q->forPublic(true)])
                 ->whereNotIn('id', $deals->pluck('id'))
                 ->orderByDesc('rating_average')
                 ->take(8 - $deals->count())
@@ -137,7 +140,7 @@ class DealsController extends Controller
                     ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
                 })
                 ->tap($filterBrandByLocation)
-                ->with(['vendorSetting'])
+                ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
                 ->orderByDesc('rating_average')
                 ->take(8)
                 ->get()

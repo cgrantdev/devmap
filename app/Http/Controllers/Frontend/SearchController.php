@@ -43,7 +43,7 @@ class SearchController extends Controller
                         })
                         ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
                     })
-                    ->with(['vendorSetting.location'])
+                    ->with(['vendorSetting' => fn ($q) => $q->forPublic()->with('location')])
                     ->withCount(['products' => function ($q) {
                         $q->visible()->where('status', 'active');
                     }]);
@@ -91,7 +91,11 @@ class SearchController extends Controller
 
             // Search Products
             if ($tab === 'all' || $tab === 'products') {
-                $productsQuery = Product::with(['brand.vendorSetting', 'category'])
+                $productsQuery = Product::with([
+                    'brand' => fn ($q) => $q->forCard(),
+                    'brand.vendorSetting' => fn ($q) => $q->forCard(),
+                    'category',
+                ])
                     ->visible()
                     ->where('status', 'active');
 

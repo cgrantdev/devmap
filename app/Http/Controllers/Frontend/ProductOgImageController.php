@@ -22,7 +22,10 @@ class ProductOgImageController extends Controller
 
     public function show(int $id): Response|BinaryFileResponse
     {
-        $product = Product::with('brand.vendorSetting')->find($id);
+        $product = Product::with([
+            'brand' => fn ($q) => $q->forPublic(),
+            'brand.vendorSetting' => fn ($q) => $q->forPublic(),
+        ])->find($id);
         if (!$product) return $this->fallbackOg(self::FALLBACK_PNG);
 
         return $this->serveOgImage(

@@ -335,6 +335,13 @@ class VendorsController extends Controller
     {
         $brand = Brand::with('vendorSetting')->findOrFail($id);
 
+        // Public serialization hides these. The edit form is allowed to
+        // show the affiliate template, tag, and feed URL. The plugin
+        // token, API key, and affiliate credentials stay hidden — the
+        // form treats them as write-only (has_api_key / blank input).
+        $brand->makeVisible(['affiliate_url_template', 'affiliate_tag']);
+        $brand->vendorSetting?->makeVisible(['feed_url']);
+
         // Fetch products for this vendor (via brand)
         $products = $brand->products()
             ->latest()

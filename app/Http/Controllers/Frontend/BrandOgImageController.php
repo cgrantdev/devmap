@@ -27,9 +27,16 @@ class BrandOgImageController extends Controller
             return $redirect;
         }
 
-        $brand = Brand::with('vendorSetting')->where('slug', $slug)->where('is_active', true)->first();
+        $brand = Brand::query()
+            ->forPublic()
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->first();
         if (!$brand) {
-            $brand = Brand::with('vendorSetting')
+            $brand = Brand::query()
+                ->forPublic()
+                ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
                 ->where('is_active', true)
                 ->whereRaw('LOWER(slug) = ?', [strtolower($slug)])
                 ->orderBy('id')

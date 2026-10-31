@@ -41,7 +41,10 @@ class BacteriostaticWaterController extends Controller
                 'brand.vendorSetting.location',
                 fn ($l) => $l->where('name', $locationFilter)
             ))
-            ->with('brand.vendorSetting')
+            ->with([
+                'brand' => fn ($q) => $q->forPublic(),
+                'brand.vendorSetting' => fn ($q) => $q->forPublic()->with('location'),
+            ])
             ->get()
             ->map(function ($p) {
                 // size_mg is empty for most BAC water products — extract mL

@@ -173,7 +173,10 @@ class CompareController extends Controller
                     'brand.vendorSetting.location',
                     fn ($l) => $l->where('name', $locationFilter)
                 ))
-                ->with('brand.vendorSetting.location')
+                ->with([
+                    'brand' => fn ($q) => $q->forPublic(),
+                    'brand.vendorSetting' => fn ($q) => $q->forPublic()->with('location'),
+                ])
                 ->get()
                 ->map(function ($product) {
                     // Cast to float UP FRONT. Eloquent returns decimal columns
@@ -851,7 +854,7 @@ class CompareController extends Controller
         $products = Product::visible()
             ->where('status', 'active')
             ->whereIn('id', $ids)
-            ->with('brand')
+            ->with(['brand' => fn ($q) => $q->forCard()])
             ->get()
             ->keyBy('id');
 
@@ -1478,7 +1481,10 @@ class CompareController extends Controller
                 'brand.vendorSetting',
                 fn ($vs) => $vs->whereJsonContains('usps', $uspFilter)
             ))
-            ->with('brand.vendorSetting.location')
+            ->with([
+                'brand' => fn ($q) => $q->forPublic(),
+                'brand.vendorSetting' => fn ($q) => $q->forPublic()->with('location'),
+            ])
             ->get()
             ->map(function ($product) {
                 $retail = (float) (

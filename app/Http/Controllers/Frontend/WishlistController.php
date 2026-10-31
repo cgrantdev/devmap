@@ -96,7 +96,11 @@ class WishlistController extends Controller
         // --- Watched products ---
         $productIds = $rows->where('wishable_type', 'product')->pluck('product_id')->filter()->values();
         $products = Product::visible()
-            ->with(['brand.vendorSetting', 'category'])
+            ->with([
+                'brand' => fn ($q) => $q->forCard(),
+                'brand.vendorSetting' => fn ($q) => $q->forCard(),
+                'category',
+            ])
             ->whereIn('id', $productIds)
             ->get()
             ->keyBy('id');
@@ -152,7 +156,10 @@ class WishlistController extends Controller
         $categoryProducts = collect();
         if ($categoryIds->isNotEmpty()) {
             $categoryProducts = Product::visible()
-                ->with(['brand.vendorSetting'])
+                ->with([
+                    'brand' => fn ($q) => $q->forCard(),
+                    'brand.vendorSetting' => fn ($q) => $q->forCard(),
+                ])
                 ->whereIn('product_category_id', $categoryIds)
                 ->where('status', 'active')
                 ->orderBy('product_category_id')

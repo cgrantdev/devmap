@@ -96,7 +96,7 @@ class LandingPageController extends Controller
         // catches the majority of vendors who explicitly cite their lab.
         $vendors = Brand::where('is_active', true)
             ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
-            ->with(['vendorSetting.location'])
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic()->with('location')])
             ->get();
 
         $byLab = [];
@@ -170,7 +170,11 @@ class LandingPageController extends Controller
                 'brand.vendorSetting.location',
                 fn ($l) => $l->where('name', $locationFilter)
             ))
-            ->with(['brand.vendorSetting.location', 'category'])
+            ->with([
+                'brand' => fn ($q) => $q->forPublic(),
+                'brand.vendorSetting' => fn ($q) => $q->forPublic()->with('location'),
+                'category',
+            ])
             ->tap($config['query'])
             ->get()
             ->map(function ($p) {
