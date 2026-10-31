@@ -67,7 +67,7 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
     public function test_migration_slot_payload_sha_and_shape_are_pinned(): void
     {
         $files = glob(database_path('migrations/2026_10_31_*.php')) ?: [];
-        $this->assertSame(['2026_10_31_100000_encyclopedia_freshness_october_31.php'], array_map('basename', $files));
+        $this->assertSame(['2026_10_31_100000_encyclopedia_freshness_october_31.php', '2026_10_31_200000_refresh_retatrutide_vs_semaglutide_transcend.php'], array_map('basename', $files));
         $this->assertStringContainsString('EncyclopediaFreshnessOctober31Seeder', (string) file_get_contents($files[0]));
         $this->assertSame(self::SHA, Fresh::PAYLOAD_SHA256);
         $this->assertSame(self::SHA, hash_file('sha256', database_path(Fresh::PAYLOAD_PATH)));
