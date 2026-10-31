@@ -393,6 +393,10 @@ class CatalogFraming
                             'type' => 'content',
                             'value' => 'A trial start is not a trial result. The filing makes no safety or efficacy finding, and eloralintide remains investigational.',
                         ],
+                        [
+                            'type' => 'content',
+                            'value' => 'Lilly\'s third-quarter 2026 earnings release (Form 8-K, Exhibit 99.1, 29 October 2026) states that Phase 3 trials of EloraTZP, Lilly\'s name for a combination of eloralintide and tirzepatide, are "to start in Q4 2026" [company-reported]. EloraTZP combines two separate molecules and is not a form of eloralintide; a planned trial start is not a result.',
+                        ],
                     ],
                 ]],
                 [[
@@ -402,6 +406,14 @@ class CatalogFraming
                     'citation' => 'SEC Form 10-Q, filed October 29, 2026 (accession no. 0000059478-26-000108).',
                     'links' => [
                         ['label' => 'SEC', 'url' => 'https://www.sec.gov/Archives/edgar/data/59478/000005947826000108/lly-20260930.htm'],
+                    ],
+                ], [
+                    'title' => 'Eli Lilly and Company, Form 8-K, Exhibit 99.1 (third-quarter 2026 earnings release)',
+                    'authors' => 'Eli Lilly and Company',
+                    'description' => 'Company-reported. The earnings release states that Phase 3 trials of EloraTZP, a combination of eloralintide and tirzepatide, are to start in Q4 2026.',
+                    'citation' => 'SEC Form 8-K, Exhibit 99.1, filed October 29, 2026 (accession no. 0000059478-26-000104).',
+                    'links' => [
+                        ['label' => 'SEC', 'url' => 'https://www.sec.gov/Archives/edgar/data/59478/000005947826000104/q326lillysalesandearningsp.htm'],
                     ],
                 ]],
             ),

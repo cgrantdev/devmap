@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Blog;
 use App\Models\EducationalGuide;
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
@@ -26,10 +27,19 @@ use RuntimeException;
  * publication" and "still forthcoming" lines rewritten. No semax-specific
  * 503A text is added or changed.
  *
+ * Blog (blogs, exactly one row by LOWER(TRIM(slug))):
+ *   hhs-503a-peptide-enforcement-discretion-2026 content only
+ * The target is the publisher rendering of the updated markdown (91 FR
+ * 68526-68527 publication, Regulations.gov comment close 13 November
+ * 2026, reference 7). read_time stays "4 Min Read"; FAQ, key_points and
+ * SEO fields are not touched.
+ *
  * Posts (EncyclopediaPostMatch, exactly one category and one linked post):
- *   orforglipron human_use_subsections (adds ACHIEVE-4), references (+2)
+ *   orforglipron human_use_subsections (adds ACHIEVE-4 and the 10-Q type 2
+ *   diabetes submission line), references (+3: Lancet, Lilly release, 10-Q)
  *   eloralintide human_use_subsections (adds the Phase 3 starts listed in
- *   Lilly's Q3 2026 Form 10-Q), references (+10-Q)
+ *   Lilly's Q3 2026 Form 10-Q and the EloraTZP Phase 3 timing in the Q3
+ *   earnings release), references (+10-Q, +8-K Exhibit 99.1)
  *
  * Guards: origin/main's value, which equalled production's live value
  * when read on 31 October 2026, so one guard per column. Eloralintide
@@ -52,7 +62,7 @@ class EncyclopediaFreshnessOctober31Seeder extends Seeder
 
     public const PAYLOAD_PATH = 'seeders/data/encyclopedia-field-updates/2026-10-31a/freshness.json';
 
-    public const PAYLOAD_SHA256 = 'eee768ad605532b8359fd3b0bd68fb0801507552f73f65054291e5076f917b6e';
+    public const PAYLOAD_SHA256 = 'a809a4c386e3b66ca6d649ac5bec7026d8622d8acf0fb06f54b9c97b26232a5c';
 
     /** @var array<string, list<string>> */
     public const COLUMNS = [
@@ -67,6 +77,13 @@ class EncyclopediaFreshnessOctober31Seeder extends Seeder
     ];
 
     public const GUIDE_PREFIX = 'guide:';
+
+    /** @var array<string, list<string>> blogs slug => columns */
+    public const BLOGS = [
+        'hhs-503a-peptide-enforcement-discretion-2026' => ['content'],
+    ];
+
+    public const BLOG_PREFIX = 'blog:';
 
     /** @var array<string, string> "<slug>.<field>" => status */
     public array $results = [];
@@ -111,6 +128,18 @@ class EncyclopediaFreshnessOctober31Seeder extends Seeder
                 throw new RuntimeException(self::LABEL.': payload columns for guide '.$slug.' do not match.');
             }
             $this->reconcileGuide($writer, $slug, $columns);
+        }
+
+        $blogs = $this->payload()['blogs'] ?? null;
+        if (! is_array($blogs) || array_keys($blogs) !== array_keys(self::BLOGS)) {
+            throw new RuntimeException(self::LABEL.': payload blogs do not match the seeder blog list.');
+        }
+        foreach (self::BLOGS as $slug => $fields) {
+            $columns = $blogs[$slug]['columns'] ?? null;
+            if (! is_array($columns) || array_keys($columns) !== $fields) {
+                throw new RuntimeException(self::LABEL.': payload columns for blog '.$slug.' do not match.');
+            }
+            $this->reconcileBlog($writer, $slug, $columns);
         }
 
         $this->results = $writer->results;
@@ -188,6 +217,46 @@ class EncyclopediaFreshnessOctober31Seeder extends Seeder
             }
             if ($changed) {
                 $guide->saveQuietly();
+            }
+        });
+    }
+
+    /**
+     * Same guard path as reconcileGuide(), on the blogs table.
+     *
+     * @param  array<string, array<string, mixed>>  $columns
+     */
+    private function reconcileBlog(GuardedFieldWriter $writer, string $slug, array $columns): void
+    {
+        $key = self::BLOG_PREFIX.$slug;
+        $rows = Blog::query()
+            ->whereRaw('LOWER(TRIM(slug)) = ?', [strtolower(trim($slug))])
+            ->orderBy('id')
+            ->get();
+        if ($rows->count() !== 1) {
+            $status = $rows->count() === 0 ? 'missing' : 'collision';
+            foreach (array_keys($columns) as $field) {
+                $writer->skip($key, $field, 'blog lookup '.$status);
+            }
+
+            return;
+        }
+
+        /** @var Blog $blog */
+        $blog = $rows->first();
+
+        DB::transaction(function () use ($writer, $key, $columns, $blog): void {
+            $this->transactions[] = $key;
+            $changed = false;
+            foreach ($columns as $field => $spec) {
+                if (! array_key_exists('target_value', $spec) || ! is_array($spec['old_values'] ?? null)) {
+                    throw new RuntimeException(self::LABEL.': payload spec for '.$key.'.'.$field.' is incomplete.');
+                }
+                $status = $writer->apply($blog, $key, $field, $spec['target_value'], array_values($spec['old_values']));
+                $changed = $changed || $status === GuardedFieldWriter::UPDATED;
+            }
+            if ($changed) {
+                $blog->saveQuietly();
             }
         });
     }

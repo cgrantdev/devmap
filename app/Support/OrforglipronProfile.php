@@ -159,6 +159,10 @@ class OrforglipronProfile
                             'type' => 'content',
                             'value' => 'Non-inferiority means the trial was designed to show that risk was not worse than the comparator by more than a prespecified margin. It is not a finding of cardiovascular benefit. The U.S. Foundayo labeling has no type 2 diabetes indication, and this result does not apply to research-chemical orforglipron.',
                         ],
+                        [
+                            'type' => 'content',
+                            'value' => 'Lilly\'s Form 10-Q for the quarter ended 30 September 2026 states that it has \'Submitted orforglipron for type 2 diabetes in the U.S. and Japan\' [company-reported]. A submission is not an approval.',
+                        ],
                     ],
                 ],
             ],

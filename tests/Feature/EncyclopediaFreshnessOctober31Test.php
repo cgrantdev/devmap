@@ -28,7 +28,7 @@ use Tests\TestCase;
 
 /**
  * 2026_10_31_100000 freshness update: orforglipron and eloralintide posts,
- * and the two 503A legality guides. Every value that reaches the seeder
+ * the two 503A legality guides and the HHS 503A blog. Every value that reaches the seeder
  * is re-encoded in production MySQL key order (shorter keys first) or in
  * a shuffled key order, because sqlite keeps insertion order.
  */
@@ -36,13 +36,18 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
 {
     use RefreshDatabase;
 
-    private const SHA = 'eee768ad605532b8359fd3b0bd68fb0801507552f73f65054291e5076f917b6e';
+    private const SHA = 'a809a4c386e3b66ca6d649ac5bec7026d8622d8acf0fb06f54b9c97b26232a5c';
 
     private const M = '2026_10_31_100000';
 
     private const LEGALITY = 'peptide-legality-fda-ruo-compounding';
 
     private const CVR = 'compounded-vs-ruo-peptides';
+
+    private const BLOG = 'hhs-503a-peptide-enforcement-discretion-2026';
+
+    /** sha256 of origin/main's rendered blog content (the guard). */
+    private const BLOG_OLD_SHA = '0fd1507513c31d28466b08b34c522c70a6d78642d225c8625d7f0457813dc396';
 
     private const CATEGORY = ['orforglipron' => 'orforglipron', 'eloralintide' => 'Eloralintide'];
 
@@ -71,6 +76,9 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         $payload = $this->payload();
         $this->assertSame(array_keys(Fresh::COLUMNS), array_keys($payload['posts']));
         $this->assertSame(array_keys(Fresh::GUIDES), array_keys($payload['guides']));
+        $this->assertSame(array_keys(Fresh::BLOGS), array_keys($payload['blogs']));
+        $this->assertSame(['content'], array_keys($payload['blogs'][self::BLOG]['columns']));
+        $this->assertSame([self::BLOG_OLD_SHA], array_map(fn ($v) => hash('sha256', $v), $payload['blogs'][self::BLOG]['columns']['content']['old_values']));
         foreach ($this->specs() as $key => $spec) {
             $this->assertNotSame([], $spec['old_values'], $key);
             foreach ($spec['old_values'] as $old) {
@@ -93,7 +101,7 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         $mainRefs = $drift['posts']['orforglipron']['columns']['references']['target_value'];
         $this->assertSame($mainRefs, $this->payload()['posts']['orforglipron']['columns']['references']['old_values'][0]);
         $this->assertSame($mainRefs, array_slice($this->target('orforglipron', 'references'), 0, count($mainRefs)));
-        $this->assertCount(count($mainRefs) + 2, $this->target('orforglipron', 'references'));
+        $this->assertCount(count($mainRefs) + 3, $this->target('orforglipron', 'references'));
 
         EducationalContentPublisher::sync();
         foreach (Fresh::GUIDES as $slug => $fields) {
@@ -106,6 +114,25 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
                 );
             }
         }
+        $blog = Blog::where('slug', self::BLOG)->firstOrFail();
+        $this->assertSame($this->blogTarget(), $blog->content);
+        $this->assertSame('4 Min Read', $blog->read_time);
+    }
+
+    public function test_blog_target_is_the_publisher_render_of_the_repo_markdown(): void
+    {
+        $md = (string) file_get_contents(resource_path('content/educational/'.self::BLOG.'.md'));
+        $this->assertSame(\App\Support\SimpleMarkdown::toHtml(EducationalContentPublisher::prepare($md)), $this->blogTarget());
+        $this->assertSame('4 Min Read', collect((new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null))->firstWhere('slug', self::BLOG)['read_time']);
+
+        $html = $this->blogTarget();
+        $this->assertStringContainsString('91 FR 68526', $html);
+        $this->assertStringContainsString('13 Nov 2026', $html);
+        $this->assertStringContainsString('https://www.regulations.gov/commenton/HHS-OASH-2026-0496-0002', $html);
+        $this->assertStringNotContainsString('scheduled for publication', $html);
+        $this->assertStringNotContainsString('Scheduled Federal Register publication', $html);
+        $this->assertStringNotContainsString('public-inspection.federalregister.gov', $html);
+        $this->assertStringContainsString('public-inspection.federalregister.gov', $this->old('blog:'.self::BLOG, 'content'));
     }
 
     public function test_live_values_in_prod_key_order_are_updated_and_logged(): void
@@ -129,7 +156,16 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
                 $this->assertSame($this->guideTarget($slug, $field), $guide->{$field});
             }
         }
-        $this->assertSame(['orforglipron', 'eloralintide', 'guide:'.self::LEGALITY, 'guide:'.self::CVR], $seeder->transactions);
+        $this->assertSame(GuardedFieldWriter::UPDATED, $seeder->results['blog:'.self::BLOG.'.content']);
+        $this->assertSame($this->blogTarget(), Blog::where('slug', self::BLOG)->firstOrFail()->content);
+        $this->assertTrue($this->hasLog('info', self::M.' blog:'.self::BLOG.'.content: updated'));
+        $this->assertSame(['orforglipron', 'eloralintide', 'guide:'.self::LEGALITY, 'guide:'.self::CVR, 'blog:'.self::BLOG], $seeder->transactions);
+        $this->assertSame([], $this->warnings());
+
+        $again = new Fresh;
+        $again->run();
+        $this->assertSame(GuardedFieldWriter::ALREADY, $again->results['blog:'.self::BLOG.'.content']);
+        $this->assertSame($this->blogTarget(), Blog::where('slug', self::BLOG)->firstOrFail()->content);
         $this->assertSame([], $this->warnings());
     }
 
@@ -179,7 +215,7 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         $again = new Fresh;
         $again->run();
 
-        $this->assertCount(8, $again->results);
+        $this->assertCount(9, $again->results);
         foreach ($again->results as $key => $status) {
             $this->assertSame(GuardedFieldWriter::ALREADY, $status, $key);
             $this->assertContains(self::M.' '.$key.': already current', $again->lines);
@@ -210,6 +246,7 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         $orfo->references = $edited;
         $orfo->saveQuietly();
         EducationalGuide::where('slug', self::CVR)->firstOrFail()->forceFill(['content' => '<p>Hand-edited guide body</p>'])->saveQuietly();
+        Blog::where('slug', self::BLOG)->firstOrFail()->forceFill(['content' => '<p>Hand-edited blog body</p>'])->saveQuietly();
 
         $seeder = new Fresh;
         $seeder->run();
@@ -222,7 +259,10 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         $this->assertSame(GuardedFieldWriter::UPDATED, $seeder->results['guide:'.self::CVR.'.reading_time']);
         $this->assertTrue($this->hasLog('warning', self::M.' orforglipron.references: guard mismatch — nothing written'));
         $this->assertTrue($this->hasLog('warning', self::M.' guide:'.self::CVR.'.content: guard mismatch — nothing written'));
-        $this->assertCount(2, $this->warnings());
+        $this->assertSame(GuardedFieldWriter::MISMATCH, $seeder->results['blog:'.self::BLOG.'.content']);
+        $this->assertSame('<p>Hand-edited blog body</p>', Blog::where('slug', self::BLOG)->firstOrFail()->content);
+        $this->assertTrue($this->hasLog('warning', self::M.' blog:'.self::BLOG.'.content: guard mismatch — nothing written'));
+        $this->assertCount(3, $this->warnings());
     }
 
     public function test_missing_rows_are_left_alone_and_warned(): void
@@ -233,6 +273,8 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         $elor->delete();
         $elorCategory->delete();
         EducationalGuide::where('slug', self::CVR)->delete();
+        Blog::where('slug', self::BLOG)->delete();
+        $blogs = Blog::count();
         $posts = EducationPost::count();
         $guides = EducationalGuide::count();
         $categories = ProductCategory::count();
@@ -245,8 +287,11 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         $this->assertSame('guide lookup missing', $seeder->results['guide:'.self::CVR.'.content']);
         $this->assertTrue($this->hasLog('warning', self::M.' eloralintide.references: post lookup missing — nothing written'));
         $this->assertTrue($this->hasLog('warning', self::M.' guide:'.self::CVR.'.content: guide lookup missing — nothing written'));
-        $this->assertSame([$posts, $guides, $categories], [EducationPost::count(), EducationalGuide::count(), ProductCategory::count()]);
+        $this->assertSame('blog lookup missing', $seeder->results['blog:'.self::BLOG.'.content']);
+        $this->assertTrue($this->hasLog('warning', self::M.' blog:'.self::BLOG.'.content: blog lookup missing — nothing written'));
+        $this->assertSame([$posts, $guides, $categories, $blogs], [EducationPost::count(), EducationalGuide::count(), ProductCategory::count(), Blog::count()]);
         $this->assertNotContains('eloralintide', $seeder->transactions);
+        $this->assertNotContains('blog:'.self::BLOG, $seeder->transactions);
         $this->assertSame(GuardedFieldWriter::UPDATED, $seeder->results['orforglipron.references']);
         $this->assertSame(GuardedFieldWriter::UPDATED, $seeder->results['guide:'.self::LEGALITY.'.content']);
     }
@@ -263,6 +308,21 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
 
         $this->assertSame('guide lookup collision', $seeder->results['guide:'.self::LEGALITY.'.content']);
         $this->assertSame($this->old('guide:'.self::LEGALITY, 'content'), EducationalGuide::where('slug', self::LEGALITY)->firstOrFail()->content);
+    }
+
+    public function test_duplicate_blog_slug_is_a_collision(): void
+    {
+        $this->seedLive(fn ($v) => $v);
+        $dup = Blog::where('slug', self::BLOG)->firstOrFail()->replicate();
+        $dup->slug = ' '.strtoupper(self::BLOG).' ';
+        $dup->saveQuietly();
+
+        $seeder = new Fresh;
+        $seeder->run();
+
+        $this->assertSame('blog lookup collision', $seeder->results['blog:'.self::BLOG.'.content']);
+        $this->assertTrue($this->hasLog('warning', self::M.' blog:'.self::BLOG.'.content: blog lookup collision — nothing written'));
+        $this->assertSame($this->old('blog:'.self::BLOG, 'content'), Blog::where('slug', self::BLOG)->firstOrFail()->content);
     }
 
     public function test_no_other_post_guide_blog_or_legacy_row_is_touched(): void
@@ -285,7 +345,9 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
             'posts' => EducationPost::whereNotIn('id', array_values($ids))->orderBy('id')->get()->map->getAttributes()->all(),
             'categories' => ProductCategory::orderBy('id')->get()->map->getAttributes()->all(),
             'guides' => EducationalGuide::whereNotIn('slug', array_keys(Fresh::GUIDES))->orderBy('id')->get()->map->getAttributes()->all(),
-            'blogs' => Blog::orderBy('id')->get()->map->getAttributes()->all(),
+            'blogs' => Blog::where('slug', '!=', self::BLOG)->orderBy('id')->get()->map->getAttributes()->all(),
+            // The target blog: every column except content stays put.
+            'blog' => collect(Blog::where('slug', self::BLOG)->firstOrFail()->getAttributes())->except(['content'])->all(),
         ];
         $before = $keep();
         $this->assertNotEmpty($before['guides']);
@@ -303,6 +365,7 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         $this->assertSame('KEEP-overview', $orfo->overview);
         $legality = EducationalGuide::where('slug', self::LEGALITY)->firstOrFail();
         $this->assertSame('KEEP-seo', $legality->seo_description);
+        $this->assertSame($this->blogTarget(), Blog::where('slug', self::BLOG)->firstOrFail()->content);
     }
 
     public function test_full_chain_from_main_reaches_targets_with_no_warnings(): void
@@ -342,6 +405,7 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
             'content' => $this->old('guide:'.self::CVR, 'content'),
             'reading_time' => $this->old('guide:'.self::CVR, 'reading_time'),
         ])->saveQuietly();
+        Blog::where('slug', self::BLOG)->firstOrFail()->forceFill(['content' => $this->old('blog:'.self::BLOG, 'content')])->saveQuietly();
 
         foreach ([
             EncyclopediaFieldUpdatesOctober22Seeder::class,
@@ -378,6 +442,7 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
                 );
             }
         }
+        $this->assertSame(self::BLOG_OLD_SHA, hash('sha256', (string) Blog::where('slug', self::BLOG)->firstOrFail()->content), 'main chain blog content');
         $this->logged = [];
 
         $seeder = new Fresh;
@@ -385,6 +450,7 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         foreach ($seeder->results as $key => $status) {
             $this->assertSame(GuardedFieldWriter::UPDATED, $status, $key);
         }
+        $this->assertArrayHasKey('blog:'.self::BLOG.'.content', $seeder->results);
         $this->assertSame([], $this->warnings());
     }
 
@@ -405,6 +471,7 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
                 $this->assertSame(GuardedFieldWriter::ALREADY, $seeder->results['guide:'.$slug.'.'.$field], $slug.'.'.$field);
             }
         }
+        $this->assertSame(GuardedFieldWriter::ALREADY, $seeder->results['blog:'.self::BLOG.'.content']);
         // orforglipron has no category here: left alone, loudly.
         $this->assertSame('post lookup missing', $seeder->results['orforglipron.references']);
         $this->assertSame([
@@ -461,6 +528,29 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         $elor = html_entity_decode((string) $this->get('/encyclopedia/Eloralintide')->assertOk()->getContent());
         $this->assertStringContainsString('obstructive sleep apnea (OSA)', $elor);
         $this->assertStringContainsString('0000059478-26-000108', $elor);
+        $this->assertStringContainsString('to start in Q4 2026', $elor);
+        $this->assertStringContainsString('0000059478-26-000104', $elor);
+        $this->assertStringContainsString('Submitted orforglipron for type 2 diabetes in the U.S. and Japan', $orfo);
+
+        $blog = Blog::where('slug', self::BLOG)->firstOrFail();
+        $page = $this->get('/blog/'.self::BLOG)->assertOk();
+        $html = html_entity_decode((string) $page->getContent());
+        $this->assertStringContainsString('91 FR 68526', $html);
+        $this->assertStringContainsString('13 Nov 2026', $html);
+        $this->assertStringNotContainsString('scheduled for publication', $html);
+        $this->assertStringNotContainsString('public-inspection.federalregister.gov', $html);
+        $page->assertSee('4 Min Read', false);
+
+        // FAQ: markdown = PHP catalog = JSON-LD, unchanged by the content write.
+        $entry = collect((new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null))->firstWhere('slug', self::BLOG);
+        $this->assertSame($entry['faq'], $blog->seo_schema[0] ?? null);
+        $this->assertCount(4, $entry['faq']['mainEntity']);
+        $md = (string) file_get_contents(resource_path('content/educational/'.self::BLOG.'.md'));
+        foreach ($entry['faq']['mainEntity'] as $entity) {
+            $this->assertStringContainsString('### '.$entity['name'], $md);
+            $this->assertStringContainsString($entity['acceptedAnswer']['text'], $md);
+        }
+        $page->assertSee((string) json_encode($blog->seo_schema[0], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), false);
     }
 
     public function test_new_copy_follows_the_content_rules(): void
@@ -474,7 +564,11 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
             $this->payload()['posts']
         ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        $all = implode("\n", [...array_values($guideTargets), $postText]);
+        $all = implode("\n", [...array_values($guideTargets), $postText, $this->blogTarget()]);
+        $this->assertDoesNotMatchRegularExpression('/\d+(?:\.\d+)?\s*mg\b/i', $this->blogTarget());
+        $this->assertDoesNotMatchRegularExpression('/%|percent/i', $this->blogTarget());
+        $this->assertStringNotContainsString('tirzepatide 15', $postText);
+        $this->assertStringNotContainsString('greater weight loss', $postText);
         foreach (['still forthcoming', 'scheduled for publication', 'scheduled for Federal Register publication', 'does not state a calendar closing date', 'legal to use', 'HHS/FDA'] as $needle) {
             if ($needle === 'legal to use') {
                 // Only the existing negated disclaimer may use the phrase.
@@ -547,6 +641,7 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
             }
             EducationalGuide::where('slug', $slug)->firstOrFail()->forceFill($attrs)->saveQuietly();
         }
+        Blog::where('slug', self::BLOG)->firstOrFail()->forceFill(['content' => $this->old('blog:'.self::BLOG, 'content')])->saveQuietly();
 
         return $ids;
     }
@@ -565,6 +660,7 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         return [
             'posts' => EducationPost::orderBy('id')->get()->map->getAttributes()->all(),
             'guides' => EducationalGuide::orderBy('id')->get()->map->getAttributes()->all(),
+            'blogs' => Blog::orderBy('id')->get()->map->getAttributes()->all(),
         ];
     }
 
@@ -608,6 +704,11 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
                 $out['guide:'.$slug.'.'.$field] = $spec;
             }
         }
+        foreach ($this->payload()['blogs'] as $slug => $b) {
+            foreach ($b['columns'] as $field => $spec) {
+                $out['blog:'.$slug.'.'.$field] = $spec;
+            }
+        }
 
         return $out;
     }
@@ -620,6 +721,11 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
     private function guideTarget(string $slug, string $field): mixed
     {
         return $this->payload()['guides'][$slug]['columns'][$field]['target_value'];
+    }
+
+    private function blogTarget(): string
+    {
+        return $this->payload()['blogs'][self::BLOG]['columns']['content']['target_value'];
     }
 
     private function old(string $key, string $field): mixed

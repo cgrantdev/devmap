@@ -2478,7 +2478,7 @@ class EducationalContentTest extends TestCase
 
         $guideMarkdown = (string) file_get_contents(resource_path('content/educational/'.$guideSlug.'.md'));
         $guideWords = $this->renderedWordCount($guideMarkdown);
-        $this->assertSame(2372, $guideWords);
+        $this->assertSame(2381, $guideWords);
         $this->assertSame('11 Min Read', ((int) ceil($guideWords / 230)).' Min Read');
         $this->assertSame('11 Min Read', $guideEntry['read_time']);
         $this->assertStringContainsString('## FAQ', $guideMarkdown);
@@ -2544,7 +2544,7 @@ class EducationalContentTest extends TestCase
 
         $blogMarkdown = (string) file_get_contents(resource_path('content/educational/'.$blogSlug.'.md'));
         $blogWords = $this->renderedWordCount($blogMarkdown);
-        $this->assertSame(842, $blogWords);
+        $this->assertSame(906, $blogWords);
         $this->assertSame('4 Min Read', ((int) ceil($blogWords / 230)).' Min Read');
         $this->assertSame('4 Min Read', $blogEntry['read_time']);
         $this->assertStringContainsString('## FAQ', $blogMarkdown);

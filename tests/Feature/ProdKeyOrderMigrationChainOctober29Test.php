@@ -352,23 +352,26 @@ class ProdKeyOrderMigrationChainOctober29Test extends TestCase
             $this->assertSame(1, Blog::where('slug', $slug)->count() + EducationalGuide::where('slug', $slug)->count(), $slug);
         }
 
-        // No 21 October date anywhere in the content tables.
-        foreach ([EducationPost::class, ProductCategory::class, EducationalGuide::class, Blog::class] as $model) {
-            foreach ($model::query()->get() as $row) {
-                $this->assertSame([], $this->dateHits($row->getAttributes()), $model.' #'.$row->getKey());
-            }
+        // No 21 October date in the retatrutide / TRIUMPH-OSA fields (OSA human-use
+        // subsection, NEJM 10.1056/NEJMoa2611477 reference) or elsewhere on the
+        // retatrutide post and its category. Other rows may carry an accurate
+        // 21 October date (PSM press release dated 21 October 2026).
+        foreach (['human_use_subsections', 'references'] as $column) {
+            $this->assertSame([], $this->dateHits($reta->getAttributes()[$column] ?? null), 'retatrutide.'.$column);
         }
+        $this->assertSame([], $this->dateHits($reta->getAttributes()), 'retatrutide post #'.$reta->getKey());
+        $this->assertSame([], $this->dateHits(ProductCategory::findOrFail($reta->product_category_id)->getAttributes()), 'retatrutide category');
         $osaSection = collect($reta->human_use_subsections)->first(fn ($s) => str_starts_with((string) ($s['title'] ?? ''), 'Obstructive sleep apnea trials'));
         $this->assertSame('Obstructive sleep apnea trials (NEJM, 20 Oct 2026) — developer-affiliated (Lilly-funded)', $osaSection['title']);
     }
 
     /**
-     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>|string|null  $attributes
      * @return list<string>
      */
-    private function dateHits(array $attributes): array
+    private function dateHits(mixed $attributes): array
     {
-        $blob = json_encode($attributes, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '';
+        $blob = is_string($attributes) ? $attributes : (json_encode($attributes, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '');
         preg_match_all('/\b21 Oct(?:ober)?\b|October 21\b/', $blob, $m);
 
         return $m[0];
