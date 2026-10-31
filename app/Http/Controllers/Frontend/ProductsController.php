@@ -567,10 +567,21 @@ class ProductsController extends Controller
 
     public function show(Request $request, $slug)
     {
-        // Find category by slug
+        // Find category by slug. Production MySQL matches letter case,
+        // so /product/BPC-157 can load the stored slug bpc-157. SQLite
+        // does not, so a unique case-insensitive match is the fallback.
+        // The canonical below always uses the stored slug.
         $category = ProductCategory::where('slug', $slug)
             ->where('is_active', true)
             ->first();
+
+        if (! $category) {
+            $matches = ProductCategory::where('is_active', true)
+                ->whereRaw('LOWER(slug) = ?', [strtolower($slug)])
+                ->orderBy('id')
+                ->get();
+            $category = $matches->count() === 1 ? $matches->first() : null;
+        }
 
         if (!$category) {
             abort(404, 'Category not found');
@@ -754,7 +765,7 @@ class ProductsController extends Controller
 
         // Generate SEO data for category listing (automatically from category fields)
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
-        $categoryUrl = url("/product/{$slug}");
+        $categoryUrl = url('/product/'.rawurlencode($category->slug));
         
         // Build category image URL
         $categoryImage = null;
@@ -806,10 +817,8 @@ class ProductsController extends Controller
         // uncategorized and stored slugs the /product/{slug} route cannot
         // treat as one segment stay out of the index. A slug containing
         // "/" never reaches this action. Titles and metas are unchanged.
-        if (
-            strcasecmp((string) $category->slug, 'uncategorized') === 0
-            || ! preg_match('#^[A-Za-z0-9._\-]+$#', (string) $category->slug)
-        ) {
+        // Same predicate as the title template above, so the two cannot drift.
+        if (! ProductListingSeo::usesVendorTemplate($category->slug)) {
             $seo['robots'] = 'noindex, follow';
         }
         
