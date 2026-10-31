@@ -47,9 +47,9 @@ class CatalogCrossLinksTest extends TestCase
 
         $product = $this->get('/product/BPC-157');
         $product->assertOk();
-        $product->assertSee('<a href="/encyclopedia/BPC-157">BPC-157 encyclopedia entry</a>', false);
-        $product->assertSee('<a href="/compare/bpc-157">Compare BPC-157 listings</a>', false);
-        $product->assertSee('<a href="/compare/bpc-157-vs-tb-500">Compare BPC-157 and TB-500 listings</a>', false);
+        $product->assertSee('<a href="/encyclopedia/BPC-157" tabindex="-1">BPC-157 encyclopedia entry</a>', false);
+        $product->assertSee('<a href="/compare/bpc-157" tabindex="-1">Compare BPC-157 listings</a>', false);
+        $product->assertSee('<a href="/compare/bpc-157-vs-tb-500" tabindex="-1">Compare BPC-157 and TB-500 listings</a>', false);
         $this->assertCatalogLinks($product, [
             '/encyclopedia/BPC-157',
             '/compare/bpc-157',
@@ -68,9 +68,9 @@ class CatalogCrossLinksTest extends TestCase
 
         $encyclopedia = $this->get('/encyclopedia/BPC-157');
         $encyclopedia->assertOk();
-        $encyclopedia->assertSee('<a href="/product/BPC-157">Products listed for BPC-157</a>', false);
-        $encyclopedia->assertSee('<a href="/compare/bpc-157">Compare BPC-157 listings</a>', false);
-        $encyclopedia->assertSee('<a href="/compare/bpc-157-vs-tb-500">Compare BPC-157 and TB-500 listings</a>', false);
+        $encyclopedia->assertSee('<a href="/product/BPC-157" tabindex="-1">Products listed for BPC-157</a>', false);
+        $encyclopedia->assertSee('<a href="/compare/bpc-157" tabindex="-1">Compare BPC-157 listings</a>', false);
+        $encyclopedia->assertSee('<a href="/compare/bpc-157-vs-tb-500" tabindex="-1">Compare BPC-157 and TB-500 listings</a>', false);
         $this->assertCatalogLinks($encyclopedia, [
             '/product/BPC-157',
             '/compare/bpc-157',
@@ -90,8 +90,8 @@ class CatalogCrossLinksTest extends TestCase
 
         $compare = $this->get('/compare/bpc-157');
         $compare->assertOk();
-        $compare->assertSee('<a href="/encyclopedia/BPC-157">BPC-157 encyclopedia entry</a>', false);
-        $compare->assertSee('<a href="/product/BPC-157">Products listed for BPC-157</a>', false);
+        $compare->assertSee('<a href="/encyclopedia/BPC-157" tabindex="-1">BPC-157 encyclopedia entry</a>', false);
+        $compare->assertSee('<a href="/product/BPC-157" tabindex="-1">Products listed for BPC-157</a>', false);
         $this->assertCatalogLinks($compare, [
             '/encyclopedia/BPC-157',
             '/product/BPC-157',
@@ -104,10 +104,10 @@ class CatalogCrossLinksTest extends TestCase
 
         $vs = $this->get('/compare/bpc-157-vs-tb-500');
         $vs->assertOk();
-        $vs->assertSee('<a href="/encyclopedia/BPC-157">BPC-157 encyclopedia entry</a>', false);
-        $vs->assertSee('<a href="/encyclopedia/TB-500">TB-500 encyclopedia entry</a>', false);
-        $vs->assertSee('<a href="/product/BPC-157">Products listed for BPC-157</a>', false);
-        $vs->assertSee('<a href="/product/TB-500">Products listed for TB-500</a>', false);
+        $vs->assertSee('<a href="/encyclopedia/BPC-157" tabindex="-1">BPC-157 encyclopedia entry</a>', false);
+        $vs->assertSee('<a href="/encyclopedia/TB-500" tabindex="-1">TB-500 encyclopedia entry</a>', false);
+        $vs->assertSee('<a href="/product/BPC-157" tabindex="-1">Products listed for BPC-157</a>', false);
+        $vs->assertSee('<a href="/product/TB-500" tabindex="-1">Products listed for TB-500</a>', false);
         $this->assertCatalogLinks($vs, [
             '/encyclopedia/BPC-157',
             '/encyclopedia/TB-500',
@@ -122,8 +122,8 @@ class CatalogCrossLinksTest extends TestCase
 
         $blendProduct = $this->get('/product/bpc-157-tb-500');
         $blendProduct->assertOk();
-        $blendProduct->assertSee('<a href="/encyclopedia/bpc-157-tb-500">BPC-157 / TB-500 encyclopedia entry</a>', false);
-        $blendProduct->assertSee('<a href="/compare/bpc-157-tb-500">Compare BPC-157 / TB-500 listings</a>', false);
+        $blendProduct->assertSee('<a href="/encyclopedia/bpc-157-tb-500" tabindex="-1">BPC-157 / TB-500 encyclopedia entry</a>', false);
+        $blendProduct->assertSee('<a href="/compare/bpc-157-tb-500" tabindex="-1">Compare BPC-157 / TB-500 listings</a>', false);
         $this->assertCatalogLinks($blendProduct, [
             '/encyclopedia/bpc-157-tb-500',
             '/compare/bpc-157-tb-500',
@@ -148,7 +148,7 @@ class CatalogCrossLinksTest extends TestCase
 
         $draftPage = $this->get('/product/draftone');
         $draftPage->assertOk();
-        $draftPage->assertSee('<a href="/compare/draftone">Compare Draftone listings</a>', false);
+        $draftPage->assertSee('<a href="/compare/draftone" tabindex="-1">Compare Draftone listings</a>', false);
         $this->assertCatalogLinks($draftPage, [
             '/compare/draftone',
         ], [
@@ -157,7 +157,7 @@ class CatalogCrossLinksTest extends TestCase
 
         $thin = $this->get('/product/zzz-alpha');
         $thin->assertOk();
-        $thin->assertSee('<a href="/compare/zzz-alpha">Compare Zzz Alpha listings</a>', false);
+        $thin->assertSee('<a href="/compare/zzz-alpha" tabindex="-1">Compare Zzz Alpha listings</a>', false);
         $this->assertCatalogLinks($thin, [
             '/encyclopedia/zzz-alpha',
             '/compare/zzz-alpha',
@@ -179,7 +179,7 @@ class CatalogCrossLinksTest extends TestCase
 
         $this->get('/product/foo_bar')
             ->assertOk()
-            ->assertSee('<a href="/encyclopedia/foo_bar">Foo Underscore encyclopedia entry</a>', false);
+            ->assertSee('<a href="/encyclopedia/foo_bar" tabindex="-1">Foo Underscore encyclopedia entry</a>', false);
         $this->assertCatalogLinks($this->get('/product/foo_bar'), [
             '/encyclopedia/foo_bar',
         ], [
@@ -234,6 +234,28 @@ class CatalogCrossLinksTest extends TestCase
         $this->assertCount(CatalogCrossLinks::CAP, $captured);
         $page->assertDontSee('/compare/cap-f-vs-cap-subject', false);
         $page->assertDontSee('/compare/cap-g-vs-cap-subject', false);
+    }
+
+    public function test_space_slug_encyclopedia_is_not_linked_and_vs_lookup_is_cached(): void
+    {
+        $brand = $this->brand();
+        $space = $this->compound('AM Shred', 'AM Shred', published: true);
+        $this->listing($brand, $space);
+        $bpc = $this->compound('BPC-157', 'BPC-157', published: true);
+        $tb = $this->compound('TB-500', 'TB-500', published: true);
+        $this->listing($brand, $bpc);
+        $this->listing($brand, $tb);
+
+        $this->assertCatalogLinks($this->get('/compare/am-shred')->assertOk(), [], [
+            '/encyclopedia/AM Shred',
+            '/encyclopedia/AM%20Shred',
+        ]);
+
+        $this->get('/product/BPC-157')->assertOk();
+        $count = 0;
+        \Illuminate\Support\Facades\DB::listen(function () use (&$count) { $count++; });
+        $this->get('/product/BPC-157')->assertOk()->assertSee('href="/compare/bpc-157-vs-tb-500"', false);
+        $this->assertLessThan(60, $count, 'catalog links should not add hundreds of queries per page');
     }
 
     private function brand(): Brand

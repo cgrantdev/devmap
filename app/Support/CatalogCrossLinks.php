@@ -8,6 +8,7 @@ use App\Models\EducationalGuide;
 use App\Models\EducationPost;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -303,6 +304,11 @@ class CatalogCrossLinks
         }
 
         $publicSlug = substr($path, strlen('/encyclopedia/'));
+        // Space slugs ("AM Shred", "MIC + B12") self-canonical with a raw
+        // space. Do not link them until that canonical is encoded.
+        if (! ProductListingSeo::slugIsRouteSafe($publicSlug)) {
+            return ['href' => null, 'ambiguous' => null];
+        }
         $resolved = self::resolveEncyclopediaCategory($publicSlug);
         if (! $resolved || (int) $resolved->id !== (int) $category->id) {
             if ($resolved && (int) $resolved->id !== (int) $category->id) {
@@ -419,30 +425,56 @@ class CatalogCrossLinks
      */
     private static function indexableVsPages(): array
     {
+        // liveIndexableVsSlug() costs several queries per candidate pair
+        // (about 200 per product or encyclopedia page). The pair list only
+        // changes with the allowlist, category activation, or a published
+        // head-to-head post, so build it once and cache the ids briefly.
+        $key = 'catalog-cross-links:vs-pages:'.md5((string) json_encode(config('seo.vs_sitemap_allowlist', [])));
+        $rows = Cache::remember($key, now()->addMinutes(10), function (): array {
+            $rows = [];
+            foreach (self::candidateVsSlugs() as $slug) {
+                $live = CompareController::liveIndexableVsSlug($slug);
+                if ($live === null || isset($rows[$live])) {
+                    continue;
+                }
+                $pos = strpos($live, '-vs-');
+                if ($pos === false) {
+                    continue;
+                }
+                $a = ProductCategory::findForCompareSlug(substr($live, 0, $pos));
+                $b = ProductCategory::findForCompareSlug(substr($live, $pos + 4));
+                if (! $a || ! $b) {
+                    continue;
+                }
+                $rows[$live] = ['slug' => $live, 'a' => (int) $a->id, 'b' => (int) $b->id];
+            }
+            ksort($rows, SORT_STRING);
+
+            return array_values($rows);
+        });
+
+        if ($rows === []) {
+            return [];
+        }
+
+        $ids = array_unique(array_merge(array_column($rows, 'a'), array_column($rows, 'b')));
+        $categories = ProductCategory::query()
+            ->whereIn('id', $ids)
+            ->where('is_active', true)
+            ->get()
+            ->keyBy('id');
+
         $pages = [];
-        foreach (self::candidateVsSlugs() as $slug) {
-            $live = CompareController::liveIndexableVsSlug($slug);
-            if ($live === null || isset($pages[$live])) {
-                continue;
-            }
-            $pos = strpos($live, '-vs-');
-            if ($pos === false) {
-                continue;
-            }
-            $a = ProductCategory::findForCompareSlug(substr($live, 0, $pos));
-            $b = ProductCategory::findForCompareSlug(substr($live, $pos + 4));
+        foreach ($rows as $row) {
+            $a = $categories->get($row['a']);
+            $b = $categories->get($row['b']);
             if (! $a || ! $b) {
                 continue;
             }
-            $pages[$live] = [
-                'slug' => $live,
-                'a' => $a,
-                'b' => $b,
-            ];
+            $pages[] = ['slug' => $row['slug'], 'a' => $a, 'b' => $b];
         }
-        ksort($pages, SORT_STRING);
 
-        return array_values($pages);
+        return $pages;
     }
 
     /**

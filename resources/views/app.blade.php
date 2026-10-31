@@ -228,7 +228,7 @@
     <nav class="ssr-catalog-links" aria-hidden="true">
         @foreach ($catalogCrossLinks['groups'] as $group)
             @foreach ($group['links'] as $link)
-                <a href="{{ $link['href'] }}">{{ $link['label'] }}</a>
+                <a href="{{ $link['href'] }}" tabindex="-1">{{ $link['label'] }}</a>
             @endforeach
         @endforeach
     </nav>
