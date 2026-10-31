@@ -567,13 +567,39 @@ class ProductsController extends Controller
 
     public function show(Request $request, $slug)
     {
-        // Find category by slug
+        // Find category by slug. The exact match is checked in PHP because
+        // production MySQL's case-insensitive collation would otherwise treat
+        // /product/bpc-157 as an exact match for the stored slug BPC-157.
+        // If there is no exact match, a single case-insensitive match is used;
+        // two or more case-insensitive matches return 404.
         $category = ProductCategory::where('slug', $slug)
             ->where('is_active', true)
-            ->first();
+            ->get()
+            ->first(fn (ProductCategory $c) => (string) $c->slug === (string) $slug);
+
+        if (! $category) {
+            $matches = ProductCategory::where('is_active', true)
+                ->whereRaw('LOWER(slug) = ?', [strtolower($slug)])
+                ->orderBy('id')
+                ->get();
+            $category = $matches->count() === 1 ? $matches->first() : null;
+        }
 
         if (!$category) {
             abort(404, 'Category not found');
+        }
+
+        // Each listing has one URL. A request that loaded a row whose
+        // stored slug differs (letter case, or trailing spaces under
+        // MySQL PAD SPACE) 301s to the stored slug and keeps the query
+        // string. The target resolves exactly, so it cannot loop.
+        if ((string) $category->slug !== (string) $slug) {
+            $qs = $request->getQueryString();
+
+            return redirect(
+                '/product/'.rawurlencode((string) $category->slug).($qs ? '?'.$qs : ''),
+                301
+            );
         }
 
         // Start building query for products in this category
@@ -754,7 +780,7 @@ class ProductsController extends Controller
 
         // Generate SEO data for category listing (automatically from category fields)
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
-        $categoryUrl = url("/product/{$slug}");
+        $categoryUrl = url('/product/'.rawurlencode($category->slug));
         
         // Build category image URL
         $categoryImage = null;
@@ -806,10 +832,8 @@ class ProductsController extends Controller
         // uncategorized and stored slugs the /product/{slug} route cannot
         // treat as one segment stay out of the index. A slug containing
         // "/" never reaches this action. Titles and metas are unchanged.
-        if (
-            strcasecmp((string) $category->slug, 'uncategorized') === 0
-            || ! preg_match('#^[A-Za-z0-9._\-]+$#', (string) $category->slug)
-        ) {
+        // Same predicate as the title template above, so the two cannot drift.
+        if (! ProductListingSeo::usesVendorTemplate($category->slug)) {
             $seo['robots'] = 'noindex, follow';
         }
         
