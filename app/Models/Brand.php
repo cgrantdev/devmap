@@ -39,6 +39,8 @@ class Brand extends Model
         'rating_count' => 'integer',
         'is_demo' => 'boolean',
         'is_active' => 'boolean',
+        'connection_token_issued_at' => 'datetime',
+        'connection_token_used_at' => 'datetime',
     ];
 
     /**
@@ -124,12 +126,19 @@ class Brand extends Model
                 $brand->slug = $slug;
             }
 
-            // Auto-generate a per-brand connection token for the WP plugin
+            // Auto-generate a per-brand connection token for the WP plugin.
+            // Always plaintext here. Hashed storage is opt-in and happens
+            // in vendors:rotate-connection-tokens, which is the only place
+            // that can hand the owner the plaintext.
             if (empty($brand->connection_token)) {
                 do {
                     $token = 'pmap_' . Str::random(40);
                 } while (static::where('connection_token', $token)->exists());
                 $brand->connection_token = $token;
+            }
+
+            if (empty($brand->connection_token_issued_at)) {
+                $brand->connection_token_issued_at = now();
             }
         });
 

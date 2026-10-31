@@ -102,9 +102,11 @@ Route::post('/api/subscribe', function (\Illuminate\Http\Request $request) {
     return response()->json(['ok' => true, 'message' => 'You\'re on the list!']);
 })->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
-// WordPress plugin connect endpoint (no CSRF — called from external WP installs)
+// WordPress plugin connect endpoint (no CSRF — called from external WP installs).
+// The throttle middleware does nothing unless VENDOR_PLUGIN_THROTTLE is on.
 Route::post('/api/vendor-plugin/connect', [\App\Http\Controllers\Api\VendorPluginController::class, 'connect'])
     ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])
+    ->middleware(\App\Http\Middleware\ThrottleVendorPluginConnect::class)
     ->name('api.vendor-plugin.connect');
 
 // Search

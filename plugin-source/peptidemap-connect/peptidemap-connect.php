@@ -97,8 +97,8 @@ class PeptideMap_Connect {
                 <h2 style="margin-top:0;font-size:16px;">Step 1 — Get your connection token</h2>
                 <ol style="margin:0 0 20px 20px;font-size:14px;line-height:1.7;color:#52525B;">
                     <li>Go to <a href="<?php echo esc_url(PEPTIDEMAP_API_BASE . '/become-a-vendor'); ?>" target="_blank">peptidemap.com/become-a-vendor</a> and complete the application (if you haven't already).</li>
-                    <li>Once approved, your unique connection token will be in your welcome email.</li>
-                    <li>Don't have one? Copy it from your registration confirmation page.</li>
+                    <li>PeptideMap issues your connection token separately. It is not in the registration email or on the confirmation page.</li>
+                    <li>Don't have one? Email <a href="mailto:info@peptidemap.com">info@peptidemap.com</a> and ask for a token.</li>
                 </ol>
 
                 <h2 style="font-size:16px;margin-bottom:8px;">Step 2 — Paste it below and connect</h2>
