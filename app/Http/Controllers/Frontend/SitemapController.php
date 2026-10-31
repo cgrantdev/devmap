@@ -29,7 +29,9 @@ class SitemapController extends Controller
     // ProductCategory). These rank for high-intent "{compound} for sale"
     // queries (retatrutide 6.4k/mo, bpc-157 etc.) and were previously
     // crawl-orphaned — Google saw them only via internal links on /products.
-    public const CACHE_KEY = 'sitemap.xml.v7';
+    // v8 drops /product/uncategorized. Slash and whitespace slugs were
+    // already omitted by the route-safe check below.
+    public const CACHE_KEY = 'sitemap.xml.v8';
     private const CACHE_TTL = 21600; // 6h
     private const BASE_URL  = 'https://peptidemap.com';
 
@@ -171,7 +173,11 @@ class SitemapController extends Controller
                     // like "BPC-157 / TB500 / Cartalax" is skipped — those 8 need the
                     // slug cleaned at the row level (separate fix). Case is preserved
                     // because the controller does an exact slug match.
-                    if (preg_match('#^[A-Za-z0-9._\-]+$#', $c->slug)) {
+                    // uncategorized is route-safe but it is a bucket, not a compound.
+                    if (
+                        strcasecmp((string) $c->slug, 'uncategorized') !== 0
+                        && preg_match('#^[A-Za-z0-9._\-]+$#', $c->slug)
+                    ) {
                         $urls[] = [
                             'loc'        => self::BASE_URL . '/product/' . $c->slug,
                             'lastmod'    => $lastmod,

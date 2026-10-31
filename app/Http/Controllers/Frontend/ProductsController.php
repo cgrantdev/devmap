@@ -803,6 +803,15 @@ class ProductsController extends Controller
         if ($seoH1 !== null) {
             $seo['h1'] = $seoH1;
         }
+        // uncategorized and stored slugs the /product/{slug} route cannot
+        // treat as one segment stay out of the index. A slug containing
+        // "/" never reaches this action. Titles and metas are unchanged.
+        if (
+            strcasecmp((string) $category->slug, 'uncategorized') === 0
+            || ! preg_match('#^[A-Za-z0-9._\-]+$#', (string) $category->slug)
+        ) {
+            $seo['robots'] = 'noindex, follow';
+        }
         
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
