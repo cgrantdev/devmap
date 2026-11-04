@@ -117,10 +117,10 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 4. COMPARE + CALCULATOR CTAs — side by side                -->
+    <!-- 4. COMPARE + CALCULATOR + BAC WATER CTAs                   -->
     <!-- ========================================================= -->
     <section class="max-w-[1280px] mx-auto px-5 lg:px-10 pb-12 lg:pb-20">
-      <div class="grid md:grid-cols-2 gap-4 lg:gap-5">
+      <div class="grid md:grid-cols-3 gap-4 lg:gap-5">
         <!-- Compare CTA -->
         <div class="rounded-[16px] border border-[color:var(--color-hairline)] bg-gradient-to-br from-[color:var(--color-accent-50)] to-white p-7 lg:p-10 flex flex-col gap-4">
           <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)]">Price comparison</div>
@@ -146,11 +146,32 @@
             Peptide reconstitution calculator
           </h2>
           <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
-            Calculate concentration, volume, and doses per vial. Presets for 17+ popular compounds.
+            Calculate concentration, volume, and doses per vial. Presets for 55+ popular compounds.
           </p>
           <div class="mt-auto pt-2">
             <Button as="a" href="/calculator" variant="secondary">
               Open calculator
+              <template #icon-right>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </template>
+            </Button>
+          </div>
+        </div>
+        <!-- Bacteriostatic water CTA. Added so the per-mL comparison
+             page actually surfaces on the homepage — every peptide
+             reconstitution needs BAC water, so it's the single
+             highest cross-sell item on the site. -->
+        <div class="rounded-[16px] border border-[color:var(--color-hairline)] bg-gradient-to-br from-sky-50 to-white p-7 lg:p-10 flex flex-col gap-4">
+          <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-sky-700">Reconstitution supply</div>
+          <h2 class="ui-display text-xl lg:text-2xl font-semibold tracking-tight text-[color:var(--color-ink)]">
+            Bacteriostatic water price index
+          </h2>
+          <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
+            Every peptide needs it. US vendor listings, ranked by per-mL price across 2 mL, 10 mL and 30 mL vials.
+          </p>
+          <div class="mt-auto pt-2">
+            <Button as="a" href="/bacteriostatic-water" variant="secondary">
+              See prices
               <template #icon-right>
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
               </template>
