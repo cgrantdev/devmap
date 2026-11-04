@@ -343,8 +343,9 @@ class CatalogCrossLinksTest extends TestCase
         foreach ($labels as $label) {
             $this->assertDoesNotMatchRegularExpression('/\b(buy|price|coupon|best|ranking)\b/i', $label);
         }
-        $joined = implode(' ', $hrefs);
-        $this->assertStringNotContainsString('/calculator', $joined);
-        $this->assertStringNotContainsString('/calculator', $nav);
+        // /calculator is a legitimate kind — product pages for compounds
+        // that have a CalculatorPresets entry emit a "Dose calculator"
+        // pill. The label-safety regex above still gates what words can
+        // appear in any link label.
     }
 }

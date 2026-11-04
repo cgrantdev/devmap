@@ -875,7 +875,7 @@ class ProductsController extends Controller
             'sortDir' => $sortDir,
             'search' => $request->get('search', ''),
             'catalogLinks' => CatalogCrossLinks::share(
-                CatalogCrossLinks::forCategory($category, ['encyclopedia', 'compare'])
+                CatalogCrossLinks::forCategory($category, ['encyclopedia', 'compare', 'calculator'])
             ),
             'seo' => $seo,
         ]);

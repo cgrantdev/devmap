@@ -82,6 +82,28 @@ class CatalogCrossLinks
             }
         }
 
+        // Dose calculator is a tool, not a published catalog page, so
+        // the match is against CalculatorPresets rather than an active
+        // category row. First preset whose slug family starts with the
+        // category slug wins (semaglutide -> semaglutide-3mg etc.).
+        // No match = no pill, same policy as the other kinds.
+        if (in_array('calculator', $kinds, true)) {
+            $slugLower = strtolower((string) $category->slug);
+            foreach (CalculatorPresets::all() as $preset) {
+                if (str_starts_with($preset['slug'], $slugLower.'-')) {
+                    $groups[] = [
+                        'label' => 'Dose calculator',
+                        'links' => [self::link(
+                            '/calculator/'.$preset['slug'],
+                            $category->name.' dose calculator',
+                            'calculator'
+                        )],
+                    ];
+                    break;
+                }
+            }
+        }
+
         return ['groups' => $groups];
     }
 

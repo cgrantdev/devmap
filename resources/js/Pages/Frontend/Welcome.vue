@@ -162,6 +162,35 @@
       </div>          
     </section>
 
+    <!-- Bacteriostatic water quick-access strip. Bac water is the single
+         highest-cross-sell item on the site (every peptide needs it to
+         reconstitute) but was buried behind the top-nav link. This puts
+         the per-mL compare page on the homepage. Non-sponsored,
+         editorial style so it doesn't read as an ad. -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <Link
+        href="/bacteriostatic-water"
+        class="group flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 bg-white border border-slate-200 rounded-lg p-5 sm:p-6 hover:border-slate-400 hover:shadow-md transition-all"
+      >
+        <div class="flex-shrink-0 w-12 h-12 bg-sky-100 rounded-lg flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-sky-700" aria-hidden="true">
+            <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5S5 13 5 15a7 7 0 0 0 7 7z"/>
+          </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[11px] uppercase tracking-wider font-semibold text-sky-700 mb-1">Reconstitution supply</div>
+          <h3 class="text-lg sm:text-xl text-gray-900 font-semibold">Bacteriostatic water price comparison</h3>
+          <p class="text-sm text-gray-600 mt-1">Every peptide needs it. Compare US vendors by per-mL price across 2 mL, 10 mL and 30 mL vials.</p>
+        </div>
+        <div class="flex items-center gap-1 text-sm font-medium text-slate-700 group-hover:text-slate-900 flex-shrink-0">
+          See prices
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-1" aria-hidden="true">
+            <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </Link>
+    </section>
+
     <!-- Your Brand Section -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <div class="bg-gradient-to-r from-slate-700 to-slate-600 rounded-lg p-6 sm:p-8 text-center text-white relative overflow-hidden">
@@ -314,11 +343,11 @@
             icon="graph"
           />
           <ResourcesToolsCard
-            title="Price Comparison"
-            description="Compare research peptide listings and prices across vendors"
-            href="/compare"
-            cta-text="Compare"
-            icon="ribbon"
+            title="Bacteriostatic Water"
+            description="Per-mL price comparison across US vendors. Needed for every peptide reconstitution."
+            href="/bacteriostatic-water"
+            cta-text="See prices"
+            icon="droplet"
           />
         </div>
       </div>

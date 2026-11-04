@@ -53,7 +53,7 @@ const props = defineProps({
   icon: {
     type: String,
     required: true,
-    validator: (value) => ['book', 'graph', 'ribbon'].includes(value)
+    validator: (value) => ['book', 'graph', 'ribbon', 'droplet'].includes(value)
   }
 })
 
@@ -106,6 +106,21 @@ const iconComponents = {
   }, [
     h('path', { d: 'm15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526' }),
     h('circle', { cx: '12', cy: '8', r: '6' })
+  ]),
+  droplet: () => h('svg', {
+    xmlns: 'http://www.w3.org/2000/svg',
+    width: '24',
+    height: '24',
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: '2',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    class: 'lucide lucide-droplet w-6 h-6 text-slate-700',
+    'aria-hidden': 'true'
+  }, [
+    h('path', { d: 'M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5S5 13 5 15a7 7 0 0 0 7 7z' })
   ])
 }
 

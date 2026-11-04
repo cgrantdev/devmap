@@ -2,10 +2,14 @@
   <ModernLayout>
     <!-- Product Listing Section -->
     <section class="bg-white">
-      <!-- Header -->
-      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-8 lg:pt-12 pb-6">
-        <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-2">{{ productName }}</h1>
-        <p class="text-[15px] text-[color:var(--color-ink-muted)]">Compare prices across listed vendors</p>
+      <!-- Header. Compound name + inline pill row of cross-links
+           (encyclopedia, compare, calculator). Dropped the subtitle
+           ("Compare prices across listed vendors") — it was telling
+           the user the same thing the "Compare prices" pill directly
+           below already says, and stacking it with the grouped
+           label-rows made the top of the page read as cluttered. -->
+      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-8 lg:pt-12 pb-5">
+        <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-tight text-[color:var(--color-ink)]">{{ productName }}</h1>
         <CatalogCrossLinks :groups="catalogLinks?.groups || []" />
       </div>
 
