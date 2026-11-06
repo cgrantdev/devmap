@@ -315,7 +315,6 @@ class BecomeVendorController extends Controller
                 'registration_complete' => [
                     'company' => $validated['companyName'],
                     'email' => $validated['email'],
-                    'connection_token' => $brand->connection_token,
                     'refused_api' => !empty($validated['refuseApiAccess']),
                     'submitted_at' => now()->toIso8601String(),
                 ],

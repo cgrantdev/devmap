@@ -1,0 +1,959 @@
+{
+    "success_new_config": {
+        "status": 200,
+        "content_type": "application/json",
+        "body": "{\"ok\":true,\"message\":\"Connected successfully. Your products will be imported into PeptideMap shortly.\",\"brand_name\":\"Char Lab\"}",
+        "writes": [
+            {
+                "sql": "insert into \"scraping_configs\" (\"vendor_id\", \"type\", \"vendor_name\", \"store_url\", \"products_url\", \"auth_credentials\", \"enabled\", \"frequency\", \"auto_promote\", \"updated_at\", \"created_at\") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "bindings": [
+                    1,
+                    "woo_api",
+                    "Char Lab",
+                    "https://shop.qa.test",
+                    "https://shop.qa.test",
+                    "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    true,
+                    "daily",
+                    true,
+                    "<ts>",
+                    "<ts>"
+                ]
+            },
+            {
+                "sql": "update \"vendor_settings\" set \"api_platform\" = ?, \"updated_at\" = ? where \"id\" = ?",
+                "bindings": [
+                    "woocommerce",
+                    "<ts>",
+                    1
+                ]
+            }
+        ],
+        "logs": [
+            {
+                "level": "info",
+                "message": "Plugin connect succeeded",
+                "context": {
+                    "brand_id": 1,
+                    "config_id": 1,
+                    "store_url": "https://shop.qa.test"
+                }
+            }
+        ],
+        "http": [
+            {
+                "method": "GET",
+                "url": "https://shop.qa.test/wp-json/wc/v3/products?per_page=1",
+                "auth": [
+                    "Basic Y2tfMTIzNDU2Nzg5MGFiY2RlZjpjc18xMjM0NTY3ODkwYWJjZGVm"
+                ],
+                "accept": [
+                    "application/json"
+                ]
+            }
+        ],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "woocommerce",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": [
+                {
+                    "auth_credentials": "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    "auto_promote": 1,
+                    "created_at": "<ts>",
+                    "enabled": 1,
+                    "error_count": 0,
+                    "frequency": "daily",
+                    "id": 1,
+                    "last_error": null,
+                    "last_run_at": null,
+                    "next_run_at": null,
+                    "products_url": "https://shop.qa.test",
+                    "selectors": null,
+                    "store_url": "https://shop.qa.test",
+                    "success_count": 0,
+                    "type": "woo_api",
+                    "updated_at": "<ts>",
+                    "vendor_id": 1,
+                    "vendor_name": "Char Lab"
+                }
+            ]
+        }
+    },
+    "success_reconnect_changes_url": {
+        "status": 200,
+        "content_type": "application/json",
+        "body": "{\"ok\":true,\"message\":\"Connected successfully. Your products will be imported into PeptideMap shortly.\",\"brand_name\":\"Char Lab\"}",
+        "writes": [
+            {
+                "sql": "update \"scraping_configs\" set \"products_url\" = ?, \"store_url\" = ?, \"auth_credentials\" = ?, \"updated_at\" = ? where \"id\" = ?",
+                "bindings": [
+                    "https://moved.qa.test",
+                    "https://moved.qa.test",
+                    "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    "<ts>",
+                    1
+                ]
+            },
+            {
+                "sql": "update \"vendor_settings\" set \"api_platform\" = ?, \"updated_at\" = ? where \"id\" = ?",
+                "bindings": [
+                    "woocommerce",
+                    "<ts>",
+                    1
+                ]
+            }
+        ],
+        "logs": [
+            {
+                "level": "info",
+                "message": "Plugin connect succeeded",
+                "context": {
+                    "brand_id": 1,
+                    "config_id": 1,
+                    "store_url": "https://moved.qa.test"
+                }
+            }
+        ],
+        "http": [
+            {
+                "method": "GET",
+                "url": "https://moved.qa.test/wp-json/wc/v3/products?per_page=1",
+                "auth": [
+                    "Basic Y2tfMTIzNDU2Nzg5MGFiY2RlZjpjc18xMjM0NTY3ODkwYWJjZGVm"
+                ],
+                "accept": [
+                    "application/json"
+                ]
+            }
+        ],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "woocommerce",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": [
+                {
+                    "auth_credentials": "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    "auto_promote": 1,
+                    "created_at": "<ts>",
+                    "enabled": 1,
+                    "error_count": 0,
+                    "frequency": "daily",
+                    "id": 1,
+                    "last_error": null,
+                    "last_run_at": null,
+                    "next_run_at": null,
+                    "products_url": "https://moved.qa.test",
+                    "selectors": null,
+                    "store_url": "https://moved.qa.test",
+                    "success_count": 0,
+                    "type": "woo_api",
+                    "updated_at": "<ts>",
+                    "vendor_id": 1,
+                    "vendor_name": "Char Lab"
+                }
+            ]
+        }
+    },
+    "success_no_vendor_setting": {
+        "status": 200,
+        "content_type": "application/json",
+        "body": "{\"ok\":true,\"message\":\"Connected successfully. Your products will be imported into PeptideMap shortly.\",\"brand_name\":\"Char Lab\"}",
+        "writes": [
+            {
+                "sql": "insert into \"scraping_configs\" (\"vendor_id\", \"type\", \"vendor_name\", \"store_url\", \"products_url\", \"auth_credentials\", \"enabled\", \"frequency\", \"auto_promote\", \"updated_at\", \"created_at\") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "bindings": [
+                    1,
+                    "woo_api",
+                    "Char Lab",
+                    "https://shop.qa.test",
+                    "https://shop.qa.test",
+                    "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    true,
+                    "daily",
+                    true,
+                    "<ts>",
+                    "<ts>"
+                ]
+            }
+        ],
+        "logs": [
+            {
+                "level": "info",
+                "message": "Plugin connect succeeded",
+                "context": {
+                    "brand_id": 1,
+                    "config_id": 1,
+                    "store_url": "https://shop.qa.test"
+                }
+            }
+        ],
+        "http": [
+            {
+                "method": "GET",
+                "url": "https://shop.qa.test/wp-json/wc/v3/products?per_page=1",
+                "auth": [
+                    "Basic Y2tfMTIzNDU2Nzg5MGFiY2RlZjpjc18xMjM0NTY3ODkwYWJjZGVm"
+                ],
+                "accept": [
+                    "application/json"
+                ]
+            }
+        ],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [],
+            "scraping_configs": [
+                {
+                    "auth_credentials": "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    "auto_promote": 1,
+                    "created_at": "<ts>",
+                    "enabled": 1,
+                    "error_count": 0,
+                    "frequency": "daily",
+                    "id": 1,
+                    "last_error": null,
+                    "last_run_at": null,
+                    "next_run_at": null,
+                    "products_url": "https://shop.qa.test",
+                    "selectors": null,
+                    "store_url": "https://shop.qa.test",
+                    "success_count": 0,
+                    "type": "woo_api",
+                    "updated_at": "<ts>",
+                    "vendor_id": 1,
+                    "vendor_name": "Char Lab"
+                }
+            ]
+        }
+    },
+    "success_demo_brand": {
+        "status": 200,
+        "content_type": "application/json",
+        "body": "{\"ok\":true,\"message\":\"Connected successfully. Your products will be imported into PeptideMap shortly.\",\"brand_name\":\"Char Lab\"}",
+        "writes": [
+            {
+                "sql": "insert into \"scraping_configs\" (\"vendor_id\", \"type\", \"vendor_name\", \"store_url\", \"products_url\", \"auth_credentials\", \"enabled\", \"frequency\", \"auto_promote\", \"updated_at\", \"created_at\") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "bindings": [
+                    1,
+                    "woo_api",
+                    "Char Lab",
+                    "https://shop.qa.test",
+                    "https://shop.qa.test",
+                    "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    true,
+                    "daily",
+                    true,
+                    "<ts>",
+                    "<ts>"
+                ]
+            },
+            {
+                "sql": "update \"vendor_settings\" set \"api_platform\" = ?, \"updated_at\" = ? where \"id\" = ?",
+                "bindings": [
+                    "woocommerce",
+                    "<ts>",
+                    1
+                ]
+            }
+        ],
+        "logs": [
+            {
+                "level": "info",
+                "message": "Plugin connect succeeded",
+                "context": {
+                    "brand_id": 1,
+                    "config_id": 1,
+                    "store_url": "https://shop.qa.test"
+                }
+            }
+        ],
+        "http": [
+            {
+                "method": "GET",
+                "url": "https://shop.qa.test/wp-json/wc/v3/products?per_page=1",
+                "auth": [
+                    "Basic Y2tfMTIzNDU2Nzg5MGFiY2RlZjpjc18xMjM0NTY3ODkwYWJjZGVm"
+                ],
+                "accept": [
+                    "application/json"
+                ]
+            }
+        ],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 1,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "woocommerce",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": [
+                {
+                    "auth_credentials": "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    "auto_promote": 1,
+                    "created_at": "<ts>",
+                    "enabled": 1,
+                    "error_count": 0,
+                    "frequency": "daily",
+                    "id": 1,
+                    "last_error": null,
+                    "last_run_at": null,
+                    "next_run_at": null,
+                    "products_url": "https://shop.qa.test",
+                    "selectors": null,
+                    "store_url": "https://shop.qa.test",
+                    "success_count": 0,
+                    "type": "woo_api",
+                    "updated_at": "<ts>",
+                    "vendor_id": 1,
+                    "vendor_name": "Char Lab"
+                }
+            ]
+        }
+    },
+    "success_trailing_slash": {
+        "status": 200,
+        "content_type": "application/json",
+        "body": "{\"ok\":true,\"message\":\"Connected successfully. Your products will be imported into PeptideMap shortly.\",\"brand_name\":\"Char Lab\"}",
+        "writes": [
+            {
+                "sql": "insert into \"scraping_configs\" (\"vendor_id\", \"type\", \"vendor_name\", \"store_url\", \"products_url\", \"auth_credentials\", \"enabled\", \"frequency\", \"auto_promote\", \"updated_at\", \"created_at\") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "bindings": [
+                    1,
+                    "woo_api",
+                    "Char Lab",
+                    "https://shop.qa.test/",
+                    "https://shop.qa.test/",
+                    "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    true,
+                    "daily",
+                    true,
+                    "<ts>",
+                    "<ts>"
+                ]
+            },
+            {
+                "sql": "update \"vendor_settings\" set \"api_platform\" = ?, \"updated_at\" = ? where \"id\" = ?",
+                "bindings": [
+                    "woocommerce",
+                    "<ts>",
+                    1
+                ]
+            }
+        ],
+        "logs": [
+            {
+                "level": "info",
+                "message": "Plugin connect succeeded",
+                "context": {
+                    "brand_id": 1,
+                    "config_id": 1,
+                    "store_url": "https://shop.qa.test/"
+                }
+            }
+        ],
+        "http": [
+            {
+                "method": "GET",
+                "url": "https://shop.qa.test/wp-json/wc/v3/products?per_page=1",
+                "auth": [
+                    "Basic Y2tfMTIzNDU2Nzg5MGFiY2RlZjpjc18xMjM0NTY3ODkwYWJjZGVm"
+                ],
+                "accept": [
+                    "application/json"
+                ]
+            }
+        ],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "woocommerce",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": [
+                {
+                    "auth_credentials": "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    "auto_promote": 1,
+                    "created_at": "<ts>",
+                    "enabled": 1,
+                    "error_count": 0,
+                    "frequency": "daily",
+                    "id": 1,
+                    "last_error": null,
+                    "last_run_at": null,
+                    "next_run_at": null,
+                    "products_url": "https://shop.qa.test/",
+                    "selectors": null,
+                    "store_url": "https://shop.qa.test/",
+                    "success_count": 0,
+                    "type": "woo_api",
+                    "updated_at": "<ts>",
+                    "vendor_id": 1,
+                    "vendor_name": "Char Lab"
+                }
+            ]
+        }
+    },
+    "bad_token": {
+        "status": 404,
+        "content_type": "application/json",
+        "body": "{\"ok\":false,\"message\":\"Connection token not recognized. Verify it in your PeptideMap registration email.\"}",
+        "writes": [],
+        "logs": [],
+        "http": [],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "manual",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": []
+        }
+    },
+    "woo_401": {
+        "status": 422,
+        "content_type": "application/json",
+        "body": "{\"ok\":false,\"message\":\"Could not authenticate against your WooCommerce REST API. Status: 401\"}",
+        "writes": [],
+        "logs": [],
+        "http": [
+            {
+                "method": "GET",
+                "url": "https://shop.qa.test/wp-json/wc/v3/products?per_page=1",
+                "auth": [
+                    "Basic Y2tfMTIzNDU2Nzg5MGFiY2RlZjpjc18xMjM0NTY3ODkwYWJjZGVm"
+                ],
+                "accept": [
+                    "application/json"
+                ]
+            }
+        ],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "manual",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": []
+        }
+    },
+    "woo_500": {
+        "status": 422,
+        "content_type": "application/json",
+        "body": "{\"ok\":false,\"message\":\"Could not authenticate against your WooCommerce REST API. Status: 500\"}",
+        "writes": [],
+        "logs": [],
+        "http": [
+            {
+                "method": "GET",
+                "url": "https://shop.qa.test/wp-json/wc/v3/products?per_page=1",
+                "auth": [
+                    "Basic Y2tfMTIzNDU2Nzg5MGFiY2RlZjpjc18xMjM0NTY3ODkwYWJjZGVm"
+                ],
+                "accept": [
+                    "application/json"
+                ]
+            }
+        ],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "manual",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": []
+        }
+    },
+    "store_unreachable": {
+        "status": 422,
+        "content_type": "application/json",
+        "body": "{\"ok\":false,\"message\":\"Could not reach your store. Verify the URL is publicly accessible: cURL error 6: Could not resolve host: shop.qa.test\"}",
+        "writes": [],
+        "logs": [
+            {
+                "level": "warning",
+                "message": "Plugin connect: HTTP test failed",
+                "context": {
+                    "brand_id": 1,
+                    "error": "cURL error 6: Could not resolve host: shop.qa.test"
+                }
+            }
+        ],
+        "http": [],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "manual",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": []
+        }
+    },
+    "private_store_url_flags_off": {
+        "status": 200,
+        "content_type": "application/json",
+        "body": "{\"ok\":true,\"message\":\"Connected successfully. Your products will be imported into PeptideMap shortly.\",\"brand_name\":\"Char Lab\"}",
+        "writes": [
+            {
+                "sql": "insert into \"scraping_configs\" (\"vendor_id\", \"type\", \"vendor_name\", \"store_url\", \"products_url\", \"auth_credentials\", \"enabled\", \"frequency\", \"auto_promote\", \"updated_at\", \"created_at\") values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "bindings": [
+                    1,
+                    "woo_api",
+                    "Char Lab",
+                    "http://127.0.0.1:8080",
+                    "http://127.0.0.1:8080",
+                    "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    true,
+                    "daily",
+                    true,
+                    "<ts>",
+                    "<ts>"
+                ]
+            },
+            {
+                "sql": "update \"vendor_settings\" set \"api_platform\" = ?, \"updated_at\" = ? where \"id\" = ?",
+                "bindings": [
+                    "woocommerce",
+                    "<ts>",
+                    1
+                ]
+            }
+        ],
+        "logs": [
+            {
+                "level": "info",
+                "message": "Plugin connect succeeded",
+                "context": {
+                    "brand_id": 1,
+                    "config_id": 1,
+                    "store_url": "http://127.0.0.1:8080"
+                }
+            }
+        ],
+        "http": [
+            {
+                "method": "GET",
+                "url": "http://127.0.0.1:8080/wp-json/wc/v3/products?per_page=1",
+                "auth": [
+                    "Basic Y2tfMTIzNDU2Nzg5MGFiY2RlZjpjc18xMjM0NTY3ODkwYWJjZGVm"
+                ],
+                "accept": [
+                    "application/json"
+                ]
+            }
+        ],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "woocommerce",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": [
+                {
+                    "auth_credentials": "<enc:{\"consumer_key\":\"ck_1234567890abcdef\",\"consumer_secret\":\"cs_1234567890abcdef\"}>",
+                    "auto_promote": 1,
+                    "created_at": "<ts>",
+                    "enabled": 1,
+                    "error_count": 0,
+                    "frequency": "daily",
+                    "id": 1,
+                    "last_error": null,
+                    "last_run_at": null,
+                    "next_run_at": null,
+                    "products_url": "http://127.0.0.1:8080",
+                    "selectors": null,
+                    "store_url": "http://127.0.0.1:8080",
+                    "success_count": 0,
+                    "type": "woo_api",
+                    "updated_at": "<ts>",
+                    "vendor_id": 1,
+                    "vendor_name": "Char Lab"
+                }
+            ]
+        }
+    },
+    "validation_bad_url": {
+        "status": 422,
+        "content_type": "application/json",
+        "body": "{\"message\":\"The store url field must be a valid URL.\",\"errors\":{\"store_url\":[\"The store url field must be a valid URL.\"]}}",
+        "writes": [],
+        "logs": [],
+        "http": [],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "manual",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": []
+        }
+    },
+    "validation_bad_consumer_key": {
+        "status": 422,
+        "content_type": "application/json",
+        "body": "{\"message\":\"The consumer key field must start with one of the following: ck_.\",\"errors\":{\"consumer_key\":[\"The consumer key field must start with one of the following: ck_.\"]}}",
+        "writes": [],
+        "logs": [],
+        "http": [],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "manual",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": []
+        }
+    },
+    "validation_missing_token": {
+        "status": 422,
+        "content_type": "application/json",
+        "body": "{\"message\":\"The connection token field is required.\",\"errors\":{\"connection_token\":[\"The connection token field is required.\"]}}",
+        "writes": [],
+        "logs": [],
+        "http": [],
+        "db": {
+            "brands": [
+                {
+                    "affiliate_tag": null,
+                    "affiliate_url_template": null,
+                    "connection_token": "<token>",
+                    "cost": 0,
+                    "created_at": "<ts>",
+                    "customer_service": 0,
+                    "id": 1,
+                    "is_active": 1,
+                    "is_demo": 0,
+                    "name": "Char Lab",
+                    "packaging": 0,
+                    "quality": 0,
+                    "rating_average": 0,
+                    "rating_count": 0,
+                    "shipping_time": 0,
+                    "slug": "char-lab",
+                    "updated_at": "<ts>",
+                    "user_id": null
+                }
+            ],
+            "vendor_settings": [
+                {
+                    "api_platform": "manual",
+                    "approval_status": "approved",
+                    "brand_id": 1,
+                    "id": 1,
+                    "status": 1
+                }
+            ],
+            "scraping_configs": []
+        }
+    }
+}
