@@ -81,13 +81,26 @@
         if (empty($seoOgImage)) $seoOgImage = $defaultOgImage;
         $seoOgImage = \App\Support\OgImageUrl::fold($seoOgImage);
 
-        // Full browser title: append site name unless it's the home page OR the
-        // controller-supplied title already contains the site name (older controllers
-        // pre-appended "- Peptidemap" themselves; this prevents "…— Peptidemap — Peptidemap").
-        $titleHasSiteName = stripos($seoTitle, $siteName) !== false;
-        $fullTitle = ($seoKey === 'home' || $seoTitle === $siteName || $titleHasSiteName)
-            ? $seoTitle
-            : ($seoTitle . ' — ' . $siteName);
+        // Full browser title. Jake (Advantage Collective, 2026-11-06):
+        // "- Peptidemap" on every title ate SERP space without helping,
+        // and the Pages SEO titles the agency authors already carry
+        // whatever brand reference they want. Policy now:
+        //   - Homepage: title is the site name.
+        //   - Every other page: use the controller/Pages-SEO title AS-IS
+        //     and strip any trailing " — Peptidemap" / " - Peptidemap"
+        //     / " | Peptidemap" that legacy controllers pre-appended.
+        if ($seoKey === 'home' || $seoTitle === $siteName) {
+            $fullTitle = $seoTitle;
+        } else {
+            $fullTitle = preg_replace(
+                '/\s*[—\-|]\s*' . preg_quote($siteName, '/') . '\s*$/u',
+                '',
+                $seoTitle
+            );
+            if (empty(trim((string) $fullTitle))) {
+                $fullTitle = $seoTitle;
+            }
+        }
 
         // SSR H1 — emitted into <body> before @inertia so bots (and Bing / DDG /
         // LLM crawlers that don't run JS) see a real heading in the initial HTML.
