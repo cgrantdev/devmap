@@ -27,12 +27,7 @@ use Illuminate\Console\Command;
  */
 class SyncExternalProductImages extends Command
 {
-    protected $signature = 'products:sync-external-images
-        {--limit=500 : Max products to process per run}
-        {--brand= : Only sync one brand (slug) — useful for backfilling a
-                   single vendor like bioedge-research-labs}
-        {--force : Re-fetch even if mirrored_image_url already set}
-        {--dry-run : Report what would change without writing}';
+    protected $signature = 'products:sync-external-images {--limit=500} {--brand=} {--force} {--dry-run}';
 
     protected $description = 'Mirror vendor product images onto our own storage so hotlink-protected hosts do not break the catalog grid.';
 
