@@ -72,6 +72,15 @@ class DevConsoleController extends Controller
             'label' => 'Set seo_og_image + hero image on blogs/encyclopedia missing one',
             'args' => ['--dry-run' => true],
         ],
+        'products:sync-external-images' => [
+            'label' => 'Mirror vendor product images onto our own /storage (fixes hotlink-blocked vendors like Bioedge, Certified-Pep)',
+            'args' => [
+                '--limit' => 'int',
+                '--brand' => 'string',
+                '--force' => true,
+                '--dry-run' => true,
+            ],
+        ],
         'brands:slug-lookup' => [
             'label' => 'Show brand slugs (optional substring filter)',
             'args' => [],
