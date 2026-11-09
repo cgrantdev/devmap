@@ -61,8 +61,8 @@
   
         <!-- Price -->
         <div class="text-lg text-gray-900">
-          ${{ displayPrice }}
-        </div>        
+          {{ currencySymbol }}{{ displayPrice }}
+        </div>
       </div>
     </div>
   </template>
@@ -76,8 +76,9 @@
     imageUrl: { type: String, default: null },
     price: { type: [String, Number], default: 0 },
     discountPrice: { type: [String, Number], default: null },
-    brandName: { type: String, default: '' },    
-    to: { type: String, required: true },    
+    brandName: { type: String, default: '' },
+    to: { type: String, required: true },
+    currencySymbol: { type: String, default: '$' },
   })
   
   const hasError = ref(false)

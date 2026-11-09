@@ -43,6 +43,10 @@ class Currency
         'Luxembourg'           => ['EUR', '€'],
         'Malta'                => ['EUR', '€'],
         'Cyprus'               => ['EUR', '€'],
+        // "European Union" is used by vendors that ship from multiple EU
+        // member states (OXpeptides) and don't want to pin a single
+        // country to their profile. Treated as EUR for display.
+        'European Union'       => ['EUR', '€'],
         'Czechia'              => ['CZK', 'Kč'],
         'Poland'               => ['PLN', 'zł'],
         'Romania'              => ['RON', 'lei'],

@@ -82,7 +82,7 @@
                 <template v-if="discountedPrice">
                   <div class="flex items-baseline gap-3">
                     <span class="text-[12px] uppercase tracking-wide text-[color:var(--color-ink)] font-semibold">Retail</span>
-                    <span class="ui-mono text-xl text-[color:var(--color-ink)] line-through font-medium">${{ retailPrice }}</span>
+                    <span class="ui-mono text-xl text-[color:var(--color-ink)] line-through font-medium">{{ product.currency_symbol || '$' }}{{ retailPrice }}</span>
                   </div>
                   <div class="text-[12px] uppercase tracking-wide text-emerald-700 font-semibold mt-3 flex items-center gap-2">
                     <span>Price with code</span>
@@ -96,18 +96,18 @@
                       <svg v-else class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                     </button>
                   </div>
-                  <div class="ui-mono text-4xl font-bold text-emerald-700 leading-tight mt-1">${{ discountedPrice }}</div>
+                  <div class="ui-mono text-4xl font-bold text-emerald-700 leading-tight mt-1">{{ product.currency_symbol || '$' }}{{ discountedPrice }}</div>
                 </template>
                 <template v-else>
                   <div class="flex items-baseline gap-3">
                     <span class="ui-mono text-4xl font-bold text-[color:var(--color-ink)]">
-                      ${{ product.discount_price || product.price }}
+                      {{ product.currency_symbol || '$' }}{{ product.discount_price || product.price }}
                     </span>
                     <span
                       v-if="product.discount_price && product.discount_price < product.price"
                       class="ui-mono text-lg text-[color:var(--color-ink-subtle)] line-through"
                     >
-                      ${{ product.price }}
+                      {{ product.currency_symbol || '$' }}{{ product.price }}
                     </span>
                   </div>
                 </template>
@@ -341,7 +341,8 @@
               :image-url="relatedProduct.image_url"
               :price="relatedProduct.price"
               :discount-price="relatedProduct.discount_price"
-              :brand-name="relatedProduct.brand?.name"              
+              :brand-name="relatedProduct.brand?.name"
+              :currency-symbol="relatedProduct.currency_symbol || '$'"
               :to="relatedProduct.brand?.slug
                 ? `/product/${relatedProduct.brand.slug}/${relatedProduct.slug}/${relatedProduct.id}`
                 : `/product/${relatedProduct.slug}/${relatedProduct.id}`"

@@ -82,14 +82,14 @@
           <template v-if="discountedPrice">
             <div class="flex items-baseline gap-2">
               <span class="text-[11px] uppercase tracking-wide text-gray-700 font-semibold leading-tight">Retail</span>
-              <span class="text-base text-gray-700 line-through leading-tight">${{ displayPrice }}</span>
+              <span class="text-base text-gray-700 line-through leading-tight">{{ currencySymbol }}{{ displayPrice }}</span>
             </div>
             <div class="text-[11px] uppercase tracking-wide text-emerald-700 font-semibold mt-1.5 leading-tight">
               Price with code <span class="ui-mono">{{ effectiveCouponCode }}</span>
             </div>
-            <div class="text-xl text-emerald-700 font-bold leading-tight">${{ discountedPrice }}</div>
+            <div class="text-xl text-emerald-700 font-bold leading-tight">{{ currencySymbol }}{{ discountedPrice }}</div>
           </template>
-          <div v-else class="text-xl text-gray-900 font-semibold leading-tight">${{ displayPrice }}</div>
+          <div v-else class="text-xl text-gray-900 font-semibold leading-tight">{{ currencySymbol }}{{ displayPrice }}</div>
         </div>
       </div>
     </div>
@@ -114,6 +114,7 @@
     // Optional — when provided, renders a wishlist heart in the top-right.
     productId: { type: [Number, String], default: null },
     to: { type: String, required: true },
+    currencySymbol: { type: String, default: '$' },
   })
 
   // Color-coded format chip rendered next to the product name. Only

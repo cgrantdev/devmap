@@ -15,6 +15,7 @@ use App\Models\Deal;
 use App\Support\CatalogCrossLinks;
 use App\Support\ProductListingSeo;
 use App\Support\ProductPageSeo;
+use App\Support\ProductRowCurrency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
@@ -249,6 +250,7 @@ class ProductsController extends Controller
         $product = Product::with([
             'brand' => fn ($q) => $q->forPublic(),
             'brand.vendorSetting' => fn ($q) => $q->forPublic(),
+            'brand.vendorSetting.location:id,name',
             'location', 'types', 'puses', 'category',
         ])
             ->visible()
@@ -274,7 +276,11 @@ class ProductsController extends Controller
 
         if ($product->product_category_id) {
             // Prefer other vendors' same-compound products first.
-            $otherVendorQuery = Product::with(['brand' => fn ($q) => $q->forCard()])
+            $otherVendorQuery = Product::with([
+                    'brand' => fn ($q) => $q->forCard(),
+                    'brand.vendorSetting:brand_id,location_id',
+                    'brand.vendorSetting.location:id,name',
+                ])
                 ->visible()
                 ->where('status', 'active')
                 ->where('product_category_id', $product->product_category_id)
@@ -293,7 +299,11 @@ class ProductsController extends Controller
 
         // Top-up from same brand's other products if we still have room.
         if ($related->count() < $relatedLimit && $product->brand_id) {
-            $fill = Product::with(['brand' => fn ($q) => $q->forCard()])
+            $fill = Product::with([
+                    'brand' => fn ($q) => $q->forCard(),
+                    'brand.vendorSetting:brand_id,location_id',
+                    'brand.vendorSetting.location:id,name',
+                ])
                 ->visible()
                 ->where('status', 'active')
                 ->where('brand_id', $product->brand_id)
@@ -307,6 +317,8 @@ class ProductsController extends Controller
         }
 
         $relatedProducts = $related->map(function ($p) {
+            [$currencyCode, $currencySymbol] = ProductRowCurrency::resolve($p);
+
             return [
                 'id' => $p->id,
                 'name' => $p->display_name,
@@ -315,6 +327,8 @@ class ProductsController extends Controller
                 'image_url' => $p->image_url,
                 'price' => $p->price,
                 'discount_price' => $p->discount_price,
+                'currency_code' => $currencyCode,
+                'currency_symbol' => $currencySymbol,
                 'brand' => $p->brand ? ['name' => $p->brand->name, 'slug' => $p->brand->slug] : null,
             ];
         });
@@ -533,6 +547,8 @@ class ProductsController extends Controller
                     ?: $product->description,
                 'price' => $product->price,
                 'discount_price' => $product->discount_price,
+                'currency_code' => ProductRowCurrency::resolve($product)[0],
+                'currency_symbol' => ProductRowCurrency::resolve($product)[1],
                 'size_mg' => $product->size_mg,
                 'availability' => $product->availability,
                 'verified' => $product->verified,
@@ -611,6 +627,11 @@ class ProductsController extends Controller
         $query = Product::with([
                 'brand' => fn ($q) => $q->forCard(),
                 'brand.vendorSetting' => fn ($q) => $q->forCard(),
+                // Needed for ProductRowCurrency::tag() — maps the
+                // brand's HQ country to a currency symbol so a non-US
+                // vendor's prices render in their own currency instead
+                // of defaulting to USD.
+                'brand.vendorSetting.location:id,name',
                 'location', 'types', 'puses', 'category',
             ])
             ->visible()
@@ -756,7 +777,9 @@ class ProductsController extends Controller
         if ($perPage < 1 || $perPage > 1000) {
             $perPage = 1000;
         }
-        $products = $query->paginate($perPage)->withQueryString();
+        $products = $query->paginate($perPage)
+            ->withQueryString()
+            ->through(fn ($p) => ProductRowCurrency::tag($p));
 
         // Get filter options for this category
         $baseQuery = Product::visible()
@@ -892,6 +915,7 @@ class ProductsController extends Controller
         $query = Product::with([
                 'brand' => fn ($q) => $q->forCard(),
                 'brand.vendorSetting' => fn ($q) => $q->forCard(),
+                'brand.vendorSetting.location:id,name',
                 'location', 'types', 'puses', 'category',
             ])
             ->visible()
@@ -985,7 +1009,9 @@ class ProductsController extends Controller
         if ($perPage < 1 || $perPage > 1000) {
             $perPage = 12;
         }
-        $products = $query->paginate($perPage)->withQueryString();
+        $products = $query->paginate($perPage)
+            ->withQueryString()
+            ->through(fn ($p) => ProductRowCurrency::tag($p));
 
         // Get filter options for this brand
         $baseQuery = Product::visible()

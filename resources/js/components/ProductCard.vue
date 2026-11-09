@@ -53,14 +53,14 @@
       <div class="mt-2 mb-2 h-[60px] flex flex-col justify-end">
         <template v-if="discountedPrice">
           <div class="flex items-baseline gap-2 flex-wrap">
-            <span class="text-lg font-bold text-emerald-700 leading-none">${{ discountedPrice }}</span>
-            <span class="text-[12px] text-gray-400 line-through leading-none">${{ displayPrice }}</span>
+            <span class="text-lg font-bold text-emerald-700 leading-none">{{ currencySymbol }}{{ discountedPrice }}</span>
+            <span class="text-[12px] text-gray-400 line-through leading-none">{{ currencySymbol }}{{ displayPrice }}</span>
           </div>
           <div class="text-[10px] uppercase tracking-wide text-emerald-700 font-semibold mt-1 leading-none">
             with code <span class="ui-mono">{{ effectiveCouponCode }}</span>
           </div>
         </template>
-        <div v-else class="text-lg font-bold text-gray-900 leading-none">${{ displayPrice }}</div>
+        <div v-else class="text-lg font-bold text-gray-900 leading-none">{{ currencySymbol }}{{ displayPrice }}</div>
       </div>
 
       <button
@@ -94,6 +94,10 @@ const props = defineProps({
   productType: { type: String, default: null },
   brandDiscountPercent: { type: [String, Number], default: null },
   brandCouponCode: { type: String, default: null },
+  // Resolved from the vendor's HQ country on the backend
+  // (ProductRowCurrency). Defaults to USD when the backend didn't
+  // attach one — same behavior as before this prop existed.
+  currencySymbol: { type: String, default: '$' },
 })
 
 // Color-coded format chip shown next to the product name. Only Capsule

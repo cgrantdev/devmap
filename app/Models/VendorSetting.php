@@ -189,6 +189,12 @@ class VendorSetting extends Model
     public const CARD_COLUMNS = [
         'id',
         'brand_id',
+        // Needed for ProductRowCurrency so a non-US vendor's product
+        // cards render in the vendor's own currency symbol instead of
+        // defaulting to '$'. Eager loads of brand.vendorSetting.location
+        // join on this column — omitting it leaves Location null and
+        // every price falls back to USD.
+        'location_id',
         'coupon_code',
         'coupon_discount_percent',
     ];

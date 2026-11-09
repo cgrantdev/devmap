@@ -262,6 +262,7 @@
                   :product-type="product.product_type"
                   :brand-discount-percent="product.brand_discount_percent"
                   :brand-coupon-code="product.brand_coupon_code"
+                  :currency-symbol="product.currency_symbol || '$'"
                   :to="`/product/${product.slug}/${product.id}`"
                 />
               </div>
