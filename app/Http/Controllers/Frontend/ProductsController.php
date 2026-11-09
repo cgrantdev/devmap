@@ -1178,11 +1178,13 @@ class ProductsController extends Controller
             '@type' => 'ItemList',
             'name' => "Products from {$brand->name}",
             'numberOfItems' => $products->total(),
+            // After ProductRowCurrency::tag() runs via ->through(), items
+            // are arrays, not Product models — access with [] not ->.
             'itemListElement' => collect($products->items())->take(20)->values()->map(fn ($p, $i) => [
                 '@type' => 'ListItem',
                 'position' => $i + 1,
-                'url' => url("/product/{$p->slug}/{$p->id}"),
-                'name' => $p->display_name,
+                'url' => url("/product/{$p['slug']}/{$p['id']}"),
+                'name' => $p['display_name'] ?? $p['name'] ?? '',
             ])->all(),
         ];
 
