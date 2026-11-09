@@ -63,6 +63,7 @@ class SyncExternalProductImages extends Command
         $ok = 0;
         $fail = 0;
         $skipped = 0;
+        $reasonCounts = [];
         $this->info('Candidates: '.$todo->count());
 
         foreach ($todo as $p) {
@@ -74,10 +75,14 @@ class SyncExternalProductImages extends Command
                 continue;
             }
 
-            $mirrored = ImageHelper::fetchAndStoreExternal($source);
+            $diag = null;
+            $mirrored = ImageHelper::fetchAndStoreExternal($source, 'vendor-mirror', 82, 12, $diag);
             if (!$mirrored) {
                 $fail++;
-                $this->line('<fg=red>FAIL</> #'.$p->id.' '.$source);
+                $reason = $diag['reason'] ?? 'unknown';
+                $status = $diag['status'] ? ' ('.$diag['status'].')' : '';
+                $reasonCounts[$reason] = ($reasonCounts[$reason] ?? 0) + 1;
+                $this->line('<fg=red>FAIL</> #'.$p->id.' ['.$reason.$status.'] '.$source);
                 continue;
             }
 
@@ -93,6 +98,13 @@ class SyncExternalProductImages extends Command
 
         $this->newLine();
         $this->info("mirrored: {$ok}  skipped: {$skipped}  failed: {$fail}");
+        if ($reasonCounts) {
+            arsort($reasonCounts);
+            $this->line('Failure breakdown:');
+            foreach ($reasonCounts as $r => $n) {
+                $this->line("  {$r}: {$n}");
+            }
+        }
         return self::SUCCESS;
     }
 }

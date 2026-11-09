@@ -170,51 +170,63 @@ class ImageHelper
         string $url,
         string $directory = 'vendor-mirror',
         int $quality = 82,
-        int $timeoutSeconds = 12
+        int $timeoutSeconds = 12,
+        ?array &$diagnostic = null
     ): ?string {
+        $diagnostic = ['reason' => null, 'status' => null];
+
         if (!function_exists('imagewebp')) {
+            $diagnostic['reason'] = 'no-gd-webp';
             return null;
         }
         if (self::isStockPlaceholder($url)) {
+            $diagnostic['reason'] = 'stock-placeholder';
             return null;
         }
         if (!preg_match('#^https?://#i', $url)) {
+            $diagnostic['reason'] = 'invalid-scheme';
             return null;
         }
 
         $filename = sha1($url).'.webp';
         $diskPath = $directory.'/'.$filename;
         if (Storage::disk('public')->exists($diskPath)) {
+            $diagnostic['reason'] = 'cache-hit';
             return Storage::url($diskPath);
         }
 
-        // Server-side fetch — no browser Referer, but we set a plausible
-        // User-Agent so vendors that block default curl UAs still answer.
-        $ctx = stream_context_create([
-            'http' => [
-                'timeout' => $timeoutSeconds,
-                'header'  => "User-Agent: Mozilla/5.0 (compatible; PeptidemapBot/1.0; +https://peptidemap.com/robots)\r\n"
-                            . "Referer: https://peptidemap.com/\r\n",
-                'ignore_errors' => true,
-            ],
-            'ssl' => [
-                'verify_peer' => true,
-                'verify_peer_name' => true,
-            ],
-        ]);
-        $bytes = @file_get_contents($url, false, $ctx);
-        if (!$bytes) {
+        // Honest UA. Vendors blocking on IP will still 403; the
+        // diagnostic surfaces the status so Colin knows whether to ask
+        // them to whitelist peptidemap.com's server IP.
+        try {
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                    'User-Agent'      => 'PeptidemapBot/1.0 (+https://peptidemap.com/robots)',
+                    'Accept'          => 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+                    'Referer'         => 'https://peptidemap.com/',
+                ])
+                ->withOptions(['allow_redirects' => true, 'verify' => true])
+                ->timeout($timeoutSeconds)
+                ->get($url);
+        } catch (\Throwable $e) {
+            $diagnostic['reason'] = 'http-exception';
             return null;
         }
-        // Check response status — @file_get_contents returns false on hard
-        // errors but a 403/404 body comes through as a string. $http_response_header
-        // is populated by the stream wrapper and gives the status line.
-        if (isset($http_response_header[0]) && !str_contains($http_response_header[0], ' 200 ')) {
+
+        $diagnostic['status'] = $response->status();
+        if (!$response->ok()) {
+            $diagnostic['reason'] = 'http-'.$response->status();
+            return null;
+        }
+
+        $bytes = $response->body();
+        if (strlen($bytes) < 128) {
+            $diagnostic['reason'] = 'empty-body';
             return null;
         }
 
         $image = @imagecreatefromstring($bytes);
         if (!$image) {
+            $diagnostic['reason'] = 'decode-failed';
             return null;
         }
 
@@ -223,9 +235,11 @@ class ImageHelper
         $ok = imagewebp($image, $absPath, $quality);
         imagedestroy($image);
         if (!$ok) {
+            $diagnostic['reason'] = 'webp-encode-failed';
             return null;
         }
 
+        $diagnostic['reason'] = 'ok';
         return Storage::url($diskPath);
     }
 
