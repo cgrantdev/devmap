@@ -47,6 +47,8 @@ class Product extends Model
         'rating_average',
         'rating_count',
         'image_url',
+        'mirrored_image_url',
+        'mirrored_image_at',
         'product_url',
         'auto_scraped',
         'last_scraped_at',

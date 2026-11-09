@@ -56,6 +56,16 @@ class ProductRowCurrency
         $row['currency_code'] = $code;
         $row['currency_symbol'] = $symbol;
 
+        // Prefer the locally-mirrored image when we have one, falling back
+        // to the vendor's own URL otherwise. Vendors (Bioedge, Certified-Pep)
+        // run hotlink / geo / UA firewalls that 403 cross-origin requests
+        // from some viewer networks, so hotlinking is unreliable. The mirror
+        // lives on /storage/vendor-mirror and is populated by
+        // products:sync-external-images.
+        if (!empty($row['mirrored_image_url'])) {
+            $row['image_url'] = $row['mirrored_image_url'];
+        }
+
         return $row;
     }
 }

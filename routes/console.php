@@ -14,6 +14,17 @@ Schedule::command('scraping:run-scheduled')
     ->withoutOverlapping()
     ->runInBackground();
 
+// Mirror vendor product images onto our own storage. Vendors (Bioedge,
+// Certified-Pep) 403 the browser's cross-origin <img> loads via
+// WordPress hotlink protection + IP/UA firewall rules, so hotlinked
+// images render as broken fallbacks on some viewer networks. Hourly
+// run picks up anything new from the scraper within the hour; limit
+// keeps a single run bounded so network stalls never cascade.
+Schedule::command('products:sync-external-images --limit=200')
+    ->hourly()
+    ->withoutOverlapping()
+    ->runInBackground();
+
 // Weekly growth digest to Discord — every Monday 09:00 UTC (04:00 ET / 01:00 PT).
 // Pulls from GrowthMetrics service; posts a summary card to the growth channel.
 Schedule::command('growth:digest')

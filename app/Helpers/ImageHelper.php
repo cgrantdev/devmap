@@ -152,6 +152,84 @@ class ImageHelper
     }
 
     /**
+     * Fetch an external image URL server-side and store it on our public
+     * disk as a WebP. Returns the public URL (served through /storage/…)
+     * or null on any failure (network error, 403 hotlink block, invalid
+     * image, GD without WebP support).
+     *
+     * Filename is content-addressed (sha1 of the source URL) so re-fetches
+     * are idempotent and cache-hit instantly. Already-present files are
+     * returned without re-downloading.
+     *
+     * Intended for mirroring vendor product imagery so the catalog never
+     * breaks when a vendor rewrites their CDN, turns on hotlink protection,
+     * or goes offline (Bioedge, Certified-Pep both block us at the origin
+     * as of 2026-11).
+     */
+    public static function fetchAndStoreExternal(
+        string $url,
+        string $directory = 'vendor-mirror',
+        int $quality = 82,
+        int $timeoutSeconds = 12
+    ): ?string {
+        if (!function_exists('imagewebp')) {
+            return null;
+        }
+        if (self::isStockPlaceholder($url)) {
+            return null;
+        }
+        if (!preg_match('#^https?://#i', $url)) {
+            return null;
+        }
+
+        $filename = sha1($url).'.webp';
+        $diskPath = $directory.'/'.$filename;
+        if (Storage::disk('public')->exists($diskPath)) {
+            return Storage::url($diskPath);
+        }
+
+        // Server-side fetch — no browser Referer, but we set a plausible
+        // User-Agent so vendors that block default curl UAs still answer.
+        $ctx = stream_context_create([
+            'http' => [
+                'timeout' => $timeoutSeconds,
+                'header'  => "User-Agent: Mozilla/5.0 (compatible; PeptidemapBot/1.0; +https://peptidemap.com/robots)\r\n"
+                            . "Referer: https://peptidemap.com/\r\n",
+                'ignore_errors' => true,
+            ],
+            'ssl' => [
+                'verify_peer' => true,
+                'verify_peer_name' => true,
+            ],
+        ]);
+        $bytes = @file_get_contents($url, false, $ctx);
+        if (!$bytes) {
+            return null;
+        }
+        // Check response status — @file_get_contents returns false on hard
+        // errors but a 403/404 body comes through as a string. $http_response_header
+        // is populated by the stream wrapper and gives the status line.
+        if (isset($http_response_header[0]) && !str_contains($http_response_header[0], ' 200 ')) {
+            return null;
+        }
+
+        $image = @imagecreatefromstring($bytes);
+        if (!$image) {
+            return null;
+        }
+
+        Storage::disk('public')->makeDirectory($directory);
+        $absPath = storage_path('app/public/'.$diskPath);
+        $ok = imagewebp($image, $absPath, $quality);
+        imagedestroy($image);
+        if (!$ok) {
+            return null;
+        }
+
+        return Storage::url($diskPath);
+    }
+
+    /**
      * Hotlinked lorem/stock CDNs are not listing art. Callers should omit
      * the image instead of rendering these.
      */
