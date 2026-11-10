@@ -37,6 +37,7 @@
           <NavItem href="/admin/seo/brands" icon="store" label="Brand SEO" />
           <NavItem href="/admin/seo/products" icon="package" label="Product SEO" />
           <NavItem href="/admin/seo/categories" icon="layers" label="Compound SEO" />
+          <NavItem href="/admin/seo/calculators" icon="file" label="Calculator SEO" />
           <NavItem href="/admin/seo/pages" icon="file" label="Pages SEO" />
           <NavItem href="/admin/redirects" icon="refresh" label="Redirects" />
           <NavItem href="/admin/content-scanner" icon="search" label="Content Scanner" />

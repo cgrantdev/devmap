@@ -200,6 +200,21 @@ $calculatorRenderer = function (?string $compoundSlug = null) {
         $compound = \App\Support\CalculatorPresets::compoundName($preset);
         $defaultTitle = "{$compound} Reconstitution Calculator — Dose, BAC Water & Syringe Units";
         $defaultDescription = "Free {$compound} calculator preloaded with the {$preset['name']} preset ({$preset['mg']}mg vial, {$preset['water']}mL BAC water, {$preset['dose']}mcg aliquot). Reconstitution, dosage and schedule modes with instant insulin-syringe unit output. Shareable result. Research use only.";
+
+        // Per-preset SEO override authored by the SEO agency
+        // (/admin/seo/calculators). Prefer DB fields when present,
+        // fall back to the compound-generated defaults above.
+        $presetOverride = \App\Models\CalculatorPresetSeo::query()
+            ->where('slug', $preset['slug'])
+            ->first();
+        if ($presetOverride) {
+            if (trim((string) $presetOverride->title) !== '') {
+                $defaultTitle = $presetOverride->title;
+            }
+            if (trim((string) $presetOverride->description) !== '') {
+                $defaultDescription = $presetOverride->description;
+            }
+        }
     } else {
         // Sep 7 2026 revenue push: title targets 'best peptide calculator'
         // + 'peptide dosage calculator' commercial-intent queries. Description
@@ -494,6 +509,11 @@ Route::middleware(['auth', 'role:admin,admin_viewer,seo_agency', 'email.verified
     Route::get('/seo/categories', [\App\Http\Controllers\Admin\SeoCategoriesController::class, 'index'])->name('admin.seo.categories');
     Route::get('/seo/categories/{category}/edit', [\App\Http\Controllers\Admin\SeoCategoriesController::class, 'edit'])->name('admin.seo.categories.edit');
     Route::put('/seo/categories/{category}', [\App\Http\Controllers\Admin\SeoCategoriesController::class, 'update'])->name('admin.seo.categories.update');
+
+    // Per-preset SEO for /calculator/{slug} pages.
+    Route::get('/seo/calculators', [\App\Http\Controllers\Admin\SeoCalculatorsController::class, 'index'])->name('admin.seo.calculators');
+    Route::post('/seo/calculators/save', [\App\Http\Controllers\Admin\SeoCalculatorsController::class, 'save'])->name('admin.seo.calculators.save');
+    Route::post('/seo/calculators/import', [\App\Http\Controllers\Admin\SeoCalculatorsController::class, 'import'])->name('admin.seo.calculators.import');
 
     // Per-page analytics — GSC + internal signals for any one URL.
     // Deep-linked from the frontend AdminBar's "Analytics" button.
