@@ -21,8 +21,16 @@
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6 pb-10">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Vendor comparison</div>
         <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">
-          {{ seo.h1 || compound.name }}
+          {{ compound.custom_h1 || seo.h1 || compound.name }}
         </h1>
+        <!-- Agency-authored intro (editable at /admin/seo/categories).
+             Shared with /product/{slug}. Rendered under the H1 so it
+             gets the same SEO prominence as the page's main copy. -->
+        <div
+          v-if="compound.custom_intro"
+          class="prose prose-sm max-w-3xl mb-4 text-[color:var(--color-ink-muted)] leading-relaxed"
+          v-html="compound.custom_intro"
+        ></div>
         <div v-if="compound.alias" class="flex items-center gap-2 mb-3">
           <span class="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)]">Also known as</span>
           <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] text-[12px] font-semibold ui-mono text-[color:var(--color-ink)]">{{ compound.alias }}</span>

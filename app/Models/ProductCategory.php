@@ -21,10 +21,14 @@ class ProductCategory extends Model
         'meta_description',
         'is_active',
         'research_area',
+        'custom_h1',
+        'custom_intro_html',
+        'custom_faqs',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'custom_faqs' => 'array',
     ];
 
     protected static function boot()

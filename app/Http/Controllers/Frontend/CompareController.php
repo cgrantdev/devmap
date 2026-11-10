@@ -618,6 +618,19 @@ class CompareController extends Controller
             ];
         }
 
+        // Agency-authored custom FAQs (admin at /admin/seo/categories).
+        // Prepended so the editorial Q&A appears first in both the
+        // visible accordion and the FAQPage JSON-LD. Same source row
+        // powers the /product/{slug} FAQ block, so a single edit
+        // populates both page types.
+        $customFaqs = is_array($category->custom_faqs) ? $category->custom_faqs : [];
+        if ($customFaqs) {
+            $faqPairs = array_merge(
+                array_map(fn ($f) => ['q' => (string) ($f['q'] ?? ''), 'a' => (string) ($f['a'] ?? '')], $customFaqs),
+                $faqPairs
+            );
+        }
+
         // ItemList only when at least one listing passes the same rules as
         // the headline. An all-ineligible catalog (for example a blend
         // category) omits the list rather than emitting numberOfItems: 0.
@@ -666,10 +679,11 @@ class CompareController extends Controller
             'og_image' => $ogImage,
             'image' => $ogImage,
             'url' => url("/compare/{$slug}"),
-            // SSR H1 matches the visible Vue H1. Retatrutide uses the
-            // narrative H1; other compounds keep the bare category name.
-            // The GLP pseudonym stays on the alias chip.
-            'h1' => $h1,
+            // SSR H1 matches the visible Vue H1. Agency-authored custom_h1
+            // (via /admin/seo/categories) wins — bots see what the agency
+            // wrote. Otherwise Retatrutide uses the narrative H1 and
+            // other compounds keep the bare category name.
+            'h1' => $category->custom_h1 ?: $h1,
             'schema' => array_values(array_filter([
                 $itemList,
                 $breadcrumb,
@@ -748,6 +762,10 @@ class CompareController extends Controller
                     'link' => 'Trial context is in the encyclopedia entry.',
                 ] : null,
                 'encyclopedia_url' => $educationPost ? EncyclopediaSlug::path($category->slug) : null,
+                // Agency-authored content (admin at /admin/seo/categories).
+                // Shared with /product/{slug} via the same row.
+                'custom_h1' => $category->custom_h1 ?: null,
+                'custom_intro' => $category->custom_intro_html ?: null,
                 'product_count' => $productCount,
                 'vendor_count' => $vendorCount,
                 'cheapest_price' => $cheapest,

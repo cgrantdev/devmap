@@ -36,6 +36,7 @@
           <div class="px-3 mb-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-white/30">SEO Tools</div>
           <NavItem href="/admin/seo/brands" icon="store" label="Brand SEO" />
           <NavItem href="/admin/seo/products" icon="package" label="Product SEO" />
+          <NavItem href="/admin/seo/categories" icon="layers" label="Compound SEO" />
           <NavItem href="/admin/seo/pages" icon="file" label="Pages SEO" />
           <NavItem href="/admin/redirects" icon="refresh" label="Redirects" />
           <NavItem href="/admin/content-scanner" icon="search" label="Content Scanner" />

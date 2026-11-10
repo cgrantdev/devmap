@@ -2,14 +2,18 @@
   <ModernLayout>
     <!-- Product Listing Section -->
     <section class="bg-white">
-      <!-- Header. Compound name + inline pill row of cross-links
-           (encyclopedia, compare, calculator). Dropped the subtitle
-           ("Compare prices across listed vendors") — it was telling
-           the user the same thing the "Compare prices" pill directly
-           below already says, and stacking it with the grouped
-           label-rows made the top of the page read as cluttered. -->
+      <!-- Header. Compound name + optional agency-authored H1
+           override + inline cross-link pills. Intro paragraph is
+           admin-editable at /admin/seo/categories/{id}/edit. -->
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-8 lg:pt-12 pb-5">
-        <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-tight text-[color:var(--color-ink)]">{{ productName }}</h1>
+        <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-tight text-[color:var(--color-ink)]">
+          {{ compoundContent?.h1 || productName }}
+        </h1>
+        <div
+          v-if="compoundContent?.intro"
+          class="prose prose-sm max-w-3xl mt-4 text-[color:var(--color-ink-muted)] leading-relaxed"
+          v-html="compoundContent.intro"
+        ></div>
         <CatalogCrossLinks :groups="catalogLinks?.groups || []" />
       </div>
 
@@ -140,6 +144,24 @@
           </div>
         </div>
     </section>
+
+    <!-- Agency-authored FAQs. Visible accordion + FAQPage JSON-LD is
+         emitted server-side for Google rich results. -->
+    <section v-if="compoundContent?.faqs?.length" class="border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+      <div class="max-w-[1024px] mx-auto px-6 lg:px-10 py-12">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-3">Frequently asked</div>
+        <h2 class="ui-display text-2xl md:text-3xl font-semibold text-[color:var(--color-ink)] mb-6">{{ productName }} FAQ</h2>
+        <div class="space-y-3">
+          <details v-for="(f, i) in compoundContent.faqs" :key="i" class="group bg-white rounded-[10px] border border-[color:var(--color-hairline)] overflow-hidden">
+            <summary class="ui-focus cursor-pointer list-none p-4 flex items-center justify-between gap-3 hover:bg-[color:var(--color-hairline-soft)] transition-colors">
+              <span class="text-[15px] font-semibold text-[color:var(--color-ink)]">{{ f.q }}</span>
+              <svg class="w-4 h-4 text-[color:var(--color-ink-subtle)] flex-shrink-0 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="px-4 pb-4 text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed whitespace-pre-line">{{ f.a }}</div>
+          </details>
+        </div>
+      </div>
+    </section>
   </ModernLayout>
 </template>
 
@@ -165,6 +187,10 @@ const props = defineProps({
   catalogLinks: {
     type: Object,
     default: () => ({ groups: [] }),
+  },
+  compoundContent: {
+    type: Object,
+    default: () => ({ h1: null, intro: null, faqs: [] }),
   },
   seo: {
     type: Object,

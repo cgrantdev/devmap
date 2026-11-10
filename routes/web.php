@@ -490,6 +490,11 @@ Route::middleware(['auth', 'role:admin,admin_viewer,seo_agency', 'email.verified
     Route::get('/seo/products/{product}/edit', [\App\Http\Controllers\Admin\SeoProductsController::class, 'edit'])->name('admin.seo.products.edit');
     Route::put('/seo/products/{product}', [\App\Http\Controllers\Admin\SeoProductsController::class, 'update'])->name('admin.seo.products.update');
 
+    // Compound content editor shared by /product/{slug} + /compare/{slug}.
+    Route::get('/seo/categories', [\App\Http\Controllers\Admin\SeoCategoriesController::class, 'index'])->name('admin.seo.categories');
+    Route::get('/seo/categories/{category}/edit', [\App\Http\Controllers\Admin\SeoCategoriesController::class, 'edit'])->name('admin.seo.categories.edit');
+    Route::put('/seo/categories/{category}', [\App\Http\Controllers\Admin\SeoCategoriesController::class, 'update'])->name('admin.seo.categories.update');
+
     // Per-page analytics — GSC + internal signals for any one URL.
     // Deep-linked from the frontend AdminBar's "Analytics" button.
     Route::get('/analytics/page', [\App\Http\Controllers\Admin\PageAnalyticsController::class, 'show'])->name('admin.analytics.page');

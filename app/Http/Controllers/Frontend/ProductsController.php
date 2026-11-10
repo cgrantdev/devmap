@@ -861,6 +861,34 @@ class ProductsController extends Controller
         if ($seoH1 !== null) {
             $seo['h1'] = $seoH1;
         }
+
+        // Agency-authored content for this compound. Shared by
+        // /product/{slug} + /compare/{slug} via product_categories.
+        // When set, custom_h1 overrides the SSR H1 so bots see the
+        // agency's wording verbatim; custom_faqs emits a FAQPage
+        // schema so Google can surface the Q&A as a rich result.
+        $compoundContent = [
+            'h1'    => $category->custom_h1 ?: null,
+            'intro' => $category->custom_intro_html ?: null,
+            'faqs'  => is_array($category->custom_faqs) ? array_values($category->custom_faqs) : [],
+        ];
+        if ($compoundContent['h1']) {
+            $seo['h1'] = $compoundContent['h1'];
+        }
+        if (!empty($compoundContent['faqs'])) {
+            $seo['schema'] = array_merge($seo['schema'] ?? [], [[
+                '@context' => 'https://schema.org',
+                '@type' => 'FAQPage',
+                'mainEntity' => array_map(fn ($f) => [
+                    '@type' => 'Question',
+                    'name' => $f['q'] ?? '',
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => $f['a'] ?? '',
+                    ],
+                ], $compoundContent['faqs']),
+            ]]);
+        }
         // uncategorized and stored slugs the /product/{slug} route cannot
         // treat as one segment stay out of the index. A slug containing
         // "/" never reaches this action. Titles and metas are unchanged.
@@ -900,6 +928,7 @@ class ProductsController extends Controller
             'catalogLinks' => CatalogCrossLinks::share(
                 CatalogCrossLinks::forCategory($category, ['encyclopedia', 'compare', 'calculator'])
             ),
+            'compoundContent' => $compoundContent,
             'seo' => $seo,
         ]);
     }
