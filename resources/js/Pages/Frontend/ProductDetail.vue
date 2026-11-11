@@ -358,6 +358,7 @@
 import { ref, computed, watchEffect } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 import { withSrc } from '@/composables/useOutbound'
 import ProductSimpleDetailCard from '@/components/ProductSimpleDetailCard.vue'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
@@ -431,15 +432,19 @@ const productTypeChip = computed(() => {
 
 // Computed values for reactive SEO updates (automatically from product data)
 const title = computed(() => {
-  // Use SEO title if provided, otherwise generate from product name
-  if (props.seo?.title) {
-    return props.seo.title
-  }
   const siteName = page.props.site_name || 'Peptidemap'
+  if (props.seo?.title) {
+    return stripSiteSuffix(props.seo.title, siteName)
+  }
   const vendorName = props.brand?.name || ''
   const productName = props.product?.name || 'Product'
-  const withVendor = vendorName ? `${productName} — ${vendorName} Listing — ${siteName}` : `${productName} Listing — ${siteName}`
-  if (withVendor.length <= 60) return withVendor
+  // Build the candidate titles WITHOUT the " — Peptidemap" tail — Jake/Ashton:
+  // the suffix eats SERP real estate and the product title already names the
+  // compound and vendor, so the brand is redundant. Keep the length-fallback
+  // logic: prefer "{compound} — {vendor} Listing" when it fits, drop "Listing"
+  // if still too long, drop the vendor last.
+  const withVendorFull = vendorName ? `${productName} — ${vendorName} Listing` : `${productName} Listing`
+  if (withVendorFull.length <= 60) return withVendorFull
   const shorter = vendorName ? `${productName} — ${vendorName}` : productName
   return shorter.length <= 60 ? shorter : productName
 })

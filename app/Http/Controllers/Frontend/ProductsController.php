@@ -934,6 +934,61 @@ class ProductsController extends Controller
             $seoH1 = $category->name;
         }
 
+        // Breadcrumb + ItemList schema parity with /compare/{slug}
+        // (Ashton 11/11: the Peptides page had no product / list / breadcrumb
+        // schema, so Google saw /compare/{slug} as the schema-rich sibling
+        // and the two pages competed instead of owning their own intents).
+        // Breadcrumb is always emitted; ItemList only when we have products
+        // to list, mirroring CompareController's gate.
+        $breadcrumbSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home',     'item' => url('/')],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Peptides', 'item' => url('/products')],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $category->name, 'item' => $categoryUrl],
+            ],
+        ];
+        $pageSchemas = [$breadcrumbSchema];
+        $itemsForSchema = method_exists($products, 'items') ? $products->items() : [];
+        if (!empty($itemsForSchema)) {
+            $pageSchemas[] = [
+                '@context' => 'https://schema.org',
+                '@type' => 'ItemList',
+                'name' => $category->name . ' — vendor listings',
+                'numberOfItems' => count($itemsForSchema),
+                'itemListElement' => array_values(array_map(function ($p, $i) use ($category) {
+                    $row = is_array($p) ? $p : (array) $p;
+                    $brandName = $row['brand']['name'] ?? ($row['brand_name'] ?? null);
+                    $brandSlug = $row['brand']['slug'] ?? ($row['brand_slug'] ?? null);
+                    $prodSlug = $row['slug'] ?? '';
+                    $prodId = $row['id'] ?? null;
+                    $prodUrl = ($brandSlug && $prodSlug && $prodId)
+                        ? url("/product/{$brandSlug}/{$prodSlug}/{$prodId}")
+                        : null;
+                    return [
+                        '@type' => 'ListItem',
+                        'position' => $i + 1,
+                        'item' => array_filter([
+                            '@type' => 'Product',
+                            'name' => $row['name'] ?? ($category->name),
+                            'url' => $prodUrl,
+                            'category' => $category->name,
+                            'brand' => $brandName ? ['@type' => 'Brand', 'name' => $brandName] : null,
+                            'offers' => isset($row['price']) && $row['price'] !== null ? [
+                                '@type' => 'Offer',
+                                'price' => (string) $row['price'],
+                                'priceCurrency' => $row['currency_code'] ?? 'USD',
+                                'availability' => 'https://schema.org/InStock',
+                                'url' => $prodUrl,
+                                'seller' => $brandName ? ['@type' => 'Organization', 'name' => $brandName] : null,
+                            ] : null,
+                        ]),
+                    ];
+                }, array_slice($itemsForSchema, 0, 30), array_keys(array_slice($itemsForSchema, 0, 30)))),
+            ];
+        }
+
         // Build SEO array (same format as other pages)
         $seo = [
             'key' => 'product-listing',
@@ -946,6 +1001,7 @@ class ProductsController extends Controller
             'image' => $categoryImage,
             'url' => $categoryUrl,
             'canonical' => $categoryUrl,
+            'schema' => $pageSchemas,
         ];
         if ($seoH1 !== null) {
             $seo['h1'] = $seoH1;

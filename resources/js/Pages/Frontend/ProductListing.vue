@@ -171,6 +171,7 @@ import { ref, computed, onMounted, nextTick, watch, h, watchEffect } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 import ProductCard from '@/components/ProductCard.vue'
 import MainButton from '@/components/MainButton.vue'
 import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
@@ -213,12 +214,14 @@ const page = usePage()
 
 // Computed values for reactive SEO updates (automatically from category data)
 const title = computed(() => {
-  // Use SEO title if provided, otherwise generate from category name
-  if (props.seo?.title) {
-    return props.seo.title
-  }
   const siteName = page.props.site_name || 'Peptidemap'
-  return `${props.productName || props.category?.name || 'Products'} – ${siteName}`
+  // Strip the " — Peptidemap" suffix on the client too, matching the
+  // SSR strip in app.blade.php. Ashton 11/11: the tail was reappearing
+  // after Vue hydrated and overwrote the server-rendered <title>.
+  if (props.seo?.title) {
+    return stripSiteSuffix(props.seo.title, siteName)
+  }
+  return stripSiteSuffix(`${props.productName || props.category?.name || 'Products'} – ${siteName}`, siteName)
 })
 
 const description = computed(() => {

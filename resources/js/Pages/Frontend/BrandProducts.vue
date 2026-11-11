@@ -991,6 +991,7 @@ import { ref, computed, onMounted, nextTick, h, defineComponent, watchEffect } f
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 import InlineEditField from '@/components/InlineEditField.vue'
 import { USP_OPTIONS } from '@/data/uspOptions'
 import { humanize as humanizeHours, daysList as hoursDaysList, openStatus } from '@/composables/useBusinessHours'
@@ -1118,12 +1119,11 @@ const registerHref = computed(() => `/register?redirect=${encodeURIComponent(rev
 
 // Computed values for reactive SEO updates (automatically from vendor data)
 const title = computed(() => {
-  // Use SEO title if provided, otherwise generate from vendor name
-  if (props.seo?.title) {
-    return props.seo.title
-  }
   const siteName = page.props.site_name || 'PeptideMap'
-  return `${props.brand?.name || 'Vendor'}: Coupon Codes & Reviews - ${siteName}`
+  if (props.seo?.title) {
+    return stripSiteSuffix(props.seo.title, siteName)
+  }
+  return stripSiteSuffix(`${props.brand?.name || 'Vendor'}: Coupon Codes & Reviews - ${siteName}`, siteName)
 })
 
 const description = computed(() => {

@@ -110,6 +110,7 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import CategoryCard from '@/components/CategoryCard.vue'
 import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 import BlogPostCard from '@/components/BlogPostCard.vue'
 import MainButton from '@/components/MainButton.vue'
 
@@ -138,7 +139,7 @@ const page = usePage()
 const title = computed(() => {
   const baseTitle = props.seo?.title || 'Peptides - Browse All Products'
   const siteName = page.props.site_name || 'Peptidemap'
-  return `${baseTitle} - ${siteName}`
+  return stripSiteSuffix(`${baseTitle} - ${siteName}`, siteName)
 })
 
 const description = computed(() => {
