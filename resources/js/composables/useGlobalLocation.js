@@ -43,6 +43,34 @@ function initial() {
 
 const location = ref(initial())
 
+// On first load, mirror whatever initial() resolved to into the cookie.
+// Watchers only fire on change, so for users whose localStorage was set
+// before the cookie-based middleware shipped, the cookie would otherwise
+// stay empty until they re-picked a country — and until that happened,
+// the server-side filter never kicked in on internal link navigations.
+//
+// When we DO migrate from localStorage-only → cookie, the current page
+// was already rendered server-side without the cookie, so a one-off
+// Inertia reload is needed to apply the filter in place. Guard via
+// sessionStorage so this fires once per tab, never in a loop.
+if (typeof document !== 'undefined' && location.value && !readCookie(COOKIE_NAME)) {
+  writeCookie(COOKIE_NAME, location.value)
+  try {
+    const migrationFlag = 'pmap.location.cookie-migrated'
+    if (!window.sessionStorage.getItem(migrationFlag)) {
+      window.sessionStorage.setItem(migrationFlag, '1')
+      // Defer so Inertia's router has mounted before we visit().
+      queueMicrotask(() => {
+        router.visit(window.location.pathname + window.location.search + window.location.hash, {
+          preserveScroll: true,
+          preserveState: false,
+          replace: true,
+        })
+      })
+    }
+  } catch {}
+}
+
 watch(location, (val) => {
   try {
     if (val) window.localStorage.setItem(LOCATION_KEY, val)
