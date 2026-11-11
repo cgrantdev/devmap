@@ -18,6 +18,7 @@
       </div>
 
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pb-8">
+        <LocationFilterChip />
         <!-- Sort + Dosage + Search bar -->
         <div class="flex flex-wrap items-center gap-3 mb-6">
           <!-- Search -->
@@ -169,6 +170,7 @@
 import { ref, computed, onMounted, nextTick, watch, h, watchEffect } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import MainButton from '@/components/MainButton.vue'
 import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'

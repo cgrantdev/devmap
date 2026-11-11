@@ -31,6 +31,8 @@
       </div>
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
 
+        <LocationFilterChip />
+
         <!-- Search Bar -->
         <div class="bg-white rounded-[14px] shadow-[var(--shadow-sm)] border border-[color:var(--color-hairline)] p-5 mb-4">
           <div class="relative">
@@ -101,6 +103,7 @@ import { ref, computed, onMounted, nextTick, watchEffect } from 'vue'
 import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import CategoryCard from '@/components/CategoryCard.vue'
+import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
 import BlogPostCard from '@/components/BlogPostCard.vue'
 import MainButton from '@/components/MainButton.vue'
 

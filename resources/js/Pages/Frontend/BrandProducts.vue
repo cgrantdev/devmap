@@ -213,6 +213,7 @@
           <!-- Left Main Content Area -->
           <div class="lg:col-span-3 space-y-6">
             <section>
+              <LocationFilterChip />
               <!-- Products header + search -->
               <div class="flex items-center justify-between mb-4">
                 <h2 class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Products <span class="ui-mono">({{ products.total }})</span></h2>
@@ -989,6 +990,7 @@
 import { ref, computed, onMounted, nextTick, h, defineComponent, watchEffect } from 'vue'
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
 import InlineEditField from '@/components/InlineEditField.vue'
 import { USP_OPTIONS } from '@/data/uspOptions'
 import { humanize as humanizeHours, daysList as hoursDaysList, openStatus } from '@/composables/useBusinessHours'
