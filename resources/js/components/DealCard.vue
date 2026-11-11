@@ -77,6 +77,11 @@
             {{ code }}
           </button>
         </div>
+        <a
+          :href="`/coupon/${slug}`"
+          @click.stop
+          class="block mt-2 text-[11px] text-center font-semibold text-emerald-700 hover:text-emerald-900"
+        >See full deal &rarr;</a>
       </div>
     </div>
   </div>
