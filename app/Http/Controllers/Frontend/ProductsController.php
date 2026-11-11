@@ -25,6 +25,8 @@ use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class ProductsController extends Controller
 {
+    // Touch-only change to force Forge to rewrite this file on deploy —
+    // server reports parse error on identical-MD5 file; forcing disk write.
     /**
      * Full product <title>, already including " — Peptidemap". Long names
      * fall back to a shorter pattern inside ProductPageSeo. The meta names
