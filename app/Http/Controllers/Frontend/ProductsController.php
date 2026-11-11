@@ -76,6 +76,30 @@ class ProductsController extends Controller
     }
 
     /**
+     * Resolve a `?location=` param to a locations.id. Accepts either a
+     * numeric id or a country name (the global CountrySelector writes
+     * the raw country name into the URL via useGlobalLocation).
+     * Returns null when the value is empty, unknown, or unresolvable —
+     * callers skip the filter in that case rather than returning zero rows.
+     */
+    private function resolveLocationId($value): ?int
+    {
+        if ($value === null || $value === '' || $value === '0') return null;
+        if (is_numeric($value)) return (int) $value;
+        $name = trim((string) $value);
+        if ($name === '') return null;
+        // Case-insensitive, fallback to a normalized alias ("US" → "United States")
+        $aliases = [
+            'us' => 'United States', 'usa' => 'United States', 'u.s.' => 'United States',
+            'u.s.a.' => 'United States', 'united states of america' => 'United States',
+            'uk' => 'United Kingdom', 'great britain' => 'United Kingdom',
+            'uae' => 'United Arab Emirates',
+        ];
+        $lookup = $aliases[strtolower($name)] ?? $name;
+        return Location::whereRaw('LOWER(name) = ?', [strtolower($lookup)])->value('id');
+    }
+
+    /**
      * Safely truncate a string to a given length
      * Works without mbstring extension
      */
@@ -101,15 +125,30 @@ class ProductsController extends Controller
         }
         return substr($value, 0, $limit) . $end;
     }
-    public function index()
+    public function index(Request $request)
     {
-        // Get all active product categories with product counts
+        // The global CountrySelector drops ?location=<country-name> onto
+        // the URL. On this categories grid the filter narrows BOTH the
+        // per-category product count AND which categories render at all
+        // (a category with zero products from that country is dropped).
+        $locationId = $request->has('location') && $request->location
+            ? $this->resolveLocationId($request->location)
+            : null;
+
+        $countScope = function ($q) use ($locationId) {
+            $q->visible()->where('status', 'active');
+            if ($locationId !== null) {
+                $q->where(function ($qq) use ($locationId) {
+                    $qq->where('location_id', $locationId)
+                       ->orWhereHas('brand.vendorSetting', function ($vs) use ($locationId) {
+                           $vs->where('location_id', $locationId);
+                       });
+                });
+            }
+        };
+
         $categories = ProductCategory::where('is_active', true)
-            ->withCount([
-                'products as products_count' => function ($q) {
-                    $q->visible()->where('status', 'active');
-                }
-            ])
+            ->withCount(['products as products_count' => $countScope])
             ->having('products_count', '>', 0)
             ->orderByDesc('products_count')
             ->orderBy('name')
@@ -661,13 +700,19 @@ class ProductsController extends Controller
         }
 
         if ($request->has('location') && $request->location) {
-            // Match products by their own location or by the vendor's location (via brand vendor settings)
-            $query->where(function ($q) use ($request) {
-                $q->where('location_id', $request->location)
-                  ->orWhereHas('brand.vendorSetting', function ($vendorSettingQuery) use ($request) {
-                      $vendorSettingQuery->where('location_id', $request->location);
-                  });
-            });
+            // Accept a numeric location_id OR a location name (the global
+            // CountrySelector dumps the country name verbatim into the URL
+            // via useGlobalLocation.applyLocation — "?location=United States"
+            // etc.) Resolve names to an id once, then filter by id.
+            $locationId = $this->resolveLocationId($request->location);
+            if ($locationId !== null) {
+                $query->where(function ($q) use ($locationId) {
+                    $q->where('location_id', $locationId)
+                      ->orWhereHas('brand.vendorSetting', function ($vendorSettingQuery) use ($locationId) {
+                          $vendorSettingQuery->where('location_id', $locationId);
+                      });
+                });
+            }
         }
 
         if ($request->has('verification') && $request->verification !== '') {
@@ -814,11 +859,13 @@ class ProductsController extends Controller
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
         $categoryUrl = url('/product/'.rawurlencode($category->slug));
         
-        // Build category image URL
-        $categoryImage = null;
-        if ($category->image_url) {
-            $categoryImage = Storage::url('categories/' . $category->image_url);
-        }
+        // OG image: always serve a unique-per-compound card via the
+        // dynamic /og/compound/{slug}.png render so every /product/{slug}
+        // page has its own social preview (was falling back to the site
+        // default whenever a category didn't have a stored image_url).
+        // The ?v= version bumps when the category or its copy rev changes.
+        $ogV = ($category->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY;
+        $categoryImage = \App\Support\OgImageUrl::compound((string) $category->slug, (string) $ogV);
         
         // Slugs that fail the sitemap's route-safe check are the 8 broken
         // category rows (a slash or whitespace in the stored slug). They
@@ -975,13 +1022,15 @@ class ProductsController extends Controller
         }
 
         if ($request->has('location') && $request->location) {
-            // Match products by their own location or by the vendor's location (via brand vendor settings)
-            $query->where(function ($q) use ($request) {
-                $q->where('location_id', $request->location)
-                  ->orWhereHas('brand.vendorSetting', function ($vendorSettingQuery) use ($request) {
-                      $vendorSettingQuery->where('location_id', $request->location);
-                  });
-            });
+            $locationId = $this->resolveLocationId($request->location);
+            if ($locationId !== null) {
+                $query->where(function ($q) use ($locationId) {
+                    $q->where('location_id', $locationId)
+                      ->orWhereHas('brand.vendorSetting', function ($vendorSettingQuery) use ($locationId) {
+                          $vendorSettingQuery->where('location_id', $locationId);
+                      });
+                });
+            }
         }
 
         if ($request->has('verification') && $request->verification !== '') {

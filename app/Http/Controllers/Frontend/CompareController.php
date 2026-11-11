@@ -1224,14 +1224,20 @@ class CompareController extends Controller
             ];
         }
 
+        // Per-pair OG: render the leading compound's dynamic og.compound
+        // card so each vs page carries a distinct social preview instead
+        // of falling back to the site default. Picking the A slug keeps
+        // the pair identifiable — the B name shows in the title already.
+        $vsOgImage = \App\Support\OgImageUrl::compound((string) $aSlug, (string) \App\Support\OgImageRevision::COPY);
+
         $seo = [
             'key' => 'compare-vs',
             'title' => $seoTitle,
             'description' => $seoDescription,
             'og_title' => $seoTitle,
             'og_description' => $seoDescription,
-            'og_image' => null,
-            'image' => null,
+            'og_image' => $vsOgImage,
+            'image' => $vsOgImage,
             'url' => url("/compare/{$aSlug}-vs-{$bSlug}"),
             'h1' => $seoCopy['h1'],
             'schema' => $schema,
