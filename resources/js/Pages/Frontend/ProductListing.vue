@@ -335,7 +335,7 @@ function clearSizes() {
 }
 
 // Product Format filter — Colin PMAP Sep 30 (#13).
-const FORMAT_OPTIONS = ['Peptide', 'Capsule', 'Nasal Spray', 'Topical', 'Kit']
+const FORMAT_OPTIONS = ['Peptide', 'Capsule', 'Nasal Spray', 'Topical', 'Kit', 'Pens']
 const initialFormats = (new URLSearchParams(window.location.search).get('format') || '')
   .split(',').map(s => s.trim()).filter(Boolean)
 const selectedFormats = ref(new Set(initialFormats))
