@@ -863,12 +863,17 @@ class ProductsController extends Controller
         // Available dosage sizes for this category — string column now,
         // sort by the leading numeric token so "5mg" comes before "10mg"
         // and bare blends sort to the end naturally.
+        // Filter out junk size strings like "2vials+water+syringes" that land
+        // in size_mg at scrape time. Only clean dose patterns survive.
         $availableSizes = (clone $baseQuery)
             ->whereNotNull('size_mg')
             ->where('size_mg', '!=', '')
             ->selectRaw('DISTINCT size_mg')
             ->pluck('size_mg')
-            ->filter()
+            ->filter(function ($s) {
+                if (!is_string($s)) return false;
+                return (bool) preg_match('/^[0-9]+(?:\.[0-9]+)?\s*(?:mg|mcg|ml|iu|g|oz)?(?:\s*\/\s*[0-9]+(?:\.[0-9]+)?\s*(?:mg|mcg|ml|iu|g|oz)?)*$/i', trim($s));
+            })
             ->sortBy(fn ($s) => (float) preg_replace('/^([0-9.]+).*/', '$1', (string) $s))
             ->values();
 
