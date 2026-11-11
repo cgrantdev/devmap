@@ -69,7 +69,13 @@
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             7+ Tested
           </Link>
+          <!-- "US Made" is a vendor-manufacturing-origin filter. It
+               sits next to the Australia/Germany/etc location chip
+               when the user picks a non-US country — reads as a UX
+               contradiction (Colin 11/12). Hide it whenever the
+               active location filter is set to anywhere but the US. -->
           <Link
+            v-if="!activeNonUsLocation"
             href="/vendors?usp=us_manufactured"
             class="ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm bg-blue-50/60 text-blue-900 border-blue-200 hover:border-blue-400 hover:bg-blue-50"
           >
@@ -163,6 +169,20 @@ watchEffect(() => {
 // Hero background lazy loading
 const heroBgRef = ref(null)
 const heroBgLoaded = ref(false)
+
+// True when the top-nav CountrySelector has set a location filter
+// to anything other than the United States — used to hide the
+// "US Made" trust chip, which reads as a contradiction next to a
+// non-US location filter.
+const activeNonUsLocation = computed(() => {
+  const url = page.url || ''
+  const q = url.includes('?') ? url.split('?')[1] : ''
+  const loc = new URLSearchParams(q).get('location') || ''
+  if (!loc) return false
+  const normalized = decodeURIComponent(loc).trim().toLowerCase()
+  const usAliases = ['united states', 'usa', 'us', 'u.s.', 'u.s.a.', 'united states of america']
+  return !usAliases.includes(normalized)
+})
 
 // Search functionality
 const searchQuery = ref('')

@@ -76,27 +76,59 @@ class ProductsController extends Controller
     }
 
     /**
-     * Resolve a `?location=` param to a locations.id. Accepts either a
-     * numeric id or a country name (the global CountrySelector writes
-     * the raw country name into the URL via useGlobalLocation).
-     * Returns null when the value is empty, unknown, or unresolvable —
-     * callers skip the filter in that case rather than returning zero rows.
+     * Resolve a `?location=` param to the list of country-name aliases
+     * callers filter against. Accepts either a numeric id (resolved to
+     * the row's name) or a country name string (the global CountrySelector
+     * writes the raw country name into the URL via useGlobalLocation).
+     * Returns [] when the value is empty, unknown, or unresolvable, so
+     * callers skip the filter rather than returning zero rows.
+     *
+     * Matches the BrandsController pattern so /products filters WHERE
+     * THE VENDOR SHIPS TO (not just HQ) — Oasis Labs HQ is US but ships
+     * to AU, so ?location=Australia keeps their categories visible.
      */
-    private function resolveLocationId($value): ?int
+    private function resolveLocationAliases($value): array
     {
-        if ($value === null || $value === '' || $value === '0') return null;
-        if (is_numeric($value)) return (int) $value;
-        $name = trim((string) $value);
-        if ($name === '') return null;
-        // Case-insensitive, fallback to a normalized alias ("US" → "United States")
-        $aliases = [
-            'us' => 'United States', 'usa' => 'United States', 'u.s.' => 'United States',
-            'u.s.a.' => 'United States', 'united states of america' => 'United States',
+        if ($value === null || $value === '' || $value === '0') return [];
+        $name = is_numeric($value)
+            ? (string) (Location::whereKey((int) $value)->value('name') ?? '')
+            : trim((string) $value);
+        if ($name === '') return [];
+
+        // Canonicalize common variants to the row name used in DB.
+        $canonMap = [
+            'us' => 'United States', 'usa' => 'United States',
+            'u.s.' => 'United States', 'u.s.a.' => 'United States',
+            'united states of america' => 'United States',
             'uk' => 'United Kingdom', 'great britain' => 'United Kingdom',
             'uae' => 'United Arab Emirates',
         ];
-        $lookup = $aliases[strtolower($name)] ?? $name;
-        return Location::whereRaw('LOWER(name) = ?', [strtolower($lookup)])->value('id');
+        $canonical = $canonMap[strtolower($name)] ?? $name;
+
+        $aliases = [$canonical];
+        if (strtolower($canonical) === 'united states') {
+            $aliases = array_merge($aliases, ['USA', 'US']);
+        } elseif (strtolower($canonical) === 'united kingdom') {
+            $aliases = array_merge($aliases, ['UK', 'Great Britain']);
+        } elseif (strtolower($canonical) === 'united arab emirates') {
+            $aliases = array_merge($aliases, ['UAE']);
+        }
+        return array_values(array_unique($aliases));
+    }
+
+    /**
+     * Apply the ?location= filter to a Product query. Matches a product
+     * when ANY of: the product's own location, the brand's HQ location,
+     * or any country the brand explicitly ships to is in $aliases.
+     */
+    private function applyLocationFilter($query, array $aliases): void
+    {
+        if (empty($aliases)) return;
+        $query->where(function ($q) use ($aliases) {
+            $q->whereHas('location', fn ($lq) => $lq->whereIn('name', $aliases))
+              ->orWhereHas('brand.vendorSetting.shipsToLocations', fn ($lq) => $lq->whereIn('name', $aliases))
+              ->orWhereHas('brand.vendorSetting.location', fn ($lq) => $lq->whereIn('name', $aliases));
+        });
     }
 
     /**
@@ -131,20 +163,15 @@ class ProductsController extends Controller
         // the URL. On this categories grid the filter narrows BOTH the
         // per-category product count AND which categories render at all
         // (a category with zero products from that country is dropped).
-        $locationId = $request->has('location') && $request->location
-            ? $this->resolveLocationId($request->location)
-            : null;
+        // Match rule mirrors BrandsController: SHIPS-TO first, HQ as
+        // fallback for vendors that haven't filled their ships-to list.
+        $locationAliases = $request->has('location') && $request->location
+            ? $this->resolveLocationAliases($request->location)
+            : [];
 
-        $countScope = function ($q) use ($locationId) {
+        $countScope = function ($q) use ($locationAliases) {
             $q->visible()->where('status', 'active');
-            if ($locationId !== null) {
-                $q->where(function ($qq) use ($locationId) {
-                    $qq->where('location_id', $locationId)
-                       ->orWhereHas('brand.vendorSetting', function ($vs) use ($locationId) {
-                           $vs->where('location_id', $locationId);
-                       });
-                });
-            }
+            $this->applyLocationFilter($q, $locationAliases);
         };
 
         $categories = ProductCategory::where('is_active', true)
@@ -700,19 +727,12 @@ class ProductsController extends Controller
         }
 
         if ($request->has('location') && $request->location) {
-            // Accept a numeric location_id OR a location name (the global
-            // CountrySelector dumps the country name verbatim into the URL
-            // via useGlobalLocation.applyLocation — "?location=United States"
-            // etc.) Resolve names to an id once, then filter by id.
-            $locationId = $this->resolveLocationId($request->location);
-            if ($locationId !== null) {
-                $query->where(function ($q) use ($locationId) {
-                    $q->where('location_id', $locationId)
-                      ->orWhereHas('brand.vendorSetting', function ($vendorSettingQuery) use ($locationId) {
-                          $vendorSettingQuery->where('location_id', $locationId);
-                      });
-                });
-            }
+            // Accept a numeric id OR a country name (the global CountrySelector
+            // dumps the raw name into the URL via useGlobalLocation.applyLocation
+            // — "?location=United States" etc). Match ships-to first, HQ as
+            // fallback — mirrors BrandsController so a US-HQ vendor that ships
+            // to AU still surfaces on ?location=Australia.
+            $this->applyLocationFilter($query, $this->resolveLocationAliases($request->location));
         }
 
         if ($request->has('verification') && $request->verification !== '') {
@@ -1022,15 +1042,7 @@ class ProductsController extends Controller
         }
 
         if ($request->has('location') && $request->location) {
-            $locationId = $this->resolveLocationId($request->location);
-            if ($locationId !== null) {
-                $query->where(function ($q) use ($locationId) {
-                    $q->where('location_id', $locationId)
-                      ->orWhereHas('brand.vendorSetting', function ($vendorSettingQuery) use ($locationId) {
-                          $vendorSettingQuery->where('location_id', $locationId);
-                      });
-                });
-            }
+            $this->applyLocationFilter($query, $this->resolveLocationAliases($request->location));
         }
 
         if ($request->has('verification') && $request->verification !== '') {
