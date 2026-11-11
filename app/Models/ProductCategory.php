@@ -24,11 +24,23 @@ class ProductCategory extends Model
         'custom_h1',
         'custom_intro_html',
         'custom_faqs',
+        'products_custom_title',
+        'products_custom_meta_description',
+        'products_custom_h1',
+        'products_custom_intro_html',
+        'products_custom_faqs',
+        'compare_custom_title',
+        'compare_custom_meta_description',
+        'compare_custom_h1',
+        'compare_custom_intro_html',
+        'compare_custom_faqs',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'custom_faqs' => 'array',
+        'products_custom_faqs' => 'array',
+        'compare_custom_faqs' => 'array',
     ];
 
     protected static function boot()
