@@ -25,30 +25,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { applyLocation } from '@/composables/useGlobalLocation'
+import { computed } from 'vue'
+import { applyLocation, useGlobalLocation } from '@/composables/useGlobalLocation'
 
-// Track the current URL's query string. Inertia's page.url occasionally
-// omits the query on first render; window.location.search is authoritative.
-// Rebuild on mount AND when Inertia navigates (popstate fires on back/fwd,
-// inertia:navigate fires on SPA visits incl. applyLocation() calls).
-const search = ref('')
-function refresh() {
-  if (typeof window !== 'undefined') {
-    search.value = window.location.search || ''
-  }
-}
-
-onMounted(() => {
-  refresh()
-  window.addEventListener('popstate', refresh)
-  document.addEventListener('inertia:navigate', refresh)
-})
-
-const location = computed(() => {
-  const params = new URLSearchParams(search.value)
-  return params.get('location') || ''
-})
+// Read the active filter from the global composable — it already syncs
+// with the pmap_location cookie that the server-side middleware honors,
+// so the chip shows up on every page where the filter is in effect, not
+// just the ones with ?location=X in the URL.
+const { location: globalLocation } = useGlobalLocation()
+const location = computed(() => globalLocation.value || '')
 
 function clear() {
   applyLocation('')
