@@ -180,7 +180,7 @@ class ProductsController extends Controller
             ->orderByDesc('products_count')
             ->orderBy('name')
             ->get()
-            ->map(function ($category) {
+            ->map(function ($category) use ($locationAliases) {
                 // Priority order:
                 //  1. A product explicitly flagged is_peptide_thumb for
                 //     this category — this is the VA's deliberate pick.
@@ -189,19 +189,26 @@ class ProductsController extends Controller
                 //     from deleted uploads otherwise render as broken).
                 //  3. Any visible product in this category with an image.
                 //  4. null — Vue card renders the themed SVG placeholder.
+                //
+                // Every product query here also honors the ?location=X
+                // filter — otherwise Colin's AU view rendered Oasis-Labs
+                // branded thumbnails for categories where Oasis happens
+                // to hold the is_peptide_thumb flag but doesn't ship to
+                // the active country (11/12 catch).
                 $image = null;
 
                 // Flagged pick — but skip when the image URL is on a host
                 // we know hotlink-blocks (certified-pep serves 403 to any
                 // request without a valid Referer from their own site).
-                $flagged = Product::visible()
+                $flaggedQ = Product::visible()
                     ->where('status', 'active')
                     ->where('product_category_id', $category->id)
                     ->where('is_peptide_thumb', true)
                     ->whereNotNull('image_url')
                     ->where('image_url', '!=', '')
-                    ->where('image_url', 'not like', '%certified-pep.com%')
-                    ->first();
+                    ->where('image_url', 'not like', '%certified-pep.com%');
+                $this->applyLocationFilter($flaggedQ, $locationAliases);
+                $flagged = $flaggedQ->first();
 
                 if ($flagged) {
                     $image = $flagged->image_url;
@@ -231,27 +238,29 @@ class ProductsController extends Controller
                         '%.supabase.co%',
                         '%myoasislabs.com/wp-content/uploads/%',
                     ];
-                    $sample = Product::visible()
+                    $sampleQ = Product::visible()
                         ->where('status', 'active')
                         ->where('product_category_id', $category->id)
                         ->whereNotNull('image_url')
                         ->where('image_url', '!=', '')
                         ->where(function ($q) use ($reliablePatterns) {
                             foreach ($reliablePatterns as $p) $q->orWhere('image_url', 'like', $p);
-                        })
-                        ->first();
+                        });
+                    $this->applyLocationFilter($sampleQ, $locationAliases);
+                    $sample = $sampleQ->first();
                     // Fall back to any visible product with an image if
                     // no reliable-host match exists (e.g. small compound
                     // category where every vendor's on their own domain).
-                    // Same certified-pep exclusion applies.
+                    // Same certified-pep + location constraints.
                     if (!$sample) {
-                        $sample = Product::visible()
+                        $sampleFallbackQ = Product::visible()
                             ->where('status', 'active')
                             ->where('product_category_id', $category->id)
                             ->whereNotNull('image_url')
                             ->where('image_url', '!=', '')
-                            ->where('image_url', 'not like', '%certified-pep.com%')
-                            ->first();
+                            ->where('image_url', 'not like', '%certified-pep.com%');
+                        $this->applyLocationFilter($sampleFallbackQ, $locationAliases);
+                        $sample = $sampleFallbackQ->first();
                     }
                     $image = $sample ? $sample->image_url : null;
                 }

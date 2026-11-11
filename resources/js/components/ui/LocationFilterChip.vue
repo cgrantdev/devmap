@@ -25,18 +25,29 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { usePage } from '@inertiajs/vue3'
+import { computed, onMounted, ref } from 'vue'
 import { applyLocation } from '@/composables/useGlobalLocation'
 
-const page = usePage()
+// Track the current URL's query string. Inertia's page.url occasionally
+// omits the query on first render; window.location.search is authoritative.
+// Rebuild on mount AND when Inertia navigates (popstate fires on back/fwd,
+// inertia:navigate fires on SPA visits incl. applyLocation() calls).
+const search = ref('')
+function refresh() {
+  if (typeof window !== 'undefined') {
+    search.value = window.location.search || ''
+  }
+}
+
+onMounted(() => {
+  refresh()
+  window.addEventListener('popstate', refresh)
+  document.addEventListener('inertia:navigate', refresh)
+})
 
 const location = computed(() => {
-  const url = page.url || ''
-  const q = url.includes('?') ? url.split('?')[1] : ''
-  const params = new URLSearchParams(q)
-  const val = params.get('location')
-  return val ? decodeURIComponent(val) : ''
+  const params = new URLSearchParams(search.value)
+  return params.get('location') || ''
 })
 
 function clear() {
