@@ -17,6 +17,13 @@ import { useGlobalLocation } from '@/composables/useGlobalLocation'
 // outgoing visit URL wins (the LocationFilterChip's clear-via-applyLocation
 // path visits with no param, which this hook must NOT re-append).
 const { location: globalLocation } = useGlobalLocation()
+function shouldSkipPath(path) {
+  return path.startsWith('/admin') || path.startsWith('/api')
+    || path.startsWith('/og/') || path.startsWith('/sitemap')
+    || path.startsWith('/storage/') || path.startsWith('/build/')
+}
+
+// Inertia router hook: covers every <Link>, router.visit(), Form POST.
 router.on('before', (event) => {
   try {
     const val = globalLocation.value
@@ -26,29 +33,52 @@ router.on('before', (event) => {
     const raw = visit.url
     if (!raw) return
 
-    // visit.url may be a URL instance or a string on different Inertia
-    // builds; normalize to URL against the current origin.
     const urlObj = raw instanceof URL
       ? raw
       : new URL(String(raw), window.location.origin)
 
-    const path = urlObj.pathname
-    if (
-      path.startsWith('/admin') || path.startsWith('/api')
-      || path.startsWith('/og/') || path.startsWith('/sitemap')
-      || path.startsWith('/storage/') || path.startsWith('/build/')
-    ) return
-
-    // If the caller is deliberately clearing the location, don't
-    // sneak the param back in (applyLocation('') writes '' into
-    // globalLocation BEFORE visiting, so val is already '' by here —
-    // this `has` guard is a belt-and-suspenders for edge cases).
+    if (shouldSkipPath(urlObj.pathname)) return
     if (urlObj.searchParams.has('location')) return
 
     urlObj.searchParams.set('location', val)
     visit.url = urlObj
   } catch {}
 })
+
+// Native anchor fallback: parts of the app still use plain <a href="/…">
+// tags (CategoryCard, some legacy header links, footer rows) that
+// trigger a full browser navigation and bypass Inertia's router. Catch
+// those at click-time and rewrite the href so the filter rides along.
+if (typeof document !== 'undefined') {
+  document.addEventListener('click', (e) => {
+    try {
+      const val = globalLocation.value
+      if (!val) return
+      // Modified clicks (open in new tab, download, etc.) left alone.
+      if (e.defaultPrevented || e.button !== 0) return
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+
+      const anchor = e.target && e.target.closest ? e.target.closest('a[href]') : null
+      if (!anchor) return
+      // Inertia Link already carries data-inertia and routes through
+      // the before-hook above — leave it.
+      if (anchor.hasAttribute('data-inertia')) return
+      if (anchor.target && anchor.target !== '' && anchor.target !== '_self') return
+      if (anchor.hasAttribute('download')) return
+
+      const href = anchor.getAttribute('href') || ''
+      if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return
+
+      const urlObj = new URL(href, window.location.origin)
+      if (urlObj.origin !== window.location.origin) return
+      if (shouldSkipPath(urlObj.pathname)) return
+      if (urlObj.searchParams.has('location')) return
+
+      urlObj.searchParams.set('location', val)
+      anchor.setAttribute('href', urlObj.pathname + urlObj.search + urlObj.hash)
+    } catch {}
+  }, true) // capture-phase so we rewrite before other listeners read href
+}
 
 createInertiaApp({
   resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
