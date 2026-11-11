@@ -3,23 +3,46 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 /**
- * SEO-agency editor for compound-level content on /product/{slug} and
- * /compare/{slug}. Both routes render the same ProductCategory row, so
- * one editor covers both page types — Advantage Collective's first
- * batch is 10 compounds × 2 pages = 20 URLs (Advantage, 2026-11-11).
+ * SEO-agency editor for per-compound content on /product/{slug} (the
+ * "Peptides" page) AND /compare/{slug} (the "Compare" page).
  *
- * Writes only three columns: custom_h1, custom_intro_html, custom_faqs.
- * Price, stock, catalog taxonomy, admin flags — none of that is
- * reachable from here.
+ * Ashton (Advantage Collective, 2026-11-11) blocker: the two pages
+ * were sharing one H1/intro/FAQ set so Google read them as duplicates.
+ * The editor now exposes a separate copy block for each page:
+ *   Peptides  →  products_custom_{title,meta_description,h1,intro_html,faqs}
+ *   Compare   →  compare_custom_{title,meta_description,h1,intro_html,faqs}
+ *
+ * Writes nothing else. Price, stock, catalog taxonomy, admin flags —
+ * none reachable from here.
  */
 class SeoCategoriesController extends Controller
 {
+    /**
+     * Columns the editor touches, grouped by page. Keeps the field-level
+     * lock honest: anything not in this map stays untouched on save.
+     */
+    private const EDITABLE = [
+        'products' => [
+            'title' => 'products_custom_title',
+            'meta'  => 'products_custom_meta_description',
+            'h1'    => 'products_custom_h1',
+            'intro' => 'products_custom_intro_html',
+            'faqs'  => 'products_custom_faqs',
+        ],
+        'compare' => [
+            'title' => 'compare_custom_title',
+            'meta'  => 'compare_custom_meta_description',
+            'h1'    => 'compare_custom_h1',
+            'intro' => 'compare_custom_intro_html',
+            'faqs'  => 'compare_custom_faqs',
+        ],
+    ];
+
     public function index(Request $request)
     {
         $q = trim((string) $request->get('q', ''));
@@ -32,9 +55,12 @@ class SeoCategoriesController extends Controller
                 ->where('name', 'like', "%{$q}%")
                 ->orWhere('slug', 'like', "%{$q}%")))
             ->when($onlyMissing, fn ($c) => $c->where(function ($w) {
-                $w->whereNull('custom_h1')
-                  ->orWhereNull('custom_intro_html')
-                  ->orWhereNull('custom_faqs');
+                // "Missing" = either page has no H1 OR no intro.
+                // FAQs are optional; title/meta fall back to the defaults.
+                $w->whereNull('products_custom_h1')
+                  ->orWhereNull('products_custom_intro_html')
+                  ->orWhereNull('compare_custom_h1')
+                  ->orWhereNull('compare_custom_intro_html');
             }))
             ->withCount(['products' => fn ($q) => $q
                 ->where('status', 'active')
@@ -47,10 +73,20 @@ class SeoCategoriesController extends Controller
                 'name' => $c->name,
                 'slug' => $c->slug,
                 'products_count' => $c->products_count,
-                'has_h1' => !empty($c->custom_h1),
-                'has_intro' => !empty($c->custom_intro_html),
-                'has_faqs' => is_array($c->custom_faqs) && count($c->custom_faqs) > 0,
-                'faq_count' => is_array($c->custom_faqs) ? count($c->custom_faqs) : 0,
+                'peptides' => [
+                    'has_title' => !empty($c->products_custom_title),
+                    'has_meta'  => !empty($c->products_custom_meta_description),
+                    'has_h1'    => !empty($c->products_custom_h1),
+                    'has_intro' => !empty($c->products_custom_intro_html),
+                    'faq_count' => is_array($c->products_custom_faqs) ? count($c->products_custom_faqs) : 0,
+                ],
+                'compare' => [
+                    'has_title' => !empty($c->compare_custom_title),
+                    'has_meta'  => !empty($c->compare_custom_meta_description),
+                    'has_h1'    => !empty($c->compare_custom_h1),
+                    'has_intro' => !empty($c->compare_custom_intro_html),
+                    'faq_count' => is_array($c->compare_custom_faqs) ? count($c->compare_custom_faqs) : 0,
+                ],
                 'peptides_url' => '/product/' . $c->slug,
                 'compare_url' => '/compare/' . $c->slug,
             ]);
@@ -69,11 +105,24 @@ class SeoCategoriesController extends Controller
                 'id' => $category->id,
                 'name' => $category->name,
                 'slug' => $category->slug,
-                'custom_h1' => $category->custom_h1 ?? '',
-                'custom_intro_html' => $category->custom_intro_html ?? '',
-                'custom_faqs' => is_array($category->custom_faqs)
-                    ? array_values($category->custom_faqs)
-                    : [],
+                'peptides' => [
+                    'title' => $category->products_custom_title ?? '',
+                    'meta'  => $category->products_custom_meta_description ?? '',
+                    'h1'    => $category->products_custom_h1 ?? '',
+                    'intro' => $category->products_custom_intro_html ?? '',
+                    'faqs'  => is_array($category->products_custom_faqs)
+                        ? array_values($category->products_custom_faqs)
+                        : [],
+                ],
+                'compare' => [
+                    'title' => $category->compare_custom_title ?? '',
+                    'meta'  => $category->compare_custom_meta_description ?? '',
+                    'h1'    => $category->compare_custom_h1 ?? '',
+                    'intro' => $category->compare_custom_intro_html ?? '',
+                    'faqs'  => is_array($category->compare_custom_faqs)
+                        ? array_values($category->compare_custom_faqs)
+                        : [],
+                ],
                 'peptides_url' => '/product/' . $category->slug,
                 'compare_url' => '/compare/' . $category->slug,
             ],
@@ -83,15 +132,24 @@ class SeoCategoriesController extends Controller
     public function update(Request $request, ProductCategory $category)
     {
         $data = $request->validate([
-            'custom_h1' => ['nullable', 'string', 'max:180'],
-            'custom_intro_html' => ['nullable', 'string', 'max:50000'],
-            'custom_faqs' => ['nullable', 'array', 'max:12'],
-            'custom_faqs.*.q' => ['required_with:custom_faqs.*.a', 'string', 'max:300'],
-            'custom_faqs.*.a' => ['required_with:custom_faqs.*.q', 'string', 'max:4000'],
+            'peptides.title' => ['nullable', 'string', 'max:200'],
+            'peptides.meta'  => ['nullable', 'string', 'max:2000'],
+            'peptides.h1'    => ['nullable', 'string', 'max:180'],
+            'peptides.intro' => ['nullable', 'string', 'max:50000'],
+            'peptides.faqs'  => ['nullable', 'array', 'max:12'],
+            'peptides.faqs.*.q' => ['required_with:peptides.faqs.*.a', 'string', 'max:300'],
+            'peptides.faqs.*.a' => ['required_with:peptides.faqs.*.q', 'string', 'max:4000'],
+
+            'compare.title'  => ['nullable', 'string', 'max:200'],
+            'compare.meta'   => ['nullable', 'string', 'max:2000'],
+            'compare.h1'     => ['nullable', 'string', 'max:180'],
+            'compare.intro'  => ['nullable', 'string', 'max:50000'],
+            'compare.faqs'   => ['nullable', 'array', 'max:12'],
+            'compare.faqs.*.q' => ['required_with:compare.faqs.*.a', 'string', 'max:300'],
+            'compare.faqs.*.a' => ['required_with:compare.faqs.*.q', 'string', 'max:4000'],
         ]);
 
-        // Drop blank faq rows (admin pressed "add" but didn't fill).
-        $faqs = collect($data['custom_faqs'] ?? [])
+        $cleanFaqs = fn (array $rows) => collect($rows)
             ->map(fn ($row) => [
                 'q' => trim((string) ($row['q'] ?? '')),
                 'a' => trim((string) ($row['a'] ?? '')),
@@ -100,15 +158,29 @@ class SeoCategoriesController extends Controller
             ->values()
             ->all();
 
-        // Field-level lock: only write the three agency-editable columns.
-        $category->forceFill([
-            'custom_h1' => $data['custom_h1'] ?? null,
-            'custom_intro_html' => $data['custom_intro_html'] ?? null,
-            'custom_faqs' => $faqs ?: null,
-        ])->save();
+        $updates = [];
+        foreach (self::EDITABLE as $page => $cols) {
+            $block = $data[$page] ?? [];
+            $updates[$cols['title']] = $this->nullIfBlank($block['title'] ?? null);
+            $updates[$cols['meta']]  = $this->nullIfBlank($block['meta'] ?? null);
+            $updates[$cols['h1']]    = $this->nullIfBlank($block['h1'] ?? null);
+            $updates[$cols['intro']] = $this->nullIfBlank($block['intro'] ?? null);
+            $faqs = $cleanFaqs($block['faqs'] ?? []);
+            $updates[$cols['faqs']] = $faqs ?: null;
+        }
+
+        // Field-level lock: only write the per-page agency columns.
+        $category->forceFill($updates)->save();
 
         return redirect()
             ->route('admin.seo.categories.edit', $category)
             ->with('success', 'Saved.');
+    }
+
+    private function nullIfBlank($value): ?string
+    {
+        if ($value === null) return null;
+        $trimmed = trim((string) $value);
+        return $trimmed === '' ? null : $trimmed;
     }
 }

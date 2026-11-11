@@ -1007,16 +1007,34 @@ class ProductsController extends Controller
             $seo['h1'] = $seoH1;
         }
 
-        // Agency-authored content for this compound. Shared by
-        // /product/{slug} + /compare/{slug} via product_categories.
-        // When set, custom_h1 overrides the SSR H1 so bots see the
-        // agency's wording verbatim; custom_faqs emits a FAQPage
-        // schema so Google can surface the Q&A as a rich result.
+        // Agency-authored content for this compound's PEPTIDES page.
+        // Ashton 11/11 split: each compound now carries two independent
+        // field sets (products_* for /product/{slug}, compare_* for
+        // /compare/{slug}) so Google doesn't see duplicate content.
+        // Falls back to the legacy shared columns during the migration
+        // window — the migration seeded products_* from custom_* so this
+        // is a pure fallback.
         $compoundContent = [
-            'h1'    => $category->custom_h1 ?: null,
-            'intro' => $category->custom_intro_html ?: null,
-            'faqs'  => is_array($category->custom_faqs) ? array_values($category->custom_faqs) : [],
+            'h1'    => $category->products_custom_h1 ?: ($category->custom_h1 ?: null),
+            'intro' => $category->products_custom_intro_html ?: ($category->custom_intro_html ?: null),
+            'faqs'  => is_array($category->products_custom_faqs) && !empty($category->products_custom_faqs)
+                ? array_values($category->products_custom_faqs)
+                : (is_array($category->custom_faqs) ? array_values($category->custom_faqs) : []),
         ];
+
+        // Per-page title + meta overrides take precedence over the
+        // auto-generated template. Agency authors verbatim — no
+        // "- Peptidemap" tail is appended anywhere downstream.
+        if (!empty($category->products_custom_title)) {
+            $seoTitle = $category->products_custom_title;
+            $seo['title'] = $seoTitle;
+            $seo['og_title'] = $seoTitle;
+        }
+        if (!empty($category->products_custom_meta_description)) {
+            $seoDescription = $category->products_custom_meta_description;
+            $seo['description'] = $seoDescription;
+            $seo['og_description'] = $seoDescription;
+        }
         if ($compoundContent['h1']) {
             $seo['h1'] = $compoundContent['h1'];
         }

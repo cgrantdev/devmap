@@ -21,14 +21,30 @@ class ProductCategory extends Model
         'meta_description',
         'is_active',
         'research_area',
+        // Legacy shared fields (still readable as a fallback until every
+        // frontend route migrates to the per-page columns).
         'custom_h1',
         'custom_intro_html',
         'custom_faqs',
+        // Agency-editable, scoped to /product/{slug} (Ashton 11/11 split).
+        'products_custom_title',
+        'products_custom_meta_description',
+        'products_custom_h1',
+        'products_custom_intro_html',
+        'products_custom_faqs',
+        // Agency-editable, scoped to /compare/{slug}.
+        'compare_custom_title',
+        'compare_custom_meta_description',
+        'compare_custom_h1',
+        'compare_custom_intro_html',
+        'compare_custom_faqs',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'custom_faqs' => 'array',
+        'products_custom_faqs' => 'array',
+        'compare_custom_faqs' => 'array',
     ];
 
     protected static function boot()
