@@ -78,6 +78,15 @@
           <path d="M5 12h14M13 5l7 7-7 7"/>
         </svg>
       </a>
+
+      <!-- Full coupon page link (Advantage Collective 11/11: /coupon/{slug}
+           pages were orphans — this gives the Deals grid a real crawl
+           path into each vendor's coupon URL). -->
+      <a
+        v-if="deal.slug"
+        :href="`/coupon/${deal.slug}`"
+        class="ui-focus text-[11px] font-semibold text-emerald-700 hover:text-emerald-900"
+      >See full deal →</a>
     </div>
   </Card>
 </template>

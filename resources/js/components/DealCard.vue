@@ -77,6 +77,14 @@
             {{ code }}
           </button>
         </div>
+        <!-- Deep link to the vendor's full coupon page (Advantage
+             Collective 11/11: /coupon/{slug} pages were orphaned off
+             the sitemap; /deals card is the most natural crawl path). -->
+        <a
+          :href="`/coupon/${slug}`"
+          @click.stop
+          class="block mt-2 text-[11px] text-center font-semibold text-emerald-700 hover:text-emerald-900"
+        >See full deal →</a>
       </div>
     </div>
   </div>

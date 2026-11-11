@@ -122,14 +122,25 @@
             </a>
 
             <!-- Coupon (desktop) — periodically wiggles to draw attention -->
-            <button
-              @click="copyDiscountCode"
-              class="pmap-coupon-shake ui-focus group hidden md:inline-flex items-center gap-3 h-10 lg:h-11 px-4 lg:px-5 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all flex-shrink-0"
-            >
-              <span class="text-[9px] lg:text-[10px] uppercase tracking-[0.1em] font-semibold text-emerald-600">Coupon</span>
-              <span class="ui-mono text-[15px] lg:text-[18px] font-bold text-emerald-800 tracking-widest">{{ brand.discount_code || 'PMAP' }}</span>
-              <svg class="w-3.5 h-3.5 text-emerald-500 group-hover:text-emerald-700 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            </button>
+            <div class="hidden md:flex md:flex-col md:items-end gap-1">
+              <button
+                @click="copyDiscountCode"
+                class="pmap-coupon-shake ui-focus group inline-flex items-center gap-3 h-10 lg:h-11 px-4 lg:px-5 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all flex-shrink-0"
+              >
+                <span class="text-[9px] lg:text-[10px] uppercase tracking-[0.1em] font-semibold text-emerald-600">Coupon</span>
+                <span class="ui-mono text-[15px] lg:text-[18px] font-bold text-emerald-800 tracking-widest">{{ brand.discount_code || 'PMAP' }}</span>
+                <svg class="w-3.5 h-3.5 text-emerald-500 group-hover:text-emerald-700 transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              </button>
+              <!-- Link to full coupon page (Advantage Collective 11/11:
+                   /coupon/{slug} pages were orphaned, Google could only
+                   find them via sitemap. One link per vendor page gives
+                   the coupon URL real crawl paths and lets users browse
+                   every current deal for this vendor). -->
+              <a
+                :href="`/coupon/${brand.slug}`"
+                class="text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 hover:underline"
+              >All {{ brand.name }} coupons &amp; deals →</a>
+            </div>
           </div>
 
           <!-- Description — inline-editable for the vendor owner. Non-owners
@@ -175,6 +186,12 @@
               <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
             </button>
           </div>
+
+          <!-- Mobile: full coupon-page link under the code button -->
+          <a
+            :href="`/coupon/${brand.slug}`"
+            class="md:hidden mt-2 inline-block text-[12px] font-semibold text-emerald-700 hover:text-emerald-900"
+          >All {{ brand.name }} coupons &amp; deals →</a>
         </div>
       </div>
 
