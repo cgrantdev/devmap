@@ -112,7 +112,6 @@
 import { ref, computed, onMounted, watchEffect } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
-import { stripSiteSuffix } from '@/utils/pageTitle'
 import EncyclopediaCard from '@/components/EncyclopediaCard.vue'
 
 const props = defineProps({
@@ -152,7 +151,7 @@ const page = usePage()
 const title = computed(() => {
   const baseTitle = props.seo?.title || 'Peptide Encyclopedia - Comprehensive Research Guide'
   const siteName = page.props.site_name || 'Peptidemap'
-  return stripSiteSuffix(`${baseTitle} - ${siteName}`, siteName)
+  return `${baseTitle} - ${siteName}`
 })
 
 const description = computed(() => {

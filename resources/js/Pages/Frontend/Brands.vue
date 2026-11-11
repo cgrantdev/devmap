@@ -269,7 +269,6 @@
 import { ref, computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
-import { stripSiteSuffix } from '@/utils/pageTitle'
 import { groupLocationsByRegion } from '@/data/locationRegions'
 
 const props = defineProps({
@@ -302,7 +301,7 @@ const page = usePage()
 const title = computed(() => {
   const base = props.seo?.title || 'Top Rated Peptide Vendors'
   const site = page.props.site_name || 'PeptideMap'
-  return stripSiteSuffix(`${base} - ${site}`, site)
+  return `${base} - ${site}`
 })
 const description = computed(() => props.seo?.description || 'Browse and compare top-rated peptide vendors.')
 const url = computed(() => props.seo?.url || page.url)

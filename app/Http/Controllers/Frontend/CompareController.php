@@ -623,11 +623,7 @@ class CompareController extends Controller
         // visible accordion and the FAQPage JSON-LD. Same source row
         // powers the /product/{slug} FAQ block, so a single edit
         // populates both page types.
-        // Ashton 11/11 split: compare page reads its own FAQ set, falls
-        // back to the legacy shared column during the migration window.
-        $customFaqs = is_array($category->compare_custom_faqs) && !empty($category->compare_custom_faqs)
-            ? $category->compare_custom_faqs
-            : (is_array($category->custom_faqs) ? $category->custom_faqs : []);
+        $customFaqs = is_array($category->custom_faqs) ? $category->custom_faqs : [];
         if ($customFaqs) {
             $faqPairs = array_merge(
                 array_map(fn ($f) => ['q' => (string) ($f['q'] ?? ''), 'a' => (string) ($f['a'] ?? '')], $customFaqs),
@@ -674,15 +670,6 @@ class CompareController extends Controller
         ];
 
         $ogImage = \App\Support\OgImageUrl::compound($slug, ($category->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY);
-        // Per-page title + meta overrides take precedence (Ashton 11/11).
-        if (!empty($category->compare_custom_title)) {
-            $seoTitle = $category->compare_custom_title;
-            $ogTitle = $seoTitle;
-        }
-        if (!empty($category->compare_custom_meta_description)) {
-            $seoDescription = $category->compare_custom_meta_description;
-            $ogDescription = $seoDescription;
-        }
         $seo = [
             'key' => 'compare-compound',
             'title' => $seoTitle,
@@ -692,11 +679,11 @@ class CompareController extends Controller
             'og_image' => $ogImage,
             'image' => $ogImage,
             'url' => url("/compare/{$slug}"),
-            // SSR H1 matches the visible Vue H1. Agency-authored
-            // compare_custom_h1 (via /admin/seo/categories, Compare tab)
-            // wins — bots see what the agency wrote. Legacy custom_h1
-            // is the fallback during the migration window.
-            'h1' => $category->compare_custom_h1 ?: ($category->custom_h1 ?: $h1),
+            // SSR H1 matches the visible Vue H1. Agency-authored custom_h1
+            // (via /admin/seo/categories) wins — bots see what the agency
+            // wrote. Otherwise Retatrutide uses the narrative H1 and
+            // other compounds keep the bare category name.
+            'h1' => $category->custom_h1 ?: $h1,
             'schema' => array_values(array_filter([
                 $itemList,
                 $breadcrumb,
@@ -775,11 +762,10 @@ class CompareController extends Controller
                     'link' => 'Trial context is in the encyclopedia entry.',
                 ] : null,
                 'encyclopedia_url' => $educationPost ? EncyclopediaSlug::path($category->slug) : null,
-                // Agency-authored content (admin at /admin/seo/categories,
-                // Compare tab). Falls back to the legacy shared column
-                // during the migration window.
-                'custom_h1' => $category->compare_custom_h1 ?: ($category->custom_h1 ?: null),
-                'custom_intro' => $category->compare_custom_intro_html ?: ($category->custom_intro_html ?: null),
+                // Agency-authored content (admin at /admin/seo/categories).
+                // Shared with /product/{slug} via the same row.
+                'custom_h1' => $category->custom_h1 ?: null,
+                'custom_intro' => $category->custom_intro_html ?: null,
                 'product_count' => $productCount,
                 'vendor_count' => $vendorCount,
                 'cheapest_price' => $cheapest,
