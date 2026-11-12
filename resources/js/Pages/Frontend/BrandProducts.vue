@@ -121,11 +121,14 @@
               Visit website
             </a>
 
-            <!-- Coupon (desktop) — periodically wiggles to draw attention -->
-            <div class="hidden md:flex md:flex-col md:items-center gap-1">
+            <!-- Coupon (desktop) — periodically wiggles to draw attention.
+                 The small coupon-page link sits absolute below the button so
+                 the parent CTA row's vertical centering stays balanced with
+                 the Visit website button next to it. -->
+            <div class="hidden md:inline-block relative flex-shrink-0">
               <button
                 @click="copyDiscountCode"
-                class="pmap-coupon-shake ui-focus group inline-flex items-center gap-3 h-10 lg:h-11 px-4 lg:px-5 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all flex-shrink-0"
+                class="pmap-coupon-shake ui-focus group inline-flex items-center gap-3 h-10 lg:h-11 px-4 lg:px-5 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all"
               >
                 <span class="text-[9px] lg:text-[10px] uppercase tracking-[0.1em] font-semibold text-emerald-600">Coupon</span>
                 <span class="ui-mono text-[15px] lg:text-[18px] font-bold text-emerald-800 tracking-widest">{{ brand.discount_code || 'PMAP' }}</span>
@@ -134,7 +137,7 @@
               <!-- Jake 11/10: /coupon/{slug} pages were orphans off the sitemap. -->
               <a
                 :href="`/coupon/${brand.slug}`"
-                class="text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 hover:underline"
+                class="absolute left-1/2 -translate-x-1/2 top-full mt-1 whitespace-nowrap text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 hover:underline"
               >All coupons &amp; deals &rarr;</a>
             </div>
           </div>
