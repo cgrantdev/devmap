@@ -174,6 +174,7 @@ import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import MainButton from '@/components/MainButton.vue'
 import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 
 const props = defineProps({
   productName: String,
@@ -213,12 +214,11 @@ const page = usePage()
 
 // Computed values for reactive SEO updates (automatically from category data)
 const title = computed(() => {
-  // Use SEO title if provided, otherwise generate from category name
-  if (props.seo?.title) {
-    return props.seo.title
-  }
   const siteName = page.props.site_name || 'Peptidemap'
-  return `${props.productName || props.category?.name || 'Products'} – ${siteName}`
+  if (props.seo?.title) {
+    return stripSiteSuffix(props.seo.title, siteName)
+  }
+  return stripSiteSuffix(props.productName || props.category?.name || 'Products', siteName)
 })
 
 const description = computed(() => {

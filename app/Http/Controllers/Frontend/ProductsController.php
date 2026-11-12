@@ -926,6 +926,88 @@ class ProductsController extends Controller
             $seoH1 = $category->name;
         }
 
+        // BreadcrumbList + ItemList + AggregateOffer schema for parity
+        // with /compare/{slug} (Ashton 11/11 blocker #4).
+        $breadcrumbSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => url('/')],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Peptides', 'item' => url('/products')],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $category->name, 'item' => $categoryUrl],
+            ],
+        ];
+        $pageSchemas = [$breadcrumbSchema];
+
+        $itemsForSchema = method_exists($products, 'items') ? $products->items() : [];
+        if (!empty($itemsForSchema)) {
+            $listRows = array_values(array_slice($itemsForSchema, 0, 30));
+            $elements = [];
+            $lowPrice = null;
+            $highPrice = null;
+            $offerCount = 0;
+            foreach ($listRows as $i => $p) {
+                $row = is_array($p) ? $p : (array) $p;
+                $brandName = $row['brand']['name'] ?? ($row['brand_name'] ?? null);
+                $brandSlug = $row['brand']['slug'] ?? ($row['brand_slug'] ?? null);
+                $prodSlug = $row['slug'] ?? '';
+                $prodId = $row['id'] ?? null;
+                $prodUrl = ($brandSlug && $prodSlug && $prodId)
+                    ? url("/product/{$brandSlug}/{$prodSlug}/{$prodId}")
+                    : null;
+                $price = isset($row['discount_price']) && $row['discount_price']
+                    ? (float) $row['discount_price']
+                    : (isset($row['price']) ? (float) $row['price'] : null);
+                if ($price !== null && $price > 0) {
+                    if ($lowPrice === null || $price < $lowPrice) $lowPrice = $price;
+                    if ($highPrice === null || $price > $highPrice) $highPrice = $price;
+                    $offerCount++;
+                }
+                $elements[] = [
+                    '@type' => 'ListItem',
+                    'position' => $i + 1,
+                    'item' => array_filter([
+                        '@type' => 'Product',
+                        'name' => $row['name'] ?? $category->name,
+                        'url' => $prodUrl,
+                        'category' => $category->name,
+                        'brand' => $brandName ? ['@type' => 'Brand', 'name' => $brandName] : null,
+                        'offers' => $price ? [
+                            '@type' => 'Offer',
+                            'price' => (string) $price,
+                            'priceCurrency' => $row['currency_code'] ?? 'USD',
+                            'availability' => 'https://schema.org/InStock',
+                            'url' => $prodUrl,
+                            'seller' => $brandName ? ['@type' => 'Organization', 'name' => $brandName] : null,
+                        ] : null,
+                    ]),
+                ];
+            }
+            $pageSchemas[] = [
+                '@context' => 'https://schema.org',
+                '@type' => 'ItemList',
+                'name' => $category->name . ' vendor listings',
+                'numberOfItems' => count($elements),
+                'itemListElement' => $elements,
+            ];
+            if ($offerCount > 0 && $lowPrice !== null) {
+                $pageSchemas[] = [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'Product',
+                    'name' => $category->name,
+                    'description' => $seoDescription,
+                    'url' => $categoryUrl,
+                    'offers' => [
+                        '@type' => 'AggregateOffer',
+                        'offerCount' => $offerCount,
+                        'lowPrice' => (string) $lowPrice,
+                        'highPrice' => (string) $highPrice,
+                        'priceCurrency' => 'USD',
+                    ],
+                ];
+            }
+        }
+
         // Build SEO array (same format as other pages)
         $seo = [
             'key' => 'product-listing',
@@ -938,21 +1020,35 @@ class ProductsController extends Controller
             'image' => $categoryImage,
             'url' => $categoryUrl,
             'canonical' => $categoryUrl,
+            'schema' => $pageSchemas,
         ];
         if ($seoH1 !== null) {
             $seo['h1'] = $seoH1;
         }
 
-        // Agency-authored content for this compound. Shared by
-        // /product/{slug} + /compare/{slug} via product_categories.
-        // When set, custom_h1 overrides the SSR H1 so bots see the
-        // agency's wording verbatim; custom_faqs emits a FAQPage
-        // schema so Google can surface the Q&A as a rich result.
+        // Agency-authored content for this compound PEPTIDES page
+        // (Ashton split: Peptides and Compare pages now carry separate
+        // copy). Reads products_custom_* fields; falls back to the
+        // legacy shared columns until the agency fills in both sides.
         $compoundContent = [
-            'h1'    => $category->custom_h1 ?: null,
-            'intro' => $category->custom_intro_html ?: null,
-            'faqs'  => is_array($category->custom_faqs) ? array_values($category->custom_faqs) : [],
+            'h1'    => $category->products_custom_h1 ?: ($category->custom_h1 ?: null),
+            'intro' => $category->products_custom_intro_html ?: ($category->custom_intro_html ?: null),
+            'faqs'  => is_array($category->products_custom_faqs) && !empty($category->products_custom_faqs)
+                ? array_values($category->products_custom_faqs)
+                : (is_array($category->custom_faqs) ? array_values($category->custom_faqs) : []),
         ];
+
+        if (!empty($category->products_custom_title)) {
+            $seoTitle = $category->products_custom_title;
+            $seo['title'] = $seoTitle;
+            $seo['og_title'] = $seoTitle;
+        }
+        if (!empty($category->products_custom_meta_description)) {
+            $seoDescription = $category->products_custom_meta_description;
+            $seo['description'] = $seoDescription;
+            $seo['og_description'] = $seoDescription;
+        }
+
         if ($compoundContent['h1']) {
             $seo['h1'] = $compoundContent['h1'];
         }

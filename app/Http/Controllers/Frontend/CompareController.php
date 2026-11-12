@@ -623,7 +623,9 @@ class CompareController extends Controller
         // visible accordion and the FAQPage JSON-LD. Same source row
         // powers the /product/{slug} FAQ block, so a single edit
         // populates both page types.
-        $customFaqs = is_array($category->custom_faqs) ? $category->custom_faqs : [];
+        $customFaqs = is_array($category->compare_custom_faqs) && !empty($category->compare_custom_faqs)
+            ? $category->compare_custom_faqs
+            : (is_array($category->custom_faqs) ? $category->custom_faqs : []);
         if ($customFaqs) {
             $faqPairs = array_merge(
                 array_map(fn ($f) => ['q' => (string) ($f['q'] ?? ''), 'a' => (string) ($f['a'] ?? '')], $customFaqs),
@@ -670,6 +672,15 @@ class CompareController extends Controller
         ];
 
         $ogImage = \App\Support\OgImageUrl::compound($slug, ($category->updated_at?->timestamp ?? 0).'-'.\App\Support\OgImageRevision::COPY);
+        // Per-page title + meta overrides (Ashton split).
+        if (!empty($category->compare_custom_title)) {
+            $seoTitle = $category->compare_custom_title;
+            $ogTitle = $seoTitle;
+        }
+        if (!empty($category->compare_custom_meta_description)) {
+            $seoDescription = $category->compare_custom_meta_description;
+            $ogDescription = $seoDescription;
+        }
         $seo = [
             'key' => 'compare-compound',
             'title' => $seoTitle,
@@ -683,7 +694,7 @@ class CompareController extends Controller
             // (via /admin/seo/categories) wins — bots see what the agency
             // wrote. Otherwise Retatrutide uses the narrative H1 and
             // other compounds keep the bare category name.
-            'h1' => $category->custom_h1 ?: $h1,
+            'h1' => $category->compare_custom_h1 ?: ($category->custom_h1 ?: $h1),
             'schema' => array_values(array_filter([
                 $itemList,
                 $breadcrumb,
@@ -764,8 +775,8 @@ class CompareController extends Controller
                 'encyclopedia_url' => $educationPost ? EncyclopediaSlug::path($category->slug) : null,
                 // Agency-authored content (admin at /admin/seo/categories).
                 // Shared with /product/{slug} via the same row.
-                'custom_h1' => $category->custom_h1 ?: null,
-                'custom_intro' => $category->custom_intro_html ?: null,
+                'custom_h1' => $category->compare_custom_h1 ?: ($category->custom_h1 ?: null),
+                'custom_intro' => $category->compare_custom_intro_html ?: ($category->custom_intro_html ?: null),
                 'product_count' => $productCount,
                 'vendor_count' => $vendorCount,
                 'cheapest_price' => $cheapest,
