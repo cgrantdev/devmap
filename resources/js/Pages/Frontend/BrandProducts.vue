@@ -122,7 +122,7 @@
             </a>
 
             <!-- Coupon (desktop) — periodically wiggles to draw attention -->
-            <div class="hidden md:flex md:flex-col md:items-end gap-1">
+            <div class="hidden md:flex md:flex-col md:items-center gap-1">
               <button
                 @click="copyDiscountCode"
                 class="pmap-coupon-shake ui-focus group inline-flex items-center gap-3 h-10 lg:h-11 px-4 lg:px-5 border-2 border-dashed border-emerald-300 bg-emerald-50 hover:border-emerald-400 hover:bg-emerald-100 transition-all flex-shrink-0"
