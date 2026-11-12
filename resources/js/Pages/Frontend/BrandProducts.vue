@@ -135,7 +135,7 @@
               <a
                 :href="`/coupon/${brand.slug}`"
                 class="text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 hover:underline"
-              >All {{ brand.name }} coupons &amp; deals &rarr;</a>
+              >All coupons &amp; deals &rarr;</a>
             </div>
           </div>
 
@@ -187,7 +187,7 @@
           <a
             :href="`/coupon/${brand.slug}`"
             class="md:hidden mt-2 inline-block text-[12px] font-semibold text-emerald-700 hover:text-emerald-900"
-          >All {{ brand.name }} coupons &amp; deals &rarr;</a>
+          >All coupons &amp; deals &rarr;</a>
         </div>
       </div>
 
