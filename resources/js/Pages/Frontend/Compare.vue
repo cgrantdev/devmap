@@ -119,7 +119,7 @@
             :key="c.id"
             class="group relative scroll-mt-28 hover:bg-[color:var(--color-bg)] transition-colors"
           >
-            <div :class="['grid grid-cols-2 gap-x-2.5 gap-y-3 px-4 sm:px-5 py-4 lg:gap-x-6 lg:items-center', GRID]">
+            <div :class="['grid grid-cols-2 gap-x-2.5 gap-y-2.5 px-4 sm:px-5 py-3.5 lg:py-4 lg:gap-x-6 lg:items-center', GRID]">
               <!-- Compound -->
               <div class="col-span-2 lg:col-span-1 min-w-0 pr-7 lg:pr-0">
                 <h3 class="text-[16px] font-semibold leading-snug text-[color:var(--color-ink)]">
@@ -137,26 +137,26 @@
                     <a :href="c.encyclopedia_url" class="ui-focus relative z-10 rounded-sm font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">Guide</a>
                   </template>
                 </div>
-                <p v-if="c.description" class="hidden md:block mt-1 text-[12.5px] leading-snug text-[color:var(--color-ink-subtle)] line-clamp-1">{{ c.description }}</p>
+                <p v-if="c.description" class="hidden md:block mt-1 truncate text-[12.5px] leading-snug text-[color:var(--color-ink-subtle)]" :title="c.description">{{ c.description }}</p>
               </div>
 
               <svg class="lg:hidden absolute right-4 top-[19px] w-4 h-4 text-[color:var(--color-ink-subtle)] group-hover:text-[color:var(--color-accent-600)] transition-colors" fill="none" stroke="currentColor" stroke-width="2.25" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
 
               <!-- From -->
-              <div class="min-w-0 rounded-[10px] bg-[color:var(--color-bg)] px-3 py-2.5 lg:bg-transparent lg:p-0">
+              <div :class="['min-w-0 rounded-[10px] bg-[color:var(--color-bg)] px-3 py-2 lg:bg-transparent lg:p-0', c.best_per_mg ? '' : 'col-span-2 lg:col-span-1']">
                 <div class="lg:hidden text-[10.5px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">From</div>
                 <template v-if="c.from">
-                  <div class="mt-0.5 lg:mt-0 ui-mono text-[16px] font-semibold leading-tight text-[color:var(--color-ink)] truncate">{{ fromMain(c.from) }}</div>
+                  <div class="mt-0.5 lg:mt-0 ui-mono text-[15px] lg:text-[16px] font-semibold leading-tight text-[color:var(--color-ink)] truncate">{{ fromMain(c.from) }}</div>
                   <div class="mt-0.5 truncate text-[12px] text-[color:var(--color-ink-muted)]">{{ fromSub(c.from) }}</div>
                 </template>
                 <div v-else class="mt-0.5 lg:mt-0 text-[14px] text-[color:var(--color-ink-subtle)]">—</div>
               </div>
 
               <!-- Best per mg -->
-              <div class="min-w-0 rounded-[10px] bg-emerald-50/70 px-3 py-2.5 lg:bg-transparent lg:p-0">
+              <div :class="['min-w-0 rounded-[10px] bg-emerald-50/70 px-3 py-2 lg:bg-transparent lg:p-0', c.best_per_mg ? '' : 'hidden lg:block']">
                 <div class="lg:hidden text-[10.5px] uppercase tracking-[0.08em] font-semibold text-emerald-700">Best per mg</div>
                 <template v-if="c.best_per_mg">
-                  <div class="mt-0.5 lg:mt-0 ui-mono text-[16px] font-semibold leading-tight text-emerald-700 truncate">{{ perMg(c.best_per_mg.usd_per_mg) }}<span class="text-[12px] font-medium">/mg</span></div>
+                  <div class="mt-0.5 lg:mt-0 ui-mono text-[15px] lg:text-[16px] font-semibold leading-tight text-emerald-700 truncate">{{ perMg(c.best_per_mg.usd_per_mg) }}<span class="text-[12px] font-medium">/mg</span></div>
                   <div class="mt-0.5 truncate text-[12px] text-[color:var(--color-ink-muted)]">{{ c.best_per_mg.size }} · {{ c.best_per_mg.vendor }}</div>
                 </template>
                 <div v-else class="mt-0.5 lg:mt-0 text-[14px] text-[color:var(--color-ink-subtle)]">—</div>
@@ -164,14 +164,14 @@
 
               <!-- Popular sizes -->
               <div :class="['col-span-2 lg:col-span-1 min-w-0', c.sizes?.length ? '' : 'hidden lg:block']">
-                <div v-if="c.sizes?.length" class="flex flex-wrap items-center gap-1.5">
-                  <span class="lg:hidden mr-0.5 text-[10.5px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Sizes</span>
+                <div v-if="c.sizes?.length" class="relative z-10 flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex-wrap lg:overflow-visible">
+                  <span class="lg:hidden shrink-0 mr-0.5 text-[10.5px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Sizes</span>
                   <a
                     v-for="s in c.sizes"
                     :key="s.param"
                     :href="sizeHref(c, s)"
                     :title="`${s.listings} ${s.listings === 1 ? 'listing' : 'listings'} at ${s.label}, from ${money(s.from_usd)}`"
-                    class="ui-focus relative z-10 inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-[color:var(--color-hairline)] bg-white text-[12px] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-accent-700)] transition-colors"
+                    class="ui-focus shrink-0 inline-flex items-center gap-1 h-7 px-2 rounded-full border border-[color:var(--color-hairline)] bg-white text-[12px] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-accent-700)] transition-colors"
                   >
                     <span class="font-semibold text-[color:var(--color-ink)]">{{ s.label }}</span>
                     <span class="ui-mono">{{ money(s.from_usd) }}</span>
@@ -267,7 +267,7 @@ const props = defineProps({
 })
 
 // Shared column template for the desktop header and rows.
-const GRID = 'lg:grid-cols-[minmax(0,2.4fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.7fr)_104px]'
+const GRID = 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,2.1fr)_104px]'
 
 // Rows past this stay in the page (crawlable) but hidden until
 // "Show all"; a search always shows every match.
