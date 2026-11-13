@@ -161,7 +161,7 @@ EMA's medicines table (generated 18 October 2026), which covers medicines evalua
 
 Peptidemap has two compare pages for this pair, and they answer different questions.
 
-- The **[Selank/Semax blend page](/compare/selanksemax)** is the blend landing. It collects listings for products sold as a single Selank-plus-Semax item. As covered above, no study has tested such a combination, and a combined product is two molecules in one container, not evidence of synergy.
+- The **[Selank/Semax blend page](/compare/selank-semax)** is the blend landing. It collects listings for products sold as a single Selank-plus-Semax item. As covered above, no study has tested such a combination, and a combined product is two molecules in one container, not evidence of synergy.
 - The **[Selank vs Semax pair page](/compare/selank-vs-semax)** is the pair page. It sets the two single compounds side by side, with their own listings.
 
 This article is the evidence companion to the pair page. Neither compare page reviews vendor quality. The [certificate of analysis guide](/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis) explains what a COA can and cannot show, which matters here because FDA found that the nominators' own documents mixed up Semax free base and Semax acetate (FDA document).
@@ -176,7 +176,7 @@ This page is for readers working with the literature and the regulatory record: 
 - [How to read a peptide certificate of analysis](/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis)
 - [Peptide legality: FDA, RUO and compounding](/guides/peptide-legality-fda-ruo-compounding)
 - Encyclopedia: [Selank](/encyclopedia/selank) and [Semax](/encyclopedia/Semax).
-- Marketplace listings (not reviewed here): [Selank vs Semax pair page](/compare/selank-vs-semax) and [Selank/Semax blend page](/compare/selanksemax).
+- Marketplace listings (not reviewed here): [Selank vs Semax pair page](/compare/selank-vs-semax) and [Selank/Semax blend page](/compare/selank-semax).
 
 ## FAQ
 

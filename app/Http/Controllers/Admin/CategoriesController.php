@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductCategory;
+use App\Support\ProductListingSeo;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -61,16 +62,13 @@ class CategoriesController extends Controller
             'research_area' => 'nullable|string|max:255',
         ]);
         
-        // Auto-generate slug if not provided
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['name']);
-            // Ensure unique slug
-            $baseSlug = $validated['slug'];
-            $counter = 1;
-            while (ProductCategory::where('slug', $validated['slug'])->exists()) {
-                $validated['slug'] = $baseSlug . '-' . $counter;
-                $counter++;
-            }
+        // Auto-generate the slug when it is blank, and clean a typed one
+        // that holds spaces, "/" or "+": those 404 or get noindexed on
+        // /product/{slug} ("Selank/Semax", "HGH 191AA" until 2026-11-13).
+        if (empty($validated['slug']) || ! ProductListingSeo::slugIsRouteSafe($validated['slug'])) {
+            $validated['slug'] = ProductCategory::uniqueSlugFrom(
+                (string) (($validated['slug'] ?? '') !== '' ? $validated['slug'] : $validated['name'])
+            );
         }
         
         // Handle image upload and convert to WebP
@@ -170,15 +168,13 @@ class CategoriesController extends Controller
             'research_area' => 'nullable|string|max:255',
         ]);
 
-        // Auto-generate slug if not provided
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['name']);
-            $baseSlug = $validated['slug'];
-            $counter = 1;
-            while (ProductCategory::where('slug', $validated['slug'])->where('id', '!=', $id)->exists()) {
-                $validated['slug'] = $baseSlug . '-' . $counter;
-                $counter++;
-            }
+        // Same slug rule as store(): blank or route-unsafe input becomes
+        // a clean, unique hyphen slug.
+        if (empty($validated['slug']) || ! ProductListingSeo::slugIsRouteSafe($validated['slug'])) {
+            $validated['slug'] = ProductCategory::uniqueSlugFrom(
+                (string) (($validated['slug'] ?? '') !== '' ? $validated['slug'] : $validated['name']),
+                (int) $id
+            );
         }
 
         // Handle image upload and convert to WebP

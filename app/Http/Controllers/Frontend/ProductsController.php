@@ -13,6 +13,7 @@ use App\Models\Brand;
 use App\Models\Location;
 use App\Models\Deal;
 use App\Support\CatalogCrossLinks;
+use App\Support\LegacyCategorySlug;
 use App\Support\ProductListingSeo;
 use App\Support\ProductPageSeo;
 use App\Support\ProductRowCurrency;
@@ -796,6 +797,12 @@ class ProductsController extends Controller
                 ->orderBy('id')
                 ->get();
             $category = $matches->count() === 1 ? $matches->first() : null;
+        }
+
+        // Slugs renamed on 2026-11-13 (/product/HGH%20191AA) 301 to the
+        // new slug below, like a letter-case variant.
+        if (! $category) {
+            $category = LegacyCategorySlug::find((string) $slug);
         }
 
         if (!$category) {

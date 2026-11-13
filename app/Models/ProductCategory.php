@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Support\CompareSlug;
 use App\Support\EncyclopediaSlug;
+use App\Support\LegacyCategorySlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -49,19 +50,43 @@ class ProductCategory extends Model
 
         static::creating(function ($category) {
             if (empty($category->slug)) {
-                $baseSlug = Str::slug($category->name);
-                $slug = $baseSlug;
-                $counter = 1;
-                
-                // Ensure unique slug
-                while (static::where('slug', $slug)->exists()) {
-                    $slug = $baseSlug . '-' . $counter;
-                    $counter++;
-                }
-                
-                $category->slug = $slug;
+                $category->slug = static::uniqueSlugFrom((string) $category->name);
             }
         });
+    }
+
+    /**
+     * Route-safe slug from a name or a hand-typed slug. "/", "+", "&"
+     * and "|" become word breaks first; Str::slug alone deletes them,
+     * which is how "Selank/Semax" became /compare/selanksemax.
+     */
+    public static function slugFrom(string $text): string
+    {
+        return Str::slug(preg_replace('#[/+&|\\\\]+#', ' ', $text) ?? $text);
+    }
+
+    /**
+     * slugFrom() plus a -1, -2 ... suffix while another row holds it
+     * (in any letter case).
+     */
+    public static function uniqueSlugFrom(string $text, ?int $ignoreId = null): string
+    {
+        $base = static::slugFrom($text);
+        if ($base === '') {
+            $base = 'compound';
+        }
+
+        $slug = $base;
+        $counter = 1;
+        while (static::query()
+            ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+            ->whereRaw('LOWER(slug) = ?', [strtolower($slug)])
+            ->exists()) {
+            $slug = $base.'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 
     public function products()
@@ -111,6 +136,11 @@ class ProductCategory extends Model
         $canonical = CompareSlug::canonical($routeSlug);
         if ($canonical === null) {
             return null;
+        }
+
+        // Slugs renamed on 2026-11-13 ("selanksemax", "Vitamin B12").
+        if ($legacy = LegacyCategorySlug::find($routeSlug)) {
+            return $legacy;
         }
 
         $matches = static::query()

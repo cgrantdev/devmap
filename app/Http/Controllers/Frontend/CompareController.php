@@ -380,6 +380,13 @@ class CompareController extends Controller
             abort(404);
         }
 
+        // A row renamed on 2026-11-13 resolves from its old canonical
+        // (/compare/selanksemax); send that to the row's own slug.
+        $own = CompareSlug::canonical($category->slug);
+        if ($own !== null && $own !== $resolved) {
+            return $this->redirectToCompareSlug($own);
+        }
+
         if ($resolved !== $slug) {
             return $this->redirectToCompareSlug($resolved);
         }

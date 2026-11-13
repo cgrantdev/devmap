@@ -169,10 +169,11 @@ class SitemapController extends Controller
                     $lastmod = $c->updated_at?->toDateString();
 
                     // /product/{slug} compound listing page (ProductsController::show).
-                    // Route segment can't contain '/' or whitespace, so a stored slug
-                    // like "BPC-157 / TB500 / Cartalax" is skipped — those 8 need the
-                    // slug cleaned at the row level (separate fix). Case is preserved
-                    // because the controller does an exact slug match.
+                    // Route segment can't contain '/' or whitespace. The nineteen
+                    // stored slugs like that ("BPC-157 / TB500 / Cartalax") were
+                    // rewritten on 2026-11-13 (LegacyCategorySlug); this guard
+                    // still skips any new one. Case is preserved because the
+                    // controller does an exact slug match.
                     // uncategorized is route-safe but it is a bucket, not a compound.
                     if (\App\Support\ProductListingSeo::usesVendorTemplate($c->slug)) {
                         $urls[] = [

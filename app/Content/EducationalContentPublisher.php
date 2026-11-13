@@ -1232,7 +1232,7 @@ class EducationalContentPublisher
     /**
      * Selank vs Semax evidence and FDA-status comparison. Drafted 2026-10-19;
      * sources checked 2026-10-19. Companion to /compare/selank-vs-semax
-     * (pair page) and /compare/selanksemax (blend landing). The body lives
+     * (pair page) and /compare/selank-semax (blend landing). The body lives
      * in resources/content/educational. The publisher reads this catalog,
      * not the draft YAML.
      *

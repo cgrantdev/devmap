@@ -803,6 +803,19 @@ Route::get('/shop/{vendor_name}', function ($vendor_name) {
 Route::get('/product/{id}/{slug}', [\App\Http\Controllers\ProductController::class, 'show'])
     ->whereNumber('id')
     ->name('product.public');
+// Slash slugs from before 2026-11-13 (/product/Selank/Semax). The
+// one-segment product.show route never matched them, so they 404ed.
+// Registered after every numeric /product route; known ones 301 to the
+// renamed listing and anything else still 404s.
+Route::get('/product/{legacy}', function (\Illuminate\Http\Request $request, string $legacy) {
+    $category = \App\Support\LegacyCategorySlug::find($legacy);
+    if (! $category) {
+        abort(404);
+    }
+    $qs = $request->getQueryString();
+
+    return redirect('/product/'.rawurlencode((string) $category->slug).($qs ? '?'.$qs : ''), 301);
+})->where('legacy', '[^/]+(?:/[^/]+)+')->name('product.legacy-slash');
 
 // Banner-slot analytics — generic; any slot can be tracked whether or not it maps to a Banner row.
 Route::post('/api/banner-events/impressions', [\App\Http\Controllers\Api\BannerEventController::class, 'impressions']);

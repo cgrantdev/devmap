@@ -17,8 +17,10 @@ namespace App\Support;
  *
  * The families below are the exception. Their public URL is the hyphen
  * slug, and the space, short, and letter-case aliases 301 there. Research
- * aliases use the same map (ss-31 / ss31 → elamipretide). Stored slugs
- * are not rewritten. Other space slugs stay as stored.
+ * aliases use the same map (ss-31 / ss31 → elamipretide). On 2026-11-13
+ * the space and slash slugs themselves were rewritten to hyphen form
+ * (see LegacyCategorySlug), so these families now also match the
+ * stored slug; the space aliases stay for old links.
  */
 class EncyclopediaSlug
 {
