@@ -38,7 +38,7 @@
           </div>
 
           <div class="w-full lg:w-[400px] xl:w-[460px] flex-shrink-0">
-            <form role="search" action="/search" method="get" class="relative" @submit.prevent="submitHomeSearch">
+            <form ref="homeSearchForm" role="search" action="/search" method="get" class="relative" @submit.prevent="submitHomeSearch">
               <label for="home-search" class="sr-only">Search compounds and vendors</label>
               <div class="flex items-center gap-2 h-12 pl-4 pr-1.5 rounded-[12px] bg-white border border-[color:var(--color-hairline)] shadow-[var(--shadow-sm)] transition-shadow focus-within:border-[color:var(--color-accent-400)] focus-within:shadow-[0_0_0_4px_var(--color-accent-100)]">
                 <svg class="w-[18px] h-[18px] flex-shrink-0 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
@@ -170,12 +170,24 @@
             :href="vendor.url"
             class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
           >
+            <!-- Fixed 16:9 logo box. The image is absolutely centred so a
+                 square or oversized file can't stretch the tile (and with it
+                 every card in the row). Rounded so an opaque square logo
+                 reads as an app icon rather than a pasted block. -->
             <div
-              class="aspect-[16/9] border-b border-[color:var(--color-hairline)] flex items-center justify-center p-4 lg:p-8"
+              class="relative aspect-[16/9] overflow-hidden border-b border-[color:var(--color-hairline)]"
               :style="{ backgroundColor: logoBackdrop(vendor.logo_url) }"
             >
-              <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-[75%] object-contain" loading="lazy" />
-              <span v-else class="ui-display text-2xl lg:text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
+              <img
+                v-if="vendor.logo_url && !brokenLogos[vendor.id]"
+                :src="vendor.logo_url"
+                :alt="vendor.name"
+                class="absolute inset-0 m-auto w-auto h-auto max-w-[72%] max-h-[60%] object-contain rounded-[12px]"
+                loading="lazy"
+                decoding="async"
+                @error="brokenLogos[vendor.id] = true"
+              />
+              <span v-else class="absolute inset-0 flex items-center justify-center ui-display text-2xl lg:text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
             </div>
             <div class="p-3 lg:p-5 flex-1 flex flex-col gap-2 lg:gap-3">
               <!-- Name on its own row on mobile so it doesn't fight the coupon
@@ -501,12 +513,16 @@ import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
 import HeroCarousel from '@/components/ui/HeroCarousel.vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { trackImpression, trackClick } from '@/lib/bannerTracking'
 import { useSearchSuggest } from '@/composables/useSearchSuggest'
+import { homeSearchInView } from '@/composables/useHomeSearchInView'
 
 // Processed logos carry their backdrop in the filename
 // ("...-lp-bg111827.webp"); white-on-dark marks need it behind them.
+// Vendor ids whose logo failed to load; their tile shows initials.
+const brokenLogos = reactive({})
+
 function logoBackdrop(url) {
   const m = /-lp-bg([0-9a-f]{6})\.webp(?:[?#].*)?$/i.exec(url || '')
   return m ? `#${m[1].toLowerCase()}` : '#ffffff'
@@ -514,6 +530,27 @@ function logoBackdrop(url) {
 
 onMounted(() => {
   trackImpression({ slot: 'homepage_vendor_cta', banner_key: 'become-a-vendor' })
+})
+
+// Tell the header when this search box is on screen, so it shows its own
+// search only once this one has scrolled away. The top margin covers the
+// fixed header plus the notice bar.
+const homeSearchForm = ref(null)
+let searchObserver = null
+onMounted(() => {
+  if (typeof IntersectionObserver === 'undefined' || !homeSearchForm.value) {
+    homeSearchInView.value = false
+    return
+  }
+  searchObserver = new IntersectionObserver(
+    ([entry]) => { homeSearchInView.value = entry.isIntersecting },
+    { rootMargin: '-100px 0px 0px 0px' }
+  )
+  searchObserver.observe(homeSearchForm.value)
+})
+onUnmounted(() => {
+  searchObserver?.disconnect()
+  homeSearchInView.value = true
 })
 
 function trackVendorCtaClick() {

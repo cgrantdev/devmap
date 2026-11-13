@@ -77,9 +77,16 @@
                wrapper doesn't hide the palette itself.
                SearchPalette is a multi-root component (button + Teleport), so
                class attrs don't reach it — wrap so `hidden xl:block` sticks. -->
-          <!-- The homepage has its own search box right under the header,
-               so the header one is hidden there (still mounted for Ctrl+K). -->
-          <div :class="onHomepage ? 'hidden' : 'hidden xl:block'">
+          <!-- On the homepage this fades out only while the page's own
+               search box is on screen, and back in once it scrolls away.
+               invisible (not hidden) keeps its width, so the nav doesn't
+               shift. Stays mounted either way for Ctrl/Cmd+K. -->
+          <div
+            :class="[
+              'hidden xl:block transition-[opacity,visibility] duration-200',
+              hideHeaderSearch ? 'xl:invisible xl:opacity-0' : '',
+            ]"
+          >
             <SearchPalette label="Search…" />
           </div>
 
@@ -404,11 +411,13 @@ import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { usePage, Link } from '@inertiajs/vue3'
 import Button from '@/components/ui/Button.vue'
 import SearchPalette from '@/components/ui/SearchPalette.vue'
+import { homeSearchInView } from '@/composables/useHomeSearchInView'
 import CountrySelector from '@/components/ui/CountrySelector.vue'
 import AdminBar from '@/components/AdminBar.vue'
 
 const page = usePage()
 const onHomepage = computed(() => page.component === 'Frontend/WelcomeV2')
+const hideHeaderSearch = computed(() => onHomepage.value && homeSearchInView.value)
 const isStaff = computed(() => {
   const role = page.props.auth?.user?.role
   return role === 'admin' || role === 'admin_viewer'
