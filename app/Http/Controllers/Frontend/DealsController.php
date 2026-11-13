@@ -18,18 +18,19 @@ class DealsController extends Controller
      */
     public function index(Request $request)
     {
-        $sortBy = $request->get('sort', 'best_discount'); // best_discount, top_rated, a_z
+        $sortBy = (string) $request->get('sort', 'best_discount');
+        if (!in_array($sortBy, ['best_discount', 'top_rated', 'a_z'], true)) {
+            $sortBy = 'best_discount';
+        }
 
-        // Site-wide header location filter (?location=Country). Applied to
-        // every branch below (deals, coupon-fallback, top-brand-fallback) so
-        // the page consistently narrows to vendors in that country.
         $locationFilter = trim((string) $request->get('location', ''));
         $filterBrandByLocation = fn ($q) => $locationFilter
             ? $q->whereHas('vendorSetting.location', fn ($l) => $l->where('name', $locationFilter))
             : $q;
 
-        // Get active deals with vendor info
-        $dealsQuery = Deal::where('active', true)
+        // Admin-curated deals first; they win over the same vendor's
+        // standing coupon code below.
+        $dealRows = Deal::where('active', true)
             ->where(function ($query) {
                 $query->whereNull('expiry_date')
                     ->orWhere('expiry_date', '>=', now());
@@ -45,144 +46,62 @@ class DealsController extends Controller
             ->with([
                 'brand' => fn ($q) => $q->forPublic(),
                 'brand.vendorSetting' => fn ($q) => $q->forPublic(),
-            ]);
-
-        $deals = $dealsQuery->get()
+            ])
+            ->get()
             ->map(function ($deal) {
                 $brand = $deal->brand;
-                if (!$brand || !$brand->is_active) {
+                if (!$brand || !$brand->is_active || trim((string) $deal->code) === '') {
                     return null;
                 }
 
-                $logoUrl = null;
-                if ($brand->vendorSetting && $brand->vendorSetting->logo) {
-                    $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
-                }
-
-                return [
-                    'id' => $brand->id,
-                    'name' => $brand->name,
-                    'slug' => $brand->slug ?? Str::slug($brand->name),
-                    'initials' => $this->getInitials($brand->name),
-                    'logo' => $logoUrl,
-                    'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
-                    'reviews' => (int) ($brand->rating_count ?? 0),
-                    'discount' => $deal->discount,
-                    'code' => $deal->code,
-                    'description' => $brand->vendorSetting->description ?? 'Premium peptides and nootropics with exceptional quality control and customer service.',
-                ];
+                return $this->dealRow($brand, (string) $deal->code, $deal->discount !== null ? (float) $deal->discount : null);
             })
             ->filter()
-            ->values()
-            ->toBase();
+            ->unique('id')
+            ->keyBy('id');
 
-        // If we don't have enough deals, supplement with top brands that have coupon codes
-        if ($deals->count() < 8) {
-            $brandsWithCoupons = Brand::where('is_active', true)
-                ->where(function ($q) {
-                    $q->whereHas('vendorSetting', function ($subQ) {
-                        $subQ->where('approval_status', 'approved')
-                            ->whereNotNull('coupon_code')
-                            ->where('coupon_code', '!=', '');
-                    })
-                    ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
-                })
-                ->tap($filterBrandByLocation)
-                ->with(['vendorSetting' => fn ($q) => $q->forPublic(true)])
-                ->whereNotIn('id', $deals->pluck('id'))
-                ->orderByDesc('rating_average')
-                ->take(8 - $deals->count())
-                ->get()
-                ->map(function ($brand) {
-                    $logoUrl = null;
-                    if ($brand->vendorSetting && $brand->vendorSetting->logo) {
-                        $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
-                    }
+        // Every other active, approved vendor with a live coupon code. This
+        // page used to stop at eight, and invented a 15% (or 10%) discount
+        // when a vendor had not set one; unknown discounts now show none.
+        $vendorRows = Brand::where('is_active', true)
+            ->whereHas('vendorSetting', function ($q) {
+                $q->where('approval_status', 'approved')
+                    ->whereNotNull('coupon_code')
+                    ->where('coupon_code', '!=', '');
+            })
+            ->tap($filterBrandByLocation)
+            ->whereNotIn('id', $dealRows->keys()->all())
+            ->with(['vendorSetting' => fn ($q) => $q->forPublic(true)])
+            ->get()
+            ->map(function ($brand) {
+                $vs = $brand->vendorSetting;
+                $boosted = $vs && $vs->couponBoostActive();
 
-                    // Colin Sep 21 — Deals page was hardcoding 15% and
-                    // missing every active coupon boost. Read the live
-                    // discount from vendor_settings so Julia's Limited-
-                    // Time Promos land here automatically (e.g. Hydro
-                    // Research at 35% for the promo window).
-                    $vs = $brand->vendorSetting;
-                    $liveDiscount = $vs?->coupon_discount_percent
-                        ? (int) round((float) $vs->coupon_discount_percent)
-                        : 15;
-                    $isBoosted = $vs && $vs->couponBoostActive();
-                    return [
-                        'id' => $brand->id,
-                        'name' => $brand->name,
-                        'slug' => $brand->slug ?? Str::slug($brand->name),
-                        'initials' => $this->getInitials($brand->name),
-                        'logo' => $logoUrl,
-                        'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
-                        'reviews' => (int) ($brand->rating_count ?? 0),
-                        'discount' => $liveDiscount,
-                        'code' => $vs->coupon_code ?? 'PMAP',
-                        'is_boosted' => $isBoosted,
-                        'boost_ends_at' => $isBoosted ? $vs->coupon_boost_expires_at?->toIso8601String() : null,
-                        'description' => $vs->description ?? 'Premium peptides and nootropics with exceptional quality control and customer service.',
-                    ];
-                })
-                ->values()
-                ->toBase();
+                return $this->dealRow(
+                    $brand,
+                    (string) $vs->coupon_code,
+                    $vs->coupon_discount_percent !== null ? (float) $vs->coupon_discount_percent : null,
+                    $boosted,
+                    $boosted ? $vs->coupon_boost_expires_at?->toIso8601String() : null
+                );
+            });
 
-            $deals = $deals->merge($brandsWithCoupons)->take(8)->values()->toBase();
-        }
-
-        // If still no deals, use top brands as fallback with default discount - only approved vendors
-        if ($deals->count() === 0) {
-            $deals = Brand::where('is_active', true)
-                ->where(function ($q) {
-                    $q->whereHas('vendorSetting', function ($subQ) {
-                        $subQ->where('approval_status', 'approved');
-                    })
-                    ->orWhereDoesntHave('vendorSetting'); // For backwards compatibility
-                })
-                ->tap($filterBrandByLocation)
-                ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
-                ->orderByDesc('rating_average')
-                ->take(8)
-                ->get()
-                ->map(function ($brand) {
-                    $logoUrl = null;
-                    if ($brand->vendorSetting && $brand->vendorSetting->logo) {
-                        $logoUrl = asset('storage/' . $brand->vendorSetting->logo);
-                    }
-
-                    return [
-                        'id' => $brand->id,
-                        'name' => $brand->name,
-                        'slug' => $brand->slug ?? Str::slug($brand->name),
-                        'initials' => $this->getInitials($brand->name),
-                        'logo' => $logoUrl,
-                        'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
-                        'reviews' => (int) ($brand->rating_count ?? 0),
-                        'discount' => 10, // Default discount
-                        'code' => 'PMAP',
-                        'description' => $brand->vendorSetting->description ?? 'Premium peptides and nootropics with exceptional quality control and customer service.',
-                    ];
-                })
-                ->values()
-                ->toBase();
-        }
-
-        // Apply sorting. Boosted (Limited-Time Promo) deals always
-        // surface first — they're the freshest, most time-sensitive
-        // offers on the page and answer Colin's Sep 21 question
-        // "shouldn't this be in deals?"
-        $deals = $deals->sortBy(function ($deal) use ($sortBy) {
-            $boostRank = !empty($deal['is_boosted']) ? 0 : 1;
-            switch ($sortBy) {
-                case 'top_rated':
-                    return [$boostRank, -$deal['rating']];
-                case 'a_z':
-                    return [$boostRank, $deal['name']];
-                case 'best_discount':
-                default:
-                    return [$boostRank, -$deal['discount']];
-            }
-        }, SORT_REGULAR)->values();
+        // Boosted (limited-time) codes first, then the chosen order. Codes
+        // without a known discount go after those with one.
+        $deals = $dealRows->values()->toBase()->merge($vendorRows->toBase())
+            ->sortBy(function ($deal) use ($sortBy) {
+                $boostRank = !empty($deal['is_boosted']) ? 0 : 1;
+                switch ($sortBy) {
+                    case 'top_rated':
+                        return [$boostRank, -(float) $deal['rating'], strtolower($deal['name'])];
+                    case 'a_z':
+                        return [$boostRank, strtolower($deal['name'])];
+                    case 'best_discount':
+                    default:
+                        return [$boostRank, $deal['discount'] === null ? 1 : 0, -($deal['discount'] ?? 0), strtolower($deal['name'])];
+                }
+            }, SORT_REGULAR)
+            ->values();
 
         // Generate SEO data
         $seoData = new SEOData(
@@ -197,6 +116,33 @@ class DealsController extends Controller
             'sortBy' => $sortBy,
             'dealsCount' => $deals->count(),
         ]);
+    }
+
+    /**
+     * One card on /deals: the vendor, its code and the discount the code
+     * gives (null when the vendor has not said).
+     *
+     * @return array<string, mixed>
+     */
+    private function dealRow(Brand $brand, string $code, ?float $discount, bool $boosted = false, ?string $boostEndsAt = null): array
+    {
+        $vs = $brand->vendorSetting;
+        $description = trim(strip_tags((string) ($vs?->description ?? '')));
+
+        return [
+            'id' => $brand->id,
+            'name' => $brand->name,
+            'slug' => $brand->slug ?? Str::slug($brand->name),
+            'initials' => $this->getInitials($brand->name),
+            'logo' => $vs?->publicLogoUrl(),
+            'rating' => number_format($brand->rating_average ?? 0, 2, '.', ''),
+            'reviews' => (int) ($brand->rating_count ?? 0),
+            'discount' => $discount !== null && $discount > 0 && $discount < 100 ? (int) round($discount) : null,
+            'code' => strtoupper(trim($code)),
+            'is_boosted' => $boosted,
+            'boost_ends_at' => $boostEndsAt,
+            'description' => $description !== '' ? Str::limit($description, 160) : null,
+        ];
     }
 
     /**

@@ -1,84 +1,72 @@
 <template>
+  <!-- One stretched link per card (the vendor name, to its coupon page),
+       so the coupon ticket can be a real copy button above it. -->
   <div
-    class="bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group relative border border-gray-200"
-    @click="handleClick"
+    class="group relative flex h-full flex-col overflow-hidden rounded-[14px] border border-[color:var(--color-hairline)] bg-white transition-all duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]"
   >
-    <!-- Discount Badge -->
-    <div class="absolute top-3 right-3 z-10 bg-red-600 text-white px-3 py-1 rounded-full text-sm shadow-lg">
-      <div class="flex items-center gap-1">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4" aria-hidden="true">
-          <path d="M16 17h6v-6"></path>
-          <path d="m22 17-8.5-8.5-5 5L2 7"></path>
-        </svg>
-        -{{ discount }}%
-      </div>
+    <!-- Discount badge (only when the vendor has said what the code gives) -->
+    <div
+      v-if="discountValue"
+      class="absolute top-3 right-3 z-[1] inline-flex items-center gap-1 h-7 px-2.5 rounded-full bg-red-600 text-white text-[13px] font-bold shadow-md"
+    >
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 17h6v-6" /><path d="m22 17-8.5-8.5-5 5L2 7" /></svg>
+      −{{ discountValue }}%
     </div>
 
-    <!-- Limited-Time badge — shown when the vendor's coupon is boosted.
-         Sits opposite the discount pill so both are readable. -->
+    <!-- Limited-Time badge — shown when the vendor's coupon is boosted. -->
     <div
       v-if="isBoosted"
-      class="absolute top-3 left-3 z-10 inline-flex items-center gap-1 bg-amber-500 text-white px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-lg"
+      class="absolute top-3 left-3 z-[1] inline-flex items-center gap-1 bg-amber-500 text-white px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md"
     >
-      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Limited time
     </div>
 
-    <!-- Logo area (shared VendorLogo: contain-fit, backdrop for dark logo
-         blocks, initials when the logo is missing or fails to load) -->
-    <!-- overflow-hidden keeps the square: an aspect-ratio box otherwise
-         grows to fit an oversized logo instead of fitting it. -->
-    <div class="aspect-square border-b border-gray-200 relative overflow-hidden">
-      <VendorLogo
-        :src="logo"
-        :name="name"
-        :alt="name + ' logo'"
-        size="xl"
-        fill
-        radius="none"
-        :bordered="false"
-        fallback="subtle"
-        img-class="w-full h-full object-contain p-[14%] select-none"
-      />
+    <!-- Fixed 16:9 logo box; overflow-hidden keeps the ratio whatever the
+         logo file's shape. -->
+    <div class="relative aspect-[16/9] overflow-hidden border-b border-[color:var(--color-hairline)]">
+      <div class="absolute inset-0">
+        <VendorLogo
+          :src="logo"
+          :name="name"
+          :alt="name + ' logo'"
+          size="xl"
+          fill
+          radius="none"
+          :bordered="false"
+          fallback="subtle"
+          img-class="w-full h-full object-contain px-[16%] py-[14%] select-none"
+        />
+      </div>
     </div>
 
-    <!-- Content Section -->
-    <div class="p-4">
-      <!-- Company Name -->
-      <h3 class="text-lg text-gray-900 mb-2 text-center group-hover:text-slate-700 transition-colors">
-        {{ name }}
-      </h3>
-
-      <!-- Rating (hidden until the vendor has real reviews) -->
-      <div v-if="Number(reviews) > 0" class="flex items-center justify-center gap-1 mb-3">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 fill-yellow-400 text-yellow-400" aria-hidden="true">
-          <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
-        </svg>
-        <span class="text-sm text-gray-700">{{ formattedRating }}</span>
-        <span class="text-xs text-gray-500">({{ reviews }})</span>
+    <div class="flex flex-1 flex-col gap-2.5 p-4">
+      <div class="min-w-0">
+        <h3 class="ui-display truncate text-[16px] font-semibold tracking-tight text-[color:var(--color-ink)] transition-colors group-hover:text-[color:var(--color-accent-700)]">
+          <a
+            :href="`/coupon/${slug}`"
+            class="outline-none after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-[color:var(--color-accent-500)]"
+          >{{ name }}</a>
+        </h3>
+        <!-- Rating (hidden until the vendor has real reviews) -->
+        <div v-if="Number(reviews) > 0" class="mt-1 flex items-center gap-1 text-xs">
+          <svg class="w-3.5 h-3.5 text-[color:var(--color-caution)]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+          <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ formattedRating }}</span>
+          <span class="text-[color:var(--color-ink-subtle)]">({{ reviews }})</span>
+        </div>
       </div>
 
-      <!-- Description -->
-      <p class="text-sm text-gray-600 mb-4 line-clamp-2 text-center">
-        {{ description }}
-      </p>
+      <p v-if="description" class="text-[13px] leading-snug text-[color:var(--color-ink-muted)] line-clamp-2">{{ description }}</p>
 
-      <!-- Use Code Button -->
-      <div class="pt-3 border-t border-gray-200">
-        <div class="flex items-center justify-between">
-          <span class="text-xs text-gray-500">Use code:</span>
-          <button
-            @click.stop="handleCodeClick"
-            class="font-mono text-xs bg-gray-700 text-white px-3 py-1.5 rounded hover:bg-gray-800 transition-colors"
-          >
-            {{ code }}
-          </button>
-        </div>
-        <a
-          :href="`/coupon/${slug}`"
-          @click.stop
-          class="block mt-2 text-[11px] text-center font-semibold text-emerald-700 hover:text-emerald-900"
-        >See full deal &rarr;</a>
+      <div class="mt-auto pt-1">
+        <CouponTicket :code="code" :percent="discountValue" size="sm" />
+        <span
+          aria-hidden="true"
+          class="mt-2 flex h-9 items-center justify-center gap-1.5 rounded-[10px] border border-[color:var(--color-hairline)] text-[12px] font-semibold text-[color:var(--color-ink)] transition-colors group-hover:border-[color:var(--color-accent-400)] group-hover:text-[color:var(--color-accent-700)]"
+        >
+          See the deal
+          <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
+        </span>
       </div>
     </div>
   </div>
@@ -86,8 +74,8 @@
 
 <script setup>
 import { computed } from 'vue'
-import { router } from '@inertiajs/vue3'
 import VendorLogo from '@/components/ui/VendorLogo.vue'
+import CouponTicket from '@/components/ui/CouponTicket.vue'
 
 const props = defineProps({
   id: {
@@ -118,9 +106,10 @@ const props = defineProps({
     type: [String, Number],
     default: 0
   },
+  // Percent the code gives; null when the vendor has not said.
   discount: {
     type: [String, Number],
-    required: true
+    default: null
   },
   code: {
     type: String,
@@ -145,18 +134,8 @@ const formattedRating = computed(() => {
   return rating.toFixed(1)
 })
 
-const handleClick = () => {
-  router.visit(`/brand/${props.slug}`)
-}
-
-const handleCodeClick = (event) => {
-  event.stopPropagation()
-  // Copy code to clipboard
-  navigator.clipboard.writeText(props.code).then(() => {
-    // You could show a toast notification here
-    alert(`Code "${props.code}" copied to clipboard!`)
-  }).catch(() => {
-    alert('Failed to copy code')
-  })
-}
+const discountValue = computed(() => {
+  const n = parseFloat(props.discount)
+  return n > 0 && n < 100 ? Math.round(n) : null
+})
 </script>
