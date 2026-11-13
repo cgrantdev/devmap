@@ -713,6 +713,13 @@ function defaultUnitFor(p) {
   return p && p.group === 'GLP-1 / Weight' ? 'mg' : 'mcg'
 }
 
+// GLP-1 research protocols are weekly (liraglutide is the daily exception),
+// so monthly cost on those presets would otherwise be overstated ~7x.
+function defaultFrequencyFor(p) {
+  if (p && p.group === 'GLP-1 / Weight' && !/liraglutide/i.test(p.name || '')) return 'weekly'
+  return 'daily'
+}
+
 function applyPreset() {
   const p = currentPreset.value
   if (!p) return
@@ -720,6 +727,7 @@ function applyPreset() {
   waterMl.value = p.water
   doseMcg.value = p.dose
   doseUnit.value = defaultUnitFor(p)
+  frequency.value = defaultFrequencyFor(p)
 }
 
 // --- Inputs ---
@@ -901,7 +909,7 @@ watch([mode, preset, peptideMg, waterMl, doseMcg, syringeUnits, frequency], () =
   set('water', waterMl.value, base ? base.water : undefined)
   set('dose', doseMcg.value, base ? base.dose : undefined)
   set('syringe', syringeUnits.value, 100)
-  set('freq', frequency.value, 'daily')
+  set('freq', frequency.value, defaultFrequencyFor(currentPreset.value))
   // Keep Inertia's history state; only the URL changes.
   window.history.replaceState(window.history.state, '', url.toString())
   shareUrl.value = url.toString()
