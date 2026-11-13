@@ -67,8 +67,10 @@
                 <VendorLogo :src="brand.logo" :name="brand.name" :alt="brand.name" size="xs" radius="sm" fallback="subtle" />
                 <span class="text-[13px] text-[color:var(--color-ink-muted)]">by</span>
                 <Link :href="`/brand/${brand.slug}`" class="text-[15px] font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-700)] transition-colors truncate">{{ brand.name }}</Link>
-                <span class="text-[color:var(--color-ink-subtle)]" aria-hidden="true">·</span>
-                <Link :href="`/brand/${brand.slug}`" class="text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">All their products</Link>
+                <!-- The name already links there; phones skip the extra link
+                     so the row stays on one line. -->
+                <span class="hidden sm:inline text-[color:var(--color-ink-subtle)]" aria-hidden="true">·</span>
+                <Link :href="`/brand/${brand.slug}`" class="hidden sm:inline text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">All their products</Link>
                 <span class="text-[color:var(--color-ink-subtle)]" aria-hidden="true">·</span>
                 <a :href="reviewVendorHref" class="text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">Reviews</a>
               </div>
