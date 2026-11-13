@@ -29,8 +29,8 @@
           </div>
           <div v-if="priceSummary.cheapest" class="rounded-[12px] border border-[color:var(--color-hairline)] bg-white px-4 py-3 min-w-0">
             <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Lowest price</div>
-            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-[color:var(--color-ink)]">{{ priceSummary.cheapest.currency_symbol || '$' }}{{ money(priceSummary.cheapest.final_price) }}</div>
-            <div class="mt-1.5 truncate text-[12px] text-[color:var(--color-ink-muted)]">{{ priceSummary.cheapest.brand?.name }}<template v-if="priceSummary.cheapest.size_mg"> · {{ formatSize(priceSummary.cheapest.size_mg) }}</template></div>
+            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-[color:var(--color-ink)]">{{ summaryPrice(priceSummary.cheapest, 'final_price', 'usd_final_price') }}</div>
+            <div class="mt-1.5 truncate text-[12px] text-[color:var(--color-ink-muted)]"><template v-if="isForeign(priceSummary.cheapest)">{{ priceSummary.cheapest.currency_symbol }}{{ money(priceSummary.cheapest.final_price) }} · </template>{{ priceSummary.cheapest.brand?.name }}<template v-if="priceSummary.cheapest.size_mg"> · {{ formatSize(priceSummary.cheapest.size_mg) }}</template></div>
           </div>
           <button
             v-if="priceSummary.bestValue"
@@ -39,8 +39,8 @@
             @click="applySort('value', 'asc')"
           >
             <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700">Best value</div>
-            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-emerald-800">{{ priceSummary.bestValue.currency_symbol || '$' }}{{ money(priceSummary.bestValue.price_per_mg) }}<span class="text-[13px] font-medium">/mg</span></div>
-            <div class="mt-1.5 truncate text-[12px] text-emerald-800/80">{{ priceSummary.bestValue.brand?.name }}<template v-if="priceSummary.bestValue.size_mg"> · {{ formatSize(priceSummary.bestValue.size_mg) }}</template> · sort by value →</div>
+            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-emerald-800">{{ summaryPrice(priceSummary.bestValue, 'price_per_mg', 'usd_per_mg') }}<span class="text-[13px] font-medium">/mg</span></div>
+            <div class="mt-1.5 truncate text-[12px] text-emerald-800/80"><template v-if="isForeign(priceSummary.bestValue)">{{ priceSummary.bestValue.currency_symbol }}{{ money(priceSummary.bestValue.price_per_mg) }}/mg · </template>{{ priceSummary.bestValue.brand?.name }}<template v-if="priceSummary.bestValue.size_mg"> · {{ formatSize(priceSummary.bestValue.size_mg) }}</template> · sort by value →</div>
           </button>
         </div>
 
@@ -438,6 +438,15 @@ const hiddenSizeCount = computed(() => sizeGroups.value.length - visibleSizeGrou
 function money(v) {
   const n = Number(v)
   return Number.isFinite(n) ? n.toFixed(2) : ''
+}
+// Tiles lead with dollars; a listing priced in another currency shows an
+// approximate USD figure here and its own price in the line below.
+function isForeign(row) {
+  return !!row && !!row.currency_code && row.currency_code !== 'USD'
+}
+function summaryPrice(row, field, usdField) {
+  if (isForeign(row) && Number(row[usdField]) > 0) return `≈$${money(row[usdField])}`
+  return `${row.currency_symbol || '$'}${money(row[field])}`
 }
 const priceSummary = computed(() => {
   const rows = (props.products?.data || []).filter((r) => r && !r.price_outlier)

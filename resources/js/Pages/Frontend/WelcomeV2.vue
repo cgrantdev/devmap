@@ -240,7 +240,8 @@
         </template>
       </SectionHeader>
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4">
+      <!-- Five across on desktop so ten compounds make two full rows. -->
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-4">
         <a
           v-for="compound in topCompounds"
           :key="compound.slug"
@@ -447,30 +448,36 @@
           <a href="/products" class="text-[12px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">All products →</a>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          <a
+          <!-- One stretched outbound link per card (the name's ::after
+               covers it), so the coupon ticket can be a real button. -->
+          <div
             v-for="d in bestDeals"
             :key="d.id"
-            :href="d.go_url"
-            target="_blank"
-            rel="noopener noreferrer nofollow sponsored"
-            class="group bg-white border border-[color:var(--color-hairline)] rounded-lg p-3 hover:border-amber-400 hover:shadow-md transition-all relative"
+            class="group relative flex flex-col rounded-[14px] border border-[color:var(--color-hairline)] bg-white p-3 transition-all duration-200 hover:-translate-y-[1px] hover:border-amber-400 hover:shadow-[var(--shadow-md)]"
           >
-            <span v-if="d.coupon_boost_active" class="absolute top-2 right-2 text-[9px] uppercase tracking-wider font-bold bg-red-600 text-white px-1.5 py-0.5 rounded-full">boost</span>
-            <div class="text-[11px] text-[color:var(--color-ink-muted)] truncate">{{ d.brand_name }}</div>
-            <div class="text-[13px] font-semibold text-[color:var(--color-ink)] leading-tight line-clamp-2 mt-0.5 min-h-[2.5em]">{{ d.name }}</div>
-            <div class="mt-2 flex items-baseline gap-2 flex-wrap">
-              <span class="text-lg font-bold text-emerald-700">${{ d.final_price.toFixed(2) }}</span>
-              <span class="text-[11px] text-gray-400 line-through">${{ d.retail.toFixed(2) }}</span>
+            <span v-if="d.coupon_boost_active" class="absolute top-2 right-2 z-[1] text-[9px] uppercase tracking-wider font-bold bg-red-600 text-white px-1.5 py-0.5 rounded-full">boost</span>
+            <div class="text-[11px] text-[color:var(--color-ink-muted)] truncate pr-10">{{ d.brand_name }}</div>
+            <div class="text-[13px] font-semibold text-[color:var(--color-ink)] leading-tight line-clamp-2 mt-0.5 min-h-[2.5em]">
+              <a
+                :href="d.go_url"
+                target="_blank"
+                rel="noopener noreferrer nofollow sponsored"
+                class="outline-none after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-amber-400"
+              >{{ d.name }}</a>
             </div>
-            <div class="mt-1 flex items-center gap-1.5 text-[10px] uppercase tracking-wide font-bold">
-              <span class="text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">Save ${{ d.savings.toFixed(0) }}</span>
-              <span class="text-emerald-700">code <span class="ui-mono">{{ d.coupon_code }}</span></span>
+            <div class="mt-2 flex items-baseline gap-2 overflow-hidden whitespace-nowrap">
+              <span class="ui-display text-lg font-bold text-[color:var(--color-ink)]">${{ d.final_price.toFixed(2) }}</span>
+              <span class="truncate text-[11px] text-[color:var(--color-ink-subtle)] line-through">${{ d.retail.toFixed(2) }}</span>
+              <span class="ml-auto flex-shrink-0 text-[10px] uppercase tracking-wide font-bold text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">Save ${{ d.savings.toFixed(0) }}</span>
             </div>
-            <button type="button" class="mt-2 w-full h-8 rounded bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] text-white text-[11px] font-semibold group-hover:brightness-110 transition-all flex items-center justify-center gap-1">
-              Buy at {{ d.brand_name }}
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-            </button>
-          </a>
+            <div class="mt-2.5">
+              <CouponTicket :code="d.coupon_code" :percent="d.coupon_pct" size="sm" />
+            </div>
+            <span aria-hidden="true" class="mt-2 w-full h-8 rounded-[8px] bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] text-white text-[11px] font-semibold group-hover:brightness-110 transition-all flex items-center justify-center gap-1 px-2">
+              <span class="truncate">Buy at {{ d.brand_name }}</span>
+              <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+            </span>
+          </div>
         </div>
       </div>
     </section>
