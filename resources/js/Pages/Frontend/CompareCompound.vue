@@ -59,8 +59,8 @@
           </div>
           <div v-if="summary.cheapest" class="min-w-0 rounded-[12px] border border-[color:var(--color-hairline)] bg-white px-4 py-3">
             <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Lowest price</div>
-            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-[color:var(--color-ink)]">{{ formatMoney(summary.cheapest, summary.cheapest.pmap_price || summary.cheapest.effective_price) }}</div>
-            <div class="mt-1.5 truncate text-[12px] text-[color:var(--color-ink-muted)]">{{ summary.cheapest.brand_name }}<template v-if="summary.cheapest.size_mg"> · {{ summary.cheapest.size_mg }}</template><template v-if="isForeign(summary.cheapest)"> · ≈ {{ usd(summary.cheapest.usd_final_price) }}</template></div>
+            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-[color:var(--color-ink)]">{{ isForeign(summary.cheapest) ? '≈ ' + usd(summary.cheapest.usd_final_price) : formatMoney(summary.cheapest, summary.cheapest.pmap_price || summary.cheapest.effective_price) }}</div>
+            <div class="mt-1.5 truncate text-[12px] text-[color:var(--color-ink-muted)]">{{ summary.cheapest.brand_name }}<template v-if="summary.cheapest.size_mg"> · {{ summary.cheapest.size_mg }}</template><template v-if="isForeign(summary.cheapest)"> · {{ formatMoney(summary.cheapest, summary.cheapest.pmap_price || summary.cheapest.effective_price) }}</template></div>
           </div>
           <button
             v-if="summary.best"
@@ -84,7 +84,7 @@
     <section class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-6 pb-10">
       <div v-if="compound.products.length">
         <div class="mb-4 space-y-3">
-          <div class="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-0.5" role="tablist" aria-label="Vial size">
+          <div ref="sizeScroller" class="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-0.5" role="tablist" aria-label="Vial size">
             <span class="shrink-0 w-12 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Size</span>
             <button type="button" role="tab" :aria-selected="selectedSize === 'all' ? 'true' : 'false'" :class="chipClass(selectedSize === 'all')" @click="selectedSize = 'all'">
               All sizes <span class="ml-1 ui-mono text-[11px] opacity-60">{{ compound.products.length }}</span>
@@ -103,7 +103,19 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <div v-if="formatOptions.length > 1" class="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-full">
+            <!-- Phones: format and trust rows fold behind this button so the
+                 listings start sooner. -->
+            <button
+              type="button"
+              class="sm:hidden ui-focus inline-flex items-center gap-1.5 h-9 px-3 rounded-[10px] border border-[color:var(--color-hairline)] bg-white text-[13px] font-semibold text-[color:var(--color-ink)]"
+              :aria-expanded="filtersOpen ? 'true' : 'false'"
+              @click="filtersOpen = !filtersOpen"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>
+              Filters
+              <span v-if="activeFilterCount" class="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-[color:var(--color-ink)] text-white text-[11px]">{{ activeFilterCount }}</span>
+            </button>
+            <div v-if="formatOptions.length > 1" :class="[filtersOpen ? 'flex w-full order-last' : 'hidden', 'sm:flex sm:w-auto sm:order-none items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-full']">
               <span class="shrink-0 w-12 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Format</span>
               <button type="button" :class="chipClass(selectedFormat === 'all')" @click="selectedFormat = 'all'">All</button>
               <button v-for="f in formatOptions" :key="f" type="button" :class="chipClass(selectedFormat === f)" @click="selectedFormat = f">{{ f }}</button>
@@ -120,7 +132,7 @@
 
           <!-- Trust filters — Colin PMAP tab 1: same toggles as the vendors
                and peptides pages (?verified=csv&usp=us_manufactured). -->
-          <div class="flex flex-wrap items-center gap-1.5">
+          <div :class="[filtersOpen ? 'flex' : 'hidden', 'sm:flex flex-wrap items-center gap-1.5']">
             <span class="shrink-0 w-12 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Trust</span>
             <button
               v-for="f in verifiedFilters"
@@ -477,7 +489,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import ModernLayout from '../Layouts/ModernLayout.vue'
 import BuyThroughModal from '@/components/BuyThroughModal.vue'
@@ -568,6 +580,8 @@ function truncate(s, max) {
 // Listing filters: size tabs, format, sort (client side, kept in the URL)
 // ---------------------------------------------------------------
 const introOpen = ref(false)
+const filtersOpen = ref(false)
+const sizeScroller = ref(null)
 const rows = computed(() => props.compound?.products || [])
 
 function formatOf(row) {
@@ -674,6 +688,24 @@ function chipClass(active) {
       : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)]',
   ]
 }
+
+const activeFilterCount = computed(() =>
+  (selectedFormat.value !== 'all' ? 1 : 0) + activeVerified.value.size + (activeUsp.value ? 1 : 0)
+)
+
+// The default size tab can sit past the right edge on phones; bring the
+// active tab into view without scrolling the page.
+function revealActiveSize() {
+  const scroller = sizeScroller.value
+  const active = scroller?.querySelector('[aria-selected="true"]')
+  if (!scroller || !active) return
+  const offset = active.getBoundingClientRect().left - scroller.getBoundingClientRect().left
+  if (offset < 56 || offset + active.offsetWidth > scroller.clientWidth) {
+    scroller.scrollLeft += offset - 56
+  }
+}
+onMounted(() => nextTick(revealActiveSize))
+watch(selectedSize, () => nextTick(revealActiveSize))
 
 function resetFilters() {
   selectedSize.value = 'all'
