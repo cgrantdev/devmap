@@ -50,46 +50,47 @@
           class="outline-none after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-[color:var(--color-accent-500)]"
         >{{ name }}</Link>
       </h3>
-      <p class="ui-mono mt-0.5 h-4 truncate text-[11px] text-[color:var(--color-ink-subtle)]">{{ sizeLine }}</p>
+      <p v-if="sizeLine" class="ui-mono mt-0.5 truncate text-[11px] text-[color:var(--color-ink-subtle)]">{{ sizeLine }}</p>
 
-      <!-- Price: what you pay (with the code when there is one), the
-           listed price struck through, then price per mg. -->
-      <div class="mt-3 flex h-[22px] items-baseline gap-2">
-        <span class="ui-display text-[20px] font-bold leading-none tracking-tight text-[color:var(--color-ink)]">{{ currencySymbol }}{{ discountedPrice || displayPrice }}</span>
-        <template v-if="discountedPrice">
-          <span class="text-[12px] leading-none text-[color:var(--color-ink-subtle)] line-through">{{ currencySymbol }}{{ displayPrice }}</span>
-          <span class="text-[10px] font-semibold uppercase leading-none tracking-wide text-emerald-700">with code</span>
-        </template>
-      </div>
-      <div class="mt-1.5 flex h-[18px] items-center">
-        <PricePerMg
-          v-if="pricePerMg !== null && pricePerMg !== undefined && pricePerMg !== ''"
-          :value="pricePerMg"
-          :currency-symbol="currencySymbol"
-          :best="bestValue"
-          :show-badge="false"
-          :size-label="sizeDisplay || ''"
-          :with-code="!!discountedPrice"
-          size="xs"
-        />
-      </div>
+      <!-- Bottom block pinned so price, ticket and button line up across
+           a row. Price: what you pay (with the code when there is one;
+           the ticket right below names it), listed price struck through,
+           then price per mg. -->
+      <div class="mt-auto pt-3">
+        <div class="flex h-[22px] items-baseline gap-2 overflow-hidden whitespace-nowrap">
+          <span class="ui-display text-[20px] font-bold leading-none tracking-tight text-[color:var(--color-ink)]">{{ currencySymbol }}{{ discountedPrice || displayPrice }}</span>
+          <span v-if="discountedPrice" class="truncate text-[12px] leading-none text-[color:var(--color-ink-subtle)] line-through">{{ currencySymbol }}{{ displayPrice }}</span>
+        </div>
+        <div class="mt-1.5 flex h-[18px] items-center">
+          <PricePerMg
+            v-if="pricePerMg !== null && pricePerMg !== undefined && pricePerMg !== ''"
+            :value="pricePerMg"
+            :currency-symbol="currencySymbol"
+            :best="bestValue"
+            :show-badge="false"
+            :size-label="sizeDisplay || ''"
+            :with-code="!!discountedPrice"
+            size="xs"
+          />
+        </div>
 
-      <div class="mt-3">
-        <CouponTicket v-if="ticketCode" :code="ticketCode" :percent="brandDiscountPercent" size="sm" />
-        <div
-          v-else
-          class="flex h-10 items-center justify-center rounded-[10px] border border-dashed border-[color:var(--color-hairline)] text-[11px] font-medium text-[color:var(--color-ink-subtle)]"
-        >Listed price · no code needed</div>
-      </div>
+        <div class="mt-3">
+          <CouponTicket v-if="ticketCode" :code="ticketCode" :percent="brandDiscountPercent" size="sm" />
+          <div
+            v-else
+            class="flex h-10 items-center justify-center rounded-[10px] border border-dashed border-[color:var(--color-hairline)] text-[11px] font-medium text-[color:var(--color-ink-subtle)]"
+          >Listed price · no code needed</div>
+        </div>
 
-      <!-- Visual CTA only; the stretched title link handles the click. -->
-      <span
-        aria-hidden="true"
-        class="mt-2.5 flex h-9 items-center justify-center gap-1.5 rounded-[10px] border border-[color:var(--color-hairline)] text-[12px] font-semibold text-[color:var(--color-ink)] transition-colors group-hover:border-[color:var(--color-accent-400)] group-hover:text-[color:var(--color-accent-700)]"
-      >
-        View listing
-        <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
-      </span>
+        <!-- Visual CTA only; the stretched title link handles the click. -->
+        <span
+          aria-hidden="true"
+          class="mt-2.5 flex h-9 items-center justify-center gap-1.5 rounded-[10px] border border-[color:var(--color-hairline)] text-[12px] font-semibold text-[color:var(--color-ink)] transition-colors group-hover:border-[color:var(--color-accent-400)] group-hover:text-[color:var(--color-accent-700)]"
+        >
+          View listing
+          <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -186,11 +187,14 @@ const sizeDisplay = computed(() => {
   return null
 })
 
-// "10mg · 10 vials". Kit is dropped when the format chip already says it.
+// "10mg · 10 vials". Kit is dropped when the format chip already says it,
+// and the size when the name already shows it ("BPC-157 (5mg)").
 const sizeLine = computed(() => {
   let pack = packLabel(props.rawName || props.name)
   if (pack === 'Kit' && props.productType === 'Kit') pack = null
-  return [sizeDisplay.value, pack].filter(Boolean).join(' · ')
+  const size = sizeDisplay.value
+  const sizeInName = size && String(props.name || '').toLowerCase().includes(String(size).toLowerCase())
+  return [sizeInName ? null : size, pack].filter(Boolean).join(' · ')
 })
 
 // Use real purity from database, or extract from name, or use default

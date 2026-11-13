@@ -51,7 +51,7 @@
 
         <!-- Vendor (related products span vendors) + size / pack line -->
         <p v-if="brandName" class="mt-1 truncate text-[12px] font-medium text-[color:var(--color-ink-muted)]">{{ brandName }}</p>
-        <p class="ui-mono mt-0.5 h-4 truncate text-[11px] text-[color:var(--color-ink-subtle)]">{{ sizeLine }}</p>
+        <p v-if="sizeLine" class="ui-mono mt-0.5 truncate text-[11px] text-[color:var(--color-ink-subtle)]">{{ sizeLine }}</p>
 
         <!-- Rating (hidden until the product has real reviews) -->
         <div v-if="Number(ratingCount) > 0" class="mt-1.5 flex items-center gap-1">
@@ -62,12 +62,11 @@
 
         <!-- Price block pinned to the bottom so cards line up. -->
         <div class="mt-auto pt-3">
-          <div class="flex h-[22px] items-baseline gap-2">
+          <!-- What you pay (with the code when there is one; the ticket
+               below names it) and the listed price struck through. -->
+          <div class="flex h-[22px] items-baseline gap-2 overflow-hidden whitespace-nowrap">
             <span class="ui-display text-[20px] font-bold leading-none tracking-tight text-[color:var(--color-ink)]">{{ currencySymbol }}{{ discountedPrice || displayPrice }}</span>
-            <template v-if="discountedPrice">
-              <span class="text-[12px] leading-none text-[color:var(--color-ink-subtle)] line-through">{{ currencySymbol }}{{ displayPrice }}</span>
-              <span class="text-[10px] font-semibold uppercase leading-none tracking-wide text-emerald-700">with code</span>
-            </template>
+            <span v-if="discountedPrice" class="truncate text-[12px] leading-none text-[color:var(--color-ink-subtle)] line-through">{{ currencySymbol }}{{ displayPrice }}</span>
           </div>
 
           <!-- Price per mg. Rendered (and its row reserved) only when the
@@ -131,10 +130,13 @@
   })
 
   const sizeLabel = computed(() => formatSizeLabel(props.sizeMg))
+  // Size is dropped when the name already shows it ("BPC-157 (5mg)").
   const sizeLine = computed(() => {
     let pack = packLabel(props.rawName)
     if (pack === 'Kit' && props.productType === 'Kit') pack = null
-    return [sizeLabel.value, pack].filter(Boolean).join(' · ')
+    const size = sizeLabel.value
+    const sizeInName = size && String(props.name || '').toLowerCase().includes(String(size).toLowerCase())
+    return [sizeInName ? null : size, pack].filter(Boolean).join(' · ')
   })
   const showPerMgRow = computed(() => props.pricePerMg !== undefined)
 
