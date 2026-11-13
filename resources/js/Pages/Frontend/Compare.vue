@@ -5,440 +5,249 @@
       <meta name="description" :content="seo.description" />
     </Head>
 
-    <!-- Header -->
-    <section class="border-b border-[color:var(--color-hairline)]">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-10">
-        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Side-by-side</div>
-        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">
+    <!-- Header on the light brand band (same treatment as the homepage):
+         title, intro, live totals and the RUO note, then straight to the
+         compound list. -->
+    <section class="relative overflow-hidden ui-brand-band-light border-b border-[color:var(--color-hairline)]">
+      <BrandSphere class="hidden md:block -right-28 -top-44" :size="520" :opacity="0.06" />
+      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-7 pb-6 lg:pt-9 lg:pb-7">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-2">Side-by-side</div>
+        <h1 class="ui-display text-3xl md:text-[42px] leading-[1.1] font-semibold tracking-[-0.02em] text-[color:var(--color-ink)]">
           Compare Peptide Prices
         </h1>
-        <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
+        <p class="mt-2.5 max-w-2xl text-[15px] md:text-[16px] leading-relaxed text-[color:var(--color-ink-muted)]">
           Compare research peptide listings and prices across vendors. Open a compound for its vendor table.
         </p>
-        <div class="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] text-[11px] text-[color:var(--color-ink-subtle)]">
-          <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-          All products listed are for <strong class="text-[color:var(--color-ink-muted)]">research use only</strong> (RUO). Not for human consumption.
-        </div>
+        <ul class="mt-4 flex flex-wrap items-center gap-2 text-[13px]" role="list">
+          <li
+            v-for="item in statItems"
+            :key="item.label"
+            class="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-white/85 border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)]"
+          >
+            <strong class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ item.value }}</strong> {{ item.label }}
+          </li>
+          <li
+            v-if="totals.prices_updated_human"
+            class="inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-white/85 border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)]"
+            :title="totals.prices_updated_iso"
+          >
+            <span class="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true" />
+            Prices checked {{ totals.prices_updated_human }}
+          </li>
+        </ul>
+        <p class="mt-3 text-[12px] text-[color:var(--color-ink-subtle)]">
+          All products listed are for <strong class="font-semibold text-[color:var(--color-ink-muted)]">research use only</strong> (RUO). Not for human consumption.
+        </p>
       </div>
     </section>
 
-    <!-- Product-type nav: 6 blocks across the top. Click filters the
-         compound rows below to only products of that type; 'All' resets.
-         Counts derived client-side from the compounds payload so the row
-         quietly hides types with zero inventory. -->
-    <section class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 pt-6">
-      <div class="grid grid-cols-3 md:grid-cols-6 gap-1.5 sm:gap-2 lg:gap-3">
-        <button
-          v-for="t in typeNavItems"
-          :key="t.key"
-          @click="selectedType = (selectedType === t.key ? null : t.key)"
-          :class="[
-            'ui-focus group flex flex-col items-center justify-center gap-1 sm:gap-1.5 py-2 px-1 sm:p-3 lg:p-4 rounded-[10px] sm:rounded-[12px] border-2 transition-all',
-            selectedType === t.key
-              ? 'border-[color:var(--color-ink)] bg-[color:var(--color-ink)] text-white shadow-[var(--shadow-md)]'
-              : 'border-[color:var(--color-hairline)] bg-white text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]',
-          ]"
-        >
-          <div class="text-lg sm:text-xl lg:text-2xl leading-none">{{ t.icon }}</div>
-          <div class="text-[11px] sm:text-[12px] lg:text-[13px] font-semibold leading-none">{{ t.label }}</div>
-          <div :class="['text-[10px] ui-mono', selectedType === t.key ? 'text-white/70' : 'text-[color:var(--color-ink-subtle)]']">
-            {{ t.count }}
-          </div>
-        </button>
-      </div>
-    </section>
-
-    <!-- Dedicated-landing banner — high-intent shortcut for people looking
-         for BAC water specifically. Sits above the compound grid so it
-         reads as a distinct destination, not just another tile. -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6">
-      <a
-        href="/bacteriostatic-water"
-        class="ui-focus group flex items-center gap-4 p-4 lg:p-5 rounded-[12px] border border-sky-200 bg-gradient-to-r from-sky-50 to-cyan-50/60 hover:border-sky-400 hover:shadow-[var(--shadow-md)] transition-all"
-      >
-        <div class="flex-shrink-0 w-11 h-11 rounded-full bg-white border border-sky-200 flex items-center justify-center">
-          <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>
-          </svg>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="text-[15px] lg:text-[16px] font-semibold text-[color:var(--color-ink)] leading-tight">
-            Looking for bacteriostatic water?
-          </div>
-          <div class="text-[12px] text-[color:var(--color-ink-muted)] mt-0.5">
-            Sorted by per-mL price · size filter · FAQ
-          </div>
-        </div>
-        <div class="flex-shrink-0 hidden sm:flex items-center gap-1 text-[13px] font-semibold text-sky-700 group-hover:text-sky-800 transition-colors">
-          Open
-          <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-        </div>
-      </a>
-    </section>
-
-    <!-- Compact fuzzy search. Matches compound name/slug/description AND
-         a small ALIASES table for shortnames (reta, RTA, GLP-3R, etc.),
-         AND every product row's raw vendor name so vendor-specific
-         labels ('SLU-PP-332', 'Wolverine Spray') still surface their
-         parent compound. -->
-    <section class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10 pt-6">
-      <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-        <div class="relative flex-1">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <!-- Search and sort. Location comes from the header picker. -->
+    <section class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-5">
+      <LocationFilterChip />
+      <div class="flex items-center gap-2">
+        <div class="relative flex-1 min-w-0">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[color:var(--color-ink-subtle)] pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
           <input
-            v-model="compoundSearch"
+            v-model="query"
             type="search"
-            placeholder="Search — try BPC, reta, RTA, GLP-1, sema, cagri, wolverine…"
-            class="w-full h-11 pl-10 pr-9 text-[14px] border border-[color:var(--color-hairline)] rounded-[10px] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 transition-colors"
+            enterkeyhint="search"
+            autocomplete="off"
+            placeholder="Find a compound: BPC, reta, GLP-1, GHK…"
+            aria-label="Find a compound"
+            class="w-full h-12 pl-11 pr-10 text-[15px] rounded-[12px] border border-[color:var(--color-hairline)] bg-white shadow-[var(--shadow-xs)] text-[color:var(--color-ink)] placeholder:text-[color:var(--color-ink-subtle)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 transition-colors [&::-webkit-search-cancel-button]:hidden"
           />
           <button
-            v-if="compoundSearch"
-            @click="compoundSearch = ''"
+            v-if="query"
+            type="button"
             aria-label="Clear search"
-            class="absolute right-2 top-1/2 -translate-y-1/2 text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)] p-1"
+            class="ui-focus absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)]"
+            @click="query = ''"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
           </button>
         </div>
-        <!-- Ships-from filter. Sidesteps the multi-currency mismatch
-             (EUR vs USD vendors mixed) by letting the visitor scope to
-             one location. Persists in localStorage so it carries across
-             pageviews. Only shows locations that have live inventory. -->
+        <label for="hub-sort" class="sr-only">Sort compounds</label>
         <select
-          v-if="locations.length"
-          v-model="selectedLocationId"
-          class="h-11 px-3 pr-9 text-[14px] border border-[color:var(--color-hairline)] rounded-[10px] bg-white text-[color:var(--color-ink)] focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15 transition-colors"
-          aria-label="Filter by vendor location"
+          id="hub-sort"
+          v-model="sortKey"
+          class="ui-focus shrink-0 w-[118px] sm:w-[150px] h-12 pl-3 pr-8 text-[14px] font-medium rounded-[12px] border border-[color:var(--color-hairline)] bg-white shadow-[var(--shadow-xs)] text-[color:var(--color-ink)] focus:border-[color:var(--color-accent-500)] focus:outline-none"
         >
-          <option :value="null">🌎 Ships from · Any</option>
-          <option v-for="loc in locations" :key="loc.id" :value="loc.id">
-            {{ locationFlag(loc.name) }} {{ loc.name }} ({{ loc.count }})
-          </option>
+          <option value="popular">Popular</option>
+          <option value="vendors">Most vendors</option>
+          <option value="name">A–Z</option>
         </select>
-        <div class="text-[12px] text-[color:var(--color-ink-subtle)] whitespace-nowrap ui-mono">
-          {{ visibleCompoundCount }} of {{ compounds.length }}
-        </div>
+      </div>
+      <div class="mt-3 flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <span class="shrink-0 mr-1 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Also</span>
+        <a
+          v-for="s in SHORTCUTS"
+          :key="s.href"
+          :href="s.href"
+          class="ui-focus shrink-0 inline-flex items-center h-8 px-3 rounded-full border border-[color:var(--color-hairline)] bg-white text-[12px] font-medium text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-accent-700)] transition-colors"
+        >{{ s.label }}</a>
       </div>
     </section>
 
-    <!-- Per-compound vendor pricing sections -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-10 pb-20">
-      <div class="space-y-12">
+    <!-- Compound index: one row per compound with a compare page. The
+         whole row opens /compare/{slug}; size chips open it on that size. -->
+    <section class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-6 pb-14">
+      <div class="flex items-baseline justify-between gap-3 mb-2.5">
+        <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)]">
+          {{ trimmedQuery ? 'Matching compounds' : 'All compounds' }}
+          <span class="ml-1 ui-mono text-[13px] font-medium text-[color:var(--color-ink-subtle)]">{{ trimmedQuery ? `${results.length} of ${compounds.length}` : compounds.length }}</span>
+        </h2>
+        <span class="hidden sm:inline text-[12px] text-[color:var(--color-ink-subtle)]">Lowest listed prices, in USD</span>
+      </div>
+
+      <div class="rounded-[14px] border border-[color:var(--color-hairline)] bg-white shadow-[var(--shadow-xs)] overflow-hidden">
         <div
-          v-for="(compound, idx) in compounds"
-          v-show="compoundMatchesSearch(compound) && compound.products.some(p => (!selectedType || productMatchesType(p, selectedType)) && productMatchesLocation(p))"
-          :key="compound.id"
-          :id="compound.anchor"
-          class="scroll-mt-24"
+          v-if="results.length"
+          :class="['hidden lg:grid gap-6 px-5 py-2.5 border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]', GRID]"
         >
-          <!-- Compound header. Dropped the #{{ idx+1 }} position badge —
-               it just reflected order in the featured-list constant, not
-               popularity or price rank; users read it as ranking and got
-               confused. -->
-          <div class="flex items-start justify-between gap-3 sm:gap-4 mb-3 flex-wrap">
-            <div class="min-w-0 flex-1">
-              <h2 class="ui-display text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-1 leading-tight">
-                {{ compound.name }}
-              </h2>
-              <div class="flex items-baseline gap-2 sm:gap-3 text-[12px] text-[color:var(--color-ink-muted)] mb-2 flex-wrap">
-                <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.vendor_count }}</strong> vendors</span>
-                <span v-if="compound.cheapest_price" class="text-[color:var(--color-ink-subtle)]">·</span>
-                <span v-if="compound.cheapest_price" class="ui-mono font-semibold text-emerald-700">lowest listed {{ compound.cheapest_currency_symbol || '$' }}{{ formatPrice(compound.cheapest_price) }}</span>
-                <span v-if="compound.prices_updated_human" class="text-[color:var(--color-ink-subtle)]">·</span>
-                <span v-if="compound.prices_updated_human" class="text-[color:var(--color-ink-subtle)]" :title="compound.prices_updated_iso">
-                  Prices updated {{ compound.prices_updated_human }}
+          <div>Compound</div>
+          <div>From</div>
+          <div>Best per mg</div>
+          <div>Popular sizes</div>
+          <div />
+        </div>
+
+        <ul v-if="results.length" class="divide-y divide-[color:var(--color-hairline-soft)]" role="list">
+          <li
+            v-for="(c, i) in results"
+            v-show="showAll || trimmedQuery || i < INITIAL_ROWS"
+            :id="c.anchor"
+            :key="c.id"
+            class="group relative scroll-mt-28 hover:bg-[color:var(--color-bg)] transition-colors"
+          >
+            <div :class="['grid grid-cols-2 gap-x-2.5 gap-y-3 px-4 sm:px-5 py-4 lg:gap-x-6 lg:items-center', GRID]">
+              <!-- Compound -->
+              <div class="col-span-2 lg:col-span-1 min-w-0 pr-7 lg:pr-0">
+                <h3 class="text-[16px] font-semibold leading-snug text-[color:var(--color-ink)]">
+                  <a
+                    :href="compareHref(c)"
+                    class="ui-focus rounded-sm after:absolute after:inset-0 group-hover:text-[color:var(--color-accent-700)] transition-colors"
+                  >{{ c.name }}</a>
+                </h3>
+                <div class="mt-0.5 text-[12.5px] text-[color:var(--color-ink-muted)]">
+                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ c.vendor_count }}</span> {{ c.vendor_count === 1 ? 'vendor' : 'vendors' }}
+                  <span class="text-[color:var(--color-ink-subtle)]"> · </span>
+                  <span class="ui-mono">{{ c.listing_count }}</span> {{ c.listing_count === 1 ? 'listing' : 'listings' }}
+                  <template v-if="c.encyclopedia_url">
+                    <span class="text-[color:var(--color-ink-subtle)]"> · </span>
+                    <a :href="c.encyclopedia_url" class="ui-focus relative z-10 rounded-sm font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">Guide</a>
+                  </template>
+                </div>
+                <p v-if="c.description" class="hidden md:block mt-1 text-[12.5px] leading-snug text-[color:var(--color-ink-subtle)] line-clamp-1">{{ c.description }}</p>
+              </div>
+
+              <svg class="lg:hidden absolute right-4 top-[19px] w-4 h-4 text-[color:var(--color-ink-subtle)] group-hover:text-[color:var(--color-accent-600)] transition-colors" fill="none" stroke="currentColor" stroke-width="2.25" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+
+              <!-- From -->
+              <div class="min-w-0 rounded-[10px] bg-[color:var(--color-bg)] px-3 py-2.5 lg:bg-transparent lg:p-0">
+                <div class="lg:hidden text-[10.5px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">From</div>
+                <template v-if="c.from">
+                  <div class="mt-0.5 lg:mt-0 ui-mono text-[16px] font-semibold leading-tight text-[color:var(--color-ink)] truncate">{{ fromMain(c.from) }}</div>
+                  <div class="mt-0.5 truncate text-[12px] text-[color:var(--color-ink-muted)]">{{ fromSub(c.from) }}</div>
+                </template>
+                <div v-else class="mt-0.5 lg:mt-0 text-[14px] text-[color:var(--color-ink-subtle)]">—</div>
+              </div>
+
+              <!-- Best per mg -->
+              <div class="min-w-0 rounded-[10px] bg-emerald-50/70 px-3 py-2.5 lg:bg-transparent lg:p-0">
+                <div class="lg:hidden text-[10.5px] uppercase tracking-[0.08em] font-semibold text-emerald-700">Best per mg</div>
+                <template v-if="c.best_per_mg">
+                  <div class="mt-0.5 lg:mt-0 ui-mono text-[16px] font-semibold leading-tight text-emerald-700 truncate">{{ perMg(c.best_per_mg.usd_per_mg) }}<span class="text-[12px] font-medium">/mg</span></div>
+                  <div class="mt-0.5 truncate text-[12px] text-[color:var(--color-ink-muted)]">{{ c.best_per_mg.size }} · {{ c.best_per_mg.vendor }}</div>
+                </template>
+                <div v-else class="mt-0.5 lg:mt-0 text-[14px] text-[color:var(--color-ink-subtle)]">—</div>
+              </div>
+
+              <!-- Popular sizes -->
+              <div :class="['col-span-2 lg:col-span-1 min-w-0', c.sizes?.length ? '' : 'hidden lg:block']">
+                <div v-if="c.sizes?.length" class="flex flex-wrap items-center gap-1.5">
+                  <span class="lg:hidden mr-0.5 text-[10.5px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Sizes</span>
+                  <a
+                    v-for="s in c.sizes"
+                    :key="s.param"
+                    :href="sizeHref(c, s)"
+                    :title="`${s.listings} ${s.listings === 1 ? 'listing' : 'listings'} at ${s.label}, from ${money(s.from_usd)}`"
+                    class="ui-focus relative z-10 inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full border border-[color:var(--color-hairline)] bg-white text-[12px] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-accent-700)] transition-colors"
+                  >
+                    <span class="font-semibold text-[color:var(--color-ink)]">{{ s.label }}</span>
+                    <span class="ui-mono">{{ money(s.from_usd) }}</span>
+                  </a>
+                </div>
+                <span v-else class="text-[14px] text-[color:var(--color-ink-subtle)]">—</span>
+              </div>
+
+              <!-- Desktop call to action (the row itself is the link) -->
+              <div class="hidden lg:flex justify-end" aria-hidden="true">
+                <span class="inline-flex items-center gap-1 h-9 px-3.5 rounded-[10px] border border-[color:var(--color-hairline)] bg-white text-[13px] font-semibold text-[color:var(--color-ink)] group-hover:border-[#0369A1] group-hover:bg-[#0284C7] group-hover:text-white transition-colors">
+                  Compare
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
                 </span>
               </div>
-              <p v-if="compound.description" class="text-[13px] sm:text-sm text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl line-clamp-2">
-                {{ compound.description }}
-              </p>
             </div>
-            <div class="flex items-center gap-2 flex-shrink-0 flex-wrap">
-              <a
-                :href="`/compare/${compound.slug}`"
-                class="ui-focus inline-flex items-center gap-1.5 h-8 sm:h-9 px-3 sm:px-4 rounded-[8px] sm:rounded-[9px] bg-[color:var(--color-ink)] text-white text-[12px] sm:text-[13px] font-semibold hover:opacity-90 transition-opacity"
-                :title="`Full ${compound.name} vendor comparison`"
-              >
-                Full comparison
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-              </a>
-              <a
-                v-if="compound.encyclopedia_url"
-                :href="compound.encyclopedia_url"
-                class="ui-focus inline-flex items-center gap-1.5 h-8 sm:h-9 px-3 sm:px-4 rounded-[8px] sm:rounded-[9px] border border-[color:var(--color-hairline)] bg-white text-[12px] sm:text-[13px] font-semibold text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] transition-colors"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 19.5A2.5 2.5 0 016.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
-                </svg>
-                Read article
-              </a>
-            </div>
-          </div>
+          </li>
+        </ul>
 
-          <!-- Mg size selector tabs -->
-          <div v-if="getSizes(compound).length > 1" class="flex items-center gap-1.5 mb-4 overflow-x-auto -mx-1 px-1 pb-1">
+        <button
+          v-if="results.length > INITIAL_ROWS && !showAll && !trimmedQuery"
+          type="button"
+          class="ui-focus w-full h-12 flex items-center justify-center gap-1.5 border-t border-[color:var(--color-hairline)] text-[14px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:bg-[color:var(--color-bg)] transition-colors"
+          @click="showAll = true"
+        >
+          Show all {{ results.length }} compounds
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+        </button>
+
+        <!-- No match: offer the site search, which also covers vendor
+             product names. -->
+        <div v-if="!results.length" class="px-6 py-12 text-center">
+          <div class="text-[15px] font-semibold text-[color:var(--color-ink)]">
+            <template v-if="trimmedQuery">No compound matches “{{ trimmedQuery }}”</template>
+            <template v-else>No compounds have listings here yet</template>
+          </div>
+          <p class="mt-1 text-[13px] text-[color:var(--color-ink-muted)]">
+            {{ trimmedQuery ? 'Try a shorter name, or search every listing.' : 'Try another location in the header.' }}
+          </p>
+          <div v-if="trimmedQuery" class="mt-4 flex flex-wrap justify-center gap-2">
+            <a
+              :href="`/search?q=${encodeURIComponent(trimmedQuery)}`"
+              class="ui-focus inline-flex items-center h-10 px-4 rounded-[10px] text-[13px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-sm"
+            >Search all listings</a>
             <button
-              @click="setSize(idx, null)"
-              :class="[
-                'ui-mono h-8 px-3 rounded-[8px] text-[12px] font-semibold transition-all whitespace-nowrap flex-shrink-0',
-                getSelectedSize(idx) === null
-                  ? 'bg-[color:var(--color-ink)] text-white shadow-sm'
-                  : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]',
-              ]"
-            >All sizes</button>
-            <button
-              v-for="size in getSizes(compound)"
-              :key="size.key"
-              @click="setSize(idx, size.key)"
-              :class="[
-                'ui-mono h-8 px-3 rounded-[8px] text-[12px] font-semibold transition-all whitespace-nowrap flex-shrink-0',
-                getSelectedSize(idx) === size.key
-                  ? 'bg-[color:var(--color-ink)] text-white shadow-sm'
-                  : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]',
-              ]"
-            >{{ size.label }}</button>
-          </div>
-
-          <!-- Price table. Mobile hides Product + Retail (compound name
-               already in the section header above, and retail is visible
-               as strikethrough inside 'Your price' when a coupon applies).
-               Wrapper allows horizontal scroll as a safety net for really
-               narrow screens. -->
-          <div v-if="getFilteredProducts(compound, idx).length" class="bg-white rounded-[14px] border border-[color:var(--color-hairline)] overflow-hidden shadow-[var(--shadow-xs)]">
-           <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
-                  <th class="text-left px-3 sm:px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendor</th>
-                  <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden md:table-cell">Product</th>
-                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden md:table-cell">Retail</th>
-                  <th class="text-right px-3 sm:px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700 bg-emerald-50/50">Price</th>
-                  <th class="text-center px-2 sm:px-3 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-amber-700 bg-amber-50/60">Coupon</th>
-                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden sm:table-cell">Savings</th>
-                  <th class="text-right px-3 sm:px-5 py-3 w-[70px] sm:w-[100px]"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(product, pidx) in getVisibleProducts(compound, idx)"
-                  :key="product.id"
-                  :class="[
-                    'border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] transition-colors',
-                    pidx === 0 && !product.price_outlier ? 'bg-[color:var(--color-verified-bg)]' : '',
-                  ]"
-                >
-                  <!-- Vendor -->
-                  <td class="px-3 sm:px-5 py-3 sm:py-4">
-                    <div class="flex items-center gap-2 sm:gap-2.5">
-                      <VendorLogo :src="product.brand_logo" :name="product.brand_name" :alt="product.brand_name" size="xxs" radius="sm" fallback="subtle" />
-                      <div class="min-w-0">
-                        <a
-                          :href="`/brand/${product.brand_slug}`"
-                          class="block font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors truncate"
-                        >
-                          {{ product.brand_name }}
-                        </a>
-                        <!-- Mobile-only: surface the product name since the Product column is hidden <md -->
-                        <div class="md:hidden text-[11px] text-[color:var(--color-ink-subtle)] truncate">{{ product.name }}</div>
-                        <!-- Price outliers (a stale $4.95 vial among ~$100
-                             listings) sort last and never take this badge. -->
-                        <div v-if="pidx === 0 && !product.price_outlier" class="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Lowest listed</span>
-                          <span
-                            v-if="percentCheaper(getFilteredProducts(compound, idx))"
-                            class="ml-1 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-[color:var(--color-verified-bg)] border border-[#A7F3D0] text-[10px] font-bold text-[#065F46]"
-                          >
-                            {{ percentCheaper(getFilteredProducts(compound, idx)) }}% cheaper
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <!-- Product — hidden on mobile (name shown under vendor instead) -->
-                  <td class="px-5 py-4 text-[color:var(--color-ink-muted)] hidden md:table-cell">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                      <span class="line-clamp-1">{{ product.name }}</span>
-                      <span
-                        v-if="product.product_type === 'Capsule'"
-                        class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-800 border border-blue-200"
-                      >Capsule</span>
-                      <span
-                        v-else-if="product.product_type === 'Nasal Spray'"
-                        class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200"
-                      >Spray</span>
-                      <span
-                        v-else-if="product.product_type === 'Topical'"
-                        class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-cyan-100 text-cyan-800 border border-cyan-200"
-                      >Topical</span>
-                      <span
-                        v-else-if="product.product_type === 'Kit'"
-                        class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200"
-                      >Kit</span>
-                    </div>
-                  </td>
-                  <!-- Retail — hidden on mobile (strikethrough already in Price cell) -->
-                  <td class="px-5 py-4 text-right hidden md:table-cell">
-                    <div v-if="product.discount_price && product.discount_price < product.price" class="flex flex-col items-end">
-                      <span class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">{{ sym(product) }}{{ formatPrice(product.discount_price) }}</span>
-                      <span class="ui-mono text-[11px] text-[color:var(--color-ink)] line-through">{{ sym(product) }}{{ formatPrice(product.price) }}</span>
-                    </div>
-                    <span v-else class="ui-mono text-[15px] font-bold text-[color:var(--color-ink)]">
-                      {{ sym(product) }}{{ formatPrice(product.price) }}
-                    </span>
-                  </td>
-                  <!-- Price — on mobile, folds in strikethrough retail since the Retail column is hidden -->
-                  <td class="px-3 sm:px-5 py-3 sm:py-4 text-right bg-emerald-50/50 whitespace-nowrap">
-                    <template v-if="discountedPriceFor(product)">
-                      <div class="ui-mono text-[14px] sm:text-[15px] font-bold text-emerald-700">{{ sym(product) }}{{ discountedPriceFor(product) }}</div>
-                      <div v-if="product.price" class="md:hidden ui-mono text-[10px] text-[color:var(--color-ink-subtle)] line-through leading-tight">{{ sym(product) }}{{ formatPrice(product.price) }}</div>
-                    </template>
-                    <template v-else>
-                      <div v-if="product.discount_price && product.discount_price < product.price" class="flex flex-col items-end">
-                        <span class="ui-mono text-[14px] sm:text-[15px] font-bold text-[color:var(--color-ink)]">{{ sym(product) }}{{ formatPrice(product.discount_price) }}</span>
-                        <span class="md:hidden ui-mono text-[10px] text-[color:var(--color-ink-subtle)] line-through leading-tight">{{ sym(product) }}{{ formatPrice(product.price) }}</span>
-                      </div>
-                      <span v-else class="ui-mono text-[14px] sm:text-[15px] font-bold text-[color:var(--color-ink)]">{{ sym(product) }}{{ formatPrice(product.price) }}</span>
-                    </template>
-                    <div v-if="product.price_per_mg" class="mt-1 flex justify-end">
-                      <PricePerMg
-                        :value="product.price_per_mg"
-                        :currency-symbol="sym(product)"
-                        :best="!!product.best_value"
-                        :size-label="formatSize(product.size_mg)"
-                        :with-code="!!discountedPriceFor(product)"
-                        size="xs"
-                      />
-                    </div>
-                  </td>
-                  <!-- Coupon — its own prominent click-to-copy column so
-                       people who don't want to click through can still grab
-                       the code. Amber dashed border, click flashes to green. -->
-                  <td class="px-2 sm:px-3 py-3 sm:py-4 text-center bg-amber-50/60">
-                    <button
-                      v-if="couponCodeFor(product)"
-                      @click="copyCoupon(product.id, couponCodeFor(product))"
-                      :class="[
-                        'ui-focus inline-flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-md border-2 border-dashed transition-all',
-                        copiedCouponId === product.id
-                          ? 'border-emerald-400 bg-emerald-100 text-emerald-800'
-                          : 'border-amber-400 bg-amber-100 text-amber-900 hover:bg-amber-200 hover:border-amber-500',
-                      ]"
-                      :title="copiedCouponId === product.id ? 'Copied!' : 'Click to copy'"
-                    >
-                      <span class="ui-mono text-[12px] sm:text-[13px] font-bold tracking-wide">{{ couponCodeFor(product) }}</span>
-                      <svg v-if="copiedCouponId === product.id" class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      <svg v-else class="w-3 h-3 hidden sm:inline" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                    </button>
-                    <span v-else class="text-[12px] text-[color:var(--color-ink-subtle)]">—</span>
-                  </td>
-                  <!-- Savings — retail → what you actually pay (folds in
-                       both the vendor's own sale AND any PMAP coupon). -->
-                  <td class="px-5 py-4 text-right hidden sm:table-cell">
-                    <span
-                      v-if="totalSavingsPct(product)"
-                      class="ui-mono text-xs font-semibold text-[color:var(--color-verified)]"
-                    >
-                      -{{ totalSavingsPct(product) }}%
-                    </span>
-                    <span v-else class="text-[color:var(--color-ink-subtle)]">—</span>
-                  </td>
-                  <!-- CTA. href preserved so bots + right-click "open in
-                       new tab" both work; @click intercepts JS clicks to
-                       show the coupon reveal first. -->
-                  <td class="px-3 sm:px-5 py-3 sm:py-4 text-right">
-                    <a
-                      :href="withSrc(product.go_url)"
-                      @click="openBuy($event, product)"
-                      target="_blank"
-                      rel="noopener noreferrer nofollow sponsored"
-                      class="ui-focus inline-flex items-center gap-1 h-8 px-3 rounded-[8px] text-[12px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08)] hover:shadow-[0_2px_8px_-2px_rgba(2,132,199,0.5)] hover:-translate-y-[0.5px] transition-all"
-                    >
-                      Buy
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M7 17L17 7M17 7H7M17 7v10" />
-                      </svg>
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-           </div>
-            <!-- Footer: expand the cheapest rows shipped with the hub, and
-                 link to the compound page for the complete table. -->
-            <div
-              v-if="getFilteredProducts(compound, idx).length > COLLAPSED_LIMIT || hasMoreListings(compound)"
-              class="flex flex-col sm:flex-row border-t border-[color:var(--color-hairline)]"
-            >
-              <button
-                v-if="getFilteredProducts(compound, idx).length > COLLAPSED_LIMIT"
-                @click="toggleCompound(idx)"
-                :aria-expanded="isExpanded(idx)"
-                class="ui-focus flex-1 h-11 flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:bg-[color:var(--color-hairline-soft)] transition-colors"
-              >
-                <template v-if="isExpanded(idx)">
-                  Show fewer
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
-                </template>
-                <template v-else>
-                  Show {{ getFilteredProducts(compound, idx).length - COLLAPSED_LIMIT }} more
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-                </template>
-              </button>
-              <a
-                v-if="hasMoreListings(compound)"
-                :href="`/compare/${compound.slug}`"
-                class="ui-focus flex-1 h-11 flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)] transition-colors sm:border-l border-t sm:border-t-0 border-[color:var(--color-hairline)]"
-              >
-                See all {{ compound.product_count }} {{ compound.name }} listings
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-              </a>
-            </div>
-          </div>
-
-          <!-- Empty state -->
-          <div
-            v-if="!getFilteredProducts(compound, idx).length"
-            class="bg-white rounded-[14px] border border-dashed border-[color:var(--color-hairline)] p-10 text-center text-[color:var(--color-ink-subtle)] text-sm"
-          >
-            <template v-if="compound.products.length && !getFilteredProducts(compound, idx).length">
-              No listings at this size in this preview.
-              <a :href="`/compare/${compound.slug}`" class="ml-1 font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">See the full {{ compound.name }} comparison</a>
-            </template>
-            <template v-else>
-              No vendors currently stock this compound.
-            </template>
+              type="button"
+              class="ui-focus inline-flex items-center h-10 px-4 rounded-[10px] border border-[color:var(--color-hairline)] bg-white text-[13px] font-semibold text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)]"
+              @click="query = ''"
+            >Clear search</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Head-to-head comparison cards below the primary tables. People come
-         to /compare for the tables — vs-pages are a secondary explore path,
-         better placed after users have scanned what they came for. -->
-    <section v-if="featuredPairs?.length" class="border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-12">
-        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] mb-4">
-          Head-to-head comparisons
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+    <!-- Head-to-head pages. A search narrows these too. -->
+    <section v-if="visiblePairs.length" class="border-t border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-10 lg:py-12">
+        <h2 class="ui-display text-xl md:text-2xl font-semibold tracking-tight text-[color:var(--color-ink)]">Head-to-head comparisons</h2>
+        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <a
-            v-for="p in featuredPairs"
+            v-for="p in visiblePairs"
             :key="p.url"
             :href="p.url"
-            class="ui-focus group p-4 rounded-[10px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all"
+            class="ui-focus group flex items-center gap-3 p-4 rounded-[12px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all"
           >
-            <div class="text-[14px] font-semibold leading-tight">
-              <span class="text-sky-700">{{ p.a_name }}</span>
-              <span class="text-[color:var(--color-ink-subtle)] mx-1.5 font-light">vs</span>
-              <span class="text-emerald-700">{{ p.b_name }}</span>
+            <div class="min-w-0 flex-1">
+              <div class="text-[15px] font-semibold leading-tight">
+                <span class="text-[color:var(--color-accent-700)]">{{ p.a_name }}</span>{{ ' ' }}<span class="text-[12px] font-medium text-[color:var(--color-ink-subtle)]">vs</span>{{ ' ' }}<span class="text-emerald-700">{{ p.b_name }}</span>
+              </div>
+              <div class="mt-1 truncate text-[12px] text-[color:var(--color-ink-muted)]">{{ p.tagline }}</div>
             </div>
-            <div class="mt-1 text-[11px] text-[color:var(--color-ink-muted)]">{{ p.tagline }}</div>
+            <svg class="shrink-0 w-4 h-4 text-[color:var(--color-ink-subtle)] group-hover:text-[color:var(--color-accent-600)] group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" stroke-width="2.25" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
           </a>
         </div>
       </div>
     </section>
-
-    <BuyThroughModal ref="buyModal" />
   </ModernLayout>
 </template>
 
@@ -446,330 +255,213 @@
 import { ref, computed, watch } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
-import WishlistHeart from '@/components/ui/WishlistHeart.vue'
-import BuyThroughModal from '@/components/BuyThroughModal.vue'
-import PricePerMg from '@/components/price/PricePerMg.vue'
-import VendorLogo from '@/components/ui/VendorLogo.vue'
-import { compareSizeInfo, sizeInfo } from '@/components/price/priceFormat'
-import { withSrc } from '@/composables/useOutbound'
-
-const buyModal = ref(null)
-
-// Intercept Buy clicks so the coupon reveal shows first. Only interrupt
-// plain left-clicks — modifier clicks (cmd, middle, right) fall through
-// to the browser's native new-tab / open-in-new-window behavior.
-function openBuy(ev, product) {
-  if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button === 1) return
-  const code = couponCodeFor(product)
-  if (!code) return // No coupon = no need to interrupt; native click continues.
-  ev.preventDefault()
-  buyModal.value?.open({
-    destination: withSrc(product.go_url),
-    code,
-    brandName: product.brand_name,
-    discountPct: product.brand_discount_percent,
-  })
-}
+import BrandSphere from '@/components/ui/BrandSphere.vue'
+import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
+import { formatMoney, formatPerMg } from '@/components/price/priceFormat'
 
 const props = defineProps({
   compounds: { type: Array, default: () => [] },
+  totals: { type: Object, default: () => ({}) },
   featuredPairs: { type: Array, default: () => [] },
-  locations: { type: Array, default: () => [] },
   seo: { type: Object, default: () => ({}) },
 })
 
-// Ships-from filter — persisted in localStorage so the visitor's chosen
-// location survives page loads. null = 'Any' (default).
-const LOCATION_KEY = 'pmap.compare.location'
-const selectedLocationId = ref(null)
+// Shared column template for the desktop header and rows.
+const GRID = 'lg:grid-cols-[minmax(0,2.4fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.7fr)_104px]'
+
+// Rows past this stay in the page (crawlable) but hidden until
+// "Show all"; a search always shows every match.
+const INITIAL_ROWS = 30
+
+const SHORTCUTS = [
+  { label: 'Bacteriostatic water', href: '/bacteriostatic-water' },
+  { label: 'Blends', href: '/blends' },
+  { label: 'Bulk', href: '/bulk' },
+  { label: 'Skincare', href: '/skincare' },
+]
+
+// Shortnames people type that don't share letters with the compound
+// name, keyed by compare slug. Lowercase.
+const ALIASES = {
+  'retatrutide': ['reta', 'rta', 'glp3', 'glp-3', 'glp-3r', 'glp3r', 'triple agonist'],
+  'semaglutide': ['sema', 'glp1', 'glp-1', 'glp1-s', 'ozempic', 'wegovy'],
+  'tirzepatide': ['tirz', 'tirze', 'tzp', 'glp2', 'glp-2', 'glp2-t', 'mounjaro', 'zepbound'],
+  'cagrilintide': ['cagri', 'cag', 'amylin'],
+  'bpc-157': ['bpc', 'body protection compound'],
+  'tb-500': ['tb500', 'tb', 'thymosin beta', 'tb4'],
+  'bpc-157-tb-500': ['wolverine', 'bpc tb', 'healing blend'],
+  'ghk-cu': ['ghk', 'copper peptide', 'copper'],
+  'cjc-1295': ['cjc', 'mod grf', 'modified grf'],
+  'cjc-1295-ipamorelin': ['cjc ipa', 'cjc/ipa'],
+  'ipamorelin': ['ipa', 'ipam'],
+  'sermorelin': ['serm'],
+  'tesamorelin': ['tesa', 'egrifta'],
+  'mots-c': ['mots', 'motsc'],
+  'bremelanotide': ['pt-141', 'pt141', 'pt 141'],
+  'kisspeptin': ['kiss', 'kp-10', 'kp10'],
+  '5-amino-1mq': ['5amino', 'aminomq', '1mq'],
+  'aod-9604': ['aod', 'aod9604'],
+  'nad': ['nad+', 'nicotinamide'],
+  'glutathione': ['gsh'],
+  'igf-1-lr3': ['igf1', 'igf-1', 'igf', 'lr3'],
+  'elamipretide': ['ss-31', 'ss31'],
+  'tesofensine': ['tesof'],
+  'glow': ['glow stack', 'glow blend'],
+  'klow-blend-ghk-cu-bpc-157-tb-500-kpv': ['klow', 'klow stack'],
+  'thymosin-alpha-1': ['ta1', 'ta-1', 'thymalfasin'],
+  'ibutamoren': ['mk-677', 'mk677', 'mk 677'],
+  'melanotan-ii': ['mt2', 'mt-2', 'mt ii', 'melanotan 2'],
+  'melanotan-i': ['mt1', 'mt-1', 'melanotan 1'],
+  'hgh-191aa': ['hgh', 'somatropin', 'growth hormone'],
+  'epitalon': ['epithalon', 'epitalone'],
+  'dsip': ['delta sleep'],
+  'slu-pp-332': ['slu', 'slupp'],
+  'semax': ['semaks'],
+  'methylene-blue': ['mb', 'methylene'],
+  'vitamin-b12': ['b12', 'cyanocobalamin', 'methylcobalamin'],
+  'mic-b12': ['mic', 'lipo b12'],
+  'bacteriostatic-water': ['bac water', 'bac', 'bacteriostatic'],
+  'orforglipron': ['orfo', 'orforg'],
+}
+
+const initialParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams()
+const query = ref(initialParams.get('q') || '')
+const sortKey = ref(['vendors', 'name'].includes(initialParams.get('sort')) ? initialParams.get('sort') : 'popular')
+const showAll = ref(false)
+const trimmedQuery = computed(() => query.value.trim())
+
+// Keep q and sort in the URL so a filtered view can be shared. Other
+// params (the header's ?location=) stay as they are.
 if (typeof window !== 'undefined') {
-  const stored = localStorage.getItem(LOCATION_KEY)
-  if (stored) {
-    const id = parseInt(stored, 10)
-    // Only re-apply if the stored id is still in the current locations list —
-    // otherwise a retired vendor could permanently blank the compare page.
-    if (props.locations.some(l => l.id === id)) selectedLocationId.value = id
-  }
-  watch(selectedLocationId, (v) => {
-    if (v == null) localStorage.removeItem(LOCATION_KEY)
-    else localStorage.setItem(LOCATION_KEY, String(v))
+  watch([trimmedQuery, sortKey], ([q, sort]) => {
+    const url = new URL(window.location.href)
+    if (q) url.searchParams.set('q', q)
+    else url.searchParams.delete('q')
+    if (sort === 'popular') url.searchParams.delete('sort')
+    else url.searchParams.set('sort', sort)
+    window.history.replaceState(window.history.state, '', url)
   })
 }
 
-function productMatchesLocation(product) {
-  if (selectedLocationId.value == null) return true
-  return product.brand_location_id === selectedLocationId.value
+function normalize(value) {
+  return String(value || '').toLowerCase()
+}
+function compact(value) {
+  return normalize(value).replace(/[^a-z0-9]+/g, '')
+}
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-// Emoji flag hint for the ships-from dropdown. Just the countries we
-// actually have vendors in — no need to enumerate all 200 Location rows.
-function locationFlag(name) {
-  return {
-    'United States':  '🇺🇸',
-    'United Kingdom': '🇬🇧',
-    'Germany':        '🇩🇪',
-    'Czechia':        '🇨🇿',
-    'Romania':        '🇷🇴',
-    'Canada':         '🇨🇦',
-    'Australia':      '🇦🇺',
-    'Netherlands':    '🇳🇱',
-    'Poland':         '🇵🇱',
-    'France':         '🇫🇷',
-    'Italy':          '🇮🇹',
-    'Spain':          '🇪🇸',
-  }[name] || '🌍'
+const indexed = computed(() => props.compounds.map((c, order) => {
+  const primary = normalize([c.name, c.slug, String(c.slug || '').replace(/-/g, ' '), ...(ALIASES[c.slug] || [])].join(' '))
+  return { c, order, primary, primaryCompact: compact(primary), description: normalize(c.description) }
+}))
+
+// 2 = the name, slug or a shortname contains the token ("ghk cu" and
+// "bpc157" both work); 1 = a word in the description starts with it.
+function tokenScore(entry, token) {
+  if (entry.primary.includes(token)) return 2
+  const t = compact(token)
+  if (t && entry.primaryCompact.includes(t)) return 2
+  if (token.length >= 3 && new RegExp('\\b' + escapeRegExp(token)).test(entry.description)) return 1
+  return 0
 }
 
-// Track selected mg size per compound (by index). null = "All"
-const selectedSizes = ref({})
+function bySort(a, b) {
+  if (sortKey.value === 'vendors') {
+    return (b.c.vendor_count - a.c.vendor_count) || (b.c.listing_count - a.c.listing_count) || (a.order - b.order)
+  }
+  if (sortKey.value === 'name') {
+    return String(a.c.name).localeCompare(String(b.c.name), 'en', { sensitivity: 'base', numeric: true })
+  }
+  return a.order - b.order
+}
 
-// Compound search — fuzzy match across name, slug, description, vendor
-// product names, AND a curated shortnames table so people can type what
-// they actually type ('reta', 'RTA', 'GLP-3R', 'sema', 'ghk') and land
-// on the right compound. Replaces the old 25-card grid which ate a
-// screen of vertical space to browse a list of 25 items.
-const compoundSearch = ref('')
-
-// Extend this whenever a compound has common shortnames people search
-// for that don't share letters with the full name. Values are lowercase;
-// the search input is lowercased before matching.
-const COMPOUND_ALIASES = {
-  'retatrutide':   ['reta', 'rta', 'glp3', 'glp-3', 'glp-3r', 'glp3r', 'triple agonist'],
-  'semaglutide':   ['sema', 'glp1', 'glp-1', 'ozempic', 'wegovy'],
-  'tirzepatide':   ['tirz', 'tzp', 'mounjaro', 'zepbound', 'gip'],
-  'cagrilintide':  ['cagri', 'cag'],
-  'bpc-157':       ['bpc', 'body protection compound'],
-  'tb-500':        ['tb500', 'thymosin', 'tb4'],
-  'ghk-cu':        ['ghk', 'copper peptide', 'copper'],
-  'cjc-1295':      ['cjc', 'mod grf', 'modified grf'],
-  'ipamorelin':    ['ipa', 'ipam'],
-  'sermorelin':    ['serm'],
-  'tesamorelin':   ['tesa', 'egrifta'],
-  'mots-c':        ['mots', 'motsc'],
-  'pt-141':        ['pt141', 'bremelanotide'],
-  'kisspeptin':    ['kiss', 'kp-10'],
-  '5-amino-1mq':   ['5amino', 'aminomq', '1mq'],
-  'aod-9604':      ['aod', 'aod9604'],
-  'nad+':          ['nad', 'nicotinamide'],
-  'glutathione':   ['gsh'],
-  'igf-1 lr3':     ['igf1', 'igf-1', 'igf', 'lr3'],
-  'ss-31':         ['ss31', 'elamipretide'],
-  'tesofensine':   ['tesof', 'tso'],
-  'glow':          ['glow stack', 'skin peptide'],
-  'klow':          ['klow stack'],
-}
-function compoundHaystack(compound) {
-  // Build once per compound per keystroke — small (25 rows), so fine to
-  // recompute rather than cache.
-  const name = String(compound.name || '').toLowerCase()
-  const slug = String(compound.slug || '').toLowerCase()
-  const desc = String(compound.description || '').toLowerCase()
-  const aliases = (COMPOUND_ALIASES[slug] || COMPOUND_ALIASES[name] || []).join(' ')
-  const productNames = (compound.products || [])
-    .slice(0, 20)                          // cap so a compound with 100 vendors doesn't dominate
-    .map(p => (p.name || '').toLowerCase())
-    .join(' ')
-  return `${name} ${slug} ${desc} ${aliases} ${productNames}`
-}
-function compoundMatchesSearch(compound) {
-  const raw = compoundSearch.value.trim().toLowerCase()
-  if (!raw) return true
-  // Split on whitespace so "ghk cu" matches "ghk-cu"; every token must appear.
-  const tokens = raw.split(/\s+/).filter(Boolean)
-  const hay = compoundHaystack(compound)
-  return tokens.every(t => hay.includes(t))
-}
-const visibleCompoundCount = computed(() =>
-  props.compounds.filter(c =>
-    compoundMatchesSearch(c) &&
-    c.products.some(p =>
-      (!selectedType.value || productMatchesType(p, selectedType.value)) &&
-      productMatchesLocation(p)
-    )
-  ).length
-)
-
-// Product-type filter (Peptide / Topical / Capsule / Nasal Spray / Kit / Other).
-// null = "All" — the default. Values match the product.product_type string
-// stored on each row, with 'Peptide' also treated as the null/default type
-// (many older products have no product_type set — they're peptides by default).
-const selectedType = ref(null)
-function productMatchesType(product, typeKey) {
-  if (typeKey === null) return true
-  const pt = product?.product_type ?? null
-  if (typeKey === 'Peptide') return !pt || pt === 'Peptide'
-  return pt === typeKey
-}
-const typeNavItems = computed(() => {
-  const defs = [
-    { key: 'Peptide',     icon: '🧪', label: 'Peptides' },
-    { key: 'Topical',     icon: '💧', label: 'Topicals' },
-    { key: 'Capsule',     icon: '💊', label: 'Capsules' },
-    { key: 'Nasal Spray', icon: '💨', label: 'Sprays' },
-    { key: 'Kit',         icon: '📦', label: 'Kits' },
-    { key: 'Other',       icon: '⚪', label: 'Other' },
-  ]
-  // The hub ships each compound's cheapest rows only; type_counts holds
-  // the full per-format totals.
-  return defs.map(d => ({
-    ...d,
-    count: props.compounds.reduce((n, c) =>
-      n + (c.type_counts && c.type_counts[d.key] !== undefined
-        ? Number(c.type_counts[d.key]) || 0
-        : c.products.filter(p => productMatchesType(p, d.key)).length), 0),
-  }))
+const results = computed(() => {
+  const tokens = normalize(trimmedQuery.value).split(/\s+/).filter(Boolean)
+  let list = indexed.value
+  if (tokens.length) {
+    list = list
+      .map((entry) => {
+        let score = 2
+        for (const token of tokens) {
+          const hit = tokenScore(entry, token)
+          if (!hit) return null
+          score = Math.min(score, hit)
+        }
+        return { ...entry, score }
+      })
+      .filter(Boolean)
+  }
+  const sorted = [...list].sort(bySort)
+  // Name matches before description matches; the sort holds within each.
+  if (tokens.length) sorted.sort((a, b) => b.score - a.score)
+  return sorted.map((entry) => entry.c)
 })
 
-// True when the hub preview holds fewer rows than the compound has.
-function hasMoreListings(compound) {
-  return Number(compound.product_count || 0) > (compound.products?.length || 0)
-}
-
-function getSizes(compound) {
-  // One tab per amount ("10 mg", "10mg" and a bare "10" share a tab),
-  // sorted by milligrams with blends after. size_counts covers every
-  // listing; the shipped rows are only the cheapest few per size.
-  const source = compound.size_counts
-    ? Object.keys(compound.size_counts)
-    : compound.products.map(p => p.size_mg)
-  const groups = new Map()
-  for (const raw of source) {
-    if (raw === null || raw === undefined || String(raw).trim() === '') continue
-    const info = sizeInfo(raw)
-    if (!groups.has(info.key)) {
-      groups.set(info.key, { ...info, label: formatSize(String(raw).replace(/\s+/g, '')) })
-    }
-  }
-  return [...groups.values()].sort(compareSizeInfo)
-}
-
-function getSelectedSize(idx) {
-  return selectedSizes.value[idx] ?? null
-}
-
-function setSize(idx, size) {
-  selectedSizes.value = { ...selectedSizes.value, [idx]: size }
-}
-
-function getFilteredProducts(compound, idx) {
-  const size = getSelectedSize(idx)
-  return compound.products.filter(p => {
-    if (size && sizeInfo(p.size_mg).key !== size) return false
-    if (!productMatchesType(p, selectedType.value)) return false
-    if (!productMatchesLocation(p)) return false
-    return true
+const visiblePairs = computed(() => {
+  const tokens = normalize(trimmedQuery.value).split(/\s+/).filter(Boolean)
+  if (!tokens.length) return props.featuredPairs
+  return props.featuredPairs.filter((p) => {
+    const hay = normalize([
+      p.a_name, p.b_name, p.a_slug, p.b_slug,
+      ...(ALIASES[p.a_slug] || []), ...(ALIASES[p.b_slug] || []),
+    ].join(' '))
+    const hayCompact = compact(hay)
+    return tokens.every((t) => hay.includes(t) || (compact(t) && hayCompact.includes(compact(t))))
   })
+})
+
+const statItems = computed(() => {
+  const t = props.totals || {}
+  return [
+    { value: t.compounds, one: 'compound', many: 'compounds' },
+    { value: t.vendors, one: 'vendor', many: 'vendors' },
+    { value: t.listings, one: 'listing', many: 'listings' },
+  ]
+    .filter((item) => Number(item.value) > 0)
+    .map((item) => ({
+      value: Number(item.value).toLocaleString('en-US'),
+      label: Number(item.value) === 1 ? item.one : item.many,
+    }))
+})
+
+function compareHref(c) {
+  return `/compare/${c.slug}`
+}
+function sizeHref(c, size) {
+  return `/compare/${c.slug}?size=${encodeURIComponent(size.param)}`
 }
 
-// Collapse each compound to top 5 rows by default — the page was scrolling
-// forever with 40-100 products per compound. Users can expand any compound
-// they want to dig into. State keyed by compound idx (matches the v-for
-// key we already pass around).
-const COLLAPSED_LIMIT = 5
-const expandedCompounds = ref({})
-function isExpanded(idx) { return !!expandedCompounds.value[idx] }
-function toggleCompound(idx) { expandedCompounds.value[idx] = !expandedCompounds.value[idx] }
-function getVisibleProducts(compound, idx) {
-  const filtered = getFilteredProducts(compound, idx)
-  return isExpanded(idx) ? filtered : filtered.slice(0, COLLAPSED_LIMIT)
+function money(value) {
+  return formatMoney(value, '$') || '—'
+}
+function perMg(value) {
+  return formatPerMg(value, '$') || '—'
 }
 
-function percentCheaper(products) {
-  // Compare on the field the rows are sorted by: what the visitor pays,
-  // in USD so a GBP row is not read as dollars. Price outliers are left
-  // out so a stale $4.95 vial can't claim to be 95% cheaper.
-  const priced = products.filter(p => !p?.price_outlier)
-  if (priced.length < 2) return null
-  const pay = (p) => parseFloat(p?.usd_final_price ?? p?.final_price ?? p?.effective_price)
-  const first = pay(priced[0])
-  const second = pay(priced[1])
-  if (!first || !second || first >= second) return null
-  return Math.round((1 - first / second) * 100)
+// "10mg" and "10 mg" read the same; blends ("5mg/5mg") stay as listed.
+function sizeText(size) {
+  const s = String(size || '').trim()
+  const m = s.match(/^(\d+(?:\.\d+)?)\s*(mg|mcg|g|ml|iu)$/i)
+  return m ? `${m[1]} ${m[2].toLowerCase()}` : s
 }
 
-function formatPrice(p) {
-  if (p === null || p === undefined || p === '') return '—'
-  const num = typeof p === 'number' ? p : parseFloat(p)
-  return isNaN(num) ? String(p) : num.toFixed(2)
+function isForeign(from) {
+  return !!from?.currency && from.currency !== 'USD'
 }
-
-// Currency symbol per product — controller stamps it from the vendor's
-// country. Falls back to $ for legacy rows / unknown countries.
-function sym(product) {
-  return product?.currency_symbol || '$'
+// Dollars first; a listing priced in another currency shows its USD
+// equivalent with the vendor's own price underneath.
+function fromMain(from) {
+  if (isForeign(from)) return '≈ ' + money(from.usd)
+  return formatMoney(from.amount, from.symbol || '$') || '—'
 }
-
-// Vendor's effective retail price — discount_price wins when it's a real
-// vendor-side sale, otherwise the plain list price.
-function effectiveRetail(product) {
-  const dp = parseFloat(product?.discount_price)
-  const p = parseFloat(product?.price)
-  if (!isNaN(dp) && dp > 0 && dp < p) return dp
-  return isNaN(p) ? 0 : p
-}
-
-// Discounted price using the vendor's configured PeptideMap discount %.
-// Returns null when no discount is set so the column shows a dash.
-function discountedPriceFor(product) {
-  const pct = parseFloat(product?.brand_discount_percent)
-  if (!pct || pct <= 0 || pct >= 100) return null
-  const base = effectiveRetail(product)
-  if (!base || base <= 0) return null
-  return (base * (1 - pct / 100)).toFixed(2)
-}
-
-// Coupon code label — only returned when the vendor actually has a real
-// discount percent configured. Otherwise the pill would show "PMAP" for
-// vendors where PMAP does nothing, which reads as a fake/broken coupon.
-function couponCodeFor(product) {
-  const pct = parseFloat(product?.brand_discount_percent)
-  if (!pct || pct <= 0 || pct >= 100) return null
-  const raw = (product?.brand_coupon_code || '').trim()
-  return (raw || 'PMAP').toUpperCase()
-}
-
-// Click-to-copy state for the coupon column. Only one code is highlighted
-// at a time — copying a second code moves the highlight; the flash clears
-// on its own after 2s. Keyed by product id so multiple rows can each show
-// their own copied state within the same rendered table.
-const copiedCouponId = ref(null)
-let _copyResetTimer = null
-async function copyCoupon(productId, code) {
-  try {
-    await navigator.clipboard.writeText(code)
-  } catch {
-    // Non-HTTPS or older browser — fall back to hidden textarea select+copy.
-    const ta = document.createElement('textarea')
-    ta.value = code; ta.style.cssText = 'position:fixed;left:-9999px'
-    document.body.appendChild(ta); ta.select()
-    try { document.execCommand('copy') } catch {}
-    document.body.removeChild(ta)
-  }
-  copiedCouponId.value = productId
-  clearTimeout(_copyResetTimer)
-  _copyResetTimer = setTimeout(() => { copiedCouponId.value = null }, 2000)
-}
-
-// Total savings vs. bare retail. Combines the vendor's own sale
-// (discount_price vs price) AND any PMAP coupon we apply on top.
-// Returns null when there's nothing to show so the cell renders '—'.
-function totalSavingsPct(product) {
-  const listPrice = parseFloat(product?.price)
-  const finalPrice = parseFloat(product?.final_price ?? product?.effective_price)
-  if (!listPrice || !finalPrice || finalPrice >= listPrice) return null
-  return Math.round((1 - finalPrice / listPrice) * 100)
-}
-
-/**
- * Render a size value cleanly. Values are stored with units already
- * ("10mg", "5mg/5mg", "100mcg"). Bare numeric legacy values get "mg"
- * appended for display only.
- */
-function formatSize(value) {
-  if (!value) return ''
-  const str = String(value).trim()
-  if (/[a-zA-Z]/.test(str)) return str
-  if (!Number.isNaN(Number(str))) return `${Number(str)}mg`
-  return str
+function fromSub(from) {
+  const parts = []
+  if (isForeign(from)) parts.push(formatMoney(from.amount, from.symbol))
+  if (from.size) parts.push(sizeText(from.size))
+  if (from.vendor) parts.push(from.vendor)
+  return parts.filter(Boolean).join(' · ')
 }
 </script>

@@ -386,9 +386,8 @@ class SeoHygieneTest extends TestCase
             ->assertDontSee('vendor.example/vial.jpg', false)
             ->assertDontSee('vendor.example/products/bpc-157', false)
             ->assertInertia(fn ($page) => $page
-                ->has('compounds.0.products.0.go_url')
-                ->missing('compounds.0.products.0.image_url')
-                ->missing('compounds.0.products.0.product_url')
+                ->has('compounds.0.from')
+                ->missing('compounds.0.products')
             );
     }
 }

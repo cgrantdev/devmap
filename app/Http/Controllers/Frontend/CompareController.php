@@ -129,6 +129,9 @@ class CompareController extends Controller
         'klow' => 'klow-blend-ghk-cu-bpc-157-tb-500-kpv',
     ];
 
+    /** @var array<string, string|null> Resolved logo URLs by stored path. */
+    private array $logoUrls = [];
+
     // Display-name overrides live in App\Support\CompoundDisplay so
     // ProductsController + CompareController stay in sync. Semaglutide,
     // Tirzepatide, and Retatrutide map to GLP1-S / GLP2-T / GLP3-R for
@@ -138,12 +141,12 @@ class CompareController extends Controller
 
     public function index(Request $request)
     {
-        // The per-compound build runs a full listing query for every
-        // featured compound (3-4s uncached). Cache it per filter set for 10
-        // minutes under a fixed key. Not FrontendCache: its versioned keys
-        // change on every bust (up to once a minute while scrapers run),
-        // and the database cache store never deletes a ~1MB row whose key
-        // is not read again. Logged-in users get a live build.
+        // The hub reads every priced listing once (a few seconds uncached).
+        // Cache it per filter set for 10 minutes under a fixed key. Not
+        // FrontendCache: its versioned keys change on every bust (up to
+        // once a minute while scrapers run), and the database cache store
+        // never deletes a row whose key is not read again. Logged-in users
+        // get a live build.
         $filterKey = md5(json_encode([
             trim((string) $request->get('location', '')),
             trim((string) $request->get('verified', '')),
@@ -152,19 +155,12 @@ class CompareController extends Controller
         $hub = auth()->check()
             ? $this->buildHub()
             : \Illuminate\Support\Facades\Cache::remember(
-                'compare:hub:v1:'.$filterKey,
+                'compare:hub:v2:'.$filterKey,
                 600,
                 fn () => $this->buildHub()
             );
         // "Updated 2 hours ago" is relative to now, not to the cache write.
-        $compounds = collect($hub['compounds'])->map(function (array $c) {
-            $c['prices_updated_human'] = ! empty($c['prices_updated_iso'])
-                ? \Carbon\Carbon::parse($c['prices_updated_iso'])->diffForHumans()
-                : null;
-
-            return $c;
-        });
-        $locationCompoundCounts = $hub['locationCompoundCounts'];
+        $updatedIso = $hub['prices_updated_iso'] ?? null;
 
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "compare")
         $defaultTitle = 'Compare Peptide Vendors Side-by-Side — Peptidemap';
@@ -187,147 +183,249 @@ class CompareController extends Controller
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
 
-        // Location filter options: only locations that actually have at
-         // least one vendor with a product surfaced on this page. Sorted by
-         // count desc so US-heavy inventory naturally leads the dropdown.
-        $vendorLocationIds = collect($locationCompoundCounts);
-        $locations = \App\Models\Location::whereIn('id', $vendorLocationIds->keys())
-            ->get(['id', 'name'])
-            ->map(fn ($l) => [
-                'id' => $l->id,
-                'name' => $l->name,
-                'count' => (int) $vendorLocationIds[$l->id],
-            ])
-            ->sortByDesc('count')
-            ->values()
-            ->all();
-
+        // Location comes from the header picker (?location=), which
+        // listingQuery() applies to the hub and the compound pages alike.
         return Inertia::render('Frontend/Compare', [
-            'compounds' => $compounds,
+            'compounds' => $hub['compounds'],
+            'totals' => [
+                'compounds' => count($hub['compounds']),
+                'vendors' => $hub['vendor_count'],
+                'listings' => $hub['listing_count'],
+                'prices_updated_iso' => $updatedIso,
+                'prices_updated_human' => $updatedIso
+                    ? \Carbon\Carbon::parse($updatedIso)->diffForHumans()
+                    : null,
+            ],
             'featuredPairs' => $this->resolveFeaturedPairs(),
-            'locations' => $locations,
             'seo' => $seo,
         ]);
     }
 
     /**
-     * Hub cards for FEATURED_COMPOUND_NAMES plus, per location id, how
-     * many compounds have listings there. Reads the request's location /
-     * verified / usp filters through productsForCategory().
+     * One hub row per compound with a compare page (the set the sitemap
+     * lists), built from a single chunked pass over every priced listing
+     * with the request's location / verified / usp filters applied.
+     * Featured compounds lead in FEATURED_COMPOUND_NAMES order, then the
+     * rest by vendor count.
      *
-     * @return array{compounds: list<array<string, mixed>>, locationCompoundCounts: array<int|string, int>}
+     * Prices follow the compound page's summary strip: the lowest listed
+     * USD single-vial price and lowest listed $/mg from ComparePriceStats.
+     * Compounds with no qualifying vial (blends, kits, non-USD vendors)
+     * show their cheapest listing instead. After-code prices stay on the
+     * compound page.
+     *
+     * @return array{compounds: list<array<string, mixed>>, vendor_count: int, listing_count: int, prices_updated_iso: string|null}
      */
     private function buildHub(): array
     {
-        // Fetch all featured categories in one query
-        $categories = ProductCategory::where('is_active', true)
-            ->whereIn('name', self::FEATURED_COMPOUND_NAMES)
+        $rowsByCategory = [];
+        $latestByCategory = [];
+        // Narrow columns: the product table carries long description text
+        // that the hub never reads.
+        $this->listingQuery()
+            ->whereNotNull('product_category_id')
+            ->select([
+                'products.id',
+                'products.name',
+                'products.slug',
+                'products.product_type',
+                'products.size_mg',
+                'products.price',
+                'products.discount_price',
+                'products.brand_id',
+                'products.product_category_id',
+                'products.image_url',
+                'products.product_url',
+                'products.last_scraped_at',
+                'products.updated_at',
+            ])
+            ->chunkById(1000, function ($chunk) use (&$rowsByCategory, &$latestByCategory) {
+                foreach ($chunk as $product) {
+                    $categoryId = (int) $product->product_category_id;
+                    $rowsByCategory[$categoryId][] = $this->listingRow($product);
+                    foreach ([$product->last_scraped_at, $product->updated_at] as $stamp) {
+                        if ($stamp && (! isset($latestByCategory[$categoryId]) || $stamp->gt($latestByCategory[$categoryId]))) {
+                            $latestByCategory[$categoryId] = $stamp;
+                        }
+                    }
+                }
+            }, 'products.id', 'id');
+
+        $categories = ProductCategory::query()
+            ->where('is_active', true)
+            ->whereIn('id', array_keys($rowsByCategory))
             ->with(['educationPost' => function ($q) {
                 $q->where('status', 'published')
                   ->select('id', 'product_category_id', 'slug', 'description', 'status');
             }])
+            ->orderBy('id')
             ->get()
-            ->keyBy('name');
+            ->keyBy('id');
 
-        // For each compound, the cheapest rows per size / format / location
-        // (Compare.vue filters on those in the browser) plus full counts.
-        // The complete table for a compound lives on /compare/{slug}; the
-        // hub used to ship every listing (~3MB of HTML).
-        $compounds = collect();
-        // Location id => number of compounds it has listings in, for the
-        // ships-from dropdown labels.
-        $locationCompoundCounts = [];
-
-        foreach (self::FEATURED_COMPOUND_NAMES as $catName) {
-            $category = $categories->get($catName);
-            if (!$category) {
-                continue; // skip if category doesn't exist in DB
-            }
-
-            // Same rows as /compare/{slug}: priced listings only, header
-            // location filter applied, cheapest first in USD.
-            $products = $this->productsForCategory($category);
-
-            // "from $X" uses the same eligibility rules as per-mg stats, on
-            // the full row set. The hub payload never ships vendor URLs or
-            // vial images (displayRows drops them).
-            $claim = $this->listedPriceClaim($products);
-            $display = $this->displayRows($products);
-
-            $sizeCounts = [];
-            $typeCounts = array_fill_keys(['Peptide', 'Topical', 'Capsule', 'Nasal Spray', 'Kit', 'Other'], 0);
-            $compoundLocations = [];
-            foreach ($display as $row) {
-                $size = strtolower(trim((string) ($row['size_mg'] ?? '')));
-                if ($size !== '') {
-                    $sizeCounts[$size] = ($sizeCounts[$size] ?? 0) + 1;
-                }
-                $type = $row['product_type'] ?? null;
-                $typeKey = ($type === null || $type === '' || $type === 'Peptide') ? 'Peptide' : (string) $type;
-                if (isset($typeCounts[$typeKey])) {
-                    $typeCounts[$typeKey]++;
-                }
-                if (! empty($row['brand_location_id'])) {
-                    $compoundLocations[$row['brand_location_id']] = true;
-                }
-            }
-            foreach (array_keys($compoundLocations) as $locationId) {
-                $locationCompoundCounts[$locationId] = ($locationCompoundCounts[$locationId] ?? 0) + 1;
-            }
-
-            $displayName = CompoundDisplay::label($category->name);
-            $educationPost = $category->educationPost;
-
-            // Freshness signal — max(last_scraped_at | updated_at) across
-            // this category's products. Google-friendly and honest: gives
-            // us a "Prices updated 2 hours ago" line that competitors
-            // ("18 hours ago" is what The Peptide Catalog uses) currently
-            // beat us on.
-            $freshRow = Product::visible()
-                ->where('status', 'active')
-                ->where('product_category_id', $category->id)
-                ->selectRaw('MAX(last_scraped_at) as latest_scraped, MAX(updated_at) as latest_updated')
-                ->first();
-            $latestRaw = collect([$freshRow?->latest_scraped, $freshRow?->latest_updated])
-                ->filter(fn ($value) => $value !== null && $value !== '')
-                ->sort()
-                ->last();
-            $latestTs = $latestRaw ? \Carbon\Carbon::parse($latestRaw) : null;
-
-            $compounds->push([
-                'id' => $category->id,
-                'name' => $displayName,
-                // Hub cards link to /compare/{slug}. Use the route-safe slug
-                // so "BPC-157" and "Vitamin B12" don't point at 404s.
-                'slug' => CompareSlug::canonical($category->slug) ?? $category->slug,
-                'anchor' => Str::slug($displayName),
-                // Encyclopedia descriptions can carry trial outcomes. The hub
-                // card sits beside a listed price, so those lines are replaced
-                // with a class sentence. Prices and display names stay put.
-                'description' => CompareHubBlurb::render($category->slug, $educationPost?->description),
-                'encyclopedia_url' => ($educationPost && $educationPost->status === 'published')
-                    ? EncyclopediaSlug::path($category->slug)
-                    : null,
-                // Distinct listings after repeat scrapes collapse.
-                'product_count' => count($display),
-                // Listed price (effective_price) of the eligible set, same rules
-                // as per-mg stats. A coupon price stays in the table and
-                // cannot set this badge.
-                'cheapest_price' => $claim['low'],
-                'cheapest_currency_symbol' => $claim['symbol'],
-                'vendor_count' => collect($display)->pluck('brand_name')->unique()->count(),
-                'prices_updated_iso' => $latestTs?->toIso8601String(),
-                'prices_updated_human' => $latestTs?->diffForHumans(),
-                'size_counts' => $sizeCounts,
-                'type_counts' => $typeCounts,
-                'products' => $this->trimForHub($display),
-            ]);
+        $featuredRank = [];
+        foreach (self::FEATURED_COMPOUND_NAMES as $rank => $name) {
+            $featuredRank[strtolower($name)] = $rank;
         }
 
+        $compounds = [];
+        $seen = [];
+        $vendors = [];
+        $listingTotal = 0;
+        $latest = null;
+        foreach ($categories as $category) {
+            $compareSlug = CompareSlug::canonical($category->slug);
+            if (! $compareSlug || isset($seen[$compareSlug])) {
+                continue;
+            }
+            $seen[$compareSlug] = true;
+
+            // /compare/{slug} shows its owner category's listings, so the
+            // hub row does too (the sitemap uses the same rule).
+            $owner = ProductCategory::findForCompareSlug($compareSlug);
+            if (! $owner || ! isset($rowsByCategory[$owner->id], $categories[$owner->id])) {
+                continue;
+            }
+            $owner = $categories[$owner->id];
+            $rows = $rowsByCategory[$owner->id];
+            $display = $this->displayRows($rows);
+            if ($display === []) {
+                continue;
+            }
+
+            $stats = ComparePriceStats::fromProducts($rows);
+            $eligible = (int) ($stats['per_mg']['eligible_count'] ?? 0);
+            $vial = $stats['lowest_single_vial_listed'] ?? null;
+            $perMg = $eligible >= 3 ? ($stats['per_mg']['lowest'] ?? null) : null;
+
+            $from = $vial ? [
+                'amount' => (float) $vial['listed_usd'],
+                'usd' => (float) $vial['listed_usd'],
+                'symbol' => '$',
+                'currency' => 'USD',
+                'size' => $vial['size_mg'].' mg',
+                'vendor' => $vial['vendor'],
+                'basis' => 'vial',
+            ] : $this->hubCheapestListing($display);
+
+            $sizes = [];
+            if ($eligible >= 3) {
+                foreach ($stats['common_sizes'] ?? [] as $size) {
+                    $sizes[] = [
+                        'label' => $size['size_mg'].' mg',
+                        // CompareCompound.vue reads ?size=10mg.
+                        'param' => $size['size_mg'].'mg',
+                        'from_usd' => (float) $size['min_listed_usd'],
+                        'listings' => (int) $size['listings'],
+                    ];
+                }
+            }
+
+            $vendorNames = [];
+            foreach ($display as $row) {
+                if (! empty($row['brand_name'])) {
+                    $vendorNames[$row['brand_name']] = true;
+                }
+                if (! empty($row['brand_slug'])) {
+                    $vendors[$row['brand_slug']] = true;
+                }
+            }
+
+            $displayName = CompoundDisplay::label($owner->name);
+            $post = $owner->educationPost;
+            $compounds[] = [
+                'id' => $owner->id,
+                'name' => $displayName,
+                'slug' => $compareSlug,
+                'anchor' => Str::slug($displayName),
+                // Encyclopedia descriptions can carry trial outcomes. The hub
+                // row sits beside a listed price, so those lines are replaced
+                // with a class sentence.
+                'description' => CompareHubBlurb::render($owner->slug, $post?->description),
+                'encyclopedia_url' => $post ? EncyclopediaSlug::path($owner->slug) : null,
+                'featured_rank' => $featuredRank[strtolower(trim((string) $owner->name))] ?? null,
+                'vendor_count' => count($vendorNames),
+                'listing_count' => count($display),
+                'from' => $from,
+                'best_per_mg' => $perMg ? [
+                    'usd_per_mg' => (float) $perMg['usd_per_mg'],
+                    'size' => $perMg['size_mg'].' mg',
+                    'vendor' => $perMg['vendor'],
+                ] : null,
+                'sizes' => $sizes,
+            ];
+
+            $listingTotal += count($display);
+            $stamp = $latestByCategory[$owner->id] ?? null;
+            if ($stamp && (! $latest || $stamp->gt($latest))) {
+                $latest = $stamp;
+            }
+        }
+
+        usort($compounds, function (array $a, array $b): int {
+            $ar = $a['featured_rank'];
+            $br = $b['featured_rank'];
+            if ($ar !== null || $br !== null) {
+                if ($ar === null) {
+                    return 1;
+                }
+                if ($br === null) {
+                    return -1;
+                }
+
+                return $ar <=> $br;
+            }
+
+            return [$b['vendor_count'], $b['listing_count'], strtolower($a['name'])]
+                <=> [$a['vendor_count'], $a['listing_count'], strtolower($b['name'])];
+        });
+
         return [
-            'compounds' => $compounds->values()->all(),
-            'locationCompoundCounts' => $locationCompoundCounts,
+            'compounds' => $compounds,
+            'vendor_count' => count($vendors),
+            'listing_count' => $listingTotal,
+            'prices_updated_iso' => $latest?->toIso8601String(),
         ];
+    }
+
+    /**
+     * Cheapest listed price among a compound's display rows, compared in
+     * USD, price outliers skipped. Used when no single vial qualifies for
+     * ComparePriceStats (blends, kits, vendors priced in other currencies).
+     *
+     * @param  list<array<string, mixed>>  $display
+     * @return array<string, mixed>|null
+     */
+    private function hubCheapestListing(array $display): ?array
+    {
+        $best = null;
+        foreach ($display as $row) {
+            if (! empty($row['price_outlier'])) {
+                continue;
+            }
+            $listed = (float) ($row['effective_price'] ?? 0);
+            if ($listed <= 0) {
+                continue;
+            }
+            $code = (string) ($row['currency_code'] ?? 'USD');
+            $usd = \App\Support\Currency::toUsd($listed, $code);
+            if ($usd === null || $usd <= 0) {
+                continue;
+            }
+            if ($best === null || $usd < $best['usd']) {
+                $size = trim((string) ($row['size_mg'] ?? ''));
+                $best = [
+                    'amount' => round($listed, 2),
+                    'usd' => round($usd, 2),
+                    'symbol' => (string) ($row['currency_symbol'] ?? '$'),
+                    'currency' => $code,
+                    'size' => $size !== '' ? $size : null,
+                    'vendor' => $row['brand_name'] ?? null,
+                    'basis' => 'listing',
+                ];
+            }
+        }
+
+        return $best;
     }
 
     /**
@@ -1494,14 +1592,30 @@ class CompareController extends Controller
     }
 
     /**
-     * Shared product-mapping used by /compare (index) and /compare/{slug} (show).
-     * Returns the vendor rows for one category, cheapest final_price first,
-     * priced only ($0 excluded), with brand + coupon info attached.
+     * Vendor rows for one category, cheapest final_price first (in USD),
+     * priced only ($0 excluded), with brand + coupon info attached. Used
+     * by /compare/{slug} (show) and the vs pages.
      *
      * Pass $applyRequestFilters false when building the canonical document
      * (title, description, FAQ schema) for a filtered URL.
      */
     private function productsForCategory(ProductCategory $category, bool $applyRequestFilters = true)
+    {
+        return $this->listingQuery($applyRequestFilters)
+            ->where('product_category_id', $category->id)
+            ->get()
+            ->map(fn (Product $product) => $this->listingRow($product))
+            // Cheapest first on what the visitor pays, compared in USD so a
+            // GBP or RON price is not ranked as if it were dollars.
+            ->pipe(fn ($rows) => collect(ProductRowCurrency::sortByUsdPrice($rows->values()->all())));
+    }
+
+    /**
+     * Visible, active, priced listings with brand, vendor settings and
+     * category loaded, narrowed by the request's location / verified / usp
+     * filters unless $applyRequestFilters is false.
+     */
+    private function listingQuery(bool $applyRequestFilters = true)
     {
         $locationFilter = '';
         $verifiedTypes = collect();
@@ -1529,7 +1643,6 @@ class CompareController extends Controller
 
         return Product::visible()
             ->where('status', 'active')
-            ->where('product_category_id', $category->id)
             ->where(function ($q) {
                 $q->where('discount_price', '>', 0)
                   ->orWhere(function ($qq) {
@@ -1560,56 +1673,73 @@ class CompareController extends Controller
                 // display_name reads the category name; without this each
                 // row ran its own category query (100+ per compare page).
                 'category:id,name',
-            ])
-            ->get()
-            ->map(function ($product) {
-                $retail = (float) (
-                    $product->discount_price && $product->discount_price < $product->price
-                        ? $product->discount_price
-                        : $product->price
-                );
-                $pct = $product->brand?->vendorSetting?->coupon_discount_percent;
-                $pmapPrice = ($pct !== null && $pct > 0 && $pct < 100 && $retail > 0)
-                    ? round($retail * (1 - ((float) $pct / 100)), 2)
-                    : null;
-                $finalPrice = $pmapPrice ?? $retail;
+            ]);
+    }
 
-                $countryName = $product->brand?->vendorSetting?->location?->name;
-                [$currencyCode, $currencySymbol] = \App\Support\Currency::forCountry($countryName);
+    /**
+     * publicLogoUrl() checks the disk on every call. The hub maps every
+     * listing, so each logo path is resolved once per request.
+     */
+    private function vendorLogoUrl($setting): ?string
+    {
+        $key = (string) ($setting?->logo ?? '');
+        if (! array_key_exists($key, $this->logoUrls)) {
+            $this->logoUrls[$key] = $setting?->publicLogoUrl();
+        }
 
-                // withPricing adds the USD figures and $/mg used for
-                // cross-currency ordering and value badges.
-                return ProductRowCurrency::withPricing([
-                    'brand_id' => $product->brand_id,
-                    'brand_location_id' => $product->brand?->vendorSetting?->location_id,
-                    'id' => $product->id,
-                    'name' => $product->display_name,
-                    'raw_name' => $product->name,
-                    'product_type' => $product->product_type,
-                    'slug' => $product->slug,
-                    'price' => $product->price !== null ? (float) $product->price : null,
-                    'discount_price' => $product->discount_price !== null ? (float) $product->discount_price : null,
-                    'effective_price' => $retail,
-                    'final_price' => $finalPrice,
-                    'pmap_price' => $pmapPrice,
-                    'currency_code' => $currencyCode,
-                    'currency_symbol' => $currencySymbol,
-                    'image_url' => $product->image_url,
-                    'product_url' => $product->product_url,
-                    'go_url' => "/go/{$product->id}",
-                    'brand_name' => $product->brand?->name,
-                    'brand_slug' => $product->brand?->slug,
-                    'brand_location' => $countryName,
-                    // Null for a missing file; VendorLogo shows initials.
-                    'brand_logo' => $product->brand?->vendorSetting?->publicLogoUrl(),
-                    'brand_coupon_code' => $product->brand?->vendorSetting?->coupon_code,
-                    'brand_discount_percent' => $pct !== null ? (float) $pct : null,
-                    'size_mg' => $product->size_mg,
-                ]);
-            })
-            // Cheapest first on what the visitor pays, compared in USD so a
-            // GBP or RON price is not ranked as if it were dollars.
-            ->pipe(fn ($rows) => collect(ProductRowCurrency::sortByUsdPrice($rows->values()->all())));
+        return $this->logoUrls[$key];
+    }
+
+    /**
+     * One vendor-table row for a listing loaded by listingQuery().
+     *
+     * @return array<string, mixed>
+     */
+    private function listingRow(Product $product): array
+    {
+        $retail = (float) (
+            $product->discount_price && $product->discount_price < $product->price
+                ? $product->discount_price
+                : $product->price
+        );
+        $pct = $product->brand?->vendorSetting?->coupon_discount_percent;
+        $pmapPrice = ($pct !== null && $pct > 0 && $pct < 100 && $retail > 0)
+            ? round($retail * (1 - ((float) $pct / 100)), 2)
+            : null;
+        $finalPrice = $pmapPrice ?? $retail;
+
+        $countryName = $product->brand?->vendorSetting?->location?->name;
+        [$currencyCode, $currencySymbol] = \App\Support\Currency::forCountry($countryName);
+
+        // withPricing adds the USD figures and $/mg used for
+        // cross-currency ordering and value badges.
+        return ProductRowCurrency::withPricing([
+            'brand_id' => $product->brand_id,
+            'brand_location_id' => $product->brand?->vendorSetting?->location_id,
+            'id' => $product->id,
+            'name' => $product->display_name,
+            'raw_name' => $product->name,
+            'product_type' => $product->product_type,
+            'slug' => $product->slug,
+            'price' => $product->price !== null ? (float) $product->price : null,
+            'discount_price' => $product->discount_price !== null ? (float) $product->discount_price : null,
+            'effective_price' => $retail,
+            'final_price' => $finalPrice,
+            'pmap_price' => $pmapPrice,
+            'currency_code' => $currencyCode,
+            'currency_symbol' => $currencySymbol,
+            'image_url' => $product->image_url,
+            'product_url' => $product->product_url,
+            'go_url' => "/go/{$product->id}",
+            'brand_name' => $product->brand?->name,
+            'brand_slug' => $product->brand?->slug,
+            'brand_location' => $countryName,
+            // Null for a missing file; VendorLogo shows initials.
+            'brand_logo' => $this->vendorLogoUrl($product->brand?->vendorSetting),
+            'brand_coupon_code' => $product->brand?->vendorSetting?->coupon_code,
+            'brand_discount_percent' => $pct !== null ? (float) $pct : null,
+            'size_mg' => $product->size_mg,
+        ]);
     }
 
     /**
@@ -1642,45 +1772,5 @@ class CompareController extends Controller
 
             return $row;
         }, $rows);
-    }
-
-    /**
-     * Hub payload trim. Compare.vue filters each compound by size, format
-     * and ships-from location in the browser, so every one of those
-     * groups keeps its cheapest rows (rows arrive cheapest-first) and the
-     * rest of the ~375 listings stay on /compare/{slug}. Each format and
-     * location pair also keeps its cheapest rows, so the two global
-     * filters together never hide a compound that has a matching listing.
-     *
-     * @param  list<array<string, mixed>>  $rows
-     * @return list<array<string, mixed>>
-     */
-    private function trimForHub(array $rows, int $perGroup = 5, int $perPair = 2): array
-    {
-        $keep = [];
-        $counters = [];
-        foreach ($rows as $i => $row) {
-            $type = $row['product_type'] ?? null;
-            $typeKey = ($type === null || $type === '' || $type === 'Peptide') ? 'Peptide' : (string) $type;
-            $size = strtolower(trim((string) ($row['size_mg'] ?? '')));
-            $location = (string) ($row['brand_location_id'] ?? 'none');
-            $keys = [
-                'all' => $perGroup,
-                'type:'.$typeKey => $perGroup,
-                'loc:'.$location => $perGroup,
-                'pair:'.$typeKey.'|'.$location => $perPair,
-            ];
-            if ($size !== '') {
-                $keys['size:'.$size] = $perGroup;
-            }
-            foreach ($keys as $key => $cap) {
-                $counters[$key] = ($counters[$key] ?? 0) + 1;
-                if ($counters[$key] <= $cap) {
-                    $keep[$i] = true;
-                }
-            }
-        }
-
-        return array_values(array_filter($rows, fn ($row, $i) => isset($keep[$i]), ARRAY_FILTER_USE_BOTH));
     }
 }

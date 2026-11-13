@@ -50,20 +50,20 @@ class CompareHubBlurbTest extends TestCase
             'Cagrilintide is a long-acting amylin analog studied in obesity research. Research use only.',
             $bySlug['cagrilintide']['description']
         );
-        $this->assertEquals(22.0, $bySlug['cagrilintide']['products'][0]['price']);
+        $this->assertEquals(22.0, $bySlug['cagrilintide']['from']['amount']);
 
         $this->assertSame('GLP3-R', $bySlug['retatrutide']['name']);
         $this->assertSame(
             'Retatrutide is a triple agonist (GLP-1, GIP, and glucagon) studied in obesity research. Research use only.',
             $bySlug['retatrutide']['description']
         );
-        $this->assertEquals(49.0, $bySlug['retatrutide']['products'][0]['price']);
+        $this->assertEquals(49.0, $bySlug['retatrutide']['from']['amount']);
 
         $this->assertSame(
             'Tesofensine is a small-molecule inhibitor of serotonin, norepinephrine, and dopamine reuptake. It is not a peptide.',
             $bySlug['tesofensine']['description']
         );
-        $this->assertEquals(18.0, $bySlug['tesofensine']['products'][0]['price']);
+        $this->assertEquals(18.0, $bySlug['tesofensine']['from']['amount']);
 
         $this->assertSame(
             'BPC-157 is a synthetic pentadecapeptide derived from a gastric protein, studied in musculoskeletal and gastrointestinal research. Research use only.',
