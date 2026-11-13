@@ -952,7 +952,20 @@ class ProductsController extends Controller
             : 'desc';
 
         if ($sortBy === 'featured') {
+            // Pinned picks first, then single vials ahead of multi-unit
+            // listings (kits, packs, bundles, bulk). With review counts near
+            // zero the price tiebreak otherwise opened pages with 2,000+
+            // dollar 10-vial kits. Mirrors ComparePriceStats' multi-unit
+            // signals using LIKE so it runs on MySQL and SQLite.
             $query->orderByDesc('is_peptide_thumb')
+                  ->orderByRaw(
+                      "CASE WHEN product_type = 'Kit'"
+                      . " OR LOWER(name) LIKE '%kit%' OR LOWER(name) LIKE '%pack%'"
+                      . " OR LOWER(name) LIKE '%vials%' OR LOWER(name) LIKE '%bundle%'"
+                      . " OR LOWER(name) LIKE '%box%' OR LOWER(name) LIKE '%bulk%'"
+                      . " OR name LIKE '%\u{00D7}%'"
+                      . ' THEN 1 ELSE 0 END ASC'
+                  )
                   ->orderByDesc('rating_count')
                   ->orderByRaw('COALESCE(discount_price, price) DESC');
         } elseif ($sortBy === 'price' || $sortBy === 'value') {
@@ -1363,7 +1376,20 @@ class ProductsController extends Controller
             : 'desc';
 
         if ($sortBy === 'featured') {
+            // Pinned picks first, then single vials ahead of multi-unit
+            // listings (kits, packs, bundles, bulk). With review counts near
+            // zero the price tiebreak otherwise opened pages with 2,000+
+            // dollar 10-vial kits. Mirrors ComparePriceStats' multi-unit
+            // signals using LIKE so it runs on MySQL and SQLite.
             $query->orderByDesc('is_peptide_thumb')
+                  ->orderByRaw(
+                      "CASE WHEN product_type = 'Kit'"
+                      . " OR LOWER(name) LIKE '%kit%' OR LOWER(name) LIKE '%pack%'"
+                      . " OR LOWER(name) LIKE '%vials%' OR LOWER(name) LIKE '%bundle%'"
+                      . " OR LOWER(name) LIKE '%box%' OR LOWER(name) LIKE '%bulk%'"
+                      . " OR name LIKE '%\u{00D7}%'"
+                      . ' THEN 1 ELSE 0 END ASC'
+                  )
                   ->orderByDesc('rating_count')
                   ->orderByRaw('COALESCE(discount_price, price) DESC');
         } elseif ($sortBy === 'price') {
