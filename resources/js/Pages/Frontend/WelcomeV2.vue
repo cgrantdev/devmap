@@ -6,22 +6,24 @@
     </Head>
 
     <!-- ========================================================= -->
-    <!-- 1. H1 BAND + HERO                                          -->
+    <!-- 1. INTRO ROW + PARTNER HERO                                -->
     <!-- ========================================================= -->
     <section class="relative">
       <div class="ui-spotlight absolute inset-0 pointer-events-none" />
-      <!-- The page's only H1: what Peptidemap is, with live counts, plus a
-           search box. Two columns on desktop so the carousel still clears
-           the fold on laptops. seo.h1 carries the same text server-side. -->
-      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-6 lg:pt-9">
-        <div class="grid gap-4 lg:gap-10 lg:items-end lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,500px)]">
-          <div class="min-w-0">
-            <h1 class="ui-display text-[26px] sm:text-[30px] lg:text-[34px] xl:text-[38px] font-semibold tracking-[-0.02em] leading-[1.1] text-[color:var(--color-ink)] text-balance">
+      <!-- The page's only H1 (what Peptidemap is, with live counts) and the
+           search box share one short row, so the partner carousel below is
+           the first big thing on screen. The carousel's slide titles are
+           h2s; keep this H1 smaller than them so the two don't compete.
+           seo.h1 carries the same text server-side. -->
+      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-5 lg:pt-7">
+        <div class="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-10">
+          <div class="min-w-0 flex-1">
+            <h1 class="ui-display text-[22px] sm:text-[24px] lg:text-[26px] font-semibold tracking-[-0.02em] leading-[1.15] text-[color:var(--color-ink)] text-balance">
               {{ heading }}
             </h1>
             <!-- The green dot doubles as the separator before the last item,
                  so a wrap on phones never leaves a dangling middot. -->
-            <p class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">
+            <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">
               <span v-if="statItems.length" class="inline-flex flex-wrap items-center gap-x-2">
                 <template v-for="(item, i) in statItems" :key="item.label">
                   <span v-if="i > 0" aria-hidden="true" class="text-[color:var(--color-ink-subtle)]">·</span>
@@ -35,7 +37,7 @@
             </p>
           </div>
 
-          <div class="min-w-0">
+          <div class="w-full lg:w-[400px] xl:w-[460px] flex-shrink-0">
             <form role="search" action="/search" method="get" class="relative" @submit.prevent="submitHomeSearch">
               <label for="home-search" class="sr-only">Search compounds and vendors</label>
               <div class="flex items-center gap-2 h-12 pl-4 pr-1.5 rounded-[12px] bg-white border border-[color:var(--color-hairline)] shadow-[var(--shadow-sm)] transition-shadow focus-within:border-[color:var(--color-accent-400)] focus-within:shadow-[0_0_0_4px_var(--color-accent-100)]">
@@ -123,24 +125,25 @@
                 </button>
               </div>
             </form>
-
-            <div v-if="popularCompounds.length" class="mt-2.5 flex flex-wrap items-center gap-1.5">
-              <span class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mr-0.5">Popular</span>
-              <a
-                v-for="(compound, i) in popularCompounds"
-                :key="compound.slug"
-                :href="`/product/${compound.slug}`"
-                :class="[
-                  'ui-focus items-center h-7 px-2.5 rounded-full border border-[color:var(--color-hairline)] bg-white text-[12px] font-medium text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-accent-700)] transition-colors',
-                  i >= 4 ? 'hidden sm:inline-flex' : 'inline-flex',
-                ]"
-              >{{ compound.name }}</a>
-            </div>
           </div>
         </div>
       </div>
-      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-5 lg:pt-6">
+      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-4 lg:pt-5">
         <HeroCarousel :slides="heroSlides" />
+      </div>
+
+      <!-- Popular compounds: one row under the banner. Scrolls sideways on
+           phones instead of wrapping into a ragged second line. -->
+      <div v-if="popularCompounds.length" class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-4">
+        <div class="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <span class="flex-shrink-0 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mr-1">Popular</span>
+          <a
+            v-for="compound in popularCompounds"
+            :key="compound.slug"
+            :href="`/product/${compound.slug}`"
+            class="ui-focus flex-shrink-0 inline-flex items-center h-8 px-3 rounded-full border border-[color:var(--color-hairline)] bg-white text-[12px] font-medium text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-accent-700)] transition-colors"
+          >{{ compound.name }}</a>
+        </div>
       </div>
     </section>
 
@@ -549,7 +552,7 @@ const statItems = computed(() => [
   { value: props.stats?.total_vendors, label: 'vendors' },
 ].filter((s) => Number(s.value) > 0))
 const popularCompounds = computed(() =>
-  (props.topCompounds || []).filter((c) => c && c.slug).slice(0, 6)
+  (props.topCompounds || []).filter((c) => c && c.slug).slice(0, 10)
 )
 
 // Homepage search box with live suggestions (same endpoint as the header

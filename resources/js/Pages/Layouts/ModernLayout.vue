@@ -77,7 +77,9 @@
                wrapper doesn't hide the palette itself.
                SearchPalette is a multi-root component (button + Teleport), so
                class attrs don't reach it — wrap so `hidden xl:block` sticks. -->
-          <div class="hidden xl:block">
+          <!-- The homepage has its own search box right under the header,
+               so the header one is hidden there (still mounted for Ctrl+K). -->
+          <div :class="onHomepage ? 'hidden' : 'hidden xl:block'">
             <SearchPalette label="Search…" />
           </div>
 
@@ -406,6 +408,7 @@ import CountrySelector from '@/components/ui/CountrySelector.vue'
 import AdminBar from '@/components/AdminBar.vue'
 
 const page = usePage()
+const onHomepage = computed(() => page.component === 'Frontend/WelcomeV2')
 const isStaff = computed(() => {
   const role = page.props.auth?.user?.role
   return role === 'admin' || role === 'admin_viewer'
