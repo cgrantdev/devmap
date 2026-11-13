@@ -218,7 +218,7 @@
                   v-for="product in results.products"
                   :key="product.id"
                   class="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
-                  @click="router.visit(`/product/${product.slug}/${product.id}`)"
+                  @click="router.visit(product.brand_slug ? `/product/${product.brand_slug}/${product.slug}/${product.id}` : `/product/${product.slug}/${product.id}`)"
                 >
                   <div class="flex items-start justify-between mb-3">
                     <div>

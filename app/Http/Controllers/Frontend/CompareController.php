@@ -138,6 +138,87 @@ class CompareController extends Controller
 
     public function index(Request $request)
     {
+        // The per-compound build runs a full listing query for every
+        // featured compound (3-4s uncached). Cache it per filter set for 10
+        // minutes under a fixed key. Not FrontendCache: its versioned keys
+        // change on every bust (up to once a minute while scrapers run),
+        // and the database cache store never deletes a ~1MB row whose key
+        // is not read again. Logged-in users get a live build.
+        $filterKey = md5(json_encode([
+            trim((string) $request->get('location', '')),
+            trim((string) $request->get('verified', '')),
+            trim((string) $request->get('usp', '')),
+        ]));
+        $hub = auth()->check()
+            ? $this->buildHub()
+            : \Illuminate\Support\Facades\Cache::remember(
+                'compare:hub:v1:'.$filterKey,
+                600,
+                fn () => $this->buildHub()
+            );
+        // "Updated 2 hours ago" is relative to now, not to the cache write.
+        $compounds = collect($hub['compounds'])->map(function (array $c) {
+            $c['prices_updated_human'] = ! empty($c['prices_updated_iso'])
+                ? \Carbon\Carbon::parse($c['prices_updated_iso'])->diffForHumans()
+                : null;
+
+            return $c;
+        });
+        $locationCompoundCounts = $hub['locationCompoundCounts'];
+
+        // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "compare")
+        $defaultTitle = 'Compare Peptide Vendors Side-by-Side — Peptidemap';
+        $defaultDescription = 'Compare research peptide listings and prices across vendors, including GLP-1s, BPC-157, GHK-Cu, and TB-500. Catalog data only: RUO.';
+
+        $seoPage = SeoPage::where('key', 'compare')->first();
+        $compareTitle = ProductPageSeo::storedTitle($seoPage?->title, $defaultTitle);
+        $compareDescription = ProductPageSeo::storedDescription($seoPage?->description, $defaultDescription);
+        $seo = [
+            'key' => 'compare',
+            'title' => $compareTitle,
+            'description' => $compareDescription,
+            'og_title' => ProductPageSeo::storedTitle($seoPage?->og_title, $compareTitle),
+            'og_description' => ProductPageSeo::storedDescription($seoPage?->og_description, $compareDescription),
+            'og_image' => $seoPage?->og_image ?: null,
+            'image' => $seoPage?->og_image ?: null,
+            'url' => url('/compare'),
+        ];
+
+        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
+        session(['page_seo_data' => $seo]);
+
+        // Location filter options: only locations that actually have at
+         // least one vendor with a product surfaced on this page. Sorted by
+         // count desc so US-heavy inventory naturally leads the dropdown.
+        $vendorLocationIds = collect($locationCompoundCounts);
+        $locations = \App\Models\Location::whereIn('id', $vendorLocationIds->keys())
+            ->get(['id', 'name'])
+            ->map(fn ($l) => [
+                'id' => $l->id,
+                'name' => $l->name,
+                'count' => (int) $vendorLocationIds[$l->id],
+            ])
+            ->sortByDesc('count')
+            ->values()
+            ->all();
+
+        return Inertia::render('Frontend/Compare', [
+            'compounds' => $compounds,
+            'featuredPairs' => $this->resolveFeaturedPairs(),
+            'locations' => $locations,
+            'seo' => $seo,
+        ]);
+    }
+
+    /**
+     * Hub cards for FEATURED_COMPOUND_NAMES plus, per location id, how
+     * many compounds have listings there. Reads the request's location /
+     * verified / usp filters through productsForCategory().
+     *
+     * @return array{compounds: list<array<string, mixed>>, locationCompoundCounts: array<int|string, int>}
+     */
+    private function buildHub(): array
+    {
         // Fetch all featured categories in one query
         $categories = ProductCategory::where('is_active', true)
             ->whereIn('name', self::FEATURED_COMPOUND_NAMES)
@@ -243,48 +324,10 @@ class CompareController extends Controller
             ]);
         }
 
-        // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "compare")
-        $defaultTitle = 'Compare Peptide Vendors Side-by-Side — Peptidemap';
-        $defaultDescription = 'Compare research peptide listings and prices across vendors, including GLP-1s, BPC-157, GHK-Cu, and TB-500. Catalog data only: RUO.';
-
-        $seoPage = SeoPage::where('key', 'compare')->first();
-        $compareTitle = ProductPageSeo::storedTitle($seoPage?->title, $defaultTitle);
-        $compareDescription = ProductPageSeo::storedDescription($seoPage?->description, $defaultDescription);
-        $seo = [
-            'key' => 'compare',
-            'title' => $compareTitle,
-            'description' => $compareDescription,
-            'og_title' => ProductPageSeo::storedTitle($seoPage?->og_title, $compareTitle),
-            'og_description' => ProductPageSeo::storedDescription($seoPage?->og_description, $compareDescription),
-            'og_image' => $seoPage?->og_image ?: null,
-            'image' => $seoPage?->og_image ?: null,
-            'url' => url('/compare'),
+        return [
+            'compounds' => $compounds->values()->all(),
+            'locationCompoundCounts' => $locationCompoundCounts,
         ];
-
-        // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
-        session(['page_seo_data' => $seo]);
-
-        // Location filter options: only locations that actually have at
-         // least one vendor with a product surfaced on this page. Sorted by
-         // count desc so US-heavy inventory naturally leads the dropdown.
-        $vendorLocationIds = collect($locationCompoundCounts);
-        $locations = \App\Models\Location::whereIn('id', $vendorLocationIds->keys())
-            ->get(['id', 'name'])
-            ->map(fn ($l) => [
-                'id' => $l->id,
-                'name' => $l->name,
-                'count' => (int) $vendorLocationIds[$l->id],
-            ])
-            ->sortByDesc('count')
-            ->values()
-            ->all();
-
-        return Inertia::render('Frontend/Compare', [
-            'compounds' => $compounds,
-            'featuredPairs' => $this->resolveFeaturedPairs(),
-            'locations' => $locations,
-            'seo' => $seo,
-        ]);
     }
 
     /**

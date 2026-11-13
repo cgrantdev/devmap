@@ -320,7 +320,7 @@
               :product-type="product.product_type"
               :brand-discount-percent="product.brand_discount_percent"
               :brand-coupon-code="product.brand_coupon_code"
-              :to="`/product/${product.slug}/${product.id}`"
+              :to="product.brand?.slug ? `/product/${product.brand.slug}/${product.slug}/${product.id}` : `/product/${product.slug}/${product.id}`"
             />
           </div>
           <div class="text-center mt-6">

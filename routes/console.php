@@ -19,6 +19,27 @@ Schedule::call(fn () => \App\Providers\AppServiceProvider::flushPendingFrontendB
     ->everyMinute()
     ->name('frontend-cache-flush');
 
+// The database cache store deletes an expired row only when that exact key
+// is read again. FrontendCache keys carry a version that changes on every
+// bust (up to once a minute while scrapers run), so old-version rows were
+// never read and never removed. Delete expired rows in batches.
+Schedule::call(function () {
+    if (config('cache.default') !== 'database') {
+        return;
+    }
+    $table = \Illuminate\Support\Facades\DB::connection(config('cache.stores.database.connection'))
+        ->table(config('cache.stores.database.table', 'cache'));
+    for ($i = 0; $i < 50; $i++) {
+        $deleted = (clone $table)->where('expiration', '<', time())->limit(2000)->delete();
+        if ($deleted < 2000) {
+            break;
+        }
+    }
+})
+    ->hourly()
+    ->name('cache-prune-expired')
+    ->withoutOverlapping(30);
+
 // Schedule automatic scraping based on frequency settings
 Schedule::command('scraping:run-scheduled')
     ->everyMinute()
