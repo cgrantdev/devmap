@@ -64,6 +64,40 @@ final class OgCanvas
     }
 
     /**
+     * Base colour plus soft radial glows. Drawn on an opaque quarter-scale
+     * layer, blurred to remove the ring banding stacked ellipses leave,
+     * then stretched over the whole canvas.
+     *
+     * @param  list<array{0: float, 1: float, 2: float, 3: string, 4: float}>  $glows  [cx, cy, radius, hex, strength]
+     */
+    public function background(string $base, array $glows): void
+    {
+        $q = 4;
+        $w = (int) ceil(self::W * self::S / $q);
+        $h = (int) ceil(self::H * self::S / $q);
+        $layer = imagecreatetruecolor($w, $h);
+        $bh = ltrim($base, '#');
+        imagefill($layer, 0, 0, imagecolorallocate($layer, hexdec(substr($bh, 0, 2)), hexdec(substr($bh, 2, 2)), hexdec(substr($bh, 4, 2))));
+        imagealphablending($layer, true);
+
+        $steps = 60;
+        foreach ($glows as [$cx, $cy, $radius, $hex, $strength]) {
+            $hs = ltrim($hex, '#');
+            $per = max(1, (int) round($strength * 127 / $steps * 2.2));
+            $col = imagecolorallocatealpha($layer, hexdec(substr($hs, 0, 2)), hexdec(substr($hs, 2, 2)), hexdec(substr($hs, 4, 2)), max(0, 127 - $per));
+            for ($i = 0; $i < $steps; $i++) {
+                $rad = $radius * (1 - $i / $steps) * self::S / $q;
+                imagefilledellipse($layer, (int) ($cx * self::S / $q), (int) ($cy * self::S / $q), (int) ($rad * 2), (int) ($rad * 2), $col);
+            }
+        }
+        for ($i = 0; $i < 14; $i++) {
+            imagefilter($layer, IMG_FILTER_GAUSSIAN_BLUR);
+        }
+        imagecopyresampled($this->im, $layer, 0, 0, 0, 0, self::W * self::S, self::H * self::S, $w, $h);
+        imagedestroy($layer);
+    }
+
+    /**
      * Soft radial glow: stacked translucent ellipses, drawn at a quarter
      * scale and stretched up, since the result is blurry by design.
      */

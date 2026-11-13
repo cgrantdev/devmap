@@ -134,10 +134,10 @@ final class OgCards
 
         $stats = [[number_format($d['vendors']), 'vendors']];
         if (!empty($d['lowest'])) {
-            $stats[] = [$d['lowest'], 'lowest price'];
+            $stats[] = [$d['lowest'], 'lowest price (USD)'];
         }
         if (!empty($d['best'])) {
-            $stats[] = [$d['best'], 'best per mg'];
+            $stats[] = [$d['best'], 'best per mg (USD)'];
         }
         $sx = $x;
         $sy = max($y + 46, 460);
@@ -153,7 +153,7 @@ final class OgCards
             $bw = 428;
             $bh = 372;
             $c->roundedRect($bx, $by, $bw, $bh, 26, self::WHITE, 0.06);
-            $c->text($bx + 28, $by + 46, 'LOWEST PER MG RIGHT NOW', 'InterTight-SemiBold', 16, self::MINT, 1, 2.2);
+            $c->text($bx + 28, $by + 46, 'LOWEST PER MG NOW · USD', 'InterTight-SemiBold', 16, self::MINT, 1, 2.2);
             $ry = $by + 92;
             foreach (array_slice($d['board'], 0, 5) as $i => $row) {
                 $valueW = $c->measure($row['value'], 'JetBrainsMono-Bold', 22);
@@ -199,9 +199,17 @@ final class OgCards
     {
         $c = self::frame($d['path'], true);
         $x = self::LEFT;
-        $w = 760;
+        $w = 800;
         $c->text($x, 186, mb_strtoupper($d['eyebrow']), 'InterTight-SemiBold', 19, self::SKY_LIGHT, 1, 2.5);
-        [$size, $lines] = $c->fit($d['title'], 'InterTight-Bold', 80, 46, $w, 3);
+        // Two lines at most, and small enough that the subtitle and chips
+        // end above the footer rule (y 566).
+        $subLines = !empty($d['subtitle']) ? min(2, count($c->wrap($d['subtitle'], 'InterTight-SemiBold', 26, $w))) : 0;
+        $max = 80;
+        do {
+            [$size, $lines] = $c->fit($d['title'], 'InterTight-Bold', $max, 40, $w, 2);
+            $bottom = 204 + $size * 0.92 + (count($lines) - 1) * $size * 1.06 + ($subLines ? 14 + $subLines * 36 : 0) + 30 + 44;
+            $max -= 4;
+        } while ($bottom > 540 && $max >= 40);
         $y = 204 + $size * 0.92;
         foreach ($lines as $line) {
             $c->text($x, $y, $line, 'InterTight-Bold', $size, self::WHITE);
@@ -233,9 +241,10 @@ final class OgCards
     private static function frame(string $path, bool $bigMotif = false): OgCanvas
     {
         $c = new OgCanvas();
-        $c->fill(self::BG);
-        $c->glow(1080, 40, 560, self::SKY, 0.55);
-        $c->glow(80, 640, 520, self::GREEN, 0.4);
+        $c->background(self::BG, [
+            [1080, 40, 560, self::SKY, 0.5],
+            [80, 640, 520, self::GREEN, 0.38],
+        ]);
         $c->dotGrid(28, self::WHITE, 0.05);
 
         if ($motif = self::asset('motif')) {

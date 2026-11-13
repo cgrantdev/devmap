@@ -96,7 +96,7 @@ class CompoundOgImageController extends Controller
         $lowest = null;
         if ($priced) {
             usort($priced, fn ($a, $b) => (float) $a['usd_final_price'] <=> (float) $b['usd_final_price']);
-            $lowest = $this->money($priced[0], 'final_price');
+            $lowest = $this->usd($priced[0], 'usd_final_price');
         }
 
         $perMg = array_values(array_filter($rows, fn ($r) => (float) ($r['usd_per_mg'] ?? 0) > 0));
@@ -120,7 +120,7 @@ class CompoundOgImageController extends Controller
             $seen[$vendor] = true;
             $board[] = [
                 'vendor' => (string) $vendor,
-                'value' => $this->money($r, 'price_per_mg').'/mg',
+                'value' => $this->usd($r, 'usd_per_mg').'/mg',
                 'ratio' => $bestUsd > 0 ? $bestUsd / (float) $r['usd_per_mg'] : 0.0,
             ];
             if (count($board) === 5) {
@@ -136,9 +136,14 @@ class CompoundOgImageController extends Controller
         ];
     }
 
-    /** @param array<string, mixed> $row */
-    private function money(array $row, string $field): string
+    /**
+     * Dollars, so a multi-vendor card compares like with like (rows are
+     * ranked in USD; a lei or pound figure beside dollars misreads).
+     *
+     * @param  array<string, mixed>  $row
+     */
+    private function usd(array $row, string $field): string
     {
-        return ($row['currency_symbol'] ?? '$').number_format((float) ($row[$field] ?? 0), 2);
+        return '$'.number_format((float) ($row[$field] ?? 0), 2);
     }
 }

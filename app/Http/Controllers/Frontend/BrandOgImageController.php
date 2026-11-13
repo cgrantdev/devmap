@@ -81,12 +81,19 @@ class BrandOgImageController extends Controller
             ->count();
     }
 
-    /** "from C$61.20": the cheapest listing's price with the vendor's code. */
+    /**
+     * "from C$61.20": the cheapest compound listing's price with the
+     * vendor's code. Bacteriostatic / sterile water is left out, or the
+     * card would quote the price of water.
+     */
     private function fromPrice(Brand $brand): ?string
     {
         $cheapest = Product::visible()
             ->where('status', 'active')
             ->where('brand_id', $brand->id)
+            ->where('name', 'not like', '%water%')
+            ->where(fn ($q) => $q->whereNull('product_category_id')
+                ->orWhereHas('category', fn ($c) => $c->where('name', 'not like', '%water%')))
             ->with([
                 'brand' => fn ($q) => $q->forCard(),
                 'brand.vendorSetting' => fn ($q) => $q->forCard(),
