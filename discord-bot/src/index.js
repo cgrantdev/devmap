@@ -49,13 +49,16 @@ client.on(Events.InteractionCreate, async interaction => {
   }
 })
 
-// Scheduled feeds — cron in UTC.
-//   every 15 min    price drops (batched top-N + deduped)
-//   12:00 daily     new products digest
-//   12:00 daily     deal of the day (same channel as manual deals)
-//   15:00 daily     peptide of the day
-//   Sun 16:00       weekly recap
-//   every 10 min    reviews mirror (rate-capped)
+// Scheduled feeds — cron in UTC. Only the Friday codes post is on by
+// default (see config.features); the rest run only with FEATURE_X=true.
+//   Fri 17:00       vendor discount codes (#deals)            on
+//   every 15 min    price drops (batched top-N + deduped)     off
+//   every 10 min    reviews mirror (rate-capped)              off
+//   12:00 daily     new products digest                       off
+//   12:00 daily     deal of the day                           off
+//   14:00 daily     blog of the day                           off
+//   15:00 daily     peptide of the day                        off
+//   Sun 16:00       weekly recap                              off
 
 function schedule() {
   cron.schedule('*/15 * * * *', () => tickPriceDrops(client), { timezone: 'UTC' })
@@ -64,9 +67,10 @@ function schedule() {
   cron.schedule('0 14 * * *',   () => tickBlogOfDay(client),   { timezone: 'UTC' })
   cron.schedule('0 15 * * *',   () => tickPeptideOfDay(client),{ timezone: 'UTC' })
   cron.schedule('0 16 * * 0',   () => tickWeeklyRecap(client), { timezone: 'UTC' })
-  cron.schedule('0 17 * * 2,5', () => tickPromoSpotlight(client), { timezone: 'UTC' }) // Tue + Fri
+  cron.schedule('0 17 * * 5',   () => tickPromoSpotlight(client), { timezone: 'UTC' }) // Fri (was Tue + Fri)
   cron.schedule('*/10 * * * *', () => tickReviews(client),     { timezone: 'UTC' })
-  console.log('Cron jobs scheduled')
+  const on = Object.entries(config.features).filter(([, v]) => v).map(([k]) => k)
+  console.log(`Cron jobs scheduled; enabled: ${on.join(', ') || 'none'}`)
 }
 
 process.on('unhandledRejection', e => console.error('unhandledRejection:', e))

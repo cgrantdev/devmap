@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\VendorSetting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /**
@@ -249,6 +250,26 @@ class CouponBoostRevertTest extends TestCase
         $this->assertSame('PMAP', $vs->coupon_code);
         $this->assertEquals(15, (float) $vs->coupon_discount_percent);
         $this->assertNull($vs->coupon_boost_expires_at);
+    }
+
+    public function test_launching_a_boost_posts_nothing_to_discord_unless_switched_on(): void
+    {
+        Http::fake();
+        config([
+            'services.discord.bot_token' => 'test-token',
+            'services.discord.deals_channel_id' => '123',
+        ]);
+
+        $this->vendor('amino-club', 'PMAP', 10)
+            ->applyCouponBoost(30, null, $this->et('2026-11-14 23:59'), 'FLASH30');
+
+        Http::assertNothingSent();
+
+        config(['services.discord.promotion_posts' => true]);
+        $this->vendor('hydro-research', 'PMAP', 10)
+            ->applyCouponBoost(30, null, $this->et('2026-11-14 23:59'), 'FLASH30');
+
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'discord.com/api/v10/channels/123/messages'));
     }
 
     public function test_admin_vendor_form_can_clear_the_coupon_code(): void

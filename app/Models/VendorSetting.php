@@ -380,8 +380,8 @@ class VendorSetting extends Model
 
     /**
      * Apply a temporary coupon boost. If $startsAt is null or in the
-     * past, the discount swap happens immediately and a Discord
-     * announcement fires. Otherwise the boost is stored as "scheduled"
+     * past, the discount swap happens immediately (and a Discord post
+     * fires if DISCORD_PROMOTION_POSTS is on). Otherwise the boost is stored as "scheduled"
      * (coupon_boost_percent + coupon_boost_starts_at + expires_at) and
      * ActivateScheduledCouponBoosts promotes it when the start time
      * passes. Either way RevertExpiredCouponBoosts handles the end.
@@ -428,6 +428,9 @@ class VendorSetting extends Model
 
     private function postDiscordBoostStart(float $newPct, \DateTimeInterface $expiresAt): void
     {
+        if (! config('services.discord.promotion_posts')) {
+            return;
+        }
         $token = config('services.discord.bot_token');
         // Colin Sep 23 — boost-live posts land in the deals channel
         // (consumer-facing) instead of the admin growth channel.

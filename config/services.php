@@ -108,6 +108,10 @@ return [
         // channel; those belong in the public deals channel. Falls
         // back to growth if not set so nothing goes silent.
         'deals_channel_id' => env('DISCORD_DEALS_CHANNEL_ID'),
+        // "X% off through DATE" posts when a coupon boost goes live. Off
+        // since Nov 2026 (Colin: the server should be a chatroom, not a
+        // notice bot); DISCORD_PROMOTION_POSTS=true turns them back on.
+        'promotion_posts' => (bool) env('DISCORD_PROMOTION_POSTS', false),
     ],
 
     'slack' => [

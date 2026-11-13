@@ -279,12 +279,12 @@
             <!-- Coupon boost — Julia's limited-time promo trigger. Sets
                  the discount % to `boost_percent` until `expires_at`, then
                  the RevertExpiredCouponBoosts scheduler restores the prior
-                 value. Discord announcement fires when the boost begins. -->
+                 value. No Discord post since Nov 2026 (DISCORD_PROMOTION_POSTS). -->
             <div class="md:col-span-2 mt-2 p-4 rounded-lg bg-amber-50 border border-amber-200">
               <div class="flex items-baseline justify-between mb-2">
                 <div>
                   <div class="text-sm font-semibold text-amber-900">Limited-time promotion</div>
-                  <div class="text-[11px] text-amber-800/80">Temporarily bump the discount %. Auto-reverts on expiry, posts to Discord when live.</div>
+                  <div class="text-[11px] text-amber-800/80">Temporarily bump the discount %. Auto-reverts on expiry.</div>
                 </div>
                 <span v-if="editForm.coupon_boost_active" class="text-[10px] uppercase tracking-wider font-bold bg-red-600 text-white px-2 py-0.5 rounded-full">● Boost active</span>
                 <span v-else-if="editForm.coupon_boost_scheduled" class="text-[10px] uppercase tracking-wider font-bold bg-amber-600 text-white px-2 py-0.5 rounded-full">◷ Scheduled</span>

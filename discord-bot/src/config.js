@@ -26,17 +26,20 @@ export const config = {
     peptideOfDay: process.env.DISCORD_CHANNEL_PEPTIDE_OF_DAY || process.env.DISCORD_CHANNEL_NEWS || null,
     welcome: process.env.DISCORD_CHANNEL_WELCOME || null,
   },
-  // Feature switches — flip to `false` to silence a feed without redeploy
-  // (just restart the systemd unit after editing .env).
+  // Feature switches. Colin, Nov 2026: the server is a chatroom first, not
+  // a notice board. Scheduled feeds are off unless FEATURE_X=true is set
+  // in the .env; the Friday codes post and the welcome stay on unless
+  // FEATURE_X=false. Restart the systemd unit after editing the .env.
   features: {
-    priceDrops: process.env.FEATURE_PRICE_DROPS !== 'false',
-    newProducts: process.env.FEATURE_NEW_PRODUCTS !== 'false',
-    reviews: process.env.FEATURE_REVIEWS !== 'false',
-    peptideOfDay: process.env.FEATURE_PEPTIDE_OF_DAY !== 'false',
-    dealOfDay: process.env.FEATURE_DEAL_OF_DAY !== 'false',
-    weeklyRecap: process.env.FEATURE_WEEKLY_RECAP !== 'false',
-    blogOfDay: process.env.FEATURE_BLOG_OF_DAY !== 'false',
+    priceDrops: process.env.FEATURE_PRICE_DROPS === 'true',
+    newProducts: process.env.FEATURE_NEW_PRODUCTS === 'true',
+    reviews: process.env.FEATURE_REVIEWS === 'true',
+    peptideOfDay: process.env.FEATURE_PEPTIDE_OF_DAY === 'true',
+    dealOfDay: process.env.FEATURE_DEAL_OF_DAY === 'true',
+    weeklyRecap: process.env.FEATURE_WEEKLY_RECAP === 'true',
+    blogOfDay: process.env.FEATURE_BLOG_OF_DAY === 'true',
     promoSpotlight: process.env.FEATURE_PROMO_SPOTLIGHT !== 'false',
+    welcome: process.env.FEATURE_WELCOME !== 'false',
   },
   // Anti-spam thresholds
   limits: {

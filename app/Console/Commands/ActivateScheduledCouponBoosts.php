@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Log;
  * vendor card keeps showing the standard rate. This command runs
  * every 5 minutes, finds vendors whose start_at just passed, swaps
  * their discount to the boosted %, clears the start_at marker so
- * the boost is now "active", and posts to Discord.
+ * the boost is now "active", and posts to Discord if
+ * DISCORD_PROMOTION_POSTS is on (off since Nov 2026).
  *
  * Pairs with RevertExpiredCouponBoosts for the end of the boost.
  */
@@ -61,6 +62,10 @@ class ActivateScheduledCouponBoosts extends Command
 
     private function postDiscordBoostStart(string $brandName, ?string $slug, float $newPct, \DateTimeInterface $expiresAt): void
     {
+        // Off unless DISCORD_PROMOTION_POSTS=true (Colin, Nov 2026).
+        if (! config('services.discord.promotion_posts')) {
+            return;
+        }
         $token = config('services.discord.bot_token');
         // Colin Sep 23 — scheduled-boost activations follow the same
         // channel split as manual boosts (VendorSetting).

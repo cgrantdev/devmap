@@ -1713,8 +1713,7 @@ class VendorsController extends Controller
      * launch limited-time promos (e.g. "END OF SUMMER SALE 35% OFF")
      * without having to remember to change the % back afterward — the
      * RevertExpiredCouponBoosts scheduler auto-restores when the
-     * expiry passes, and a Discord announcement fires when the boost
-     * begins. Backend logic lives in VendorSetting::applyCouponBoost.
+     * expiry passes. Backend logic lives in VendorSetting::applyCouponBoost.
      */
     public function applyCouponBoost(Request $request, int $id)
     {

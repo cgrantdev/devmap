@@ -43,7 +43,12 @@ so secrets rotate in one place. Bot-only keys:
 - `BOT_API_TOKEN` — bearer for `/api/bot/*` (generated at install)
 - `DISCORD_BOT_TOKEN`, `DISCORD_APPLICATION_ID`, `DISCORD_GUILD_ID`
 - `DISCORD_CHANNEL_*` — one per feed target
-- `FEATURE_*=false` — silence any feed without a redeploy
+- Feeds (Nov 2026, the server is a chatroom first): the scheduled feeds
+  are off unless `FEATURE_*=true` (`PRICE_DROPS`, `REVIEWS`,
+  `NEW_PRODUCTS`, `DEAL_OF_DAY`, `BLOG_OF_DAY`, `PEPTIDE_OF_DAY`,
+  `WEEKLY_RECAP`). The Friday codes post (`PROMO_SPOTLIGHT`) and the
+  member welcome (`WELCOME`) stay on unless set to `false`. Slash
+  commands always work. Restart the unit after editing the `.env`.
 - `PRICE_DROP_MIN_PCT` (default 10), `PRICE_DROP_TOP_N` (5),
   `PRICE_DROP_DEDUPE_DAYS` (7), `NEW_PRODUCTS_MIN_COUNT` (3),
   `REVIEWS_RATE_LIMIT_PER_HOUR` (3)
