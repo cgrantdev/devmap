@@ -143,7 +143,7 @@ class BrandsController extends Controller
         // product/promotion write, so admin edits reflect immediately.
         // Every filter input is part of the key, or a filtered request
         // could be served a cached unfiltered list.
-        $cacheKey = 'brands.index.v2.' . md5(serialize([
+        $cacheKey = 'brands.index.v3.' . md5(serialize([
             $request->only(['search', 'location', 'verified', 'usp', 'min_rating', 'top_vendors_only']),
             $sortBy,
             $sortDir,
@@ -206,6 +206,14 @@ class BrandsController extends Controller
                         ? (float) $brand->vendorSetting->external_rating_avg : null,
                     'external_rating_count' => (int) ($brand->vendorSetting?->external_rating_count ?? 0),
                     'is_partner' => $brand->vendorSetting && $brand->vendorSetting->is_partner ? true : false,
+                    // Card coupon ticket: the vendor's code and its
+                    // Peptidemap discount.
+                    'coupon_code' => trim((string) ($brand->vendorSetting?->coupon_code ?? '')) !== ''
+                        ? strtoupper(trim((string) $brand->vendorSetting->coupon_code))
+                        : null,
+                    'coupon_percent' => $brand->vendorSetting?->coupon_discount_percent !== null
+                        ? (float) $brand->vendorSetting->coupon_discount_percent
+                        : null,
                     'featured' => $brand->vendorSetting && $brand->vendorSetting->featured ? true : false,
                     'last_updated' => $brand->updated_at?->diffForHumans(null, true) ?? null,
                     // Approved verification badges (cGMP / 7+ Tested)

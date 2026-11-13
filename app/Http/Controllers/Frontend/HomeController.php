@@ -602,6 +602,9 @@ class HomeController extends Controller
                     'founded_year' => $vs && $vs->founded_year ? (int) $vs->founded_year : null,
                     'is_partner' => $vs && (($vs->is_partner ?? false) || ($vs->featured ?? false)),
                     'coupon_code' => $vs->coupon_code ?? null,
+                    'coupon_percent' => $vs && $vs->coupon_discount_percent !== null
+                        ? (float) $vs->coupon_discount_percent
+                        : null,
                 ];
             });
 

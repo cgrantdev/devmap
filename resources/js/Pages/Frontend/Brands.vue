@@ -154,12 +154,13 @@
            Featured/partner vendors get a shiny animated gold border so they
            stand out without breaking the grid rhythm. -->
       <div v-if="filteredBrands.length > 0" class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-        <a
+        <!-- One stretched link per card (the name's ::after covers it), so
+             the coupon ticket can be a real button above it. -->
+        <div
           v-for="brand in filteredBrands"
           :key="brand.id"
-          :href="`/brand/${brand.slug}`"
           :class="[
-            'ui-focus group flex flex-col bg-white hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden',
+            'group relative flex flex-col rounded-[14px] bg-white hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden',
             brand.is_partner || brand.featured
               ? 'pmap-gold-border'
               : 'border border-[color:var(--color-hairline)] hover:border-[color:var(--color-accent-400)]',
@@ -197,7 +198,12 @@
                the card has ratings or verified badges. -->
           <div class="p-5 flex-1 flex flex-col gap-3">
             <div>
-              <h3 class="ui-display text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate">{{ brand.name }}</h3>
+              <h3 class="ui-display text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate group-hover:text-[color:var(--color-accent-700)] transition-colors">
+                <a
+                  :href="`/brand/${brand.slug}`"
+                  class="outline-none after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-[color:var(--color-accent-500)]"
+                >{{ brand.name }}</a>
+              </h3>
               <div class="flex items-center gap-1 mt-1 text-xs text-[color:var(--color-ink-muted)] h-[16px]">
                 <template v-if="brand.location">
                   <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -236,6 +242,8 @@
               </span>
             </div>
 
+            <CouponTicket v-if="brand.coupon_code" :code="brand.coupon_code" :percent="brand.coupon_percent" size="sm" />
+
             <!-- Stats row -->
             <div class="mt-auto pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-xs text-[color:var(--color-ink-muted)]">
               <span class="flex items-center gap-1">
@@ -247,7 +255,7 @@
               </span>
             </div>
           </div>
-        </a>
+        </div>
       </div>
 
       <!-- Empty state -->
@@ -275,6 +283,7 @@ import { ref, computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import VendorLogo from '@/components/ui/VendorLogo.vue'
+import CouponTicket from '@/components/ui/CouponTicket.vue'
 import { stripSiteSuffix } from '@/utils/pageTitle'
 import { groupLocationsByRegion } from '@/data/locationRegions'
 

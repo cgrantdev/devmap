@@ -164,11 +164,12 @@
         </div>
 
         <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
-          <a
+          <!-- One stretched link per tile (the name's ::after covers the
+               card), so the coupon ticket can be a real button above it. -->
+          <div
             v-for="vendor in verifiedVendors.slice(0, 6)"
             :key="vendor.id"
-            :href="vendor.url"
-            class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
+            class="group relative flex flex-col overflow-hidden rounded-[14px] border border-[color:var(--color-hairline)] bg-white transition-all duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]"
           >
             <!-- Fixed 16:9 logo box. The image is absolutely centred so a
                  square or oversized file can't stretch the tile (and with it
@@ -189,31 +190,30 @@
               />
               <span v-else class="absolute inset-0 flex items-center justify-center ui-display text-2xl lg:text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
             </div>
-            <div class="p-3 lg:p-5 flex-1 flex flex-col gap-2 lg:gap-3">
-              <!-- Name on its own row on mobile so it doesn't fight the coupon
-                   chip for space (was truncating to 'Insta...', 'Nur...' etc.).
-                   Chip drops below and left-aligned on <lg; inline on lg+. -->
-              <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-1.5">
-                <h3 class="ui-display text-[14px] lg:text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate min-w-0">{{ vendor.name }}</h3>
-                <span v-if="vendor.coupon_code" class="self-start inline-flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 border-dashed flex-shrink-0">
-                  <span class="text-emerald-500 text-[8px] uppercase tracking-wider font-semibold">Code</span>
-                  <span class="ui-mono">{{ vendor.coupon_code }}</span>
+            <div class="p-3 lg:p-5 flex-1 flex flex-col gap-2.5 lg:gap-3">
+              <div class="flex items-center justify-between gap-2 min-w-0">
+                <h3 class="ui-display text-[14px] lg:text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate min-w-0 group-hover:text-[color:var(--color-accent-700)] transition-colors">
+                  <a
+                    :href="vendor.url"
+                    class="ui-focus outline-none after:absolute after:inset-0 after:rounded-[14px]"
+                  >{{ vendor.name }}</a>
+                </h3>
+                <!-- Rating hidden until the vendor has actually collected
+                     reviews on their storefront. Same treatment as /vendors. -->
+                <span v-if="(vendor.rating_count || 0) > 0" class="flex-shrink-0 inline-flex items-center gap-1 text-xs">
+                  <svg class="w-3.5 h-3.5 text-[color:var(--color-caution)]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ (vendor.rating_average || 0).toFixed(1) }}</span>
                 </span>
               </div>
-              <!-- Rating hidden until the vendor has actually collected
-                   reviews on their storefront. Same treatment as /vendors. -->
-              <div v-if="(vendor.rating_count || 0) > 0" class="flex items-center gap-1 text-xs">
-                <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5" :class="n <= Math.round(vendor.rating_average) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-                <span class="ui-mono font-semibold text-[color:var(--color-ink)] ml-0.5">{{ (vendor.rating_average || 0).toFixed(1) }}</span>
-              </div>
+              <CouponTicket v-if="vendor.coupon_code" :code="vendor.coupon_code" :percent="vendor.coupon_percent" size="sm" />
               <div class="mt-auto pt-2 lg:pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-[11px] lg:text-xs text-[color:var(--color-ink-muted)]">
                 <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendor.product_count }}</span> listings</span>
                 <span class="text-[color:var(--color-accent-600)] font-semibold group-hover:translate-x-0.5 transition-transform duration-[180ms] flex items-center gap-0.5">
-                  View <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                  View <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </span>
               </div>
             </div>
-          </a>
+          </div>
         </div>
       </div>
     </section>
@@ -513,6 +513,7 @@ import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
 import HeroCarousel from '@/components/ui/HeroCarousel.vue'
+import CouponTicket from '@/components/ui/CouponTicket.vue'
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { trackImpression, trackClick } from '@/lib/bannerTracking'
 import { useSearchSuggest } from '@/composables/useSearchSuggest'

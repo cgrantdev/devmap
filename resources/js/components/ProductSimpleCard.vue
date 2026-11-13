@@ -1,127 +1,97 @@
 <template>
     <!-- The whole card is one real link: the title's ::after box stretches
-         over the card. The wishlist heart sits above it (z-10). -->
+         over the card. The wishlist heart and the coupon ticket sit above
+         it (z-10); the ticket only copies the code. Rows have fixed
+         heights so a grid lines up whatever the name or discount. -->
     <div
-      class="bg-white border border-gray-100 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all cursor-pointer overflow-hidden group relative flex flex-col h-full"
+      class="group relative flex h-full flex-col overflow-hidden rounded-[14px] border border-[color:var(--color-hairline)] bg-white transition-all duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]"
     >
-      <!-- Wishlist heart — top-right, layered above image -->
-      <div v-if="productId" class="absolute top-2 right-2 z-10">
+      <div v-if="productId" class="absolute right-2 top-2 z-10">
         <WishlistHeart type="product" :id="productId" size="md" />
       </div>
 
-      <!-- Top Section: Product Image — object-contain so vials/boxes fit
-           inside the card without cropping. Light bg so transparent PNGs
-           don't disappear, with a gentle hover scale. -->
-      <div class="relative aspect-square bg-gray-50 p-3 flex items-center justify-center overflow-hidden">
+      <div class="relative flex aspect-square items-center justify-center overflow-hidden border-b border-[color:var(--color-hairline)] bg-[color:var(--color-hairline-soft)] p-4">
         <!-- Lowest USD $/mg for this vial size among these listings. -->
         <span
           v-if="bestValue"
-          class="absolute top-2 left-2 inline-flex items-center gap-1 h-5 px-1.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-[0.06em] shadow-sm"
+          class="absolute left-2 top-2 z-[1] inline-flex h-5 items-center gap-1 rounded-full bg-emerald-600 px-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-white shadow-sm"
         >
-          <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+          <svg class="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
           Best value
         </span>
         <img
           v-if="imageUrl && !hasError"
           :src="imageUrl"
           :alt="name"
-          class="max-w-full max-h-full object-contain select-none group-hover:scale-[1.04] transition-transform duration-300"
+          class="max-h-full max-w-full select-none object-contain transition-transform duration-300 group-hover:scale-[1.03]"
           loading="lazy"
+          decoding="async"
           @error="onError"
         />
-        <div v-else class="w-full h-full flex items-center justify-center">
-          <svg
-            class="w-full h-full flex items-center justify-center"
-            viewBox="0 0 200 200"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect x="70" y="30" width="60" height="15" fill="#687280" stroke="#374151" stroke-width="2"></rect>
-            <rect x="75" y="45" width="50" height="10" fill="#9CA3AF" stroke="#374151" stroke-width="2"></rect>
-            <rect x="60" y="55" width="80" height="110" rx="8" fill="#E5E7EB" stroke="#374151" stroke-width="2"></rect>
-            <rect x="65" y="100" width= "70" height="60" rx="6" fill="#3B82F6" fill-opacity= "0.3"></rect>
-            <rect x="70" y="80" width="60" height="30" fill="white" stroke="#9CA3AF" stroke-width="1"></rect>
-            <line x1="75" y1="88" x2="125" y2="88" stroke="#D1D5DB" stroke-width="2"></line>
-            <line x1="75" y1="95" x2="115" y2="95" stroke="#D1D5DB" stroke-width="2"></line>
-            <line x1="75" y1="102" x2="120" y2="102" stroke="#D1D5DB" stroke-width="2"></line>
-            <line x1="145" y1="70" x2="150" y2="70" stroke="#9CA3AF" stroke-width="1"></line>
-            <line x1="145" y1="90" x2="150" y2="90" stroke="#9CA3AF" stroke-width="1"></line>
-            <line x1="145" y1="110" x2="150" y2="110" stroke="#9CA3AF" stroke-width="1"></line>
-            <line x1="145" y1="130" x2="150" y2="130" stroke="#9CA3AF" stroke-width="1"></line>
-            <line x1="145" y1="150" x2="150" y2="150" stroke="#9CA3AF" stroke-width="1"></line>
-          </svg>
-        </div>
+        <svg v-else class="h-20 w-14 text-[color:var(--color-ink-subtle)] opacity-60" viewBox="0 0 56 80" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <rect x="16" y="4" width="24" height="9" rx="2" />
+          <path d="M19 13v6c-5 2-9 6-9 12v38a6 6 0 0 0 6 6h24a6 6 0 0 0 6-6V31c0-6-4-10-9-12v-6" />
+          <path d="M10 48h36" stroke-dasharray="3 3" />
+        </svg>
       </div>
-  
-      <!-- Bottom Section: Product Information. flex-col + flex-1 +
-           bottom-aligned price block keeps card heights consistent
-           across a mixed-discount grid (Julia flagged Sep 1: images
-           bursting card bounds + heights all over the place). -->
-      <div class="p-4 flex flex-col flex-1">
-        <!-- Product Title + Type chip. FIXED 2-line height so the card
-             CTA row lines up across the grid (Colin PMAP Sep 16). -->
-        <div class="flex items-start gap-1.5 mb-2 h-[2.5rem] overflow-hidden">
-          <h3 class="text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 min-w-0">
+
+      <div class="flex flex-1 flex-col p-3.5">
+        <div class="flex h-[2.5rem] items-start gap-1.5 overflow-hidden">
+          <h3 class="ui-display min-w-0 flex-1 text-[14px] font-semibold leading-[1.25rem] tracking-tight text-[color:var(--color-ink)] line-clamp-2 transition-colors group-hover:text-[color:var(--color-accent-700)]">
             <Link
               :href="to"
-              class="outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-2 focus-visible:after:ring-blue-500"
+              class="outline-none after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-[color:var(--color-accent-500)]"
             >{{ name }}</Link>
           </h3>
           <span
             v-if="typeChip"
-            :class="['flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold leading-tight mt-0.5', typeChip.classes]"
+            :class="['mt-0.5 inline-flex flex-shrink-0 items-center rounded px-1.5 py-0.5 text-[10px] font-semibold leading-tight', typeChip.classes]"
           >{{ typeChip.label }}</span>
         </div>
 
-        <!-- Brand (optional) + size / pack line -->
-        <p v-if="brandName" class="text-[11px] text-gray-500 -mt-1 mb-1 truncate">{{ brandName }}</p>
-        <p v-if="sizeLine" class="text-[11px] text-gray-700 ui-mono -mt-0.5 mb-2 truncate">{{ sizeLine }}</p>
+        <!-- Vendor (related products span vendors) + size / pack line -->
+        <p v-if="brandName" class="mt-1 truncate text-[12px] font-medium text-[color:var(--color-ink-muted)]">{{ brandName }}</p>
+        <p class="ui-mono mt-0.5 h-4 truncate text-[11px] text-[color:var(--color-ink-subtle)]">{{ sizeLine }}</p>
 
         <!-- Rating (hidden until the product has real reviews) -->
-        <div v-if="Number(ratingCount) > 0" class="flex items-center gap-1 mb-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-3 h-3 fill-yellow-400 text-yellow-400" aria-hidden="true">
-            <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path>
-          </svg>
-          <span class="text-xs text-gray-900">
-            {{ formattedRating }}
-          </span>
-          <span class="text-xs text-gray-500">
-            ({{ ratingCount || 0 }})
-          </span>
-        </div>
-  
-        <!-- Price — mt-auto pins to bottom + min-h reserves the full
-             3-line discount block so undiscounted cards get the price
-             bottom-aligned inside the reserved space. Buttons/prices
-             line up across a mixed-discount grid. -->
-        <div class="mt-auto h-[74px] flex flex-col justify-end">
-          <template v-if="discountedPrice">
-            <div class="flex items-baseline gap-2">
-              <span class="text-[11px] uppercase tracking-wide text-gray-700 font-semibold leading-tight">Retail</span>
-              <span class="text-base text-gray-700 line-through leading-tight">{{ currencySymbol }}{{ displayPrice }}</span>
-            </div>
-            <div class="text-[11px] uppercase tracking-wide text-emerald-700 font-semibold mt-1.5 leading-tight">
-              Price with code <span class="ui-mono">{{ effectiveCouponCode }}</span>
-            </div>
-            <div class="text-xl text-emerald-700 font-bold leading-tight">{{ currencySymbol }}{{ discountedPrice }}</div>
-          </template>
-          <div v-else class="text-xl text-gray-900 font-semibold leading-tight">{{ currencySymbol }}{{ displayPrice }}</div>
+        <div v-if="Number(ratingCount) > 0" class="mt-1.5 flex items-center gap-1">
+          <svg class="h-3 w-3 fill-yellow-400 text-yellow-400" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" /></svg>
+          <span class="text-xs text-[color:var(--color-ink)]">{{ formattedRating }}</span>
+          <span class="text-xs text-[color:var(--color-ink-subtle)]">({{ ratingCount || 0 }})</span>
         </div>
 
-        <!-- Price per mg. Rendered (and its row reserved) only when the
-             parent passes the price-per-mg prop, so grids that do not use
-             it keep their old height. -->
-        <div v-if="showPerMgRow" class="mt-1.5 h-[18px] flex items-center">
-          <PricePerMg
-            v-if="pricePerMg !== null && pricePerMg !== ''"
-            :value="pricePerMg"
-            :currency-symbol="currencySymbol"
-            :best="bestValue"
-            :show-badge="false"
-            :size-label="sizeLabel || ''"
-            :with-code="!!discountedPrice"
-            size="xs"
-          />
+        <!-- Price block pinned to the bottom so cards line up. -->
+        <div class="mt-auto pt-3">
+          <div class="flex h-[22px] items-baseline gap-2">
+            <span class="ui-display text-[20px] font-bold leading-none tracking-tight text-[color:var(--color-ink)]">{{ currencySymbol }}{{ discountedPrice || displayPrice }}</span>
+            <template v-if="discountedPrice">
+              <span class="text-[12px] leading-none text-[color:var(--color-ink-subtle)] line-through">{{ currencySymbol }}{{ displayPrice }}</span>
+              <span class="text-[10px] font-semibold uppercase leading-none tracking-wide text-emerald-700">with code</span>
+            </template>
+          </div>
+
+          <!-- Price per mg. Rendered (and its row reserved) only when the
+               parent passes the price-per-mg prop. -->
+          <div v-if="showPerMgRow" class="mt-1.5 flex h-[18px] items-center">
+            <PricePerMg
+              v-if="pricePerMg !== null && pricePerMg !== ''"
+              :value="pricePerMg"
+              :currency-symbol="currencySymbol"
+              :best="bestValue"
+              :show-badge="false"
+              :size-label="sizeLabel || ''"
+              :with-code="!!discountedPrice"
+              size="xs"
+            />
+          </div>
+
+          <div class="mt-3">
+            <CouponTicket v-if="ticketCode" :code="ticketCode" :percent="brandDiscountPercent" size="sm" />
+            <div
+              v-else
+              class="flex h-10 items-center justify-center rounded-[10px] border border-dashed border-[color:var(--color-hairline)] text-[11px] font-medium text-[color:var(--color-ink-subtle)]"
+            >Listed price · no code needed</div>
+          </div>
         </div>
       </div>
     </div>
@@ -132,6 +102,7 @@
   import { Link } from '@inertiajs/vue3'
   import WishlistHeart from '@/components/ui/WishlistHeart.vue'
   import PricePerMg from '@/components/price/PricePerMg.vue'
+  import CouponTicket from '@/components/ui/CouponTicket.vue'
   import { formatSizeLabel, packLabel } from '@/components/price/priceFormat'
 
   const props = defineProps({
@@ -200,10 +171,13 @@
     return parseFloat(price).toFixed(2)
   })
 
-  // Effective coupon code shown on the label — falls back to PMAP.
-  const effectiveCouponCode = computed(() => {
+  // Code on the ticket: the vendor's own code, else PMAP when the vendor
+  // has a Peptidemap discount but no code of its own. Null (no ticket)
+  // when there is neither.
+  const ticketCode = computed(() => {
     const raw = (props.brandCouponCode || '').trim()
-    return (raw || 'PMAP').toUpperCase()
+    if (raw) return raw.toUpperCase()
+    return discountedPrice.value ? 'PMAP' : null
   })
 
   // Discounted price = retail × (1 − discount%). Null when no discount

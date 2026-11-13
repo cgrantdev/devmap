@@ -1,87 +1,67 @@
 <template>
   <!-- The whole card is one real link: the title's ::after box stretches
        over the card, so middle-click, open-in-new-tab and crawlers all
-       see an <a href> instead of a click handler. -->
+       see an <a href>. The coupon ticket sits above that overlay (z-10)
+       and only copies the code. Every row has a fixed height so cards in
+       a grid line up whatever the name length or discount. -->
   <div
-    class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group relative flex flex-col h-full"
+    class="group relative flex h-full flex-col overflow-hidden rounded-[14px] border border-[color:var(--color-hairline)] bg-white transition-all duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]"
   >
-    <!-- Top Section: Product Image. aspect-[4/3] (was square) so cards
-         aren't dominated by empty gradient when images fail to load. -->
-    <div class="relative aspect-[4/3] bg-gradient-to-br from-blue-50 to-purple-50 p-4 border-b border-gray-200 flex items-center justify-center overflow-hidden">
+    <div class="relative flex aspect-[4/3] items-center justify-center overflow-hidden border-b border-[color:var(--color-hairline)] bg-[color:var(--color-hairline-soft)] p-4">
       <!-- Lowest USD $/mg for this vial size on the page. -->
       <span
         v-if="bestValue"
-        class="absolute top-2 left-2 inline-flex items-center gap-1 h-5 px-1.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-[0.06em] shadow-sm"
+        class="absolute left-2 top-2 z-[1] inline-flex h-5 items-center gap-1 rounded-full bg-emerald-600 px-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-white shadow-sm"
       >
-        <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+        <svg class="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
         Best value
       </span>
       <img
         v-if="imageUrl && !hasError"
         :src="imageUrl"
         :alt="name"
-        class="w-full h-full object-contain select-none"
+        class="h-full w-full select-none object-contain transition-transform duration-300 group-hover:scale-[1.03]"
         loading="lazy"
+        decoding="async"
         @error="onError"
       />
-      <svg
-        v-else
-        class="w-20 h-24 text-gray-300"
-        viewBox="0 0 80 120"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <rect x="20" y="20" width="40" height="80" rx="2" fill="white" stroke="currentColor" stroke-width="1.5"/>
-        <rect x="18" y="15" width="44" height="8" rx="1" fill="currentColor"/>
-        <rect x="22" y="60" width="36" height="36" rx="1" fill="#BFDBFE"/>
-        <rect x="26" y="70" width="28" height="16" rx="1" fill="white" opacity="0.9"/>
+      <svg v-else class="h-20 w-14 text-[color:var(--color-ink-subtle)] opacity-60" viewBox="0 0 56 80" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <rect x="16" y="4" width="24" height="9" rx="2" />
+        <path d="M19 13v6c-5 2-9 6-9 12v38a6 6 0 0 0 6 6h24a6 6 0 0 0 6-6V31c0-6-4-10-9-12v-6" />
+        <path d="M10 48h36" stroke-dasharray="3 3" />
       </svg>
     </div>
 
-    <!-- Bottom Section: tighter padding + condensed price block. -->
-    <div class="p-3 flex flex-col flex-1">
-      <!-- Product name + optional type chip. FIXED 2-line height so
-           the "View Product" button lines up across every card in the
-           grid regardless of name length. Colin PMAP Sep 16: min-h
-           allowed cards with a wrapping name + tall chip to grow taller
-           than one-line neighbours, misaligning the CTA row. -->
-      <div class="flex items-start gap-1.5 h-[2.5rem] overflow-hidden">
-        <h3 class="text-[13px] font-semibold text-gray-900 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors flex-1 min-w-0">
-          <Link
-            :href="to"
-            class="outline-none after:absolute after:inset-0 after:rounded-lg focus-visible:after:ring-2 focus-visible:after:ring-blue-500"
-          >{{ name }}</Link>
-        </h3>
+    <div class="flex flex-1 flex-col p-3.5">
+      <!-- Vendor first: on a compound page every card is the same
+           compound, so who sells it is what people scan for. -->
+      <div class="flex h-[18px] items-center gap-1.5">
+        <span class="ui-display min-w-0 truncate text-[14px] font-semibold tracking-tight text-[color:var(--color-ink)] transition-colors group-hover:text-[color:var(--color-accent-700)]">
+          {{ brandName || 'Unknown vendor' }}
+        </span>
         <span
           v-if="typeChip"
-          :class="['flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold leading-tight', typeChip.classes]"
+          :class="['inline-flex flex-shrink-0 items-center rounded px-1.5 py-0.5 text-[10px] font-semibold leading-tight', typeChip.classes]"
         >{{ typeChip.label }}</span>
       </div>
+      <h3 class="mt-1 h-[2.25rem] overflow-hidden text-[12.5px] leading-[1.125rem] text-[color:var(--color-ink-muted)] line-clamp-2">
+        <Link
+          :href="to"
+          class="outline-none after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-[color:var(--color-accent-500)]"
+        >{{ name }}</Link>
+      </h3>
+      <p class="ui-mono mt-0.5 h-4 truncate text-[11px] text-[color:var(--color-ink-subtle)]">{{ sizeLine }}</p>
 
-      <p class="text-[11px] text-gray-500 mt-0.5 truncate h-[1rem]">{{ brandName || 'Unknown Brand' }}</p>
-      <!-- Size / pack line. Fixed height keeps the grid aligned when a
-           listing has neither. -->
-      <p class="text-[11px] text-gray-700 mt-0.5 truncate h-[1rem] ui-mono">{{ sizeLine }}</p>
-
-      <!-- Price — FIXED 60px so every card gets the same block height
-           whether the row is discounted (retail + strikethrough + "with
-           code X" + big new price) or plain (just the price). -->
-      <div class="mt-2 h-[60px] flex flex-col justify-end">
+      <!-- Price: what you pay (with the code when there is one), the
+           listed price struck through, then price per mg. -->
+      <div class="mt-3 flex h-[22px] items-baseline gap-2">
+        <span class="ui-display text-[20px] font-bold leading-none tracking-tight text-[color:var(--color-ink)]">{{ currencySymbol }}{{ discountedPrice || displayPrice }}</span>
         <template v-if="discountedPrice">
-          <div class="flex items-baseline gap-2 flex-wrap">
-            <span class="text-lg font-bold text-emerald-700 leading-none">{{ currencySymbol }}{{ discountedPrice }}</span>
-            <span class="text-[12px] text-gray-400 line-through leading-none">{{ currencySymbol }}{{ displayPrice }}</span>
-          </div>
-          <div class="text-[10px] uppercase tracking-wide text-emerald-700 font-semibold mt-1 leading-none">
-            with code <span class="ui-mono">{{ effectiveCouponCode }}</span>
-          </div>
+          <span class="text-[12px] leading-none text-[color:var(--color-ink-subtle)] line-through">{{ currencySymbol }}{{ displayPrice }}</span>
+          <span class="text-[10px] font-semibold uppercase leading-none tracking-wide text-emerald-700">with code</span>
         </template>
-        <div v-else class="text-lg font-bold text-gray-900 leading-none">{{ currencySymbol }}{{ displayPrice }}</div>
       </div>
-
-      <!-- Price per mg (single vials only; null for kits, packs, blends
-           and price outliers). Fixed height for grid alignment. -->
-      <div class="mt-1.5 mb-2 h-[18px] flex items-center">
+      <div class="mt-1.5 flex h-[18px] items-center">
         <PricePerMg
           v-if="pricePerMg !== null && pricePerMg !== undefined && pricePerMg !== ''"
           :value="pricePerMg"
@@ -94,13 +74,21 @@
         />
       </div>
 
+      <div class="mt-3">
+        <CouponTicket v-if="ticketCode" :code="ticketCode" :percent="brandDiscountPercent" size="sm" />
+        <div
+          v-else
+          class="flex h-10 items-center justify-center rounded-[10px] border border-dashed border-[color:var(--color-hairline)] text-[11px] font-medium text-[color:var(--color-ink-subtle)]"
+        >Listed price · no code needed</div>
+      </div>
+
       <!-- Visual CTA only; the stretched title link handles the click. -->
       <span
         aria-hidden="true"
-        class="mt-auto h-8 rounded bg-blue-600 group-hover:bg-blue-700 text-white text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
+        class="mt-2.5 flex h-9 items-center justify-center gap-1.5 rounded-[10px] border border-[color:var(--color-hairline)] text-[12px] font-semibold text-[color:var(--color-ink)] transition-colors group-hover:border-[color:var(--color-accent-400)] group-hover:text-[color:var(--color-accent-700)]"
       >
-        View Product
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+        View listing
+        <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
       </span>
     </div>
   </div>
@@ -110,6 +98,7 @@
 import { computed, ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
 import PricePerMg from '@/components/price/PricePerMg.vue'
+import CouponTicket from '@/components/ui/CouponTicket.vue'
 import { packLabel } from '@/components/price/priceFormat'
 
 const props = defineProps({
@@ -235,11 +224,13 @@ const displayPrice = computed(() => {
   return parseFloat(price).toFixed(2)
 })
 
-// Effective coupon code shown on the label — falls back to PMAP if the
-// brand hasn't set one. Always upper-cased for visual consistency.
-const effectiveCouponCode = computed(() => {
+// Code on the ticket: the vendor's own code, else PMAP when the vendor
+// has a Peptidemap discount but no code of its own. Null (no ticket)
+// when there is neither.
+const ticketCode = computed(() => {
   const raw = (props.brandCouponCode || '').trim()
-  return (raw || 'PMAP').toUpperCase()
+  if (raw) return raw.toUpperCase()
+  return discountedPrice.value ? 'PMAP' : null
 })
 
 // Discounted price = retail × (1 − discount%). Null when no discount or
