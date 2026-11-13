@@ -69,6 +69,8 @@ class EducationPost extends Model
         'conclusion',
         'references',
         'areas_of_research_intro',
+        // Optional grey note under Areas of Research (2026_11_14 migration).
+        'areas_of_research_note',
         // SEO fields
         'seo_page_title',
         'seo_h1',
@@ -88,6 +90,8 @@ class EducationPost extends Model
         'contraindications' => 'array',
         'stacking_recommendations' => 'array',
         'faqs' => 'array',
+        // Schema-only FAQs archived by the 2026_11_14 migration; read-only.
+        'legacy_faqs' => 'array',
         // New encyclopedia entry casts
         'tags' => 'array',
         'key_points' => 'array',

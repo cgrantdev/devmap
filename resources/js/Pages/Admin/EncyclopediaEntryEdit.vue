@@ -190,6 +190,16 @@
               </template>
             </RepeaterObjectList>
           </FormField>
+          <FormField label="Research note (optional)" :hint="researchNoteHint">
+            <textarea
+              v-model="form.areas_of_research_note"
+              rows="3"
+              maxlength="2000"
+              class="ui-input"
+              :disabled="!newFieldsReady"
+              placeholder="e.g. These findings come from animal and cell studies. Human evidence is limited."
+            ></textarea>
+          </FormField>
         </SectionCard>
 
         <!-- 7. Background -->
@@ -373,6 +383,50 @@
           <textarea v-model="form.conclusion" rows="8" class="ui-input" placeholder="Enter conclusion"></textarea>
         </SectionCard>
 
+        <!-- FAQs: rendered on the page and used for FAQPage JSON-LD. -->
+        <SectionCard section-id="faqs" title="FAQs" :open="isOpen('faqs')" :complete="isComplete('faqs')" @toggle="toggle('faqs')">
+          <template v-if="newFieldsReady">
+            <p class="text-[12px] text-[color:var(--color-ink-muted)]">
+              Shown under "Frequently asked questions" on the page, in this order, and sent as FAQPage JSON-LD with the same text. Plain text, up to 12.
+            </p>
+            <div v-for="(faq, i) in form.faqs" :key="i" class="border border-[color:var(--color-hairline)] bg-white p-3 space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] uppercase tracking-wide font-semibold text-[color:var(--color-ink-subtle)]">Question {{ i + 1 }}</span>
+                <div class="flex items-center gap-1">
+                  <button type="button" class="px-1.5 text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)] disabled:opacity-30" :disabled="i === 0" title="Move up" @click="moveFaq(i, -1)">&#9650;</button>
+                  <button type="button" class="px-1.5 text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink)] disabled:opacity-30" :disabled="i === form.faqs.length - 1" title="Move down" @click="moveFaq(i, 1)">&#9660;</button>
+                  <button type="button" class="ml-1 text-[12px] text-red-600 hover:text-red-800" @click="form.faqs.splice(i, 1)">Remove</button>
+                </div>
+              </div>
+              <input v-model="faq.question" type="text" maxlength="300" class="ui-input" placeholder="Question" />
+              <textarea v-model="faq.answer" rows="3" maxlength="4000" class="ui-input" placeholder="Answer"></textarea>
+            </div>
+            <button
+              type="button"
+              class="w-full py-2 text-[12px] font-medium text-[color:var(--color-ink-muted)] border border-dashed border-[color:var(--color-hairline)] hover:border-[color:var(--color-accent-500)] hover:text-[color:var(--color-accent-600)] disabled:opacity-50"
+              :disabled="form.faqs.length >= MAX_FAQS"
+              @click="addFaq"
+            >+ Add FAQ ({{ form.faqs.length }} / {{ MAX_FAQS }})</button>
+
+            <div v-if="legacyFaqs.length" class="border border-amber-200 bg-amber-50 p-3">
+              <p class="text-[12px] font-semibold text-amber-900">Earlier FAQs, not on the page ({{ legacyFaqs.length }})</p>
+              <p class="mt-1 text-[12px] text-amber-800">These were only sent as hidden FAQ JSON-LD and are no longer published. Copy any you want to keep into the list above, edit them, then save.</p>
+              <ol class="mt-2 space-y-2 list-decimal pl-5 text-[12px] text-amber-900">
+                <li v-for="(f, i) in legacyFaqs" :key="i"><strong>{{ f.question }}</strong><br>{{ f.answer }}</li>
+              </ol>
+              <button
+                type="button"
+                class="mt-2 text-[12px] font-semibold text-amber-900 underline underline-offset-2 disabled:opacity-50"
+                :disabled="form.faqs.length >= MAX_FAQS"
+                @click="copyLegacyFaqs"
+              >Copy into the FAQ list</button>
+            </div>
+          </template>
+          <p v-else class="text-[12px] text-[color:var(--color-ink-muted)]">
+            The FAQ field turns on after the pending database update runs (Dev console, Run pending migrations). Until then this entry shows no FAQ and sends no FAQ JSON-LD.
+          </p>
+        </SectionCard>
+
         <!-- 14. References -->
         <SectionCard section-id="references" title="References" :open="isOpen('references')" :complete="isComplete('references')" @toggle="toggle('references')">
           <RepeaterObjectList
@@ -480,6 +534,8 @@ import RepeaterObjectList from '@/components/admin/RepeaterObjectList.vue'
 const props = defineProps({
   entry: Object,
   categories: { type: Array, default: () => [] },
+  // False until the 2026_11_14 migration adds the FAQ and note columns.
+  newFieldsReady: { type: Boolean, default: false },
 })
 const page = usePage()
 
@@ -627,6 +683,7 @@ const form = useForm({
   key_points: props.entry?.key_points || [],
   overview: props.entry?.overview || '',
   areas_of_research_intro: props.entry?.areas_of_research_intro || '',
+  areas_of_research_note: props.entry?.areas_of_research_note || '',
   areas_of_research: props.entry?.areas_of_research || [],
   background: props.entry?.background || '',
   mechanism_of_action_intro: props.entry?.mechanism_of_action_intro || '',
@@ -643,6 +700,7 @@ const form = useForm({
   potential_applications_important_context: props.entry?.potential_applications_important_context || '',
   conclusion: props.entry?.conclusion || '',
   references: props.entry?.references || [],
+  faqs: (props.entry?.faqs || []).map((f) => ({ question: f?.question || '', answer: f?.answer || '' })),
   product_category_id: props.entry?.product_category_id || null,
   status: props.entry?.status || 'draft',
   seo_page_title: props.entry?.seo_page_title || '',
@@ -668,6 +726,7 @@ const sections = [
   { id: 'regulatory',   label: 'Regulatory' },
   { id: 'applications', label: 'Potential Applications' },
   { id: 'conclusion',   label: 'Conclusion' },
+  { id: 'faqs',         label: 'FAQs' },
   { id: 'references',   label: 'References' },
   { id: 'publishing',   label: 'Publishing' },
   { id: 'seo',          label: 'SEO Data' },
@@ -683,7 +742,7 @@ const isComplete = (id) => {
     case 'amino':        return hasText(form.amino_acid_sequence) || hasText(form.amino_acid_net_charge) || hasText(form.amino_acid_hydrophobic) || hasText(form.amino_acid_stability) || hasText(form.amino_acid_solubility)
     case 'key_points':   return arrayHasContent(form.key_points, hasText)
     case 'overview':     return hasText(form.overview)
-    case 'areas':        return hasText(form.areas_of_research_intro) || arrayHasContent(form.areas_of_research, (a) => hasText(a?.name) || hasText(a?.description))
+    case 'areas':        return hasText(form.areas_of_research_intro) || hasText(form.areas_of_research_note) || arrayHasContent(form.areas_of_research, (a) => hasText(a?.name) || hasText(a?.description))
     case 'background':   return hasText(form.background)
     case 'mechanism':    return hasText(form.mechanism_of_action_intro) || arrayHasContent(form.mechanism_subsections, (s) => hasText(s?.title) || hasText(s?.intro) || arrayHasContent(s?.items, (it) => hasText(it?.item) || hasText(it?.description)))
     case 'preclinical':  return hasText(form.preclinical_intro) || hasText(form.preclinical_disclaimer) || arrayHasContent(form.preclinical_subsections, (s) => hasText(s?.title) || arrayHasContent(s?.findings, (f) => hasText(f?.title) || hasText(f?.content)))
@@ -691,11 +750,35 @@ const isComplete = (id) => {
     case 'regulatory':   return hasText(form.regulatory_important_note) || arrayHasContent(form.regulatory_subsections, (s) => hasText(s?.title) || arrayHasContent(s?.entries, (e) => hasText(e?.value)))
     case 'applications': return hasText(form.potential_applications_intro) || hasText(form.potential_applications_important_context) || arrayHasContent(form.potential_applications, (a) => hasText(a?.title) || hasText(a?.description))
     case 'conclusion':   return hasText(form.conclusion)
+    case 'faqs':         return arrayHasContent(form.faqs, (f) => hasText(f?.question) && hasText(f?.answer))
     case 'references':   return arrayHasContent(form.references, (r) => hasText(r?.title) || hasText(r?.authors) || hasText(r?.citation) || hasText(r?.description))
     case 'publishing':   return !!form.product_category_id
     case 'seo':          return hasText(form.seo_page_title) || hasText(form.seo_description) || hasText(form.seo_og_title) || hasText(form.seo_og_description) || hasText(form.seo_og_image)
   }
   return false
+}
+
+// --- FAQs and research note ---
+const MAX_FAQS = 12
+const researchNoteHint = computed(() => (props.newFieldsReady
+  ? 'Grey note under Areas of Research on the page. Leave empty to show none. Say what kind of evidence the areas above come from (animal and cell studies, human trials, or both).'
+  : 'Turns on after the pending database update runs (Dev console, Run pending migrations).'))
+const legacyFaqs = computed(() => (props.entry?.legacy_faqs || []).filter((f) => hasText(f?.question) || hasText(f?.answer)))
+const addFaq = () => {
+  if (form.faqs.length < MAX_FAQS) form.faqs.push({ question: '', answer: '' })
+}
+const moveFaq = (i, dir) => {
+  const j = i + dir
+  if (j < 0 || j >= form.faqs.length) return
+  const next = [...form.faqs]
+  ;[next[i], next[j]] = [next[j], next[i]]
+  form.faqs = next
+}
+const copyLegacyFaqs = () => {
+  const room = Math.max(0, MAX_FAQS - form.faqs.length)
+  legacyFaqs.value.slice(0, room).forEach((f) => {
+    form.faqs.push({ question: f.question || '', answer: f.answer || '' })
+  })
 }
 
 // --- Collapse state ---
@@ -780,6 +863,7 @@ const submit = (opts = {}) => {
   form.regulatory_subsections = form.regulatory_subsections.filter((s) => (s.title || '').trim() !== '' || (s.entries && s.entries.length > 0))
 
   form.potential_applications = form.potential_applications.filter((a) => (a.title || '').trim() !== '' || (a.description || '').trim() !== '')
+  form.faqs = form.faqs.filter((f) => (f.question || '').trim() !== '' || (f.answer || '').trim() !== '')
   form.references = form.references.filter((r) => (r.authors || '').trim() !== '' || (r.title || '').trim() !== '' || (r.description || '').trim() !== '' || (r.citation || '').trim() !== '')
   form.references.forEach((r) => {
     if (r.links) r.links = r.links.filter((l) => (l.url || '').trim() !== '' || (l.label || '').trim() !== '')

@@ -966,6 +966,41 @@ textarea.ui-input { resize: vertical; }
     text-decoration: underline;
     text-underline-offset: 2px;
 }
+
+/* Agency-authored HTML (compound intros on /compare/{slug} and
+   /product/{slug}). Tailwind's preflight strips link color, underline
+   and list bullets, and the typography plugin is not installed, so the
+   old "prose" class did nothing: intro links read as body text. */
+.ui-rich > * + * {
+    margin-top: 0.75rem;
+}
+.ui-rich ul,
+.ui-rich ol {
+    padding-left: 1.25rem;
+}
+.ui-rich ul {
+    list-style: disc;
+}
+.ui-rich ol {
+    list-style: decimal;
+}
+.ui-rich li + li {
+    margin-top: 0.25rem;
+}
+.ui-rich strong {
+    color: var(--color-ink);
+    font-weight: 600;
+}
+.ui-rich a {
+    color: var(--color-accent-700);
+    font-weight: 500;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+.ui-rich a:hover {
+    color: var(--color-accent-600);
+}
 .edu-article hr {
     margin: 2rem 0;
     border: 0;

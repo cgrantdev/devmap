@@ -708,20 +708,29 @@ class CompareController extends Controller
             ];
         }
 
-        // Agency-authored custom FAQs (admin at /admin/seo/categories).
-        // Prepended so the editorial Q&A appears first in both the
-        // visible accordion and the FAQPage JSON-LD. Same source row
-        // powers the /product/{slug} FAQ block, so a single edit
-        // populates both page types.
+        // Agency-authored FAQs (admin at /admin/seo/categories) replace
+        // the generated set, on the page and in the FAQPage JSON-LD.
+        // Appending the generated questions repeated the agency's own
+        // ("Does Peptidemap sell BPC-157?" twice, 13 questions in the
+        // schema for 9 written ones).
         $customFaqs = is_array($category->compare_custom_faqs) && !empty($category->compare_custom_faqs)
             ? $category->compare_custom_faqs
             : (is_array($category->custom_faqs) ? $category->custom_faqs : []);
-        if ($customFaqs) {
-            $faqPairs = array_merge(
-                array_map(fn ($f) => ['q' => (string) ($f['q'] ?? ''), 'a' => (string) ($f['a'] ?? '')], $customFaqs),
-                $faqPairs
-            );
+        $customFaqPairs = array_values(array_filter(
+            array_map(fn ($f) => [
+                'q' => trim((string) ($f['q'] ?? '')),
+                'a' => trim((string) ($f['a'] ?? '')),
+            ], $customFaqs),
+            fn ($f) => $f['q'] !== '' && $f['a'] !== ''
+        ));
+        if ($customFaqPairs) {
+            $faqPairs = $customFaqPairs;
         }
+
+        // The agency intro replaces the default description (the
+        // encyclopedia summary, or the retatrutide price intro) so the
+        // page carries one intro, not two.
+        $customIntro = $category->compare_custom_intro_html ?: ($category->custom_intro_html ?: null);
 
         // ItemList only when at least one listing passes the same rules as
         // the headline. An all-ineligible catalog (for example a blend
@@ -855,7 +864,7 @@ class CompareController extends Controller
                 'alias' => $alias,
                 'raw_name' => $category->name,
                 'slug' => $category->slug,
-                'summary' => $summary,
+                'summary' => $customIntro ? null : $summary,
                 'research' => null,
                 'trial_context' => $canonical === 'retatrutide' ? [
                     'line' => 'Retatrutide is an investigational compound.',
@@ -866,14 +875,14 @@ class CompareController extends Controller
                 // Agency-authored content (admin at /admin/seo/categories).
                 // Shared with /product/{slug} via the same row.
                 'custom_h1' => $category->compare_custom_h1 ?: ($category->custom_h1 ?: null),
-                'custom_intro' => $category->compare_custom_intro_html ?: ($category->custom_intro_html ?: null),
+                'custom_intro' => $customIntro,
                 'product_count' => $productCount,
                 'vendor_count' => $vendorCount,
                 'cheapest_price' => $cheapest,
                 'priciest_price' => $priciest,
                 'products' => $this->displayRows($products),
                 'faqs' => $faqPairs,
-                'price_intro' => $priceIntro,
+                'price_intro' => $customIntro ? null : $priceIntro,
                 'price_stats' => $priceStats,
                 'per_mg_title' => $perMgTitle,
                 'per_mg_intro' => $perMgIntro,

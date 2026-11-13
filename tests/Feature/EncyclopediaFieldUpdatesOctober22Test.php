@@ -468,7 +468,11 @@ class EncyclopediaFieldUpdatesOctober22Test extends TestCase
             ->assertOk()
             ->assertInertia(function ($page) {
                 $props = $page->toArray()['props'];
-                $this->assertSame([], $props['faqs']);
+                // Visible since the 2026_11_14 migration: schema and page share one list.
+                $this->assertSame([[
+                    'question' => 'What is the best time to inject Sermorelin?',
+                    'answer' => 'Bedtime is often discussed.',
+                ]], $props['faqs']);
                 $faqPage = collect($props['seo']['schema'])->firstWhere('@type', 'FAQPage');
                 $this->assertIsArray($faqPage);
                 $this->assertSame('What is the best time to inject Sermorelin?', $faqPage['mainEntity'][0]['name']);

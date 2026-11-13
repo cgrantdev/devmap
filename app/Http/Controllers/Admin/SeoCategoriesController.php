@@ -22,8 +22,14 @@ use Inertia\Inertia;
  */
 class SeoCategoriesController extends Controller
 {
+    /**
+     * Keys are the request blocks the editor submits ('peptides',
+     * 'compare'). This map used 'products' for the Peptides block, so
+     * $data['products'] was always missing and every save wrote NULL to
+     * the Peptides fields while Compare saved (agency report, Nov 12).
+     */
     private const EDITABLE = [
-        'products' => [
+        'peptides' => [
             'title' => 'products_custom_title',
             'meta'  => 'products_custom_meta_description',
             'h1'    => 'products_custom_h1',

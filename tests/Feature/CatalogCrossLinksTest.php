@@ -344,7 +344,7 @@ class CatalogCrossLinksTest extends TestCase
             $this->assertDoesNotMatchRegularExpression('/\b(buy|price|coupon|best|ranking)\b/i', $label);
         }
         // /calculator is a legitimate kind — product pages for compounds
-        // that have a CalculatorPresets entry emit a "Dose calculator"
+        // that have a CalculatorPresets entry emit a "Peptide calculator"
         // pill. The label-safety regex above still gates what words can
         // appear in any link label.
     }

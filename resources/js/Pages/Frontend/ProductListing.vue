@@ -11,7 +11,7 @@
         </h1>
         <div
           v-if="compoundContent?.intro"
-          class="prose prose-sm max-w-3xl mt-4 text-[color:var(--color-ink-muted)] leading-relaxed"
+          class="ui-rich max-w-3xl mt-4 text-[color:var(--color-ink-muted)] leading-relaxed"
           v-html="compoundContent.intro"
         ></div>
         <!-- Price summary for the listings shown (filters apply). The

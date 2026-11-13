@@ -254,7 +254,7 @@
                       {{ researchUseNotice }}
                     </p>
                     <p v-else class="text-sm text-amber-800 leading-relaxed">
-                      {{ name }} is an experimental compound not approved for human use by any regulatory agency. This article is for informational and educational purposes only and does not constitute medical advice. Peptidemaps does not provide recommendations on safety, usage, or dosages.
+                      {{ name }} is an experimental compound not approved for human use by any regulatory agency. This article is for informational and educational purposes only and does not constitute medical advice. Peptidemap does not provide recommendations on safety, usage, or dosages.
                     </p>
                   </div>
                 </div>
@@ -366,8 +366,10 @@
                     </div>
                   </div>
                   <p v-else class="text-slate-700 leading-relaxed mb-6">No research areas available.</p>
-                  <!-- Research Note -->
-                  <div class="mt-6 bg-slate-50 border border-slate-200 rounded-lg p-5">
+                  <!-- Research note: written per entry in the admin editor. The
+                       fixed "preclinical animal and cell studies" line was
+                       wrong for entries that summarise human trials. -->
+                  <div v-if="areasOfResearchNote" class="mt-6 bg-slate-50 border border-slate-200 rounded-lg p-5">
                     <div class="flex items-start gap-3">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users w-5 h-5 text-slate-600 flex-shrink-0 mt-0.5" aria-hidden="true">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
@@ -378,7 +380,7 @@
                       <div>
                         <p class="text-sm text-slate-700 leading-relaxed">
                           <strong>Research Note:</strong>
-                           All findings listed above are derived from preclinical animal and cell studies. Human clinical evidence remains limited, and these research areas should not be interpreted as proven therapeutic applications.
+                          {{ areasOfResearchNote }}
                         </p>
                       </div>
                     </div>
@@ -839,7 +841,7 @@
                   </template>
                 </section>
 
-                <!-- FAQ — only the controller allowlist passes a non-empty list. Plain text; no v-html. -->
+                <!-- FAQ: the same list the controller turns into FAQPage JSON-LD. Plain text; no v-html. -->
                 <section v-if="faqs && faqs.length" id="faqs" class="mb-12">
                   <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
                     <div class="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg">
@@ -929,7 +931,7 @@
 
                 <!-- Footer Disclaimer -->
                 <div class="text-sm text-slate-500 pt-6 border-t border-slate-200">
-                  <p>This article is for informational purposes only. Last updated: February 2026</p>
+                  <p>This article is for informational purposes only.<template v-if="lastUpdated?.label"> Last updated: <time :datetime="lastUpdated.iso">{{ lastUpdated.label }}</time></template></p>
                   <p class="mt-1">Source: Comprehensive research overview compiled from published scientific literature</p>
                 </div>
               </div>     
@@ -1685,6 +1687,14 @@ const props = defineProps({
   faqs: {
     type: Array,
     default: () => []
+  },
+  areasOfResearchNote: {
+    type: String,
+    default: ''
+  },
+  lastUpdated: {
+    type: Object,
+    default: null
   },
   references: {
     type: Array,

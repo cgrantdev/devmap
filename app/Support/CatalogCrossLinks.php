@@ -82,7 +82,7 @@ class CatalogCrossLinks
             }
         }
 
-        // Dose calculator is a tool, not a published catalog page, so
+        // Peptide calculator is a tool, not a published catalog page, so
         // the match is against CalculatorPresets rather than an active
         // category row. First preset whose slug family starts with the
         // category slug wins (semaglutide -> semaglutide-3mg etc.).
@@ -92,10 +92,11 @@ class CatalogCrossLinks
             foreach (CalculatorPresets::all() as $preset) {
                 if (str_starts_with($preset['slug'], $slugLower.'-')) {
                     $groups[] = [
-                        'label' => 'Dose calculator',
+                        // Same label as the footer link (agency, Nov 2026).
+                        'label' => 'Peptide calculator',
                         'links' => [self::link(
                             '/calculator/'.$preset['slug'],
-                            $category->name.' dose calculator',
+                            $category->name.' peptide calculator',
                             'calculator'
                         )],
                     ];

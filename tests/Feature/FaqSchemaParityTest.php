@@ -303,7 +303,12 @@ HTML;
         $this->assertSame($stored, $post->fresh()->faqs);
     }
 
-    public function test_non_allowlisted_encyclopedia_keeps_existing_faqpage_and_has_no_visible_faq(): void
+    /**
+     * Since the 2026_11_14 migration (legacy_faqs column present), stored
+     * FAQs are visible on every entry and FAQPage JSON-LD is built from
+     * the visible list. Schema-only FAQs were moved to legacy_faqs.
+     */
+    public function test_non_allowlisted_encyclopedia_shows_its_faq_and_matching_faqpage(): void
     {
         $stored = [[
             'question' => '  What catalog label does this sermorelin entry use?  ',
@@ -345,7 +350,9 @@ HTML;
         $this->assertSame($expected, $this->faqPage($response->getContent()));
 
         $response->assertInertia(fn ($page) => $page
-            ->has('faqs', 0)
+            ->has('faqs', 1)
+            ->where('faqs.0.question', $expected['mainEntity'][0]['name'])
+            ->where('faqs.0.answer', $expected['mainEntity'][0]['acceptedAnswer']['text'])
         );
 
         $this->assertSame($stored, $post->fresh()->faqs);

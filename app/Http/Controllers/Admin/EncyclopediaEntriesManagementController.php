@@ -6,10 +6,85 @@ use App\Http\Controllers\Controller;
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 class EncyclopediaEntriesManagementController extends Controller
 {
+    /**
+     * Visible FAQ field and Areas of Research note. Both columns arrive with
+     * the 2026_11_14_100000 migration, which also moves the old schema-only
+     * FAQs out of education_posts.faqs. Until it has run these fields are
+     * read-only, so an edit cannot be archived by the migration afterwards.
+     */
+    private const NEW_FIELD_RULES = [
+        'faqs' => 'nullable|array|max:12',
+        'faqs.*.question' => 'nullable|string|max:300|required_with:faqs.*.answer',
+        'faqs.*.answer' => 'nullable|string|max:4000|required_with:faqs.*.question',
+        'areas_of_research_note' => 'nullable|string|max:2000',
+    ];
+
+    private const NEW_FIELD_MESSAGES = [
+        'faqs.max' => 'An entry can have up to 12 FAQs.',
+        'faqs.*.question.required_with' => 'FAQ :position has an answer but no question.',
+        'faqs.*.answer.required_with' => 'FAQ :position has a question but no answer.',
+    ];
+
+    private function newFieldsReady(?EducationPost $entry = null): bool
+    {
+        if ($entry !== null) {
+            return array_key_exists('legacy_faqs', $entry->getAttributes());
+        }
+
+        return Schema::hasColumn('education_posts', 'legacy_faqs');
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    private function applyNewFields(array $validated, bool $ready): array
+    {
+        if (! $ready) {
+            unset($validated['faqs'], $validated['areas_of_research_note']);
+
+            return $validated;
+        }
+        if (array_key_exists('faqs', $validated)) {
+            $faqs = $this->faqRows(is_array($validated['faqs']) ? $validated['faqs'] : []);
+            $validated['faqs'] = $faqs === [] ? null : $faqs;
+        }
+        if (array_key_exists('areas_of_research_note', $validated)) {
+            $note = trim((string) ($validated['areas_of_research_note'] ?? ''));
+            $validated['areas_of_research_note'] = $note === '' ? null : $note;
+        }
+
+        return $validated;
+    }
+
+    /**
+     * Stored FAQ shape: [{question, answer}], trimmed, empty pairs dropped.
+     *
+     * @return list<array{question: string, answer: string}>
+     */
+    private function faqRows(mixed $rows): array
+    {
+        $out = [];
+        foreach (is_array($rows) ? $rows : [] as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+            $question = trim((string) ($row['question'] ?? $row['q'] ?? ''));
+            $answer = trim((string) ($row['answer'] ?? $row['a'] ?? ''));
+            if ($question === '' && $answer === '') {
+                continue;
+            }
+            $out[] = ['question' => $question, 'answer' => $answer];
+        }
+
+        return $out;
+    }
+
     public function index(Request $request)
     {
         $entries = EducationPost::with('category')
@@ -50,6 +125,7 @@ class EncyclopediaEntriesManagementController extends Controller
         return Inertia::render('Admin/EncyclopediaEntryEdit', [
             'entry' => null,
             'categories' => $categories,
+            'newFieldsReady' => $this->newFieldsReady(),
         ]);
     }
 
@@ -129,7 +205,8 @@ class EncyclopediaEntriesManagementController extends Controller
             'seo_og_title' => 'nullable|string|max:255',
             'seo_og_description' => 'nullable|string',
             'seo_og_image' => 'nullable|string|max:500',
-        ]);
+        ] + self::NEW_FIELD_RULES, self::NEW_FIELD_MESSAGES);
+        $validated = $this->applyNewFields($validated, $this->newFieldsReady());
 
         // Set published_at when status is published
         if ($validated['status'] === 'published' && empty($request->published_at)) {
@@ -147,6 +224,7 @@ class EncyclopediaEntriesManagementController extends Controller
     public function edit($id)
     {
         $entry = EducationPost::findOrFail($id);
+        $ready = $this->newFieldsReady($entry);
 
         $categories = ProductCategory::where('is_active', true)
             ->orderBy('name')
@@ -180,6 +258,7 @@ class EncyclopediaEntriesManagementController extends Controller
                 'key_points' => $entry->key_points ?? [],
                 'overview' => $entry->overview ?? '',
                 'areas_of_research_intro' => $entry->areas_of_research_intro ?? '',
+                'areas_of_research_note' => $ready ? ($entry->areas_of_research_note ?? '') : '',
                 'areas_of_research' => $entry->areas_of_research ?? [],
                 'background' => $entry->background ?? '',
                 'mechanism_of_action_intro' => $entry->mechanism_of_action_intro ?? '',
@@ -196,6 +275,10 @@ class EncyclopediaEntriesManagementController extends Controller
                 'potential_applications_important_context' => $entry->potential_applications_important_context ?? '',
                 'conclusion' => $entry->conclusion ?? '',
                 'references' => $entry->references ?? [],
+                // Visible FAQs (page + FAQPage JSON-LD) and the archived
+                // schema-only set, shown read-only for reference.
+                'faqs' => $ready ? $this->faqRows($entry->faqs) : [],
+                'legacy_faqs' => $ready ? $this->faqRows($entry->legacy_faqs) : [],
                 'product_category_id' => $entry->product_category_id,
                 'published_at' => $entry->published_at ? $entry->published_at->format('Y-m-d') : null,
                 'status' => $entry->status,
@@ -207,6 +290,7 @@ class EncyclopediaEntriesManagementController extends Controller
                 'seo_og_image' => $entry->seo_og_image ?? '',
             ],
             'categories' => $categories,
+            'newFieldsReady' => $ready,
         ]);
     }
 
@@ -288,7 +372,8 @@ class EncyclopediaEntriesManagementController extends Controller
             'seo_og_title' => 'nullable|string|max:255',
             'seo_og_description' => 'nullable|string',
             'seo_og_image' => 'nullable|string|max:500',
-        ]);
+        ] + self::NEW_FIELD_RULES, self::NEW_FIELD_MESSAGES);
+        $validated = $this->applyNewFields($validated, $this->newFieldsReady($entry));
 
         // Handle status change and published_at
         $oldStatus = $entry->status;

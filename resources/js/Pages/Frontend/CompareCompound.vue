@@ -37,7 +37,7 @@
              is reached sooner. The full text is in the page either way. -->
         <div v-if="compound.custom_intro || compound.price_intro || compound.summary" class="mt-3 max-w-3xl">
           <div :class="['relative text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed', introOpen ? '' : 'max-h-[3.3em] overflow-hidden']">
-            <div v-if="compound.custom_intro" class="prose prose-sm max-w-none text-[color:var(--color-ink-muted)]" v-html="compound.custom_intro"></div>
+            <div v-if="compound.custom_intro" class="ui-rich text-[color:var(--color-ink-muted)]" v-html="compound.custom_intro"></div>
             <p v-if="compound.price_intro" :class="compound.custom_intro ? 'mt-3' : ''">{{ compound.price_intro }}</p>
             <p v-else-if="compound.summary" :class="compound.custom_intro ? 'mt-3' : ''">{{ compound.summary }}</p>
             <div v-if="!introOpen" class="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-[color:var(--color-bg)] to-transparent pointer-events-none" />

@@ -1,6 +1,6 @@
 <template>
   <!-- Flat inline pill row. Each pill shows a short action label
-       ("Encyclopedia entry", "Compare prices", "Dose calculator") — not
+       ("Encyclopedia entry", "Compare prices", "Peptide calculator") — not
        the full "{compound} encyclopedia entry" copy the server sends,
        since the compound name is already in the H1 right above. Groups
        are flattened; the group label is used as the short pill text so
@@ -31,7 +31,7 @@ const props = defineProps({
 const SHORT = {
   'Encyclopedia': 'Encyclopedia entry',
   'Compare listings': 'Compare prices',
-  'Dose calculator': 'Dose calculator',
+  'Peptide calculator': 'Peptide calculator',
   'Products listed': 'Product listings',
 }
 

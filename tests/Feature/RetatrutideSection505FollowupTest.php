@@ -293,7 +293,8 @@ class RetatrutideSection505FollowupTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Frontend/EncyclopediaArticleDetail')
-            ->where('faqs', [])
+            // Visible since the 2026_11_14 migration: schema and page share one list.
+            ->has('faqs', count($faqs))
             ->where('regulatoryImportantNote', function ($note) {
                 return is_string($note)
                     && str_contains($note, 'Lilly said on 29 September 2026 that it plans to submit a Biologics License Application (BLA) in Q1 2027.');

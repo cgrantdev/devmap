@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\SeoPage;
 use App\Models\Setting;
+use App\Support\ApprovedMedicines;
 use App\Support\CatalogCrossLinks;
 use App\Support\CompareSlug;
 use App\Support\EncyclopediaFraming;
@@ -60,40 +61,6 @@ class EncyclopediaController extends Controller
         }
 
         return $pairs;
-    }
-
-    /**
-     * FAQPage schema for pages that are not on the visible-FAQ allowlist.
-     * This is the builder main already shipped: trim, then strip_tags on
-     * the answer. It stays so those pages keep the same JSON-LD.
-     *
-     * @param  list<array<string, mixed>>  $faqs
-     */
-    private function faqPageSchema(array $faqs, string $slug): ?array
-    {
-        $mainEntity = [];
-        foreach ($faqs as $f) {
-            $q = trim((string) ($f['question'] ?? ''));
-            $a = trim((string) ($f['answer'] ?? ''));
-            if ($q === '' || $a === '') {
-                continue;
-            }
-            $mainEntity[] = [
-                '@type' => 'Question',
-                'name' => $q,
-                'acceptedAnswer' => ['@type' => 'Answer', 'text' => strip_tags($a)],
-            ];
-        }
-        if (empty($mainEntity)) {
-            return null;
-        }
-
-        return [
-            '@context' => 'https://schema.org',
-            '@type' => 'FAQPage',
-            '@id' => url("/encyclopedia/{$slug}#faq"),
-            'mainEntity' => $mainEntity,
-        ];
     }
 
     private function getClinicalData($compoundName, $field)
@@ -240,18 +207,23 @@ class EncyclopediaController extends Controller
 
     /**
      * The shared encyclopedia banner says every compound is unapproved.
-     * Forzinity has accelerated approval, so that sentence is false here.
-     * Research-use listings are still not the approved product.
+     * That sentence is false for compounds sold as FDA-approved branded
+     * medicines, so those get the agency's approved-medicine wording, and
+     * elamipretide keeps its Forzinity notice. Research-use listings are
+     * still not the approved product. Null keeps the default banner.
      */
-    private function researchUseNotice(ProductCategory $category): ?string
+    private function researchUseNotice(ProductCategory $category, string $publicSlug, string $title): ?string
     {
         $slug = mb_strtolower((string) $category->slug);
         $name = mb_strtolower((string) $category->name);
-        if ($slug !== 'elamipretide' && $name !== 'elamipretide') {
-            return null;
+        if ($slug === 'elamipretide' || $name === 'elamipretide') {
+            return 'Forzinity (elamipretide) injection has accelerated FDA approval (19 September 2025) for Barth syndrome in patients weighing at least 30 kg. Research-use-only listings sold as elamipretide or SS-31 are not Forzinity. This page is publisher comparison only. It is not medical advice and does not give dosing, administration, or treatment guidance.';
+        }
+        if (ApprovedMedicines::has($publicSlug) || ApprovedMedicines::has($category->slug)) {
+            return ApprovedMedicines::notice($title);
         }
 
-        return 'Forzinity (elamipretide) injection has accelerated FDA approval (19 September 2025) for Barth syndrome in patients weighing at least 30 kg. Research-use-only listings sold as elamipretide or SS-31 are not Forzinity. This page is publisher comparison only. It is not medical advice and does not give dosing, administration, or treatment guidance.';
+        return null;
     }
 
     private function truncateToSentences($text, $maxChars = 350)
@@ -764,18 +736,11 @@ class EncyclopediaController extends Controller
         // encyclopedia document at /compare splits the informational URL.
         $encyclopediaUrl = url('/encyclopedia/'.$publicSlug);
 
-        // Allowlisted pages render one normalised list and build FAQPage
-        // JSON-LD from that same list. Every other page keeps the schema
-        // this controller already emitted and gains no visible FAQ.
-        // The faqs column is not written.
-        $storedFaqs = $this->faqsForSchema($educationPost, $profile);
-        if (FaqPage::renderAllowed('encyclopedia', $publicSlug)) {
-            $faqs = $this->faqPairs($storedFaqs);
-            $faqSchema = FaqPage::schema($faqs, url("/encyclopedia/{$publicSlug}#faq"));
-        } else {
-            $faqs = [];
-            $faqSchema = $this->faqPageSchema($storedFaqs, $publicSlug);
-        }
+        // One FAQ list feeds the visible section and the FAQPage JSON-LD.
+        // An entry with no visible FAQ sends no FAQ schema: 68 entries sent
+        // FAQ JSON-LD that was not on the page (agency report, Nov 2026).
+        $faqs = $this->visibleFaqs($educationPost, $profile, $publicSlug);
+        $faqSchema = FaqPage::schema($faqs, url("/encyclopedia/{$publicSlug}#faq"));
 
         // Build SEO array (same format as products/brands pages)
         $seo = [
@@ -793,8 +758,7 @@ class EncyclopediaController extends Controller
             'schema' => array_values(array_filter([
                 $definedTermSchema,
                 $breadcrumbSchema,
-                // FAQPage schema (SEO rec #7). Allowlisted pages use the
-                // visible pairs. Other pages keep the existing node.
+                // FAQPage schema (SEO rec #7), built from the visible FAQs only.
                 $faqSchema,
             ])),
         ];
@@ -861,6 +825,10 @@ class EncyclopediaController extends Controller
             // must still render (was throwing "Attempt to read property … on null"
             // several times a day for compounds missing an education post).
             'areasOfResearchIntro' => $educationPost?->areas_of_research_intro ?? '',
+            // Optional grey note under Areas of Research, written per entry.
+            // Replaces the fixed "preclinical animal and cell studies" line,
+            // which was wrong for entries that summarise human trials.
+            'areasOfResearchNote' => trim((string) ($educationPost?->areas_of_research_note ?? '')),
             'background' => $educationPost?->background ?? '',
             'mechanismOfActionIntro' => $educationPost?->mechanism_of_action_intro ?? '',
             'mechanismSubsections' => $educationPost && $educationPost->mechanism_subsections ? (is_array($educationPost->mechanism_subsections) ? $educationPost->mechanism_subsections : json_decode($educationPost->mechanism_subsections, true) ?? []) : [],
@@ -880,7 +848,12 @@ class EncyclopediaController extends Controller
             // Same-origin featured art only. PubChem stays the structure
             // fallback when this path is empty.
             'featuredImage' => $this->localEncyclopediaImage($educationPost?->seo_og_image),
-            'researchUseNotice' => $this->researchUseNotice($category),
+            'researchUseNotice' => $this->researchUseNotice($category, $publicSlug, (string) $title),
+            // Footer date: when the entry was last saved, not a fixed month.
+            'lastUpdated' => $educationPost?->updated_at ? [
+                'iso' => $educationPost->updated_at->toDateString(),
+                'label' => $educationPost->updated_at->format('j F Y'),
+            ] : null,
         ];
 
         $peptideData = $this->applyStubNarrative($peptideData, $educationPost, $profile);
@@ -963,6 +936,26 @@ class EncyclopediaController extends Controller
         return $text === ''
             || str_contains($text, 'peptide encyclopedia')
             || str_contains($text, ' peptides.');
+    }
+
+    /**
+     * FAQs shown on the page; FAQPage JSON-LD is built from this list only.
+     *
+     * The 2026_11_14_100000 migration moves FAQs that were schema-only into
+     * education_posts.legacy_faqs, after which every stored FAQ is visible.
+     * Until it runs (the column is then absent), only the allowlisted
+     * entries show theirs, as before, and the rest show and send none.
+     *
+     * @return list<array{question: string, answer: string}>
+     */
+    private function visibleFaqs(?EducationPost $post, ?FramingProfile $profile, string $publicSlug): array
+    {
+        $archived = $post !== null && array_key_exists('legacy_faqs', $post->getAttributes());
+        if (! $archived && ! FaqPage::renderAllowed('encyclopedia', $publicSlug)) {
+            return [];
+        }
+
+        return $this->faqPairs($this->faqsForSchema($post, $profile));
     }
 
     /**
