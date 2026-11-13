@@ -1,15 +1,19 @@
 <template>
   <ModernLayout>
-    <div class="min-h-screen">
+    <!-- Bottom padding on phones keeps the sticky buy bar off the last
+         block of content. -->
+    <div class="min-h-screen pb-24 lg:pb-0">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 py-6">
-        <!-- Breadcrumb -->
-        <div class="flex items-center gap-2 text-[13px] text-[color:var(--color-ink-muted)] mb-6">
-          <button @click="handleClick1" class="hover:text-[color:var(--color-ink)] transition-colors">Products</button>
-          <span class="text-[color:var(--color-ink-subtle)]">/</span>
-          <button @click="handleClick2" class="hover:text-[color:var(--color-ink)] transition-colors">{{ product.category?.name || 'N/A' }}</button>
-          <span class="text-[color:var(--color-ink-subtle)]">/</span>
-          <span class="text-[color:var(--color-ink)] font-medium">{{ product.name || 'N/A' }}</span>
-        </div>
+        <!-- Breadcrumb: real links, so they open in new tabs and crawl. -->
+        <nav aria-label="Breadcrumb" class="flex items-center gap-2 min-w-0 text-[13px] text-[color:var(--color-ink-muted)] mb-6">
+          <Link href="/products" class="flex-shrink-0 hover:text-[color:var(--color-ink)] transition-colors">Products</Link>
+          <template v-if="product.category?.slug">
+            <span class="text-[color:var(--color-ink-subtle)]" aria-hidden="true">/</span>
+            <Link :href="`/product/${product.category.slug}`" class="flex-shrink-0 hover:text-[color:var(--color-ink)] transition-colors">{{ product.category.name }}</Link>
+          </template>
+          <span class="text-[color:var(--color-ink-subtle)]" aria-hidden="true">/</span>
+          <span class="text-[color:var(--color-ink)] font-medium truncate">{{ product.name || 'N/A' }}</span>
+        </nav>
         <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-sm)] mb-8">
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6 md:p-8">
             <!-- Left: Product Image -->
@@ -33,10 +37,15 @@
   
             <!-- Right: Product Details -->
             <div>
-              <!-- Product Identifier Tag -->
-              <div v-if="product.category" class="inline-block bg-slate-100 text-slate-700 px-3 py-1.5 rounded text-sm mb-3">
+              <!-- Compound chip: links to every vendor's listings for it. -->
+              <Link
+                v-if="product.category?.slug"
+                :href="`/product/${product.category.slug}`"
+                class="inline-flex items-center gap-1 h-7 px-3 mb-3 rounded-full bg-[color:var(--color-hairline-soft)] text-[12px] font-semibold text-[color:var(--color-ink-muted)] hover:bg-[color:var(--color-accent-50)] hover:text-[color:var(--color-accent-700)] transition-colors"
+              >
                 {{ product.category.name }}
-              </div>
+                <span class="font-normal text-[color:var(--color-ink-subtle)]">· all vendors</span>
+              </Link>
   
               <!-- Product Title + Type chip + Wishlist -->
               <div class="flex items-start gap-3 mb-3">
@@ -50,6 +59,18 @@
                 <div class="flex-shrink-0 mt-1">
                   <WishlistHeart type="product" :id="product.id" size="lg" />
                 </div>
+              </div>
+
+              <!-- Who sells it, up top: the seller is half of what a listing
+                   page is about. -->
+              <div v-if="brand" class="mb-4 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 min-w-0">
+                <VendorLogo :src="brand.logo" :name="brand.name" :alt="brand.name" size="xs" radius="sm" fallback="subtle" />
+                <span class="text-[13px] text-[color:var(--color-ink-muted)]">by</span>
+                <Link :href="`/brand/${brand.slug}`" class="text-[15px] font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-700)] transition-colors truncate">{{ brand.name }}</Link>
+                <span class="text-[color:var(--color-ink-subtle)]" aria-hidden="true">·</span>
+                <Link :href="`/brand/${brand.slug}`" class="text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">All their products</Link>
+                <span class="text-[color:var(--color-ink-subtle)]" aria-hidden="true">·</span>
+                <a :href="reviewVendorHref" class="text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">Reviews</a>
               </div>
 
               <!-- Trust badges + stock — one chip row instead of stock floating on its own -->
@@ -74,8 +95,7 @@
                 </span>
               </div>
 
-              <!-- Divider before commerce block. Seller lives in the 'Sold by' card below the CTA. -->
-              <div class="border-b border-gray-200 mb-5"></div>
+              <div class="border-b border-[color:var(--color-hairline)] mb-5"></div>
 
               <!-- Price — monospace, prominent -->
               <div class="mb-6">
@@ -84,17 +104,8 @@
                     <span class="text-[12px] uppercase tracking-wide text-[color:var(--color-ink)] font-semibold">Retail</span>
                     <span class="ui-mono text-xl text-[color:var(--color-ink)] line-through font-medium">{{ product.currency_symbol || '$' }}{{ retailPrice }}</span>
                   </div>
-                  <div class="text-[12px] uppercase tracking-wide text-emerald-700 font-semibold mt-3 flex items-center gap-2">
-                    <span>Price with code</span>
-                    <button
-                      @click="copyDiscountCode"
-                      class="ui-focus inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[6px] border border-dashed border-emerald-400 bg-emerald-50 hover:bg-emerald-100 transition-colors"
-                      :title="couponCopied ? 'Copied' : 'Click to copy'"
-                    >
-                      <span class="ui-mono text-emerald-800">{{ effectiveCouponCode }}</span>
-                      <svg v-if="couponCopied" class="w-3 h-3 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      <svg v-else class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                    </button>
+                  <div class="text-[12px] uppercase tracking-wide text-emerald-700 font-semibold mt-3">
+                    Price with code <span class="ui-mono">{{ effectiveCouponCode }}</span>
                   </div>
                   <div class="ui-mono text-4xl font-bold text-emerald-700 leading-tight mt-1">{{ product.currency_symbol || '$' }}{{ discountedPrice }}</div>
                 </template>
@@ -135,8 +146,14 @@
                 </div>
               </div>
 
+              <!-- Copy the code, then go buy: the ticket sits right above
+                   the button that uses it. -->
+              <div v-if="ticketCode" class="mb-3">
+                <CouponTicket :code="ticketCode" :percent="brand?.discount_percent" />
+              </div>
+
               <!-- Purchase Button — primary CTA, clean -->
-              <div v-if="product.product_url" class="mb-4">
+              <div v-if="product.product_url" ref="mainCta" class="mb-4">
                 <a
                   :href="withSrc(`/go/${product.id}`)"
                   target="_blank"
@@ -153,7 +170,7 @@
               <!-- Compare link — secondary utility below CTA. Coupon lives in the price block above; no need to duplicate. -->
               <div v-if="product.category" class="mb-6">
                 <a
-                  :href="`/compare#${product.category.slug || ''}`"
+                  :href="compareHref"
                   class="text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors inline-flex items-center gap-1"
                 >
                   Compare {{ product.category.name }} across all vendors
@@ -183,38 +200,8 @@
                 <svg class="w-4 h-4 flex-shrink-0 text-[color:var(--color-ink-subtle)] group-hover:text-[#5865F2] transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
               </a>
 
-              <!-- Seller Information -->
-              <div v-if="brand" class="border-t border-[color:var(--color-hairline)] pt-5 mb-6">
-                <div class="flex items-center gap-4">
-                  <div class="w-10 h-10 flex-shrink-0 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] flex items-center justify-center overflow-hidden">
-                    <img v-if="brand.logo" :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain p-1" loading="lazy" />
-                    <span v-else class="ui-display text-sm font-bold text-[color:var(--color-ink-muted)]">{{ brandInitials }}</span>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="text-[11px] text-[color:var(--color-ink-subtle)] uppercase tracking-[0.08em] font-semibold">Sold by</div>
-                    <a
-                      :href="`/brand/${brand.slug}`"
-                      class="text-[14px] font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors"
-                    >
-                      {{ brand.name }}
-                    </a>
-                  </div>
-                  <a
-                    :href="`/brand/${brand.slug}`"
-                    class="ui-focus flex items-center gap-1 text-[13px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors flex-shrink-0"
-                  >
-                    All products
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                  </a>
-                </div>
-                <a :href="reviewVendorHref" class="mt-3 inline-flex items-center gap-1 text-[12px] font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
-                  Review {{ brand.name }} on Peptidemap
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                </a>
-              </div>
-
               <!-- Disclaimer -->
-              <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <div class="bg-[color:var(--color-caution-bg)] border border-amber-200 rounded-[10px] p-3">
                 <div class="flex items-start gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-alert w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" aria-hidden="true">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -229,6 +216,44 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Related Products -->
+        <div v-if="relatedProducts && relatedProducts.length > 0" class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] p-5 md:p-8 mb-8">
+          <div class="flex flex-wrap items-end justify-between gap-2 mb-5">
+            <div>
+              <h2 class="ui-display text-xl md:text-2xl font-semibold tracking-tight text-[color:var(--color-ink)]">Compare {{ product.category?.name || 'this compound' }} at other vendors</h2>
+              <p class="mt-1 text-[13px] text-[color:var(--color-ink-muted)]">Same size first, cheapest per mg first, each with its vendor's code price.</p>
+            </div>
+            <a v-if="product.category?.slug" :href="`/product/${product.category.slug}`" class="text-[13px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">All listings →</a>
+          </div>
+          <!-- Same vial size first, cheapest per mg first, with each
+               vendor's code price. -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <ProductSimpleCard
+              v-for="relatedProduct in relatedProducts"
+              :key="relatedProduct.id"
+              :product-id="relatedProduct.id"
+              :name="relatedProduct.name"
+              :raw-name="relatedProduct.raw_name || ''"
+              :image-url="relatedProduct.image_url"
+              :price="relatedProduct.price"
+              :discount-price="relatedProduct.discount_price"
+              :brand-name="relatedProduct.brand?.name || ''"
+              :rating-average="relatedProduct.rating_average"
+              :rating-count="relatedProduct.rating_count"
+              :product-type="relatedProduct.product_type"
+              :brand-discount-percent="relatedProduct.brand_discount_percent"
+              :brand-coupon-code="relatedProduct.brand_coupon_code"
+              :currency-symbol="relatedProduct.currency_symbol || '$'"
+              :size-mg="relatedProduct.size_mg"
+              :price-per-mg="relatedProduct.price_per_mg ?? null"
+              :best-value="!!relatedProduct.best_value"
+              :to="relatedProduct.brand?.slug
+                ? `/product/${relatedProduct.brand.slug}/${relatedProduct.slug}/${relatedProduct.id}`
+                : `/product/${relatedProduct.slug}/${relatedProduct.id}`"
+            />
           </div>
         </div>
 
@@ -352,45 +377,48 @@
           </div>
         </div>        
 
-        <!-- Related Products -->
-        <div v-if="relatedProducts && relatedProducts.length > 0" class="bg-white rounded-lg border border-gray-200 p-8">
-          <h2 class="text-2xl text-gray-900 mb-6">Related Products</h2>
-          <!-- Same vial size first, cheapest per mg first, with each
-               vendor's code price. -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <ProductSimpleCard
-              v-for="relatedProduct in relatedProducts"
-              :key="relatedProduct.id"
-              :product-id="relatedProduct.id"
-              :name="relatedProduct.name"
-              :raw-name="relatedProduct.raw_name || ''"
-              :image-url="relatedProduct.image_url"
-              :price="relatedProduct.price"
-              :discount-price="relatedProduct.discount_price"
-              :brand-name="relatedProduct.brand?.name || ''"
-              :rating-average="relatedProduct.rating_average"
-              :rating-count="relatedProduct.rating_count"
-              :product-type="relatedProduct.product_type"
-              :brand-discount-percent="relatedProduct.brand_discount_percent"
-              :brand-coupon-code="relatedProduct.brand_coupon_code"
-              :currency-symbol="relatedProduct.currency_symbol || '$'"
-              :size-mg="relatedProduct.size_mg"
-              :price-per-mg="relatedProduct.price_per_mg ?? null"
-              :best-value="!!relatedProduct.best_value"
-              :to="relatedProduct.brand?.slug
-                ? `/product/${relatedProduct.brand.slug}/${relatedProduct.slug}/${relatedProduct.id}`
-                : `/product/${relatedProduct.slug}/${relatedProduct.id}`"
-            />
+      </div>
+    </div>
+
+    <!-- Phones: the image pushes the buy button below the fold, so keep
+         price, code and button on screen once the main button scrolls
+         away. -->
+    <div
+      v-if="product.product_url && showStickyBuy"
+      class="lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--color-hairline)] bg-white/95 backdrop-blur px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_-12px_rgba(10,11,14,0.18)]"
+    >
+      <div class="flex items-center gap-3 max-w-[640px] mx-auto">
+        <div class="min-w-0">
+          <div class="ui-display text-[20px] font-bold leading-none tracking-tight" :class="discountedPrice ? 'text-emerald-700' : 'text-[color:var(--color-ink)]'">
+            {{ product.currency_symbol || '$' }}{{ discountedPrice || retailPrice }}
           </div>
+          <button
+            v-if="ticketCode"
+            type="button"
+            class="mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700"
+            @click="copyDiscountCode"
+          >
+            {{ couponCopied ? 'Copied' : 'Code' }} <span class="ui-mono">{{ ticketCode }}</span>
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
         </div>
+        <a
+          :href="withSrc(`/go/${product.id}`)"
+          target="_blank"
+          rel="noopener noreferrer nofollow sponsored"
+          class="ui-focus ml-auto flex-1 max-w-[260px] h-12 flex items-center justify-center gap-1.5 rounded-[12px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-md"
+        >
+          <span class="truncate">Buy at {{ brand?.name || 'vendor' }}</span>
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7v10" /></svg>
+        </a>
       </div>
     </div>
   </ModernLayout>
 </template>
 
 <script setup>
-import { ref, computed, watchEffect } from 'vue'
-import { Link, router, usePage } from '@inertiajs/vue3'
+import { ref, computed, watchEffect, onMounted, onUnmounted } from 'vue'
+import { Link, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import { stripSiteSuffix } from '@/utils/pageTitle'
 import { withSrc } from '@/composables/useOutbound'
@@ -398,6 +426,8 @@ import ProductSimpleCard from '@/components/ProductSimpleCard.vue'
 import PricePerMg from '@/components/price/PricePerMg.vue'
 import PriceSparkline from '@/components/price/PriceSparkline.vue'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
+import CouponTicket from '@/components/ui/CouponTicket.vue'
+import VendorLogo from '@/components/ui/VendorLogo.vue'
 
 const props = defineProps({
   product: Object,
@@ -470,6 +500,36 @@ const effectiveCouponCode = computed(() => {
   const raw = (props.brand?.discount_code || '').trim()
   return (raw || 'PMAP').toUpperCase()
 })
+
+// Code on the big ticket: the vendor's own code, else PMAP when the
+// vendor has a Peptidemap discount but no code of its own.
+const ticketCode = computed(() => {
+  const raw = (props.brand?.discount_code || '').trim()
+  if (raw) return raw.toUpperCase()
+  return discountedPrice.value ? 'PMAP' : null
+})
+
+// Per-compound compare table (/compare/{slug}); the slug is the
+// route-safe form CompareSlug::canonical() produces.
+const compareHref = computed(() => {
+  const raw = String(props.product?.category?.slug || '')
+  const slug = raw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+  return slug ? `/compare/${slug}` : '/compare'
+})
+
+// Sticky phone buy bar: shown whenever the main buy button is off screen
+// (below the fold on first load, or scrolled past).
+const mainCta = ref(null)
+const showStickyBuy = ref(false)
+let ctaObserver = null
+onMounted(() => {
+  if (!mainCta.value || typeof IntersectionObserver === 'undefined') return
+  ctaObserver = new IntersectionObserver(([entry]) => {
+    showStickyBuy.value = !entry.isIntersecting
+  })
+  ctaObserver.observe(mainCta.value)
+})
+onUnmounted(() => ctaObserver?.disconnect())
 
 // "Review {vendor} on Peptidemap" CTA — drives storefront visits from the
 // product page even though there's no review form here.
@@ -665,13 +725,4 @@ const copyDiscountCode = async () => {
   }
 }
 
-const handleClick1 = () => {
-  router.visit('/products')
-}
-
-const handleClick2 = () => {
-  if (props.product?.category?.slug) {
-    router.visit(`/product/${props.product.category.slug}`)
-  }
-}
 </script>
