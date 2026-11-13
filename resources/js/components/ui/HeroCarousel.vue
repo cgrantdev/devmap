@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative rounded-[24px] overflow-hidden border border-white/10 bg-black select-none"
+    class="relative rounded-[24px] overflow-hidden border border-[color:var(--color-hairline)] bg-black select-none"
     @mouseenter="pause"
     @mouseleave="resume"
   >

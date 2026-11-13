@@ -8,11 +8,11 @@
     <!-- ========================================================= -->
     <!-- 1. INTRO ROW + PARTNER HERO                                -->
     <!-- ========================================================= -->
-    <!-- Brand band: navy with the logo's sky and green glows and its
-         network sphere, matching the social cards. -->
-    <section class="relative overflow-hidden ui-brand-band pb-6 lg:pb-8">
-      <div class="ui-brand-dots absolute inset-0 pointer-events-none" />
-      <BrandSphere class="hidden md:block -right-24 -top-32" :size="560" :opacity="0.16" />
+    <!-- Light brand band: the partner banners are dark photography, so
+         this stays light (soft sky and green glows, faint sphere) and the
+         banner keeps its contrast. Navy is used lower down instead. -->
+    <section class="relative overflow-hidden ui-brand-band-light pb-2">
+      <BrandSphere class="hidden md:block -right-24 -top-36" :size="560" :opacity="0.07" />
       <!-- The page's only H1 (what Peptidemap is, with live counts) and the
            search box share one short row, so the partner carousel below is
            the first big thing on screen. The carousel's slide titles are
@@ -21,16 +21,16 @@
       <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-5 lg:pt-7">
         <div class="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-10">
           <div class="min-w-0 flex-1">
-            <h1 class="ui-display text-[22px] sm:text-[24px] lg:text-[26px] font-semibold tracking-[-0.02em] leading-[1.15] text-white text-balance">
+            <h1 class="ui-display text-[22px] sm:text-[24px] lg:text-[26px] font-semibold tracking-[-0.02em] leading-[1.15] text-[color:var(--color-ink)] text-balance">
               {{ heading }}
             </h1>
             <!-- The green dot doubles as the separator before the last item,
                  so a wrap on phones never leaves a dangling middot. -->
-            <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] lg:text-[13px] text-white/65">
+            <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">
               <span v-if="statItems.length" class="inline-flex flex-wrap items-center gap-x-2">
                 <template v-for="(item, i) in statItems" :key="item.label">
-                  <span v-if="i > 0" aria-hidden="true" class="text-white/35">·</span>
-                  <span><span class="ui-mono font-semibold text-white">{{ formatNumber(item.value) }}</span> {{ item.label }}</span>
+                  <span v-if="i > 0" aria-hidden="true" class="text-[color:var(--color-ink-subtle)]">·</span>
+                  <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ formatNumber(item.value) }}</span> {{ item.label }}</span>
                 </template>
               </span>
               <span class="inline-flex items-center gap-1.5">
@@ -139,12 +139,12 @@
            phones instead of wrapping into a ragged second line. -->
       <div v-if="popularCompounds.length" class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-4">
         <div class="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <span class="flex-shrink-0 text-[11px] uppercase tracking-[0.08em] font-semibold text-white/45 mr-1">Popular</span>
+          <span class="flex-shrink-0 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mr-1">Popular</span>
           <a
             v-for="compound in popularCompounds"
             :key="compound.slug"
             :href="`/product/${compound.slug}`"
-            class="ui-focus flex-shrink-0 inline-flex items-center h-8 px-3 rounded-full border border-white/15 bg-white/[0.08] text-[12px] font-medium text-white/85 hover:bg-white/15 hover:border-white/30 hover:text-white transition-colors"
+            class="ui-focus flex-shrink-0 inline-flex items-center h-8 px-3 rounded-full border border-[color:var(--color-hairline)] bg-white text-[12px] font-medium text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-accent-700)] transition-colors"
           >{{ compound.name }}</a>
         </div>
       </div>

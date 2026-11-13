@@ -154,6 +154,16 @@ html {
     background-size: 28px 28px;
 }
 
+/* Light version for areas that hold dark photography (the homepage
+   partner banner): off-white with a soft sky glow top right and a hint
+   of green bottom left, so dark banners still stand out. */
+.ui-brand-band-light {
+    background-color: var(--color-bg);
+    background-image:
+        radial-gradient(ellipse 900px 520px at 96% -14%, rgba(14, 165, 233, 0.12), transparent 62%),
+        radial-gradient(ellipse 760px 440px at -4% 104%, rgba(16, 185, 129, 0.08), transparent 62%);
+}
+
 /* Text in the logo's sky-to-green gradient. */
 .ui-brand-gradient-text {
     background-image: linear-gradient(90deg, #38BDF8 0%, #34D399 100%);
