@@ -22,6 +22,22 @@ class OgImageUrl
      * Fold a generated /og/compound|brand/{slug}.png URL to a lowercase slug.
      * Other image URLs, including the ?v= query, are left as they are.
      */
+    /** Section card (home, products, vendors, deals, compare, calculator, research, encyclopedia). */
+    public static function page(string $key): string
+    {
+        return route('og.page', ['key' => $key]).'?v='.OgImageRevision::COPY;
+    }
+
+    public static function coupon(string $slug): string
+    {
+        return route('og.coupon', ['slug' => strtolower($slug)]).'?v='.OgImageRevision::COPY;
+    }
+
+    public static function calculator(string $slug): string
+    {
+        return route('og.calculator', ['slug' => strtolower($slug)]).'?v='.OgImageRevision::COPY;
+    }
+
     public static function fold(string $url): string
     {
         $folded = preg_replace_callback(

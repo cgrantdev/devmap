@@ -109,6 +109,8 @@ class CouponController extends Controller
             'og_description' => $seoDescription,
             'url' => url("/coupon/{$slug}"),
             'canonical' => url("/coupon/{$slug}"),
+            'og_image' => \App\Support\OgImageUrl::coupon($slug),
+            'image' => \App\Support\OgImageUrl::coupon($slug),
             'schema' => $schema,
         ];
         session(['page_seo_data' => $seo]);

@@ -6,22 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Frontend\Concerns\RendersOgImage;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Support\CompareHubBlurb;
-use App\Support\EncyclopediaFraming;
+use App\Support\CompareSlug;
+use App\Support\CompoundDisplay;
 use App\Support\EncyclopediaSlug;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Str;
+use App\Support\Og\OgCards;
+use App\Support\OgImageRevision;
+use App\Support\ProductRowCurrency;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Per-compound OG image: GET /og/compound/{slug}.png
- * Powers social previews for /encyclopedia/{slug}. "Compound" = ProductCategory row.
+ * Per-compound social card: GET /og/compound/{slug}.png, shared by
+ * /product/{slug}, /compare/{slug} and /encyclopedia/{slug}. Vendor
+ * count, lowest price, best $/mg and the five cheapest vendors per mg.
  */
 class CompoundOgImageController extends Controller
 {
     use RendersOgImage;
 
     private const CACHE_DIR = 'og/compound';
+
     private const FALLBACK_PNG = 'images/og-default-v8.png';
 
     public function show(string $slug): Response
@@ -30,67 +33,112 @@ class CompoundOgImageController extends Controller
             return $redirect;
         }
 
-        $category = ProductCategory::with('educationPost')
-            ->where('slug', $slug)
-            ->where('is_active', true)
-            ->first();
+        $category = ProductCategory::where('slug', $slug)->where('is_active', true)->first()
+            ?? ProductCategory::findForPublicSlug(EncyclopediaSlug::publicSlug($slug) ?? $slug);
         if (!$category) {
-            $category = ProductCategory::findForPublicSlug(EncyclopediaSlug::publicSlug($slug) ?? $slug);
-            if ($category) {
-                $category->load('educationPost');
-            }
+            return $this->fallbackOg(self::FALLBACK_PNG);
         }
-        if (!$category) return $this->fallbackOg(self::FALLBACK_PNG);
 
-        $ep = $category->educationPost;
-        $profile = EncyclopediaFraming::match($category->slug, $category->name);
         $mtime = max(
             $category->updated_at?->timestamp ?? 0,
-            $ep?->updated_at?->timestamp ?? 0,
+            // Prices move daily; redraw once a day.
+            now()->startOfDay()->timestamp,
         );
 
-        return $this->serveOgImage(
+        return $this->serveCard(
             self::CACHE_DIR,
-            $slug.'-'.\App\Support\OgImageRevision::COPY,
+            $slug.'-'.OgImageRevision::COPY,
             $mtime,
             self::FALLBACK_PNG,
-            fn () => View::make('og.compound', [
-                'category'    => $category,
-                'fullName'    => $ep?->peptide_full_name ?: $profile?->subtitle(),
-                'tagline'     => $this->tagline($ep, $category, $profile),
-                'eyebrow'     => $profile?->ogEyebrow() ?? 'Peptide Compound Guide',
-                'vendorCount' => $this->vendorCount($category),
-            ])->render()
-        );
-    }
+            function () use ($category) {
+                $stats = $this->priceStats($category);
 
-    private function tagline($educationPost, ProductCategory $category, $profile = null): ?string
-    {
-        $raw = $educationPost?->description ?? $category->description;
-        if (!$raw && $profile) {
-            $raw = $profile->cardDescription();
-        }
-        $guarded = CompareHubBlurb::guard($category->slug, $raw);
-        if (!$guarded) return null;
-        return Str::limit($guarded, 180);
+                return OgCards::compound([
+                    'name' => CompoundDisplay::label($category->name) ?? (string) $category->name,
+                    'eyebrow' => 'Peptide price comparison',
+                    'vendors' => $stats['vendors'],
+                    'lowest' => $stats['lowest'],
+                    'best' => $stats['best'],
+                    'board' => $stats['board'],
+                    'path' => '/compare/'.(CompareSlug::canonical($category->slug) ?? $category->slug),
+                ]);
+            }
+        );
     }
 
     /**
-     * Same priced-row rule as the compare page, so the card cannot
-     * count a vendor the page leaves out.
+     * Same priced, visible rows as the compare page, in USD for ranking
+     * and shown in each listing's own currency. Per-mg figures under a
+     * quarter of the median are left out as likely bad scrapes.
+     *
+     * @return array{vendors: int, lowest: ?string, best: ?string, board: list<array{vendor: string, value: string, ratio: float}>}
      */
-    private function vendorCount(ProductCategory $category): int
+    private function priceStats(ProductCategory $category): array
     {
-        return Product::visible()
+        $products = Product::visible()
             ->where('status', 'active')
             ->where('product_category_id', $category->id)
             ->where(function ($q) {
                 $q->where('discount_price', '>', 0)
-                  ->orWhere(function ($qq) {
-                      $qq->whereNull('discount_price')->where('price', '>', 0);
-                  });
+                    ->orWhere(fn ($qq) => $qq->whereNull('discount_price')->where('price', '>', 0));
             })
-            ->distinct('brand_id')
-            ->count('brand_id');
+            ->with([
+                'brand' => fn ($q) => $q->forCard(),
+                'brand.vendorSetting' => fn ($q) => $q->forCard(),
+                'brand.vendorSetting.location:id,name',
+            ])
+            ->get();
+
+        $rows = ProductRowCurrency::collapseDuplicates($products->map(fn ($p) => ProductRowCurrency::cardRow($p))->all());
+        $vendors = count(array_unique(array_map(fn ($r) => $r['brand_id'] ?? null, $rows)));
+
+        $priced = array_values(array_filter($rows, fn ($r) => (float) ($r['usd_final_price'] ?? 0) > 0));
+        $lowest = null;
+        if ($priced) {
+            usort($priced, fn ($a, $b) => (float) $a['usd_final_price'] <=> (float) $b['usd_final_price']);
+            $lowest = $this->money($priced[0], 'final_price');
+        }
+
+        $perMg = array_values(array_filter($rows, fn ($r) => (float) ($r['usd_per_mg'] ?? 0) > 0));
+        if (count($perMg) >= 4) {
+            $values = array_map(fn ($r) => (float) $r['usd_per_mg'], $perMg);
+            sort($values);
+            $mid = intdiv(count($values), 2);
+            $median = count($values) % 2 ? $values[$mid] : ($values[$mid - 1] + $values[$mid]) / 2;
+            $perMg = array_values(array_filter($perMg, fn ($r) => (float) $r['usd_per_mg'] >= $median * 0.25));
+        }
+        usort($perMg, fn ($a, $b) => (float) $a['usd_per_mg'] <=> (float) $b['usd_per_mg']);
+
+        $board = [];
+        $seen = [];
+        $bestUsd = $perMg ? (float) $perMg[0]['usd_per_mg'] : 0;
+        foreach ($perMg as $r) {
+            $vendor = $r['brand']['name'] ?? null;
+            if (!$vendor || isset($seen[$vendor])) {
+                continue;
+            }
+            $seen[$vendor] = true;
+            $board[] = [
+                'vendor' => (string) $vendor,
+                'value' => $this->money($r, 'price_per_mg').'/mg',
+                'ratio' => $bestUsd > 0 ? $bestUsd / (float) $r['usd_per_mg'] : 0.0,
+            ];
+            if (count($board) === 5) {
+                break;
+            }
+        }
+
+        return [
+            'vendors' => $vendors,
+            'lowest' => $lowest,
+            'best' => $board ? $board[0]['value'] : null,
+            'board' => $board,
+        ];
+    }
+
+    /** @param array<string, mixed> $row */
+    private function money(array $row, string $field): string
+    {
+        return ($row['currency_symbol'] ?? '$').number_format((float) ($row[$field] ?? 0), 2);
     }
 }

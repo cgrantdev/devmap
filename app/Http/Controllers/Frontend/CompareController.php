@@ -179,8 +179,8 @@ class CompareController extends Controller
             'description' => $compareDescription,
             'og_title' => ProductPageSeo::storedTitle($seoPage?->og_title, $compareTitle),
             'og_description' => ProductPageSeo::storedDescription($seoPage?->og_description, $compareDescription),
-            'og_image' => $seoPage?->og_image ?: null,
-            'image' => $seoPage?->og_image ?: null,
+            'og_image' => $seoPage?->og_image ?: \App\Support\OgImageUrl::page('compare'),
+            'image' => $seoPage?->og_image ?: \App\Support\OgImageUrl::page('compare'),
             'url' => url('/compare'),
         ];
 

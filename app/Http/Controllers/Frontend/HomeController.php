@@ -450,7 +450,7 @@ class HomeController extends Controller
             'url'            => 'https://peptidemap.com/',
             'og_title'       => 'Compare every peptide vendor — Peptidemap',
             'og_description' => "Live prices and coupon codes. Check each vendor's site for COAs.",
-            'og_image'       => 'https://peptidemap.com/images/og-default-v8.png',
+            'og_image'       => \App\Support\OgImageUrl::page('home'),
             'h1'             => $payload['heroHeading'],
             'preload_images' => $this->heroPreloadImages($payload['heroSlides'][0] ?? null),
         ];

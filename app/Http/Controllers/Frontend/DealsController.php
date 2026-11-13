@@ -108,6 +108,7 @@ class DealsController extends Controller
             title: 'Peptide Deals & Discount Codes | Peptidemap',
             description: 'Discount codes and sale prices supplied by vendors. Confirm the price on the vendor site. Catalog data only: RUO, and Peptidemap sells nothing.',
             url: url('/deals'),
+            image: \App\Support\OgImageUrl::page('deals'),
         );
         session(['page_seo_data' => $seoData]);
 

@@ -69,6 +69,59 @@ trait RendersOgImage
         ]);
     }
 
+    /**
+     * Serve a cached card or draw it with GD on a cache miss. $draw
+     * returns a ready App\Support\Og\OgCanvas. Replaces the headless
+     * Chromium path, which failed on the server and sent every share the
+     * default image.
+     */
+    protected function serveCard(
+        string $cacheDir,
+        string $cacheKey,
+        int $sourceMTime,
+        string $fallbackPngPath,
+        callable $draw
+    ): Response|BinaryFileResponse {
+        $absPath = storage_path("app/public/{$cacheDir}/{$cacheKey}.png");
+
+        if (!file_exists($absPath) || filemtime($absPath) < $sourceMTime) {
+            try {
+                $canvas = $draw();
+                $ok = $canvas instanceof \App\Support\Og\OgCanvas && $canvas->save($absPath);
+            } catch (\Throwable $e) {
+                report($e);
+                $ok = false;
+            }
+            if (!$ok) {
+                return $this->fallbackOg($fallbackPngPath);
+            }
+        }
+
+        return response()->file($absPath, [
+            'Content-Type' => 'image/png',
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
+    }
+
+    /** Absolute path of a local image (storage path or /storage/... URL), or null. */
+    protected function localImagePath(?string $path): ?string
+    {
+        $path = trim((string) $path);
+        if ($path === '' || preg_match('#^(https?:)?//#i', $path)) {
+            return null;
+        }
+        if (str_starts_with($path, '/storage/')) {
+            $path = substr($path, strlen('/storage/'));
+        } elseif (str_starts_with($path, '/')) {
+            $abs = public_path(ltrim($path, '/'));
+
+            return is_file($abs) ? $abs : null;
+        }
+        $abs = storage_path('app/public/'.ltrim($path, '/'));
+
+        return is_file($abs) ? $abs : null;
+    }
+
     private function generateOgImage(string $outPath, string $html, string $cacheDir): bool
     {
         try {

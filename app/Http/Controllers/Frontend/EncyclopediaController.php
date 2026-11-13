@@ -516,9 +516,9 @@ class EncyclopediaController extends Controller
             'description' => $seoPage?->description ?: $defaultDescription,
             'og_title' => $seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle),
             'og_description' => $seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription),
-            'og_image' => $seoPage?->og_image ?: null,
+            'og_image' => $seoPage?->og_image ?: \App\Support\OgImageUrl::page('encyclopedia'),
             // Backward-compatible field used by some pages
-            'image' => $seoPage?->og_image ?: null,
+            'image' => $seoPage?->og_image ?: \App\Support\OgImageUrl::page('encyclopedia'),
             'url' => url('/encyclopedia'),
         ];
 

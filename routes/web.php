@@ -69,13 +69,19 @@ Route::get('/robots.txt', [\App\Http\Controllers\Frontend\RobotsController::clas
         \App\Http\Middleware\LogPageView::class,
     ]);
 
-// Per-URL OG images (server-rendered via headless Chromium, disk-cached).
+// Per-URL social cards, drawn with GD (App\Support\Og) and disk-cached.
 Route::get('/og/product/{id}.png', [\App\Http\Controllers\Frontend\ProductOgImageController::class, 'show'])
     ->whereNumber('id')->name('og.product');
 Route::get('/og/brand/{slug}.png', [\App\Http\Controllers\Frontend\BrandOgImageController::class, 'show'])
     ->where('slug', '[A-Za-z0-9-]+')->name('og.brand');
 Route::get('/og/compound/{slug}.png', [\App\Http\Controllers\Frontend\CompoundOgImageController::class, 'show'])
     ->where('slug', '[A-Za-z0-9-]+')->name('og.compound');
+Route::get('/og/coupon/{slug}.png', [\App\Http\Controllers\Frontend\CouponOgImageController::class, 'show'])
+    ->where('slug', '[A-Za-z0-9-]+')->name('og.coupon');
+Route::get('/og/page/{key}.png', [\App\Http\Controllers\Frontend\PageOgImageController::class, 'show'])
+    ->where('key', '[a-z]+')->name('og.page');
+Route::get('/og/calculator/{slug}.png', [\App\Http\Controllers\Frontend\PageOgImageController::class, 'calculator'])
+    ->where('slug', '[A-Za-z0-9-]+')->name('og.calculator');
 
 Route::get('/', [HomeController::class, 'v2'])->name('home');
 // Legacy homepage (kept for reference, remove when fully migrated)
@@ -235,7 +241,11 @@ $calculatorRenderer = function (?string $compoundSlug = null) {
         'description' => $usePageOverride ? ($seoPage?->description ?: $defaultDescription) : $defaultDescription,
         'og_title' => $usePageOverride ? ($seoPage?->og_title ?: ($seoPage?->title ?: $defaultTitle)) : $defaultTitle,
         'og_description' => $usePageOverride ? ($seoPage?->og_description ?: ($seoPage?->description ?: $defaultDescription)) : $defaultDescription,
-        'og_image' => $seoPage?->og_image ?: null,
+        // Agency image on the generic page if set, else the drawn card
+        // (one per preset).
+        'og_image' => ($usePageOverride && $seoPage?->og_image)
+            ? $seoPage->og_image
+            : ($preset ? \App\Support\OgImageUrl::calculator($preset['slug']) : \App\Support\OgImageUrl::page('calculator')),
         'url' => $pageUrl,
         'prefilled_preset_slug' => $preset['slug'] ?? null,
         // HowTo JSON-LD earns numbered-step SERP treatment for peptide
