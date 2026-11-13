@@ -14,27 +14,53 @@
         >
           <!-- Background — mobile image (portrait), desktop image (landscape),
                or gradient. slide.bg_size lets a slide override the default
-               'cover' (fill + crop) with 'contain' (fit inside, no crop) or
-               an explicit size like 'auto 70%' for tighter product-shot
-               framing. Southern Aminos uses 'contain' so its vials render
-               at natural aspect instead of being cropped/stretched. -->
-          <div
-            v-if="slide.image_mobile"
-            class="md:hidden absolute inset-0 bg-no-repeat pointer-events-none"
-            :style="{
-              backgroundImage: `url(${slide.image_mobile})`,
-              backgroundSize: slide.bg_size_mobile || slide.bg_size || 'cover',
-              backgroundPosition: slide.bg_position_mobile || 'center',
-            }"
-          />
-          <div
-            v-if="slide.image"
-            :class="[slide.image_mobile ? 'hidden md:block' : '', 'absolute inset-0 bg-center bg-no-repeat pointer-events-none']"
-            :style="{
-              backgroundImage: `url(${slide.image})`,
-              backgroundSize: slide.bg_size || 'cover',
-            }"
-          />
+               'cover' (fill + crop) with 'contain' (fit inside, no crop).
+               Southern Aminos uses 'contain' so its vials render at natural
+               aspect. Cover/contain slides render a real <picture>: only the
+               matching source downloads, slide 1 loads at high priority and
+               the rest wait for page load. Exotic sizes ('auto 70%') keep the
+               CSS-background path so their framing doesn't change. -->
+          <picture
+            v-if="usesImg(slide) && (slide.image || slide.image_mobile)"
+            :class="[!slide.image ? 'md:hidden' : '', 'absolute inset-0 pointer-events-none']"
+          >
+            <source
+              v-if="slide.image && slide.image_mobile"
+              media="(max-width: 767px)"
+              :srcset="slide.image_mobile"
+            />
+            <img
+              :src="slide.image || slide.image_mobile"
+              :alt="slide.title_highlight || slide.title || ''"
+              width="1200"
+              height="460"
+              :loading="i === 0 || warm ? 'eager' : 'lazy'"
+              :fetchpriority="i === 0 ? 'high' : 'auto'"
+              :decoding="i === 0 ? 'auto' : 'async'"
+              draggable="false"
+              class="hero-img w-full h-full"
+              :style="imgVars(slide)"
+            />
+          </picture>
+          <template v-else-if="!usesImg(slide)">
+            <div
+              v-if="slide.image_mobile"
+              class="md:hidden absolute inset-0 bg-no-repeat pointer-events-none"
+              :style="{
+                backgroundImage: `url(${slide.image_mobile})`,
+                backgroundSize: slide.bg_size_mobile || slide.bg_size || 'cover',
+                backgroundPosition: slide.bg_position_mobile || 'center',
+              }"
+            />
+            <div
+              v-if="slide.image"
+              :class="[slide.image_mobile ? 'hidden md:block' : '', 'absolute inset-0 bg-center bg-no-repeat pointer-events-none']"
+              :style="{
+                backgroundImage: `url(${slide.image})`,
+                backgroundSize: slide.bg_size || 'cover',
+              }"
+            />
+          </template>
           <div
             v-if="!slide.image && !slide.image_mobile"
             class="absolute inset-0 pointer-events-none"
@@ -93,9 +119,10 @@
             >
               {{ slide.eyebrow }}
             </div>
-            <h1 class="ui-display text-white text-[26px] font-semibold tracking-[-0.02em] leading-[1.05]" :style="(slide.highlight_color_mobile || slide.highlight_color) ? `color: ${slide.highlight_color_mobile || slide.highlight_color};` : ''">
+            <!-- h2: the page's single H1 lives in the homepage band above. -->
+            <h2 class="ui-display text-white text-[26px] font-semibold tracking-[-0.02em] leading-[1.05]" :style="(slide.highlight_color_mobile || slide.highlight_color) ? `color: ${slide.highlight_color_mobile || slide.highlight_color};` : ''">
               {{ slide.title_highlight || slide.title }}
-            </h1>
+            </h2>
             <div class="relative z-20 mt-5 flex flex-wrap items-center justify-center gap-2 pointer-events-auto">
               <a
                 :href="slide.url"
@@ -140,12 +167,12 @@
                    indigo accent when nothing's set. dark_text: true swaps
                    the base word color to ink for slides sitting on a light
                    product-shot background (e.g. Southern Aminos studio). -->
-              <h1 class="ui-display text-3xl lg:text-4xl font-semibold tracking-[-0.02em] leading-[1.1]" :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">
+              <h2 class="ui-display text-3xl lg:text-4xl font-semibold tracking-[-0.02em] leading-[1.1]" :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">
                 <template v-if="slide.title_highlight && slide.title.includes(slide.title_highlight)">
                   <span :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">{{ slide.title.split(slide.title_highlight)[0] }}</span><span :style="`color: ${slide.highlight_color || 'var(--color-accent-300, #a5b4fc)'};`">{{ slide.title_highlight }}</span><span :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
                 </template>
                 <template v-else><span :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">{{ slide.title }}</span></template>
-              </h1>
+              </h2>
 
               <p
                 v-if="slide.subtitle"
@@ -274,6 +301,31 @@ const autoplayPlugin = Autoplay({
   playOnInit: props.autoplay,
 })
 
+// Slides whose fits are plain cover/contain render as <picture>; the same
+// rule decides the <link rel="preload"> in HomeController::heroPreloadImages.
+const FIT_OK = ['', 'cover', 'contain']
+function mobileFitOf(slide) {
+  return slide.image_mobile ? (slide.bg_size_mobile || slide.bg_size || '') : (slide.bg_size || '')
+}
+function usesImg(slide) {
+  return FIT_OK.includes(slide.bg_size || '') && FIT_OK.includes(mobileFitOf(slide))
+}
+function imgVars(slide) {
+  return {
+    '--fit-d': slide.bg_size === 'contain' ? 'contain' : 'cover',
+    '--fit-m': mobileFitOf(slide) === 'contain' ? 'contain' : 'cover',
+    '--pos-m': slide.image_mobile ? (slide.bg_position_mobile || 'center') : 'center',
+  }
+}
+
+// Off-screen slides start lazy; once the page has finished loading they
+// switch to eager so they're ready before autoplay reaches them.
+const warm = ref(false)
+onMounted(() => {
+  if (document.readyState === 'complete') warm.value = true
+  else window.addEventListener('load', () => { warm.value = true }, { once: true })
+})
+
 // Coupon-code copy state — tracks which slide just copied so we can show a
 // briefly checkmarked confirmation.
 const copiedIndex = ref(null)
@@ -360,3 +412,18 @@ function slideGradient(slide, i) {
   return `linear-gradient(135deg, ${palette[i % palette.length][0]} 0%, ${palette[i % palette.length][1]} 100%)`
 }
 </script>
+
+<style scoped>
+/* Fit/position per breakpoint, driven by the slide's admin settings via
+   CSS variables (see imgVars). Matches the old background-size/position. */
+.hero-img {
+  object-fit: var(--fit-m, cover);
+  object-position: var(--pos-m, center);
+}
+@media (min-width: 768px) {
+  .hero-img {
+    object-fit: var(--fit-d, cover);
+    object-position: center;
+  }
+}
+</style>

@@ -3,8 +3,6 @@ import './bootstrap';
 import { createApp, h } from 'vue'
 import { createInertiaApp, router } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
-import Toast from 'vue-toastification'
-import 'vue-toastification/dist/index.css'
 import { useGlobalLocation } from '@/composables/useGlobalLocation'
 import { stripSiteSuffix } from '@/utils/pageTitle'
 
@@ -88,26 +86,11 @@ createInertiaApp({
     return stripSiteSuffix(title)
   },
   resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
+  // Toasts are admin-only; their container mounts from Admin/Layout.vue so
+  // the library and its CSS stay out of the public bundle.
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(App, props) })
       .use(plugin)
-      .use(Toast, {
-        position: 'top-right',
-        timeout: 3000,
-        closeOnClick: true,
-        pauseOnFocusLoss: true,
-        pauseOnHover: true,
-        draggable: true,
-        draggablePercent: 0.6,
-        showCloseButtonOnHover: false,
-        hideProgressBar: false,
-        closeButton: 'button',
-        icon: true,
-        rtl: false,
-        transition: 'Vue-Toastification__bounce',
-        maxToasts: 5,
-        newestOnTop: true,
-      })
       .mount(el)
   },
 })

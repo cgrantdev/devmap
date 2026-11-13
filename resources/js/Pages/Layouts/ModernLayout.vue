@@ -21,8 +21,13 @@
           <span class="text-white/70 truncate min-w-0"><span class="hidden sm:inline">Deals, price drops, and vendor reviews — live in our </span><span class="sm:hidden">Join our </span><strong class="text-white font-semibold">Discord</strong></span>
           <a href="https://discord.gg/uYj2M9XKa5" target="_blank" rel="noopener" class="font-semibold text-[color:var(--color-accent-400)] hover:text-white transition-colors flex-shrink-0">Join →</a>
         </template>
-        <button @click="showNotice = false" class="text-white/30 hover:text-white/60 transition-colors p-1 flex-shrink-0 ml-1 sm:ml-2 sm:absolute sm:right-3 lg:right-6">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        <button
+          type="button"
+          @click="dismissNotice"
+          aria-label="Dismiss announcement"
+          class="inline-flex items-center justify-center w-8 h-8 rounded-[6px] text-white/40 hover:text-white/80 hover:bg-white/10 transition-colors flex-shrink-0 ml-1 sm:ml-2 sm:absolute sm:right-2 sm:top-1/2 sm:-translate-y-1/2 lg:right-5"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
       </div>
     </div>
@@ -41,10 +46,13 @@
           : 'bg-white/85 backdrop-blur-xl lg:bg-transparent lg:backdrop-blur-none lg:shadow-none lg:border-b-0',
       ]"
     >
-      <div class="max-w-[1280px] mx-auto px-4 lg:px-10 h-14 lg:h-16 flex items-center gap-3 lg:gap-8">
+      <!-- Widths are budgeted: at 1024px the old bar (6 links + text search)
+           ran ~290px past the viewport and clipped Sign in / Get Listed.
+           Below xl: 5 links + search icon; xl+: all links + compact search. -->
+      <div class="max-w-[1280px] mx-auto px-4 lg:px-10 h-14 lg:h-16 flex items-center gap-3 lg:gap-6">
         <!-- Logo -->
         <a href="/" class="ui-focus flex items-center flex-shrink-0 min-w-0">
-          <img :src="'/images/logo.png?v=2'" alt="Peptidemap" class="h-8 lg:h-9 brightness-0 translate-y-[1px]" />
+          <img :src="'/images/logo.png?v=2'" alt="Peptidemap" width="148" height="36" class="h-8 lg:h-9 w-auto brightness-0 translate-y-[1px]" />
         </a>
 
         <!-- Primary nav (desktop) -->
@@ -53,7 +61,10 @@
             v-for="link in navLinks"
             :key="link.href"
             :href="link.href"
-            class="ui-focus px-3 py-1.5 rounded-[8px] transition-colors duration-200 text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04]"
+            :class="[
+              'ui-focus px-2.5 xl:px-3 py-1.5 rounded-[8px] transition-colors duration-200 text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04]',
+              link.xlOnly ? 'hidden xl:block' : '',
+            ]"
           >
             {{ link.label }}
           </a>
@@ -61,18 +72,21 @@
 
         <!-- Right side -->
         <div class="ml-auto flex items-center gap-1 sm:gap-2 lg:gap-3 flex-shrink-0">
-          <!-- Full search bar (desktop / lg+ only).
+          <!-- Search box (xl+ only). Stays mounted below xl so it keeps
+               owning Ctrl/Cmd+K; its modal is teleported, so `hidden` on the
+               wrapper doesn't hide the palette itself.
                SearchPalette is a multi-root component (button + Teleport), so
-               class attrs don't reach it — wrap so `hidden lg:block` sticks. -->
-          <div class="hidden lg:block">
-            <SearchPalette />
+               class attrs don't reach it — wrap so `hidden xl:block` sticks. -->
+          <div class="hidden xl:block">
+            <SearchPalette label="Search…" />
           </div>
 
-          <!-- Search icon (under lg — opens the SearchPalette modal directly;
+          <!-- Search icon (under xl — opens the SearchPalette modal directly;
                dropped the inline slide-down bar that was overflowing on mobile) -->
           <button
+            type="button"
             @click="openSearch"
-            class="lg:hidden p-2 rounded-[8px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
+            class="xl:hidden p-2 rounded-[8px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
             aria-label="Search"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -167,7 +181,7 @@
         >
           <!-- Drawer header: logo + close -->
           <div class="flex-shrink-0 flex items-center justify-between px-5 h-14 border-b border-[color:var(--color-hairline)]">
-            <img :src="'/images/logo.png?v=2'" alt="PeptideMap" class="h-7 brightness-0" />
+            <img :src="'/images/logo.png?v=2'" alt="Peptidemap" width="115" height="28" class="h-7 w-auto brightness-0" />
             <button
               @click="mobileOpen = false"
               class="p-2 -mr-2 rounded-[8px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] hover:bg-black/[0.04] transition-colors"
@@ -265,7 +279,7 @@
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
             <!-- Left: brand + newsletter -->
             <div>
-              <img :src="'/images/logo.png?v=2'" alt="Peptidemap" class="h-10 brightness-0 invert mb-5" />
+              <img :src="'/images/logo.png?v=2'" alt="Peptidemap" width="165" height="40" loading="lazy" class="h-10 w-auto brightness-0 invert mb-5" />
               <p class="text-[15px] text-white/45 leading-relaxed mb-8 max-w-md">
                 Compare research-peptide vendors, prices, coupons and vendor-published COAs.
               </p>
@@ -350,8 +364,13 @@
     >
       <div v-if="showDiscordToast" class="fixed bottom-4 right-4 z-[70] w-[calc(100vw-2rem)] sm:w-[340px] max-w-sm">
         <div class="bg-[#0A0B0E] border border-white/[0.08] rounded-[14px] shadow-[0_20px_50px_rgba(0,0,0,0.35)] p-4 relative">
-          <button @click="dismissDiscordToast" aria-label="Dismiss" class="absolute top-2 right-2 text-white/30 hover:text-white/70 transition-colors p-1">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <button
+            type="button"
+            @click="dismissDiscordToast"
+            aria-label="Dismiss Discord invite"
+            class="absolute top-1.5 right-1.5 inline-flex items-center justify-center w-8 h-8 rounded-[8px] text-white/40 hover:text-white/80 hover:bg-white/10 transition-colors"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
           <div class="flex items-start gap-3 pr-6">
             <div class="flex-shrink-0 w-10 h-10 rounded-[10px] bg-[#5865F2]/15 border border-[#5865F2]/30 flex items-center justify-center">
@@ -422,17 +441,39 @@ const mobileSearchRef = ref(null)
 function openSearch() {
   mobileSearchRef.value?.show?.()
 }
-const showNotice = ref(true)
+// Top announcement bar. Dismissal is remembered for 30 days.
+const NOTICE_KEY = 'pmap.notice-bar.dismissed'
+const NOTICE_TTL_MS = 30 * 86400 * 1000
+function noticeDismissedRecently() {
+  try {
+    return Date.now() - Number(localStorage.getItem(NOTICE_KEY) || 0) < NOTICE_TTL_MS
+  } catch {
+    return false
+  }
+}
+const showNotice = ref(typeof window === 'undefined' ? true : !noticeDismissedRecently())
+function dismissNotice() {
+  showNotice.value = false
+  try { localStorage.setItem(NOTICE_KEY, String(Date.now())) } catch {}
+}
 const currentYear = new Date().getFullYear()
 
-// Discord join toast — appears bottom-right after 25s on any given session,
-// dismissible, remembers dismissal for 30 days so we don't nag returners.
+// Discord join toast: bottom-right after 25s of dwell, shown at most once
+// per visitor (and never after a dismissal). If storage is unavailable we
+// skip it rather than nag on every page.
 const showDiscordToast = ref(false)
-if (typeof window !== 'undefined') {
-  const dismissedAt = Number(localStorage.getItem('pmap.discord-toast.dismissed') || 0)
-  const THIRTY_DAYS = 30 * 86400 * 1000
-  if (Date.now() - dismissedAt > THIRTY_DAYS && !isDemoHost.value) {
-    setTimeout(() => { showDiscordToast.value = true }, 25000)
+let discordToastTimer = null
+if (typeof window !== 'undefined' && !isDemoHost.value) {
+  let alreadySeen = true
+  try {
+    alreadySeen = !!localStorage.getItem('pmap.discord-toast.shown')
+      || !!localStorage.getItem('pmap.discord-toast.dismissed')
+  } catch {}
+  if (!alreadySeen) {
+    discordToastTimer = setTimeout(() => {
+      showDiscordToast.value = true
+      try { localStorage.setItem('pmap.discord-toast.shown', String(Date.now())) } catch {}
+    }, 25000)
   }
 }
 function dismissDiscordToast() {
@@ -472,13 +513,17 @@ async function subscribeNewsletter() {
   newsletterLoading.value = false
 }
 
+// xlOnly: left out of the desktop bar from 1024 to 1279px, where the full
+// set doesn't fit beside the account buttons. Always in the mobile drawer,
+// and the footer links both.
 const navLinks = [
   { href: '/vendors', label: 'Vendors' },
   { href: '/products', label: 'Peptides' },
   { href: '/compare', label: 'Compare' },
+  { href: '/deals', label: 'Deals' },
   { href: '/encyclopedia', label: 'Encyclopedia' },
-  { href: '/calculator', label: 'Calculator' },
-  { href: '/news', label: 'Research' },
+  { href: '/calculator', label: 'Calculator', xlOnly: true },
+  { href: '/news', label: 'Research', xlOnly: true },
 ]
 
 const footerColumns = [
@@ -573,6 +618,7 @@ onMounted(() => {
   document.addEventListener('click', handleOutboundClick, { capture: true })
 })
 onUnmounted(() => {
+  clearTimeout(discordToastTimer)
   window.removeEventListener('scroll', handleScroll)
   document.removeEventListener('click', handleOutboundClick, { capture: true })
   document.body.style.overflow = ''

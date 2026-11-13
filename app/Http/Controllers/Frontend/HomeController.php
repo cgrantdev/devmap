@@ -16,6 +16,7 @@ use App\Models\Deal;
 use App\Support\CompareSlug;
 use App\Support\EncyclopediaSlug;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
@@ -421,20 +422,94 @@ class HomeController extends Controller
     }
 
     /**
-     * Preview of the redesigned homepage at /home-v2.
-     * Independent data-fetching from index() so the live site stays untouched
-     * while we iterate on the new design.
+     * Live homepage (route "home"). The heavy payload is cached for ten
+     * minutes per location for guests; FrontendCache skips the cache for
+     * logged-in users so admin edits show immediately. SEO is built per
+     * request because it travels through the session to app.blade.php.
      */
     public function v2(\Illuminate\Http\Request $request)
     {
-        // Site-wide vendor-location filter, set by the header CountrySelector.
-        // Empty string = All locations. Applied to every brand + product query
-        // below via when() so unfiltered visitors see the full catalog.
-        $locationFilter = trim((string) $request->get('location', ''));
-        // Colin PMAP Sep 30 (#12): a vendor should appear under a
-        // country when either their HQ is there OR their ships_to
-        // list includes it. Certified-Pep is US-HQ but ships to
-        // Canada — the Canadian view used to hide them.
+        // Site-wide vendor-location filter set by the header CountrySelector.
+        // Only exact location names are honored; anything else falls back to
+        // all locations so arbitrary ?location= values can't fill the cache
+        // or end up echoed in the H1.
+        $locationFilter = $this->knownLocationName(trim((string) $request->get('location', '')));
+
+        $payload = \App\Support\FrontendCache::remember(
+            'home_v2:' . md5(mb_strtolower($locationFilter)),
+            600,
+            fn () => $this->buildHomePayload($locationFilter)
+        );
+
+        // Title and meta are agency-owned. h1 mirrors the visible H1 so the
+        // server-rendered heading matches what visitors see.
+        $seo = [
+            'key'            => 'home',
+            'title'          => 'Peptidemap — Compare Peptide Vendors, Prices & Coupons',
+            'description'    => "Live prices and coupon codes. Check each vendor's site for COAs.",
+            'url'            => 'https://peptidemap.com/',
+            'og_title'       => 'Compare every peptide vendor — Peptidemap',
+            'og_description' => "Live prices and coupon codes. Check each vendor's site for COAs.",
+            'og_image'       => 'https://peptidemap.com/images/og-default-v8.png',
+            'h1'             => $payload['heroHeading'],
+            'preload_images' => $this->heroPreloadImages($payload['heroSlides'][0] ?? null),
+        ];
+        session(['page_seo_data' => $seo]);
+
+        return Inertia::render('Frontend/WelcomeV2', array_merge($payload, ['seo' => $seo]));
+    }
+
+    /**
+     * Case-insensitive match against the locations table. Returns the stored
+     * name, or '' when the value is empty or unknown.
+     */
+    private function knownLocationName(string $value): string
+    {
+        if ($value === '') return '';
+        $names = Cache::remember('location_names_v1', 3600, fn () => Location::query()->pluck('name')->all());
+        foreach ($names as $name) {
+            if (strcasecmp((string) $name, $value) === 0) return (string) $name;
+        }
+        return '';
+    }
+
+    /**
+     * Preload hints for the first hero slide so the LCP image starts
+     * downloading from the HTML head instead of after Vue mounts. Mirrors
+     * HeroCarousel.vue: only slides drawn as <img> (cover/contain fits).
+     */
+    private function heroPreloadImages($slide): array
+    {
+        if (!is_array($slide)) return [];
+        $desktop = $slide['image'] ?? null;
+        $mobile = $slide['image_mobile'] ?? null;
+        if (!$desktop && !$mobile) return [];
+
+        $fitOk = fn ($v) => in_array((string) ($v ?? ''), ['', 'cover', 'contain'], true);
+        if ($mobile) {
+            $mobileFit = ($slide['bg_size_mobile'] ?? null) ?: ($slide['bg_size'] ?? null);
+        } else {
+            $mobileFit = $slide['bg_size'] ?? null;
+        }
+        if (!$fitOk($slide['bg_size'] ?? null) || !$fitOk($mobileFit)) return [];
+
+        if ($desktop && $mobile) {
+            return [
+                ['href' => $mobile, 'media' => '(max-width: 767px)'],
+                ['href' => $desktop, 'media' => '(min-width: 768px)'],
+            ];
+        }
+        if ($desktop) return [['href' => $desktop, 'media' => null]];
+        return [['href' => $mobile, 'media' => '(max-width: 767px)']];
+    }
+
+    /**
+     * Everything the homepage renders except SEO. Cached by v2().
+     */
+    private function buildHomePayload(string $locationFilter): array
+    {
+        // A vendor appears under a country when its HQ is there OR its
+        // ships-to list includes it (Colin PMAP Sep 30, #12).
         $applyBrandLocation = fn ($q) => $locationFilter
             ? $q->where(function ($q) use ($locationFilter) {
                 $q->whereHas('vendorSetting.location', fn ($l) => $l->where('name', $locationFilter))
@@ -450,7 +525,7 @@ class HomeController extends Controller
               })
             : $q;
 
-        // Headline stats for the hero trust row
+        // Headline stats for the H1 band and the compare card.
         $verifiedVendorCount = Brand::where('is_active', true)
             ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
             ->tap($applyBrandLocation)
@@ -460,21 +535,33 @@ class HomeController extends Controller
             ->tap($applyBrandLocation)
             ->count();
 
-        $totalCompoundCount = Product::visible()
+        $listingCount = Product::visible()
             ->where('status', 'active')
             ->tap($applyProductLocation)
             ->count();
 
-        $totalCategoryCount = ProductCategory::where('is_active', true)->count();
+        // Compounds that actually have at least one live listing.
+        $compoundCount = ProductCategory::where('is_active', true)
+            ->whereHas('products', fn ($q) => $q->visible()->where('status', 'active')->tap($applyProductLocation))
+            ->count();
 
         $stats = [
             'verified_vendors' => $verifiedVendorCount,
             'total_vendors' => $totalVendorCount,
-            'compounds' => $totalCompoundCount,
-            'categories' => $totalCategoryCount,
+            'listings' => $listingCount,
+            'compounds' => $compoundCount,
         ];
 
-        // Top 6 vendors for the vendor grid on the homepage.
+        $vendorWord = $totalVendorCount === 1 ? 'vendor' : 'vendors';
+        if ($totalVendorCount <= 0) {
+            $heroHeading = 'Compare research peptide prices across vendors';
+        } elseif ($locationFilter !== '') {
+            $heroHeading = "Compare research peptide prices from {$totalVendorCount} {$vendorWord} shipping to {$locationFilter}";
+        } else {
+            $heroHeading = "Compare research peptide prices from {$totalVendorCount} {$vendorWord}";
+        }
+
+        // Top vendors for the vendor grid.
         $verifiedVendors = Brand::where('is_active', true)
             ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
             ->tap($applyBrandLocation)
@@ -498,11 +585,6 @@ class HomeController extends Controller
             ->map(function ($brand) {
                 $vs = $brand->vendorSetting;
 
-                $lastUpdated = Product::visible()
-                    ->where('status', 'active')
-                    ->where('brand_id', $brand->id)
-                    ->max('updated_at');
-
                 return [
                     'id' => $brand->id,
                     'name' => $brand->name,
@@ -518,82 +600,10 @@ class HomeController extends Controller
                     'founded_year' => $vs && $vs->founded_year ? (int) $vs->founded_year : null,
                     'is_partner' => $vs && (($vs->is_partner ?? false) || ($vs->featured ?? false)),
                     'coupon_code' => $vs->coupon_code ?? null,
-                    'last_tested_label' => $lastUpdated
-                        ? \Carbon\Carbon::parse($lastUpdated)->diffForHumans(null, true)
-                        : null,
                 ];
             });
 
-        // Trending compounds — 8 highest-rated products. Later: swap to real
-        // click-count ordering from product_clicks once we have enough data.
-        $trendingProducts = Product::visible()
-            ->where('status', 'active')
-            ->tap($applyProductLocation)
-            ->with([
-                'brand' => fn ($q) => $q->forPublic(),
-                'brand.vendorSetting' => fn ($q) => $q->forPublic()->with('location'),
-            ])
-            ->orderByDesc('rating_count')
-            ->orderByDesc('featured')
-            ->orderByDesc('rating_average')
-            ->take(8)
-            ->get()
-            ->map(function ($product) {
-                $salePrice = $product->discount_price && $product->discount_price < $product->price
-                    ? $product->discount_price
-                    : $product->price;
-
-                $brandVerified = $product->brand && $product->brand->vendorSetting
-                    ? ($product->brand->vendorSetting->approval_status === 'approved')
-                    : false;
-
-                $countryName = $product->brand?->vendorSetting?->location?->name;
-                [$currencyCode, $currencySymbol] = \App\Support\Currency::forCountry($countryName);
-
-                // Product image: may be a full URL (from scraper) or a local file path.
-                $imageUrl = $product->image_url;
-                if ($imageUrl && !str_starts_with($imageUrl, 'http')) {
-                    // Local file path stored in DB — try resolve to asset URL
-                    $full = storage_path('app/public/' . $imageUrl);
-                    $imageUrl = file_exists($full) ? asset('storage/' . $imageUrl) : null;
-                }
-                if (ImageHelper::isStockPlaceholder($imageUrl)) {
-                    $imageUrl = null;
-                }
-
-                return [
-                    'id' => $product->id,
-                    'name' => $product->display_name,
-                    'product_type' => $product->product_type,
-                    'brand_discount_percent' => $product->brand_discount_percent,
-                    'brand_coupon_code' => $product->brand_coupon_code,
-                    'image_url' => $imageUrl,
-                    'url' => $product->brand && $product->brand->slug
-                        ? '/product/' . $product->brand->slug . '/' . ($product->slug ?? 'product') . '/' . $product->id
-                        : '/product/' . ($product->slug ?? 'product') . '/' . $product->id,
-                    'brand_name' => $product->brand?->name,
-                    'brand_verified' => $brandVerified,
-                    'price' => $salePrice,
-                    'original_price' => ($product->discount_price && $product->discount_price < $product->price)
-                        ? $product->price
-                        : null,
-                    'currency_code' => $currencyCode,
-                    'currency_symbol' => $currencySymbol,
-                    'price_per_mg' => null,
-                    'verified' => $brandVerified,
-                    'lab_tested' => (bool) ($product->lab_tested ?? false),
-                    'featured' => (bool) ($product->featured ?? false),
-                ];
-            });
-
-        // Ticker strip — rotating live price snippets
-        $tickerItems = $trendingProducts->take(12)->map(fn ($p) => [
-            'name' => $p['name'],
-            'brand' => $p['brand_name'],
-            'price' => $p['price'],
-        ])->values();
-
-        // Latest editorial — 4 research insights for the editorial section
+        // Latest editorial - 4 research insights for the editorial section
         $editorial = Blog::where('status', 'published')
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
@@ -612,9 +622,9 @@ class HomeController extends Controller
                 ];
             });
 
-        // Premium / featured vendors for the homepage hero slot (paid placement).
-        // Use vendor_settings.is_partner or featured as the selector, fall back
-        // to top-rated approved vendors so the section never sits empty.
+        // Premium / featured vendors (paid placement). Used for the hero
+        // fallback slides and the encyclopedia sponsor rotation. Falls back
+        // to top-rated approved vendors so neither sits empty.
         $premiumVendors = Brand::where('is_active', true)
             ->where(function ($q) {
                 $q->whereHas('vendorSetting', function ($s) {
@@ -633,7 +643,6 @@ class HomeController extends Controller
             ->take(3)
             ->get();
 
-        // Fallback if nobody is flagged partner/featured yet
         if ($premiumVendors->isEmpty()) {
             $premiumVendors = Brand::where('is_active', true)
                 ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
@@ -667,70 +676,7 @@ class HomeController extends Controller
             ];
         });
 
-        // Limited-time deals: reuse the same logic pattern as index(), trimmed.
-        $limitedDeals = Deal::where('active', true)
-            ->where(function ($query) {
-                $query->whereNull('expiry_date')->orWhere('expiry_date', '>=', now());
-            })
-            ->when($locationFilter, fn ($q) => $q->whereHas('brand.vendorSetting.location', fn ($l) => $l->where('name', $locationFilter)))
-            ->with([
-                'brand' => fn ($q) => $q->forPublic(),
-                'brand.vendorSetting' => fn ($q) => $q->forPublic(),
-            ])
-            ->orderByDesc('discount')
-            ->take(8)
-            ->get()
-            ->map(function ($deal) {
-                $brand = $deal->brand;
-                if (!$brand || !$brand->is_active) return null;
-
-                $logoUrl = $brand->vendorSetting && $brand->vendorSetting->logo
-                    ? asset('storage/' . $brand->vendorSetting->logo)
-                    : null;
-
-                return [
-                    'id' => $deal->id,
-                    'name' => $brand->name,
-                    'logo' => $logoUrl,
-                    'rating' => (float) ($brand->rating_average ?? 0),
-                    'reviews' => (int) ($brand->rating_count ?? 0),
-                    'discount' => (int) $deal->discount,
-                    'code' => $deal->code,
-                    'url' => '/brand/' . ($brand->slug ?? Str::slug($brand->name)),
-                ];
-            })
-            ->filter()
-            ->values();
-
-        // Fallback: brands with coupon codes
-        if ($limitedDeals->count() < 4) {
-            $brandsWithCoupons = Brand::where('is_active', true)
-                ->whereHas('vendorSetting', function ($q) {
-                    $q->where('approval_status', 'approved')
-                        ->whereNotNull('coupon_code')
-                        ->where('coupon_code', '!=', '');
-                })
-                ->tap($applyBrandLocation)
-                ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
-                ->take(8 - $limitedDeals->count())
-                ->get()
-                ->map(function ($brand) {
-                    $vs = $brand->vendorSetting;
-                    return [
-                        'id' => $brand->id,
-                        'name' => $brand->name,
-                        'logo' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
-                        'rating' => (float) ($brand->rating_average ?? 0),
-                        'reviews' => (int) ($brand->rating_count ?? 0),
-                        'discount' => 15,
-                        'code' => $vs->coupon_code ?? 'PMAP',
-                        'url' => '/brand/' . ($brand->slug ?? Str::slug($brand->name)),
-                    ];
-                });
-            $limitedDeals = collect($limitedDeals->all())->merge($brandsWithCoupons)->take(8)->values();
-        }
-
-        // Peptide encyclopedia highlights — categories with published education posts
+        // Peptide encyclopedia highlights - categories with published education posts
         $encyclopediaCategories = ProductCategory::where('is_active', true)
             ->whereHas('educationPost', function ($q) {
                 $q->where('status', 'published')
@@ -764,8 +710,7 @@ class HomeController extends Controller
                 ];
             });
 
-        // Attach a rotating sponsor from premiumVendors to each encyclopedia
-        // entry, so sponsored content is cycled deterministically.
+        // Rotate a sponsor from premiumVendors onto each encyclopedia entry.
         $sponsorPool = $premiumVendors->values();
         $encyclopediaCategories = $encyclopediaCategories->values()->map(function ($cat, $i) use ($sponsorPool) {
             if ($sponsorPool->isEmpty()) {
@@ -779,10 +724,9 @@ class HomeController extends Controller
             return $cat;
         });
 
-        // Hero carousel slides — managed by admin at /admin/banners.
-        // Loaded from the `hero_slides` setting; if none configured yet, we
-        // fall back to a seeded Certified Peptides slide + auto-generated
-        // premium-vendor slides so the homepage never renders empty.
+        // Hero carousel slides, managed at /admin/banners via the
+        // hero_slides setting. Falls back to a seeded Certified Peptides
+        // slide plus premium-vendor slides so the carousel never renders empty.
         $heroSlides = $this->loadAdminHeroSlides();
         if ($heroSlides->isEmpty()) {
             $heroSlides->push([
@@ -813,26 +757,8 @@ class HomeController extends Controller
             }
         }
 
-        // Brand strip marquee — all verified vendors with a logo (or placeholder)
-        $brandStripVendors = Brand::where('is_active', true)
-            ->whereHas('vendorSetting', fn ($q) => $q->where('approval_status', 'approved'))
-            ->with(['vendorSetting' => fn ($q) => $q->forPublic()])
-            ->orderByDesc('rating_average')
-            ->take(16)
-            ->get()
-            ->map(function ($brand) {
-                $vs = $brand->vendorSetting;
-                return [
-                    'id' => $brand->id,
-                    'name' => $brand->name,
-                    'url' => '/brand/' . ($brand->slug ?? Str::slug($brand->name)),
-                    'logo' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
-                    'verified' => true,
-                ];
-            });
-
-        // Top compound categories for the homepage "What are you researching?" grid.
-        // Uses the same priority list as the Compare page.
+        // Top compound tiles ("What are you researching?"). Same priority
+        // list as the Compare page.
         $topCompoundNames = [
             'BPC-157', 'GLP1-S (Semaglutide)', 'GLP2-T (Tirzepatide)', 'GLP3-R (Retatrutide)',
             'TB-500', 'Ipamorelin', 'CJC-1295 / Ipamorelin', 'GLOW', 'KLOW',
@@ -850,37 +776,32 @@ class HomeController extends Controller
             'KLOW' => 'KLOW Blend',
         ];
 
-        $topCompounds = ProductCategory::where('is_active', true)
+        $topCategories = ProductCategory::where('is_active', true)
             ->whereIn('name', $topCompoundNames)
-            ->withCount(['products as product_count' => fn ($q) => $q->visible()->where('status', 'active')])
-            ->get()
-            ->map(function ($cat) use ($displayNames) {
-                $vendorCount = Product::visible()
-                    ->where('status', 'active')
-                    ->where('product_category_id', $cat->id)
-                    ->distinct('brand_id')
-                    ->count('brand_id');
+            ->get(['id', 'name', 'slug']);
 
-                // Exclude $0/unpriced rows — scrapers dump parent-variable
-                // products with no resolved price and they poison the MIN,
-                // making tiles read "from $0.00".
-                $cheapest = Product::visible()
-                    ->where('status', 'active')
-                    ->where('product_category_id', $cat->id)
-                    ->where(function ($q) {
-                        $q->where('discount_price', '>', 0)
-                          ->orWhere(function ($qq) {
-                              $qq->whereNull('discount_price')->where('price', '>', 0);
-                          });
-                    })
-                    ->selectRaw('MIN(COALESCE(NULLIF(discount_price, 0), price)) as min_price')
-                    ->value('min_price');
+        // One grouped query for vendor counts and lowest listed price instead
+        // of two queries per compound. visible() already drops $0 rows; the
+        // CASE skips zero discount prices like the old per-compound MIN did.
+        $compoundAgg = Product::visible()
+            ->where('status', 'active')
+            ->whereIn('product_category_id', $topCategories->pluck('id')->all())
+            ->groupBy('product_category_id')
+            ->selectRaw('product_category_id, COUNT(DISTINCT brand_id) as vendor_count, MIN(CASE WHEN discount_price > 0 THEN discount_price WHEN discount_price IS NULL AND price > 0 THEN price END) as min_price')
+            ->toBase()
+            ->get()
+            ->keyBy('product_category_id');
+
+        $topCompounds = $topCategories
+            ->map(function ($cat) use ($displayNames, $compoundAgg) {
+                $agg = $compoundAgg->get($cat->id);
+                $cheapest = $agg?->min_price;
 
                 return [
                     'id' => $cat->id,
                     'name' => $displayNames[$cat->name] ?? $cat->name,
                     'slug' => $cat->slug,
-                    'vendor_count' => $vendorCount,
+                    'vendor_count' => (int) ($agg?->vendor_count ?? 0),
                     'from_price' => $cheapest ? number_format((float) $cheapest, 2, '.', '') : null,
                 ];
             })
@@ -888,29 +809,12 @@ class HomeController extends Controller
             ->values()
             ->take(16);
 
-        // SEO — pushed into the session so app.blade.php can read it and
-        // render the correct <title>, canonical, and OG/Twitter tags.
-        $seo = [
-            'key'            => 'home',
-            'title'          => 'Peptidemap — Compare Peptide Vendors, Prices & Coupons',
-            'description'    => "Live prices and coupon codes. Check each vendor's site for COAs.",
-            'url'            => 'https://peptidemap.com/',
-            'og_title'       => 'Compare every peptide vendor — Peptidemap',
-            'og_description' => "Live prices and coupon codes. Check each vendor's site for COAs.",
-            'og_image'       => 'https://peptidemap.com/images/og-default-v8.png',
-        ];
-        session(['page_seo_data' => $seo]);
-
-        // Listed prices — direct-to-affiliate cards. Ranking is
-        // BIGGEST SAVINGS $ + boosted vendors + higher retail price
-        // (not lowest absolute price — a \$500 product 30% off is a
-        // better 'deal' than a \$10 product at full price, AND yields
-        // higher commission per outbound click on an affiliate model).
-        // Colin Sep 7: 'we need to focus on ways to sell the BEST
-        // products not cheapest, or we make less money'.
-        //
-        // Only products with an actual discount (%-off applied) qualify
-        // — a full-price product isn't a 'deal'.
+        // Listed prices - direct-to-affiliate cards. Ranking is biggest
+        // savings + boosted vendors + higher retail price, not the lowest
+        // absolute price: a $500 product 30% off is a better deal than a $10
+        // product at full price and earns more per outbound click. Colin
+        // Sep 7: sell the BEST products, not the cheapest. Only products with
+        // a real coupon discount qualify.
         $bestDeals = \App\Models\Product::visible()
             ->where('status', 'active')
             ->whereHas('brand.vendorSetting', function ($q) {
@@ -921,12 +825,9 @@ class HomeController extends Controller
                 'brand:id,name,slug',
                 'brand.vendorSetting' => fn ($q) => $q->forPublic(true),
             ])
-            // Accessible price band: \$40-\$500 retail. Excludes low-AOV
-            // noise on the floor AND bulk/kit products on the ceiling
-            // (\$2K Teduglutide kits, 10-packs, etc.) that don't convert
-            // for a first-time homepage visitor. Colin Sep 7 flagged the
-            // 'wtf are these prices' problem — cards were dominated by
-            // bulk/kit products that price out the average buyer.
+            // Accessible price band: $40-$500 retail. Excludes low-AOV noise
+            // and bulk/kit products that price out a first-time visitor
+            // (Colin Sep 7).
             ->where(function ($q) {
                 $q->where(function ($qq) {
                     $qq->whereNotNull('discount_price')
@@ -967,31 +868,26 @@ class HomeController extends Controller
                     'go_url' => "/go/{$p->id}?src=homepage-best-deals",
                 ];
             })
-            // Rank: boosted vendors first, then by absolute \$ savings desc.
-            // Absolute savings favors premium products, which are what
-            // drives affiliate revenue.
+            // Boosted vendors first, then by absolute savings desc.
             ->sortBy(function ($d) {
                 $boostFlag = $d['coupon_boost_active'] ? '0' : '1';
-                // Invert savings for ascending sort → biggest savings first
+                // Invert savings for ascending sort so the biggest savings come first
                 $invSavings = str_pad(number_format(999999 - $d['savings'], 2, '.', ''), 12, '0', STR_PAD_LEFT);
                 return $boostFlag . '-' . $invSavings;
             })
             ->take(10)
             ->values();
 
-        return Inertia::render('Frontend/WelcomeV2', [
+        return [
             'stats' => $stats,
+            'heroHeading' => $heroHeading,
             'heroSlides' => $heroSlides,
-            'brandStripVendors' => $brandStripVendors,
             'verifiedVendors' => $verifiedVendors,
             'topCompounds' => $topCompounds,
-            'trendingProducts' => $trendingProducts,
-            'limitedDeals' => $limitedDeals,
             'encyclopediaCategories' => $encyclopediaCategories,
             'editorial' => $editorial,
             'bestDeals' => $bestDeals,
-            'seo' => $seo,
-        ]);
+        ];
     }
 
     /**

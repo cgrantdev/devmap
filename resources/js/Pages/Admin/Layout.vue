@@ -146,6 +146,33 @@ import { useForm, usePage, Link } from '@inertiajs/vue3'
 import { useAdminLoading } from '../../composables/useAdminLoading'
 import { useToast } from '../../composables/useToast'
 import { h, defineComponent, computed } from 'vue'
+import { createToastInterface, globalEventBus } from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
+
+// Toasts are admin-only, so the container mounts here (once per tab) rather
+// than globally in app.js. useToast() falls back to the same globalEventBus
+// when no plugin is installed, so every existing call keeps working.
+if (typeof window !== 'undefined' && !window.__pmapToastContainer) {
+  window.__pmapToastContainer = true
+  createToastInterface({
+    eventBus: globalEventBus,
+    position: 'top-right',
+    timeout: 3000,
+    closeOnClick: true,
+    pauseOnFocusLoss: true,
+    pauseOnHover: true,
+    draggable: true,
+    draggablePercent: 0.6,
+    showCloseButtonOnHover: false,
+    hideProgressBar: false,
+    closeButton: 'button',
+    icon: true,
+    rtl: false,
+    transition: 'Vue-Toastification__bounce',
+    maxToasts: 5,
+    newestOnTop: true,
+  })
+}
 
 const { isLoading, loadingMessage } = useAdminLoading()
 const { toast } = useToast()

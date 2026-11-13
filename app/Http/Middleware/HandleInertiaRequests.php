@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Setting;
 use App\Models\Brand;
+use App\Providers\AppServiceProvider;
 use App\Models\Product;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
@@ -158,11 +158,13 @@ class HandleInertiaRequests extends Middleware
                 || (bool) session('preview_as_agency', false),
             'is_agency_preview_active' => fn () => $request->user()?->role !== 'seo_agency'
                 && (bool) session('preview_as_agency', false),
-            'site_name' => fn () => Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap',
+            // One cached lookup for all three (AppServiceProvider::siteSettings),
+            // instead of three queries on every request.
+            'site_name' => fn () => AppServiceProvider::siteSettings()['site_name'] ?? 'Peptidemap',
             'site_description' => fn () => \App\Support\SiteCopy::description(
-                Setting::where('key', 'site_description')->value('value')
+                AppServiceProvider::siteSettings()['site_description'] ?? null
             ),
-            'contact_email' => fn () => Setting::where('key', 'contact_email')->value('value') ?? 'contact@peptidemaps.com',
+            'contact_email' => fn () => AppServiceProvider::siteSettings()['contact_email'] ?? 'info@peptidemap.com',
             'pending_vendors_count' => fn () => $request->user() && $request->user()->canAccessAdmin()
                 ? Brand::whereNotNull('user_id')->whereHas('vendorSetting', function ($query) {
                     $query->where('approval_status', 'pending');
@@ -174,15 +176,10 @@ class HandleInertiaRequests extends Middleware
             // Shared wishlist membership arrays. Frontend heart-icons read
             // these to render active/inactive state without needing every
             // controller to pass in_wishlist_* props. Only fires for logged-in
-            // customers; two small pluck queries per request. Wrapped in
-            // Schema::hasTable so requests during a fresh install don't 500
-            // before the migration runs.
+            // users; one small query per request.
             'wishlist' => function () use ($request) {
                 $u = $request->user();
                 if (!$u) return ['product_ids' => [], 'category_ids' => [], 'count' => 0];
-                if (!\Illuminate\Support\Facades\Schema::hasTable('wishlists')) {
-                    return ['product_ids' => [], 'category_ids' => [], 'count' => 0];
-                }
                 $rows = Wishlist::where('user_id', $u->id)
                     ->select('wishable_type', 'product_id', 'category_id')
                     ->get();

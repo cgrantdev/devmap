@@ -33,11 +33,10 @@
     <!-- Search engine verification -->
     <meta name="msvalidate.01" content="63538BD42BDE107E930BCBB0DB36B709" />
     @php
-        $siteName = \App\Models\Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
-        $siteDescription = \App\Support\SiteCopy::description(
-            \App\Models\Setting::where('key', 'site_description')->value('value')
-        );
-        $contactEmail = \App\Models\Setting::where('key', 'contact_email')->value('value') ?? 'info@peptidemap.com';
+        $siteSettings = \App\Providers\AppServiceProvider::siteSettings();
+        $siteName = $siteSettings['site_name'] ?? 'Peptidemap';
+        $siteDescription = \App\Support\SiteCopy::description($siteSettings['site_description'] ?? null);
+        $contactEmail = $siteSettings['contact_email'] ?? 'info@peptidemap.com';
         $canonicalHost = 'https://peptidemap.com';
         $defaultOgImage = $canonicalHost . '/images/og-default-v8.png';
 
@@ -208,9 +207,20 @@
         @endforeach
     @endif
 
+    {{-- First hero slide on the homepage: start the LCP image download from
+         the HTML head instead of waiting for Vue to mount the carousel. --}}
+    @if(is_array($seoData) && !empty($seoData['preload_images']))
+        @foreach($seoData['preload_images'] as $preloadImage)
+    <link rel="preload" as="image" href="{{ $preloadImage['href'] }}" @if(!empty($preloadImage['media'])) media="{{ $preloadImage['media'] }}" @endif fetchpriority="high">
+        @endforeach
+    @endif
+
+    {{-- Inter Tight (UI/body/headings) and JetBrains Mono (prices, doses).
+         Loaded here instead of an @import inside app.css so the font CSS
+         downloads in parallel with the bundle rather than after it. --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     @vite(['resources/js/app.js', 'resources/css/app.css'])
 
     {{-- Critical CSS for the SSR H1's sr-only class — inlined so it takes

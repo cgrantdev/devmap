@@ -6,11 +6,140 @@
     </Head>
 
     <!-- ========================================================= -->
-    <!-- 1. HERO                                                    -->
+    <!-- 1. H1 BAND + HERO                                          -->
     <!-- ========================================================= -->
     <section class="relative">
       <div class="ui-spotlight absolute inset-0 pointer-events-none" />
-      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-3 lg:pt-3">
+      <!-- The page's only H1: what Peptidemap is, with live counts, plus a
+           search box. Two columns on desktop so the carousel still clears
+           the fold on laptops. seo.h1 carries the same text server-side. -->
+      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-6 lg:pt-9">
+        <div class="grid gap-4 lg:gap-10 lg:items-end lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] xl:grid-cols-[minmax(0,1fr)_minmax(0,500px)]">
+          <div class="min-w-0">
+            <h1 class="ui-display text-[26px] sm:text-[30px] lg:text-[34px] xl:text-[38px] font-semibold tracking-[-0.02em] leading-[1.1] text-[color:var(--color-ink)] text-balance">
+              {{ heading }}
+            </h1>
+            <!-- The green dot doubles as the separator before the last item,
+                 so a wrap on phones never leaves a dangling middot. -->
+            <p class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">
+              <span v-if="statItems.length" class="inline-flex flex-wrap items-center gap-x-2">
+                <template v-for="(item, i) in statItems" :key="item.label">
+                  <span v-if="i > 0" aria-hidden="true" class="text-[color:var(--color-ink-subtle)]">·</span>
+                  <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ formatNumber(item.value) }}</span> {{ item.label }}</span>
+                </template>
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-[color:var(--color-verified)]" aria-hidden="true" />
+                prices checked daily
+              </span>
+            </p>
+          </div>
+
+          <div class="min-w-0">
+            <form role="search" action="/search" method="get" class="relative" @submit.prevent="submitHomeSearch">
+              <label for="home-search" class="sr-only">Search compounds and vendors</label>
+              <div class="flex items-center gap-2 h-12 pl-4 pr-1.5 rounded-[12px] bg-white border border-[color:var(--color-hairline)] shadow-[var(--shadow-sm)] transition-shadow focus-within:border-[color:var(--color-accent-400)] focus-within:shadow-[0_0_0_4px_var(--color-accent-100)]">
+                <svg class="w-[18px] h-[18px] flex-shrink-0 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" stroke-linecap="round" />
+                </svg>
+                <!-- 16px text so iOS Safari doesn't zoom the page on focus. -->
+                <input
+                  id="home-search"
+                  v-model="homeQuery"
+                  name="q"
+                  type="search"
+                  autocomplete="off"
+                  spellcheck="false"
+                  enterkeyhint="search"
+                  placeholder="Compound or vendor name"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-controls="home-search-results"
+                  :aria-expanded="suggestOpen && results.length > 0 ? 'true' : 'false'"
+                  :aria-activedescendant="suggestOpen && activeIndex >= 0 ? `home-suggest-${activeIndex}` : undefined"
+                  class="flex-1 min-w-0 h-full bg-transparent outline-none text-[16px] text-[color:var(--color-ink)] placeholder-[color:var(--color-ink-subtle)]"
+                  @focus="setSearchFocus(true)"
+                  @blur="setSearchFocus(false)"
+                  @keydown.down.prevent="openAndMove(1)"
+                  @keydown.up.prevent="openAndMove(-1)"
+                  @keydown.esc="closeSuggest"
+                />
+                <button
+                  type="submit"
+                  class="ui-focus flex-shrink-0 h-9 px-4 rounded-[9px] text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:brightness-110 transition-all"
+                >
+                  Search
+                </button>
+              </div>
+
+              <!-- Live suggestions. mousedown.prevent keeps focus in the
+                   input so the list doesn't close before a click lands. -->
+              <div
+                v-if="suggestOpen"
+                class="absolute left-0 right-0 top-full mt-1.5 z-40 rounded-[12px] bg-white border border-[color:var(--color-hairline)] shadow-[var(--shadow-lg)] overflow-hidden"
+                @mousedown.prevent
+              >
+                <div v-if="results.length" id="home-search-results" role="listbox" aria-label="Suggestions" class="py-1.5 max-h-[60vh] overflow-y-auto">
+                  <a
+                    v-for="(item, idx) in results"
+                    :id="`home-suggest-${idx}`"
+                    :key="item.type + item.url"
+                    :href="item.url"
+                    role="option"
+                    tabindex="-1"
+                    :aria-selected="idx === activeIndex ? 'true' : 'false'"
+                    :class="[
+                      'flex items-center gap-3 px-4 py-2.5 transition-colors',
+                      idx === activeIndex ? 'bg-[color:var(--color-hairline-soft)]' : 'hover:bg-[color:var(--color-hairline-soft)]',
+                    ]"
+                    @mouseenter="setActive(idx)"
+                  >
+                    <span
+                      :class="[
+                        'flex-shrink-0 w-[68px] text-center text-[10px] uppercase tracking-[0.08em] font-semibold rounded-full py-0.5 border',
+                        item.type === 'compound'
+                          ? 'text-[color:var(--color-accent-700)] bg-[color:var(--color-accent-50)] border-[color:var(--color-accent-100)]'
+                          : 'text-emerald-700 bg-emerald-50 border-emerald-200',
+                      ]"
+                    >{{ item.type === 'compound' ? 'Compound' : 'Vendor' }}</span>
+                    <span class="flex-1 min-w-0">
+                      <span class="block truncate text-[14px] font-medium text-[color:var(--color-ink)]">{{ item.label }}</span>
+                      <span v-if="item.sublabel" class="block truncate text-[12px] text-[color:var(--color-ink-muted)] ui-mono">{{ item.sublabel }}</span>
+                    </span>
+                  </a>
+                </div>
+                <p v-else-if="loading" class="px-4 py-3 text-[13px] text-[color:var(--color-ink-muted)]">Searching…</p>
+                <p v-else class="px-4 py-3 text-[13px] text-[color:var(--color-ink-muted)]">No quick matches.</p>
+                <button
+                  type="button"
+                  class="w-full flex items-center gap-2 px-4 py-2.5 border-t border-[color:var(--color-hairline)] text-left text-[13px] text-[color:var(--color-ink-muted)] hover:bg-[color:var(--color-hairline-soft)] transition-colors"
+                  @click="searchEverything"
+                >
+                  <span class="flex-1 min-w-0 truncate">
+                    Search everything for <span class="text-[color:var(--color-ink)] font-medium">"{{ homeQuery.trim() }}"</span>
+                  </span>
+                  <kbd class="hidden sm:inline ui-mono text-[10px] px-1.5 py-0.5 rounded border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)]">Enter</kbd>
+                </button>
+              </div>
+            </form>
+
+            <div v-if="popularCompounds.length" class="mt-2.5 flex flex-wrap items-center gap-1.5">
+              <span class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mr-0.5">Popular</span>
+              <a
+                v-for="(compound, i) in popularCompounds"
+                :key="compound.slug"
+                :href="`/product/${compound.slug}`"
+                :class="[
+                  'ui-focus items-center h-7 px-2.5 rounded-full border border-[color:var(--color-hairline)] bg-white text-[12px] font-medium text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-accent-700)] transition-colors',
+                  i >= 4 ? 'hidden sm:inline-flex' : 'inline-flex',
+                ]"
+              >{{ compound.name }}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-5 lg:pt-6">
         <HeroCarousel :slides="heroSlides" />
       </div>
     </section>
@@ -128,7 +257,7 @@
             See every vendor's price, side by side
           </h2>
           <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
-            {{ formatNumber(stats.compounds) }} listings across {{ formatNumber(stats.total_vendors) }} vendors. Compare every price side by side.
+            {{ formatNumber(stats.listings) }} listings for {{ formatNumber(stats.compounds) }} compounds across {{ formatNumber(stats.total_vendors) }} vendors. Compare every price side by side.
           </p>
           <div class="mt-auto pt-2">
             <Button as="a" href="/compare" variant="primary">
@@ -329,21 +458,9 @@
     </section>
 
     <!-- ========================================================= -->
-    <!-- 7. RUO NOTICE — research use disclaimer                    -->
+    <!-- 7. VENDOR CTA (the RUO notice lives in the site footer)    -->
     <!-- ========================================================= -->
-    <section class="max-w-[1280px] mx-auto px-5 lg:px-10 py-8">
-      <div class="flex items-start gap-3 p-4 rounded-[12px] bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)]">
-        <svg class="w-4 h-4 text-[color:var(--color-ink-subtle)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        <p class="text-[11px] text-[color:var(--color-ink-subtle)] leading-relaxed">
-          <strong class="text-[color:var(--color-ink-muted)]">Research Use Only.</strong> All products listed on PeptideMap are intended for laboratory and research purposes only. They are not intended for human consumption, therapeutic use, or any form of self-administration. Always comply with local regulations. PeptideMap does not provide medical advice.
-        </p>
-      </div>
-    </section>
-
-    <!-- ========================================================= -->
-    <!-- 8. VENDOR CTA                                              -->
-    <!-- ========================================================= -->
-    <section class="max-w-[1280px] mx-auto px-5 lg:px-10 pb-12 lg:pb-16">
+    <section class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-16">
       <div class="border border-[color:var(--color-hairline)] bg-gradient-to-r from-[color:var(--color-accent-50)] to-white p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
         <div class="flex-1">
           <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-2">For vendors</div>
@@ -378,8 +495,9 @@ import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
 import HeroCarousel from '@/components/ui/HeroCarousel.vue'
-import { onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { trackImpression, trackClick } from '@/lib/bannerTracking'
+import { useSearchSuggest } from '@/composables/useSearchSuggest'
 
 onMounted(() => {
   trackImpression({ slot: 'homepage_vendor_cta', banner_key: 'become-a-vendor' })
@@ -393,8 +511,9 @@ function trackVendorCtaClick() {
   })
 }
 
-defineProps({
+const props = defineProps({
   stats: { type: Object, default: () => ({}) },
+  heroHeading: { type: String, default: '' },
   heroSlides: { type: Array, default: () => [] },
   verifiedVendors: { type: Array, default: () => [] },
   topCompounds: { type: Array, default: () => [] },
@@ -407,5 +526,50 @@ defineProps({
 function formatNumber(n) {
   if (n === null || n === undefined) return '—'
   return new Intl.NumberFormat().format(n)
+}
+
+// H1 band. The controller builds the heading from live counts and sends
+// the same string as seo.h1.
+const heading = computed(() =>
+  props.heroHeading || props.seo?.h1 || 'Compare research peptide prices across vendors'
+)
+const statItems = computed(() => [
+  { value: props.stats?.listings, label: 'listings' },
+  { value: props.stats?.compounds, label: 'compounds' },
+  { value: props.stats?.total_vendors, label: 'vendors' },
+].filter((s) => Number(s.value) > 0))
+const popularCompounds = computed(() =>
+  (props.topCompounds || []).filter((c) => c && c.slug).slice(0, 6)
+)
+
+// Homepage search box with live suggestions (same endpoint as the header
+// palette). Arrow keys pick a suggestion, Enter opens it; with nothing
+// picked, Enter runs the full /search.
+const homeQuery = ref('')
+const searchFocused = ref(false)
+const suggestDismissed = ref(false)
+const { results, loading, activeIndex, move, current } = useSearchSuggest(homeQuery)
+watch(homeQuery, () => { suggestDismissed.value = false })
+const suggestOpen = computed(() =>
+  searchFocused.value && !suggestDismissed.value && homeQuery.value.trim().length >= 2
+)
+function setSearchFocus(focused) { searchFocused.value = focused }
+function setActive(idx) { activeIndex.value = idx }
+function closeSuggest() { suggestDismissed.value = true }
+function openAndMove(delta) {
+  suggestDismissed.value = false
+  move(delta)
+}
+function searchEverything() {
+  const term = homeQuery.value.trim()
+  window.location.href = term ? `/search?q=${encodeURIComponent(term)}` : '/products'
+}
+function submitHomeSearch() {
+  const item = suggestOpen.value ? current() : null
+  if (item) {
+    window.location.href = item.url
+    return
+  }
+  searchEverything()
 }
 </script>

@@ -109,6 +109,7 @@ Route::post('/api/vendor-plugin/connect', [\App\Http\Controllers\Api\VendorPlugi
 
 // Search
 Route::get('/search', [\App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('search');
+Route::get('/api/search/suggest', \App\Http\Controllers\Frontend\SearchSuggestController::class)->middleware('throttle:120,1')->name('search.suggest');
 
 // Frontend pages
 Route::get('/products', [ProductsController::class, 'index'])->name('products');

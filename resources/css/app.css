@@ -1,6 +1,6 @@
-/* Modern 2026 design system fonts (loaded from Google Fonts via CDN).
-   Inter Tight for UI/headings, JetBrains Mono for data (prices, dosages, COAs). */
-@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Design system fonts: Inter Tight for UI/body/headings, JetBrains Mono for
+   data (prices, dosages, COAs). Loaded by a <link> in app.blade.php so they
+   download in parallel with this file instead of after it. */
 
 /* HV Muse Font Face Declarations */
 @font-face {
@@ -27,7 +27,9 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    /* Body text uses the same loaded family as the UI ('Instrument Sans'
+       was never loaded, so text silently fell back to the system font). */
+    --font-sans: 'Inter Tight', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 
     /* --- Modern 2026 design system tokens ---
@@ -496,7 +498,9 @@ textarea.ui-input { resize: vertical; }
 :root {
     /* Font Families */
     --font-hv-muse: 'HV Muse', serif;
-    --font-roboto: 'Roboto', sans-serif;
+    /* Legacy .font-roboto components now share the design-system font, so
+       the separate Roboto download is gone. */
+    --font-roboto: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
 
     /* Gray Scale */
     --color-gray-100: #F3F4F6;
