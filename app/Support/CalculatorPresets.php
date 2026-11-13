@@ -158,7 +158,7 @@ class CalculatorPresets
 
         try {
             $data = Cache::remember(
-                'calculator-pricing:v1:' . $preset['slug'],
+                'calculator-pricing:v2:' . $preset['slug'],
                 3600,
                 function () use ($preset, $compound) {
                     // Cache a miss too, so presets without listings don't
@@ -248,6 +248,21 @@ class CalculatorPresets
         // so the headline compares USD listings when any exist.
         $usd = array_values(array_filter($matches, fn ($m) => $m['currency_code'] === 'USD'));
         $pool = $usd !== [] ? $usd : $matches;
+
+        // Drop implausible outliers before picking the cheapest: a stale or
+        // mis-scraped row (e.g. a 10mg retatrutide vial stored at 4.95) must
+        // not become the headline price. Needs a pool big enough for a
+        // meaningful median.
+        if (count($pool) >= 4) {
+            $prices = array_column($pool, 'price');
+            sort($prices);
+            $mid = intdiv(count($prices), 2);
+            $median = count($prices) % 2 ? $prices[$mid] : ($prices[$mid - 1] + $prices[$mid]) / 2;
+            $plausible = array_values(array_filter($pool, fn ($m) => $m['price'] >= $median * 0.25));
+            if ($plausible !== []) {
+                $pool = $plausible;
+            }
+        }
         usort($pool, fn ($a, $b) => $a['price'] <=> $b['price']);
         $best = $pool[0];
 
