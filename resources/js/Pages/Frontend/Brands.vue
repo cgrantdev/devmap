@@ -168,7 +168,10 @@
           <!-- Logo area. Logos are trimmed on upload, so they fill the
                same padded box; dark or coloured logo blocks get their own
                edge colour as the backdrop instead of floating on white. -->
-          <div class="aspect-[16/9] border-b border-[color:var(--color-hairline)] relative">
+          <!-- overflow-hidden matters: an aspect-ratio box otherwise grows to
+               its content, and a square logo stretched the tile (and every
+               card in its row) instead of fitting inside it. -->
+          <div class="aspect-[16/9] border-b border-[color:var(--color-hairline)] relative overflow-hidden">
             <VendorLogo
               :src="brand.logo"
               :name="brand.name"

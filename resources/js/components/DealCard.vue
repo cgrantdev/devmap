@@ -26,7 +26,9 @@
 
     <!-- Logo area (shared VendorLogo: contain-fit, backdrop for dark logo
          blocks, initials when the logo is missing or fails to load) -->
-    <div class="aspect-square border-b border-gray-200">
+    <!-- overflow-hidden keeps the square: an aspect-ratio box otherwise
+         grows to fit an oversized logo instead of fitting it. -->
+    <div class="aspect-square border-b border-gray-200 relative overflow-hidden">
       <VendorLogo
         :src="logo"
         :name="name"
