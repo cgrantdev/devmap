@@ -156,7 +156,7 @@
         <a
           v-for="brand in filteredBrands"
           :key="brand.id"
-          :href="`/shop/${brand.slug}`"
+          :href="`/brand/${brand.slug}`"
           :class="[
             'ui-focus group flex flex-col bg-white hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden',
             brand.is_partner || brand.featured
@@ -269,6 +269,7 @@
 import { ref, computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 import { groupLocationsByRegion } from '@/data/locationRegions'
 
 const props = defineProps({
@@ -298,11 +299,7 @@ function brandDisplayedRating(b) {
 
 const page = usePage()
 
-const title = computed(() => {
-  const base = props.seo?.title || 'Top Rated Peptide Vendors'
-  const site = page.props.site_name || 'PeptideMap'
-  return `${base} - ${site}`
-})
+const title = computed(() => stripSiteSuffix(props.seo?.title || 'Top Rated Peptide Vendors', page.props.site_name))
 const description = computed(() => props.seo?.description || 'Browse and compare top-rated peptide vendors.')
 const url = computed(() => props.seo?.url || page.url)
 const ogTitle = computed(() => props.seo?.og_title || title.value)

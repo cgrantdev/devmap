@@ -150,7 +150,7 @@
       <!-- Hidden SearchPalette instance the mobile header magnifier opens
            programmatically. Wrapped so `hidden` actually hides the trigger button. -->
       <div class="hidden">
-        <SearchPalette ref="mobileSearchRef" />
+        <SearchPalette ref="mobileSearchRef" :shortcut="false" />
       </div>
     </header>
 
@@ -179,7 +179,7 @@
 
           <!-- Search built into the drawer -->
           <div class="flex-shrink-0 px-5 py-4 border-b border-[color:var(--color-hairline)] space-y-3">
-            <SearchPalette @navigate="mobileOpen = false" />
+            <SearchPalette :shortcut="false" @navigate="mobileOpen = false" />
             <CountrySelector />
           </div>
 
@@ -526,8 +526,6 @@ function handleScroll() {
 // Lock body scroll when mobile nav is open
 watch(mobileOpen, (open) => {
   document.body.style.overflow = open ? 'hidden' : ''
-  // Close search when nav opens
-  if (open) showMobileSearch.value = false
 })
 
 // GA4 outbound-click tracker. Advantage Collective Oct 2026 audit flagged

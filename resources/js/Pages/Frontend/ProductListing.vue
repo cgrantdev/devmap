@@ -39,6 +39,7 @@
             :value="sortValue"
             @change="handleSortChange"
           >
+            <option value="featured|desc">Featured</option>
             <option value="price|asc">Price: Low → High</option>
             <option value="price|desc">Price: High → Low</option>
             <option value="popular|desc">Most Popular</option>
@@ -302,7 +303,7 @@ watchEffect(() => {
 const heroBgRef = ref(null)
 const heroBgLoaded = ref(false)
 
-const sortValue = computed(() => `${props.sort || 'price'}|${props.sortDir || 'asc'}`)
+const sortValue = computed(() => `${props.sort || 'featured'}|${props.sortDir || 'desc'}`)
 // Multi-select via a Set. URL carries comma-separated ?size=A,B.
 // Colin PMAP Sep 30 (#11): revert to strictly data-driven — show
 // only sizes that actually exist in the DB for this category, in
@@ -412,7 +413,8 @@ const filterIcon = h('svg', {
 const selectedFilters = ref({
   use: props.filters?.use ? parseInt(props.filters.use) : null,
   type: props.filters?.type ? parseInt(props.filters.type) : null,
-  location: props.filters?.location ? parseInt(props.filters.location) : null,
+  // Country name from the global location filter, not a numeric id.
+  location: props.filters?.location || null,
   verification: props.filters?.verification || '',
   brand: props.filters?.brand ? parseInt(props.filters.brand) : null,
   cost_min: props.filters?.cost_min || '',
@@ -602,15 +604,6 @@ onMounted(() => {
         rootMargin: '50px'
       })
       observer.observe(heroBgRef.value)
-    }
-  })
-})
-
-// Close dropdowns when clicking outside
-onMounted(() => {
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.relative')) {
-      showSortDropdown.value = false
     }
   })
 })

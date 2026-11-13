@@ -112,6 +112,7 @@
 import { ref, computed, onMounted, watchEffect } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 import EncyclopediaCard from '@/components/EncyclopediaCard.vue'
 
 const props = defineProps({
@@ -148,11 +149,7 @@ const props = defineProps({
 const page = usePage()
 
 // Computed values for reactive SEO updates
-const title = computed(() => {
-  const baseTitle = props.seo?.title || 'Peptide Encyclopedia - Comprehensive Research Guide'
-  const siteName = page.props.site_name || 'Peptidemap'
-  return `${baseTitle} - ${siteName}`
-})
+const title = computed(() => stripSiteSuffix(props.seo?.title || 'Peptide Encyclopedia - Comprehensive Research Guide', page.props.site_name))
 
 const description = computed(() => {
   return props.seo?.description || 'Explore our comprehensive peptide encyclopedia. Detailed information on peptides including benefits, dosing, safety, and research applications.'

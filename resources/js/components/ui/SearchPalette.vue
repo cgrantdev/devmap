@@ -93,10 +93,13 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 
-defineProps({
+const props = defineProps({
   asTrigger: { type: Boolean, default: true },
   dark: { type: Boolean, default: false },
   countryCode: { type: String, default: 'US' },
+  // Only one mounted instance should own Ctrl/Cmd+K, or the shortcut
+  // opens two palettes stacked on top of each other.
+  shortcut: { type: Boolean, default: true },
 })
 
 defineEmits(['toggle-country'])
@@ -135,6 +138,6 @@ function handleKey(e) {
   }
 }
 
-onMounted(() => window.addEventListener('keydown', handleKey))
+onMounted(() => { if (props.shortcut) window.addEventListener('keydown', handleKey) })
 onUnmounted(() => window.removeEventListener('keydown', handleKey))
 </script>

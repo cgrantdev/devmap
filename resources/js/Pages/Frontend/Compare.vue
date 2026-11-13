@@ -241,7 +241,7 @@
                       </div>
                       <div class="min-w-0">
                         <a
-                          :href="`/shop/${product.brand_slug}`"
+                          :href="`/brand/${product.brand_slug}`"
                           class="block font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors truncate"
                         >
                           {{ product.brand_name }}

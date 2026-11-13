@@ -83,6 +83,7 @@ import { ref } from 'vue'
 import { Link, router, useForm } from '@inertiajs/vue3'
 import PageHeader from '@/components/admin/PageHeader.vue'
 import AdminLayout from './Layout.vue'
+import StatTile from '@/components/admin/StatTile.vue'
 
 const props = defineProps({
   redirects: Object,
@@ -115,15 +116,5 @@ function submit() {
 function destroy(r) {
   if (!confirm(`Remove redirect from ${r.from_path}?`)) return
   router.delete(`/admin/redirects/${r.id}`, { preserveScroll: true })
-}
-
-const StatTile = {
-  props: ['n', 'label'],
-  template: `
-    <div class="bg-white rounded-xl border border-[color:var(--color-hairline)] p-5">
-      <div class="text-2xl font-semibold text-[color:var(--color-ink)]">{{ n }}</div>
-      <div class="text-[11px] text-[color:var(--color-ink-muted)] uppercase tracking-wider mt-1">{{ label }}</div>
-    </div>
-  `,
 }
 </script>

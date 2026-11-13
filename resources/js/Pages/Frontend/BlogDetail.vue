@@ -145,6 +145,7 @@
 import { computed } from 'vue'
 import { Head, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 
 const props = defineProps({
   blog: Object,
@@ -155,7 +156,7 @@ const props = defineProps({
 
 const page = usePage()
 
-const title = computed(() => props.seo?.title || `${props.blog?.title || 'News'} - ${page.props.site_name || 'Peptidemap'}`)
+const title = computed(() => stripSiteSuffix(props.seo?.title || props.blog?.title || 'News', page.props.site_name))
 const description = computed(() => props.seo?.description || props.blog?.description?.substring(0, 160) || '')
 const url = computed(() => props.seo?.url || page.url)
 const ogTitle = computed(() => props.seo?.og_title || title.value)

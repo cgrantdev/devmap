@@ -257,6 +257,7 @@
 import { computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 
 const props = defineProps({
   id: {
@@ -378,7 +379,7 @@ const canonical = computed(() => {
 
 // Watch for SEO changes and update document meta tags
 watchEffect(() => {
-  document.title = seoTitle.value
+  document.title = stripSiteSuffix(seoTitle.value)
   let metaDescription = document.querySelector('meta[name="description"]')
   if (!metaDescription) {
     metaDescription = document.createElement('meta')

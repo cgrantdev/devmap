@@ -23,7 +23,7 @@
         <div class="flex items-center justify-between mb-5">
           <div class="flex items-center gap-3">
             <h2 class="text-[13px] lg:text-[14px] font-semibold text-[color:var(--color-ink)] tracking-tight">Top-rated vendors</h2>
-            <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ verifiedVendors.length }}+ listed</span>
+            <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ formatNumber(stats.total_vendors || verifiedVendors.length) }} listed</span>
           </div>
           <a href="/vendors" class="text-[12px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors flex items-center gap-1">
             All vendors
@@ -60,7 +60,7 @@
                 <span class="ui-mono font-semibold text-[color:var(--color-ink)] ml-0.5">{{ (vendor.rating_average || 0).toFixed(1) }}</span>
               </div>
               <div class="mt-auto pt-2 lg:pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-[11px] lg:text-xs text-[color:var(--color-ink-muted)]">
-                <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendor.product_count }}</span> compounds</span>
+                <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendor.product_count }}</span> listings</span>
                 <span class="text-[color:var(--color-accent-600)] font-semibold group-hover:translate-x-0.5 transition-transform duration-[180ms] flex items-center gap-0.5">
                   View <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </span>
@@ -128,7 +128,7 @@
             See every vendor's price, side by side
           </h2>
           <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
-            {{ formatNumber(stats.compounds) }} compounds across {{ formatNumber(stats.total_vendors) }} vendors. Compare listings and prices.
+            {{ formatNumber(stats.compounds) }} listings across {{ formatNumber(stats.total_vendors) }} vendors. Compare every price side by side.
           </p>
           <div class="mt-auto pt-2">
             <Button as="a" href="/compare" variant="primary">
@@ -348,7 +348,7 @@
         <div class="flex-1">
           <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-2">For vendors</div>
           <h2 class="ui-display text-xl md:text-2xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-2">
-            List your research peptides on PeptideMaps
+            List your research peptides on Peptidemap
           </h2>
           <p class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">
             Auto-sync from WooCommerce. Click analytics. Affiliate tracking. Free during beta.

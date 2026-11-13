@@ -30,7 +30,9 @@ class ApplyLocationCookie
     public function handle(Request $request, Closure $next)
     {
         // Admin, API, and asset routes have their own filter semantics.
-        if ($request->is('admin/*') || $request->is('api/*') || $request->is('og/*') || $request->is('sitemap*')) {
+        // /go/* is the outbound buy click; an extra hop there only slows the
+        // shopper on the way to the vendor.
+        if ($request->is('admin/*') || $request->is('api/*') || $request->is('og/*') || $request->is('sitemap*') || $request->is('go/*')) {
             return $next($request);
         }
 

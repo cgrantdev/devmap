@@ -821,7 +821,12 @@ class ProductsController extends Controller
         // first is revenue-hostile on an affiliate model — higher AOV means
         // higher commission per outbound click. Users can still opt into
         // cheapest via ?sort=price&sort_dir=asc.
-        $sortBy = $request->get('sort', 'featured');
+        // Allowlist: an unknown ?sort= value used to reach orderBy() raw
+        // and 500 the page.
+        $sortBy = (string) $request->get('sort', 'featured');
+        if (!in_array($sortBy, ['featured', 'price', 'popular', 'reviews', 'rating'], true)) {
+            $sortBy = 'featured';
+        }
         $sortDir = in_array(strtolower($request->get('sort_dir', 'desc')), ['asc', 'desc'])
             ? strtolower($request->get('sort_dir', 'desc'))
             : 'desc';
@@ -836,10 +841,8 @@ class ProductsController extends Controller
             $query->orderByDesc('rating_count');
         } elseif ($sortBy === 'reviews') {
             $query->orderBy('rating_count', $sortDir);
-        } elseif ($sortBy === 'rating') {
-            $query->orderBy('rating_average', $sortDir);
         } else {
-            $query->orderBy($sortBy, $sortDir);
+            $query->orderBy('rating_average', $sortDir);
         }
 
         // Category pages should show every product in the category, not a
@@ -1181,7 +1184,12 @@ class ProductsController extends Controller
         // first is revenue-hostile on an affiliate model — higher AOV means
         // higher commission per outbound click. Users can still opt into
         // cheapest via ?sort=price&sort_dir=asc.
-        $sortBy = $request->get('sort', 'featured');
+        // Allowlist: an unknown ?sort= value used to reach orderBy() raw
+        // and 500 the page.
+        $sortBy = (string) $request->get('sort', 'featured');
+        if (!in_array($sortBy, ['featured', 'price', 'popular', 'reviews', 'rating'], true)) {
+            $sortBy = 'featured';
+        }
         $sortDir = in_array(strtolower($request->get('sort_dir', 'desc')), ['asc', 'desc'])
             ? strtolower($request->get('sort_dir', 'desc'))
             : 'desc';
@@ -1196,10 +1204,8 @@ class ProductsController extends Controller
             $query->orderByDesc('rating_count');
         } elseif ($sortBy === 'reviews') {
             $query->orderBy('rating_count', $sortDir);
-        } elseif ($sortBy === 'rating') {
-            $query->orderBy('rating_average', $sortDir);
         } else {
-            $query->orderBy($sortBy, $sortDir);
+            $query->orderBy('rating_average', $sortDir);
         }
 
         // Paginate — vendor pages now use a 12-item grid so each product
@@ -1632,6 +1638,9 @@ class ProductsController extends Controller
                 'return_policy' => $brand->vendorSetting && $brand->vendorSetting->return_policy ? $brand->vendorSetting->return_policy : null,
                 'payment_methods' => $brand->vendorSetting && $brand->vendorSetting->payment_methods ? $brand->vendorSetting->payment_methods : [],
                 'discount_code' => $discountCode,
+                // /coupon/{slug} 404s without a stored coupon_code, so the
+                // vendor page only links there when the page exists.
+                'has_coupon_page' => !empty($brand->vendorSetting?->coupon_code),
                 'affiliate_visit_url' => $this->buildAffiliateVisitUrl($brand),
                 'shipping_time' => round($shippingTime, 1),
                 'customer_service' => round($customerService, 1),

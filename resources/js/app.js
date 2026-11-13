@@ -6,6 +6,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 import { useGlobalLocation } from '@/composables/useGlobalLocation'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 
 // Site-wide sticky location filter: whenever the top-nav CountrySelector
 // has a country set, every Inertia visit automatically carries that
@@ -81,6 +82,11 @@ if (typeof document !== 'undefined') {
 }
 
 createInertiaApp({
+  // Agency rule: no site-name tail on any page title except the homepage.
+  title: (title) => {
+    if (!title || (typeof window !== 'undefined' && window.location.pathname === '/')) return title
+    return stripSiteSuffix(title)
+  },
   resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
   setup({ el, App, props, plugin }) {
     createApp({ render: () => h(App, props) })

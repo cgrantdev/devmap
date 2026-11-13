@@ -509,7 +509,7 @@ class HomeController extends Controller
                     'tagline' => $vs && $vs->description
                         ? Str::limit(strip_tags($vs->description), 80)
                         : null,
-                    'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
+                    'url' => '/brand/' . ($brand->slug ?? Str::slug($brand->name)),
                     'logo_url' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
                     'rating_average' => (float) ($brand->rating_average ?? 0),
                     'rating_count' => (int) ($brand->rating_count ?? 0),
@@ -654,7 +654,7 @@ class HomeController extends Controller
                 'id' => $brand->id,
                 'name' => $brand->name,
                 'slug' => $brand->slug ?? Str::slug($brand->name),
-                'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
+                'url' => '/brand/' . ($brand->slug ?? Str::slug($brand->name)),
                 'logo' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
                 'verified' => $vs && $vs->approval_status === 'approved',
                 'rating' => (float) ($brand->rating_average ?? 0),
@@ -696,7 +696,7 @@ class HomeController extends Controller
                     'reviews' => (int) ($brand->rating_count ?? 0),
                     'discount' => (int) $deal->discount,
                     'code' => $deal->code,
-                    'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
+                    'url' => '/brand/' . ($brand->slug ?? Str::slug($brand->name)),
                 ];
             })
             ->filter()
@@ -724,7 +724,7 @@ class HomeController extends Controller
                         'reviews' => (int) ($brand->rating_count ?? 0),
                         'discount' => 15,
                         'code' => $vs->coupon_code ?? 'PMAP',
-                        'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
+                        'url' => '/brand/' . ($brand->slug ?? Str::slug($brand->name)),
                     ];
                 });
             $limitedDeals = collect($limitedDeals->all())->merge($brandsWithCoupons)->take(8)->values();
@@ -825,7 +825,7 @@ class HomeController extends Controller
                 return [
                     'id' => $brand->id,
                     'name' => $brand->name,
-                    'url' => '/shop/' . ($brand->slug ?? Str::slug($brand->name)),
+                    'url' => '/brand/' . ($brand->slug ?? Str::slug($brand->name)),
                     'logo' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
                     'verified' => true,
                 ];

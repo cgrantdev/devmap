@@ -945,6 +945,7 @@
 import { ref, computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
 import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
 
@@ -1853,7 +1854,7 @@ const visibleContents = computed(() => {
 
 // Watch for SEO changes and update document meta tags
 watchEffect(() => {
-  document.title = seoTitle.value
+  document.title = stripSiteSuffix(seoTitle.value)
   let metaDescription = document.querySelector('meta[name="description"]')
   if (!metaDescription) {
     metaDescription = document.createElement('meta')

@@ -108,6 +108,7 @@
 import { ref, computed, onMounted, nextTick, watchEffect } from 'vue'
 import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 import CategoryCard from '@/components/CategoryCard.vue'
 import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
 import BlogPostCard from '@/components/BlogPostCard.vue'
@@ -135,11 +136,7 @@ const props = defineProps({
 const page = usePage()
 
 // Computed values for reactive SEO updates
-const title = computed(() => {
-  const baseTitle = props.seo?.title || 'Peptides - Browse All Products'
-  const siteName = page.props.site_name || 'Peptidemap'
-  return `${baseTitle} - ${siteName}`
-})
+const title = computed(() => stripSiteSuffix(props.seo?.title || 'Peptides - Browse All Products', page.props.site_name))
 
 const description = computed(() => {
   return props.seo?.description || 'Browse our comprehensive collection of peptides. Compare products, prices, and vendors to find the best peptides for your research needs.'

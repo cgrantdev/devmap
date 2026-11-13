@@ -32,6 +32,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\NoindexSubdomains::class,
         ]);
 
+        // pmap_location is written in plain text by useGlobalLocation.js.
+        // Encrypted-cookie middleware would discard it, so the server-side
+        // location filter never saw the visitor's country on direct loads.
+        $middleware->encryptCookies(except: ['pmap_location']);
+
         $middleware->validateCsrfTokens(except: [
             'admin/discover',
             'admin/discover/*',

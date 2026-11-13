@@ -34,19 +34,19 @@
                    of negative letter-spacing to sit tight — the SVG viewBox
                    has whitespace baked in. -->
               <div class="flex items-center mt-0.5">
-                <span class="inline-flex items-center gap-0">
-                  <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5 -mr-px" :class="n <= Math.round(displayedRating) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
-                </span>
-                <span class="ui-mono text-[12px] lg:text-[13px] font-semibold text-[color:var(--color-ink)] ml-1.5">{{ displayedRating ? displayedRating.toFixed(1) : '0.0' }}</span>
-                <a
-                  v-if="totalReviewCount > 0"
-                  href="#reviews"
-                  class="ml-1 text-[12px] lg:text-[13px] text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:underline"
-                >({{ totalReviewCount.toLocaleString() }})</a>
-                <span
-                  v-else
-                  class="ml-1 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]"
-                >(0)</span>
+                <!-- Empty "0.0 (0)" stars read as a bad vendor, so the
+                     star row only shows once real reviews exist. -->
+                <template v-if="totalReviewCount > 0">
+                  <span class="inline-flex items-center gap-0">
+                    <svg v-for="n in 5" :key="n" class="w-3 lg:w-3.5 h-3 lg:h-3.5 -mr-px" :class="n <= Math.round(displayedRating) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                  </span>
+                  <span class="ui-mono text-[12px] lg:text-[13px] font-semibold text-[color:var(--color-ink)] ml-1.5">{{ displayedRating ? displayedRating.toFixed(1) : '0.0' }}</span>
+                  <a
+                    href="#reviews"
+                    class="ml-1 text-[12px] lg:text-[13px] text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:underline"
+                  >({{ totalReviewCount.toLocaleString() }})</a>
+                </template>
+                <span v-else class="text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">No reviews yet</span>
                 <span v-if="brand.location" class="hidden sm:flex items-center gap-1 ml-2 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
                   {{ brand.location }}
@@ -136,6 +136,7 @@
               </button>
               <!-- Jake 11/10: /coupon/{slug} pages were orphans off the sitemap. -->
               <a
+                v-if="brand.has_coupon_page"
                 :href="`/coupon/${brand.slug}`"
                 class="absolute left-1/2 -translate-x-1/2 top-full mt-1 whitespace-nowrap text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 hover:underline"
               >All coupons &amp; deals &rarr;</a>
@@ -188,6 +189,7 @@
 
           <!-- Mobile coupon-page link -->
           <a
+            v-if="brand.has_coupon_page"
             :href="`/coupon/${brand.slug}`"
             class="md:hidden mt-2 inline-block text-[12px] font-semibold text-emerald-700 hover:text-emerald-900"
           >All coupons &amp; deals &rarr;</a>
@@ -1007,6 +1009,7 @@ import { ref, computed, onMounted, nextTick, h, defineComponent, watchEffect } f
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
+import { stripSiteSuffix } from '@/utils/pageTitle'
 import InlineEditField from '@/components/InlineEditField.vue'
 import { USP_OPTIONS } from '@/data/uspOptions'
 import { humanize as humanizeHours, daysList as hoursDaysList, openStatus } from '@/composables/useBusinessHours'
@@ -1134,12 +1137,10 @@ const registerHref = computed(() => `/register?redirect=${encodeURIComponent(rev
 
 // Computed values for reactive SEO updates (automatically from vendor data)
 const title = computed(() => {
-  // Use SEO title if provided, otherwise generate from vendor name
   if (props.seo?.title) {
-    return props.seo.title
+    return stripSiteSuffix(props.seo.title, page.props.site_name)
   }
-  const siteName = page.props.site_name || 'PeptideMap'
-  return `${props.brand?.name || 'Vendor'}: Coupon Codes & Reviews - ${siteName}`
+  return `${props.brand?.name || 'Vendor'}: Coupon Codes & Reviews`
 })
 
 const description = computed(() => {
