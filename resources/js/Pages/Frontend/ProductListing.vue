@@ -14,45 +14,87 @@
           class="prose prose-sm max-w-3xl mt-4 text-[color:var(--color-ink-muted)] leading-relaxed"
           v-html="compoundContent.intro"
         ></div>
+        <!-- Price summary for the listings shown (filters apply). The
+             best-value tile re-sorts the grid by $/mg. -->
+        <div v-if="priceSummary" class="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+          <div class="rounded-[12px] border border-[color:var(--color-hairline)] bg-white px-4 py-3">
+            <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendors</div>
+            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-[color:var(--color-ink)]">{{ priceSummary.vendors }}</div>
+            <div class="mt-1.5 truncate text-[12px] text-[color:var(--color-ink-muted)]">with listings shown</div>
+          </div>
+          <div class="rounded-[12px] border border-[color:var(--color-hairline)] bg-white px-4 py-3">
+            <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Listings</div>
+            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-[color:var(--color-ink)]">{{ priceSummary.listings }}</div>
+            <div class="mt-1.5 truncate text-[12px] text-[color:var(--color-ink-muted)]">sizes, kits and formats</div>
+          </div>
+          <div v-if="priceSummary.cheapest" class="rounded-[12px] border border-[color:var(--color-hairline)] bg-white px-4 py-3 min-w-0">
+            <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Lowest price</div>
+            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-[color:var(--color-ink)]">{{ priceSummary.cheapest.currency_symbol || '$' }}{{ money(priceSummary.cheapest.final_price) }}</div>
+            <div class="mt-1.5 truncate text-[12px] text-[color:var(--color-ink-muted)]">{{ priceSummary.cheapest.brand?.name }}<template v-if="priceSummary.cheapest.size_mg"> · {{ formatSize(priceSummary.cheapest.size_mg) }}</template></div>
+          </div>
+          <button
+            v-if="priceSummary.bestValue"
+            type="button"
+            class="ui-focus min-w-0 text-left rounded-[12px] border border-emerald-200 bg-emerald-50/70 px-4 py-3 hover:border-emerald-400 transition-colors"
+            @click="applySort('value', 'asc')"
+          >
+            <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700">Best value</div>
+            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-emerald-800">{{ priceSummary.bestValue.currency_symbol || '$' }}{{ money(priceSummary.bestValue.price_per_mg) }}<span class="text-[13px] font-medium">/mg</span></div>
+            <div class="mt-1.5 truncate text-[12px] text-emerald-800/80">{{ priceSummary.bestValue.brand?.name }}<template v-if="priceSummary.bestValue.size_mg"> · {{ formatSize(priceSummary.bestValue.size_mg) }}</template> · sort by value →</div>
+          </button>
+        </div>
+
         <CatalogCrossLinks :groups="catalogLinks?.groups || []" />
       </div>
 
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pb-8">
         <LocationFilterChip />
-        <!-- Sort + Dosage + Search bar -->
-        <div class="flex flex-wrap items-center gap-3 mb-6">
-          <!-- Search -->
-          <div class="relative flex-1 max-w-xs">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input
-              v-model="searchQuery"
-              @input="handleSearchInput"
-              type="text"
-              placeholder="Search products..."
-              class="w-full h-9 pl-9 pr-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
-            />
+        <div class="mb-6 space-y-3">
+          <!-- Search, sort, vendor and count on one row. -->
+          <div class="flex flex-wrap items-center gap-2.5">
+            <div class="relative flex-1 min-w-[180px] max-w-sm">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input
+                v-model="searchQuery"
+                @input="handleSearchInput"
+                type="text"
+                placeholder="Search these listings…"
+                class="w-full h-10 pl-9 pr-3 text-[14px] rounded-[10px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
+              />
+            </div>
+
+            <select
+              class="h-10 pl-3 pr-8 text-[13px] rounded-[10px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none"
+              :value="sortValue"
+              aria-label="Sort listings"
+              @change="handleSortChange"
+            >
+              <option value="featured|desc">Featured</option>
+              <option value="value|asc">Best value ($/mg)</option>
+              <option value="price|asc">Price: Low → High</option>
+              <option value="price|desc">Price: High → Low</option>
+              <option value="popular|desc">Most Popular</option>
+            </select>
+
+            <select
+              v-if="filterOptions.brands && filterOptions.brands.length > 1"
+              class="h-10 pl-3 pr-8 text-[13px] rounded-[10px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none max-w-[220px]"
+              :value="selectedBrand"
+              aria-label="Filter by vendor"
+              @change="handleBrandChange"
+            >
+              <option value="">All vendors</option>
+              <option v-for="b in filterOptions.brands" :key="b.id" :value="b.id">{{ b.name }}</option>
+            </select>
+
+            <span class="ml-auto text-[12px] text-[color:var(--color-ink-subtle)] ui-mono">{{ products.total || products.data?.length || 0 }} listings</span>
           </div>
 
-          <!-- Sort -->
-          <select
-            class="h-9 px-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none"
-            :value="sortValue"
-            @change="handleSortChange"
-          >
-            <option value="featured|desc">Featured</option>
-            <option value="value|asc">Best value ($/mg)</option>
-            <option value="price|asc">Price: Low → High</option>
-            <option value="price|desc">Price: High → Low</option>
-            <option value="popular|desc">Most Popular</option>
-          </select>
-
-          <!-- Product Format filter — Colin PMAP Sep 30 (#13). Same
-               multi-select chip pattern as size. Peptide is the
-               implicit default so null product_type rows count under
-               it (see the backend). Chip rows scroll sideways on
-               phones instead of wrapping into a tall block. -->
-          <div class="w-full md:w-auto flex flex-nowrap md:flex-wrap items-center gap-1.5 overflow-x-auto md:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-0.5 md:pb-0">
-            <span class="shrink-0 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] pr-0.5">Format</span>
+          <!-- Product Format filter — Colin PMAP Sep 30 (#13). Peptide is
+               the implicit default so null product_type rows count under
+               it (see the backend). One row; scrolls sideways on phones. -->
+          <div class="flex flex-nowrap items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-0.5">
+            <span class="shrink-0 w-12 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Format</span>
             <button
               v-for="fmt in FORMAT_OPTIONS"
               :key="fmt"
@@ -60,7 +102,7 @@
               @click="toggleFormat(fmt)"
               :aria-pressed="selectedFormats.has(fmt)"
               :class="[
-                'shrink-0 whitespace-nowrap h-7 px-2.5 text-[12px] rounded-full border transition-colors',
+                'shrink-0 whitespace-nowrap h-8 px-3 text-[12px] rounded-full border transition-colors',
                 selectedFormats.has(fmt)
                   ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
                   : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)]',
@@ -76,20 +118,20 @@
             >clear</button>
           </div>
 
-          <!-- Dosage size filter — multi-select chips (Colin PMAP
-               Sep 22). Data-driven: only sizes actually present in
-               this compound's product set show. "10 mg" and "10mg"
-               share one chip; chips sort by amount, not text. -->
-          <div class="w-full md:w-auto flex flex-nowrap md:flex-wrap items-center gap-1.5 overflow-x-auto md:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-0.5 md:pb-0">
-            <span class="shrink-0 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] pr-0.5">Size</span>
+          <!-- Dosage size filter — multi-select chips (Colin PMAP Sep 22),
+               data-driven: only sizes present for this compound. The most
+               listed sizes show first; the rest sit behind "+N more" so
+               the bar stays one line. "10 mg" and "10mg" share a chip. -->
+          <div class="flex flex-nowrap md:flex-wrap items-center gap-1.5 overflow-x-auto md:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-0.5 md:pb-0">
+            <span class="shrink-0 w-12 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Size</span>
             <button
-              v-for="group in sizeGroups"
+              v-for="group in visibleSizeGroups"
               :key="group.key"
               type="button"
               @click="toggleSizeGroup(group)"
               :aria-pressed="isSizeGroupSelected(group)"
               :class="[
-                'shrink-0 whitespace-nowrap h-7 px-2.5 text-[12px] rounded-full border transition-colors ui-mono',
+                'shrink-0 whitespace-nowrap h-8 px-3 text-[12px] rounded-full border transition-colors ui-mono',
                 isSizeGroupSelected(group)
                   ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
                   : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)]',
@@ -98,25 +140,24 @@
               {{ group.label }}
             </button>
             <button
+              v-if="hiddenSizeCount > 0"
+              type="button"
+              @click="showAllSizes = true"
+              class="shrink-0 whitespace-nowrap h-8 px-3 text-[12px] font-semibold rounded-full text-[color:var(--color-accent-700)] hover:bg-[color:var(--color-accent-50)] transition-colors"
+            >+{{ hiddenSizeCount }} more</button>
+            <button
+              v-else-if="showAllSizes && sizeGroups.length > SIZE_CHIP_LIMIT + 2"
+              type="button"
+              @click="showAllSizes = false"
+              class="shrink-0 whitespace-nowrap h-8 px-3 text-[12px] font-semibold rounded-full text-[color:var(--color-ink-muted)] hover:bg-[color:var(--color-hairline-soft)] transition-colors"
+            >Fewer</button>
+            <button
               v-if="selectedSizes.size > 0"
               type="button"
               @click="clearSizes"
               class="shrink-0 text-[11px] text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)] underline ml-1"
             >clear</button>
           </div>
-
-          <!-- Brand filter (if multiple) -->
-          <select
-            v-if="filterOptions.brands && filterOptions.brands.length > 1"
-            class="h-9 px-3 text-[13px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none"
-            :value="selectedBrand"
-            @change="handleBrandChange"
-          >
-            <option value="">All vendors</option>
-            <option v-for="b in filterOptions.brands" :key="b.id" :value="b.id">{{ b.name }}</option>
-          </select>
-
-          <span class="ml-auto text-[12px] text-[color:var(--color-ink-subtle)] ui-mono">{{ products.total || products.data?.length || 0 }} products</span>
         </div>
 
         <!-- Main Content Area -->
@@ -126,7 +167,7 @@
             </div>
 
             <!-- Product Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 mb-8">
               <ProductCard
                 v-for="product in products.data"
                 :key="product.id"
@@ -364,6 +405,60 @@ const sizeGroups = computed(() => {
   }
   return [...groups.values()].sort(compareSizeInfo)
 })
+// Rows per size in the listings shown, so the size bar can lead with the
+// sizes people actually find. With a size already picked the counts only
+// cover that size, so every chip shows instead.
+const SIZE_CHIP_LIMIT = 10
+const showAllSizes = ref(false)
+const sizeCounts = computed(() => {
+  const counts = new Map()
+  for (const row of (props.products?.data || [])) {
+    if (!row || row.size_mg == null || row.size_mg === '') continue
+    const key = sizeInfo(String(row.size_mg)).key
+    counts.set(key, (counts.get(key) || 0) + 1)
+  }
+  return counts
+})
+const visibleSizeGroups = computed(() => {
+  const groups = sizeGroups.value
+  if (showAllSizes.value || selectedSizes.value.size > 0 || groups.length <= SIZE_CHIP_LIMIT + 2) return groups
+  const top = new Set(
+    [...groups]
+      .sort((a, b) => (sizeCounts.value.get(b.key) || 0) - (sizeCounts.value.get(a.key) || 0))
+      .slice(0, SIZE_CHIP_LIMIT)
+      .map((g) => g.key)
+  )
+  return groups.filter((g) => top.has(g.key))
+})
+const hiddenSizeCount = computed(() => sizeGroups.value.length - visibleSizeGroups.value.length)
+
+// Summary tiles: vendor and listing counts, the cheapest listing and the
+// lowest $/mg, compared in USD (price outliers left out) and shown in the
+// listing's own currency.
+function money(v) {
+  const n = Number(v)
+  return Number.isFinite(n) ? n.toFixed(2) : ''
+}
+const priceSummary = computed(() => {
+  const rows = (props.products?.data || []).filter((r) => r && !r.price_outlier)
+  if (!rows.length) return null
+  const vendors = new Set(rows.map((r) => r.brand?.id ?? r.brand_id).filter(Boolean)).size
+  let cheapest = null
+  let bestValue = null
+  for (const r of rows) {
+    const usd = Number(r.usd_final_price)
+    if (usd > 0 && (!cheapest || usd < Number(cheapest.usd_final_price))) cheapest = r
+    const perMg = Number(r.usd_per_mg)
+    if (perMg > 0 && (!bestValue || perMg < Number(bestValue.usd_per_mg))) bestValue = r
+  }
+  return {
+    vendors,
+    listings: props.products?.total || rows.length,
+    cheapest,
+    bestValue: bestValue && bestValue.price_per_mg != null ? bestValue : null,
+  }
+})
+
 function isSizeGroupSelected(group) {
   return group.values.some((v) => selectedSizes.value.has(v))
 }
