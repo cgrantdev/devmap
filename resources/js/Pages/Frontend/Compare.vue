@@ -428,7 +428,7 @@
             class="ui-focus group p-4 rounded-[10px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all"
           >
             <div class="text-[14px] font-semibold leading-tight">
-              <span class="text-indigo-700">{{ p.a_name }}</span>
+              <span class="text-sky-700">{{ p.a_name }}</span>
               <span class="text-[color:var(--color-ink-subtle)] mx-1.5 font-light">vs</span>
               <span class="text-emerald-700">{{ p.b_name }}</span>
             </div>

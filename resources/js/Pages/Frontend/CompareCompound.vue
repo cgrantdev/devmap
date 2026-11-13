@@ -16,194 +16,187 @@
       </ol>
     </nav>
 
-    <!-- Header -->
+    <!-- Header: title, a short intro, summary tiles, then straight to the
+         table. Long copy is clamped (all of it stays in the page). -->
     <section class="border-b border-[color:var(--color-hairline)]">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6 pb-10">
-        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Vendor comparison</div>
-        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">
+      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-5 pb-6">
+        <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-2">Vendor comparison</div>
+        <h1 class="ui-display text-3xl md:text-[42px] leading-[1.1] font-semibold tracking-[-0.02em] text-[color:var(--color-ink)]">
           {{ compound.custom_h1 || seo.h1 || compound.name }}
         </h1>
-        <!-- Agency-authored intro (editable at /admin/seo/categories).
-             Shared with /product/{slug}. Rendered under the H1 so it
-             gets the same SEO prominence as the page's main copy. -->
-        <div
-          v-if="compound.custom_intro"
-          class="prose prose-sm max-w-3xl mb-4 text-[color:var(--color-ink-muted)] leading-relaxed"
-          v-html="compound.custom_intro"
-        ></div>
-        <div v-if="compound.alias" class="flex items-center gap-2 mb-3">
+        <div v-if="compound.alias" class="mt-2 flex items-center gap-2">
           <span class="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)]">Also known as</span>
-          <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] text-[12px] font-semibold ui-mono text-[color:var(--color-ink)]">{{ compound.alias }}</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-white border border-[color:var(--color-hairline)] text-[12px] font-semibold ui-mono text-[color:var(--color-ink)]">{{ compound.alias }}</span>
         </div>
         <!-- Screen-reader heading for the comparison. Retatrutide uses
              price_intro instead. An empty catalog omits the heading. -->
         <h2 v-if="compound.vendor_count > 0 && !compound.price_intro" class="sr-only">{{ compound.name }} — compare listings from {{ compound.vendor_count }} {{ compound.vendor_count === 1 ? 'vendor' : 'vendors' }}</h2>
 
-        <p v-if="compound.price_intro" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl">
-          {{ compound.price_intro }}
-        </p>
+        <!-- Agency-authored intro (editable at /admin/seo/categories) stays
+             under the H1, clamped to two lines with Read more so the table
+             is reached sooner. The full text is in the page either way. -->
+        <div v-if="compound.custom_intro || compound.price_intro || compound.summary" class="mt-3 max-w-3xl">
+          <div :class="['relative text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed', introOpen ? '' : 'max-h-[3.3em] overflow-hidden']">
+            <div v-if="compound.custom_intro" class="prose prose-sm max-w-none text-[color:var(--color-ink-muted)]" v-html="compound.custom_intro"></div>
+            <p v-if="compound.price_intro" :class="compound.custom_intro ? 'mt-3' : ''">{{ compound.price_intro }}</p>
+            <p v-else-if="compound.summary" :class="compound.custom_intro ? 'mt-3' : ''">{{ compound.summary }}</p>
+            <div v-if="!introOpen" class="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-[color:var(--color-bg)] to-transparent pointer-events-none" />
+          </div>
+          <button type="button" class="ui-focus mt-1 text-[13px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors" :aria-expanded="introOpen ? 'true' : 'false'" @click="introOpen = !introOpen">
+            {{ introOpen ? 'Show less' : 'Read more' }}
+          </button>
+        </div>
+
         <ComparePriceSummary v-if="compound.price_stats" :stats="compound.price_stats" />
-
-        <div v-if="compound.vendor_count > 0 && !compound.price_stats" class="flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[color:var(--color-ink-muted)] mb-4">
-          <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.vendor_count }}</strong> vendor{{ compound.vendor_count === 1 ? '' : 's' }}</span>
-          <span class="text-[color:var(--color-ink-subtle)]">·</span>
-          <span><strong class="ui-mono text-[color:var(--color-ink)]">{{ compound.product_count }}</strong> product{{ compound.product_count === 1 ? '' : 's' }}</span>
-          <span v-if="compound.cheapest_price" class="text-[color:var(--color-ink-subtle)]">·</span>
-          <span v-if="compound.cheapest_price">listed prices vary by vendor</span>
+        <div v-else-if="summary" class="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+          <div class="rounded-[12px] border border-[color:var(--color-hairline)] bg-white px-4 py-3">
+            <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendors</div>
+            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-[color:var(--color-ink)]">{{ summary.vendors }}</div>
+          </div>
+          <div class="rounded-[12px] border border-[color:var(--color-hairline)] bg-white px-4 py-3">
+            <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Listings</div>
+            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-[color:var(--color-ink)]">{{ summary.listings }}</div>
+          </div>
+          <div v-if="summary.cheapest" class="min-w-0 rounded-[12px] border border-[color:var(--color-hairline)] bg-white px-4 py-3">
+            <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Lowest price</div>
+            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-[color:var(--color-ink)]">{{ formatMoney(summary.cheapest, summary.cheapest.pmap_price || summary.cheapest.effective_price) }}</div>
+            <div class="mt-1.5 truncate text-[12px] text-[color:var(--color-ink-muted)]">{{ summary.cheapest.brand_name }}<template v-if="summary.cheapest.size_mg"> · {{ summary.cheapest.size_mg }}</template><template v-if="isForeign(summary.cheapest)"> · ≈ {{ usd(summary.cheapest.usd_final_price) }}</template></div>
+          </div>
+          <button
+            v-if="summary.best"
+            type="button"
+            class="ui-focus min-w-0 text-left rounded-[12px] border border-emerald-200 bg-emerald-50/70 px-4 py-3 hover:border-emerald-400 transition-colors"
+            @click="showBestValue"
+          >
+            <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700">Best per mg</div>
+            <div class="ui-display mt-1.5 text-[22px] font-semibold leading-none tracking-tight text-emerald-800">{{ usd(summary.best.usd_per_mg) }}<span class="text-[13px] font-medium">/mg</span></div>
+            <div class="mt-1.5 truncate text-[12px] text-emerald-800/80">{{ summary.best.brand_name }}<template v-if="summary.best.size_mg"> · {{ summary.best.size_mg }}</template> · sort by value →</div>
+          </button>
         </div>
 
-        <p v-if="!compound.price_intro && compound.summary" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl mb-4">
-          {{ truncate(compound.summary, 320) }}
-        </p>
-
-        <div class="flex flex-wrap items-center gap-2 mb-2">
-          <a
-            v-if="compound.encyclopedia_url"
-            :href="compound.encyclopedia_url"
-            class="ui-focus inline-flex items-center gap-1 h-8 px-3 rounded-md border border-[color:var(--color-hairline)] bg-white text-[13px] font-medium text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-accent-700)] transition-colors"
-          >
-            Read the encyclopedia entry
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </a>
-          <a
-            href="/compare"
-            class="ui-focus inline-flex items-center gap-1 h-8 px-3 rounded-md border border-[color:var(--color-hairline)] bg-white text-[13px] font-medium text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-accent-700)] transition-colors"
-          >
-            ← All compare pages
-          </a>
-        </div>
         <CatalogCrossLinks :groups="catalogLinks?.groups || []" />
-
-        <!-- Trust filters — Colin PMAP tab 1: same three toggles as
-             the vendors + peptides pages. cGMP + 7+ Tested combine
-             (both must have approved claims); US Made is a self-
-             declared USP. Toggle state persists in the URL as
-             ?verified=csv&usp=us_manufactured. -->
-        <div class="mt-5 flex flex-wrap items-center gap-2">
-          <span class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-ink-subtle)] pr-1">Trust filters</span>
-          <button
-            v-for="f in verifiedFilters"
-            :key="f.value"
-            @click="toggleVerified(f.value)"
-            :class="[
-              'ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm',
-              activeVerified.has(f.value)
-                ? 'bg-emerald-600 text-white border-emerald-600'
-                : 'bg-emerald-50/60 text-emerald-800 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50',
-            ]"
-          >
-            <svg v-if="f.value !== 'cgmp'" class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-            {{ f.label }}
-          </button>
-          <button
-            @click="toggleUsp('us_manufactured')"
-            :class="[
-              'ui-focus h-9 px-4 rounded-full text-[13px] font-semibold transition-all duration-200 border-[1.5px] flex items-center gap-1.5 shadow-sm',
-              activeUsp === 'us_manufactured'
-                ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
-                : 'bg-blue-50/60 text-blue-900 border-blue-200 hover:border-blue-400 hover:bg-blue-50',
-            ]"
-          >
-            <svg class="w-4 h-3 rounded-[1px]" viewBox="0 0 21 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <rect width="21" height="15" fill="#b22234"/>
-              <path stroke="#fff" stroke-width="1.15" d="M0 2.3h21M0 4.6h21M0 6.9h21M0 9.2h21M0 11.5h21M0 13.8h21"/>
-              <rect width="9" height="8" fill="#3c3b6e"/>
-            </svg>
-            US Made
-          </button>
-          <button
-            v-if="activeVerified.size > 0 || activeUsp"
-            @click="clearTrustFilters"
-            class="text-[11px] text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)] underline ml-1"
-          >clear</button>
-        </div>
-
-        <div class="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)] text-[11px] text-[color:var(--color-ink-subtle)]">
-          <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-          All products listed are for <strong class="text-[color:var(--color-ink-muted)]">research use only</strong> (RUO). Not for human consumption.
-        </div>
       </div>
     </section>
 
-    <!-- Price table (full — no collapse on the focused per-compound page) -->
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-10">
-      <div v-if="compound.products.length" class="bg-white rounded-[14px] border border-[color:var(--color-hairline)] overflow-hidden shadow-[var(--shadow-xs)]">
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
-                <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendor</th>
-                <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Product</th>
-                <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden sm:table-cell">Size</th>
-                <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Retail</th>
-                <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700 bg-emerald-50/50">Price with code</th>
-                <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden sm:table-cell" title="Price per mg for single vials, after the code when one applies">Per mg</th>
-                <th class="text-right px-5 py-3 w-[100px]"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(product, pidx) in compound.products"
-                :key="product.id"
-                :class="[
-                  'border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] transition-colors',
-                  pidx === 0 && !compound.price_stats && !product.price_outlier ? 'bg-[color:var(--color-verified-bg)]' : '',
-                ]"
-              >
-                <td class="px-5 py-4">
-                  <div class="flex items-center gap-2.5">
-                    <VendorLogo :src="product.brand_logo" :name="product.brand_name" :alt="product.brand_name" size="xxs" radius="sm" fallback="subtle" />
-                    <div>
-                      <a
-                        :href="`/brand/${product.brand_slug}`"
-                        class="font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors"
-                      >
-                        {{ product.brand_name }}
-                      </a>
-                      <!-- Price outliers sort last and never take this badge. -->
-                      <div v-if="pidx === 0 && !compound.price_stats && !product.price_outlier" class="flex items-center gap-1 mt-0.5">
-                        <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Lowest listed</span>
-                      </div>
-                    </div>
+    <!-- Listings: size tabs, format, sort and trust filters, then one row
+         per listing (cards on phones, a table from sm up). Filters run in
+         the browser and are kept in the URL; trust filters reload. -->
+    <section class="max-w-[1280px] mx-auto px-5 lg:px-10 pt-6 pb-10">
+      <div v-if="compound.products.length">
+        <div class="mb-4 space-y-3">
+          <div class="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-0.5" role="tablist" aria-label="Vial size">
+            <span class="shrink-0 w-12 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Size</span>
+            <button type="button" role="tab" :aria-selected="selectedSize === 'all' ? 'true' : 'false'" :class="chipClass(selectedSize === 'all')" @click="selectedSize = 'all'">
+              All sizes <span class="ml-1 ui-mono text-[11px] opacity-60">{{ compound.products.length }}</span>
+            </button>
+            <button
+              v-for="tab in sizeTabs"
+              :key="tab.key"
+              type="button"
+              role="tab"
+              :aria-selected="selectedSize === tab.key ? 'true' : 'false'"
+              :class="chipClass(selectedSize === tab.key)"
+              @click="selectedSize = tab.key"
+            >
+              <span class="ui-mono">{{ tab.label }}</span> <span class="ml-1 ui-mono text-[11px] opacity-60">{{ tab.count }}</span>
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div v-if="formatOptions.length > 1" class="flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden max-w-full">
+              <span class="shrink-0 w-12 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Format</span>
+              <button type="button" :class="chipClass(selectedFormat === 'all')" @click="selectedFormat = 'all'">All</button>
+              <button v-for="f in formatOptions" :key="f" type="button" :class="chipClass(selectedFormat === f)" @click="selectedFormat = f">{{ f }}</button>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+              <label for="compare-sort" class="text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Sort</label>
+              <select id="compare-sort" v-model="sortKey" class="h-9 pl-3 pr-8 text-[13px] rounded-[10px] border border-[color:var(--color-hairline)] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none">
+                <option value="price">Cheapest first</option>
+                <option value="value">Best price per mg</option>
+                <option value="vendor">Vendor A–Z</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Trust filters — Colin PMAP tab 1: same toggles as the vendors
+               and peptides pages (?verified=csv&usp=us_manufactured). -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="shrink-0 w-12 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)]">Trust</span>
+            <button
+              v-for="f in verifiedFilters"
+              :key="f.value"
+              type="button"
+              @click="toggleVerified(f.value)"
+              :aria-pressed="activeVerified.has(f.value) ? 'true' : 'false'"
+              :class="[
+                'ui-focus h-8 px-3 rounded-full text-[12px] font-semibold transition-colors border flex items-center gap-1.5',
+                activeVerified.has(f.value)
+                  ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
+                  : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)]',
+              ]"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+              {{ f.label }}
+            </button>
+            <button
+              type="button"
+              @click="toggleUsp('us_manufactured')"
+              :aria-pressed="activeUsp === 'us_manufactured' ? 'true' : 'false'"
+              :class="[
+                'ui-focus h-8 px-3 rounded-full text-[12px] font-semibold transition-colors border flex items-center gap-1.5',
+                activeUsp === 'us_manufactured'
+                  ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
+                  : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)]',
+              ]"
+            >
+              <svg class="w-4 h-3 rounded-[1px]" viewBox="0 0 21 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect width="21" height="15" fill="#b22234"/>
+                <path stroke="#fff" stroke-width="1.15" d="M0 2.3h21M0 4.6h21M0 6.9h21M0 9.2h21M0 11.5h21M0 13.8h21"/>
+                <rect width="9" height="8" fill="#3c3b6e"/>
+              </svg>
+              US Made
+            </button>
+            <button
+              v-if="activeVerified.size > 0 || activeUsp"
+              type="button"
+              @click="clearTrustFilters"
+              class="text-[11px] text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)] underline ml-1"
+            >clear</button>
+          </div>
+        </div>
+
+        <p class="mb-2.5 text-[12px] text-[color:var(--color-ink-subtle)]">
+          <span class="ui-mono font-semibold text-[color:var(--color-ink-muted)]">{{ visibleRows.length }}</span> {{ visibleRows.length === 1 ? 'listing' : 'listings' }}
+          · {{ sortLabel }} · prices in each vendor's currency, ≈ USD under the rest
+        </p>
+
+        <!-- Phones: one card per listing; price and Buy always visible. -->
+        <ul class="sm:hidden space-y-2">
+          <li
+            v-for="(product, pidx) in visibleRows"
+            :key="product.id"
+            :class="[
+              'rounded-[14px] border bg-white p-3',
+              isLowest(product, pidx) ? 'border-emerald-300 ring-1 ring-emerald-200' : 'border-[color:var(--color-hairline)]',
+            ]"
+          >
+            <div class="flex items-start gap-3">
+              <VendorLogo :src="product.brand_logo" :name="product.brand_name" :alt="product.brand_name" size="sm" radius="md" fallback="subtle" />
+              <div class="min-w-0 flex-1">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="min-w-0">
+                    <a :href="`/brand/${product.brand_slug}`" class="block truncate text-[14px] font-semibold text-[color:var(--color-ink)]">{{ product.brand_name }}</a>
+                    <a :href="`/product/${product.brand_slug}/${product.slug}/${product.id}`" class="block truncate text-[12px] text-[color:var(--color-ink-muted)]">{{ product.name }}</a>
+                    <span v-if="isLowest(product, pidx)" class="mt-1 inline-block text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Lowest listed</span>
                   </div>
-                </td>
-                <td class="px-5 py-4">
-                  <a
-                    :href="`/product/${product.brand_slug}/${product.slug}/${product.id}`"
-                    class="text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors"
-                  >
-                    {{ product.name }}
-                  </a>
-                </td>
-                <td class="px-5 py-4 hidden sm:table-cell text-[color:var(--color-ink-muted)] ui-mono text-[13px]">
-                  {{ product.size_mg || '—' }}
-                </td>
-                <td class="px-5 py-4 text-right ui-mono text-[color:var(--color-ink)]">
-                  <span :class="product.pmap_price ? 'text-[color:var(--color-ink-subtle)] line-through' : ''">
-                    {{ formatMoney(product, product.effective_price) }}
-                  </span>
-                </td>
-                <td class="px-5 py-4 text-right bg-emerald-50/30">
-                  <template v-if="product.pmap_price">
-                    <div class="ui-mono font-semibold text-emerald-700">{{ formatMoney(product, product.pmap_price) }}</div>
-                    <div class="mt-1 flex justify-end">
-                      <CouponChip :code="product.brand_coupon_code || 'PMAP'" />
-                    </div>
-                  </template>
-                  <span v-else class="text-[color:var(--color-ink-subtle)] text-[12px]">—</span>
-                  <!-- Phones: per-mg folds in here (its column is hidden). -->
-                  <div v-if="product.price_per_mg" class="sm:hidden mt-1 flex justify-end">
-                    <PricePerMg
-                      :value="product.price_per_mg"
-                      :currency-symbol="product.currency_symbol || '$'"
-                      :best="!!product.best_value"
-                      :size-label="product.size_mg || ''"
-                      :with-code="!!product.pmap_price"
-                      size="xs"
-                    />
+                  <div class="flex-shrink-0 text-right">
+                    <div :class="['ui-mono text-[16px] font-bold leading-tight', product.pmap_price ? 'text-emerald-700' : 'text-[color:var(--color-ink)]']">{{ formatMoney(product, product.pmap_price || product.effective_price) }}</div>
+                    <div v-if="product.pmap_price" class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)] line-through">{{ formatMoney(product, product.effective_price) }}</div>
+                    <div v-if="isForeign(product)" class="text-[11px] text-[color:var(--color-ink-subtle)]">≈ {{ usd(product.usd_final_price) }}</div>
                   </div>
-                </td>
-                <td class="px-5 py-4 text-right hidden sm:table-cell">
+                </div>
+                <div class="mt-2 flex items-center gap-2 min-w-0">
+                  <CouponChip v-if="product.pmap_price" :code="product.brand_coupon_code || 'PMAP'" />
                   <PricePerMg
                     v-if="product.price_per_mg"
                     :value="product.price_per_mg"
@@ -211,24 +204,107 @@
                     :best="!!product.best_value"
                     :size-label="product.size_mg || ''"
                     :with-code="!!product.pmap_price"
+                    size="xs"
                   />
-                  <span v-else class="text-[color:var(--color-ink-subtle)] text-[12px]">—</span>
-                </td>
-                <td class="px-5 py-4 text-right">
                   <a
                     :href="withSrc(product.go_url)"
                     @click="openBuy($event, product)"
                     target="_blank"
                     rel="noopener noreferrer nofollow sponsored"
-                    class="ui-focus inline-flex items-center gap-1 h-9 px-3 rounded-md text-[12px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] hover:-translate-y-[1px] transition-all"
+                    class="ui-focus ml-auto flex-shrink-0 inline-flex items-center gap-1 h-9 px-3.5 rounded-[10px] text-[13px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1]"
                   >
                     Buy
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
                   </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <!-- sm and up: table. -->
+        <div class="hidden sm:block bg-white rounded-[14px] border border-[color:var(--color-hairline)] overflow-hidden shadow-[var(--shadow-xs)]">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
+                  <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Vendor</th>
+                  <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Product</th>
+                  <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Size</th>
+                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700" title="What you pay, with the vendor's code when one applies">Price</th>
+                  <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]" title="Price per mg for single vials, after the code when one applies">Per mg</th>
+                  <th class="text-right px-5 py-3 w-[100px]"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(product, pidx) in visibleRows"
+                  :key="product.id"
+                  :class="[
+                    'border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] transition-colors',
+                    isLowest(product, pidx) ? 'bg-[color:var(--color-verified-bg)]' : '',
+                  ]"
+                >
+                  <td class="px-5 py-4">
+                    <div class="flex items-center gap-2.5">
+                      <VendorLogo :src="product.brand_logo" :name="product.brand_name" :alt="product.brand_name" size="xxs" radius="sm" fallback="subtle" />
+                      <div class="min-w-0">
+                        <a :href="`/brand/${product.brand_slug}`" class="font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors">{{ product.brand_name }}</a>
+                        <!-- Price outliers sort last and never take this badge. -->
+                        <div v-if="isLowest(product, pidx)" class="mt-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Lowest listed</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-5 py-4">
+                    <a :href="`/product/${product.brand_slug}/${product.slug}/${product.id}`" class="text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors">{{ product.name }}</a>
+                  </td>
+                  <td class="px-5 py-4 text-[color:var(--color-ink-muted)] ui-mono text-[13px] whitespace-nowrap">{{ product.size_mg || '—' }}</td>
+                  <td class="px-5 py-4 text-right whitespace-nowrap">
+                    <div :class="['ui-mono font-semibold', product.pmap_price ? 'text-emerald-700' : 'text-[color:var(--color-ink)]']">{{ formatMoney(product, product.pmap_price || product.effective_price) }}</div>
+                    <div v-if="product.pmap_price" class="ui-mono text-[11px] text-[color:var(--color-ink-subtle)] line-through">{{ formatMoney(product, product.effective_price) }}</div>
+                    <div v-if="isForeign(product)" class="text-[11px] text-[color:var(--color-ink-subtle)]">≈ {{ usd(product.usd_final_price) }}</div>
+                    <div v-if="product.pmap_price" class="mt-1 flex justify-end">
+                      <CouponChip :code="product.brand_coupon_code || 'PMAP'" />
+                    </div>
+                  </td>
+                  <td class="px-5 py-4 text-right whitespace-nowrap">
+                    <PricePerMg
+                      v-if="product.price_per_mg"
+                      :value="product.price_per_mg"
+                      :currency-symbol="product.currency_symbol || '$'"
+                      :best="!!product.best_value"
+                      :size-label="product.size_mg || ''"
+                      :with-code="!!product.pmap_price"
+                    />
+                    <span v-else class="text-[color:var(--color-ink-subtle)] text-[12px]">—</span>
+                    <div v-if="product.price_per_mg && isForeign(product) && product.usd_per_mg" class="text-[11px] text-[color:var(--color-ink-subtle)]">≈ {{ usd(product.usd_per_mg) }}/mg</div>
+                  </td>
+                  <td class="px-5 py-4 text-right">
+                    <a
+                      :href="withSrc(product.go_url)"
+                      @click="openBuy($event, product)"
+                      target="_blank"
+                      rel="noopener noreferrer nofollow sponsored"
+                      class="ui-focus inline-flex items-center gap-1 h-9 px-3 rounded-md text-[12px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] hover:-translate-y-[1px] transition-all"
+                    >
+                      Buy
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div v-if="!visibleRows.length" class="mt-3 rounded-[14px] border border-dashed border-[color:var(--color-hairline)] bg-white p-8 text-center">
+          <p class="text-[14px] text-[color:var(--color-ink-muted)]">No listings match this size and format.</p>
+          <button type="button" class="mt-3 text-[13px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]" @click="resetFilters">Show all listings</button>
+        </div>
+
+        <div class="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white border border-[color:var(--color-hairline)] text-[11px] text-[color:var(--color-ink-subtle)]">
+          <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          All products listed are for <strong class="text-[color:var(--color-ink-muted)]">research use only</strong> (RUO). Not for human consumption.
         </div>
       </div>
 
@@ -336,7 +412,7 @@
             class="ui-focus group p-4 rounded-[10px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all"
           >
             <div class="text-[14px] font-semibold leading-tight">
-              <span class="text-indigo-700">{{ p.a_name }}</span>
+              <span class="text-sky-700">{{ p.a_name }}</span>
               <span class="text-[color:var(--color-ink-subtle)] mx-1.5 font-light">vs</span>
               <span class="text-emerald-700">{{ p.b_name }}</span>
             </div>
@@ -401,7 +477,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import ModernLayout from '../Layouts/ModernLayout.vue'
 import BuyThroughModal from '@/components/BuyThroughModal.vue'
@@ -412,6 +488,7 @@ import VendorLogo from '@/components/ui/VendorLogo.vue'
 import CouponChip from '@/components/ui/CouponChip.vue'
 import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
 import { withSrc } from '@/composables/useOutbound'
+import { sizeInfo, compareSizeInfo } from '@/components/price/priceFormat'
 
 const props = defineProps({
   compound: { type: Object, required: true },
@@ -485,5 +562,167 @@ function formatMoney(product, amount) {
 function truncate(s, max) {
   if (!s) return ''
   return s.length <= max ? s : s.slice(0, max - 1).trimEnd() + '…'
+}
+
+// ---------------------------------------------------------------
+// Listing filters: size tabs, format, sort (client side, kept in the URL)
+// ---------------------------------------------------------------
+const introOpen = ref(false)
+const rows = computed(() => props.compound?.products || [])
+
+function formatOf(row) {
+  switch (row?.product_type) {
+    case 'Kit': return 'Kits'
+    case 'Capsule': return 'Capsules'
+    case 'Nasal Spray': return 'Sprays'
+    case 'Topical': return 'Topicals'
+    case 'Pens': return 'Pens'
+    case null:
+    case undefined:
+    case '':
+    case 'Peptide': return 'Vials'
+    default: return 'Other'
+  }
+}
+const FORMAT_ORDER = ['Vials', 'Kits', 'Capsules', 'Sprays', 'Topicals', 'Pens', 'Other']
+const formatOptions = computed(() => {
+  const present = new Set(rows.value.map(formatOf))
+  return FORMAT_ORDER.filter((f) => present.has(f))
+})
+
+const sizeGroups = computed(() => {
+  const groups = new Map()
+  for (const r of rows.value) {
+    if (r.size_mg == null || r.size_mg === '') continue
+    const info = sizeInfo(r.size_mg)
+    let g = groups.get(info.key)
+    if (!g) {
+      g = { key: info.key, info, label: String(r.size_mg).replace(/\s+/g, ''), count: 0, vials: 0 }
+      groups.set(info.key, g)
+    }
+    g.count++
+    if (formatOf(r) === 'Vials') g.vials++
+  }
+  return [...groups.values()]
+})
+// The eight most-listed sizes, in size order.
+const sizeTabs = computed(() =>
+  [...sizeGroups.value]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8)
+    .sort((a, b) => compareSizeInfo(a.info, b.info))
+)
+
+// First view compares like with like: the most-listed single-vial size.
+// Small catalogs, or ones without a clear common size, show everything.
+const defaultSizeKey = computed(() => {
+  if (rows.value.length < 12) return 'all'
+  const top = [...sizeGroups.value].sort((a, b) => b.vials - a.vials)[0]
+  return top && top.vials >= 3 ? top.key : 'all'
+})
+
+const initialParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams()
+const urlSize = initialParams.get('size')
+const selectedSize = ref(urlSize === 'all' ? 'all' : (urlSize ? sizeInfo(urlSize).key : defaultSizeKey.value))
+const urlFormat = initialParams.get('format')
+const selectedFormat = ref(urlFormat && FORMAT_ORDER.includes(urlFormat) ? urlFormat : 'all')
+const urlSort = initialParams.get('sort')
+const sortKey = ref(['price', 'value', 'vendor'].includes(urlSort) ? urlSort : 'price')
+
+const sortLabel = computed(() => ({
+  price: 'cheapest first',
+  value: 'best price per mg first',
+  vendor: 'vendor A–Z',
+}[sortKey.value]))
+
+function numOrInf(v) {
+  const n = Number(v)
+  return Number.isFinite(n) && n > 0 ? n : Infinity
+}
+function cmp(a, b) {
+  if (a === b) return 0
+  return a < b ? -1 : 1
+}
+
+// Rows arrive cheapest-first in USD (outliers last) from the server.
+const visibleRows = computed(() => {
+  let list = rows.value.filter((r) =>
+    (selectedSize.value === 'all' || (r.size_mg != null && r.size_mg !== '' && sizeInfo(r.size_mg).key === selectedSize.value))
+    && (selectedFormat.value === 'all' || formatOf(r) === selectedFormat.value)
+  )
+  if (sortKey.value === 'value') {
+    list = [...list].sort((a, b) =>
+      cmp(a.price_outlier ? 1 : 0, b.price_outlier ? 1 : 0)
+      || cmp(numOrInf(a.usd_per_mg), numOrInf(b.usd_per_mg))
+      || cmp(numOrInf(a.usd_final_price), numOrInf(b.usd_final_price))
+    )
+  } else if (sortKey.value === 'vendor') {
+    list = [...list].sort((a, b) => String(a.brand_name || '').localeCompare(String(b.brand_name || '')))
+  }
+  return list
+})
+
+function isLowest(product, index) {
+  return index === 0 && sortKey.value === 'price' && !props.compound.price_stats && !product.price_outlier
+}
+
+function chipClass(active) {
+  return [
+    'ui-focus shrink-0 whitespace-nowrap inline-flex items-center h-8 px-3 rounded-full border text-[12px] font-medium transition-colors',
+    active
+      ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
+      : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)]',
+  ]
+}
+
+function resetFilters() {
+  selectedSize.value = 'all'
+  selectedFormat.value = 'all'
+}
+
+function showBestValue() {
+  sortKey.value = 'value'
+  selectedSize.value = 'all'
+}
+
+// Keep the view in the URL without a reload or a new history entry.
+watch([selectedSize, selectedFormat, sortKey], () => {
+  if (typeof window === 'undefined') return
+  const url = new URL(window.location.href)
+  if (selectedSize.value === defaultSizeKey.value) url.searchParams.delete('size')
+  else url.searchParams.set('size', selectedSize.value === 'all' ? 'all' : (sizeGroups.value.find((g) => g.key === selectedSize.value)?.label || 'all'))
+  if (selectedFormat.value === 'all') url.searchParams.delete('format')
+  else url.searchParams.set('format', selectedFormat.value)
+  if (sortKey.value === 'price') url.searchParams.delete('sort')
+  else url.searchParams.set('sort', sortKey.value)
+  window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash)
+})
+
+// Summary tiles when the server sends no price_stats.
+const summary = computed(() => {
+  const list = rows.value.filter((r) => !r.price_outlier)
+  if (!list.length) return null
+  let cheapest = null
+  let best = null
+  for (const r of list) {
+    const usdPrice = Number(r.usd_final_price)
+    if (usdPrice > 0 && (!cheapest || usdPrice < Number(cheapest.usd_final_price))) cheapest = r
+    const perMg = Number(r.usd_per_mg)
+    if (perMg > 0 && (!best || perMg < Number(best.usd_per_mg))) best = r
+  }
+  return {
+    vendors: new Set(list.map((r) => r.brand_slug || r.brand_name)).size,
+    listings: rows.value.length,
+    cheapest,
+    best,
+  }
+})
+
+function isForeign(product) {
+  return !!product?.currency_code && product.currency_code !== 'USD'
+}
+function usd(value) {
+  const n = Number(value)
+  return Number.isFinite(n) && n > 0 ? '$' + n.toFixed(2) : '—'
 }
 </script>

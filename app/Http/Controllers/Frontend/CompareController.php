@@ -1629,14 +1629,13 @@ class CompareController extends Controller
             )
         );
 
-        // usd_final_price stays so the tables can compare rows priced in
-        // different currencies ("12% cheaper") on one scale.
+        // usd_final_price and usd_per_mg stay so the tables can compare
+        // and sort rows priced in different currencies on one scale.
         return array_map(function (array $row) {
             unset(
                 $row['product_url'],
                 $row['raw_name'],
                 $row['image_url'],
-                $row['usd_per_mg'],
                 $row['size_mg_value'],
                 $row['brand_id']
             );

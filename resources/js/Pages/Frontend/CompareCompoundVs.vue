@@ -20,10 +20,11 @@
     <section class="border-b border-[color:var(--color-hairline)]">
       <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6 pb-10">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Head-to-head</div>
+        <!-- Explicit spaces: Vue drops the whitespace between these spans,
+             so the heading's text read "GLP3-RvsGLP2-T" to search engines
+             and screen readers (the gap was only margin). -->
         <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-2">
-          <span class="text-indigo-700">{{ a.name }}</span>
-          <span class="text-[color:var(--color-ink-subtle)] font-light mx-2">vs</span>
-          <span class="text-emerald-700">{{ b.name }}</span>
+          <span class="text-[color:var(--color-accent-700)]">{{ a.name }}</span>{{ ' ' }}<span class="text-[color:var(--color-ink-subtle)] font-light">vs</span>{{ ' ' }}<span class="text-emerald-700">{{ b.name }}</span>
         </h1>
         <p v-if="a.summary || b.summary" class="text-[color:var(--color-ink-muted)] leading-relaxed max-w-3xl">
           Side-by-side vendor comparison, mechanism &amp; use-case differences, and listed prices.
@@ -43,7 +44,7 @@
           <thead>
             <tr class="border-b border-[color:var(--color-hairline)] bg-[color:var(--color-bg)]">
               <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] w-40">At a glance</th>
-              <th class="text-left px-5 py-3 text-[13px] font-semibold text-indigo-700">{{ a.name }}</th>
+              <th class="text-left px-5 py-3 text-[13px] font-semibold text-sky-700">{{ a.name }}</th>
               <th class="text-left px-5 py-3 text-[13px] font-semibold text-emerald-700">{{ b.name }}</th>
             </tr>
           </thead>
@@ -167,7 +168,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           <a v-for="r in related" :key="r.url" :href="r.url" class="ui-focus group p-4 rounded-[10px] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] transition-all">
             <div class="text-[13px] font-semibold text-[color:var(--color-ink)] group-hover:text-[color:var(--color-accent-600)] transition-colors">
-              <span class="text-indigo-700">{{ r.name_a || formatSlug(r.raw_a) }}</span>
+              <span class="text-sky-700">{{ r.name_a || formatSlug(r.raw_a) }}</span>
               <span class="text-[color:var(--color-ink-subtle)] mx-1.5">vs</span>
               <span class="text-emerald-700">{{ r.name_b || formatSlug(r.raw_b) }}</span>
             </div>
@@ -264,11 +265,11 @@ const CompoundColumn = defineComponent({
   props: { compound: Object, accent: String },
   setup(props) {
     const accentBar = {
-      indigo: 'bg-indigo-500',
+      indigo: 'bg-sky-500',
       emerald: 'bg-emerald-500',
     }[props.accent]
     const accentText = {
-      indigo: 'text-indigo-700',
+      indigo: 'text-sky-700',
       emerald: 'text-emerald-700',
     }[props.accent]
 
@@ -333,7 +334,7 @@ const CompoundColumn = defineComponent({
 
       sections.push(h('div', { class: 'space-y-3' }, cards))
 
-      return h('div', { class: `bg-[color:var(--color-bg)] rounded-[14px] border-l-4 border-t border-r border-b ${props.accent === 'indigo' ? 'border-l-indigo-500' : 'border-l-emerald-500'} border-[color:var(--color-hairline)] p-6` }, sections)
+      return h('div', { class: `bg-[color:var(--color-bg)] rounded-[14px] border-l-4 border-t border-r border-b ${props.accent === 'indigo' ? 'border-l-sky-500' : 'border-l-emerald-500'} border-[color:var(--color-hairline)] p-6` }, sections)
     }
   },
 })
@@ -346,8 +347,8 @@ const CompoundColumn = defineComponent({
 const VendorMiniTable = defineComponent({
   props: { compound: Object, accent: String },
   setup(props) {
-    const accentBorder = props.accent === 'indigo' ? 'border-l-indigo-500' : 'border-l-emerald-500'
-    const accentText = props.accent === 'indigo' ? 'text-indigo-700' : 'text-emerald-700'
+    const accentBorder = props.accent === 'indigo' ? 'border-l-sky-500' : 'border-l-emerald-500'
+    const accentText = props.accent === 'indigo' ? 'text-sky-700' : 'text-emerald-700'
     return () => {
       const c = props.compound
       const rows = c.top_vendors || []
