@@ -354,12 +354,22 @@ function escapeRegExp(value) {
 }
 
 const indexed = computed(() => props.compounds.map((c, order) => {
-  const primary = normalize([c.name, c.slug, String(c.slug || '').replace(/-/g, ' '), ...(ALIASES[c.slug] || [])].join(' '))
-  return { c, order, primary, primaryCompact: compact(primary), description: normalize(c.description) }
+  const names = [c.name, c.slug, ...(ALIASES[c.slug] || [])]
+  const primary = normalize([...names, String(c.slug || '').replace(/-/g, ' ')].join(' '))
+  return {
+    c,
+    order,
+    primary,
+    primaryCompact: compact(primary),
+    exact: new Set(names.map(compact).filter(Boolean)),
+    description: normalize(c.description),
+  }
 }))
 
-// 2 = the name, slug or a shortname contains the token ("ghk cu" and
-// "bpc157" both work); 1 = a word in the description starts with it.
+// 3 = the whole query is the name, slug or a shortname ("bpc" puts
+// BPC-157 first); 2 = the name, slug or a shortname contains the token
+// ("ghk cu" and "bpc157" both work); 1 = a word in the description
+// starts with it.
 function tokenScore(entry, token) {
   if (entry.primary.includes(token)) return 2
   const t = compact(token)
@@ -390,12 +400,14 @@ const results = computed(() => {
           if (!hit) return null
           score = Math.min(score, hit)
         }
+        if (entry.exact.has(compact(trimmedQuery.value))) score = 3
         return { ...entry, score }
       })
       .filter(Boolean)
   }
   const sorted = [...list].sort(bySort)
-  // Name matches before description matches; the sort holds within each.
+  // Exact names, then name matches, then description matches; the
+  // chosen sort holds within each.
   if (tokens.length) sorted.sort((a, b) => b.score - a.score)
   return sorted.map((entry) => entry.c)
 })
