@@ -186,7 +186,7 @@
           Email us at <a href="mailto:info@peptidemap.com" class="text-[color:var(--color-accent-400)] underline font-semibold">info@peptidemap.com</a> with which path you want and any docs you already have. We usually reply same-day.
         </p>
         <a href="mailto:info@peptidemap.com?subject=Vendor%20integration%20-%20&body=Which%20path%3A%20(JSON%20feed%20%2F%20Push%20API%20%2F%20Custom%20scraper)%0A%0ACompany%3A%0AWebsite%3A%0AWe%20already%20have%3A%20"
-          class="ui-focus inline-flex items-center gap-2 h-11 px-6 rounded-[10px] bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] text-white font-semibold text-[14px] hover:-translate-y-[0.5px] transition-all">
+          class="ui-focus inline-flex items-center gap-2 h-11 px-6 rounded-[10px] bg-gradient-to-b from-[#0284C7] to-[#0369A1] text-white font-semibold text-[14px] hover:-translate-y-[0.5px] transition-all">
           Email us
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         </a>

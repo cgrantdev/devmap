@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative rounded-[24px] overflow-hidden border border-[color:var(--color-hairline)] bg-black select-none"
+    class="relative rounded-[24px] overflow-hidden border border-white/10 bg-black select-none"
     @mouseenter="pause"
     @mouseleave="resume"
   >
@@ -169,7 +169,7 @@
                    product-shot background (e.g. Southern Aminos studio). -->
               <h2 class="ui-display text-3xl lg:text-4xl font-semibold tracking-[-0.02em] leading-[1.1]" :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">
                 <template v-if="slide.title_highlight && slide.title.includes(slide.title_highlight)">
-                  <span :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">{{ slide.title.split(slide.title_highlight)[0] }}</span><span :style="`color: ${slide.highlight_color || 'var(--color-accent-300, #a5b4fc)'};`">{{ slide.title_highlight }}</span><span :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
+                  <span :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">{{ slide.title.split(slide.title_highlight)[0] }}</span><span :style="`color: ${slide.highlight_color || 'var(--color-accent-300, #7DD3FC)'};`">{{ slide.title_highlight }}</span><span :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">{{ slide.title.split(slide.title_highlight).slice(1).join(slide.title_highlight) }}</span>
                 </template>
                 <template v-else><span :style="`color: ${slide.dark_text ? '#0f172a' : '#ffffff'};`">{{ slide.title }}</span></template>
               </h2>
@@ -403,8 +403,8 @@ onUnmounted(() => {
 function slideGradient(slide, i) {
   if (slide.gradient) return `linear-gradient(135deg, ${slide.gradient[0]} 0%, ${slide.gradient[1]} 100%)`
   const palette = [
-    ['#0A0B0E', '#4F46E5'],
-    ['#0F172A', '#6366F1'],
+    ['#0A0B0E', '#0284C7'],
+    ['#0F172A', '#0EA5E9'],
     ['#1E1B4B', '#3B82F6'],
     ['#111827', '#7C3AED'],
     ['#0C4A6E', '#0EA5E9'],

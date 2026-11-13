@@ -206,7 +206,7 @@
                   <!-- Major tick marks every 20 units with labels -->
                   <div v-for="tick in 4" :key="`major-${tick}`" class="absolute top-0 h-full border-l border-[color:var(--color-ink)]/35" :style="{ left: (tick * 20) + '%' }"></div>
                   <!-- Plunger line (where the user pulls to) -->
-                  <div class="absolute top-0 bottom-0 w-[3px] bg-[color:var(--color-accent-700)] shadow-[0_0_8px_rgba(79,70,229,0.5)] transition-all duration-500 ease-out z-10" :style="{ left: `calc(${Math.min(fillPercent, 100)}% - 1.5px)` }"></div>
+                  <div class="absolute top-0 bottom-0 w-[3px] bg-[color:var(--color-accent-700)] shadow-[0_0_8px_rgba(2,132,199,0.5)] transition-all duration-500 ease-out z-10" :style="{ left: `calc(${Math.min(fillPercent, 100)}% - 1.5px)` }"></div>
                 </div>
                 <!-- Needle hint on the right -->
                 <div class="absolute right-0 top-1/2 -translate-y-1/2 flex items-center">

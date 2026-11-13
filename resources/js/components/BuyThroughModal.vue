@@ -61,7 +61,7 @@
           @click="handleContinue"
           target="_blank"
           rel="noopener noreferrer nofollow sponsored"
-          class="ui-focus relative w-full inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[10px] text-white font-semibold text-[14px] bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:-translate-y-[0.5px] transition-all overflow-hidden"
+          class="ui-focus relative w-full inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[10px] text-white font-semibold text-[14px] bg-gradient-to-b from-[#0284C7] to-[#0369A1] hover:-translate-y-[0.5px] transition-all overflow-hidden"
         >
           <!-- Progress fill that drains as the countdown ticks. Sits behind
                the label; opacity kept low so text stays readable. -->

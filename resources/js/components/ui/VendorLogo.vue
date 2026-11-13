@@ -130,14 +130,14 @@ const initial = computed(() => {
 // same tile across the site.
 const gradient = computed(() => {
   const palette = [
-    ['#6366F1', '#3B82F6'],
-    ['#8B5CF6', '#6366F1'],
-    ['#0EA5E9', '#6366F1'],
+    ['#0EA5E9', '#3B82F6'],
+    ['#8B5CF6', '#0EA5E9'],
+    ['#0EA5E9', '#0EA5E9'],
     ['#14B8A6', '#3B82F6'],
     ['#06B6D4', '#8B5CF6'],
-    ['#4F46E5', '#EC4899'],
+    ['#0284C7', '#EC4899'],
     ['#0F172A', '#334155'],
-    ['#1E3A8A', '#6366F1'],
+    ['#1E3A8A', '#0EA5E9'],
   ]
   const n = (props.name || '?').trim()
   let h = 0

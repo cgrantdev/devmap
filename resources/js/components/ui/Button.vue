@@ -53,9 +53,9 @@ const sizeClasses = computed(() => ({
 const variantClasses = computed(() => ({
   primary:
     // Layered gradient + inset highlight + soft glow shadow for a premium feel
-    'text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] ' +
-    'shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_10px_24px_-8px_rgba(79,70,229,0.45)] ' +
-    'hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_2px_4px_rgba(10,11,14,0.1),0_14px_32px_-8px_rgba(79,70,229,0.55)] ' +
+    'text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] ' +
+    'shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_10px_24px_-8px_rgba(2,132,199,0.45)] ' +
+    'hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_2px_4px_rgba(10,11,14,0.1),0_14px_32px_-8px_rgba(2,132,199,0.55)] ' +
     'hover:-translate-y-[1px] active:translate-y-0',
   secondary:
     'text-[color:var(--color-ink)] bg-white border border-[color:var(--color-hairline)] ' +

@@ -8,8 +8,11 @@
     <!-- ========================================================= -->
     <!-- 1. INTRO ROW + PARTNER HERO                                -->
     <!-- ========================================================= -->
-    <section class="relative">
-      <div class="ui-spotlight absolute inset-0 pointer-events-none" />
+    <!-- Brand band: navy with the logo's sky and green glows and its
+         network sphere, matching the social cards. -->
+    <section class="relative overflow-hidden ui-brand-band pb-6 lg:pb-8">
+      <div class="ui-brand-dots absolute inset-0 pointer-events-none" />
+      <BrandSphere class="hidden md:block -right-24 -top-32" :size="560" :opacity="0.16" />
       <!-- The page's only H1 (what Peptidemap is, with live counts) and the
            search box share one short row, so the partner carousel below is
            the first big thing on screen. The carousel's slide titles are
@@ -18,16 +21,16 @@
       <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-5 lg:pt-7">
         <div class="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-10">
           <div class="min-w-0 flex-1">
-            <h1 class="ui-display text-[22px] sm:text-[24px] lg:text-[26px] font-semibold tracking-[-0.02em] leading-[1.15] text-[color:var(--color-ink)] text-balance">
+            <h1 class="ui-display text-[22px] sm:text-[24px] lg:text-[26px] font-semibold tracking-[-0.02em] leading-[1.15] text-white text-balance">
               {{ heading }}
             </h1>
             <!-- The green dot doubles as the separator before the last item,
                  so a wrap on phones never leaves a dangling middot. -->
-            <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] lg:text-[13px] text-[color:var(--color-ink-muted)]">
+            <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] lg:text-[13px] text-white/65">
               <span v-if="statItems.length" class="inline-flex flex-wrap items-center gap-x-2">
                 <template v-for="(item, i) in statItems" :key="item.label">
-                  <span v-if="i > 0" aria-hidden="true" class="text-[color:var(--color-ink-subtle)]">·</span>
-                  <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ formatNumber(item.value) }}</span> {{ item.label }}</span>
+                  <span v-if="i > 0" aria-hidden="true" class="text-white/35">·</span>
+                  <span><span class="ui-mono font-semibold text-white">{{ formatNumber(item.value) }}</span> {{ item.label }}</span>
                 </template>
               </span>
               <span class="inline-flex items-center gap-1.5">
@@ -69,7 +72,7 @@
                 />
                 <button
                   type="submit"
-                  class="ui-focus flex-shrink-0 h-9 px-4 rounded-[9px] text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:brightness-110 transition-all"
+                  class="ui-focus flex-shrink-0 h-9 px-4 rounded-[9px] text-[13px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-sm hover:brightness-110 transition-all"
                 >
                   Search
                 </button>
@@ -136,12 +139,12 @@
            phones instead of wrapping into a ragged second line. -->
       <div v-if="popularCompounds.length" class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-4">
         <div class="flex items-center gap-2 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <span class="flex-shrink-0 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mr-1">Popular</span>
+          <span class="flex-shrink-0 text-[11px] uppercase tracking-[0.08em] font-semibold text-white/45 mr-1">Popular</span>
           <a
             v-for="compound in popularCompounds"
             :key="compound.slug"
             :href="`/product/${compound.slug}`"
-            class="ui-focus flex-shrink-0 inline-flex items-center h-8 px-3 rounded-full border border-[color:var(--color-hairline)] bg-white text-[12px] font-medium text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-accent-700)] transition-colors"
+            class="ui-focus flex-shrink-0 inline-flex items-center h-8 px-3 rounded-full border border-white/15 bg-white/[0.08] text-[12px] font-medium text-white/85 hover:bg-white/15 hover:border-white/30 hover:text-white transition-colors"
           >{{ compound.name }}</a>
         </div>
       </div>
@@ -337,8 +340,10 @@
     <!-- ========================================================= -->
     <!-- 5. ENCYCLOPEDIA — compound knowledge base                  -->
     <!-- ========================================================= -->
-    <section v-if="encyclopediaCategories && encyclopediaCategories.length" class="bg-[#0A0B0E]">
-      <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
+    <section v-if="encyclopediaCategories && encyclopediaCategories.length" class="relative overflow-hidden ui-brand-band">
+      <div class="ui-brand-dots absolute inset-0 pointer-events-none" />
+      <BrandSphere class="hidden md:block -left-28 -bottom-40" :size="520" :opacity="0.12" />
+      <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
         <div class="flex items-start justify-between gap-4 mb-8 flex-wrap">
           <div>
             <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-400)] mb-2">Peptide encyclopedia</div>
@@ -403,7 +408,7 @@
           >
             <div class="aspect-[16/9] bg-[#0F172A] overflow-hidden relative">
               <img v-if="editorial[0].image" :src="editorial[0].image" :alt="editorial[0].title" class="w-full h-full object-cover opacity-80 group-hover:opacity-90 group-hover:scale-[1.03] transition-all duration-500" loading="lazy" />
-              <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/40 via-transparent to-[#4F46E5]/20 pointer-events-none" />
+              <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/40 via-transparent to-[#0284C7]/20 pointer-events-none" />
             </div>
             <div class="p-5 lg:p-6 flex-1 flex flex-col gap-2">
               <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ editorial[0].date }} · {{ editorial[0].read_time }}</span>
@@ -423,7 +428,7 @@
             >
               <div class="w-40 lg:w-48 flex-shrink-0 bg-[#0F172A] overflow-hidden relative">
                 <img v-if="post.image" :src="post.image" :alt="post.title" class="w-full h-full object-cover opacity-80 group-hover:opacity-90 transition-all duration-500" loading="lazy" />
-                <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/30 via-transparent to-[#4F46E5]/15 pointer-events-none" />
+                <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/30 via-transparent to-[#0284C7]/15 pointer-events-none" />
               </div>
               <div class="p-4 lg:p-5 flex-1 flex flex-col gap-1.5 justify-center">
                 <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ post.date }} · {{ post.read_time }}</span>
@@ -478,7 +483,7 @@
             <div class="mt-2.5">
               <CouponTicket :code="d.coupon_code" :percent="d.coupon_pct" size="sm" />
             </div>
-            <span aria-hidden="true" class="mt-2 w-full h-8 rounded-[8px] bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] text-white text-[11px] font-semibold group-hover:brightness-110 transition-all flex items-center justify-center gap-1 px-2">
+            <span aria-hidden="true" class="mt-2 w-full h-8 rounded-[8px] bg-gradient-to-b from-[#0284C7] to-[#0369A1] text-white text-[11px] font-semibold group-hover:brightness-110 transition-all flex items-center justify-center gap-1 px-2">
               <span class="truncate">Buy at {{ d.brand_name }}</span>
               <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
             </span>
@@ -491,26 +496,29 @@
     <!-- 7. VENDOR CTA (the RUO notice lives in the site footer)    -->
     <!-- ========================================================= -->
     <section class="max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-16">
-      <div class="border border-[color:var(--color-hairline)] bg-gradient-to-r from-[color:var(--color-accent-50)] to-white p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
-        <div class="flex-1">
-          <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-2">For vendors</div>
-          <h2 class="ui-display text-xl md:text-2xl font-semibold tracking-tight text-[color:var(--color-ink)] mb-2">
+      <!-- Brand panel, same navy treatment as the hero band. -->
+      <div class="relative overflow-hidden rounded-[20px] ui-brand-band p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-10">
+        <div class="ui-brand-dots absolute inset-0 pointer-events-none" />
+        <BrandSphere class="hidden md:block -right-16 -top-24" :size="360" :opacity="0.14" />
+        <div class="relative flex-1">
+          <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-300)] mb-2">For vendors</div>
+          <h2 class="ui-display text-xl md:text-2xl font-semibold tracking-tight text-white mb-2">
             List your research peptides on Peptidemap
           </h2>
-          <p class="text-[14px] text-[color:var(--color-ink-muted)] leading-relaxed">
+          <p class="text-[14px] text-white/65 leading-relaxed">
             Auto-sync from WooCommerce. Click analytics. Affiliate tracking. Free during beta.
           </p>
         </div>
-        <div class="flex items-center gap-4 flex-shrink-0">
+        <div class="relative flex items-center gap-4 flex-shrink-0">
           <a
             href="/become-a-vendor"
             @click="trackVendorCtaClick"
-            class="ui-focus inline-flex items-center gap-2 h-11 px-6 text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm hover:-translate-y-[0.5px] transition-all"
+            class="ui-focus inline-flex items-center gap-2 h-11 px-6 rounded-[11px] text-[14px] font-semibold text-[color:var(--color-brand-navy)] bg-white shadow-sm hover:-translate-y-[0.5px] hover:bg-white/90 transition-all"
           >
             Get listed
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </a>
-          <a href="/login" class="text-[13px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)] font-medium transition-colors">
+          <a href="/login" class="text-[13px] text-white/65 hover:text-white font-medium transition-colors">
             Vendor sign in →
           </a>
         </div>
@@ -525,6 +533,7 @@ import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
 import HeroCarousel from '@/components/ui/HeroCarousel.vue'
+import BrandSphere from '@/components/ui/BrandSphere.vue'
 import CouponTicket from '@/components/ui/CouponTicket.vue'
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { trackImpression, trackClick } from '@/lib/bannerTracking'

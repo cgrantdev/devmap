@@ -1788,7 +1788,7 @@ const residuePositions = computed(() => {
 function residueColor(letter) {
   const colors = {
     // Hydrophobic — indigo
-    G: '#4F46E5', A: '#4F46E5', V: '#4F46E5', L: '#4F46E5', I: '#4F46E5', P: '#4F46E5', F: '#4F46E5', M: '#4F46E5', W: '#4F46E5',
+    G: '#0284C7', A: '#0284C7', V: '#0284C7', L: '#0284C7', I: '#0284C7', P: '#0284C7', F: '#0284C7', M: '#0284C7', W: '#0284C7',
     // Polar — teal
     S: '#0D9488', T: '#0D9488', C: '#0D9488', Y: '#0D9488', N: '#0D9488', Q: '#0D9488',
     // Positive charge — blue

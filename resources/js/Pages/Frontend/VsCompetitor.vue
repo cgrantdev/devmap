@@ -81,7 +81,7 @@
         </div>
 
         <div class="mt-8 flex flex-wrap gap-3">
-          <a href="/compare" class="inline-flex items-center gap-2 h-11 px-5 rounded-[10px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:-translate-y-[1px] transition-all">
+          <a href="/compare" class="inline-flex items-center gap-2 h-11 px-5 rounded-[10px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] hover:-translate-y-[1px] transition-all">
             Try our compare tables →
           </a>
           <a href="/vendors" class="inline-flex items-center gap-2 h-11 px-5 rounded-[10px] text-[14px] font-semibold text-[color:var(--color-ink)] border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] transition-colors">

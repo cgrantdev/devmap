@@ -118,12 +118,12 @@ async function copy() {
 
 const bandGradient = computed(() => {
   const palette = [
-    ['#4F46E5', '#7C3AED'],
-    ['#3B82F6', '#4F46E5'],
-    ['#0EA5E9', '#6366F1'],
+    ['#0284C7', '#7C3AED'],
+    ['#3B82F6', '#0284C7'],
+    ['#0EA5E9', '#0EA5E9'],
     ['#14B8A6', '#3B82F6'],
     ['#06B6D4', '#8B5CF6'],
-    ['#1E293B', '#4F46E5'],
+    ['#1E293B', '#0284C7'],
   ]
   const n = (props.deal.name || '?').trim()
   let h = 0

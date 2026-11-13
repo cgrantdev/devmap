@@ -160,7 +160,7 @@
                   :href="withSrc(`/go/${product.id}`)"
                   target="_blank"
                   rel="noopener noreferrer nofollow sponsored"
-                  class="ui-focus w-full h-[52px] flex items-center justify-center gap-2 rounded-[13px] text-[15px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_10px_24px_-8px_rgba(79,70,229,0.4)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_2px_4px_rgba(10,11,14,0.1),0_14px_32px_-8px_rgba(79,70,229,0.55)] hover:-translate-y-[1px] active:translate-y-0 transition-all"
+                  class="ui-focus w-full h-[52px] flex items-center justify-center gap-2 rounded-[13px] text-[15px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_10px_24px_-8px_rgba(2,132,199,0.4)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_2px_4px_rgba(10,11,14,0.1),0_14px_32px_-8px_rgba(2,132,199,0.55)] hover:-translate-y-[1px] active:translate-y-0 transition-all"
                 >
                   Visit {{ brand.name }} to purchase
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -408,7 +408,7 @@
           :href="withSrc(`/go/${product.id}`)"
           target="_blank"
           rel="noopener noreferrer nofollow sponsored"
-          class="ui-focus ml-auto flex-1 max-w-[260px] h-12 flex items-center justify-center gap-1.5 rounded-[12px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-md"
+          class="ui-focus ml-auto flex-1 max-w-[260px] h-12 flex items-center justify-center gap-1.5 rounded-[12px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-md"
         >
           <span class="truncate">Buy at {{ brand?.name || 'vendor' }}</span>
           <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M17 7H7M17 7v10" /></svg>

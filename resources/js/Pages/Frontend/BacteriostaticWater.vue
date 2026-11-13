@@ -115,7 +115,7 @@
                   <span v-else class="text-[color:var(--color-ink-subtle)] text-[12px]">—</span>
                 </td>
                 <td class="px-5 py-4 text-right">
-                  <a :href="withSrc(r.go_url)" @click="openBuy($event, r)" target="_blank" rel="noopener noreferrer nofollow sponsored" class="ui-focus inline-flex items-center gap-1 h-9 px-3 rounded-md text-[12px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:-translate-y-[1px] transition-all">
+                  <a :href="withSrc(r.go_url)" @click="openBuy($event, r)" target="_blank" rel="noopener noreferrer nofollow sponsored" class="ui-focus inline-flex items-center gap-1 h-9 px-3 rounded-md text-[12px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] hover:-translate-y-[1px] transition-all">
                     Buy
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
                   </a>

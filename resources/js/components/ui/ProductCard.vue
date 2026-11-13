@@ -109,11 +109,11 @@ const hasBadges = computed(() => props.product.featured || props.product.lab_tes
 
 const fallbackGradient = computed(() => {
   const palette = [
-    ['#1E293B', '#4F46E5'],
-    ['#0F172A', '#6366F1'],
+    ['#1E293B', '#0284C7'],
+    ['#0F172A', '#0EA5E9'],
     ['#1E3A8A', '#3B82F6'],
     ['#134E4A', '#14B8A6'],
-    ['#312E81', '#4F46E5'],
+    ['#312E81', '#0284C7'],
   ]
   const n = (props.product.name || '?').trim()
   let h = 0

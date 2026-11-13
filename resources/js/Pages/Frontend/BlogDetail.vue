@@ -48,7 +48,7 @@
       <div v-if="blog.image" class="max-w-4xl mx-auto mb-10 lg:mb-14">
         <div class="aspect-[2/1] bg-[#0F172A] overflow-hidden relative">
           <img :src="blog.image" :alt="blog.title" class="w-full h-full object-cover opacity-90" loading="lazy" @error="$event.target.style.display='none'" />
-          <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/30 via-transparent to-[#4F46E5]/15 pointer-events-none" />
+          <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/30 via-transparent to-[#0284C7]/15 pointer-events-none" />
         </div>
       </div>
 
@@ -127,7 +127,7 @@
             >
               <div class="aspect-[16/9] bg-[#0F172A] overflow-hidden relative">
                 <img v-if="item.image" :src="item.image" :alt="item.title" class="w-full h-full object-cover opacity-80 group-hover:opacity-90 group-hover:scale-[1.03] transition-all duration-500" loading="lazy" />
-                <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/40 via-transparent to-[#4F46E5]/20 pointer-events-none" />
+                <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/40 via-transparent to-[#0284C7]/20 pointer-events-none" />
               </div>
               <div class="p-4 flex-1 flex flex-col gap-1.5">
                 <span class="text-[11px] text-[color:var(--color-ink-subtle)] ui-mono">{{ item.date }}</span>

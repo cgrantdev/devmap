@@ -460,12 +460,12 @@ function navigate(overrides = {}) {
 
 function vendorGradient(name) {
   const palette = [
-    ['#1E293B', '#4F46E5'],
-    ['#0F172A', '#6366F1'],
+    ['#1E293B', '#0284C7'],
+    ['#0F172A', '#0EA5E9'],
     ['#1E3A8A', '#3B82F6'],
     ['#0C4A6E', '#0EA5E9'],
     ['#134E4A', '#14B8A6'],
-    ['#312E81', '#4F46E5'],
+    ['#312E81', '#0284C7'],
     ['#111827', '#7C3AED'],
     ['#164E63', '#06B6D4'],
   ]

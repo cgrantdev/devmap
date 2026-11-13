@@ -47,13 +47,21 @@
     --color-hairline: #E4E4E7;
     --color-hairline-soft: #F4F4F5;
 
-    /* Accent (primary CTA gradient) */
-    --color-accent-50: #EEF2FF;
-    --color-accent-100: #E0E7FF;
-    --color-accent-400: #818CF8;
-    --color-accent-500: #6366F1;
-    --color-accent-600: #4F46E5;
-    --color-accent-700: #4338CA;
+    /* Accent: the logo's sky blue (was stock indigo, which clashed with
+       the sky-to-green logo). Green stays reserved for savings. */
+    --color-accent-50: #F0F9FF;
+    --color-accent-100: #E0F2FE;
+    --color-accent-200: #BAE6FD;
+    --color-accent-300: #7DD3FC;
+    --color-accent-400: #38BDF8;
+    --color-accent-500: #0EA5E9;
+    --color-accent-600: #0284C7;
+    --color-accent-700: #0369A1;
+
+    /* Brand: the share cards' navy and the logo's sky-to-green gradient. */
+    --color-brand-navy: #0B1020;
+    --color-brand-sky: #0EA5E9;
+    --color-brand-green: #10B981;
 
     /* Biotech blue (secondary accent) */
     --color-biotech-400: #60A5FA;
@@ -125,9 +133,33 @@ html {
 .ui-spotlight {
     background: radial-gradient(
         ellipse 800px 400px at 50% 0%,
-        rgba(99, 102, 241, 0.08) 0%,
+        rgba(14,165,233, 0.08) 0%,
         transparent 60%
     );
+}
+
+/* Brand band: deep navy with the logo's sky glow (top right) and green
+   glow (bottom left), as on the social cards. Pair with .ui-brand-dots
+   and <BrandSphere> for the full treatment. */
+.ui-brand-band {
+    background-color: var(--color-brand-navy);
+    background-image:
+        radial-gradient(ellipse 900px 560px at 92% -12%, rgba(14, 165, 233, 0.34), transparent 62%),
+        radial-gradient(ellipse 820px 520px at 0% 112%, rgba(16, 185, 129, 0.24), transparent 62%);
+    color: #fff;
+}
+
+.ui-brand-dots {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+}
+
+/* Text in the logo's sky-to-green gradient. */
+.ui-brand-gradient-text {
+    background-image: linear-gradient(90deg, #38BDF8 0%, #34D399 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 /* Hairline divider */
@@ -365,7 +397,7 @@ main input:focus,
 main select:focus,
 main textarea:focus {
     border-color: var(--color-accent-500);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    box-shadow: 0 0 0 3px rgba(14,165,233, 0.12);
     outline: none;
 }
 
@@ -435,12 +467,12 @@ main .shadow { box-shadow: var(--shadow-sm); }
 /* Admin buttons — normalize */
 .bg-gray-100 .bg-blue-600,
 .bg-gray-100 .bg-blue-500 {
-    background: linear-gradient(to bottom, #5B5FE8, #4338CA);
+    background: linear-gradient(to bottom, #0284C7, #0369A1);
 }
 
 .bg-gray-100 .bg-blue-600:hover,
 .bg-gray-100 .bg-blue-500:hover {
-    background: linear-gradient(to bottom, #4F46E5, #3730A3);
+    background: linear-gradient(to bottom, #0284C7, #3730A3);
 }
 
 /* Admin form inputs — consistent styling */
@@ -459,7 +491,7 @@ main .shadow { box-shadow: var(--shadow-sm); }
 .bg-gray-100 textarea:focus,
 .bg-gray-100 select:focus {
     border-color: var(--color-accent-500);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    box-shadow: 0 0 0 3px rgba(14,165,233, 0.12);
 }
 
 /* Shared admin input utility used by FormField-based pages */
@@ -478,7 +510,7 @@ main .shadow { box-shadow: var(--shadow-sm); }
 .ui-input::placeholder { color: var(--color-ink-subtle); }
 .ui-input:focus {
     border-color: var(--color-accent-500);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    box-shadow: 0 0 0 3px rgba(14,165,233, 0.12);
     outline: none;
 }
 textarea.ui-input { resize: vertical; }

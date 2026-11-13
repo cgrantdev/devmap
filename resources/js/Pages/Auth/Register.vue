@@ -2,7 +2,7 @@
   <div class="min-h-screen flex">
     <!-- Left: branding panel (matches Login.vue) -->
     <div class="hidden lg:flex lg:w-1/2 bg-[#0F172A] relative overflow-hidden items-center justify-center">
-      <div class="absolute inset-0" :style="{ background: 'radial-gradient(ellipse 800px 500px at 30% 40%, rgba(99,102,241,0.2) 0%, transparent 60%)' }" />
+      <div class="absolute inset-0" :style="{ background: 'radial-gradient(ellipse 800px 500px at 30% 40%, rgba(14,165,233,0.2) 0%, transparent 60%)' }" />
       <div class="absolute inset-0 opacity-[0.03]" :style="{ backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)', backgroundSize: '40px 40px' }" />
       <div class="relative z-10 max-w-md px-12">
         <a href="/" class="inline-block mb-8">
@@ -61,7 +61,7 @@
               type="text"
               required
               autofocus
-              class="w-full h-11 px-4 text-[15px] border border-[#E4E4E7] bg-white focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-colors"
+              class="w-full h-11 px-4 text-[15px] border border-[#E4E4E7] bg-white focus:border-[#0EA5E9] focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/15 transition-colors"
               placeholder="Your name"
             />
           </div>
@@ -72,7 +72,7 @@
               v-model="form.email"
               type="email"
               required
-              class="w-full h-11 px-4 text-[15px] border border-[#E4E4E7] bg-white focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-colors"
+              class="w-full h-11 px-4 text-[15px] border border-[#E4E4E7] bg-white focus:border-[#0EA5E9] focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/15 transition-colors"
               placeholder="you@example.com"
             />
           </div>
@@ -83,7 +83,7 @@
               v-model="form.password"
               type="password"
               required
-              class="w-full h-11 px-4 text-[15px] border border-[#E4E4E7] bg-white focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-colors"
+              class="w-full h-11 px-4 text-[15px] border border-[#E4E4E7] bg-white focus:border-[#0EA5E9] focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/15 transition-colors"
               placeholder="At least 8 characters"
             />
           </div>
@@ -94,7 +94,7 @@
               v-model="form.password_confirmation"
               type="password"
               required
-              class="w-full h-11 px-4 text-[15px] border border-[#E4E4E7] bg-white focus:border-[#6366F1] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/15 transition-colors"
+              class="w-full h-11 px-4 text-[15px] border border-[#E4E4E7] bg-white focus:border-[#0EA5E9] focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/15 transition-colors"
               placeholder="Re-enter password"
             />
           </div>
@@ -102,7 +102,7 @@
           <button
             type="submit"
             :disabled="form.processing"
-            class="w-full h-11 text-[15px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_8px_20px_-8px_rgba(79,70,229,0.4)] hover:-translate-y-[0.5px] active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full h-11 text-[15px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_8px_20px_-8px_rgba(2,132,199,0.4)] hover:-translate-y-[0.5px] active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {{ form.processing ? 'Creating account…' : 'Create free account' }}
           </button>
@@ -119,7 +119,7 @@
         <div class="mt-8 pt-6 border-t border-[#E4E4E7] flex items-center justify-between text-sm">
           <span class="text-[#A1A1AA]">
             Already have an account?
-            <Link :href="loginHref" class="text-[#6366F1] font-medium hover:text-[#4F46E5] ml-1">Sign in</Link>
+            <Link :href="loginHref" class="text-[#0EA5E9] font-medium hover:text-[#0284C7] ml-1">Sign in</Link>
           </span>
           <a href="/become-a-vendor" class="text-[#A1A1AA] hover:text-[#52525B]">
             List a vendor →

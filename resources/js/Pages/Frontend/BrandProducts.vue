@@ -123,7 +123,7 @@
               :target="(brand.affiliate_visit_url || brand.shop_url) ? '_blank' : '_self'"
               rel="noopener noreferrer nofollow sponsored"
               @click="trackVisitWebsite"
-              class="ui-focus hidden md:inline-flex items-center gap-2 h-10 lg:h-11 px-5 lg:px-6 text-[13px] lg:text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_8px_20px_-8px_rgba(79,70,229,0.4)] hover:-translate-y-[1px] transition-all flex-shrink-0"
+              class="ui-focus hidden md:inline-flex items-center gap-2 h-10 lg:h-11 px-5 lg:px-6 text-[13px] lg:text-[14px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_1px_2px_rgba(10,11,14,0.08),0_8px_20px_-8px_rgba(2,132,199,0.4)] hover:-translate-y-[1px] transition-all flex-shrink-0"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
               Visit website
@@ -197,7 +197,7 @@
               :target="(brand.affiliate_visit_url || brand.shop_url) ? '_blank' : '_self'"
               rel="noopener noreferrer nofollow sponsored"
               @click="trackVisitWebsite"
-              class="ui-focus flex-1 inline-flex items-center justify-center gap-2 h-10 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm"
+              class="ui-focus flex-1 inline-flex items-center justify-center gap-2 h-10 text-[13px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-sm"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
               Visit website

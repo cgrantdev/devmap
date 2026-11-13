@@ -60,7 +60,7 @@
         >
           <div class="aspect-[16/9] bg-[#0F172A] border-b border-[color:var(--color-hairline)] overflow-hidden relative">
             <img v-if="blog.image" :src="blog.image" :alt="blog.title" class="w-full h-full object-cover opacity-80 group-hover:opacity-90 group-hover:scale-[1.03] transition-all duration-500" loading="lazy" />
-            <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/40 via-transparent to-[#4F46E5]/20 pointer-events-none" />
+            <div class="absolute inset-0 bg-gradient-to-tr from-[#312E81]/40 via-transparent to-[#0284C7]/20 pointer-events-none" />
             <div v-if="blog.categoryTag" class="absolute top-3 left-3 px-2 py-0.5 bg-white/90 backdrop-blur-sm text-[10px] font-semibold text-[color:var(--color-accent-700)] uppercase tracking-wide">{{ blog.categoryTag }}</div>
             <div v-if="!blog.image" class="absolute inset-0 flex items-center justify-center text-white/30">
               <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-linecap="round" stroke-linejoin="round"/></svg>

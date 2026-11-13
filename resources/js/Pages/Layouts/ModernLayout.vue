@@ -124,7 +124,7 @@
           <button
             v-else-if="isDemoHost && !isLoggedIn"
             @click="tryVendorDashboard"
-            class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[0_1px_2px_rgba(10,11,14,0.08),0_4px_12px_-4px_rgba(79,70,229,0.3)] hover:-translate-y-[0.5px] hover:shadow-[0_1px_2px_rgba(10,11,14,0.1),0_6px_16px_-4px_rgba(79,70,229,0.4)] transition-all"
+            class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-[0_1px_2px_rgba(10,11,14,0.08),0_4px_12px_-4px_rgba(2,132,199,0.3)] hover:-translate-y-[0.5px] hover:shadow-[0_1px_2px_rgba(10,11,14,0.1),0_6px_16px_-4px_rgba(2,132,199,0.4)] transition-all"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             Try Vendor Dashboard
@@ -152,7 +152,7 @@
             </Link>
             <a
               href="/become-a-vendor"
-              class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-[0_1px_2px_rgba(10,11,14,0.08),0_4px_12px_-4px_rgba(79,70,229,0.3)] hover:-translate-y-[0.5px] hover:shadow-[0_1px_2px_rgba(10,11,14,0.1),0_6px_16px_-4px_rgba(79,70,229,0.4)] transition-all"
+              class="ui-focus hidden sm:inline-flex items-center gap-1.5 h-9 px-4 text-[13px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-[0_1px_2px_rgba(10,11,14,0.08),0_4px_12px_-4px_rgba(2,132,199,0.3)] hover:-translate-y-[0.5px] hover:shadow-[0_1px_2px_rgba(10,11,14,0.1),0_6px_16px_-4px_rgba(2,132,199,0.4)] transition-all"
             >
               Get Listed
               <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
@@ -237,7 +237,7 @@
             <button
               v-else-if="isDemoHost && !isLoggedIn"
               @click="() => { mobileOpen = false; tryVendorDashboard() }"
-              class="ui-focus w-full flex items-center justify-center gap-2 h-11 rounded-[10px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm transition-all hover:-translate-y-[0.5px]"
+              class="ui-focus w-full flex items-center justify-center gap-2 h-11 rounded-[10px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-sm transition-all hover:-translate-y-[0.5px]"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
               Try Vendor Dashboard
@@ -245,7 +245,7 @@
             <template v-else>
               <a
                 href="/become-a-vendor"
-                class="ui-focus flex items-center justify-center gap-2 h-11 rounded-[10px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] shadow-sm transition-all hover:-translate-y-[0.5px]"
+                class="ui-focus flex items-center justify-center gap-2 h-11 rounded-[10px] text-[14px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] shadow-sm transition-all hover:-translate-y-[0.5px]"
                 @click="mobileOpen = false"
               >
                 Get Listed
@@ -283,7 +283,7 @@
     <footer class="bg-[#0A0B0E] text-white">
       <!-- Newsletter + CTA hero area -->
       <div class="relative overflow-hidden">
-        <div class="absolute inset-0" :style="{ background: 'radial-gradient(ellipse 800px 400px at 50% 0%, rgba(99,102,241,0.12) 0%, transparent 70%)' }" />
+        <div class="absolute inset-0" :style="{ background: 'radial-gradient(ellipse 800px 400px at 50% 0%, rgba(14,165,233,0.12) 0%, transparent 70%)' }" />
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
         <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 pt-16 lg:pt-20 pb-12 lg:pb-16">

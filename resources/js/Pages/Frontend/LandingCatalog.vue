@@ -82,7 +82,7 @@
                     :href="withSrc(p.go_url)"
                     target="_blank"
                     rel="noopener noreferrer nofollow sponsored"
-                    class="ui-focus inline-flex items-center gap-1 h-8 px-3 rounded-[8px] text-[12px] font-semibold text-white bg-gradient-to-b from-[#5B5FE8] to-[#4338CA] hover:-translate-y-[0.5px] transition-all"
+                    class="ui-focus inline-flex items-center gap-1 h-8 px-3 rounded-[8px] text-[12px] font-semibold text-white bg-gradient-to-b from-[#0284C7] to-[#0369A1] hover:-translate-y-[0.5px] transition-all"
                   >
                     Buy →
                   </a>
