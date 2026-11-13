@@ -309,7 +309,10 @@ class CompareController extends Controller
 
             $sizes = [];
             if ($eligible >= 3) {
-                foreach ($stats['common_sizes'] ?? [] as $size) {
+                // The three most-listed sizes, shown smallest first.
+                $common = $stats['common_sizes'] ?? [];
+                usort($common, fn (array $a, array $b): int => (float) $a['size_mg'] <=> (float) $b['size_mg']);
+                foreach ($common as $size) {
                     $sizes[] = [
                         'label' => $size['size_mg'].' mg',
                         // CompareCompound.vue reads ?size=10mg.
