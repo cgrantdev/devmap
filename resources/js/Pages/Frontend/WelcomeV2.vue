@@ -342,7 +342,7 @@
     <!-- ========================================================= -->
     <section v-if="encyclopediaCategories && encyclopediaCategories.length" class="relative overflow-hidden ui-brand-band">
       <div class="ui-brand-dots absolute inset-0 pointer-events-none" />
-      <BrandSphere class="hidden md:block -left-28 -bottom-40" :size="520" :opacity="0.12" />
+      <BrandSphere class="hidden md:block -left-36 -bottom-48" :size="520" :opacity="0.06" />
       <div class="relative max-w-[1280px] mx-auto px-5 lg:px-10 py-12 lg:py-20">
         <div class="flex items-start justify-between gap-4 mb-8 flex-wrap">
           <div>
