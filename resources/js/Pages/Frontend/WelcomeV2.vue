@@ -167,7 +167,10 @@
             :href="vendor.url"
             class="ui-focus group flex flex-col border border-[color:var(--color-hairline)] bg-white hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden"
           >
-            <div class="aspect-[16/9] bg-white border-b border-[color:var(--color-hairline)] flex items-center justify-center p-4 lg:p-8">
+            <div
+              class="aspect-[16/9] border-b border-[color:var(--color-hairline)] flex items-center justify-center p-4 lg:p-8"
+              :style="{ backgroundColor: logoBackdrop(vendor.logo_url) }"
+            >
               <img v-if="vendor.logo_url" :src="vendor.logo_url" :alt="vendor.name" class="max-h-full max-w-[75%] object-contain" loading="lazy" />
               <span v-else class="ui-display text-2xl lg:text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
             </div>
@@ -498,6 +501,13 @@ import HeroCarousel from '@/components/ui/HeroCarousel.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { trackImpression, trackClick } from '@/lib/bannerTracking'
 import { useSearchSuggest } from '@/composables/useSearchSuggest'
+
+// Processed logos carry their backdrop in the filename
+// ("...-lp-bg111827.webp"); white-on-dark marks need it behind them.
+function logoBackdrop(url) {
+  const m = /-lp-bg([0-9a-f]{6})\.webp(?:[?#].*)?$/i.exec(url || '')
+  return m ? `#${m[1].toLowerCase()}` : '#ffffff'
+}
 
 onMounted(() => {
   trackImpression({ slot: 'homepage_vendor_cta', banner_key: 'become-a-vendor' })

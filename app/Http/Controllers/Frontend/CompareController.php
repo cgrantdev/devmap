@@ -1557,9 +1557,8 @@ class CompareController extends Controller
                     'brand_name' => $product->brand?->name,
                     'brand_slug' => $product->brand?->slug,
                     'brand_location' => $countryName,
-                    'brand_logo' => $product->brand?->vendorSetting?->logo
-                        ? asset('storage/' . $product->brand->vendorSetting->logo)
-                        : null,
+                    // Null for a missing file; VendorLogo shows initials.
+                    'brand_logo' => $product->brand?->vendorSetting?->publicLogoUrl(),
                     'brand_coupon_code' => $product->brand?->vendorSetting?->coupon_code,
                     'brand_discount_percent' => $pct !== null ? (float) $pct : null,
                     'size_mg' => $product->size_mg,

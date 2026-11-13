@@ -230,15 +230,7 @@
                   <!-- Vendor -->
                   <td class="px-3 sm:px-5 py-3 sm:py-4">
                     <div class="flex items-center gap-2 sm:gap-2.5">
-                      <div class="flex-shrink-0 w-7 h-7 rounded-[6px] overflow-hidden bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)]">
-                        <img
-                          v-if="product.brand_logo"
-                          :src="product.brand_logo"
-                          :alt="product.brand_name"
-                          class="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      </div>
+                      <VendorLogo :src="product.brand_logo" :name="product.brand_name" :alt="product.brand_name" size="xxs" radius="sm" fallback="subtle" />
                       <div class="min-w-0">
                         <a
                           :href="`/brand/${product.brand_slug}`"
@@ -457,6 +449,7 @@ import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
 import BuyThroughModal from '@/components/BuyThroughModal.vue'
 import PricePerMg from '@/components/price/PricePerMg.vue'
+import VendorLogo from '@/components/ui/VendorLogo.vue'
 import { compareSizeInfo, sizeInfo } from '@/components/price/priceFormat'
 import { withSrc } from '@/composables/useOutbound'
 

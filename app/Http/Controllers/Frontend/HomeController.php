@@ -592,7 +592,9 @@ class HomeController extends Controller
                         ? Str::limit(strip_tags($vs->description), 80)
                         : null,
                     'url' => '/brand/' . ($brand->slug ?? Str::slug($brand->name)),
-                    'logo_url' => $vs && $vs->logo ? asset('storage/' . $vs->logo) : null,
+                    // Null when the file is gone, so the tile shows initials
+                    // instead of a broken image.
+                    'logo_url' => $vs?->publicLogoUrl(),
                     'rating_average' => (float) ($brand->rating_average ?? 0),
                     'rating_count' => (int) ($brand->rating_count ?? 0),
                     'product_count' => (int) $brand->product_count,

@@ -152,15 +152,7 @@
               >
                 <td class="px-5 py-4">
                   <div class="flex items-center gap-2.5">
-                    <div class="flex-shrink-0 w-7 h-7 rounded-[6px] overflow-hidden bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)]">
-                      <img
-                        v-if="product.brand_logo"
-                        :src="product.brand_logo"
-                        :alt="product.brand_name"
-                        class="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
+                    <VendorLogo :src="product.brand_logo" :name="product.brand_name" :alt="product.brand_name" size="xxs" radius="sm" fallback="subtle" />
                     <div>
                       <a
                         :href="`/brand/${product.brand_slug}`"
@@ -416,6 +408,7 @@ import BuyThroughModal from '@/components/BuyThroughModal.vue'
 import ComparePriceSummary from '@/components/ComparePriceSummary.vue'
 import PricePerMgTable from '@/components/PricePerMgTable.vue'
 import PricePerMg from '@/components/price/PricePerMg.vue'
+import VendorLogo from '@/components/ui/VendorLogo.vue'
 import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
 import { withSrc } from '@/composables/useOutbound'
 
