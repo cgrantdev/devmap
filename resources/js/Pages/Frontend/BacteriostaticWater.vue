@@ -88,9 +88,7 @@
               >
                 <td class="px-5 py-4">
                   <div class="flex items-center gap-2.5">
-                    <div class="flex-shrink-0 w-7 h-7 rounded-[6px] overflow-hidden bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)]">
-                      <img v-if="r.brand_logo" :src="r.brand_logo" :alt="r.brand_name" class="w-full h-full object-cover" loading="lazy" />
-                    </div>
+                    <VendorLogo :src="r.brand_logo" :name="r.brand_name" :alt="r.brand_name" size="xxs" radius="sm" />
                     <div>
                       <a :href="`/brand/${r.brand_slug}`" class="font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)] transition-colors">
                         {{ r.brand_name }}
@@ -201,6 +199,7 @@ import { Head } from '@inertiajs/vue3'
 import { ref, computed, defineComponent, h } from 'vue'
 import ModernLayout from '../Layouts/ModernLayout.vue'
 import BuyThroughModal from '@/components/BuyThroughModal.vue'
+import VendorLogo from '@/components/ui/VendorLogo.vue'
 import { withSrc } from '@/composables/useOutbound'
 
 const props = defineProps({

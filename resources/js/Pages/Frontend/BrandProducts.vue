@@ -21,11 +21,19 @@
         <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-5 lg:py-6">
           <!-- Top row: logo + name + CTAs -->
           <div class="flex items-center gap-4 mb-3">
-            <!-- Logo -->
-            <div class="w-12 h-12 lg:w-16 lg:h-16 flex-shrink-0 border border-[color:var(--color-hairline)] bg-white flex items-center justify-center overflow-hidden" :style="{ background: brand.logo ? 'white' : coverGradient }">
-              <img v-if="brand.logo" :src="brand.logo" :alt="brand.name" class="w-full h-full object-contain p-1" loading="lazy" />
-              <span v-else class="text-lg lg:text-xl font-bold text-white select-none ui-display">{{ brand.initials }}</span>
-            </div>
+            <!-- Logo: fixed height, width follows the logo's shape (up to
+                 160px) so wide wordmarks stay readable. Above the fold, so
+                 it loads eagerly. -->
+            <VendorLogo
+              :src="brand.logo"
+              :name="brand.name"
+              :alt="brand.name"
+              size="header"
+              shape="wide"
+              :max-width="160"
+              radius="none"
+              eager
+            />
 
             <!-- Name + rating -->
             <div class="flex-1 min-w-0">
@@ -141,6 +149,23 @@
                 class="absolute left-1/2 -translate-x-1/2 top-full mt-1 whitespace-nowrap text-[11px] font-semibold text-emerald-700 hover:text-emerald-900 hover:underline"
               >All coupons &amp; deals &rarr;</a>
             </div>
+          </div>
+
+          <!-- Mobile trust row: the location line is hidden at phone width
+               and shipping/testing details sit below the product grid, so
+               surface the essentials right under the vendor name. -->
+          <div v-if="mobileTrustChips.length" class="md:hidden flex flex-wrap gap-1.5 mb-3">
+            <span
+              v-for="chip in mobileTrustChips"
+              :key="chip.key"
+              :title="chip.title || null"
+              :class="[
+                'inline-flex items-center gap-1 h-6 px-2 rounded-full text-[11px] font-medium border',
+                chip.tone === 'deal'
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                  : 'bg-[color:var(--color-bg-soft,#f4f5f7)] border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)]',
+              ]"
+            >{{ chip.label }}</span>
           </div>
 
           <!-- Description — inline-editable for the vendor owner. Non-owners
@@ -1009,6 +1034,7 @@ import { ref, computed, onMounted, nextTick, h, defineComponent, watchEffect } f
 import { Link, router, useForm, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
+import VendorLogo from '@/components/ui/VendorLogo.vue'
 import { stripSiteSuffix } from '@/utils/pageTitle'
 import InlineEditField from '@/components/InlineEditField.vue'
 import { USP_OPTIONS } from '@/data/uspOptions'
@@ -1080,18 +1106,37 @@ const props = defineProps({
   }
 })
 
-// Deterministic gradient for the cover photo banner
-const coverGradient = computed(() => {
-  const palette = [
-    ['#1E293B', '#4F46E5'], ['#0F172A', '#6366F1'], ['#1E3A8A', '#3B82F6'],
-    ['#0C4A6E', '#0EA5E9'], ['#134E4A', '#14B8A6'], ['#312E81', '#4F46E5'],
-    ['#111827', '#7C3AED'], ['#164E63', '#06B6D4'],
-  ]
-  const n = (props.brand?.name || '?').trim()
-  let h = 0
-  for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) & 0xffffffff
-  const [a, b] = palette[Math.abs(h) % palette.length]
-  return `linear-gradient(135deg, ${a} 0%, ${b} 100%)`
+// Mobile trust row under the vendor header. Lab names match the ones
+// /testing-labs groups by; they come from the vendor's own copy, so the
+// chip is worded as the vendor's statement, not ours.
+const TESTING_LABS = ['Janoshik', 'KryoLabs', 'Simec', 'Certara', 'BioTech Analytical']
+const mobileTrustChips = computed(() => {
+  const b = props.brand || {}
+  const chips = []
+
+  const ships = Array.isArray(b.ships_to) ? b.ships_to.filter(Boolean) : []
+  if (ships.length) {
+    const extra = ships.length > 2 ? ` +${ships.length - 2}` : ''
+    chips.push({ key: 'ships', label: `Ships to ${ships.slice(0, 2).join(', ')}${extra}`, title: ships.join(', ') })
+  } else if (b.location) {
+    chips.push({ key: 'ships', label: `Based in ${b.location}` })
+  }
+
+  const text = `${b.description || ''} ${b.independent_testing_notes || ''}`.toLowerCase()
+  const lab = TESTING_LABS.find((name) => text.includes(name.toLowerCase()))
+  if (lab) {
+    chips.push({ key: 'lab', label: `Tests with ${lab}`, title: 'Third-party lab named by the vendor' })
+  }
+
+  // The coupon percent lives on each product row (brand_discount_percent).
+  const row = (props.products?.data || []).find((p) => Number(p.brand_discount_percent) > 0)
+  if (row) {
+    const pct = Number(Number(row.brand_discount_percent).toFixed(1))
+    const code = row.brand_coupon_code || b.discount_code || 'PMAP'
+    chips.push({ key: 'coupon', tone: 'deal', label: `${pct}% off with ${code}` })
+  }
+
+  return chips
 })
 
 const ArrowRightIcon = defineComponent({

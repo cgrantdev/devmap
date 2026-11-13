@@ -42,6 +42,7 @@
             @change="handleSortChange"
             class="ui-focus h-11 px-4 bg-white border border-[color:var(--color-hairline)] rounded-[10px] text-[color:var(--color-ink)] text-[14px] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/20 cursor-pointer"
           >
+            <option value="recommended|desc">Recommended</option>
             <option value="products|desc">Most Compounds</option>
             <option value="name|asc">Alphabetical</option>
           </select>
@@ -164,22 +165,23 @@
               : 'border border-[color:var(--color-hairline)] hover:border-[color:var(--color-accent-400)]',
           ]"
         >
-          <!-- Big logo area. Fixed inner slot (not percentage) so tall
-               square marks like Vertex Labs can't dominate the card
-               next to wide marks like Pinnacle. Everything renders
-               inside the same ~72x180 box, object-contain. -->
-          <div class="aspect-[16/9] bg-white border-b border-[color:var(--color-hairline)] flex items-center justify-center p-8 relative">
-            <img
-              v-if="brand.logo"
+          <!-- Logo area. Logos are trimmed on upload, so they fill the
+               same padded box; dark or coloured logo blocks get their own
+               edge colour as the backdrop instead of floating on white. -->
+          <div class="aspect-[16/9] border-b border-[color:var(--color-hairline)] relative">
+            <VendorLogo
               :src="brand.logo"
+              :name="brand.name"
               :alt="brand.name"
-              class="h-[72px] w-[180px] object-contain"
-              loading="lazy"
+              fill
+              radius="none"
+              :bordered="false"
+              fallback="subtle"
+              img-class="w-full h-full object-contain px-[15%] py-[11%]"
             />
-            <span v-else class="ui-display text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ brand.initials }}</span>
             <span
               v-if="brand.is_partner || brand.featured"
-              class="pmap-featured-pill absolute top-3 right-3 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-white font-bold shadow-[0_2px_8px_rgba(245,158,11,0.5)]"
+              class="pmap-featured-pill z-10 absolute top-3 right-3 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-white font-bold shadow-[0_2px_8px_rgba(245,158,11,0.5)]"
             >
               <span class="text-yellow-100">★</span>
               <span>Featured</span>
@@ -269,6 +271,7 @@
 import { ref, computed, watchEffect } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import VendorLogo from '@/components/ui/VendorLogo.vue'
 import { stripSiteSuffix } from '@/utils/pageTitle'
 import { groupLocationsByRegion } from '@/data/locationRegions'
 
@@ -340,7 +343,7 @@ function handleLocationSelect(value) {
   navigate({})
 }
 
-const sortValue = computed(() => `${props.sort || 'rating'}|${props.sortDir || 'desc'}`)
+const sortValue = computed(() => `${props.sort || 'recommended'}|${props.sortDir || 'desc'}`)
 // Featured / partner vendors float to the top of whatever order the
 // backend sent (search, sort, etc.). Within each tier, original order
 // is preserved (stable sort) so the backend's sort decisions still
@@ -367,7 +370,7 @@ const hasActiveFilters = computed(() =>
 )
 
 function handleSortChange(e) {
-  const [sort, dir] = (e?.target?.value || 'rating|desc').split('|')
+  const [sort, dir] = (e?.target?.value || 'recommended|desc').split('|')
   navigate({ sort, sort_dir: dir })
 }
 
@@ -412,7 +415,7 @@ function navigate(overrides = {}) {
   const s = searchQuery.value.trim()
   if (s) params.set('search', s)
 
-  const sort = overrides.sort || props.sort || 'rating'
+  const sort = overrides.sort || props.sort || 'recommended'
   const dir = overrides.sort_dir || props.sortDir || 'desc'
   params.set('sort', sort)
   params.set('sort_dir', dir)

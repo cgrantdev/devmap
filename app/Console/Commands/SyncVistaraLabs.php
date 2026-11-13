@@ -126,6 +126,61 @@ class SyncVistaraLabs extends Command
         return (float) preg_replace('/[^0-9.]/', '', $text);
     }
 
+    /** og:image per product page (without the variant query), fetched once per run. */
+    private array $ogImageCache = [];
+
+    /**
+     * The price library has no images, so new rows rendered as grey vial
+     * placeholders. Read og:image from the product page instead. Honest
+     * user agent, 10s timeout; any failure just leaves the image empty.
+     */
+    private function ogImageFor(?string $productUrl): ?string
+    {
+        $parts = parse_url((string) $productUrl);
+        if (!$parts || empty($parts['host'])) {
+            return null;
+        }
+        $page = ($parts['scheme'] ?? 'https') . '://' . $parts['host'] . ($parts['path'] ?? '/');
+        if (array_key_exists($page, $this->ogImageCache)) {
+            return $this->ogImageCache[$page];
+        }
+
+        $image = null;
+        try {
+            $resp = Http::timeout(10)
+                ->withHeaders([
+                    'User-Agent' => 'PeptidemapBot/1.0 (+https://peptidemap.com)',
+                    'Accept' => 'text/html',
+                ])
+                ->get($page);
+            if ($resp->successful()) {
+                $image = self::extractOgImage($resp->body());
+            }
+        } catch (\Throwable $e) {
+            $image = null;
+        }
+
+        return $this->ogImageCache[$page] = $image;
+    }
+
+    private static function extractOgImage(string $html): ?string
+    {
+        // property and content can appear in either order.
+        $patterns = [
+            '~<meta[^>]+property=["\']og:image(?::secure_url)?["\'][^>]*content=["\']([^"\']+)["\']~i',
+            '~<meta[^>]+content=["\']([^"\']+)["\'][^>]*property=["\']og:image(?::secure_url)?["\']~i',
+        ];
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $html, $m) === 1) {
+                $url = html_entity_decode(trim($m[1]), ENT_QUOTES | ENT_HTML5);
+                if (preg_match('#^https?://#i', $url) === 1) {
+                    return $url;
+                }
+            }
+        }
+        return null;
+    }
+
     private function upsert(int $brandId, array $r): string
     {
         $sku = $r['sku'];
@@ -135,14 +190,19 @@ class SyncVistaraLabs extends Command
 
         if ($existing) {
             // Admin-field lock: price + stock + url only. Name, size,
-            // category, hidden stay whatever Julia set them to.
+            // category, hidden stay whatever Julia set them to. An image is
+            // only filled in when the row has none.
             if ($this->option('dry-run')) return 'updated';
-            $existing->fill([
+            $update = [
                 'price' => $r['price'],
                 'discount_price' => $r['discount_price'],
                 'product_url' => $r['product_url'],
                 'stock_status' => 'in_stock',
-            ])->save();
+            ];
+            if (empty($existing->image_url) && ($image = $this->ogImageFor($r['product_url']))) {
+                $update['image_url'] = $image;
+            }
+            $existing->fill($update)->save();
             return 'updated';
         }
 
@@ -159,6 +219,7 @@ class SyncVistaraLabs extends Command
             'price' => $r['price'],
             'discount_price' => $r['discount_price'],
             'product_url' => $r['product_url'],
+            'image_url' => $this->ogImageFor($r['product_url']),
             'size_mg' => $r['size'],
             'stock_status' => 'in_stock',
             'external_id' => $sku,

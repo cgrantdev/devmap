@@ -344,6 +344,16 @@ class VendorSetting extends Model
         }
     }
 
+    /**
+     * Public URL for the vendor logo, or null when no logo is stored or the
+     * file is missing on disk. Callers render an initials fallback on null;
+     * never substitute an external placeholder service.
+     */
+    public function publicLogoUrl(): ?string
+    {
+        return \App\Helpers\ImageHelper::resolveVendorLogo($this->logo);
+    }
+
     public function brand()
     {
         return $this->belongsTo(Brand::class);

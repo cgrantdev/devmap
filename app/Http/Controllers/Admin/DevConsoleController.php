@@ -169,6 +169,19 @@ class DevConsoleController extends Controller
             'label' => 'Scrape Vistara Labs central price library',
             'args' => ['--dry-run' => true, '--limit' => 'int'],
         ],
+        'vistara:hide-legacy-duplicates' => [
+            'label' => 'Vistara: hide older rows duplicated by scraped price-library rows (copies images first; run with --dry-run first)',
+            'args' => ['--dry-run' => true],
+        ],
+        'vendors:reprocess-logos' => [
+            'label' => 'Trim + resize stored vendor logos (keeps originals; --revert restores; run with --dry-run first)',
+            'args' => [
+                '--dry-run' => true,
+                '--brand' => 'string',
+                '--force' => true,
+                '--revert' => true,
+            ],
+        ],
         'recherche:add-missing' => [
             'label' => 'Add Recherche Kisspeptin 10mg + Tirzepatide 20mg (one-off)',
             'args' => [],

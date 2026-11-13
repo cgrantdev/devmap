@@ -3,14 +3,21 @@
     <!-- Top band: vendor logo IS the banner, centered on gradient -->
     <div class="relative aspect-[16/9] overflow-hidden">
       <div class="absolute inset-0" :style="{ background: bandGradient }" />
-      <!-- Centered logo -->
+      <!-- Centered logo plaque: white-background logos no longer look like
+           stickers on the gradient, and dark logo blocks keep their own
+           colour (VendorLogo reads it from the processed filename). -->
       <div class="absolute inset-0 flex items-center justify-center p-5">
-        <img
+        <VendorLogo
           v-if="deal.logo"
           :src="deal.logo"
+          :name="deal.name"
           :alt="`${deal.name} logo`"
-          class="max-h-full max-w-[65%] object-contain drop-shadow-lg"
-          loading="lazy"
+          size="xl"
+          shape="wide"
+          :max-width="200"
+          radius="lg"
+          :bordered="false"
+          class="shadow-lg"
         />
         <span
           v-else
@@ -85,6 +92,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import Card from './Card.vue'
+import VendorLogo from './VendorLogo.vue'
 
 const props = defineProps({
   deal: { type: Object, required: true },

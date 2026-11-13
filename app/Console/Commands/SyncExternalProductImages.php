@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Helpers\ImageHelper;
 use App\Models\Product;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Walks products whose image_url is hosted off-site (vendor CDN) and
@@ -31,6 +32,9 @@ class SyncExternalProductImages extends Command
 
     protected $description = 'Mirror vendor product images onto our own storage so hotlink-protected hosts do not break the catalog grid.';
 
+    /** Days to wait before retrying a row whose last mirror attempt failed. */
+    private const BACKOFF_DAYS = 3;
+
     public function handle(): int
     {
         $limit = max(1, (int) $this->option('limit'));
@@ -56,9 +60,28 @@ class SyncExternalProductImages extends Command
             $query->whereHas('brand', fn ($q) => $q->where('slug', $brandSlug));
         }
 
+        // Backoff: skip rows that failed recently (geo/IP-blocked vendors)
+        // and try never-attempted rows first, so blocked rows can't use up
+        // the per-run limit. Guarded so the command still runs before the
+        // migration that adds the column.
+        $hasBackoff = Schema::hasColumn('products', 'mirror_failed_at');
+        if ($hasBackoff) {
+            if (!$force) {
+                $query->where(function ($q) {
+                    $q->whereNull('mirror_failed_at')
+                      ->orWhere('mirror_failed_at', '<', now()->subDays(self::BACKOFF_DAYS));
+                });
+            }
+            $query->orderByRaw('mirror_failed_at IS NOT NULL')->orderBy('mirror_failed_at');
+        }
+
         $query->orderBy('id')->limit($limit);
 
-        $todo = $query->get(['id', 'image_url', 'mirrored_image_url']);
+        $columns = ['id', 'image_url', 'mirrored_image_url'];
+        if ($hasBackoff) {
+            $columns[] = 'mirror_failed_at';
+        }
+        $todo = $query->get($columns);
 
         $ok = 0;
         $fail = 0;
@@ -83,14 +106,21 @@ class SyncExternalProductImages extends Command
                 $status = $diag['status'] ? ' ('.$diag['status'].')' : '';
                 $reasonCounts[$reason] = ($reasonCounts[$reason] ?? 0) + 1;
                 $this->line('<fg=red>FAIL</> #'.$p->id.' ['.$reason.$status.'] '.$source);
+                if ($hasBackoff && !$dry) {
+                    $p->forceFill(['mirror_failed_at' => now()])->save();
+                }
                 continue;
             }
 
             if (!$dry) {
-                $p->forceFill([
+                $fill = [
                     'mirrored_image_url' => $mirrored,
                     'mirrored_image_at'  => now(),
-                ])->save();
+                ];
+                if ($hasBackoff) {
+                    $fill['mirror_failed_at'] = null;
+                }
+                $p->forceFill($fill)->save();
             }
             $ok++;
             $this->line('<fg=green> OK </> #'.$p->id.' → '.$mirrored);

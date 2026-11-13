@@ -112,12 +112,18 @@ class BrandsController extends Controller
             }
         }
         
-        // Apply sorting
-        $sortBy = $request->get('sort', 'rating');
-        $sortDir = in_array(strtolower($request->get('sort_dir', 'desc')), ['asc', 'desc']) 
-            ? strtolower($request->get('sort_dir', 'desc')) 
+        // Apply sorting. "recommended" is the default: featured/partner
+        // vendors, then vendors with reviews by rating, then vendors with a
+        // logo, then name. Almost every vendor has zero reviews, so the old
+        // rating default produced an effectively random order.
+        $sortBy = (string) $request->get('sort', 'recommended');
+        if (!in_array($sortBy, ['recommended', 'rating', 'reviews', 'products', 'name'], true)) {
+            $sortBy = 'recommended';
+        }
+        $sortDir = in_array(strtolower($request->get('sort_dir', 'desc')), ['asc', 'desc'])
+            ? strtolower($request->get('sort_dir', 'desc'))
             : 'desc';
-        
+
         if ($sortBy === 'rating') {
             $query->orderBy('rating_average', $sortDir);
         } elseif ($sortBy === 'reviews') {
@@ -129,19 +135,32 @@ class BrandsController extends Controller
         } else {
             $query->orderBy('name', 'asc');
         }
-        
+
         // Cache the fully-shaped brand payload per filter combination so
         // anonymous pageloads don't re-run the brands + vendor_settings +
-        // locations join + per-brand verified-badges query. 5 min TTL;
+        // locations join + verified-badges query. 5 min TTL;
         // FrontendCacheBuster invalidates on any brand/vendor_setting/
         // product/promotion write, so admin edits reflect immediately.
-        $cacheKey = 'brands.index.' . md5(serialize($request->only([
-            'search', 'location', 'verified', 'usp', 'sort', 'sortDir',
-        ])));
+        // Every filter input is part of the key, or a filtered request
+        // could be served a cached unfiltered list.
+        $cacheKey = 'brands.index.v2.' . md5(serialize([
+            $request->only(['search', 'location', 'verified', 'usp', 'min_rating', 'top_vendors_only']),
+            $sortBy,
+            $sortDir,
+        ]));
         // Frontend precedence (Colin 10/20 — dedup fix): the vendor's own
         // description always wins. generated_description is the AI gap-
         // filler for brands without authored copy.
-        $brands = \App\Support\FrontendCache::remember($cacheKey, 300, fn () => $query->get()->map(function ($brand) {
+        $brands = \App\Support\FrontendCache::remember($cacheKey, 300, function () use ($query, $sortBy) {
+            $rows = $query->get();
+            // One query for every vendor's approved badges instead of one
+            // per vendor inside the map.
+            $badgesByBrand = \App\Models\VendorCertificationClaim::whereIn('brand_id', $rows->pluck('id'))
+                ->where('status', 'approved')
+                ->get()
+                ->groupBy('brand_id');
+
+            $mapped = $rows->map(function ($brand) use ($badgesByBrand) {
                 // Prefer vendor setting location if set; otherwise derive from products
                 $location = null;
                 if ($brand->vendorSetting && $brand->vendorSetting->location) {
@@ -168,11 +187,8 @@ class BrandsController extends Controller
                     $location = $locationId ? Location::find($locationId) : null;
                 }
                 
-                $logoUrl = \App\Helpers\ImageHelper::resolveVendorLogo(
-                    $brand->vendorSetting?->logo,
-                    $brand->name
-                );
-                
+                $logoUrl = $brand->vendorSetting?->publicLogoUrl();
+
                 return [
                     'id' => $brand->id,
                     'name' => $brand->name,
@@ -195,13 +211,14 @@ class BrandsController extends Controller
                     // Approved verification badges (cGMP / 7+ Tested)
                     // for the storefront + card display. Julia approves
                     // these via /admin/certifications.
-                    'verified_badges' => \App\Models\VendorCertificationClaim::where('brand_id', $brand->id)
-                        ->where('status', 'approved')
-                        ->get()
+                    'verified_badges' => collect($badgesByBrand->get($brand->id, []))
                         ->map(fn ($c) => ['type' => $c->type, 'label' => $c->label()])
                         ->values(),
                 ];
-            }));
+            });
+
+            return $sortBy === 'recommended' ? self::recommendedOrder($mapped) : $mapped->values();
+        });
         
         // Generate SEO data (editable via Admin -> Settings -> SEO Pages, key: "brands")
         $siteName = Setting::where('key', 'site_name')->value('value') ?? 'Peptidemap';
@@ -235,7 +252,7 @@ class BrandsController extends Controller
         return Inertia::render('Frontend/Brands', [
             'brands' => $brands,
             'search' => $request->get('search', ''),
-            'sort' => $request->get('sort', 'rating'),
+            'sort' => $sortBy,
             'sortDir' => $request->get('sort_dir', 'desc'),
             'filters' => [
                 'location' => $request->get('location', ''),
@@ -247,6 +264,54 @@ class BrandsController extends Controller
             'locations' => $locationsList,
             'seo' => $seo,
         ]);
+    }
+
+    /**
+     * Default /vendors order: featured or partner first, then vendors with
+     * reviews by combined rating (more reviews breaks ties), then vendors
+     * with a logo, then name.
+     */
+    private static function recommendedOrder(\Illuminate\Support\Collection $rows): \Illuminate\Support\Collection
+    {
+        $featured = fn (array $r): int => ($r['is_partner'] || $r['featured']) ? 0 : 1;
+        $reviewCount = fn (array $r): int => (int) $r['reviews'] + (int) $r['external_rating_count'];
+        $rating = function (array $r): float {
+            $nativeCount = (int) $r['reviews'];
+            $externalCount = (int) $r['external_rating_count'];
+            $total = $nativeCount + $externalCount;
+            if ($total === 0) {
+                return 0.0;
+            }
+            return ((float) $r['rating'] * $nativeCount + (float) ($r['external_rating_avg'] ?? 0) * $externalCount) / $total;
+        };
+
+        return $rows->sort(function (array $a, array $b) use ($featured, $reviewCount, $rating): int {
+            $cmp = $featured($a) <=> $featured($b);
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+            $aReviewed = $reviewCount($a) > 0 ? 0 : 1;
+            $bReviewed = $reviewCount($b) > 0 ? 0 : 1;
+            $cmp = $aReviewed <=> $bReviewed;
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+            if ($aReviewed === 0) {
+                $cmp = $rating($b) <=> $rating($a);
+                if ($cmp !== 0) {
+                    return $cmp;
+                }
+                $cmp = $reviewCount($b) <=> $reviewCount($a);
+                if ($cmp !== 0) {
+                    return $cmp;
+                }
+            }
+            $cmp = ($a['logo'] ? 0 : 1) <=> ($b['logo'] ? 0 : 1);
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+            return strcasecmp((string) $a['name'], (string) $b['name']);
+        })->values();
     }
 
     /**

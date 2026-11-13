@@ -1545,7 +1545,7 @@ class ProductsController extends Controller
                 'shop_url' => $brand->vendorSetting->shop_url ?? null,
                 'contact_email' => $brand->vendorSetting->contact_email ?? null,
                 'phone_number' => $brand->vendorSetting->phone_number ?? null,
-                'logo' => $this->getBrandLogoUrl($brand),
+                'logo' => $brand->vendorSetting?->publicLogoUrl(),
                 'banner' => $brand->vendorSetting && $brand->vendorSetting->banner ? asset('storage/' . $brand->vendorSetting->banner) : null,
                 'banner_image_url' => $brand->vendorSetting->banner_image_url ?? null,
                 'location' => $location ? $location->name : null,
