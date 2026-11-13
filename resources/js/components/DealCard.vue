@@ -4,15 +4,6 @@
   <div
     class="group relative flex h-full flex-col overflow-hidden rounded-[14px] border border-[color:var(--color-hairline)] bg-white transition-all duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]"
   >
-    <!-- Discount badge (only when the vendor has said what the code gives) -->
-    <div
-      v-if="discountValue"
-      class="absolute top-3 right-3 z-[1] inline-flex items-center gap-1 h-7 px-2.5 rounded-full bg-red-600 text-white text-[13px] font-bold shadow-md"
-    >
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 17h6v-6" /><path d="m22 17-8.5-8.5-5 5L2 7" /></svg>
-      −{{ discountValue }}%
-    </div>
-
     <!-- Limited-Time badge — shown when the vendor's coupon is boosted. -->
     <div
       v-if="isBoosted"
@@ -42,12 +33,19 @@
 
     <div class="flex flex-1 flex-col gap-2.5 p-4">
       <div class="min-w-0">
-        <h3 class="ui-display truncate text-[16px] font-semibold tracking-tight text-[color:var(--color-ink)] transition-colors group-hover:text-[color:var(--color-accent-700)]">
+        <div class="flex items-start justify-between gap-2">
+        <h3 class="ui-display min-w-0 truncate text-[16px] font-semibold tracking-tight text-[color:var(--color-ink)] transition-colors group-hover:text-[color:var(--color-accent-700)]">
           <a
             :href="`/coupon/${slug}`"
             class="outline-none after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-[color:var(--color-accent-500)]"
           >{{ name }}</a>
         </h3>
+        <!-- Discount (only when the vendor has said what the code gives) -->
+        <span
+          v-if="discountValue"
+          class="flex-shrink-0 inline-flex items-center h-6 px-2 rounded-full bg-red-600 text-white text-[12px] font-bold"
+        >−{{ discountValue }}%</span>
+        </div>
         <!-- Rating (hidden until the vendor has real reviews) -->
         <div v-if="Number(reviews) > 0" class="mt-1 flex items-center gap-1 text-xs">
           <svg class="w-3.5 h-3.5 text-[color:var(--color-caution)]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>

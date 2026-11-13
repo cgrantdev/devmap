@@ -24,12 +24,7 @@
           tone === 'solid' ? 'text-emerald-50' : 'text-emerald-600',
         ]"
       >{{ copied ? 'Copied!' : label }}</span>
-      <span
-        :class="[
-          'ui-mono mt-1 max-w-full truncate font-black uppercase tracking-[0.06em]',
-          size === 'sm' ? 'text-[14px]' : 'text-[15px] sm:text-[17px]',
-        ]"
-      >{{ displayCode }}</span>
+      <span :class="['ui-mono mt-1 max-w-full truncate font-black uppercase', codeClass]">{{ displayCode }}</span>
     </span>
     <span
       aria-hidden="true"
@@ -70,6 +65,19 @@ const percentValue = computed(() => {
 })
 
 const label = computed(() => (percentValue.value ? `${percentValue.value}% off · code` : 'Coupon code'))
+
+// Longer codes ("WEEKEND35") step down in size and tracking so they fit
+// a narrow phone card instead of truncating.
+const codeClass = computed(() => {
+  const len = displayCode.value.length
+  if (props.size === 'sm') {
+    if (len >= 10) return 'text-[12px] tracking-[0.01em]'
+    if (len >= 8) return 'text-[13px] tracking-[0.03em]'
+    return 'text-[14px] tracking-[0.06em]'
+  }
+  if (len >= 10) return 'text-[14px] sm:text-[16px] tracking-[0.03em]'
+  return 'text-[15px] sm:text-[17px] tracking-[0.06em]'
+})
 
 const { copied, copy: copyText } = useCopyText()
 
