@@ -33,7 +33,7 @@ class ProductRowCurrency
     {
         $country = $product->brand?->vendorSetting?->location?->name;
 
-        return Currency::forCountry($country);
+        return Currency::forVendor($product->brand?->slug, $country);
     }
 
     /**
@@ -54,7 +54,7 @@ class ProductRowCurrency
             $country = $row['brand']['vendor_setting']['location']['name']
                 ?? $row['brand']['vendorSetting']['location']['name']
                 ?? null;
-            [$code, $symbol] = Currency::forCountry($country);
+            [$code, $symbol] = Currency::forVendor($row['brand']['slug'] ?? null, $country);
         }
 
         $row['currency_code'] = $code;

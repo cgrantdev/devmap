@@ -12,7 +12,8 @@ use Illuminate\Support\Collection;
  * the first one a row fails is its exclusion reason.
  *
  * 1. currency_code is USD (else non_usd). Currency comes from the vendor
- *    country via Currency::forCountry, not from the listing.
+ *    (Currency::forVendor: an override, else the vendor's country), not
+ *    from the listing.
  * 2. product_type is Peptide (else kit_or_other_type).
  * 3. Blend / multi-unit check, before the size check (else multi_unit_or_blend).
  * 4. size_mg is one number plus "mg" (else size_unparsable).

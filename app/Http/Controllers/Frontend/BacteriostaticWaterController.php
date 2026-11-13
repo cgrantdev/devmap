@@ -74,7 +74,7 @@ class BacteriostaticWaterController extends Controller
                     : ($p->display_name ?: $p->name);
 
                 $countryName = $p->brand?->vendorSetting?->location?->name;
-                [$currencyCode, $currencySymbol] = \App\Support\Currency::forCountry($countryName);
+                [$currencyCode, $currencySymbol] = \App\Support\Currency::forVendor($p->brand?->slug, $countryName);
 
                 return [
                     'id' => $p->id,

@@ -80,6 +80,32 @@ class Currency
         return self::MAP[trim($country)] ?? self::DEFAULT;
     }
 
+    /**
+     * Vendors whose shop prices in a different currency from the one
+     * their location implies, keyed by brand slug. CertaPeptides ships
+     * from Romania but its shop prices in euros (checked 2026-11-13);
+     * read as lei, its prices showed at about a fifth of their value.
+     */
+    private const VENDOR_OVERRIDES = [
+        'certapeptides' => ['EUR', '€'],
+    ];
+
+    /**
+     * Currency for a vendor's prices: the override when one is set,
+     * otherwise the currency of the vendor's country.
+     *
+     * @return array{0: string, 1: string}
+     */
+    public static function forVendor(?string $brandSlug, ?string $country): array
+    {
+        $slug = strtolower(trim((string) $brandSlug));
+        if ($slug !== '' && isset(self::VENDOR_OVERRIDES[$slug])) {
+            return self::VENDOR_OVERRIDES[$slug];
+        }
+
+        return self::forCountry($country);
+    }
+
     public static function codeFor(?string $country): string
     {
         return self::forCountry($country)[0];

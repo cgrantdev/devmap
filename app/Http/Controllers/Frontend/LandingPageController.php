@@ -186,7 +186,7 @@ class LandingPageController extends Controller
                 $finalPrice = $pmapPrice ?? $retail;
 
                 $countryName = $p->brand?->vendorSetting?->location?->name;
-                [$currencyCode, $currencySymbol] = Currency::forCountry($countryName);
+                [$currencyCode, $currencySymbol] = Currency::forVendor($p->brand?->slug, $countryName);
 
                 return [
                     'id' => $p->id,

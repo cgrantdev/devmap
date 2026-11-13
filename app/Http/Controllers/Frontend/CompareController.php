@@ -1709,7 +1709,7 @@ class CompareController extends Controller
         $finalPrice = $pmapPrice ?? $retail;
 
         $countryName = $product->brand?->vendorSetting?->location?->name;
-        [$currencyCode, $currencySymbol] = \App\Support\Currency::forCountry($countryName);
+        [$currencyCode, $currencySymbol] = \App\Support\Currency::forVendor($product->brand?->slug, $countryName);
 
         // withPricing adds the USD figures and $/mg used for
         // cross-currency ordering and value badges.
