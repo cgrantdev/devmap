@@ -634,7 +634,13 @@ class VendorsController extends Controller
         }
         
         $settings->founded_year = $validated['founded_year'] ?? $settings->founded_year;
-        $settings->coupon_code = $validated['coupon_code'] ?? $settings->coupon_code;
+        // array_key_exists so a blanked field clears the code. With ?? a
+        // blank kept the old code, so a stuck promo code (Certified Pep's
+        // WEEKEND35, Nov 2026) could not be removed by hand.
+        if (array_key_exists('coupon_code', $validated)) {
+            $code = trim((string) $validated['coupon_code']);
+            $settings->coupon_code = $code !== '' ? $code : null;
+        }
         // Use array_key_exists so an explicit null/blank clears the discount
         // (?? would only assign when the key was absent from the payload).
         if (array_key_exists('coupon_discount_percent', $validated)) {
@@ -1716,7 +1722,9 @@ class VendorsController extends Controller
         $validated = $request->validate([
             'boost_percent' => 'required|numeric|min:1|max:90',
             'starts_at' => 'nullable|date',
-            'expires_at' => 'required|date|after:now',
+            // "In the future" is checked below, once the time is read as
+            // ET. after:now read it as UTC and refused ends a few hours out.
+            'expires_at' => 'required|date',
             // Optional code swap — Hydro Research's affiliate-only
             // Monday code, per Julia Sep 18. Blank = keep the standard.
             'boost_code' => 'nullable|string|max:64',
@@ -1737,6 +1745,9 @@ class VendorsController extends Controller
             : null;
         $expiresAt = new \DateTimeImmutable($validated['expires_at'], $adminTz);
 
+        if ($expiresAt <= now()) {
+            return back()->withErrors(['expires_at' => 'End must be in the future.']);
+        }
         if ($startsAt && $startsAt >= $expiresAt) {
             return back()->withErrors(['starts_at' => 'Start must be before end.']);
         }
@@ -1748,16 +1759,12 @@ class VendorsController extends Controller
             !empty($validated['boost_code']) ? strtoupper(trim($validated['boost_code'])) : null
         );
 
-        $msg = $startsAt && $startsAt > new \DateTimeImmutable()
+        $msg = $startsAt && $startsAt > now()
             ? 'Coupon boost scheduled — activates at ' . $validated['starts_at']
             : 'Coupon boost active — auto-reverts at ' . $validated['expires_at'];
         return back()->with('flash_success', $msg);
     }
 
-    /**
-     * Cancel an active coupon boost early — restores the previous %
-     * immediately and clears the expiry.
-     */
     /**
      * Colin PMAP Sep 16 — Julia needs to force-grant cGMP / 7x-Tested
      * badges directly from the vendor edit page when she has proof
@@ -1796,25 +1803,24 @@ class VendorsController extends Controller
         return back()->with('flash_success', "Revoked {$validated['type']} for {$brand->name}.");
     }
 
+    /**
+     * Cancel a boost early: a running one puts the vendor's own coupon
+     * back at once, a scheduled one is dropped. Used to accept running
+     * boosts only, so "Cancel schedule" left the schedule in place.
+     */
     public function cancelCouponBoost(int $id)
     {
         $brand = Brand::findOrFail($id);
         $settings = $brand->vendorSetting;
-        if (!$settings || !$settings->couponBoostActive()) {
-            return back()->with('flash_error', 'No active boost to cancel.');
+        if (!$settings || !$settings->couponBoostInFlight()) {
+            return back()->with('flash_error', 'No boost to cancel.');
         }
-        $settings->coupon_discount_percent = $settings->coupon_discount_previous_percent;
-        $settings->coupon_discount_previous_percent = null;
-        // Only restore the code if we swapped it during the boost.
-        if ($settings->coupon_code_previous !== null) {
-            $settings->coupon_code = $settings->coupon_code_previous;
-        }
-        $settings->coupon_code_previous = null;
-        $settings->coupon_boost_code = null;
-        $settings->coupon_boost_expires_at = null;
-        $settings->coupon_boost_starts_at = null;
-        $settings->coupon_boost_percent = null;
+        $wasScheduled = $settings->couponBoostScheduled();
+        $settings->endCouponBoost();
         $settings->save();
-        return back()->with('flash_success', 'Coupon boost cancelled — % reverted.');
+
+        return back()->with('flash_success', $wasScheduled
+            ? 'Scheduled boost cancelled.'
+            : 'Coupon boost cancelled. The vendor\'s own coupon is back.');
     }
 }

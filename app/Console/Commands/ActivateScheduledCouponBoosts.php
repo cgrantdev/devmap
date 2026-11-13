@@ -46,16 +46,11 @@ class ActivateScheduledCouponBoosts extends Command
 
             if ($this->option('dry-run')) continue;
 
-            $updates = [
-                'coupon_discount_percent' => $newPct,
-                'coupon_boost_starts_at' => null,
-            ];
-            // Swap the code too if the boost carries one. previous_code
-            // was already snapshotted at applyCouponBoost time.
-            if (!empty($vs->coupon_boost_code)) {
-                $updates['coupon_code'] = $vs->coupon_boost_code;
-            }
-            $vs->forceFill($updates)->save();
+            // Swaps in the boost's % and code (if it has one) and saves the
+            // vendor's own coupon as it stands now, so edits made while
+            // the boost was scheduled are what the end restores.
+            $vs->swapInCouponBoost();
+            $vs->save();
 
             $this->postDiscordBoostStart($brand?->name ?? 'A vendor', $brand?->slug, $newPct, $vs->coupon_boost_expires_at);
         }
@@ -79,7 +74,8 @@ class ActivateScheduledCouponBoosts extends Command
         \Illuminate\Support\Facades\Cache::put($dedupKey, 1, now()->addHours(6));
 
         $link = $slug ? "https://peptidemap.com/brand/{$slug}" : 'https://peptidemap.com/deals';
-        $until = \Carbon\Carbon::parse($expiresAt)->format('M j');
+        // End times are stored in UTC; Julia sets them in ET.
+        $until = \Carbon\Carbon::instance($expiresAt)->setTimezone('America/New_York')->format('M j');
 
         try {
             Http::withHeaders(['Authorization' => 'Bot ' . $token, 'Content-Type' => 'application/json'])

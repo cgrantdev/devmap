@@ -259,7 +259,7 @@
           </FormSection>
 
           <FormSection title="Coupon & Affiliate" :columns="2">
-            <FormField label="Coupon Code" hint="Promo code visitors will use at this vendor's checkout">
+            <FormField label="Coupon Code" :hint="editForm.coupon_boost_active ? 'A boost is running, so this shows its code and %. The vendor\'s own coupon comes back when it ends.' : 'Promo code visitors will use at this vendor\'s checkout'">
               <input v-model="editForm.coupon_code" type="text" class="w-full h-10 px-3 text-sm border border-[color:var(--color-hairline)] ui-mono focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15" />
             </FormField>
             <FormField label="Discount %" hint="What the coupon takes off retail. Drives the 'PeptideMap Price' shown across the site.">
@@ -293,10 +293,9 @@
                 <div class="flex items-baseline justify-between gap-3 flex-wrap">
                   <div class="text-amber-900">
                     <span class="font-semibold">{{ editForm.coupon_discount_percent }}%</span>
-                    <span v-if="editForm.coupon_code_previous"> · code <span class="ui-mono uppercase font-semibold">{{ editForm.coupon_code }}</span></span>
+                    <span v-if="editForm.coupon_boost_code"> · code <span class="ui-mono uppercase font-semibold">{{ editForm.coupon_boost_code }}</span></span>
                     until <span class="ui-mono">{{ formatBoostExpiry(editForm.coupon_boost_expires_at) }}</span>
-                    <span class="text-amber-700"> · reverts to <span class="ui-mono">{{ editForm.coupon_discount_previous_percent }}%</span></span>
-                    <span v-if="editForm.coupon_code_previous" class="text-amber-700"> / <span class="ui-mono uppercase">{{ editForm.coupon_code_previous }}</span></span>
+                    <span class="text-amber-700"> · then back to <span class="ui-mono">{{ boostRevertsTo }}</span></span>
                   </div>
                   <button type="button" @click="cancelCouponBoost" class="text-[11px] font-semibold text-red-700 hover:text-red-900 underline">Cancel boost early</button>
                 </div>
@@ -329,7 +328,10 @@
                   <input v-model="boostForm.expires_at" type="datetime-local" class="w-full h-9 px-3 text-sm border border-amber-300 rounded ui-mono focus:border-amber-500 focus:outline-none" />
                 </div>
                 <div class="sm:col-span-3">
-                  <label class="block text-[11px] text-amber-900 mb-1">Boost code <span class="text-amber-700/70">(blank = keep standard "{{ editForm.coupon_code || 'PMAP' }}")</span></label>
+                  <label class="block text-[11px] text-amber-900 mb-1">Boost code
+                    <span v-if="editForm.coupon_code" class="text-amber-700/70">(blank = keep standard "{{ editForm.coupon_code }}")</span>
+                    <span v-else class="text-amber-700/70">(this vendor has no code of its own; it goes back to none when the boost ends)</span>
+                  </label>
                   <input v-model="boostForm.code" type="text" placeholder="e.g. MONDAY35" class="w-full h-9 px-3 text-sm border border-amber-300 rounded ui-mono uppercase focus:border-amber-500 focus:outline-none" />
                 </div>
                 <div class="sm:col-span-3 flex items-center justify-between gap-3 flex-wrap">
@@ -960,6 +962,16 @@ watch(() => props.vendor, (newVendor) => {
     editForm.founded_year = newVendor.settings?.founded_year || null
     editForm.coupon_code = newVendor.settings?.coupon_code || ''
     editForm.coupon_discount_percent = newVendor.settings?.coupon_discount_percent ?? null
+    // Boost state comes back from the server after a launch, cancel or
+    // save, so the panel shows what is stored, not a local guess.
+    editForm.coupon_boost_active = newVendor.settings?.coupon_boost_active ?? false
+    editForm.coupon_boost_scheduled = newVendor.settings?.coupon_boost_scheduled ?? false
+    editForm.coupon_boost_percent = newVendor.settings?.coupon_boost_percent ?? null
+    editForm.coupon_boost_code = newVendor.settings?.coupon_boost_code ?? null
+    editForm.coupon_code_previous = newVendor.settings?.coupon_code_previous ?? null
+    editForm.coupon_boost_starts_at = newVendor.settings?.coupon_boost_starts_at ?? null
+    editForm.coupon_boost_expires_at = newVendor.settings?.coupon_boost_expires_at ?? null
+    editForm.coupon_discount_previous_percent = newVendor.settings?.coupon_discount_previous_percent ?? null
     editForm.referral_url = newVendor.settings?.referral_url || ''
     editForm.shipping_info = newVendor.settings?.shipping_info || ''
     editForm.return_policy = newVendor.settings?.return_policy || ''
@@ -1055,9 +1067,18 @@ function formatBoostExpiry(iso) {
     month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
   })
 }
+// What the vendor shows once the boost ends: its own % and code, saved
+// when the boost went live. "no coupon" for a vendor without one.
+const boostRevertsTo = computed(() => {
+  const pct = editForm.coupon_discount_previous_percent
+  const code = editForm.coupon_boost_code ? editForm.coupon_code_previous : editForm.coupon_code
+  const parts = []
+  if (pct !== null && pct !== undefined && pct !== '') parts.push(`${pct}%`)
+  if (code) parts.push(String(code).toUpperCase())
+  return parts.length ? parts.join(' / ') : 'no coupon'
+})
 function applyCouponBoost() {
   if (!props.vendor || !boostForm.percent || !boostForm.expires_at) return
-  const willBeScheduled = !!boostForm.starts_at && new Date(boostForm.starts_at) > new Date()
   const normalizedCode = boostForm.code ? boostForm.code.trim().toUpperCase() : ''
   const form = useForm({
     _token: usePage().props.csrf_token,
@@ -1069,27 +1090,8 @@ function applyCouponBoost() {
   form.post(`/admin/vendors/${props.vendor.id}/coupon-boost`, {
     preserveScroll: true,
     onSuccess: () => {
-      // Sync local state so the panel flips to Active / Scheduled
-      // without waiting for a page reload — Julia's bug from Sep 14
-      // was that submit looked like it did nothing except bump the
-      // discount % field. Now the UI switches to the summary card.
-      if (willBeScheduled) {
-        editForm.coupon_boost_scheduled = true
-        editForm.coupon_boost_active = false
-      } else {
-        editForm.coupon_boost_active = true
-        editForm.coupon_boost_scheduled = false
-        editForm.coupon_discount_previous_percent = editForm.coupon_discount_previous_percent ?? editForm.coupon_discount_percent
-        editForm.coupon_discount_percent = boostForm.percent
-        if (normalizedCode) {
-          editForm.coupon_code_previous = editForm.coupon_code_previous ?? editForm.coupon_code
-          editForm.coupon_code = normalizedCode
-        }
-      }
-      editForm.coupon_boost_percent = boostForm.percent
-      editForm.coupon_boost_code = normalizedCode || null
-      editForm.coupon_boost_starts_at = boostForm.starts_at ? new Date(boostForm.starts_at).toISOString() : null
-      editForm.coupon_boost_expires_at = new Date(boostForm.expires_at).toISOString()
+      // The panel switches to the Active / Scheduled card from the
+      // fresh vendor props (see the watcher above).
       boostForm.percent = null
       boostForm.starts_at = ''
       boostForm.expires_at = ''
@@ -1102,25 +1104,10 @@ function cancelCouponBoost() {
   if (!props.vendor) return
   if (!confirm('Cancel the boost now and revert to the previous %?')) return
   const form = useForm({ _token: usePage().props.csrf_token })
+  // The fresh vendor props put the panel back in the input state (see
+  // the watcher above).
   form.delete(`/admin/vendors/${props.vendor.id}/coupon-boost`, {
     preserveScroll: true,
-    onSuccess: () => {
-      // Flip back to the input state locally.
-      if (editForm.coupon_boost_active && editForm.coupon_discount_previous_percent != null) {
-        editForm.coupon_discount_percent = editForm.coupon_discount_previous_percent
-      }
-      if (editForm.coupon_code_previous) {
-        editForm.coupon_code = editForm.coupon_code_previous
-      }
-      editForm.coupon_boost_active = false
-      editForm.coupon_boost_scheduled = false
-      editForm.coupon_boost_percent = null
-      editForm.coupon_boost_code = null
-      editForm.coupon_code_previous = null
-      editForm.coupon_boost_starts_at = null
-      editForm.coupon_boost_expires_at = null
-      editForm.coupon_discount_previous_percent = null
-    },
     onError: () => toastError('Cancel failed.'),
   })
 }

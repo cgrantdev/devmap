@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class VendorSetting extends Model
@@ -201,13 +202,13 @@ class VendorSetting extends Model
 
     /**
      * Read by couponBoostActive() so a live boost still flags on the
-     * homepage and deals page. Not storefront fields, so they are not
-     * part of PUBLIC_COLUMNS. Load them only for queries that map the
-     * result into a boolean and do not serialize the model.
+     * homepage and deals page (the end time is in PUBLIC_COLUMNS). Not a
+     * storefront field, so it is not part of PUBLIC_COLUMNS. Load it only
+     * for queries that map the result into a boolean and do not
+     * serialize the model.
      */
     public const BOOST_STATE_COLUMNS = [
         'coupon_boost_starts_at',
-        'coupon_discount_previous_percent',
     ];
 
     protected $hidden = self::SECRET_COLUMNS;
@@ -235,15 +236,131 @@ class VendorSetting extends Model
      */
     public function couponBoostActive(): bool
     {
-        if (!$this->coupon_boost_expires_at || $this->coupon_boost_expires_at->isPast()) {
+        // forPublic() without the boost state leaves the start time
+        // unloaded, and a scheduled boost would then read as live.
+        if (! array_key_exists('coupon_boost_starts_at', $this->getAttributes())) {
             return false;
         }
-        if ($this->coupon_discount_previous_percent === null) {
+        // This used to also require a saved previous %. A vendor with no
+        // discount of its own has none, so its boosts never counted as
+        // live and never reverted (Certified Pep, WEEKEND35, Nov 2026).
+        if (! $this->coupon_boost_expires_at || $this->coupon_boost_expires_at->isPast()) {
             return false;
         }
         if ($this->coupon_boost_starts_at && $this->coupon_boost_starts_at->isFuture()) {
             return false;
         }
+
+        return true;
+    }
+
+    /**
+     * A boost has been launched or scheduled and not yet reverted or
+     * cancelled. Every boost has an end time, and ending one clears it.
+     */
+    public function couponBoostInFlight(): bool
+    {
+        return $this->coupon_boost_expires_at !== null;
+    }
+
+    /**
+     * The boost's % (and its code, if it has one) is the live coupon. A
+     * scheduled boost keeps its start time until it is swapped in.
+     */
+    private function couponBoostSwappedIn(): bool
+    {
+        return $this->couponBoostInFlight() && $this->coupon_boost_starts_at === null;
+    }
+
+    /**
+     * The vendor's own coupon as [percent, code]: what shows whenever no
+     * boost is live. Either can be null, and a vendor with no coupon of
+     * its own goes back to having none.
+     *
+     * While a boost is live the previous_* columns hold it. Before Nov 14
+     * a null there meant "nothing to restore", so a vendor without a code
+     * kept the boost's code as its own after the boost ended.
+     */
+    public function standardCoupon(): array
+    {
+        if (! $this->couponBoostSwappedIn()) {
+            return [$this->coupon_discount_percent, $this->coupon_code];
+        }
+
+        return [
+            $this->coupon_discount_previous_percent,
+            $this->coupon_boost_code !== null ? $this->coupon_code_previous : $this->coupon_code,
+        ];
+    }
+
+    /**
+     * Make the boost's % and code the live coupon, saving the vendor's
+     * own coupon for when the boost ends. Runs when a boost launches and
+     * when a scheduled one starts (ActivateScheduledCouponBoosts). Does
+     * not save.
+     */
+    public function swapInCouponBoost(): void
+    {
+        [$percent, $code] = $this->standardCoupon();
+
+        $this->coupon_discount_previous_percent = $percent;
+        $this->coupon_code_previous = $this->coupon_boost_code !== null ? $code : null;
+        $this->coupon_discount_percent = $this->coupon_boost_percent;
+        if ($this->coupon_boost_code !== null) {
+            $this->coupon_code = $this->coupon_boost_code;
+        }
+        $this->coupon_boost_starts_at = null;
+    }
+
+    /**
+     * End the boost and put the vendor's own coupon back. A boost that
+     * never started only loses its schedule. Does not save.
+     *
+     * With $keepHandEdits, a live % or code that no longer matches the
+     * boost stays as it is, because someone set it by hand after the
+     * boost went live. The revert job uses this for boosts that ended
+     * more than a day ago: boosts from before the Nov 14 fix that never
+     * reverted.
+     */
+    public function endCouponBoost(bool $keepHandEdits = false): void
+    {
+        if ($this->couponBoostSwappedIn()) {
+            [$percent, $code] = $this->standardCoupon();
+
+            $percentIsTheBoosts = $this->coupon_boost_percent !== null
+                && $this->coupon_discount_percent !== null
+                && abs((float) $this->coupon_discount_percent - (float) $this->coupon_boost_percent) < 0.01;
+            $codeIsTheBoosts = $this->coupon_boost_code !== null
+                && strcasecmp(trim((string) $this->coupon_code), trim($this->coupon_boost_code)) === 0;
+
+            if (! $keepHandEdits || $percentIsTheBoosts) {
+                $this->coupon_discount_percent = $percent;
+            }
+            if ($this->coupon_boost_code !== null && (! $keepHandEdits || $codeIsTheBoosts)) {
+                $this->coupon_code = $code;
+            }
+        }
+
+        $this->coupon_discount_previous_percent = null;
+        $this->coupon_code_previous = null;
+        $this->coupon_boost_percent = null;
+        $this->coupon_boost_code = null;
+        $this->coupon_boost_starts_at = null;
+        $this->coupon_boost_expires_at = null;
+    }
+
+    /**
+     * End a boost whose end time has passed. False when there is none.
+     * Does not save.
+     */
+    public function revertExpiredCouponBoost(): bool
+    {
+        if (! $this->couponBoostInFlight() || $this->coupon_boost_expires_at->isFuture()) {
+            return false;
+        }
+
+        $this->endCouponBoost(keepHandEdits: $this->coupon_boost_expires_at->lt(now()->subDay()));
+
         return true;
     }
 
@@ -269,33 +386,38 @@ class VendorSetting extends Model
      * ActivateScheduledCouponBoosts promotes it when the start time
      * passes. Either way RevertExpiredCouponBoosts handles the end.
      *
-     * Idempotent: re-applying while a boost is active or scheduled
-     * updates the new percentage + timing without losing the original
-     * previous_percent snapshot.
+     * Re-applying while a boost is running or scheduled replaces it and
+     * keeps the vendor's own coupon as the one to restore.
      */
     public function applyCouponBoost(float $newPercent, ?\DateTimeInterface $startsAt, \DateTimeInterface $expiresAt, ?string $boostCode = null): void
     {
-        $startsImmediately = !$startsAt || $startsAt <= new \DateTimeImmutable();
-        $isNewBoost = !$this->couponBoostActive() && !$this->couponBoostScheduled();
+        $boostCode = $boostCode !== null && trim($boostCode) !== '' ? trim($boostCode) : null;
+        $startsImmediately = ! $startsAt || $startsAt <= now();
 
-        if ($isNewBoost) {
-            // Snapshot current standard % + code — this is what we revert to.
-            $this->coupon_discount_previous_percent = $this->coupon_discount_percent;
-            $this->coupon_code_previous = $boostCode ? $this->coupon_code : $this->coupon_code_previous;
-        }
+        // A boost that has ended but the five-minute job has not reverted.
+        $this->revertExpiredCouponBoost();
+        $isNewBoost = ! $this->couponBoostInFlight();
+
+        // The vendor's own coupon shows until the new boost starts.
+        [$percent, $code] = $this->standardCoupon();
+        $this->coupon_discount_percent = $percent;
+        $this->coupon_code = $code;
+        // Read by the admin panel and dashboard while the boost is
+        // scheduled; swapInCouponBoost() sets them again at the start.
+        $this->coupon_discount_previous_percent = $percent;
+        $this->coupon_code_previous = $boostCode !== null ? $code : null;
 
         $this->coupon_boost_percent = $newPercent;
-        $this->coupon_boost_code = $boostCode ?: null;
-        $this->coupon_boost_starts_at = $startsImmediately ? null : $startsAt;
-        $this->coupon_boost_expires_at = $expiresAt;
+        $this->coupon_boost_code = $boostCode;
+        // Stored as UTC. The admin form sends ET times, and a datetime
+        // cast saves a zoned time's clock reading without converting it,
+        // so "11:59 PM" was read back as 11:59 PM UTC and boosts ended
+        // four or five hours early.
+        $this->coupon_boost_starts_at = $startsImmediately ? null : Carbon::instance($startsAt)->utc();
+        $this->coupon_boost_expires_at = Carbon::instance($expiresAt)->utc();
 
         if ($startsImmediately) {
-            // Live now — swap the discount % (and code, if provided) so
-            // vendor cards display the boosted values immediately.
-            $this->coupon_discount_percent = $newPercent;
-            if ($boostCode) {
-                $this->coupon_code = $boostCode;
-            }
+            $this->swapInCouponBoost();
         }
         $this->save();
 
@@ -324,7 +446,7 @@ class VendorSetting extends Model
         $brandName = $this->brand?->name ?? 'A vendor';
         $slug = $this->brand?->slug;
         $link = $slug ? "https://peptidemap.com/brand/{$slug}" : 'https://peptidemap.com/deals';
-        $until = \Carbon\Carbon::parse($expiresAt)->format('M j');
+        $until = Carbon::instance($expiresAt)->setTimezone('America/New_York')->format('M j');
 
         try {
             \Illuminate\Support\Facades\Http::withHeaders([
