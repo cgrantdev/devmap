@@ -186,8 +186,8 @@
                 <td class="px-5 py-4 text-right bg-emerald-50/30">
                   <template v-if="product.pmap_price">
                     <div class="ui-mono font-semibold text-emerald-700">{{ formatMoney(product, product.pmap_price) }}</div>
-                    <div class="text-[10px] uppercase tracking-wide text-emerald-600 mt-0.5">
-                      code <span class="ui-mono">{{ product.brand_coupon_code || 'PMAP' }}</span>
+                    <div class="mt-1 flex justify-end">
+                      <CouponChip :code="product.brand_coupon_code || 'PMAP'" />
                     </div>
                   </template>
                   <span v-else class="text-[color:var(--color-ink-subtle)] text-[12px]">—</span>
@@ -409,6 +409,7 @@ import ComparePriceSummary from '@/components/ComparePriceSummary.vue'
 import PricePerMgTable from '@/components/PricePerMgTable.vue'
 import PricePerMg from '@/components/price/PricePerMg.vue'
 import VendorLogo from '@/components/ui/VendorLogo.vue'
+import CouponChip from '@/components/ui/CouponChip.vue'
 import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
 import { withSrc } from '@/composables/useOutbound'
 

@@ -46,7 +46,8 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed } from 'vue'
+import { useCopyText } from '@/composables/useCopyText'
 
 const props = defineProps({
   code: { type: String, required: true },
@@ -70,38 +71,9 @@ const percentValue = computed(() => {
 
 const label = computed(() => (percentValue.value ? `${percentValue.value}% off · code` : 'Coupon code'))
 
-const copied = ref(false)
-let timer = null
+const { copied, copy: copyText } = useCopyText()
 
 async function copy() {
-  const text = displayCode.value
-  if (!text) return
-  let ok = false
-  try {
-    await navigator.clipboard.writeText(text)
-    ok = true
-  } catch {
-    // Older Safari / insecure contexts: fall back to a hidden textarea.
-    try {
-      const ta = document.createElement('textarea')
-      ta.value = text
-      ta.setAttribute('readonly', '')
-      ta.style.position = 'fixed'
-      ta.style.opacity = '0'
-      document.body.appendChild(ta)
-      ta.select()
-      ok = document.execCommand('copy')
-      document.body.removeChild(ta)
-    } catch {
-      ok = false
-    }
-  }
-  if (!ok) return
-  copied.value = true
-  emit('copied', text)
-  clearTimeout(timer)
-  timer = setTimeout(() => { copied.value = false }, 1800)
+  if (await copyText(displayCode.value)) emit('copied', displayCode.value)
 }
-
-onBeforeUnmount(() => clearTimeout(timer))
 </script>
