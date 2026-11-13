@@ -290,6 +290,59 @@ class ComparePriceStats
         return 'name_size_mismatch';
     }
 
+    /**
+     * Milligrams in a single-compound size string: "10mg", "10 mg",
+     * "500mcg", "1g", or a bare legacy number read as mg. Null for blends
+     * ("10mg/3mg"), volumes, IU, and anything else unparsable.
+     */
+    public static function parseSizeMg(?string $size): ?float
+    {
+        $s = strtolower(trim((string) $size));
+        if ($s === '' || str_contains($s, '/')) {
+            return null;
+        }
+        if (preg_match('/^(\d+(?:\.\d+)?)$/', $s, $bare)) {
+            $n = (float) $bare[1];
+
+            return $n > 0 ? $n : null;
+        }
+        if (! preg_match('/^(\d+(?:\.\d+)?)\s*(mg|mcg|g)$/', $s, $m)) {
+            return null;
+        }
+        $n = (float) $m[1];
+        if ($n <= 0) {
+            return null;
+        }
+
+        return match ($m[2]) {
+            'mcg' => $n / 1000,
+            'g' => $n * 1000,
+            default => $n,
+        };
+    }
+
+    /**
+     * True when a listing's price does not map to one vial of its stated
+     * size: non-vial formats (capsules, sprays, kits, pens) and the same
+     * pack / blend / bundle signals the per-mg stats use.
+     *
+     * @param  array<string, mixed>  $row
+     */
+    public static function isMultiUnitListing(array $row): bool
+    {
+        $type = $row['product_type'] ?? null;
+        if ($type !== null && $type !== '' && $type !== 'Peptide') {
+            return true;
+        }
+        $name = (string) ($row['name'] ?? '');
+        $rawName = trim((string) ($row['raw_name'] ?? ''));
+        $slugText = str_replace('-', ' ', trim((string) ($row['slug'] ?? '')));
+
+        return self::isMultiUnitOrBlend($name)
+            || ($rawName !== '' && self::isMultiUnitOrBlend($rawName))
+            || ($slugText !== '' && self::isMultiUnitOrBlend($slugText));
+    }
+
     private static function isMultiUnitOrBlend(string $name): bool
     {
         return preg_match(self::MULTI_UNIT_PATTERN, $name) === 1

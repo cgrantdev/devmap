@@ -184,6 +184,8 @@ import { Head } from '@inertiajs/vue3'
 import { computed, defineComponent, h } from 'vue'
 import ModernLayout from '../Layouts/ModernLayout.vue'
 import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
+import PricePerMg from '@/components/price/PricePerMg.vue'
+import { formatMoney } from '@/components/price/priceFormat'
 import { withSrc } from '@/composables/useOutbound'
 
 const props = defineProps({
@@ -199,14 +201,20 @@ const props = defineProps({
   seo: { type: Object, default: () => ({}) },
 })
 
-function fmtPrice(v) {
-  if (v == null) return null
-  return '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+// Prices stay in the vendor's currency; the symbol comes with the row
+// (or, for the compound's lowest listed price, with the compound).
+function fmtPrice(v, symbol = '$') {
+  if (v === null || v === undefined || v === '') return null
+  return formatMoney(v, symbol || '$')
 }
 
 const snapshotRows = computed(() => {
   return [
-    { label: 'Lowest listed', a: fmtPrice(props.a.cheapest_price), b: fmtPrice(props.b.cheapest_price) },
+    {
+      label: 'Lowest listed',
+      a: fmtPrice(props.a.cheapest_price, props.a.cheapest_currency_symbol),
+      b: fmtPrice(props.b.cheapest_price, props.b.cheapest_currency_symbol),
+    },
     { label: 'Vendors', a: props.a.vendor_count, b: props.b.vendor_count },
     { label: 'Products', a: props.a.product_count, b: props.b.product_count },
     { label: 'Half-life', a: props.a.half_life || null, b: props.b.half_life || null },
@@ -348,7 +356,7 @@ const VendorMiniTable = defineComponent({
           h('div', {}, [
             h('div', { class: `text-[14px] font-semibold ${accentText}` }, c.name),
             h('div', { class: 'text-[11px] text-[color:var(--color-ink-subtle)] mt-0.5' },
-              `${c.vendor_count} ${c.vendor_count === 1 ? 'vendor' : 'vendors'} · lowest listed ${fmtPrice(c.cheapest_price) || '—'}`),
+              `${c.vendor_count} ${c.vendor_count === 1 ? 'vendor' : 'vendors'} · lowest listed ${fmtPrice(c.cheapest_price, c.cheapest_currency_symbol) || '—'}`),
           ]),
           c.compare_url ? h('a', {
             href: c.compare_url,
@@ -362,14 +370,27 @@ const VendorMiniTable = defineComponent({
           }, [
             h('td', { class: 'pl-5 pr-3 py-3' }, [
               h('a', { href: `/brand/${p.brand_slug}`, class: 'text-[13px] font-semibold text-[color:var(--color-ink)] hover:text-[color:var(--color-accent-600)]' }, p.brand_name),
-              i === 0 ? h('div', { class: 'text-[10px] uppercase tracking-wide font-bold text-[color:var(--color-verified)] mt-0.5' }, 'Lowest listed') : null,
+              // Price outliers sort last and never take this badge.
+              i === 0 && !p.price_outlier ? h('div', { class: 'text-[10px] uppercase tracking-wide font-bold text-[color:var(--color-verified)] mt-0.5' }, 'Lowest listed') : null,
             ]),
-            h('td', { class: 'px-3 py-3 text-right ui-mono text-[13px] whitespace-nowrap' },
-              p.pmap_price
-                ? [h('span', { class: 'text-emerald-700 font-semibold' }, fmtPrice(p.pmap_price)),
+            h('td', { class: 'px-3 py-3 text-right ui-mono text-[13px] whitespace-nowrap' }, [
+              ...(p.pmap_price
+                ? [h('span', { class: 'text-emerald-700 font-semibold' }, fmtPrice(p.pmap_price, p.currency_symbol)),
                    h('div', { class: 'text-[9px] text-emerald-600 uppercase tracking-wide' }, `code ${p.brand_coupon_code || 'PMAP'}`)]
-                : fmtPrice(p.effective_price)
-            ),
+                : [fmtPrice(p.effective_price, p.currency_symbol)]),
+              p.price_per_mg
+                ? h('div', { class: 'mt-1 flex justify-end font-sans' }, [
+                    h(PricePerMg, {
+                      value: p.price_per_mg,
+                      currencySymbol: p.currency_symbol || '$',
+                      best: !!p.best_value,
+                      sizeLabel: p.size_mg || '',
+                      withCode: !!p.pmap_price,
+                      size: 'xs',
+                    }),
+                  ])
+                : null,
+            ]),
             h('td', { class: 'pl-3 pr-5 py-3 text-right' }, [
               h('a', {
                 href: withSrc(p.go_url),

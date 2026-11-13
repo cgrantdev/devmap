@@ -1,7 +1,8 @@
 <template>
+    <!-- The whole card is one real link: the title's ::after box stretches
+         over the card. The wishlist heart sits above it (z-10). -->
     <div
       class="bg-white border border-gray-100 rounded-xl hover:border-gray-300 hover:shadow-lg transition-all cursor-pointer overflow-hidden group relative flex flex-col h-full"
-      @click="handleClick"
     >
       <!-- Wishlist heart — top-right, layered above image -->
       <div v-if="productId" class="absolute top-2 right-2 z-10">
@@ -11,7 +12,15 @@
       <!-- Top Section: Product Image — object-contain so vials/boxes fit
            inside the card without cropping. Light bg so transparent PNGs
            don't disappear, with a gentle hover scale. -->
-      <div class="aspect-square bg-gray-50 p-3 flex items-center justify-center overflow-hidden">
+      <div class="relative aspect-square bg-gray-50 p-3 flex items-center justify-center overflow-hidden">
+        <!-- Lowest USD $/mg for this vial size among these listings. -->
+        <span
+          v-if="bestValue"
+          class="absolute top-2 left-2 inline-flex items-center gap-1 h-5 px-1.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-[0.06em] shadow-sm"
+        >
+          <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+          Best value
+        </span>
         <img
           v-if="imageUrl && !hasError"
           :src="imageUrl"
@@ -53,14 +62,21 @@
              CTA row lines up across the grid (Colin PMAP Sep 16). -->
         <div class="flex items-start gap-1.5 mb-2 h-[2.5rem] overflow-hidden">
           <h3 class="text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 min-w-0">
-            {{ name }}
+            <Link
+              :href="to"
+              class="outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-2 focus-visible:after:ring-blue-500"
+            >{{ name }}</Link>
           </h3>
           <span
             v-if="typeChip"
             :class="['flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold leading-tight mt-0.5', typeChip.classes]"
           >{{ typeChip.label }}</span>
         </div>
-  
+
+        <!-- Brand (optional) + size / pack line -->
+        <p v-if="brandName" class="text-[11px] text-gray-500 -mt-1 mb-1 truncate">{{ brandName }}</p>
+        <p v-if="sizeLine" class="text-[11px] text-gray-700 ui-mono -mt-0.5 mb-2 truncate">{{ sizeLine }}</p>
+
         <!-- Rating (hidden until the product has real reviews) -->
         <div v-if="Number(ratingCount) > 0" class="flex items-center gap-1 mb-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star w-3 h-3 fill-yellow-400 text-yellow-400" aria-hidden="true">
@@ -91,14 +107,32 @@
           </template>
           <div v-else class="text-xl text-gray-900 font-semibold leading-tight">{{ currencySymbol }}{{ displayPrice }}</div>
         </div>
+
+        <!-- Price per mg. Rendered (and its row reserved) only when the
+             parent passes the price-per-mg prop, so grids that do not use
+             it keep their old height. -->
+        <div v-if="showPerMgRow" class="mt-1.5 h-[18px] flex items-center">
+          <PricePerMg
+            v-if="pricePerMg !== null && pricePerMg !== ''"
+            :value="pricePerMg"
+            :currency-symbol="currencySymbol"
+            :best="bestValue"
+            :show-badge="false"
+            :size-label="sizeLabel || ''"
+            :with-code="!!discountedPrice"
+            size="xs"
+          />
+        </div>
       </div>
     </div>
   </template>
-  
+
   <script setup>
   import { computed, ref } from 'vue'
-  import { router } from '@inertiajs/vue3'
+  import { Link } from '@inertiajs/vue3'
   import WishlistHeart from '@/components/ui/WishlistHeart.vue'
+  import PricePerMg from '@/components/price/PricePerMg.vue'
+  import { formatSizeLabel, packLabel } from '@/components/price/priceFormat'
 
   const props = defineProps({
     name: { type: String, required: true },
@@ -115,7 +149,23 @@
     productId: { type: [Number, String], default: null },
     to: { type: String, required: true },
     currencySymbol: { type: String, default: '$' },
+    // Optional extras. brandName shows a vendor line (related products
+    // span vendors); sizeMg + rawName give the size / pack line.
+    sizeMg: { type: [String, Number], default: null },
+    rawName: { type: String, default: '' },
+    // undefined = parent does not use $/mg (no row); null = reserve the
+    // row so a grid with some per-mg prices stays aligned.
+    pricePerMg: { type: [Number, String], default: undefined },
+    bestValue: { type: Boolean, default: false },
   })
+
+  const sizeLabel = computed(() => formatSizeLabel(props.sizeMg))
+  const sizeLine = computed(() => {
+    let pack = packLabel(props.rawName)
+    if (pack === 'Kit' && props.productType === 'Kit') pack = null
+    return [sizeLabel.value, pack].filter(Boolean).join(' · ')
+  })
+  const showPerMgRow = computed(() => props.pricePerMg !== undefined)
 
   // Color-coded format chip rendered next to the product name. Only
   // Capsule + Nasal Spray render — Peptide is the implicit default.
@@ -165,9 +215,5 @@
     if (!retail || retail <= 0) return null
     return (retail * (1 - pct / 100)).toFixed(2)
   })
-  
-  const handleClick = () => {
-    router.visit(props.to)
-  }
   </script>
   

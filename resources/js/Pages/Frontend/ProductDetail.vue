@@ -111,8 +111,27 @@
                     </span>
                   </div>
                 </template>
-                <div v-if="product.size_mg" class="ui-mono text-sm text-[color:var(--color-ink-muted)] mt-1">
-                  {{ /[a-zA-Z]/.test(String(product.size_mg)) ? product.size_mg : `${product.size_mg}mg` }} vial
+                <div v-if="product.size_mg || product.price_per_mg" class="mt-1 flex items-center gap-x-2 gap-y-1 flex-wrap">
+                  <span v-if="product.size_mg" class="ui-mono text-sm text-[color:var(--color-ink-muted)]">
+                    {{ /[a-zA-Z]/.test(String(product.size_mg)) ? product.size_mg : `${product.size_mg}mg` }} vial
+                  </span>
+                  <span v-if="product.size_mg && product.price_per_mg" class="text-[color:var(--color-ink-subtle)]" aria-hidden="true">·</span>
+                  <PricePerMg
+                    v-if="product.price_per_mg"
+                    :value="product.price_per_mg"
+                    :currency-symbol="product.currency_symbol || '$'"
+                    :size-label="detailSizeLabel"
+                    :with-code="!!discountedPrice"
+                    size="md"
+                  />
+                </div>
+                <!-- Short form of the 90-day history, next to the price. -->
+                <div
+                  v-if="historyLowestLabel"
+                  class="mt-2 inline-flex items-center gap-1 h-6 px-2 rounded-full border border-emerald-200 bg-emerald-50 text-[11px] font-semibold text-emerald-800"
+                >
+                  <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                  {{ historyLowestLabel }}
                 </div>
               </div>
 
@@ -141,7 +160,10 @@
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
               </div>
-  
+
+              <!-- 90-day retail price history (change-based snapshots). -->
+              <PriceSparkline v-if="priceHistory" :history="priceHistory" class="mb-6" />
+
               <!-- Discord discussion chip — small ask, not competing with the primary CTA -->
               <a
                 href="https://discord.gg/uYj2M9XKa5"
@@ -333,16 +355,28 @@
         <!-- Related Products -->
         <div v-if="relatedProducts && relatedProducts.length > 0" class="bg-white rounded-lg border border-gray-200 p-8">
           <h2 class="text-2xl text-gray-900 mb-6">Related Products</h2>
+          <!-- Same vial size first, cheapest per mg first, with each
+               vendor's code price. -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <ProductSimpleDetailCard
+            <ProductSimpleCard
               v-for="relatedProduct in relatedProducts"
               :key="relatedProduct.id"
+              :product-id="relatedProduct.id"
               :name="relatedProduct.name"
+              :raw-name="relatedProduct.raw_name || ''"
               :image-url="relatedProduct.image_url"
               :price="relatedProduct.price"
               :discount-price="relatedProduct.discount_price"
-              :brand-name="relatedProduct.brand?.name"
+              :brand-name="relatedProduct.brand?.name || ''"
+              :rating-average="relatedProduct.rating_average"
+              :rating-count="relatedProduct.rating_count"
+              :product-type="relatedProduct.product_type"
+              :brand-discount-percent="relatedProduct.brand_discount_percent"
+              :brand-coupon-code="relatedProduct.brand_coupon_code"
               :currency-symbol="relatedProduct.currency_symbol || '$'"
+              :size-mg="relatedProduct.size_mg"
+              :price-per-mg="relatedProduct.price_per_mg ?? null"
+              :best-value="!!relatedProduct.best_value"
               :to="relatedProduct.brand?.slug
                 ? `/product/${relatedProduct.brand.slug}/${relatedProduct.slug}/${relatedProduct.id}`
                 : `/product/${relatedProduct.slug}/${relatedProduct.id}`"
@@ -360,7 +394,9 @@ import { Link, router, usePage } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import { stripSiteSuffix } from '@/utils/pageTitle'
 import { withSrc } from '@/composables/useOutbound'
-import ProductSimpleDetailCard from '@/components/ProductSimpleDetailCard.vue'
+import ProductSimpleCard from '@/components/ProductSimpleCard.vue'
+import PricePerMg from '@/components/price/PricePerMg.vue'
+import PriceSparkline from '@/components/price/PriceSparkline.vue'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
 
 const props = defineProps({
@@ -368,6 +404,9 @@ const props = defineProps({
   brand: Object,
   relatedProducts: Array,
   reviews: Array,
+  // { points, lowest, highest, current, is_lowest, change_pct,
+  //   currency_symbol, days } or null when there is nothing to plot.
+  priceHistory: { type: Object, default: null },
   seo: {
     type: Object,
     default: () => ({
@@ -399,6 +438,31 @@ const discountedPrice = computed(() => {
   const base = parseFloat(props.product?.discount_price || props.product?.price || 0)
   if (!base || base <= 0) return null
   return (base * (1 - pct / 100)).toFixed(2)
+})
+
+const detailSizeLabel = computed(() => {
+  const s = props.product?.size_mg
+  if (s === null || s === undefined || s === '') return ''
+  return /[a-zA-Z]/.test(String(s)) ? String(s) : `${s}mg`
+})
+
+// "Lowest in 90 days" next to the price: only when the price actually
+// moved in the window and today's price is the low. A history that
+// starts inside the window says "since <date>" instead.
+const historyLowestLabel = computed(() => {
+  const h = props.priceHistory
+  if (!h || !h.is_lowest || !(Number(h.highest) - Number(h.lowest) >= 0.005)) return null
+  const first = Array.isArray(h.points) && h.points.length ? String(h.points[0].date || '') : ''
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(first)
+  if (!m) return null
+  const start = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  const lastDate = String(h.points[h.points.length - 1].date || '')
+  const l = /^(\d{4})-(\d{2})-(\d{2})/.exec(lastDate)
+  const end = l ? Date.UTC(Number(l[1]), Number(l[2]) - 1, Number(l[3])) : start
+  const days = Number(h.days) || 90
+  if ((end - start) / 86400000 >= days - 1) return `Lowest price in ${days} days`
+  const since = new Date(start).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+  return `Lowest price since ${since}`
 })
 
 // Effective coupon code label — vendor's code if set, otherwise PMAP.

@@ -89,4 +89,27 @@ class Currency
     {
         return self::forCountry($country)[1];
     }
+
+    /**
+     * Approximate USD value of an amount in the given currency, from the
+     * static rates in config/currency_rates.php. For ranking and badges
+     * only; displayed prices stay in the vendor's currency. Null when the
+     * currency has no configured rate.
+     */
+    public static function toUsd(?float $amount, ?string $code): ?float
+    {
+        if ($amount === null) {
+            return null;
+        }
+        $code = strtoupper(trim((string) $code));
+        if ($code === '' || $code === 'USD') {
+            return $amount;
+        }
+        $rate = config('currency_rates.usd_per_unit.'.$code);
+        if (! is_numeric($rate) || (float) $rate <= 0) {
+            return null;
+        }
+
+        return round($amount * (float) $rate, 4);
+    }
 }

@@ -188,15 +188,15 @@
             >All sizes</button>
             <button
               v-for="size in getSizes(compound)"
-              :key="size"
-              @click="setSize(idx, size)"
+              :key="size.key"
+              @click="setSize(idx, size.key)"
               :class="[
                 'ui-mono h-8 px-3 rounded-[8px] text-[12px] font-semibold transition-all whitespace-nowrap flex-shrink-0',
-                getSelectedSize(idx) === size
+                getSelectedSize(idx) === size.key
                   ? 'bg-[color:var(--color-ink)] text-white shadow-sm'
                   : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]',
               ]"
-            >{{ formatSize(size) }}</button>
+            >{{ size.label }}</button>
           </div>
 
           <!-- Price table. Mobile hides Product + Retail (compound name
@@ -224,7 +224,7 @@
                   :key="product.id"
                   :class="[
                     'border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] transition-colors',
-                    pidx === 0 ? 'bg-[color:var(--color-verified-bg)]' : '',
+                    pidx === 0 && !product.price_outlier ? 'bg-[color:var(--color-verified-bg)]' : '',
                   ]"
                 >
                   <!-- Vendor -->
@@ -248,7 +248,9 @@
                         </a>
                         <!-- Mobile-only: surface the product name since the Product column is hidden <md -->
                         <div class="md:hidden text-[11px] text-[color:var(--color-ink-subtle)] truncate">{{ product.name }}</div>
-                        <div v-if="pidx === 0" class="flex items-center gap-1 mt-0.5 flex-wrap">
+                        <!-- Price outliers (a stale $4.95 vial among ~$100
+                             listings) sort last and never take this badge. -->
+                        <div v-if="pidx === 0 && !product.price_outlier" class="flex items-center gap-1 mt-0.5 flex-wrap">
                           <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Lowest listed</span>
                           <span
                             v-if="percentCheaper(getFilteredProducts(compound, idx))"
@@ -305,6 +307,16 @@
                       </div>
                       <span v-else class="ui-mono text-[14px] sm:text-[15px] font-bold text-[color:var(--color-ink)]">{{ sym(product) }}{{ formatPrice(product.price) }}</span>
                     </template>
+                    <div v-if="product.price_per_mg" class="mt-1 flex justify-end">
+                      <PricePerMg
+                        :value="product.price_per_mg"
+                        :currency-symbol="sym(product)"
+                        :best="!!product.best_value"
+                        :size-label="formatSize(product.size_mg)"
+                        :with-code="!!discountedPriceFor(product)"
+                        size="xs"
+                      />
+                    </div>
                   </td>
                   <!-- Coupon — its own prominent click-to-copy column so
                        people who don't want to click through can still grab
@@ -359,21 +371,36 @@
               </tbody>
             </table>
            </div>
-            <!-- Show more / less toggle. Hidden when the filtered set fits under the cap. -->
-            <button
-              v-if="getFilteredProducts(compound, idx).length > 5"
-              @click="toggleCompound(idx)"
-              class="ui-focus w-full h-11 flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:bg-[color:var(--color-hairline-soft)] border-t border-[color:var(--color-hairline)] transition-colors"
+            <!-- Footer: expand the cheapest rows shipped with the hub, and
+                 link to the compound page for the complete table. -->
+            <div
+              v-if="getFilteredProducts(compound, idx).length > COLLAPSED_LIMIT || hasMoreListings(compound)"
+              class="flex flex-col sm:flex-row border-t border-[color:var(--color-hairline)]"
             >
-              <template v-if="isExpanded(idx)">
-                Show fewer
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
-              </template>
-              <template v-else>
-                Show all {{ getFilteredProducts(compound, idx).length }} vendors
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-              </template>
-            </button>
+              <button
+                v-if="getFilteredProducts(compound, idx).length > COLLAPSED_LIMIT"
+                @click="toggleCompound(idx)"
+                :aria-expanded="isExpanded(idx)"
+                class="ui-focus flex-1 h-11 flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] hover:bg-[color:var(--color-hairline-soft)] transition-colors"
+              >
+                <template v-if="isExpanded(idx)">
+                  Show fewer
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+                </template>
+                <template v-else>
+                  Show {{ getFilteredProducts(compound, idx).length - COLLAPSED_LIMIT }} more
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </template>
+              </button>
+              <a
+                v-if="hasMoreListings(compound)"
+                :href="`/compare/${compound.slug}`"
+                class="ui-focus flex-1 h-11 flex items-center justify-center gap-1.5 text-[13px] font-semibold text-[color:var(--color-ink)] hover:bg-[color:var(--color-hairline-soft)] transition-colors sm:border-l border-t sm:border-t-0 border-[color:var(--color-hairline)]"
+              >
+                See all {{ compound.product_count }} {{ compound.name }} listings
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </a>
+            </div>
           </div>
 
           <!-- Empty state -->
@@ -382,7 +409,8 @@
             class="bg-white rounded-[14px] border border-dashed border-[color:var(--color-hairline)] p-10 text-center text-[color:var(--color-ink-subtle)] text-sm"
           >
             <template v-if="compound.products.length && !getFilteredProducts(compound, idx).length">
-              No products at this dosage. Try a different size above.
+              No listings at this size in this preview.
+              <a :href="`/compare/${compound.slug}`" class="ml-1 font-semibold text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)]">See the full {{ compound.name }} comparison</a>
             </template>
             <template v-else>
               No vendors currently stock this compound.
@@ -428,6 +456,8 @@ import { Head } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
 import WishlistHeart from '@/components/ui/WishlistHeart.vue'
 import BuyThroughModal from '@/components/BuyThroughModal.vue'
+import PricePerMg from '@/components/price/PricePerMg.vue'
+import { compareSizeInfo, sizeInfo } from '@/components/price/priceFormat'
 import { withSrc } from '@/composables/useOutbound'
 
 const buyModal = ref(null)
@@ -586,28 +616,38 @@ const typeNavItems = computed(() => {
     { key: 'Kit',         icon: '📦', label: 'Kits' },
     { key: 'Other',       icon: '⚪', label: 'Other' },
   ]
+  // The hub ships each compound's cheapest rows only; type_counts holds
+  // the full per-format totals.
   return defs.map(d => ({
     ...d,
     count: props.compounds.reduce((n, c) =>
-      n + c.products.filter(p => productMatchesType(p, d.key)).length, 0),
+      n + (c.type_counts && c.type_counts[d.key] !== undefined
+        ? Number(c.type_counts[d.key]) || 0
+        : c.products.filter(p => productMatchesType(p, d.key)).length), 0),
   }))
 })
 
+// True when the hub preview holds fewer rows than the compound has.
+function hasMoreListings(compound) {
+  return Number(compound.product_count || 0) > (compound.products?.length || 0)
+}
+
 function getSizes(compound) {
-  // Collect unique size strings ("10mg", "5mg/5mg", etc.) and sort by the
-  // first numeric token so the tabs read 5mg → 10mg → 20mg → blends after.
-  const unique = [...new Set(
-    compound.products
-      .map(p => p.size_mg)
-      .filter(s => s && String(s).trim() !== '')
-      .map(s => String(s).toLowerCase())
-  )]
-  return unique.sort((a, b) => {
-    const numA = parseFloat(a) || 0
-    const numB = parseFloat(b) || 0
-    if (numA !== numB) return numA - numB
-    return a.localeCompare(b)
-  })
+  // One tab per amount ("10 mg", "10mg" and a bare "10" share a tab),
+  // sorted by milligrams with blends after. size_counts covers every
+  // listing; the shipped rows are only the cheapest few per size.
+  const source = compound.size_counts
+    ? Object.keys(compound.size_counts)
+    : compound.products.map(p => p.size_mg)
+  const groups = new Map()
+  for (const raw of source) {
+    if (raw === null || raw === undefined || String(raw).trim() === '') continue
+    const info = sizeInfo(raw)
+    if (!groups.has(info.key)) {
+      groups.set(info.key, { ...info, label: formatSize(String(raw).replace(/\s+/g, '')) })
+    }
+  }
+  return [...groups.values()].sort(compareSizeInfo)
 }
 
 function getSelectedSize(idx) {
@@ -621,7 +661,7 @@ function setSize(idx, size) {
 function getFilteredProducts(compound, idx) {
   const size = getSelectedSize(idx)
   return compound.products.filter(p => {
-    if (size && String(p.size_mg).toLowerCase() !== String(size).toLowerCase()) return false
+    if (size && sizeInfo(p.size_mg).key !== size) return false
     if (!productMatchesType(p, selectedType.value)) return false
     if (!productMatchesLocation(p)) return false
     return true
@@ -642,12 +682,14 @@ function getVisibleProducts(compound, idx) {
 }
 
 function percentCheaper(products) {
-  if (products.length < 2) return null
-  // Compare against the same field the rows are sorted by (final_price =
-  // post-coupon when applicable, retail otherwise) so 'X% cheaper than #2'
-  // reflects what visitors actually pay.
-  const first = parseFloat(products[0]?.final_price ?? products[0]?.effective_price)
-  const second = parseFloat(products[1]?.final_price ?? products[1]?.effective_price)
+  // Compare on the field the rows are sorted by: what the visitor pays,
+  // in USD so a GBP row is not read as dollars. Price outliers are left
+  // out so a stale $4.95 vial can't claim to be 95% cheaper.
+  const priced = products.filter(p => !p?.price_outlier)
+  if (priced.length < 2) return null
+  const pay = (p) => parseFloat(p?.usd_final_price ?? p?.final_price ?? p?.effective_price)
+  const first = pay(priced[0])
+  const second = pay(priced[1])
   if (!first || !second || first >= second) return null
   return Math.round((1 - first / second) * 100)
 }

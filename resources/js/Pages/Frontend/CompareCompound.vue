@@ -137,6 +137,7 @@
                 <th class="text-left px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden sm:table-cell">Size</th>
                 <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)]">Retail</th>
                 <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-emerald-700 bg-emerald-50/50">Price with code</th>
+                <th class="text-right px-5 py-3 text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] hidden sm:table-cell" title="Price per mg for single vials, after the code when one applies">Per mg</th>
                 <th class="text-right px-5 py-3 w-[100px]"></th>
               </tr>
             </thead>
@@ -146,7 +147,7 @@
                 :key="product.id"
                 :class="[
                   'border-b border-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline-soft)] transition-colors',
-                  pidx === 0 && !compound.price_stats ? 'bg-[color:var(--color-verified-bg)]' : '',
+                  pidx === 0 && !compound.price_stats && !product.price_outlier ? 'bg-[color:var(--color-verified-bg)]' : '',
                 ]"
               >
                 <td class="px-5 py-4">
@@ -167,7 +168,8 @@
                       >
                         {{ product.brand_name }}
                       </a>
-                      <div v-if="pidx === 0 && !compound.price_stats" class="flex items-center gap-1 mt-0.5">
+                      <!-- Price outliers sort last and never take this badge. -->
+                      <div v-if="pidx === 0 && !compound.price_stats && !product.price_outlier" class="flex items-center gap-1 mt-0.5">
                         <span class="text-[10px] font-bold uppercase tracking-[0.1em] text-[color:var(--color-verified)]">Lowest listed</span>
                       </div>
                     </div>
@@ -196,6 +198,28 @@
                       code <span class="ui-mono">{{ product.brand_coupon_code || 'PMAP' }}</span>
                     </div>
                   </template>
+                  <span v-else class="text-[color:var(--color-ink-subtle)] text-[12px]">—</span>
+                  <!-- Phones: per-mg folds in here (its column is hidden). -->
+                  <div v-if="product.price_per_mg" class="sm:hidden mt-1 flex justify-end">
+                    <PricePerMg
+                      :value="product.price_per_mg"
+                      :currency-symbol="product.currency_symbol || '$'"
+                      :best="!!product.best_value"
+                      :size-label="product.size_mg || ''"
+                      :with-code="!!product.pmap_price"
+                      size="xs"
+                    />
+                  </div>
+                </td>
+                <td class="px-5 py-4 text-right hidden sm:table-cell">
+                  <PricePerMg
+                    v-if="product.price_per_mg"
+                    :value="product.price_per_mg"
+                    :currency-symbol="product.currency_symbol || '$'"
+                    :best="!!product.best_value"
+                    :size-label="product.size_mg || ''"
+                    :with-code="!!product.pmap_price"
+                  />
                   <span v-else class="text-[color:var(--color-ink-subtle)] text-[12px]">—</span>
                 </td>
                 <td class="px-5 py-4 text-right">
@@ -391,6 +415,7 @@ import ModernLayout from '../Layouts/ModernLayout.vue'
 import BuyThroughModal from '@/components/BuyThroughModal.vue'
 import ComparePriceSummary from '@/components/ComparePriceSummary.vue'
 import PricePerMgTable from '@/components/PricePerMgTable.vue'
+import PricePerMg from '@/components/price/PricePerMg.vue'
 import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
 import { withSrc } from '@/composables/useOutbound'
 

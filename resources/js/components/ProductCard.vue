@@ -1,11 +1,21 @@
 <template>
+  <!-- The whole card is one real link: the title's ::after box stretches
+       over the card, so middle-click, open-in-new-tab and crawlers all
+       see an <a href> instead of a click handler. -->
   <div
-    @click="handleClick"
     class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-all cursor-pointer group relative flex flex-col h-full"
   >
     <!-- Top Section: Product Image. aspect-[4/3] (was square) so cards
          aren't dominated by empty gradient when images fail to load. -->
-    <div class="aspect-[4/3] bg-gradient-to-br from-blue-50 to-purple-50 p-4 border-b border-gray-200 flex items-center justify-center overflow-hidden">
+    <div class="relative aspect-[4/3] bg-gradient-to-br from-blue-50 to-purple-50 p-4 border-b border-gray-200 flex items-center justify-center overflow-hidden">
+      <!-- Lowest USD $/mg for this vial size on the page. -->
+      <span
+        v-if="bestValue"
+        class="absolute top-2 left-2 inline-flex items-center gap-1 h-5 px-1.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-[0.06em] shadow-sm"
+      >
+        <svg class="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+        Best value
+      </span>
       <img
         v-if="imageUrl && !hasError"
         :src="imageUrl"
@@ -37,7 +47,10 @@
            than one-line neighbours, misaligning the CTA row. -->
       <div class="flex items-start gap-1.5 h-[2.5rem] overflow-hidden">
         <h3 class="text-[13px] font-semibold text-gray-900 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors flex-1 min-w-0">
-          {{ name }}
+          <Link
+            :href="to"
+            class="outline-none after:absolute after:inset-0 after:rounded-lg focus-visible:after:ring-2 focus-visible:after:ring-blue-500"
+          >{{ name }}</Link>
         </h3>
         <span
           v-if="typeChip"
@@ -46,11 +59,14 @@
       </div>
 
       <p class="text-[11px] text-gray-500 mt-0.5 truncate h-[1rem]">{{ brandName || 'Unknown Brand' }}</p>
+      <!-- Size / pack line. Fixed height keeps the grid aligned when a
+           listing has neither. -->
+      <p class="text-[11px] text-gray-700 mt-0.5 truncate h-[1rem] ui-mono">{{ sizeLine }}</p>
 
       <!-- Price — FIXED 60px so every card gets the same block height
            whether the row is discounted (retail + strikethrough + "with
            code X" + big new price) or plain (just the price). -->
-      <div class="mt-2 mb-2 h-[60px] flex flex-col justify-end">
+      <div class="mt-2 h-[60px] flex flex-col justify-end">
         <template v-if="discountedPrice">
           <div class="flex items-baseline gap-2 flex-wrap">
             <span class="text-lg font-bold text-emerald-700 leading-none">{{ currencySymbol }}{{ discountedPrice }}</span>
@@ -63,20 +79,38 @@
         <div v-else class="text-lg font-bold text-gray-900 leading-none">{{ currencySymbol }}{{ displayPrice }}</div>
       </div>
 
-      <button
-        @click="handleClick"
-        class="mt-auto h-8 rounded bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
+      <!-- Price per mg (single vials only; null for kits, packs, blends
+           and price outliers). Fixed height for grid alignment. -->
+      <div class="mt-1.5 mb-2 h-[18px] flex items-center">
+        <PricePerMg
+          v-if="pricePerMg !== null && pricePerMg !== undefined && pricePerMg !== ''"
+          :value="pricePerMg"
+          :currency-symbol="currencySymbol"
+          :best="bestValue"
+          :show-badge="false"
+          :size-label="sizeDisplay || ''"
+          :with-code="!!discountedPrice"
+          size="xs"
+        />
+      </div>
+
+      <!-- Visual CTA only; the stretched title link handles the click. -->
+      <span
+        aria-hidden="true"
+        class="mt-auto h-8 rounded bg-blue-600 group-hover:bg-blue-700 text-white text-[12px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
       >
         View Product
         <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-      </button>
+      </span>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { Link } from '@inertiajs/vue3'
+import PricePerMg from '@/components/price/PricePerMg.vue'
+import { packLabel } from '@/components/price/priceFormat'
 
 const props = defineProps({
   name: { type: String, required: true },
@@ -98,6 +132,13 @@ const props = defineProps({
   // (ProductRowCurrency). Defaults to USD when the backend didn't
   // attach one — same behavior as before this prop existed.
   currencySymbol: { type: String, default: '$' },
+  // Vendor's own product name (the card title is the cleaned display
+  // name); used to spot pack sizes like "10 vials" or "60 ct".
+  rawName: { type: String, default: '' },
+  // Price per mg with the code, vendor currency (backend price_per_mg).
+  pricePerMg: { type: [Number, String], default: null },
+  // Lowest USD $/mg for this size on the page (backend best_value).
+  bestValue: { type: Boolean, default: false },
 })
 
 // Color-coded format chip shown next to the product name. Only Capsule
@@ -154,6 +195,13 @@ const sizeDisplay = computed(() => {
     return `${match[1]}mg`
   }
   return null
+})
+
+// "10mg · 10 vials". Kit is dropped when the format chip already says it.
+const sizeLine = computed(() => {
+  let pack = packLabel(props.rawName || props.name)
+  if (pack === 'Kit' && props.productType === 'Kit') pack = null
+  return [sizeDisplay.value, pack].filter(Boolean).join(' · ')
 })
 
 // Use real purity from database, or extract from name, or use default
@@ -216,8 +264,4 @@ const stockStatus = computed(() => {
 const isInStock = computed(() => {
   return props.availability === 'in_stock' || props.availability === 'available'
 })
-
-const handleClick = () => {
-  router.visit(props.to)
-}
 </script>

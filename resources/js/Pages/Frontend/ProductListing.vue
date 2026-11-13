@@ -40,6 +40,7 @@
             @change="handleSortChange"
           >
             <option value="featured|desc">Featured</option>
+            <option value="value|asc">Best value ($/mg)</option>
             <option value="price|asc">Price: Low → High</option>
             <option value="price|desc">Price: High → Low</option>
             <option value="popular|desc">Most Popular</option>
@@ -48,16 +49,18 @@
           <!-- Product Format filter — Colin PMAP Sep 30 (#13). Same
                multi-select chip pattern as size. Peptide is the
                implicit default so null product_type rows count under
-               it (see the backend). -->
-          <div class="flex flex-wrap items-center gap-1.5">
-            <span class="text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] pr-0.5">Format</span>
+               it (see the backend). Chip rows scroll sideways on
+               phones instead of wrapping into a tall block. -->
+          <div class="w-full md:w-auto flex flex-nowrap md:flex-wrap items-center gap-1.5 overflow-x-auto md:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-0.5 md:pb-0">
+            <span class="shrink-0 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] pr-0.5">Format</span>
             <button
               v-for="fmt in FORMAT_OPTIONS"
               :key="fmt"
               type="button"
               @click="toggleFormat(fmt)"
+              :aria-pressed="selectedFormats.has(fmt)"
               :class="[
-                'h-7 px-2.5 text-[12px] rounded-full border transition-colors',
+                'shrink-0 whitespace-nowrap h-7 px-2.5 text-[12px] rounded-full border transition-colors',
                 selectedFormats.has(fmt)
                   ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
                   : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)]',
@@ -69,34 +72,36 @@
               v-if="selectedFormats.size > 0"
               type="button"
               @click="clearFormats"
-              class="text-[11px] text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)] underline ml-1"
+              class="shrink-0 text-[11px] text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)] underline ml-1"
             >clear</button>
           </div>
 
           <!-- Dosage size filter — multi-select chips (Colin PMAP
                Sep 22). Data-driven: only sizes actually present in
-               this compound's product set show. -->
-          <div class="flex flex-wrap items-center gap-1.5">
-            <span class="text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] pr-0.5">Size</span>
+               this compound's product set show. "10 mg" and "10mg"
+               share one chip; chips sort by amount, not text. -->
+          <div class="w-full md:w-auto flex flex-nowrap md:flex-wrap items-center gap-1.5 overflow-x-auto md:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pb-0.5 md:pb-0">
+            <span class="shrink-0 text-[11px] uppercase tracking-[0.1em] font-semibold text-[color:var(--color-ink-subtle)] pr-0.5">Size</span>
             <button
-              v-for="size in mergedSizes"
-              :key="size"
+              v-for="group in sizeGroups"
+              :key="group.key"
               type="button"
-              @click="toggleSize(size)"
+              @click="toggleSizeGroup(group)"
+              :aria-pressed="isSizeGroupSelected(group)"
               :class="[
-                'h-7 px-2.5 text-[12px] rounded-full border transition-colors ui-mono',
-                selectedSizes.has(size)
+                'shrink-0 whitespace-nowrap h-7 px-2.5 text-[12px] rounded-full border transition-colors ui-mono',
+                isSizeGroupSelected(group)
                   ? 'bg-[color:var(--color-ink)] text-white border-[color:var(--color-ink)]'
                   : 'bg-white text-[color:var(--color-ink-muted)] border-[color:var(--color-hairline)] hover:border-[color:var(--color-ink-subtle)]',
               ]"
             >
-              {{ formatSize(size) }}
+              {{ group.label }}
             </button>
             <button
               v-if="selectedSizes.size > 0"
               type="button"
               @click="clearSizes"
-              class="text-[11px] text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)] underline ml-1"
+              class="shrink-0 text-[11px] text-[color:var(--color-ink-subtle)] hover:text-[color:var(--color-ink-muted)] underline ml-1"
             >clear</button>
           </div>
 
@@ -140,7 +145,10 @@
                 :brand-discount-percent="product.brand_discount_percent"
                 :brand-coupon-code="product.brand_coupon_code"
                 :currency-symbol="product.currency_symbol || '$'"
-                :to="`/product/${product.slug}/${product.id}`"
+                :raw-name="product.name || ''"
+                :price-per-mg="product.price_per_mg ?? null"
+                :best-value="!!product.best_value"
+                :to="productUrl(product)"
               />
             </div>
           </div>
@@ -175,6 +183,7 @@ import LocationFilterChip from '@/components/ui/LocationFilterChip.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import MainButton from '@/components/MainButton.vue'
 import CatalogCrossLinks from '@/components/CatalogCrossLinks.vue'
+import { compareSizeInfo, sizeInfo } from '@/components/price/priceFormat'
 import { stripSiteSuffix } from '@/utils/pageTitle'
 
 const props = defineProps({
@@ -303,7 +312,17 @@ watchEffect(() => {
 const heroBgRef = ref(null)
 const heroBgLoaded = ref(false)
 
-const sortValue = computed(() => `${props.sort || 'featured'}|${props.sortDir || 'desc'}`)
+// Best value only runs one way (lowest $/mg first), whatever sort_dir says.
+const sortValue = computed(() => (props.sort === 'value'
+  ? 'value|asc'
+  : `${props.sort || 'featured'}|${props.sortDir || 'desc'}`))
+
+// Canonical product URL; the legacy /product/{slug}/{id} form 301s.
+function productUrl(product) {
+  return product.brand?.slug
+    ? `/product/${product.brand.slug}/${product.slug}/${product.id}`
+    : `/product/${product.slug}/${product.id}`
+}
 // Multi-select via a Set. URL carries comma-separated ?size=A,B.
 // Colin PMAP Sep 30 (#11): revert to strictly data-driven — show
 // only sizes that actually exist in the DB for this category, in
@@ -322,11 +341,37 @@ const mergedSizes = computed(() =>
     .filter(Boolean)
 )
 
-function toggleSize(size) {
-  const set = selectedSizes.value
-  if (set.has(size)) set.delete(size)
-  else set.add(size)
-  selectedSizes.value = new Set(set)
+// One chip per amount: "10 mg", "10mg" and a bare legacy "10" are the
+// same size, so they share a chip that toggles every stored spelling.
+// Chips sort by milligrams (500mcg before 1mg before 1g); blends and
+// other units follow in numeric order.
+const sizeGroups = computed(() => {
+  const groups = new Map()
+  for (const raw of mergedSizes.value) {
+    const info = sizeInfo(raw)
+    let group = groups.get(info.key)
+    if (!group) {
+      group = { key: info.key, rank: info.rank, mg: info.mg, values: [], label: '' }
+      groups.set(info.key, group)
+    }
+    group.values.push(raw)
+  }
+  for (const group of groups.values()) {
+    // Prefer a stored spelling that carries its unit and no spaces.
+    const preferred = group.values.find((v) => /[a-z]/i.test(v) && !/\s/.test(v))
+    const label = preferred || formatSize(group.values[0].replace(/\s+/g, ''))
+    group.label = group.key.startsWith('mg:') ? label.toLowerCase() : label
+  }
+  return [...groups.values()].sort(compareSizeInfo)
+})
+function isSizeGroupSelected(group) {
+  return group.values.some((v) => selectedSizes.value.has(v))
+}
+function toggleSizeGroup(group) {
+  const set = new Set(selectedSizes.value)
+  if (isSizeGroupSelected(group)) group.values.forEach((v) => set.delete(v))
+  else group.values.forEach((v) => set.add(v))
+  selectedSizes.value = set
   applyFilters()
 }
 

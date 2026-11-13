@@ -16,7 +16,10 @@ use App\Support\CatalogCrossLinks;
 use App\Support\ProductListingSeo;
 use App\Support\ProductPageSeo;
 use App\Support\ProductRowCurrency;
+use App\Support\Currency;
+use App\Models\ProductPriceSnapshot;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -129,6 +132,78 @@ class ProductsController extends Controller
               ->orWhereHas('brand.vendorSetting.shipsToLocations', fn ($lq) => $lq->whereIn('name', $aliases))
               ->orWhereHas('brand.vendorSetting.location', fn ($lq) => $lq->whereIn('name', $aliases));
         });
+    }
+
+    /**
+     * 90-day price history for the product page. Snapshots are stored only
+     * when a price changes, so the series is the price in force when the
+     * window opened, each change inside it, and today's price. Prices are
+     * the vendor's listed price (sale price when lower), in its currency.
+     * Null when there is nothing to plot.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function priceHistory(Product $product, string $currencySymbol): ?array
+    {
+        $effective = static function ($price, $sale): float {
+            $price = (float) $price;
+            $sale = (float) $sale;
+
+            return ($sale > 0 && ($price <= 0 || $sale < $price)) ? $sale : $price;
+        };
+
+        try {
+            $since = now()->subDays(90);
+            $window = ProductPriceSnapshot::where('product_id', $product->id)
+                ->where('snapshot_at', '>=', $since)
+                ->orderBy('snapshot_at')
+                ->get(['price', 'discount_price', 'snapshot_at']);
+            $before = ProductPriceSnapshot::where('product_id', $product->id)
+                ->where('snapshot_at', '<', $since)
+                ->orderByDesc('snapshot_at')
+                ->first(['price', 'discount_price', 'snapshot_at']);
+        } catch (\Throwable $e) {
+            // A missing history must never take the product page down.
+            report($e);
+
+            return null;
+        }
+
+        $points = [];
+        if ($before) {
+            $opening = round($effective($before->price, $before->discount_price), 2);
+            if ($opening > 0) {
+                $points[] = ['date' => $since->toDateString(), 'price' => $opening];
+            }
+        }
+        foreach ($window as $snap) {
+            $value = round($effective($snap->price, $snap->discount_price), 2);
+            if ($value > 0) {
+                $points[] = ['date' => $snap->snapshot_at->toDateString(), 'price' => $value];
+            }
+        }
+        $current = round($effective($product->price, $product->discount_price), 2);
+        if ($current > 0) {
+            $points[] = ['date' => now()->toDateString(), 'price' => $current];
+        }
+        if (count($points) < 2) {
+            return null;
+        }
+
+        $prices = array_column($points, 'price');
+        $lowest = min($prices);
+        $first = $points[0]['price'];
+
+        return [
+            'points' => $points,
+            'lowest' => $lowest,
+            'highest' => max($prices),
+            'current' => $current,
+            'is_lowest' => $current > 0 && $current <= $lowest + 0.005,
+            'change_pct' => $first > 0 ? round(($current - $first) / $first * 100, 1) : null,
+            'currency_symbol' => $currencySymbol,
+            'days' => 90,
+        ];
     }
 
     /**
@@ -347,15 +422,22 @@ class ProductsController extends Controller
         // product would "match" every OTHER uncategorized product in the DB
         // because Laravel translates ->where('col', null) into `col IS NULL`.
         $relatedLimit = 12;
-        $related = collect();
+        // Card relations: coupon fields for the "with code" price, location
+        // for currency, and a slim category so display_name doesn't query
+        // once per row.
+        $relatedWith = [
+            'brand' => fn ($q) => $q->forCard(),
+            'brand.vendorSetting' => fn ($q) => $q->forCard(),
+            'brand.vendorSetting.location:id,name',
+            'category:id,name,slug',
+        ];
+        $relatedRows = [];
 
         if ($product->product_category_id) {
-            // Prefer other vendors' same-compound products first.
-            $otherVendorQuery = Product::with([
-                    'brand' => fn ($q) => $q->forCard(),
-                    'brand.vendorSetting:brand_id,location_id',
-                    'brand.vendorSetting.location:id,name',
-                ])
+            // Other vendors' same-compound listings first, so the visitor can
+            // price-compare. A wider pool is pulled and ranked here: same
+            // vial size first by USD $/mg, then other sizes by $/mg.
+            $otherVendorQuery = Product::with($relatedWith)
                 ->visible()
                 ->where('status', 'active')
                 ->where('product_category_id', $product->product_category_id)
@@ -365,48 +447,69 @@ class ProductsController extends Controller
             if ($product->product_type) {
                 $otherVendorQuery->where('product_type', $product->product_type);
             }
-            $related = $otherVendorQuery
-                ->orderByDesc('rating_count')
-                ->orderByDesc('featured')
-                ->take($relatedLimit)
-                ->get();
+            $pool = $otherVendorQuery
+                ->orderByRaw('COALESCE(discount_price, price) ASC')
+                ->take(80)
+                ->get()
+                ->map(fn ($p) => ProductRowCurrency::cardRow($p))
+                ->all();
+            $pool = ProductRowCurrency::rankValue(ProductRowCurrency::collapseDuplicates($pool));
+
+            $currentMg = \App\Support\ComparePriceStats::parseSizeMg($product->size_mg !== null ? (string) $product->size_mg : null);
+            $sameSize = [];
+            $otherSize = [];
+            foreach ($pool as $row) {
+                $rowMg = $row['size_mg_value'] ?? null;
+                if ($currentMg !== null && $rowMg !== null && abs((float) $rowMg - $currentMg) < 0.0001) {
+                    $sameSize[] = $row;
+                } else {
+                    $otherSize[] = $row;
+                }
+            }
+            $relatedRows = array_slice(array_merge(
+                ProductRowCurrency::sortByValue($sameSize),
+                ProductRowCurrency::sortByValue($otherSize)
+            ), 0, $relatedLimit);
         }
 
         // Top-up from same brand's other products if we still have room.
-        if ($related->count() < $relatedLimit && $product->brand_id) {
-            $fill = Product::with([
-                    'brand' => fn ($q) => $q->forCard(),
-                    'brand.vendorSetting:brand_id,location_id',
-                    'brand.vendorSetting.location:id,name',
-                ])
+        if (count($relatedRows) < $relatedLimit && $product->brand_id) {
+            $fill = Product::with($relatedWith)
                 ->visible()
                 ->where('status', 'active')
                 ->where('brand_id', $product->brand_id)
                 ->where('id', '!=', $product->id)
-                ->whereNotIn('id', $related->pluck('id')->all())
+                ->whereNotIn('id', array_column($relatedRows, 'id'))
                 ->orderByDesc('rating_count')
                 ->orderByDesc('featured')
-                ->take($relatedLimit - $related->count())
-                ->get();
-            $related = $related->concat($fill);
+                ->take($relatedLimit - count($relatedRows))
+                ->get()
+                ->map(fn ($p) => ProductRowCurrency::cardRow($p))
+                ->all();
+            $relatedRows = array_merge($relatedRows, $fill);
         }
 
-        $relatedProducts = $related->map(function ($p) {
-            [$currencyCode, $currencySymbol] = ProductRowCurrency::resolve($p);
-
-            return [
-                'id' => $p->id,
-                'name' => $p->display_name,
-                'product_type' => $p->product_type,
-                'slug' => $p->slug,
-                'image_url' => $p->mirrored_image_url ?: $p->image_url,
-                'price' => $p->price,
-                'discount_price' => $p->discount_price,
-                'currency_code' => $currencyCode,
-                'currency_symbol' => $currencySymbol,
-                'brand' => $p->brand ? ['name' => $p->brand->name, 'slug' => $p->brand->slug] : null,
-            ];
-        });
+        $relatedProducts = collect($relatedRows)->map(fn (array $row) => [
+            'id' => $row['id'],
+            'name' => $row['display_name'] ?: $row['name'],
+            // Vendor's own name, for the card's pack-size line.
+            'raw_name' => $row['name'],
+            'product_type' => $row['product_type'],
+            'slug' => $row['slug'],
+            'image_url' => $row['image_url'],
+            'price' => $row['price'],
+            'discount_price' => $row['discount_price'],
+            'size_mg' => $row['size_mg'],
+            'currency_code' => $row['currency_code'],
+            'currency_symbol' => $row['currency_symbol'],
+            'brand_discount_percent' => $row['brand_discount_percent'],
+            'brand_coupon_code' => $row['brand_coupon_code'],
+            'rating_average' => $row['rating_average'],
+            'rating_count' => $row['rating_count'],
+            'price_per_mg' => $row['price_per_mg'],
+            'best_value' => (bool) ($row['best_value'] ?? false),
+            'brand' => $row['brand'] ? ['name' => $row['brand']['name'], 'slug' => $row['brand']['slug']] : null,
+        ])->values();
 
         // Get brand initials
         $brand = $product->brand;
@@ -603,8 +706,22 @@ class ProductsController extends Controller
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
 
+        [$detailCurrencyCode, $detailCurrencySymbol] = ProductRowCurrency::resolve($product);
+        $detailPricing = ProductRowCurrency::withPricing([
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'product_type' => $product->product_type,
+            'size_mg' => $product->size_mg,
+            'price' => $product->price,
+            'discount_price' => $product->discount_price,
+            'brand_discount_percent' => $product->brand_discount_percent,
+            'currency_code' => $detailCurrencyCode,
+        ]);
+
         return Inertia::render('Frontend/ProductDetail', [
+            'priceHistory' => $this->priceHistory($product, $detailCurrencySymbol),
             'product' => [
+                'price_per_mg' => $detailPricing['price_per_mg'],
                 'id' => $product->id,
                 'name' => $product->display_name,
                 'original_name' => $product->getRawOriginal('name'),
@@ -698,16 +815,19 @@ class ProductsController extends Controller
             );
         }
 
-        // Start building query for products in this category
+        // Start building query for products in this category. Only what
+        // the card renders is loaded: the full category row carried both
+        // pages' agency intro/FAQ text into every listing (2.3MB on
+        // BPC-157), and location/types/puses were never rendered.
         $query = Product::with([
                 'brand' => fn ($q) => $q->forCard(),
                 'brand.vendorSetting' => fn ($q) => $q->forCard(),
-                // Needed for ProductRowCurrency::tag() — maps the
+                // Needed for ProductRowCurrency::cardRow(): maps the
                 // brand's HQ country to a currency symbol so a non-US
                 // vendor's prices render in their own currency instead
                 // of defaulting to USD.
                 'brand.vendorSetting.location:id,name',
-                'location', 'types', 'puses', 'category',
+                'category:id,name,slug',
             ])
             ->visible()
             ->where('product_category_id', $category->id)
@@ -775,7 +895,7 @@ class ProductsController extends Controller
         if ($request->filled('format')) {
             $formats = collect(explode(',', $request->format))
                 ->map(fn ($f) => trim($f))
-                ->filter(fn ($f) => in_array($f, ['Peptide', 'Capsule', 'Nasal Spray', 'Topical', 'Kit'], true))
+                ->filter(fn ($f) => in_array($f, ['Peptide', 'Capsule', 'Nasal Spray', 'Topical', 'Kit', 'Pens'], true))
                 ->unique()
                 ->values();
             if ($formats->isNotEmpty()) {
@@ -824,7 +944,7 @@ class ProductsController extends Controller
         // Allowlist: an unknown ?sort= value used to reach orderBy() raw
         // and 500 the page.
         $sortBy = (string) $request->get('sort', 'featured');
-        if (!in_array($sortBy, ['featured', 'price', 'popular', 'reviews', 'rating'], true)) {
+        if (!in_array($sortBy, ['featured', 'price', 'value', 'popular', 'reviews', 'rating'], true)) {
             $sortBy = 'featured';
         }
         $sortDir = in_array(strtolower($request->get('sort_dir', 'desc')), ['asc', 'desc'])
@@ -835,8 +955,10 @@ class ProductsController extends Controller
             $query->orderByDesc('is_peptide_thumb')
                   ->orderByDesc('rating_count')
                   ->orderByRaw('COALESCE(discount_price, price) DESC');
-        } elseif ($sortBy === 'price') {
-            $query->orderByRaw('COALESCE(discount_price, price) ' . $sortDir);
+        } elseif ($sortBy === 'price' || $sortBy === 'value') {
+            // value is re-ordered by USD $/mg in PHP below; price order is
+            // a sane base if a caller asks for a small per_page.
+            $query->orderByRaw('COALESCE(discount_price, price) ' . ($sortBy === 'value' ? 'asc' : $sortDir));
         } elseif ($sortBy === 'popular') {
             $query->orderByDesc('rating_count');
         } elseif ($sortBy === 'reviews') {
@@ -854,9 +976,39 @@ class ProductsController extends Controller
         if ($perPage < 1 || $perPage > 1000) {
             $perPage = 1000;
         }
-        $products = $query->paginate($perPage)
-            ->withQueryString()
-            ->through(fn ($p) => ProductRowCurrency::tag($p));
+        $paged = $query->paginate($perPage)
+            ->through(fn ($p) => ProductRowCurrency::cardRow($p));
+
+        // Collapse repeat scrapes of one offer, then rank value per size.
+        // Price-based sorts compare in USD so a GBP or RON listing is not
+        // ranked as if it were dollars.
+        $pageRows = $paged->items();
+        $rows = ProductRowCurrency::rankValue(ProductRowCurrency::collapseDuplicates($pageRows));
+        $removed = count($pageRows) - count($rows);
+        if ($sortBy === 'value') {
+            $rows = ProductRowCurrency::sortByValue($rows);
+        } elseif ($sortBy === 'price') {
+            $rows = ProductRowCurrency::sortByUsdPrice($rows);
+            if ($sortDir === 'desc') {
+                // Reverse priced rows only; outliers stay at the end.
+                $outliers = array_values(array_filter($rows, fn ($r) => ! empty($r['price_outlier'])));
+                $priced = array_values(array_filter($rows, fn ($r) => empty($r['price_outlier'])));
+                $rows = array_merge(array_reverse($priced), $outliers);
+            }
+        }
+        $rows = array_map(function (array $row) {
+            unset($row['product_url']);
+
+            return $row;
+        }, $rows);
+
+        $products = new LengthAwarePaginator(
+            $rows,
+            max(count($rows), $paged->total() - $removed),
+            $paged->perPage(),
+            $paged->currentPage(),
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
         // Get filter options for this category
         $baseQuery = Product::visible()
@@ -946,9 +1098,30 @@ class ProductsController extends Controller
         if (!empty($itemsForSchema)) {
             $listRows = array_values(array_slice($itemsForSchema, 0, 30));
             $elements = [];
-            $lowPrice = null;
-            $highPrice = null;
-            $offerCount = 0;
+            // AggregateOffer covers every visible listing (after duplicate
+            // collapse), not just the 30 ItemList rows, so offerCount and the
+            // price range match the page. Mixed currencies compare and emit
+            // in USD via config/currency_rates.php. Price outliers (a stale
+            // $4.95 vial among ~$100 listings) count as offers but cannot
+            // set lowPrice.
+            $usdOffers = [];
+            $usdLowCandidates = [];
+            foreach ($itemsForSchema as $offerRow) {
+                $offerRow = is_array($offerRow) ? $offerRow : (array) $offerRow;
+                $listed = isset($offerRow['discount_price']) && $offerRow['discount_price']
+                    ? (float) $offerRow['discount_price']
+                    : (isset($offerRow['price']) ? (float) $offerRow['price'] : 0.0);
+                $usd = $listed > 0 ? Currency::toUsd($listed, (string) ($offerRow['currency_code'] ?? 'USD')) : null;
+                if ($usd !== null && $usd > 0) {
+                    $usdOffers[] = $usd;
+                    if (empty($offerRow['price_outlier'])) {
+                        $usdLowCandidates[] = $usd;
+                    }
+                }
+            }
+            $offerCount = count($usdOffers);
+            $lowPrice = $usdLowCandidates ? number_format(min($usdLowCandidates), 2, '.', '') : null;
+            $highPrice = $offerCount ? number_format(max($usdOffers), 2, '.', '') : null;
             foreach ($listRows as $i => $p) {
                 $row = is_array($p) ? $p : (array) $p;
                 $brandName = $row['brand']['name'] ?? ($row['brand_name'] ?? null);
@@ -961,11 +1134,6 @@ class ProductsController extends Controller
                 $price = isset($row['discount_price']) && $row['discount_price']
                     ? (float) $row['discount_price']
                     : (isset($row['price']) ? (float) $row['price'] : null);
-                if ($price !== null && $price > 0) {
-                    if ($lowPrice === null || $price < $lowPrice) $lowPrice = $price;
-                    if ($highPrice === null || $price > $highPrice) $highPrice = $price;
-                    $offerCount++;
-                }
                 $elements[] = [
                     '@type' => 'ListItem',
                     'position' => $i + 1,
@@ -1003,8 +1171,8 @@ class ProductsController extends Controller
                     'offers' => [
                         '@type' => 'AggregateOffer',
                         'offerCount' => $offerCount,
-                        'lowPrice' => (string) $lowPrice,
-                        'highPrice' => (string) $highPrice,
+                        'lowPrice' => $lowPrice,
+                        'highPrice' => $highPrice,
                         'priceCurrency' => 'USD',
                     ],
                 ];
@@ -1215,9 +1383,11 @@ class ProductsController extends Controller
         if ($perPage < 1 || $perPage > 1000) {
             $perPage = 12;
         }
+        // withPricing only adds fields (final_price, price_per_mg, ...) so
+        // vendor-page cards can show $/mg; the existing row shape is kept.
         $products = $query->paginate($perPage)
             ->withQueryString()
-            ->through(fn ($p) => ProductRowCurrency::tag($p));
+            ->through(fn ($p) => ProductRowCurrency::withPricing(ProductRowCurrency::tag($p)));
 
         // Get filter options for this brand
         $baseQuery = Product::visible()

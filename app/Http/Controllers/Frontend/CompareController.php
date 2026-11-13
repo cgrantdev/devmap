@@ -13,6 +13,7 @@ use App\Support\CompareHubBlurb;
 use App\Support\ComparePageSeo;
 use App\Support\ProductPageSeo;
 use App\Support\ComparePriceStats;
+use App\Support\ProductRowCurrency;
 use App\Support\VsPageSeo;
 use App\Support\VsPairIndexing;
 use App\Support\CompareSlug;
@@ -147,11 +148,14 @@ class CompareController extends Controller
             ->get()
             ->keyBy('name');
 
-        // For each compound, get all visible products with brand info, sorted by effective price
+        // For each compound, the cheapest rows per size / format / location
+        // (Compare.vue filters on those in the browser) plus full counts.
+        // The complete table for a compound lives on /compare/{slug}; the
+        // hub used to ship every listing (~3MB of HTML).
         $compounds = collect();
-
-        // Site-wide header location filter (?location=Country) applies here too.
-        $locationFilter = trim((string) $request->get('location', ''));
+        // Location id => number of compounds it has listings in, for the
+        // ships-from dropdown labels.
+        $locationCompoundCounts = [];
 
         foreach (self::FEATURED_COMPOUND_NAMES as $catName) {
             $category = $categories->get($catName);
@@ -159,100 +163,36 @@ class CompareController extends Controller
                 continue; // skip if category doesn't exist in DB
             }
 
-            $products = Product::visible()
-                ->where('status', 'active')
-                ->where('product_category_id', $category->id)
-                // Hide $0 / unpriced rows — they distort the price comparison
-                // and usually indicate a stale import or a parent variable
-                // product that didn't get its price resolved.
-                ->where(function ($q) {
-                    $q->where('discount_price', '>', 0)
-                      ->orWhere(function ($qq) {
-                          $qq->whereNull('discount_price')->where('price', '>', 0);
-                      });
-                })
-                ->when($locationFilter, fn ($q) => $q->whereHas(
-                    'brand.vendorSetting.location',
-                    fn ($l) => $l->where('name', $locationFilter)
-                ))
-                ->with([
-                    'brand' => fn ($q) => $q->forPublic(),
-                    'brand.vendorSetting' => fn ($q) => $q->forPublic()->with('location'),
-                ])
-                ->get()
-                ->map(function ($product) {
-                    // Cast to float UP FRONT. Eloquent returns decimal columns
-                    // as strings, and sortBy() comparing string "100.00" vs
-                    // string "70.00" sorts lexically ('1' < '7'), putting the
-                    // $100 rows in the middle of the list. Forcing float
-                    // makes every comparison numeric.
-                    $retail = (float) (
-                        $product->discount_price && $product->discount_price < $product->price
-                            ? $product->discount_price
-                            : $product->price
-                    );
+            // Same rows as /compare/{slug}: priced listings only, header
+            // location filter applied, cheapest first in USD.
+            $products = $this->productsForCategory($category);
 
-                    // PeptideMap-applied price using the brand's discount %.
-                    $pct = $product->brand?->vendorSetting?->coupon_discount_percent;
-                    $pmapPrice = ($pct !== null && $pct > 0 && $pct < 100 && $retail > 0)
-                        ? round($retail * (1 - ((float) $pct / 100)), 2)
-                        : null;
-
-                    // The figure we sort on per category — what the visitor
-                    // actually pays. Falls back to retail when there's no
-                    // PeptideMap discount configured for this vendor.
-                    $finalPrice = $pmapPrice ?? $retail;
-                    $countryName = $product->brand?->vendorSetting?->location?->name;
-                    [$currencyCode, $currencySymbol] = \App\Support\Currency::forCountry($countryName);
-
-                    return [
-                        'id' => $product->id,
-                        'name' => $product->display_name,
-                        'product_type' => $product->product_type,
-                        'slug' => $product->slug,
-                        // Cast prices to float so the Vue template can do
-                        // numeric comparisons. Eloquent ships decimal columns
-                        // as strings; '69.99' < '100.00' is FALSE in JS
-                        // lexical comparison (because '6' > '1'), which broke
-                        // the 'show discount + retail strikethrough' branch
-                        // for vendors whose discount has more digits left of
-                        // the decimal than retail.
-                        'price' => $product->price !== null ? (float) $product->price : null,
-                        'discount_price' => $product->discount_price !== null ? (float) $product->discount_price : null,
-                        'effective_price' => $retail,
-                        'final_price' => $finalPrice,
-                        'currency_code' => $currencyCode,
-                        'currency_symbol' => $currencySymbol,
-                        'product_url' => $product->product_url,
-                        'go_url' => "/go/{$product->id}",
-                        'brand_name' => $product->brand?->name,
-                        'brand_slug' => $product->brand?->slug,
-                        'brand_location' => $product->brand?->vendorSetting?->location?->name,
-                        'brand_location_id' => $product->brand?->vendorSetting?->location_id,
-                        'brand_logo' => $product->brand?->vendorSetting?->logo
-                            ? asset('storage/' . $product->brand->vendorSetting->logo)
-                            : null,
-                        'brand_coupon_code' => $product->brand?->vendorSetting?->coupon_code,
-                        'brand_discount_percent' => $pct !== null ? (float) $pct : null,
-                        'size_mg' => $product->size_mg,
-                    ];
-                })
-                // Sort by the price the visitor will actually pay (PMAP price
-                // when applicable, retail otherwise). Numeric sort is
-                // enforced even though every final_price is now a float,
-                // in case a future change reintroduces mixed types.
-                ->sortBy(fn ($p) => (float) $p['final_price'])
-                ->values();
-
-            // "from $X" uses the same eligibility rules as per-mg stats.
-            // product_url is only an input to that dedupe key; the hub
-            // payload does not ship vendor URLs or vial images.
+            // "from $X" uses the same eligibility rules as per-mg stats, on
+            // the full row set. The hub payload never ships vendor URLs or
+            // vial images (displayRows drops them).
             $claim = $this->listedPriceClaim($products);
-            $products = $products->map(function ($row) {
-                unset($row['product_url']);
+            $display = $this->displayRows($products);
 
-                return $row;
-            })->values();
+            $sizeCounts = [];
+            $typeCounts = array_fill_keys(['Peptide', 'Topical', 'Capsule', 'Nasal Spray', 'Kit', 'Other'], 0);
+            $compoundLocations = [];
+            foreach ($display as $row) {
+                $size = strtolower(trim((string) ($row['size_mg'] ?? '')));
+                if ($size !== '') {
+                    $sizeCounts[$size] = ($sizeCounts[$size] ?? 0) + 1;
+                }
+                $type = $row['product_type'] ?? null;
+                $typeKey = ($type === null || $type === '' || $type === 'Peptide') ? 'Peptide' : (string) $type;
+                if (isset($typeCounts[$typeKey])) {
+                    $typeCounts[$typeKey]++;
+                }
+                if (! empty($row['brand_location_id'])) {
+                    $compoundLocations[$row['brand_location_id']] = true;
+                }
+            }
+            foreach (array_keys($compoundLocations) as $locationId) {
+                $locationCompoundCounts[$locationId] = ($locationCompoundCounts[$locationId] ?? 0) + 1;
+            }
 
             $displayName = CompoundDisplay::label($category->name);
             $educationPost = $category->educationPost;
@@ -287,16 +227,19 @@ class CompareController extends Controller
                 'encyclopedia_url' => ($educationPost && $educationPost->status === 'published')
                     ? EncyclopediaSlug::path($category->slug)
                     : null,
-                'product_count' => $products->count(),
+                // Distinct listings after repeat scrapes collapse.
+                'product_count' => count($display),
                 // Listed price (effective_price) of the eligible set, same rules
                 // as per-mg stats. A coupon price stays in the table and
                 // cannot set this badge.
                 'cheapest_price' => $claim['low'],
                 'cheapest_currency_symbol' => $claim['symbol'],
-                'vendor_count' => $products->pluck('brand_name')->unique()->count(),
+                'vendor_count' => collect($display)->pluck('brand_name')->unique()->count(),
                 'prices_updated_iso' => $latestTs?->toIso8601String(),
                 'prices_updated_human' => $latestTs?->diffForHumans(),
-                'products' => $products->values(),
+                'size_counts' => $sizeCounts,
+                'type_counts' => $typeCounts,
+                'products' => $this->trimForHub($display),
             ]);
         }
 
@@ -324,11 +267,7 @@ class CompareController extends Controller
         // Location filter options: only locations that actually have at
          // least one vendor with a product surfaced on this page. Sorted by
          // count desc so US-heavy inventory naturally leads the dropdown.
-        $vendorLocationIds = collect($compounds)->flatMap(fn ($c) => collect($c['products'])
-            ->pluck('brand_location_id')
-            ->filter()
-            ->unique()
-        )->countBy();
+        $vendorLocationIds = collect($locationCompoundCounts);
         $locations = \App\Models\Location::whereIn('id', $vendorLocationIds->keys())
             ->get(['id', 'name'])
             ->map(fn ($l) => [
@@ -781,7 +720,7 @@ class CompareController extends Controller
                 'vendor_count' => $vendorCount,
                 'cheapest_price' => $cheapest,
                 'priciest_price' => $priciest,
-                'products' => $products,
+                'products' => $this->displayRows($products),
                 'faqs' => $faqPairs,
                 'price_intro' => $priceIntro,
                 'price_stats' => $priceStats,
@@ -1319,6 +1258,8 @@ class CompareController extends Controller
             return array_values(array_filter($out, fn ($x) => !empty($x['text']) || !empty($x['heading'])));
         };
 
+        $claim = $this->listedPriceClaim($products);
+
         return [
             'id' => $category->id,
             'name' => $displayName,
@@ -1327,8 +1268,9 @@ class CompareController extends Controller
             'encyclopedia_url' => $ep ? EncyclopediaSlug::path($category->slug) : null,
             'vendor_count' => $products->pluck('brand_name')->unique()->count(),
             'product_count' => $products->count(),
-            'cheapest_price' => $this->listedPriceClaim($products)['low'],
-            'top_vendors' => $products->take(5)->values(),
+            'cheapest_price' => $claim['low'],
+            'cheapest_currency_symbol' => $claim['symbol'],
+            'top_vendors' => array_slice($this->displayRows($products), 0, 5),
             'summary' => $this->vsSummary($category, $vsNarrative, $ep),
             'mechanism' => ($m = strip_tags((string) $ep?->mechanism_of_action_intro)) !== '' && ! CompareHubBlurb::hasOutcomeClaim($m) ? $m : null,
             'half_life' => $ep?->half_life,
@@ -1565,6 +1507,9 @@ class CompareController extends Controller
             ->with([
                 'brand' => fn ($q) => $q->forPublic(),
                 'brand.vendorSetting' => fn ($q) => $q->forPublic()->with('location'),
+                // display_name reads the category name; without this each
+                // row ran its own category query (100+ per compare page).
+                'category:id,name',
             ])
             ->get()
             ->map(function ($product) {
@@ -1582,7 +1527,11 @@ class CompareController extends Controller
                 $countryName = $product->brand?->vendorSetting?->location?->name;
                 [$currencyCode, $currencySymbol] = \App\Support\Currency::forCountry($countryName);
 
-                return [
+                // withPricing adds the USD figures and $/mg used for
+                // cross-currency ordering and value badges.
+                return ProductRowCurrency::withPricing([
+                    'brand_id' => $product->brand_id,
+                    'brand_location_id' => $product->brand?->vendorSetting?->location_id,
                     'id' => $product->id,
                     'name' => $product->display_name,
                     'raw_name' => $product->name,
@@ -1607,9 +1556,83 @@ class CompareController extends Controller
                     'brand_coupon_code' => $product->brand?->vendorSetting?->coupon_code,
                     'brand_discount_percent' => $pct !== null ? (float) $pct : null,
                     'size_mg' => $product->size_mg,
-                ];
+                ]);
             })
-            ->sortBy(fn ($p) => (float) $p['final_price'])
-            ->values();
+            // Cheapest first on what the visitor pays, compared in USD so a
+            // GBP or RON price is not ranked as if it were dollars.
+            ->pipe(fn ($rows) => collect(ProductRowCurrency::sortByUsdPrice($rows->values()->all())));
+    }
+
+    /**
+     * Vendor-table rows for display: repeat scrapes collapsed, value
+     * ranked per size, cheapest-first in USD with price outliers last, and
+     * fields the tables never read dropped. Claims, counts and schema keep
+     * using the full productsForCategory() rows.
+     *
+     * @param  \Illuminate\Support\Collection<int, array<string, mixed>>|array<int, array<string, mixed>>  $products
+     * @return list<array<string, mixed>>
+     */
+    private function displayRows($products): array
+    {
+        $rows = ProductRowCurrency::sortByUsdPrice(
+            ProductRowCurrency::rankValue(
+                ProductRowCurrency::collapseDuplicates(collect($products)->values()->all())
+            )
+        );
+
+        // usd_final_price stays so the tables can compare rows priced in
+        // different currencies ("12% cheaper") on one scale.
+        return array_map(function (array $row) {
+            unset(
+                $row['product_url'],
+                $row['raw_name'],
+                $row['image_url'],
+                $row['usd_per_mg'],
+                $row['size_mg_value'],
+                $row['brand_id']
+            );
+
+            return $row;
+        }, $rows);
+    }
+
+    /**
+     * Hub payload trim. Compare.vue filters each compound by size, format
+     * and ships-from location in the browser, so every one of those
+     * groups keeps its cheapest rows (rows arrive cheapest-first) and the
+     * rest of the ~375 listings stay on /compare/{slug}. Each format and
+     * location pair also keeps its cheapest rows, so the two global
+     * filters together never hide a compound that has a matching listing.
+     *
+     * @param  list<array<string, mixed>>  $rows
+     * @return list<array<string, mixed>>
+     */
+    private function trimForHub(array $rows, int $perGroup = 5, int $perPair = 2): array
+    {
+        $keep = [];
+        $counters = [];
+        foreach ($rows as $i => $row) {
+            $type = $row['product_type'] ?? null;
+            $typeKey = ($type === null || $type === '' || $type === 'Peptide') ? 'Peptide' : (string) $type;
+            $size = strtolower(trim((string) ($row['size_mg'] ?? '')));
+            $location = (string) ($row['brand_location_id'] ?? 'none');
+            $keys = [
+                'all' => $perGroup,
+                'type:'.$typeKey => $perGroup,
+                'loc:'.$location => $perGroup,
+                'pair:'.$typeKey.'|'.$location => $perPair,
+            ];
+            if ($size !== '') {
+                $keys['size:'.$size] = $perGroup;
+            }
+            foreach ($keys as $key => $cap) {
+                $counters[$key] = ($counters[$key] ?? 0) + 1;
+                if ($counters[$key] <= $cap) {
+                    $keep[$i] = true;
+                }
+            }
+        }
+
+        return array_values(array_filter($rows, fn ($row, $i) => isset($keep[$i]), ARRAY_FILTER_USE_BOTH));
     }
 }
