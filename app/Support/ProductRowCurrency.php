@@ -345,28 +345,93 @@ class ProductRowCurrency
      */
     public static function sortByValue(array $rows): array
     {
-        usort($rows, function (array $a, array $b): int {
-            $outlier = (int) ! empty($a['price_outlier']) <=> (int) ! empty($b['price_outlier']);
-            if ($outlier !== 0) {
-                return $outlier;
-            }
-            $av = $a['usd_per_mg'] ?? null;
-            $bv = $b['usd_per_mg'] ?? null;
-            if ($av !== null && $bv !== null) {
-                return (float) $av <=> (float) $bv;
-            }
-            if ($av !== null) {
-                return -1;
-            }
-            if ($bv !== null) {
-                return 1;
-            }
-            $ap = $a['usd_final_price'] ?? INF;
-            $bp = $b['usd_final_price'] ?? INF;
+        usort($rows, fn (array $a, array $b): int => self::compareValue($a, $b));
 
-            return (float) $ap <=> (float) $bp;
+        return $rows;
+    }
+
+    /**
+     * Default ("featured") order on a compound page: pinned rows, then
+     * single vials ahead of kits, packs and bulk listings, then rows with
+     * reviews, then best value as in sortByValue(). The SQL query applies
+     * the first three keys too; its price-descending tiebreak opened
+     * pages on the most expensive vial. Rows carry featured_pin from the
+     * controller; callers drop it before the payload ships.
+     *
+     * @param  list<array<string, mixed>>  $rows
+     * @return list<array<string, mixed>>
+     */
+    public static function sortFeatured(array $rows): array
+    {
+        usort($rows, function (array $a, array $b): int {
+            $cmp = (int) empty($a['featured_pin']) <=> (int) empty($b['featured_pin']);
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+            $cmp = (int) self::isFeaturedMultiUnit($a) <=> (int) self::isFeaturedMultiUnit($b);
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+            $cmp = (int) ($b['rating_count'] ?? 0) <=> (int) ($a['rating_count'] ?? 0);
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+
+            return self::compareValue($a, $b);
         });
 
         return $rows;
+    }
+
+    /**
+     * Same signals as the featured SQL CASE in ProductsController:
+     * product_type Kit, or kit / pack / vials / bundle / box / bulk / ×
+     * in the name.
+     *
+     * @param  array<string, mixed>  $row
+     */
+    private static function isFeaturedMultiUnit(array $row): bool
+    {
+        if (($row['product_type'] ?? null) === 'Kit') {
+            return true;
+        }
+        $name = mb_strtolower((string) ($row['name'] ?? ''));
+        foreach (['kit', 'pack', 'vials', 'bundle', 'box', 'bulk', "\u{00D7}"] as $token) {
+            if (str_contains($name, $token)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Price outliers last, then USD per mg ascending (rows without a
+     * per-mg figure after those with one), then USD price ascending.
+     *
+     * @param  array<string, mixed>  $a
+     * @param  array<string, mixed>  $b
+     */
+    private static function compareValue(array $a, array $b): int
+    {
+        $outlier = (int) ! empty($a['price_outlier']) <=> (int) ! empty($b['price_outlier']);
+        if ($outlier !== 0) {
+            return $outlier;
+        }
+        $av = $a['usd_per_mg'] ?? null;
+        $bv = $b['usd_per_mg'] ?? null;
+        if ($av !== null && $bv !== null) {
+            return (float) $av <=> (float) $bv;
+        }
+        if ($av !== null) {
+            return -1;
+        }
+        if ($bv !== null) {
+            return 1;
+        }
+        $ap = $a['usd_final_price'] ?? INF;
+        $bp = $b['usd_final_price'] ?? INF;
+
+        return (float) $ap <=> (float) $bp;
     }
 }

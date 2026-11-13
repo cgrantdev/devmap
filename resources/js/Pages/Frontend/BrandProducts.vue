@@ -307,7 +307,8 @@
                   :brand-discount-percent="product.brand_discount_percent"
                   :brand-coupon-code="product.brand_coupon_code"
                   :currency-symbol="product.currency_symbol || '$'"
-                  :to="`/product/${product.slug}/${product.id}`"
+                  :price-per-mg="product.price_per_mg ?? null"
+                  :to="productHref(product)"
                 />
               </div>
 
@@ -1275,6 +1276,15 @@ const showSortDropdown = ref(false)
 const showSidebar = ref(false)
 // Initialize searchQuery from URL parameters or props
 const searchQuery = ref(props.search || '')
+// Canonical listing URL. /product/{slug}/{id} 301s here, so linking
+// it directly saves a redirect hop on every card click.
+function productHref(product) {
+  const vendor = product.brand?.slug || props.brand?.slug
+  return vendor
+    ? `/product/${vendor}/${product.slug}/${product.id}`
+    : `/product/${product.slug}/${product.id}`
+}
+
 const perPage = ref(props.products.per_page || 20)
 const currentSort = ref(props.sort || 'featured')
 const currentSortDir = ref(props.sortDir || 'desc')

@@ -552,7 +552,6 @@ class ProductsController extends Controller
                     'rating' => $review->rating,
                     'review' => $review->review ?? '',
                     'user_name' => $review->user ? $review->user->name : $review->user_name,
-                    'user_email' => $review->user_email,
                     'user_id' => $review->user_id,
                     'created_at' => $review->created_at->format('Y-m-d'),
                     'shipping_time' => $review->shipping_time,
@@ -997,7 +996,7 @@ class ProductsController extends Controller
             $perPage = 1000;
         }
         $paged = $query->paginate($perPage)
-            ->through(fn ($p) => ProductRowCurrency::cardRow($p));
+            ->through(fn ($p) => ProductRowCurrency::cardRow($p) + ['featured_pin' => (bool) $p->is_peptide_thumb]);
 
         // Collapse repeat scrapes of one offer, then rank value per size.
         // Price-based sorts compare in USD so a GBP or RON listing is not
@@ -1005,7 +1004,9 @@ class ProductsController extends Controller
         $pageRows = $paged->items();
         $rows = ProductRowCurrency::rankValue(ProductRowCurrency::collapseDuplicates($pageRows));
         $removed = count($pageRows) - count($rows);
-        if ($sortBy === 'value') {
+        if ($sortBy === 'featured') {
+            $rows = ProductRowCurrency::sortFeatured($rows);
+        } elseif ($sortBy === 'value') {
             $rows = ProductRowCurrency::sortByValue($rows);
         } elseif ($sortBy === 'price') {
             $rows = ProductRowCurrency::sortByUsdPrice($rows);
@@ -1017,7 +1018,7 @@ class ProductsController extends Controller
             }
         }
         $rows = array_map(function (array $row) {
-            unset($row['product_url']);
+            unset($row['product_url'], $row['featured_pin']);
 
             return $row;
         }, $rows);
@@ -1313,7 +1314,7 @@ class ProductsController extends Controller
                 'brand' => fn ($q) => $q->forCard(),
                 'brand.vendorSetting' => fn ($q) => $q->forCard(),
                 'brand.vendorSetting.location:id,name',
-                'location', 'types', 'puses', 'category',
+                'category:id,name,slug',
             ])
             ->visible()
             ->where('brand_id', $brandId)
@@ -1416,11 +1417,18 @@ class ProductsController extends Controller
         if ($perPage < 1 || $perPage > 1000) {
             $perPage = 12;
         }
-        // withPricing only adds fields (final_price, price_per_mg, ...) so
-        // vendor-page cards can show $/mg; the existing row shape is kept.
+        // Lean card rows (what ProductSimpleCard renders, plus $/mg). The
+        // full model shipped descriptions, scrape metadata and relations
+        // the page never read. product_url is dropped: cards link to our
+        // listing page, and outbound clicks go through /go/{id}.
         $products = $query->paginate($perPage)
             ->withQueryString()
-            ->through(fn ($p) => ProductRowCurrency::withPricing(ProductRowCurrency::tag($p)));
+            ->through(function ($p) {
+                $row = ProductRowCurrency::cardRow($p);
+                unset($row['product_url']);
+
+                return $row;
+            });
 
         // Get filter options for this brand
         $baseQuery = Product::visible()
@@ -1500,7 +1508,6 @@ class ProductsController extends Controller
                 'rating' => $review->rating,
                 'review' => $review->review ?? '', // Ensure review field is included
                 'user_name' => $review->user ? $review->user->name : $review->user_name,
-                'user_email' => $review->user_email,
                 'user_id' => $review->user_id,
                 'created_at' => $review->created_at->format('Y-m-d'),
                 'shipping_time' => $review->shipping_time,
@@ -1592,7 +1599,7 @@ class ProductsController extends Controller
             'itemListElement' => collect($products->items())->take(20)->values()->map(fn ($p, $i) => [
                 '@type' => 'ListItem',
                 'position' => $i + 1,
-                'url' => url("/product/{$p['slug']}/{$p['id']}"),
+                'url' => url("/product/{$brand->slug}/{$p['slug']}/{$p['id']}"),
                 'name' => $p['display_name'] ?? $p['name'] ?? '',
             ])->all(),
         ];
