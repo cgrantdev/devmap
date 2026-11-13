@@ -7,40 +7,29 @@
 
     <!-- Hero -->
     <section class="border-b border-[color:var(--color-hairline)] bg-gradient-to-b from-[color:var(--color-bg)] to-white">
-      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-8 pb-8">
+      <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6 pb-6 md:pt-8 md:pb-8">
         <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-biotech-600)] mb-3">Free · No signup · Instant results</div>
-        <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">
-          The Best Peptide Calculator
+        <h1 class="ui-display text-3xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">
+          {{ pageHeading }}
         </h1>
-        <p class="text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-5">
+        <p class="text-base md:text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-5">
           Reconstitution, dosage, and schedule — all in one place. 55+ preset compounds across GLP-1s, growth-hormone secretagogues, healing peptides, longevity, and cognitive stacks — with instant insulin-syringe unit output.
         </p>
         <!-- Trust chips: quantifies the "best" claim -->
         <div class="flex flex-wrap items-center gap-2 text-[12px]">
           <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold">⚡ Instant results</span>
-          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 font-semibold">🧪 17+ presets</span>
+          <span v-if="presets.length" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 font-semibold">🧪 {{ presets.length }} presets</span>
           <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-800 font-semibold">🔗 Shareable results</span>
           <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 font-semibold">🆓 Free forever</span>
         </div>
       </div>
     </section>
 
-    <!-- RUO Banner -->
-    <div class="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6">
-      <div class="flex items-start gap-3 p-4 rounded-[12px] bg-amber-50 border border-amber-200">
-        <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-        <div>
-          <p class="text-[12px] font-semibold text-amber-900">Research Use Only (RUO)</p>
-          <p class="text-[11px] text-amber-800 leading-relaxed mt-0.5">This calculator is provided as a reference tool for laboratory research peptide reconstitution. All products and calculations are intended for <strong>in-vitro research and laboratory use only</strong>. Not for human consumption, diagnostic, or therapeutic use. Not medical advice.</p>
-        </div>
-      </div>
-    </div>
-
-    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
+    <section class="max-w-[1280px] mx-auto px-6 lg:px-10 py-6 md:py-8">
       <div class="grid lg:grid-cols-[420px_1fr] gap-8 items-start">
 
         <!-- LEFT: Inputs -->
-        <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-sm)] p-6 lg:sticky lg:top-24">
+        <div ref="inputsRef" class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-sm)] p-6 lg:sticky lg:top-24">
           <!-- Mode tabs -->
           <div class="flex gap-1 p-1 rounded-[10px] bg-[color:var(--color-bg)] mb-2">
             <button
@@ -79,22 +68,44 @@
             >
               <option value="">Custom</option>
               <optgroup v-for="g in presetGroups" :key="g.label" :label="g.label">
-                <option v-for="p in g.items" :key="p.name" :value="p.name">{{ p.name }}</option>
+                <option v-for="p in g.items" :key="p.slug" :value="p.slug">{{ p.name }}</option>
               </optgroup>
             </select>
           </div>
 
           <!-- Peptide amount -->
-          <CalcField label="Peptide in vial" unit="mg" v-model="peptideMg" :step="0.5" :min="0.1" />
+          <CalcField label="Peptide in vial" unit="mg" v-model="peptideMg" placeholder="e.g. 5" />
 
           <!-- Water volume — called out as BAC water for clarity -->
-          <CalcField label="BAC water added" unit="mL" v-model="waterMl" :step="0.5" :min="0.1" />
+          <CalcField label="BAC water added" unit="mL" v-model="waterMl" placeholder="e.g. 2" />
 
-          <!-- Desired dose (reconstitution mode doesn't need this).
-               Was labelled "Desired aliquot amount" — layman doesn't know
-               'aliquot'. "Dose per injection" is what they're actually
-               looking up. -->
-          <CalcField v-if="mode !== 'reconstitution'" label="Dose per injection" unit="mcg" v-model="doseMcg" :step="10" :min="1" />
+          <!-- Desired dose (reconstitution mode doesn't need this). Stored in
+               mcg; the toggle only changes how it's entered and shown. -->
+          <CalcField
+            v-if="mode !== 'reconstitution'"
+            label="Dose per injection"
+            :unit="doseUnit"
+            v-model="doseDisplay"
+            :placeholder="doseUnit === 'mg' ? 'e.g. 2.5' : 'e.g. 250'"
+          >
+            <template #aside>
+              <div class="inline-flex rounded-[7px] border border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] p-0.5" role="group" aria-label="Dose unit">
+                <button
+                  v-for="u in doseUnits"
+                  :key="u"
+                  type="button"
+                  @click="doseUnit = u"
+                  :aria-pressed="doseUnit === u ? 'true' : 'false'"
+                  :class="[
+                    'h-6 px-2 rounded-[5px] text-[11px] font-semibold transition-all',
+                    doseUnit === u
+                      ? 'bg-white text-[color:var(--color-ink)] shadow-sm'
+                      : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]',
+                  ]"
+                >{{ u }}</button>
+              </div>
+            </template>
+          </CalcField>
 
           <!-- Syringe size -->
           <div class="mb-5">
@@ -121,12 +132,7 @@
               v-model="frequency"
               class="w-full h-10 px-3 text-[13px] border border-[color:var(--color-hairline)] rounded-[8px] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
             >
-              <option value="daily">Daily</option>
-              <option value="eod">Every other day</option>
-              <option value="3x">3x per week</option>
-              <option value="2x">2x per week</option>
-              <option value="weekly">Weekly</option>
-              <option value="biweekly">Every 2 weeks</option>
+              <option v-for="o in frequencyOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
             </select>
           </div>
 
@@ -141,12 +147,13 @@
         <!-- RIGHT: Results -->
         <div class="space-y-6">
 
+          <div ref="resultRef" class="scroll-mt-24">
           <!-- HERO RESULT — the actual answer. What the user came for.
                Big syringe-unit number, integrated visual, one-click copy.
                Everything else on the page is supporting detail. -->
           <div v-if="mode !== 'reconstitution'" class="bg-gradient-to-b from-white to-[color:var(--color-bg)] rounded-[20px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-md)] p-6 lg:p-8">
             <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
-              <div class="text-[10px] uppercase tracking-[0.14em] font-bold text-[color:var(--color-accent-600)]">Draw · from {{ concentration.toLocaleString('en-US', { maximumFractionDigits: 0 }) }} mcg/mL solution</div>
+              <div class="text-[10px] uppercase tracking-[0.14em] font-bold text-[color:var(--color-accent-600)]">Draw · from {{ concentrationText }} mcg/mL solution</div>
               <div class="flex items-center gap-2">
                 <button @click="copyResult" :class="['inline-flex items-center gap-1.5 h-8 px-3 rounded-[8px] text-[11px] font-semibold transition-all', copiedResult ? 'bg-emerald-600 text-white' : 'bg-white border border-[color:var(--color-hairline)] text-[color:var(--color-ink-muted)] hover:border-[color:var(--color-accent-400)] hover:text-[color:var(--color-ink)]']">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><template v-if="copiedResult"><path d="M20 6L9 17l-5-5"/></template><template v-else><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></template></svg>
@@ -160,7 +167,7 @@
             </div>
 
             <div class="flex items-baseline gap-3 mb-2">
-              <span class="ui-display text-[64px] lg:text-[88px] leading-none font-bold text-[color:var(--color-ink)] tracking-tight">{{ syringeMarks }}</span>
+              <span class="ui-display text-[64px] lg:text-[88px] leading-none font-bold text-[color:var(--color-ink)] tracking-tight">{{ unitsText }}</span>
               <span class="text-[color:var(--color-ink-muted)]">
                 <div class="text-lg font-semibold">units</div>
                 <div class="text-[13px]">on a {{ syringeUnits }}-unit syringe</div>
@@ -169,8 +176,11 @@
 
             <!-- Plain-English restatement — reads the answer back to the
                  user so they don't have to decode the number. -->
-            <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">
-              Draw the plunger to the <strong class="text-[color:var(--color-ink)]">{{ syringeMarks }}-unit mark</strong> on your {{ syringeUnits }}-unit insulin syringe for a {{ doseMcg }}mcg ({{ (doseMcg/1000).toFixed(doseMcg >= 1000 ? 1 : 3) }}mg) dose.
+            <p v-if="hasDraw" class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">
+              Draw the plunger to the <strong class="text-[color:var(--color-ink)]">{{ unitsText }}-unit mark</strong> on your {{ syringeUnits }}-unit insulin syringe for a {{ doseLabel }} dose.
+            </p>
+            <p v-else class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">
+              Enter the vial size, the BAC water you added and your dose to see the draw.
             </p>
 
             <!-- Syringe visual — now actually looks like a syringe + has
@@ -180,7 +190,7 @@
               <!-- Caption above tells the user what the picture is. -->
               <div class="flex items-center justify-between text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-2 px-1">
                 <span>Your {{ syringeUnits }}-unit insulin syringe</span>
-                <span class="text-[color:var(--color-accent-700)]">Pull plunger to {{ Math.min(syringeMarks, syringeUnits) }} units</span>
+                <span class="text-[color:var(--color-accent-700)]">{{ plungerText }}</span>
               </div>
               <div class="relative pl-1 pr-10">
                 <!-- Barrel -->
@@ -214,14 +224,22 @@
 
             <!-- Result stats underneath — plain English labels, no "aliquot". -->
             <div class="flex items-center justify-between gap-4 text-[13px] flex-wrap pt-4 border-t border-[color:var(--color-hairline-soft)]">
-              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Liquid volume</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ volumeMl }} mL</span></div>
-              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Dose</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ doseMcg }} mcg</span></div>
-              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Doses per vial</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ dosesPerVial }}</span></div>
+              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Liquid volume</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ volumeText }} mL</span></div>
+              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Dose</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ doseLabel }}</span></div>
+              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Doses per vial</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ dosesPerVialText }}</span></div>
             </div>
 
-            <div v-if="fillPercent > 100" class="mt-4 flex items-center gap-2 text-[12px] text-[color:var(--color-danger)] font-semibold">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-              Volume exceeds syringe capacity — use a larger syringe or add more reconstitution water.
+            <div v-if="doseExceedsVial" class="mt-4 flex items-start gap-2 text-[12px] text-[color:var(--color-danger)] font-semibold">
+              <svg class="w-4 h-4 flex-shrink-0 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              <span>This dose is more than the whole vial holds ({{ vialMcgText }} mcg). Check the vial size and dose units.</span>
+            </div>
+            <div v-else-if="overCapacity" class="mt-4 flex items-start gap-2 text-[12px] text-[color:var(--color-danger)] font-semibold">
+              <svg class="w-4 h-4 flex-shrink-0 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              <span>That's more than one {{ syringeUnits }}-unit syringe holds. Use a larger syringe, split the dose into two draws, or reconstitute with less BAC water.</span>
+            </div>
+            <div v-else-if="tinyDraw" class="mt-4 flex items-start gap-2 text-[12px] text-amber-700 font-semibold">
+              <svg class="w-4 h-4 flex-shrink-0 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              <span>Under 5 units is hard to measure accurately. A 30-unit syringe has finer marks, or add more BAC water so each dose is a larger volume.</span>
             </div>
           </div>
 
@@ -239,12 +257,30 @@
               </div>
             </div>
             <div class="flex items-baseline gap-3">
-              <span class="ui-display text-[56px] lg:text-[80px] leading-none font-bold text-[color:var(--color-ink)] tracking-tight">{{ concentration.toLocaleString('en-US', { maximumFractionDigits: 0 }) }}</span>
+              <span class="ui-display text-[56px] lg:text-[80px] leading-none font-bold text-[color:var(--color-ink)] tracking-tight">{{ concentrationText }}</span>
               <span class="text-[color:var(--color-ink-muted)]">
                 <div class="text-lg font-semibold">mcg/mL</div>
-                <div class="text-[13px]">{{ peptideMg }}mg peptide in {{ waterMl }}mL BAC water</div>
+                <div class="text-[13px]">{{ mgText }}mg peptide in {{ waterText }}mL BAC water</div>
               </span>
             </div>
+          </div>
+          </div>
+
+          <!-- Price this vial: live cheapest listing for the page's preset. -->
+          <PriceThisVial
+            v-if="pricingForCurrent"
+            :pricing="pricingForCurrent"
+            :compound-name="currentCompoundName"
+            :vial-mg="peptideMg"
+            :doses-per-vial="dosesPerVial"
+            :per-week="administrationsPerWeek"
+            :stability-days="STABILITY_DAYS"
+            :frequency-options="frequencyOptions"
+            v-model:frequency="frequency"
+          />
+          <div v-else-if="compareHref" class="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-[14px] border border-[color:var(--color-hairline)] bg-white px-5 py-4 text-[13px] font-semibold">
+            <Link :href="compareHref" class="text-[color:var(--color-accent-700)] hover:underline">Compare {{ currentCompoundName }} prices across vendors &rarr;</Link>
+            <Link href="/bacteriostatic-water" class="text-[color:var(--color-accent-700)] hover:underline">Bacteriostatic water prices &rarr;</Link>
           </div>
 
           <!-- Schedule mode: vial duration -->
@@ -252,17 +288,21 @@
             <h3 class="text-[13px] font-semibold text-[color:var(--color-ink)] mb-4">Vial yield schedule</h3>
             <div class="grid sm:grid-cols-3 gap-4">
               <div class="text-center p-4 rounded-[12px] bg-[color:var(--color-bg)]">
-                <div class="ui-mono text-2xl font-bold text-[color:var(--color-ink)]">{{ dosesPerVial }}</div>
-                <div class="text-[11px] text-[color:var(--color-ink-subtle)] mt-1">aliquots per vial</div>
+                <div class="ui-mono text-2xl font-bold text-[color:var(--color-ink)]">{{ dosesPerVialText }}</div>
+                <div class="text-[11px] text-[color:var(--color-ink-subtle)] mt-1">doses per vial</div>
               </div>
               <div class="text-center p-4 rounded-[12px] bg-[color:var(--color-bg)]">
-                <div class="ui-mono text-2xl font-bold text-[color:var(--color-accent-600)]">{{ vialDurationDays }}</div>
+                <div :class="['ui-mono text-2xl font-bold', stabilityExceeded ? 'text-amber-700' : 'text-[color:var(--color-accent-600)]']">{{ vialDurationText }}</div>
                 <div class="text-[11px] text-[color:var(--color-ink-subtle)] mt-1">days per vial</div>
               </div>
               <div class="text-center p-4 rounded-[12px] bg-[color:var(--color-bg)]">
                 <div class="ui-mono text-2xl font-bold text-[color:var(--color-ink)]">{{ vialsPerMonth }}</div>
                 <div class="text-[11px] text-[color:var(--color-ink-subtle)] mt-1">vials per month</div>
               </div>
+            </div>
+            <div v-if="stabilityExceeded" class="mt-4 flex items-start gap-2 rounded-[10px] bg-amber-50 border border-amber-200 p-3 text-[12px] text-amber-900">
+              <svg class="w-4 h-4 flex-shrink-0 mt-px text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+              <span>At this schedule one vial lasts {{ vialDurationText }} days, longer than the ~{{ STABILITY_DAYS }} days reconstituted peptide keeps in the fridge. Plan on a fresh vial about every {{ STABILITY_DAYS }} days (the vials-per-month figure assumes this), or choose a smaller vial.</span>
             </div>
           </div>
 
@@ -290,10 +330,10 @@
                     ]"
                   >
                     <td class="py-2.5 ui-mono">{{ row.water }}mL</td>
-                    <td class="py-2.5 text-right ui-mono">{{ row.conc.toLocaleString() }} mcg/mL</td>
-                    <td class="py-2.5 text-right ui-mono">{{ row.d100 }} units</td>
-                    <td class="py-2.5 text-right ui-mono">{{ row.d250 }} units</td>
-                    <td class="py-2.5 text-right ui-mono">{{ row.d500 }} units</td>
+                    <td class="py-2.5 text-right ui-mono">{{ fmtNum(row.conc, 0) }} mcg/mL</td>
+                    <td class="py-2.5 text-right ui-mono">{{ fmtNum(row.d100, 1) }} units</td>
+                    <td class="py-2.5 text-right ui-mono">{{ fmtNum(row.d250, 1) }} units</td>
+                    <td class="py-2.5 text-right ui-mono">{{ fmtNum(row.d500, 1) }} units</td>
                   </tr>
                 </tbody>
               </table>
@@ -306,20 +346,29 @@
             <div class="space-y-3 text-[13px] text-[color:var(--color-ink-muted)]">
               <div class="flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-bold flex items-center justify-center flex-shrink-0">1</span>
-                <span>{{ peptideMg }}mg peptide &divide; {{ waterMl }}mL water = <strong class="text-[color:var(--color-ink)]">{{ (peptideMg / waterMl).toFixed(2) }}mg/mL</strong> ({{ concentration.toLocaleString() }} mcg/mL)</span>
+                <span>{{ mgText }}mg peptide &divide; {{ waterText }}mL water = <strong class="text-[color:var(--color-ink)]">{{ mgPerMlText }}mg/mL</strong> ({{ concentrationText }} mcg/mL)</span>
               </div>
               <div v-if="mode !== 'reconstitution'" class="flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-bold flex items-center justify-center flex-shrink-0">2</span>
-                <span>{{ doseMcg }}mcg &divide; {{ concentration.toLocaleString() }} mcg/mL = <strong class="text-[color:var(--color-ink)]">{{ volumeMl }}mL</strong> per aliquot</span>
+                <span>{{ doseMcgText }}mcg &divide; {{ concentrationText }} mcg/mL = <strong class="text-[color:var(--color-ink)]">{{ volumeText }}mL</strong> per dose</span>
               </div>
               <div v-if="mode !== 'reconstitution'" class="flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-bold flex items-center justify-center flex-shrink-0">3</span>
-                <span>{{ volumeMl }}mL &times; 100 = <strong class="text-[color:var(--color-ink)]">{{ syringeMarks }} units</strong> on a {{ syringeUnits }}-unit syringe</span>
+                <span>{{ volumeText }}mL &times; 100 = <strong class="text-[color:var(--color-ink)]">{{ unitsText }} units</strong> on a {{ syringeUnits }}-unit syringe</span>
               </div>
               <div v-if="mode !== 'reconstitution'" class="flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-bold flex items-center justify-center flex-shrink-0">4</span>
-                <span>{{ waterMl }}mL total &divide; {{ volumeMl }}mL per aliquot = <strong class="text-[color:var(--color-ink)]">{{ dosesPerVial }} aliquots</strong> per vial</span>
+                <span>{{ vialMcgText }}mcg in the vial &divide; {{ doseMcgText }}mcg per dose = <strong class="text-[color:var(--color-ink)]">{{ dosesPerVialText }} doses</strong> per vial</span>
               </div>
+            </div>
+          </div>
+
+          <!-- RUO notice, below the tool so the answer isn't pushed down on mobile. -->
+          <div class="flex items-start gap-3 p-4 rounded-[12px] bg-amber-50 border border-amber-200">
+            <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+            <div>
+              <p class="text-[12px] font-semibold text-amber-900">Research Use Only (RUO)</p>
+              <p class="text-[11px] text-amber-800 leading-relaxed mt-0.5">This calculator is provided as a reference tool for laboratory research peptide reconstitution. All products and calculations are intended for <strong>in-vitro research and laboratory use only</strong>. Not for human consumption, diagnostic, or therapeutic use. Not medical advice.</p>
             </div>
           </div>
 
@@ -366,10 +415,10 @@
                 <h2 class="ui-display text-lg font-semibold text-[color:var(--color-ink)] mb-1">Share this calculation</h2>
                 <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed mb-3">
                   Every change you make here is saved into the page's URL. Send the link to anyone &mdash; a friend, a Reddit thread, a Discord group &mdash; and they'll open the calculator preloaded with your exact
-                  <template v-if="preset"><strong class="text-[color:var(--color-ink)]">{{ preset }}</strong> preset, </template>
-                  <strong class="text-[color:var(--color-ink)]">{{ peptideMg }}mg vial</strong>,
-                  <strong class="text-[color:var(--color-ink)]">{{ waterMl }}mL</strong> BAC water, and
-                  <strong class="text-[color:var(--color-ink)]">{{ doseMcg }}mcg dose</strong>. No signup, no login, same calculation on the other end.
+                  <template v-if="currentPreset"><strong class="text-[color:var(--color-ink)]">{{ currentPreset.name }}</strong> preset, </template>
+                  <strong class="text-[color:var(--color-ink)]">{{ mgText }}mg vial</strong>,
+                  <strong class="text-[color:var(--color-ink)]">{{ waterText }}mL</strong> BAC water, and
+                  <strong class="text-[color:var(--color-ink)]">{{ doseLabel }} dose</strong>. No signup, no login, same calculation on the other end.
                 </p>
                 <div class="flex flex-wrap gap-2 mb-3">
                   <button @click="copyShareLink" :class="['inline-flex items-center gap-2 h-9 px-4 rounded-[8px] text-[13px] font-semibold transition-all', copiedShare ? 'bg-emerald-600 text-white' : 'bg-[color:var(--color-ink)] text-white hover:opacity-90']">
@@ -518,44 +567,97 @@
         </div>
       </div>
     </section>
+
+    <!-- Mobile sticky result: shows the answer while the inputs are on
+         screen and the result card isn't. Tap to jump to the full result. -->
+    <transition
+      enter-active-class="transition-transform duration-200 ease-out"
+      enter-from-class="translate-y-full"
+      enter-to-class="translate-y-0"
+      leave-active-class="transition-transform duration-150 ease-in"
+      leave-from-class="translate-y-0"
+      leave-to-class="translate-y-full"
+    >
+      <button
+        v-if="showStickyBar"
+        type="button"
+        @click="scrollToResult"
+        class="lg:hidden fixed inset-x-0 bottom-0 z-30 w-full text-left bg-white/95 backdrop-blur border-t border-[color:var(--color-hairline)] shadow-[0_-4px_16px_rgba(10,11,14,0.08)] px-5 pt-3"
+        style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom))"
+      >
+        <div class="flex items-center justify-between gap-3">
+          <div v-if="mode !== 'reconstitution'">
+            <div class="text-[10px] uppercase tracking-[0.12em] font-bold text-[color:var(--color-accent-600)]">Draw</div>
+            <div class="ui-mono text-[22px] font-bold leading-tight text-[color:var(--color-ink)]">{{ unitsText }} <span class="text-[13px] font-semibold text-[color:var(--color-ink-muted)]">units</span></div>
+          </div>
+          <div v-else>
+            <div class="text-[10px] uppercase tracking-[0.12em] font-bold text-[color:var(--color-accent-600)]">Concentration</div>
+            <div class="ui-mono text-[22px] font-bold leading-tight text-[color:var(--color-ink)]">{{ concentrationText }} <span class="text-[13px] font-semibold text-[color:var(--color-ink-muted)]">mcg/mL</span></div>
+          </div>
+          <div class="text-right text-[12px] text-[color:var(--color-ink-muted)]">
+            <div v-if="mode !== 'reconstitution'">{{ volumeText }} mL &middot; {{ syringeUnits }}U syringe</div>
+            <div class="font-semibold text-[color:var(--color-accent-700)]">Full result &darr;</div>
+          </div>
+        </div>
+      </button>
+    </transition>
   </ModernLayout>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-import { Head } from '@inertiajs/vue3'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { Head, Link } from '@inertiajs/vue3'
 import ModernLayout from '@/Pages/Layouts/ModernLayout.vue'
+import CalcField from '@/components/calculator/CalcField.vue'
+import PriceThisVial from '@/components/calculator/PriceThisVial.vue'
 
 const props = defineProps({
   seo: { type: Object, default: () => ({}) },
   presets: { type: Array, default: () => [] },
+  // Cheapest live listing for this page's preset (null when none).
+  pricing: { type: Object, default: null },
+  // "{Compound} Calculator" on /calculator/{slug}; null on /calculator.
+  heading: { type: String, default: null },
 })
+
+// Reconstituted peptide keeps roughly this long refrigerated.
+const STABILITY_DAYS = 28
+const GENERIC_DEFAULTS = { mg: 5, water: 2, dose: 250 }
+
+const pageHeading = computed(() => props.heading || 'The Best Peptide Calculator')
+
+// --- Formatting helpers -------------------------------------------------
+function fmtNum(n, maxDigits) {
+  if (typeof n !== 'number' || !Number.isFinite(n)) return '—'
+  return n.toLocaleString('en-US', { maximumFractionDigits: maxDigits })
+}
+function isPos(v) {
+  return typeof v === 'number' && Number.isFinite(v) && v > 0
+}
+function compoundOf(name) {
+  return String(name || '').replace(/\s*\([^)]*\)\s*$/, '').trim()
+}
 
 // --- Share-link support -----------------------------------------------
 // Every meaningful input syncs to URL query params so users can copy the
-// address bar and share their exact configuration. Hydrated on mount from
-// whatever's in the URL — Colin Sep 7 revenue push, calculator as an SEO
-// funnel + viral share vector.
+// address bar and share their exact configuration.
 const copiedShare = ref(false)
 const copiedResult = ref(false)
-// Reactive mirror of the browser location so the "Your shareable link"
-// input updates in real time as inputs change. Hydrated on mount, kept
-// in sync by the state <-> URL watcher below.
 const shareUrl = ref('')
 const canNativeShare = ref(false)
 
 async function nativeShare() {
   if (!navigator.share) return
   const text = mode.value === 'reconstitution'
-    ? `My peptide reconstitution: ${peptideMg.value}mg + ${waterMl.value}mL BAC water`
-    : `${preset.value || 'My peptide dose'}: ${doseMcg.value}mcg (${syringeMarks.value} units)`
+    ? `My peptide reconstitution: ${mgText.value}mg + ${waterText.value}mL BAC water = ${concentrationText.value} mcg/mL`
+    : `${currentPreset.value ? currentPreset.value.name : 'My peptide dose'}: ${doseLabel.value} = ${unitsText.value} units`
   try {
-    await navigator.share({ title: 'Peptide calculation', text, url: shareUrl.value })
+    await navigator.share({ title: 'Peptide calculation', text, url: shareUrl.value || window.location.href })
   } catch { /* user cancelled */ }
 }
 async function copyShareLink() {
   try {
-    await navigator.clipboard.writeText(window.location.href)
+    await navigator.clipboard.writeText(shareUrl.value || window.location.href)
     copiedShare.value = true
     setTimeout(() => (copiedShare.value = false), 2000)
   } catch { /* clipboard blocked; user can still copy the URL manually */ }
@@ -564,8 +666,8 @@ async function copyShareLink() {
 // and forums. More useful than a URL when someone just wants the number.
 async function copyResult() {
   const text = mode.value === 'reconstitution'
-    ? `${peptideMg.value}mg peptide + ${waterMl.value}mL BAC water = ${concentration.value.toLocaleString('en-US', { maximumFractionDigits: 0 })} mcg/mL (via Peptidemap)`
-    : `Draw ${syringeMarks.value} units on a ${syringeUnits.value}-unit syringe (${volumeMl.value} mL) for a ${doseMcg.value} mcg dose from a ${concentration.value.toLocaleString('en-US', { maximumFractionDigits: 0 })} mcg/mL solution (via Peptidemap)`
+    ? `${mgText.value}mg peptide + ${waterText.value}mL BAC water = ${concentrationText.value} mcg/mL (via Peptidemap)`
+    : `Draw ${unitsText.value} units (${volumeText.value} mL) on a ${syringeUnits.value}-unit syringe for a ${doseLabel.value} dose from a ${concentrationText.value} mcg/mL solution (via Peptidemap)`
   try {
     await navigator.clipboard.writeText(text)
     copiedResult.value = true
@@ -582,88 +684,10 @@ const modes = [
 const mode = ref('dosage')
 
 // --- Presets ---
-// Presets now come from the server (app/Support/CalculatorPresets.php)
-// so one source of truth drives both the dropdown and the /calculator/{slug}
-// routing. If server props are missing (unusual) we fall back to this
-// hardcoded list to keep the UI functional during local hot-reload.
-const presetsFallback = [
-  // GLP-1 / weight management
-  { group: 'GLP-1 / Weight', name: 'Semaglutide (3mg)', mg: 3, water: 1.5, dose: 250 },
-  { group: 'GLP-1 / Weight', name: 'Semaglutide (5mg)', mg: 5, water: 2, dose: 500 },
-  { group: 'GLP-1 / Weight', name: 'Semaglutide (10mg)', mg: 10, water: 2, dose: 250 },
-  { group: 'GLP-1 / Weight', name: 'Tirzepatide (5mg)', mg: 5, water: 2, dose: 2500 },
-  { group: 'GLP-1 / Weight', name: 'Tirzepatide (10mg)', mg: 10, water: 2, dose: 2500 },
-  { group: 'GLP-1 / Weight', name: 'Tirzepatide (15mg)', mg: 15, water: 3, dose: 2500 },
-  { group: 'GLP-1 / Weight', name: 'Tirzepatide (30mg)', mg: 30, water: 3, dose: 2500 },
-  { group: 'GLP-1 / Weight', name: 'Retatrutide (5mg)', mg: 5, water: 2, dose: 1000 },
-  { group: 'GLP-1 / Weight', name: 'Retatrutide (10mg)', mg: 10, water: 2, dose: 1000 },
-  { group: 'GLP-1 / Weight', name: 'Liraglutide (5mg)', mg: 5, water: 2, dose: 600 },
-  { group: 'GLP-1 / Weight', name: 'Cagrilintide (5mg)', mg: 5, water: 2, dose: 600 },
-  { group: 'GLP-1 / Weight', name: 'Survodutide (10mg)', mg: 10, water: 2, dose: 800 },
-  { group: 'GLP-1 / Weight', name: 'Pemvidutide (10mg)', mg: 10, water: 2, dose: 1000 },
+// Presets come from the server (app/Support/CalculatorPresets.php), the
+// single source of truth for the dropdown and /calculator/{slug} routing.
+const presets = computed(() => props.presets || [])
 
-  // Growth hormone / GH secretagogues
-  { group: 'Growth / GH', name: 'CJC-1295 no DAC (2mg)', mg: 2, water: 2, dose: 100 },
-  { group: 'Growth / GH', name: 'CJC-1295 no DAC (5mg)', mg: 5, water: 2.5, dose: 100 },
-  { group: 'Growth / GH', name: 'CJC-1295 w/ DAC (2mg)', mg: 2, water: 2, dose: 1000 },
-  { group: 'Growth / GH', name: 'Ipamorelin (2mg)', mg: 2, water: 2, dose: 200 },
-  { group: 'Growth / GH', name: 'Ipamorelin (5mg)', mg: 5, water: 2.5, dose: 200 },
-  { group: 'Growth / GH', name: 'CJC/Ipamorelin Blend (10mg)', mg: 10, water: 3, dose: 300 },
-  { group: 'Growth / GH', name: 'Tesamorelin (2mg)', mg: 2, water: 2, dose: 2000 },
-  { group: 'Growth / GH', name: 'Tesamorelin (5mg)', mg: 5, water: 2, dose: 2000 },
-  { group: 'Growth / GH', name: 'Sermorelin (2mg)', mg: 2, water: 2, dose: 200 },
-  { group: 'Growth / GH', name: 'Sermorelin (5mg)', mg: 5, water: 2.5, dose: 300 },
-  { group: 'Growth / GH', name: 'Hexarelin (2mg)', mg: 2, water: 2, dose: 100 },
-  { group: 'Growth / GH', name: 'Hexarelin (5mg)', mg: 5, water: 2.5, dose: 200 },
-  { group: 'Growth / GH', name: 'GHRP-2 (5mg)', mg: 5, water: 2, dose: 150 },
-  { group: 'Growth / GH', name: 'GHRP-6 (5mg)', mg: 5, water: 2, dose: 150 },
-
-  // Healing / repair
-  { group: 'Healing / Repair', name: 'BPC-157 (5mg)', mg: 5, water: 2, dose: 250 },
-  { group: 'Healing / Repair', name: 'BPC-157 (10mg)', mg: 10, water: 3, dose: 500 },
-  { group: 'Healing / Repair', name: 'TB-500 (5mg)', mg: 5, water: 2, dose: 2500 },
-  { group: 'Healing / Repair', name: 'TB-500 (10mg)', mg: 10, water: 3, dose: 5000 },
-  { group: 'Healing / Repair', name: 'BPC-157 / TB-500 Blend (10mg)', mg: 10, water: 3, dose: 500 },
-  { group: 'Healing / Repair', name: 'KPV (5mg)', mg: 5, water: 2, dose: 500 },
-  { group: 'Healing / Repair', name: 'LL-37 (5mg)', mg: 5, water: 2, dose: 500 },
-  { group: 'Healing / Repair', name: 'Thymosin Alpha-1 (5mg)', mg: 5, water: 2, dose: 1600 },
-  { group: 'Healing / Repair', name: 'GHK-Cu (50mg)', mg: 50, water: 2, dose: 500 },
-  { group: 'Healing / Repair', name: 'GHK-Cu (100mg)', mg: 100, water: 3, dose: 1000 },
-
-  // Longevity / mitochondrial
-  { group: 'Longevity', name: 'MOTS-c (5mg)', mg: 5, water: 2.5, dose: 5000 },
-  { group: 'Longevity', name: 'MOTS-c (10mg)', mg: 10, water: 2, dose: 10000 },
-  { group: 'Longevity', name: 'Humanin (5mg)', mg: 5, water: 2, dose: 1500 },
-  { group: 'Longevity', name: 'SS-31 / Elamipretide (10mg)', mg: 10, water: 2, dose: 1000 },
-  { group: 'Longevity', name: 'Epitalon (10mg)', mg: 10, water: 2, dose: 1000 },
-  { group: 'Longevity', name: 'Epitalon (50mg)', mg: 50, water: 2, dose: 5000 },
-  { group: 'Longevity', name: 'NAD+ (100mg)', mg: 100, water: 2, dose: 5000 },
-  { group: 'Longevity', name: 'NAD+ (500mg)', mg: 500, water: 3, dose: 25000 },
-  { group: 'Longevity', name: 'FOXO4-DRI (5mg)', mg: 5, water: 2, dose: 1000 },
-
-  // Cognitive / nootropic
-  { group: 'Cognitive', name: 'Semax (5mg)', mg: 5, water: 2, dose: 300 },
-  { group: 'Cognitive', name: 'Selank (5mg)', mg: 5, water: 2, dose: 300 },
-  { group: 'Cognitive', name: 'Dihexa (10mg)', mg: 10, water: 2, dose: 8000 },
-  { group: 'Cognitive', name: 'DSIP (5mg)', mg: 5, water: 2, dose: 300 },
-
-  // Sexual function / cosmetic
-  { group: 'Sexual / Cosmetic', name: 'PT-141 / Bremelanotide (10mg)', mg: 10, water: 2, dose: 1750 },
-  { group: 'Sexual / Cosmetic', name: 'Melanotan II (10mg)', mg: 10, water: 2, dose: 250 },
-  { group: 'Sexual / Cosmetic', name: 'Melanotan I (10mg)', mg: 10, water: 2, dose: 500 },
-  { group: 'Sexual / Cosmetic', name: 'Kisspeptin-10 (5mg)', mg: 5, water: 2, dose: 100 },
-  { group: 'Sexual / Cosmetic', name: 'Kisspeptin-10 (10mg)', mg: 10, water: 2, dose: 100 },
-
-  // Metabolic / lipolytic
-  { group: 'Metabolic', name: 'AOD-9604 (5mg)', mg: 5, water: 2, dose: 300 },
-  { group: 'Metabolic', name: '5-Amino-1MQ (50mg)', mg: 50, water: 2, dose: 50000 },
-  { group: 'Metabolic', name: 'SLU-PP-332 (10mg)', mg: 10, water: 2, dose: 500 },
-]
-
-// Prefer server-supplied presets, fall back to the JS copy if props empty.
-const presets = computed(() => (props.presets?.length ? props.presets : presetsFallback))
-
-// Group presets for the dropdown (optgroup rendering).
 const presetGroups = computed(() => {
   const groups = {}
   for (const p of presets.value) {
@@ -672,39 +696,114 @@ const presetGroups = computed(() => {
   return Object.entries(groups).map(([label, items]) => ({ label, items }))
 })
 
+// Selected preset slug; '' means custom values.
 const preset = ref('')
+const currentPreset = computed(() => presets.value.find(p => p.slug === preset.value) || null)
+const currentCompoundName = computed(() => (currentPreset.value ? compoundOf(currentPreset.value.name) : ''))
+const pagePresetSlug = computed(() => props.seo?.prefilled_preset_slug || '')
+
+// Accepts a slug, or a display name from links shared before slugs were used.
+function findPreset(key) {
+  if (!key) return null
+  const k = String(key)
+  return presets.value.find(p => p.slug === k) || presets.value.find(p => p.name === k) || null
+}
+
+function defaultUnitFor(p) {
+  return p && p.group === 'GLP-1 / Weight' ? 'mg' : 'mcg'
+}
 
 function applyPreset() {
-  const p = presets.value.find(x => x.name === preset.value)
-  if (p) {
-    peptideMg.value = p.mg
-    waterMl.value = p.water
-    doseMcg.value = p.dose
-  }
+  const p = currentPreset.value
+  if (!p) return
+  peptideMg.value = p.mg
+  waterMl.value = p.water
+  doseMcg.value = p.dose
+  doseUnit.value = defaultUnitFor(p)
 }
 
 // --- Inputs ---
-const peptideMg = ref(5)
-const waterMl = ref(2)
-const doseMcg = ref(250)
+// Dose is always stored in mcg; the mcg/mg toggle only changes entry and display.
+const peptideMg = ref(GENERIC_DEFAULTS.mg)
+const waterMl = ref(GENERIC_DEFAULTS.water)
+const doseMcg = ref(GENERIC_DEFAULTS.dose)
+const doseUnit = ref('mcg')
+const doseUnits = ['mcg', 'mg']
 const syringeUnits = ref(100)
 const syringes = [30, 50, 100]
 const frequency = ref('daily')
+const frequencyOptions = [
+  { value: 'daily', label: 'Daily' },
+  { value: 'eod', label: 'Every other day' },
+  { value: '3x', label: '3x per week' },
+  { value: '2x', label: '2x per week' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'biweekly', label: 'Every 2 weeks' },
+]
+
+const doseDisplay = computed({
+  get() {
+    if (!isPos(doseMcg.value)) return null
+    return doseUnit.value === 'mg' ? doseMcg.value / 1000 : doseMcg.value
+  },
+  set(v) {
+    if (!isPos(v)) { doseMcg.value = null; return }
+    const mcg = doseUnit.value === 'mg' ? v * 1000 : v
+    // Round off float noise (1.1 mg * 1000 = 1100.0000000000002).
+    doseMcg.value = Math.round(mcg * 1000) / 1000
+  },
+})
 
 // --- Computed results ---
-const concentration = computed(() => (peptideMg.value * 1000) / waterMl.value)
+const inputsValid = computed(() => isPos(peptideMg.value) && isPos(waterMl.value))
+const doseValid = computed(() => isPos(doseMcg.value))
 
-const volumeMlRaw = computed(() => doseMcg.value / concentration.value)
-const volumeMl = computed(() => volumeMlRaw.value.toFixed(3))
+const concentration = computed(() => (inputsValid.value ? (peptideMg.value * 1000) / waterMl.value : null))
+const concentrationText = computed(() => fmtNum(concentration.value, 0))
+const mgText = computed(() => fmtNum(peptideMg.value, 3))
+const waterText = computed(() => fmtNum(waterMl.value, 3))
+const mgPerMlText = computed(() => (inputsValid.value ? (peptideMg.value / waterMl.value).toFixed(2) : '—'))
+const vialMcgText = computed(() => (isPos(peptideMg.value) ? fmtNum(peptideMg.value * 1000, 3) : '—'))
 
-const syringeMarks = computed(() => Math.round(volumeMlRaw.value * 100))
-
-const fillPercent = computed(() => (syringeMarks.value / syringeUnits.value) * 100)
-
-const dosesPerVial = computed(() => {
-  if (volumeMlRaw.value <= 0) return 0
-  return Math.floor(waterMl.value / volumeMlRaw.value)
+// Units on a U-100 insulin syringe (100 units per mL), shown to 0.1 unit.
+const unitsRaw = computed(() => (concentration.value && doseValid.value
+  ? (doseMcg.value / concentration.value) * 100
+  : null))
+const unitsRounded = computed(() => (unitsRaw.value === null ? null : Math.round(unitsRaw.value * 10) / 10))
+const hasDraw = computed(() => unitsRounded.value !== null)
+const unitsText = computed(() => {
+  if (unitsRounded.value === null) return '—'
+  return Number.isInteger(unitsRounded.value) ? String(unitsRounded.value) : unitsRounded.value.toFixed(1)
 })
+// Volume is derived from the rounded units so "mL x 100 = units" reads exactly.
+const volumeText = computed(() => (unitsRounded.value === null ? '—' : (unitsRounded.value / 100).toFixed(3)))
+
+const fillPercent = computed(() => (unitsRaw.value === null ? 0 : (unitsRaw.value / syringeUnits.value) * 100))
+const overCapacity = computed(() => unitsRaw.value !== null && unitsRaw.value > syringeUnits.value + 1e-9)
+const tinyDraw = computed(() => unitsRaw.value !== null && unitsRaw.value < 5)
+const doseExceedsVial = computed(() => doseValid.value && isPos(peptideMg.value) && doseMcg.value > peptideMg.value * 1000 + 1e-9)
+const plungerText = computed(() => {
+  if (!hasDraw.value) return 'Enter your numbers'
+  if (overCapacity.value) return `More than ${syringeUnits.value} units`
+  return `Pull plunger to ${unitsText.value} units`
+})
+
+const doseMcgText = computed(() => fmtNum(doseMcg.value, 3))
+const doseMgText = computed(() => (doseValid.value ? fmtNum(doseMcg.value / 1000, 4) : '—'))
+const doseLabel = computed(() => {
+  if (!doseValid.value) return '—'
+  return doseUnit.value === 'mg'
+    ? `${doseMgText.value} mg (${doseMcgText.value} mcg)`
+    : `${doseMcgText.value} mcg (${doseMgText.value} mg)`
+})
+
+// Whole doses in the vial. The epsilon absorbs float error that used to
+// turn 50.0 into 49.999... and floor it to 49.
+const dosesPerVial = computed(() => {
+  if (!isPos(peptideMg.value) || !doseValid.value) return null
+  return Math.floor((peptideMg.value * 1000) / doseMcg.value + 1e-9)
+})
+const dosesPerVialText = computed(() => (dosesPerVial.value === null ? '—' : String(dosesPerVial.value)))
 
 // Schedule
 const administrationsPerWeek = computed(() => {
@@ -713,113 +812,126 @@ const administrationsPerWeek = computed(() => {
 })
 
 const vialDurationDays = computed(() => {
-  if (dosesPerVial.value <= 0 || administrationsPerWeek.value <= 0) return 0
-  return Math.floor(dosesPerVial.value / (administrationsPerWeek.value / 7))
+  if (!dosesPerVial.value || administrationsPerWeek.value <= 0) return null
+  return Math.floor(dosesPerVial.value / (administrationsPerWeek.value / 7) + 1e-9)
+})
+const vialDurationText = computed(() => (vialDurationDays.value === null ? '—' : String(vialDurationDays.value)))
+const stabilityExceeded = computed(() => vialDurationDays.value !== null && vialDurationDays.value > STABILITY_DAYS)
+
+// A vial is replaced at least every STABILITY_DAYS once mixed.
+const vialsPerMonth = computed(() => {
+  if (!vialDurationDays.value) return '—'
+  const v = 30 / Math.min(vialDurationDays.value, STABILITY_DAYS)
+  return v < 1 ? '< 1' : v.toFixed(1)
 })
 
-const vialsPerMonth = computed(() => {
-  if (vialDurationDays.value <= 0) return '—'
-  const v = 30 / vialDurationDays.value
-  return v < 1 ? '< 1' : v.toFixed(1)
+// Reconstitution table (units to 0.1, matching the main result)
+function unitsFor(doseMcgValue, conc) {
+  return Math.round((doseMcgValue / conc) * 1000) / 10
+}
+const reconTable = computed(() => {
+  if (!isPos(peptideMg.value)) return []
+  return [0.5, 1, 1.5, 2, 2.5, 3, 4, 5].map(w => {
+    const conc = (peptideMg.value * 1000) / w
+    return { water: w, conc, d100: unitsFor(100, conc), d250: unitsFor(250, conc), d500: unitsFor(500, conc) }
+  })
+})
+
+// --- Pricing ---
+// Full card only for the preset the page loaded; other presets get a link.
+const pricingForCurrent = computed(() => {
+  const p = props.pricing
+  return p && currentPreset.value && p.preset_slug === currentPreset.value.slug ? p : null
+})
+const compareHref = computed(() => {
+  const p = currentPreset.value
+  return p && p.compound ? `/compare/${p.compound}` : null
 })
 
 // --- URL <-> state sync -----------------------------------------------
 // Hydrate from ?mode=&preset=&mg=&water=&dose=&syringe=&freq= on mount,
-// then whenever any of those inputs change, replaceState so the URL
-// mirrors what the user is looking at. Uses replaceState (not pushState)
-// so the browser history doesn't clog with every keystroke.
+// then mirror every change into the URL with replaceState. Params that
+// match the current preset (or the generic defaults) are left out, and the
+// page's own preset needs no ?preset= at all, so untouched preset pages
+// keep a clean URL.
 onMounted(() => {
   if (typeof window === 'undefined') return
   canNativeShare.value = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
+  const params = new URL(window.location.href).searchParams
+
+  // An explicit ?preset= wins over the page's preset so shared links
+  // reproduce the sender's choice; ?preset=custom means no preset.
+  const qp = params.get('preset')
+  const start = qp === 'custom' ? null : (findPreset(qp) || findPreset(pagePresetSlug.value))
+  if (start) { preset.value = start.slug; applyPreset() }
+
+  const m = params.get('mode'); if (m && modes.some(x => x.key === m)) mode.value = m
+  const num = (k) => { const v = parseFloat(params.get(k)); return Number.isFinite(v) && v > 0 ? v : null }
+  const mg = num('mg'); if (mg) peptideMg.value = mg
+  const w = num('water'); if (w) waterMl.value = w
+  const d = num('dose'); if (d) doseMcg.value = d
+  const s = parseInt(params.get('syringe'), 10); if (syringes.includes(s)) syringeUnits.value = s
+  const f = params.get('freq'); if (f && frequencyOptions.some(o => o.value === f)) frequency.value = f
   shareUrl.value = window.location.href
-  // Prefilled slug from /calculator/{slug} wins over ?preset= query
-  // param — the compound URL is the canonical for that compound and
-  // its SEO assumes those inputs are what's rendered.
-  const prefilled = props.seo?.prefilled_preset_slug
-  if (prefilled) {
-    const p = presets.value.find(x => x.slug === prefilled)
-    if (p) { preset.value = p.name; applyPreset() }
-  }
-  const p = new URL(window.location.href).searchParams
-  const get = (k, cast) => (p.has(k) ? (cast ? cast(p.get(k)) : p.get(k)) : null)
-  const m = get('mode'); if (m && modes.some(x => x.key === m)) mode.value = m
-  const pr = get('preset'); if (pr && !prefilled) { preset.value = pr; applyPreset() }
-  const mg = get('mg', parseFloat); if (mg && mg > 0) peptideMg.value = mg
-  const w = get('water', parseFloat); if (w && w > 0) waterMl.value = w
-  const d = get('dose', parseFloat); if (d && d > 0) doseMcg.value = d
-  const s = get('syringe', parseInt); if (s && [30, 50, 100].includes(s)) syringeUnits.value = s
-  const f = get('freq'); if (f) frequency.value = f
+
+  setupStickyObserver()
 })
 
 watch([mode, preset, peptideMg, waterMl, doseMcg, syringeUnits, frequency], () => {
   if (typeof window === 'undefined') return
   const url = new URL(window.location.href)
-  const set = (k, v, def) => (v !== undefined && v !== null && v !== '' && v !== def
-    ? url.searchParams.set(k, String(v))
-    : url.searchParams.delete(k))
+  const set = (k, v, def) => {
+    if (v === undefined || v === null || v === '' || (def !== undefined && v === def)) url.searchParams.delete(k)
+    else url.searchParams.set(k, String(v))
+  }
+
+  let presetParam = null
+  if (currentPreset.value) {
+    presetParam = currentPreset.value.slug === pagePresetSlug.value ? null : currentPreset.value.slug
+  } else if (pagePresetSlug.value) {
+    presetParam = 'custom'
+  }
+  set('preset', presetParam)
+
+  // Custom values on a preset page are always written out; otherwise only
+  // values that differ from the active preset (or generic defaults).
+  const base = currentPreset.value || (pagePresetSlug.value ? null : GENERIC_DEFAULTS)
   set('mode', mode.value, 'dosage')
-  set('preset', preset.value, '')
-  set('mg', peptideMg.value, 5)
-  set('water', waterMl.value, 2)
-  set('dose', doseMcg.value, 250)
+  set('mg', peptideMg.value, base ? base.mg : undefined)
+  set('water', waterMl.value, base ? base.water : undefined)
+  set('dose', doseMcg.value, base ? base.dose : undefined)
   set('syringe', syringeUnits.value, 100)
   set('freq', frequency.value, 'daily')
-  window.history.replaceState({}, '', url.toString())
+  // Keep Inertia's history state; only the URL changes.
+  window.history.replaceState(window.history.state, '', url.toString())
   shareUrl.value = url.toString()
 })
 
-// Reconstitution table
-const reconTable = computed(() => {
-  const waters = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5]
-  return waters.map(w => {
-    const conc = (peptideMg.value * 1000) / w
-    return {
-      water: w,
-      conc,
-      d100: Math.round((100 / conc) * 100),
-      d250: Math.round((250 / conc) * 100),
-      d500: Math.round((500 / conc) * 100),
+// --- Mobile sticky result bar -----------------------------------------
+const inputsRef = ref(null)
+const resultRef = ref(null)
+const inputsVisible = ref(false)
+const resultVisible = ref(true)
+let stickyObserver = null
+
+function setupStickyObserver() {
+  if (typeof IntersectionObserver === 'undefined') return
+  stickyObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.target === inputsRef.value) inputsVisible.value = entry.isIntersecting
+      if (entry.target === resultRef.value) resultVisible.value = entry.isIntersecting
     }
-  })
+  }, { threshold: 0.15 })
+  if (inputsRef.value) stickyObserver.observe(inputsRef.value)
+  if (resultRef.value) stickyObserver.observe(resultRef.value)
+}
+onBeforeUnmount(() => {
+  if (stickyObserver) stickyObserver.disconnect()
 })
 
-// --- Subcomponents ---
-const CalcField = {
-  props: ['label', 'unit', 'modelValue', 'step', 'min'],
-  emits: ['update:modelValue'],
-  template: `
-    <div class="mb-5">
-      <label class="block text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-2">{{ label }}</label>
-      <div class="relative">
-        <input
-          type="number"
-          :value="modelValue"
-          @input="$emit('update:modelValue', parseFloat($event.target.value) || 0)"
-          :step="step"
-          :min="min"
-          class="w-full h-10 pl-3 pr-14 text-[14px] ui-mono border border-[color:var(--color-hairline)] rounded-[8px] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
-        />
-        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[color:var(--color-ink-subtle)] font-semibold">{{ unit }}</span>
-      </div>
-    </div>
-  `,
-}
+const showStickyBar = computed(() => inputsVisible.value && !resultVisible.value)
 
-const ResultCard = {
-  props: ['label', 'value', 'unit', 'highlight'],
-  template: `
-    <div :class="[
-      'rounded-[14px] border p-5 transition-all',
-      highlight
-        ? 'bg-[color:var(--color-verified-bg)] border-[#A7F3D0] shadow-[var(--shadow-sm)]'
-        : 'bg-white border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)]',
-    ]">
-      <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-2">{{ label }}</div>
-      <div class="flex items-baseline gap-1.5">
-        <span class="ui-mono text-2xl font-bold text-[color:var(--color-ink)]">{{ value }}</span>
-        <span class="text-[12px] text-[color:var(--color-ink-muted)]">{{ unit }}</span>
-      </div>
-    </div>
-  `,
+function scrollToResult() {
+  if (resultRef.value) resultRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 </script>

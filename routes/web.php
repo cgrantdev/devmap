@@ -259,13 +259,6 @@ $calculatorRenderer = function (?string $compoundSlug = null) {
                     'price' => '0',
                     'priceCurrency' => 'USD',
                 ],
-                'aggregateRating' => [
-                    '@type' => 'AggregateRating',
-                    'ratingValue' => '4.9',
-                    'ratingCount' => '312',
-                    'bestRating' => '5',
-                    'worstRating' => '1',
-                ],
             ],
             // HowTo — numbered-step SERP treatment for reconstitution queries.
             [
@@ -311,11 +304,19 @@ $calculatorRenderer = function (?string $compoundSlug = null) {
             ],
         ],
     ];
+    // Compound pages get a compound H1 (visible and SSR); the generic
+    // landing keeps its title-derived H1. Titles and metas are untouched.
+    $heading = $preset ? \App\Support\CalculatorPresets::compoundName($preset) . ' Calculator' : null;
+    if ($heading) {
+        $seo['h1'] = $heading;
+    }
     session(['page_seo_data' => $seo]);
 
     return Inertia::render('Frontend/Calculator', [
         'seo' => $seo,
         'presets' => \App\Support\CalculatorPresets::all(),
+        'heading' => $heading,
+        'pricing' => $preset ? \App\Support\CalculatorPresets::pricing($preset) : null,
     ]);
 };
 
