@@ -4,7 +4,7 @@
       type="button"
       @click="open = !open"
       :class="[
-        'ui-focus flex items-center gap-2 h-10 pl-2.5 pr-2 rounded-[10px] text-sm font-medium transition-colors',
+        'ui-focus flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 pl-2 sm:pl-2.5 pr-1.5 sm:pr-2 rounded-[10px] text-sm font-medium transition-colors',
         dark
           ? 'bg-white/10 border border-white/15 text-white hover:bg-white/15'
           : 'border border-[color:var(--color-hairline)] bg-white text-[color:var(--color-ink)] hover:border-[color:var(--color-accent-400)]',
@@ -21,7 +21,8 @@
         <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/>
         <circle cx="12" cy="10" r="3"/>
       </svg>
-      <span class="hidden md:inline text-[13px] font-semibold tracking-tight">{{ selectedCode || 'ALL' }}</span>
+      <!-- Code shows at every width (phones used to get a bare pin). -->
+      <span class="text-[12px] sm:text-[13px] font-semibold tracking-tight">{{ selectedCode || 'ALL' }}</span>
       <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 9l6 6 6-6"/>
       </svg>

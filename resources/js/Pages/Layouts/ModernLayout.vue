@@ -104,7 +104,9 @@
           <!-- Site-wide vendor-location filter. Reloads current URL with
                ?location={country}; server-side filters on /vendors, /products,
                and /search pick it up automatically. -->
-          <div class="hidden sm:block">
+          <!-- Shown at every width: on phones it was only inside the menu,
+               so most mobile visitors never found the location filter. -->
+          <div>
             <CountrySelector />
           </div>
 

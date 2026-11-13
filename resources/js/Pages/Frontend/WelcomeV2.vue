@@ -163,36 +163,38 @@
           </a>
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
+        <!-- Phones: one compact row per vendor (logo square left, details
+             right). From sm up: the card grid. -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3 lg:gap-4">
           <!-- One stretched link per tile (the name's ::after covers the
                card), so the coupon ticket can be a real button above it. -->
           <div
             v-for="vendor in verifiedVendors.slice(0, 6)"
             :key="vendor.id"
-            class="group relative flex flex-col overflow-hidden rounded-[14px] border border-[color:var(--color-hairline)] bg-white transition-all duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]"
+            class="group relative flex flex-row sm:flex-col overflow-hidden rounded-[14px] border border-[color:var(--color-hairline)] bg-white transition-all duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]"
           >
             <!-- Fixed 16:9 logo box. The image is absolutely centred so a
                  square or oversized file can't stretch the tile (and with it
                  every card in the row). Rounded so an opaque square logo
                  reads as an app icon rather than a pasted block. -->
             <div
-              class="relative aspect-[16/9] overflow-hidden border-b border-[color:var(--color-hairline)]"
+              class="relative flex-shrink-0 overflow-hidden w-[84px] h-[84px] m-2.5 mr-0 rounded-[12px] border border-[color:var(--color-hairline)] sm:m-0 sm:w-auto sm:h-auto sm:aspect-[16/9] sm:rounded-none sm:border-0 sm:border-b"
               :style="{ backgroundColor: logoBackdrop(vendor.logo_url) }"
             >
               <img
                 v-if="vendor.logo_url && !brokenLogos[vendor.id]"
                 :src="vendor.logo_url"
                 :alt="vendor.name"
-                class="absolute inset-0 m-auto w-auto h-auto max-w-[72%] max-h-[60%] object-contain rounded-[12px]"
+                class="absolute inset-0 m-auto w-auto h-auto max-w-[82%] max-h-[70%] sm:max-w-[72%] sm:max-h-[60%] object-contain rounded-[10px] sm:rounded-[12px]"
                 loading="lazy"
                 decoding="async"
                 @error="brokenLogos[vendor.id] = true"
               />
-              <span v-else class="absolute inset-0 flex items-center justify-center ui-display text-2xl lg:text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
+              <span v-else class="absolute inset-0 flex items-center justify-center ui-display text-xl sm:text-2xl lg:text-4xl font-bold text-[color:var(--color-ink-subtle)]">{{ vendor.name.slice(0,2).toUpperCase() }}</span>
             </div>
-            <div class="p-3 lg:p-5 flex-1 flex flex-col gap-2.5 lg:gap-3">
+            <div class="min-w-0 p-2.5 pl-3 sm:p-3 lg:p-5 flex-1 flex flex-col gap-1.5 sm:gap-2.5 lg:gap-3">
               <div class="flex items-center justify-between gap-2 min-w-0">
-                <h3 class="ui-display text-[14px] lg:text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate min-w-0 group-hover:text-[color:var(--color-accent-700)] transition-colors">
+                <h3 class="ui-display text-[15px] lg:text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate min-w-0 group-hover:text-[color:var(--color-accent-700)] transition-colors">
                   <a
                     :href="vendor.url"
                     class="ui-focus outline-none after:absolute after:inset-0 after:rounded-[14px]"
@@ -205,8 +207,11 @@
                   <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ (vendor.rating_average || 0).toFixed(1) }}</span>
                 </span>
               </div>
+              <!-- Phones: listing count on its own line (the footer row is
+                   desktop-only). -->
+              <div class="sm:hidden -mt-0.5 text-[12px] text-[color:var(--color-ink-muted)]"><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendor.product_count }}</span> listings</div>
               <CouponTicket v-if="vendor.coupon_code" :code="vendor.coupon_code" :percent="vendor.coupon_percent" size="sm" />
-              <div class="mt-auto pt-2 lg:pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-[11px] lg:text-xs text-[color:var(--color-ink-muted)]">
+              <div class="hidden sm:flex mt-auto pt-2 lg:pt-3 border-t border-[color:var(--color-hairline-soft)] items-center justify-between text-[11px] lg:text-xs text-[color:var(--color-ink-muted)]">
                 <span><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ vendor.product_count }}</span> listings</span>
                 <span class="text-[color:var(--color-accent-600)] font-semibold group-hover:translate-x-0.5 transition-transform duration-[180ms] flex items-center gap-0.5">
                   View <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>

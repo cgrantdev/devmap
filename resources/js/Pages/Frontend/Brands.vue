@@ -153,14 +153,17 @@
       <!-- Vendor card grid — logo prominent, equal weight.
            Featured/partner vendors get a shiny animated gold border so they
            stand out without breaking the grid rhythm. -->
-      <div v-if="filteredBrands.length > 0" class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
+      <!-- Phones: one compact row per vendor (logo square left, details
+           right); two half-width cards squeezed names, badges and codes.
+           From sm up: the card grid. -->
+      <div v-if="filteredBrands.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4 lg:gap-5">
         <!-- One stretched link per card (the name's ::after covers it), so
              the coupon ticket can be a real button above it. -->
         <div
           v-for="brand in filteredBrands"
           :key="brand.id"
           :class="[
-            'group relative flex flex-col rounded-[14px] bg-white hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden',
+            'group relative flex flex-row sm:flex-col rounded-[14px] bg-white hover:shadow-[var(--shadow-md)] hover:-translate-y-[1px] transition-all duration-[200ms] overflow-hidden',
             brand.is_partner || brand.featured
               ? 'pmap-gold-border'
               : 'border border-[color:var(--color-hairline)] hover:border-[color:var(--color-accent-400)]',
@@ -172,7 +175,7 @@
           <!-- overflow-hidden matters: an aspect-ratio box otherwise grows to
                its content, and a square logo stretched the tile (and every
                card in its row) instead of fitting inside it. -->
-          <div class="aspect-[16/9] border-b border-[color:var(--color-hairline)] relative overflow-hidden">
+          <div class="relative flex-shrink-0 overflow-hidden w-[84px] h-[84px] m-2.5 mr-0 rounded-[12px] border border-[color:var(--color-hairline)] sm:m-0 sm:w-auto sm:h-auto sm:aspect-[16/9] sm:rounded-none sm:border-0 sm:border-b">
             <VendorLogo
               :src="brand.logo"
               :name="brand.name"
@@ -181,11 +184,11 @@
               radius="none"
               :bordered="false"
               fallback="subtle"
-              img-class="w-full h-full object-contain px-[15%] py-[11%]"
+              img-class="w-full h-full object-contain p-[12%] sm:px-[15%] sm:py-[11%]"
             />
             <span
               v-if="brand.is_partner || brand.featured"
-              class="pmap-featured-pill z-10 absolute top-3 right-3 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-white font-bold shadow-[0_2px_8px_rgba(245,158,11,0.5)]"
+              class="pmap-featured-pill z-10 absolute top-3 right-3 hidden sm:inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-white font-bold shadow-[0_2px_8px_rgba(245,158,11,0.5)]"
             >
               <span class="text-yellow-100">★</span>
               <span>Featured</span>
@@ -196,19 +199,30 @@
                brand name row, location row, and stats row line up
                across every card in the grid, regardless of whether
                the card has ratings or verified badges. -->
-          <div class="p-5 flex-1 flex flex-col gap-3">
-            <div>
-              <h3 class="ui-display text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate group-hover:text-[color:var(--color-accent-700)] transition-colors">
-                <a
-                  :href="`/brand/${brand.slug}`"
-                  class="outline-none after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-[color:var(--color-accent-500)]"
-                >{{ brand.name }}</a>
-              </h3>
-              <div class="flex items-center gap-1 mt-1 text-xs text-[color:var(--color-ink-muted)] h-[16px]">
+          <div class="min-w-0 p-2.5 pl-3 sm:p-5 flex-1 flex flex-col gap-1.5 sm:gap-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 min-w-0">
+                <h3 class="ui-display min-w-0 text-[15px] sm:text-[17px] font-semibold text-[color:var(--color-ink)] tracking-tight truncate group-hover:text-[color:var(--color-accent-700)] transition-colors">
+                  <a
+                    :href="`/brand/${brand.slug}`"
+                    class="outline-none after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-[color:var(--color-accent-500)]"
+                  >{{ brand.name }}</a>
+                </h3>
+                <!-- Phones: the featured pill can't sit on an 84px logo. -->
+                <span v-if="brand.is_partner || brand.featured" class="sm:hidden flex-shrink-0 text-[12px] text-amber-500" title="Featured">★</span>
+              </div>
+              <div class="flex items-center gap-1 mt-0.5 sm:mt-1 text-xs text-[color:var(--color-ink-muted)] h-[16px] min-w-0">
                 <template v-if="brand.location">
-                  <svg class="w-3 h-3 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <svg class="w-3 h-3 flex-shrink-0 text-[color:var(--color-ink-subtle)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a8 8 0 00-8 8c0 5.5 8 12 8 12s8-6.5 8-12a8 8 0 00-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
                   <span class="truncate">{{ brand.location }}</span>
                 </template>
+                <!-- Phones: count and rating share this line (the stats row
+                     and full rating are desktop-only). -->
+                <span class="sm:hidden flex-shrink-0 whitespace-nowrap"><template v-if="brand.location"> · </template><span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.product_count }}</span> compounds</span>
+                <span v-if="brandTotalReviews(brand) > 0" class="sm:hidden flex-shrink-0 inline-flex items-center gap-0.5 whitespace-nowrap">
+                  · <svg class="w-3 h-3 text-[color:var(--color-caution)]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
+                  <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brandDisplayedRating(brand).toFixed(1) }}</span>
+                </span>
               </div>
             </div>
 
@@ -221,7 +235,7 @@
                  reviews AND any external-platform reviews we've aggregated
                  (Trustpilot, Reviews.io). Displayed rating is the count-
                  weighted mean across all sources. -->
-            <div v-if="brandTotalReviews(brand) > 0" class="flex items-center gap-1.5 text-xs">
+            <div v-if="brandTotalReviews(brand) > 0" class="hidden sm:flex items-center gap-1.5 text-xs">
               <svg v-for="n in 5" :key="n" class="w-3.5 h-3.5" :class="n <= Math.round(brandDisplayedRating(brand)) ? 'text-[color:var(--color-caution)]' : 'text-[color:var(--color-hairline)]'" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.8 5.7 6.2.9-4.5 4.4 1.1 6.3L10 15.3 4.4 18.3l1.1-6.3L1 7.6l6.2-.9L10 1z"/></svg>
               <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brandDisplayedRating(brand).toFixed(1) }}</span>
               <span class="text-[color:var(--color-ink-subtle)]">({{ brandTotalReviews(brand).toLocaleString() }} reviews)</span>
@@ -230,22 +244,25 @@
             <!-- Approved verification badges (cGMP / 7+ Tested). Only
                  rendered when Julia has approved a document upload;
                  self-declared USPs like "US Made" stay a separate chip. -->
-            <div v-if="brand.verified_badges && brand.verified_badges.length" class="flex flex-wrap gap-1 mt-2">
+            <!-- Phones use short labels on one line ("cGMP", "7+ tested");
+                 the full labels wrapped into tall pills. -->
+            <div v-if="brand.verified_badges && brand.verified_badges.length" class="flex flex-nowrap sm:flex-wrap gap-1 sm:mt-2 overflow-hidden">
               <span
                 v-for="b in brand.verified_badges"
                 :key="b.type"
-                class="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full"
+                class="inline-flex flex-shrink-0 items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full whitespace-nowrap"
                 :title="b.type === 'cgmp' ? 'cGMP (vendor-reported)' : `${b.label} (vendor-submitted)`"
               >
                 <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                {{ b.label }}
+                <span class="sm:hidden">{{ shortBadge(b) }}</span>
+                <span class="hidden sm:inline">{{ b.label }}</span>
               </span>
             </div>
 
             <CouponTicket v-if="brand.coupon_code" :code="brand.coupon_code" :percent="brand.coupon_percent" size="sm" />
 
-            <!-- Stats row -->
-            <div class="mt-auto pt-3 border-t border-[color:var(--color-hairline-soft)] flex items-center justify-between text-xs text-[color:var(--color-ink-muted)]">
+            <!-- Stats row (desktop; phones show the count beside the location) -->
+            <div class="hidden sm:flex mt-auto pt-3 border-t border-[color:var(--color-hairline-soft)] items-center justify-between text-xs text-[color:var(--color-ink-muted)]">
               <span class="flex items-center gap-1">
                 <span class="ui-mono font-semibold text-[color:var(--color-ink)]">{{ brand.product_count }}</span> compounds
               </span>
@@ -457,6 +474,13 @@ function vendorGradient(name) {
   for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) & 0xffffffff
   const [a, b] = palette[Math.abs(h) % palette.length]
   return `linear-gradient(135deg, ${a} 0%, ${b} 100%)`
+}
+
+// Short verification badge labels for phone rows.
+function shortBadge(b) {
+  if (b?.type === 'cgmp') return 'cGMP'
+  if (b?.type === 'testing_7x') return '7+ tested'
+  return b?.label || ''
 }
 </script>
 

@@ -2,12 +2,12 @@
   <!-- One stretched link per card (the vendor name, to its coupon page),
        so the coupon ticket can be a real copy button above it. -->
   <div
-    class="group relative flex h-full flex-col overflow-hidden rounded-[14px] border border-[color:var(--color-hairline)] bg-white transition-all duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]"
+    class="group relative flex h-full flex-row sm:flex-col overflow-hidden rounded-[14px] border border-[color:var(--color-hairline)] bg-white transition-all duration-200 hover:-translate-y-[1px] hover:border-[color:var(--color-accent-400)] hover:shadow-[var(--shadow-md)]"
   >
     <!-- Limited-Time badge — shown when the vendor's coupon is boosted. -->
     <div
       v-if="isBoosted"
-      class="absolute top-3 left-3 z-[1] inline-flex items-center gap-1 bg-amber-500 text-white px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md"
+      class="absolute top-2 left-2 sm:top-3 sm:left-3 z-[1] inline-flex items-center gap-1 bg-amber-500 text-white px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md"
     >
       <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       Limited time
@@ -15,7 +15,8 @@
 
     <!-- Fixed 16:9 logo box; overflow-hidden keeps the ratio whatever the
          logo file's shape. -->
-    <div class="relative aspect-[16/9] overflow-hidden border-b border-[color:var(--color-hairline)]">
+    <!-- Phones: an 84px logo square beside the details; sm up: 16:9 box. -->
+    <div class="relative flex-shrink-0 overflow-hidden w-[84px] h-[84px] m-2.5 mr-0 rounded-[12px] border border-[color:var(--color-hairline)] sm:m-0 sm:w-auto sm:h-auto sm:aspect-[16/9] sm:rounded-none sm:border-0 sm:border-b">
       <div class="absolute inset-0">
         <VendorLogo
           :src="logo"
@@ -26,12 +27,12 @@
           radius="none"
           :bordered="false"
           fallback="subtle"
-          img-class="w-full h-full object-contain px-[16%] py-[14%] select-none"
+          img-class="w-full h-full object-contain p-[12%] sm:px-[16%] sm:py-[14%] select-none"
         />
       </div>
     </div>
 
-    <div class="flex flex-1 flex-col gap-2.5 p-4">
+    <div class="flex min-w-0 flex-1 flex-col gap-2 p-2.5 pl-3 sm:gap-2.5 sm:p-4">
       <div class="min-w-0">
         <div class="flex items-start justify-between gap-2">
         <h3 class="ui-display min-w-0 truncate text-[16px] font-semibold tracking-tight text-[color:var(--color-ink)] transition-colors group-hover:text-[color:var(--color-accent-700)]">
@@ -54,13 +55,13 @@
         </div>
       </div>
 
-      <p v-if="description" class="text-[13px] leading-snug text-[color:var(--color-ink-muted)] line-clamp-2">{{ description }}</p>
+      <p v-if="description" class="hidden sm:block text-[13px] leading-snug text-[color:var(--color-ink-muted)] line-clamp-2">{{ description }}</p>
 
       <div class="mt-auto pt-1">
         <CouponTicket :code="code" :percent="discountValue" size="sm" />
         <span
           aria-hidden="true"
-          class="mt-2 flex h-9 items-center justify-center gap-1.5 rounded-[10px] border border-[color:var(--color-hairline)] text-[12px] font-semibold text-[color:var(--color-ink)] transition-colors group-hover:border-[color:var(--color-accent-400)] group-hover:text-[color:var(--color-accent-700)]"
+          class="mt-2 hidden sm:flex h-9 items-center justify-center gap-1.5 rounded-[10px] border border-[color:var(--color-hairline)] text-[12px] font-semibold text-[color:var(--color-ink)] transition-colors group-hover:border-[color:var(--color-accent-400)] group-hover:text-[color:var(--color-accent-700)]"
         >
           See the deal
           <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7" /></svg>

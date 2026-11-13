@@ -35,7 +35,8 @@
     <!-- Discount Cards Grid -->
     <section class="bg-[color:var(--color-bg)] min-h-screen">
       <div class="max-w-[1280px] mx-auto px-5 lg:px-10 py-8 lg:py-10">
-        <div v-if="deals.length > 0" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+        <!-- Phones: one compact row per vendor; sm up: card grid. -->
+        <div v-if="deals.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
           <DealCard
             v-for="deal in deals"
             :key="deal.id"

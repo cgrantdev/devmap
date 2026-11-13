@@ -17,10 +17,12 @@
     :aria-label="copied ? `Code ${displayCode} copied` : `Copy coupon code ${displayCode}`"
     @click.stop.prevent="copy"
   >
-    <span class="flex min-w-0 flex-1 flex-col items-start leading-none">
+    <!-- overflow-hidden + truncate: in a narrow card the label used to run
+         under the copy icon instead of clipping. -->
+    <span class="flex min-w-0 flex-1 flex-col items-start overflow-hidden leading-none">
       <span
         :class="[
-          'text-[9px] font-bold uppercase tracking-[0.14em] whitespace-nowrap',
+          'max-w-full truncate text-[9px] font-bold uppercase tracking-[0.14em]',
           tone === 'solid' ? 'text-emerald-50' : 'text-emerald-600',
         ]"
       >{{ copied ? 'Copied!' : label }}</span>
@@ -64,7 +66,12 @@ const percentValue = computed(() => {
   return Number.isInteger(n) ? n : Number(n.toFixed(1))
 })
 
-const label = computed(() => (percentValue.value ? `${percentValue.value}% off · code` : 'Coupon code'))
+// Small tickets sit in narrow cards: "15% off" (the dashed ticket already
+// reads as a code). Full size adds "· code".
+const label = computed(() => {
+  if (!percentValue.value) return props.size === 'sm' ? 'Code' : 'Coupon code'
+  return props.size === 'sm' ? `${percentValue.value}% off` : `${percentValue.value}% off · code`
+})
 
 // Longer codes ("WEEKEND35") step down in size and tracking so they fit
 // a narrow phone card instead of truncating.
