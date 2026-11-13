@@ -38,24 +38,8 @@ class DevConsoleController extends Controller
             'label' => 'Show migration status (read-only)',
             'args' => [],
         ],
-        'optimize:clear' => [
-            'label' => 'Clear ALL caches (config/route/view/compiled/events)',
-            'args' => [],
-        ],
         'config:clear' => [
             'label' => 'Clear config cache only',
-            'args' => [],
-        ],
-        'route:clear' => [
-            'label' => 'Clear route cache only',
-            'args' => [],
-        ],
-        'view:clear' => [
-            'label' => 'Clear compiled Blade views (fixes stale Inertia renders)',
-            'args' => [],
-        ],
-        'cache:clear' => [
-            'label' => 'Clear the application cache',
             'args' => [],
         ],
         'products:ensure-vendor-desc-column' => [
