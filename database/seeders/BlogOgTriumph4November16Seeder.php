@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * retatrutide-side-effects-trial-data og_description, 16 November 2026
  * (2026_11_16_230000). One column, blogs.seo_og_description, so the share
- * card names the TRIUMPH-4 knee-OA paper (NEJM, online 8 November 2026)
- * that the article body already covers. seo_description is not changed.
+ * card names the NEJM knee-OA paper (TRIUMPH-4 + TRIUMPH-1-OA).
+ * Meta Optimizer signed off on this wording. seo_description is not changed.
  *
  * Lookup: exactly one blog row by LOWER(TRIM(slug)); otherwise a WARNING.
  * Guard: the column must equal the live value read 16 Nov 2026 10:40 ICT
@@ -30,7 +30,7 @@ class BlogOgTriumph4November16Seeder extends Seeder
 
     public const OLD = 'Retatrutide adverse events from phase 2 papers, the published TRIUMPH-1 and TRIUMPH-2 papers, and other company-reported readouts. Educational only.';
 
-    public const TARGET = 'Retatrutide adverse events from phase 2, TRIUMPH-1, TRIUMPH-2 and the TRIUMPH-4 knee-OA paper (NEJM), plus company-reported readouts. Educational only.';
+    public const TARGET = 'Retatrutide adverse events from phase 2, TRIUMPH-1, TRIUMPH-2 and the NEJM knee-OA paper (TRIUMPH-4 + TRIUMPH-1-OA), plus company data. Educational only.';
 
     /** @var array<string, string> live values read 16 Nov 2026 */
     public const SIBLINGS = [

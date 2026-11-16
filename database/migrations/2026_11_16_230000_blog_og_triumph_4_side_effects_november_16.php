@@ -4,10 +4,10 @@ use Database\Seeders\BlogOgTriumph4November16Seeder;
 use Illuminate\Database\Migrations\Migration;
 
 /**
- * retatrutide-side-effects-trial-data: og_description names the TRIUMPH-4
- * knee-OA paper (NEJM). One guarded column (blogs.seo_og_description).
- * Drop this migration, its seeder and test, and the catalog line if Meta
- * Optimizer rejects the wording. down() does not restore the old value.
+ * retatrutide-side-effects-trial-data: og_description names the NEJM
+ * knee-OA paper (TRIUMPH-4 + TRIUMPH-1-OA). One guarded column
+ * (blogs.seo_og_description). Meta Optimizer signed off on this wording.
+ * down() does not restore the old value.
  */
 return new class extends Migration
 {

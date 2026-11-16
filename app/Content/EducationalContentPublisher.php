@@ -1053,7 +1053,7 @@ class EducationalContentPublisher
                 'seo_title' => 'Retatrutide Side Effects: GI, Heart Rate, Dysesthesia Data',
                 'seo_description' => 'Retatrutide adverse events from phase 2 papers, the published TRIUMPH-1 and TRIUMPH-2 papers, and other company-reported readouts. Educational only.',
                 'og_title' => 'Retatrutide Side Effects: GI, Heart Rate, Dysesthesia Data',
-                'og_description' => 'Retatrutide adverse events from phase 2, TRIUMPH-1, TRIUMPH-2 and the TRIUMPH-4 knee-OA paper (NEJM), plus company-reported readouts. Educational only.',
+                'og_description' => 'Retatrutide adverse events from phase 2, TRIUMPH-1, TRIUMPH-2 and the NEJM knee-OA paper (TRIUMPH-4 + TRIUMPH-1-OA), plus company data. Educational only.',
                 'blog_type' => 'Research',
                 'read_time' => '21 Min Read',
                 'published_at' => '2026-10-19',

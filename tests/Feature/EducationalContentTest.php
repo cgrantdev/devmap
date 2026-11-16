@@ -1306,10 +1306,10 @@ class EducationalContentTest extends TestCase
         $this->assertSame($seoDescription, $blog->seo_description);
         $this->assertSame(58, strlen($seoTitle));
         $this->assertSame($blog->seo_page_title, $blog->seo_og_title);
-        // og_description names the TRIUMPH-4 knee-OA paper (16 Nov 2026); seo_description is unchanged.
-        $ogDescription = 'Retatrutide adverse events from phase 2, TRIUMPH-1, TRIUMPH-2 and the TRIUMPH-4 knee-OA paper (NEJM), plus company-reported readouts. Educational only.';
+        // og_description names the NEJM knee-OA paper (16 Nov 2026); seo_description is unchanged.
+        $ogDescription = 'Retatrutide adverse events from phase 2, TRIUMPH-1, TRIUMPH-2 and the NEJM knee-OA paper (TRIUMPH-4 + TRIUMPH-1-OA), plus company data. Educational only.';
         $this->assertSame($ogDescription, $blog->seo_og_description);
-        $this->assertSame(151, strlen($ogDescription));
+        $this->assertSame(153, strlen($ogDescription));
         $this->assertLessThanOrEqual(155, strlen($ogDescription));
         $this->assertDoesNotMatchRegularExpression('/\b(price|prices|pricing|coupon|buy|cheap|deal|best|better|superior)\b/i', $ogDescription);
         $this->assertSame($cover, $blog->image);

@@ -10,7 +10,8 @@ use Tests\TestCase;
 
 /**
  * 2026_11_16_230000: retatrutide-side-effects-trial-data og_description
- * names the TRIUMPH-4 knee-OA paper. Draft wording, pending Meta Optimizer.
+ * names the NEJM knee-OA paper (TRIUMPH-4 + TRIUMPH-1-OA). Meta Optimizer
+ * signed off on this wording.
  */
 class BlogOgTriumph4November16Test extends TestCase
 {
@@ -24,7 +25,7 @@ class BlogOgTriumph4November16Test extends TestCase
         $this->assertSame(Og::SIBLINGS['seo_description'], $entry['seo_description']);
         $this->assertSame(Og::SIBLINGS['seo_og_title'], $entry['og_title']);
         $this->assertLessThanOrEqual(155, strlen(Og::TARGET));
-        $this->assertStringContainsString('TRIUMPH-4 knee-OA paper (NEJM)', Og::TARGET);
+        $this->assertStringContainsString('NEJM knee-OA paper (TRIUMPH-4 + TRIUMPH-1-OA)', Og::TARGET);
         $this->assertDoesNotMatchRegularExpression('/\b(price|prices|pricing|coupon|buy|cheap|deal|best|better|superior)\b|\$|\bmg\b/i', Og::TARGET);
         $this->assertFileExists(database_path('migrations/2026_11_16_230000_blog_og_triumph_4_side_effects_november_16.php'));
     }
