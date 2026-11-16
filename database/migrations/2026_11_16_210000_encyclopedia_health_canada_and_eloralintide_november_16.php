@@ -8,10 +8,9 @@ use Illuminate\Database\Migrations\Migration;
  *
  *  - Health Canada public advisories RA-82930 (6 Nov 2026) and RA-82944
  *    (12 Nov 2026): one dated "Health Canada advisories (November 2026)"
- *    regulatory subsection and the advisory reference(s) on 8 entries (9 entries in all with eloralintide).
+ *    regulatory subsection and the advisory reference(s) on 8 entries.
  *    No seller is named. RA-82930 is cited "(not linked)" because its page
  *    links to seller websites; RA-82944 is linked.
- *  - eloralintide: Lilly's 14 Nov 2026 ObesityWeek release, company-reported.
  *
  * Guarded, all-or-nothing per entry: every target column must hold its
  * live 16 Nov 2026 value (or already the target), and the entry's sibling

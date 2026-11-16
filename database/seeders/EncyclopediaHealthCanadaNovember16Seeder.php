@@ -14,9 +14,7 @@ use RuntimeException;
  * Encyclopedia freshness, 16 November 2026 (2026_11_16_210000).
  *
  * Health Canada advisories RA-82930 (6 Nov 2026) and RA-82944 (12 Nov
- * 2026) on 8 entries (regulatory_subsections, references), and Lilly's
- * 14 Nov 2026 ObesityWeek release on eloralintide (human_use_subsections,
- * references), company-reported.
+ * 2026) on 8 entries (regulatory_subsections, references).
  *
  * Lookup: EncyclopediaPostMatch (one category by LOWER(TRIM(slug)), one
  * linked post). Any other status is a WARNING and the entry is skipped.
@@ -49,7 +47,7 @@ class EncyclopediaHealthCanadaNovember16Seeder extends Seeder
 
     public const PAYLOAD_PATH = 'seeders/data/encyclopedia-field-updates/2026-11-16a/health-canada-eloralintide.json';
 
-    public const PAYLOAD_SHA256 = 'a614a537e6885fddbec00909b91c1e098372c6fd577c39ab31f516e764e57723';
+    public const PAYLOAD_SHA256 = 'cb340c91c080e3ac5a342fac904fe890c5de918146d3102ce6630d9cf2a2690a';
 
     public const GUARD_MISMATCH = 'guard mismatch';
 
@@ -67,7 +65,6 @@ class EncyclopediaHealthCanadaNovember16Seeder extends Seeder
         'tirzepatide' => ['regulatory_subsections', 'references'],
         'bpc-157' => ['regulatory_subsections', 'references'],
         'selank' => ['regulatory_subsections', 'references'],
-        'eloralintide' => ['human_use_subsections', 'references'],
     ];
 
     /** @var array<string, string> "<slug>.<field>" => status */

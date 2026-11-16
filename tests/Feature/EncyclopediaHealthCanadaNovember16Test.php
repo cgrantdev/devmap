@@ -12,8 +12,9 @@ use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 /**
- * 2026_11_16_210000: Health Canada advisories on 8 encyclopedia entries
- * and Lilly's 14 Nov 2026 ObesityWeek release on eloralintide.
+ * 2026_11_16_210000: Health Canada advisories on 8 encyclopedia entries.
+ * Eloralintide was dropped (16 Nov 2026 QA): human_use_subsections is not rendered
+ * and the encyclopedia page carries vendor prices.
  * Live values are re-encoded in production MySQL key order (shorter keys
  * first) because sqlite keeps insertion order.
  */
@@ -21,7 +22,7 @@ class EncyclopediaHealthCanadaNovember16Test extends TestCase
 {
     use RefreshDatabase;
 
-    private const SHA = 'a614a537e6885fddbec00909b91c1e098372c6fd577c39ab31f516e764e57723';
+    private const SHA = 'cb340c91c080e3ac5a342fac904fe890c5de918146d3102ce6630d9cf2a2690a';
 
     private const M = '2026_11_16_210000';
 
@@ -77,7 +78,8 @@ class EncyclopediaHealthCanadaNovember16Test extends TestCase
             $this->assertSame([], array_intersect($fields, array_keys($payload['posts'][$slug]['drift'])), $slug);
         }
         $this->assertArrayNotHasKey('human_use_subsections', $payload['posts']['retatrutide']['columns']);
-        $this->assertCount(9, Hc::COLUMNS);
+        $this->assertCount(8, Hc::COLUMNS);
+        $this->assertArrayNotHasKey('eloralintide', Hc::COLUMNS);
         foreach (self::DROPPED as $slug) {
             $this->assertArrayNotHasKey($slug, Hc::COLUMNS, $slug);
             $this->assertArrayNotHasKey($slug, $payload['posts'], $slug);
@@ -144,23 +146,6 @@ class EncyclopediaHealthCanadaNovember16Test extends TestCase
         }
     }
 
-    public function test_eloralintide_lines_are_company_reported_up_to_figures(): void
-    {
-        $subs = $this->target('eloralintide', 'human_use_subsections');
-        $new = end($subs);
-        $this->assertStringContainsString('company-reported', $new['title']);
-        $text = implode(' ', array_column($new['entries'], 'value'));
-        foreach (['up to 23.3% at 48 weeks', 'up to 2.9%', 'up to 60%', 'up to 77%', '74%', '52%', '41%', '[company-reported]', 'NCT06603571', 'investigational'] as $needle) {
-            $this->assertStringContainsString($needle, $text);
-        }
-        $this->assertStringContainsString('"Up to" refers to the highest figure across the trial\'s arms', $text);
-        $this->assertStringNotContainsString('best-performing', $text);
-        $this->assertDoesNotMatchRegularExpression('/\b(superior|better|best|more effective)\b/i', $text);
-        $this->assertDoesNotMatchRegularExpression('/\d\s?(mg|mcg|µg)\b/i', $text);
-        $refs = $this->target('eloralintide', 'references');
-        $this->assertStringContainsString('Company-reported', end($refs)['description']);
-    }
-
     public function test_live_values_in_prod_key_order_are_updated_then_a_second_run_writes_nothing(): void
     {
         $ids = $this->seedLive();
@@ -213,17 +198,17 @@ class EncyclopediaHealthCanadaNovember16Test extends TestCase
     {
         $ids = $this->seedLive();
         EducationPost::findOrFail($ids['selank'])->forceFill(['regulatory_important_note' => 'ADMIN-NOTE'])->saveQuietly();
-        EducationPost::findOrFail($ids['eloralintide'])->forceFill(['regulatory_subsections' => [['title' => 'ADMIN', 'entries' => []]]])->saveQuietly();
+        EducationPost::findOrFail($ids['tirzepatide'])->forceFill(['human_use_subsections' => [['title' => 'ADMIN', 'entries' => []]]])->saveQuietly();
         $selank = EducationPost::findOrFail($ids['selank'])->getAttributes();
-        $elora = EducationPost::findOrFail($ids['eloralintide'])->getAttributes();
+        $tirz = EducationPost::findOrFail($ids['tirzepatide'])->getAttributes();
 
         $seeder = new Hc;
         $seeder->run();
 
         $this->assertSame($selank, EducationPost::findOrFail($ids['selank'])->getAttributes());
-        $this->assertSame($elora, EducationPost::findOrFail($ids['eloralintide'])->getAttributes());
+        $this->assertSame($tirz, EducationPost::findOrFail($ids['tirzepatide'])->getAttributes());
         $this->assertSame(Hc::DRIFT_PREFIX.'regulatory_important_note', $seeder->results['selank.regulatory_subsections']);
-        $this->assertSame(Hc::DRIFT_PREFIX.'regulatory_subsections', $seeder->results['eloralintide.human_use_subsections']);
+        $this->assertSame(Hc::DRIFT_PREFIX.'human_use_subsections', $seeder->results['tirzepatide.regulatory_subsections']);
         $this->assertSame(GuardedFieldWriter::UPDATED, $seeder->results['bpc-157.regulatory_subsections']);
         $this->assertNotEmpty($this->warnings());
     }
