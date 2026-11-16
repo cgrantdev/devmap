@@ -118,6 +118,25 @@ class EncyclopediaHhsNotice503aStatusNovember16Test extends TestCase
         }
     }
 
+    public function test_repo_shell_files_carry_the_same_wording(): void
+    {
+        $lead = $this->motscLead();
+        foreach (['Semax' => 'Semax', 'kpv' => 'KPV', 'epitalon' => 'Epitalon'] as $shell => $name) {
+            $body = (string) file_get_contents(database_path("seeders/data/encyclopedia-shells/{$shell}/body.md"));
+            $this->assertStringNotContainsString('scheduled for publication', $body, $shell);
+            $this->assertSame(1, substr_count($body, 'value: '.$lead.$name.' is one of six peptides in the policy’s Appendix A.'), $shell);
+        }
+        $semax = (string) file_get_contents(database_path('seeders/data/encyclopedia-shells/Semax/body.md'));
+        $this->assertStringContainsString('title: U.S. compounding policy (FDA status as of 29 October 2026)', $semax);
+        $this->assertStringNotContainsString('title: U.S. compounding policy (as of 29 October 2026)', $semax);
+        foreach (['kpv', 'epitalon'] as $shell) {
+            $body = (string) file_get_contents(database_path("seeders/data/encyclopedia-shells/{$shell}/body.md"));
+            $this->assertStringContainsString('title: FDA / compounding (FDA status as of 29 October 2026)', $body, $shell);
+            $this->assertStringNotContainsString('title: FDA / compounding (as of 29 October 2026)', $body, $shell);
+        }
+        $this->assertStringContainsString(self::KPV_CAS, (string) file_get_contents(app_path('Support/EncyclopediaShellParser.php')));
+    }
+
     public function test_bpc157_variants_tie_to_the_210000_payload(): void
     {
         $hc = json_decode((string) file_get_contents(database_path(Hc::PAYLOAD_PATH)), true)['posts']['bpc-157'];
