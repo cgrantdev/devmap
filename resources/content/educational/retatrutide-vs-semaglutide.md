@@ -81,7 +81,7 @@ The TRIUMPH-1 and TRIUMPH-2 papers were funded by Lilly and include Lilly-employ
 
 Points the sources add:
 
-- **TRIUMPH-1.** The paper's primary analyses compared the middle and highest dose arms with placebo, with differences of −19.8 and −21.0 percentage points. The trial also included basket studies in people with knee osteoarthritis and obstructive sleep apnea, reported in the same paper. Lilly reports a mean baseline weight of 112.7 kg and a mean BMI of 40.0.
+- **TRIUMPH-1.** The paper's primary analyses compared the middle and highest dose arms with placebo, with differences of −19.8 and −21.0 percentage points. The trial also included basket studies in people with knee osteoarthritis and obstructive sleep apnea. Their primary results are in separate NEJM papers, both Lilly-funded (developer-affiliated) and placebo-controlled, with no semaglutide arm [25][26]. Lilly reports a mean baseline weight of 112.7 kg and a mean BMI of 40.0.
 - **TRIUMPH-2.** Estimated treatment differences vs placebo under the treatment-regimen estimand were −6.9, −11.8 and −13.8 percentage points (all p<0.0001). Mean baseline BMI was 38.2 and mean baseline HbA1c 7.71%. Under the efficacy estimand, HbA1c changed by −1.41%, −1.63% and −1.54% vs −0.19% with placebo, reported in the paper's appendix and company-reported by Lilly.
 - **TRIUMPH-3.** No paper was found. Lilly reports 44 vs 52 five-component major adverse cardiovascular events (hazard ratio 0.82, 95% CI 0.55 to 1.22) and 27 vs 23 three-component events (hazard ratio 1.12, 95% CI 0.64 to 1.96) for pooled retatrutide vs placebo, in a pre-specified in-study analysis. Both confidence intervals cross 1. These figures do not establish a cardiovascular benefit or harm. A dedicated cardiovascular and kidney outcomes trial, TRIUMPH-Outcomes ([NCT06383390](https://clinicaltrials.gov/study/NCT06383390)), is active, not recruiting, with primary completion estimated for February 2029.
 
@@ -156,7 +156,7 @@ The current Wegovy label carries a boxed warning on the risk of thyroid C-cell t
 **Retatrutide: investigational, not approved by the FDA or the EMA.**
 
 - A search of FDA drug-approval records (openFDA Drugs@FDA data, 19 October 2026) found no retatrutide product. EMA's published list of medicines (downloaded 19 October 2026) includes no retatrutide entry.
-- 23 July 2026: Lilly said it is completing the chemistry, manufacturing and controls package and plans to submit retatrutide for US approval in the first quarter of 2027, as a Biologics License Application (company-reported). A planned submission is not an approval.
+- 23 July 2026: Lilly said it is completing the chemistry, manufacturing and controls package and plans to submit retatrutide for US approval in the first quarter of 2027, as a Biologics License Application (company-reported). That is Lilly's expected timing, not a completed submission, and a submission is not an approval.
 - The FDA has twice concluded (March 2024 and October 2026) that retatrutide is a drug, not a biological product. A federal court sent the first decision back to the agency in October 2025, and Lilly's appeal is pending at the Seventh Circuit with no ruling as of 19 October 2026. For general background on FDA status and RUO labelling, see [our legality guide](/guides/peptide-legality-fda-ruo-compounding).
 - Lilly states that retatrutide "cannot be legally sold or marketed for human use."
 
@@ -245,5 +245,7 @@ No. Products sold online as research-use-only retatrutide or semaglutide are not
 22. European Medicines Agency. Ozempic, Rybelsus and Wegovy EPARs, and EMA medicines data download (accessed 19 October 2026). https://www.ema.europa.eu/en/medicines/human/EPAR/wegovy
 23. Eli Lilly and Company (company-reported). TRANSCEND-T2D-2 topline press release, 28 October 2026. https://investor.lilly.com/news-releases/news-release-details/lillys-retatrutide-delivered-greater-a1c-reduction-and-more
 24. Eli Lilly and Company (company-reported). Lilly reports third-quarter 2026 financial results, raises full-year guidance and highlights regulatory progress across the portfolio, 29 October 2026. https://investor.lilly.com/news-releases/news-release-details/lilly-reports-third-quarter-2026-financial-results-raises-full
+25. Schnitzer TJ, et al. Retatrutide Once Weekly in Adults with Knee Osteoarthritis Pain and Obesity (TRIUMPH-4 and TRIUMPH-1-OA). *N Engl J Med*, online 8 November 2026. Developer-affiliated (Lilly-funded). https://doi.org/10.1056/NEJMoa2610676
+26. Grunstein RR, et al. Retatrutide Once Weekly for Treatment of Obstructive Sleep Apnea (TRIUMPH-1-OSA and TRIUMPH-2-OSA). *N Engl J Med*, online 20 October 2026. PMID 42904878. Developer-affiliated (Lilly-funded). https://doi.org/10.1056/NEJMoa2611477
 
 *Educational content only. Not medical or legal advice. Regulatory status can change after publication; check the primary sources above.*

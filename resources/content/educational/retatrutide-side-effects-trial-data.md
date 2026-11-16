@@ -21,9 +21,9 @@ Percentages are the share of participants with at least one event, unless stated
 | TRIUMPH-1 (NEJM 2026) | Adults with obesity, or overweight with a weight-related condition, without diabetes | 80 weeks | 2,339 | Paper and company-reported figures |
 | TRIUMPH-2 (Lancet 2026) | Adults with BMI 27 or higher and type 2 diabetes, 92 centres in 8 countries | 80 weeks | 1,152 | Paper; company-reported figures |
 | TRIUMPH-3 | Adults with BMI 35 or higher and established cardiovascular disease | 80 weeks | 1,949 | Company-reported figures only |
-| TRIUMPH-4 | Adults with obesity or overweight and knee osteoarthritis | 68 weeks | 445 | Company-reported figures only |
+| TRIUMPH-4 (NEJM 2026) | Adults with obesity or overweight and painful knee osteoarthritis, without diabetes | 68 weeks | 445 | Paper; gastrointestinal table company-reported |
 
-TRIUMPH-3 and TRIUMPH-4 tested only two retatrutide doses: the program's middle and highest dose arms. Neither had a full paper in the sources reviewed, so their figures below are company-reported.
+TRIUMPH-3 and TRIUMPH-4 tested only two retatrutide doses: the program's middle and highest dose arms. TRIUMPH-3 had no full paper in the sources reviewed. TRIUMPH-4 is now published in NEJM together with TRIUMPH-1-OA, the knee osteoarthritis group within TRIUMPH-1 (source 13, developer-affiliated: Lilly-funded, with Lilly-employed authors). The gastrointestinal table below still uses Lilly's figures.
 
 ## Gastrointestinal events
 
@@ -103,7 +103,8 @@ Definitions differ. The phase 2 papers report stopping study drug because of an 
 | TRIUMPH-1 | Paper (randomized population, excluding deaths) | 4.6% | 4.1% | 6.5% | 11.2% |
 | TRIUMPH-2 | Paper (includes death) | 5% | 4% | 12% | 8% |
 | TRIUMPH-3 | Company-reported | 4.8% | not tested | 9.8% | 13.5% |
-| TRIUMPH-4 | Company-reported | 4.0% | not tested | 12.2% | 18.2% |
+| TRIUMPH-4 | Paper (same figures as company-reported) | 4.0% | not tested | 12.2% | 18.2% |
+| TRIUMPH-1-OA (knee osteoarthritis) | Paper | 6.3% | 2.8% | 8.4% | 15.3% |
 
 Points the sources add:
 
@@ -111,6 +112,7 @@ Points the sources add:
 - **Phase 2 type 2 diabetes.** 16 of 190 retatrutide participants (8%) discontinued, most often for gastrointestinal events (6, or 3%). The highest arm-level rate, 17%, was in an intermediate-dose arm with fast escalation.
 - **TRIUMPH-1.** The figures are from Table 3 of the NEJM paper, whose footnote says these events exclude deaths and use the randomized population as the denominator. The paper's results text and participant-flow figure give 11.1% for the highest dose arm. Both describe the same 65 participants: 65 of the 584 randomized to that arm is 11.1%, while Table 3 prints 11.2%, which matches 65 of the 582 in that arm who received at least one dose.
 - **TRIUMPH-2.** The middle dose arm had a higher rate than the highest dose arm, in both the paper's counts and the company's percentages. Neither source accessible here explains why.
+- **TRIUMPH-4 and TRIUMPH-1-OA (paper).** The knee osteoarthritis paper reports treatment discontinuations due to adverse events by randomized arm. It attributes about half of them in TRIUMPH-4, and about a third in TRIUMPH-1-OA, to gastrointestinal events. The table uses the results text (randomized participants); the paper's Table 3 (treated participants) prints 12.9% for the TRIUMPH-4 middle dose arm and 6.2% for TRIUMPH-1-OA placebo.
 - **TRIUMPH-4.** Lilly said discontinuations were "highly correlated with baseline BMI" and "included discontinuations for perceived excessive weight loss". In participants with a baseline BMI of 35 or higher, the company-reported rates were 4.8% with placebo and 8.8% and 12.1% in the two retatrutide arms.
 
 The ClinicalTrials.gov participant-flow tables list a separate figure: withdrawals from the *study* recorded as "Adverse Event". These are not the same as stopping study drug and are smaller numbers. They should not be read as discontinuation rates.
@@ -185,14 +187,14 @@ Adjudicated major adverse cardiovascular events were reported in all arms of bot
 - **Phase 2 obesity (paper).** Transient rises in ALT to more than 3 times the upper limit of normal occurred in 1% of retatrutide recipients. Mean ALT and AST were unchanged or lower at week 48. Biliary events occurred in 3 participants, all on retatrutide: 1 cholecystitis and 2 cholelithiasis.
 - **Phase 2 type 2 diabetes (paper).** Hepatic or biliary disorders occurred in 4 of 281 participants (1%), including 1 on placebo. Mean ALT and AST generally decreased. The investigator attributed one serious cholecystitis to study drug.
 - **TRIUMPH-2 (paper).** The Lancet paper (Table 3) reports severe or serious gallbladder and biliary tract disorders in 3, 1 and 1 participants in the lowest, middle and highest dose arms vs 1 with placebo, and severe or serious hepatic disorders in 1, 0 and 0 vs 1. Lilly Medical Information lists the same counts (company-reported).
-- **TRIUMPH-1 (paper).** Table 3 of the NEJM paper reports severe or serious gallbladder or biliary tract disorders in 10, 5 and 4 participants in the lowest, middle and highest dose arms vs 4 with placebo, and severe or serious hepatic disorders in 0, 0 and 3 vs 0. Hepatobiliary counts for TRIUMPH-3 and TRIUMPH-4 were not in the sources reviewed.
+- **TRIUMPH-1 (paper).** Table 3 of the NEJM paper reports severe or serious gallbladder or biliary tract disorders in 10, 5 and 4 participants in the lowest, middle and highest dose arms vs 4 with placebo, and severe or serious hepatic disorders in 0, 0 and 3 vs 0. Hepatobiliary counts for TRIUMPH-3 were not in the sources reviewed. Table 3 of the knee osteoarthritis paper (source 13) reports severe or serious gallbladder or biliary tract disorders in 1 and 1 participants in the TRIUMPH-4 middle and highest dose arms vs 0 with placebo, and in 1, 1 and 0 in the TRIUMPH-1-OA lowest, middle and highest dose arms vs 2 with placebo. It reports severe or serious hepatic disorders in no TRIUMPH-4 participants and in 1 participant in the TRIUMPH-1-OA highest dose arm.
 
 ### Pancreatitis
 
 - **Phase 2 obesity (paper).** One adjudicated case of acute pancreatitis, in the highest dose arm, was reported as a serious adverse event. Otherwise, amylase and lipase increases were asymptomatic.
 - **Phase 2 type 2 diabetes (paper).** Two adjudicated pancreatitis events occurred, one in the lowest dose arm and one in a middle dose arm (one of the four arms between the lowest and highest). The investigator attributed one of them to study drug: it occurred 7 days after that participant's only dose.
 - **TRIUMPH-2 (paper).** The Lancet paper (Table 3) reports adjudication-confirmed pancreatitis in 0, 1 and 2 participants in the lowest, middle and highest dose arms vs 0 with placebo. Lilly Medical Information lists the same counts (company-reported).
-- **TRIUMPH-1 (paper).** Table 3 of the NEJM paper reports adjudication-confirmed pancreatitis in 1, 3 and 4 participants in the lowest, middle and highest dose arms vs 2 with placebo. Pancreatitis counts for TRIUMPH-3 and TRIUMPH-4 were not in the sources reviewed.
+- **TRIUMPH-1 (paper).** Table 3 of the NEJM paper reports adjudication-confirmed pancreatitis in 1, 3 and 4 participants in the lowest, middle and highest dose arms vs 2 with placebo. Pancreatitis counts for TRIUMPH-3 were not in the sources reviewed. Table 3 of the knee osteoarthritis paper (source 13) reports adjudication-confirmed pancreatitis in no TRIUMPH-4 participants, and in 0, 2 and 0 in the TRIUMPH-1-OA lowest, middle and highest dose arms vs 0 with placebo.
 
 ### Hypoglycaemia
 
@@ -205,13 +207,14 @@ Adjudicated major adverse cardiovascular events were reported in all arms of bot
 - **Phase 2 obesity (paper).** Serious adverse events occurred in 4% of both the retatrutide and placebo groups. One death, by drowning, was assessed by the investigator as not related to retatrutide.
 - **Phase 2 type 2 diabetes (paper).** There were no deaths. The investigator attributed three serious adverse events to study drug: cholecystitis, acute pancreatitis and starvation ketoacidosis.
 - **TRIUMPH-2 (paper).** There were 2, 3 and 1 deaths in the lowest, middle and highest dose arms and 1 with placebo, all deemed unrelated by the investigator. The authors describe the safety profile as "generally consistent with other molecules with GLP-1 receptor agonism".
+- **TRIUMPH-4 and TRIUMPH-1-OA (paper).** The abstract says serious adverse events were more common with retatrutide than placebo in both trials. In TRIUMPH-4, 14 and 16 participants in the middle and highest dose arms reported one; in TRIUMPH-1-OA, 6, 14 and 21 in the lowest, middle and highest dose arms. TRIUMPH-4 had one death in each retatrutide arm, both assessed by investigators as unrelated to study treatment. TRIUMPH-1-OA had none.
 
 ## What the trials can't tell us
 
 - **Duration.** Treatment lasted 36 to 80 weeks. Events that take longer to appear, or that depend on years of exposure, are outside what these trials could detect.
 - **Populations.** Both phase 2 trials ran at US sites only. The trials enrolled specific groups: people without diabetes, people with type 2 diabetes, people with cardiovascular disease and people with knee osteoarthritis. They screened out people with many other conditions. Results in one group do not automatically carry over to another.
-- **Rare events.** Single-digit counts of pancreatitis, gallbladder or arrhythmia events cannot produce precise rates. TRIUMPH-1 (NEJM) and TRIUMPH-2 (Lancet) publish arm-level counts for these events; other TRIUMPH readouts remain company-reported.
-- **Full phase 3 data.** Arm-level phase 3 heart-rate data were found only for TRIUMPH-1 (appendix Table S12 and Figure S22), and the time course of dysesthesia was not available in the sources reviewed. For hepatobiliary events and pancreatitis, the arm-level phase 3 figures used here are TRIUMPH-1 counts from Table 3 of the NEJM paper and TRIUMPH-2 counts from the Lancet paper, which Lilly Medical Information also lists. For hypoglycaemia, the arm-level phase 3 figures used here are TRIUMPH-2 counts from the Lancet paper, which Lilly Medical Information also lists. TRIUMPH-1 (NEJM) and TRIUMPH-2 (Lancet) are published papers; other TRIUMPH readouts used above remain company-reported.
+- **Rare events.** Single-digit counts of pancreatitis, gallbladder or arrhythmia events cannot produce precise rates. TRIUMPH-1, TRIUMPH-2 and the knee osteoarthritis paper publish arm-level counts for these events; TRIUMPH-3 remains company-reported.
+- **Full phase 3 data.** Arm-level phase 3 heart-rate data were found only for TRIUMPH-1 (appendix Table S12 and Figure S22), and the time course of dysesthesia was not available in the sources reviewed. For hepatobiliary events and pancreatitis, the arm-level phase 3 figures used here are TRIUMPH-1 counts from Table 3 of the NEJM paper, TRIUMPH-2 counts from the Lancet paper, which Lilly Medical Information also lists, and TRIUMPH-4 and TRIUMPH-1-OA counts from Table 3 of the knee osteoarthritis paper. For hypoglycaemia, the arm-level phase 3 figures used here are TRIUMPH-2 counts from the Lancet paper, which Lilly Medical Information also lists. TRIUMPH-1, TRIUMPH-2 and the knee osteoarthritis paper are published; TRIUMPH-3 and the rows marked company-reported are not.
 - **Monitored conditions.** Trial participants received pharmaceutical-grade study drug under a protocol, with set escalation steps, scheduled visits, laboratory monitoring and adjudication of key events. Those conditions are part of what the numbers describe.
 
 ### Research-labelled "retatrutide" is not the trial drug
@@ -262,5 +265,6 @@ Not reliably. The trials differ in population, duration, dose escalation and how
 10. Lilly Medical Information (company-reported). Was dysesthesia reported as an adverse event in the retatrutide TRIUMPH trials? Last reviewed 18 August 2026. https://medical.lilly.com/us/products/answers/was-dysesthesia-reported-as-an-adverse-event-in-the-retatrutide-triumph-trials-in-patients-with-overweight-or-obesity-387925
 11. Lilly Medical Information (company-reported). Were there cardiovascular-related adverse events in the retatrutide TRIUMPH clinical trials? Last reviewed 25 August 2026. https://medical.lilly.com/us/products/answers/were-there-cardiovascular-related-adverse-events-in-the-retatrutide-triumph-clinical-trials-in-patients-with-overweight-or-obesity-with-or-without-type-2-diabetes-387676
 12. Lilly Medical Information (company-reported). What are the results of the retatrutide TRIUMPH-2 trial in adults with obesity or overweight and type 2 diabetes? Last reviewed 22 September 2026. https://medical.lilly.com/us/products/answers/what-are-the-results-of-the-retatrutide-triumph-2-trial-in-adults-with-obesity-or-overweight-and-type-2-diabetes-402119
+13. Schnitzer TJ, et al. Retatrutide Once Weekly in Adults with Knee Osteoarthritis Pain and Obesity (TRIUMPH-4 and TRIUMPH-1-OA). N Engl J Med, online 8 November 2026. Funded by Eli Lilly; Lilly-employed authors (developer-affiliated). https://doi.org/10.1056/NEJMoa2610676 · author accepted manuscript: https://eprints.whiterose.ac.uk/id/eprint/247091/1/NEJMoa2610676-manuscript.pdf
 
 *Educational content only. Not medical or legal advice. Regulatory status can change after publication; check the primary sources above.*

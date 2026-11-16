@@ -6,6 +6,7 @@ use App\Content\EducationalContentPublisher;
 use App\Models\EducationalGuide;
 use App\Models\EducationPost;
 use App\Models\ProductCategory;
+use Database\Seeders\EducationalFreshnessNovember16Seeder as Nov16;
 use Database\Seeders\EncyclopediaCompoundingPolicyOctober29Seeder as Policy;
 use Database\Seeders\EncyclopediaFreshnessOctober31Seeder as Freshness;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -199,19 +200,39 @@ class CompoundingPolicyOctober29Test extends TestCase
     public function test_publisher_output_matches_guide_targets(): void
     {
         // content and reading_time moved on in 2026_10_31_100000, whose
-        // guard is this payload's target; every other column is unchanged.
+        // guard is this payload's target, and again on 16 Nov 2026.
+        // Historical targets and the chain pin stay. The current render
+        // differs, and 2026_11_16_200000 brings a row still holding the
+        // 31 Oct target forward to that render. Every other column is unchanged.
         $fresh = json_decode((string) file_get_contents(database_path(Freshness::PAYLOAD_PATH)), true)['guides'][self::GUIDE]['columns'];
         EducationalContentPublisher::sync();
+        $render = \App\Support\SimpleMarkdown::toHtml(EducationalContentPublisher::prepare(
+            (string) file_get_contents(resource_path('content/educational/'.self::GUIDE.'.md'))
+        ));
+        $catalogRead = collect((new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null))
+            ->firstWhere('slug', self::GUIDE)['read_time'];
+        $this->assertSame('25 Min Read', $catalogRead);
         foreach ($this->guideCols() as $column => $spec) {
             if (isset($fresh[$column])) {
                 $this->assertSame([$spec['target_values'][0]], $fresh[$column]['old_values'], $column);
-                $this->assertSame(Policy::normalize($fresh[$column]['target_value']), Policy::normalize($this->guide()->{$column}), $column);
+                $current = $column === 'content' ? $render : $catalogRead;
+                $this->assertNotSame(Policy::normalize($fresh[$column]['target_value']), Policy::normalize($current), $column);
+                $this->assertSame(Policy::normalize($current), Policy::normalize($this->guide()->{$column}), $column);
 
                 continue;
             }
             $this->assertSame(Policy::normalize($spec['target_values'][0]), Policy::normalize($this->guide()->{$column}), $column);
         }
         $this->assertSame(['content', 'reading_time'], array_keys($fresh));
+
+        $this->guide()->forceFill([
+            'content' => $fresh['content']['target_value'],
+            'reading_time' => $fresh['reading_time']['target_value'],
+        ])->saveQuietly();
+        (new Nov16)->run();
+        $guide = $this->guide()->fresh();
+        $this->assertSame($render, $guide->content);
+        $this->assertSame($catalogRead, $guide->reading_time);
     }
 
     public function test_guide_seo_and_og_descriptions_are_160_characters_or_fewer(): void
@@ -235,8 +256,8 @@ class CompoundingPolicyOctober29Test extends TestCase
     public function test_guide_reading_time_moves_from_20_or_19_to_21_and_is_guarded(): void
     {
         $this->assertSame('21 Min Read', $this->guideCols()['reading_time']['target_values'][0]);
-        // The catalog now carries the 2026_10_31_100000 value (24 Min Read).
-        $this->assertSame('24 Min Read', collect((new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null))
+        // The catalog now carries the 16 Nov 2026 value (25 Min Read).
+        $this->assertSame('25 Min Read', collect((new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null))
             ->firstWhere('slug', self::GUIDE)['read_time']);
         $this->assertSame(['20 Min Read', '19 Min Read'], $this->guideCols()['reading_time']['old_values']);
         foreach (['20 Min Read', '19 Min Read'] as $old) {

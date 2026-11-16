@@ -61,7 +61,7 @@ Hair claims need care too: a frequently cited follicle paper (Pyo et al., 2007) 
 
 **Cosmetic status (GHK-Cu).** FDA says cosmetic ingredients other than color additives need no premarket approval, and intended use decides whether a product is a cosmetic or a drug. Copper tripeptide-1 in a serum does not make an injectable vial a cosmetic or an approved drug.
 
-**RUO labels.** In an August 2026 warning letter to Peptide Partners LLC, FDA found products were intended as drugs for human use despite "for research use only" labeling.
+**RUO labels.** In an August 2026 warning letter to an online peptide seller, FDA found products were intended as drugs for human use despite "for research use only" labeling.
 
 **WADA (2026 and 2027 lists).** BPC-157 is named under S0 Non-approved substances, prohibited at all times. GHK-Cu is not named. S0 is a catch-all for substances without human therapeutic approval, so athletes should ask their anti-doping organization. The 2027 List (effective 1 January 2027) adds "peptides" to S0's examples of non-approved substances; BPC-157 remains named and GHK-Cu still is not.
 
@@ -107,7 +107,7 @@ BPC-157 is named under S0 on the WADA 2026 Prohibited List and remains named on 
 6. U.S. FDA. Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks. https://www.fda.gov/drugs/human-drug-compounding/certain-bulk-drug-substances-use-compounding-may-present-significant-safety-risks
 7. U.S. FDA. Meeting of the Pharmacy Compounding Advisory Committee (upcoming; GHK-Cu on agenda). https://www.fda.gov/advisory-committees/pharmacy-compounding-advisory-committee/meeting-pharmacy-compounding-advisory-committee
 8. U.S. FDA. Is It a Cosmetic, a Drug, or Both? https://www.fda.gov/cosmetics/cosmetics-laws-regulations/it-cosmetic-drug-or-both-or-it-soap
-9. U.S. FDA. Warning letter, Peptide Partners LLC, 24 August 2026. https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/peptide-partners-llc-735063-08242026
+9. U.S. FDA. Warning letter to an online peptide seller (MARCS-CMS 735063), 24 August 2026. Letter not linked; FDA warning-letter index: https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters
 10. Vasireddi N, et al. Emerging Use of BPC-157 in Orthopaedic Sports Medicine: A Systematic Review. *HSS J*. 2025. PMID 40756949. doi:10.1177/15563316251355551
 11. McGuire FP, et al. Regeneration or Risk? A Narrative Review of BPC-157 for Musculoskeletal Healing. *Curr Rev Musculoskelet Med*. 2025. PMID 40789979. doi:10.1007/s12178-025-09990-7
 12. Lee E, Walker C, Ayadi B. Effect of BPC-157 on Symptoms in Patients with Interstitial Cystitis: A Pilot Study. *Altern Ther Health Med*. 2024. PMID 39325560
