@@ -474,7 +474,8 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('dihexa acetate', $legality->content);
         $this->assertStringContainsString('PEG-MGF', $legality->content);
         $this->assertStringContainsString('non-pegylated MGF', $legality->content);
-        $this->assertStringContainsString('Peptide Partners', $legality->content);
+        $this->assertStringNotContainsString('Peptide Partners', $legality->content);
+        $this->assertStringContainsString('an online peptide seller', $legality->content);
         $this->assertStringContainsString('for research use only', $legality->content);
         $this->assertStringContainsString('not permission to compound', $legality->content);
         $this->assertStringContainsString('Last verified against FDA and HHS primary sources: 2026-10-31', $legality->content);
@@ -541,7 +542,7 @@ class EducationalContentTest extends TestCase
         $pathway->assertSee('before the end of February 2027', false);
         $pathway->assertSee('dihexa acetate', false);
         $pathway->assertSee('PEG-MGF', false);
-        $pathway->assertSee('Peptide Partners', false);
+        $pathway->assertDontSee('Peptide Partners', false);
         $pathway->assertSee('for research use only', false);
         $pathway->assertSee('not permission to compound', false);
         $pathway->assertDontSee('formblends', false);
@@ -1310,7 +1311,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame('https://peptidemap.com'.$cover, $blog->seo_og_image);
         $this->assertSame('2026-10-19', $blog->published_at->toDateString());
         $this->assertSame('Research', $blog->blog_type);
-        $this->assertSame('20 Min Read', $blog->read_time);
+        $this->assertSame('21 Min Read', $blog->read_time);
         $this->assertSame('Peptidemap', $blog->author_name);
         $this->assertFalse((bool) $blog->is_featured);
         $this->assertSame('published', $blog->status);
@@ -1343,7 +1344,7 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('/compare/retatrutide-vs-tirzepatide', $markdown);
         $this->assertStringContainsString('/guides/peptide-legality-fda-ruo-compounding', $markdown);
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(4388, $words);
+        $this->assertSame(4720, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringContainsString('/blog/retatrutide-testing-coa-limits', $markdown);
 
@@ -1397,7 +1398,7 @@ class EducationalContentTest extends TestCase
         $page->assertSee($cover, false);
         $page->assertSee('What were the most common side effects in the retatrutide trials?', false);
         $page->assertSee('Can these trials be compared with trials of other drugs?', false);
-        $page->assertSee('20 Min Read', false);
+        $page->assertSee('21 Min Read', false);
         $page->assertDontSee('/workspace', false);
         $page->assertDontSee('CMS paste', false);
         $page->assertDontSee('CHANGES', false);
@@ -1405,7 +1406,7 @@ class EducationalContentTest extends TestCase
             ->where('blog.slug', $slug)
             ->where('blog.title', $h1)
             ->where('blog.image', $cover)
-            ->where('blog.readTime', '20 Min Read')
+            ->where('blog.readTime', '21 Min Read')
             ->where('blog.content', function ($html) {
                 return is_string($html)
                     && ! str_contains($html, '<!--')
@@ -1793,7 +1794,7 @@ class EducationalContentTest extends TestCase
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(4237, $words);
+        $this->assertSame(4319, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringNotContainsString('<!--', $markdown);
         $this->assertStringNotContainsString('/workspace', $markdown);
@@ -2220,7 +2221,7 @@ class EducationalContentTest extends TestCase
         $expected = [
             'orforglipron-vs-tirzepatide' => [1515, '7 Min Read'],
             'cagrilintide-vs-eloralintide' => [1488, '7 Min Read'],
-            'eloralintide-tirzepatide-vs-retatrutide' => [1306, '6 Min Read'],
+            'eloralintide-tirzepatide-vs-retatrutide' => [1459, '7 Min Read'],
         ];
 
         foreach ($expected as $slug => [$words, $readTime]) {
@@ -2477,9 +2478,9 @@ class EducationalContentTest extends TestCase
 
         $guideMarkdown = (string) file_get_contents(resource_path('content/educational/'.$guideSlug.'.md'));
         $guideWords = $this->renderedWordCount($guideMarkdown);
-        $this->assertSame(2381, $guideWords);
-        $this->assertSame('11 Min Read', ((int) ceil($guideWords / 230)).' Min Read');
-        $this->assertSame('11 Min Read', $guideEntry['read_time']);
+        $this->assertSame(2903, $guideWords);
+        $this->assertSame('13 Min Read', ((int) ceil($guideWords / 230)).' Min Read');
+        $this->assertSame('13 Min Read', $guideEntry['read_time']);
         $this->assertStringContainsString('## FAQ', $guideMarkdown);
         $this->assertDoesNotMatchRegularExpression('/^# [^#]/m', $guideMarkdown);
         $this->assertDoesNotMatchRegularExpression('/\A---\n/', $guideMarkdown);
@@ -2490,7 +2491,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame($guideEntry['lede'], $guide->description);
         $this->assertSame($guideSeo, $guide->seo_page_title);
         $this->assertSame($guideDescription, $guide->seo_description);
-        $this->assertSame('11 Min Read', $guide->reading_time);
+        $this->assertSame('13 Min Read', $guide->reading_time);
         $this->assertSame('2026-10-29', $guide->published_at->toDateString());
         $this->assertSame($guideEntry['faq'], $guide->seo_schema[0] ?? null);
         $this->assertFileExists(public_path('images/educational/'.$guideSlug.'.png'));
@@ -2510,7 +2511,7 @@ class EducationalContentTest extends TestCase
         $guidePage->assertOk();
         $guidePage->assertSee($guideH1, false);
         $guidePage->assertSee($guideSeo, false);
-        $guidePage->assertSee('11 Min Read', false);
+        $guidePage->assertSee('13 Min Read', false);
         $guidePage->assertSee('https://peptidemap.com/guides/'.$guideSlug.'#faq', false);
         $guidePage->assertSee('https://peptidemap.com/guides/'.$guideSlug, false);
         $guidePage->assertSee('Did FDA approve these six peptides?', false);
@@ -2522,7 +2523,7 @@ class EducationalContentTest extends TestCase
             ->component('Frontend/GuideArticle')
             ->where('guide.slug', $guideSlug)
             ->where('guide.title', $guideH1)
-            ->where('guide.readingTime', '11 Min Read')
+            ->where('guide.readingTime', '13 Min Read')
         );
 
         $blogSlug = 'hhs-503a-peptide-enforcement-discretion-2026';
@@ -2543,7 +2544,7 @@ class EducationalContentTest extends TestCase
 
         $blogMarkdown = (string) file_get_contents(resource_path('content/educational/'.$blogSlug.'.md'));
         $blogWords = $this->renderedWordCount($blogMarkdown);
-        $this->assertSame(906, $blogWords);
+        $this->assertSame(910, $blogWords);
         $this->assertSame('4 Min Read', ((int) ceil($blogWords / 230)).' Min Read');
         $this->assertSame('4 Min Read', $blogEntry['read_time']);
         $this->assertStringContainsString('## FAQ', $blogMarkdown);
@@ -2721,7 +2722,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame($policyGuideId, $updatedGuide->id);
         $this->assertStringNotContainsString('STALE GUIDE', (string) $updatedGuide->content);
         $this->assertStringContainsString('federal district courts in California and Texas', (string) $updatedGuide->content);
-        $this->assertSame('11 Min Read', $updatedGuide->reading_time);
+        $this->assertSame('13 Min Read', $updatedGuide->reading_time);
 
         $this->assertSame($blogCount + 1, Blog::count());
         $createdBlog = Blog::where('slug', 'hhs-503a-peptide-enforcement-discretion-2026')->firstOrFail();

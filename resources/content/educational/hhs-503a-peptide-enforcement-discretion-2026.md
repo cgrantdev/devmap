@@ -30,7 +30,7 @@ For the full conditions, and for how this differs from RUO-labelled products, se
 - **14 Oct 2026.** OIRA received the item for review under RIN 0910-ZD94, titled "Interim Access Policy for Compounding Using Certain Peptides" [3] [primary].
 - **27 Oct 2026.** OIRA concluded its review "Consistent with Change" [3] [primary].
 - **28 Oct 2026.** HHS announced the policy, and the Federal Register notice was filed [2] [primary].
-- **30 Oct 2026.** Federal Register publication at 91 FR 68526–68527. Comments are open "until 2 weeks after date of publication" [2] [primary]. Regulations.gov lists the comment period as closing on 13 Nov 2026 at 11:59 pm Eastern Time [7] [primary].
+- **30 Oct 2026.** Federal Register publication at 91 FR 68526–68527. Comments were accepted "until 2 weeks after date of publication" [2] [primary]. The Regulations.gov comment period closed on 13 Nov 2026 at 11:59 pm Eastern Time [7] [primary].
 
 ## What it is, and what is still pending
 
@@ -38,7 +38,7 @@ The notice calls the policy a "draft" and says it "does not establish any rights
 
 Several things are still pending:
 
-- **The comment period,** which Regulations.gov lists as closing on 13 Nov 2026 [7] [primary], and any revision to the draft [2] [primary].
+- **Any revision to the draft** after the comment period, which closed on 13 Nov 2026 [7] [primary]. None had been published as of 16 Nov 2026 [2] [primary].
 - **Rulemaking.** "FDA's future rulemakings may propose adding some or all of these peptides to the 503A bulks list" [2] [primary]. NCPA reports that pharmacies "are still awaiting final rulemaking" [6] [press].
 - **Supply.** NPR quotes a compounder who said "We won't be able to meet demand" [5] [press].
 
@@ -70,4 +70,4 @@ No. Its terms require 503A compounding, a patient-specific prescription and regi
 4. FDA, PCAC meeting, 23–24 Jul 2026. https://www.fda.gov/advisory-committees/advisory-committee-calendar/july-23-24-2026-meeting-pharmacy-compounding-advisory-committee-07232026 [primary]
 5. NPR, 28 Oct 2026. https://www.npr.org/2026/10/28/nx-s1-6021030/peptides-compounding-enforcement [press]
 6. NCPA, 29 Oct 2026. https://ncpa.org/newsroom/qam/2026/10/29/fda-grants-enforcement-discretion-compounding-six-peptides [press]
-7. Regulations.gov, HHS-OASH-2026-0496-0002, comment page for FR Doc. 2026-22192; comment period closes 13 Nov 2026, 11:59 pm Eastern Time (checked 31 Oct 2026). https://www.regulations.gov/commenton/HHS-OASH-2026-0496-0002 [primary]
+7. Regulations.gov, HHS-OASH-2026-0496-0002, comment page for FR Doc. 2026-22192; comment period closed 13 Nov 2026, 11:59 pm Eastern Time (checked 16 Nov 2026). https://www.regulations.gov/commenton/HHS-OASH-2026-0496-0002 [primary]

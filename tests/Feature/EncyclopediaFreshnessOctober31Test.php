@@ -107,22 +107,34 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         foreach (Fresh::GUIDES as $slug => $fields) {
             $guide = EducationalGuide::where('slug', $slug)->firstOrFail();
             foreach ($fields as $field) {
-                $this->assertSame(
+                $current = $field === 'content' ? $this->renderEducational($slug) : $this->catalogReadTime($slug);
+                $this->assertNotSame(
                     GuardedFieldWriter::comparable($this->guideTarget($slug, $field)),
+                    GuardedFieldWriter::comparable($current),
+                    $slug.'.'.$field.' historical target differs from the 16 Nov render'
+                );
+                $this->assertSame(
+                    GuardedFieldWriter::comparable($current),
                     GuardedFieldWriter::comparable($guide->{$field}),
                     $slug.'.'.$field
                 );
             }
         }
         $blog = Blog::where('slug', self::BLOG)->firstOrFail();
-        $this->assertSame($this->blogTarget(), $blog->content);
+        $blogRender = $this->renderEducational(self::BLOG);
+        $this->assertNotSame($this->blogTarget(), $blogRender);
+        $this->assertSame($blogRender, $blog->content);
         $this->assertSame('4 Min Read', $blog->read_time);
     }
 
     public function test_blog_target_is_the_publisher_render_of_the_repo_markdown(): void
     {
         $md = (string) file_get_contents(resource_path('content/educational/'.self::BLOG.'.md'));
-        $this->assertSame(\App\Support\SimpleMarkdown::toHtml(EducationalContentPublisher::prepare($md)), $this->blogTarget());
+        $render = \App\Support\SimpleMarkdown::toHtml(EducationalContentPublisher::prepare($md));
+        // The 31 Oct payload and its SHA stay. The repo markdown is the 16 Nov copy.
+        $this->assertNotSame($render, $this->blogTarget());
+        $this->assertStringContainsString('closed on 13 Nov 2026', $render);
+        $this->assertStringNotContainsString('closed on 13 Nov 2026', $this->blogTarget());
         $this->assertSame('4 Min Read', collect((new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null))->firstWhere('slug', self::BLOG)['read_time']);
 
         $html = $this->blogTarget();
@@ -461,6 +473,12 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         EducationalContentPublisher::sync();
         $this->reencodeAll();
 
+        $beforeGuides = [];
+        foreach (Fresh::GUIDES as $slug => $fields) {
+            $beforeGuides[$slug] = EducationalGuide::where('slug', $slug)->firstOrFail()->only($fields);
+        }
+        $beforeBlog = Blog::where('slug', self::BLOG)->firstOrFail()->content;
+
         $seeder = new Fresh;
         $seeder->run();
 
@@ -468,17 +486,27 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         $this->assertSame(GuardedFieldWriter::ALREADY, $seeder->results['eloralintide.references']);
         foreach (Fresh::GUIDES as $slug => $fields) {
             foreach ($fields as $field) {
-                $this->assertSame(GuardedFieldWriter::ALREADY, $seeder->results['guide:'.$slug.'.'.$field], $slug.'.'.$field);
+                $this->assertSame(GuardedFieldWriter::MISMATCH, $seeder->results['guide:'.$slug.'.'.$field], $slug.'.'.$field);
             }
+            $this->assertSame($beforeGuides[$slug], EducationalGuide::where('slug', $slug)->firstOrFail()->only($fields), $slug);
         }
-        $this->assertSame(GuardedFieldWriter::ALREADY, $seeder->results['blog:'.self::BLOG.'.content']);
+        $this->assertSame(GuardedFieldWriter::MISMATCH, $seeder->results['blog:'.self::BLOG.'.content']);
+        $this->assertSame($beforeBlog, Blog::where('slug', self::BLOG)->firstOrFail()->content);
         // orforglipron has no category here: left alone, loudly.
+        // Guides and the blog now hold the 16 Nov render, which matches neither the payload target nor its old values.
         $this->assertSame('post lookup missing', $seeder->results['orforglipron.references']);
-        $this->assertSame([
+        $expectedWarnings = [
             Fresh::LABEL.' orforglipron: missing (categories 0, linked posts 0, slug-matching posts 0). Stored categories: none. Stored linked posts: none. Stored slug-matching posts: none.',
             self::M.' orforglipron.human_use_subsections: post lookup missing — nothing written',
             self::M.' orforglipron.references: post lookup missing — nothing written',
-        ], $this->warnings());
+        ];
+        foreach (Fresh::GUIDES as $slug => $fields) {
+            foreach ($fields as $field) {
+                $expectedWarnings[] = self::M.' guide:'.$slug.'.'.$field.': guard mismatch — nothing written';
+            }
+        }
+        $expectedWarnings[] = self::M.' blog:'.self::BLOG.'.content: guard mismatch — nothing written';
+        $this->assertSame($expectedWarnings, $this->warnings());
     }
 
     /**
@@ -504,8 +532,10 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
 
         $seeder = new Fresh;
         $seeder->run();
-        $this->assertSame(GuardedFieldWriter::ALREADY, $seeder->results['guide:'.self::LEGALITY.'.content']);
-        $this->assertSame(GuardedFieldWriter::ALREADY, $seeder->results['guide:'.self::LEGALITY.'.reading_time']);
+        // 16 Nov copy matches neither the 31 Oct target nor its old values, so the seeder leaves it.
+        $this->assertSame(GuardedFieldWriter::MISMATCH, $seeder->results['guide:'.self::LEGALITY.'.content']);
+        $this->assertSame(GuardedFieldWriter::MISMATCH, $seeder->results['guide:'.self::LEGALITY.'.reading_time']);
+        $this->assertSame($before, EducationalGuide::where('slug', self::LEGALITY)->firstOrFail()->only(['content', 'reading_time']));
     }
 
     public function test_rendered_pages_show_the_new_copy(): void
@@ -711,6 +741,20 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         }
 
         return $out;
+    }
+
+    private function renderEducational(string $slug): string
+    {
+        $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
+
+        return \App\Support\SimpleMarkdown::toHtml(EducationalContentPublisher::prepare($markdown));
+    }
+
+    private function catalogReadTime(string $slug): string
+    {
+        $catalog = (new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null);
+
+        return (string) collect($catalog)->firstWhere('slug', $slug)['read_time'];
     }
 
     private function target(string $slug, string $field): mixed

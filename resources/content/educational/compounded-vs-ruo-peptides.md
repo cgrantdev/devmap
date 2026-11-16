@@ -26,7 +26,7 @@ The documents say this is **not**:
 - **Irrevocable.** "HHS may revisit application of this interim policy (in whole or in part) if, among other things, a safety signal or product quality issue arises" [1][2] [primary].
 - **A safety or efficacy finding.** The documents contain no determination that any of the six is safe or effective. Appendix B records that for each peptide "CDER recommended against listing" and that the PCAC, which met 23–24 Jul 2026 [4], voted in favour [1] [primary]. The draft was reviewed by OIRA from 14 Oct to 27 Oct 2026 under the title "Interim Access Policy for Compounding Using Certain Peptides" [3] [primary]. NPR reports that FDA's own scientists recommended against unwinding the restrictions [5] [press].
 
-The comment window is "2 weeks after date of publication in the Federal Register," through regulations.gov on docket HHS-OASH-2026-0496 [2] [primary]. Regulations.gov lists the comment period as closing on 13 Nov 2026 at 11:59 pm Eastern Time [10] [primary].
+The comment window was "2 weeks after date of publication in the Federal Register," through regulations.gov on docket HHS-OASH-2026-0496 [2] [primary]. It closed on 13 Nov 2026 at 11:59 pm Eastern Time, and the Federal Register page now says comments are no longer being accepted [2][10] [primary]. As of 16 Nov 2026 neither the Federal Register nor the docket showed a final or revised version [2][10] [primary].
 
 ## Scope: forms, listed routes and single ingredient
 
@@ -54,6 +54,19 @@ The draft does not use the word "certify." These are the conditions in its own w
 - **Label.** The label must state: "This is a compounded drug product. Not for resale."
 - **Other law.** The product must comply with "all other applicable requirements of the FD&C Act," including the insanitary-conditions ban and "section 503A's … patient specific prescription requirement."
 
+## The ten conditions together, and what the COA must show
+
+The draft's non-enforcement statement applies only "when all of the following circumstances are present," followed by ten numbered conditions [1] [primary]. The sections above quote each one. Some restate section 503A itself, which already requires bulk substances "manufactured by an establishment that is registered under section 510 and accompanied by valid certificates of analysis" and a patient-specific prescription [1] [primary]. This is scope, not usage guidance or a description of how to obtain any product.
+
+**HHS's stated reasons.** For four conditions the draft gives a reason [1] [primary]:
+
+- Reporting to FDA and the States: "an opportunity for FDA and States to act on emerging risks."
+- A single API: "easier to attribute adverse events or clinical outcomes to a specific substance."
+- Oral bioavailability documentation: oral peptide bioavailability is "inherently difficult and complex."
+- The 510(k)-cleared syringe as the only device: "More complex drug delivery devices introduce additional patient risk."
+
+**What the COA must contain.** Appendix B lists required COA information, including the manufacturer, its FDA Establishment Identification (FEI) number and address, the batch number, synthesis and release dates, an expiration or retest date, a CGMP compliance statement and a dated quality-unit signature [1] [primary]. Listed tests include identity by at least two orthogonal methods, HPLC assay, peptide-related and nitrosamine impurities, residual solvents, elemental impurities, residual TFA, bioburden and bacterial endotoxins [1] [primary].
+
 ## How this differs from RUO-labelled products
 
 RUO ("research use only") products are sold with a label saying they are not for human use. The draft's conditions describe a different channel:
@@ -75,6 +88,14 @@ On 23 Oct 2026 the Partnership for Safe Medicines (PSM) filed a citizen petition
 
 AJMC reports that, as of July, the PCAC was scheduled to review five more unapproved peptides for pharmacy compounding in February [11] [press]. FDA's PCAC page says FDA "will host an advisory committee meeting before the end of February 2027" [14] [primary]. A scheduled review is not a listing.
 
+## Stakeholder statements after publication
+
+Two organisations published positions relevant to the draft in November 2026. They are stakeholder statements, not decisions by HHS or FDA, and they do not change the draft's status.
+
+On 3 Nov 2026 USP, the standards body that publishes USP–NF monographs, said the peptides in the HHS policy "do not have USP–NF Monographs, USP Reference Standards, or established bulk drug substance name" that define their identity and substance-specific quality attributes [15] [primary, stakeholder statement]. It said the USP standards referenced in the policy "cannot, on their own, provide adequate quality assurance for these peptide substances," and that "neither existing nor potential new USP standards replace a regulator's role in determining whether a product is safe and effective" [15]. USP sets quality standards. It does not decide 503A eligibility or enforcement.
+
+On 9 Nov 2026 the American Medical Association said its House of Delegates adopted policy under which the AMA "will urge" HHS, FDA and other federal authorities "to immediately rescind administrative policies, or directives that ease restrictions on compounding and distributing synthetic peptides that lack FDA approval" [16] [primary, stakeholder position]. The release does not name the HHS draft. It is an advocacy position, not a policy change.
+
 ## Litigation context: Eli Lilly's retatrutide suits
 
 On 12 Aug 2026, Eli Lilly announced six US lawsuits over unapproved retatrutide. Retatrutide is an investigational drug that Lilly says is in Phase 3 trials and not approved anywhere [8] [company-reported]. Lilly says the suits target "compounding pharmacies, medical spas, and online sellers that falsely claim their drugs are for 'research-use only' when they are actually intended for human use" [8] [company-reported]. The six cases it lists were filed in federal district courts in California and Texas [8] [company-reported]. Reuters reported the filings the same day [9] [press]. These are allegations, and no ruling is reported in these sources. Retatrutide is not one of the six peptides in the HHS draft.
@@ -87,7 +108,7 @@ No. The notice comes from the HHS Office of the Secretary. It says compounded dr
 
 ### Is the policy final?
 
-No. The Federal Register notice calls it a draft, says it is not binding, and opens a two-week comment window after publication on 30 Oct 2026 [2] [primary].
+No. The Federal Register notice calls it a draft and says it is not binding. Its two-week comment window closed on 13 Nov 2026, and no final version had been published as of 16 Nov 2026 [2][10] [primary].
 
 ### How long does it last?
 
@@ -116,8 +137,10 @@ Appendix B records that CDER recommended against listing each of the six and tha
 7. Frier Levitt, "HHS Announces Landmark Peptide Enforcement Discretion Policy," 28 Oct 2026. https://www.frierlevitt.com/articles/hhs-peptide-compounding-enforcement-discretion-policy/ [press, law-firm analysis]
 8. Eli Lilly and Company, "Lilly calls on online platforms, payment companies and regulators to shut down the illegal retatrutide black market," PR Newswire, 12 Aug 2026. https://www.prnewswire.com/news-releases/lilly-calls-on-online-platforms-payment-companies-and-regulators-to-shut-down-the-illegal-retatrutide-black-market-302849551.html [company-reported]
 9. Reuters, "Lilly sues six companies over alleged illegal sales of experimental obesity drug retatrutide," 12 Aug 2026. https://www.reuters.com/legal/litigation/lilly-sues-six-companies-over-alleged-illegal-sales-experimental-obesity-drug-2026-08-12/ [press]
-10. Regulations.gov, HHS-OASH-2026-0496-0002, comment page for FR Doc. 2026-22192; comment period closes 13 Nov 2026, 11:59 pm Eastern Time (checked 31 Oct 2026). https://www.regulations.gov/commenton/HHS-OASH-2026-0496-0002 [primary]
+10. Regulations.gov, HHS-OASH-2026-0496-0002, comment page for FR Doc. 2026-22192; comment period closed 13 Nov 2026, 11:59 pm Eastern Time; no later document on the docket (checked 16 Nov 2026). https://www.regulations.gov/commenton/HHS-OASH-2026-0496-0002 [primary]
 11. Pearl Steinzor, "5 Things to Know About HHS's Interim Peptide Compounding Policy," AJMC, 29 Oct 2026. https://www.ajmc.com/view/5-things-to-know-about-hhs-s-interim-peptide-compounding-policy [press]
 12. Partnership for Safe Medicines, citizen petition under 21 C.F.R. 10.30, docket FDA-2026-P-13366, submitted 23 Oct 2026. https://www.regulations.gov/document/FDA-2026-P-13366-0001 [primary, petitioner's filing]
 13. Partnership for Safe Medicines, "Partnership for Safe Medicines Files Citizen Petition Urging FDA to Block Compounding of Unapproved and Uncharacterized Peptides," press release, 21 October 2026. https://www.safemedicines.org/2026/10/press-release-psm-petition-peptides.html [press release]
 14. FDA, Meeting of the Pharmacy Compounding Advisory Committee (meeting to be held before the end of February 2027; checked 31 Oct 2026). https://www.fda.gov/advisory-committees/pharmacy-compounding-advisory-committee/meeting-pharmacy-compounding-advisory-committee [primary]
+15. United States Pharmacopeia (USP), "USP statement on quality and safety considerations for unapproved peptides," Rockville, MD, 3 Nov 2026. https://www.usp.org/news/usp-statement-on-quality-and-safety-considerations-for-unapproved-peptides [primary, stakeholder statement]
+16. American Medical Association, "AMA adopts new policies to protect patients and strengthen public health," press release, 9 Nov 2026. https://www.ama-assn.org/press-center/ama-press-releases/ama-adopts-new-policies-protect-patients-and-strengthen-public [primary, stakeholder position]

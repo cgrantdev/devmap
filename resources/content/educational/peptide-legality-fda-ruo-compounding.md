@@ -8,16 +8,16 @@
 4. **Removal from Category 2 is not permission to compound.** It does not place a substance on the Bulks List and does not equal Category 1.
 5. A **Pharmacy Compounding Advisory Committee (PCAC) recommendation** is **advisory**. It is **not** a final FDA rule and does **not** by itself authorize compounding.
 6. As of **29 October 2026**, peptides reviewed at the **July 2026 PCAC** meeting (including BPC-157 and TB-500) **had not been added to the 503A Bulks List by FDA rulemaking**. The codified 503A Bulks List does not name them, and no proposed rule to add them has appeared in the Federal Register. Treat any “now legal to compound” claim with extreme skepticism unless it cites a final listing.
-7. On **28 October 2026** the **HHS Office of the Secretary** announced a **draft interim policy**, the “Enforcement Discretion Policy Regarding 503A Compounding Using Certain Peptide Bulk Drug Substances” (FR Doc. 2026-22192; Docket No. HHS-OASH-2026-0496). The notice of availability was published in the Federal Register on **30 October 2026** at **91 FR 68526**, and Regulations.gov lists the comment period as closing on **13 November 2026**. It describes when HHS does not intend to take enforcement action against certain 503A compounding of six peptides. It is **not** FDA approval of any peptide, **not** a 503A Bulks List listing, and **not** binding. See the dated update below.
+7. On **28 October 2026** the **HHS Office of the Secretary** announced a **draft interim policy**, the “Enforcement Discretion Policy Regarding 503A Compounding Using Certain Peptide Bulk Drug Substances” (FR Doc. 2026-22192; Docket No. HHS-OASH-2026-0496). The notice of availability was published in the Federal Register on **30 October 2026** at **91 FR 68526**, and the Regulations.gov comment period closed on **13 November 2026**. No final or revised version had been published as of 16 November 2026. It describes when HHS does not intend to take enforcement action against certain 503A compounding of six peptides. It is **not** FDA approval of any peptide, **not** a 503A Bulks List listing, and **not** binding. See the dated update below.
 
-## Update, October 2026: draft interim enforcement-discretion policy (published for comment)
+## Update, October–November 2026: draft interim enforcement-discretion policy (comment period closed)
 
-**As of 31 October 2026.** This section records a draft interim policy published for comment. It describes what the published text says. It is not legal advice, and it will be revised when the record changes. For how compounded drugs differ from RUO-labelled peptides under the draft, see [Compounded vs RUO Peptides](/guides/compounded-vs-ruo-peptides); for a summary of the six-peptide policy, see [the HHS 503A explainer](/blog/hhs-503a-peptide-enforcement-discretion-2026).
+**As of 16 November 2026.** This section records a draft interim policy that was published for comment. The comment period closed on 13 November 2026, and neither the Federal Register nor the docket showed a final or revised version as of 16 November 2026. It describes what the published text says. It is not legal advice, and it will be revised when the record changes. For how compounded drugs differ from RUO-labelled peptides under the draft, see [Compounded vs RUO Peptides](/guides/compounded-vs-ruo-peptides); for a summary of the six-peptide policy, see [the HHS 503A explainer](/blog/hhs-503a-peptide-enforcement-discretion-2026).
 
 ### What the primary documents say
 
 - **The notice.** The HHS Office of the Secretary filed a Federal Register notice of availability, FR Doc. 2026-22192 (Docket No. HHS-OASH-2026-0496; RIN 0910-ZD94), on 28 October 2026. It was published in the Federal Register on 30 October 2026 as 91 FR 68526 (pages 68526–68527): https://www.federalregister.gov/documents/2026/10/30/2026-22192/enforcement-discretion-policy-regarding-503a-compounding-using-certain-peptide-bulk-drug-substances . The notice states: “HHS is announcing the availability of a draft ‘Enforcement Discretion Policy Regarding 503A Compounding Using Certain Peptide Bulk Drug Substances.’” It describes “the Secretary of HHS’s enforcement policy regarding the use of certain peptide bulk drug substances in compounding pursuant to section 503A … while the list of bulk drug substances that can be used in compounding under section 503A of the FD&C Act (the 503A bulks list) is developed through rulemaking.”
-- **Comment window.** “Written comments can be submitted until 2 weeks after date of publication in the Federal Register via regulations.gov on Docket No. HHS-OASH-2026-0496.” The notice itself prints no calendar date. The Regulations.gov entry for the notice (HHS-OASH-2026-0496-0002) lists the comment period as closing on **13 November 2026 at 11:59 pm Eastern Time**, two weeks after publication: https://www.regulations.gov/commenton/HHS-OASH-2026-0496-0002 .
+- **Comment window.** “Written comments can be submitted until 2 weeks after date of publication in the Federal Register via regulations.gov on Docket No. HHS-OASH-2026-0496.” The notice itself prints no calendar date. The Regulations.gov entry for the notice (HHS-OASH-2026-0496-0002) lists the comment period as closed on **13 November 2026 at 11:59 pm Eastern Time**, two weeks after publication, and the Federal Register page says comments are no longer being accepted: https://www.regulations.gov/commenton/HHS-OASH-2026-0496-0002 .
 - **OIRA review concluded.** OIRA’s EO 12866 review of “Interim Access Policy for Compounding Using Certain Peptides” (RIN 0910-ZD94) shows **Concluded Date: 10/27/2026** and **Concluded Action: Consistent with Change**.
 - **Which peptides.** Appendix A lists six: BPC-157, epitalon, KPV, MOTS-c, semax, and TB-500.
 - **What HHS says it will do.** “Until a peptide bulk drug substance is addressed in a final rule as being included or not included on the 503A bulks list, HHS does not intend to take action against a State licensed pharmacy, Federal facility, or licensed physician compounding a drug product using a peptide bulk drug substance that is not a component of an FDA-approved drug product, the subject of an applicable USP or NF monograph, or on the 503A bulks list codified at 21 CFR 216.23(a), when all of the following circumstances are present.”
@@ -52,7 +52,7 @@ The policy lists ten conditions. In summary:
 - **Washington Post, 7 October 2026.** Rachel Roubein reported, citing two people familiar with the matter who spoke on condition of anonymity, that the administration was crafting plans to allow the temporary sale of certain previously restricted peptides through some compounding pharmacies while regulations are developed. That report predates the published text.
 - **Holland & Knight, 16 October 2026.** In a client alert written before the text was released, the law firm Holland & Knight (Sarah Starling Crossan and Shalyn Watkins) wrote that “the most likely approach of the policy is interim enforcement discretion.” This is one law firm’s analysis of a then-unpublished document, not HHS’s description of it.
 
-### Pending vs in force (as of 29 October 2026; HHS notice rows updated 31 October 2026)
+### Pending vs in force (as of 29 October 2026; HHS notice row updated 16 November 2026)
 
 | Item | Current status (law or federal policy) | Source |
 | --- | --- | --- |
@@ -61,7 +61,7 @@ The policy lists ten conditions. In summary:
 | FDA drug approval | **In force.** None of these peptides is an FDA-approved drug. Neither a PCAC vote nor an enforcement-discretion policy is an approval. | Drugs@FDA; BPC-157 and TB-500 sections below |
 | RUO labeling | **In force.** “Research use only” wording does not control intended use under 21 CFR 201.128. FDA’s August 2026 warning letters treated RUO-labeled peptides as unapproved new drugs where website evidence showed human-use intent. | 21 CFR 201.128; FDA warning letter, 24 August 2026 |
 | July 2026 PCAC recommendations | **Advisory only.** No proposed rule has been published. | FDA PCAC meeting page; HHS policy, Appendix B; Federal Register |
-| HHS enforcement-discretion policy (FR Doc. 2026-22192) | **Draft interim policy published for comment.** Announced 28 October 2026; published 30 October 2026 at 91 FR 68526; Regulations.gov comment period closes 13 November 2026. Non-binding; no calendar end date. | Federal Register, 91 FR 68526; Regulations.gov, HHS-OASH-2026-0496; HHS policy PDF |
+| HHS enforcement-discretion policy (FR Doc. 2026-22192) | **Draft interim policy; comment period closed.** Announced 28 October 2026; published 30 October 2026 at 91 FR 68526; Regulations.gov comment period closed 13 November 2026. Not finalized as of 16 November 2026. Non-binding; no calendar end date. | Federal Register, 91 FR 68526; Regulations.gov, HHS-OASH-2026-0496; HHS policy PDF |
 | PSM citizen petition (Docket No. FDA-2026-P-13366) | **Pending petition.** Filed 23 October 2026. Asks FDA not to allow compounding of the seven July 2026 PCAC peptides and not to rely on that meeting. A petition, not litigation; no FDA response reported. | Regulations.gov, FDA-2026-P-13366 |
 | OIRA review (RIN 0910-ZD94) | **Concluded** 27 October 2026, “Consistent with Change”. | reginfo.gov, OIRA conclusion |
 | Next PCAC meeting (LL-37, GHK-Cu, dihexa acetate, melanotan II, PEG-MGF) | **Scheduled discussion only,** before the end of February 2027. Date not yet set. | FDA PCAC meeting page |
@@ -176,9 +176,17 @@ What RUO does **not** automatically do:
 
 Under **21 CFR 201.128**, “intended uses” are based on objective intent—expressions, design/composition, and circumstances of distribution—including labeling claims and advertising. FDA warning letters to peptide sellers have treated website disease/structure-function style claims as evidence that products are being marketed as **drugs**, and then as **unapproved new drugs** when no approval is in effect—regardless of research branding.
 
-The **24 August 2026** FDA warning letter to Peptide Partners LLC says this directly about that firm’s labeled products: despite statements marketing them “for research use only” and “not for human or veterinary use,” website evidence established that the products were intended to be drugs for human use. RUO wording on those products did not prevent the unapproved-new-drug finding in that letter. This is an enforcement example, not a complete list of every August 2026 letter and not legal advice about any other seller.
+The **24 August 2026** FDA warning letter to an online peptide seller, issued for unapproved new drugs, says this directly about that firm’s labeled products: despite statements marketing them “for research use only” and “not for human or veterinary use,” website evidence established that the products were intended to be drugs for human use. RUO wording on those products did not prevent the unapproved-new-drug finding in that letter. This is an enforcement example, not a complete list of every August 2026 letter and not legal advice about any other seller.
 
 **High-level takeaway:** legality depends on pathway and marketing context, not on a disclaimer sticker. Static “legal or illegal” charts go stale quickly; prefer FDA primary pages and dated trackers over slogans.
+
+## Outside the U.S.: Health Canada advisories (November 2026)
+
+**As of 16 November 2026.** Health Canada published two public advisories on unauthorized peptide products. They are Canadian consumer advisories. They are not U.S. law and do not change any FDA or HHS status described above.
+
+- **RA-82930, 6 November 2026.** Health Canada says it seized and tested unauthorized injectable peptides from one overseas supplier, and that lab testing "found bacteria in products sold online." It lists products sold as hCG, MOTS-C, NAD+, retatrutide, tesamorelin and tirzepatide as "examples of unauthorized injectable peptide and non-peptide drugs." It does not say which listed product tested contaminated.
+- **RA-82944, 12 November 2026.** Health Canada says lab testing found bacteria "in an injectable peptide product" seized from a retailer in Ontario, without naming the product. It lists products labelled as BPC-157, hCG, MOTS-C, Selank, Semax, Melanotan-1, retatrutide, tesamorelin and two blends containing BPC-157 and TB-500 as unauthorized injectable peptides, and a BPC-157 capsule product as an unauthorized oral peptide.
+- **Research labelling.** RA-82944 says some seized vials were labelled "For Research Purposes Only," and that "this type of labelling also does not make these products legal or exempt from regulatory requirements." Both advisories say injectable peptides in Canada "are generally regulated as prescription drugs."
 
 ## WADA / sport (briefly)
 
@@ -235,7 +243,7 @@ Primary / regulatory:
 1. U.S. FDA. Bulk Drug Substances Used in Compounding: https://www.fda.gov/drugs/human-drug-compounding/bulk-drug-substances-used-compounding
 2. U.S. FDA. Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks: https://www.fda.gov/drugs/human-drug-compounding/certain-bulk-drug-substances-use-compounding-may-present-significant-safety-risks
 3. 21 CFR 201.128 — Meaning of “intended uses”: https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-201/subpart-D/section-201.128
-4. U.S. FDA warning letter, Peptide Partners LLC (MARCS-CMS 735063), 24 August 2026. Footnote: “for research use only” and “not for human or veterinary use” labeling did not control intended use where website evidence showed human-drug intent: https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/warning-letters/peptide-partners-llc-735063-08242026
+4. U.S. FDA warning letter to an online peptide seller (MARCS-CMS 735063), 24 August 2026. Footnote: “for research use only” and “not for human or veterinary use” labeling did not control intended use where website evidence showed human-drug intent. Letter not linked; FDA warning-letter index: https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters
 5. WADA Prohibited List 2026 (PDF): https://www.wada-ama.org/sites/default/files/2025-09/2026list_en_final_clean_september_2025.pdf
 6. DoD OPSS — BPC-157 advisory: https://www.opss.org/article/bpc-157-prohibited-peptide-and-unapproved-drug-found-health-and-wellness-products
 7. Leslie Liang, “Peptides: US advisory committee recommends six for FDA ‘compounding list’,” BMJ 2026;394:e100422, 28 July 2026 (reporting): https://www.bmj.com/content/394/bmj-2026-100422
@@ -248,7 +256,7 @@ October 2026 enforcement-discretion policy (checked 31 October 2026):
 
 7c. Office of the Secretary, HHS, “Enforcement Discretion Policy Regarding 503A Compounding Using Certain Peptide Bulk Drug Substances,” notice of availability, 91 FR 68526–68527 (30 October 2026), FR Doc. 2026-22192, Docket No. HHS-OASH-2026-0496, RIN 0910-ZD94. Filed for public inspection 28 October 2026: https://www.federalregister.gov/documents/2026/10/30/2026-22192/enforcement-discretion-policy-regarding-503a-compounding-using-certain-peptide-bulk-drug-substances . PDF: https://www.govinfo.gov/content/pkg/FR-2026-10-30/pdf/2026-22192.pdf
 
-7c-1. Regulations.gov, HHS-OASH-2026-0496-0002, comment page for the notice. Lists the comment period as closing 13 November 2026, 11:59 pm Eastern Time (checked 31 October 2026): https://www.regulations.gov/commenton/HHS-OASH-2026-0496-0002
+7c-1. Regulations.gov, HHS-OASH-2026-0496-0002, comment page for the notice. Lists the comment period as closed on 13 November 2026, 11:59 pm Eastern Time; the docket shows no later document (checked 16 November 2026): https://www.regulations.gov/commenton/HHS-OASH-2026-0496-0002
 
 7c-2. Partnership for Safe Medicines, citizen petition under 21 C.F.R. § 10.30, Docket No. FDA-2026-P-13366 (document FDA-2026-P-13366-0001), submitted 23 October 2026. The petitioner’s own filing: https://www.regulations.gov/document/FDA-2026-P-13366-0001 . PSM press release dated 21 October 2026 (Regulations.gov records the petition as received on 23 October 2026): https://www.safemedicines.org/2026/10/press-release-psm-petition-peptides.html
 
@@ -276,6 +284,12 @@ Enforcement-related reports (checked 22 October 2026):
 
 7k. Richard Lawler, “TikTok has started censoring searches for popular peptides,” The Verge, 20 October 2026. Reports a “no results found” page for certain peptide-name searches, that a search for “peptides” still returned videos, and that TikTok’s U.S. owner did not immediately respond to a request for comment: https://www.theverge.com/science/1014825/peptide-tiktok-search-ban
 
+
+Health Canada advisories (checked 16 November 2026):
+
+7l. Health Canada, “Health Canada warns about contaminated unauthorized injectable peptides and non-peptide drugs,” public advisory RA-82930, 6 November 2026 (not linked).
+
+7m. Health Canada, “Health Canada warns about unauthorized peptides, including contaminated injectable peptides …,” public advisory RA-82944, 12 November 2026 (full title names the retailer): https://recalls-rappels.canada.ca/en/alert-recall/health-canada-warns-about-unauthorized-peptides-including-contaminated-injectable
 
 ## Disclaimer
 
