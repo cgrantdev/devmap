@@ -53,7 +53,11 @@ class EducationalFreshnessNovember16Test extends TestCase
     {
         $files = glob(database_path('migrations/2026_11_16_*.php')) ?: [];
         sort($files);
-        $this->assertSame([self::MIGRATION, '2026_11_16_210000_encyclopedia_health_canada_and_eloralintide_november_16.php'], array_map('basename', $files));
+        $this->assertSame([
+            self::MIGRATION,
+            '2026_11_16_210000_encyclopedia_health_canada_and_eloralintide_november_16.php',
+            '2026_11_16_220000_encyclopedia_mots_c_503a_comment_period_closed.php',
+        ], array_map('basename', $files));
         $source = (string) file_get_contents(database_path('migrations/'.self::MIGRATION));
         $this->assertStringContainsString('EducationalFreshnessNovember16Seeder', $source);
         $this->assertStringContainsString('Previous wording is not restored', $source);
