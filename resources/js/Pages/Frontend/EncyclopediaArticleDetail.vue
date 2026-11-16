@@ -47,21 +47,15 @@
               <!-- Short TLDR intro — uses overview (the actual compound description) -->
               <p v-if="overviewShort || overview" class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">{{ overviewShort || overview }}</p>
 
-              <!-- Vendor availability — links to the dedicated per-compound
-                   compare page (/compare/{slug}) with the vendor pricing
-                   table. Previously used /compare#{slug} which just scrolled
-                   nowhere because the index page has no such anchors. -->
-              <!-- One link to this compound's compare page, not two: when the
-                   cross-links chips already carry it ("Compare X listings",
-                   canonical URL), the vendor count is plain text. Otherwise
-                   the count links to the lowercase /compare URL, which does
-                   not 301 (#87 QA S1). -->
-              <p v-if="vendorCount > 0 && hasOwnCompareChip" class="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-ink-muted)] m-0">
+              <!-- Vendor availability. Plain text: the only link to this
+                   compound's compare page is the cross-links chip ("Compare X
+                   listings"), which the server emits only when that page is
+                   owned by this category, resolves canonically and has priced
+                   listings (CatalogCrossLinks::compareTarget). A hero link
+                   would skip those checks (#87 QA S1, #94 QA A2). -->
+              <p v-if="vendorCount > 0" class="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-ink-muted)] m-0">
                 Available from {{ vendorCount }} vendors
               </p>
-              <a v-else-if="vendorCount > 0" :href="`/compare/${(slug || slugify(categoryName || name)).toLowerCase()}`" class="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
-                Available from {{ vendorCount }} vendors <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-              </a>
               <CatalogCrossLinks :groups="catalogLinks?.groups || []" />
             </div>
 
@@ -1731,11 +1725,6 @@ const props = defineProps({
   }
 })
 
-// True when the cross-links chips already link this compound's own compare page.
-const hasOwnCompareChip = computed(() => (props.catalogLinks?.groups || []).some(
-  (group) => (group.links || []).some((link) => link.kind === 'compare')
-))
-
 // Computed property for amino acid composition
 const aminoAcidComposition = computed(() => {
   if (props.aminoAcidSequence && props.aminoAcidSequence.sequence) {
@@ -1747,9 +1736,6 @@ const aminoAcidComposition = computed(() => {
 const page = usePage()
 const structureImageFailed = ref(false)
 
-function slugify(str) {
-  return (str || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-}
 const structureView = ref('2d')
 const no3d = ref(false)
 
