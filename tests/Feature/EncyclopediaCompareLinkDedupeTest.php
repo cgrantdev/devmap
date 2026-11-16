@@ -10,10 +10,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * #87 follow-up (QA S1): the encyclopedia page links its own compare page
- * once. The cross-links chip "Compare X listings" carries the canonical
- * href; the hero "Available from N vendors" is plain text when that chip
- * is present, and otherwise links the lowercase /compare URL (no 301).
+ * #87 follow-up (QA S1) and #94 QA A1/A2: the encyclopedia page links its
+ * own compare page once, through the cross-links chip, which the server
+ * emits only for an owned, canonical, priced compare page. The hero
+ * "Available from N vendors" is plain text. The pill reads "Compare
+ * listings".
  */
 class EncyclopediaCompareLinkDedupeTest extends TestCase
 {
@@ -66,15 +67,51 @@ class EncyclopediaCompareLinkDedupeTest extends TestCase
         });
     }
 
-    public function test_hero_vendor_count_is_not_a_second_link_when_the_chip_is_present(): void
+    public function test_vendor_count_without_a_listed_price_gets_no_compare_link(): void
+    {
+        // #94 QA A2: vendorCount (Product::visible) and the chip's priced check
+        // (CatalogCrossLinks::listedCategoryIds) differ. A listing with price 40 but
+        // discount_price 0 counts as a vendor yet is not a listed price, so the
+        // old hero link pointed at a compare page the chip deliberately skips.
+        $brand = Brand::create(['name' => 'Example Research', 'slug' => 'example-research', 'is_active' => true]);
+        $category = ProductCategory::create(['name' => 'Unpricedpep', 'slug' => 'Unpricedpep', 'is_active' => true]);
+        EducationPost::create([
+            'title' => 'Unpricedpep', 'slug' => 'post-unpricedpep', 'product_category_id' => $category->id,
+            'status' => 'published', 'show_in_encyclopedia' => true, 'overview' => 'Unpricedpep overview.',
+        ]);
+        Product::create([
+            'name' => 'Unpricedpep listing', 'slug' => 'listing-unpriced', 'brand_id' => $brand->id,
+            'product_category_id' => $category->id, 'price' => 40, 'discount_price' => 0, 'status' => 'active', 'hidden' => false,
+        ]);
+
+        $this->get('/encyclopedia/Unpricedpep')->assertOk()->assertInertia(function ($page) {
+            $props = $page->toArray()['props'];
+            $this->assertSame(1, (int) $props['vendorCount']);
+            foreach ($props['catalogLinks']['groups'] ?? [] as $group) {
+                foreach ($group['links'] ?? [] as $link) {
+                    $this->assertNotSame('compare', $link['kind'] ?? null);
+                    $this->assertStringNotContainsString('/compare/unpricedpep', strtolower((string) $link['href']));
+                }
+            }
+        });
+    }
+
+    public function test_hero_vendor_count_is_plain_text_and_the_chip_is_the_only_compare_link(): void
     {
         $vue = (string) file_get_contents(resource_path(self::VUE));
 
-        $this->assertStringContainsString('const hasOwnCompareChip = computed(', $vue);
-        $this->assertStringContainsString("link.kind === 'compare'", $vue);
-        $this->assertMatchesRegularExpression('/<p v-if="vendorCount > 0 && hasOwnCompareChip"[^>]*>\s*Available from \{\{ vendorCount \}\} vendors\s*<\/p>/', $vue);
-        $this->assertStringContainsString('<a v-else-if="vendorCount > 0" :href="`/compare/${(slug || slugify(categoryName || name)).toLowerCase()}`"', $vue);
-        $this->assertStringNotContainsString('<a v-if="vendorCount > 0"', $vue);
+        // #94 QA A2: no hero link that skips the server's ownership / priced check.
+        $this->assertMatchesRegularExpression('/<p v-if="vendorCount > 0"[^>]*>\s*Available from \{\{ vendorCount \}\} vendors\s*<\/p>/', $vue);
+        $this->assertDoesNotMatchRegularExpression('/<a\b[^>]*>\s*Available from/', $vue);
+        $this->assertStringNotContainsString(':href="`/compare/${', $vue);
+        $this->assertStringContainsString('<CatalogCrossLinks :groups="catalogLinks?.groups || []" />', $vue);
+    }
+
+    public function test_compare_pill_says_listings_not_prices(): void
+    {
+        $vue = (string) file_get_contents(resource_path('js/components/CatalogCrossLinks.vue'));
+        $this->assertStringContainsString("'Compare listings': 'Compare listings',", $vue);
+        $this->assertStringNotContainsString('Compare prices', $vue);
     }
 
     public function test_compare_anchors_say_listings_not_prices(): void
