@@ -57,6 +57,7 @@ class EducationalFreshnessNovember16Test extends TestCase
             self::MIGRATION,
             '2026_11_16_210000_encyclopedia_health_canada_and_eloralintide_november_16.php',
             '2026_11_16_220000_encyclopedia_mots_c_503a_comment_period_closed.php',
+            '2026_11_16_230000_blog_og_triumph_4_side_effects_november_16.php',
         ], array_map('basename', $files));
         $source = (string) file_get_contents(database_path('migrations/'.self::MIGRATION));
         $this->assertStringContainsString('EducationalFreshnessNovember16Seeder', $source);
