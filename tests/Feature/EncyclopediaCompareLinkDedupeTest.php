@@ -77,6 +77,13 @@ class EncyclopediaCompareLinkDedupeTest extends TestCase
         $this->assertStringNotContainsString('<a v-if="vendorCount > 0"', $vue);
     }
 
+    public function test_compare_pill_says_listings_not_prices(): void
+    {
+        $vue = (string) file_get_contents(resource_path('js/components/CatalogCrossLinks.vue'));
+        $this->assertStringContainsString("'Compare listings': 'Compare listings',", $vue);
+        $this->assertStringNotContainsString('Compare prices', $vue);
+    }
+
     public function test_compare_anchors_say_listings_not_prices(): void
     {
         $source = (string) file_get_contents(app_path('Http/Controllers/Frontend/EncyclopediaController.php'));
