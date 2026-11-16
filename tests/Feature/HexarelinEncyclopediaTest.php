@@ -351,7 +351,7 @@ class HexarelinEncyclopediaTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->where('vendorCount', 1)
-                ->where('relatedPages.compare.anchor', 'Compare Hexarelin prices across vendors')
+                ->where('relatedPages.compare.anchor', 'Compare Hexarelin listings across vendors')
                 ->where('relatedPages.compare.url', url('/compare/hexarelin'))
                 ->where('relatedPages.shop.anchor', 'Shop Hexarelin — all available products')
                 ->where('relatedPages.shop.url', url('/products?category=hexarelin'))

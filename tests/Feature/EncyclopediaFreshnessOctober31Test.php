@@ -560,7 +560,10 @@ class EncyclopediaFreshnessOctober31Test extends TestCase
         $this->assertStringContainsString('0000059478-26-000108', $elor);
         $this->assertStringContainsString('to start in Q4 2026', $elor);
         $this->assertStringContainsString('0000059478-26-000104', $elor);
-        $this->assertStringContainsString('Submitted orforglipron for type 2 diabetes in the U.S. and Japan', $orfo);
+        // Human-use text is stored but not sent to the page (hidden site-wide since 10/7).
+        $orfoPost = EducationPost::where('product_category_id', ProductCategory::where('slug', 'orforglipron')->value('id'))->firstOrFail();
+        $this->assertStringContainsString('Submitted orforglipron for type 2 diabetes in the U.S. and Japan', json_encode($orfoPost->human_use_subsections, JSON_UNESCAPED_UNICODE));
+        $this->assertStringNotContainsString('Submitted orforglipron for type 2 diabetes in the U.S. and Japan', $orfo);
 
         $blog = Blog::where('slug', self::BLOG)->firstOrFail();
         $page = $this->get('/blog/'.self::BLOG)->assertOk();

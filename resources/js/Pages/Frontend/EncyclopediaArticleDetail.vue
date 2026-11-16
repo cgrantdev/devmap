@@ -51,7 +51,15 @@
                    compare page (/compare/{slug}) with the vendor pricing
                    table. Previously used /compare#{slug} which just scrolled
                    nowhere because the index page has no such anchors. -->
-              <a v-if="vendorCount > 0" :href="`/compare/${slug || slugify(categoryName || name)}`" class="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
+              <!-- One link to this compound's compare page, not two: when the
+                   cross-links chips already carry it ("Compare X listings",
+                   canonical URL), the vendor count is plain text. Otherwise
+                   the count links to the lowercase /compare URL, which does
+                   not 301 (#87 QA S1). -->
+              <p v-if="vendorCount > 0 && hasOwnCompareChip" class="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-ink-muted)] m-0">
+                Available from {{ vendorCount }} vendors
+              </p>
+              <a v-else-if="vendorCount > 0" :href="`/compare/${(slug || slugify(categoryName || name)).toLowerCase()}`" class="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-accent-600)] hover:text-[color:var(--color-accent-700)] transition-colors">
                 Available from {{ vendorCount }} vendors <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
               </a>
               <CatalogCrossLinks :groups="catalogLinks?.groups || []" />
@@ -1722,6 +1730,11 @@ const props = defineProps({
     default: () => ({ groups: [] }),
   }
 })
+
+// True when the cross-links chips already link this compound's own compare page.
+const hasOwnCompareChip = computed(() => (props.catalogLinks?.groups || []).some(
+  (group) => (group.links || []).some((link) => link.kind === 'compare')
+))
 
 // Computed property for amino acid composition
 const aminoAcidComposition = computed(() => {

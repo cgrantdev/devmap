@@ -377,10 +377,9 @@ class EncyclopediaIdentityLiteracyTest extends TestCase
             ->assertSee('Seventh Circuit', false)
             ->assertSee('BLA', false)
             ->assertDontSee('Condor', false)
+            ->assertDontSee(RetatrutideTimelineLiteracySeeder::MAP_TITLE, false)
             ->assertInertia(fn ($page) => $page
-                ->where('humanUseSubsections.1.entries.0.value', $triumph2Body)
-                ->where('humanUseSubsections.2.entries.0.value', 'LOCKED-TRIUMPH-1 treatment-regimen −25.0% vs efficacy −28.3%.')
-                ->where('humanUseSubsections.3.title', RetatrutideTimelineLiteracySeeder::MAP_TITLE)
+                ->missing('humanUseSubsections')
                 ->where('overview', fn ($overview) => is_string($overview)
                     && str_contains($overview, '−20.8%')
                     && str_contains($overview, '−18.8%')

@@ -224,18 +224,23 @@ class BpcCleanupAddendumOctober22Test extends TestCase
 
     public function test_bpc_page_after_120000_and_170000(): void
     {
-        $this->seedLive(with65: true);
+        [$bpcPost] = $this->seedLive(with65: true);
         (new EncyclopediaFieldUpdatesOctober22Seeder)->run();
         (new Addendum)->run();
         $payload = Addendum::payload();
+        // Human-use subsections are stored but not sent to the page (hidden site-wide since 10/7),
+        // so their content checks read the stored column.
+        $humanUse = $bpcPost->fresh()->human_use_subsections ?? [];
 
-        $this->get('/encyclopedia/BPC-157')->assertOk()->assertInertia(function ($page) use ($payload) {
+        $this->get('/encyclopedia/BPC-157')->assertOk()->assertInertia(function ($page) use ($payload, $humanUse) {
             $p = $page->toArray()['props'];
+            $this->assertArrayNotHasKey('humanUseSubsections', $p);
+            $this->assertArrayNotHasKey('humanUseIntro', $p);
             $this->assertSame('No human PK data', $p['halfLife']);
             foreach ($p['routes'] as $route) {
                 $this->assertStringContainsString('(studied in animals)', $route);
             }
-            $this->assertNotContains('Anecdotal Clinical Use', array_column($p['humanUseSubsections'], 'title'));
+            $this->assertNotContains('Anecdotal Clinical Use', array_column($humanUse, 'title'));
             $refs = json_encode($p['references']);
             $this->assertStringNotContainsString('wikipedia.org', $refs);
             $this->assertStringNotContainsString('orthoandwellness.com', $refs);
@@ -243,7 +248,7 @@ class BpcCleanupAddendumOctober22Test extends TestCase
             $this->assertStringContainsString('2026list_en_final_clean_september_2025.pdf', $refs);
             $this->assertStringContainsString('14554208', $refs);
             $this->assertStringNotContainsString('Kazmi A, et al.', $refs);
-            $all = json_encode([$p['humanUseSubsections'], $p['regulatorySubsections'], $p['preclinicalSubsections']], JSON_UNESCAPED_UNICODE);
+            $all = json_encode([$humanUse, $p['regulatorySubsections'], $p['preclinicalSubsections']], JSON_UNESCAPED_UNICODE);
             $this->assertStringNotContainsString('without control groups', $all);
             $this->assertStringContainsString('placebo-controlled studies FDA identified', $all);
             $this->assertStringContainsString('Staresinic et al. 2003', $all);
@@ -252,7 +257,7 @@ class BpcCleanupAddendumOctober22Test extends TestCase
             $this->assertStringNotContainsString('no study has shown', $all);
             $this->assertStringContainsString('developer-affiliated', $all);
 
-            $content = json_encode(array_intersect_key($p, array_flip([
+            $content = json_encode(array_intersect_key($p + ['humanUseSubsections' => $humanUse], array_flip([
                 'humanUseSubsections', 'regulatorySubsections', 'preclinicalSubsections', 'references',
                 'background', 'conclusion', 'halfLife', 'routes', 'keyPoints', 'regulatoryImportantNote',
             ])), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
