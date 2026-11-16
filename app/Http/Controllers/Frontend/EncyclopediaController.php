@@ -787,7 +787,7 @@ class EncyclopediaController extends Controller
             // has no vendor listings, so an empty catalog does not render
             // a buy or shop button.
             'relatedPages' => $vendorCount > 0 ? array_filter([
-                'compare' => ['url' => url('/compare/'.(CompareSlug::canonical($category->slug) ?? $category->slug)), 'anchor' => "Compare {$category->name} prices across vendors"],
+                'compare' => ['url' => url('/compare/'.(CompareSlug::canonical($category->slug) ?? $category->slug)), 'anchor' => "Compare {$category->name} listings across vendors"],
                 'shop' => $profile ? null : ['url' => url("/products?category={$category->slug}"), 'anchor' => "Shop {$category->name} — all available products"],
             ]) : [],
             // $educationPost may be null when a ProductCategory exists but

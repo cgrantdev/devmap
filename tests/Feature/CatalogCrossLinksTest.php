@@ -83,7 +83,7 @@ class CatalogCrossLinksTest extends TestCase
             '/calculator',
         ]);
         $encyclopedia->assertInertia(fn ($page) => $page
-            ->where('relatedPages.compare.anchor', 'Compare BPC-157 prices across vendors')
+            ->where('relatedPages.compare.anchor', 'Compare BPC-157 listings across vendors')
             ->where('catalogLinks.groups.0.label', 'Products listed for BPC-157')
             ->where('catalogLinks.groups.1.label', 'Compare listings')
         );
