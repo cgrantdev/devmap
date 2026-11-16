@@ -835,8 +835,11 @@ class EncyclopediaController extends Controller
             'preclinicalIntro' => $educationPost?->preclinical_intro ?? '',
             'preclinicalSubsections' => $educationPost && $educationPost->preclinical_subsections ? (is_array($educationPost->preclinical_subsections) ? $educationPost->preclinical_subsections : json_decode($educationPost->preclinical_subsections, true) ?? []) : [],
             'preclinicalDisclaimer' => $educationPost?->preclinical_disclaimer ?? '',
-            'humanUseIntro' => $educationPost?->human_use_intro ?? '',
-            'humanUseSubsections' => $educationPost && $educationPost->human_use_subsections ? (is_array($educationPost->human_use_subsections) ? $educationPost->human_use_subsections : json_decode($educationPost->human_use_subsections, true) ?? []) : [],
+            // humanUseIntro / humanUseSubsections are not sent. The "Human Use
+            // & Evidence" section is hidden site-wide (Colin 10/7,
+            // EncyclopediaArticleDetail.vue), so the text must not reach the
+            // Inertia payload or page source either. The columns stay in the
+            // database and the admin CMS; the Vue props default to empty.
             'regulatorySubsections' => $educationPost && $educationPost->regulatory_subsections ? (is_array($educationPost->regulatory_subsections) ? $educationPost->regulatory_subsections : json_decode($educationPost->regulatory_subsections, true) ?? []) : [],
             'regulatoryImportantNote' => $educationPost?->regulatory_important_note ?? '',
             'potentialApplicationsIntro' => $educationPost?->potential_applications_intro ?? '',

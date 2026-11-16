@@ -291,14 +291,17 @@ class RetatrutideOsaLitigationUpdateTest extends TestCase
 
     public function test_rendered_page_shows_the_new_subsections(): void
     {
-        $this->seedColumns($this->state(0));
+        $post = $this->seedColumns($this->state(0));
         (new EncyclopediaRetatrutideOsaLitigationSeeder)->run();
 
+        // Human-use text is stored but no longer sent to the page (hidden site-wide since 10/7).
+        $this->assertTrue(collect($post->fresh()->human_use_subsections)->contains(fn ($x) => ($x['title'] ?? null) === self::OSA_TITLE));
         $this->get('/encyclopedia/retatrutide')
             ->assertOk()
+            ->assertDontSee(self::OSA_TITLE, false)
             ->assertInertia(fn ($page) => $page
                 ->component('Frontend/EncyclopediaArticleDetail')
-                ->where('humanUseSubsections', fn ($s) => collect($s)->contains(fn ($x) => ($x['title'] ?? null) === self::OSA_TITLE))
+                ->missing('humanUseSubsections')
                 ->where('regulatorySubsections', fn ($s) => collect($s)->contains(fn ($x) => ($x['title'] ?? null) === self::LAW_TITLE))
                 ->where('references', fn ($r) => collect($r)->contains(fn ($x) => str_contains((string) ($x['citation'] ?? ''), '10.1056/NEJMoa2611477'))));
     }

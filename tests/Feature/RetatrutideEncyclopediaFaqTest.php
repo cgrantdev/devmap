@@ -306,7 +306,8 @@ class RetatrutideEncyclopediaFaqTest extends TestCase
             ->assertSee('\u221228.3%', false)
             ->assertSee('not the abstract primary', false)
             ->assertSee('does not establish a reduction in cardiovascular events', false)
-            ->assertSee('LOCKED-TRIUMPH-2', false)
+            // LOCKED-TRIUMPH-2 lives in human_use_subsections: stored (asserted above), not sent to the page.
+            ->assertDontSee('LOCKED-TRIUMPH-2', false)
             ->assertSee('Planned U.S. BLA stated for Q1 2027 (company plan, not approval)', false)
             ->assertDontSee('2025-2026', false)
             ->assertDontSee('expected in 2025', false)

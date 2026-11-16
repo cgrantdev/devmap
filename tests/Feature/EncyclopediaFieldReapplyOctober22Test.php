@@ -358,29 +358,26 @@ class EncyclopediaFieldReapplyOctober22Test extends TestCase
 
     public function test_rendered_pages_show_new_subsections_faqs_and_status(): void
     {
-        $this->seedOne('retatrutide', 'retatrutide', [], 'Retatrutide');
-        $this->seedOne('ghk-cu', 'GHK-Cu', [], 'GHK-Cu');
-        $this->seedOne('cagrilintide', 'Cagrilintide', [], 'Cagrilintide');
+        $retaPost = $this->seedOne('retatrutide', 'retatrutide', [], 'Retatrutide');
+        $ghkPost = $this->seedOne('ghk-cu', 'GHK-Cu', [], 'GHK-Cu');
+        $cagriPost = $this->seedOne('cagrilintide', 'Cagrilintide', [], 'Cagrilintide');
         (new EncyclopediaFieldReapplyOctober22Seeder)->run();
+
+        // Human-use subsections are stored but not sent to the page (hidden site-wide since 10/7).
+        $this->assertContains('Reported safety signals outside clinical trials (as of 22 October 2026)', collect($retaPost->fresh()->human_use_subsections)->pluck('title')->all());
+        $this->assertContains('Evidence limits (as of 19 Oct 2026)', collect($ghkPost->fresh()->human_use_subsections)->pluck('title')->all());
+        $this->assertContains('Clinical program (as of 19 Oct 2026)', collect($cagriPost->fresh()->human_use_subsections)->pluck('title')->all());
 
         $this->get('/encyclopedia/retatrutide')
             ->assertOk()
-            ->assertInertia(fn ($page) => $page->where('humanUseSubsections', function ($sections) {
-                $titles = collect($sections)->pluck('title');
-                Assert::assertTrue($titles->contains('Reported safety signals outside clinical trials (as of 22 October 2026)'));
-
-                return true;
-            }));
+            ->assertDontSee('Reported safety signals outside clinical trials (as of 22 October 2026)', false)
+            ->assertInertia(fn ($page) => $page->missing('humanUseSubsections'));
 
         $ghkFaqs = $this->payload('ghk-cu')['columns']['faqs']['new_value'];
         $this->get('/encyclopedia/GHK-Cu')
             ->assertOk()
             ->assertInertia(fn ($page) => $page
-                ->where('humanUseSubsections', function ($sections) {
-                    Assert::assertTrue(collect($sections)->pluck('title')->contains('Evidence limits (as of 19 Oct 2026)'));
-
-                    return true;
-                })
+                ->missing('humanUseSubsections')
                 ->where('regulatorySubsections', function ($sections) {
                     Assert::assertTrue(collect($sections)->pluck('title')->contains('FDA compounding status (as of 22 Oct 2026)'));
 
@@ -397,11 +394,7 @@ class EncyclopediaFieldReapplyOctober22Test extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->where('drugStatus', 'Investigational; not approved (as of 22 Oct 2026)')
-                ->where('humanUseSubsections', function ($sections) {
-                    Assert::assertTrue(collect($sections)->pluck('title')->contains('Clinical program (as of 19 Oct 2026)'));
-
-                    return true;
-                })
+                ->missing('humanUseSubsections')
                 ->where('regulatorySubsections', function ($sections) {
                     Assert::assertTrue(collect($sections)->pluck('title')->contains('Development and regulatory status (as of 22 Oct 2026)'));
 
