@@ -10,6 +10,7 @@ use App\Support\SimpleMarkdown;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use ReflectionMethod;
 
 /**
@@ -124,6 +125,12 @@ class EducationalFreshnessNovember16Seeder extends Seeder
 
             $content = (string) $row->getAttribute('content');
             if (hash('sha256', $content) === $spec['old_sha256']) {
+                $drift = $this->columnDrift($row, $slug);
+                if ($drift !== null) {
+                    $this->warn($key, 'column drift: '.$drift);
+
+                    continue;
+                }
                 $this->info($key, GuardedFieldWriter::UPDATED);
                 $passed[] = $slug;
 
@@ -154,6 +161,65 @@ class EducationalFreshnessNovember16Seeder extends Seeder
         }
 
         throw new \RuntimeException(self::MIGRATION.': catalog has no page for '.$slug);
+    }
+
+    /**
+     * syncOnly rewrites every catalog-owned column of a passing row, not
+     * just content and read time. A row whose content still matches the
+     * 1a9fb77 render but whose other catalog-owned columns were edited
+     * (title, SEO, status, featured flag, guide cover or date) is skipped,
+     * so an admin edit is never overwritten. Returns the first drifted
+     * column, or null.
+     */
+    private function columnDrift(Model $row, string $slug): ?string
+    {
+        $page = null;
+        foreach ($this->catalog() as $candidate) {
+            if (($candidate['slug'] ?? null) === $slug) {
+                $page = $candidate;
+                break;
+            }
+        }
+        if ($page === null) {
+            return 'catalog';
+        }
+
+        $isGuide = self::PAGES[$slug]['table'] === 'educational_guides';
+        $map = [
+            'title' => 'h1',
+            'description' => 'lede',
+            'seo_page_title' => 'seo_title',
+            'seo_description' => 'seo_description',
+            'seo_og_title' => 'og_title',
+            'seo_og_description' => 'og_description',
+        ];
+        $map += $isGuide
+            ? ['tag' => 'tag']
+            : ['blog_type' => 'blog_type', 'key_points' => 'key_points', 'tags' => 'tags'];
+
+        foreach ($map as $column => $catalogKey) {
+            if (json_encode($row->getAttribute($column)) !== json_encode($page[$catalogKey] ?? null)) {
+                return $column;
+            }
+        }
+        if ((string) $row->getAttribute('status') !== 'published') {
+            return 'status';
+        }
+        if ($isGuide) {
+            if ((bool) $row->getAttribute('is_featured')) {
+                return 'is_featured';
+            }
+            $published = $row->getAttribute('published_at');
+            if ($published === null || $published->toDateString() !== ($page['published_at'] ?? null)) {
+                return 'published_at';
+            }
+            if (Schema::hasColumn('educational_guides', 'cover') && filled($page['image_file'] ?? null)
+                && (string) $row->getAttribute('cover') !== '/images/educational/'.basename((string) $page['image_file'])) {
+                return 'cover';
+            }
+        }
+
+        return null;
     }
 
     private function key(string $slug): string

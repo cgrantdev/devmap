@@ -122,6 +122,30 @@ class EducationalFreshnessNovember16Test extends TestCase
         }
     }
 
+    public function test_an_admin_edit_outside_content_skips_the_row(): void
+    {
+        $this->plantOld();
+        $blog = $this->row('retatrutide-vs-semaglutide');
+        $blog->forceFill(['seo_description' => 'ADMIN-SEO', 'status' => 'draft'])->saveQuietly();
+        $guide = $this->row('compounded-vs-ruo-peptides');
+        $guide->forceFill(['seo_page_title' => 'ADMIN-GUIDE-SEO'])->saveQuietly();
+        $blogBefore = $blog->fresh()->getAttributes();
+        $guideBefore = $guide->fresh()->getAttributes();
+
+        $seeder = new Nov16;
+        $seeder->run();
+
+        $blogAfter = $blog->fresh()->getAttributes();
+        $guideAfter = $guide->fresh()->getAttributes();
+        unset($blogBefore['updated_at'], $blogAfter['updated_at'], $guideBefore['updated_at'], $guideAfter['updated_at']);
+        $this->assertSame($blogBefore, $blogAfter);
+        $this->assertSame($guideBefore, $guideAfter);
+        $this->assertSame(GuardedFieldWriter::MISMATCH, $seeder->results[$this->key('retatrutide-vs-semaglutide')]);
+        $this->assertSame(GuardedFieldWriter::MISMATCH, $seeder->results[$this->key('compounded-vs-ruo-peptides')]);
+        $this->assertSame(GuardedFieldWriter::UPDATED, $seeder->results[$this->key('retatrutide-side-effects-trial-data')]);
+        $this->assertSame('21 Min Read', $this->row('retatrutide-side-effects-trial-data')->read_time);
+    }
+
     public function test_missing_and_duplicate_slugs_are_warned_and_skipped(): void
     {
         EducationalGuide::where('slug', 'compounded-vs-ruo-peptides')->delete();
