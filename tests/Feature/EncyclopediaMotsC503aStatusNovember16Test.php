@@ -21,7 +21,7 @@ class EncyclopediaMotsC503aStatusNovember16Test extends TestCase
 {
     use RefreshDatabase;
 
-    private const SHA = '161980f2b3204a08730529085919190c482c0fb4d7a5252074ea4b56d517102d';
+    private const SHA = 'b255d813fd7df445c18fd3da3b4d403b2909c97e79b3340120bb9b94b84db041';
 
     private const M = '2026_11_16_220000';
 
@@ -70,7 +70,12 @@ class EncyclopediaMotsC503aStatusNovember16Test extends TestCase
             $new = $this->flatten($variant['target_value']);
             $this->assertCount(count($old), $new);
             $changed = array_keys(array_diff_assoc($new, $old));
-            $this->assertCount(1, $changed, $variant['name']);
+            $this->assertCount(2, $changed, $variant['name']);
+            // The section heading is scoped to the FDA facts it dates; the HHS paragraph carries its own date.
+            $this->assertSame('1.title', $changed[0], $variant['name']);
+            $this->assertSame('U.S. compounding policy (as of 29 October 2026)', $old['1.title']);
+            $this->assertSame('U.S. compounding policy (FDA status as of 29 October 2026)', $new['1.title']);
+            $changed = array_values(array_diff($changed, ['1.title']));
             $text = $new[$changed[0]];
             $this->assertStringStartsWith(self::NEW_LEAD, $text);
             $this->assertStringContainsString('FR Doc. 2026-22192; 91 FR 68526–68527; Docket No. HHS-OASH-2026-0496', $text);

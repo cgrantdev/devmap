@@ -48,7 +48,7 @@ class EncyclopediaMotsC503aStatusNovember16Seeder extends Seeder
 
     public const PAYLOAD_PATH = 'seeders/data/encyclopedia-field-updates/2026-11-16b/mots-c-503a-status.json';
 
-    public const PAYLOAD_SHA256 = '161980f2b3204a08730529085919190c482c0fb4d7a5252074ea4b56d517102d';
+    public const PAYLOAD_SHA256 = 'b255d813fd7df445c18fd3da3b4d403b2909c97e79b3340120bb9b94b84db041';
 
     public const SLUG = 'mots-c';
 
