@@ -50,6 +50,16 @@ class BecomeVendorController extends Controller
      */
     public function store(Request $request)
     {
+        // Every Business Info section is required on the full signup form
+        // (Colin, Nov 19 2026: vendors were onboarding with empty
+        // profiles). The page sends signupForm=full; the shorter invitation
+        // form at join.peptidemap.com posts here without it and keeps the
+        // older optional rules. Minimums mirror BecomeVendor.vue STEP3_MIN.
+        $full = $request->input('signupForm') === 'full';
+        $text = fn (int $min, int $max) => $full
+            ? ['required', 'string', "min:{$min}", "max:{$max}"]
+            : ['nullable', 'string', "max:{$max}"];
+
         $validated = $request->validate([
             // Step 1: Company Information
             'companyName' => 'required|string|min:2|max:255',
@@ -87,31 +97,40 @@ class BecomeVendorController extends Controller
             'refuseApiAccess' => 'nullable|boolean',
             'apiConsumerKey' => ['nullable', 'required_without:refuseApiAccess', 'string', 'min:10', 'max:255', 'starts_with:ck_'],
             'apiConsumerSecret' => ['nullable', 'required_without:refuseApiAccess', 'string', 'min:10', 'max:255', 'starts_with:cs_'],
-            'productCount' => 'nullable|string|max:50',
-            'companyDescription' => 'nullable|string|max:2000',
-            'paymentMethods' => 'nullable|array',
+            'productCount' => [$full ? 'required' : 'nullable', 'string', 'max:50'],
+            'companyDescription' => $text(50, 2000),
+            'paymentMethods' => $full ? ['required', 'array', 'min:1'] : ['nullable', 'array'],
             'paymentMethods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
             // Character limits mirror the client-side counters in
             // BecomeVendor.vue (LIMITS constant). Kept slightly generous
             // server-side so trailing whitespace doesn't reject a valid
             // payload the UI accepted.
-            'tagline' => 'nullable|string|max:160',
-            'shippingInformation' => 'nullable|string|max:400',
-            'returnPolicy' => 'nullable|string|max:400',
+            'tagline' => $text(10, 160),
+            'shippingInformation' => $text(20, 400),
+            'returnPolicy' => $text(20, 400),
             // Colin PMAP Sep 30 (#7): manufacturing + testing prose
             // now collected in onboarding step 3 instead of only
             // post-approval.
-            'manufacturingNotes' => 'nullable|string|max:2000',
-            'independentTestingNotes' => 'nullable|string|max:2000',
+            'manufacturingNotes' => $text(20, 2000),
+            'independentTestingNotes' => $text(20, 2000),
             'businessHours' => 'nullable|string|max:200',
-            'businessHoursJson' => 'nullable|array',
-            'usps' => 'nullable|array|max:12',
+            'businessHoursJson' => $full
+                ? ['required', 'array', function (string $attribute, mixed $value, \Closure $fail) {
+                    foreach (['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as $day) {
+                        if (! empty($value[$day]['open']) && ! empty($value[$day]['close'])) {
+                            return;
+                        }
+                    }
+                    $fail('Set your business hours: at least one open day, or 24/7.');
+                }]
+                : ['nullable', 'array'],
+            'usps' => $full ? ['required', 'array', 'min:1', 'max:12'] : ['nullable', 'array', 'max:12'],
             'usps.*' => 'string|max:32',
             'uniqueSellingPoints' => 'nullable|string|max:800',
             // Logo: accept PNG/JPG/JPEG/WebP/SVG up to 8 MB. Real vendor logos
             // are often 2-5 MB (transparent backgrounds, full-resolution) and
             // the older 2 MB PNG-only rule was bouncing legitimate signups.
-            'logoFile' => 'nullable|file|mimes:png,jpg,jpeg,webp,svg|max:8192',
+            'logoFile' => [$full ? 'required' : 'nullable', 'file', 'mimes:png,jpg,jpeg,webp,svg', 'max:8192'],
             // External review platform URLs — optional. Fed into
             // ExternalReviewFetcher which populates the trust panel on the
             // vendor's storefront.
@@ -127,10 +146,30 @@ class BecomeVendorController extends Controller
             'email.email' => 'Please enter a valid email address.',
             'logoFile.mimes' => 'Logo must be a PNG, JPG, WebP, or SVG file.',
             'logoFile.max' => 'Logo file is too large. Please use a file under 8 MB.',
-            'companyDescription.max' => 'Company description is too long (5,000 character limit).',
-            'shippingInformation.max' => 'Shipping information is too long (5,000 character limit).',
-            'returnPolicy.max' => 'Return policy is too long (5,000 character limit).',
-            'uniqueSellingPoints.max' => 'Unique selling points is too long (5,000 character limit).',
+            'companyDescription.max' => 'Company description is too long (2,000 character limit).',
+            'shippingInformation.max' => 'Shipping information is too long (400 character limit).',
+            'returnPolicy.max' => 'Return policy is too long (400 character limit).',
+            'uniqueSellingPoints.max' => 'Unique selling points is too long (800 character limit).',
+            // Business Info requirements; same wording as the signup page.
+            'productCount.required' => 'Choose how many products you sell.',
+            'tagline.required' => 'Tagline is required.',
+            'tagline.min' => 'Tagline needs at least 10 characters.',
+            'companyDescription.required' => 'Company description is required.',
+            'companyDescription.min' => 'Company description needs at least 50 characters.',
+            'paymentMethods.required' => 'Pick at least one payment method.',
+            'paymentMethods.min' => 'Pick at least one payment method.',
+            'shippingInformation.required' => 'Shipping information is required.',
+            'shippingInformation.min' => 'Shipping information needs at least 20 characters.',
+            'returnPolicy.required' => 'Return policy is required.',
+            'returnPolicy.min' => 'Return policy needs at least 20 characters.',
+            'manufacturingNotes.required' => 'Manufacturing is required.',
+            'manufacturingNotes.min' => 'Manufacturing needs at least 20 characters.',
+            'independentTestingNotes.required' => 'Independent testing is required.',
+            'independentTestingNotes.min' => 'Independent testing needs at least 20 characters.',
+            'businessHoursJson.required' => 'Set your business hours: at least one open day, or 24/7.',
+            'usps.required' => 'Pick at least one selling point.',
+            'usps.min' => 'Pick at least one selling point.',
+            'logoFile.required' => 'Upload your logo.',
         ]);
 
         try {

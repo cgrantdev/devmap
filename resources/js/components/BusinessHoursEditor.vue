@@ -6,7 +6,7 @@
        ("Mon-Fri 9am-5pm") for the common case. -->
   <div>
     <div class="flex items-baseline justify-between mb-2 gap-2 flex-wrap">
-      <label class="block text-sm text-slate-700">Business hours</label>
+      <label class="block text-sm text-slate-700">Business hours <span v-if="required" class="text-rose-500">*</span></label>
       <div class="flex items-center gap-2">
         <select v-model="innerTz" class="h-7 px-2 text-[11px] border border-slate-300 rounded bg-white">
           <option v-for="tz in TIMEZONES" :key="tz.key" :value="tz.key">{{ tz.label }}</option>
@@ -75,6 +75,8 @@ const DAYS = [
 
 const props = defineProps({
   modelValue: { type: Object, default: () => ({}) },
+  // Shows a required marker on the label (vendor signup).
+  required: { type: Boolean, default: false },
 })
 const emit = defineEmits(['update:modelValue'])
 

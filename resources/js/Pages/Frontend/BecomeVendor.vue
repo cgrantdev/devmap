@@ -475,13 +475,13 @@
               <!-- Number of Products -->
               <div>
                 <label for="product_count" class="block text-sm text-slate-700 mb-2">
-                  Number of Products
+                  Number of Products <span class="text-rose-500">*</span>
                 </label>
                 <div class="relative">
                   <select
                     id="product_count"
                     v-model="formData.productCount"
-                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                    :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', step3Error('productCount') ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                   >
                     <option value="">Select range...</option>
                     <option value="1-10">1 - 10 products</option>
@@ -489,8 +489,9 @@
                     <option value="26-50">26 - 50 products</option>
                     <option value="51-100">51 - 100 products</option>
                     <option value="100+">100+ products</option>
-                  </select>                  
+                  </select>
                 </div>
+                <p v-if="step3Error('productCount')" class="text-xs text-rose-600 mt-1">{{ step3Error('productCount') }}</p>
               </div>
 
               <!-- Tagline — short one-liner shown under the brand name on
@@ -499,7 +500,7 @@
               <div>
                 <div class="flex items-baseline justify-between mb-2">
                   <label for="tagline" class="block text-sm text-slate-700">
-                    Tagline <span class="text-xs text-slate-500 font-normal">— one line under your name</span>
+                    Tagline <span class="text-rose-500">*</span> <span class="text-xs text-slate-500 font-normal">— one line under your name</span>
                   </label>
                   <span class="text-[11px] ui-mono" :class="charCountColor(formData.tagline, LIMITS.tagline)">
                     {{ (formData.tagline || '').length }} / {{ LIMITS.tagline }}
@@ -511,15 +512,16 @@
                   type="text"
                   :maxlength="LIMITS.tagline"
                   placeholder="USA-manufactured research peptides, 3rd-party tested, ships same-day"
-                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', step3Error('tagline') ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                 />
+                <p v-if="step3Error('tagline')" class="text-xs text-rose-600 mt-1">{{ step3Error('tagline') }}</p>
               </div>
 
               <!-- Company Description -->
               <div>
                 <div class="flex items-baseline justify-between mb-2">
                   <label for="company_description" class="block text-sm text-slate-700">
-                    Company Description <span class="text-xs text-slate-500 font-normal">— longer 'about us'</span>
+                    Company Description <span class="text-rose-500">*</span> <span class="text-xs text-slate-500 font-normal">— longer 'about us'</span>
                   </label>
                   <span class="text-[11px] ui-mono" :class="charCountColor(formData.companyDescription, LIMITS.description)">
                     {{ (formData.companyDescription || '').length }} / {{ LIMITS.description }}
@@ -531,8 +533,9 @@
                   rows="4"
                   :maxlength="LIMITS.description"
                   placeholder="Tell us about your company..."
-                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', step3Error('companyDescription') ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                 ></textarea>
+                <p v-if="step3Error('companyDescription')" class="text-xs text-rose-600 mt-1">{{ step3Error('companyDescription') }}</p>
               </div>
 
               <!-- Review platform URLs — compact reintroduction Sep 1.
@@ -552,9 +555,9 @@
               </details>
 
               <!-- Payment Methods Accepted -->
-              <div>
+              <div id="payment_methods">
                 <label class="block text-sm text-slate-700 mb-2">
-                  Payment Methods Accepted
+                  Payment Methods Accepted <span class="text-rose-500">*</span>
                 </label>
                 <div class="space-y-2">
                   <label class="flex items-center gap-2 cursor-pointer">
@@ -594,12 +597,13 @@
                     <span class="text-sm text-slate-700">Bank Transfer</span>
                   </label>
                 </div>
+                <p v-if="step3Error('paymentMethods')" class="text-xs text-rose-600 mt-1">{{ step3Error('paymentMethods') }}</p>
               </div>
 
               <!-- Shipping Information -->
               <div>
                 <div class="flex items-baseline justify-between mb-2">
-                  <label for="shipping_information" class="block text-sm text-slate-700">Shipping Information</label>
+                  <label for="shipping_information" class="block text-sm text-slate-700">Shipping Information <span class="text-rose-500">*</span></label>
                   <span class="text-[11px] ui-mono" :class="charCountColor(formData.shippingInformation, LIMITS.shipping_info)">
                     {{ (formData.shippingInformation || '').length }} / {{ LIMITS.shipping_info }}
                   </span>
@@ -610,14 +614,15 @@
                   rows="4"
                   :maxlength="LIMITS.shipping_info"
                   placeholder="Describe your shipping policies, methods, and estimated delivery times..."
-                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', step3Error('shippingInformation') ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                 ></textarea>
+                <p v-if="step3Error('shippingInformation')" class="text-xs text-rose-600 mt-1">{{ step3Error('shippingInformation') }}</p>
               </div>
 
               <!-- Return Policy -->
               <div>
                 <div class="flex items-baseline justify-between mb-2">
-                  <label for="return_policy" class="block text-sm text-slate-700">Return Policy</label>
+                  <label for="return_policy" class="block text-sm text-slate-700">Return Policy <span class="text-rose-500">*</span></label>
                   <span class="text-[11px] ui-mono" :class="charCountColor(formData.returnPolicy, LIMITS.return_policy)">
                     {{ (formData.returnPolicy || '').length }} / {{ LIMITS.return_policy }}
                   </span>
@@ -628,8 +633,9 @@
                   rows="4"
                   :maxlength="LIMITS.return_policy"
                   placeholder="Describe your return and refund policies..."
-                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', step3Error('returnPolicy') ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                 ></textarea>
+                <p v-if="step3Error('returnPolicy')" class="text-xs text-rose-600 mt-1">{{ step3Error('returnPolicy') }}</p>
               </div>
 
               <!-- Manufacturing + Independent Testing — Colin PMAP
@@ -637,50 +643,58 @@
                    the storefront. Distinct from the verified cGMP
                    and 7+ Tested badges (those need document review). -->
               <div>
-                <label for="manufacturing_notes" class="block text-sm text-slate-700 mb-2">Manufacturing <span class="text-xs text-slate-500 font-normal">— where + how your peptides are produced</span></label>
+                <label for="manufacturing_notes" class="block text-sm text-slate-700 mb-2">Manufacturing <span class="text-rose-500">*</span> <span class="text-xs text-slate-500 font-normal">— where + how your peptides are produced</span></label>
                 <textarea
                   id="manufacturing_notes"
                   v-model="formData.manufacturingNotes"
                   rows="4"
                   maxlength="2000"
                   placeholder="e.g. Manufactured in an ISO-certified US facility using pharmaceutical-grade precursors…"
-                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', step3Error('manufacturingNotes') ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                 ></textarea>
+                <p v-if="step3Error('manufacturingNotes')" class="text-xs text-rose-600 mt-1">{{ step3Error('manufacturingNotes') }}</p>
               </div>
               <div>
-                <label for="independent_testing_notes" class="block text-sm text-slate-700 mb-2">Independent Testing <span class="text-xs text-slate-500 font-normal">— which labs test each batch + where results are published</span></label>
+                <label for="independent_testing_notes" class="block text-sm text-slate-700 mb-2">Independent Testing <span class="text-rose-500">*</span> <span class="text-xs text-slate-500 font-normal">— which labs test each batch + where results are published</span></label>
                 <textarea
                   id="independent_testing_notes"
                   v-model="formData.independentTestingNotes"
                   rows="4"
                   maxlength="2000"
                   placeholder="e.g. Every batch is tested for purity, sterility, and endotoxins at an ISO/IEC 17025 lab. COAs available on each product page."
-                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  :class="['w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2', step3Error('independentTestingNotes') ? 'border-rose-300 focus:ring-rose-300' : 'border-slate-300 focus:ring-slate-400']"
                 ></textarea>
+                <p v-if="step3Error('independentTestingNotes')" class="text-xs text-rose-600 mt-1">{{ step3Error('independentTestingNotes') }}</p>
               </div>
 
               <!-- Business Hours — structured per-day editor. Powers the
                    Open Now / Closed pill on the storefront. -->
-              <BusinessHoursEditor v-model="formData.businessHoursJson" />
+              <div id="business_hours">
+                <BusinessHoursEditor v-model="formData.businessHoursJson" required />
+                <p v-if="step3Error('businessHoursJson')" class="text-xs text-rose-600 mt-1">{{ step3Error('businessHoursJson') }}</p>
+              </div>
 
               <!-- Unique Selling Points — selectable icon boxes. Preset
                    list keeps cross-vendor rendering consistent + prevents
                    freeform marketing text ("BEST QUALITY!!"). -->
-              <UspPicker v-model="formData.usps" />
+              <div id="usps">
+                <UspPicker v-model="formData.usps" required />
+                <p v-if="step3Error('usps')" class="text-xs text-rose-600 mt-1">{{ step3Error('usps') }}</p>
+              </div>
 
               <!-- Logo upload — vendor picks the file, we immediately
                    show 3 mockups (vendor card, storefront header,
                    product-card badge) so they can see EXACTLY how their
                    logo will land across the site before committing.
                    Colin: "Accept" or "Revise" flow. -->
-              <div>
+              <div id="logo_section">
                 <label class="block text-sm font-semibold text-slate-800 mb-2">
-                  Logo
+                  Logo <span class="text-rose-500">*</span>
                   <span v-if="logoConfirmed" class="ml-2 text-[10px] uppercase tracking-wider font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full align-middle">● Approved</span>
                 </label>
 
                 <!-- Logo not yet uploaded → dropzone + spec hint -->
-                <div v-if="!formData.logoFile" class="p-6 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50">
+                <div v-if="!formData.logoFile" :class="['p-6 rounded-lg border-2 border-dashed bg-slate-50', step3Error('logoFile') ? 'border-rose-300' : 'border-slate-300']">
                   <input
                     id="logo_file"
                     type="file"
@@ -692,7 +706,7 @@
                     <div><strong class="text-slate-800">Recommended:</strong> 1000×1000 transparent PNG. Under 2 MB.</div>
                     <div class="text-slate-500 mt-0.5">Displayed at 380×215 on vendor cards, smaller in the storefront header, and as a tiny badge on product cards — the higher-res source keeps every render crisp on retina. A centered design that reads at any size works best.</div>
                   </div>
-                  <p v-if="fieldErrors.logoFile" class="mt-2 text-xs text-rose-600">{{ fieldErrors.logoFile }}</p>
+                  <p v-if="step3Error('logoFile')" class="mt-2 text-xs text-rose-600">{{ step3Error('logoFile') }}</p>
                 </div>
 
                 <!-- Logo uploaded → 3-mockup preview + Accept/Revise -->
@@ -799,7 +813,10 @@
               </div>
 
               <!-- Navigation Buttons -->
-              <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-200">
+              <p v-if="step3ErrorCount" class="mt-8 text-sm text-rose-600" role="alert">
+                {{ step3ErrorCount === 1 ? 'One section still needs filling in.' : `${step3ErrorCount} sections still need filling in.` }} They're marked in red above.
+              </p>
+              <div :class="['flex items-center justify-between pt-6 border-t border-slate-200', step3ErrorCount ? 'mt-3' : 'mt-8']">
                 <button type="button" @click="goToStep(2)" class="px-6 py-2 text-slate-600 hover:text-slate-700 transition-colors">Back</button>
                 <button type="submit" class="flex items-center gap-2 px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
                   Continue
@@ -1230,7 +1247,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
 import VendorStorefrontPreview from '@/components/VendorStorefrontPreview.vue';
 import BusinessHoursEditor from '@/components/BusinessHoursEditor.vue';
 import UspPicker from '@/components/UspPicker.vue';
@@ -1323,10 +1340,11 @@ const formData = ref({
   uniqueSellingPoints: '',
   tagline: '',
   businessHoursJson: {},
-  // Sensible defaults — nearly every legitimate research-peptide vendor
-  // claims lab testing, per-batch COAs, high purity, and international
-  // shipping. Vendors uncheck any that don't apply during onboarding.
-  usps: ['lab_tested', 'coa_per_batch', 'high_purity', 'international'],
+  // Starts empty and must be picked (Colin, Nov 19 2026: every Business
+  // Info section is required). Was pre-ticked with lab tested, COA per
+  // batch, high purity and international, which passed "required" with
+  // no input and showed claims the vendor never made.
+  usps: [],
   logoFile: null,
   // External review platform URLs — all optional. Aggregated into the
   // trust panel on the vendor's storefront by ExternalReviewFetcher.
@@ -1736,14 +1754,97 @@ const submissionError = ref('');
 const fieldStepMap = {
   companyName: 1, website: 1, yearEstablished: 1, country: 1,
   fullName: 2, email: 2, phone: 2, password: 2, password_confirmation: 2,
-  productCount: 3, companyDescription: 3, paymentMethods: 3,
-  shippingInformation: 3, returnPolicy: 3, businessHours: 3,
-  uniqueSellingPoints: 3, logoFile: 3,
+  productCount: 3, tagline: 3, companyDescription: 3, paymentMethods: 3,
+  shippingInformation: 3, returnPolicy: 3, manufacturingNotes: 3,
+  independentTestingNotes: 3, businessHours: 3, businessHoursJson: 3,
+  usps: 3, uniqueSellingPoints: 3, logoFile: 3,
   apiConsumerKey: 4, apiConsumerSecret: 4, connectionMethod: 4,
 };
 
+// --- Step 3: every section is required (Colin, Nov 19 2026: vendors were
+// onboarding with empty profiles). Review platform URLs stay optional.
+// Mirrored in BecomeVendorController for submissions with signupForm=full;
+// keep the minimums and messages in step.
+const STEP3_MIN = {
+  tagline: 10,
+  companyDescription: 50,
+  shippingInformation: 20,
+  returnPolicy: 20,
+  manufacturingNotes: 20,
+  independentTestingNotes: 20,
+};
+const STEP3_LABELS = {
+  tagline: 'Tagline',
+  companyDescription: 'Company description',
+  shippingInformation: 'Shipping information',
+  returnPolicy: 'Return policy',
+  manufacturingNotes: 'Manufacturing',
+  independentTestingNotes: 'Independent testing',
+};
+// [field, element id] in page order, for scrolling to the first problem.
+const STEP3_FIELDS = [
+  ['productCount', 'product_count'],
+  ['tagline', 'tagline'],
+  ['companyDescription', 'company_description'],
+  ['paymentMethods', 'payment_methods'],
+  ['shippingInformation', 'shipping_information'],
+  ['returnPolicy', 'return_policy'],
+  ['manufacturingNotes', 'manufacturing_notes'],
+  ['independentTestingNotes', 'independent_testing_notes'],
+  ['businessHoursJson', 'business_hours'],
+  ['usps', 'usps'],
+  ['logoFile', 'logo_section'],
+];
+const WEEK_DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+function step3Problems() {
+  const f = formData.value;
+  const problems = {};
+  if (!f.productCount) problems.productCount = 'Choose how many products you sell.';
+  for (const [key, min] of Object.entries(STEP3_MIN)) {
+    const len = String(f[key] || '').trim().length;
+    if (len === 0) problems[key] = `${STEP3_LABELS[key]} is required.`;
+    else if (len < min) problems[key] = `${STEP3_LABELS[key]} needs at least ${min} characters.`;
+  }
+  if (!(f.paymentMethods || []).length) problems.paymentMethods = 'Pick at least one payment method.';
+  const hours = f.businessHoursJson || {};
+  if (!WEEK_DAYS.some(d => hours[d] && hours[d].open && hours[d].close)) {
+    problems.businessHoursJson = 'Set your business hours: at least one open day, or 24/7.';
+  }
+  if (!(f.usps || []).length) problems.usps = 'Pick at least one selling point.';
+  // The logo is not kept in the saved draft, so a restored form needs it again.
+  if (!(f.logoFile instanceof File)) problems.logoFile = 'Upload your logo.';
+  return problems;
+}
+
+// Checked live once they have tried to continue, so each message clears
+// as soon as its section is filled in.
+const step3Tried = ref(false);
+const step3Live = computed(() => (step3Tried.value ? step3Problems() : {}));
+const step3ErrorCount = computed(() => Object.keys(step3Live.value).length);
+function step3Error(key) {
+  const server = fieldErrors.value[key];
+  return step3Live.value[key] || (Array.isArray(server) ? server[0] : server) || '';
+}
+function scrollToFirstStep3Problem(problems) {
+  const first = STEP3_FIELDS.find(([key]) => problems[key]);
+  if (!first) return;
+  nextTick(() => {
+    document.getElementById(first[1])?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+}
+
 const handleStep3Submit = () => {
+  step3Tried.value = true;
+  const problems = step3Problems();
+  if (Object.keys(problems).length) {
+    scrollToFirstStep3Problem(problems);
+    return;
+  }
+  // Server messages for this step are stale once the sections pass.
+  for (const [key] of STEP3_FIELDS) delete fieldErrors.value[key];
   step.value = 4;
+  if (maxStepReached.value < 4) maxStepReached.value = 4;
 }
 
 const handleStep4Submit = () => {
@@ -1773,6 +1874,21 @@ const handleStep4Submit = () => {
     submissionError.value = 'Passwords do not match. Please re-enter them.';
     router.get('/become-a-vendor', { step: 2 }, { preserveState: true, replace: true });
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  // Step 3 can be skipped by jumping ahead on the progress bar or by a
+  // restored draft (which never keeps the logo). Send them back to it.
+  const step3Missing = step3Problems();
+  if (Object.keys(step3Missing).length) {
+    step3Tried.value = true;
+    step.value = 3;
+    const onlyLogo = Object.keys(step3Missing).length === 1 && step3Missing.logoFile;
+    submissionError.value = onlyLogo
+      ? 'Please upload your logo again. It is not kept when you leave the page.'
+      : 'Some business details are missing. Please fill in the sections marked in red.';
+    router.get('/become-a-vendor', { step: 3 }, { preserveState: true, replace: true });
+    scrollToFirstStep3Problem(step3Missing);
     return;
   }
 
@@ -1822,6 +1938,9 @@ const handleStep4Submit = () => {
     googleReviewsUrl: formData.value.googleReviewsUrl || null,
     reviewsIoUrl: formData.value.reviewsIoUrl || null,
     pepreviewproUrl: formData.value.pepreviewproUrl || null,
+    // Tells the server this is the full signup form, whose Business Info
+    // sections are all required (the join.peptidemap.com form is shorter).
+    signupForm: 'full',
     _token: page.props.csrf_token,
   });
 
@@ -1867,7 +1986,7 @@ const handleStep4Submit = () => {
       // Find the earliest step with a problem and jump back to it
       let earliestStep = 4;
       for (const field in errors) {
-        const fs = fieldStepMap[field];
+        const fs = fieldStepMap[field] ?? fieldStepMap[field.split('.')[0]];
         if (fs && fs < earliestStep) earliestStep = fs;
       }
 

@@ -8,7 +8,7 @@
   <div>
     <div class="flex items-baseline justify-between mb-2">
       <label class="block text-sm text-slate-700">
-        Unique selling points <span class="text-xs text-slate-500 font-normal">— pick the ones that apply</span>
+        Unique selling points <span v-if="required" class="text-rose-500">*</span> <span class="text-xs text-slate-500 font-normal">— pick the ones that apply</span>
       </label>
       <span class="text-[11px] ui-mono text-slate-400">{{ (modelValue || []).length }} / {{ OPTIONS.length }}</span>
     </div>
@@ -44,6 +44,8 @@ import { USP_OPTIONS as OPTIONS } from '@/data/uspOptions'
 
 const props = defineProps({
   modelValue: { type: Array, default: () => [] },
+  // Shows a required marker on the label (vendor signup).
+  required: { type: Boolean, default: false },
 })
 const emit = defineEmits(['update:modelValue'])
 
