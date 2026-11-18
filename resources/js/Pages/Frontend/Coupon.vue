@@ -29,10 +29,13 @@
         <div class="min-w-0">
           <div class="text-[11px] uppercase tracking-[0.14em] font-semibold text-emerald-700 mb-1">Peptidemap code</div>
           <h1 class="ui-display text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] leading-[1.1]">
-            {{ brand.name }} Coupon Code
+            {{ copy?.h1 || `${brand.name} Coupon Code` }}
           </h1>
         </div>
       </div>
+
+      <!-- Agency intro (cleaned HTML). No default intro. -->
+      <div v-if="copy?.intro_html" class="ui-rich text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed mb-6" v-html="copy.intro_html"></div>
 
       <!-- Big code card -->
       <div class="rounded-[16px] border-2 border-dashed border-emerald-400 bg-gradient-to-b from-emerald-50 to-white p-6 md:p-8 mb-6">
@@ -99,14 +102,28 @@
            Google can distinguish from every other coupon URL. Shown
            above the FAQ since it's more directly relevant to someone
            evaluating the vendor at code-use time. Colin 10/21. -->
-      <div v-if="brand.description" class="mb-6 pb-6 border-b border-[color:var(--color-hairline)]">
+      <!-- Agency page copy replaces the About paragraph. -->
+      <div v-if="copy?.body_html" class="edu-article mb-6 pb-6 border-b border-[color:var(--color-hairline)]" v-html="copy.body_html"></div>
+      <div v-else-if="brand.description" class="mb-6 pb-6 border-b border-[color:var(--color-hairline)]">
         <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-2">About {{ brand.name }}</h2>
         <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed whitespace-pre-line">{{ brand.description }}</p>
         <p v-if="brand.location" class="text-[12px] text-[color:var(--color-ink-subtle)] mt-2">Based in {{ brand.location }}.</p>
       </div>
 
+      <!-- Agency FAQs replace the default question blocks below; the page
+           sends the same list as FAQPage JSON-LD. -->
+      <section v-if="copy?.faqs?.length" id="faq">
+        <h2 class="text-[17px] font-semibold text-[color:var(--color-ink)] mb-4">Frequently asked questions</h2>
+        <div class="space-y-5">
+          <div v-for="(faq, i) in copy.faqs" :key="i">
+            <h3 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-2">{{ faq.question }}</h3>
+            <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed whitespace-pre-line">{{ faq.answer }}</p>
+          </div>
+        </div>
+      </section>
+
       <!-- FAQ / body copy for query-match depth -->
-      <div class="space-y-5">
+      <div v-else class="space-y-5">
         <div>
           <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-2">Is the {{ brand.name }} coupon code {{ coupon.code }} legit?</h2>
           <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
@@ -151,6 +168,8 @@ const props = defineProps({
   brand: { type: Object, required: true },
   coupon: { type: Object, required: true },
   seo: { type: Object, required: true },
+  // Agency copy: { h1, intro_html, body_html, faqs } or null.
+  copy: { type: Object, default: null },
 })
 
 const copied = ref(false)

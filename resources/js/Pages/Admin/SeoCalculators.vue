@@ -1,12 +1,21 @@
 <template>
   <AdminLayout>
-    <PageHeader title="Calculator SEO" subtitle="Per-preset title + meta for /calculator/{slug} pages — 55+ compounds">
+    <PageHeader title="Calculator SEO" subtitle="Title and meta per /calculator/{slug} page, plus page copy (H1, intro, copy, FAQs)">
       <template #actions>
         <Link href="/admin/seo" class="text-[13px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">← SEO dashboard</Link>
       </template>
     </PageHeader>
 
     <div class="max-w-7xl mx-auto px-6 py-6 space-y-6">
+      <!-- /calculator itself: title + meta live on Pages SEO, copy here. -->
+      <div class="bg-white rounded-xl border border-[color:var(--color-hairline)] p-5 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div class="text-sm font-semibold text-[color:var(--color-ink)]">/calculator</div>
+          <div class="text-[12px] text-[color:var(--color-ink-muted)]">The main calculator page. Its title and meta are on Pages SEO; its H1, intro, copy and FAQs are here.</div>
+        </div>
+        <Link href="/admin/seo/calculators/index/content" class="text-[13px] font-semibold text-[color:var(--color-accent-700)] hover:underline">{{ copySet.has('index') ? 'Edit page copy ✓' : 'Add page copy →' }}</Link>
+      </div>
+
       <!-- Filter + bulk import -->
       <div class="bg-white rounded-xl border border-[color:var(--color-hairline)] p-5 flex flex-wrap items-center gap-4">
         <input v-model="searchQ" @input="debouncedSearch" placeholder="Search compound or slug…" class="ui-input flex-1 min-w-[240px]" />
@@ -60,7 +69,8 @@
                 ></textarea>
                 <div class="text-[10px] font-mono mt-1" :class="r.description.length > 160 ? 'text-amber-600' : 'text-[color:var(--color-ink-subtle)]'">{{ r.description.length }} / 160 ideal</div>
               </td>
-              <td class="px-4 py-3 align-top text-right">
+              <td class="px-4 py-3 align-top text-right whitespace-nowrap">
+                <Link :href="`/admin/seo/calculators/${r.slug}/content`" class="block text-[11px] font-semibold text-[color:var(--color-accent-700)] hover:underline mb-1">{{ copySet.has(r.slug) ? 'Page copy ✓' : 'Page copy →' }}</Link>
                 <a :href="r.url" target="_blank" class="text-[11px] text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">View ↗</a>
                 <div v-if="savingState[r.slug]" class="text-[10px] mt-1" :class="savingState[r.slug] === 'ok' ? 'text-emerald-700' : savingState[r.slug] === 'err' ? 'text-red-600' : 'text-[color:var(--color-ink-muted)]'">
                   {{ savingState[r.slug] === 'saving' ? 'saving…' : savingState[r.slug] === 'ok' ? 'saved' : 'error' }}
@@ -83,7 +93,10 @@ import { Link, router } from '@inertiajs/vue3'
 import PageHeader from '@/components/admin/PageHeader.vue'
 import AdminLayout from './Layout.vue'
 
-const props = defineProps({ rows: Array, q: String, onlyMissing: Boolean })
+const props = defineProps({ rows: Array, q: String, onlyMissing: Boolean, withCopy: { type: Array, default: () => [] } })
+
+// Pages that have agency copy (H1 / intro / body / FAQs).
+const copySet = computed(() => new Set(props.withCopy || []))
 
 const rows = ref((props.rows || []).map(r => ({ ...r })))
 const searchQ = ref(props.q || '')

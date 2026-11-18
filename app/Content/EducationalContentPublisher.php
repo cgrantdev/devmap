@@ -28,6 +28,12 @@ class EducationalContentPublisher
         'kinetixatx.com',
     ];
 
+    /**
+     * Upsert every catalog page. Warning: since Nov 2026 the SEO agency
+     * edits these posts in the blog editor, and this overwrites their
+     * content, description and SEO fields (not blogs.faqs). For new
+     * pages use syncOnly() with just the new slugs.
+     */
     public static function sync(): void
     {
         self::syncPages(self::catalog());

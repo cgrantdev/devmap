@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Models\PageContent;
 use App\Models\Product;
+use App\Support\CouponPageSeo;
+use App\Support\FaqPage;
 use Inertia\Inertia;
 
 /**
@@ -55,22 +58,25 @@ class CouponController extends Controller
             ->value('effective');
 
         $couponCode = strtoupper($vs->coupon_code);
-        $percentOff = $vs->coupon_discount_percent
-            ? (int) round((float) $vs->coupon_discount_percent)
-            : null;
+        $percentOff = CouponPageSeo::percentOff($vs->coupon_discount_percent);
 
         $affiliateUrl = $vs->referral_url ?: ($vs->shop_url ?: $vs->website);
 
         // SEO — coupon-intent queries want the code + brand in the title
         // and description, per the GSC "glow aminos coupon code" cluster.
-        $seoTitle = $percentOff
-            ? "{$brand->name} Coupon Code {$couponCode} — {$percentOff}% Off"
-            : "{$brand->name} Coupon Code {$couponCode}";
-        $seoDescription = $percentOff
-            ? "Peptidemap code {$couponCode}. Save {$percentOff}% at {$brand->name}. "
-              . "Code supplied by {$brand->name}. Applies across {$productCount} products."
-            : "Peptidemap code {$couponCode}. "
-              . "Code supplied by {$brand->name}. Applies across {$productCount} products.";
+        $seoTitle = CouponPageSeo::defaultTitle($brand->name, $couponCode, $percentOff);
+        $seoDescription = CouponPageSeo::defaultDescription($brand->name, $couponCode, $percentOff, $productCount);
+
+        // Agency copy (/admin/seo/coupons, Nov 2026): title, meta, H1,
+        // intro, body and FAQs. Each part replaces its default.
+        $copy = PageContent::forPage(PageContent::COUPON, $brand->id);
+        $copyFaqs = $copy ? $copy->faqPairs() : [];
+        if ($copy?->title) {
+            $seoTitle = $copy->title;
+        }
+        if ($copy?->meta_description) {
+            $seoDescription = $copy->meta_description;
+        }
 
         // Schema.org DiscountOffer + Organization — signals to Google
         // this page is a legitimate coupon listing, not affiliate spam.
@@ -100,6 +106,11 @@ class CouponController extends Controller
                 ],
             ],
         ];
+        // FAQPage only from the agency FAQs the page shows. The default
+        // Q&A blocks never had one.
+        if ($faqSchema = FaqPage::schema($copyFaqs, url("/coupon/{$slug}").'#faq')) {
+            $schema[] = $faqSchema;
+        }
 
         $seo = [
             'key' => 'coupon',
@@ -113,6 +124,9 @@ class CouponController extends Controller
             'image' => \App\Support\OgImageUrl::coupon($slug),
             'schema' => $schema,
         ];
+        if ($copy?->h1) {
+            $seo['h1'] = $copy->h1;
+        }
         session(['page_seo_data' => $seo]);
 
         return Inertia::render('Frontend/Coupon', [
@@ -138,6 +152,12 @@ class CouponController extends Controller
                 'lowest_price' => $lowest ? (float) $lowest : null,
                 'product_count' => $productCount,
             ],
+            'copy' => $copy ? [
+                'h1' => $copy->h1,
+                'intro_html' => $copy->intro_html,
+                'body_html' => $copy->body_html,
+                'faqs' => $copyFaqs,
+            ] : null,
             'seo' => $seo,
         ]);
     }

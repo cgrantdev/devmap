@@ -12,7 +12,9 @@
         <h1 class="ui-display text-3xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">
           {{ pageHeading }}
         </h1>
-        <p class="text-base md:text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-5">
+        <!-- Agency intro (cleaned HTML) replaces the default line. -->
+        <div v-if="copy?.intro_html" class="ui-rich text-base md:text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-5" v-html="copy.intro_html"></div>
+        <p v-else class="text-base md:text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-5">
           Reconstitution, dosage, and schedule — all in one place. 55+ preset compounds across GLP-1s, growth-hormone secretagogues, healing peptides, longevity, and cognitive stacks — with instant insulin-syringe unit output.
         </p>
         <!-- Trust chips: quantifies the "best" claim -->
@@ -444,9 +446,17 @@
 
           <!-- FAQ — visible mirror of the FAQPage schema, required for the
                rich Q&A snippet to earn a SERP block. -->
-          <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
+          <div id="faq" class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
             <h2 class="ui-display text-xl font-semibold text-[color:var(--color-ink)] mb-4">Frequently asked</h2>
-            <div class="space-y-5">
+            <!-- Agency FAQs replace the default 12; the FAQPage schema is
+                 rebuilt from the same list server-side. -->
+            <div v-if="copy?.faqs?.length" class="space-y-5">
+              <div v-for="(faq, i) in copy.faqs" :key="i">
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">{{ faq.question }}</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed whitespace-pre-line">{{ faq.answer }}</p>
+              </div>
+            </div>
+            <div v-else class="space-y-5">
               <div>
                 <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">How do I calculate peptide dosage in insulin syringe units?</h3>
                 <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Divide your desired dose (in mcg) by the peptide concentration (in mcg/mL), then multiply by 100. Example: 250 mcg from a 2,500 mcg/mL solution = 0.10 mL = <strong class="ui-mono">10 units</strong> on a 100-unit insulin syringe. The calculator above does the math automatically.</p>
@@ -498,6 +508,13 @@
             </div>
           </div>
 
+          <!-- Agency page copy replaces the three default guide sections
+               below (and the HowTo schema that mirrors the first). -->
+          <div v-if="copy?.body_html" class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
+            <div class="edu-article" v-html="copy.body_html"></div>
+          </div>
+
+          <template v-else>
           <!-- SEO content -->
           <div class="bg-white rounded-[16px] border border-[color:var(--color-hairline)] shadow-[var(--shadow-xs)] p-6">
             <h2 class="ui-display text-xl font-semibold text-[color:var(--color-ink)] mb-3">How to reconstitute research peptides</h2>
@@ -555,6 +572,8 @@
               <p><strong class="text-[color:var(--color-ink)]">Lost track of what's in the vial &mdash;</strong> label the vial on reconstitution with the compound name, reconstitution date, and final concentration (mcg/mL). The calculator's "Copy result" button generates a one-line summary suitable for a vial label.</p>
             </div>
           </div>
+
+          </template>
 
           <!-- Bottom RUO notice -->
           <div class="flex items-start gap-3 p-4 rounded-[12px] bg-[color:var(--color-bg)] border border-[color:var(--color-hairline)]">
@@ -617,7 +636,10 @@ const props = defineProps({
   // Cheapest live listing for this page's preset (null when none).
   pricing: { type: Object, default: null },
   // "{Compound} Calculator" on /calculator/{slug}; null on /calculator.
+  // The agency H1 when one is set.
   heading: { type: String, default: null },
+  // Agency page copy: { intro_html, body_html, faqs } or null.
+  copy: { type: Object, default: null },
 })
 
 // Reconstituted peptide keeps roughly this long refrigerated.

@@ -60,6 +60,11 @@
           {{ blog.description }}
         </p>
 
+        <!-- Article body. When it is filled in it replaces the older
+             introduction / key points / analysis / conclusion boxes. -->
+        <div v-if="blog.content" class="edu-article" v-html="blog.content"></div>
+
+        <template v-else>
         <!-- Introduction -->
         <div v-if="blog.introduction" class="mb-10">
           <p class="text-[16px] text-[color:var(--color-ink)] leading-[1.8] whitespace-pre-line">{{ blog.introduction }}</p>
@@ -87,8 +92,7 @@
           <p class="text-[16px] text-[color:var(--color-ink)] leading-[1.8] whitespace-pre-line">{{ blog.conclusion }}</p>
         </div>
 
-        <!-- HTML content fallback -->
-        <div v-if="!blog.introduction && !blog.detailed_analysis && blog.content" class="edu-article" v-html="blog.content"></div>
+        </template>
 
         <!-- FAQ from the same FAQPage entities as the JSON-LD. -->
         <section v-if="faqs.length" id="faq" class="mt-12 pt-8 border-t border-[color:var(--color-hairline)]">

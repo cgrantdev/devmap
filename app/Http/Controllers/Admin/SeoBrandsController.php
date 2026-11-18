@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Models\PageContent;
+use App\Support\AgencyFields;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -45,7 +47,11 @@ class SeoBrandsController extends Controller
     {
         $brand->loadMissing('vendorSetting');
         $vs = $brand->vendorSetting;
+        $copy = PageContent::forPage(PageContent::BRAND, $brand->id);
         return Inertia::render('Admin/SeoBrandEdit', [
+            // H1, main copy and FAQs (Jake, Nov 17 2026). False until the
+            // database update that adds page_contents has run.
+            'copyReady' => PageContent::ready(),
             'brand' => [
                 'id' => $brand->id,
                 'name' => $brand->name,
@@ -57,7 +63,10 @@ class SeoBrandsController extends Controller
                 'seo_description' => $vs?->seo_description ?? '',
                 'seo_og_title' => $vs?->seo_og_title ?? '',
                 'seo_og_description' => $vs?->seo_og_description ?? '',
-                'storefront_url' => "/vendor/{$brand->slug}",
+                'storefront_url' => "/brand/{$brand->slug}",
+                'h1' => $copy?->h1 ?? '',
+                'body_html' => $copy?->body_html ?? '',
+                'faqs' => $copy ? $copy->faqPairs() : [],
             ],
         ]);
     }
@@ -73,7 +82,10 @@ class SeoBrandsController extends Controller
             'seo_og_title' => 'nullable|string|max:120',
             'seo_og_description' => 'nullable|string|max:300',
             'logo' => 'nullable|image|mimes:jpeg,png,webp,svg|max:2048',
-        ]);
+            // Set by the editor that carries the H1 / copy / FAQ fields, so
+            // an older form without them never clears saved copy.
+            'copy_sent' => 'nullable|boolean',
+        ] + AgencyFields::rules(), AgencyFields::messages());
 
         $vs = $brand->vendorSetting;
         if (!$vs) {
@@ -105,6 +117,14 @@ class SeoBrandsController extends Controller
         }
 
         $vs->save();
+
+        if ($request->boolean('copy_sent') && PageContent::ready()) {
+            AgencyFields::save(PageContent::BRAND, (string) $brand->id, [
+                'h1' => $data['h1'] ?? null,
+                'body_html' => $data['body_html'] ?? null,
+                'faqs' => $data['faqs'] ?? [],
+            ]);
+        }
 
         return back()->with('success', 'Brand SEO updated.');
     }

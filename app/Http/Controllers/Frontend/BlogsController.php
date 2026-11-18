@@ -6,6 +6,7 @@ use App\Helpers\ImageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\Setting;
+use App\Support\AgencyFields;
 use App\Support\FaqPage;
 use App\Support\OrforglipronOralSemaglutideComparePage;
 use Illuminate\Http\Request;
@@ -222,7 +223,19 @@ class BlogsController extends Controller
         // JSON-LD from it. Every other post keeps its stored schema
         // blocks, including an existing FAQPage, and gains no visible FAQ.
         $storedSchemas = $this->storedSchemaBlocks($blog->seo_schema);
-        if (FaqPage::renderAllowed('blog', (string) $blog->slug)) {
+        $savedFaqs = $blog->hasFaqColumn() && $blog->faqs !== null ? AgencyFields::faqs($blog->faqs) : null;
+        if ($savedFaqs !== null) {
+            // The post's own FAQ list, saved from the blog editor (agency,
+            // Nov 2026), replaces any stored FAQPage block. The page shows
+            // the same list, so the counts always match.
+            [$otherSchemas] = $this->partitionStoredSchema($blog->seo_schema);
+            $schemas = array_merge([$articleSchema, $breadcrumbSchema], $otherSchemas);
+            $faqs = $savedFaqs;
+            if ($faqSchema = $this->faqPageSchema($faqs, $blogUrl.'#faq')) {
+                $schemas[] = $faqSchema;
+            }
+            $content = $this->withoutMarkdownFaqHeading($blog->content, $faqs);
+        } elseif (FaqPage::renderAllowed('blog', (string) $blog->slug)) {
             [$otherSchemas, $faqs, $faqId] = $this->partitionStoredSchema($blog->seo_schema);
             $schemas = array_merge([$articleSchema, $breadcrumbSchema], $otherSchemas);
             if ($faqSchema = $this->faqPageSchema($faqs, $faqId)) {

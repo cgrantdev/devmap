@@ -43,34 +43,72 @@
         </FormField>
       </FormSection>
 
-      <FormSection title="Body">
-        <FormField label="Outline" :error="form.errors.outline" hint="Brief outline of the post">
-          <textarea v-model="form.outline" class="ui-input" rows="3" placeholder="Brief outline..."></textarea>
-        </FormField>
-        <FormField label="Description" :error="form.errors.description">
-          <textarea v-model="form.description" class="ui-input" rows="3" placeholder="Short description / excerpt..."></textarea>
-        </FormField>
-        <FormField label="Introduction" :error="form.errors.introduction">
-          <textarea v-model="form.introduction" class="ui-input" rows="5" placeholder="Introduction paragraph..."></textarea>
-        </FormField>
-        <FormField label="Key Points">
-          <div class="space-y-2">
-            <div v-for="(point, index) in form.key_points" :key="index" class="flex gap-2">
-              <input v-model="form.key_points[index]" type="text" class="ui-input flex-1" placeholder="Key point..." />
-              <button type="button" @click="form.key_points.splice(index, 1)" class="h-[38px] px-3 text-[12px] font-medium text-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)] hover:bg-red-100 transition-colors">Remove</button>
+      <FormSection title="Featured image">
+        <div class="flex flex-col sm:flex-row items-start gap-6">
+          <div class="w-64 max-w-full h-40 flex-shrink-0 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] overflow-hidden">
+            <img v-if="imagePreview" :src="imagePreview" alt="Preview" class="w-full h-full object-cover" />
+            <img v-else-if="blog?.image" :src="blog.image" alt="Current featured image" class="w-full h-full object-cover" />
+            <div v-else class="w-full h-full flex flex-col items-center justify-center text-[color:var(--color-ink-subtle)]">
+              <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zm16 12l-3.09-3.09a2 2 0 00-2.82 0L6 21M9 9a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="text-[12px]">No image</span>
             </div>
-            <button type="button" @click="form.key_points.push('')" class="h-8 px-3 text-[12px] font-medium text-[color:var(--color-ink-muted)] bg-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline)] transition-colors">
-              + Add Key Point
-            </button>
           </div>
-        </FormField>
-        <FormField label="Detailed Analysis" :error="form.errors.detailed_analysis">
-          <textarea v-model="form.detailed_analysis" class="ui-input" rows="10" placeholder="Main body content..."></textarea>
-        </FormField>
-        <FormField label="Conclusion" :error="form.errors.conclusion">
-          <textarea v-model="form.conclusion" class="ui-input" rows="5" placeholder="Concluding paragraphs..."></textarea>
-        </FormField>
+          <div class="flex-1 space-y-3">
+            <FormField label="Upload image" :error="form.errors.image" hint="Shown at the top of the article and on blog cards. 1200 x 630 px recommended, max 2 MB. Converted to WebP.">
+              <input @change="handleImageChange" type="file" accept="image/*" class="ui-input text-sm" />
+            </FormField>
+          </div>
+        </div>
       </FormSection>
+
+      <FormSection title="Article">
+        <FormField label="Excerpt" :error="form.errors.description" hint="One or two sentences. Shown under the title and on blog cards, and used as the meta description when the SEO tab's is empty.">
+          <textarea v-model="form.description" class="ui-input" rows="3" placeholder="Short summary of the article..."></textarea>
+        </FormField>
+        <RichHtmlField
+          v-model="form.content"
+          label="Article body"
+          :error="form.errors.content"
+          :rows="24"
+          :min-height="420"
+          hint="The full article. Use H2 and H3 for sections; tables need HTML mode. When this is filled in it replaces the older format boxes below."
+        />
+      </FormSection>
+
+      <FormSection title="FAQs">
+        <p class="text-[12px] text-[color:var(--color-ink-muted)] -mt-1 mb-3">Shown at the end of the article and used for the FAQ schema, so both always match. Up to 12.<template v-if="blog && faqsReady && !blog.faqs_saved"> These are the FAQs the post shows now; saving keeps them.</template></p>
+        <p v-if="!faqsReady" class="text-[12px] text-amber-700 mb-3">The FAQ field turns on after the pending database update.</p>
+        <FaqListField v-model="form.faqs" :errors="form.errors" :disabled="!faqsReady" />
+      </FormSection>
+
+      <details class="mb-6 bg-white border border-[color:var(--color-hairline)]" :open="usesOldFormat">
+        <summary class="cursor-pointer select-none px-5 py-3 text-[13px] font-semibold text-[color:var(--color-ink)]">Older article format <span class="font-normal text-[color:var(--color-ink-muted)]">(only shown when the article body is empty)</span></summary>
+        <div class="px-5 pb-5 space-y-4">
+          <FormField label="Outline" :error="form.errors.outline" hint="Brief outline of the post">
+            <textarea v-model="form.outline" class="ui-input" rows="3" placeholder="Brief outline..."></textarea>
+          </FormField>
+          <FormField label="Introduction" :error="form.errors.introduction">
+            <textarea v-model="form.introduction" class="ui-input" rows="5" placeholder="Introduction paragraph..."></textarea>
+          </FormField>
+          <FormField label="Key Points">
+            <div class="space-y-2">
+              <div v-for="(point, index) in form.key_points" :key="index" class="flex gap-2">
+                <input v-model="form.key_points[index]" type="text" class="ui-input flex-1" placeholder="Key point..." />
+                <button type="button" @click="form.key_points.splice(index, 1)" class="h-[38px] px-3 text-[12px] font-medium text-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)] hover:bg-red-100 transition-colors">Remove</button>
+              </div>
+              <button type="button" @click="form.key_points.push('')" class="h-8 px-3 text-[12px] font-medium text-[color:var(--color-ink-muted)] bg-[color:var(--color-hairline-soft)] hover:bg-[color:var(--color-hairline)] transition-colors">
+                + Add Key Point
+              </button>
+            </div>
+          </FormField>
+          <FormField label="Detailed Analysis" :error="form.errors.detailed_analysis">
+            <textarea v-model="form.detailed_analysis" class="ui-input" rows="10" placeholder="Main body content..."></textarea>
+          </FormField>
+          <FormField label="Conclusion" :error="form.errors.conclusion">
+            <textarea v-model="form.conclusion" class="ui-input" rows="5" placeholder="Concluding paragraphs..."></textarea>
+          </FormField>
+        </div>
+      </details>
 
       <FormSection title="Tags">
         <div class="space-y-2">
@@ -94,27 +132,6 @@
         <FormField label="Author Job Title" :error="form.errors.author_job">
           <input v-model="form.author_job" type="text" class="ui-input" placeholder="e.g. Senior Researcher" />
         </FormField>
-      </FormSection>
-    </template>
-
-    <!-- Media tab -->
-    <template v-if="activeTab === 'media'">
-      <FormSection title="Featured Image">
-        <div class="flex items-start gap-6">
-          <div class="w-64 h-40 flex-shrink-0 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] overflow-hidden">
-            <img v-if="imagePreview" :src="imagePreview" alt="Preview" class="w-full h-full object-cover" />
-            <img v-else-if="blog?.image" :src="blog.image" alt="Current" class="w-full h-full object-cover" />
-            <div v-else class="w-full h-full flex flex-col items-center justify-center text-[color:var(--color-ink-subtle)]">
-              <svg class="w-8 h-8 mb-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zm16 12l-3.09-3.09a2 2 0 00-2.82 0L6 21M9 9a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span class="text-[12px]">No image</span>
-            </div>
-          </div>
-          <div class="flex-1 space-y-3">
-            <FormField label="Upload Image" hint="Recommended: 1200x630px. Will be converted to WebP.">
-              <input @change="handleImageChange" type="file" accept="image/*" class="ui-input text-sm" />
-            </FormField>
-          </div>
-        </div>
       </FormSection>
     </template>
 
@@ -175,15 +192,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Link, useForm, usePage } from '@inertiajs/vue3'
 import AdminLayout from './Layout.vue'
 import FormPage from '@/components/admin/FormPage.vue'
 import FormSection from '@/components/admin/FormSection.vue'
 import FormField from '@/components/admin/FormField.vue'
+import RichHtmlField from '@/components/admin/RichHtmlField.vue'
+import FaqListField from '@/components/admin/FaqListField.vue'
 
 const props = defineProps({
   blog: Object,
+  // False until the database update that adds blogs.faqs has run.
+  faqsReady: { type: Boolean, default: false },
 })
 
 const page = usePage()
@@ -194,10 +215,15 @@ const imagePreview = ref(null)
 const tabs = [
   { id: 'content', label: 'Content' },
   { id: 'author', label: 'Author' },
-  { id: 'media', label: 'Media' },
   { id: 'publishing', label: 'Publishing' },
   { id: 'seo', label: 'SEO' },
 ]
+
+// Open the older-format boxes only for a post that still uses them.
+const usesOldFormat = computed(() => !props.blog?.content && !!(
+  props.blog?.outline || props.blog?.introduction || props.blog?.detailed_analysis
+  || props.blog?.conclusion || props.blog?.key_points?.length
+))
 
 const form = useForm({
   title: props.blog?.title || '',
@@ -210,6 +236,11 @@ const form = useForm({
   key_points: props.blog?.key_points || [],
   detailed_analysis: props.blog?.detailed_analysis || '',
   conclusion: props.blog?.conclusion || '',
+  content: props.blog?.content || '',
+  faqs: (props.blog?.faqs || []).map(f => ({ question: f.question || '', answer: f.answer || '' })),
+  // Tells the server this form carries the FAQ list, so an emptied list
+  // clears it (FormData drops empty arrays).
+  faqs_sent: true,
   tags: props.blog?.tags || [],
   image: null,
   read_time: props.blog?.read_time || '',
@@ -237,6 +268,8 @@ function submit() {
   // Clean up empty values
   form.key_points = form.key_points.filter(p => p.trim() !== '')
   form.tags = form.tags.filter(t => t.trim() !== '')
+  form.faqs = form.faqs.filter(f => (f.question || '').trim() !== '' || (f.answer || '').trim() !== '')
+  form.faqs_sent = props.faqsReady
   form._token = page.props.csrf_token
 
   const url = props.blog ? `/admin/blogs/${props.blog.id}` : '/admin/blogs'

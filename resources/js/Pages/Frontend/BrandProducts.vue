@@ -37,7 +37,7 @@
 
             <!-- Name + rating -->
             <div class="flex-1 min-w-0">
-              <h1 class="ui-display text-xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">{{ brand.name }}</h1>
+              <h1 class="ui-display text-xl lg:text-3xl font-semibold tracking-tight text-[color:var(--color-ink)]">{{ brand.h1 || brand.name }}</h1>
               <!-- Star row + review-count link. Stars use gap-0 with a bit
                    of negative letter-spacing to sit tight — the SVG viewBox
                    has whitespace baked in. -->
@@ -499,6 +499,23 @@
                 </div>
               </div>
             </section>
+
+            <!-- Main page copy written by the SEO agency (cleaned HTML). -->
+            <section v-if="brand.body_html" id="about-vendor" class="mt-10">
+              <div class="edu-article" v-html="brand.body_html"></div>
+            </section>
+
+            <!-- FAQs: the agency's, or the automatic ones. The same list is
+                 this page's FAQPage JSON-LD. -->
+            <section v-if="brand.faqs && brand.faqs.length" id="faq" class="mt-10">
+              <h2 class="text-2xl text-gray-900 mb-6">{{ brand.name }} FAQs</h2>
+              <div class="bg-white border border-gray-200 rounded-lg divide-y divide-gray-100">
+                <div v-for="(faq, i) in brand.faqs" :key="i" class="p-5 md:p-6">
+                  <h3 class="text-[15px] font-semibold text-gray-900">{{ faq.question }}</h3>
+                  <p class="mt-1.5 text-[14px] text-gray-600 leading-relaxed whitespace-pre-line">{{ faq.answer }}</p>
+                </div>
+              </div>
+            </section>
           </div>
 
           <!-- Right Sidebar (1/3) -->
@@ -596,9 +613,17 @@
                    was ambiguous and the free-text bullets panel below
                    (zero vendors populated it, defaults for everyone)
                    was redundant. USP picker is the single source. -->
-              <div v-if="uspBadges.length" class="bg-white border border-gray-200 rounded-lg p-6">
+              <div v-if="uspBadges.length || whyChooseBullets.length" class="bg-white border border-gray-200 rounded-lg p-6">
                 <h3 class="text-lg text-gray-900 mb-3">Why Choose {{ brand.name || 'this vendor' }}?</h3>
-                <div class="flex flex-wrap gap-1.5">
+                <!-- Bullets the SEO agency writes for this vendor. Only shown
+                     when filled in; no generic defaults (Colin, Sep 22). -->
+                <ul v-if="whyChooseBullets.length" class="space-y-2 text-[14px] text-gray-700 leading-relaxed" :class="uspBadges.length ? 'mb-4' : ''">
+                  <li v-for="(b, i) in whyChooseBullets" :key="i" class="flex gap-2">
+                    <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>{{ b }}</span>
+                  </li>
+                </ul>
+                <div v-if="uspBadges.length" class="flex flex-wrap gap-1.5">
                   <div v-for="u in uspBadges" :key="u.key" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-100">
                     <svg v-if="u.icon === '__US_FLAG__'" class="w-4 h-3 rounded-[1px]" viewBox="0 0 21 15" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                       <rect width="21" height="15" fill="#b22234"/>
@@ -1330,6 +1355,12 @@ const externalAggScore = computed(() => props.brand?.external_rating_avg || null
 
 // Structured USPs — resolve preset keys to icon+label.
 const USP_MAP = Object.fromEntries(USP_OPTIONS.map(o => [o.key, o]))
+const whyChooseBullets = computed(() =>
+  (Array.isArray(props.brand?.why_choose_bullets) ? props.brand.why_choose_bullets : [])
+    .map(b => String(b || '').trim())
+    .filter(Boolean)
+)
+
 const uspBadges = computed(() => {
   const keys = props.brand?.usps
   if (!Array.isArray(keys)) return []

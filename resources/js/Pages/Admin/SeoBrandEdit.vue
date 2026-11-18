@@ -45,9 +45,38 @@
         </div>
 
         <div class="bg-white rounded-xl border border-[color:var(--color-hairline)] p-6 space-y-4">
-          <h2 class="text-sm font-semibold text-[color:var(--color-ink)]">Brand description (on-page body)</h2>
+          <h2 class="text-sm font-semibold text-[color:var(--color-ink)]">Page heading</h2>
+          <div>
+            <label for="brand-h1" class="block text-[11px] font-medium text-[color:var(--color-ink-muted)] mb-1">H1 <span class="text-[color:var(--color-ink-subtle)]">(blank = "{{ brand.name }}")</span></label>
+            <input id="brand-h1" v-model="form.h1" maxlength="255" :disabled="!copyReady" :placeholder="brand.name" :class="['ui-input', form.errors.h1 ? 'border-red-500' : '']" />
+            <p v-if="form.errors.h1" class="mt-1 text-[12px] text-red-600">{{ form.errors.h1 }}</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-[color:var(--color-hairline)] p-6 space-y-4">
+          <h2 class="text-sm font-semibold text-[color:var(--color-ink)]">About this vendor</h2>
           <textarea v-model="form.description" rows="6" class="ui-input"></textarea>
-          <p class="text-[11px] text-[color:var(--color-ink-muted)]">Shows on the storefront as the "about this vendor" paragraph.</p>
+          <p class="text-[11px] text-[color:var(--color-ink-muted)]">The short paragraph under the vendor name at the top of the page.</p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-[color:var(--color-hairline)] p-6 space-y-4">
+          <h2 class="text-sm font-semibold text-[color:var(--color-ink)]">Main page copy</h2>
+          <p v-if="!copyReady" class="text-[12px] text-amber-700">The H1, main copy and FAQ fields turn on after the pending database update.</p>
+          <RichHtmlField
+            v-if="copyReady"
+            v-model="form.body_html"
+            label="Copy"
+            :error="form.errors.body_html"
+            :rows="18"
+            :min-height="320"
+            hint="Long-form copy shown below the products and reviews. Use H2 and H3 for sections."
+          />
+        </div>
+
+        <div class="bg-white rounded-xl border border-[color:var(--color-hairline)] p-6 space-y-3">
+          <h2 class="text-sm font-semibold text-[color:var(--color-ink)]">FAQs</h2>
+          <p class="text-[12px] text-[color:var(--color-ink-muted)]">Shown on the page and used for the FAQ schema, so both always match. Up to 12. When empty, the automatic FAQs (coupon code, where they ship, product count, rating) show instead.</p>
+          <FaqListField v-model="form.faqs" :errors="form.errors" :disabled="!copyReady" empty-text="No FAQs yet. The automatic ones show." />
         </div>
 
         <div class="bg-white rounded-xl border border-[color:var(--color-hairline)] p-6 space-y-4">
@@ -62,7 +91,7 @@
             </div>
             <p v-if="!form.why_choose_bullets.length" class="text-[11px] text-[color:var(--color-ink-muted)] italic">No bullets yet. Click "+ Add bullet" to add one.</p>
           </div>
-          <p class="text-[11px] text-[color:var(--color-ink-muted)]">Up to 8 reasons shoppers should pick this vendor. Shown on the storefront.</p>
+          <p class="text-[11px] text-[color:var(--color-ink-muted)]">Up to 8 reasons shoppers should pick this vendor. Shown in the "Why choose" panel beside the products.</p>
         </div>
 
         <div class="flex justify-end gap-3">
@@ -77,12 +106,24 @@
 <script setup>
 import { Link, useForm } from '@inertiajs/vue3'
 import PageHeader from '@/components/admin/PageHeader.vue'
+import RichHtmlField from '@/components/admin/RichHtmlField.vue'
+import FaqListField from '@/components/admin/FaqListField.vue'
 import AdminLayout from './Layout.vue'
 
-const props = defineProps({ brand: Object })
+const props = defineProps({
+  brand: Object,
+  // False until the database update that adds page_contents has run.
+  copyReady: { type: Boolean, default: false },
+})
 
 const form = useForm({
   _method: 'put',
+  h1: props.brand.h1 || '',
+  body_html: props.brand.body_html || '',
+  faqs: (props.brand.faqs || []).map(f => ({ question: f.question || '', answer: f.answer || '' })),
+  // Tells the server this form carries the H1 / copy / FAQ fields (FormData
+  // drops an empty FAQ list, so the flag is how an emptied list clears).
+  copy_sent: props.copyReady,
   description: props.brand.description || '',
   why_choose_bullets: props.brand.why_choose_bullets?.slice() || [],
   seo_page_title: props.brand.seo_page_title || '',
@@ -97,6 +138,7 @@ function addBullet() {
 }
 
 function submit() {
-  form.post(`/admin/seo/brands/${props.brand.id}`, { forceFormData: true })
+  form.faqs = form.faqs.filter(f => (f.question || '').trim() !== '' || (f.answer || '').trim() !== '')
+  form.post(`/admin/seo/brands/${props.brand.id}`, { forceFormData: true, preserveScroll: true })
 }
 </script>

@@ -231,6 +231,13 @@ $calculatorRenderer = function (?string $compoundSlug = null) {
         $defaultDescription = 'The most-used peptide calculator on the internet. 55+ preset compounds across GLP-1s, growth, healing, longevity and cognitive peptides, with instant syringe unit output. Reconstitution, dosage, and schedule modes. Shareable results. RUO.';
     }
     $pageUrl = $preset ? url('/calculator/' . $preset['slug']) : url('/calculator');
+    // Agency page copy (/admin/seo/calculators, Nov 2026): H1, intro, body
+    // and FAQs. Each part replaces its default; blank parts keep it.
+    $copy = \App\Models\PageContent::forPage(
+        \App\Models\PageContent::CALCULATOR,
+        $preset ? $preset['slug'] : \App\Models\PageContent::CALCULATOR_INDEX
+    );
+    $copyFaqs = $copy ? $copy->faqPairs() : [];
     // On compound-specific pages the SeoPage override is for the generic
     // landing — do not apply it, so each compound page emits its unique
     // compound-targeted title and meta.
@@ -315,9 +322,31 @@ $calculatorRenderer = function (?string $compoundSlug = null) {
             ],
         ],
     ];
+    if ($copyFaqs) {
+        // The page shows the agency FAQs instead of the default 12, so the
+        // FAQPage node is rebuilt from the same list.
+        $seo['schema'] = array_values(array_filter(array_map(
+            fn ($node) => ($node['@type'] ?? null) === 'FAQPage'
+                ? \App\Support\FaqPage::schema($copyFaqs, $pageUrl . '#faq')
+                : $node,
+            $seo['schema']
+        )));
+    }
+    if ($copy?->body_html) {
+        // Agency copy replaces the reconstitution guide the HowTo mirrors.
+        $seo['schema'] = array_values(array_filter(
+            $seo['schema'],
+            fn ($node) => ($node['@type'] ?? null) !== 'HowTo'
+        ));
+    }
+
     // Compound pages get a compound H1 (visible and SSR); the generic
     // landing keeps its title-derived H1. Titles and metas are untouched.
+    // An agency H1 replaces either.
     $heading = $preset ? \App\Support\CalculatorPresets::compoundName($preset) . ' Calculator' : null;
+    if ($copy?->h1) {
+        $heading = $copy->h1;
+    }
     if ($heading) {
         $seo['h1'] = $heading;
     }
@@ -328,6 +357,11 @@ $calculatorRenderer = function (?string $compoundSlug = null) {
         'presets' => \App\Support\CalculatorPresets::all(),
         'heading' => $heading,
         'pricing' => $preset ? \App\Support\CalculatorPresets::pricing($preset) : null,
+        'copy' => $copy ? [
+            'intro_html' => $copy->intro_html,
+            'body_html' => $copy->body_html,
+            'faqs' => $copyFaqs,
+        ] : null,
     ]);
 };
 
@@ -526,6 +560,16 @@ Route::middleware(['auth', 'role:admin,admin_viewer,seo_agency', 'email.verified
     Route::get('/seo/calculators', [\App\Http\Controllers\Admin\SeoCalculatorsController::class, 'index'])->name('admin.seo.calculators');
     Route::post('/seo/calculators/save', [\App\Http\Controllers\Admin\SeoCalculatorsController::class, 'save'])->name('admin.seo.calculators.save');
     Route::post('/seo/calculators/import', [\App\Http\Controllers\Admin\SeoCalculatorsController::class, 'import'])->name('admin.seo.calculators.import');
+    // Page copy (H1, intro, body, FAQs) per calculator page; slug "index"
+    // is /calculator itself (Jake, Nov 17 2026).
+    Route::get('/seo/calculators/{slug}/content', [\App\Http\Controllers\Admin\SeoCalculatorsController::class, 'content'])
+        ->where('slug', '[a-z0-9-]+')->name('admin.seo.calculators.content');
+    Route::put('/seo/calculators/{slug}/content', [\App\Http\Controllers\Admin\SeoCalculatorsController::class, 'saveContent'])
+        ->where('slug', '[a-z0-9-]+')->name('admin.seo.calculators.content.save');
+    // Coupon page SEO: title, meta, H1, intro, body, FAQs per /coupon/{slug}.
+    Route::get('/seo/coupons', [\App\Http\Controllers\Admin\SeoCouponsController::class, 'index'])->name('admin.seo.coupons');
+    Route::get('/seo/coupons/{brand}/edit', [\App\Http\Controllers\Admin\SeoCouponsController::class, 'edit'])->name('admin.seo.coupons.edit');
+    Route::put('/seo/coupons/{brand}', [\App\Http\Controllers\Admin\SeoCouponsController::class, 'update'])->name('admin.seo.coupons.update');
 
     // Per-page analytics — GSC + internal signals for any one URL.
     // Deep-linked from the frontend AdminBar's "Analytics" button.

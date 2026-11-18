@@ -40,6 +40,10 @@
           class="px-4 py-2 text-sm font-medium border-b-2 -mb-px border-transparent text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">
           Brand SEO
         </a>
+        <a href="/admin/seo/coupons"
+          class="px-4 py-2 text-sm font-medium border-b-2 -mb-px border-transparent text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">
+          Coupon SEO
+        </a>
         <a href="/admin/seo/changelog"
           class="px-4 py-2 text-sm font-medium border-b-2 -mb-px border-transparent text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]">
           Changelog

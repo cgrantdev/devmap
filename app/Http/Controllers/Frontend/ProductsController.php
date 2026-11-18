@@ -12,7 +12,9 @@ use App\Models\Puse;
 use App\Models\Brand;
 use App\Models\Location;
 use App\Models\Deal;
+use App\Models\PageContent;
 use App\Support\CatalogCrossLinks;
+use App\Support\FaqPage;
 use App\Support\LegacyCategorySlug;
 use App\Support\ProductListingSeo;
 use App\Support\ProductPageSeo;
@@ -1653,15 +1655,13 @@ class ProductsController extends Controller
         // FAQPage — dynamic answers pulled from real vendor state so the
         // SERP snippet doubles as social proof. Only rendered when there's
         // enough data to give truthful answers.
-        $faqSchema = null;
         $couponPct = $vs?->coupon_discount_percent ? (float) $vs->coupon_discount_percent : null;
         $couponCode = $vs?->coupon_code ?: 'PMAP';
         $shipsCount = $vs?->shipsToLocations()->count() ?? 0;
         $productCount = $products->total();
+        $mainEntity = [];
 
         if ($productCount > 0) {
-            $mainEntity = [];
-
             if ($couponPct > 0) {
                 $mainEntity[] = [
                     '@type' => 'Question',
@@ -1707,16 +1707,20 @@ class ProductsController extends Controller
                     ],
                 ];
             }
+        }
 
-            if (!empty($mainEntity)) {
-                $faqSchema = [
-                    '@context' => 'https://schema.org',
-                    '@type' => 'FAQPage',
-                    '@id' => $brandUrl . '#faq',
-                    'mainEntity' => $mainEntity,
-                ];
+        // Agency copy for this page (Jake, Nov 17 2026): H1, main copy and
+        // FAQs. Agency FAQs replace the automatic ones. Either way the page
+        // shows the same list it sends as FAQPage JSON-LD; the automatic
+        // ones used to be JSON-LD only, with nothing visible.
+        $copy = PageContent::forPage(PageContent::BRAND, $brand->id);
+        $faqPairs = $copy ? $copy->faqPairs() : [];
+        if ($faqPairs === []) {
+            foreach ($mainEntity as $entity) {
+                $faqPairs[] = ['question' => $entity['name'], 'answer' => $entity['acceptedAnswer']['text']];
             }
         }
+        $faqSchema = FaqPage::schema($faqPairs, $brandUrl . '#faq');
 
         // Build SEO array (same format as other pages)
         $seo = [
@@ -1732,6 +1736,10 @@ class ProductsController extends Controller
             'canonical' => $brandUrl,
             'schema' => array_values(array_filter([$organizationSchema, $itemListSchema, $breadcrumbSchema, $faqSchema])),
         ];
+        if ($copy?->h1) {
+            // Server-rendered heading matches the agency H1.
+            $seo['h1'] = $copy->h1;
+        }
 
         // Store SEO data in session for Blade template access (server-rendered OG/Twitter tags)
         session(['page_seo_data' => $seo]);
@@ -1783,9 +1791,14 @@ class ProductsController extends Controller
                     auth()->id() === $brand->user_id
                     || (bool) (auth()->user()->is_admin ?? false)
                 ),
-                // Per-vendor Why-Choose bullets. Frontend falls back to
-                // the generic default list when this is null/empty.
+                // Per-vendor Why-Choose bullets the agency writes. Shown only
+                // when filled in; there is no generic default list.
                 'why_choose_bullets' => $brand->vendorSetting->why_choose_bullets ?? null,
+                // Agency H1, main copy (cleaned HTML) and the FAQ list the
+                // page shows (agency or automatic, same as the JSON-LD).
+                'h1' => $copy?->h1,
+                'body_html' => $copy?->body_html,
+                'faqs' => $faqPairs,
                 // Verified badges — only APPROVED certification claims
                 // show as trust signals on storefront + vendor cards.
                 // See docs/vendor-certifications.md for the workflow.

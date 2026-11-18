@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
+use App\Support\AgencyFields;
+use App\Support\SafeHtml;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -42,7 +45,37 @@ class BlogManagementController extends Controller
     {
         return Inertia::render('Admin/BlogEdit', [
             'blog' => null,
+            'faqsReady' => self::faqColumnReady(),
         ]);
+    }
+
+    /** blogs.faqs exists (the 2026_11_19 migration has run). */
+    private static function faqColumnReady(): bool
+    {
+        return Schema::hasColumn('blogs', 'faqs');
+    }
+
+    /**
+     * Article body and FAQs from the editor (Jake, Nov 17 2026). The body
+     * is cleaned to the tags the article styles support. FAQs are saved
+     * only when the form sent its FAQ list (faqs_sent), so an empty list
+     * clears them, and only once the column exists.
+     */
+    private function applyBodyAndFaqs(Request $request, array $validated): array
+    {
+        if (array_key_exists('content', $validated)) {
+            $validated['content'] = SafeHtml::clean($validated['content']);
+        }
+
+        $faqsSent = $request->boolean('faqs_sent');
+        unset($validated['faqs_sent']);
+        if ($faqsSent && self::faqColumnReady()) {
+            $validated['faqs'] = AgencyFields::faqs($validated['faqs'] ?? []);
+        } else {
+            unset($validated['faqs']);
+        }
+
+        return $validated;
     }
 
     public function store(Request $request)
@@ -62,7 +95,8 @@ class BlogManagementController extends Controller
             'conclusion' => 'nullable|string',
             'tags' => 'nullable|array',
             'tags.*' => 'nullable|string',
-            'content' => 'nullable|string',
+            'content' => 'nullable|string|max:200000',
+            'faqs_sent' => 'nullable|boolean',
             'image' => 'nullable|image|max:2048',
             'read_time' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published',
@@ -72,7 +106,8 @@ class BlogManagementController extends Controller
             'seo_og_title' => 'nullable|string|max:255',
             'seo_og_description' => 'nullable|string|max:500',
             'seo_og_image' => 'nullable|url|max:500',
-        ]);
+        ] + AgencyFields::faqRules(), AgencyFields::messages());
+        $validated = $this->applyBodyAndFaqs($request, $validated);
 
         // Auto-generate slug from title
         $validated['slug'] = Str::slug($validated['title']);
@@ -117,6 +152,12 @@ class BlogManagementController extends Controller
                 'conclusion' => $blog->conclusion,
                 'tags' => $blog->tags ?? [],
                 'content' => $blog->content,
+                // Saved list once the post has one; before that, the
+                // FAQs its stored FAQPage schema already shows.
+                'faqs' => $blog->hasFaqColumn() && $blog->faqs !== null
+                    ? AgencyFields::faqs($blog->faqs)
+                    : $blog->schemaFaqs(),
+                'faqs_saved' => $blog->hasFaqColumn() && $blog->faqs !== null,
                 'image' => ImageHelper::listingImageUrl($blog->image),
                 'read_time' => $blog->read_time,
                 'published_at' => $blog->published_at ? $blog->published_at->format('Y-m-d') : null,
@@ -128,6 +169,7 @@ class BlogManagementController extends Controller
                 'seo_og_description' => $blog->seo_og_description,
                 'seo_og_image' => $blog->seo_og_image,
             ],
+            'faqsReady' => self::faqColumnReady(),
         ]);
     }
 
@@ -150,7 +192,8 @@ class BlogManagementController extends Controller
             'conclusion' => 'nullable|string',
             'tags' => 'nullable|array',
             'tags.*' => 'nullable|string',
-            'content' => 'nullable|string',
+            'content' => 'nullable|string|max:200000',
+            'faqs_sent' => 'nullable|boolean',
             'image' => 'nullable|image|max:2048',
             'read_time' => 'nullable|string|max:255',
             'status' => 'required|in:draft,published',
@@ -160,7 +203,8 @@ class BlogManagementController extends Controller
             'seo_og_title' => 'nullable|string|max:255',
             'seo_og_description' => 'nullable|string|max:500',
             'seo_og_image' => 'nullable|url|max:500',
-        ]);
+        ] + AgencyFields::faqRules(), AgencyFields::messages());
+        $validated = $this->applyBodyAndFaqs($request, $validated);
 
         // Auto-generate slug from title
         $validated['slug'] = Str::slug($validated['title']);
