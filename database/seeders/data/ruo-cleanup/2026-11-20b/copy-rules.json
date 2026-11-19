@@ -29,6 +29,10 @@
    "replace": ""
   },
   {
+   "find": " ?No dosing\\.",
+   "replace": ""
+  },
+  {
    "find": " ?No dosing (?:guidance )?is provided(?: here| on this page)?\\.",
    "replace": ""
   },
@@ -439,6 +443,14 @@
   {
    "find": "Which one should someone take\\?",
    "replace": "Which one is better?"
+  },
+  {
+   "find": "Not an FDA-approved U\\.S\\. therapeutic",
+   "replace": "Not an FDA-approved U.S. drug"
+  },
+  {
+   "find": "purity, price, and dose\\.",
+   "replace": "purity, price, and vial size."
   },
   {
    "find": "or a labeled diluent protocol for human injection",

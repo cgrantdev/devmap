@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Blog;
 use App\Models\EducationalGuide;
 use App\Models\EducationPost;
+use App\Models\ProductCategory;
 use Database\Seeders\RuoCopyCleanupNovember20bSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -106,6 +107,38 @@ class RuoCopyCleanupNovember20bTest extends TestCase
         $raw = $this->raw('blogs', $blog->id);
         (new RuoCopyCleanupNovember20bSeeder)->run();
         $this->assertSame($raw, $this->raw('blogs', $blog->id));
+    }
+
+    public function test_category_descriptions_and_page_and_encyclopedia_metas_are_cleaned(): void
+    {
+        $category = ProductCategory::create([
+            'name' => 'Sample Category',
+            'slug' => 'sample-category',
+            'is_active' => true,
+            'description' => 'Sample is a small molecule. It is not a peptide. No dosing is given here.',
+        ]);
+        $post = EducationPost::create([
+            'title' => 'Sample Meta',
+            'slug' => 'sample-meta',
+            'status' => 'published',
+            'show_in_encyclopedia' => true,
+            'seo_description' => 'A hypothalamic research peptide. No dosing.',
+            'seo_og_description' => 'Synthetic peptide. Not an FDA-approved U.S. therapeutic; prohibited in sport (WADA S2).',
+        ]);
+        DB::table('seo_pages')->insert([
+            'key' => 'ruo-test-page',
+            'description' => 'Every listing. Filter by compound, purity, price, and dose.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        (new RuoCopyCleanupNovember20bSeeder)->run();
+
+        $this->assertSame('Sample is a small molecule. It is not a peptide.', $category->fresh()->description);
+        $post->refresh();
+        $this->assertSame('A hypothalamic research peptide.', $post->seo_description);
+        $this->assertSame('Synthetic peptide. Not an FDA-approved U.S. drug; prohibited in sport (WADA S2).', $post->seo_og_description);
+        $this->assertSame('Every listing. Filter by compound, purity, price, and vial size.', DB::table('seo_pages')->where('key', 'ruo-test-page')->value('description'));
     }
 
     public function test_guide_wording_is_rewritten(): void

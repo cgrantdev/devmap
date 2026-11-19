@@ -61,6 +61,7 @@ class GenerateProductDescriptionJob implements ShouldQueue
         $prompt = "You are writing a 90-130 word product description for a research-peptide comparison site. Rules:
 
 - RESEARCH USE ONLY — never imply human use, dosing, or clinical application
+- Never use these words in any form: dose, dosing, dosage, protocol, stack, stacking, cycle, cycling, therapeutic, therapy, treatment. Write research, study, experiment, assay, quantity or amount instead
 - Factual + distinct voice; no marketing fluff ('premium', 'best-in-class', etc.)
 - Mention the compound, the vendor, the size/form, and one specific research-context fact about the compound (mechanism, structure, or research use)
 - Each description must read differently from every other one, even for products of the same compound

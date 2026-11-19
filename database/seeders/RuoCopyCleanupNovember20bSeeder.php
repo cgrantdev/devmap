@@ -44,6 +44,8 @@ class RuoCopyCleanupNovember20bSeeder extends Seeder
                 'areas_of_research_intro', 'areas_of_research_note', 'mechanism_of_action_intro', 'preclinical_intro',
                 'preclinical_disclaimer', 'regulatory_important_note', 'potential_applications_intro',
                 'potential_applications_important_context', 'conclusion',
+                // Added for 2026_11_20_140000: encyclopedia meta descriptions.
+                'seo_description', 'seo_og_description',
             ],
             'json' => [
                 'key_points', 'key_effects', 'areas_of_research', 'mechanism_subsections', 'preclinical_subsections',
@@ -64,10 +66,21 @@ class RuoCopyCleanupNovember20bSeeder extends Seeder
             ],
             'json' => ['seo_schema'],
         ],
+        // Added for 2026_11_20_140000. Category descriptions show on
+        // product pages and as the encyclopedia subtitle fallback;
+        // seo_pages holds the page-level metas (e.g. /products).
+        'product_categories' => [
+            'text' => ['description'],
+            'json' => [],
+        ],
+        'seo_pages' => [
+            'text' => ['title', 'description', 'og_title', 'og_description'],
+            'json' => [],
+        ],
     ];
 
     /** @var array<string, int> */
-    public array $counts = ['education_posts' => 0, 'blogs' => 0, 'educational_guides' => 0];
+    public array $counts = ['education_posts' => 0, 'blogs' => 0, 'educational_guides' => 0, 'product_categories' => 0, 'seo_pages' => 0];
 
     /** @var list<array{0: string, 1: string}> */
     private array $rules = [];

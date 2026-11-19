@@ -66,7 +66,7 @@ class LandingPageController extends Controller
             'title' => 'Bulk Peptides — Compare Gram + High-mg Vendor Prices',
             'h1' => 'Bulk Peptides',
             'subtitle' => 'Gram-scale and hundred-mg-plus vials across our tracked vendors — for labs, high-dose protocols, and long-cycle research.',
-            'meta_description' => 'Compare bulk peptide prices. Gram-scale and 200mg+ vials across listed vendors — for research labs, long-cycle protocols, and cost-per-mg optimization.',
+            'meta_description' => 'Compare bulk peptide prices. Gram-scale and 200mg+ vials across listed vendors — for research labs comparing cost per mg.',
             'intro' => 'Larger vials nearly always beat small-vial pricing on a per-mg basis. This page filters to gram-scale (1g and up) and larger single-vial sizes (200mg+) so you can compare bulk-tier vendor pricing directly instead of digging through the main catalog.',
             'query' => fn ($q) => $q->where(function ($qq) {
                 $qq->where('size_mg', 'regexp', '^[0-9]+g$')          // 1g, 2g, 5g, 10g, 50g, 100g
