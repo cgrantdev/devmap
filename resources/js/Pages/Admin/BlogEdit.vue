@@ -43,6 +43,24 @@
         </FormField>
       </FormSection>
 
+      <FormSection title="URL">
+        <FormField label="Post URL" :error="form.errors.slug" :hint="slugHint">
+          <div class="flex items-stretch min-w-0">
+            <span class="inline-flex items-center px-3 text-[13px] ui-mono text-[color:var(--color-ink-muted)] bg-[color:var(--color-hairline-soft)] border border-r-0 border-[color:var(--color-hairline)] whitespace-nowrap">peptidemap.com/blog/</span>
+            <input
+              v-model="form.slug"
+              type="text"
+              maxlength="200"
+              :disabled="blog?.slug_locked"
+              :placeholder="slugify(form.title) || 'your-post-url'"
+              :class="['ui-input ui-mono flex-1 min-w-0', form.errors.slug ? 'border-red-500' : '']"
+              aria-label="Post URL slug"
+            />
+          </div>
+          <p v-if="!blog?.slug_locked && slugPreview && slugPreview !== form.slug" class="mt-1 text-[11px] text-[color:var(--color-ink-muted)]">Saves as <span class="ui-mono">/blog/{{ slugPreview }}</span></p>
+        </FormField>
+      </FormSection>
+
       <FormSection title="Featured image">
         <div class="flex flex-col sm:flex-row items-start gap-6">
           <div class="w-64 max-w-full h-40 flex-shrink-0 bg-[color:var(--color-hairline-soft)] border border-[color:var(--color-hairline)] overflow-hidden">
@@ -219,6 +237,23 @@ const tabs = [
   { id: 'seo', label: 'SEO' },
 ]
 
+// Close to Laravel's Str::slug, for the "Saves as" preview only; the
+// server does the real normalising.
+function slugify(value) {
+  return String(value || '')
+    .normalize('NFKD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/@/g, '-at-')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+const slugPreview = computed(() => slugify((form.slug || '').trim() ? form.slug : form.title))
+const slugHint = computed(() => {
+  if (props.blog?.slug_locked) return 'This post is shown at /compare/orforglipron-vs-oral-semaglutide, so its URL is fixed.'
+  if (props.blog?.status === 'published') return 'Lowercase letters, numbers and hyphens. Changing it sends the old URL to the new one with a 301 redirect.'
+  return 'Lowercase letters, numbers and hyphens. Leave blank to build it from the title. Editing the title later does not change the URL.'
+})
+
 // Open the older-format boxes only for a post that still uses them.
 const usesOldFormat = computed(() => !props.blog?.content && !!(
   props.blog?.outline || props.blog?.introduction || props.blog?.detailed_analysis
@@ -227,6 +262,7 @@ const usesOldFormat = computed(() => !props.blog?.content && !!(
 
 const form = useForm({
   title: props.blog?.title || '',
+  slug: props.blog?.slug || '',
   blog_type: props.blog?.blog_type || null,
   author_name: props.blog?.author_name || '',
   author_job: props.blog?.author_job || '',

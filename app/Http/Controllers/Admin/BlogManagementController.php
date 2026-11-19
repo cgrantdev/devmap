@@ -4,11 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
+use App\Models\Redirect;
 use App\Support\AgencyFields;
+use App\Support\OrforglipronOralSemaglutideComparePage;
 use App\Support\SafeHtml;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use App\Helpers\ImageHelper;
@@ -49,6 +53,54 @@ class BlogManagementController extends Controller
         ]);
     }
 
+    /**
+     * The post's URL slug (Jake, Nov 18 2026: the agency sets each post's
+     * URL). A typed slug is normalised to lowercase and hyphens; a blank
+     * one is built from the title. Editing the title alone no longer
+     * changes the URL. The orforglipron post is fixed because
+     * /compare/orforglipron-vs-oral-semaglutide renders it by slug.
+     */
+    private function resolveSlug(?string $typed, string $title, ?Blog $blog = null): string
+    {
+        if ($blog && OrforglipronOralSemaglutideComparePage::isBlogSlug((string) $blog->slug)) {
+            return (string) $blog->slug;
+        }
+
+        $slug = Str::slug(trim((string) $typed) !== '' ? (string) $typed : $title);
+        if ($slug === '') {
+            throw ValidationException::withMessages(['slug' => 'The URL needs at least one letter or number.']);
+        }
+        $taken = Blog::where('slug', $slug)
+            ->when($blog, fn ($q) => $q->where('id', '!=', $blog->id))
+            ->exists();
+        if ($taken) {
+            throw ValidationException::withMessages(['slug' => "Another post already uses /blog/{$slug}. Pick a different URL."]);
+        }
+
+        return $slug;
+    }
+
+    /**
+     * A published post's old URL 301s to its new one. Redirects that
+     * pointed at the old URL now point at the new one (no chains), and a
+     * redirect away from the new URL is removed (no loops).
+     */
+    private function redirectOldUrl(string $oldSlug, string $newSlug): void
+    {
+        $from = '/blog/'.$oldSlug;
+        $to = '/blog/'.$newSlug;
+
+        Redirect::where('from_path', $to)->delete();
+        Redirect::where('to_path', $from)->update(['to_path' => $to]);
+        Redirect::updateOrCreate(['from_path' => $from], [
+            'to_path' => $to,
+            'status_code' => 301,
+            'note' => 'Blog URL changed in the blog editor',
+            'created_by_user_id' => auth()->id(),
+        ]);
+        Cache::forget('redirects:map');
+    }
+
     /** blogs.faqs exists (the 2026_11_19 migration has run). */
     private static function faqColumnReady(): bool
     {
@@ -86,7 +138,7 @@ class BlogManagementController extends Controller
             'author_name' => 'nullable|string|max:255',
             'author_job' => 'nullable|string|max:255',
             'outline' => 'nullable|string',
-            'slug' => 'nullable|string|max:255|unique:blogs,slug',
+            'slug' => 'nullable|string|max:200',
             'description' => 'nullable|string',
             'introduction' => 'nullable|string',
             'key_points' => 'nullable|array',
@@ -109,8 +161,8 @@ class BlogManagementController extends Controller
         ] + AgencyFields::faqRules(), AgencyFields::messages());
         $validated = $this->applyBodyAndFaqs($request, $validated);
 
-        // Auto-generate slug from title
-        $validated['slug'] = Str::slug($validated['title']);
+        // URL: the typed slug, or one built from the title.
+        $validated['slug'] = $this->resolveSlug($validated['slug'] ?? null, $validated['title']);
 
         // Set published_at when status is published
         if ($validated['status'] === 'published' && empty($request->published_at)) {
@@ -158,6 +210,9 @@ class BlogManagementController extends Controller
                     ? AgencyFields::faqs($blog->faqs)
                     : $blog->schemaFaqs(),
                 'faqs_saved' => $blog->hasFaqColumn() && $blog->faqs !== null,
+                // /compare/orforglipron-vs-oral-semaglutide renders this
+                // post by slug, so its URL cannot change.
+                'slug_locked' => OrforglipronOralSemaglutideComparePage::isBlogSlug((string) $blog->slug),
                 'image' => ImageHelper::listingImageUrl($blog->image),
                 'read_time' => $blog->read_time,
                 'published_at' => $blog->published_at ? $blog->published_at->format('Y-m-d') : null,
@@ -183,7 +238,7 @@ class BlogManagementController extends Controller
             'author_name' => 'nullable|string|max:255',
             'author_job' => 'nullable|string|max:255',
             'outline' => 'nullable|string',
-            'slug' => 'nullable|string|max:255|unique:blogs,slug,' . $id,
+            'slug' => 'nullable|string|max:200',
             'description' => 'nullable|string',
             'introduction' => 'nullable|string',
             'key_points' => 'nullable|array',
@@ -206,8 +261,11 @@ class BlogManagementController extends Controller
         ] + AgencyFields::faqRules(), AgencyFields::messages());
         $validated = $this->applyBodyAndFaqs($request, $validated);
 
-        // Auto-generate slug from title
-        $validated['slug'] = Str::slug($validated['title']);
+        // URL: the typed slug, or one built from the title when blank.
+        // The title alone no longer moves the URL.
+        $oldSlug = (string) $blog->slug;
+        $wasPublished = $blog->status === 'published';
+        $validated['slug'] = $this->resolveSlug($validated['slug'] ?? null, $validated['title'], $blog);
 
         // Handle status change and published_at
         $oldStatus = $blog->status;
@@ -235,6 +293,10 @@ class BlogManagementController extends Controller
 
         $blog->update($validated);
 
+        if ($wasPublished && $blog->status === 'published' && $oldSlug !== '' && $oldSlug !== $blog->slug) {
+            $this->redirectOldUrl($oldSlug, $blog->slug);
+        }
+
         return redirect()->back()
             ->with('success', 'Blog post updated successfully.');
     }
@@ -248,10 +310,8 @@ class BlogManagementController extends Controller
             'status' => 'required|in:draft,published',
         ]);
 
-        // Auto-generate slug from title if title changed
-        if ($validated['title'] !== $blog->title) {
-            $validated['slug'] = Str::slug($validated['title']);
-        }
+        // The URL stays put when the title changes; it is set in the
+        // blog editor's URL field (Nov 2026).
 
         // Handle status change and published_at
         $oldStatus = $blog->status;
