@@ -453,6 +453,18 @@
    "replace": "purity, price, and vial size."
   },
   {
+   "find": "purity, price, and dose\\b",
+   "replace": "purity, price, and vial size"
+  },
+  {
+   "find": "or invent clinical protocols\\.",
+   "replace": "or invent clinical guidance."
+  },
+  {
+   "find": "and as part of assisted reproductive technology protocols\\.",
+   "replace": "and in assisted reproductive technology."
+  },
+  {
    "find": "or a labeled diluent protocol for human injection",
    "replace": "or labeled diluent instructions for human injection"
   },
