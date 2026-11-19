@@ -1,6 +1,6 @@
 Cagrilintide and eloralintide are stacked online as if they were the same drug, or as if one trial had already compared them. They are not the same molecule, and no head-to-head was identified in the primaries checked here.
 
-This note is a companion to the live price page. It does not copy vendor tables, rank a winner, or move a combination percent onto either drug alone. Peptidemap publishes research-use and grey-area peptide comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice, a dose, or a mixing instruction.
+This note is a companion to the live price page. It does not copy vendor tables, rank a winner, or move a combination percent onto either drug alone. Peptidemap publishes research-use-only (RUO) peptide comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice, a dose, or a mixing instruction.
 
 Price listings stay on the compare page: [Cagrilintide vs eloralintide](https://peptidemap.com/compare/cagrilintide-vs-eloralintide). Identity pages that returned HTTP 200 on 5 October 2026: [cagrilintide](https://peptidemap.com/encyclopedia/Cagrilintide) and [eloralintide](https://peptidemap.com/encyclopedia/Eloralintide).
 

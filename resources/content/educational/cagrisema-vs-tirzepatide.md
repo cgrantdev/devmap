@@ -2,7 +2,7 @@ CagriSema and tirzepatide are two once-weekly injectable programs for obesity th
 
 This article sets out what each product is, what REDEFINE 4 reported, what REDEFINE 1 showed for CagriSema against semaglutide alone, what safety data have been published, and where each stands with the FDA. Every efficacy figure is labelled with its estimand. Numbers from different trials are kept apart, because those trials differ in population, duration, design and comparator.
 
-Peptidemap is an RUO / grey-area peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice, gives no dosing, and does not say which product is better.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice, gives no dosing, and does not say which product is better.
 
 ## What each is
 

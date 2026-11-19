@@ -1,6 +1,6 @@
 BPC-157 and GHK-Cu often sit side by side in "skin and recovery" catalog sections, and some blend vials contain both. They are unrelated molecules. BPC-157 is a synthetic 15-amino-acid peptide studied mostly in rodents. GHK-Cu is a copper complex of a naturally occurring tripeptide, and most of its human data are topical and cosmetic.
 
-Peptidemap is an RUO / grey-area peptide comparison publisher, not a clinic, pharmacy, or supplier. This article is educational. It is not medical advice, does not cover dosing, protocols, or reconstitution, and does not rank the two.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy, or supplier. This article is educational. It is not medical advice, does not cover dosing, protocols, or reconstitution, and does not rank the two.
 
 ## What each is
 

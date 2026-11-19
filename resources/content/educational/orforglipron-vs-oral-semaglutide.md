@@ -2,7 +2,7 @@ Orforglipron and oral semaglutide are both once-daily GLP-1 receptor agonist pil
 
 This article covers what each drug is, how ACHIEVE-3 was designed, what it reported for HbA1c, weight and tolerability, and where each drug stands with the FDA. Every efficacy figure is labelled with its estimand. Lilly's press releases and the Lancet paper lead with different estimands, so the figures are shown side by side with their source.
 
-Peptidemap is an RUO / grey-area peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice, gives no dosing, and does not say which drug is better.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice, gives no dosing, and does not say which drug is better.
 
 ## What each is
 

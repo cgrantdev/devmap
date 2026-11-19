@@ -1,6 +1,6 @@
 Eloralintide plus tirzepatide and retatrutide share the same online conversation—multi-pathway obesity research and large percent headlines stacked as if they came from one trial. They did not. This evidence note covers what has been published, which estimand each percent belongs to, and why a combo readout is not a head-to-head with TRIUMPH-1.
 
-Peptidemap is an RUO / grey-area peptide comparison publisher—not a clinic or pharmacy. Not medical advice; no dosing or reconstitution. Price compares stay on `/compare` (no combo price URL yet). Live lanes: [Eloralintide encyclopedia](/encyclopedia/Eloralintide), [eloralintide compare](/compare/eloralintide), [eloralintide vs retatrutide compare](/compare/eloralintide-vs-retatrutide), [retatrutide compare](/compare/retatrutide).
+Peptidemap is a research-use-only (RUO) peptide comparison publisher—not a clinic or pharmacy. Not medical advice; no dosing or reconstitution. Price compares stay on `/compare` (no combo price URL yet). Live lanes: [Eloralintide encyclopedia](/encyclopedia/Eloralintide), [eloralintide compare](/compare/eloralintide), [eloralintide vs retatrutide compare](/compare/eloralintide-vs-retatrutide), [retatrutide compare](/compare/retatrutide).
 
 ## What is being compared
 

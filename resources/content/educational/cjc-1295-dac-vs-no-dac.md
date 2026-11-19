@@ -1,6 +1,6 @@
 Catalogs often place “CJC-1295 with DAC” next to “CJC-1295 no DAC” as if both inherited the same peer-reviewed file. They do not. In the literature that named **CJC-1295**, the compound is the long-acting growth-hormone-releasing-hormone (GHRH) analog that carries a Drug Affinity Complex (DAC). The material sold as “CJC-1295 no DAC” is better identified as **Modified GRF 1-29**—a related backbone without that albumin-binding design.
 
-Peptidemap is a RUO / grey-area peptide comparison publisher. This note is identity and evidence-boundary literacy. It is **not** medical advice, a dose, a reconstitution recipe, a “which is better” ranking, or a treatment claim.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher. This note is identity and evidence-boundary literacy. It is **not** medical advice, a dose, a reconstitution recipe, a “which is better” ranking, or a treatment claim.
 
 ## Naming map
 

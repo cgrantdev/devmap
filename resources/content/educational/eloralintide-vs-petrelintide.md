@@ -1,4 +1,4 @@
-Eloralintide and petrelintide are both investigational peptides in the amylin class. They are not the same molecule, they come from different sponsors, and no head-to-head trial of the two was found in the sources checked on 22 October 2026. This page says what each compound is, which trials use it, and what is still unknown. It does not give a dose, a protocol, or medical advice. Peptidemap publishes research-use and grey-area peptide comparisons. It is not a clinic, a pharmacy, or a seller.
+Eloralintide and petrelintide are both investigational peptides in the amylin class. They are not the same molecule, they come from different sponsors, and no head-to-head trial of the two was found in the sources checked on 22 October 2026. This page says what each compound is, which trials use it, and what is still unknown. It does not give a dose, a protocol, or medical advice. Peptidemap publishes research-use-only (RUO) peptide comparisons. It is not a clinic, a pharmacy, or a seller.
 
 Price listings for related pairs stay on the compare pages: [Cagrilintide vs eloralintide](/compare/cagrilintide-vs-eloralintide) and [Eloralintide vs tirzepatide](/compare/eloralintide-vs-tirzepatide). The [Eloralintide encyclopedia entry](/encyclopedia/Eloralintide) is a separate identity page. For how U.S. law treats research-use-only peptides, compounding, and approval, see [Are research peptides legal?](/guides/peptide-legality-fda-ruo-compounding).
 
@@ -99,7 +99,7 @@ In a developer-affiliated paper (funded by Eli Lilly, with Lilly employees among
 
 ### Is a research-use vial the same as the trial drug?
 
-No. A research-use-only vial is not the investigational material used in these trials and is not an approved medicine. Peptidemap compares research-use and grey-area peptide listings. It is not a clinic, a pharmacy, or a seller. See the peptide legality guide for FDA, RUO, and compounding status. This page is not medical advice and does not give a dose.
+No. A research-use-only vial is not the investigational material used in these trials and is not an approved medicine. Peptidemap compares research-use-only (RUO) peptide listings. It is not a clinic, a pharmacy, or a seller. See the peptide legality guide for FDA, RUO, and compounding status. This page is not medical advice and does not give a dose.
 
 ## Sources
 

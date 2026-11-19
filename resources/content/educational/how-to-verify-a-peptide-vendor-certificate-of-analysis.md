@@ -1,6 +1,6 @@
 A Certificate of Analysis (COA) is often the strongest paperwork a research-use peptide vendor can show. Used carefully, it helps you check whether a **submitted sample** matched the labeled identity and purity claim. Used carelessly, a PDF can become marketing theater: copied across storefronts, detached from the vial in your hand, or never checked against the laboratory’s own records.
 
-Peptidemap is a RUO / grey-area peptide comparison publisher. This guide is educational literacy about documents and labs. It is **not** medical advice, a dose, a reconstitution recipe, a treatment claim, or a vendor ranking. Peptidemap does not endorse any single testing laboratory.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher. This guide is educational literacy about documents and labs. It is **not** medical advice, a dose, a reconstitution recipe, a treatment claim, or a vendor ranking. Peptidemap does not endorse any single testing laboratory.
 
 This guide covers the basics plus shared-lot reuse, lab-site verification, redaction, and what a COA does not prove.
 
@@ -26,14 +26,14 @@ A credible Certificate of Analysis should usually contain at least:
 
 - **HPLC** (high-performance liquid chromatography) — often used for purity as area-percent under stated conditions.
 - **Mass spectrometry (MS)** — identity / molecular-mass confirmation against the expected analyte.
-- **Endotoxin (for example LAL)** — only if that assay was ordered; many grey-market peptide COAs never include it.
+- **Endotoxin (for example LAL)** — only if that assay was ordered; many research-peptide COAs never include it.
 - **Amino-acid analysis or sequencing-related checks** — sometimes present for compositional confirmation.
 
 **Results with units and limits.** A purity percentage without method, wavelength, or system suitability context is weak. Identity without an expected mass or reference is weak.
 
 ## Shared-lot and shared-COA patterns
 
-A recurring failure mode in grey-area catalogs is the **shared COA**: one laboratory report, or one lot identity, appears on many storefronts for the “same” named peptide.
+A recurring failure mode in research-peptide catalogs is the **shared COA**: one laboratory report, or one lot identity, appears on many storefronts for the “same” named peptide.
 
 That pattern can mean several different things, and the document alone usually cannot tell you which:
 
@@ -46,7 +46,7 @@ What shared paperwork **can** show, at best, is that a laboratory once issued th
 
 Practical checks: match vial lot to COA lot character for character; ask whether the report is vendor-, manufacturer-, or buyer-submitted marketing reuse; prefer lab-verifiable reports over chat screenshots; treat one PDF reused across unrelated brands as **unverified for your purchase** until lot match and lab-side verification succeed.
 
-For a compound-specific companion on how far grey-market identity/purity paperwork goes—especially for retatrutide labels—see the companion post [Retatrutide testing and COA limits](/blog/retatrutide-testing-coa-limits). For which vendors publicly associate with which labs, see the live [testing labs](https://peptidemap.com/testing-labs) index.
+For a compound-specific companion on how far research-peptide identity/purity paperwork goes—especially for retatrutide labels—see the companion post [Retatrutide testing and COA limits](/blog/retatrutide-testing-coa-limits). For which vendors publicly associate with which labs, see the live [testing labs](https://peptidemap.com/testing-labs) index.
 
 ## Verify on the lab site, not only the PDF
 
@@ -93,9 +93,9 @@ A verified, lot-matched COA is evidence about **the sample the laboratory receiv
 - That the next lot will match.
 - That every vial in a lot matches the tested aliquot.
 - Safety, efficacy, or suitability for any human use.
-- That a grey-market label equals clinical-trial or approved drug substance.
+- That a research-use label equals clinical-trial or approved drug substance.
 
-A high purity percentage does not make a research vial “safe.” It does not convert an unapproved product into a medicine. For retatrutide-labeled grey-market products and public-health alerts that sit beside COA literacy, see the companion post: [Retatrutide testing and COA limits](/blog/retatrutide-testing-coa-limits).
+A high purity percentage does not make a research vial “safe.” It does not convert an unapproved product into a medicine. For retatrutide-labeled research products and public-health alerts that sit beside COA literacy, see the companion post: [Retatrutide testing and COA limits](/blog/retatrutide-testing-coa-limits).
 
 ## Purity figures without inventing pass rates
 

@@ -1,4 +1,4 @@
-Peptidemap publishes comparisons for research-use and grey-area peptide listings. It is not a clinic, a pharmacy, or a pharmaceutical brand. This page compares orforglipron with oral semaglutide: what each product is, how the molecules differ, regulatory status as of 22 October 2026, what the labels state about food and water, and what the named trials studied. It is not medical advice, not a dose guide, and not a ranking. Per-arm weight-change percentages are not printed here. A company press release is labelled company-reported. A paper from a trial sponsored by Eli Lilly or Novo Nordisk is labelled developer-affiliated.
+Peptidemap publishes comparisons for research-use-only (RUO) peptide listings. It is not a clinic, a pharmacy, or a pharmaceutical brand. This page compares orforglipron with oral semaglutide: what each product is, how the molecules differ, regulatory status as of 22 October 2026, what the labels state about food and water, and what the named trials studied. It is not medical advice, not a dose guide, and not a ranking. Per-arm weight-change percentages are not printed here. A company press release is labelled company-reported. A paper from a trial sponsored by Eli Lilly or Novo Nordisk is labelled developer-affiliated.
 
 ## What each product is
 
@@ -78,7 +78,7 @@ That is orientation for a research reader. It is not a statement about who shoul
 
 ## Research-use listings are not these tablets
 
-A research-use-only vial, capsule, or powder sold under the name orforglipron or semaglutide is not Foundayo, not Rybelsus, not an Ozempic tablet, and not a Wegovy tablet. It is not the material used in the trials named above. Peptidemap compares research-use and grey-area listings. It does not sell them.
+A research-use-only vial, capsule, or powder sold under the name orforglipron or semaglutide is not Foundayo, not Rybelsus, not an Ozempic tablet, and not a Wegovy tablet. It is not the material used in the trials named above. Peptidemap compares research-use-only (RUO) listings. It does not sell them.
 
 Whether a specific product can be compounded is a separate legal question. The [peptide legality guide](/guides/peptide-legality-fda-ruo-compounding) separates FDA approval, research-use labelling, and compounding. This page does not answer that question for a named seller.
 
@@ -112,7 +112,7 @@ ACHIEVE-3 compared them in adults with type 2 diabetes who were taking metformin
 
 ### Is a research-use listing the same as the approved tablet?
 
-No. A research-use-only product sold under one of these names is not Foundayo, not Rybelsus, not an Ozempic tablet, and not a Wegovy tablet. Peptidemap is a comparison publisher for research-use and grey-area peptide listings. It is not a clinic, a pharmacy, or a seller. The peptide legality guide separates FDA approval, research-use labelling, and compounding. This page is not medical advice and does not give a dose.
+No. A research-use-only product sold under one of these names is not Foundayo, not Rybelsus, not an Ozempic tablet, and not a Wegovy tablet. Peptidemap is a comparison publisher for research-use-only (RUO) peptide listings. It is not a clinic, a pharmacy, or a seller. The peptide legality guide separates FDA approval, research-use labelling, and compounding. This page is not medical advice and does not give a dose.
 
 ## Sources
 

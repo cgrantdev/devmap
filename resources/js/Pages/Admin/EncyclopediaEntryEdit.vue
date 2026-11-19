@@ -349,8 +349,8 @@
           </FormField>
         </SectionCard>
 
-        <!-- 12. Potential Applications -->
-        <SectionCard section-id="applications" title="Potential Therapeutic Applications" :open="isOpen('applications')" :complete="isComplete('applications')" @toggle="toggle('applications')">
+        <!-- 12. Further Areas of Research (was "Potential Therapeutic Applications"; RUO wording, Nov 2026) -->
+        <SectionCard section-id="applications" title="Further Areas of Research" :open="isOpen('applications')" :complete="isComplete('applications')" @toggle="toggle('applications')">
           <FormField label="Introduction">
             <textarea v-model="form.potential_applications_intro" rows="4" class="ui-input" placeholder="Enter introduction"></textarea>
           </FormField>
@@ -724,7 +724,7 @@ const sections = [
   { id: 'preclinical',  label: 'Preclinical Research' },
   { id: 'human_use',    label: 'Human Use & Evidence' },
   { id: 'regulatory',   label: 'Regulatory' },
-  { id: 'applications', label: 'Potential Applications' },
+  { id: 'applications', label: 'Further Areas of Research' },
   { id: 'conclusion',   label: 'Conclusion' },
   { id: 'faqs',         label: 'FAQs' },
   { id: 'references',   label: 'References' },

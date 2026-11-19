@@ -2,7 +2,7 @@ From 2022 into 2025, FDA listed semaglutide and tirzepatide injection products a
 
 This post sets out that timeline with dates from FDA pages, court opinions and the Federal Register. It also explains what each legal status means for a product: approved, compounded and research-labelled.
 
-Peptidemap is an RUO / grey-area peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical or legal advice, gives no dosing or sourcing guidance, and does not judge whether any product is safe.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical or legal advice, gives no dosing or sourcing guidance, and does not judge whether any product is safe.
 
 ## Timeline: from shortage to resolution
 

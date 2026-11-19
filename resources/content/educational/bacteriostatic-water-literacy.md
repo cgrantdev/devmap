@@ -50,7 +50,7 @@ Read **both** the diluent label and—when a finished drug is involved—the dru
 
 **What this guide will not do:** invent home beyond-use dates, mL charts, IU conversions, or “how much bac water for peptide X” recipes. Peptidemap intentionally omits reconstitution math for research peptides.
 
-Marketplace quality variance also matters. Grey-channel “bac water” may not match USP expectations or may be mislabeled. Treat seller claims the way you would other research-adjacent documentation: identity and labeling clarity first. For batch-document literacy on *peptide* vials (not diluents), see [How to verify a peptide vendor Certificate of Analysis](https://peptidemap.com/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis).
+Marketplace quality variance also matters. Unregulated “bac water” may not match USP expectations or may be mislabeled. Treat seller claims the way you would other research-adjacent documentation: identity and labeling clarity first. For batch-document literacy on *peptide* vials (not diluents), see [How to verify a peptide vendor Certificate of Analysis](https://peptidemap.com/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis).
 
 ## RUO framing: diluent literacy ≠ human-use permission
 

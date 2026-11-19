@@ -649,7 +649,9 @@
                   </div>
                 </section>
 
-                <!-- Potential Applications -->
+                <!-- Further Areas of Research (was "Potential Therapeutic
+                     Applications": therapy framing is not RUO language,
+                     Nov 2026). Fields keep their potential_applications_* names. -->
                 <section v-if="potentialApplicationsIntro || (potentialApplications && potentialApplications.length > 0)" id="potential-applications" class="mb-12">
                   <div class="flex items-center gap-3 mb-4 pb-3 border-b-2 border-slate-200">
                     <div class="p-2 bg-gradient-to-br from-slate-600 to-slate-700 rounded-lg">
@@ -662,7 +664,7 @@
                       </svg>
                     </div>
                     <h2 class="text-2xl font-semibold text-slate-900 m-0">
-                      Potential Therapeutic Applications
+                      Further Areas of Research
                     </h2>
                   </div>
     
@@ -1555,7 +1557,7 @@ const props = defineProps({
       // (Colin 10/7, RUO). Preclinical Research covers the research
       // findings; nothing on the page frames human use at all.
       { id: 'regulatory-status', label: 'Regulatory Status' },
-      { id: 'potential-applications', label: 'Potential Applications' },
+      { id: 'potential-applications', label: 'Further Areas of Research' },
       { id: 'faqs', label: 'FAQ' },
       { id: 'references', label: 'References' }
     ]

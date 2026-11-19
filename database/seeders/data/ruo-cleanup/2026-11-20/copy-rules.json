@@ -1,0 +1,86 @@
+[
+ [
+  "\\b[Aa]n? RUO / gr[ae]y-area\\b",
+  "a research-use-only (RUO)"
+ ],
+ [
+  "research-use and gr[ae]y-area\\b",
+  "research-use-only (RUO)"
+ ],
+ [
+  "in gr[ae]y-area catalogs",
+  "in research-peptide catalogs"
+ ],
+ [
+  "\\bGr[ae]y-channel\\b",
+  "Unregulated"
+ ],
+ [
+  "Grey-Market Labels",
+  "Research-Use Labels"
+ ],
+ [
+  "Grey-market labels are not Lilly trial material\\.",
+  "Research-use labels are not Lilly trial material."
+ ],
+ [
+  "A grey-market retatrutide label",
+  "A research-use retatrutide label"
+ ],
+ [
+  "Is a grey-market vial the same",
+  "Is a research-use vial the same"
+ ],
+ [
+  "grey-market labels are outside that accountability chain",
+  "research-use labels are outside that accountability chain"
+ ],
+ [
+  "It explains what grey-market testing noise and public-health alerts do",
+  "It explains what third-party testing and public-health alerts do"
+ ],
+ [
+  "investigational molecule vs grey-market label",
+  "investigational molecule vs research-use label"
+ ],
+ [
+  " The same release says black-market products are [“\"]entirely unverified, unapproved and not worth the risk,[”\"] and announces lawsuits against U\\.S\\. entities Lilly alleges sold illegal retatrutide products, including some that used [“\"]research-use only[”\"] framing\\.",
+  ""
+ ],
+ [
+  "grey-market naming is not sponsor accountability",
+  "a vendor product name is not sponsor accountability"
+ ],
+ [
+  "A common grey-market peptide COA",
+  "A common research-peptide COA"
+ ],
+ [
+  "Grey-market label ≠ proven composition\\.",
+  "A product label ≠ proven composition."
+ ],
+ [
+  "; enforcement/lawsuit escalation against alleged black-market sellers",
+  ""
+ ],
+ [
+  "Treat grey-market ([“\"])retatrutide",
+  "Treat research-use $1retatrutide"
+ ],
+ [
+  "many grey-market peptide COAs never include it",
+  "many research-peptide COAs never include it"
+ ],
+ [
+  "how far grey-market identity/purity paperwork goes",
+  "how far research-peptide identity/purity paperwork goes"
+ ],
+ [
+  "That a grey-market label equals",
+  "That a research-use label equals"
+ ],
+ [
+  "retatrutide-labeled grey-market products",
+  "retatrutide-labeled research products"
+ ]
+]

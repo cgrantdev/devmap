@@ -2,7 +2,7 @@ MOTS-c and NAD+ often show up side by side in longevity and "mitochondrial healt
 
 This article covers what each molecule is, how each is thought to work, how strong the evidence is, and each one's US regulatory status, with dates. Animal-only findings are labelled. For NAD+, trials of the precursors nicotinamide riboside (NR) and nicotinamide mononucleotide (NMN) are kept apart from studies of NAD+ itself.
 
-Peptidemap is an RUO / grey-area peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice, gives no dosing, and does not rank one molecule above the other.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice, gives no dosing, and does not rank one molecule above the other.
 
 ## What each is
 

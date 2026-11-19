@@ -1,6 +1,6 @@
 Some research catalogs sell a product named as retatrutide plus cagrilintide in one vial. That product name is a catalog label. It is not a published clinical trial, and it is not a registrational program name.
 
-This note is a companion to the live price page. It does not copy vendor tables, milligram ratios, or rank a winner. Peptidemap publishes research-use and grey-area peptide comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice, a dose, or a mixing instruction.
+This note is a companion to the live price page. It does not copy vendor tables, milligram ratios, or rank a winner. Peptidemap publishes research-use-only (RUO) peptide comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice, a dose, or a mixing instruction.
 
 Vendor listings stay on [Retatrutide / cagrilintide blend](https://peptidemap.com/compare/retatrutide-cagrilintide-blend). Identity pages that returned HTTP 200 on 5 October 2026: [retatrutide](https://peptidemap.com/encyclopedia/retatrutide) and [cagrilintide](https://peptidemap.com/encyclopedia/Cagrilintide). No encyclopedia page for the blend itself was used as a source for trial figures.
 

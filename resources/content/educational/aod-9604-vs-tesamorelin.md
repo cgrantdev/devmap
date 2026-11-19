@@ -1,6 +1,6 @@
 AOD-9604 and tesamorelin often sit side by side in "fat loss" catalog sections. They are different kinds of molecule with very different evidence and regulatory records. AOD-9604 is a short synthetic fragment modeled on the tail end of human growth hormone (hGH). Tesamorelin is a modified version of growth hormone–releasing hormone (GHRH), and specific Egrifta products are FDA-approved for one narrow indication.
 
-Peptidemap is an RUO / grey-area peptide comparison publisher, not a clinic, pharmacy, or supplier. This article is educational. It is not medical advice, does not cover dosing, protocols, or reconstitution, and does not rank the two.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy, or supplier. This article is educational. It is not medical advice, does not cover dosing, protocols, or reconstitution, and does not rank the two.
 
 ## What each is
 

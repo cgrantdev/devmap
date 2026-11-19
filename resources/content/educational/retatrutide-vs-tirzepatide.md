@@ -1,6 +1,6 @@
 Retatrutide and tirzepatide are stacked in shop listings as if one study had measured both. It has not. The molecules differ, the populations differ, and the follow-up is 80 weeks in one program and 72 weeks in the other.
 
-This note is a companion to the live price page. It does not copy vendor tables, rank a winner, or tell anyone what to take. Peptidemap publishes research-use and grey-area comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice, a dose, or a mixing instruction.
+This note is a companion to the live price page. It does not copy vendor tables, rank a winner, or tell anyone what to take. Peptidemap publishes research-use-only (RUO) comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice, a dose, or a mixing instruction.
 
 Vendor listings stay on [Retatrutide vs tirzepatide](https://peptidemap.com/compare/retatrutide-vs-tirzepatide). That page’s title uses the shop labels “GLP3-R” and “GLP2-T.” Those labels are not trial names. Identity pages that returned HTTP 200 on 5 October 2026: [retatrutide](https://peptidemap.com/encyclopedia/retatrutide) and [tirzepatide](https://peptidemap.com/encyclopedia/tirzepatide). TRIUMPH-1 and TRIUMPH-2 were published on 29 September 2026. This note does not use the encyclopedia’s summary percents.
 

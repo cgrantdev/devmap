@@ -2,7 +2,7 @@ Retatrutide and semaglutide both act on the GLP-1 receptor, but they are at very
 
 This article covers what each molecule is, how their mechanisms differ, what each trial program measured, the side effects reported in the trial publications, and where each stands with regulators. Every efficacy figure is labelled with its estimand and its source. Retatrutide and semaglutide figures are kept in separate tables, because they come from different trials with different populations, durations and analysis methods.
 
-Peptidemap is an RUO / grey-area peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice, gives no dosing, and does not say which drug is better. It is not a guide to choosing, switching or using either drug.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice, gives no dosing, and does not say which drug is better. It is not a guide to choosing, switching or using either drug.
 
 ## What each is
 
