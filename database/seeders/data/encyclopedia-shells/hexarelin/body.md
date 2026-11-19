@@ -164,7 +164,7 @@ Not approved. No FDA approval (Drugs@FDA) or EU marketing authorization (EMA med
 
 ## Field: halfLife
 
-No human plasma half-life for hexarelin was found in the primary sources cited here. Animal studies report an intravenous half-life of about 76 minutes in rats and a terminal half-life of about 120 minutes in dogs. Not a dosing guide.
+No human plasma half-life for hexarelin was found in the primary sources cited here. Animal studies report an intravenous half-life of about 76 minutes in rats and a terminal half-life of about 120 minutes in dogs.
 
 ## Field: regulatoryImportantNote
 

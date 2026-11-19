@@ -1,0 +1,556 @@
+{
+ "rules": [
+  {
+   "find": " ?No therapeutic protocol is described\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?They are not a protocol\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?No dose is (?:given|stated)(?: here)?\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?No dosing(?:/protocols)? (?:here|on this page|on Peptidemap encyclopedia pages)\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?No dosing (?:is given|content) (?:here|on this page)\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?No dosing protocols here\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?No dosing is given\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?No dosing (?:guidance )?is provided(?: here| on this page)?\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?No (?:labor or )?fertility dos(?:e|ing) is given(?: here)?\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?No human dose is copied onto this page\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?This page does not (?:give|provide|restate) (?:a dose|doses|dosing)(?: or (?:a price|prices))?\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?This page does not give (?:fertility doses|labor protocols, fertility doses, or unit amounts)\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?This page gives no doses and no prices\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?Not dosing or reconstitution\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?Not a (?:consumer )?dosing (?:guide|parameter)\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?Not a consumer dosing guide—no half-life-based protocols on this page\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?A single number is not given here as dosing guidance\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?No dosing or body-composition treatment claims on this page\\.?",
+   "replace": ""
+  },
+  {
+   "find": " ?High preclinical potency ≠ human protocol\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?This combination represents the gold standard in GH secretagogue research protocols\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?This page gives no dosing, administration, sourcing, or treatment guidance\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?No ovulation-induction protocol and no microgram amount are stated\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?No doses are given\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?That approval is not a dosing guide\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?This note does not restate the label(?:'|’|&#039;|&#39;|&apos;|\\\\')s dose schedule\\.",
+   "replace": ""
+  },
+  {
+   "find": "This page does not provide dosing, prices, or preparation instructions\\.",
+   "replace": "This page does not provide prices or preparation instructions."
+  },
+  {
+   "find": "Not medical advice, and not a dosing guide\\.",
+   "replace": "Not medical advice."
+  },
+  {
+   "find": "This page is educational and gives no dosing or administration guidance\\.",
+   "replace": "This page is educational only."
+  },
+  {
+   "find": "Not a price comparison and not a dose guide\\.",
+   "replace": "Not a price comparison."
+  },
+  {
+   "find": "Educational only—not medical advice; not a dosing guide\\.",
+   "replace": "Educational only—not medical advice."
+  },
+  {
+   "find": "It is not preparation or dosing guidance\\.",
+   "replace": "It is not preparation guidance."
+  },
+  {
+   "find": "This page is informational, does not give doses or prices, and is not medical advice\\.",
+   "replace": "This page is informational and is not medical advice."
+  },
+  {
+   "find": "This profile is informational and does not provide dosing, protocols, or sourcing advice\\.",
+   "replace": "This profile is informational and does not provide sourcing advice."
+  },
+  {
+   "find": "This page does not describe those programs or any dose\\.",
+   "replace": "This page does not describe those programs."
+  },
+  {
+   "find": "This summary does not restate study doses or imply that",
+   "replace": "This summary does not imply that"
+  },
+  {
+   "find": "is not a human dosing conversion\\.",
+   "replace": "is not a human-equivalent figure."
+  },
+  {
+   "find": "research summaries, not dosing guides?\\.",
+   "replace": "research summaries."
+  },
+  {
+   "find": "—foundational, not a dosing guide\\.",
+   "replace": "—foundational."
+  },
+  {
+   "find": "and are not the approved dosage form\\.",
+   "replace": "and are not the approved product."
+  },
+  {
+   "find": "Its complementary mechanism to BPC-157 has made it one of the most commonly paired peptides in research protocols\\.",
+   "replace": "Its complementary mechanism has made it one of the peptides most often studied alongside BPC-157."
+  },
+  {
+   "find": "which is why it has become one of the most commonly combined compounds in multi-peptide research protocols\\.",
+   "replace": "which is why it is often studied alongside other peptides."
+  },
+  {
+   "find": "Often stacked in commerce with",
+   "replace": "Often sold in blends with"
+  },
+  {
+   "find": "not proof of safe compounded stacks",
+   "replace": "not proof that blends are safe"
+  },
+  {
+   "find": "—not consumer protocol development\\.",
+   "replace": "."
+  },
+  {
+   "find": "ART protocols, and puberty research",
+   "replace": "assisted-reproduction research, and puberty research"
+  },
+  {
+   "find": "when a protocol calls for a bacteriostatic vehicle",
+   "replace": "when a lab method calls for a bacteriostatic vehicle"
+  },
+  {
+   "find": "AOD-9604(?:'|’|&#039;|&#39;|&apos;|\\\\')s fat-specific mechanism makes it a logical complement to GH secretagogue protocols for body composition optimization\\.",
+   "replace": "AOD-9604 has been studied alongside GH secretagogues in body-composition research."
+  },
+  {
+   "find": "for continued investigation in surgical recovery protocols\\.",
+   "replace": "for continued investigation in post-surgical recovery research."
+  },
+  {
+   "find": "under controlled endocrine protocols",
+   "replace": "under controlled endocrine study conditions"
+  },
+  {
+   "find": "In vitro/in vivo lab protocols",
+   "replace": "In vitro/in vivo lab studies"
+  },
+  {
+   "find": "under controlled lab protocols",
+   "replace": "under controlled lab conditions"
+  },
+  {
+   "find": "Only under formal research protocols if materials are characterized",
+   "replace": "Only in formal research settings with characterized materials"
+  },
+  {
+   "find": "under IACUC protocols",
+   "replace": "in IACUC-approved animal studies"
+  },
+  {
+   "find": "Study-specific inhalation/IV protocols under IRBs—not DIY",
+   "replace": "IRB-approved studies only—not DIY"
+  },
+  {
+   "find": "^Combination Protocols$",
+   "replace": "Combination Research"
+  },
+  {
+   "find": "^Synergistic Protocols$",
+   "replace": "Combination Research"
+  },
+  {
+   "find": "at therapeutic doses",
+   "replace": "at the doses studied"
+  },
+  {
+   "find": " \\(a massive dose for a peptide\\)",
+   "replace": ""
+  },
+  {
+   "find": "L-carnitine is not a peptide and this entry is not a supplement dose chart\\.",
+   "replace": "L-carnitine is not a peptide."
+  },
+  {
+   "find": "This page does not assign a CAS number and does not give a dose\\.",
+   "replace": "This page does not assign a CAS number."
+  },
+  {
+   "find": "Does PeptideMap give dosing, route or usage advice for BPC-157\\?",
+   "replace": "Does PeptideMap give usage advice for BPC-157?"
+  },
+  {
+   "find": "It does not give dosing, route, timing, cycling, stacking, storage or sourcing guidance",
+   "replace": "It does not give route, timing, storage or sourcing guidance"
+  },
+  {
+   "find": "This page does not give combination, dosing or protocol guidance\\.",
+   "replace": "This page does not give combination guidance."
+  },
+  {
+   "find": "This page does not give dosing or scheduling guidance\\.",
+   "replace": "This page does not give scheduling guidance."
+  },
+  {
+   "find": "This page does not give stacking or dosing guidance\\.",
+   "replace": "This page does not give combination guidance."
+  },
+  {
+   "find": "This page does not give stacking, synergy or dosing guidance\\.",
+   "replace": "This page does not give combination or synergy guidance."
+  },
+  {
+   "find": ", and no dose is stated\\.",
+   "replace": "."
+  },
+  {
+   "find": "Nothing here is medical advice, a dose, or a mixing instruction\\.",
+   "replace": "Nothing here is medical advice or a mixing instruction."
+  },
+  {
+   "find": "It is not a dosing guide, a protocol, a ranking or medical advice\\.",
+   "replace": "It is not a ranking or medical advice."
+  },
+  {
+   "find": "does not cover dosing, protocols, or reconstitution, and does not rank the two\\.",
+   "replace": "does not cover reconstitution, and does not rank the two."
+  },
+  {
+   "find": "It is not medical advice, gives no dosing, and does not",
+   "replace": "It is not medical advice and does not"
+  },
+  {
+   "find": "gives no dosing or sourcing guidance",
+   "replace": "gives no sourcing guidance"
+  },
+  {
+   "find": "medical advice, a dose, ",
+   "replace": "medical advice, "
+  },
+  {
+   "find": "It is not medical advice, not a recommendation to use any of these substances, and not dosing or administration guidance\\.",
+   "replace": "It is not medical advice or a recommendation to use any of these substances."
+  },
+  {
+   "find": "It does not give dosing, protocols, or product recommendations",
+   "replace": "It does not give product recommendations"
+  },
+  {
+   "find": "and does not give dosing or reconstitution steps\\.",
+   "replace": "and does not give reconstitution steps."
+  },
+  {
+   "find": "This page does not give doses or reconstitution steps\\.",
+   "replace": "This page does not give reconstitution steps."
+  },
+  {
+   "find": "This page does not give dosing, reconstitution, stacking, or a recommendation of which compound to take\\.",
+   "replace": "This page does not give reconstitution steps or recommend either compound."
+  },
+  {
+   "find": "It does ((?:<strong>|\\*\\*)?)not((?:</strong>|\\*\\*)?) recommend a product, dose, stack, or reconstitution method\\.",
+   "replace": "It does $1not$2 recommend a product or a reconstitution method."
+  },
+  {
+   "find": "It does not give a dose, a protocol, or medical advice\\.",
+   "replace": "It does not give medical advice."
+  },
+  {
+   "find": "It is not intended for human use, and this page provides no dosing\\.",
+   "replace": "It is not intended for human use."
+  },
+  {
+   "find": "Not medical advice; no dosing or reconstitution\\.",
+   "replace": "Not medical advice; no reconstitution steps."
+  },
+  {
+   "find": "Nothing here is a dosing guide, a safety verdict or medical advice\\.",
+   "replace": "Nothing here is a safety verdict or medical advice."
+  },
+  {
+   "find": "That approval is not a dosing guide, and a research-use vial is not those brands\\.",
+   "replace": "A research-use vial is not those brands."
+  },
+  {
+   "find": "This note does not tell anyone how to buy, compound, or dose a peptide\\.",
+   "replace": "This note does not tell anyone how to buy or compound a peptide."
+  },
+  {
+   "find": "Doses are not given; multi-arm trials",
+   "replace": "Multi-arm trials"
+  },
+  {
+   "find": "A contents comparison, not a clinical ranking or dose guide\\.",
+   "replace": "A contents comparison, not a clinical ranking."
+  },
+  {
+   "find": "The added piece is KPV, not a higher GHK-Cu dose\\.",
+   "replace": "The added piece is KPV, not more GHK-Cu."
+  },
+  {
+   "find": "was approved with its own dosage and switching instructions\\.",
+   "replace": "was approved with its own label and switching instructions."
+  },
+  {
+   "find": "not an approved drug label and not a clinical protocol\\.",
+   "replace": "not an approved drug label."
+  },
+  {
+   "find": "It is not a protocol, and it is not a reason to combine the two\\.",
+   "replace": "It is not a reason to combine the two."
+  },
+  {
+   "find": "It is not a trial name, a regulatory category, or a protocol\\.",
+   "replace": "It is not a trial name or a regulatory category."
+  },
+  {
+   "find": "Online stacking narratives",
+   "replace": "Online combination narratives"
+  },
+  {
+   "find": "why stacking claims outrun the data",
+   "replace": "why combination claims outrun the data"
+  },
+  {
+   "find": "—often as a (?:\"|“|”|&quot;)healing stack(?:\"|“|”|&quot;)—",
+   "replace": "—often sold as a blend—"
+  },
+  {
+   "find": "Any claim that they (?:\"|“|”|&quot;)work together(?:\"|“|”|&quot;) or (?:\"|“|”|&quot;)stack(?:\"|“|”|&quot;) has no direct test behind it\\.",
+   "replace": "Any claim that they work together has no direct test behind it."
+  },
+  {
+   "find": "Claims that they work together or should be stacked are not based on a direct test\\.",
+   "replace": "Claims that they work together or should be combined are not based on a direct test."
+  },
+  {
+   "find": "are stacked online as if",
+   "replace": "are lumped together online as if"
+  },
+  {
+   "find": "are stacked in shop listings as if",
+   "replace": "are listed side by side in shop listings as if"
+  },
+  {
+   "find": "large percent headlines stacked as if",
+   "replace": "large percent headlines lined up as if"
+  },
+  {
+   "find": "still too thin to stack ",
+   "replace": "still too thin to combine "
+  },
+  {
+   "find": "Why these percents cannot be stacked onto a blend",
+   "replace": "Why these percents cannot be applied to a blend"
+  },
+  {
+   "find": "Why these percents cannot be stacked",
+   "replace": "Why these percents cannot be combined"
+  },
+  {
+   "find": "It is not a trial name or a protocol\\.",
+   "replace": "It is not a trial name."
+  },
+  {
+   "find": "dosing, reconstitution, stacking, or product-selection guidance",
+   "replace": "reconstitution or product-selection guidance"
+  },
+  {
+   "find": "untested stacking claims",
+   "replace": "untested combination claims"
+  },
+  {
+   "find": "Peptidemap does not give dosing or combination instructions\\.",
+   "replace": "Peptidemap does not give usage instructions."
+  },
+  {
+   "find": "It is not medical advice, not a dose guide, and not a ranking\\.",
+   "replace": "It is not medical advice and not a ranking."
+  },
+  {
+   "find": "—no dosing or prices\\.",
+   "replace": "—no prices."
+  },
+  {
+   "find": "Which one should someone take\\?",
+   "replace": "Which one is better?"
+  },
+  {
+   "find": "or a labeled diluent protocol for human injection",
+   "replace": "or labeled diluent instructions for human injection"
+  },
+  {
+   "find": "Reading a price page as a protocol page",
+   "replace": "Reading a price page as an instruction page"
+  },
+  {
+   "find": ", not an active drug, and not a (?:\"|“|”|&quot;)research stack ingredient\\.(?:\"|“|”|&quot;)",
+   "replace": " and not an active drug."
+  },
+  {
+   "find": "not instructions for human administration or dosing\\.",
+   "replace": "not instructions for human administration."
+  },
+  {
+   "find": "not instructions for reconstitution, dosing, or human administration\\.",
+   "replace": "not instructions for reconstitution or human administration."
+  },
+  {
+   "find": "without dosing math or reconstitution recipes",
+   "replace": "without reconstitution recipes"
+  },
+  {
+   "find": "That keeps educational pages from doubling as protocols\\.",
+   "replace": "That keeps educational pages from doubling as instructions."
+  },
+  {
+   "find": " ?The FDA has twice concluded \\(March 2024 and October 2026\\) that retatrutide is a drug, not a biological product\\. A federal court sent the first decision back to the agency in October 2025, and Lilly(?:'|’|&#039;|&#39;|&apos;|\\\\')s appeal is pending at the Seventh Circuit with no ruling as of 19 October 2026\\.",
+   "replace": ""
+  },
+  {
+   "find": " ?The FDA has determined that retatrutide is a drug rather than a biological product, a classification Lilly is challenging in court\\.",
+   "replace": ""
+  },
+  {
+   "find": "(?:<p>)?<strong>RUO labels\\.</strong> In an August 2026 warning letter to an online peptide seller, FDA found products were intended as drugs for human use despite (?:\"|“|”|&quot;)for research use only(?:\"|“|”|&quot;) labeling\\.(?:</p>)?\\s*",
+   "replace": ""
+  },
+  {
+   "find": "\\*\\*RUO labels\\.\\*\\* In an August 2026 warning letter to an online peptide seller, FDA found products were intended as drugs for human use despite (?:\"|“|”|&quot;)for research use only(?:\"|“|”|&quot;) labeling\\.\\n\\n",
+   "replace": ""
+  },
+  {
+   "find": "<li>U\\.S\\. FDA\\. Warning letter to an online peptide seller \\(MARCS-CMS 735063\\)[^<]*</li>\\s*",
+   "replace": ""
+  }
+ ],
+ "groups": [
+  {
+   "when": "Eli Lilly and Co\\. v\\. Kennedy",
+   "slugs": [
+    "retatrutide-vs-semaglutide"
+   ],
+   "rules": [
+    {
+     "find": "<li>U\\.S\\. FDA\\. Letter to Eli Lilly and Company on issues remanded to FDA \\(retatrutide product classification\\)[^<]*<em>Eli Lilly and Co\\. v\\. Kennedy</em>[^<]*</li>\\s*<li>U\\.S\\. District Court, S\\.D\\. Indiana\\. <em>Eli Lilly and Co\\. v\\. Kennedy et al\\.</em>[^<]*</li>\\s*",
+     "replace": ""
+    },
+    {
+     "find": "\\[23\\]",
+     "replace": "[21]"
+    },
+    {
+     "find": "\\[24\\]",
+     "replace": "[22]"
+    },
+    {
+     "find": "\\[25\\]",
+     "replace": "[23]"
+    },
+    {
+     "find": "\\[26\\]",
+     "replace": "[24]"
+    }
+   ]
+  }
+ ],
+ "cleanup": [
+  {
+   "find": "<p>\\s*</p>",
+   "replace": ""
+  },
+  {
+   "find": "<li>\\s*</li>",
+   "replace": ""
+  },
+  {
+   "find": "(?<=<p>) +",
+   "replace": ""
+  },
+  {
+   "find": "(?<=<li>) +",
+   "replace": ""
+  },
+  {
+   "find": " +(?=</p>)",
+   "replace": ""
+  },
+  {
+   "find": "(?<=\\S)  +(?=\\S)",
+   "replace": " "
+  },
+  {
+   "find": "^\\s+(?=\\S)",
+   "replace": ""
+  },
+  {
+   "find": "(?<=\\S) +$",
+   "replace": ""
+  }
+ ]
+}

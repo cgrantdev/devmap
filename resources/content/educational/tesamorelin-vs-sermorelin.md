@@ -89,7 +89,7 @@ Peptidemap’s [sermorelin vs tesamorelin compare page](https://peptidemap.com/c
 This blog is different on purpose:
 
 - It compares **chemistry, labeled indications, approval/discontinuation history, and studied populations**.
-- It does **not** recommend a product, dose, stack, or reconstitution method.
+- It does **not** recommend a product or a reconstitution method.
 - It does **not** treat RUO vials as substitutes for approved or historically approved drugs.
 
 If either compare slug is missing from a sitemap crawl, that is a site-index issue—not a reason to merge this editorial URL into the price page.
@@ -112,9 +112,9 @@ A research-use vial is **not** an FDA-approved drug merely because it shares a p
 
 **No.** This is educational comparison content from a RUO / peptide-comparison publisher. It is not medical advice, not a prescription decision aid, and not instruction to use a research product as treatment.
 
-### Which one should someone take?
+### Which one is better?
 
-This page **does not answer that**. No dosing, reconstitution, stacking, or product-selection guidance. Therapy decisions belong with licensed clinicians and approved labeling—not with a blog or research catalog.
+This page **does not answer that**. No reconstitution or product-selection guidance. Therapy decisions belong with licensed clinicians and approved labeling—not with a blog or research catalog.
 
 ## Bottom line
 

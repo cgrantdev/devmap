@@ -1,6 +1,6 @@
 BPC-157 and GHK-Cu often sit side by side in "skin and recovery" catalog sections, and some blend vials contain both. They are unrelated molecules. BPC-157 is a synthetic 15-amino-acid peptide studied mostly in rodents. GHK-Cu is a copper complex of a naturally occurring tripeptide, and most of its human data are topical and cosmetic.
 
-Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy, or supplier. This article is educational. It is not medical advice, does not cover dosing, protocols, or reconstitution, and does not rank the two.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy, or supplier. This article is educational. It is not medical advice, does not cover reconstitution, and does not rank the two.
 
 ## What each is
 
@@ -61,8 +61,6 @@ Hair claims need care too: a frequently cited follicle paper (Pyo et al., 2007) 
 
 **Cosmetic status (GHK-Cu).** FDA says cosmetic ingredients other than color additives need no premarket approval, and intended use decides whether a product is a cosmetic or a drug. Copper tripeptide-1 in a serum does not make an injectable vial a cosmetic or an approved drug.
 
-**RUO labels.** In an August 2026 warning letter to an online peptide seller, FDA found products were intended as drugs for human use despite "for research use only" labeling.
-
 **WADA (2026 and 2027 lists).** BPC-157 is named under S0 Non-approved substances, prohibited at all times. GHK-Cu is not named. S0 is a catch-all for substances without human therapeutic approval, so athletes should ask their anti-doping organization. The 2027 List (effective 1 January 2027) adds "peptides" to S0's examples of non-approved substances; BPC-157 remains named and GHK-Cu still is not.
 
 ## What a CoA can and can't tell you
@@ -107,24 +105,23 @@ BPC-157 is named under S0 on the WADA 2026 Prohibited List and remains named on 
 6. U.S. FDA. Certain Bulk Drug Substances for Use in Compounding that May Present Significant Safety Risks. https://www.fda.gov/drugs/human-drug-compounding/certain-bulk-drug-substances-use-compounding-may-present-significant-safety-risks
 7. U.S. FDA. Meeting of the Pharmacy Compounding Advisory Committee (upcoming; GHK-Cu on agenda). https://www.fda.gov/advisory-committees/pharmacy-compounding-advisory-committee/meeting-pharmacy-compounding-advisory-committee
 8. U.S. FDA. Is It a Cosmetic, a Drug, or Both? https://www.fda.gov/cosmetics/cosmetics-laws-regulations/it-cosmetic-drug-or-both-or-it-soap
-9. U.S. FDA. Warning letter to an online peptide seller (MARCS-CMS 735063), 24 August 2026. Letter not linked; FDA warning-letter index: https://www.fda.gov/inspections-compliance-enforcement-and-criminal-investigations/compliance-actions-and-activities/warning-letters
-10. Vasireddi N, et al. Emerging Use of BPC-157 in Orthopaedic Sports Medicine: A Systematic Review. *HSS J*. 2025. PMID 40756949. doi:10.1177/15563316251355551
-11. McGuire FP, et al. Regeneration or Risk? A Narrative Review of BPC-157 for Musculoskeletal Healing. *Curr Rev Musculoskelet Med*. 2025. PMID 40789979. doi:10.1007/s12178-025-09990-7
-12. Lee E, Walker C, Ayadi B. Effect of BPC-157 on Symptoms in Patients with Interstitial Cystitis: A Pilot Study. *Altern Ther Health Med*. 2024. PMID 39325560
-13. Lee E, Burgess K. Safety of Intravenous Infusion of BPC157 in Humans: A Pilot Study. *Altern Ther Health Med*. 2025. PMID 40131143
-14. Pickart L, Vasquez-Soltero JM, Margolina A. GHK Peptide as a Natural Modulator of Multiple Cellular Pathways in Skin Regeneration. *Biomed Res Int*. 2015. PMID 26236730. doi:10.1155/2015/648108
-15. Pickart L, Margolina A. Regenerative and Protective Actions of the GHK-Cu Peptide in the Light of the New Gene Data. *Int J Mol Sci*. 2018. PMID 29986520. doi:10.3390/ijms19071987
-16. Pickart L, Thaler MM. Tripeptide in human serum which prolongs survival of normal liver cells and stimulates growth in neoplastic liver. *Nat New Biol*. 1973;243:85-87. PMID 4349963
-17. Mateescu DM, et al. GHK-Cu as a Bioactive Metallopeptide and Drug-Delivery Cargo: Coordination Chemistry, Formulation Science, Therapeutic Evidence, and a Translational Roadmap. *Pharmaceutics*. 2026;18(9):1077. PMID 42797253. doi:10.3390/pharmaceutics18091077
-18. Miller TR, et al. Effects of topical copper tripeptide complex on CO2 laser-resurfaced skin. *Arch Facial Plast Surg*. 2006. PMID 16847171. doi:10.1001/archfaci.8.4.252
-19. Bishop JB, et al. A prospective randomized evaluator-blinded trial of two potential wound healing agents for the treatment of venous stasis ulcers. *J Vasc Surg*. 1992. PMID 1495150. doi:10.1067/mva.1992.37086
-20. Pyo HK, et al. The effect of tripeptide-copper complex on human hair growth in vitro. *Arch Pharm Res*. 2007. PMID 17703734. doi:10.1007/BF02978833
-21. ClinicalTrials.gov. Topical GHK-Cu Gel for Acute Skin Wound Healing (NCT07437586). https://clinicaltrials.gov/study/NCT07437586
-22. Liang L. Peptides: US advisory committee recommends six for FDA "compounding list." *BMJ*. 2026;394:e100422. https://www.bmj.com/content/394/bmj-2026-100422
-23. Feldscher K. Peptides are all over social media and the news (Q&A with S. Bryn Austin). Harvard T.H. Chan School of Public Health, 1 October 2026. https://hsph.harvard.edu/news/peptides-are-all-over-social-media-and-the-news-heres-what-to-know-about-them/
-24. Roubein R. Trump administration paving way for temporary sale of some unapproved peptides. *Washington Post*, 7 October 2026. https://www.washingtonpost.com/health/2026/10/07/trump-administration-paving-way-temporary-sale-some-unapproved-peptides/
-25. WADA. 2026 Prohibited List. https://www.wada-ama.org/sites/default/files/2025-09/2026list_en_final_clean_september_2025.pdf
-26. U.S. FDA. Bulk Drug Substances Nominated for Use in Compounding Under Section 503A (categories list), updated 14 May 2026. https://www.fda.gov/media/94155/download
-27. WADA. 2027 Prohibited List (effective 1 January 2027). https://www.wada-ama.org/sites/default/files/2026-09/2027list_en_final_clean_26_august_2026_2.pdf
+9. Vasireddi N, et al. Emerging Use of BPC-157 in Orthopaedic Sports Medicine: A Systematic Review. *HSS J*. 2025. PMID 40756949. doi:10.1177/15563316251355551
+10. McGuire FP, et al. Regeneration or Risk? A Narrative Review of BPC-157 for Musculoskeletal Healing. *Curr Rev Musculoskelet Med*. 2025. PMID 40789979. doi:10.1007/s12178-025-09990-7
+11. Lee E, Walker C, Ayadi B. Effect of BPC-157 on Symptoms in Patients with Interstitial Cystitis: A Pilot Study. *Altern Ther Health Med*. 2024. PMID 39325560
+12. Lee E, Burgess K. Safety of Intravenous Infusion of BPC157 in Humans: A Pilot Study. *Altern Ther Health Med*. 2025. PMID 40131143
+13. Pickart L, Vasquez-Soltero JM, Margolina A. GHK Peptide as a Natural Modulator of Multiple Cellular Pathways in Skin Regeneration. *Biomed Res Int*. 2015. PMID 26236730. doi:10.1155/2015/648108
+14. Pickart L, Margolina A. Regenerative and Protective Actions of the GHK-Cu Peptide in the Light of the New Gene Data. *Int J Mol Sci*. 2018. PMID 29986520. doi:10.3390/ijms19071987
+15. Pickart L, Thaler MM. Tripeptide in human serum which prolongs survival of normal liver cells and stimulates growth in neoplastic liver. *Nat New Biol*. 1973;243:85-87. PMID 4349963
+16. Mateescu DM, et al. GHK-Cu as a Bioactive Metallopeptide and Drug-Delivery Cargo: Coordination Chemistry, Formulation Science, Therapeutic Evidence, and a Translational Roadmap. *Pharmaceutics*. 2026;18(9):1077. PMID 42797253. doi:10.3390/pharmaceutics18091077
+17. Miller TR, et al. Effects of topical copper tripeptide complex on CO2 laser-resurfaced skin. *Arch Facial Plast Surg*. 2006. PMID 16847171. doi:10.1001/archfaci.8.4.252
+18. Bishop JB, et al. A prospective randomized evaluator-blinded trial of two potential wound healing agents for the treatment of venous stasis ulcers. *J Vasc Surg*. 1992. PMID 1495150. doi:10.1067/mva.1992.37086
+19. Pyo HK, et al. The effect of tripeptide-copper complex on human hair growth in vitro. *Arch Pharm Res*. 2007. PMID 17703734. doi:10.1007/BF02978833
+20. ClinicalTrials.gov. Topical GHK-Cu Gel for Acute Skin Wound Healing (NCT07437586). https://clinicaltrials.gov/study/NCT07437586
+21. Liang L. Peptides: US advisory committee recommends six for FDA "compounding list." *BMJ*. 2026;394:e100422. https://www.bmj.com/content/394/bmj-2026-100422
+22. Feldscher K. Peptides are all over social media and the news (Q&A with S. Bryn Austin). Harvard T.H. Chan School of Public Health, 1 October 2026. https://hsph.harvard.edu/news/peptides-are-all-over-social-media-and-the-news-heres-what-to-know-about-them/
+23. Roubein R. Trump administration paving way for temporary sale of some unapproved peptides. *Washington Post*, 7 October 2026. https://www.washingtonpost.com/health/2026/10/07/trump-administration-paving-way-temporary-sale-some-unapproved-peptides/
+24. WADA. 2026 Prohibited List. https://www.wada-ama.org/sites/default/files/2025-09/2026list_en_final_clean_september_2025.pdf
+25. U.S. FDA. Bulk Drug Substances Nominated for Use in Compounding Under Section 503A (categories list), updated 14 May 2026. https://www.fda.gov/media/94155/download
+26. WADA. 2027 Prohibited List (effective 1 January 2027). https://www.wada-ama.org/sites/default/files/2026-09/2027list_en_final_clean_26_august_2026_2.pdf
 
 *Educational content only. Not medical or legal advice. Regulatory status can change after publication; check the primary sources above.*

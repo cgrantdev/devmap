@@ -34,7 +34,7 @@ class RetatrutideCompareNarrative
         return array_merge([
             'lead' => $lead,
             'paragraphs' => [
-                'Retatrutide (LY3437943) is an investigational GIP, GLP-1, and glucagon receptor agonist. It is not FDA-approved and is not a marketed medicine. PeptideMap cites published trial readouts and compares research-use (RUO) vendor listings. This page is not medical advice, not a dose, and not a clinic or pharmacy recommendation.',
+                'Retatrutide (LY3437943) is an investigational GIP, GLP-1, and glucagon receptor agonist. It is not FDA-approved and is not a marketed medicine. PeptideMap cites published trial readouts and compares research-use (RUO) vendor listings. This page is not medical advice and not a clinic or pharmacy recommendation.',
                 'TRIUMPH-1 (NCT05929066; Jastreboff et al. for the TRIUMPH-1 Investigators, N Engl J Med, 29 Sep 2026; DOI 10.1056/NEJMoa2604169; PMID 42814954) enrolled adults with obesity or overweight without diabetes. Under the treatment-regimen estimand, mean weight change was −17.6% at 4 mg, −23.7% at 9 mg, and −25.0% at 12 mg, versus −3.9% with placebo. The same paper’s efficacy estimand was −19.0% at 4 mg, −25.9% at 9 mg, and −28.3% at 12 mg. Those are two analysis methods in one study, not rival headlines and not a second trial.',
             ],
             'key_points' => [

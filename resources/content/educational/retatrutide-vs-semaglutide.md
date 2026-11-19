@@ -2,7 +2,7 @@ Retatrutide and semaglutide both act on the GLP-1 receptor, but they are at very
 
 This article covers what each molecule is, how their mechanisms differ, what each trial program measured, the side effects reported in the trial publications, and where each stands with regulators. Every efficacy figure is labelled with its estimand and its source. Retatrutide and semaglutide figures are kept in separate tables, because they come from different trials with different populations, durations and analysis methods.
 
-Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice, gives no dosing, and does not say which drug is better. It is not a guide to choosing, switching or using either drug.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice and does not say which drug is better. It is not a guide to choosing, switching or using either drug.
 
 ## What each is
 
@@ -36,13 +36,13 @@ The same paper reports that, compared with the natural hormones, retatrutide is 
 
 ### TRANSCEND-T2D-2: topline results (company-reported, 28 Oct 2026)
 
-On 28 Oct 2026, Eli Lilly announced topline results from TRANSCEND-T2D-2, the first Phase 3 trial comparing retatrutide with another incretin medicine [23][24] [company-reported]. The trial was randomised and open-label. It compared two once-weekly retatrutide dose arms (the middle and highest of the three retatrutide dose levels used in the TRIUMPH trials) with once-weekly injectable semaglutide (Ozempic) in 1,298 adults with type 2 diabetes not controlled on metformin, with or without an SGLT2 inhibitor [23]. Its registry record is NCT06260722 [7]. Lilly says it chose the semaglutide arm because it was "the highest approved dose" [23] [company-reported].
+On 28 Oct 2026, Eli Lilly announced topline results from TRANSCEND-T2D-2, the first Phase 3 trial comparing retatrutide with another incretin medicine [21][22] [company-reported]. The trial was randomised and open-label. It compared two once-weekly retatrutide dose arms (the middle and highest of the three retatrutide dose levels used in the TRIUMPH trials) with once-weekly injectable semaglutide (Ozempic) in 1,298 adults with type 2 diabetes not controlled on metformin, with or without an SGLT2 inhibitor [21]. Its registry record is NCT06260722 [7]. Lilly says it chose the semaglutide arm because it was "the highest approved dose" [21] [company-reported].
 
-The primary objective was noninferiority on A1C change at 80 weeks for the highest dose arm versus semaglutide. Body-weight change was a key secondary endpoint [23]. Lilly reported that retatrutide "met the primary and all key secondary endpoints" [23] [company-reported]. All figures Lilly released use the efficacy estimand, which estimates results had all participants stayed on treatment without added glucose-lowering medicine [23]. This page does not reproduce per-arm figures.
+The primary objective was noninferiority on A1C change at 80 weeks for the highest dose arm versus semaglutide. Body-weight change was a key secondary endpoint [21]. Lilly reported that retatrutide "met the primary and all key secondary endpoints" [21] [company-reported]. All figures Lilly released use the efficacy estimand, which estimates results had all participants stayed on treatment without added glucose-lowering medicine [21]. This page does not reproduce per-arm figures.
 
-Lilly said gastrointestinal events were the most common adverse events and that dysesthesia was also reported [23] [company-reported].
+Lilly said gastrointestinal events were the most common adverse events and that dysesthesia was also reported [21] [company-reported].
 
-This is a topline company announcement. It has not been peer-reviewed, and full results are not yet published. Lilly says detailed results will be presented at a medical meeting and published in a journal [23]. Retatrutide is investigational and is not approved anywhere [23].
+This is a topline company announcement. It has not been peer-reviewed, and full results are not yet published. Lilly says detailed results will be presented at a medical meeting and published in a journal [21]. Retatrutide is investigational and is not approved anywhere [21].
 
 ### Other registered trials with a semaglutide arm
 
@@ -81,7 +81,7 @@ The TRIUMPH-1 and TRIUMPH-2 papers were funded by Lilly and include Lilly-employ
 
 Points the sources add:
 
-- **TRIUMPH-1.** The paper's primary analyses compared the middle and highest dose arms with placebo, with differences of −19.8 and −21.0 percentage points. The trial also included basket studies in people with knee osteoarthritis and obstructive sleep apnea. Their primary results are in separate NEJM papers, both Lilly-funded (developer-affiliated) and placebo-controlled, with no semaglutide arm [25][26]. Lilly reports a mean baseline weight of 112.7 kg and a mean BMI of 40.0.
+- **TRIUMPH-1.** The paper's primary analyses compared the middle and highest dose arms with placebo, with differences of −19.8 and −21.0 percentage points. The trial also included basket studies in people with knee osteoarthritis and obstructive sleep apnea. Their primary results are in separate NEJM papers, both Lilly-funded (developer-affiliated) and placebo-controlled, with no semaglutide arm [23][24]. Lilly reports a mean baseline weight of 112.7 kg and a mean BMI of 40.0.
 - **TRIUMPH-2.** Estimated treatment differences vs placebo under the treatment-regimen estimand were −6.9, −11.8 and −13.8 percentage points (all p<0.0001). Mean baseline BMI was 38.2 and mean baseline HbA1c 7.71%. Under the efficacy estimand, HbA1c changed by −1.41%, −1.63% and −1.54% vs −0.19% with placebo, reported in the paper's appendix and company-reported by Lilly.
 - **TRIUMPH-3.** No paper was found. Lilly reports 44 vs 52 five-component major adverse cardiovascular events (hazard ratio 0.82, 95% CI 0.55 to 1.22) and 27 vs 23 three-component events (hazard ratio 1.12, 95% CI 0.64 to 1.96) for pooled retatrutide vs placebo, in a pre-specified in-study analysis. Both confidence intervals cross 1. These figures do not establish a cardiovascular benefit or harm. A dedicated cardiovascular and kidney outcomes trial, TRIUMPH-Outcomes ([NCT06383390](https://clinicaltrials.gov/study/NCT06383390)), is active, not recruiting, with primary completion estimated for February 2029.
 
@@ -157,7 +157,7 @@ The current Wegovy label carries a boxed warning on the risk of thyroid C-cell t
 
 - A search of FDA drug-approval records (openFDA Drugs@FDA data, 19 October 2026) found no retatrutide product. EMA's published list of medicines (downloaded 19 October 2026) includes no retatrutide entry.
 - 23 July 2026: Lilly said it is completing the chemistry, manufacturing and controls package and plans to submit retatrutide for US approval in the first quarter of 2027, as a Biologics License Application (company-reported). That is Lilly's expected timing, not a completed submission, and a submission is not an approval.
-- The FDA has twice concluded (March 2024 and October 2026) that retatrutide is a drug, not a biological product. A federal court sent the first decision back to the agency in October 2025, and Lilly's appeal is pending at the Seventh Circuit with no ruling as of 19 October 2026. For general background on FDA status and RUO labelling, see [our legality guide](/guides/peptide-legality-fda-ruo-compounding).
+- For general background on FDA status and RUO labelling, see [our legality guide](/guides/peptide-legality-fda-ruo-compounding).
 - Lilly states that retatrutide "cannot be legally sold or marketed for human use."
 
 **Semaglutide: FDA-approved in several products (Drugs@FDA).**
@@ -209,7 +209,7 @@ For both drugs, gastrointestinal events such as nausea, diarrhoea, vomiting and 
 
 ### Is retatrutide FDA-approved?
 
-No. As of 19 October 2026, retatrutide is investigational and not approved by the FDA or the EMA. Lilly says it plans to submit it for US approval in the first quarter of 2027. The FDA has determined that retatrutide is a drug rather than a biological product, a classification Lilly is challenging in court.
+No. As of 19 October 2026, retatrutide is investigational and not approved by the FDA or the EMA. Lilly says it plans to submit it for US approval in the first quarter of 2027.
 
 ### What is semaglutide approved for?
 
@@ -233,19 +233,17 @@ No. Products sold online as research-use-only retatrutide or semaglutide are not
 10. Eli Lilly and Company (company-reported). Lilly's triple agonist, retatrutide, delivered powerful weight loss in pivotal Phase 3 obesity trial, 21 May 2026. https://investor.lilly.com/news-releases/news-release-details/lillys-triple-agonist-retatrutide-delivered-powerful-weight-loss
 11. Eli Lilly and Company (company-reported). Lilly's triple agonist, retatrutide, successful in two additional Phase 3 obesity trials, 23 July 2026. https://investor.lilly.com/news-releases/news-release-details/lillys-triple-agonist-retatrutide-successful-two-additional
 12. Lilly Medical Information (company-reported). How does retatrutide compare with other incretin-based therapies? Last reviewed 21 April 2026. https://medical.lilly.com/us/products/answers/how-does-retatrutide-compare-with-other-incretin-based-therapies-386043
-13. U.S. FDA. Letter to Eli Lilly and Company on issues remanded to FDA (retatrutide product classification), 2 October 2026, filed in *Eli Lilly and Co. v. Kennedy*, 7th Cir. No. 26-1301, 8 October 2026. https://storage.courtlistener.com/recap/gov.uscourts.ca7.55916/gov.uscourts.ca7.55916.46.2.pdf
-14. U.S. District Court, S.D. Indiana. *Eli Lilly and Co. v. Kennedy et al.*, No. 1:24-cv-01503, amended order on cross-motions for summary judgment, 3 October 2025. https://www.govinfo.gov/content/pkg/USCOURTS-insd-1_24-cv-01503/pdf/USCOURTS-insd-1_24-cv-01503-1.pdf
-15. U.S. FDA. FDA's Concerns with Unapproved GLP-1 Drugs Used for Weight Loss (content current as of 1 October 2026). https://www.fda.gov/drugs/drug-alerts-and-statements/fdas-concerns-unapproved-glp-1-drugs-used-weight-loss
-16. U.S. FDA. Drugs@FDA: Ozempic (semaglutide) injection, NDA 209637, with approval letters of 5 December 2017, 16 January 2020 (S-003) and 28 January 2025 (S-025). https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209637
-17. U.S. FDA. Drugs@FDA: Rybelsus and Ozempic (semaglutide) tablets, NDA 213051. https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213051
-18. U.S. FDA. Supplement approval letter, Ozempic (semaglutide) tablets and Rybelsus (semaglutide) tablets, NDA 213051/S-030 (change of name of Rybelsus formulation R2 to Ozempic tablets), 30 January 2026. https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2026/213051Orig1s030ltr.pdf
-19. U.S. FDA. Drugs@FDA: Wegovy (semaglutide) injection, NDA 215256, with approval letters of 4 June 2021, 8 March 2024 (S-011), 15 August 2025 (S-024) and 19 March 2026 (S-029). https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=215256
-20. U.S. FDA. Wegovy injection and tablets prescribing information (NDA 215256/S-031, approved 5 May 2026, revised 05/2026). https://www.accessdata.fda.gov/drugsatfda_docs/label/2026/215256s031,218316s00lbl.pdf
-21. U.S. FDA. Wegovy (semaglutide) tablets, NDA 218316 approval package (approval date 22 December 2025). https://www.accessdata.fda.gov/drugsatfda_docs/nda/2026/218316Orig1s000TOC.html
-22. European Medicines Agency. Ozempic, Rybelsus and Wegovy EPARs, and EMA medicines data download (accessed 19 October 2026). https://www.ema.europa.eu/en/medicines/human/EPAR/wegovy
-23. Eli Lilly and Company (company-reported). TRANSCEND-T2D-2 topline press release, 28 October 2026. https://investor.lilly.com/news-releases/news-release-details/lillys-retatrutide-delivered-greater-a1c-reduction-and-more
-24. Eli Lilly and Company (company-reported). Lilly reports third-quarter 2026 financial results, raises full-year guidance and highlights regulatory progress across the portfolio, 29 October 2026. https://investor.lilly.com/news-releases/news-release-details/lilly-reports-third-quarter-2026-financial-results-raises-full
-25. Schnitzer TJ, et al. Retatrutide Once Weekly in Adults with Knee Osteoarthritis Pain and Obesity (TRIUMPH-4 and TRIUMPH-1-OA). *N Engl J Med*, online 8 November 2026. Developer-affiliated (Lilly-funded). https://doi.org/10.1056/NEJMoa2610676
-26. Grunstein RR, et al. Retatrutide Once Weekly for Treatment of Obstructive Sleep Apnea (TRIUMPH-1-OSA and TRIUMPH-2-OSA). *N Engl J Med*, online 20 October 2026. PMID 42904878. Developer-affiliated (Lilly-funded). https://doi.org/10.1056/NEJMoa2611477
+13. U.S. FDA. FDA's Concerns with Unapproved GLP-1 Drugs Used for Weight Loss (content current as of 1 October 2026). https://www.fda.gov/drugs/drug-alerts-and-statements/fdas-concerns-unapproved-glp-1-drugs-used-weight-loss
+14. U.S. FDA. Drugs@FDA: Ozempic (semaglutide) injection, NDA 209637, with approval letters of 5 December 2017, 16 January 2020 (S-003) and 28 January 2025 (S-025). https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=209637
+15. U.S. FDA. Drugs@FDA: Rybelsus and Ozempic (semaglutide) tablets, NDA 213051. https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=213051
+16. U.S. FDA. Supplement approval letter, Ozempic (semaglutide) tablets and Rybelsus (semaglutide) tablets, NDA 213051/S-030 (change of name of Rybelsus formulation R2 to Ozempic tablets), 30 January 2026. https://www.accessdata.fda.gov/drugsatfda_docs/appletter/2026/213051Orig1s030ltr.pdf
+17. U.S. FDA. Drugs@FDA: Wegovy (semaglutide) injection, NDA 215256, with approval letters of 4 June 2021, 8 March 2024 (S-011), 15 August 2025 (S-024) and 19 March 2026 (S-029). https://www.accessdata.fda.gov/scripts/cder/daf/index.cfm?event=overview.process&ApplNo=215256
+18. U.S. FDA. Wegovy injection and tablets prescribing information (NDA 215256/S-031, approved 5 May 2026, revised 05/2026). https://www.accessdata.fda.gov/drugsatfda_docs/label/2026/215256s031,218316s00lbl.pdf
+19. U.S. FDA. Wegovy (semaglutide) tablets, NDA 218316 approval package (approval date 22 December 2025). https://www.accessdata.fda.gov/drugsatfda_docs/nda/2026/218316Orig1s000TOC.html
+20. European Medicines Agency. Ozempic, Rybelsus and Wegovy EPARs, and EMA medicines data download (accessed 19 October 2026). https://www.ema.europa.eu/en/medicines/human/EPAR/wegovy
+21. Eli Lilly and Company (company-reported). TRANSCEND-T2D-2 topline press release, 28 October 2026. https://investor.lilly.com/news-releases/news-release-details/lillys-retatrutide-delivered-greater-a1c-reduction-and-more
+22. Eli Lilly and Company (company-reported). Lilly reports third-quarter 2026 financial results, raises full-year guidance and highlights regulatory progress across the portfolio, 29 October 2026. https://investor.lilly.com/news-releases/news-release-details/lilly-reports-third-quarter-2026-financial-results-raises-full
+23. Schnitzer TJ, et al. Retatrutide Once Weekly in Adults with Knee Osteoarthritis Pain and Obesity (TRIUMPH-4 and TRIUMPH-1-OA). *N Engl J Med*, online 8 November 2026. Developer-affiliated (Lilly-funded). https://doi.org/10.1056/NEJMoa2610676
+24. Grunstein RR, et al. Retatrutide Once Weekly for Treatment of Obstructive Sleep Apnea (TRIUMPH-1-OSA and TRIUMPH-2-OSA). *N Engl J Med*, online 20 October 2026. PMID 42904878. Developer-affiliated (Lilly-funded). https://doi.org/10.1056/NEJMoa2611477
 
 *Educational content only. Not medical or legal advice. Regulatory status can change after publication; check the primary sources above.*

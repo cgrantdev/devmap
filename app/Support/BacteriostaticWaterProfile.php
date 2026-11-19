@@ -162,12 +162,12 @@ class BacteriostaticWaterProfile
                     ],
                 ],
             ],
-            'regulatory_important_note' => 'This entry is informational. It intentionally omits reconstitution volumes and mixing charts. It is not preparation or dosing guidance.',
+            'regulatory_important_note' => 'This entry is informational. It intentionally omits reconstitution volumes and mixing charts. It is not preparation guidance.',
             'potential_applications_intro' => 'The only role described here is as a diluent and preservative vehicle.',
             'potential_applications' => [
                 [
                     'title' => 'Laboratory diluent',
-                    'description' => 'A preserved sterile water used when a protocol calls for a bacteriostatic vehicle. Volumes are not specified here.',
+                    'description' => 'A preserved sterile water used when a laboratory procedure calls for a bacteriostatic vehicle. Volumes are not specified here.',
                 ],
             ],
             'potential_applications_important_context' => 'Do not infer a mixing recipe from this page. Bacteriostatic water is not itself a research peptide.',

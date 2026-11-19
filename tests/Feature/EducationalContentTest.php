@@ -452,7 +452,7 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('not an active peptide', $bac->content);
         $this->assertStringContainsString('neonates', $bac->content);
         $this->assertStringContainsString('not instructions for reconstituting research chemicals', $bac->description);
-        $this->assertStringContainsString('without dosing math or reconstitution recipes', $bac->content);
+        $this->assertStringContainsString('without reconstitution recipes', $bac->content);
         $this->assertStringNotContainsString('Note for Meta Optimizer', $bac->content);
         $this->assertStringNotContainsString('/workspace/', $bac->content);
 
@@ -946,8 +946,8 @@ class EducationalContentTest extends TestCase
         $this->assertSame('Research', $blog->blog_type);
         $this->assertSame('13 Min Read', $blog->read_time);
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
-        $this->assertSame(2900, $this->renderedWordCount($markdown));
-        $this->assertSame((int) ceil(2900 / 230).' Min Read', $blog->read_time);
+        $this->assertSame(2897, $this->renderedWordCount($markdown));
+        $this->assertSame((int) ceil(2897 / 230).' Min Read', $blog->read_time);
         $this->assertStringContainsString(
             'https://peptidemap.com/compare/orforglipron-vs-oral-semaglutide',
             $markdown
@@ -1349,7 +1349,7 @@ class EducationalContentTest extends TestCase
         $this->assertStringContainsString('/compare/retatrutide-vs-tirzepatide', $markdown);
         $this->assertStringContainsString('/guides/peptide-legality-fda-ruo-compounding', $markdown);
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(4720, $words);
+        $this->assertSame(4717, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringContainsString('/blog/retatrutide-testing-coa-limits', $markdown);
 
@@ -1799,7 +1799,7 @@ class EducationalContentTest extends TestCase
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(4318, $words);
+        $this->assertSame(4183, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $blog->read_time);
         $this->assertStringNotContainsString('<!--', $markdown);
         $this->assertStringNotContainsString('/workspace', $markdown);
@@ -1969,7 +1969,7 @@ class EducationalContentTest extends TestCase
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(4600, $words);
+        $this->assertSame(4591, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $entry['read_time']);
         $this->assertSame('20 Min Read', $entry['read_time']);
         $this->assertSame('20 Min Read', $blog->read_time);
@@ -2120,7 +2120,7 @@ class EducationalContentTest extends TestCase
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(1899, $words);
+        $this->assertSame(1894, $words);
         $this->assertGreaterThan(1840, $words);
         $this->assertSame(((int) ceil($words / 230)).' Min Read', $entry['read_time']);
         $this->assertSame('9 Min Read', $entry['read_time']);
@@ -2224,8 +2224,8 @@ class EducationalContentTest extends TestCase
     {
         $pattern = '/\b\d+(\.\d+)?\s?mg\b(?!\/dL)/i';
         $expected = [
-            'orforglipron-vs-tirzepatide' => [1514, '7 Min Read'],
-            'cagrilintide-vs-eloralintide' => [1487, '7 Min Read'],
+            'orforglipron-vs-tirzepatide' => [1496, '7 Min Read'],
+            'cagrilintide-vs-eloralintide' => [1486, '7 Min Read'],
             'eloralintide-tirzepatide-vs-retatrutide' => [1458, '7 Min Read'],
         ];
 
@@ -2333,7 +2333,7 @@ class EducationalContentTest extends TestCase
 
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $words = $this->renderedWordCount($markdown);
-        $this->assertSame(3021, $words);
+        $this->assertSame(3017, $words);
         $this->assertSame((int) ceil($words / 230).' Min Read', $entry['read_time']);
         $this->assertStringNotContainsString('<!--', $markdown);
         $this->assertStringNotContainsString('/workspace', $markdown);

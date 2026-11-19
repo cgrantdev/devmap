@@ -2,7 +2,7 @@ MOTS-c and NAD+ often show up side by side in longevity and "mitochondrial healt
 
 This article covers what each molecule is, how each is thought to work, how strong the evidence is, and each one's US regulatory status, with dates. Animal-only findings are labelled. For NAD+, trials of the precursors nicotinamide riboside (NR) and nicotinamide mononucleotide (NMN) are kept apart from studies of NAD+ itself.
 
-Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice, gives no dosing, and does not rank one molecule above the other.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice and does not rank one molecule above the other.
 
 ## What each is
 
@@ -126,7 +126,7 @@ For how approval, compounding categories and RUO labelling differ, see [Are Rese
 | Animal and cell | Metabolic, exercise, bone, vascular; lifespan trend not significant | Extensive | Limited |
 | Main open problem | No human exposure data; unreliable assays; unknown target | Biomarker change without consistent clinical benefit | Whether infused NAD+ reaches tissues usefully |
 
-**Where they appear to overlap.** Both are discussed in terms of energy sensing, exercise and ageing. MOTS-c research leans on AMPK, while NAD+ research leans on sirtuins and PARPs. We found no interventional study combining or comparing them in searches of PubMed and ClinicalTrials.gov as of 19 October 2026. Any claim that they "work together" or "stack" has no direct test behind it.
+**Where they appear to overlap.** Both are discussed in terms of energy sensing, exercise and ageing. MOTS-c research leans on AMPK, while NAD+ research leans on sirtuins and PARPs. We found no interventional study combining or comparing them in searches of PubMed and ClinicalTrials.gov as of 19 October 2026. Any claim that they work together has no direct test behind it.
 
 **Who this comparison is for.** Researchers, students, journalists and regulation-watchers who need to separate these molecules in the literature and FDA records, or to check whether a claim citing "studies" means human trials, mouse experiments or biomarkers. It is not a guide to using either.
 
@@ -169,7 +169,7 @@ FDA's 503A categories list, updated 14 May 2026, places NAD and NADH in Category
 
 ### Has anyone studied MOTS-c and NAD+ together?
 
-We found no interventional study combining or comparing them in searches of PubMed and ClinicalTrials.gov as of 19 October 2026. Claims that they work together or should be stacked are not based on a direct test.
+We found no interventional study combining or comparing them in searches of PubMed and ClinicalTrials.gov as of 19 October 2026. Claims that they work together or should be combined are not based on a direct test.
 
 ### Is research-labelled MOTS-c or NAD+ the same as a compounded or approved product?
 

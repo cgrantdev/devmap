@@ -56,7 +56,7 @@ class PageOgImageController extends Controller
             fn () => OgCards::page([
                 'eyebrow' => 'Reconstitution calculator',
                 'title' => $compound.' calculator',
-                'subtitle' => 'Concentration, dose volume and syringe units for a '.$preset['name'].' vial.',
+                'subtitle' => 'Concentration, aliquot volume and syringe units for a '.$preset['name'].' vial.',
                 'chips' => array_values(array_filter([
                     !empty($preset['mg']) ? $preset['mg'].'mg vial' : null,
                     'mg and mcg',
@@ -114,7 +114,7 @@ class PageOgImageController extends Controller
             'calculator' => [
                 'eyebrow' => 'Free tool',
                 'title' => 'Peptide reconstitution calculator',
-                'subtitle' => 'Concentration, dose volume and syringe units in seconds.',
+                'subtitle' => 'Concentration, aliquot volume and syringe units in seconds.',
                 'chips' => ['55+ presets', 'mg and mcg', 'U-100 syringe units'],
                 'path' => '/calculator',
             ],

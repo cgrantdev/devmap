@@ -1,6 +1,6 @@
-Eloralintide plus tirzepatide and retatrutide share the same online conversation—multi-pathway obesity research and large percent headlines stacked as if they came from one trial. They did not. This evidence note covers what has been published, which estimand each percent belongs to, and why a combo readout is not a head-to-head with TRIUMPH-1.
+Eloralintide plus tirzepatide and retatrutide share the same online conversation—multi-pathway obesity research and large percent headlines lined up as if they came from one trial. They did not. This evidence note covers what has been published, which estimand each percent belongs to, and why a combo readout is not a head-to-head with TRIUMPH-1.
 
-Peptidemap is a research-use-only (RUO) peptide comparison publisher—not a clinic or pharmacy. Not medical advice; no dosing or reconstitution. Price compares stay on `/compare` (no combo price URL yet). Live lanes: [Eloralintide encyclopedia](/encyclopedia/Eloralintide), [eloralintide compare](/compare/eloralintide), [eloralintide vs retatrutide compare](/compare/eloralintide-vs-retatrutide), [retatrutide compare](/compare/retatrutide).
+Peptidemap is a research-use-only (RUO) peptide comparison publisher—not a clinic or pharmacy. Not medical advice; no reconstitution steps. Price compares stay on `/compare` (no combo price URL yet). Live lanes: [Eloralintide encyclopedia](/encyclopedia/Eloralintide), [eloralintide compare](/compare/eloralintide), [eloralintide vs retatrutide compare](/compare/eloralintide-vs-retatrutide), [retatrutide compare](/compare/retatrutide).
 
 ## What is being compared
 
@@ -61,7 +61,7 @@ No published head-to-head of the combination versus retatrutide was identified i
 - A true head-to-head versus retatrutide in the same population, duration, and estimand.
 - Treatment-regimen body-weight figures for EloraTZP comparable to TRIUMPH-1’s −25.0% lane.
 
-Until then: retatrutide has large phase 3 packages with labeled estimands; eloralintide has phase 2 monotherapy data; the combo has a phase 2b T2D efficacy-estimand top line of −23.3% at 48 weeks—and early combo work still too thin to stack against TRIUMPH-1.
+Until then: retatrutide has large phase 3 packages with labeled estimands; eloralintide has phase 2 monotherapy data; the combo has a phase 2b T2D efficacy-estimand top line of −23.3% at 48 weeks—and early combo work still too thin to combine against TRIUMPH-1.
 
 ## How this differs from a price page
 

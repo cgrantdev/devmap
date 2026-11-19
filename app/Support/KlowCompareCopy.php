@@ -87,7 +87,7 @@ class KlowCompareCopy
                 'GLOW and KLOW are marketplace names for multi-peptide research blends. They are not single molecules, and they are not approved medicines. On Peptidemap\'s catalog labels, GLOW names three components: GHK-Cu, BPC-157, and TB-500. KLOW names the same three plus a fourth, KPV (Lys-Pro-Val). The added piece is KPV, not more GHK-Cu.',
                 'This page compares catalog listings and what each label names. It does not rank the blends, it does not pick a winner, and it is not medical advice. Listings are research use only (RUO), and Peptidemap sells nothing.',
                 'Listings label these blends in different ways. Some print one total fill for the vial and others print a separate fill for each component, and the totals differ from listing to listing. The component order in product titles varies, and TB-500 is sometimes written as TB500. A few GLOW-titled entries are capsules or kits rather than single vials. Peptidemap does not publish an official ratio for either blend. A stated fill belongs on that lot\'s certificate of analysis.',
-                'This page is for readers checking what research-catalog labels name: lab teams comparing listings, researchers confirming which components a blend title covers, and analysts tracking how vendors label these products. It is a contents and listings comparison. It does not suggest a blend for any condition, goal, or experiment, and it does not give dosing or preparation instructions.',
+                'This page is for readers checking what research-catalog labels name: lab teams comparing listings, researchers confirming which components a blend title covers, and analysts tracking how vendors label these products. It is a contents and listings comparison. It does not suggest a blend for any condition, goal, or experiment, and it does not give preparation instructions.',
             ],
             'table' => [
                 'caption' => 'What the GLOW and KLOW catalog labels name',
@@ -136,7 +136,7 @@ class KlowCompareCopy
             ['q' => 'Does this page say which blend is better?', 'a' => 'This page does not rank them. No published study has compared GLOW with KLOW, and a paper on one component does not show what a three- or four-peptide mixture does.'],
             ['q' => 'Why do GLOW and KLOW listings show different fills?', 'a' => 'Vendors label these blends differently. Some print a single total and some print a fill for each component, and totals vary. Peptidemap does not publish an official ratio, so the certificate of analysis for a given lot is the place to check what was tested.'],
             ['q' => 'Who is this comparison for?', 'a' => 'Readers comparing research-catalog listings and checking what each blend label names. It is not a guide to choosing a blend for any use, and it is not medical advice.'],
-            ['q' => 'Does Peptidemap sell GLOW or KLOW, or give dosing information?', 'a' => 'No. Peptidemap is a comparison publisher. It lists research-use-only (RUO) products from other sellers and does not give dosing, preparation, or combination instructions.'],
+            ['q' => 'Does Peptidemap sell GLOW or KLOW?', 'a' => 'No. Peptidemap is a comparison publisher. It lists research-use-only (RUO) products from other sellers and does not give preparation or combination instructions.'],
         ];
     }
 
@@ -149,7 +149,7 @@ class KlowCompareCopy
                 'GHK-Cu is a single peptide: the copper(II) complex of the tripeptide glycyl-L-histidyl-L-lysine. KLOW is a marketplace name for a four-peptide research blend. On Peptidemap\'s catalog labels, KLOW names GHK-Cu, BPC-157, TB-500, and KPV (Lys-Pro-Val). GHK-Cu is one of KLOW\'s four named components. A GHK-Cu listing is not a KLOW listing, and KLOW is not a stronger form of GHK-Cu.',
                 'This page compares catalog listings and what each label names. It does not rank them, it does not pick a winner, and it is not medical advice. Listings are research use only (RUO), and Peptidemap sells nothing.',
                 'Labels vary on both sides. GHK-Cu listings are sold in several fill sizes. KLOW listings print either one total fill for the vial or a separate fill for each component, and the totals differ from listing to listing. Component order in KLOW titles varies, and TB-500 is sometimes written as TB500. Peptidemap does not publish an official ratio for KLOW. A stated fill belongs on that lot\'s certificate of analysis.',
-                'This page is for readers checking what research-catalog labels name: lab teams comparing a single-peptide listing with a blend listing, researchers confirming that a blend title includes GHK-Cu alongside other components, and analysts tracking how vendors label these products. It is a contents and listings comparison. It does not suggest either listing for any condition, goal, or experiment, and it does not give dosing or preparation instructions.',
+                'This page is for readers checking what research-catalog labels name: lab teams comparing a single-peptide listing with a blend listing, researchers confirming that a blend title includes GHK-Cu alongside other components, and analysts tracking how vendors label these products. It is a contents and listings comparison. It does not suggest either listing for any condition, goal, or experiment, and it does not give preparation instructions.',
             ],
             'table' => [
                 'caption' => 'What GHK-Cu and KLOW catalog labels name',
@@ -196,7 +196,7 @@ class KlowCompareCopy
             ['q' => 'Has GHK-Cu or KLOW been tested in people?', 'a' => 'GHK-Cu has small topical and cosmetic human studies, none of them on research-vial material. No human trial of KLOW as a named blend was identified in a PubMed search on 19 October 2026.'],
             ['q' => 'Does this page say which blend is better?', 'a' => 'This page does not rank them. No published study has compared GHK-Cu with KLOW, and GHK-Cu research does not show what a four-peptide mixture does.'],
             ['q' => 'Who is this comparison for?', 'a' => 'Readers comparing research-catalog listings and checking what each label names. It is not a guide to choosing a product for any use, and it is not medical advice.'],
-            ['q' => 'Does Peptidemap sell GHK-Cu or KLOW, or give dosing information?', 'a' => 'No. Peptidemap is a comparison publisher. It lists research-use-only (RUO) products from other sellers and does not give dosing, preparation, or combination instructions.'],
+            ['q' => 'Does Peptidemap sell GHK-Cu or KLOW?', 'a' => 'No. Peptidemap is a comparison publisher. It lists research-use-only (RUO) products from other sellers and does not give preparation or combination instructions.'],
         ];
     }
 

@@ -76,11 +76,11 @@ class RetatrutideTirzepatideCompareCopy
                     'url' => 'https://pubmed.ncbi.nlm.nih.gov/42904878/',
                 ],
                 [
-                    'title' => 'ClinicalTrials.gov, TRIUMPH-1 master protocol (NCT05929066).',
+                    'title' => 'ClinicalTrials.gov, TRIUMPH-1 basket trial (NCT05929066).',
                     'url' => 'https://clinicaltrials.gov/study/NCT05929066',
                 ],
                 [
-                    'title' => 'ClinicalTrials.gov, TRIUMPH-2 master protocol (NCT05929079).',
+                    'title' => 'ClinicalTrials.gov, TRIUMPH-2 basket trial (NCT05929079).',
                     'url' => 'https://clinicaltrials.gov/study/NCT05929079',
                 ],
                 [

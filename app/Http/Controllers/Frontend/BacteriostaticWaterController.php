@@ -224,11 +224,11 @@ class BacteriostaticWaterController extends Controller
             ],
             [
                 'q' => 'Why is bacteriostatic water listed with research peptides?',
-                'a' => 'Lyophilized research peptides are sold as dry powder. Bacteriostatic water is the diluent vendors list alongside them. Peptidemap compares vial sizes and listed prices and does not provide reconstitution or dosing guidance.',
+                'a' => 'Lyophilized research peptides are sold as dry powder. Bacteriostatic water is the diluent vendors list alongside them. Peptidemap compares vial sizes and listed prices and does not provide reconstitution guidance.',
             ],
             [
                 'q' => "What's the difference between bacteriostatic water and sterile water?",
-                'a' => 'Sterile water has nothing added; it goes bad quickly once opened. Bacteriostatic water contains 0.9% benzyl alcohol as a preservative, so a punctured vial is labeled for reuse for up to 28 days. Peptidemap lists both as catalog data and does not recommend a protocol.',
+                'a' => 'Sterile water has nothing added; it goes bad quickly once opened. Bacteriostatic water contains 0.9% benzyl alcohol as a preservative, so a punctured vial is labeled for reuse for up to 28 days. Peptidemap lists both as catalog data.',
             ],
             [
                 'q' => 'How does this page compare bacteriostatic water listings?',

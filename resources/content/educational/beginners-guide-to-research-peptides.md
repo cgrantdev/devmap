@@ -154,4 +154,4 @@ Synthesis quality, testing practices, storage, naming honesty, and regulatory po
 
 ## Disclaimer
 
-Educational literacy only. Not medical advice, not legal advice, and not instructions for human administration or dosing. Follow applicable law, institutional rules, and licensed professional guidance.
+Educational literacy only. Not medical advice, not legal advice, and not instructions for human administration. Follow applicable law, institutional rules, and licensed professional guidance.

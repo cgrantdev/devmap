@@ -302,7 +302,7 @@
             Peptide reconstitution calculator
           </h2>
           <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
-            Calculate concentration, volume, and doses per vial. Presets for 55+ popular compounds.
+            Calculate concentration, volume, and aliquots per vial. Presets for 55+ popular compounds.
           </p>
           <div class="mt-auto pt-2">
             <Button as="a" href="/calculator" variant="secondary">

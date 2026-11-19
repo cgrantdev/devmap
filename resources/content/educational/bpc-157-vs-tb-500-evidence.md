@@ -68,7 +68,7 @@ A key distinction for readers: **full-length Tβ4 biology is not automatically e
 
 ### Complementary ≠ proven combination
 
-Online stacking narratives often say BPC-157 is more “local / growth-factor oriented” and TB-500 more “systemic / cell-migration oriented.” That framing is a mechanistic hypothesis. It is **not** supported by combination trials in humans (see the Wolverine stack section below).
+Online combination narratives often say BPC-157 is more “local / growth-factor oriented” and TB-500 more “systemic / cell-migration oriented.” That framing is a mechanistic hypothesis. It is **not** supported by combination trials in humans (see the Wolverine stack section below).
 
 ## Animal vs human evidence limits
 
@@ -112,7 +112,7 @@ Missing human RCTs does **not** prove these peptides “don’t work.” It also
 
 ## The “Wolverine stack” nickname: what was and was not studied
 
-“Wolverine stack” is a nickname that vendors and online communities use for pairing BPC-157 with TB-500, often sold as a pre-mixed blend. A pre-mixed blend still contains two separate peptides; it is not one molecule. It is a marketing and community label. It is not a trial name, a regulatory category, or a protocol. Common justifications for the pairing are:
+“Wolverine stack” is a nickname that vendors and online communities use for pairing BPC-157 with TB-500, often sold as a pre-mixed blend. A pre-mixed blend still contains two separate peptides; it is not one molecule. It is a marketing and community label. It is not a trial name or a regulatory category. Common justifications for the pairing are:
 
 - Different proposed mechanisms might be complementary
 - Testimonials from clinics or forums, which are not controlled evidence
@@ -126,7 +126,7 @@ One retrospective clinic chart review of knee injections (Lee & Padgett, *Altern
 
 One animal study is on the record. Biçer and colleagues compared BPC-157, TB-500, and the combination in a rat Achilles tendon healing model (histopathology and biomechanics): Biçer O, et al. *Jt Dis Relat Surg* 2026;37(3):822–837 ([full text](https://www.jointdrs.org/full-text/1851); DOI 10.52312/jdrs.2026.2951; PMID 42542926). The abstract states: “Combined BPC-157 and TB-500 treatment did not confer additional benefits compared to either agent alone.” Its results paragraph covers maximum load to failure, total Bonar score, and total Movin score. The discussion states that the combination “did not demonstrate superior biomechanical or histopathological outcomes compared to monotherapy.”
 
-This is a rat study, not a human trial. It is not a protocol, and it is not a reason to combine the two. The paper calls its material “synthetic thymosin beta-4 (TB-500).” It was **not** confirmed that the vial was the 7-residue Ac-LKKTETQ fragment rather than full-length thymosin β4, so do not read the rat result as a test of the FDA briefing’s heptapeptide specifically. Blend calculators and timing schedules circulating online are not derived from clinical trials of the pair.
+This is a rat study, not a human trial. It is not a reason to combine the two. The paper calls its material “synthetic thymosin beta-4 (TB-500).” It was **not** confirmed that the vial was the 7-residue Ac-LKKTETQ fragment rather than full-length thymosin β4, so do not read the rat result as a test of the FDA briefing’s heptapeptide specifically. Blend calculators and timing schedules circulating online are not derived from clinical trials of the pair.
 
 A July 2026 advisory committee vote does not change this picture. The PCAC voted on each substance separately, not on the pair, and a committee vote is not an FDA approval (see below).
 
@@ -191,7 +191,7 @@ No. Animal and cell studies can be scientifically interesting and still fail to 
 
 ### What is the “Wolverine stack”?
 
-It is a nickname that vendors and online communities use for pairing BPC-157 with TB-500. It is not a trial name or a protocol. No human trial has studied the pair. A 2026 rat Achilles study (Biçer et al., *Jt Dis Relat Surg*) reported that combined BPC-157 and TB-500 did not confer additional benefits compared with either agent alone, and that paper did not confirm its “TB-500” was the Ac-LKKTETQ fragment. A July 2026 FDA advisory committee vote recommending each substance for the 503A bulks list is advisory and is not FDA approval. Peptidemap does not give dosing or combination instructions.
+It is a nickname that vendors and online communities use for pairing BPC-157 with TB-500. It is not a trial name. No human trial has studied the pair. A 2026 rat Achilles study (Biçer et al., *Jt Dis Relat Surg*) reported that combined BPC-157 and TB-500 did not confer additional benefits compared with either agent alone, and that paper did not confirm its “TB-500” was the Ac-LKKTETQ fragment. A July 2026 FDA advisory committee vote recommending each substance for the 503A bulks list is advisory and is not FDA approval. Peptidemap does not give usage instructions.
 
 ### Are these substances banned in sport?
 
@@ -234,4 +234,4 @@ Primary and review sources consulted for this article (fetched or checked via pu
 
 ## Disclaimer
 
-This article is for educational and research-context discussion. It is not medical advice, not a recommendation to use any of these substances, and not dosing or administration guidance. Decisions about any unapproved compound belong with a licensed clinician and applicable law. Athletes should consult current anti-doping rules. Regulatory status can change after publication.
+This article is for educational and research-context discussion. It is not medical advice or a recommendation to use any of these substances. Decisions about any unapproved compound belong with a licensed clinician and applicable law. Athletes should consult current anti-doping rules. Regulatory status can change after publication.

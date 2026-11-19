@@ -1,10 +1,10 @@
-Sermorelin and ipamorelin are often listed together as "growth hormone peptides". Both make the pituitary release growth hormone (GH), but through different receptors and with very different records. Sermorelin is a fragment of the body's own GH-releasing hormone and was once an FDA-approved drug. Ipamorelin is a synthetic ghrelin-receptor agonist that reached phase 2 trials and was never approved. This article compares identity, mechanism, evidence and FDA status from primary sources. It is not a dosing guide, a protocol, a ranking or medical advice. Marketplace listings are on the separate [ipamorelin vs sermorelin compare page](/compare/ipamorelin-vs-sermorelin). Compound overviews are on the [Ipamorelin](/encyclopedia/Ipamorelin) and [Sermorelin](/encyclopedia/Sermorelin) encyclopedia entries.
+Sermorelin and ipamorelin are often listed together as "growth hormone peptides". Both make the pituitary release growth hormone (GH), but through different receptors and with very different records. Sermorelin is a fragment of the body's own GH-releasing hormone and was once an FDA-approved drug. Ipamorelin is a synthetic ghrelin-receptor agonist that reached phase 2 trials and was never approved. This article compares identity, mechanism, evidence and FDA status from primary sources. It is not a ranking or medical advice. Marketplace listings are on the separate [ipamorelin vs sermorelin compare page](/compare/ipamorelin-vs-sermorelin). Compound overviews are on the [Ipamorelin](/encyclopedia/Ipamorelin) and [Sermorelin](/encyclopedia/Sermorelin) encyclopedia entries.
 
 ## How to read this page
 
 Each fact is labelled by source: **paper** (peer-reviewed, PubMed-indexed; "abstract" where only the abstract was read), **registry** (ClinicalTrials.gov), or **FDA document** (Drugs@FDA, the Federal Register, FDA bulk-substance lists, or Pharmacy Compounding Advisory Committee (PCAC) materials).
 
-No company-reported figures are used. Doses are not given; multi-arm trials are described by arm position only. All sources were checked on 19 October 2026.
+No company-reported figures are used. Multi-arm trials are described by arm position only. All sources were checked on 19 October 2026.
 
 ## What each compound is
 

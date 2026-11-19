@@ -1,6 +1,6 @@
 Retatrutide is Eli Lilly’s investigational triple agonist (GLP-1, GIP, and glucagon receptors). It is studied in clinical programs; it is not an approved medicine. A vial sold online under a retatrutide-like label is **not** automatically Lilly trial material, not an FDA-approved drug product, and not proven equivalent to anything in a sponsor protocol simply because the name matches.
 
-Peptidemap is a research-use-only (RUO) peptide comparison publisher. This companion post sits beside general COA literacy. It explains what third-party testing and public-health alerts do—and do not—establish. It is **not** medical advice, a dose, a scare piece beyond cited wording, a vendor ranking, or a claim that any purity percentage makes a vial “safe.”
+Peptidemap is a research-use-only (RUO) peptide comparison publisher. This companion post sits beside general COA literacy. It explains what third-party testing and public-health alerts do—and do not—establish. It is **not** medical advice, a scare piece beyond cited wording, a vendor ranking, or a claim that any purity percentage makes a vial “safe.”
 
 Compound background: [Retatrutide encyclopedia](https://peptidemap.com/encyclopedia/retatrutide). Document literacy: [How to verify a peptide vendor Certificate of Analysis](https://peptidemap.com/blog/how-to-verify-a-peptide-vendor-certificate-of-analysis).
 

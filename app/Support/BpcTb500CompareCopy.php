@@ -106,7 +106,7 @@ class BpcTb500CompareCopy
         return [
             [
                 'q' => 'What is the “Wolverine stack”?',
-                'a' => 'It is a nickname vendors and online communities use for pairing BPC-157 with TB-500. It is not a trial name or a protocol, and listings on this page are for research use only. No human trial has studied the pair. A 2026 rat Achilles study found no added benefit from combining them. FDA advisory committee votes in July 2026 recommending each substance for the 503A bulks list are advisory and are not FDA approval. Peptidemap does not give dosing or combination instructions.',
+                'a' => 'It is a nickname vendors and online communities use for pairing BPC-157 with TB-500. It is not a trial name, and listings on this page are for research use only. No human trial has studied the pair. A 2026 rat Achilles study found no added benefit from combining them. FDA advisory committee votes in July 2026 recommending each substance for the 503A bulks list are advisory and are not FDA approval. Peptidemap does not give combination instructions.',
             ],
         ];
     }

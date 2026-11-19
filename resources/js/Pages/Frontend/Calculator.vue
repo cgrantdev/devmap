@@ -15,7 +15,7 @@
         <!-- Agency intro (cleaned HTML) replaces the default line. -->
         <div v-if="copy?.intro_html" class="ui-rich text-base md:text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-5" v-html="copy.intro_html"></div>
         <p v-else class="text-base md:text-lg text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl mb-5">
-          Reconstitution, dosage, and schedule — all in one place. 55+ preset compounds across GLP-1s, growth-hormone secretagogues, healing peptides, longevity, and cognitive stacks — with instant insulin-syringe unit output.
+          Reconstitution, research quantity, and schedule — all in one place. 55+ preset compounds across GLP-1s, growth-hormone secretagogues, healing peptides, longevity, and cognitive compounds — with instant insulin-syringe unit output.
         </p>
         <!-- Trust chips: quantifies the "best" claim -->
         <div class="flex flex-wrap items-center gap-2 text-[12px]">
@@ -44,19 +44,19 @@
                   ? 'bg-white text-[color:var(--color-ink)] shadow-sm'
                   : 'text-[color:var(--color-ink-muted)] hover:text-[color:var(--color-ink)]',
               ]"
-            >{{ m.label }}</button>
+            ><span class="sm:hidden">{{ m.short || m.label }}</span><span class="hidden sm:inline">{{ m.label }}</span></button>
           </div>
           <!-- Inline mode hint — tells first-timers which tab is theirs. -->
           <div class="text-[12px] text-[color:var(--color-ink-muted)] leading-relaxed mb-5 px-1">
             <template v-if="mode === 'dosage'">
-              <strong class="text-[color:var(--color-ink)]">Pick your peptide, enter your dose, see the exact syringe units.</strong>
-              If you don't know your peptide's vial size or how much BAC water you added, pick a preset below and we'll fill in the standard values.
+              <strong class="text-[color:var(--color-ink)]">Pick a peptide, enter a research quantity, see the exact syringe units.</strong>
+              If you don't know the vial size or how much BAC water was added, pick a preset below and we'll fill in the standard values.
             </template>
             <template v-else-if="mode === 'reconstitution'">
-              <strong class="text-[color:var(--color-ink)]">Just mixed a vial with BAC water?</strong> Enter what's on the vial and how much water you added — we'll show you the strength and a quick dose-to-units reference.
+              <strong class="text-[color:var(--color-ink)]">Just mixed a vial with BAC water?</strong> Enter what's on the vial and how much water you added — we'll show you the strength and a quick mcg-to-units reference.
             </template>
             <template v-else-if="mode === 'schedule'">
-              <strong class="text-[color:var(--color-ink)]">How long does one vial last?</strong> Enter your dose + how often you take it — we'll show how many days per vial and how many vials you'll go through in a month.
+              <strong class="text-[color:var(--color-ink)]">How long does one vial last?</strong> Enter the amount per aliquot and how often an aliquot is drawn — we'll show how many days one vial covers and how many vials are needed per month.
             </template>
           </div>
 
@@ -85,13 +85,13 @@
                mcg; the toggle only changes how it's entered and shown. -->
           <CalcField
             v-if="mode !== 'reconstitution'"
-            label="Dose per injection"
+            label="Amount per aliquot"
             :unit="doseUnit"
             v-model="doseDisplay"
             :placeholder="doseUnit === 'mg' ? 'e.g. 2.5' : 'e.g. 250'"
           >
             <template #aside>
-              <div class="inline-flex rounded-[7px] border border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] p-0.5" role="group" aria-label="Dose unit">
+              <div class="inline-flex rounded-[7px] border border-[color:var(--color-hairline)] bg-[color:var(--color-bg)] p-0.5" role="group" aria-label="Amount unit">
                 <button
                   v-for="u in doseUnits"
                   :key="u"
@@ -129,7 +129,7 @@
 
           <!-- Administration frequency (for schedule mode) -->
           <div v-if="mode === 'schedule'" class="mb-5">
-            <label class="block text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-2">Administration frequency</label>
+            <label class="block text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-2">Aliquot frequency</label>
             <select
               v-model="frequency"
               class="w-full h-10 px-3 text-[13px] border border-[color:var(--color-hairline)] rounded-[8px] bg-white focus:border-[color:var(--color-accent-500)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-accent-500)]/15"
@@ -179,10 +179,10 @@
             <!-- Plain-English restatement — reads the answer back to the
                  user so they don't have to decode the number. -->
             <p v-if="hasDraw" class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">
-              Draw the plunger to the <strong class="text-[color:var(--color-ink)]">{{ unitsText }}-unit mark</strong> on your {{ syringeUnits }}-unit insulin syringe for a {{ doseLabel }} dose.
+              Draw the plunger to the <strong class="text-[color:var(--color-ink)]">{{ unitsText }}-unit mark</strong> on your {{ syringeUnits }}-unit insulin syringe for a {{ doseLabel }} aliquot.
             </p>
             <p v-else class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed mb-4">
-              Enter the vial size, the BAC water you added and your dose to see the draw.
+              Enter the vial size, the BAC water added and the amount per aliquot to see the draw.
             </p>
 
             <!-- Syringe visual — now actually looks like a syringe + has
@@ -224,24 +224,24 @@
               </div>
             </div>
 
-            <!-- Result stats underneath — plain English labels, no "aliquot". -->
+            <!-- Result stats underneath — short lab labels. -->
             <div class="flex items-center justify-between gap-4 text-[13px] flex-wrap pt-4 border-t border-[color:var(--color-hairline-soft)]">
               <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Liquid volume</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ volumeText }} mL</span></div>
-              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Dose</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ doseLabel }}</span></div>
-              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Doses per vial</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ dosesPerVialText }}</span></div>
+              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Per aliquot</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ doseLabel }}</span></div>
+              <div class="flex items-center gap-1.5"><span class="text-[color:var(--color-ink-muted)]">Aliquots per vial</span> <span class="ui-mono font-bold text-[color:var(--color-ink)]">{{ dosesPerVialText }}</span></div>
             </div>
 
             <div v-if="doseExceedsVial" class="mt-4 flex items-start gap-2 text-[12px] text-[color:var(--color-danger)] font-semibold">
               <svg class="w-4 h-4 flex-shrink-0 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-              <span>This dose is more than the whole vial holds ({{ vialMcgText }} mcg). Check the vial size and dose units.</span>
+              <span>This amount is more than the whole vial holds ({{ vialMcgText }} mcg). Check the vial size and the mcg/mg units.</span>
             </div>
             <div v-else-if="overCapacity" class="mt-4 flex items-start gap-2 text-[12px] text-[color:var(--color-danger)] font-semibold">
               <svg class="w-4 h-4 flex-shrink-0 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-              <span>That's more than one {{ syringeUnits }}-unit syringe holds. Use a larger syringe, split the dose into two draws, or reconstitute with less BAC water.</span>
+              <span>That's more than one {{ syringeUnits }}-unit syringe holds. Use a larger syringe, split the aliquot into two draws, or reconstitute with less BAC water.</span>
             </div>
             <div v-else-if="tinyDraw" class="mt-4 flex items-start gap-2 text-[12px] text-amber-700 font-semibold">
               <svg class="w-4 h-4 flex-shrink-0 mt-px" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-              <span>Under 5 units is hard to measure accurately. A 30-unit syringe has finer marks, or add more BAC water so each dose is a larger volume.</span>
+              <span>Under 5 units is hard to measure accurately. A 30-unit syringe has finer marks, or add more BAC water so each aliquot is a larger volume.</span>
             </div>
           </div>
 
@@ -291,7 +291,7 @@
             <div class="grid sm:grid-cols-3 gap-4">
               <div class="text-center p-4 rounded-[12px] bg-[color:var(--color-bg)]">
                 <div class="ui-mono text-2xl font-bold text-[color:var(--color-ink)]">{{ dosesPerVialText }}</div>
-                <div class="text-[11px] text-[color:var(--color-ink-subtle)] mt-1">doses per vial</div>
+                <div class="text-[11px] text-[color:var(--color-ink-subtle)] mt-1">aliquots per vial</div>
               </div>
               <div class="text-center p-4 rounded-[12px] bg-[color:var(--color-bg)]">
                 <div :class="['ui-mono text-2xl font-bold', stabilityExceeded ? 'text-amber-700' : 'text-[color:var(--color-accent-600)]']">{{ vialDurationText }}</div>
@@ -352,7 +352,7 @@
               </div>
               <div v-if="mode !== 'reconstitution'" class="flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-bold flex items-center justify-center flex-shrink-0">2</span>
-                <span>{{ doseMcgText }}mcg &divide; {{ concentrationText }} mcg/mL = <strong class="text-[color:var(--color-ink)]">{{ volumeText }}mL</strong> per dose</span>
+                <span>{{ doseMcgText }}mcg &divide; {{ concentrationText }} mcg/mL = <strong class="text-[color:var(--color-ink)]">{{ volumeText }}mL</strong> per aliquot</span>
               </div>
               <div v-if="mode !== 'reconstitution'" class="flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-bold flex items-center justify-center flex-shrink-0">3</span>
@@ -360,7 +360,7 @@
               </div>
               <div v-if="mode !== 'reconstitution'" class="flex items-center gap-3">
                 <span class="w-6 h-6 rounded-full bg-[color:var(--color-accent-50)] text-[color:var(--color-accent-700)] text-[11px] font-bold flex items-center justify-center flex-shrink-0">4</span>
-                <span>{{ vialMcgText }}mcg in the vial &divide; {{ doseMcgText }}mcg per dose = <strong class="text-[color:var(--color-ink)]">{{ dosesPerVialText }} doses</strong> per vial</span>
+                <span>{{ vialMcgText }}mcg in the vial &divide; {{ doseMcgText }}mcg per aliquot = <strong class="text-[color:var(--color-ink)]">{{ dosesPerVialText }} aliquots</strong> per vial</span>
               </div>
             </div>
           </div>
@@ -420,7 +420,7 @@
                   <template v-if="currentPreset"><strong class="text-[color:var(--color-ink)]">{{ currentPreset.name }}</strong> preset, </template>
                   <strong class="text-[color:var(--color-ink)]">{{ mgText }}mg vial</strong>,
                   <strong class="text-[color:var(--color-ink)]">{{ waterText }}mL</strong> BAC water, and
-                  <strong class="text-[color:var(--color-ink)]">{{ doseLabel }} dose</strong>. No signup, no login, same calculation on the other end.
+                  <strong class="text-[color:var(--color-ink)]">{{ doseLabel }} per aliquot</strong>. No signup, no login, same calculation on the other end.
                 </p>
                 <div class="flex flex-wrap gap-2 mb-3">
                   <button @click="copyShareLink" :class="['inline-flex items-center gap-2 h-9 px-4 rounded-[8px] text-[13px] font-semibold transition-all', copiedShare ? 'bg-emerald-600 text-white' : 'bg-[color:var(--color-ink)] text-white hover:opacity-90']">
@@ -458,24 +458,24 @@
             </div>
             <div v-else class="space-y-5">
               <div>
-                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">How do I calculate peptide dosage in insulin syringe units?</h3>
-                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Divide your desired dose (in mcg) by the peptide concentration (in mcg/mL), then multiply by 100. Example: 250 mcg from a 2,500 mcg/mL solution = 0.10 mL = <strong class="ui-mono">10 units</strong> on a 100-unit insulin syringe. The calculator above does the math automatically.</p>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">How do I convert a peptide research quantity into insulin syringe units?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Divide the amount per aliquot (in mcg) by the peptide concentration (in mcg/mL), then multiply by 100. Example: 250 mcg from a 2,500 mcg/mL solution = 0.10 mL = <strong class="ui-mono">10 units</strong> on a 100-unit insulin syringe. The calculator on this page does the math automatically.</p>
               </div>
               <div>
                 <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">How much bacteriostatic water should I use to reconstitute a 5mg peptide?</h3>
-                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">2 mL of bacteriostatic water per 5 mg vial is the most common ratio, giving a working concentration of 2,500 mcg/mL. Adjust based on your desired dose granularity — more water gives finer aliquots, less water gives fewer syringe units per dose.</p>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">2 mL of bacteriostatic water per 5 mg vial is the most common ratio, giving a working concentration of 2,500 mcg/mL. Adjust the water volume to suit the aliquot size you need — more water gives finer aliquots, less water gives fewer syringe units per aliquot.</p>
               </div>
               <div>
                 <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">How long do reconstituted peptides last?</h3>
                 <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Once reconstituted with bacteriostatic water, peptides are typically stable for <strong>28-30 days</strong> when refrigerated at 2-8 °C. Do not freeze reconstituted peptides — freezing damages the peptide structure and reduces potency.</p>
               </div>
               <div>
-                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Is the Peptidemap Peptide Calculator really free?</h3>
-                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — completely free, no signup, no email required, no paywall. Supports 55+ preset compounds and works in reconstitution, dosage, and schedule modes. Shareable results via URL parameters.</p>
+                <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Is the Peptidemap Peptide Calculator free?</h3>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — completely free, no signup, no email required, no paywall. Supports 55+ preset compounds and works in reconstitution, research quantity, and schedule modes. Shareable results via URL parameters.</p>
               </div>
               <div>
                 <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Can I share my calculator settings?</h3>
-                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — every change to the calculator updates the URL with your current settings. Copy the URL (or click the "Copy shareable link" button above), and the person opening it sees the exact same inputs and results.</p>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — every change to the calculator updates the URL with your current settings. Copy the URL (or click the "Copy shareable link" button), and the person opening it sees the exact same inputs and results.</p>
               </div>
               <div>
                 <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">What's the difference between bacteriostatic water and sterile water?</h3>
@@ -491,7 +491,7 @@
               </div>
               <div>
                 <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Can I split one vial into multiple aliquots over several days?</h3>
-                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — reconstituted peptide stays stable 28–30 days refrigerated at 2–8°C, so one vial typically covers a multi-week cycle. The Schedule mode above shows exactly how many aliquots per vial and how long one vial lasts at your frequency.</p>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Yes — reconstituted peptide stays stable 28–30 days refrigerated at 2–8°C, so one vial typically covers a multi-week study period. The calculator's Schedule mode shows exactly how many aliquots per vial and how long one vial lasts at the chosen frequency.</p>
               </div>
               <div>
                 <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Can I freeze reconstituted peptides to make them last longer?</h3>
@@ -503,7 +503,7 @@
               </div>
               <div>
                 <h3 class="text-[14px] font-semibold text-[color:var(--color-ink)] mb-1">Can I mix two peptides into the same vial?</h3>
-                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Some combinations are commercially sold pre-blended (CJC-1295 + Ipamorelin, BPC-157 + TB-500) and are stable together in solution. For arbitrary combinations we recommend keeping them in separate vials — some peptides interact chemically, and co-reconstitution can shorten the stable shelf life of both. If you need to co-administer, draw each dose from its own vial into the same syringe just before use.</p>
+                <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">Some combinations are commercially sold pre-blended (CJC-1295 + Ipamorelin, BPC-157 + TB-500) and are stable together in solution. For arbitrary combinations we recommend keeping them in separate vials — some peptides interact chemically, and co-reconstitution can shorten the stable shelf life of both.</p>
               </div>
             </div>
           </div>
@@ -555,7 +555,7 @@
                   <li>Short exposure to room temperature is tolerated</li>
                   <li>Refrigerate on arrival, don't delay</li>
                   <li>Vials sealed in foil pouches handle shipping best</li>
-                  <li>Document any heat damage before use</li>
+                  <li>Document any heat damage before reconstitution</li>
                 </ul>
               </div>
             </div>
@@ -672,7 +672,7 @@ async function nativeShare() {
   if (!navigator.share) return
   const text = mode.value === 'reconstitution'
     ? `My peptide reconstitution: ${mgText.value}mg + ${waterText.value}mL BAC water = ${concentrationText.value} mcg/mL`
-    : `${currentPreset.value ? currentPreset.value.name : 'My peptide dose'}: ${doseLabel.value} = ${unitsText.value} units`
+    : `${currentPreset.value ? currentPreset.value.name : 'Peptide aliquot'}: ${doseLabel.value} = ${unitsText.value} units`
   try {
     await navigator.share({ title: 'Peptide calculation', text, url: shareUrl.value || window.location.href })
   } catch { /* user cancelled */ }
@@ -689,7 +689,7 @@ async function copyShareLink() {
 async function copyResult() {
   const text = mode.value === 'reconstitution'
     ? `${mgText.value}mg peptide + ${waterText.value}mL BAC water = ${concentrationText.value} mcg/mL (via Peptidemap)`
-    : `Draw ${unitsText.value} units (${volumeText.value} mL) on a ${syringeUnits.value}-unit syringe for a ${doseLabel.value} dose from a ${concentrationText.value} mcg/mL solution (via Peptidemap)`
+    : `Draw ${unitsText.value} units (${volumeText.value} mL) on a ${syringeUnits.value}-unit syringe for a ${doseLabel.value} aliquot from a ${concentrationText.value} mcg/mL solution (via Peptidemap)`
   try {
     await navigator.clipboard.writeText(text)
     copiedResult.value = true
@@ -698,8 +698,10 @@ async function copyResult() {
 }
 
 // --- Modes ---
+// Keys are URL values (?mode=dosage) and must not change; `short` is the
+// tab text below the sm breakpoint, where the full label would wrap.
 const modes = [
-  { key: 'dosage', label: 'Dosage' },
+  { key: 'dosage', label: 'Research Quantity', short: 'Quantity' },
   { key: 'reconstitution', label: 'Reconstitution' },
   { key: 'schedule', label: 'Schedule' },
 ]

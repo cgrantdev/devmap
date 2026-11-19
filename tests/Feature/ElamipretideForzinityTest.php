@@ -139,8 +139,8 @@ class ElamipretideForzinityTest extends TestCase
         $this->assertContains('Does SS-31 need to come before MOTS-c?', $questions);
         $this->assertContains('Why is Forzinity’s approval called “accelerated”?', $questions);
         $sequencing = collect($faqs)->firstWhere('question', 'Does SS-31 need to come before MOTS-c?');
-        $this->assertStringContainsString('no validated stacking or sequencing protocol', $sequencing['answer']);
-        $this->assertStringContainsString('does not give dosing', $sequencing['answer']);
+        $this->assertStringContainsString('No published study has validated combining or sequencing', $sequencing['answer']);
+        $this->assertStringContainsString('does not give sequencing or combination advice', $sequencing['answer']);
 
         $this->assertSame('Research-use (RUO) listings are not Forzinity', $post->regulatory_subsections[1]['title']);
         $this->assertSame('Barth syndrome program behind the Forzinity approval', $post->human_use_subsections[0]['title']);
@@ -311,7 +311,7 @@ class ElamipretideForzinityTest extends TestCase
             ->assertSee('19 September 2025', false)
             ->assertSee('not that product', false)
             ->assertSee('39940712', false)
-            ->assertSee('no validated stacking or sequencing protocol', false)
+            ->assertSee('No published study has validated combining or sequencing', false)
             ->assertDontSee('which should you take', false)
             ->assertInertia(fn ($page) => $page
                 ->component('Frontend/CompareCompoundVs')

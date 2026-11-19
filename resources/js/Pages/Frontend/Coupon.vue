@@ -132,9 +132,9 @@
           </p>
         </div>
         <div>
-          <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-2">Does the discount stack with other promotions?</h2>
+          <h2 class="text-[15px] font-semibold text-[color:var(--color-ink)] mb-2">Does the discount combine with other promotions?</h2>
           <p class="text-[13px] text-[color:var(--color-ink-muted)] leading-relaxed">
-            {{ brand.name }} may run additional sitewide sales; those usually stack on top of {{ coupon.code }}. Their <a :href="'/brand/' + brand.slug" class="text-[color:var(--color-accent-600)] hover:underline">storefront page</a> shows any live promotions.
+            {{ brand.name }} may run additional sitewide sales; those usually combine with {{ coupon.code }}. Their <a :href="'/brand/' + brand.slug" class="text-[color:var(--color-accent-600)] hover:underline">storefront page</a> shows any live promotions.
           </p>
         </div>
         <div v-if="coupon.lowest_price">

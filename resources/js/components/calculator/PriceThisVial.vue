@@ -22,7 +22,7 @@
 
     <div v-if="showCosts" class="grid sm:grid-cols-2 gap-3 mt-5">
       <div class="rounded-[12px] bg-[color:var(--color-bg)] p-4">
-        <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-1">Cost per dose</div>
+        <div class="text-[11px] uppercase tracking-[0.08em] font-semibold text-[color:var(--color-ink-subtle)] mb-1">Cost per aliquot</div>
         <div class="ui-mono text-xl font-bold text-[color:var(--color-ink)]">{{ costPerDoseText }}</div>
         <div class="text-[11px] text-[color:var(--color-ink-subtle)] mt-1">{{ usableDosesText }}</div>
       </div>
@@ -32,7 +32,7 @@
           <select
             :value="frequency"
             @change="$emit('update:frequency', $event.target.value)"
-            aria-label="Dosing frequency"
+            aria-label="Aliquot frequency"
             class="h-7 px-2 text-[11px] border border-[color:var(--color-hairline)] rounded-[6px] bg-white text-[color:var(--color-ink)] focus:border-[color:var(--color-accent-500)] focus:outline-none"
           >
             <option v-for="o in frequencyOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
@@ -98,12 +98,12 @@ const costPerDose = computed(() => price.value / usableDoses.value)
 const costPerDoseText = computed(() => money(costPerDose.value))
 const monthlyText = computed(() => money((costPerDose.value * props.perWeek * 30) / 7))
 const usableDosesText = computed(() => (stabilityLimited.value
-  ? `${usableDoses.value} doses used within ${props.stabilityDays} days`
-  : `${props.dosesPerVial} ${props.dosesPerVial === 1 ? 'dose' : 'doses'} per vial`))
+  ? `${usableDoses.value} aliquots used within ${props.stabilityDays} days`
+  : `${props.dosesPerVial} ${props.dosesPerVial === 1 ? 'aliquot' : 'aliquots'} per vial`))
 const noCostReason = computed(() => {
   if (!sizeMatches.value) {
-    return `This price is for a ${sizeText.value}mg vial. Set the vial size to ${sizeText.value}mg to see cost per dose.`
+    return `This price is for a ${sizeText.value}mg vial. Set the vial size to ${sizeText.value}mg to see cost per aliquot.`
   }
-  return 'Enter a dose to see cost per dose and per month.'
+  return 'Enter an amount per aliquot to see cost per aliquot and per month.'
 })
 </script>

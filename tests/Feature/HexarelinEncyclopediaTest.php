@@ -21,7 +21,7 @@ class HexarelinEncyclopediaTest extends TestCase
 
     private const STATUS = 'Not approved. No FDA approval (Drugs@FDA) or EU marketing authorization (EMA medicines database) was found, and ClinicalTrials.gov lists no registered studies. Prohibited at all times in sport (WADA 2026 and 2027 Prohibited Lists, S2.2.4).';
 
-    private const HALF_LIFE = 'No human plasma half-life for hexarelin was found in the primary sources cited here. Animal studies report an intravenous half-life of about 76 minutes in rats and a terminal half-life of about 120 minutes in dogs. Not a dosing guide.';
+    private const HALF_LIFE = 'No human plasma half-life for hexarelin was found in the primary sources cited here. Animal studies report an intravenous half-life of about 76 minutes in rats and a terminal half-life of about 120 minutes in dogs.';
 
     protected function setUp(): void
     {
@@ -51,7 +51,7 @@ class HexarelinEncyclopediaTest extends TestCase
         $this->assertSame('C47H58N12O6', $parsed['molecular_formula']);
         $this->assertSame('887.04 g/mol', $parsed['molecular_weight']);
         $this->assertNull($parsed['amino_acid_sequence']);
-        $this->assertSame(234, mb_strlen((string) $parsed['half_life']));
+        $this->assertSame(214, mb_strlen((string) $parsed['half_life']));
         $this->assertSame(self::HALF_LIFE, $parsed['half_life']);
         $this->assertSame('Hexarelin', $parsed['seo_h1']);
         $this->assertSame('What is Hexarelin (Examorelin)? GHRP Research Overview', $parsed['seo_page_title']);

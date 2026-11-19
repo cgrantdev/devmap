@@ -20,7 +20,7 @@ class PemvidutideEncyclopediaTest extends TestCase
 
     private const STATUS = 'Investigational. Not approved by the FDA or by any other regulator found in the sources checked. FDA Fast Track (MASH; AUD) and Breakthrough Therapy (MASH) designations have been announced by the sponsor. Phase 3 (PERFORMA) is enrolling.';
 
-    private const HALF_LIFE = 'No numeric half-life is reported in the primary sources cited on this page. The sponsor attributes its once-weekly trial schedule to the lipidated EuPort domain. Not a dosing guide.';
+    private const HALF_LIFE = 'No numeric half-life is reported in the primary sources cited on this page. The sponsor attributes its once-weekly trial schedule to the lipidated EuPort domain.';
 
     protected function setUp(): void
     {
@@ -49,7 +49,7 @@ class PemvidutideEncyclopediaTest extends TestCase
         $this->assertSame('2538014-94-5', $parsed['cas_registry_number']);
         $this->assertNull($parsed['molecular_formula']);
         $this->assertNull($parsed['molecular_weight']);
-        $this->assertSame(181, mb_strlen((string) $parsed['half_life']));
+        $this->assertSame(161, mb_strlen((string) $parsed['half_life']));
         $this->assertSame(self::HALF_LIFE, $parsed['half_life']);
         $this->assertSame('Pemvidutide', $parsed['seo_h1']);
         $this->assertSame('GLP-1/glucagon dual receptor agonist · investigational, not approved', $parsed['peptide_full_name']);

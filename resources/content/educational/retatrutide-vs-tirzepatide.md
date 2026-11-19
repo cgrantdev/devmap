@@ -1,6 +1,6 @@
-Retatrutide and tirzepatide are stacked in shop listings as if one study had measured both. It has not. The molecules differ, the populations differ, and the follow-up is 80 weeks in one program and 72 weeks in the other.
+Retatrutide and tirzepatide are listed side by side in shop listings as if one study had measured both. It has not. The molecules differ, the populations differ, and the follow-up is 80 weeks in one program and 72 weeks in the other.
 
-This note is a companion to the live price page. It does not copy vendor tables, rank a winner, or tell anyone what to take. Peptidemap publishes research-use-only (RUO) comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice, a dose, or a mixing instruction.
+This note is a companion to the live price page. It does not copy vendor tables, rank a winner, or tell anyone what to take. Peptidemap publishes research-use-only (RUO) comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice or a mixing instruction.
 
 Vendor listings stay on [Retatrutide vs tirzepatide](https://peptidemap.com/compare/retatrutide-vs-tirzepatide). That page’s title uses the shop labels “GLP3-R” and “GLP2-T.” Those labels are not trial names. Identity pages that returned HTTP 200 on 5 October 2026: [retatrutide](https://peptidemap.com/encyclopedia/retatrutide) and [tirzepatide](https://peptidemap.com/encyclopedia/tirzepatide). TRIUMPH-1 and TRIUMPH-2 were published on 29 September 2026. This note does not use the encyclopedia’s summary percents.
 
@@ -8,7 +8,7 @@ Vendor listings stay on [Retatrutide vs tirzepatide](https://peptidemap.com/comp
 
 Retatrutide (LY3437943) is one investigational molecule with agonist activity at three receptors: glucose-dependent insulinotropic polypeptide (GIP), glucagon-like peptide-1 (GLP-1), and glucagon. The phase 3 papers describe once-weekly subcutaneous injection. It is not an approved medicine. A research-use vial is not a branded product and is not tirzepatide.
 
-Tirzepatide is one peptide and a dual agonist at the GIP and GLP-1 receptors. It does not add glucagon-receptor agonism. In the United States it is approved as Mounjaro and as Zepbound for labeled uses. That approval is not a dosing guide. A research-use vial is not those brands.
+Tirzepatide is one peptide and a dual agonist at the GIP and GLP-1 receptors. It does not add glucagon-receptor agonism. In the United States it is approved as Mounjaro and as Zepbound for labeled uses. A research-use vial is not those brands.
 
 Dose arms below are named by position in each trial. Those names are assigned trial arms, not instructions.
 
@@ -36,7 +36,7 @@ TRIUMPH-2 (NCT05929079) is retatrutide again, not tirzepatide and not TRIUMPH-1.
 
 On the treatment-regimen estimand, mean percent change in body weight at week 80 in the *Lancet* paper was −11.9% in the lowest dose arm, −16.8% in the middle dose arm, and −18.8% in the highest dose arm, versus −5.1% with placebo. On the efficacy estimand, reported in the *Lancet* paper and company-reported by Lilly in its press release of 23 July 2026, the mean change was −12.7% in the lowest dose arm, −19.1% in the middle dose arm, and −20.8% in the highest dose arm, versus −4.0% with placebo. The −18.8% figure is the highest dose arm treatment-regimen result in type 2 diabetes. It is not the TRIUMPH-1 treatment-regimen −25.0%, measured without diabetes.
 
-## Why these percents cannot be stacked
+## Why these percents cannot be combined
 
 A larger percent is not a winner across these programs.
 

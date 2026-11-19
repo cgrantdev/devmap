@@ -243,7 +243,7 @@
                 <span v-else-if="promo.promo_type === 'nocode_sitewide'">Applied automatically</span>
                 <span v-else-if="promo.promo_type === 'category' && promo.category_name">on {{ promo.category_name }}</span>
                 <span v-else-if="promo.promo_type === 'bogo'">Bundle offer</span>
-                <span v-if="promo.stacks_with_affiliate"> · stacks with affiliate code</span>
+                <span v-if="promo.stacks_with_affiliate"> · combines with affiliate code</span>
               </div>
             </div>
           </div>

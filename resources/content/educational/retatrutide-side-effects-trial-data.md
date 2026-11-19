@@ -1,4 +1,4 @@
-Retatrutide is an investigational once-weekly injection that acts on GIP, GLP-1 and glucagon receptors. It is not approved anywhere. This article collects the adverse events reported in the primary trial publications, the ClinicalTrials.gov results that have been posted, and, where no full paper was available, figures Lilly has released. Each number is labelled with where it came from. Nothing here is a dosing guide, a safety verdict or medical advice.
+Retatrutide is an investigational once-weekly injection that acts on GIP, GLP-1 and glucagon receptors. It is not approved anywhere. This article collects the adverse events reported in the primary trial publications, the ClinicalTrials.gov results that have been posted, and, where no full paper was available, figures Lilly has released. Each number is labelled with where it came from. Nothing here is a safety verdict or medical advice.
 
 ## How to read the numbers on this page
 

@@ -25,20 +25,20 @@ class EducationalFreshnessNovember16Test extends TestCase
     private const MIGRATION = '2026_11_16_200000_refresh_guides_and_blogs_november_16.php';
 
     /**
-     * Word counts of the current sources. The 20 Nov RUO wording pass took
-     * one word off three of them; no read time changed.
+     * Word counts of the current sources. The two 20 Nov strict-RUO passes
+     * shortened several of them; no read time changed.
      *
      * @var array<string, array{0: int, 1: string}>
      */
     private const EXPECTED = [
         'compounded-vs-ruo-peptides' => [2903, '13 Min Read'],
         'peptide-legality-fda-ruo-compounding' => [5748, '25 Min Read'],
-        'bpc-157-vs-tb-500-evidence' => [4367, '19 Min Read'],
-        'retatrutide-side-effects-trial-data' => [4720, '21 Min Read'],
-        'retatrutide-vs-semaglutide' => [4318, '19 Min Read'],
+        'bpc-157-vs-tb-500-evidence' => [4348, '19 Min Read'],
+        'retatrutide-side-effects-trial-data' => [4717, '21 Min Read'],
+        'retatrutide-vs-semaglutide' => [4183, '19 Min Read'],
         'eloralintide-tirzepatide-vs-retatrutide' => [1458, '7 Min Read'],
         'hhs-503a-peptide-enforcement-discretion-2026' => [910, '4 Min Read'],
-        'bpc-157-vs-ghk-cu' => [2189, '10 Min Read'],
+        'bpc-157-vs-ghk-cu' => [2136, '10 Min Read'],
     ];
 
     /** @var list<array{level: string, message: string}> */
@@ -257,7 +257,9 @@ class EducationalFreshnessNovember16Test extends TestCase
         $legality = html_entity_decode((string) $this->get('/guides/peptide-legality-fda-ruo-compounding')->assertOk()->getContent());
         $ghk = html_entity_decode((string) $this->get('/blog/bpc-157-vs-ghk-cu')->assertOk()->getContent());
         $this->assertStringContainsString('an online peptide seller', $legality);
-        $this->assertStringContainsString('an online peptide seller', $ghk);
+        // The warning-letter paragraph and its reference left this post in
+        // the 20 Nov strict-RUO pass.
+        $this->assertStringNotContainsString('an online peptide seller', $ghk);
     }
 
     /**

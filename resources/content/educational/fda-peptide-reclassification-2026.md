@@ -32,7 +32,7 @@ A PCAC recommendation is **advisory and non-binding**. It is not a final FDA rul
 
 “Research use only” or “not for human consumption” is a seller’s claimed intended-use framing. It does not create FDA approval, does not place a substance on a bulks list, and does not erase how FDA evaluates intended use from labeling and advertising (see [21 CFR 201.128](https://www.ecfr.gov/current/title-21/chapter-I/subchapter-C/part-201/subpart-D/section-201.128)).
 
-This note does not tell anyone how to buy, compound, or dose a peptide. Peptidemap is a vendor-comparison platform, not a pharmacy and not a law firm.
+This note does not tell anyone how to buy or compound a peptide. Peptidemap is a vendor-comparison platform, not a pharmacy and not a law firm.
 
 ## What to read instead of a slogan
 

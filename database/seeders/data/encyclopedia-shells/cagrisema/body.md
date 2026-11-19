@@ -129,7 +129,7 @@ Investigational. An NDA for weight management was submitted to the FDA on 18 Dec
 
 ## Field: halfLife
 
-Human: cagrilintide 159–195 hours and semaglutide 145–165 hours when co-administered in a phase 1b trial (Lancet 2021). Not a dosing guide.
+Human: cagrilintide 159–195 hours and semaglutide 145–165 hours when co-administered in a phase 1b trial (Lancet 2021).
 
 ## Field: regulatoryImportantNote
 

@@ -1,6 +1,6 @@
-Orforglipron and tirzepatide are stacked online as if one trial had measured both. It has not. The molecules differ, the routes differ, and the published percents come from different studies.
+Orforglipron and tirzepatide are lumped together online as if one trial had measured both. It has not. The molecules differ, the routes differ, and the published percents come from different studies.
 
-This note is a companion to the live price page. It does not copy vendor tables, rank a winner, or tell anyone what to take. Peptidemap publishes research-use-only (RUO) comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice, a dose, or a mixing instruction.
+This note is a companion to the live price page. It does not copy vendor tables, rank a winner, or tell anyone what to take. Peptidemap publishes research-use-only (RUO) comparisons. It is not a clinic, a pharmacy, or a drug company. Nothing here is medical advice or a mixing instruction.
 
 Vendor listings stay on the compare page: [Orforglipron vs tirzepatide](https://peptidemap.com/compare/orforglipron-vs-tirzepatide). That page’s title uses the shop label “GLP2-T” for the tirzepatide side. GLP2-T is not a third molecule and not a trial name. Identity pages: [orforglipron](https://peptidemap.com/encyclopedia/orforglipron) and [tirzepatide](https://peptidemap.com/encyclopedia/tirzepatide).
 
@@ -8,9 +8,9 @@ Vendor listings stay on the compare page: [Orforglipron vs tirzepatide](https://
 
 Orforglipron is a small-molecule, nonpeptide glucagon-like peptide-1 (GLP-1) receptor agonist taken by mouth. It is not a peptide. Chugai discovered it, and Lilly licensed it. The 2025 ATTAIN papers still call it investigational, which was its status in those trials.
 
-Lilly’s 9 April 2026 release says the U.S. Food and Drug Administration approved Foundayo (orforglipron) tablets on 1 April 2026. The DailyMed label, updated 29 July 2026, lists initial U.S. approval in 2026. DailyMed’s indication is: in combination with a reduced-calorie diet and increased physical activity to reduce excess body weight and maintain weight reduction long term in adults with obesity or adults with overweight in the presence of at least one weight-related comorbid condition. This note does not restate the label’s dose schedule. The ATTAIN dose arms are not the tablet strengths on that label. A research-use powder, capsule, or vial is not a Foundayo tablet.
+Lilly’s 9 April 2026 release says the U.S. Food and Drug Administration approved Foundayo (orforglipron) tablets on 1 April 2026. The DailyMed label, updated 29 July 2026, lists initial U.S. approval in 2026. DailyMed’s indication is: in combination with a reduced-calorie diet and increased physical activity to reduce excess body weight and maintain weight reduction long term in adults with obesity or adults with overweight in the presence of at least one weight-related comorbid condition. The ATTAIN dose arms are not the tablet strengths on that label. A research-use powder, capsule, or vial is not a Foundayo tablet.
 
-Tirzepatide is a peptide and a dual agonist at the glucose-dependent insulinotropic polypeptide (GIP) receptor and the GLP-1 receptor. It is given once weekly by subcutaneous injection. In the United States it is approved as Mounjaro and as Zepbound for labeled uses. That approval is not a dosing guide, and a research-use vial is not those brands.
+Tirzepatide is a peptide and a dual agonist at the glucose-dependent insulinotropic polypeptide (GIP) receptor and the GLP-1 receptor. It is given once weekly by subcutaneous injection. In the United States it is approved as Mounjaro and as Zepbound for labeled uses. A research-use vial is not those brands.
 
 ## ATTAIN-1 is an orforglipron trial without diabetes
 
@@ -36,7 +36,7 @@ On that estimand, mean percent change in body weight at week 72 was −5.1% in t
 
 Lilly’s efficacy estimand in that release was −5.5%, −7.8%, and −10.5%, versus −2.2% with placebo. The −10.5% figure is orforglipron’s highest dose arm in type 2 diabetes. It is not the ATTAIN-1 −12.4%, and it is not SURMOUNT-1.
 
-## Why these percents cannot be stacked
+## Why these percents cannot be combined
 
 A larger percent is not a winner across these programs. The studies differ on the points that move a result:
 

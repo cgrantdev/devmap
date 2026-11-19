@@ -140,7 +140,7 @@ Investigational. Not approved by the FDA or by any other regulator found in the 
 
 ## Field: halfLife
 
-No numeric half-life is reported in the primary sources cited on this page. The sponsor attributes its once-weekly trial schedule to the lipidated EuPort domain. Not a dosing guide.
+No numeric half-life is reported in the primary sources cited on this page. The sponsor attributes its once-weekly trial schedule to the lipidated EuPort domain.
 
 ## Field: regulatoryImportantNote
 

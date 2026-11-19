@@ -141,10 +141,10 @@
             <strong class="text-[color:var(--color-ink)]">Bacteriostatic water</strong> is sterile water with 0.9% benzyl alcohol added as a preservative. That preservative is what makes it different from plain sterile water — once a BAC vial is punctured, the benzyl alcohol prevents bacterial growth, so researchers can safely draw from the same vial multiple times over a ~28-day window.
           </p>
           <p>
-            Practically, every research peptide arrives lyophilized (dry powder) and needs a solvent to reconstitute. BAC water is the standard choice because a single 10 mL vial can serve multiple peptides across a whole research cycle without needing a fresh vial every draw.
+            Practically, every research peptide arrives lyophilized (dry powder) and needs a solvent to reconstitute. BAC water is the standard choice because a single 10 mL vial can serve multiple peptides without needing a fresh vial every draw.
           </p>
           <p class="text-[13px] italic text-[color:var(--color-ink-subtle)] border-l-2 border-[color:var(--color-hairline)] pl-4">
-            All products listed are for research use only (RUO). Peptidemap does not provide dosing, medical, or veterinary guidance.
+            All products listed are for research use only (RUO). Peptidemap does not provide medical or veterinary guidance.
           </p>
         </div>
       </div>

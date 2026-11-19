@@ -1,4 +1,4 @@
-GLOW and KLOW are marketplace names for multi-peptide research blends. They are not single molecules, and they are not approved medicines. Readers often treat KLOW as “more GLOW,” or treat a vial of GHK-Cu alone, or of KPV alone, as the same product. Those are different listings. On Peptidemap’s catalog, GLOW is the three-part label GHK-Cu, BPC-157, and TB-500. KLOW is that same named set plus a fourth component, KPV (Lys-Pro-Val). The added piece is KPV, not a higher GHK-Cu dose. This page is a contents comparison, and a limit on blend evidence. It is not a shopping guide, not a beginner primer, and not medical advice.
+GLOW and KLOW are marketplace names for multi-peptide research blends. They are not single molecules, and they are not approved medicines. Readers often treat KLOW as “more GLOW,” or treat a vial of GHK-Cu alone, or of KPV alone, as the same product. Those are different listings. On Peptidemap’s catalog, GLOW is the three-part label GHK-Cu, BPC-157, and TB-500. KLOW is that same named set plus a fourth component, KPV (Lys-Pro-Val). The added piece is KPV, not more GHK-Cu. This page is a contents comparison, and a limit on blend evidence. It is not a shopping guide, not a beginner primer, and not medical advice.
 
 Vendor and price listings stay on their own pages: [GLOW](https://peptidemap.com/compare/glow) and [KLOW — GHK-Cu/BPC-157/TB-500/KPV](https://peptidemap.com/compare/klow-blend-ghk-cu-bpc-157-tb-500-kpv). Head-to-head listings are at [GLOW vs KLOW](https://peptidemap.com/compare/glow-vs-klow-blend-ghk-cu-bpc-157-tb-500-kpv). This article does not copy vendor tables, coupon codes, or prices. Listings on those compare pages are framed as research use only (RUO).
 
@@ -48,7 +48,7 @@ Vial size strings on the compare pages differ across listings. Peptidemap does n
 
 Research catalogs often use TB-500 for the acetylated fragment Ac-LKKTETQ (Ac-Leu-Lys-Lys-Thr-Glu-Thr-Gln). PubChem’s TB-500 record is that sequence: CID 62707662, CAS 885340-08-9. A 2012 *Drug Testing and Analysis* paper reported the N-terminal acetylated 17–23 fragment of thymosin beta-4 in material identified as TB-500 (Esposito et al., doi:10.1002/dta.1402).
 
-Full-length thymosin beta-4 is a different substance. PubChem lists it under a separate record (CID 45382195). Studies of the full-length protein are not automatically studies of the short acetylated fragment. Neither kind of study is a study of a vial labeled GLOW or KLOW. Sellers sometimes use these names loosely. The certificate of analysis is what shows which sequence a lot was tested as. This page does not give doses or reconstitution steps.
+Full-length thymosin beta-4 is a different substance. PubChem lists it under a separate record (CID 45382195). Studies of the full-length protein are not automatically studies of the short acetylated fragment. Neither kind of study is a study of a vial labeled GLOW or KLOW. Sellers sometimes use these names loosely. The certificate of analysis is what shows which sequence a lot was tested as. This page does not give reconstitution steps.
 
 ## Where blend evidence stops
 
@@ -56,7 +56,7 @@ There is no published human trial of the named commercial blends “GLOW” or �
 
 This page does not rank GLOW against KLOW for healing, skin, gut, or recovery, and it does not pick a winner. It does not convert cosmetic research on copper tripeptide, or separate preclinical work on BPC-157 or on KPV, into a blend effect. Those are different materials.
 
-A Peptidemap listing is a research-catalog record, not an approved drug label and not a clinical protocol.
+A Peptidemap listing is a research-catalog record, not an approved drug label.
 
 ## Where prices live
 

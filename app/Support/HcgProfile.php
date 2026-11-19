@@ -106,7 +106,7 @@ class HcgProfile
             'molecular_formula' => 'Heterodimeric glycoprotein',
             'molecular_weight' => 'Approximately 37 kDa',
             'cas_registry_number' => '',
-            'half_life' => 'Longer than LH because of additional glycosylation. A single number is not given here as dosing guidance.',
+            'half_life' => 'Longer than LH because of additional glycosylation.',
             'bioavailability' => 'Pharmaceutical products are parenteral. This page does not describe administration.',
             'storage' => 'Follow the labeling of the specific pharmaceutical or research product. Do not assume research-grade storage matches a prescription brand.',
             'background' => 'hCG was identified in the early twentieth century as the pregnancy hormone of the placenta. It is a glycoprotein: both subunits carry carbohydrate, and the beta subunit has a glycosylated C-terminal extension that lengthens circulation relative to LH. It signals through the LH/choriogonadotropin receptor. Pharmaceutical forms include urinary chorionic gonadotropin and recombinant choriogonadotropin alfa. Those labeled medicines are prescription products for reproductive care. They are not weight-loss drugs, and a research-catalog listing is not a substitute for them.',
@@ -138,7 +138,7 @@ class HcgProfile
                     ],
                 ],
             ],
-            'preclinical_disclaimer' => 'Weight-loss programs that use hCG are not an FDA-labeled indication. This page does not describe those programs or any dose.',
+            'preclinical_disclaimer' => 'Weight-loss programs that use hCG are not an FDA-labeled indication. This page does not describe those programs.',
             'human_use_intro' => 'Prescription hCG is an Rx hormone with reproductive labeling. Research-grade hCG is not that medicine.',
             'human_use_subsections' => [
                 [
@@ -166,7 +166,7 @@ class HcgProfile
                     ],
                 ],
             ],
-            'regulatory_important_note' => 'hCG is a prescription glycoprotein hormone when it is the approved medicine, and a laboratory material when it is sold for research. Neither framing is a weight-loss peptide. This page gives no doses and no prices.',
+            'regulatory_important_note' => 'hCG is a prescription glycoprotein hormone when it is the approved medicine, and a laboratory material when it is sold for research. Neither framing is a weight-loss peptide. This page gives no prices.',
             'potential_applications_intro' => 'The established context is reproductive endocrinology.',
             'potential_applications' => [
                 [
@@ -200,7 +200,7 @@ class HcgProfile
                 'hCG is a heterodimeric glycoprotein hormone, not a short peptide.',
                 'Prescription products are labeled for reproductive indications.',
                 'Weight loss is not an FDA-labeled use.',
-                'Research-grade material is not the prescription product. No dosing is provided here.',
+                'Research-grade material is not the prescription product.',
             ],
             'areas_of_research_intro' => 'hCG belongs with glycoprotein hormone and reproductive endocrinology research.',
             'areas_of_research' => [

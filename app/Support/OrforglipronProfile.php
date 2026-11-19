@@ -100,12 +100,12 @@ class OrforglipronProfile
             'education_tag' => self::educationTag(),
             'tags' => ['Small Molecule', 'Nonpeptide', 'GLP-1 Receptor Agonist'],
             'description' => self::cardDescription(),
-            'overview' => 'Orforglipron is a synthetic small-molecule GLP-1 receptor agonist designed for oral use. It is a nonpeptide: it is not built from an amino-acid chain. PubChem lists the free base as C48H48F2N10O5 (CID 137319706). The FDA-approved medicine is Foundayo, an orforglipron tablet from Eli Lilly, approved on April 1, 2026 for chronic weight management together with diet and physical activity. Research-chemical powders, capsules, or vials sold under the orforglipron name are not Foundayo and are not the approved dosage form. This page does not provide dosing or prices.',
+            'overview' => 'Orforglipron is a synthetic small-molecule GLP-1 receptor agonist designed for oral use. It is a nonpeptide: it is not built from an amino-acid chain. PubChem lists the free base as C48H48F2N10O5 (CID 137319706). The FDA-approved medicine is Foundayo, an orforglipron tablet from Eli Lilly, approved on April 1, 2026 for chronic weight management together with diet and physical activity. Research-chemical powders, capsules, or vials sold under the orforglipron name are not Foundayo and are not the approved tablet. This page does not provide prices.',
             'molecular_formula' => 'C48H48F2N10O5',
             'molecular_weight' => '883.0 g/mol',
             'cas_registry_number' => '',
             'half_life' => 'See the Foundayo prescribing information for the approved tablet. Not stated here for research-chemical material.',
-            'bioavailability' => 'The approved product is an oral tablet. Research-chemical material is a separate substance presentation and is not the approved dosage form.',
+            'bioavailability' => 'The approved product is an oral tablet. Research-chemical material is a separate substance presentation and is not that tablet.',
             'storage' => 'Follow the applicable product labeling or supplier certificate of analysis. Do not assume research-chemical storage conditions match Foundayo tablets.',
             'background' => 'Orforglipron was discovered by Chugai Pharmaceutical and licensed to Eli Lilly. It is a small-molecule agonist of the GLP-1 receptor, in a different chemical class from peptide GLP-1 medicines such as semaglutide or tirzepatide. On April 1, 2026 the FDA approved Foundayo (orforglipron) tablets for adults with obesity, or overweight with a weight-related condition, as an adjunct to a reduced-calorie diet and increased physical activity. Foundayo is a finished prescription tablet. Material offered for laboratory research under the same chemical name is not that tablet, is not interchangeable with it, and should not be described as Foundayo.',
             'mechanism_of_action_intro' => 'Orforglipron binds and activates the GLP-1 receptor as a small molecule. That mechanism is the same receptor class targeted by peptide GLP-1 agonists, but the ligand itself is nonpeptide.',
@@ -120,7 +120,7 @@ class OrforglipronProfile
                     ],
                 ],
             ],
-            'preclinical_intro' => 'Clinical development of the oral molecule supported the Foundayo approval. This summary does not restate study doses or imply that research-chemical powders match the approved tablet.',
+            'preclinical_intro' => 'Clinical development of the oral molecule supported the Foundayo approval. This summary does not imply that research-chemical powders match the approved tablet.',
             'preclinical_subsections' => [
                 [
                     'title' => 'Approved product versus research chemical',
@@ -136,7 +136,7 @@ class OrforglipronProfile
                     ],
                 ],
             ],
-            'preclinical_disclaimer' => 'The Foundayo approval does not convert research-chemical orforglipron into the approved tablet. No dosing guidance is provided on this page.',
+            'preclinical_disclaimer' => 'The Foundayo approval does not convert research-chemical orforglipron into the approved tablet.',
             'human_use_intro' => 'The only FDA-approved orforglipron product named here is Foundayo tablets. This encyclopedia entry is not a prescription and does not describe how to take either the tablet or research material.',
             'human_use_subsections' => [
                 [
@@ -177,7 +177,7 @@ class OrforglipronProfile
                     ],
                 ],
             ],
-            'regulatory_important_note' => 'Do not treat research-chemical orforglipron as Foundayo. This page is informational, does not give doses or prices, and is not medical advice.',
+            'regulatory_important_note' => 'Do not treat research-chemical orforglipron as Foundayo. This page is informational, does not give prices, and is not medical advice.',
             'potential_applications_intro' => 'Research interest follows GLP-1 receptor pharmacology. The approved use of Foundayo is the labeled weight-management indication, which applies to the tablet, not to research powders.',
             'potential_applications' => [
                 [
@@ -214,8 +214,8 @@ class OrforglipronProfile
             'key_points' => [
                 'Orforglipron is a small-molecule, nonpeptide GLP-1 receptor agonist.',
                 'Foundayo is the FDA-approved orforglipron tablet (April 1, 2026).',
-                'Research-chemical powders and vials are not Foundayo and are not the approved dosage form.',
-                'This page does not provide dosing or prices.',
+                'Research-chemical powders and vials are not Foundayo and are not the approved tablet.',
+                'This page does not provide prices.',
             ],
             'areas_of_research_intro' => 'The relevant class is oral nonpeptide GLP-1 receptor agonism, not peptide chemistry.',
             'areas_of_research' => [
@@ -239,11 +239,11 @@ class OrforglipronProfile
                 ],
                 [
                     'question' => 'Is research-chemical orforglipron the same as Foundayo?',
-                    'answer' => 'No. Foundayo is the FDA-approved orforglipron tablet. Research powders, capsules, or vials that use the orforglipron name are not Foundayo and are not the approved dosage form.',
+                    'answer' => 'No. Foundayo is the FDA-approved orforglipron tablet. Research powders, capsules, or vials that use the orforglipron name are not Foundayo and are not the approved tablet.',
                 ],
                 [
                     'question' => 'What is Foundayo approved for?',
-                    'answer' => 'Foundayo tablets are approved for chronic weight management in specified adults, together with diet and physical activity. That approval does not extend to research-chemical material. This page does not provide dosing.',
+                    'answer' => 'Foundayo tablets are approved for chronic weight management in specified adults, together with diet and physical activity. That approval does not extend to research-chemical material.',
                 ],
             ],
             'seo_page_title' => self::seoTitle(),

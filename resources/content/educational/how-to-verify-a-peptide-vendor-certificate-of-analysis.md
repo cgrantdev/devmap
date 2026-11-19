@@ -1,6 +1,6 @@
 A Certificate of Analysis (COA) is often the strongest paperwork a research-use peptide vendor can show. Used carefully, it helps you check whether a **submitted sample** matched the labeled identity and purity claim. Used carelessly, a PDF can become marketing theater: copied across storefronts, detached from the vial in your hand, or never checked against the laboratory’s own records.
 
-Peptidemap is a research-use-only (RUO) peptide comparison publisher. This guide is educational literacy about documents and labs. It is **not** medical advice, a dose, a reconstitution recipe, a treatment claim, or a vendor ranking. Peptidemap does not endorse any single testing laboratory.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher. This guide is educational literacy about documents and labs. It is **not** medical advice, a reconstitution recipe, a treatment claim, or a vendor ranking. Peptidemap does not endorse any single testing laboratory.
 
 This guide covers the basics plus shared-lot reuse, lab-site verification, redaction, and what a COA does not prove.
 

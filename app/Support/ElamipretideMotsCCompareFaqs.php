@@ -36,7 +36,7 @@ class ElamipretideMotsCCompareFaqs
         return [
             [
                 'q' => 'Does SS-31 need to come before MOTS-c?',
-                'a' => 'The literature does not establish that. There is no validated stacking or sequencing protocol for SS-31 (elamipretide) and MOTS-c. SS-31 is a research alias for elamipretide, the same molecule. The only FDA approval involving elamipretide is Forzinity (elamipretide) injection for Barth syndrome in patients weighing at least 30 kg (accelerated approval, 19 September 2025), and research-chemical “SS-31” listings are not that product. MOTS-c is a mitochondrial-derived research peptide that is not FDA-approved. Peptidemap is a publisher comparison resource, not medical guidance, and it does not give dosing, sequencing, or combination advice.',
+                'a' => 'The literature does not establish that. No published study has validated combining or sequencing SS-31 (elamipretide) and MOTS-c. SS-31 is a research alias for elamipretide, the same molecule. The only FDA approval involving elamipretide is Forzinity (elamipretide) injection for Barth syndrome in patients weighing at least 30 kg (accelerated approval, 19 September 2025), and research-chemical “SS-31” listings are not that product. MOTS-c is a mitochondrial-derived research peptide that is not FDA-approved. Peptidemap is a publisher comparison resource, not medical guidance, and it does not give sequencing or combination advice.',
             ],
             [
                 'q' => 'Are “SS-31” and “elamipretide” listings on this page different compounds?',

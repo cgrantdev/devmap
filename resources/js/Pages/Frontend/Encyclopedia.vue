@@ -10,7 +10,7 @@
             <div class="text-[11px] uppercase tracking-[0.12em] font-semibold text-[color:var(--color-accent-600)] mb-3">Reference</div>
             <h1 class="ui-display text-4xl md:text-5xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)] mb-3">Peptide Encyclopedia</h1>
             <p class="text-[15px] text-[color:var(--color-ink-muted)] leading-relaxed max-w-2xl">
-              Research-grade profiles on every major compound. Mechanisms, protocols, vendor availability.
+              Research-grade profiles on every major compound. Mechanisms and vendor availability.
             </p>
           </div>
           <!-- Inline stats -->
@@ -152,7 +152,7 @@ const page = usePage()
 const title = computed(() => stripSiteSuffix(props.seo?.title || 'Peptide Encyclopedia - Comprehensive Research Guide', page.props.site_name))
 
 const description = computed(() => {
-  return props.seo?.description || 'Explore our comprehensive peptide encyclopedia. Detailed information on peptides including benefits, dosing, safety, and research applications.'
+  return props.seo?.description || 'Explore our comprehensive peptide encyclopedia. Detailed information on peptides including mechanisms, safety, and areas of research.'
 })
 
 const url = computed(() => {

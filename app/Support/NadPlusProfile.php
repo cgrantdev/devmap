@@ -117,11 +117,11 @@ class NadPlusProfile
             'education_tag' => self::educationTag(),
             'tags' => ['Coenzyme', 'Dinucleotide', 'Redox Metabolism'],
             'description' => self::cardDescription(),
-            'overview' => 'NAD+ (nicotinamide adenine dinucleotide) is a dinucleotide coenzyme found in living cells. It carries electrons in redox metabolism and is a substrate for enzymes that include sirtuins and PARPs. It is not a peptide and it has no amino-acid sequence. This page is informational and does not provide dosing or administration guidance.',
+            'overview' => 'NAD+ (nicotinamide adenine dinucleotide) is a dinucleotide coenzyme found in living cells. It carries electrons in redox metabolism and is a substrate for enzymes that include sirtuins and PARPs. It is not a peptide and it has no amino-acid sequence. This page is informational and does not provide administration guidance.',
             'molecular_formula' => 'C21H27N7O14P2',
             'molecular_weight' => '663.4 g/mol',
             'cas_registry_number' => '',
-            'half_life' => 'Cellular NAD+ turnover is tightly regulated. A dosing interval is not stated here.',
+            'half_life' => 'Cellular NAD+ turnover is tightly regulated.',
             'bioavailability' => 'Not discussed. This page does not compare routes of administration.',
             'storage' => 'Follow the supplier certificate of analysis for research material.',
             'background' => 'NAD was identified in the early twentieth century as a cofactor of fermentation and later as the general redox coenzyme of cellular metabolism. The oxidized form, NAD+, accepts a hydride to become NADH. Separate from that redox cycle, NAD+ is consumed by sirtuins, PARPs, and other ADP-ribosyl transferases. Those are enzyme-cofactor roles. They do not make NAD+ a peptide.',
@@ -136,7 +136,7 @@ class NadPlusProfile
                     ],
                 ],
             ],
-            'preclinical_intro' => 'A large biochemical literature describes NAD+ metabolism. This entry states the chemical class only and does not give doses.',
+            'preclinical_intro' => 'A large biochemical literature describes NAD+ metabolism. This entry states the chemical class only.',
             'preclinical_subsections' => [
                 [
                     'title' => 'Chemical class',
@@ -148,7 +148,7 @@ class NadPlusProfile
                     ],
                 ],
             ],
-            'preclinical_disclaimer' => 'No dosing, infusion rate, or price is provided.',
+            'preclinical_disclaimer' => 'No price is provided.',
             'human_use_intro' => 'NAD+ is a coenzyme. This encyclopedia entry does not describe clinical administration.',
             'human_use_subsections' => [
                 [
@@ -156,7 +156,7 @@ class NadPlusProfile
                     'entries' => [
                         [
                             'type' => 'content',
-                            'value' => 'Discussion here is limited to chemical identity and biochemical role. It is not a protocol for supplementation or infusion.',
+                            'value' => 'Discussion here is limited to chemical identity and biochemical role.',
                         ],
                     ],
                 ],
@@ -172,7 +172,7 @@ class NadPlusProfile
                     ],
                 ],
             ],
-            'regulatory_important_note' => 'Informational overview of a coenzyme. Not dosing or medical advice.',
+            'regulatory_important_note' => 'Informational overview of a coenzyme. Not medical advice.',
             'potential_applications_intro' => 'Research contexts are biochemical, not peptide pharmacology.',
             'potential_applications' => [
                 [
@@ -200,7 +200,7 @@ class NadPlusProfile
             'key_points' => [
                 'NAD+ is a dinucleotide coenzyme, not a peptide.',
                 'It functions as a redox cofactor and as a substrate for sirtuins and PARPs.',
-                'This page does not provide dosing or administration guidance.',
+                'This page does not provide administration guidance.',
             ],
             'areas_of_research_intro' => 'NAD+ research is coenzyme and redox biology.',
             'areas_of_research' => [

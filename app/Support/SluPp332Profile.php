@@ -177,7 +177,7 @@ class SluPp332Profile
                     ],
                 ],
             ],
-            'preclinical_disclaimer' => 'All findings above are from cell culture and animal models. They do not establish human safety or effectiveness. No dosing guidance is provided.',
+            'preclinical_disclaimer' => 'All findings above are from cell culture and animal models. They do not establish human safety or effectiveness.',
             'human_use_intro' => 'No published human clinical trials of SLU-PP-332 are cited in the primary papers summarized here. Human pharmacokinetics, safety, and efficacy have not been established.',
             'human_use_subsections' => [
                 [
@@ -205,7 +205,7 @@ class SluPp332Profile
                     ],
                 ],
             ],
-            'regulatory_important_note' => 'SLU-PP-332 is an experimental small-molecule research compound. It is not approved for human consumption, therapeutic use, or self-administration. This profile is informational and does not provide dosing, protocols, or sourcing advice.',
+            'regulatory_important_note' => 'SLU-PP-332 is an experimental small-molecule research compound. It is not approved for human consumption, therapeutic use, or self-administration. This profile is informational and does not provide sourcing advice.',
             'potential_applications_intro' => 'Research interest follows the receptor biology, not an approved indication. The domains below are preclinical research topics.',
             'potential_applications' => [
                 [
@@ -256,7 +256,7 @@ class SluPp332Profile
                 'SLU-PP-332 is a synthetic small-molecule pan-agonist of ERRα, ERRβ, and ERRγ, with the highest reported potency at ERRα.',
                 'It is a benzohydrazide (C18H14N2O2; CAS 303760-60-3), not a peptide.',
                 'Preclinical papers describe exercise-mimetic and metabolic effects in cell and mouse models.',
-                'Not approved for human use. Research use only. No dosing guidance is provided here.',
+                'Not approved for human use. Research use only.',
             ],
             'areas_of_research_intro' => 'Laboratory work on SLU-PP-332 sits in nuclear-receptor pharmacology and exercise metabolism, not in peptide biology.',
             'areas_of_research' => [

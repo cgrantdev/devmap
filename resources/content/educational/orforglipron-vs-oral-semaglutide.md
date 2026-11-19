@@ -2,7 +2,7 @@ Orforglipron and oral semaglutide are both once-daily GLP-1 receptor agonist pil
 
 This article covers what each drug is, how ACHIEVE-3 was designed, what it reported for HbA1c, weight and tolerability, and where each drug stands with the FDA. Every efficacy figure is labelled with its estimand. Lilly's press releases and the Lancet paper lead with different estimands, so the figures are shown side by side with their source.
 
-Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice, gives no dosing, and does not say which drug is better.
+Peptidemap is a research-use-only (RUO) peptide comparison publisher, not a clinic, pharmacy or supplier. This article is educational. It is not medical advice and does not say which drug is better.
 
 ## What each is
 
@@ -105,7 +105,7 @@ According to the Lancet authors, most gastrointestinal events were mild to moder
 **Oral semaglutide (Rybelsus, NDA 213051): FDA-approved.**
 
 - 20 September 2019: approved as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes. This was the first approval on Drugs@FDA.
-- 9 December 2024: a second tablet formulation, R2, was approved with its own dosage and switching instructions. On 30 January 2026, FDA approved a supplement under the same NDA that changed the name of formulation R2 to Ozempic tablets. The current label says Rybelsus and Ozempic tablets are not substitutable on a mg-to-mg basis.
+- 9 December 2024: a second tablet formulation, R2, was approved with its own label and switching instructions. On 30 January 2026, FDA approved a supplement under the same NDA that changed the name of formulation R2 to Ozempic tablets. The current label says Rybelsus and Ozempic tablets are not substitutable on a mg-to-mg basis.
 - 17 October 2025: a new indication was approved to reduce the risk of major adverse cardiovascular events in adults with type 2 diabetes at high risk of those events.
 - Separately, 22 December 2025: Wegovy tablets (oral semaglutide, NDA 218316) were approved for use in combination with a reduced calorie diet and increased physical activity to reduce the risk of major adverse cardiovascular events (cardiovascular death, non-fatal myocardial infarction, or non-fatal stroke) in adults with established cardiovascular disease and either obesity or overweight, and to reduce excess body weight and maintain weight reduction long term in adults with obesity or overweight in the presence of at least one weight-related comorbid condition. That is a different product and was not the ACHIEVE-3 comparator.
 

@@ -2,7 +2,7 @@ For vendor and price listings, use Peptidemap’s separate product page: [Bacter
 
 ## What bacteriostatic water is
 
-**Bacteriostatic Water for Injection, USP** is sterile water that contains a **bacteriostatic preservative**—commonly **benzyl alcohol at about 0.9%**—supplied in containers designed for **more than one withdrawal** when used as labeled. It is a **diluent / vehicle**, not a peptide, not an active drug, and not a “research stack ingredient.”
+**Bacteriostatic Water for Injection, USP** is sterile water that contains a **bacteriostatic preservative**—commonly **benzyl alcohol at about 0.9%**—supplied in containers designed for **more than one withdrawal** when used as labeled. It is a **diluent / vehicle**, not a peptide and not an active drug.
 
 Useful vocabulary:
 
@@ -60,7 +60,7 @@ Keep the lanes separate:
 
 - **Approved injectable drugs** — diluent choice is defined by that product’s labeling
 - **Compounded medications** — pharmacy pathway under compounding law; not the same as open-web RUO sales (see the legality companion)
-- **RUO / research-labeled peptides** — seller’s claimed intended-use framing for laboratory context; a research disclaimer does **not** create FDA approval or a labeled diluent protocol for human injection
+- **RUO / research-labeled peptides** — seller’s claimed intended-use framing for laboratory context; a research disclaimer does **not** create FDA approval or labeled diluent instructions for human injection
 
 Using any diluent to prepare **unapproved research chemicals for human injection** is outside labeled pharmaceutical use of bacteriostatic water. This page exists so readers can **name the fluid correctly and avoid mix-ups**—not so they can follow a reconstitution SOP.
 
@@ -78,7 +78,7 @@ Shopping stays on the price page: [bacteriostatic water vendors & prices](https:
 3. Ignoring neonate / route contraindications on the insert  
 4. Inventing reconstitution volumes from forum charts instead of reading a finished drug’s label (and omitting research-chemical recipes entirely here)  
 5. Confusing bacteriostatic water with bacteriostatic **sodium chloride** or other vehicles  
-6. Reading a price page as a protocol page—or this literacy guide as a shopping table  
+6. Reading a price page as an instruction page—or this literacy guide as a shopping table  
 
 ## FAQs
 
@@ -92,7 +92,7 @@ No. Sterile Water for Injection typically has **no** antimicrobial preservative 
 
 ### Why does Peptidemap refuse reconstitution charts?
 
-Site policy: diluent and peptide literacy without dosing math or reconstitution recipes for research chemicals. That keeps educational pages from doubling as protocols.
+Site policy: diluent and peptide literacy without reconstitution recipes for research chemicals. That keeps educational pages from doubling as instructions.
 
 ### Can neonates receive bacteriostatic water?
 
@@ -118,6 +118,6 @@ On the separate product page: [https://peptidemap.com/bacteriostatic-water](http
 
 ## Disclaimer
 
-Educational literacy only. Not medical advice, not legal advice, and not instructions for reconstitution, dosing, or human administration. Follow applicable law, institutional sterile-product practice, and licensed professional guidance. Read current product labeling.
+Educational literacy only. Not medical advice, not legal advice, and not instructions for reconstitution or human administration. Follow applicable law, institutional sterile-product practice, and licensed professional guidance. Read current product labeling.
 
 ---
