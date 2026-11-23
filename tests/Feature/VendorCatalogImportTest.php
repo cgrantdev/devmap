@@ -15,6 +15,7 @@ use App\Models\VendorSetting;
 use App\Services\IngestionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Sleep;
@@ -339,6 +340,60 @@ class VendorCatalogImportTest extends TestCase
         $this->assertEquals($uncategorized->id, $klowHidden->fresh()->product_category_id);
         $this->assertTrue((bool) $klowHidden->fresh()->hidden);
         $this->assertEquals($aliasBefore, CategoryAlias::where('keyword', 'semax')->value('product_category_id'));
+    }
+
+    public function test_the_cardiogen_migration_files_only_an_unfiled_row(): void
+    {
+        $brand = Brand::create(['name' => 'Capital Precision Labs', 'slug' => 'capital-precision-labs', 'is_active' => true]);
+        $cardiogen = ProductCategory::firstOrCreate(['slug' => 'cardiogen'], ['name' => 'Cardiogen', 'is_active' => true]);
+        $cardiogen->update(['is_active' => true]);
+        $row = Product::create([
+            'name' => 'Cardiogen 20mg',
+            'slug' => 'cardiogen-20mg-cpl',
+            'brand_id' => $brand->id,
+            'price' => 40,
+            'status' => 'active',
+        ]);
+
+        $migration = require database_path('migrations/2026_11_24_130000_capital_precision_labs_cardiogen.php');
+        $migration->up();
+        $this->assertEquals($cardiogen->id, $row->fresh()->product_category_id);
+
+        $migration->down();
+        $this->assertNull($row->fresh()->product_category_id);
+    }
+
+    public function test_vendor_page_paging_has_a_unique_tiebreaker(): void
+    {
+        $brand = Brand::create(['name' => 'Tied Prices', 'slug' => 'tied-prices', 'is_active' => true]);
+        VendorSetting::create(['brand_id' => $brand->id, 'approval_status' => 'approved', 'status' => 1]);
+        foreach (range(1, 30) as $i) {
+            Product::create([
+                'name' => 'Bioregulator '.$i.' 20mg',
+                'slug' => 'bioregulator-'.$i.'-tied',
+                'brand_id' => $brand->id,
+                'price' => 45,
+                'status' => 'active',
+            ]);
+        }
+
+        DB::enableQueryLog();
+        $seen = [];
+        foreach ([1, 2, 3] as $page) {
+            $props = $this->get('/brand/tied-prices?page='.$page)->assertOk()->viewData('page')['props'];
+            foreach ($props['products']['data'] as $row) {
+                $seen[] = $row['id'];
+            }
+        }
+        $listing = collect(DB::getQueryLog())->pluck('query')
+            ->first(fn (string $sql) => str_contains($sql, 'from "products"') && str_contains($sql, 'limit 12'));
+
+        // Equal prices and no reviews tie on every sort key; MySQL may
+        // order ties differently per page query unless a unique key ends it.
+        $this->assertNotNull($listing);
+        $this->assertMatchesRegularExpression('/order by .*"products"\."id" asc limit 12/i', $listing);
+        $this->assertCount(30, $seen);
+        $this->assertCount(30, array_unique($seen));
     }
 
     private function stage(ScrapingConfig $config, string $slug, string $name, float $price): void

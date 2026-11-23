@@ -987,6 +987,10 @@ class ProductsController extends Controller
         } else {
             $query->orderBy('rating_average', $sortDir);
         }
+        // Unique tiebreaker: rows tied on every key above come back in a
+        // different order per query, so pages repeated some and skipped
+        // others.
+        $query->orderBy('products.id');
 
         // Category pages should show every product in the category, not a
         // paginated slice — researchers compare vendor pricing across the
@@ -1411,6 +1415,11 @@ class ProductsController extends Controller
         } else {
             $query->orderBy('rating_average', $sortDir);
         }
+        // Unique tiebreaker. A fresh import is mostly ties (same price, no
+        // reviews), which came back in a different order per page query,
+        // so paging repeated some listings and never showed others
+        // (Capital Precision Labs, 241 listings, 24 Nov 2026).
+        $query->orderBy('products.id');
 
         // Paginate — vendor pages now use a 12-item grid so each product
         // image gets room to breathe. Users can opt into larger pages via
