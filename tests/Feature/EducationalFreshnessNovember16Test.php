@@ -26,16 +26,18 @@ class EducationalFreshnessNovember16Test extends TestCase
 
     /**
      * Word counts of the current sources. The two 20 Nov strict-RUO passes
-     * shortened several of them; no read time changed.
+     * shortened several of them; no read time changed. The 23 Nov
+     * state-enforcement update (2026_11_23_200000) lengthened the two
+     * guides: legality 25 to 31, compounded 13 to 15.
      *
      * @var array<string, array{0: int, 1: string}>
      */
     private const EXPECTED = [
-        'compounded-vs-ruo-peptides' => [2903, '13 Min Read'],
-        'peptide-legality-fda-ruo-compounding' => [5748, '25 Min Read'],
+        'compounded-vs-ruo-peptides' => [3379, '15 Min Read'],
+        'peptide-legality-fda-ruo-compounding' => [7040, '31 Min Read'],
         'bpc-157-vs-tb-500-evidence' => [4348, '19 Min Read'],
         'retatrutide-side-effects-trial-data' => [4717, '21 Min Read'],
-        'retatrutide-vs-semaglutide' => [4183, '19 Min Read'],
+        'retatrutide-vs-semaglutide' => [4181, '19 Min Read'],
         'eloralintide-tirzepatide-vs-retatrutide' => [1458, '7 Min Read'],
         'hhs-503a-peptide-enforcement-discretion-2026' => [910, '4 Min Read'],
         'bpc-157-vs-ghk-cu' => [2136, '10 Min Read'],
@@ -221,7 +223,8 @@ class EducationalFreshnessNovember16Test extends TestCase
     public function test_compounded_guide_faq_matches_the_publisher_and_json_ld(): void
     {
         $slug = 'compounded-vs-ruo-peptides';
-        $answer = 'No. The Federal Register notice calls it a draft and says it is not binding. Its two-week comment window closed on 13 Nov 2026, and no final version had been published as of 16 Nov 2026 [2][10] [primary].';
+        // Date moved to 23 Nov 2026 by 2026_11_23_200000.
+        $answer = 'No. The Federal Register notice calls it a draft and says it is not binding. Its two-week comment window closed on 13 Nov 2026, and no final version had been published as of 23 Nov 2026 [2][10] [primary].';
         $markdown = (string) file_get_contents(resource_path('content/educational/'.$slug.'.md'));
         $this->assertStringContainsString("### Is the policy final?\n\n".$answer, $markdown);
         $this->assertStringContainsString("['Is the policy final?', '".$answer."'],", (string) file_get_contents(app_path('Content/EducationalContentPublisher.php')));

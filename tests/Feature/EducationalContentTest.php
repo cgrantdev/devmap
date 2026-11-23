@@ -2483,9 +2483,9 @@ class EducationalContentTest extends TestCase
 
         $guideMarkdown = (string) file_get_contents(resource_path('content/educational/'.$guideSlug.'.md'));
         $guideWords = $this->renderedWordCount($guideMarkdown);
-        $this->assertSame(2903, $guideWords);
-        $this->assertSame('13 Min Read', ((int) ceil($guideWords / 230)).' Min Read');
-        $this->assertSame('13 Min Read', $guideEntry['read_time']);
+        $this->assertSame(3379, $guideWords);
+        $this->assertSame('15 Min Read', ((int) ceil($guideWords / 230)).' Min Read');
+        $this->assertSame('15 Min Read', $guideEntry['read_time']);
         $this->assertStringContainsString('## FAQ', $guideMarkdown);
         $this->assertDoesNotMatchRegularExpression('/^# [^#]/m', $guideMarkdown);
         $this->assertDoesNotMatchRegularExpression('/\A---\n/', $guideMarkdown);
@@ -2496,7 +2496,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame($guideEntry['lede'], $guide->description);
         $this->assertSame($guideSeo, $guide->seo_page_title);
         $this->assertSame($guideDescription, $guide->seo_description);
-        $this->assertSame('13 Min Read', $guide->reading_time);
+        $this->assertSame('15 Min Read', $guide->reading_time);
         $this->assertSame('2026-10-29', $guide->published_at->toDateString());
         $this->assertSame($guideEntry['faq'], $guide->seo_schema[0] ?? null);
         $this->assertFileExists(public_path('images/educational/'.$guideSlug.'.png'));
@@ -2516,7 +2516,7 @@ class EducationalContentTest extends TestCase
         $guidePage->assertOk();
         $guidePage->assertSee($guideH1, false);
         $guidePage->assertSee($guideSeo, false);
-        $guidePage->assertSee('13 Min Read', false);
+        $guidePage->assertSee('15 Min Read', false);
         $guidePage->assertSee('https://peptidemap.com/guides/'.$guideSlug.'#faq', false);
         $guidePage->assertSee('https://peptidemap.com/guides/'.$guideSlug, false);
         $guidePage->assertSee('Did FDA approve these six peptides?', false);
@@ -2528,7 +2528,7 @@ class EducationalContentTest extends TestCase
             ->component('Frontend/GuideArticle')
             ->where('guide.slug', $guideSlug)
             ->where('guide.title', $guideH1)
-            ->where('guide.readingTime', '13 Min Read')
+            ->where('guide.readingTime', '15 Min Read')
         );
 
         $blogSlug = 'hhs-503a-peptide-enforcement-discretion-2026';
@@ -2668,7 +2668,9 @@ class EducationalContentTest extends TestCase
         foreach (['guide' => $guideCopy, 'blog' => $blogCopy] as $label => $text) {
             $this->assertStringNotContainsString('HHS/FDA', $text, $label);
             $this->assertDoesNotMatchRegularExpression($dose, $text, $label);
-            $this->assertDoesNotMatchRegularExpression($percentage, $text, $label);
+            // Percent-encoded bytes inside a source URL (e.g. the Kentucky
+            // alert PDF, added 23 Nov 2026) are not figures.
+            $this->assertDoesNotMatchRegularExpression($percentage, preg_replace('~https?://\S+~', '', $text) ?? $text, $label);
         }
 
         $this->get('/guides/compounded-vs-ruo-peptides')->assertOk();
@@ -2727,7 +2729,7 @@ class EducationalContentTest extends TestCase
         $this->assertSame($policyGuideId, $updatedGuide->id);
         $this->assertStringNotContainsString('STALE GUIDE', (string) $updatedGuide->content);
         $this->assertStringContainsString('federal district courts in California and Texas', (string) $updatedGuide->content);
-        $this->assertSame('13 Min Read', $updatedGuide->reading_time);
+        $this->assertSame('15 Min Read', $updatedGuide->reading_time);
 
         $this->assertSame($blogCount + 1, Blog::count());
         $createdBlog = Blog::where('slug', 'hhs-503a-peptide-enforcement-discretion-2026')->firstOrFail();
