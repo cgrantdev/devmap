@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\ProductCategory;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Case-insensitive encyclopedia category lookup.
@@ -28,7 +29,10 @@ final class EncyclopediaCategoryMatch
 
         if ($rows->count() > 1) {
             $stored = $rows->map(fn (ProductCategory $category) => $category->slug)->implode(', ');
-            $command?->warn($label.': skipped slug collision ('.$stored.').');
+            $line = $label.': skipped slug collision ('.$stored.').';
+            Log::warning($line);
+            $command?->warn($line);
+            self::emit('stderr', $line);
 
             return new self(null, false, true);
         }
@@ -38,5 +42,16 @@ final class EncyclopediaCategoryMatch
         }
 
         return new self($rows->first(), false, false);
+    }
+
+    private static function emit(string $stream, string $line): void
+    {
+        $handle = match ($stream) {
+            'stderr' => defined('STDERR') ? STDERR : null,
+            default => defined('STDOUT') ? STDOUT : null,
+        };
+        if (is_resource($handle)) {
+            @fwrite($handle, $line.PHP_EOL);
+        }
     }
 }
