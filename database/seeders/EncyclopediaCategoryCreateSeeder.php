@@ -7,6 +7,8 @@ use App\Models\EducationPost;
 use App\Models\ProductCategory;
 use App\Support\EncyclopediaShellParser;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -28,7 +30,9 @@ use Illuminate\Support\Facades\Schema;
  * preserve_active also leaves a stub description alone. No match creates
  * the category. create_inactive inserts that new row with is_active false;
  * every other create stays active. No product, vendor, or price rows are
- * written. Safe to run twice.
+ * written. Each slug's writes run in one DB::transaction and use
+ * saveQuietly(). Skip lines go out through a defined()-guarded helper.
+ * Safe to run twice.
  */
 class EncyclopediaCategoryCreateSeeder extends Seeder
 {
@@ -37,6 +41,7 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
         'pemvidutide',
         'hexarelin',
         'cagrisema',
+        'cbl-514',
     ];
 
     /**
@@ -48,7 +53,9 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
      *     copy_research_area_from: string,
      *     blank_chemistry: bool,
      *     create_inactive?: bool,
-     *     preserve_active?: bool
+     *     preserve_active?: bool,
+     *     blank_sequence?: bool,
+     *     read_time?: string
      * }>
      */
     private const DETAILS = [
@@ -90,6 +97,21 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
             'create_inactive' => true,
             'preserve_active' => true,
         ],
+        // Content-only page. Created inactive so /encyclopedia/cbl-514 stays
+        // 404 until someone activates it. No aliases, no featured image, no
+        // chemistry, no sequence, and no product or vendor rows.
+        'cbl-514' => [
+            'name' => 'CBL-514',
+            'aliases' => [],
+            'image' => '',
+            'cas' => '',
+            'copy_research_area_from' => '',
+            'blank_chemistry' => true,
+            'blank_sequence' => true,
+            'create_inactive' => true,
+            'preserve_active' => true,
+            'read_time' => '11',
+        ],
     ];
 
     /** @var array<string, list<string>> */
@@ -112,7 +134,7 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
             $this->seedSlug($slug, $parser);
         }
 
-        $this->command?->info(sprintf(
+        $this->info(sprintf(
             'Encyclopedia category create: created %d, reused %d, filled %d, already filled %d, collision %d, slug taken %d, missing draft %d.',
             count($this->report['created_categories']),
             count($this->report['reused_categories']),
@@ -146,7 +168,7 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
             $this->report['reused_categories'][] = $slug;
             $post = EducationPost::query()->where('product_category_id', $category->id)->first();
             if ($post && $this->overviewIsFilled($post->overview)) {
-                $this->report['skipped_already_filled'][] = $slug;
+                $this->noteAlreadyFilled($slug, $post, $entry);
 
                 return;
             }
@@ -156,6 +178,7 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
         $metaPath = $this->dataPath($slug, 'meta.md');
         if (! is_file($bodyPath) || ! is_file($metaPath)) {
             $this->report['missing_draft'][] = $slug;
+            $this->warn($entry['name'].' encyclopedia create: skipped, missing draft.');
 
             return;
         }
@@ -166,74 +189,88 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
             (string) file_get_contents($metaPath)
         );
 
-        $createdCategory = false;
-        if (! $category instanceof ProductCategory) {
-            $category = $this->createCategory($slug, $entry, $attributes);
-            $createdCategory = true;
-            $this->report['created_categories'][] = $slug;
-        }
+        DB::transaction(function () use ($slug, $entry, $attributes, &$category, &$post) {
+            $createdCategory = false;
+            if (! $category instanceof ProductCategory) {
+                $category = $this->createCategory($slug, $entry, $attributes);
+                $createdCategory = true;
+                $this->report['created_categories'][] = $slug;
+            }
 
-        $storedSlug = (string) $category->slug;
-        $post = $post ?? EducationPost::query()->where('product_category_id', $category->id)->first();
-        if ($post && $this->overviewIsFilled($post->overview)) {
-            $this->report['skipped_already_filled'][] = $slug;
-
-            return;
-        }
-
-        $createdPost = false;
-        if (! $post) {
-            if ($this->educationSlugTaken($storedSlug)) {
-                $this->report['skipped_slug_taken'][] = $slug;
+            $storedSlug = (string) $category->slug;
+            $post = $post ?? EducationPost::query()->where('product_category_id', $category->id)->first();
+            if ($post && $this->overviewIsFilled($post->overview)) {
+                $this->repairExisting($post, $slug, $entry);
+                $this->report['skipped_already_filled'][] = $slug;
 
                 return;
             }
-            $post = new EducationPost([
-                'product_category_id' => $category->id,
-                'slug' => $storedSlug,
-                'published_at' => now(),
-            ]);
-            $createdPost = true;
-        } elseif ($post->slug !== $storedSlug && $this->educationSlugTaken($storedSlug, $post->id)) {
-            $this->report['skipped_slug_taken'][] = $slug;
 
-            return;
-        }
+            $createdPost = false;
+            if (! $post) {
+                if ($this->educationSlugTaken($storedSlug)) {
+                    $this->report['skipped_slug_taken'][] = $slug;
+                    $this->warn($entry['name'].' encyclopedia create: skipped, education slug taken ('.$storedSlug.').');
 
-        $attributes = array_intersect_key($attributes, array_flip($post->getFillable()));
-        $post->fill($attributes);
-        $post->product_category_id = $category->id;
-        $post->slug = $storedSlug;
-        $post->status = 'published';
-        $post->show_in_encyclopedia = true;
-        $post->published_at = $post->published_at ?? now();
-        if (($entry['cas'] ?? '') !== '') {
-            $post->cas_registry_number = $entry['cas'];
-        }
-        if (($entry['blank_chemistry'] ?? false) === true) {
-            $post->molecular_formula = null;
-            $post->molecular_weight = null;
-        }
+                    return;
+                }
+                $post = new EducationPost([
+                    'product_category_id' => $category->id,
+                    'slug' => $storedSlug,
+                    'published_at' => now(),
+                ]);
+                $createdPost = true;
+            } elseif ($post->slug !== $storedSlug && $this->educationSlugTaken($storedSlug, $post->id)) {
+                $this->report['skipped_slug_taken'][] = $slug;
+                $this->warn($entry['name'].' encyclopedia create: skipped, education slug taken ('.$storedSlug.').');
 
-        $image = $this->imageWebPath($entry['image']);
-        if ($image) {
-            $post->seo_og_image = $image;
-        }
+                return;
+            }
 
-        $keywords = $post->tags;
-        if (! $post->education_tag && is_array($keywords) && isset($keywords[0]) && is_string($keywords[0]) && $keywords[0] !== '') {
-            $post->education_tag = mb_substr($keywords[0], 0, 255);
-        }
+            $fillable = array_intersect_key($attributes, array_flip($post->getFillable()));
+            $post->fill($fillable);
+            $post->product_category_id = $category->id;
+            $post->slug = $storedSlug;
+            $post->status = 'published';
+            $post->show_in_encyclopedia = true;
+            $post->published_at = $post->published_at ?? now();
+            if (($entry['cas'] ?? '') !== '') {
+                $post->cas_registry_number = $entry['cas'];
+            }
+            if (($entry['blank_chemistry'] ?? false) === true) {
+                $post->molecular_formula = null;
+                $post->molecular_weight = null;
+                if (($entry['cas'] ?? '') === '') {
+                    $post->cas_registry_number = null;
+                }
+            }
+            if (($entry['blank_sequence'] ?? false) === true) {
+                $post->amino_acid_sequence = null;
+            }
+            if (array_key_exists('read_time', $entry) && Schema::hasColumn('education_posts', 'read_time')) {
+                $post->read_time = $entry['read_time'];
+            }
 
-        $post->save();
-        if (! $createdCategory && ($entry['preserve_active'] ?? false) !== true) {
-            $this->replaceStubDescription($category, $post->description);
-        }
+            $image = $this->imageWebPath($entry['image']);
+            if ($image) {
+                $post->seo_og_image = $image;
+            }
 
-        $this->report['filled'][] = $slug;
-        if ($createdPost) {
-            $this->report['created_posts'][] = $slug;
-        }
+            $keywords = $post->tags;
+            if (! $post->education_tag && is_array($keywords) && isset($keywords[0]) && is_string($keywords[0]) && $keywords[0] !== '') {
+                $post->education_tag = mb_substr($keywords[0], 0, 255);
+            }
+
+            $post->saveQuietly();
+            if (! $createdCategory && ($entry['preserve_active'] ?? false) !== true) {
+                $this->replaceStubDescription($category, $post->description);
+            }
+
+            $this->report['filled'][] = $slug;
+            if ($createdPost) {
+                $this->report['created_posts'][] = $slug;
+            }
+        });
     }
 
     /**
@@ -259,7 +296,7 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
                 ->orderBy('id')
                 ->pluck('slug')
                 ->implode(', ');
-            $this->command?->warn($entry['name'].' encyclopedia create: skipped slug collision ('.$stored.').');
+            $this->warn($entry['name'].' encyclopedia create: skipped slug collision ('.$stored.').');
 
             return ['status' => 'collision', 'category' => null];
         }
@@ -316,7 +353,7 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
         if (($entry['copy_research_area_from'] ?? '') !== '') {
             $this->copySiblingClassification($category, $entry['copy_research_area_from']);
         }
-        $category->save();
+        $category->saveQuietly();
 
         return $category;
     }
@@ -375,7 +412,85 @@ class EncyclopediaCategoryCreateSeeder extends Seeder
             return;
         }
         $category->description = $short;
-        $category->save();
+        $category->saveQuietly();
+    }
+
+    /**
+     * @param  array<string, mixed>  $entry
+     */
+    private function noteAlreadyFilled(string $slug, EducationPost $post, array $entry): void
+    {
+        DB::transaction(function () use ($post, $entry, $slug) {
+            $this->repairExisting($post, $slug, $entry);
+        });
+        $this->report['skipped_already_filled'][] = $slug;
+    }
+
+    /**
+     * A fresh migrate can insert this post from an earlier seeder run.
+     * That run is before the read_time column, and the 14 Nov FAQ migration
+     * then archives faqs for slugs that are not on the render allowlist.
+     * Fill those two gaps once. A second run finds them set and writes nothing.
+     * Other slugs are not repaired.
+     *
+     * @param  array<string, mixed>  $entry
+     */
+    private function repairExisting(EducationPost $post, string $slug, array $entry): void
+    {
+        $dirty = false;
+        if (array_key_exists('read_time', $entry) && Schema::hasColumn('education_posts', 'read_time')) {
+            $current = $post->read_time;
+            if ($current === null || $current === '') {
+                $post->read_time = $entry['read_time'];
+                $dirty = true;
+            }
+        }
+        if ($slug === 'cbl-514' && ! $this->faqList($post->faqs)) {
+            $bodyPath = $this->dataPath($slug, 'body.md');
+            $metaPath = $this->dataPath($slug, 'meta.md');
+            if (is_file($bodyPath) && is_file($metaPath)) {
+                $parsed = (new EncyclopediaShellParser)->parse(
+                    $slug,
+                    (string) file_get_contents($bodyPath),
+                    (string) file_get_contents($metaPath)
+                );
+                $post->faqs = $parsed['faqs'];
+                $dirty = true;
+            }
+        }
+        if ($dirty) {
+            $post->saveQuietly();
+        }
+    }
+
+    private function faqList(mixed $faqs): bool
+    {
+        return is_array($faqs) && $faqs !== [];
+    }
+
+    private function info(string $line): void
+    {
+        Log::info($line);
+        $this->command?->info($line);
+        $this->emit('stdout', $line);
+    }
+
+    private function warn(string $line): void
+    {
+        Log::warning($line);
+        $this->command?->warn($line);
+        $this->emit('stderr', $line);
+    }
+
+    private function emit(string $stream, string $line): void
+    {
+        $handle = match ($stream) {
+            'stderr' => defined('STDERR') ? STDERR : null,
+            default => defined('STDOUT') ? STDOUT : null,
+        };
+        if (is_resource($handle)) {
+            @fwrite($handle, $line.PHP_EOL);
+        }
     }
 
     private function imageWebPath(string $file): ?string

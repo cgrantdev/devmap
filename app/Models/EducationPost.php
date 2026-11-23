@@ -78,6 +78,7 @@ class EducationPost extends Model
         'seo_og_title',
         'seo_og_description',
         'seo_og_image',
+        'read_time',
     ];
 
     protected $casts = [
