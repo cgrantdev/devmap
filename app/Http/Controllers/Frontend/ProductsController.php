@@ -288,8 +288,10 @@ class ProductsController extends Controller
                 $this->applyLocationFilter($flaggedQ, $locationAliases);
                 $flagged = $flaggedQ->first();
 
+                // Our WebP mirror before the vendor's file: vendor originals
+                // ran to 4 MB per card, and hotlink-protected hosts 403.
                 if ($flagged) {
-                    $image = $flagged->image_url;
+                    $image = $flagged->mirrored_image_url ?: $flagged->image_url;
                 } elseif ($category->image_url
                     && \Illuminate\Support\Facades\Storage::disk('public')->exists('categories/' . $category->image_url)
                 ) {
@@ -316,14 +318,19 @@ class ProductsController extends Controller
                         '%.supabase.co%',
                         '%myoasislabs.com/wp-content/uploads/%',
                     ];
+                    // A product with our own mirror always serves, so it
+                    // qualifies whatever the vendor's host; mirrored first.
                     $sampleQ = Product::visible()
                         ->where('status', 'active')
                         ->where('product_category_id', $category->id)
                         ->whereNotNull('image_url')
                         ->where('image_url', '!=', '')
                         ->where(function ($q) use ($reliablePatterns) {
+                            $q->where(fn ($m) => $m->whereNotNull('mirrored_image_url')->where('mirrored_image_url', '!=', ''));
                             foreach ($reliablePatterns as $p) $q->orWhere('image_url', 'like', $p);
-                        });
+                        })
+                        ->orderByRaw('mirrored_image_url IS NULL')
+                        ->orderBy('id');
                     $this->applyLocationFilter($sampleQ, $locationAliases);
                     $sample = $sampleQ->first();
                     // Fall back to any visible product with an image if
@@ -336,13 +343,15 @@ class ProductsController extends Controller
                             ->where('product_category_id', $category->id)
                             ->whereNotNull('image_url')
                             ->where('image_url', '!=', '')
-                            ->where('image_url', 'not like', '%certified-pep.com%');
+                            ->where('image_url', 'not like', '%certified-pep.com%')
+                            ->orderByRaw('mirrored_image_url IS NULL')
+                            ->orderBy('id');
                         $this->applyLocationFilter($sampleFallbackQ, $locationAliases);
                         $sample = $sampleFallbackQ->first();
                     }
-                    $image = $sample ? $sample->image_url : null;
+                    $image = $sample ? ($sample->mirrored_image_url ?: $sample->image_url) : null;
                 }
-                
+
                 return [
                     'id' => $category->id,
                     'name' => \App\Support\CompoundDisplay::label($category->name),

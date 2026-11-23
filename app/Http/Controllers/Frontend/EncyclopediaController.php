@@ -350,8 +350,10 @@ class EncyclopediaController extends Controller
                 ->where('image_url', 'not like', '%certified-pep.com%')
                 ->first();
 
+            // Our WebP mirror before the vendor's file: vendor originals ran
+            // to 4 MB per card, and hotlink-protected hosts 403.
             if ($flagged) {
-                $image = $flagged->image_url;
+                $image = $flagged->mirrored_image_url ?: $flagged->image_url;
             } elseif ($category->image_url
                 && Storage::disk('public')->exists('categories/'.$category->image_url)
             ) {
@@ -363,8 +365,10 @@ class EncyclopediaController extends Controller
                     ->whereNotNull('image_url')
                     ->where('image_url', '!=', '')
                     ->where('image_url', 'not like', '%certified-pep.com%')
+                    ->orderByRaw('mirrored_image_url IS NULL')
+                    ->orderBy('id')
                     ->first();
-                $image = $sample ? $sample->image_url : null;
+                $image = $sample ? ($sample->mirrored_image_url ?: $sample->image_url) : null;
             }
 
             $profile = EncyclopediaFraming::match($category->slug, $category->name);
