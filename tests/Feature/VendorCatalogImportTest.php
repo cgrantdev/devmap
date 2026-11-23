@@ -291,6 +291,56 @@ class VendorCatalogImportTest extends TestCase
         $this->assertTrue($second->fresh()->enabled);
     }
 
+    public function test_the_compound_migration_files_capital_precision_products(): void
+    {
+        $brand = Brand::create(['name' => 'Capital Precision Labs', 'slug' => 'capital-precision-labs', 'is_active' => true]);
+        $category = function (string $slug, string $name, bool $active = true): ProductCategory {
+            $row = ProductCategory::firstOrCreate(['slug' => $slug], ['name' => $name, 'is_active' => $active]);
+            $row->update(['is_active' => $active]);
+
+            return $row;
+        };
+        $semaglutide = $category('semaglutide', 'Semaglutide');
+        $semax = $category('semax', 'Semax');
+        $tb500 = $category('tb-500', 'TB-500');
+        $klow = $category('klow-blend-ghk-cu-bpc-157-tb-500-kpv', 'KLOW');
+        $uncategorized = $category('uncategorized', 'Uncategorized', false);
+        $product = fn (string $name, ?int $categoryId, bool $hidden = false) => Product::create([
+            'name' => $name,
+            'slug' => strtolower((string) preg_replace('/[^A-Za-z0-9]+/', '-', $name)).'-cpl',
+            'brand_id' => $brand->id,
+            'product_category_id' => $categoryId,
+            'price' => 30,
+            'status' => 'active',
+            'hidden' => $hidden,
+        ]);
+        $semaxRow = $product('Semax 10mg', $semaglutide->id);
+        $semaglutideRow = $product('Semaglutide 10mg', $semaglutide->id);
+        $fragment = $product('TB-500 Fragment 10mg', $tb500->id);
+        $klowHidden = $product('KLOW Blend 80mg', $uncategorized->id, true);
+        $noPage = $product('Liraglutide 10mg', null);
+        $aliasBefore = CategoryAlias::where('keyword', 'semax')->value('product_category_id');
+
+        $migration = require database_path('migrations/2026_11_24_120000_capital_precision_labs_compounds.php');
+        $migration->up();
+
+        $this->assertEquals($semax->id, $semaxRow->fresh()->product_category_id);
+        $this->assertEquals($semaglutide->id, $semaglutideRow->fresh()->product_category_id);
+        $this->assertNull($fragment->fresh()->product_category_id);
+        $this->assertEquals($klow->id, $klowHidden->fresh()->product_category_id);
+        $this->assertFalse((bool) $klowHidden->fresh()->hidden);
+        $this->assertNull($noPage->fresh()->product_category_id);
+        $this->assertEquals($semax->id, CategoryAlias::where('keyword', 'semax')->value('product_category_id'));
+
+        $migration->down();
+
+        $this->assertEquals($semaglutide->id, $semaxRow->fresh()->product_category_id);
+        $this->assertEquals($tb500->id, $fragment->fresh()->product_category_id);
+        $this->assertEquals($uncategorized->id, $klowHidden->fresh()->product_category_id);
+        $this->assertTrue((bool) $klowHidden->fresh()->hidden);
+        $this->assertEquals($aliasBefore, CategoryAlias::where('keyword', 'semax')->value('product_category_id'));
+    }
+
     private function stage(ScrapingConfig $config, string $slug, string $name, float $price): void
     {
         $url = 'https://shop.example.com/products/'.$slug;
