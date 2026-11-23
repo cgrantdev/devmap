@@ -56,7 +56,7 @@ return new class extends Migration
                         'config_id' => $config?->id,
                         'original' => $config ? array_intersect_key($config->getRawOriginal(), array_flip([
                             'type', 'products_url', 'store_url', 'selectors', 'auth_credentials',
-                            'frequency', 'auto_promote', 'product_category_id', 'enabled', 'next_run_at',
+                            'frequency', 'auto_promote', 'enabled', 'next_run_at',
                         ])) : null,
                         'disabled_config_ids' => $others->pluck('id')->values()->all(),
                     ]),
@@ -83,8 +83,6 @@ return new class extends Migration
             'store_url' => self::STORE,
             'selectors' => ['max_products' => 400],
             'auth_credentials' => array_merge($credentials, ['currency_code' => 'AUD']),
-            // A pinned category would file every product under one compound.
-            'product_category_id' => null,
             'enabled' => true,
             'frequency' => 'daily',
             'auto_promote' => true,

@@ -281,7 +281,6 @@ class VendorCatalogImportTest extends TestCase
         $this->assertSame('AUD', $fresh->auth_credentials['currency_code']);
         $this->assertTrue($fresh->enabled);
         $this->assertTrue($fresh->auto_promote);
-        $this->assertNull($fresh->product_category_id);
         $this->assertFalse($fresh->next_run_at->isFuture());
         $this->assertFalse($second->fresh()->enabled);
 
