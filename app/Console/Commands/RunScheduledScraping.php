@@ -2,12 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\RunBigCommerceIngestJob;
-use App\Jobs\RunJsonFeedIngestJob;
-use App\Jobs\RunJsonLdIngestJob;
-use App\Jobs\RunMedusaIngestJob;
 use App\Jobs\RunPythonScraperJob;
-use App\Jobs\RunWooCommerceIngestJob;
 use App\Models\ScrapingConfig;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -66,14 +61,7 @@ class RunScheduledScraping extends Command
                 'next_run_at' => $config->next_run_at?->toIso8601String(),
             ]);
 
-            match ($type) {
-                ScrapingConfig::TYPE_WOO_API     => RunWooCommerceIngestJob::dispatch($config),
-                ScrapingConfig::TYPE_JSON_FEED   => RunJsonFeedIngestJob::dispatch($config),
-                ScrapingConfig::TYPE_MEDUSA_STORE => RunMedusaIngestJob::dispatch($config),
-                ScrapingConfig::TYPE_JSON_LD     => RunJsonLdIngestJob::dispatch($config),
-                ScrapingConfig::TYPE_BIGCOMMERCE  => RunBigCommerceIngestJob::dispatch($config),
-                default                          => RunPythonScraperJob::dispatch($config),
-            };
+            dispatch($config->dedicatedIngestJob() ?? new RunPythonScraperJob($config));
         }
 
         $this->info('All due scraping jobs have been dispatched.');

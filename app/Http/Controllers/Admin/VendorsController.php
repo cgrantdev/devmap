@@ -1666,10 +1666,12 @@ class VendorsController extends Controller
             if (empty($creds['consumer_key']) || empty($creds['consumer_secret'])) {
                 return back()->with('error', 'WooCommerce API keys required. Add consumer key and secret in Integration tab.');
             }
-            \App\Jobs\RunWooCommerceIngestJob::dispatch($config);
-        } else {
-            \App\Jobs\RunPageScraperJob::dispatch($config);
         }
+
+        // A config with its own importer (WooCommerce, JSON-LD, JSON feed,
+        // Medusa, BigCommerce) runs it; anything else refreshes the pages
+        // of the products we already list.
+        dispatch($config->dedicatedIngestJob() ?? new \App\Jobs\RunPageScraperJob($config));
 
         return back()->with('success', 'Scrape triggered! Check back in a minute for results.');
     }
@@ -1685,6 +1687,22 @@ class VendorsController extends Controller
         ];
 
         $type = $typeMap[$settings->api_platform] ?? 'page_scrape';
+
+        // Keep a dedicated importer. The platform dropdown has no entry for
+        // JSON-LD, JSON feeds or BigCommerce and maps Medusa to the page
+        // scraper, so every save of the vendor form turned those configs
+        // back into a page scrape of the homepage (Capital Precision Labs,
+        // 24 Nov 2026). Choosing WooCommerce still switches to its API.
+        $dedicated = [
+            ScrapingConfig::TYPE_JSON_LD,
+            ScrapingConfig::TYPE_JSON_FEED,
+            ScrapingConfig::TYPE_MEDUSA_STORE,
+            ScrapingConfig::TYPE_BIGCOMMERCE,
+        ];
+        if ($type !== 'woo_api'
+            && ScrapingConfig::where('vendor_id', $brand->id)->whereIn('type', $dedicated)->exists()) {
+            return;
+        }
 
         $config = ScrapingConfig::updateOrCreate(
             ['vendor_id' => $brand->id],

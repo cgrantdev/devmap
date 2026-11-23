@@ -2,6 +2,12 @@
 
 namespace App\Models;
 
+use App\Jobs\RunBigCommerceIngestJob;
+use App\Jobs\RunJsonFeedIngestJob;
+use App\Jobs\RunJsonLdIngestJob;
+use App\Jobs\RunMedusaIngestJob;
+use App\Jobs\RunWooCommerceIngestJob;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +15,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ScrapingConfig extends Model
 {
     public const TYPE_CSS_SCRAPE = 'css_scrape';
+    // "Page Scraper" in the admin vendor form. Its "Update Products" button
+    // runs RunPageScraperJob, which refreshes the page of each product we
+    // already list and never adds products.
+    public const TYPE_PAGE_SCRAPE = 'page_scrape';
     public const TYPE_WOO_API = 'woo_api';
     public const TYPE_WP_REST = 'wp_rest';
     public const TYPE_XML_FEED = 'xml_feed';
@@ -66,6 +76,22 @@ class ScrapingConfig extends Model
         return $this->hasMany(ScrapedProduct::class);
     }
 
+    /**
+     * The importer for a config with its own adapter, or null for the
+     * generic scrapers (page_scrape, css_scrape).
+     */
+    public function dedicatedIngestJob(): ?ShouldQueue
+    {
+        return match ($this->type) {
+            self::TYPE_WOO_API => new RunWooCommerceIngestJob($this),
+            self::TYPE_JSON_FEED => new RunJsonFeedIngestJob($this),
+            self::TYPE_MEDUSA_STORE => new RunMedusaIngestJob($this),
+            self::TYPE_JSON_LD => new RunJsonLdIngestJob($this),
+            self::TYPE_BIGCOMMERCE => new RunBigCommerceIngestJob($this),
+            default => null,
+        };
+    }
+
     public function calculateNextRunAt(): void
     {
         $now = now();
@@ -113,10 +139,14 @@ class ScrapingConfig extends Model
     /**
      * Push the next run out after the vendor refused us (revoked key,
      * rate limit), so a dead integration is not retried every hour.
+     * Never sooner than the regular schedule: a six-hour rate-limit wait
+     * must not make a daily config run again early.
      */
     public function deferNextRun(\DateTimeInterface $until): void
     {
-        $this->next_run_at = $until;
+        if ($this->next_run_at === null || $this->next_run_at->lessThan($until)) {
+            $this->next_run_at = $until;
+        }
         $this->save();
     }
 }

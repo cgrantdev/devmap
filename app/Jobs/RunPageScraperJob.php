@@ -15,6 +15,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Sleep;
 
 /**
  * Generic page scraper — fetches each product's page URL and extracts
@@ -33,6 +34,9 @@ class RunPageScraperJob implements ShouldBeUnique, ShouldQueue
     public int $timeout = 600;
     public int $backoff = 15;
 
+    /** Set when the store refuses a product page (401, 403 or 429). */
+    private ?int $refusedStatus = null;
+
     public function __construct(public ScrapingConfig $config) {}
 
     public function handle(IngestionService $ingestion): void
@@ -43,10 +47,14 @@ class RunPageScraperJob implements ShouldBeUnique, ShouldQueue
             return;
         }
 
-        // Get all products for this brand that have a product_url
+        // Get all products for this brand that have a product_url. Stalest
+        // first (never scraped sorts first), so a run cut off by the
+        // timeout still gets through the whole list over a few days.
         $products = Product::where('brand_id', $brandId)
             ->whereNotNull('product_url')
             ->where('product_url', '!=', '')
+            ->orderBy('last_scraped_at')
+            ->orderBy('id')
             ->get();
 
         if ($products->isEmpty()) {
@@ -61,6 +69,16 @@ class RunPageScraperJob implements ShouldBeUnique, ShouldQueue
         foreach ($products as $product) {
             try {
                 $data = $this->scrapeProductPage($product->product_url, $selectors);
+
+                // The store refused us: stop instead of asking for every
+                // remaining page. A block waits a day, a rate limit 6 hours.
+                if ($this->refusedStatus !== null) {
+                    $status = $this->refusedStatus;
+                    $this->recordFailure(($status === 429 ? 'Rate limited (429)' : 'Refused (' . $status . ')') . ' at ' . $product->product_url);
+                    $this->config->deferNextRun($status === 429 ? now()->addHours(6) : now()->addDay());
+
+                    return;
+                }
 
                 if (!$data) {
                     $errorCount++;
@@ -85,7 +103,7 @@ class RunPageScraperJob implements ShouldBeUnique, ShouldQueue
                 }
 
                 // Be polite — don't hammer the vendor's server
-                usleep(500_000); // 500ms between requests
+                Sleep::usleep(500_000); // 500ms between requests
             } catch (\Throwable $e) {
                 Log::warning('Page scrape failed for product', [
                     'product_id' => $product->id,
@@ -124,6 +142,12 @@ class RunPageScraperJob implements ShouldBeUnique, ShouldQueue
                 'Accept' => 'text/html',
             ])
             ->get($url);
+
+        if (in_array($response->status(), [401, 403, 429], true)) {
+            $this->refusedStatus = $response->status();
+
+            return null;
+        }
 
         if (!$response->successful()) {
             return null;

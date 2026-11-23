@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\ProductCategory;
 use App\Models\ScrapedProduct;
 use App\Models\ScrapingConfig;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -20,6 +22,9 @@ use Illuminate\Support\Str;
  */
 class IngestionService
 {
+    /** Category aliases, longest first (see matchCategoryByName). */
+    private ?Collection $aliases = null;
+
     /**
      * Upsert a single normalized product into the staging table.
      *
@@ -280,7 +285,7 @@ class IngestionService
                 // "DSIP (Delta Sleep Inducing Peptide 5mg)" and undo the work
                 // of every triage pass.
                 if ($product->auto_update || $staged->manual_override) {
-                    $product->update([
+                    $product->update(array_merge([
                         'description' => $staged->description,
                         'price' => $staged->price,
                         'discount_price' => $staged->discount_price,
@@ -288,7 +293,7 @@ class IngestionService
                         'product_url' => $staged->source_url,
                         'auto_scraped' => true,
                         'last_scraped_at' => $staged->last_scraped_at ?? now(),
-                    ]);
+                    ], $this->placeholderRepairs($product, $staged)));
                 }
                 // Backfill the link so subsequent promotes hit tier (1)
                 // directly and skip the URL/name lookups.
@@ -303,6 +308,7 @@ class IngestionService
                     'description' => $staged->description,
                     'brand_id' => $brandId,
                     'product_category_id' => $categoryId,
+                    'size_mg' => $this->sizeFrom($staged->dosage),
                     'price' => $staged->price,
                     'discount_price' => $staged->discount_price,
                     'image_url' => $staged->image_url,
@@ -318,6 +324,59 @@ class IngestionService
 
             return $product;
         });
+    }
+
+    /**
+     * "Discover Products" in admin names a product after its URL ("Cp1 Sg
+     * 10mg" for /products/cp1-sg-10mg) and hides it when that name matches
+     * no compound. Nobody chose that name, so the vendor's own name
+     * replaces it, an empty size is filled, and a hidden uncategorized row
+     * gets its compound and goes live once the real name matches one.
+     * Names, compounds and sizes a person set are left alone.
+     *
+     * @return array<string, mixed>
+     */
+    private function placeholderRepairs(Product $product, ScrapedProduct $staged): array
+    {
+        $name = trim((string) $staged->name);
+        $slug = basename((string) parse_url((string) $product->product_url, PHP_URL_PATH));
+        $slug = (string) preg_replace('/\.(html?|php|aspx?)$/', '', $slug);
+        if ($name === '' || $slug === '' || $product->name !== ucwords(str_replace(['-', '_'], ' ', $slug))) {
+            return [];
+        }
+
+        $repairs = ['name' => $name];
+
+        $size = $this->sizeFrom($staged->dosage);
+        if ($size !== null && trim((string) $product->size_mg) === '') {
+            $repairs['size_mg'] = $size;
+        }
+
+        $categoryId = $product->product_category_id;
+        $uncategorized = $categoryId === null
+            || ProductCategory::whereKey($categoryId)->where('slug', 'uncategorized')->exists();
+        $match = $uncategorized ? $this->matchCategoryByName($name) : null;
+        if ($match !== null) {
+            $repairs['product_category_id'] = $match;
+            $repairs['hidden'] = false;
+        }
+
+        return $repairs;
+    }
+
+    /**
+     * A staged size in the shape the admin product form accepts for
+     * size_mg ("10mg", "0.5 mg", "5mg/5mg"), or null.
+     */
+    private function sizeFrom(?string $dosage): ?string
+    {
+        $size = trim((string) $dosage);
+        if ($size === '' || strlen($size) > 50) {
+            return null;
+        }
+        $amount = '\d+(?:\.\d+)?\s?(?:mcg|mg|g|iu|ml|oz)?';
+
+        return preg_match('~^'.$amount.'(?:/'.$amount.')*$~i', $size) === 1 ? $size : null;
     }
 
     public function reject(ScrapedProduct $staged, ?string $reason = null): void
@@ -378,9 +437,10 @@ class IngestionService
     {
         if (empty($name)) return null;
 
-        // Cache aliases per-request to avoid hammering the DB during bulk syncs
-        static $aliases = null;
-        if ($aliases === null) {
+        // Cache aliases for this instance (one ingest run) so bulk syncs do
+        // not query them per product. A static cache outlived the run: a
+        // queue worker kept the aliases it first loaded until restarted.
+        if ($this->aliases === null) {
             // Longest alias wins. MySQL CHAR_LENGTH counts characters.
             // SQLite has no CHAR_LENGTH; its LENGTH() also counts characters.
             // Do not use MySQL LENGTH() here — that counts bytes.
@@ -388,13 +448,13 @@ class IngestionService
                 ? 'LENGTH(keyword)'
                 : 'CHAR_LENGTH(keyword)';
 
-            $aliases = DB::table('category_aliases')
+            $this->aliases = DB::table('category_aliases')
                 ->orderByRaw($lengthExpr.' DESC')
                 ->get(['keyword', 'product_category_id']);
         }
 
         $haystack = mb_strtolower($name);
-        foreach ($aliases as $alias) {
+        foreach ($this->aliases as $alias) {
             $needle = mb_strtolower($alias->keyword);
             if ($needle === '') continue;
             if (str_contains($haystack, $needle)) {
