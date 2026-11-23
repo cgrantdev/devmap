@@ -412,7 +412,7 @@ class EducationalContentPublisher
                 'og_title' => 'Are Research Peptides Legal? FDA & RUO Basics',
                 'og_description' => 'Educational explainer: FDA approval vs 503A compounding vs RUO, plus the draft HHS interim peptide enforcement-discretion policy of October 2026.',
                 'tag' => 'Regulation',
-                'read_time' => '25 Min Read',
+                'read_time' => '31 Min Read',
                 'published_at' => '2026-09-29',
                 'faq' => self::faq($host.'/guides/peptide-legality-fda-ruo-compounding#faq', [
                     ['Are research peptides legal to buy online?', 'There is no single yes/no answer for every peptide, seller, claim, and jurisdiction. RUO listings exist; FDA still polices unapproved new drugs marketed for human use. This page does not advise purchases.'],
@@ -1406,11 +1406,11 @@ class EducationalContentPublisher
                 'og_title' => 'Compounded vs RUO Peptides: The Draft HHS 503A Policy',
                 'og_description' => 'How the draft HHS 503A peptide enforcement-discretion policy works, what it does not do, and how compounded drugs differ from RUO-labelled peptides.',
                 'tag' => 'Regulation',
-                'read_time' => '13 Min Read',
+                'read_time' => '15 Min Read',
                 'published_at' => '2026-10-29',
                 'faq' => self::faq($host.'/guides/compounded-vs-ruo-peptides#faq', [
                     ['Did FDA approve these six peptides?', 'No. The notice comes from the HHS Office of the Secretary. It says compounded drugs are not FDA-approved, and none of the six is on the 503A Bulks List [1][2] [primary].'],
-                    ['Is the policy final?', 'No. The Federal Register notice calls it a draft and says it is not binding. Its two-week comment window closed on 13 Nov 2026, and no final version had been published as of 16 Nov 2026 [2][10] [primary].'],
+                    ['Is the policy final?', 'No. The Federal Register notice calls it a draft and says it is not binding. Its two-week comment window closed on 13 Nov 2026, and no final version had been published as of 23 Nov 2026 [2][10] [primary].'],
                     ['How long does it last?', 'No end date is given. It applies until a final rule addresses each substance, and HHS may revisit it at any time [1] [primary].'],
                     ['Does it cover blends such as BPC-157 with TB-500?', 'No. The draft requires a single listed active ingredient [1] [primary].'],
                     ['Does it cover RUO-labelled products?', 'No. Its terms depend on 503A compounding, a patient-specific prescription and registered CGMP sourcing. HHS calls foreign RUO peptides a safety risk [1] [primary].'],

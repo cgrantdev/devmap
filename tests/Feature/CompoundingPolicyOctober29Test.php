@@ -211,7 +211,8 @@ class CompoundingPolicyOctober29Test extends TestCase
         ));
         $catalogRead = collect((new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null))
             ->firstWhere('slug', self::GUIDE)['read_time'];
-        $this->assertSame('25 Min Read', $catalogRead);
+        // 23 Nov 2026 catalog value (2026_11_23_200000).
+        $this->assertSame('31 Min Read', $catalogRead);
         foreach ($this->guideCols() as $column => $spec) {
             if (isset($fresh[$column])) {
                 $this->assertSame([$spec['target_values'][0]], $fresh[$column]['old_values'], $column);
@@ -256,8 +257,8 @@ class CompoundingPolicyOctober29Test extends TestCase
     public function test_guide_reading_time_moves_from_20_or_19_to_21_and_is_guarded(): void
     {
         $this->assertSame('21 Min Read', $this->guideCols()['reading_time']['target_values'][0]);
-        // The catalog now carries the 16 Nov 2026 value (25 Min Read).
-        $this->assertSame('25 Min Read', collect((new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null))
+        // The catalog now carries the 23 Nov 2026 value (31 Min Read).
+        $this->assertSame('31 Min Read', collect((new \ReflectionMethod(EducationalContentPublisher::class, 'catalog'))->invoke(null))
             ->firstWhere('slug', self::GUIDE)['read_time']);
         $this->assertSame(['20 Min Read', '19 Min Read'], $this->guideCols()['reading_time']['old_values']);
         foreach (['20 Min Read', '19 Min Read'] as $old) {
