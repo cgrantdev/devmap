@@ -2483,7 +2483,7 @@ class EducationalContentTest extends TestCase
 
         $guideMarkdown = (string) file_get_contents(resource_path('content/educational/'.$guideSlug.'.md'));
         $guideWords = $this->renderedWordCount($guideMarkdown);
-        $this->assertSame(3378, $guideWords);
+        $this->assertSame(3379, $guideWords);
         $this->assertSame('15 Min Read', ((int) ceil($guideWords / 230)).' Min Read');
         $this->assertSame('15 Min Read', $guideEntry['read_time']);
         $this->assertStringContainsString('## FAQ', $guideMarkdown);

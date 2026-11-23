@@ -33,8 +33,8 @@ class EducationalFreshnessNovember16Test extends TestCase
      * @var array<string, array{0: int, 1: string}>
      */
     private const EXPECTED = [
-        'compounded-vs-ruo-peptides' => [3378, '15 Min Read'],
-        'peptide-legality-fda-ruo-compounding' => [7042, '31 Min Read'],
+        'compounded-vs-ruo-peptides' => [3379, '15 Min Read'],
+        'peptide-legality-fda-ruo-compounding' => [7040, '31 Min Read'],
         'bpc-157-vs-tb-500-evidence' => [4348, '19 Min Read'],
         'retatrutide-side-effects-trial-data' => [4717, '21 Min Read'],
         'retatrutide-vs-semaglutide' => [4181, '19 Min Read'],

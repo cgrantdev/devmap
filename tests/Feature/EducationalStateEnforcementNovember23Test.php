@@ -30,8 +30,8 @@ class EducationalStateEnforcementNovember23Test extends TestCase
 
     /** @var array<string, array{0: int, 1: string}> */
     private const EXPECTED = [
-        self::LEGALITY => [7042, '31 Min Read'],
-        self::COMPOUNDED => [3378, '15 Min Read'],
+        self::LEGALITY => [7040, '31 Min Read'],
+        self::COMPOUNDED => [3379, '15 Min Read'],
     ];
 
     private const FAQ_ANSWER = 'No. The Federal Register notice calls it a draft and says it is not binding. Its two-week comment window closed on 13 Nov 2026, and no final version had been published as of 23 Nov 2026 [2][10] [primary].';
@@ -309,7 +309,9 @@ class EducationalStateEnforcementNovember23Test extends TestCase
         }
         $stored = (string) $this->row(self::COMPOUNDED)->content;
         $this->assertStringContainsString('https://news.ashp.org/news/ashp-news/2026/11/18/ashp-and-accp-call-for-enforcement-of-hhs-interim-policy-on-peptides', $stored);
-        $this->assertStringContainsString('https://www.citizen.org/article/asleep-at-the-vial/', $stored);
+        // The report links seller sites and product pages, so it is cited unlinked.
+        $this->assertStringNotContainsString('citizen.org', $stored);
+        $this->assertStringContainsString('19 Nov 2026 (not linked). [advocacy report]', $stored);
         $this->assertStringContainsString('Kentucky Board of Pharmacy', $html);
         $this->assertStringContainsString('15 Min Read', $html);
     }
