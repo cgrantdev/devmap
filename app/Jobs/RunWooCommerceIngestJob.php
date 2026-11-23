@@ -2,10 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\OnePerScrapingConfig;
 use App\Models\ScrapedProduct;
 use App\Models\ScrapingConfig;
 use App\Services\IngestionService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\Client\RequestException;
@@ -14,14 +16,31 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class RunWooCommerceIngestJob implements ShouldQueue
+class RunWooCommerceIngestJob implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, OnePerScrapingConfig, Queueable, SerializesModels;
 
-    public int $tries = 3;
+    // One attempt per scheduled run: the schedule is the retry, so a failed
+    // or killed run does not hit the vendor again minutes later.
+    public int $tries = 1;
+
+    public int $timeout = 600;
     public int $backoff = 30;
 
+    /** Set when the store refuses a variation call mid-run (401, 403 or 429). */
+    private ?int $refusedStatus = null;
+
     public function __construct(public ScrapingConfig $config) {}
+
+    /**
+     * The store refused us: record it and wait before trying again. A
+     * revoked or blocked key waits a day; a rate limit waits six hours.
+     */
+    private function refused(int $status, string $where): void
+    {
+        $this->recordFailure(($status === 429 ? 'Rate limited (429)' : 'Authentication failed: '.$status).' at '.$where);
+        $this->config->deferNextRun($status === 429 ? now()->addHours(6) : now()->addDay());
+    }
 
     public function handle(IngestionService $ingestion): void
     {
@@ -52,8 +71,8 @@ class RunWooCommerceIngestJob implements ShouldQueue
                         'status' => 'publish',
                     ]);
 
-                if ($response->status() === 401 || $response->status() === 403) {
-                    $this->recordFailure('Authentication failed: ' . $response->status());
+                if (in_array($response->status(), [401, 403, 429], true)) {
+                    $this->refused($response->status(), 'products page ' . $page);
                     return;
                 }
 
@@ -75,6 +94,12 @@ class RunWooCommerceIngestJob implements ShouldQueue
                         $variants = $this->fetchVariations(
                             $storeUrl, $consumerKey, $consumerSecret, (int) $p['id']
                         );
+                        // The store refused a variation call: stop here
+                        // instead of calling it for every remaining product.
+                        if ($this->refusedStatus !== null) {
+                            $this->refused($this->refusedStatus, 'variations of product ' . $p['id']);
+                            return;
+                        }
 
                         foreach ($variants as $variant) {
                             $variantName = $this->buildVariantName($p, $variant);
@@ -172,6 +197,12 @@ class RunWooCommerceIngestJob implements ShouldQueue
                 ->timeout(20)
                 ->acceptJson()
                 ->get($endpoint, ['per_page' => 100]);
+
+            if (in_array($response->status(), [401, 403, 429], true)) {
+                $this->refusedStatus = $response->status();
+
+                return [];
+            }
 
             if (!$response->successful()) {
                 Log::warning('Variation fetch failed', [

@@ -79,6 +79,44 @@ class ScrapingConfig extends Model
             case 'weekly':
                 $this->next_run_at = $now->copy()->addWeek();
                 break;
+            default:
+                // Never leave next_run_at in the past: the scheduler checks
+                // every minute and would dispatch this config every minute.
+                $this->next_run_at = $now->copy()->addHour();
         }
+    }
+
+    /**
+     * Move next_run_at forward before an ingest is dispatched.
+     *
+     * Jobs also set it when they finish, but a run that is still queued,
+     * slow, or killed before it finished left the config "due", and the
+     * every-minute scheduler dispatched it again each minute. Southern
+     * Aminos saw about 1,300 requests an hour from that (23 Nov 2026).
+     *
+     * Returns false when another process claimed this run first.
+     */
+    public function claimScheduledRun(): bool
+    {
+        $due = $this->getRawOriginal('next_run_at');
+        $this->calculateNextRunAt();
+
+        $query = static::query()->whereKey($this->getKey());
+        $due === null ? $query->whereNull('next_run_at') : $query->where('next_run_at', $due);
+        $claimed = $query->update(['next_run_at' => $this->next_run_at]) === 1;
+
+        $this->syncOriginalAttribute('next_run_at');
+
+        return $claimed;
+    }
+
+    /**
+     * Push the next run out after the vendor refused us (revoked key,
+     * rate limit), so a dead integration is not retried every hour.
+     */
+    public function deferNextRun(\DateTimeInterface $until): void
+    {
+        $this->next_run_at = $until;
+        $this->save();
     }
 }

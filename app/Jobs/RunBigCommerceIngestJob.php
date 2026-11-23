@@ -2,10 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\OnePerScrapingConfig;
 use App\Models\ScrapedProduct;
 use App\Models\ScrapingConfig;
 use App\Services\IngestionService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\Client\RequestException;
@@ -30,11 +32,15 @@ use Illuminate\Support\Facades\Log;
  *   - auth_credentials.access_token     X-Auth-Token value
  *   - store_url                         (optional) public storefront URL for source_url
  */
-class RunBigCommerceIngestJob implements ShouldQueue
+class RunBigCommerceIngestJob implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, OnePerScrapingConfig, Queueable, SerializesModels;
 
-    public int $tries = 3;
+    // One attempt per scheduled run: the schedule is the retry, so a failed
+    // or killed run does not hit the vendor again minutes later.
+    public int $tries = 1;
+
+    public int $timeout = 600;
     public int $backoff = 30;
 
     public function __construct(public ScrapingConfig $config) {}
@@ -72,8 +78,11 @@ class RunBigCommerceIngestJob implements ShouldQueue
                         'is_visible' => true,
                     ]);
 
-                if ($response->status() === 401 || $response->status() === 403) {
-                    $this->recordFailure('Authentication failed: ' . $response->status());
+                if (in_array($response->status(), [401, 403, 429], true)) {
+                    // Refused: a revoked or blocked key waits a day, a rate
+                    // limit six hours, instead of the normal schedule.
+                    $this->recordFailure(($response->status() === 429 ? 'Rate limited (429)' : 'Authentication failed: '.$response->status()).' from BigCommerce');
+                    $this->config->deferNextRun($response->status() === 429 ? now()->addHours(6) : now()->addDay());
                     return;
                 }
                 if (!$response->successful()) {

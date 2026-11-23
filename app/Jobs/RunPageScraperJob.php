@@ -2,11 +2,13 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\OnePerScrapingConfig;
 use App\Models\Product;
 use App\Models\ScrapedProduct;
 use App\Models\ScrapingConfig;
 use App\Services\IngestionService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -20,11 +22,15 @@ use Illuminate\Support\Facades\Log;
  * platform (Medusa, Shopify, custom, etc.) by reading og: meta tags,
  * JSON-LD structured data, and optional CSS selectors.
  */
-class RunPageScraperJob implements ShouldQueue
+class RunPageScraperJob implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, OnePerScrapingConfig, Queueable, SerializesModels;
 
-    public int $tries = 2;
+    // One attempt per scheduled run: the schedule is the retry, so a failed
+    // or killed run does not hit the vendor again minutes later.
+    public int $tries = 1;
+
+    public int $timeout = 600;
     public int $backoff = 15;
 
     public function __construct(public ScrapingConfig $config) {}

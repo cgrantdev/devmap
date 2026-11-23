@@ -2,18 +2,26 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\OnePerScrapingConfig;
 use App\Models\ScrapingConfig;
 use App\Services\IngestionService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class RunPythonScraperJob implements ShouldQueue
+class RunPythonScraperJob implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, OnePerScrapingConfig, Queueable, SerializesModels;
+
+    // One attempt per scheduled run: the schedule is the retry, so a failed
+    // or killed run does not hit the vendor again minutes later.
+    public int $tries = 1;
+
+    public int $timeout = 600;
 
     public function __construct(public ScrapingConfig $config) {}
 

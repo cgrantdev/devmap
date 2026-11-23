@@ -2,10 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Jobs\Concerns\OnePerScrapingConfig;
 use App\Models\ScrapedProduct;
 use App\Models\ScrapingConfig;
 use App\Services\IngestionService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\Client\RequestException;
@@ -33,11 +35,15 @@ use Illuminate\Support\Facades\Log;
  *   - auth_credentials.region_id  (optional) Region ID for USD prices
  *   - auth_credentials.currency_code (optional, default 'usd')
  */
-class RunMedusaIngestJob implements ShouldQueue
+class RunMedusaIngestJob implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, OnePerScrapingConfig, Queueable, SerializesModels;
 
-    public int $tries = 3;
+    // One attempt per scheduled run: the schedule is the retry, so a failed
+    // or killed run does not hit the vendor again minutes later.
+    public int $tries = 1;
+
+    public int $timeout = 600;
     public int $backoff = 30;
 
     public function __construct(public ScrapingConfig $config) {}

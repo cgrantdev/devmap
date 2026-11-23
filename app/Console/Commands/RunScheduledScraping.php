@@ -51,6 +51,12 @@ class RunScheduledScraping extends Command
         $this->info("Found {$configsToRun->count()} scraping config(s) due to run.");
 
         foreach ($configsToRun as $config) {
+            // Reschedule before dispatching. A run that is queued, slow, or
+            // killed must not leave the config due on the next minute's tick.
+            if (! $config->claimScheduledRun()) {
+                continue;
+            }
+
             $type = $config->type ?? ScrapingConfig::TYPE_CSS_SCRAPE;
             $this->info("Dispatching {$type} job for config ID: {$config->id} (Vendor: {$config->vendor_name})");
             Log::info('Auto-scheduling ingestion job', [
