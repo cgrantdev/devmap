@@ -7,6 +7,7 @@ use App\Jobs\RunJsonFeedIngestJob;
 use App\Jobs\RunJsonLdIngestJob;
 use App\Jobs\RunMedusaIngestJob;
 use App\Jobs\RunWooCommerceIngestJob;
+use App\Jobs\RunWooStoreIngestJob;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,6 +36,10 @@ class ScrapingConfig extends Model
     // most WooCommerce themes). No API key required, no CSS selectors to
     // maintain — the schema is standard. See RunJsonLdIngestJob for shape.
     public const TYPE_JSON_LD = 'json_ld';
+    // WooCommerce's public Store API: every product and variation with its
+    // own price and link, no API keys. For Woo vendors who won't issue
+    // REST keys. See RunWooStoreIngestJob.
+    public const TYPE_WOO_STORE = 'woo_store';
 
     protected $fillable = [
         'vendor_id',
@@ -87,6 +92,7 @@ class ScrapingConfig extends Model
             self::TYPE_JSON_FEED => new RunJsonFeedIngestJob($this),
             self::TYPE_MEDUSA_STORE => new RunMedusaIngestJob($this),
             self::TYPE_JSON_LD => new RunJsonLdIngestJob($this),
+            self::TYPE_WOO_STORE => new RunWooStoreIngestJob($this),
             self::TYPE_BIGCOMMERCE => new RunBigCommerceIngestJob($this),
             default => null,
         };

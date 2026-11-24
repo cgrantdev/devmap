@@ -182,6 +182,10 @@ class IngestionService
             'shipping insurance',
             'route protection',      // Route.com shipping insurance
             'seel protection',       // Seel shipping/returns coverage
+            'chilled shipping',      // cold-pack shipping add-on (NextSelf Labs)
+            'cold pack',
+            'vial box',              // storage box sold beside the vials
+            'gift card',
         ];
         $lower = strtolower($name);
         foreach ($patterns as $needle) {
@@ -232,7 +236,13 @@ class IngestionService
         // when the source_url is null (some feeds don't carry it — but that
         // usually means the row came from an authenticated API where the
         // shape is trustworthy, e.g. WooCommerce REST).
-        if ($staged->source_url && !$this->looksLikeProductUrl($staged->source_url)) {
+        //
+        // HTML scrapes only: a feed, a store API or a schema.org Product
+        // names its products explicitly, and those stores' URLs need not
+        // follow the pattern (Vancouver Island Peptides: /bpc-157-canada.html,
+        // so every row from their feed was rejected).
+        $scraped = in_array($staged->source_type, [ScrapedProduct::SOURCE_CSS_SCRAPE, ScrapedProduct::SOURCE_PAGE_SCRAPE, null], true);
+        if ($scraped && $staged->source_url && !$this->looksLikeProductUrl($staged->source_url)) {
             $this->reject($staged, 'Source URL does not look like a product page: ' . $staged->source_url);
             return null;
         }

@@ -116,32 +116,18 @@ class RunJsonLdIngestJob implements ShouldBeUnique, ShouldQueue
                 }
                 if (!$html) { $skippedCount++; continue; }
 
-                $product = $this->extractProductJsonLd($html);
-                if (!$product) { $skippedCount++; continue; }
-
-                $offer = $this->pickOffer($product['offers'] ?? null, $currency);
-                if (!$offer || !isset($offer['price'])) { $skippedCount++; continue; }
-
-                $name = is_string($product['name'] ?? null) ? trim($product['name']) : null;
-
-                $staged = $ingestion->upsertStaged($this->config, [
-                    'source_type' => ScrapedProduct::SOURCE_JSON_LD,
-                    'external_id' => (string) ($product['sku'] ?? $product['@id'] ?? $absUrl),
-                    'source_url' => $absUrl,
-                    'name' => $name,
-                    'description' => is_string($product['description'] ?? null)
-                        ? trim(strip_tags($product['description'])) : null,
-                    'price' => (float) $offer['price'],
-                    'discount_price' => null,
-                    'image_url' => $this->firstString($product['image'] ?? null),
-                    'stock_status' => $this->stockStatus($offer['availability'] ?? null),
-                    'dosage' => self::sizeFromName($name),
-                    'raw_data' => [
-                        'sku' => $product['sku'] ?? null,
-                        'currency' => $offer['priceCurrency'] ?? null,
-                    ],
-                ]);
-                if ($staged) $stagedCount++;
+                // Every Product on the page (Vancouver Island Peptides puts
+                // one per variant on a page), each as one or more listings.
+                $listed = 0;
+                foreach ($this->extractProducts($html) as $product) {
+                    foreach ($this->listingsFor($product, $absUrl, $currency) as $listing) {
+                        $listed++;
+                        if ($ingestion->upsertStaged($this->config, $listing)) {
+                            $stagedCount++;
+                        }
+                    }
+                }
+                if ($listed === 0) { $skippedCount++; }
             }
 
             Log::info('JSON-LD ingest complete', [
@@ -170,12 +156,144 @@ class RunJsonLdIngestJob implements ShouldBeUnique, ShouldQueue
      */
     public static function sizeFromName(?string $name): ?string
     {
+        if (!$name) {
+            return null;
+        }
+        // "10 mg/vial", "10 mg per vial", "1 mg vial": the size is per vial.
+        $name = (string) preg_replace('~\s*(?:/\s*vial|per\s+vial|vials?)\s*$~i', '', trim($name));
         $amount = '\d+(?:\.\d+)?\s*(?:mcg|mg|iu|ml|g)';
-        if (!$name || !preg_match('~(?<![\w.])(' . $amount . '(?:\s*[+/]\s*' . $amount . ')*)\s*$~i', trim($name), $m)) {
+        if (!preg_match('~(?<![\w.])(' . $amount . '(?:\s*[+/]\s*' . $amount . ')*)\s*$~i', $name, $m)) {
             return null;
         }
 
         return str_replace('+', '/', strtolower((string) preg_replace('/\s+/', '', $m[1])));
+    }
+
+    /**
+     * The size at the end of a URL slug: "/product/adamax-5mg" → "5mg",
+     * "/product/NAD-1000-mg" → "1000mg". For stores whose product names
+     * leave the size out (Southern Labs).
+     */
+    public static function sizeFromUrl(?string $url): ?string
+    {
+        $slug = basename((string) parse_url((string) $url, PHP_URL_PATH));
+        $slug = (string) preg_replace('/\.(html?|php)$/i', '', $slug);
+        if (!preg_match('~(?:^|[-_])(\d+(?:\.\d+)?)[-_]?(mcg|mg|ml|iu)$~i', $slug, $m)) {
+            return null;
+        }
+
+        return $m[1] . strtolower($m[2]);
+    }
+
+    /**
+     * The staged rows for one Product node: one row per offer when the
+     * offers name sizes (V8 Peptides lists each size of a product as an
+     * offer named "10 mg"), otherwise one row at the first price in the
+     * wanted currency.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function listingsFor(array $product, string $pageUrl, string $currency): array
+    {
+        $name = is_string($product['name'] ?? null)
+            ? trim(html_entity_decode($product['name'], ENT_QUOTES | ENT_HTML5, 'UTF-8'))
+            : '';
+        if ($name === '') {
+            return [];
+        }
+
+        $description = is_string($product['description'] ?? null) ? trim(strip_tags($product['description'])) : null;
+        $url = $this->productUrl($product, $pageUrl);
+        $pack = $this->packNote($description);
+        $common = [
+            'source_type' => ScrapedProduct::SOURCE_JSON_LD,
+            'description' => $description,
+            'discount_price' => null,
+            'image_url' => $this->firstString($product['image'] ?? null),
+        ];
+
+        $nameSize = self::sizeFromName($name);
+        $sized = array_values(array_filter(
+            $this->offersIn($product['offers'] ?? null, $currency),
+            fn (array $offer) => self::sizeFromName(is_string($offer['name'] ?? null) ? $offer['name'] : null) !== null
+        ));
+
+        if ($sized !== [] && ($nameSize === null || count($sized) > 1)) {
+            $rows = [];
+            foreach ($sized as $offer) {
+                $label = trim((string) $offer['name']);
+                $offerUrl = $this->offerUrl($offer, $url, $label, count($sized) > 1);
+                $rows[] = $common + [
+                    'external_id' => (string) ($offer['sku'] ?? $offerUrl),
+                    'source_url' => $offerUrl,
+                    'name' => (stripos($name, $label) === false ? $name . ' ' . $label : $name) . $pack,
+                    'price' => (float) $offer['price'],
+                    'stock_status' => $this->stockStatus($offer['availability'] ?? null),
+                    'dosage' => self::sizeFromName($label),
+                    'raw_data' => ['sku' => $offer['sku'] ?? null, 'currency' => $offer['priceCurrency'] ?? null],
+                ];
+            }
+
+            return $rows;
+        }
+
+        $offer = $this->pickOffer($product['offers'] ?? null, $currency);
+        if (!$offer || !isset($offer['price'])) {
+            return [];
+        }
+        $size = $nameSize ?? self::sizeFromUrl($url);
+        // "Adamax" from /product/adamax-5mg is listed as "Adamax 5mg";
+        // "Water 30 mL bottle" already names its size.
+        $namesSize = $size !== null && str_contains(strtolower((string) preg_replace('/\s+/', '', $name)), $size);
+
+        return [$common + [
+            'external_id' => (string) ($product['sku'] ?? $product['@id'] ?? $pageUrl),
+            'source_url' => $url,
+            'name' => ($nameSize === null && $size !== null && !$namesSize ? $name . ' ' . $size : $name) . $pack,
+            'price' => (float) $offer['price'],
+            'stock_status' => $this->stockStatus($offer['availability'] ?? null),
+            'dosage' => $size,
+            'raw_data' => ['sku' => $product['sku'] ?? null, 'currency' => $offer['priceCurrency'] ?? null],
+        ]];
+    }
+
+    /**
+     * The product's own URL when it is this page (a variant fragment or
+     * query allowed: "...bpc-157-canada.html#variant-5"), else the page.
+     */
+    private function productUrl(array $product, string $pageUrl): string
+    {
+        $url = is_string($product['url'] ?? null) ? trim($product['url']) : '';
+        $strip = fn (string $u) => (string) preg_replace('~[?#].*$~', '', $u);
+
+        return $url !== '' && str_starts_with($url, 'http') && $strip($url) === $strip($pageUrl) ? $url : $pageUrl;
+    }
+
+    /**
+     * An offer's own URL. Offers that share the product URL get a fragment
+     * per size, or every size would land on the same product.
+     */
+    private function offerUrl(array $offer, string $productUrl, string $label, bool $several): string
+    {
+        $url = is_string($offer['url'] ?? null) && str_starts_with($offer['url'], 'http') ? $offer['url'] : $productUrl;
+        if ($several && $url === $productUrl && !str_contains($url, '#')) {
+            $url .= '#' . trim((string) preg_replace('/[^a-z0-9]+/', '-', strtolower($label)), '-');
+        }
+
+        return $url;
+    }
+
+    /**
+     * " — 10 vials" when the description sells a multi-vial pack
+     * ("Pack: 10 vials."), so the listing is not read as a single vial.
+     */
+    private function packNote(?string $description): string
+    {
+        return $description !== null
+            && preg_match('~\bPack:\s*(\d+)\s*vials?\b~i', $description, $m) === 1
+            && (int) $m[1] > 1
+            ? ' — ' . $m[1] . ' vials'
+            : '';
     }
 
     /**
@@ -299,34 +417,38 @@ class RunJsonLdIngestJob implements ShouldBeUnique, ShouldQueue
     }
 
     /**
-     * Pull the first JSON-LD block whose (nested) @type includes 'Product'.
-     * Handles arrays of blocks, @graph containers, and single objects.
+     * Every Product node in the page's JSON-LD blocks: top-level objects,
+     * arrays of blocks, @graph members, and a Product one level inside
+     * another node (WebPage.mainEntity).
+     *
+     * @return list<array<string, mixed>>
      */
-    private function extractProductJsonLd(string $html): ?array
+    private function extractProducts(string $html): array
     {
         preg_match_all('#<script[^>]+type="application/ld\+json"[^>]*>(.*?)</script>#si', $html, $matches);
+        $found = [];
         foreach ($matches[1] ?? [] as $raw) {
             $decoded = json_decode(trim($raw), true);
             if (!is_array($decoded)) continue;
-            $found = $this->findProductNode($decoded);
-            if ($found) return $found;
-        }
-        return null;
-    }
-
-    private function findProductNode(array $node): ?array
-    {
-        if ($this->isProductType($node['@type'] ?? null)) return $node;
-        if (isset($node['@graph']) && is_array($node['@graph'])) {
-            foreach ($node['@graph'] as $g) {
-                if (is_array($g) && $this->isProductType($g['@type'] ?? null)) return $g;
+            foreach (array_is_list($decoded) ? $decoded : [$decoded] as $node) {
+                if (!is_array($node)) continue;
+                if ($this->isProductType($node['@type'] ?? null)) {
+                    $found[] = $node;
+                    continue;
+                }
+                foreach ($node as $key => $value) {
+                    if (!is_array($value)) continue;
+                    $children = $key === '@graph' && array_is_list($value) ? $value : (array_is_list($value) ? [] : [$value]);
+                    foreach ($children as $child) {
+                        if (is_array($child) && $this->isProductType($child['@type'] ?? null)) {
+                            $found[] = $child;
+                        }
+                    }
+                }
             }
         }
-        // Array-of-blocks at the top level (some sites emit `[ {...Product}, {...Breadcrumb} ]`)
-        foreach ($node as $v) {
-            if (is_array($v) && $this->isProductType($v['@type'] ?? null)) return $v;
-        }
-        return null;
+
+        return $found;
     }
 
     private function isProductType(mixed $type): bool
@@ -342,29 +464,54 @@ class RunJsonLdIngestJob implements ShouldBeUnique, ShouldQueue
      */
     private function pickOffer(mixed $offers, string $currency): ?array
     {
-        if (!is_array($offers)) return null;
-
         // AggregateOffer — collapse to a synthetic offer keyed on lowPrice.
-        if (($offers['@type'] ?? null) === 'AggregateOffer') {
+        if (is_array($offers) && ($offers['@type'] ?? null) === 'AggregateOffer') {
             $price = $offers['lowPrice'] ?? $offers['price'] ?? null;
             return $price !== null ? ['price' => $price, 'priceCurrency' => $offers['priceCurrency'] ?? null] : null;
         }
 
-        // Single Offer object.
-        if (isset($offers['price']) || isset($offers['@type'])) {
-            return $offers;
+        return $this->offersIn($offers, $currency)[0] ?? null;
+    }
+
+    /**
+     * The priced offers, in page order, in the wanted currency when any
+     * offer uses it. A price may sit in priceSpecification (WooCommerce).
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function offersIn(mixed $offers, string $currency): array
+    {
+        if (!is_array($offers)) {
+            return [];
         }
 
-        // Array of Offer.
-        $currencyMatch = null;
-        foreach ($offers as $o) {
-            if (!is_array($o) || !isset($o['price'])) continue;
-            if (strtolower($o['priceCurrency'] ?? '') === $currency) {
-                return $o;
+        $priced = [];
+        foreach (array_is_list($offers) ? $offers : [$offers] as $offer) {
+            if (!is_array($offer) || ($offer['@type'] ?? null) === 'AggregateOffer') {
+                continue;
             }
-            $currencyMatch ??= $o;
+            $price = $offer['price'] ?? null;
+            $spec = $offer['priceSpecification'] ?? null;
+            if (($price === null || $price === '') && is_array($spec)) {
+                $first = array_is_list($spec) ? ($spec[0] ?? null) : $spec;
+                if (is_array($first)) {
+                    $price = $first['price'] ?? null;
+                    $offer['priceCurrency'] ??= $first['priceCurrency'] ?? null;
+                }
+            }
+            if (!is_numeric($price) || (float) $price <= 0) {
+                continue;
+            }
+            $offer['price'] = $price;
+            $priced[] = $offer;
         }
-        return $currencyMatch;
+
+        $wanted = array_values(array_filter(
+            $priced,
+            fn (array $offer) => strtolower((string) ($offer['priceCurrency'] ?? '')) === $currency
+        ));
+
+        return $wanted !== [] ? $wanted : $priced;
     }
 
     private function firstString(mixed $v): ?string

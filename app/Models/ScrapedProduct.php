@@ -24,6 +24,8 @@ class ScrapedProduct extends Model
     public const SOURCE_MEDUSA_STORE = 'medusa_store';
     public const SOURCE_BIGCOMMERCE = 'bigcommerce';
     public const SOURCE_JSON_LD = 'json_ld';
+    // WooCommerce's public Store API (no keys): RunWooStoreIngestJob.
+    public const SOURCE_WOO_STORE = 'woo_store';
 
     protected $fillable = [
         'scraping_config_id',

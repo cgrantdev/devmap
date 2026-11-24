@@ -1692,14 +1692,17 @@ class VendorsController extends Controller
         // JSON-LD, JSON feeds or BigCommerce and maps Medusa to the page
         // scraper, so every save of the vendor form turned those configs
         // back into a page scrape of the homepage (Capital Precision Labs,
-        // 24 Nov 2026). Choosing WooCommerce still switches to its API.
+        // 24 Nov 2026). Choosing WooCommerce switches to its REST API only
+        // when an API key is saved; without one that importer cannot run.
         $dedicated = [
             ScrapingConfig::TYPE_JSON_LD,
+            ScrapingConfig::TYPE_WOO_STORE,
             ScrapingConfig::TYPE_JSON_FEED,
             ScrapingConfig::TYPE_MEDUSA_STORE,
             ScrapingConfig::TYPE_BIGCOMMERCE,
         ];
-        if ($type !== 'woo_api'
+        $switchesToWooApi = $type === 'woo_api' && !empty($settings->api_key);
+        if (!$switchesToWooApi
             && ScrapingConfig::where('vendor_id', $brand->id)->whereIn('type', $dedicated)->exists()) {
             return;
         }
