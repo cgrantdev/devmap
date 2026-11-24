@@ -100,10 +100,21 @@ class RunJsonFeedIngestJob implements ShouldBeUnique, ShouldQueue
 
                     if (!$price && !$salePrice) continue;
 
+                    // Each variant needs its own URL: promote() matches an
+                    // unlinked row to a product by URL, so variants sharing
+                    // the product's URL all landed on the first variant's
+                    // listing and overwrote its price. The vendor's variant
+                    // URL when given, else a fragment per variant.
+                    $variantUrl = is_array($v) && is_string($v['url'] ?? null) && $v['url'] !== '' ? $v['url'] : ($p['url'] ?? null);
+                    if (is_string($variantUrl) && count($p['variants']) > 1 && $variantUrl === ($p['url'] ?? null)) {
+                        $fragment = trim((string) preg_replace('/[^a-z0-9]+/', '-', strtolower((string) ($size ?: $variantName))), '-');
+                        $variantUrl .= (str_contains($variantUrl, '#') ? '-' : '#') . $fragment;
+                    }
+
                     $staged = $ingestion->upsertStaged($this->config, [
                         'source_type' => ScrapedProduct::SOURCE_JSON_FEED,
                         'external_id' => $this->variantExternalId($p, $v),
-                        'source_url' => $p['url'] ?? null,
+                        'source_url' => $variantUrl,
                         'name' => $variantName,
                         'description' => $p['description'] ?? null,
                         'price' => $price,

@@ -255,6 +255,87 @@ class VendorImportersTest extends TestCase
         $this->assertDatabaseHas('products', ['product_url' => 'https://shop.example.com/bpc-157-canada.html']);
     }
 
+    public function test_feed_variants_of_one_product_stay_separate_listings(): void
+    {
+        $config = $this->config('variant-feed', ScrapingConfig::TYPE_JSON_FEED, 'https://shop.example.com/feed.json', null);
+        Http::fake([
+            'shop.example.com/feed.json' => Http::response(['products' => [[
+                'id' => 'bpc',
+                'name' => 'BPC-157',
+                'url' => 'https://shop.example.com/bpc-157-canada.html',
+                'variants' => [
+                    ['size' => '5', 'unit' => 'mg', 'price' => 30, 'in_stock' => true],
+                    ['size' => '10', 'unit' => 'mg', 'price' => 50, 'in_stock' => true],
+                ],
+            ]]]),
+            '*' => Http::response('', 404),
+        ]);
+
+        (new \App\Jobs\RunJsonFeedIngestJob($config))->handle(app(IngestionService::class));
+
+        $five = Product::where('product_url', 'https://shop.example.com/bpc-157-canada.html#5mg')->firstOrFail();
+        $ten = Product::where('product_url', 'https://shop.example.com/bpc-157-canada.html#10mg')->firstOrFail();
+        $this->assertEquals(30, (float) $five->price);
+        $this->assertEquals(50, (float) $ten->price);
+    }
+
+    public function test_the_vistara_cleanup_hides_a_legacy_duplicate(): void
+    {
+        $brand = Brand::create(['name' => 'Vistara Labs', 'slug' => 'vistara-labs', 'is_active' => true]);
+        $base = ['brand_id' => $brand->id, 'price' => 98, 'status' => 'active', 'hidden' => false];
+        $legacy = Product::create($base + [
+            'name' => 'BPC-157 Nasal Spray',
+            'slug' => 'bpc-157-nasal-spray-legacy',
+            'size_mg' => '350mcg',
+            'product_url' => 'https://vistaralabs.ca/bpc-157-nasal-spray-10mg/',
+            'image_url' => 'https://vistaralabs.ca/spray.webp',
+        ]);
+        $synced = Product::create($base + [
+            'name' => 'BPC-157 Nasal Spray',
+            'slug' => 'bpc-157-nasal-spray-synced',
+            'size_mg' => '10mg',
+            'external_id' => 'VL-bpc-157-nasal-spray-10mg',
+            'product_url' => 'https://vistaralabs.ca/bpc-157-nasal-spray-10mg/?attribute_size=10mg',
+        ]);
+
+        $migration = require database_path('migrations/2026_11_25_120000_vistara_hide_legacy_duplicates.php');
+        $migration->up();
+
+        $this->assertTrue((bool) $legacy->fresh()->hidden);
+        $this->assertFalse((bool) $synced->fresh()->hidden);
+        $this->assertSame('https://vistaralabs.ca/spray.webp', $synced->fresh()->image_url);
+
+        $migration->down();
+        $this->assertFalse((bool) $legacy->fresh()->hidden);
+    }
+
+    public function test_vancouver_island_gets_the_importer_that_can_work(): void
+    {
+        $migrationPath = database_path('migrations/2026_11_25_130000_vancouver_island_peptides_import.php');
+        $brand = Brand::create(['name' => 'Vancouver Island Peptides', 'slug' => 'vancouver-island-peptides', 'is_active' => true]);
+
+        // No feed anywhere: read the product pages.
+        (require $migrationPath)->up();
+        $config = ScrapingConfig::where('vendor_id', $brand->id)->firstOrFail();
+        $this->assertSame(ScrapingConfig::TYPE_JSON_LD, $config->type);
+        $this->assertSame('https://vancouverislandpeptides.com/sitemap.xml', $config->products_url);
+        $this->assertSame('~\.html$~i', $config->selectors['url_pattern']);
+
+        // A JSON feed saved in the XML-only "Product Feed" field: use it.
+        VendorSetting::create(['brand_id' => $brand->id, 'feed_url' => 'https://vancouverislandpeptides.com/api/peptidemap.json']);
+        (require $migrationPath)->up();
+        $config->refresh();
+        $this->assertSame(ScrapingConfig::TYPE_JSON_FEED, $config->type);
+        $this->assertSame('https://vancouverislandpeptides.com/api/peptidemap.json', $config->products_url);
+
+        // An enabled json_feed config is run again as it is.
+        $config->update(['next_run_at' => now()->addDay()]);
+        (require $migrationPath)->up();
+        $config->refresh();
+        $this->assertSame(ScrapingConfig::TYPE_JSON_FEED, $config->type);
+        $this->assertFalse($config->next_run_at->isFuture());
+    }
+
     public function test_the_report_lists_a_vendors_configs(): void
     {
         $config = $this->config('report-test', ScrapingConfig::TYPE_JSON_LD, 'https://shop.example.com/sitemap.xml', 'USD');
