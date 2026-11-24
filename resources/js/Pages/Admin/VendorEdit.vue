@@ -217,7 +217,7 @@
           </FormSection>
           <FormSection title="Payment Methods">
             <div class="flex flex-wrap gap-6">
-              <label v-for="method in ['Credit Card', 'PayPal', 'Cryptocurrency', 'Bank Transfer']" :key="method" class="flex items-center gap-2 text-sm">
+              <label v-for="method in ['Credit Card', 'PayPal', 'Google Pay', 'Interac e-Transfer', 'Cryptocurrency', 'Bank Transfer']" :key="method" class="flex items-center gap-2 text-sm">
                 <input type="checkbox" :value="method" v-model="editForm.payment_methods" class="w-4 h-4 accent-[color:var(--color-accent-600)]" />
                 {{ method }}
               </label>

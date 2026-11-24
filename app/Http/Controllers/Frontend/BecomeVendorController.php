@@ -100,7 +100,7 @@ class BecomeVendorController extends Controller
             'productCount' => [$full ? 'required' : 'nullable', 'string', 'max:50'],
             'companyDescription' => $text(50, 2000),
             'paymentMethods' => $full ? ['required', 'array', 'min:1'] : ['nullable', 'array'],
-            'paymentMethods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
+            'paymentMethods.*' => VendorSetting::paymentMethodRule(),
             // Character limits mirror the client-side counters in
             // BecomeVendor.vue (LIMITS constant). Kept slightly generous
             // server-side so trailing whitespace doesn't reject a valid

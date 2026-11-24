@@ -245,7 +245,7 @@
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-2">Payment Methods Accepted</label>
               <div class="grid grid-cols-2 gap-2">
-                <label v-for="method in ['Credit Card', 'PayPal', 'Cryptocurrency', 'Bank Transfer']" :key="method"
+                <label v-for="method in ['Credit Card', 'PayPal', 'Google Pay', 'Interac e-Transfer', 'Cryptocurrency', 'Bank Transfer']" :key="method"
                   class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50">
                   <input type="checkbox" :value="method" v-model="formData.paymentMethods" class="w-4 h-4 accent-slate-700" />
                   <span class="text-sm text-slate-700">{{ method }}</span>

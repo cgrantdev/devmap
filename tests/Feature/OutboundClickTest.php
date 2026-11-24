@@ -288,7 +288,10 @@ class OutboundClickTest extends TestCase
     public function test_shopify_coupon_redirect_keeps_product_path_and_referral_param(): void
     {
         $product = $this->makeGoProduct(
-            product: ['product_url' => 'https://acme.example.com/products/bpc-157'],
+            product: [
+                'product_url' => 'https://acme.example.com/products/bpc-157',
+                'image_url' => 'https://cdn.shopify.com/s/files/1/0001/products/bpc-157.png',
+            ],
             settings: [
                 'referral_url' => 'https://acme.example.com/?ref=PMAP',
                 'coupon_code' => 'PMAP',
@@ -301,6 +304,32 @@ class OutboundClickTest extends TestCase
         $this->withHeaders(['User-Agent' => 'Mozilla/5.0 (Test)'])
             ->get("/go/{$product->id}")
             ->assertRedirect($expected);
+    }
+
+    public function test_a_products_path_on_a_non_shopify_store_keeps_the_product_page(): void
+    {
+        // Capital Precision Labs: Next.js store, /products/ URLs, PMAP 10%.
+        $product = $this->makeGoProduct(
+            product: [
+                'product_url' => 'https://acme.example.com/products/bpc-157-10mg',
+                'image_url' => 'https://acme.example.com/products/bpc-157-10mg.png',
+            ],
+            settings: [
+                'referral_url' => 'https://acme.example.com/?ref=PMAP',
+                'coupon_code' => 'PMAP',
+                'coupon_discount_percent' => 10,
+            ],
+        );
+
+        $location = $this->withHeaders(['User-Agent' => 'Mozilla/5.0 (Test)'])
+            ->get("/go/{$product->id}")
+            ->assertStatus(302)
+            ->headers->get('Location');
+
+        $this->assertStringStartsWith('https://acme.example.com/products/bpc-157-10mg?', $location);
+        $this->assertStringNotContainsString('/discount/', $location);
+        $this->assertStringContainsString('ref=PMAP', $location);
+        $this->assertStringContainsString('coupon=PMAP', $location);
     }
 
     /**

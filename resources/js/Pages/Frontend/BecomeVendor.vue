@@ -578,6 +578,15 @@
                     />
                     <span class="text-sm text-slate-700">PayPal</span>
                   </label>
+                  <label v-for="method in ['Google Pay', 'Interac e-Transfer']" :key="method" class="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      :value="method"
+                      v-model="formData.paymentMethods"
+                      class="w-4 h-4 text-slate-700 border-slate-300 rounded focus:ring-slate-400"
+                    />
+                    <span class="text-sm text-slate-700">{{ method }}</span>
+                  </label>
                   <label class="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"

@@ -11,6 +11,25 @@ class VendorSetting extends Model
 {
     use HasFactory;
 
+    /**
+     * Payment methods a vendor can list. Every payment_methods validation
+     * rule and form uses this list (Google Pay and Interac e-Transfer
+     * added 25 Nov 2026 on a vendor's request).
+     */
+    public const PAYMENT_METHODS = [
+        'Credit Card',
+        'PayPal',
+        'Google Pay',
+        'Interac e-Transfer',
+        'Cryptocurrency',
+        'Bank Transfer',
+    ];
+
+    public static function paymentMethodRule(): string
+    {
+        return 'nullable|string|in:'.implode(',', self::PAYMENT_METHODS);
+    }
+
     // Any create/update/delete that could change which countries have
     // vendors invalidates the header CountrySelector's cache. Key matches
     // HandleInertiaRequests::share().

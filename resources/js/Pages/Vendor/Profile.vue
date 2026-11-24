@@ -417,7 +417,7 @@ const page = usePage()
 const isEditing = ref(false)
 const logoPreview = ref(null)
 
-const paymentMethodOptions = ['Credit Card', 'PayPal', 'Cryptocurrency', 'Bank Transfer']
+const paymentMethodOptions = ['Credit Card', 'PayPal', 'Google Pay', 'Interac e-Transfer', 'Cryptocurrency', 'Bank Transfer']
 
 const form = useForm({
   name: props.vendor?.name || '',

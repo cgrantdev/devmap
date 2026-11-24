@@ -265,6 +265,17 @@ class OutboundClickController extends Controller
         return $this->rebuildUrl($product);
     }
 
+    /**
+     * Shopify serves store images from cdn.shopify.com, or from
+     * /cdn/shop/ on the store's own domain.
+     */
+    protected function servedByShopify(Product $product): bool
+    {
+        $image = strtolower((string) $product->image_url);
+
+        return str_contains($image, 'cdn.shopify.com') || str_contains($image, '/cdn/shop/');
+    }
+
     protected function normalizeHost(string $host): string
     {
         $host = strtolower($host);
@@ -335,11 +346,17 @@ class OutboundClickController extends Controller
         $scrapeType = $product->brand_id
             ? ScrapingConfig::where('vendor_id', $product->brand_id)->value('type')
             : null;
+        // A /products/ path alone is not Shopify: Capital Precision Labs
+        // (Next.js) uses it too, and /discount/{code} 404s on any other
+        // platform, so every click landed on a 404 (25 Nov 2026). The
+        // Shopify route needs a Shopify signal: the myshopify.com host or
+        // a product image on Shopify's CDN.
         $looksShopify = str_contains($host, 'myshopify.com')
             || (str_contains($path, '/products/')
+                && $this->servedByShopify($product)
                 && !str_contains($host, 'medusajs.')
                 && !str_contains($host, 'bigcommerce.com')
-                && !in_array($scrapeType, ['medusa_store', 'bigcommerce', 'woo_api', 'wp_rest'], true));
+                && !in_array($scrapeType, ['medusa_store', 'bigcommerce', 'woo_api', 'woo_store', 'wp_rest'], true));
 
         if ($looksShopify) {
             // Shopify's canonical discount-application route. Preserves the

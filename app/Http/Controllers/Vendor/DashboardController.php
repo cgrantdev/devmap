@@ -659,7 +659,7 @@ class DashboardController extends Controller
             'return_policy' => 'nullable|string|max:5000',
             'business_hours' => 'nullable|string|max:255',
             'payment_methods' => 'nullable|array',
-            'payment_methods.*' => 'nullable|string|in:Credit Card,PayPal,Cryptocurrency,Bank Transfer',
+            'payment_methods.*' => VendorSetting::paymentMethodRule(),
             'usps' => 'nullable|array',
             'usps.*' => 'nullable|string|max:64',
             'logo' => 'nullable|mimes:png|max:2048',
