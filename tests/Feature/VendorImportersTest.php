@@ -58,6 +58,62 @@ class VendorImportersTest extends TestCase
         $this->assertSame('https://shop.example.com/products/bpc-157#10-mg', $ten->product_url);
     }
 
+    public function test_a_page_listed_by_size_hides_its_old_page_listing(): void
+    {
+        $config = $this->config('v8-retire', ScrapingConfig::TYPE_JSON_LD, 'https://shop.example.com/sitemap.xml', 'USD');
+        $page = 'https://shop.example.com/products/ghk-cu';
+        // What an earlier import made for the page itself: no size.
+        $old = Product::create([
+            'name' => 'GHK-Cu',
+            'slug' => 'ghk-cu-v8-retire',
+            'brand_id' => $config->vendor_id,
+            'price' => 40,
+            'product_url' => $page,
+            'status' => 'active',
+            'hidden' => false,
+        ]);
+        $this->fakeSite([$page => [[
+            '@type' => 'Product',
+            'name' => 'GHK-Cu',
+            'offers' => [
+                ['@type' => 'Offer', 'name' => '50 mg', 'price' => '40.00', 'priceCurrency' => 'USD', 'url' => $page],
+                ['@type' => 'Offer', 'name' => '100 mg', 'price' => '65.00', 'priceCurrency' => 'USD', 'url' => $page],
+            ],
+        ]]]);
+
+        (new RunJsonLdIngestJob($config))->handle(app(IngestionService::class));
+
+        $this->assertTrue((bool) $old->fresh()->hidden);
+        $this->assertSame(2, Product::where('brand_id', $config->vendor_id)->where('hidden', false)->count());
+    }
+
+    public function test_an_empty_size_is_filled_but_the_name_is_kept(): void
+    {
+        $config = $this->config('v8-size', ScrapingConfig::TYPE_JSON_LD, 'https://shop.example.com/sitemap.xml', 'USD');
+        $page = 'https://shop.example.com/products/bpc-157-research-peptide';
+        $old = Product::create([
+            'name' => 'BPC-157',
+            'slug' => 'bpc-157-v8-size',
+            'brand_id' => $config->vendor_id,
+            'price' => 60,
+            'product_url' => $page,
+            'status' => 'active',
+        ]);
+        $this->fakeSite([$page => [[
+            '@type' => 'Product',
+            'name' => 'BPC-157',
+            'offers' => [['@type' => 'Offer', 'name' => '10 mg', 'price' => '69.00', 'priceCurrency' => 'USD', 'url' => $page]],
+        ]]]);
+
+        (new RunJsonLdIngestJob($config))->handle(app(IngestionService::class));
+
+        $fresh = $old->fresh();
+        $this->assertSame('BPC-157', $fresh->name);
+        $this->assertSame('10mg', $fresh->size_mg);
+        $this->assertEquals(69, (float) $fresh->price);
+        $this->assertFalse((bool) $fresh->hidden);
+    }
+
     public function test_every_product_on_a_page_is_listed_with_its_pack(): void
     {
         // Vancouver Island Peptides: one Product per variant on a .html page,

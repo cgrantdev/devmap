@@ -342,6 +342,7 @@ class IngestionService
      * no compound. Nobody chose that name, so the vendor's own name
      * replaces it, an empty size is filled, and a hidden uncategorized row
      * gets its compound and goes live once the real name matches one.
+     * Any other product only gets an empty size filled (sizeRepair).
      * Names, compounds and sizes a person set are left alone.
      *
      * @return array<string, mixed>
@@ -352,15 +353,10 @@ class IngestionService
         $slug = basename((string) parse_url((string) $product->product_url, PHP_URL_PATH));
         $slug = (string) preg_replace('/\.(html?|php|aspx?)$/', '', $slug);
         if ($name === '' || $slug === '' || $product->name !== ucwords(str_replace(['-', '_'], ' ', $slug))) {
-            return [];
+            return $this->sizeRepair($product, $staged);
         }
 
-        $repairs = ['name' => $name];
-
-        $size = $this->sizeFrom($staged->dosage);
-        if ($size !== null && trim((string) $product->size_mg) === '') {
-            $repairs['size_mg'] = $size;
-        }
+        $repairs = ['name' => $name] + $this->sizeRepair($product, $staged);
 
         $categoryId = $product->product_category_id;
         $uncategorized = $categoryId === null
@@ -372,6 +368,19 @@ class IngestionService
         }
 
         return $repairs;
+    }
+
+    /**
+     * An empty size filled from the vendor's data ("BPC-157" whose page
+     * says 10 mg). A size someone set is never changed.
+     *
+     * @return array<string, string>
+     */
+    private function sizeRepair(Product $product, ScrapedProduct $staged): array
+    {
+        $size = $this->sizeFrom($staged->dosage);
+
+        return $size !== null && trim((string) $product->size_mg) === '' ? ['size_mg' => $size] : [];
     }
 
     /**

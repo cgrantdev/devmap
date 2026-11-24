@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Jobs\Concerns\OnePerScrapingConfig;
+use App\Models\Product;
 use App\Models\ScrapedProduct;
 use App\Models\ScrapingConfig;
 use App\Services\IngestionService;
@@ -118,16 +119,19 @@ class RunJsonLdIngestJob implements ShouldBeUnique, ShouldQueue
 
                 // Every Product on the page (Vancouver Island Peptides puts
                 // one per variant on a page), each as one or more listings.
-                $listed = 0;
+                $listedUrls = [];
                 foreach ($this->extractProducts($html) as $product) {
                     foreach ($this->listingsFor($product, $absUrl, $currency) as $listing) {
-                        $listed++;
+                        $listedUrls[] = $listing['source_url'];
                         if ($ingestion->upsertStaged($this->config, $listing)) {
                             $stagedCount++;
                         }
                     }
                 }
-                if ($listed === 0) { $skippedCount++; }
+                if ($listedUrls === []) { $skippedCount++; }
+                if (count($listedUrls) > 1 && !in_array($absUrl, $listedUrls, true)) {
+                    $this->retirePageListing($absUrl);
+                }
             }
 
             Log::info('JSON-LD ingest complete', [
@@ -255,6 +259,27 @@ class RunJsonLdIngestJob implements ShouldBeUnique, ShouldQueue
             'dosage' => $size,
             'raw_data' => ['sku' => $product['sku'] ?? null, 'currency' => $offer['priceCurrency'] ?? null],
         ]];
+    }
+
+    /**
+     * A page now listed size by size (URL#10-mg, URL#variant-5) supersedes
+     * the single listing an earlier import made for the page itself, which
+     * carried one size's price and no size. Hide that row so the page is
+     * not listed twice (V8 Peptides, 25 Nov 2026). Hidden, not deleted.
+     */
+    private function retirePageListing(string $pageUrl): void
+    {
+        $retired = Product::where('brand_id', $this->config->vendor_id)
+            ->where('product_url', $pageUrl)
+            ->where('hidden', false)
+            ->update(['hidden' => true]);
+        if ($retired > 0) {
+            Log::info('JSON-LD ingest: hid page-level listing superseded by per-size listings', [
+                'config_id' => $this->config->id,
+                'url' => $pageUrl,
+                'rows' => $retired,
+            ]);
+        }
     }
 
     /**
